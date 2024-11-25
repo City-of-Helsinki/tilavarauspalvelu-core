@@ -87,13 +87,11 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
                 # History & Redirect to Edit view
                 url_pattern.lookup_str.endswith((".history_view", ".RedirectView"))
                 # Custom views
-                or url_pattern.lookup_str.startswith(
-                    (
-                        "adminsortable2.",  # Updating the rank field order when moving instances in the list view
-                        "admin_extra_buttons.",  # Custom admin views
-                        "import_export.",  # Import/export views
-                    )
-                )
+                or url_pattern.lookup_str.startswith((
+                    "adminsortable2.",  # Updating the rank field order when moving instances in the list view
+                    "admin_extra_buttons.",  # Custom admin views
+                    "import_export.",  # Import/export views
+                ))
             ):
                 continue
             else:
@@ -111,14 +109,12 @@ def test_django_admin_site__pages_load__data_views():
     url_pattern: URLPattern
     for url_pattern in admin.site.get_admin_data_urls():
         # Views that we don't really want to test
-        if url_pattern.lookup_str.endswith(
-            (
-                ".download_json",  # Doesn't accept GET requests
-                ".download_csv",  # Doesn't accept GET requests
-                ".text_search_list_view",  # Does not work with LocMemCache
-                "_redirect_view",
-            )
-        ):
+        if url_pattern.lookup_str.endswith((
+            ".download_json",  # Doesn't accept GET requests
+            ".download_csv",  # Doesn't accept GET requests
+            ".text_search_list_view",  # Does not work with LocMemCache
+            "_redirect_view",
+        )):
             continue
 
         # Handle views that take arguments

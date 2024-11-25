@@ -51,8 +51,7 @@ def test_get_context__permission_deactivation__fi():
         "email_recipient_name": None,
         "title": "Henkilökunnan käyttöoikeutesi Varaamoon on vanhentumassa",
         "text_permission_deactivation": (
-            "Henkilökunnan käyttöoikeutesi Varaamoon vanhenee, "
-            "jos et kirjaudu sisään palveluun kahden viikon kuluessa."
+            "Henkilökunnan käyttöoikeutesi Varaamoon vanhenee, jos et kirjaudu sisään palveluun kahden viikon kuluessa."
         ),
         "text_login_to_prevent": "Kirjaudu palveluun osoitteessa",
         "login_url": "https://fake.varaamo.hel.fi/kasittely",

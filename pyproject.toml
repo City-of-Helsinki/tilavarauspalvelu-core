@@ -99,6 +99,7 @@ extend-exclude = [
 [tool.ruff.format]
 # Enable reformatting of code snippets in docstrings.
 docstring-code-format = true
+preview = true
 
 [tool.ruff.lint]
 explicit-preview-rules = true

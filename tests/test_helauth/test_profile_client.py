@@ -61,30 +61,28 @@ def test_helsinki_profile_client__prefill_info__all_primary():
 @patch_method(HelsinkiProfileClient.generic)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "HOME address": Params(
-                types=["NONE", "OTHER", "WORK", "HOME"],
-                select=-1,
-            ),
-            "WORK address": Params(
-                types=["NONE", "OTHER", "WORK"],
-                select=-1,
-            ),
-            "OTHER address": Params(
-                types=["NONE", "OTHER"],
-                select=-1,
-            ),
-            "NONE address": Params(
-                types=["NONE"],
-                select=-1,
-            ),
-            "highest priority address not last": Params(
-                types=["NONE", "HOME", "OTHER", "WORK"],
-                select=1,
-            ),
-        }
-    )
+    **parametrize_helper({
+        "HOME address": Params(
+            types=["NONE", "OTHER", "WORK", "HOME"],
+            select=-1,
+        ),
+        "WORK address": Params(
+            types=["NONE", "OTHER", "WORK"],
+            select=-1,
+        ),
+        "OTHER address": Params(
+            types=["NONE", "OTHER"],
+            select=-1,
+        ),
+        "NONE address": Params(
+            types=["NONE"],
+            select=-1,
+        ),
+        "highest priority address not last": Params(
+            types=["NONE", "HOME", "OTHER", "WORK"],
+            select=1,
+        ),
+    })
 )
 def test_helsinki_profile_client__prefill_info__highest_priority_address(types, select):
     addresses = [ProfileAddressFactory.create(addressType=type_) for type_ in types]
@@ -161,34 +159,32 @@ def test_helsinki_profile_client__prefill_info__no_address():
 @patch_method(HelsinkiProfileClient.generic)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "MOBILE phone": Params(
-                types=["NONE", "OTHER", "WORK", "HOME", "MOBILE"],
-                select=-1,
-            ),
-            "HOME phone": Params(
-                types=["NONE", "OTHER", "WORK", "HOME"],
-                select=-1,
-            ),
-            "WORK phone": Params(
-                types=["NONE", "OTHER", "WORK"],
-                select=-1,
-            ),
-            "OTHER phone": Params(
-                types=["NONE", "OTHER"],
-                select=-1,
-            ),
-            "NONE phone": Params(
-                types=["NONE"],
-                select=-1,
-            ),
-            "highest priority phone not last": Params(
-                types=["NONE", "OTHER", "MOBILE", "WORK", "HOME"],
-                select=2,
-            ),
-        }
-    )
+    **parametrize_helper({
+        "MOBILE phone": Params(
+            types=["NONE", "OTHER", "WORK", "HOME", "MOBILE"],
+            select=-1,
+        ),
+        "HOME phone": Params(
+            types=["NONE", "OTHER", "WORK", "HOME"],
+            select=-1,
+        ),
+        "WORK phone": Params(
+            types=["NONE", "OTHER", "WORK"],
+            select=-1,
+        ),
+        "OTHER phone": Params(
+            types=["NONE", "OTHER"],
+            select=-1,
+        ),
+        "NONE phone": Params(
+            types=["NONE"],
+            select=-1,
+        ),
+        "highest priority phone not last": Params(
+            types=["NONE", "OTHER", "MOBILE", "WORK", "HOME"],
+            select=2,
+        ),
+    })
 )
 def test_helsinki_profile_client__prefill_info__highest_priority_phone(types, select):
     phones = [ProfilePhoneFactory.create(phoneType=type_) for type_ in types]
@@ -217,30 +213,28 @@ def test_helsinki_profile_client__prefill_info__no_phone():
 @patch_method(HelsinkiProfileClient.generic)
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "PERSONAL address": Params(
-                types=["NONE", "OTHER", "WORK", "PERSONAL"],
-                select=-1,
-            ),
-            "WORK address": Params(
-                types=["NONE", "OTHER", "WORK"],
-                select=-1,
-            ),
-            "OTHER address": Params(
-                types=["NONE", "OTHER"],
-                select=-1,
-            ),
-            "NONE address": Params(
-                types=["NONE"],
-                select=-1,
-            ),
-            "highest priority email not last": Params(
-                types=["NONE", "PERSONAL", "OTHER", "WORK"],
-                select=1,
-            ),
-        }
-    )
+    **parametrize_helper({
+        "PERSONAL address": Params(
+            types=["NONE", "OTHER", "WORK", "PERSONAL"],
+            select=-1,
+        ),
+        "WORK address": Params(
+            types=["NONE", "OTHER", "WORK"],
+            select=-1,
+        ),
+        "OTHER address": Params(
+            types=["NONE", "OTHER"],
+            select=-1,
+        ),
+        "NONE address": Params(
+            types=["NONE"],
+            select=-1,
+        ),
+        "highest priority email not last": Params(
+            types=["NONE", "PERSONAL", "OTHER", "WORK"],
+            select=1,
+        ),
+    })
 )
 def test_helsinki_profile_client__prefill_info__highest_priority_email(types, select):
     emails = [ProfileEmailFactory.create(emailType=type_) for type_ in types]

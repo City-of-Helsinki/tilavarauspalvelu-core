@@ -244,48 +244,46 @@ def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_ex
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Date Start is in the past": ReservableParams(
-                filters=ReservableFilters(
-                    date_start=(NOW - datetime.timedelta(days=1)).date(),
-                ),
-                result="'reservable_date_start' must be not be in the past.",
+    **parametrize_helper({
+        "Date Start is in the past": ReservableParams(
+            filters=ReservableFilters(
+                date_start=(NOW - datetime.timedelta(days=1)).date(),
             ),
-            "Date End is in the past": ReservableParams(
-                filters=ReservableFilters(
-                    date_end=(NOW - datetime.timedelta(days=1)).date(),
-                ),
-                result="'reservable_date_end' must be not be in the past.",
+            result="'reservable_date_start' must be not be in the past.",
+        ),
+        "Date End is in the past": ReservableParams(
+            filters=ReservableFilters(
+                date_end=(NOW - datetime.timedelta(days=1)).date(),
             ),
-            "Date End is before Date Start": ReservableParams(
-                filters=ReservableFilters(
-                    date_start=_date(day=10),
-                    date_end=_date(day=9),
-                ),
-                result="'reservable_date_start' must be before 'reservable_date_end'.",
+            result="'reservable_date_end' must be not be in the past.",
+        ),
+        "Date End is before Date Start": ReservableParams(
+            filters=ReservableFilters(
+                date_start=_date(day=10),
+                date_end=_date(day=9),
             ),
-            "Time Start and End filters exact start time": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=15),
-                    time_end=datetime.time(hour=15),
-                ),
-                result="'reservable_time_start' must be before 'reservable_time_end'.",
+            result="'reservable_date_start' must be before 'reservable_date_end'.",
+        ),
+        "Time Start and End filters exact start time": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=15),
+                time_end=datetime.time(hour=15),
             ),
-            "Minimum duration minutes is zero": ReservableParams(
-                filters=ReservableFilters(
-                    minimum_duration_minutes=0,
-                ),
-                result="'minimum_duration_minutes' can not be less than '15'.",
+            result="'reservable_time_start' must be before 'reservable_time_end'.",
+        ),
+        "Minimum duration minutes is zero": ReservableParams(
+            filters=ReservableFilters(
+                minimum_duration_minutes=0,
             ),
-            "Minimum duration minutes less than 15": ReservableParams(
-                filters=ReservableFilters(
-                    minimum_duration_minutes=14,
-                ),
-                result="'minimum_duration_minutes' can not be less than '15'.",
+            result="'minimum_duration_minutes' can not be less than '15'.",
+        ),
+        "Minimum duration minutes less than 15": ReservableParams(
+            filters=ReservableFilters(
+                minimum_duration_minutes=14,
             ),
-        }
-    )
+            result="'minimum_duration_minutes' can not be less than '15'.",
+        ),
+    })
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__invalid_values(graphql, reservation_unit, filters, result):
@@ -300,59 +298,57 @@ def test__reservation_unit__first_reservable_time__filters__invalid_values(graph
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "No Results | Date Start is after the last reservable time": ReservableParams(
-                filters=ReservableFilters(
-                    date_start=_date(day=3),
-                ),
-                result=ReservableNode(is_closed=True),
+    **parametrize_helper({
+        "No Results | Date Start is after the last reservable time": ReservableParams(
+            filters=ReservableFilters(
+                date_start=_date(day=3),
             ),
-            "No Results | Date End is before next reservable time": ReservableParams(
-                filters=ReservableFilters(
-                    date_end=_date(day=1),
-                ),
-                result=ReservableNode(is_closed=True),
+            result=ReservableNode(is_closed=True),
+        ),
+        "No Results | Date End is before next reservable time": ReservableParams(
+            filters=ReservableFilters(
+                date_end=_date(day=1),
             ),
-            "No Results | Time Start is when time span ends": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=19),
-                ),
-                result=ReservableNode(is_closed=True),
+            result=ReservableNode(is_closed=True),
+        ),
+        "No Results | Time Start is when time span ends": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=19),
             ),
-            "No Results | Time Start is after all reservable times have ended": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=19, minute=1),
-                ),
-                result=ReservableNode(is_closed=True),
+            result=ReservableNode(is_closed=True),
+        ),
+        "No Results | Time Start is after all reservable times have ended": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=19, minute=1),
             ),
-            "No Results | Time End is when time span starts": ReservableParams(
-                filters=ReservableFilters(
-                    time_end=datetime.time(hour=15),
-                ),
-                result=ReservableNode(is_closed=True),
+            result=ReservableNode(is_closed=True),
+        ),
+        "No Results | Time End is when time span starts": ReservableParams(
+            filters=ReservableFilters(
+                time_end=datetime.time(hour=15),
             ),
-            "No Results | Time End is before any reservable time begins": ReservableParams(
-                filters=ReservableFilters(
-                    time_end=datetime.time(hour=14, minute=59),
-                ),
-                result=ReservableNode(is_closed=True),
+            result=ReservableNode(is_closed=True),
+        ),
+        "No Results | Time End is before any reservable time begins": ReservableParams(
+            filters=ReservableFilters(
+                time_end=datetime.time(hour=14, minute=59),
             ),
-            "No Results | Minimum Duration Minutes is longer than reservable time span": ReservableParams(
-                filters=ReservableFilters(
-                    minimum_duration_minutes=241,  # 4 hours + 1 minute
-                ),
-                result=ReservableNode(is_closed=False),
+            result=ReservableNode(is_closed=True),
+        ),
+        "No Results | Minimum Duration Minutes is longer than reservable time span": ReservableParams(
+            filters=ReservableFilters(
+                minimum_duration_minutes=241,  # 4 hours + 1 minute
             ),
-            "No Results | Time Start and Minimum duration cause reservable time to be too short": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=18, minute=1),
-                    minimum_duration_minutes=60,
-                ),
-                result=ReservableNode(is_closed=False),
+            result=ReservableNode(is_closed=False),
+        ),
+        "No Results | Time Start and Minimum duration cause reservable time to be too short": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=18, minute=1),
+                minimum_duration_minutes=60,
             ),
-        }
-    )
+            result=ReservableNode(is_closed=False),
+        ),
+    })
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no_first_reservable_time_exists(
@@ -388,75 +384,73 @@ def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Basic | No filters": ReservableParams(
-                filters=ReservableFilters(),
+    **parametrize_helper({
+        "Basic | No filters": ReservableParams(
+            filters=ReservableFilters(),
+        ),
+        "Basic | Only Date Start": ReservableParams(
+            filters=ReservableFilters(
+                date_start=_date(),
             ),
-            "Basic | Only Date Start": ReservableParams(
-                filters=ReservableFilters(
-                    date_start=_date(),
-                ),
+        ),
+        "Basic | Only Date End": ReservableParams(
+            filters=ReservableFilters(
+                date_end=_date(day=31),
             ),
-            "Basic | Only Date End": ReservableParams(
-                filters=ReservableFilters(
-                    date_end=_date(day=31),
-                ),
+        ),
+        "Basic | Start & End Date | Filters same as time span": ReservableParams(
+            filters=ReservableFilters(
+                date_start=_date(),
+                date_end=_date(),
             ),
-            "Basic | Start & End Date | Filters same as time span": ReservableParams(
-                filters=ReservableFilters(
-                    date_start=_date(),
-                    date_end=_date(),
-                ),
+        ),
+        "Basic | Only Time Start": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=13),
             ),
-            "Basic | Only Time Start": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=13),
-                ),
+        ),
+        "Basic | Only Time End": ReservableParams(
+            filters=ReservableFilters(
+                time_end=datetime.time(hour=14),
             ),
-            "Basic | Only Time End": ReservableParams(
-                filters=ReservableFilters(
-                    time_end=datetime.time(hour=14),
-                ),
+        ),
+        "Basic | Start & End Time | Filters same as time span": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=13),
+                time_end=datetime.time(hour=14),
             ),
-            "Basic | Start & End Time | Filters same as time span": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=13),
-                    time_end=datetime.time(hour=14),
-                ),
+        ),
+        "Basic | Only reservable_minimum_duration_minutes| Shorter than time span": ReservableParams(
+            filters=ReservableFilters(
+                minimum_duration_minutes=30,
+            )
+        ),
+        "Basic | Only reservable_minimum_duration_minutes | Same length as time span": ReservableParams(
+            filters=ReservableFilters(
+                minimum_duration_minutes=60,
             ),
-            "Basic | Only reservable_minimum_duration_minutes| Shorter than time span": ReservableParams(
-                filters=ReservableFilters(
-                    minimum_duration_minutes=30,
-                )
+        ),
+        "Basic | Only show_only_reservable True": ReservableParams(
+            filters=ReservableFilters(
+                show_only_reservable=True,
             ),
-            "Basic | Only reservable_minimum_duration_minutes | Same length as time span": ReservableParams(
-                filters=ReservableFilters(
-                    minimum_duration_minutes=60,
-                ),
+        ),
+        "Basic | Only show_only_reservable False": ReservableParams(
+            filters=ReservableFilters(
+                show_only_reservable=False,
             ),
-            "Basic | Only show_only_reservable True": ReservableParams(
-                filters=ReservableFilters(
-                    show_only_reservable=True,
-                ),
+        ),
+        "Basic | All filters": ReservableParams(
+            filters=ReservableFilters(
+                date_start=_date(),
+                date_end=_date(day=30),
+                time_start=datetime.time(),
+                time_end=datetime.time(hour=23, minute=59),
+                minimum_duration_minutes=30,
+                show_only_reservable=False,
             ),
-            "Basic | Only show_only_reservable False": ReservableParams(
-                filters=ReservableFilters(
-                    show_only_reservable=False,
-                ),
-            ),
-            "Basic | All filters": ReservableParams(
-                filters=ReservableFilters(
-                    date_start=_date(),
-                    date_end=_date(day=30),
-                    time_start=datetime.time(),
-                    time_end=datetime.time(hour=23, minute=59),
-                    minimum_duration_minutes=30,
-                    show_only_reservable=False,
-                ),
-            ),
-        }
-    )
+        ),
+    })
 )
 @freezegun.freeze_time(NOW)
 def test__query_reservation_unit_reservable__filters__should_not_exclude_time_span(
@@ -500,105 +494,103 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Simple | Date Start in the future": ReservableParams(
-                filters=ReservableFilters(
-                    date_start=_date(day=10),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=10, hour=16),
-                ),
+    **parametrize_helper({
+        "Simple | Date Start in the future": ReservableParams(
+            filters=ReservableFilters(
+                date_start=_date(day=10),
             ),
-            "Simple | Time End filter is early in the morning": ReservableParams(
-                filters=ReservableFilters(
-                    time_end=datetime.time(hour=9),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=5, hour=7),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=10, hour=16),
             ),
-            "Simple | Minimum Duration Minutes matches time span duration exactly": ReservableParams(
-                filters=ReservableFilters(
-                    minimum_duration_minutes=240,
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=10, hour=16),
-                ),
+        ),
+        "Simple | Time End filter is early in the morning": ReservableParams(
+            filters=ReservableFilters(
+                time_end=datetime.time(hour=9),
             ),
-            "Simple | Time Start is after Time Span start time, return valid next interval": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=12, minute=1),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=1, hour=12, minute=15),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=5, hour=7),
             ),
-            "Simple | Time Start filter is at next interval, since it's valid it should be returned": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=12, minute=1),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=1, hour=12, minute=15),
-                ),
+        ),
+        "Simple | Minimum Duration Minutes matches time span duration exactly": ReservableParams(
+            filters=ReservableFilters(
+                minimum_duration_minutes=240,
             ),
-            "Simple | Time Start and End filters together match time span exactly": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=16),
-                    time_end=datetime.time(hour=20),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=10, hour=16),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=10, hour=16),
             ),
-            "Simple | Time Start and End only partially contain the ReservableTimeSpan from start": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=16, minute=1),
-                    time_end=datetime.time(hour=20),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=10, hour=16, minute=15),
-                ),
+        ),
+        "Simple | Time Start is after Time Span start time, return valid next interval": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=12, minute=1),
             ),
-            "Simple | Time Start and End only partially contain the ReservableTimeSpan from end": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=16),
-                    time_end=datetime.time(hour=19, minute=59),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=10, hour=16),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=1, hour=12, minute=15),
             ),
-            "Simple | Time Start late at night, reservation ends at midnight": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=22),
-                    minimum_duration_minutes=120,
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=15, hour=22),
-                ),
+        ),
+        "Simple | Time Start filter is at next interval, since it's valid it should be returned": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=12, minute=1),
             ),
-            "Simple | Time Start is at midnight on time spans second day": ReservableParams(
-                filters=ReservableFilters(
-                    date_start=_date(day=16),
-                    time_start=datetime.time(hour=0),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=16, hour=0),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=1, hour=12, minute=15),
             ),
-        }
-    )
+        ),
+        "Simple | Time Start and End filters together match time span exactly": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=16),
+                time_end=datetime.time(hour=20),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=10, hour=16),
+            ),
+        ),
+        "Simple | Time Start and End only partially contain the ReservableTimeSpan from start": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=16, minute=1),
+                time_end=datetime.time(hour=20),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=10, hour=16, minute=15),
+            ),
+        ),
+        "Simple | Time Start and End only partially contain the ReservableTimeSpan from end": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=16),
+                time_end=datetime.time(hour=19, minute=59),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=10, hour=16),
+            ),
+        ),
+        "Simple | Time Start late at night, reservation ends at midnight": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=22),
+                minimum_duration_minutes=120,
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=15, hour=22),
+            ),
+        ),
+        "Simple | Time Start is at midnight on time spans second day": ReservableParams(
+            filters=ReservableFilters(
+                date_start=_date(day=16),
+                time_start=datetime.time(hour=0),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=16, hour=0),
+            ),
+        ),
+    })
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__simple(graphql, reservation_unit, filters, result):
@@ -653,49 +645,47 @@ def test__reservation_unit__first_reservable_time__filters__simple(graphql, rese
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Same day timespans | Time Start is after first time span": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=14),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(hour=16),
-                ),
+    **parametrize_helper({
+        "Same day timespans | Time Start is after first time span": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=14),
             ),
-            "Same day timespans | Time start in the middle of first time span": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=11),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(hour=11),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(hour=16),
             ),
-            "Same day timespans | Time start in the middle of first time span, minimum duration": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=11),
-                    minimum_duration_minutes=120,
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(hour=16),
-                ),
+        ),
+        "Same day timespans | Time start in the middle of first time span": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=11),
             ),
-            "Same day timespans | Time start in first time span, ends in last last, minimum duration": ReservableParams(
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=11),
-                    time_end=datetime.time(hour=17),
-                    minimum_duration_minutes=120,
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=None,
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(hour=11),
             ),
-        }
-    )
+        ),
+        "Same day timespans | Time start in the middle of first time span, minimum duration": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=11),
+                minimum_duration_minutes=120,
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(hour=16),
+            ),
+        ),
+        "Same day timespans | Time start in first time span, ends in last last, minimum duration": ReservableParams(
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=11),
+                time_end=datetime.time(hour=17),
+                minimum_duration_minutes=120,
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=None,
+            ),
+        ),
+    })
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__multiple_time_spans_on_the_same_day(
@@ -736,50 +726,48 @@ def test__reservation_unit__first_reservable_time__filters__multiple_time_spans_
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Multi-day | Time on the first day": ReservableParams(
-                filters=ReservableFilters(
-                    date_start=_date(day=1),
-                    time_start=datetime.time(hour=14),
-                    time_end=datetime.time(hour=16),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=1, hour=14),
-                ),
+    **parametrize_helper({
+        "Multi-day | Time on the first day": ReservableParams(
+            filters=ReservableFilters(
+                date_start=_date(day=1),
+                time_start=datetime.time(hour=14),
+                time_end=datetime.time(hour=16),
             ),
-            "Multi-day | Time on the second day": ReservableParams(
-                filters=ReservableFilters(
-                    date_start=_date(day=2),
-                    time_start=datetime.time(hour=14),
-                    time_end=datetime.time(hour=16),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=2, hour=14),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=1, hour=14),
             ),
-            "Multi-day | Time End filter causes midnight of second day to be returned": ReservableParams(
-                filters=ReservableFilters(
-                    time_end=datetime.time(hour=12, minute=59),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=2, hour=0),
-                ),
+        ),
+        "Multi-day | Time on the second day": ReservableParams(
+            filters=ReservableFilters(
+                date_start=_date(day=2),
+                time_start=datetime.time(hour=14),
+                time_end=datetime.time(hour=16),
             ),
-            "Multi-day | Minimum duration is 25 hours": ReservableParams(
-                filters=ReservableFilters(
-                    minimum_duration_minutes=60 * 25,
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=1, hour=13),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=2, hour=14),
             ),
-        }
-    )
+        ),
+        "Multi-day | Time End filter causes midnight of second day to be returned": ReservableParams(
+            filters=ReservableFilters(
+                time_end=datetime.time(hour=12, minute=59),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=2, hour=0),
+            ),
+        ),
+        "Multi-day | Minimum duration is 25 hours": ReservableParams(
+            filters=ReservableFilters(
+                minimum_duration_minutes=60 * 25,
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=1, hour=13),
+            ),
+        ),
+    })
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters__multiple_days_long_time_span(
@@ -819,100 +807,98 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "ReservationUnit Settings | reservation_begins": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_begins=_datetime(day=20, hour=17),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=20, hour=17),
-                ),
+    **parametrize_helper({
+        "ReservationUnit Settings | reservation_begins": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservation_begins=_datetime(day=20, hour=17),
             ),
-            "ReservationUnit Settings | reservation_begins in the middle of time span": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_begins=_datetime(day=20, hour=18, minute=1),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=20, hour=18, minute=15),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=20, hour=17),
             ),
-            "ReservationUnit Settings | reservation_ends causes no results": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_ends=_datetime(day=11),
-                ),
-                result=ReservableNode(
-                    is_closed=True,
-                    first_reservable_datetime=None,
-                ),
+        ),
+        "ReservationUnit Settings | reservation_begins in the middle of time span": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservation_begins=_datetime(day=20, hour=18, minute=1),
             ),
-            "ReservationUnit Settings | publish_ends causes no results": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    publish_ends=_datetime(day=11, hour=13),
-                ),
-                result=ReservableNode(
-                    is_closed=True,
-                    first_reservable_datetime=None,
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=20, hour=18, minute=15),
             ),
-            "ReservationUnit Settings | reservations_min_days_before": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservations_min_days_before=19,  # Blocks Jan 1st to 19th
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=20, hour=17),
-                ),
+        ),
+        "ReservationUnit Settings | reservation_ends causes no results": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservation_ends=_datetime(day=11),
             ),
-            "ReservationUnit Settings | reservations_min_days_before uses beginning of the day": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservations_min_days_before=20,  # Blocks Jan 1st to 20th
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=21, hour=0),
-                ),
+            result=ReservableNode(
+                is_closed=True,
+                first_reservable_datetime=None,
             ),
-            "ReservationUnit Settings | reservations_max_days_before": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservations_max_days_before=12,  # Blocks days from Jan 13th onwards
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=12, hour=13),
-                ),
+        ),
+        "ReservationUnit Settings | publish_ends causes no results": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                publish_ends=_datetime(day=11, hour=13),
             ),
-            "ReservationUnit Settings | reservations_max_days_before uses beginning of the day": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservations_max_days_before=11,  # Blocks days from Jan 12th onwards
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=None,
-                ),
+            result=ReservableNode(
+                is_closed=True,
+                first_reservable_datetime=None,
             ),
-            "ReservationUnit Settings | min_reservation_duration": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    min_reservation_duration=datetime.timedelta(hours=2),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=20, hour=17),
-                ),
+        ),
+        "ReservationUnit Settings | reservations_min_days_before": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservations_min_days_before=19,  # Blocks Jan 1st to 19th
             ),
-            "ReservationUnit Settings | max_reservation_duration": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    max_reservation_duration=datetime.timedelta(hours=2),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=12, hour=13),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=20, hour=17),
             ),
-        }
-    )
+        ),
+        "ReservationUnit Settings | reservations_min_days_before uses beginning of the day": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservations_min_days_before=20,  # Blocks Jan 1st to 20th
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=21, hour=0),
+            ),
+        ),
+        "ReservationUnit Settings | reservations_max_days_before": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservations_max_days_before=12,  # Blocks days from Jan 13th onwards
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=12, hour=13),
+            ),
+        ),
+        "ReservationUnit Settings | reservations_max_days_before uses beginning of the day": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservations_max_days_before=11,  # Blocks days from Jan 12th onwards
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=None,
+            ),
+        ),
+        "ReservationUnit Settings | min_reservation_duration": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                min_reservation_duration=datetime.timedelta(hours=2),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=20, hour=17),
+            ),
+        ),
+        "ReservationUnit Settings | max_reservation_duration": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                max_reservation_duration=datetime.timedelta(hours=2),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=12, hour=13),
+            ),
+        ),
+    })
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__reservation_unit_settings(
@@ -957,97 +943,95 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Advanced | Min duration is longer than Max duration allowed by reservation unit": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    max_reservation_duration=datetime.timedelta(
-                        minutes=120,
-                    ),
-                ),
-                filters=ReservableFilters(
-                    minimum_duration_minutes=121,
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=None,
+    **parametrize_helper({
+        "Advanced | Min duration is longer than Max duration allowed by reservation unit": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                max_reservation_duration=datetime.timedelta(
+                    minutes=120,
                 ),
             ),
-            "Advanced | Greater minimum durations is used > min_reservation_duration": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    min_reservation_duration=datetime.timedelta(minutes=61),
-                ),
-                filters=ReservableFilters(
-                    minimum_duration_minutes=60,
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=20, hour=17),
-                ),
+            filters=ReservableFilters(
+                minimum_duration_minutes=121,
             ),
-            "Advanced | Greater minimum durations is used > reservable_minimum_duration_minutes": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    min_reservation_duration=datetime.timedelta(minutes=60),
-                ),
-                filters=ReservableFilters(
-                    minimum_duration_minutes=61,
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=20, hour=17),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=None,
             ),
-            "Advanced | Next interval is a non-default value": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
-                ),
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=13, minute=1),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=12, hour=13, minute=30),
-                ),
+        ),
+        "Advanced | Greater minimum durations is used > min_reservation_duration": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                min_reservation_duration=datetime.timedelta(minutes=61),
             ),
-            "Advanced | Next interval doesn't leave enough duration for the minimum duration": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
-                ),
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=13, minute=1),
-                    minimum_duration_minutes=31,
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=20, hour=17),
-                ),
+            filters=ReservableFilters(
+                minimum_duration_minutes=60,
             ),
-            "Advanced | Next interval is at the end of the time span": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES.value,
-                ),
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=13, minute=1),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=20, hour=17),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=20, hour=17),
             ),
-            "Advanced | Next interval is outside time span": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    reservation_start_interval=ReservationStartInterval.INTERVAL_90_MINUTES.value,
-                ),
-                filters=ReservableFilters(
-                    time_start=datetime.time(hour=13, minute=1),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=20, hour=17),
-                ),
+        ),
+        "Advanced | Greater minimum durations is used > reservable_minimum_duration_minutes": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                min_reservation_duration=datetime.timedelta(minutes=60),
             ),
-        }
-    )
+            filters=ReservableFilters(
+                minimum_duration_minutes=61,
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=20, hour=17),
+            ),
+        ),
+        "Advanced | Next interval is a non-default value": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
+            ),
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=13, minute=1),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=12, hour=13, minute=30),
+            ),
+        ),
+        "Advanced | Next interval doesn't leave enough duration for the minimum duration": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
+            ),
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=13, minute=1),
+                minimum_duration_minutes=31,
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=20, hour=17),
+            ),
+        ),
+        "Advanced | Next interval is at the end of the time span": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES.value,
+            ),
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=13, minute=1),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=20, hour=17),
+            ),
+        ),
+        "Advanced | Next interval is outside time span": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                reservation_start_interval=ReservationStartInterval.INTERVAL_90_MINUTES.value,
+            ),
+            filters=ReservableFilters(
+                time_start=datetime.time(hour=13, minute=1),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=20, hour=17),
+            ),
+        ),
+    })
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_settings_combined(
@@ -1092,145 +1076,143 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "ApplicationRound | Period overlaps, Status=OPEN, ReservationUnit not part of round": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_date(day=1),
-                    reservation_period_end=_date(day=20),
-                    reservation_units=[],
-                ),
-                filters=ReservableFilters(),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=15, hour=12),
-                ),
+    **parametrize_helper({
+        "ApplicationRound | Period overlaps, Status=OPEN, ReservationUnit not part of round": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.OPEN,
+                reservation_period_begin=_date(day=1),
+                reservation_period_end=_date(day=20),
+                reservation_units=[],
             ),
-            "ApplicationRound | Period overlaps, STATUS=UPCOMING": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.UPCOMING,
-                    reservation_period_begin=_date(day=1),
-                    reservation_period_end=_date(day=20),
-                ),
-                filters=ReservableFilters(),
-                result=ReservableNode(
-                    is_closed=True,
-                    first_reservable_datetime=None,
-                ),
+            filters=ReservableFilters(),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=15, hour=12),
             ),
-            "ApplicationRound | Period overlaps, Status=OPEN": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_date(day=1),
-                    reservation_period_end=_date(day=20),
-                ),
-                filters=ReservableFilters(),
-                result=ReservableNode(
-                    is_closed=True,
-                    first_reservable_datetime=None,
-                ),
+        ),
+        "ApplicationRound | Period overlaps, STATUS=UPCOMING": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.UPCOMING,
+                reservation_period_begin=_date(day=1),
+                reservation_period_end=_date(day=20),
             ),
-            "ApplicationRound | Period overlaps, Status=IN_ALLOCATION": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.IN_ALLOCATION,
-                    reservation_period_begin=_date(day=1),
-                    reservation_period_end=_date(day=20),
-                ),
-                filters=ReservableFilters(),
-                result=ReservableNode(
-                    is_closed=True,
-                    first_reservable_datetime=None,
-                ),
+            filters=ReservableFilters(),
+            result=ReservableNode(
+                is_closed=True,
+                first_reservable_datetime=None,
             ),
-            "ApplicationRound | Period overlaps, Status=HANDLED": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.HANDLED,
-                    reservation_period_begin=_date(day=1),
-                    reservation_period_end=_date(day=20),
-                ),
-                filters=ReservableFilters(),
-                result=ReservableNode(
-                    is_closed=True,
-                    first_reservable_datetime=None,
-                ),
+        ),
+        "ApplicationRound | Period overlaps, Status=OPEN": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.OPEN,
+                reservation_period_begin=_date(day=1),
+                reservation_period_end=_date(day=20),
             ),
-            "ApplicationRound | Period overlaps, Status=RESULTS_SENT": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.RESULTS_SENT,
-                    reservation_period_begin=_date(day=1),
-                    reservation_period_end=_date(day=20),
-                ),
-                filters=ReservableFilters(),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=15, hour=12),
-                ),
+            filters=ReservableFilters(),
+            result=ReservableNode(
+                is_closed=True,
+                first_reservable_datetime=None,
             ),
-            "ApplicationRound | Not overlapping, Period in the past, Status=UPCOMING": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.UPCOMING,
-                    reservation_period_begin=_date(day=1),
-                    reservation_period_end=_date(day=10),
-                ),
-                filters=ReservableFilters(),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=15, hour=12),
-                ),
+        ),
+        "ApplicationRound | Period overlaps, Status=IN_ALLOCATION": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.IN_ALLOCATION,
+                reservation_period_begin=_date(day=1),
+                reservation_period_end=_date(day=20),
             ),
-            "ApplicationRound | Not overlapping, Period in the future, Status=OPEN": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_date(day=20),
-                    reservation_period_end=_date(day=30),
-                ),
-                filters=ReservableFilters(),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=15, hour=12),
-                ),
+            filters=ReservableFilters(),
+            result=ReservableNode(
+                is_closed=True,
+                first_reservable_datetime=None,
             ),
-            "ApplicationRound | Period partially overlaps, Status=OPEN": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_date(day=14),
-                    reservation_period_end=_date(day=15),
-                ),
-                filters=ReservableFilters(),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(day=16, hour=0),
-                ),
+        ),
+        "ApplicationRound | Period overlaps, Status=HANDLED": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.HANDLED,
+                reservation_period_begin=_date(day=1),
+                reservation_period_end=_date(day=20),
             ),
-            "ApplicationRound | Period partially overlaps, Status=OPEN, Min duration too long": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_date(day=14),
-                    reservation_period_end=_date(day=15),
-                ),
-                filters=ReservableFilters(
-                    minimum_duration_minutes=61,
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=None,
-                ),
+            filters=ReservableFilters(),
+            result=ReservableNode(
+                is_closed=True,
+                first_reservable_datetime=None,
             ),
-            "ApplicationRound | Period ends on the day of time span, STATUS=OPEN": AR_ReservableParams(
-                application_round_params=ApplicationStatusParams(
-                    status=ApplicationRoundStatusChoice.OPEN,
-                    reservation_period_begin=_date(day=14),
-                    reservation_period_end=_date(day=16),
-                ),
-                filters=ReservableFilters(),
-                result=ReservableNode(
-                    is_closed=True,
-                    first_reservable_datetime=None,
-                ),
+        ),
+        "ApplicationRound | Period overlaps, Status=RESULTS_SENT": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.RESULTS_SENT,
+                reservation_period_begin=_date(day=1),
+                reservation_period_end=_date(day=20),
             ),
-        }
-    )
+            filters=ReservableFilters(),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=15, hour=12),
+            ),
+        ),
+        "ApplicationRound | Not overlapping, Period in the past, Status=UPCOMING": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.UPCOMING,
+                reservation_period_begin=_date(day=1),
+                reservation_period_end=_date(day=10),
+            ),
+            filters=ReservableFilters(),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=15, hour=12),
+            ),
+        ),
+        "ApplicationRound | Not overlapping, Period in the future, Status=OPEN": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.OPEN,
+                reservation_period_begin=_date(day=20),
+                reservation_period_end=_date(day=30),
+            ),
+            filters=ReservableFilters(),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=15, hour=12),
+            ),
+        ),
+        "ApplicationRound | Period partially overlaps, Status=OPEN": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.OPEN,
+                reservation_period_begin=_date(day=14),
+                reservation_period_end=_date(day=15),
+            ),
+            filters=ReservableFilters(),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(day=16, hour=0),
+            ),
+        ),
+        "ApplicationRound | Period partially overlaps, Status=OPEN, Min duration too long": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.OPEN,
+                reservation_period_begin=_date(day=14),
+                reservation_period_end=_date(day=15),
+            ),
+            filters=ReservableFilters(
+                minimum_duration_minutes=61,
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=None,
+            ),
+        ),
+        "ApplicationRound | Period ends on the day of time span, STATUS=OPEN": AR_ReservableParams(
+            application_round_params=ApplicationStatusParams(
+                status=ApplicationRoundStatusChoice.OPEN,
+                reservation_period_begin=_date(day=14),
+                reservation_period_end=_date(day=16),
+            ),
+            filters=ReservableFilters(),
+            result=ReservableNode(
+                is_closed=True,
+                first_reservable_datetime=None,
+            ),
+        ),
+    })
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__application_rounds(
@@ -1251,9 +1233,9 @@ def test__reservation_unit__first_reservable_time__application_rounds(
     if application_round_params.reservation_units is None:
         application_round_params.reservation_units = [reservation_unit]
 
-    ApplicationRoundFactory.create_in_status(
-        **{k: v for k, v in asdict(application_round_params).items() if v is not None}
-    )
+    ApplicationRoundFactory.create_in_status(**{
+        k: v for k, v in asdict(application_round_params).items() if v is not None
+    })
 
     # 15th Jan 12:00 - 16th Jan 01:00 (13h)
     ReservableTimeSpanFactory.create(
@@ -1822,30 +1804,28 @@ def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_tim
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Buffers | Different length buffers are overlapping": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    buffer_time_before=datetime.timedelta(minutes=60),
-                    buffer_time_after=datetime.timedelta(minutes=60),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(hour=16, minute=30),
-                ),
+    **parametrize_helper({
+        "Buffers | Different length buffers are overlapping": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                buffer_time_before=datetime.timedelta(minutes=60),
+                buffer_time_after=datetime.timedelta(minutes=60),
             ),
-            "Buffers | Asymmetric different length buffers are overlapping": RU_ReservableParams(
-                reservation_unit_settings=ReservationUnitOverrides(
-                    buffer_time_before=datetime.timedelta(),
-                    buffer_time_after=datetime.timedelta(minutes=60),
-                ),
-                result=ReservableNode(
-                    is_closed=False,
-                    first_reservable_datetime=dt(hour=16),
-                ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(hour=16, minute=30),
             ),
-        }
-    )
+        ),
+        "Buffers | Asymmetric different length buffers are overlapping": RU_ReservableParams(
+            reservation_unit_settings=ReservationUnitOverrides(
+                buffer_time_before=datetime.timedelta(),
+                buffer_time_after=datetime.timedelta(minutes=60),
+            ),
+            result=ReservableNode(
+                is_closed=False,
+                first_reservable_datetime=dt(hour=16),
+            ),
+        ),
+    })
 )
 @freezegun.freeze_time(NOW)
 def test__reservation_unit__first_reservable_time__buffers__different_length_buffers_are_overlapping(

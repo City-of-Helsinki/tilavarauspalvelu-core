@@ -47,23 +47,19 @@ def test_verkkokauppa__product_types__product__from_json():
 
 def test_verkkokauppa__product_types__product__from_json__raises_exception_if_key_is_missing():
     with pytest.raises(ParseProductError):
-        Product.from_json(
-            {
-                "namespace": "some-namespace",
-                "namespaceEntityId": "some-entity-id",
-            }
-        )
+        Product.from_json({
+            "namespace": "some-namespace",
+            "namespaceEntityId": "some-entity-id",
+        })
 
 
 def test_verkkokauppa__product_types__product__from_json__raises_exception_if_value_is_invalid():
     with pytest.raises(ParseProductError):
-        Product.from_json(
-            {
-                "productId": "invalid-product-id",
-                "namespace": "some-namespace",
-                "namespaceEntityId": "some-entity-id",
-            }
-        )
+        Product.from_json({
+            "productId": "invalid-product-id",
+            "namespace": "some-namespace",
+            "namespaceEntityId": "some-entity-id",
+        })
 
 
 def test_verkkokauppa__product_types__create_or_update_accounting_params__to_json():
@@ -142,14 +138,12 @@ def test_verkkokauppa__product_types__accounting_params__from_json():
 
 def test_verkkokauppa__product_types__accounting_params__from_json__raises_exception_if_key_is_missing():
     with pytest.raises(ParseAccountingError):
-        Accounting.from_json(
-            {
-                "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
-                "vatCode": "vat-code",
-                "internalOrder": "internal-order",
-                "profitCenter": "profit-center",
-                "project": "project",
-                "operationArea": "operation-area",
-                "companyCode": "CODE",
-            }
-        )
+        Accounting.from_json({
+            "productId": "306ab20a-6b30-3ce3-95e8-fef818e6c30e",
+            "vatCode": "vat-code",
+            "internalOrder": "internal-order",
+            "profitCenter": "profit-center",
+            "project": "project",
+            "operationArea": "operation-area",
+            "companyCode": "CODE",
+        })

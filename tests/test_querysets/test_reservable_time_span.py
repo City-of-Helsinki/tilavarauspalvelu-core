@@ -23,65 +23,63 @@ class OverlapParams(NamedTuple):
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "starts before period start and ends before period start": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 9, tzinfo=datetime.UTC),
-                overlaps=False,
-            ),
-            "starts before period start and ends at period start": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
-                overlaps=False,
-            ),
-            "starts before period start and ends after period start": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 11, tzinfo=datetime.UTC),
-                overlaps=True,
-            ),
-            "starts before period start and ends at period end": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
-                overlaps=True,
-            ),
-            "starts after period start and ends before period end": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 11, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 13, tzinfo=datetime.UTC),
-                overlaps=True,
-            ),
-            "starts at period start and ends at period end": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
-                overlaps=True,
-            ),
-            "starts before period start and ends after period end": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
-                overlaps=True,
-            ),
-            "starts at period start and ends after period end": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
-                overlaps=True,
-            ),
-            "starts before period end and ends after period end": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 13, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
-                overlaps=True,
-            ),
-            "starts at period end and ends after period end": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
-                overlaps=False,
-            ),
-            "starts after period end and ends after period end": OverlapParams(
-                start=datetime.datetime(2024, 1, 1, 15, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
-                overlaps=False,
-            ),
-        }
-    ),
+    **parametrize_helper({
+        "starts before period start and ends before period start": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 9, tzinfo=datetime.UTC),
+            overlaps=False,
+        ),
+        "starts before period start and ends at period start": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
+            overlaps=False,
+        ),
+        "starts before period start and ends after period start": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 11, tzinfo=datetime.UTC),
+            overlaps=True,
+        ),
+        "starts before period start and ends at period end": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
+            overlaps=True,
+        ),
+        "starts after period start and ends before period end": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 11, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 13, tzinfo=datetime.UTC),
+            overlaps=True,
+        ),
+        "starts at period start and ends at period end": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
+            overlaps=True,
+        ),
+        "starts before period start and ends after period end": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
+            overlaps=True,
+        ),
+        "starts at period start and ends after period end": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
+            overlaps=True,
+        ),
+        "starts before period end and ends after period end": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 13, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
+            overlaps=True,
+        ),
+        "starts at period end and ends after period end": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
+            overlaps=False,
+        ),
+        "starts after period end and ends after period end": OverlapParams(
+            start=datetime.datetime(2024, 1, 1, 15, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
+            overlaps=False,
+        ),
+    }),
 )
 def test_reservable_time_span__overlapping_with_period(start, end, overlaps):
     origin_hauki_resource = OriginHaukiResourceFactory.create(id=205872)
@@ -102,65 +100,63 @@ class FillParams(NamedTuple):
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "starts before period start and ends before period start": FillParams(
-                start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 9, tzinfo=datetime.UTC),
-                fills=False,
-            ),
-            "starts before period start and ends at period start": FillParams(
-                start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
-                fills=False,
-            ),
-            "starts before period start and ends after period start": FillParams(
-                start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 11, tzinfo=datetime.UTC),
-                fills=False,
-            ),
-            "starts before period start and ends at period end": FillParams(
-                start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
-                fills=True,
-            ),
-            "starts after period start and ends before period end": FillParams(
-                start=datetime.datetime(2024, 1, 1, 11, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 13, tzinfo=datetime.UTC),
-                fills=False,
-            ),
-            "starts at period start and ends at period end": FillParams(
-                start=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
-                fills=True,
-            ),
-            "starts before period start and ends after period end": FillParams(
-                start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
-                fills=True,
-            ),
-            "starts at period start and ends after period end": FillParams(
-                start=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
-                fills=True,
-            ),
-            "starts before period end and ends after period end": FillParams(
-                start=datetime.datetime(2024, 1, 1, 13, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
-                fills=False,
-            ),
-            "starts at period end and ends after period end": FillParams(
-                start=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
-                fills=False,
-            ),
-            "starts after period end and ends after period end": FillParams(
-                start=datetime.datetime(2024, 1, 1, 15, tzinfo=datetime.UTC),
-                end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
-                fills=False,
-            ),
-        }
-    ),
+    **parametrize_helper({
+        "starts before period start and ends before period start": FillParams(
+            start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 9, tzinfo=datetime.UTC),
+            fills=False,
+        ),
+        "starts before period start and ends at period start": FillParams(
+            start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
+            fills=False,
+        ),
+        "starts before period start and ends after period start": FillParams(
+            start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 11, tzinfo=datetime.UTC),
+            fills=False,
+        ),
+        "starts before period start and ends at period end": FillParams(
+            start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
+            fills=True,
+        ),
+        "starts after period start and ends before period end": FillParams(
+            start=datetime.datetime(2024, 1, 1, 11, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 13, tzinfo=datetime.UTC),
+            fills=False,
+        ),
+        "starts at period start and ends at period end": FillParams(
+            start=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
+            fills=True,
+        ),
+        "starts before period start and ends after period end": FillParams(
+            start=datetime.datetime(2024, 1, 1, 8, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
+            fills=True,
+        ),
+        "starts at period start and ends after period end": FillParams(
+            start=datetime.datetime(2024, 1, 1, 10, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
+            fills=True,
+        ),
+        "starts before period end and ends after period end": FillParams(
+            start=datetime.datetime(2024, 1, 1, 13, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
+            fills=False,
+        ),
+        "starts at period end and ends after period end": FillParams(
+            start=datetime.datetime(2024, 1, 1, 14, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
+            fills=False,
+        ),
+        "starts after period end and ends after period end": FillParams(
+            start=datetime.datetime(2024, 1, 1, 15, tzinfo=datetime.UTC),
+            end=datetime.datetime(2024, 1, 1, 16, tzinfo=datetime.UTC),
+            fills=False,
+        ),
+    }),
 )
 def test_reservable_time_span__fully_fill_period(start, end, fills):
     origin_hauki_resource = OriginHaukiResourceFactory.create(id=205872)

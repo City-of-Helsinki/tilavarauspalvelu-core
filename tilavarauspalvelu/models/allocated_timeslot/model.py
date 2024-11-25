@@ -67,10 +67,9 @@ class AllocatedTimeSlot(models.Model):
         ]
 
     def __str__(self) -> str:
-        return (
-            f"{Weekday(self.day_of_the_week).label} "
-            f"{self.begin_time.isoformat(timespec="minutes")}-{self.end_time.isoformat(timespec="minutes")}"
-        )
+        begin_time = self.begin_time.isoformat(timespec="minutes")
+        end_time = self.end_time.isoformat(timespec="minutes")
+        return f"{Weekday(self.day_of_the_week).label} {begin_time}-{end_time}"
 
     @cached_property
     def actions(self) -> AllocatedTimeSlotActions:

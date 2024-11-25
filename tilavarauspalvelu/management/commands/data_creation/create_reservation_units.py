@@ -1550,12 +1550,10 @@ def _create_reservation_units_in_resource_hierarchies(
     reservation_units.append(meeting_room_unit)
     pricings.append(pricing_base.build(reservation_unit=meeting_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=meeting_room_unit, space=meeting_room))
-    reservation_unit_resources.extend(
-        (
-            ResourceThoughModel(reservationunit=meeting_room_unit, resource=coffee_machine),
-            ResourceThoughModel(reservationunit=meeting_room_unit, resource=printer),
-        )
-    )
+    reservation_unit_resources.extend((
+        ResourceThoughModel(reservationunit=meeting_room_unit, resource=coffee_machine),
+        ResourceThoughModel(reservationunit=meeting_room_unit, resource=printer),
+    ))
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=meeting_room_unit,
@@ -1569,12 +1567,10 @@ def _create_reservation_units_in_resource_hierarchies(
     reservation_units.append(break_room_unit)
     pricings.append(pricing_base.build(reservation_unit=break_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=break_room_unit, space=break_room))
-    reservation_unit_resources.extend(
-        (
-            ResourceThoughModel(reservationunit=break_room_unit, resource=coffee_machine),
-            ResourceThoughModel(reservationunit=break_room_unit, resource=printer),
-        )
-    )
+    reservation_unit_resources.extend((
+        ResourceThoughModel(reservationunit=break_room_unit, resource=coffee_machine),
+        ResourceThoughModel(reservationunit=break_room_unit, resource=printer),
+    ))
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=break_room_unit,

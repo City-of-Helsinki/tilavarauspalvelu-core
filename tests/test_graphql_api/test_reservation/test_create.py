@@ -205,30 +205,28 @@ class BufferParams(NamedTuple):
 
 @pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.BLOCKED, ReservationTypeChoice.NORMAL])
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Reservation Buffer Before": BufferParams(
-                reservation_delta_time=-datetime.timedelta(hours=1),
-                reservation_unit_buffer_before=datetime.timedelta(minutes=1),
-                error_message="Reservation overlaps with reservation before due to buffer time.",
-            ),
-            "Reservation Buffer After": BufferParams(
-                reservation_delta_time=datetime.timedelta(hours=1),
-                reservation_unit_buffer_after=datetime.timedelta(minutes=1),
-                error_message="Reservation overlaps with reservation after due to buffer time.",
-            ),
-            "Reservation Unit Buffer Before": BufferParams(
-                reservation_delta_time=-datetime.timedelta(hours=1),
-                reservation_unit_buffer_before=datetime.timedelta(minutes=1),
-                error_message="Reservation overlaps with reservation before due to buffer time.",
-            ),
-            "Reservation Unit Buffer After": BufferParams(
-                reservation_delta_time=datetime.timedelta(hours=1),
-                reservation_unit_buffer_after=datetime.timedelta(minutes=1),
-                error_message="Reservation overlaps with reservation after due to buffer time.",
-            ),
-        }
-    )
+    **parametrize_helper({
+        "Reservation Buffer Before": BufferParams(
+            reservation_delta_time=-datetime.timedelta(hours=1),
+            reservation_unit_buffer_before=datetime.timedelta(minutes=1),
+            error_message="Reservation overlaps with reservation before due to buffer time.",
+        ),
+        "Reservation Buffer After": BufferParams(
+            reservation_delta_time=datetime.timedelta(hours=1),
+            reservation_unit_buffer_after=datetime.timedelta(minutes=1),
+            error_message="Reservation overlaps with reservation after due to buffer time.",
+        ),
+        "Reservation Unit Buffer Before": BufferParams(
+            reservation_delta_time=-datetime.timedelta(hours=1),
+            reservation_unit_buffer_before=datetime.timedelta(minutes=1),
+            error_message="Reservation overlaps with reservation before due to buffer time.",
+        ),
+        "Reservation Unit Buffer After": BufferParams(
+            reservation_delta_time=datetime.timedelta(hours=1),
+            reservation_unit_buffer_after=datetime.timedelta(minutes=1),
+            error_message="Reservation overlaps with reservation after due to buffer time.",
+        ),
+    })
 )
 def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
     graphql,
@@ -383,18 +381,16 @@ class ReservationTimeParams(NamedTuple):
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Reservation began in the past": ReservationTimeParams(reservation_begins_delta=-10),
-            "Reservation begins in the future": ReservationTimeParams(reservation_begins_delta=10, is_error=True),
-            "Reservation ended in the past": ReservationTimeParams(reservation_ends_delta=-10, is_error=True),
-            "Reservation ends in the future": ReservationTimeParams(reservation_ends_delta=10),
-            "Publish began in the past": ReservationTimeParams(publish_begins_delta=-10),
-            "Publish begins in the future": ReservationTimeParams(publish_begins_delta=10, is_error=True),
-            "Publish ended in the past": ReservationTimeParams(publish_ends_delta=-10, is_error=True),
-            "Publish ends in the future": ReservationTimeParams(publish_ends_delta=10),
-        }
-    )
+    **parametrize_helper({
+        "Reservation began in the past": ReservationTimeParams(reservation_begins_delta=-10),
+        "Reservation begins in the future": ReservationTimeParams(reservation_begins_delta=10, is_error=True),
+        "Reservation ended in the past": ReservationTimeParams(reservation_ends_delta=-10, is_error=True),
+        "Reservation ends in the future": ReservationTimeParams(reservation_ends_delta=10),
+        "Publish began in the past": ReservationTimeParams(publish_begins_delta=-10),
+        "Publish begins in the future": ReservationTimeParams(publish_begins_delta=10, is_error=True),
+        "Publish ended in the past": ReservationTimeParams(publish_ends_delta=-10, is_error=True),
+        "Publish ends in the future": ReservationTimeParams(publish_ends_delta=10),
+    })
 )
 def test_reservation__create__reservation_unit_reservation_and_publish_in_the_past_or_future(
     graphql,
@@ -627,30 +623,28 @@ class ReservationsMinMaxDaysParams(NamedTuple):
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Max days before exceeded": ReservationsMinMaxDaysParams(
-                reservation_days_delta=2,
-                reservations_max_days_before=2,
-                error_message="Reservation start time is earlier than 2 days before.",
-            ),
-            "Max days before in limits": ReservationsMinMaxDaysParams(
-                reservation_days_delta=0,
-                reservations_max_days_before=2,
-                error_message=None,
-            ),
-            "Min days before in limits": ReservationsMinMaxDaysParams(
-                reservation_days_delta=2,
-                reservations_min_days_before=2,
-                error_message=None,
-            ),
-            "Min days before subceeded": ReservationsMinMaxDaysParams(
-                reservation_days_delta=0,
-                reservations_min_days_before=2,
-                error_message="Reservation start time is later than 2 days before.",
-            ),
-        }
-    )
+    **parametrize_helper({
+        "Max days before exceeded": ReservationsMinMaxDaysParams(
+            reservation_days_delta=2,
+            reservations_max_days_before=2,
+            error_message="Reservation start time is earlier than 2 days before.",
+        ),
+        "Max days before in limits": ReservationsMinMaxDaysParams(
+            reservation_days_delta=0,
+            reservations_max_days_before=2,
+            error_message=None,
+        ),
+        "Min days before in limits": ReservationsMinMaxDaysParams(
+            reservation_days_delta=2,
+            reservations_min_days_before=2,
+            error_message=None,
+        ),
+        "Min days before subceeded": ReservationsMinMaxDaysParams(
+            reservation_days_delta=0,
+            reservations_min_days_before=2,
+            error_message="Reservation start time is later than 2 days before.",
+        ),
+    })
 )
 def test_reservation__create__reservation_unit_reservations_min_and_max_days_before_and_after(
     graphql,
