@@ -8,10 +8,11 @@ from typing import Any
 import pytest
 from django.conf import settings
 
-from tests.helpers import patch_method
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import ParsePaymentError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment
 from utils.sentry import SentryLogger
+
+from tests.helpers import patch_method
 
 get_payment_response: dict[str, Any] = {
     "paymentId": "08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",

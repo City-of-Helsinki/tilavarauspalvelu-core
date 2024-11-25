@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ReservationFactory
 from tilavarauspalvelu.enums import UserRoleChoice
+
+from tests.factories import ReservationFactory
 
 from .helpers import REQUIRE_HANDLING_MUTATION, get_require_handling_data
 

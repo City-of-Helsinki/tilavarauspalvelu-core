@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ReservationUnitOptionFactory
 from tilavarauspalvelu.enums import Weekday
+
+from tests.factories import ReservationUnitOptionFactory
 
 from .helpers import UPDATE_MUTATION
 

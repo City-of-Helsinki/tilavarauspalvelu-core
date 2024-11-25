@@ -7,6 +7,17 @@ from django.test import override_settings
 from freezegun import freeze_time
 from social_django.models import UserSocialAuth
 
+from tilavarauspalvelu.enums import ApplicationStatusChoice, OrderStatus, ReservationNotification
+from tilavarauspalvelu.models import GeneralRole, UnitRole, User
+from tilavarauspalvelu.models.user.actions import (
+    ANONYMIZED,
+    ANONYMIZED_FIRST_NAME,
+    ANONYMIZED_LAST_NAME,
+    SENSITIVE_APPLICATION,
+    SENSITIVE_RESERVATION,
+)
+from utils.date_utils import local_datetime
+
 from tests.factories import (
     AddressFactory,
     ApplicationFactory,
@@ -20,16 +31,6 @@ from tests.factories import (
     UserSocialAuthFactory,
 )
 from tests.factories.application import ApplicationBuilder
-from tilavarauspalvelu.enums import ApplicationStatusChoice, OrderStatus, ReservationNotification
-from tilavarauspalvelu.models import GeneralRole, UnitRole, User
-from tilavarauspalvelu.models.user.actions import (
-    ANONYMIZED,
-    ANONYMIZED_FIRST_NAME,
-    ANONYMIZED_LAST_NAME,
-    SENSITIVE_APPLICATION,
-    SENSITIVE_RESERVATION,
-)
-from utils.date_utils import local_datetime
 
 # Applied to all tests
 pytestmark = [

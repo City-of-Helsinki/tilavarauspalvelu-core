@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories.application import ApplicationBuilder
 from tilavarauspalvelu.enums import ApplicationStatusChoice
+
+from tests.factories.application import ApplicationBuilder
 
 # Applied to all tests
 pytestmark = [

@@ -1,9 +1,10 @@
 import pytest
 
-from tests.factories import UserFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
+
+from tests.factories import UserFactory
+from tests.helpers import patch_method
 
 from .helpers import REFRESH_MUTATION, get_order
 

@@ -6,10 +6,11 @@ import uuid
 import pytest
 from django.conf import settings
 
-from tests.helpers import patch_method
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import ParseRefundStatusError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import RefundStatusResult
 from utils.sentry import SentryLogger
+
+from tests.helpers import patch_method
 
 refund_status_json = {
     "refundPaymentId": "ea0f16e8-14d7-4510-b83f-1a29494756f0_at_20230329-073612",

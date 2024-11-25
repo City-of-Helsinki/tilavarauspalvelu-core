@@ -9,6 +9,10 @@ from django.urls import reverse
 from freezegun import freeze_time
 from rest_framework.exceptions import ErrorDetail
 
+from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.sentry import SentryLogger
+
 from tests.factories import (
     AddressFactory,
     ApplicationFactory,
@@ -19,9 +23,6 @@ from tests.factories import (
     UserFactory,
 )
 from tests.helpers import patch_method
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.sentry import SentryLogger
 
 from .helpers import get_gdpr_auth_header, patch_oidc_config
 

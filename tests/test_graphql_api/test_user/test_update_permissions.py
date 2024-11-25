@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import UserFactory
 from tilavarauspalvelu.enums import Language
+
+from tests.factories import UserFactory
 
 from .helpers import UPDATE_MUTATION
 

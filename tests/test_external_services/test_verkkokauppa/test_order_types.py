@@ -8,7 +8,6 @@ from typing import Any
 import pytest
 from django.conf import settings
 
-from tests.helpers import patch_method
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import ParseOrderError
 from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     CreateOrderParams,
@@ -20,6 +19,8 @@ from tilavarauspalvelu.utils.verkkokauppa.order.types import (
     OrderItemParams,
 )
 from utils.sentry import SentryLogger
+
+from tests.helpers import patch_method
 
 # Applied to all tests
 pytestmark = [

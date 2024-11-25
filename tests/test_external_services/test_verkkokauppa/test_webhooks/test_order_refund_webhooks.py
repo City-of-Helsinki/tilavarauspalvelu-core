@@ -3,13 +3,14 @@ import uuid
 import pytest
 from django.urls import reverse
 
-from tests.factories import PaymentOrderFactory
-from tests.helpers import patch_method
-from tests.test_external_services.test_verkkokauppa.test_webhooks.helpers import get_mock_order_refund_api
 from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetRefundStatusError
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
+
+from tests.factories import PaymentOrderFactory
+from tests.helpers import patch_method
+from tests.test_external_services.test_verkkokauppa.test_webhooks.helpers import get_mock_order_refund_api
 
 # Applied to all tests
 pytestmark = [

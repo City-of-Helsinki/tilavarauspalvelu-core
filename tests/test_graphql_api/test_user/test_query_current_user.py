@@ -1,8 +1,9 @@
 import pytest
 
+from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+
 from tests.factories import UnitFactory, UserFactory, UserSocialAuthFactory
 from tests.helpers import patch_method
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 
 from .helpers import current_user_query
 

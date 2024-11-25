@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ResourceFactory
 from tilavarauspalvelu.enums import ResourceLocationType
+
+from tests.factories import ResourceFactory
 
 from .helpers import UPDATE_MUTATION
 

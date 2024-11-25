@@ -3,8 +3,6 @@ import uuid
 import pytest
 from django.test import override_settings
 
-from tests.factories import OrderFactory, PaymentFactory, PaymentOrderFactory, ReservationFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
@@ -12,6 +10,9 @@ from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderErr
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
+
+from tests.factories import OrderFactory, PaymentFactory, PaymentOrderFactory, ReservationFactory
+from tests.helpers import patch_method
 
 from .helpers import DELETE_MUTATION, get_delete_data
 

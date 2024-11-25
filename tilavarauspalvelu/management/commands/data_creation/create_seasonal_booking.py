@@ -3,18 +3,6 @@ import random
 from collections.abc import Generator
 from typing import Any
 
-from tests.factories import (
-    AddressFactory,
-    AllocatedTimeSlotFactory,
-    ApplicationRoundTimeSlotFactory,
-    OrganisationFactory,
-    PersonFactory,
-)
-from tests.factories.application import ApplicationBuilder
-from tests.factories.application_round import ApplicationRoundBuilder
-from tests.factories.application_section import ApplicationSectionBuilder
-from tests.factories.reservation_unit_option import ReservationUnitOptionBuilder
-from tests.factories.suitable_time_range import SuitableTimeRangeBuilder
 from tilavarauspalvelu.enums import (
     ApplicantTypeChoice,
     Priority,
@@ -43,6 +31,19 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.typing import TimeSlotDB
 from utils.date_utils import DEFAULT_TIMEZONE, get_time_range, local_datetime
+
+from tests.factories import (
+    AddressFactory,
+    AllocatedTimeSlotFactory,
+    ApplicationRoundTimeSlotFactory,
+    OrganisationFactory,
+    PersonFactory,
+)
+from tests.factories.application import ApplicationBuilder
+from tests.factories.application_round import ApplicationRoundBuilder
+from tests.factories.application_section import ApplicationSectionBuilder
+from tests.factories.reservation_unit_option import ReservationUnitOptionBuilder
+from tests.factories.suitable_time_range import SuitableTimeRangeBuilder
 
 from .utils import (
     AllocationInfo,

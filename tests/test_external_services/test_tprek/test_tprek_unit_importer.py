@@ -4,15 +4,16 @@ import re
 import pytest
 from django.utils.timezone import get_default_timezone
 
-from tests.factories import UnitFactory
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
-from tests.test_external_services.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
 from tilavarauspalvelu.models import Location
 from tilavarauspalvelu.utils.importers.tprek_api_client import TprekAPIClient
 from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitHaukiResourceIdImporter, TprekUnitImporter
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.sentry import SentryLogger
+
+from tests.factories import UnitFactory
+from tests.helpers import patch_method
+from tests.mocks import MockResponse
+from tests.test_external_services.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
 
 # Applied to all tests
 pytestmark = [

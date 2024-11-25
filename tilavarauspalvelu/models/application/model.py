@@ -23,8 +23,7 @@ from .queryset import ApplicationManager
 if TYPE_CHECKING:
     import datetime
 
-    from tests.helpers import User
-    from tilavarauspalvelu.models import Address, ApplicationRound, City, Organisation, Person, Unit
+    from tilavarauspalvelu.models import Address, ApplicationRound, City, Organisation, Person, Unit, User
 
     from .actions import ApplicationActions
 

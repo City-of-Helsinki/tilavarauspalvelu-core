@@ -1,11 +1,12 @@
 import pytest
 
-from tests.factories import ApplicationFactory, ReservationFactory
 from tilavarauspalvelu.enums import Language
 from tilavarauspalvelu.integrations.email.find_language import (
     get_application_email_language,
     get_reservation_email_language,
 )
+
+from tests.factories import ApplicationFactory, ReservationFactory
 
 pytestmark = [
     pytest.mark.django_db,

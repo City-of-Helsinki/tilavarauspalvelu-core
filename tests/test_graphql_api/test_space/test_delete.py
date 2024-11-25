@@ -1,8 +1,9 @@
 import pytest
 
-from tests.factories import ApplicationRoundFactory, SpaceFactory
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import Space
+
+from tests.factories import ApplicationRoundFactory, SpaceFactory
 
 from .helpers import DELETE_MUTATION
 

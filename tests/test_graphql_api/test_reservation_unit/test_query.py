@@ -3,6 +3,15 @@ import datetime
 import pytest
 from graphql_relay import to_global_id
 
+from tilavarauspalvelu.enums import (
+    ReservationStateChoice,
+    ReservationTypeChoice,
+    ReservationUnitPublishingState,
+    TermsOfUseTypeChoices,
+    WeekdayChoice,
+)
+from utils.date_utils import local_datetime, next_hour
+
 from tests.factories import (
     ApplicationRoundFactory,
     ApplicationRoundTimeSlotFactory,
@@ -22,14 +31,6 @@ from tests.factories import (
     TermsOfUseFactory,
     UserFactory,
 )
-from tilavarauspalvelu.enums import (
-    ReservationStateChoice,
-    ReservationTypeChoice,
-    ReservationUnitPublishingState,
-    TermsOfUseTypeChoices,
-    WeekdayChoice,
-)
-from utils.date_utils import local_datetime, next_hour
 
 from .helpers import reservation_unit_query, reservation_units_query
 

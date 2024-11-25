@@ -9,30 +9,6 @@ import requests
 from django.conf import settings
 from django.contrib.gis.geos import Point
 
-from tests.factories import (
-    AgeGroupFactory,
-    CityFactory,
-    EquipmentCategoryFactory,
-    EquipmentFactory,
-    LocationFactory,
-    OriginHaukiResourceFactory,
-    PaymentAccountingFactory,
-    PaymentMerchantFactory,
-    PurposeFactory,
-    QualifierFactory,
-    ReservableTimeSpanFactory,
-    ReservationCancelReasonFactory,
-    ReservationDenyReasonFactory,
-    ReservationMetadataFieldFactory,
-    ReservationMetadataSetFactory,
-    ReservationPurposeFactory,
-    ReservationUnitCancellationRuleFactory,
-    ReservationUnitImageFactory,
-    ReservationUnitPaymentTypeFactory,
-    ServiceFactory,
-    TaxPercentageFactory,
-    TermsOfUseFactory,
-)
 from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
 from tilavarauspalvelu.enums import PaymentType, ReservationUnitImageType, ServiceTypeChoices, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import (
@@ -63,6 +39,31 @@ from tilavarauspalvelu.models import (
     Unit,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_start_of_day
+
+from tests.factories import (
+    AgeGroupFactory,
+    CityFactory,
+    EquipmentCategoryFactory,
+    EquipmentFactory,
+    LocationFactory,
+    OriginHaukiResourceFactory,
+    PaymentAccountingFactory,
+    PaymentMerchantFactory,
+    PurposeFactory,
+    QualifierFactory,
+    ReservableTimeSpanFactory,
+    ReservationCancelReasonFactory,
+    ReservationDenyReasonFactory,
+    ReservationMetadataFieldFactory,
+    ReservationMetadataSetFactory,
+    ReservationPurposeFactory,
+    ReservationUnitCancellationRuleFactory,
+    ReservationUnitImageFactory,
+    ReservationUnitPaymentTypeFactory,
+    ServiceFactory,
+    TaxPercentageFactory,
+    TermsOfUseFactory,
+)
 
 from .utils import FieldCombination, Percentage, PurposeData, SetName, with_logs
 

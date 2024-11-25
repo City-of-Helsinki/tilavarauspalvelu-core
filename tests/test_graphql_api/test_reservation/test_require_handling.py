@@ -1,8 +1,9 @@
 import pytest
 from django.test import override_settings
 
-from tests.factories import ReservationFactory, UserFactory
 from tilavarauspalvelu.enums import ReservationNotification, ReservationStateChoice
+
+from tests.factories import ReservationFactory, UserFactory
 
 from .helpers import REQUIRE_HANDLING_MUTATION, get_require_handling_data
 

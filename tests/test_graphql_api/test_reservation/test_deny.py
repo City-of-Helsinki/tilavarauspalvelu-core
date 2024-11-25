@@ -3,9 +3,10 @@ import datetime
 import pytest
 from django.test import override_settings
 
-from tests.factories import ReservationFactory
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from utils.date_utils import local_datetime
+
+from tests.factories import ReservationFactory
 
 from .helpers import DENY_MUTATION, get_deny_data
 

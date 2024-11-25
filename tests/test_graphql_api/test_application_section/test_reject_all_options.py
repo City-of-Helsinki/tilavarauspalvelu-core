@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ApplicationSectionFactory, ReservationUnitOptionFactory, UserFactory
 from tilavarauspalvelu.enums import Weekday
+
+from tests.factories import ApplicationSectionFactory, ReservationUnitOptionFactory, UserFactory
 
 from .helpers import REJECT_MUTATION
 

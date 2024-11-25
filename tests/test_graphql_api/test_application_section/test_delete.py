@@ -1,8 +1,9 @@
 import pytest
 
+from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
+
 from tests.factories.application_section import ApplicationSectionBuilder
 from tests.test_graphql_api.test_application_section.helpers import DELETE_MUTATION, get_application_section_delete_data
-from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
 
 # Applied to all tests
 pytestmark = [

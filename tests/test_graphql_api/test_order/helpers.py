@@ -3,8 +3,9 @@ from functools import partial
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 from tilavarauspalvelu.models import PaymentOrder, User
+
+from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
 
 order_query = partial(
     build_query,

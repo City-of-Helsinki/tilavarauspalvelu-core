@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ReservationFactory, UserFactory
 from tilavarauspalvelu.models import Reservation
+
+from tests.factories import ReservationFactory, UserFactory
 
 from .helpers import DELETE_MUTATION, get_delete_data
 

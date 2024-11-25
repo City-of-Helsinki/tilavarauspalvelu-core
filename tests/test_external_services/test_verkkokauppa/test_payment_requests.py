@@ -7,12 +7,13 @@ import pytest
 from django.conf import settings
 from requests import Timeout
 
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError, RefundPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
+
+from tests.helpers import patch_method
+from tests.mocks import MockResponse
 
 get_payment_response: dict[str, Any] = {
     "paymentId": "08c2d282-eb98-3271-a3fc-81fe200f129b_at_20211115-122645",

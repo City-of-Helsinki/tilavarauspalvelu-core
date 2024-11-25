@@ -3,9 +3,10 @@ import datetime
 import pytest
 from lookup_property import L
 
-from tests.factories import ApplicationRoundFactory
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import ApplicationRound
+
+from tests.factories import ApplicationRoundFactory
 
 # Applied to all tests
 pytestmark = [

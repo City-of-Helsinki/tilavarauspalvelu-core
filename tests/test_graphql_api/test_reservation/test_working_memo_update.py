@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, UserFactory
 from tilavarauspalvelu.enums import UserRoleChoice
+
+from tests.factories import ReservationFactory, ReservationUnitFactory, UserFactory
 
 from .helpers import UPDATE_WORKING_MEMO_MUTATION, get_working_memo_update_data
 

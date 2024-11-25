@@ -283,7 +283,6 @@ known-third-party = [
 ]
 known-first-party = [
     "config",
-    "tests",
     "tilavarauspalvelu",
     "utils",
 ]
@@ -292,8 +291,10 @@ section-order = [
     "standard-library",
     "third-party",
     "first-party",
+    "testing",
     "local-folder",
 ]
+sections.testing = ["tests"]
 
 [tool.ruff.lint.flake8-annotations]
 allow-star-arg-any = true

@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import AllocatedTimeSlotFactory, ApplicationSectionFactory, ReservationUnitFactory
 from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
+
+from tests.factories import AllocatedTimeSlotFactory, ApplicationSectionFactory, ReservationUnitFactory
 
 from .helpers import allocations_query
 

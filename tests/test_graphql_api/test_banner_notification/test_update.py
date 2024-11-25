@@ -4,9 +4,10 @@ from typing import Any, NamedTuple
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tests.factories import BannerNotificationFactory, UserFactory
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
+
+from tests.factories import BannerNotificationFactory, UserFactory
 
 from .helpers import UPDATE_MUTATION
 

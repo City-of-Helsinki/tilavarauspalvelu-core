@@ -5,8 +5,6 @@ from typing import TYPE_CHECKING
 import freezegun
 import pytest
 
-from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.enums import (
     ApplicantTypeChoice,
     CustomerTypeChoice,
@@ -27,6 +25,9 @@ from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClien
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIDatePeriod
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_iso_format
 from utils.sentry import SentryLogger
+
+from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
+from tests.helpers import patch_method
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation

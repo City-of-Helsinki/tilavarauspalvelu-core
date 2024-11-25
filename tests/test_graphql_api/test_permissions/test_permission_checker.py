@@ -3,8 +3,9 @@ from functools import partial
 import pytest
 from graphene_django_extensions.testing import build_query
 
-from tests.factories import UnitFactory, UnitGroupFactory, UnitRoleFactory, UserFactory
 from tilavarauspalvelu.enums import UserPermissionChoice, UserRoleChoice
+
+from tests.factories import UnitFactory, UnitGroupFactory, UnitRoleFactory, UserFactory
 
 pytestmark = [
     pytest.mark.django_db,

@@ -5,8 +5,9 @@ import pytest
 from graphene_django_extensions.testing import build_query
 from graphql_relay import to_global_id
 
-from tests.factories import UserFactory
 from tilavarauspalvelu.models import PersonalInfoViewLog
+
+from tests.factories import UserFactory
 
 # Applied to all tests
 pytestmark = [

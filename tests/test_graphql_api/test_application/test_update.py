@@ -1,8 +1,9 @@
 import pytest
 
-from tests.factories import ApplicationFactory
 from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.models import Address, ApplicationSection, Organisation, SuitableTimeRange
+
+from tests.factories import ApplicationFactory
 
 from .helpers import UPDATE_MUTATION
 

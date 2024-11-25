@@ -2,6 +2,9 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from tilavarauspalvelu.enums import CustomerTypeChoice
+from tilavarauspalvelu.models import ReservationStatistic
+
 from tests.factories import (
     AgeGroupFactory,
     CityFactory,
@@ -9,8 +12,6 @@ from tests.factories import (
     ReservationFactory,
     ReservationPurposeFactory,
 )
-from tilavarauspalvelu.enums import CustomerTypeChoice
-from tilavarauspalvelu.models import ReservationStatistic
 
 from .helpers import UPDATE_SERIES_MUTATION
 

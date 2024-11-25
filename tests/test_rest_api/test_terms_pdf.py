@@ -5,8 +5,9 @@ import pytest
 from pypdf import PdfReader
 from rest_framework.reverse import reverse
 
-from tests.factories import TermsOfUseFactory
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+
+from tests.factories import TermsOfUseFactory
 
 if TYPE_CHECKING:
     from django.http import FileResponse, JsonResponse

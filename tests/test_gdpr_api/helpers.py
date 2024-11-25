@@ -10,8 +10,9 @@ from helusers.settings import api_token_auth_settings
 from jose import jwk, jwt
 from jose.constants import ALGORITHMS
 
-from tests.helpers import ResponseMock
 from utils.date_utils import local_datetime
+
+from tests.helpers import ResponseMock
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User

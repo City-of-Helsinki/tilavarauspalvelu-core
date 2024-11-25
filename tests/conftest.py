@@ -5,9 +5,10 @@ from typing import TYPE_CHECKING
 import pytest
 from rest_framework.test import APIClient
 
+from utils.sentry import SentryLogger
+
 from tests.factories._base import FakerEN, FakerFI, FakerSV
 from tests.helpers import GraphQLClient, patch_method
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from django.core.mail import EmailMessage

@@ -3,9 +3,10 @@ from unittest import mock
 import pytest
 from django.test import override_settings
 
-from tests.helpers import patch_method
 from utils import image_cache
 from utils.sentry import SentryLogger
+
+from tests.helpers import patch_method
 
 
 @mock.patch("utils.image_cache.urljoin")

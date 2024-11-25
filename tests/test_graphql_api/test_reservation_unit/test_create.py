@@ -2,13 +2,14 @@ import datetime
 
 import pytest
 
-from tests.factories import ReservationUnitPaymentTypeFactory, UnitFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.enums import PaymentType, ReservationKind, WeekdayChoice
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
+
+from tests.factories import ReservationUnitPaymentTypeFactory, UnitFactory
+from tests.helpers import patch_method
 
 from .helpers import CREATE_MUTATION, get_create_non_draft_input_data
 

@@ -5,11 +5,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from tests.factories import ReservationFactory, UserFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
+
+from tests.factories import ReservationFactory, UserFactory
+from tests.helpers import patch_method
 
 from .helpers import REFUND_MUTATION, get_refund_data
 

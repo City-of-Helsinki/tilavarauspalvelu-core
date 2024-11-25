@@ -3,6 +3,11 @@ from decimal import Decimal
 
 import pytest
 
+from tilavarauspalvelu.enums import CustomerTypeChoice, PriceUnit, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import ReservationUnitHierarchy
+from utils.date_utils import local_datetime
+from utils.decimal_utils import round_decimal
+
 from tests.factories import (
     ApplicationRoundFactory,
     CityFactory,
@@ -10,10 +15,6 @@ from tests.factories import (
     ReservationMetadataSetFactory,
     ReservationUnitPricingFactory,
 )
-from tilavarauspalvelu.enums import CustomerTypeChoice, PriceUnit, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.models import ReservationUnitHierarchy
-from utils.date_utils import local_datetime
-from utils.decimal_utils import round_decimal
 
 from .helpers import UPDATE_MUTATION, get_update_data, mock_profile_reader
 

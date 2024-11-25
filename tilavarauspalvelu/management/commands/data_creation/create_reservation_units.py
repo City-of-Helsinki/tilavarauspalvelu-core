@@ -7,16 +7,6 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 
-from tests.factories import (
-    PaymentProductFactory,
-    ReservationUnitPricingFactory,
-    ReservationUnitTypeFactory,
-    ResourceFactory,
-    SpaceFactory,
-    UnitFactory,
-)
-from tests.factories.reservation_unit import ReservationUnitBuilder
-from tests.factories.reservation_unit_pricing import ReservationUnitPricingBuilder
 from tilavarauspalvelu.enums import (
     AuthenticationType,
     PaymentType,
@@ -46,6 +36,17 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.tasks import create_reservation_unit_thumbnails_and_urls
 from utils.date_utils import DEFAULT_TIMEZONE
+
+from tests.factories import (
+    PaymentProductFactory,
+    ReservationUnitPricingFactory,
+    ReservationUnitTypeFactory,
+    ResourceFactory,
+    SpaceFactory,
+    UnitFactory,
+)
+from tests.factories.reservation_unit import ReservationUnitBuilder
+from tests.factories.reservation_unit_pricing import ReservationUnitPricingBuilder
 
 from .create_reservation_related_things import (
     _create_equipments,

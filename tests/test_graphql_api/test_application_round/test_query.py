@@ -2,15 +2,16 @@ import datetime
 
 import pytest
 
-from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, ReservationUnitFactory
-from tests.factories.application import ApplicationBuilder
-from tests.test_graphql_api.test_application_round.helpers import rounds_query
 from tilavarauspalvelu.enums import (
     ApplicationRoundReservationCreationStatusChoice,
     ApplicationRoundStatusChoice,
     ApplicationStatusChoice,
 )
 from utils.date_utils import local_datetime
+
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, ReservationUnitFactory
+from tests.factories.application import ApplicationBuilder
+from tests.test_graphql_api.test_application_round.helpers import rounds_query
 
 # Applied to all tests
 pytestmark = [

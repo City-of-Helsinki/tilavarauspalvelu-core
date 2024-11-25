@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import GeneralRoleFactory, RecurringReservationFactory, UnitRoleFactory, UserFactory
 from tilavarauspalvelu.enums import UserRoleChoice
+
+from tests.factories import GeneralRoleFactory, RecurringReservationFactory, UnitRoleFactory, UserFactory
 
 from .helpers import UPDATE_SERIES_MUTATION
 

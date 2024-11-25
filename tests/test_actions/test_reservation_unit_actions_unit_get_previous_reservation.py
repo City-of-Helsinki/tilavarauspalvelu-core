@@ -5,9 +5,10 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
+
+from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
 
 # Applied to all tests
 pytestmark = [

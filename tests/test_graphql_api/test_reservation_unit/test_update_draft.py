@@ -3,10 +3,11 @@ from auditlog.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 
 from config.utils.auditlog_util import AuditLogger
-from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, TermsOfUseFactory
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AuthenticationType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import ReservationUnit
+
+from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, TermsOfUseFactory
 
 from .helpers import UPDATE_MUTATION, get_draft_update_input_data
 

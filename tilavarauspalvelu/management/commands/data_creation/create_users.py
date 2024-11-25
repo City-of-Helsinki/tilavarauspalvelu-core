@@ -1,8 +1,9 @@
 from django.contrib.auth.hashers import make_password
 
-from tests.factories import UserFactory
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
 from tilavarauspalvelu.models import User
+
+from tests.factories import UserFactory
 
 from .utils import with_logs
 

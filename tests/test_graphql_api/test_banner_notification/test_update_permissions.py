@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import BannerNotificationFactory
 from tilavarauspalvelu.enums import UserRoleChoice
+
+from tests.factories import BannerNotificationFactory
 
 from .helpers import UPDATE_MUTATION
 

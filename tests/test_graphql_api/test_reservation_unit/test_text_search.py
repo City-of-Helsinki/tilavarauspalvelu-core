@@ -4,8 +4,9 @@ import pytest
 from elasticsearch_django.settings import get_client
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tests.factories import ReservationUnitFactory, SpaceFactory
 from tilavarauspalvelu.models import ReservationUnit
+
+from tests.factories import ReservationUnitFactory, SpaceFactory
 
 from .helpers import reservation_units_query
 

@@ -1,7 +1,8 @@
 import pytest
 
-from tests.factories import ApplicationFactory
 from tilavarauspalvelu.enums import UserRoleChoice
+
+from tests.factories import ApplicationFactory
 
 from .helpers import section_options_query
 

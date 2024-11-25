@@ -3,10 +3,11 @@ from decimal import Decimal
 
 import pytest
 
-from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory, TaxPercentageFactory
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import local_date
+
+from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory, TaxPercentageFactory
 
 from .helpers import (
     CREATE_MUTATION,

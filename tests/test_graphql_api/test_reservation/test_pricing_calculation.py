@@ -4,10 +4,11 @@ from decimal import Decimal
 import pytest
 from freezegun import freeze_time
 
-from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationPriceMixin
 from tilavarauspalvelu.enums import PriceUnit
 from utils.date_utils import local_datetime
+
+from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 
 # Applied to all tests
 pytestmark = [

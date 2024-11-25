@@ -3,8 +3,9 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from tests.factories import PaymentProductFactory, ReservationUnitFactory, ReservationUnitPricingFactory
 from tilavarauspalvelu.enums import ReservationUnitReservationState
+
+from tests.factories import PaymentProductFactory, ReservationUnitFactory, ReservationUnitPricingFactory
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit

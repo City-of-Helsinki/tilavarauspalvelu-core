@@ -1,8 +1,9 @@
 import pytest
 from graphene_django_extensions.testing import build_query
 
-from tests.factories import SpaceFactory
 from tilavarauspalvelu.models.sql_log.model import SQLLog
+
+from tests.factories import SpaceFactory
 
 # Applied to all tests
 pytestmark = [

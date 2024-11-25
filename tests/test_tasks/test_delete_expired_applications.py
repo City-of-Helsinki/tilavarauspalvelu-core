@@ -3,10 +3,11 @@ import datetime
 import pytest
 from django.test import override_settings
 
-from tests.factories import ApplicationFactory, ApplicationRoundFactory
 from tilavarauspalvelu.models import Application
 from tilavarauspalvelu.tasks import delete_expired_applications
 from utils.date_utils import local_date
+
+from tests.factories import ApplicationFactory, ApplicationRoundFactory
 
 pytestmark = [
     pytest.mark.django_db,

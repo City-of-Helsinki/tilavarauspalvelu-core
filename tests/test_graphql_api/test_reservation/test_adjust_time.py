@@ -7,6 +7,10 @@ import freezegun
 import pytest
 from django.test import override_settings
 
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice
+from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
+
 from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,
@@ -17,9 +21,6 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice
-from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from .helpers import ADJUST_MUTATION, get_adjust_data
 

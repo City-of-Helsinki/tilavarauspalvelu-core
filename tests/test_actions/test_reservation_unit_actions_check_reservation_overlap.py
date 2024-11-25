@@ -4,10 +4,11 @@ import datetime
 
 import pytest
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceFactory, SpaceFactory
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import local_datetime
+
+from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceFactory, SpaceFactory
 
 # Applied to all tests
 pytestmark = [

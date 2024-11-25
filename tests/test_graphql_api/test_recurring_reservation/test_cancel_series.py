@@ -3,14 +3,15 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
+from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from utils.date_utils import local_date, local_datetime
+
 from tests.factories import (
     AllocatedTimeSlotFactory,
     ApplicationRoundFactory,
     ReservationCancelReasonFactory,
     UserFactory,
 )
-from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
-from utils.date_utils import local_date, local_datetime
 
 from .helpers import CANCEL_SECTION_SERIES_MUTATION, create_reservation_series
 

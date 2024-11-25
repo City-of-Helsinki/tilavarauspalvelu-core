@@ -3,6 +3,10 @@ import datetime
 import freezegun
 import pytest
 
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour, timedelta_to_json
+
 from tests.factories import (
     AgeGroupFactory,
     CityFactory,
@@ -15,9 +19,6 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour, timedelta_to_json
 
 from .helpers import CREATE_STAFF_MUTATION, get_staff_create_data
 

@@ -3,9 +3,6 @@ import random
 
 from django.db import models
 
-from tests.factories import RecurringReservationFactory, RejectedOccurrenceFactory
-from tests.factories.payment_order import PaymentOrderBuilder
-from tests.factories.reservation import NextDateError, ReservationBuilder
 from tilavarauspalvelu.enums import (
     CustomerTypeChoice,
     Language,
@@ -37,6 +34,10 @@ from tilavarauspalvelu.models import (
     User,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, combine, get_date_range, get_periods_between, local_date, local_datetime
+
+from tests.factories import RecurringReservationFactory, RejectedOccurrenceFactory
+from tests.factories.payment_order import PaymentOrderBuilder
+from tests.factories.reservation import NextDateError, ReservationBuilder
 
 from .create_reservation_related_things import _create_cancel_reasons, _create_deny_reasons
 from .create_reservation_units import _create_reservation_unit_for_recurring_reservations

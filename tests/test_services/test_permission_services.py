@@ -3,10 +3,11 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
-from tests.factories import GeneralRoleFactory, UnitRoleFactory, UserFactory
 from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.services.permission_service import deactivate_old_permissions
 from utils.date_utils import local_start_of_day
+
+from tests.factories import GeneralRoleFactory, UnitRoleFactory, UserFactory
 
 pytestmark = [
     pytest.mark.django_db,

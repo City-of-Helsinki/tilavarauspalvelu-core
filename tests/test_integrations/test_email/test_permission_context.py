@@ -2,6 +2,11 @@
 
 from freezegun import freeze_time
 
+from tilavarauspalvelu.integrations.email.template_context import (
+    get_context_for_permission_deactivation,
+    get_context_for_user_anonymization,
+)
+
 from tests.helpers import TranslationsFromPOFiles
 from tests.test_integrations.test_email.helpers import (
     AUTOMATIC_REPLY_CONTEXT_EN,
@@ -13,10 +18,6 @@ from tests.test_integrations.test_email.helpers import (
     CLOSING_CONTEXT_EN,
     CLOSING_CONTEXT_FI,
     CLOSING_CONTEXT_SV,
-)
-from tilavarauspalvelu.integrations.email.template_context import (
-    get_context_for_permission_deactivation,
-    get_context_for_user_anonymization,
 )
 
 

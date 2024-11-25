@@ -2,14 +2,15 @@ import uuid
 
 import pytest
 
-from tests.factories import PaymentFactory
-from tests.helpers import patch_method
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
+
+from tests.factories import PaymentFactory
+from tests.helpers import patch_method
 
 from .helpers import REFRESH_MUTATION, get_order
 

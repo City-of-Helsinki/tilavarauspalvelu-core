@@ -1,8 +1,9 @@
 import pytest
 
-from tests.factories import SpaceFactory, UnitGroupFactory, UserFactory
 from tilavarauspalvelu.enums import ResourceLocationType
 from tilavarauspalvelu.models import Resource
+
+from tests.factories import SpaceFactory, UnitGroupFactory, UserFactory
 
 from .helpers import CREATE_MUTATION
 
