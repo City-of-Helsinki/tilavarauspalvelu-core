@@ -22,7 +22,7 @@ __all__ = [
 class ReservationStatisticsReservationUnit(models.Model):
     name = models.CharField(max_length=255)
     unit_name = models.CharField(max_length=255)
-    unit_tprek_id = models.CharField(max_length=255, null=True)
+    unit_tprek_id = models.CharField(max_length=255, null=True)  # noqa: DJ001
 
     reservation_statistics = models.ForeignKey(
         "tilavarauspalvelu.ReservationStatistic",
