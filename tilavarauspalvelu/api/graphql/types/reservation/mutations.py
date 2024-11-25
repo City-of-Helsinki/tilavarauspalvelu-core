@@ -23,18 +23,18 @@ from .permissions import (
 from .serializers import (
     ReservationAdjustTimeSerializer,
     ReservationApproveSerializer,
+    ReservationBaseSaveSerializer,
     ReservationCancellationSerializer,
     ReservationConfirmSerializer,
-    ReservationCreateSerializer,
     ReservationDenySerializer,
+    ReservationRefundSerializer,
     ReservationRequiresHandlingSerializer,
     ReservationStaffCreateSerializer,
     ReservationUpdateSerializer,
     ReservationWorkingMemoSerializer,
+    StaffReservationAdjustTimeSerializer,
+    StaffReservationModifySerializer,
 )
-from .serializers.refund_serializers import ReservationRefundSerializer
-from .serializers.staff_adjust_time_serializers import StaffReservationAdjustTimeSerializer
-from .serializers.staff_reservation_modify_serializers import StaffReservationModifySerializer
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import PaymentOrder
@@ -46,7 +46,7 @@ __all__ = [
 
 class ReservationCreateMutation(CreateMutation):
     class Meta:
-        serializer_class = ReservationCreateSerializer
+        serializer_class = ReservationBaseSaveSerializer
         permission_classes = [ReservationPermission]
 
 
