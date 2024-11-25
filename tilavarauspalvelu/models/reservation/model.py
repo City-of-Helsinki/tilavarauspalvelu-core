@@ -215,10 +215,8 @@ class Reservation(SerializableMixin, models.Model):
         return _("reservation") + f" {self.name} ({self.type})"
 
     def __repr__(self) -> str:
-        return (
-            f"<Reservation {self.name} "
-            f"({datetime_range_as_string(start_datetime=self.begin, end_datetime=self.end)})>"
-        )
+        dt_range = datetime_range_as_string(start_datetime=self.begin, end_datetime=self.end)
+        return f"<Reservation {self.name} ({dt_range})>"
 
     @cached_property
     def actions(self) -> ReservationActions:

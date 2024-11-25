@@ -52,7 +52,7 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
             ),
             (
                 (
-                    "recurring_reservation"
+                    "recurring_reservation"  #
                     "__allocated_time_slot"
                     "__reservation_unit_option"
                     "__application_section"
@@ -62,7 +62,7 @@ class RejectedOccurrenceFilterSet(ModelFilterSet):
             ),
             (
                 (
-                    "recurring_reservation"
+                    "recurring_reservation"  #
                     "__allocated_time_slot"
                     "__reservation_unit_option"
                     "__application_section"

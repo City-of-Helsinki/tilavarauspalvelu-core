@@ -84,7 +84,7 @@ class ReservationUnitSelectForm(forms.Form):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         runit_choices = [(None, "-")] + [
-            (runit.pk, f"{runit.name} - {safe_getattr(runit, "unit.name")}")
+            (runit.pk, f"{runit.name} - {safe_getattr(runit, 'unit.name')}")
             for runit in ReservationUnit.objects.select_related("unit").order_by("name_fi")
         ]
         self.fields["reservation_unit"].choices = runit_choices

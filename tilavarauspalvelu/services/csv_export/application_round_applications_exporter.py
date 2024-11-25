@@ -219,10 +219,8 @@ class ApplicationRoundApplicationsCSVExporter(BaseCSVExporter):
             row.contact_person_phone = instance.application.contact_person.phone_number
 
             if not row.applicant:
-                row.applicant = (
-                    f"{instance.application.contact_person.first_name} "
-                    f"{instance.application.contact_person.last_name}"
-                )
+                contact = instance.application.contact_person
+                row.applicant = f"{contact.first_name} {contact.last_name}"
 
         if instance.application.home_city is not None:
             row.home_city_name = instance.application.home_city.name

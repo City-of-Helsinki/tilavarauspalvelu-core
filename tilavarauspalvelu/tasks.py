@@ -335,9 +335,9 @@ def update_reservation_unit_pricings_tax_percentage(
     for pricing in unhandled_future_pricings:
         logger.info(f"Pricing should be handled manually: {pricing.id} {pricing.reservation_unit.name} {pricing}")
 
-    unhandled_future_pricings_str = ", ".join(
-        [f"<{pricing.id}: {pricing.reservation_unit}: {pricing}>" for pricing in unhandled_future_pricings]
-    )
+    unhandled_future_pricings_str = ", ".join([
+        f"<{pricing.id}: {pricing.reservation_unit}: {pricing}>" for pricing in unhandled_future_pricings
+    ])
     SentryLogger.log_message(
         message="Task `update_reservation_unit_pricings_tax_percentage` has unhandled future pricings",
         details=f"Task found the following unhandled future pricings: {unhandled_future_pricings_str}",

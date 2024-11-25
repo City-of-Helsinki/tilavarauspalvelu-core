@@ -130,49 +130,47 @@ def get_id_token(
     loa: Literal["substantial", "low"] = "low",
     ad_groups: Iterable[str] = (),
 ) -> str:
-    return ".".join(
-        [
-            # Header
-            base64.urlsafe_b64encode(
-                json.dumps(
-                    {
-                        "alg": "RS256",
-                        "kid": uuid4().hex,
-                    },
-                ).encode(),
-            ).decode(),
-            # Payload
-            base64.urlsafe_b64encode(
-                json.dumps(
-                    asdict(
-                        IDToken(
-                            iss="https://tunnistamo.test.hel.ninja/openid",
-                            sub=str(instance.user.uuid),
-                            aud="tilavaraus-test",
-                            jti=uuid4().hex,
-                            typ="ID",
-                            exp=int(datetime.datetime.now().timestamp()),
-                            iat=int(datetime.datetime.now().timestamp()),
-                            auth_time=int(datetime.datetime.now().timestamp()),
-                            nonce=get_random_string(64),
-                            at_hash=uuid4().hex,
-                            name=instance.user.username,
-                            preferred_username=uuid4().hex,
-                            given_name=instance.user.first_name,
-                            family_name=instance.user.last_name,
-                            email=instance.user.email,
-                            email_verified=True,
-                            ad_groups=list(ad_groups),
-                            azp="tilavaraus-test",
-                            sid=uuid4().hex,
-                            session_state=uuid4().hex,
-                            amr=amr,
-                            loa=loa,
-                        )
-                    ),
-                ).encode(),
-            ).decode(),
-            # Signature (not real of course)
-            get_random_string(100),
-        ]
-    )
+    return ".".join([
+        # Header
+        base64.urlsafe_b64encode(
+            json.dumps(
+                {
+                    "alg": "RS256",
+                    "kid": uuid4().hex,
+                },
+            ).encode(),
+        ).decode(),
+        # Payload
+        base64.urlsafe_b64encode(
+            json.dumps(
+                asdict(
+                    IDToken(
+                        iss="https://tunnistamo.test.hel.ninja/openid",
+                        sub=str(instance.user.uuid),
+                        aud="tilavaraus-test",
+                        jti=uuid4().hex,
+                        typ="ID",
+                        exp=int(datetime.datetime.now().timestamp()),
+                        iat=int(datetime.datetime.now().timestamp()),
+                        auth_time=int(datetime.datetime.now().timestamp()),
+                        nonce=get_random_string(64),
+                        at_hash=uuid4().hex,
+                        name=instance.user.username,
+                        preferred_username=uuid4().hex,
+                        given_name=instance.user.first_name,
+                        family_name=instance.user.last_name,
+                        email=instance.user.email,
+                        email_verified=True,
+                        ad_groups=list(ad_groups),
+                        azp="tilavaraus-test",
+                        sid=uuid4().hex,
+                        session_state=uuid4().hex,
+                        amr=amr,
+                        loa=loa,
+                    )
+                ),
+            ).encode(),
+        ).decode(),
+        # Signature (not real of course)
+        get_random_string(100),
+    ])

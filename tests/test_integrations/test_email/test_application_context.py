@@ -155,8 +155,7 @@ def test_get_context__application_in_allocation__sv():
     assert context == {
         "email_recipient_name": None,
         "text_application_in_allocation": (
-            "Ansökningstiden har löpt ut. "
-            "Vi skickar ett meddelande till e-postadressen när din ansökan har behandlats."
+            "Ansökningstiden har löpt ut. Vi skickar ett meddelande till e-postadressen när din ansökan har behandlats."
         ),
         "text_view_application": (
             "Du kan se den ansökan du har skickat på sidan 'Mina ansökningar': "

@@ -152,43 +152,41 @@ def test_application_round_applications_export__multiple_applications(graphql):
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "Missing organisation name": MissingParams(
-                missing=Missing(empty=["organisation__name"]),
-                column_value_mapping={"hakija": "first last"},
-            ),
-            "Missing organisation name and contact person": MissingParams(
-                missing=Missing(empty=["organisation__name"], null=["contact_person"]),
-                column_value_mapping={"hakija": ""},
-            ),
-            "Missing organisation identifier": MissingParams(
-                missing=Missing(empty=["organisation__identifier"]),
-                column_value_mapping={"y-tunnus": ""},
-            ),
-            "Missing contact person": MissingParams(
-                missing=Missing(null=["contact_person"]),
-                column_value_mapping={
-                    "yhteyshenkilö etunimi": "",
-                    "yhteyshenkilö sukunimi": "",
-                    "sähköpostiosoite": "",
-                    "yhteyshenkilön puh": "",
-                },
-            ),
-            "Missing home city": MissingParams(
-                missing=Missing(null=["home_city"]),
-                column_value_mapping={"kotikunta": "muu"},
-            ),
-            "Missing purpose": MissingParams(
-                missing=Missing(null=["application_sections__purpose"]),
-                column_value_mapping={"vuoronkäyttötarkoitus": ""},
-            ),
-            "Missing age group": MissingParams(
-                missing=Missing(null=["application_sections__age_group"]),
-                column_value_mapping={"ikäryhmä": ""},
-            ),
-        }
-    )
+    **parametrize_helper({
+        "Missing organisation name": MissingParams(
+            missing=Missing(empty=["organisation__name"]),
+            column_value_mapping={"hakija": "first last"},
+        ),
+        "Missing organisation name and contact person": MissingParams(
+            missing=Missing(empty=["organisation__name"], null=["contact_person"]),
+            column_value_mapping={"hakija": ""},
+        ),
+        "Missing organisation identifier": MissingParams(
+            missing=Missing(empty=["organisation__identifier"]),
+            column_value_mapping={"y-tunnus": ""},
+        ),
+        "Missing contact person": MissingParams(
+            missing=Missing(null=["contact_person"]),
+            column_value_mapping={
+                "yhteyshenkilö etunimi": "",
+                "yhteyshenkilö sukunimi": "",
+                "sähköpostiosoite": "",
+                "yhteyshenkilön puh": "",
+            },
+        ),
+        "Missing home city": MissingParams(
+            missing=Missing(null=["home_city"]),
+            column_value_mapping={"kotikunta": "muu"},
+        ),
+        "Missing purpose": MissingParams(
+            missing=Missing(null=["application_sections__purpose"]),
+            column_value_mapping={"vuoronkäyttötarkoitus": ""},
+        ),
+        "Missing age group": MissingParams(
+            missing=Missing(null=["application_sections__age_group"]),
+            column_value_mapping={"ikäryhmä": ""},
+        ),
+    })
 )
 def test_application_round_applications_export__missing_data(graphql, column_value_mapping, missing):
     # given:

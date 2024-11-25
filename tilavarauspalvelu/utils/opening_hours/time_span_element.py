@@ -42,15 +42,13 @@ class TimeSpanElement:
         )
 
     def __hash__(self) -> int:
-        return hash(
-            (
-                self.start_datetime,
-                self.end_datetime,
-                self.is_reservable,
-                self.buffer_time_after,
-                self.buffer_time_before,
-            )
-        )
+        return hash((
+            self.start_datetime,
+            self.end_datetime,
+            self.is_reservable,
+            self.buffer_time_after,
+            self.buffer_time_before,
+        ))
 
     @classmethod
     def create_from_time_element(

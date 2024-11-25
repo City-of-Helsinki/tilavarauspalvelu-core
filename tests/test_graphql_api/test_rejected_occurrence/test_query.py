@@ -139,22 +139,18 @@ def test_rejected_recurrence__filter__by_text_search(graphql):
     # Works similarly to allocated time slot text search.
     # No need to test as thoroughly.
     section_ref = "recurring_reservation__allocated_time_slot__reservation_unit_option__application_section"
-    occurrence = RejectedOccurrenceFactory.create(
-        **{
-            f"{section_ref}__application__organisation": None,
-            f"{section_ref}__application__contact_person": None,
-            f"{section_ref}__application__user": None,
-            f"{section_ref}__name": "foo",
-        }
-    )
-    RejectedOccurrenceFactory.create(
-        **{
-            f"{section_ref}__application__organisation": None,
-            f"{section_ref}__application__contact_person": None,
-            f"{section_ref}__application__user": None,
-            f"{section_ref}__name": "bar",
-        }
-    )
+    occurrence = RejectedOccurrenceFactory.create(**{
+        f"{section_ref}__application__organisation": None,
+        f"{section_ref}__application__contact_person": None,
+        f"{section_ref}__application__user": None,
+        f"{section_ref}__name": "foo",
+    })
+    RejectedOccurrenceFactory.create(**{
+        f"{section_ref}__application__organisation": None,
+        f"{section_ref}__application__contact_person": None,
+        f"{section_ref}__application__user": None,
+        f"{section_ref}__name": "bar",
+    })
 
     graphql.login_with_superuser()
     query = rejected_occurrence_query(text_search="foo")

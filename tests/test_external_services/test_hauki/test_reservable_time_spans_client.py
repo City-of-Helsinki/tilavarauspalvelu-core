@@ -439,22 +439,20 @@ def test__ReservableTimeSpanClient__create_reservable_time_spans__overlapping_wi
         end_datetime=_get_date(day=1, hour=12),
     )
 
-    client._create_reservable_time_spans(
-        [
-            # Overlaps with the last already existing time span, so it should be extended
-            TimeSpanElement(
-                start_datetime=_get_date(day=1, hour=10),
-                end_datetime=_get_date(day=1, hour=14),
-                is_reservable=True,
-            ),
-            # Does not overlap
-            TimeSpanElement(
-                start_datetime=_get_date(day=2, hour=12),
-                end_datetime=_get_date(day=2, hour=16),
-                is_reservable=True,
-            ),
-        ]
-    )
+    client._create_reservable_time_spans([
+        # Overlaps with the last already existing time span, so it should be extended
+        TimeSpanElement(
+            start_datetime=_get_date(day=1, hour=10),
+            end_datetime=_get_date(day=1, hour=14),
+            is_reservable=True,
+        ),
+        # Does not overlap
+        TimeSpanElement(
+            start_datetime=_get_date(day=2, hour=12),
+            end_datetime=_get_date(day=2, hour=16),
+            is_reservable=True,
+        ),
+    ])
 
     reservable_time_spans = ReservableTimeSpan.objects.all()
     assert reservable_time_spans[0].start_datetime == _get_date(day=1, hour=8)

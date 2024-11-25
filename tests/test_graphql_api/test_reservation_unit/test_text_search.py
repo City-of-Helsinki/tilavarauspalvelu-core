@@ -58,75 +58,73 @@ class Params(NamedTuple):
 
 
 @pytest.mark.parametrize(
-    **parametrize_helper(
-        {
-            "No results": Params(
-                text_search="foo",
-                fields="nameFi",
-                expected=None,
-            ),
-            "Name FI": Params(
-                text_search="Test name fi",
-                fields="nameFi",
-                expected={"nameFi": "test name fi"},
-            ),
-            "Name EN": Params(
-                text_search="Test name en",
-                fields="nameEn",
-                expected={"nameEn": "test name en"},
-            ),
-            "Name SV": Params(
-                text_search="Test name sv",
-                fields="nameSv",
-                expected={"nameSv": "test name sv"},
-            ),
-            "Type FI": Params(
-                text_search="Test type fi",
-                fields="nameFi reservationUnitType{nameFi}",
-                expected={"nameFi": "test name fi", "reservationUnitType": {"nameFi": "test type fi"}},
-            ),
-            "Type EN": Params(
-                text_search="Test type en",
-                fields="nameEn reservationUnitType{nameEn}",
-                expected={"nameEn": "test name en", "reservationUnitType": {"nameEn": "test type en"}},
-            ),
-            "Type SV": Params(
-                text_search="Test type sv",
-                fields="nameSv reservationUnitType{nameSv}",
-                expected={"nameSv": "test name sv", "reservationUnitType": {"nameSv": "test type sv"}},
-            ),
-            "Description FI": Params(
-                text_search="Lorem ipsum fi",
-                fields="nameFi descriptionFi",
-                expected={"nameFi": "test name fi", "descriptionFi": "Lorem ipsum fi"},
-            ),
-            "Description EN": Params(
-                text_search="Lorem ipsum en",
-                fields="nameEn descriptionEn",
-                expected={"nameEn": "test name en", "descriptionEn": "Lorem ipsum en"},
-            ),
-            "Description SV": Params(
-                text_search="Lorem ipsum sv",
-                fields="nameSv descriptionSv",
-                expected={"nameSv": "test name sv", "descriptionSv": "Lorem ipsum sv"},
-            ),
-            "Space name FI": Params(
-                text_search="space name fi",
-                fields="nameFi spaces{nameFi}",
-                expected={"nameFi": "test name fi", "spaces": [{"nameFi": "space name fi"}]},
-            ),
-            "Space name EN": Params(
-                text_search="space name en",
-                fields="nameEn spaces{nameEn}",
-                expected={"nameEn": "test name en", "spaces": [{"nameEn": "space name en"}]},
-            ),
-            "Space name SV": Params(
-                text_search="space name sv",
-                fields="nameSv spaces{nameSv}",
-                expected={"nameSv": "test name sv", "spaces": [{"nameSv": "space name sv"}]},
-            ),
-        }
-    )
+    **parametrize_helper({
+        "No results": Params(
+            text_search="foo",
+            fields="nameFi",
+            expected=None,
+        ),
+        "Name FI": Params(
+            text_search="Test name fi",
+            fields="nameFi",
+            expected={"nameFi": "test name fi"},
+        ),
+        "Name EN": Params(
+            text_search="Test name en",
+            fields="nameEn",
+            expected={"nameEn": "test name en"},
+        ),
+        "Name SV": Params(
+            text_search="Test name sv",
+            fields="nameSv",
+            expected={"nameSv": "test name sv"},
+        ),
+        "Type FI": Params(
+            text_search="Test type fi",
+            fields="nameFi reservationUnitType{nameFi}",
+            expected={"nameFi": "test name fi", "reservationUnitType": {"nameFi": "test type fi"}},
+        ),
+        "Type EN": Params(
+            text_search="Test type en",
+            fields="nameEn reservationUnitType{nameEn}",
+            expected={"nameEn": "test name en", "reservationUnitType": {"nameEn": "test type en"}},
+        ),
+        "Type SV": Params(
+            text_search="Test type sv",
+            fields="nameSv reservationUnitType{nameSv}",
+            expected={"nameSv": "test name sv", "reservationUnitType": {"nameSv": "test type sv"}},
+        ),
+        "Description FI": Params(
+            text_search="Lorem ipsum fi",
+            fields="nameFi descriptionFi",
+            expected={"nameFi": "test name fi", "descriptionFi": "Lorem ipsum fi"},
+        ),
+        "Description EN": Params(
+            text_search="Lorem ipsum en",
+            fields="nameEn descriptionEn",
+            expected={"nameEn": "test name en", "descriptionEn": "Lorem ipsum en"},
+        ),
+        "Description SV": Params(
+            text_search="Lorem ipsum sv",
+            fields="nameSv descriptionSv",
+            expected={"nameSv": "test name sv", "descriptionSv": "Lorem ipsum sv"},
+        ),
+        "Space name FI": Params(
+            text_search="space name fi",
+            fields="nameFi spaces{nameFi}",
+            expected={"nameFi": "test name fi", "spaces": [{"nameFi": "space name fi"}]},
+        ),
+        "Space name EN": Params(
+            text_search="space name en",
+            fields="nameEn spaces{nameEn}",
+            expected={"nameEn": "test name en", "spaces": [{"nameEn": "space name en"}]},
+        ),
+        "Space name SV": Params(
+            text_search="space name sv",
+            fields="nameSv spaces{nameSv}",
+            expected={"nameSv": "test name sv", "spaces": [{"nameSv": "space name sv"}]},
+        ),
+    })
 )
 def test_reservation_unit__filter__by_text_search__type_fi(graphql, text_search, fields, expected):
     space = SpaceFactory.create(
