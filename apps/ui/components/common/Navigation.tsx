@@ -210,10 +210,12 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: HeaderProps) {
           label={userName}
           icon={<IconUser />}
         >
-          <a href={profileLink} target="_blank" rel="noopener norreferrer">
-            {t("navigation:profileLinkLabel")}
-            <IconLinkExternal />
-          </a>
+          {!user?.isAdAuthenticated && (
+            <a href={profileLink} target="_blank" rel="noopener norreferrer">
+              {t("navigation:profileLinkLabel")}
+              <IconLinkExternal />
+            </a>
+          )}
           <button
             type="button"
             aria-label={t("common:logout")}
