@@ -827,7 +827,7 @@ def _create_application_sections_for_application(
 def _create_suitable_time_ranges_for_section(
     section: ApplicationSection,
     suitable_time_info: SuitableTimeInfo,
-) -> Generator[SuitableTimeRange, None, None]:
+) -> Generator[SuitableTimeRange]:
     weekday: Weekday
     for weekday in Weekday:
         begin_time = datetime.time(hour=random.randint(8, 12), tzinfo=DEFAULT_TIMEZONE)
@@ -863,7 +863,7 @@ def _create_reservation_unit_options_for_section(
     section: ApplicationSection,
     option_info: OptionInfo,
     reservation_units: list[ReservationUnit],
-) -> Generator[ReservationUnitOption, None, None]:
+) -> Generator[ReservationUnitOption]:
     for i in range(option_info.number):
         option = (
             ReservationUnitOptionBuilder()
@@ -882,7 +882,7 @@ def _create_allocated_time_slots_for_section(
     duration: datetime.timedelta,
     suitable_time_info: SuitableTimeInfo,
     allocation_info: AllocationInfo,
-) -> Generator[AllocatedTimeSlot, None, None]:
+) -> Generator[AllocatedTimeSlot]:
     """
     For an application section with the given reservation unit options and suitable time ranges,
     create allocations according to the applied reservations per week, adhering to the

@@ -135,7 +135,7 @@ def get_combinations(
     output_type: type[T],
     limit: int = 300,
     multiplier: int = 1,
-) -> Generator[T, None, None]:
+) -> Generator[T]:
     """
     Get all combinations of the given iterables.
 

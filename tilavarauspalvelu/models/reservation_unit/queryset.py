@@ -92,7 +92,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         hook: Callable[[list[ReservationUnit]], None],
         *,
         chunk_size: int,
-    ) -> Generator[ReservationUnit, None, None]:
+    ) -> Generator[ReservationUnit]:
         """A `QuerySet.iterator()` that calls the given hook for each chunk of results before yielding them."""
         chunked_fetch = not connections[self.db].settings_dict.get("DISABLE_SERVER_SIDE_CURSORS")
         iterable = self._iterable_class(self, chunked_fetch=chunked_fetch, chunk_size=chunk_size)
