@@ -8,8 +8,7 @@ import {
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { default as ErrorComponent } from "next/error";
-import { MediumButton } from "@/styles/util";
-import { ButtonContainer, CenterSpinner } from "@/components/common/common";
+import { CenterSpinner } from "@/components/common/common";
 import { ViewApplication } from "@/components/application/ViewApplication";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
@@ -21,6 +20,8 @@ import { base64encode } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { ButtonContainer, Flex } from "common/styles/util";
+import { Button } from "hds-react";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -92,7 +93,7 @@ function Preview(props: PropsNarrowed): JSX.Element {
       translationKeyPrefix="application:preview"
       application={application}
     >
-      <form onSubmit={onSubmit}>
+      <Flex as="form" onSubmit={onSubmit}>
         <ViewApplication
           application={application}
           tos={tos}
@@ -103,16 +104,16 @@ function Preview(props: PropsNarrowed): JSX.Element {
           <ButtonLikeLink size="large" href={getApplicationPath(pk, "page3")}>
             {t("common:prev")}
           </ButtonLikeLink>
-          <MediumButton
+          <Button
             id="submit"
             type="submit"
             disabled={!acceptTermsOfUse}
             isLoading={isMutationLoading}
           >
             {t("common:submit")}
-          </MediumButton>
+          </Button>
         </ButtonContainer>
-      </form>
+      </Flex>
     </ApplicationPageWrapper>
   );
 }

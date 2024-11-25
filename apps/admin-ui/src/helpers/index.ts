@@ -2,8 +2,6 @@
 import {
   ReservationTypeChoice,
   ApplicantTypeChoice,
-  ApplicationSectionStatusChoice,
-  ApplicationStatusChoice,
   type PersonNode,
   type ReservationsInIntervalFragment,
   ApplicationNode,
@@ -105,46 +103,6 @@ export function getApplicantName(app?: Application | undefined | null): string {
     return `${firstName || "-"} ${lastName || "-"}`;
   }
   return app.organisation?.nameFi || "-";
-}
-
-export function getApplicationStatusColor(
-  status: ApplicationStatusChoice,
-  size: "s" | "l"
-): string {
-  switch (status) {
-    case ApplicationStatusChoice.Handled:
-      return "var(--color-info)";
-    case ApplicationStatusChoice.InAllocation:
-      return "var(--color-alert-dark)";
-    case ApplicationStatusChoice.Received:
-    case ApplicationStatusChoice.Draft:
-    case ApplicationStatusChoice.ResultsSent:
-      return "var(--color-white)";
-    case ApplicationStatusChoice.Expired:
-    case ApplicationStatusChoice.Cancelled:
-    default:
-      switch (size) {
-        case "s":
-          return "var(--color-error)";
-        case "l":
-        default:
-          return "var(--color-error-dark)";
-      }
-  }
-}
-
-export function getApplicationSectiontatusColor(
-  status: ApplicationSectionStatusChoice
-): string {
-  switch (status) {
-    case ApplicationSectionStatusChoice.Unallocated:
-    case ApplicationSectionStatusChoice.InAllocation:
-      return "var(--color-alert-dark)";
-    case ApplicationSectionStatusChoice.Handled:
-      return "var(--color-success)";
-    default:
-      return "var(--color-error)";
-  }
 }
 
 export function isApplicationRoundInProgress(

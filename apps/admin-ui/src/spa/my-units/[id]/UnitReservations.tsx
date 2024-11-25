@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { breakpoints } from "common/src/common/style";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import Legend from "@/component/Legend";
+import { Legend, LegendsWrapper } from "@/component/Legend";
 import { legend } from "./eventStyleGetter";
 import { UnitCalendar } from "./UnitCalendar";
 import { useUnitResources } from "./hooks";
@@ -16,13 +16,6 @@ import { HR } from "@/component/Table";
 import { SearchTags } from "@/component/SearchTags";
 import { MultiSelectFilter } from "@/component/QueryParamFilters";
 import { DayNavigation } from "@/component/QueryParamFilters/DayNavigation";
-
-const Legends = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xl);
-  padding: var(--spacing-m) 0;
-`;
 
 const LegendContainer = styled.div`
   max-width: 100%;
@@ -68,11 +61,11 @@ function UnitReservationsInner({
         isLoading={loading}
       />
       <LegendContainer>
-        <Legends>
+        <LegendsWrapper>
           {legend.map((l) => (
             <Legend key={l.label} style={l.style} label={t(l.label)} />
           ))}
-        </Legends>
+        </LegendsWrapper>
       </LegendContainer>
     </>
   );

@@ -14,6 +14,7 @@ import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 import { pixel } from "@/styles/util";
 import { getTranslationSafe } from "common/src/common/util";
 import { getLocalizationLang } from "common/src/helpers";
+import { Flex } from "common/styles/util";
 
 type Props = {
   purposes: Pick<
@@ -22,22 +23,15 @@ type Props = {
   >[];
 };
 
-const mobileBreakpoint = "450px";
-
-const Heading = styled(H3).attrs({ as: "h2" })`
-  margin: 0;
-`;
-
-const Top = styled.div`
+const Top = styled(Flex).attrs({
+  $justify: "space-between",
+  $direction: "row",
+  $wrap: "wrap",
+})`
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--spacing-m);
 
-  @media (min-width: ${breakpoints.m}) {
-    flex-direction: row;
-    align-items: flex-end;
+  & > * {
+    flex-grow: 1;
   }
 `;
 
@@ -50,14 +44,12 @@ const PurposeContainer = styled(ShowAllContainer)`
   }
 `;
 
-const PurposeItem = styled.div`
+const PurposeItem = styled(Flex).attrs({
+  gap: "xs",
+})`
   &:hover {
     text-decoration: underline;
   }
-
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
 `;
 
 const PurposeLink = styled(Link)`
@@ -74,18 +66,16 @@ const Image = styled.img`
   }
 `;
 
-const Title = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: var(--fontsize-heading-xs);
-  gap: var(--spacing-xs);
-`;
+const Title = styled(Flex).attrs({
+  $direction: "row",
+  $align: "center",
+  $gap: "xs",
+})``;
 
 export function Purposes({ purposes }: Props): JSX.Element {
   const { t, i18n } = useTranslation(["home", "common"]);
 
-  const isMobile = useMedia(`(max-width: ${mobileBreakpoint})`, false);
+  const isMobile = useMedia(`(max-width: ${breakpoints.s})`, false);
 
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
 
@@ -101,7 +91,9 @@ export function Purposes({ purposes }: Props): JSX.Element {
   return (
     <>
       <Top>
-        <Heading>{t("purposesHeading")}</Heading>
+        <H3 as="h2" $noMargin>
+          {t("purposesHeading")}
+        </H3>
         <ReservationUnitSearch />
       </Top>
       <PurposeContainer

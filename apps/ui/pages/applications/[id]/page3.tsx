@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import styled from "styled-components";
 import {
   ApplicantTypeChoice,
   type ApplicationQuery,
@@ -29,18 +28,13 @@ import {
 } from "@/components/application/Form";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
-import { CenterSpinner, ButtonContainer } from "@/components/common/common";
+import { CenterSpinner } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
-import { MediumButton } from "@/styles/util";
 import { getApplicationPath } from "@/modules/urls";
-import { IconArrowRight } from "hds-react";
-
-const Form = styled.form`
-  margin-bottom: var(--spacing-layout-l);
-  padding-bottom: var(--spacing-l);
-`;
+import { Button, IconArrowRight } from "hds-react";
+import { ButtonContainer } from "common/styles/util";
 
 function Buttons({
   applicationPk,
@@ -56,17 +50,17 @@ function Buttons({
 
   return (
     <ButtonContainer>
-      <MediumButton variant="secondary" onClick={onPrev}>
+      <Button variant="secondary" onClick={onPrev}>
         {t("common:prev")}
-      </MediumButton>
-      <MediumButton
+      </Button>
+      <Button
         id="button__application--next"
         iconRight={<IconArrowRight />}
         type="submit"
         disabled={submitDisabled}
       >
         {t("common:next")}
-      </MediumButton>
+      </Button>
     </ButtonContainer>
   );
 }
@@ -275,11 +269,11 @@ function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
         application={application}
         isDirty={isDirty}
       >
-        <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <form noValidate onSubmit={handleSubmit(onSubmit)}>
           <ApplicantTypeSelector />
           <Page3 />
           <Buttons applicationPk={application.pk} submitDisabled={!isValid} />
-        </Form>
+        </form>
       </ApplicationPageWrapper>
     </FormProvider>
   );

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { breakpoints } from "../common/style";
 import Link from "next/link";
 import { fontMedium } from "../common/typography";
+import { Flex } from "../../styles/util";
 
 type CardVariant = "default" | "vertical";
 
@@ -51,14 +52,16 @@ const Wrapper = styled.div<{ $bgColor: string }>`
   }
 `;
 
-const ImageWrapper = styled.div`
-  display: flex;
+const ImageWrapper = styled(Flex).attrs({
+  $gap: "none",
+  $align: "center",
+  $justify: "center",
+  $direction: "row",
+})`
   overflow: hidden;
   width: 100%;
   max-height: 220px;
   background: var(--color-black-20);
-  align-items: center;
-  justify-content: center;
   a {
     display: block;
     width: 100%;
@@ -388,10 +391,11 @@ function Tags({ tags }: Readonly<{ tags?: JSX.Element[] }>) {
   );
 }
 
-const InfoItem = styled.div`
-  display: flex;
-  gap: var(--spacing-2-xs);
-  align-items: center;
+const InfoItem = styled(Flex).attrs({
+  $gap: "2-xs",
+  $align: "center",
+  $direction: "row",
+})`
   font-size: var(--fontsize-body-s);
   margin-top: auto;
 `;

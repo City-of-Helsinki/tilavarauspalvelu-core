@@ -30,30 +30,11 @@ import {
 } from "common/src/apolloUtils";
 import { useCheckPermission } from "@/hooks";
 import { isApplicationRoundInProgress } from "@/helpers";
-import { breakpoints } from "common";
 import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
 import { errorToast } from "common/src/common/toast";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
 import { Flex, TabWrapper, TitleSection } from "common/styles/util";
-
-const AllocationButtonsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: end;
-  gap: 1rem;
-  justify-content: space-between;
-
-  @media (min-width: ${breakpoints.s}) {
-    flex-direction: row;
-    align-items: center;
-  }
-`;
-
-const AllocationButtonContainer = styled.div`
-  flex-shrink: 0;
-  margin-left: auto;
-`;
 
 const TabContent = styled.div`
   display: grid;
@@ -63,8 +44,7 @@ const TabContent = styled.div`
 `;
 
 const StyledNotification = styled(Notification)`
-  margin-bottom: var(--spacing-m);
-  margin-top: var(--spacing-m);
+  margin-right: auto;
   max-width: 852px;
 `;
 
@@ -309,17 +289,15 @@ export function Review({
       {/* NOTE this check blocks users that don't have permissions to end the allocation
        * so for them it's always showing the allocation tool
        */}
-      <AllocationButtonsContainer>
+      <Flex $justify="space-between" $direction="row-reverse" $align="center">
         {isEndingAllowed || isHandled ? (
-          <div>
-            <EndAllocation
-              applicationRound={applicationRound}
-              refetch={refetch}
-            />
-          </div>
+          <EndAllocation
+            applicationRound={applicationRound}
+            refetch={refetch}
+          />
         ) : null}
         {!isHandled && (
-          <AllocationButtonContainer>
+          <>
             {isAllocationEnabled ? (
               <ButtonLikeLink to="allocation" variant="primary" size="large">
                 {t("ApplicationRound.allocate")}
@@ -329,9 +307,9 @@ export function Review({
                 {t("ApplicationRound.allocate")}
               </Button>
             )}
-          </AllocationButtonContainer>
+          </>
         )}
-      </AllocationButtonsContainer>
+      </Flex>
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTabIndex}>
           <Tabs.TabList>

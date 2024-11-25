@@ -1,22 +1,23 @@
-import React, { CSSProperties, ReactNode } from "react";
+import React, { type CSSProperties, type ReactNode } from "react";
 import styled from "styled-components";
 import { Koros } from "hds-react";
 import { H1 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { Flex } from "common/styles/util";
 
 interface IProps {
-  heroImage?: string;
+  heroImage: string;
   children?: ReactNode | ReactNode[];
   className?: string;
   style?: CSSProperties;
 }
 
-const Wrapper = styled.div.attrs({
-  style: {
-    "--fill-color": "var(--tilavaraus-admin-header-background-color)",
-    "--background-color": "var(--color-white)",
-  } as React.CSSProperties,
-})<{ $image?: string }>`
+const Wrapper = styled.div<{ $image?: string }>`
+  --fill-color: var(--tilavaraus-admin-header-background-color);
+  --background-color: var(--color-white);
+
+  display: flex;
+  flex-direction: column;
+
   ${({ $image }) =>
     $image
       ? `
@@ -27,60 +28,28 @@ const Wrapper = styled.div.attrs({
       : `
   background-color: var(--fill-color);
   `}
-  display: flex;
-  flex-direction: column;
 `;
 
-export const Heading = styled(H1).attrs({ $legacy: true })`
+export const Heading = styled(H1)`
   color: var(--color-white);
-  margin: 0 var(--spacing-m);
-  margin-bottom: var(--spacing-xs);
 `;
 
-const Content = styled.div<{ $heroImage: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+const Content = styled(Flex).attrs({
+  $align: "center",
+  $justify: "center",
+})`
   color: var(--color-white);
   width: 100%;
-  ${({ $heroImage }) =>
-    $heroImage
-      ? `
-      padding: var(--spacing-5-xl) 0;
-      justify-content: center;
-    `
-      : `
-      padding: 3.75rem 0 1.25rem;
-    `}
-
-  ${H1} {
-    ${({ $heroImage }) =>
-      $heroImage &&
-      `
-        font-size: var(--fontsize-heading-l);
-
-        @media (min-width: ${breakpoints.m}) {
-          font-size: var(--fontsize-heading-xl);
-        }
-      `}
-  }
+  padding: var(--spacing-5-xl) 0;
 `;
 
-const StyledKoros = styled(Koros).attrs(() => ({
-  style: {
-    fill: "var(--background-color)",
-    backgroundColor: "var(--fill-color)",
-  } as React.CSSProperties,
-}))<{ $hasImage: boolean }>`
-  ${({ $hasImage }) =>
-    $hasImage &&
-    `
-    background-color: transparent !important;
-  `}
+const StyledKoros = styled(Koros)`
+  --background-color: transparent;
+  fill: var(--color-white);
   height: 84px;
 `;
 
-function KorosHeading({
+export function KorosHeading({
   heroImage,
   className,
   style,
@@ -88,10 +57,8 @@ function KorosHeading({
 }: IProps): JSX.Element {
   return (
     <Wrapper $image={heroImage} className={className} style={style}>
-      <Content $heroImage={!!heroImage}>{children}</Content>
-      <StyledKoros type="pulse" $hasImage={!!heroImage} />
+      <Content>{children}</Content>
+      <StyledKoros type="pulse" />
     </Wrapper>
   );
 }
-
-export default KorosHeading;

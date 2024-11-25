@@ -5,19 +5,7 @@ import { useTranslation } from "next-i18next";
 import { Button, IconArrowRight, ImageWithCard } from "hds-react";
 import { fontMedium, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-
-const Wrapper = styled.div`
-  width: 100%;
-  @media (max-width: ${breakpoints.m}) {
-    display: flex;
-    flex-direction: column;
-    gap: 46px;
-  }
-`;
-
-const Heading = styled(H3)`
-  margin-top: var(--spacing-s);
-`;
+import { Flex } from "common/styles/util";
 
 const StyledImageWithCard = styled(ImageWithCard)<{ cardAlignment: string }>`
   && {
@@ -71,29 +59,20 @@ const StyledImageWithCard = styled(ImageWithCard)<{ cardAlignment: string }>`
   }
 `;
 
-const InfoContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-content: space-between;
+const InfoContainer = styled(Flex).attrs({
+  $gap: "none",
+})`
   word-break: break-word;
+
+  /* fix weird global positioning issues in the image card */
+  @media (min-width: ${breakpoints.m}) {
+    padding-top: var(--spacing-m);
+    padding-bottom: var(--spacing-m);
+  }
 
   a {
     ${fontMedium}
     text-decoration: underline;
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-top: var(--spacing-s);
-    margin-bottom: var(--spacing-m);
-  }
-`;
-
-const ButtonContainer = styled.div`
-  margin-top: var(--spacing-xs);
-
-  @media (max-width: ${breakpoints.s}) {
-    display: flex;
-    flex-direction: column;
   }
 `;
 
@@ -102,29 +81,27 @@ export function SearchGuides(): JSX.Element {
   const router = useRouter();
 
   return (
-    <Wrapper>
-      <StyledImageWithCard
-        cardAlignment="left"
-        cardLayout="hover"
-        color="primary"
-        src="images/guide-recurring.png"
-      >
-        <InfoContainer data-test-id="search-guide__recurring">
-          <div>
-            <Heading>{t("infoRecurring.heading")}</Heading>
-            <p>{t("infoRecurring.text")}</p>
-          </div>
-          <ButtonContainer>
-            <Button
-              id="browseRecurringReservationUnits"
-              onClick={() => router.push("/recurring")}
-              iconRight={<IconArrowRight />}
-            >
-              {t("browseRecurringReservationsButton")}
-            </Button>
-          </ButtonContainer>
-        </InfoContainer>
-      </StyledImageWithCard>
-    </Wrapper>
+    <StyledImageWithCard
+      cardAlignment="left"
+      cardLayout="hover"
+      color="primary"
+      src="images/guide-recurring.png"
+    >
+      <InfoContainer data-test-id="search-guide__recurring">
+        <H3 as="h2" $noMargin>
+          {t("infoRecurring.heading")}
+        </H3>
+        <p>{t("infoRecurring.text")}</p>
+        <Flex $marginTop="s">
+          <Button
+            id="browseRecurringReservationUnits"
+            onClick={() => router.push("/recurring")}
+            iconRight={<IconArrowRight />}
+          >
+            {t("browseRecurringReservationsButton")}
+          </Button>
+        </Flex>
+      </InfoContainer>
+    </StyledImageWithCard>
   );
 }

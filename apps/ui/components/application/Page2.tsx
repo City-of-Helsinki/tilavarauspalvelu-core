@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IconArrowRight, Notification } from "hds-react";
+import { Button, IconArrowRight, Notification } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
@@ -27,12 +27,11 @@ import {
   transformWeekday,
   type Day,
 } from "common/src/conversion";
-import { MediumButton } from "@/styles/util";
 import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { TimeSelector } from "./TimeSelector";
-import { ButtonContainer } from "../common/common";
 import { errorToast, successToast } from "common/src/common/toast";
+import { ButtonContainer } from "common/styles/util";
 
 type Node = NonNullable<ApplicationQuery["application"]>;
 type Props = {
@@ -479,19 +478,19 @@ function Page2({ application, onNext }: Props): JSX.Element {
         </Notification>
       )}
       <ButtonContainer>
-        <MediumButton
+        <Button
           variant="secondary"
           onClick={() => router.push(`${application.pk}/page1`)}
         >
           {t("common:prev")}
-        </MediumButton>
-        <MediumButton
+        </Button>
+        <Button
           id="button__application--next"
           iconRight={<IconArrowRight />}
           type="submit"
         >
           {t("common:next")}
-        </MediumButton>
+        </Button>
       </ButtonContainer>
     </form>
   );

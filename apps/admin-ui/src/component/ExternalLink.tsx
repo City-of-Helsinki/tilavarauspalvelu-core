@@ -4,26 +4,19 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 
 type Props = {
-  to: string | null;
-  children: string | null;
+  to: string;
+  children: string;
   size?: "xs" | "s" | "m" | "l" | "xl";
 };
 
-const Container = styled.div`
+const StyledLink = styled(Link)`
   display: inline-flex;
   align-items: center;
-
-  & svg {
-    margin-left: var(--spacing-2-xs);
-  }
+  gap: var(--spacing-2-xs);
+  text-decoration: none;
   &:hover {
     text-decoration: underline;
   }
-`;
-
-const Name = styled.span`
-  display: flex;
-  flex-direction: rows;
 `;
 
 export function ExternalLink({
@@ -31,15 +24,10 @@ export function ExternalLink({
   to,
   size,
 }: Props): JSX.Element | null {
-  if (children == null || to == null) {
-    return null;
-  }
   return (
-    <Link to={to} target="_blank" rel="noopener noreferrer">
-      <Container>
-        <Name>{children}</Name>
-        <IconLinkExternal size={size} aria-hidden />
-      </Container>
-    </Link>
+    <StyledLink to={to} target="_blank" rel="noopener noreferrer">
+      <span>{children}</span>
+      <IconLinkExternal size={size} aria-hidden />
+    </StyledLink>
   );
 }

@@ -34,7 +34,7 @@ const SingleLabelInputGroup = ({
 }: SingleLabelRangeInputProps) => {
   return (
     <div>
-      <Label aria-hidden>{label}</Label>
+      <Label aria-hidden="true">{label}</Label>
       <InputContainer>{children}</InputContainer>
     </div>
   );

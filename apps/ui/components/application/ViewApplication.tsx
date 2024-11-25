@@ -12,7 +12,6 @@ import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
 import {
   ApplicationSection,
   ApplicationSectionHeader,
-  CheckboxContainer,
   CompactTermsBox,
   StyledNotification,
   TermsAccordion as Accordion,
@@ -40,13 +39,15 @@ export function ViewApplication({
     application.status !== ApplicationStatusChoice.Draft;
   return (
     <>
-      <ApplicationSection>
-        <ApplicationSectionHeader>
-          {t("application:preview.basicInfoSubHeading")}
-        </ApplicationSectionHeader>
-        <ApplicantInfoPreview application={application} />
-      </ApplicationSection>
-      <ApplicationEventList application={application} />
+      <div>
+        <ApplicationSection>
+          <ApplicationSectionHeader>
+            {t("application:preview.basicInfoSubHeading")}
+          </ApplicationSectionHeader>
+          <ApplicantInfoPreview application={application} />
+        </ApplicationSection>
+        <ApplicationEventList application={application} />
+      </div>
       {tos && (
         <Accordion
           id="preview.acceptTermsOfUse"
@@ -70,17 +71,13 @@ export function ViewApplication({
         </Accordion>
       )}
       {acceptTermsOfUse != null && setAcceptTermsOfUse != null && (
-        <Accordion heading={t("application:preview.userAcceptsTerms")} open>
-          <CheckboxContainer>
-            <Checkbox
-              id="preview.acceptTermsOfUse"
-              checked={acceptTermsOfUse}
-              onChange={(e) => setAcceptTermsOfUse(e.target.checked)}
-              label={t("application:preview.userAcceptsTerms")}
-              // NOTE I'm assuming we can just hide the whole checkbox in View
-            />
-          </CheckboxContainer>
-        </Accordion>
+        <Checkbox
+          id="preview.acceptTermsOfUse"
+          checked={acceptTermsOfUse}
+          onChange={(e) => setAcceptTermsOfUse(e.target.checked)}
+          label={t("application:preview.userAcceptsTerms")}
+          // NOTE I'm assuming we can just hide the whole checkbox in View
+        />
       )}
       {shouldShowNotification && (
         <div>

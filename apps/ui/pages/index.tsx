@@ -26,7 +26,6 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 function Home({ purposes, units }: Props): JSX.Element {
   const { t } = useTranslation(["home", "common"]);
 
-  // FIXME add gap to the layout by default (or allow configuring it), need like 48px here
   return (
     <Flex>
       <Head heading={t("head.heading")} text={t("head.text")} />

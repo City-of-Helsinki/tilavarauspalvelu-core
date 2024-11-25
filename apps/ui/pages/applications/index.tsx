@@ -14,11 +14,10 @@ import {
   ApplicationOrderingChoices,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import ApplicationsGroup from "@/components/applications/ApplicationsGroup";
+import { ApplicationsGroup } from "@/components/applications/ApplicationsGroup";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useCurrentUser } from "@/hooks/user";
-import { HeroSubheading } from "@/modules/style/typography";
 import { H1 } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -181,14 +180,12 @@ function ApplicationsPage({
         <H1 $marginTop="l" $marginBottom="none">
           {t("applications:heading")}
         </H1>
-        <HeroSubheading>{t("applications:subHeading")}</HeroSubheading>
+        <p>{t("applications:subHeading")}</p>
       </div>
-      <div>
-        <ApplicationGroups
-          applications={applications}
-          actionCallback={actionCallback}
-        />
-      </div>
+      <ApplicationGroups
+        applications={applications}
+        actionCallback={actionCallback}
+      />
       {cancelled && (
         <Notification
           type="success"

@@ -438,7 +438,7 @@ function RequestedReservation({
         reservation={reservation}
         tagline={reservationTagline}
       />
-      <ButtonContainer $justify="flex-start" $noMargin>
+      <ButtonContainer $justify="flex-start">
         <ButtonsWithPermChecks
           reservation={reservation}
           onReservationUpdated={refetch}

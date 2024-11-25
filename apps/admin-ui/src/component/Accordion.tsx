@@ -3,6 +3,7 @@ import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { H2 } from "common/src/common/typography";
+import { Flex } from "common/styles/util";
 
 interface IProps {
   heading: string | JSX.Element | null;
@@ -20,11 +21,11 @@ const ToggleButton = styled.button`
   background: none;
 `;
 
-const Heading = styled.div<{ $disabled: boolean }>`
-  /* stylelint-disable csstools/value-no-unknown-custom-properties */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+const Heading = styled(Flex).attrs({
+  $align: "center",
+  $justify: "space-between",
+  $direction: "row",
+})<{ $disabled: boolean }>`
   cursor: pointer;
   user-select: none;
   border-bottom: 1px solid var(--border-color);

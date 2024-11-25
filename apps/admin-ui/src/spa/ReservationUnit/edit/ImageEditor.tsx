@@ -3,16 +3,9 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button, FileInput } from "hds-react";
 import { ImageType } from "@gql/gql-types";
-import { AutoGrid } from "common/styles/util";
+import { AutoGrid, Flex } from "common/styles/util";
 import { type ImageFormType } from "./form";
-
-const Actions = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 1em;
-
-  margin-bottom: var(--spacing-s);
-`;
+import { fontRegular } from "common";
 
 const StyledImage = styled.img`
   max-height: 12.5em;
@@ -71,7 +64,9 @@ const FileInputContainer = styled.div`
 const SmallButton = styled(Button).attrs({
   variant: "secondary",
   theme: "black",
+  size: "small",
 })`
+  ${fontRegular}
   border: 0;
   padding: 0;
   min-height: 0;
@@ -98,8 +93,8 @@ function ReservationUnitImage({
   const isMain = image.imageType === ImageType.Main;
   const { t } = useTranslation();
   return (
-    <div>
-      <Actions>
+    <Flex $gap="s">
+      <Flex $direction="row" $gap="m" $justify="space-between">
         {isMain ? (
           <span>{t("ImageEditor.mainImage")}</span>
         ) : (
@@ -116,9 +111,9 @@ function ReservationUnitImage({
         >
           {t("ImageEditor.deleteImage")}
         </SmallButton>
-      </Actions>
+      </Flex>
       <RUImage image={image} />
-    </div>
+    </Flex>
   );
 }
 

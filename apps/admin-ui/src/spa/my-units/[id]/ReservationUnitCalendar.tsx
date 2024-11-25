@@ -13,7 +13,7 @@ import {
 } from "@gql/gql-types";
 import { getEventBuffers } from "common/src/calendar/util";
 import { getReservationUrl } from "@/common/urls";
-import Legend from "@/component/Legend";
+import { Legend, LegendsWrapper } from "@/component/Legend";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
@@ -26,13 +26,6 @@ type Props = {
   reservationUnitPk: number;
   unitPk: number;
 };
-
-const Legends = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xl);
-  padding: var(--spacing-m) 0;
-`;
 
 const Container = styled.div`
   .rbc-event-label {
@@ -170,13 +163,13 @@ export function ReservationUnitCalendar({
         }}
         underlineEvents
       />
-      <Legends>
+      <LegendsWrapper>
         {legend
           .filter((l) => !calendarEventExcludedLegends.includes(l.key))
           .map((l) => (
             <Legend key={l.label} style={l.style} label={t(l.label)} />
           ))}
-      </Legends>
+      </LegendsWrapper>
     </Container>
   );
 }

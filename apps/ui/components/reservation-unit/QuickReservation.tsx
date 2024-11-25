@@ -53,10 +53,6 @@ const Form = styled.form`
   }
 `;
 
-const Heading = styled(H4).attrs({ as: "h3" })`
-  margin: 0;
-`;
-
 const Price = styled.div`
   & > * {
     display: inline-block;
@@ -179,7 +175,9 @@ export function QuickReservation({
       className={className}
       style={style}
     >
-      <Heading>{t("reservationCalendar:quickReservation.heading")}</Heading>
+      <H4 as="h2" $noMargin>
+        {t("reservationCalendar:quickReservation.heading")}
+      </H4>
       <Selects>
         <ControlledDateInput
           id="quick-reservation-date"

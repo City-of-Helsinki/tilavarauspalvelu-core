@@ -13,7 +13,6 @@ import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { getApplicationPath } from "@/modules/urls";
 import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
 import { H1 } from "common";
-import { FontMedium } from "./styled";
 
 const InnerContainer = styled.div<{ $hideStepper: boolean }>`
   display: grid;
@@ -115,8 +114,10 @@ export function ApplicationPageWrapper({
   return (
     <>
       <BreadcrumbWrapper route={["/applications", "application"]} />
-      <H1 $noMargin>{title}</H1>
-      <FontMedium>{subTitle}</FontMedium>
+      <div>
+        <H1 $noMargin>{title}</H1>
+        <p>{subTitle}</p>
+      </div>
       <InnerContainer $hideStepper={hideStepper}>
         {hideStepper ? null : <Stepper {...steps} />}
         <>

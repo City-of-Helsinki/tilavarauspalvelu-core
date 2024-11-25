@@ -113,7 +113,10 @@ function getApplicationStatusLabelProps(
   }
 }
 
-function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
+export function ApplicationCard({
+  application,
+  actionCallback,
+}: Props): JSX.Element {
   const { t } = useTranslation();
   const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
 
@@ -186,7 +189,7 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
   return (
     <Card
       heading={getApplicationRoundName(applicationRound)}
-      headingLevel={2}
+      headingLevel={3}
       text={
         application.applicantType != null ? getApplicant(application, t) : ""
       }
@@ -212,5 +215,3 @@ function ApplicationCard({ application, actionCallback }: Props): JSX.Element {
     </Card>
   );
 }
-
-export default ApplicationCard;

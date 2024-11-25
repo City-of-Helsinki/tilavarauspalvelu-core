@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled, { css, FlattenSimpleInterpolation } from "styled-components";
 import { truncatedText } from "../../styles/util";
+import { Flex } from "common/styles/util";
 
 type LegendItemT = {
   title: string;
@@ -14,14 +15,15 @@ type Props = {
   items?: LegendItemT[];
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled(Flex).attrs({
+  $wrap: "wrap",
+  $justify: "space-between",
+  $direction: "row",
+})`
   margin-top: var(--spacing-m);
   margin-bottom: var(--spacing-l);
   width: 100%;
   gap: var(--spacing-s) var(--spacing-xs);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
 `;
 
 const LegendItem = styled.div<{

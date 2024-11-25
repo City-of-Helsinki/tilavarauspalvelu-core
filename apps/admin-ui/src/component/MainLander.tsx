@@ -6,7 +6,7 @@ import { Button, IconArrowRight, IconGroup } from "hds-react";
 import { H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { HERO_IMAGE_URL } from "@/common/const";
-import KorosHeading, { Heading } from "./KorosHeading";
+import { KorosHeading, Heading } from "./KorosHeading";
 
 const LoginBtn = styled(Button).attrs({
   iconLeft: <IconGroup className="icon-group" />,

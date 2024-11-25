@@ -18,9 +18,8 @@ import {
 } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
-import Loader from "@/component/Loader";
 import { useOptions } from "@/hooks";
-import { autoGridCss, TabWrapper } from "common/styles/util";
+import { autoGridCss, CenterSpinner, TabWrapper } from "common/styles/util";
 import { errorToast } from "common/src/common/toast";
 import {
   ALLOCATION_POLL_INTERVAL,
@@ -610,7 +609,7 @@ function AllocationWrapper({
   // TODO don't use spinners, skeletons are better
   // also this blocks the sub component query (the initial with zero filters) which slows down the page load
   if (loading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   // TODO improve this (disabled filters if error, notify the user, but don't block the whole page)

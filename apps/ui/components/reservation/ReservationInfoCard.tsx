@@ -76,21 +76,14 @@ const Content = styled(Flex).attrs({
   padding: 1px var(--spacing-m) var(--spacing-xs);
 `;
 
-const Heading = styled(H4).attrs({ as: "h3" })`
-  margin-top: var(--spacing-m);
-  margin-bottom: 0;
-`;
-
 const StyledLink = styled(Link)`
   text-decoration: underline;
   color: var(--color-black-90);
   text-underline-offset: 4px;
 `;
 
-const Value = styled.div``;
-
-const Subheading = styled(Value)`
-  font-size: var(--fontsize-body-l);
+const Subheading = styled.p`
+  margin: 0;
 `;
 
 type Props = {
@@ -161,14 +154,14 @@ export function ReservationInfoCard({
     <Wrapper $type={type} className={className} style={style}>
       {!disableImage && <MainImage src={imgSrc} alt={name} />}
       <Content data-testid="reservation__reservation-info-card__content">
-        <Heading>
+        <H4 as="h2" $marginBottom="none">
           <StyledLink
             data-testid="reservation__reservation-info-card__reservationUnit"
             href={getReservationUnitPath(reservationUnit.pk)}
           >
             {name}
           </StyledLink>
-        </Heading>
+        </H4>
         {(type === "confirmed" || type === "complete") && (
           <Subheading>
             {t("reservations:reservationNumber")}:{" "}
@@ -182,12 +175,12 @@ export function ReservationInfoCard({
             ? getTranslation(reservationUnit.unit, "name")
             : "-"}
         </Subheading>
-        <Value data-testid="reservation__reservation-info-card__duration">
+        <div data-testid="reservation__reservation-info-card__duration">
           <Strong>
             {capitalize(timeString)}, {formatDuration(duration, t)}
           </Strong>
-        </Value>
-        <Value data-testid="reservation__reservation-info-card__price">
+        </div>
+        <div data-testid="reservation__reservation-info-card__price">
           {t("common:price")}: <Strong>{price}</Strong>{" "}
           {taxPercentageValue &&
             shouldDisplayTaxPercentage &&
@@ -196,7 +189,7 @@ export function ReservationInfoCard({
                 parseFloat(taxPercentageValue)
               ),
             })})`}
-        </Value>
+        </div>
       </Content>
     </Wrapper>
   );

@@ -36,10 +36,6 @@ const Wrapper = styled.div`
   }
 `;
 
-const Heading = styled(H6)`
-  margin-top: 0;
-`;
-
 const Content = styled.div`
   max-height: 18.75rem;
   min-height: 7.5rem;
@@ -63,9 +59,9 @@ const LinkList = styled.ul`
 `;
 
 const Anchor = styled(Link)`
-  color: var(--color-black) !important;
+  color: var(--color-black);
   text-decoration: underline;
-  display: flex;
+  display: inline-flex;
   gap: var(--spacing-2-xs);
 
   svg {
@@ -90,7 +86,7 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
-const TermsBox = ({
+function TermsBox({
   id,
   heading,
   body,
@@ -99,13 +95,17 @@ const TermsBox = ({
   accepted,
   setAccepted,
   ...rest
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const canAccept = Boolean(acceptLabel) && Boolean(setAccepted);
 
   return (
     <Wrapper {...rest} id={id}>
       <Content>
-        {heading && <Heading>{heading}</Heading>}
+        {heading && (
+          <H6 as="h2" $marginTop="none">
+            {heading}
+          </H6>
+        )}
         {typeof body === "string" ? <p>{body}</p> : body}
         {links && links?.length > 0 && (
           <LinkList>
@@ -138,6 +138,6 @@ const TermsBox = ({
       )}
     </Wrapper>
   );
-};
+}
 
 export default TermsBox;

@@ -1,8 +1,7 @@
 import React from "react";
-import styled from "styled-components";
 import { H2 } from "common/src/common/typography";
 import { type ApplicationsQuery } from "@gql/gql-types";
-import ApplicationCard from "./ApplicationCard";
+import { ApplicationCard } from "./ApplicationCard";
 import { Flex } from "common/styles/util";
 
 type Props = {
@@ -15,11 +14,7 @@ type Props = {
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
-const Wrapper = styled(Flex)`
-  margin-bottom: var(--spacing-layout-l);
-`;
-
-function ApplicationsGroup({
+export function ApplicationsGroup({
   name,
   applications,
   actionCallback,
@@ -38,8 +33,10 @@ function ApplicationsGroup({
   });
 
   return (
-    <Wrapper data-testid="applications__group--wrapper">
-      <H2 $noMargin>{name}</H2>
+    <Flex data-testid="applications__group--wrapper">
+      <H2 $marginTop="l" $marginBottom="none">
+        {name}
+      </H2>
       {applications.map((application) => (
         <ApplicationCard
           key={application.pk}
@@ -47,8 +44,6 @@ function ApplicationsGroup({
           actionCallback={actionCallback}
         />
       ))}
-    </Wrapper>
+    </Flex>
   );
 }
-
-export default ApplicationsGroup;

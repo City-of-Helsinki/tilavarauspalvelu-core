@@ -10,7 +10,7 @@ import {
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
-import Legend from "@/component/Legend";
+import { Legend, LegendsWrapper } from "@/component/Legend";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { isPossibleToEdit } from "./reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
@@ -31,13 +31,6 @@ type Props = {
   focusDate: Date;
   events: Array<CalendarEventType>;
 };
-
-const Legends = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-xl);
-  padding: var(--spacing-m) 0;
-`;
 
 const Container = styled.div`
   .rbc-calendar {
@@ -133,11 +126,11 @@ function Calendar({
           }
         }}
       />
-      <Legends>
+      <LegendsWrapper>
         {legend.map((l) => (
           <Legend key={l.label} style={l.style} label={t(l.label)} />
         ))}
-      </Legends>{" "}
+      </LegendsWrapper>
     </Container>
   );
 }

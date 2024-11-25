@@ -649,18 +649,18 @@ function ReservationUnit({
       </div>
       <PageContentWrapper>
         <div data-testid="reservation-unit__description">
-          <H4 as="h3">{t("reservationUnit:description")}</H4>
+          <H4 as="h2">{t("reservationUnit:description")}</H4>
           <Sanitize html={getTranslation(reservationUnit, "description")} />
         </div>
         {equipment?.length > 0 && (
           <div data-testid="reservation-unit__equipment">
-            <H4 as="h3">{t("reservationUnit:equipment")}</H4>
+            <H4 as="h2">{t("reservationUnit:equipment")}</H4>
             <EquipmentList equipment={equipment} />
           </div>
         )}
         {reservationUnitIsReservable && (
           <div data-testid="reservation-unit__calendar--wrapper">
-            <H4 as="h3">
+            <H4 as="h2">
               {t("reservations:reservationCalendar", {
                 title: getTranslation(reservationUnit, "name"),
               })}
@@ -690,6 +690,7 @@ function ReservationUnit({
           <Accordion
             heading={t("reservationUnit:terms")}
             disableBottomMargin
+            headingLevel={2}
             theme="thin"
             data-testid="reservation-unit__reservation-notice"
           >
@@ -703,6 +704,7 @@ function ReservationUnit({
         {showApplicationRoundTimeSlots && (
           <Accordion
             disableBottomMargin
+            headingLevel={2}
             heading={t("reservationUnit:recurringHeading")}
           >
             <p>{t("reservationUnit:recurringBody")}</p>

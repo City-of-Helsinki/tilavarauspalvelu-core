@@ -6,12 +6,6 @@ import { AccordionWithState } from "@/components/Accordion";
 import { H5 } from "common/src/common/typography";
 import { Flex, FullRow } from "common/styles/util";
 
-export const CheckboxContainer = styled.div`
-  margin-top: var(--spacing-m);
-  display: flex;
-  align-items: center;
-`;
-
 // TODO this belongs to application view page
 export const StyledNotification = styled(Notification)`
   line-height: var(--fontsize-heading-m);
@@ -35,7 +29,6 @@ export const ApplicationSection = styled.section`
 
   &:last-of-type {
     border-bottom: 1px solid var(--color-black-90);
-    margin-bottom: var(--spacing-layout-s);
   }
 `;
 
@@ -92,8 +85,9 @@ export const InfoItemContainer = styled(Flex).attrs({
 
 export const InfoItem = styled(Flex).attrs({
   $align: "stretch",
+  $marginTop: "m",
+  $marginBottom: "m",
 })`
-  margin: var(--spacing-m) 0;
   height: 100%;
   box-sizing: border-box;
   width: 100%;
@@ -168,6 +162,7 @@ export const ScheduleDay = styled.div`
 `;
 
 export const TermsAccordion = styled(AccordionWithState)`
+  margin-bottom: 0;
   --accordion-border-color: var(--color-black-90);
   [class^="Button-module_label"] div {
     font-size: var(--fontsize-heading-s);
@@ -185,7 +180,7 @@ export const FontMedium = styled.div`
 
 export const SpanTwoColumns = styled(FullRow).attrs({ as: "span" })``;
 
-export const FormSubHeading = styled(H5)`
+export const FormSubHeading = styled(H5).attrs({ as: "h2" })`
   margin: var(--spacing-m) 0 0 0;
   grid-column: 1 / -1;
 `;

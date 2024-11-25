@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { H4 } from "common/src/common/typography";
+import { fontMedium, H4 } from "common/src/common/typography";
 import type {
   Maybe,
   UnitNode,
@@ -26,10 +26,9 @@ const AddressSpan = styled.span`
 
 const Links = styled(Flex).attrs({
   $gap: "xs",
+  $marginTop: "m",
 })`
-  margin-top: var(--spacing-m);
-  font-family: var(--font-medium);
-  font-weight: 500;
+  ${fontMedium}
 
   /* IconButton includes too much padding */
   && > * > * {
@@ -124,7 +123,7 @@ export function AddressSection({ reservationUnit }: Props): JSX.Element {
 
   return (
     <div data-testid="reservation-unit__address--container">
-      <H4 as="h3">{getTranslation(reservationUnit, "name")}</H4>
+      <H4 as="h2">{getTranslation(reservationUnit, "name")}</H4>
       {addressStreet && <AddressSpan>{addressStreet}</AddressSpan>}
       {location?.addressZip && addressCity && (
         <AddressSpan>{`, ${location?.addressZip} ${addressCity}`}</AddressSpan>

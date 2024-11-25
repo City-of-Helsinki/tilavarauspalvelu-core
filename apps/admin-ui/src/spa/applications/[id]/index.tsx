@@ -10,6 +10,7 @@ import {
   IconCross,
   IconArrowRedo,
   Tag,
+  IconCogwheel,
 } from "hds-react";
 import { isEqual, trim } from "lodash";
 import { type ApolloQueryResult } from "@apollo/client";
@@ -45,15 +46,16 @@ import Loader from "@/component/Loader";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/component/StickyHeader";
-import StatusBlock from "@/component/StatusBlock";
 import { BirthDate } from "@/component/BirthDate";
 import { ValueBox } from "../ValueBox";
 import { TimeSelector } from "../TimeSelector";
-import { getApplicantName, getApplicationStatusColor } from "@/helpers";
+import { getApplicantName } from "@/helpers";
 import Error404 from "@/common/Error404";
 import { useCheckPermission } from "@/hooks";
 import { errorToast } from "common/src/common/toast";
 import { Flex, TitleSection } from "common/styles/util";
+import { StatusLabelType } from "common/src/tags";
+import { StatusLabel } from "common/src/components";
 
 type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
 type ApplicationSectionType = NonNullable<
@@ -81,52 +83,49 @@ function printSuitableTimes(
 }
 
 function getApplicationStatusIcon(status: ApplicationStatusChoice): {
-  icon: ReactNode | null;
-  style: React.CSSProperties;
+  icon: JSX.Element;
+  type: StatusLabelType;
 } {
   switch (status) {
     case ApplicationStatusChoice.Handled:
       return {
-        icon: (
-          <IconCheck aria-hidden style={{ color: "var(--color-success)" }} />
-        ),
-        style: { fontSize: "var(--fontsize-heading-xs)" },
+        type: "success",
+        icon: <IconCheck aria-hidden="true" />,
       };
     case ApplicationStatusChoice.ResultsSent:
       return {
+        type: "success",
         icon: <IconEnvelope aria-hidden />,
-        style: { fontSize: "var(--fontsize-heading-xs)" },
       };
+    case ApplicationStatusChoice.InAllocation:
+    case ApplicationStatusChoice.Received:
+      return {
+        type: "info",
+        icon: <IconCogwheel aria-hidden="true" />,
+      };
+    case ApplicationStatusChoice.Cancelled:
+    case ApplicationStatusChoice.Draft:
+    case ApplicationStatusChoice.Expired:
     default:
       return {
-        icon: null,
-        style: {},
+        type: "neutral",
+        icon: <IconCross aria-hidden="true" />,
       };
   }
 }
 
-const StyledStatusBlock = styled(StatusBlock)`
-  margin: 0;
-`;
-
 function ApplicationStatusBlock({
   status,
-  className,
 }: {
   status: ApplicationStatusChoice;
-  className?: string;
 }): JSX.Element {
   const { t } = useTranslation();
 
-  const { icon, style } = getApplicationStatusIcon(status);
+  const { icon, type } = getApplicationStatusIcon(status);
   return (
-    <StyledStatusBlock
-      statusStr={t(`Application.statuses.${status}`)}
-      color={getApplicationStatusColor(status, "l")}
-      icon={icon}
-      className={className}
-      style={style}
-    />
+    <StatusLabel type={type} icon={icon}>
+      {t(`ApplicationRound.statuses.${status}`)}
+    </StatusLabel>
   );
 }
 

@@ -66,9 +66,13 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 // TODO clean this up, way too much css
 // also this breaks way too early to two lines (should just have no-wrap on the two elements)
 // reason is the way the separator is added
-const SubHeading = styled(H4).attrs({ as: "p" })`
-  ${fontRegular}
-  margin-top: 0;
+const SubHeading = styled(H4).attrs({
+  as: "p",
+  $noMargin: true,
+})`
+  && {
+    ${fontRegular}
+  }
 
   /* TODO make this into a css fragment */
   a,
@@ -78,7 +82,7 @@ const SubHeading = styled(H4).attrs({ as: "p" })`
     display: block;
 
     /* TODO the problem here is that it relies on the size of the window instead if we are splitting the line or not */
-    @media (width > ${breakpoints.m}) {
+    @media (min-width: ${breakpoints.m}) {
       &:after {
         content: "|";
         position: relative;

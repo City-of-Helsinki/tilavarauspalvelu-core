@@ -4,6 +4,7 @@ import { IconSortAscending, IconSortDescending, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common";
+import { Flex } from "common/styles/util";
 
 type OptionType = {
   label: string;
@@ -18,10 +19,17 @@ type Props = {
   className?: string;
 };
 
-const Wrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
+const Wrapper = styled(Flex).attrs({
+  $align: "center",
+  $direction: "row",
+  $gap: "xs",
+  $justify: "flex-end",
+  $wrap: "wrap",
+})`
+  flex-grow: 1;
+
+  padding: var(--spacing-xs);
+  background-color: var(--color-black-5);
 
   label {
     ${fontMedium};
@@ -40,27 +48,28 @@ const OrderBtn = styled.button`
   }
 `;
 
+// without min-width the select size changes depending on the content
+// correct way would be calculate the width based on the content
 const StyledSelect = styled(Select<OptionType>)`
   min-width: 230px;
   flex-grow: 1;
   @media (min-width: ${breakpoints.s}) {
-    padding-left: var(--spacing-s);
     flex-grow: 0;
   }
 `;
 
+// NOTE this is not used anywhere except SortingComponent.tsx
 export function Sorting({
   value,
   sortingOptions,
   setSorting,
   isOrderingAsc,
   setIsOrderingAsc,
-  className,
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
   return (
-    <Wrapper className={className}>
+    <Wrapper>
       <OrderBtn
         type="button"
         onClick={() => setIsOrderingAsc(!isOrderingAsc)}

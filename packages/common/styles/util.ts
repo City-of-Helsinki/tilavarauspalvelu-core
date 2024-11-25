@@ -55,7 +55,7 @@ export type SpacingSize =
 
 // TODO should allow for switching to smaller gap on mobile (scale down)
 export const Flex = styled.div<{
-  $direction?: "row" | "column";
+  $direction?: "row" | "column" | "row-reverse" | "column-reverse";
   $gap?: SpacingSize;
   $marginTop?: SpacingSize;
   $marginBottom?: SpacingSize;
@@ -74,8 +74,7 @@ export const Flex = styled.div<{
   flex-wrap: ${({ $wrap }) => $wrap ?? "nowrap"};
   gap: ${({ $gap }) =>
     $gap != null ? `var(--spacing-${$gap})` : "var(--spacing-m)"};
-  flex-direction: ${({ $direction }) =>
-    $direction === "row" ? "row" : "column"};
+  flex-direction: ${({ $direction }) => $direction ?? "column"};
   justify-content: ${({ $justify }) => $justify ?? "initial"};
   align-items: ${({ $align }) => $align ?? "initial"};
   margin-top: ${({ $marginTop }) =>
@@ -90,7 +89,6 @@ export const Flex = styled.div<{
 // three buttons need a 1, 1/2, 1/2 layout on mobile (100% width total, two rows)
 // four buttons need 1/2, 1/2, 1/2, 1/2 layout on mobile (100% width total, two rows)
 export const ButtonContainer = styled.div<{
-  $noMargin?: boolean;
   $justify?:
     | "center"
     | "flex-start"
@@ -98,12 +96,16 @@ export const ButtonContainer = styled.div<{
     | "space-between"
     | "space-around"
     | "space-evenly";
+  $marginTop?: SpacingSize;
+  $marginBottom?: SpacingSize;
 }>`
   display: inline-flex;
   flex-wrap: wrap;
   gap: var(--spacing-2-xs);
   width: 100%;
-  margin-bottom: ${({ $noMargin }) => ($noMargin ? "0" : "var(--spacing-s);")};
+  margin-bottom: ${({ $marginBottom }) =>
+    `var(--spacing-${$marginBottom ?? "none"})`};
+  margin-top: ${({ $marginTop }) => `var(--spacing-${$marginTop ?? "none"})`};
   justify-content: ${({ $justify }) => $justify ?? "flex-end"};
 
   @media (max-width: ${breakpoints.s}) {

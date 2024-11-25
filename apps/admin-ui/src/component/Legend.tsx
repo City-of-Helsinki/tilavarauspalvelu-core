@@ -1,3 +1,4 @@
+import { Flex } from "common/styles/util";
 import React from "react";
 import styled from "styled-components";
 
@@ -6,11 +7,12 @@ type Props = {
   style: React.CSSProperties;
 };
 
-const Container = styled.div`
+const Container = styled(Flex).attrs({
+  $gap: "xs",
+  $direction: "row",
+  $align: "center",
+})`
   max-width: 14em;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
   font-size: var(--fontsize-body-s);
 `;
 
@@ -19,13 +21,19 @@ const Box = styled.div`
   min-width: 3em;
 `;
 
-const Legend = ({ label, style }: Props): JSX.Element => {
+export const LegendsWrapper = styled(Flex).attrs({
+  $gap: "xl",
+  $direction: "row",
+  $wrap: "wrap",
+})`
+  padding: var(--spacing-m) 0;
+`;
+
+export function Legend({ label, style }: Props): JSX.Element {
   return (
     <Container>
       <Box style={style} />
       {label}
     </Container>
   );
-};
-
-export default Legend;
+}

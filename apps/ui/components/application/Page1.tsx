@@ -1,4 +1,4 @@
-import { IconArrowRight, IconPlusCircle } from "hds-react";
+import { Button, IconArrowRight, IconPlusCircle } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { uniq } from "lodash";
@@ -9,12 +9,11 @@ import {
 import { useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
 import { getTranslation } from "@/modules/util";
-import { MediumButton } from "@/styles/util";
 import { useOptions } from "@/hooks/useOptions";
-import { ButtonContainer } from "../common/common";
 import { ApplicationEvent } from "./ApplicationEvent";
 import { type ApplicationFormValues } from "./Form";
 import useReservationUnitsList from "@/hooks/useReservationUnitList";
+import { ButtonContainer } from "common/styles/util";
 
 type Node = NonNullable<ApplicationQuery["application"]>;
 type AppRoundNode = NonNullable<Node["applicationRound"]>;
@@ -138,26 +137,25 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
           />
         ) : null
       )}
-      <MediumButton
+      <Button
         id="addApplicationEvent"
         variant="supplementary"
         iconLeft={<IconPlusCircle />}
         onClick={handleAddNewApplicationEvent}
         size="small"
-        style={{ gap: "var(--spacing-s)" }}
       >
         {t("application:Page1.createNew")}
-      </MediumButton>
-      <ButtonContainer style={{ marginTop: "var(--spacing-s)" }}>
+      </Button>
+      <ButtonContainer>
         <div />
-        <MediumButton
+        <Button
           id="button__application--next"
           iconRight={<IconArrowRight />}
           disabled={submitDisabled}
           type="submit"
         >
           {t("common:next")}
-        </MediumButton>
+        </Button>
       </ButtonContainer>
     </form>
   );

@@ -119,7 +119,7 @@ function Unit(): JSX.Element {
       <ExternalLink to={`${UNIT_REGISTRY_LINK}${unit.tprekId}`}>
         {t("Unit.maintainOpeningHours")}
       </ExternalLink>
-      <H2>{t("Unit.reservationUnitTitle")}</H2>
+      <H2 $noMargin>{t("Unit.reservationUnitTitle")}</H2>
       <Flex $direction="row" $justify="space-between">
         {reservationUnits.length > 0 ? (
           <ResourceUnitCount>

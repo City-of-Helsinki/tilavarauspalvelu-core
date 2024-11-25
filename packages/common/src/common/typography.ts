@@ -1,5 +1,6 @@
 import styled, { css } from "styled-components";
 import { breakpoints } from "./style";
+import { type SpacingSize } from "../../styles/util";
 
 export const fontRegular = css`
   font-family: var(--font-regular);
@@ -39,8 +40,8 @@ export const Regular = styled.span`
 export const H1 = styled.h1<{
   $large?: boolean;
   $noMargin?: boolean;
-  $marginTop?: "none" | "xs" | "s" | "m" | "l" | "xl";
-  $marginBottom?: "none" | "xs" | "s" | "m" | "l" | "xl";
+  $marginTop?: SpacingSize;
+  $marginBottom?: SpacingSize;
 }>`
   font-size: ${({ $large }) =>
     !$large
@@ -62,13 +63,18 @@ export const H1 = styled.h1<{
 `;
 
 // TODO where is $large used?
-export const H2 = styled.h2<{ $large?: boolean; $noMargin?: boolean }>`
+export const H2 = styled.h2<{
+  $large?: boolean;
+  $noMargin?: boolean;
+  $marginTop?: SpacingSize;
+  $marginBottom?: SpacingSize;
+}>`
   font-size: ${({ $large }) =>
     !$large ? `var(--fontsize-heading-m)` : `var(--fontsize-heading-l)`};
   ${fontRegular}
   line-height: var(--lineheight-s);
-  margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
-  margin-top: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-s)`)};
+  margin-bottom: ${({ $noMargin, $marginBottom }) => ($noMargin ? `0` : `var(--spacing-${$marginBottom ?? "m"})`)};
+  margin-top: ${({ $noMargin, $marginTop }) => ($noMargin ? `0` : `var(--spacing-${$marginTop ?? "s"})`)};
 
   @media (width > ${breakpoints.s}) {
     ${({ $large }) =>
@@ -99,12 +105,18 @@ export const H3 = styled.h3<{ $large?: boolean; $noMargin?: boolean }>`
   }
 `;
 
-export const H4 = styled.h4<{ $noMargin?: boolean }>`
+export const H4 = styled.h4<{
+  $noMargin?: boolean;
+  $marginTop?: SpacingSize;
+  $marginBottom?: SpacingSize;
+}>`
   font-size: var(--fontsize-heading-s);
   ${fontMedium}
   line-height: var(--lineheight-m);
-  margin-bottom: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-s)`)};
-  margin-top: ${({ $noMargin }) => ($noMargin ? `0` : `var(--spacing-m)`)};
+  margin-bottom: ${({ $noMargin, $marginBottom }) =>
+    $noMargin ? `0` : `var(--spacing-${$marginBottom ?? "s"})`};
+  margin-top: ${({ $noMargin, $marginTop }) =>
+    $noMargin ? `0` : `var(--spacing-${$marginTop ?? "s"})`};
 
   @media (width > ${breakpoints.s}) {
     font-size: var(--fontsize-heading-m);
@@ -113,8 +125,8 @@ export const H4 = styled.h4<{ $noMargin?: boolean }>`
 
 export const H5 = styled.h5<{
   $noMargin?: boolean;
-  $marginTop?: "none" | "xs" | "s" | "m" | "l" | "xl";
-  $marginBottom?: "none" | "xs" | "s" | "m" | "l" | "xl";
+  $marginTop?: SpacingSize;
+  $marginBottom?: SpacingSize;
 }>`
   font-size: var(--fontsize-heading-xs);
   ${fontBold}
@@ -130,11 +142,16 @@ export const H5 = styled.h5<{
   }
 `;
 
-export const H6 = styled.h6`
+export const H6 = styled.h6<{
+  $marginTop?: SpacingSize;
+  $marginBottom?: SpacingSize;
+}>`
   font-size: var(--fontsize-heading-xs);
   ${fontBold}
   line-height: 1.4;
-  margin-bottom: var(--spacing-m);
+  margin-bottom: ${({ $marginBottom }) =>
+    `var(--spacing-${$marginBottom ?? "m"})`};
+  margin-top: ${({ $marginTop }) => `var(--spacing-${$marginTop ?? "s"})`};
 
   @media (width > ${breakpoints.s}) {
     font-size: var(--fontsize-heading-xs);

@@ -2,8 +2,8 @@ import React from "react";
 import { Button } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Strong, fontMedium } from "common/src/common/typography";
-import { ApolloQueryResult } from "@apollo/client";
+import { H5, Strong, fontMedium } from "common/src/common/typography";
+import { type ApolloQueryResult } from "@apollo/client";
 import {
   Priority,
   type ApplicationSectionAllocationsQuery,
@@ -30,6 +30,7 @@ import {
   useRemoveAllocation,
 } from "./hooks";
 import { getApplicantName } from "@/helpers";
+import { Flex } from "common/styles/util";
 
 type Props = {
   applicationSection: SectionNodeT;
@@ -46,7 +47,9 @@ type Props = {
   allocatedTimeSlot: AllocatedTimeSlotNodeT;
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled(Flex).attrs({
+  $gap: "2-xs",
+})`
   &:last-of-type {
     border: 0;
     margin-bottom: 0;
@@ -55,12 +58,6 @@ const Wrapper = styled.div`
   border-bottom: 1px solid var(--color-black-50);
   margin-bottom: var(--spacing-s);
   padding-bottom: var(--spacing-s);
-`;
-
-const ApplicationEventName = styled.h2`
-  ${fontMedium}
-  font-size: var(--fontsize-body-l);
-  line-height: var(--lineheight-l);
 `;
 
 const Applicant = styled.div`
@@ -82,18 +79,10 @@ const DetailRow = styled.div`
   }
 `;
 
-// NOTE flex-wrap doesn't match the design, but there is layout shifts without it
-// so when removing it, fix the card size changing when there is more than one button.
-const Actions = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-top: var(--spacing-s);
-  gap: var(--spacing-s);
-  & > * {
-    width: 100%;
-  }
-`;
+const Actions = styled(Flex).attrs({
+  $gap: "s",
+  $justify: "space-between",
+})``;
 
 const StyledAccordion = styled(Accordion)`
   --header-font-size: 1rem;
@@ -110,13 +99,6 @@ const StyledAccordion = styled(Accordion)`
     ${fontMedium}
     padding: 0;
   }
-`;
-
-const DetailContainer = styled.div`
-  padding-top: var(--spacing-2-xs);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2-xs);
 `;
 
 /// Why two different components?
@@ -181,7 +163,9 @@ export function AllocatedCard({
 
   return (
     <Wrapper>
-      <ApplicationEventName>{applicationSection.name}</ApplicationEventName>
+      <H5 as="h3" $noMargin>
+        {applicationSection.name}
+      </H5>
       <Applicant>{applicantName}</Applicant>
       {allocatedTimeSlot != null ? (
         <AllocatedDetails
@@ -197,18 +181,16 @@ export function AllocatedCard({
       </StyledAccordion>
       {/* TODO this could be abstracted into a common component (both cards use it, but use diferent error messages and durations
        * a common error component, since there is also a third different error message (with "error" type) */}
-      <DetailContainer>
-        {isTimeMismatch ? (
-          <NotificationInline type="alert">
-            {t("Allocation.errors.allocatedOutsideOfRequestedTimes")}
-          </NotificationInline>
-        ) : null}
-        {durationIsInvalid ? (
-          <NotificationInline type="alert">
-            {t("Allocation.errors.allocatedDurationIsIncorrect")}
-          </NotificationInline>
-        ) : null}
-      </DetailContainer>
+      {isTimeMismatch ? (
+        <NotificationInline type="alert">
+          {t("Allocation.errors.allocatedOutsideOfRequestedTimes")}
+        </NotificationInline>
+      ) : null}
+      {durationIsInvalid ? (
+        <NotificationInline type="alert">
+          {t("Allocation.errors.allocatedDurationIsIncorrect")}
+        </NotificationInline>
+      ) : null}
       <Actions>
         <Button
           size="small"
@@ -312,31 +294,29 @@ export function SuitableTimeCard({
 
   return (
     <Wrapper>
-      <ApplicationEventName>{applicationSection.name}</ApplicationEventName>
+      <H5 as="h3" $noMargin>
+        {applicationSection.name}
+      </H5>
       <Applicant>{applicantName}</Applicant>
-      <DetailContainer>
-        <TimeRequested applicationSection={applicationSection} />
-      </DetailContainer>
-      <DetailContainer>
-        {/* logic: if in edit mode / not allocated -> check against selection
-         * if allocated -> check against allocated time
-         * always show error
-         * TODO error should be shown for some cases where the selection is not valid
-         */}
-        {/*error ? (
-          <NotificationInline type="error">{error}</NotificationInline>
-        ) : null*/}
-        {isTimeMismatch ? (
-          <NotificationInline type="alert">
-            {t("Allocation.errors.selectionOutsideOfRequestedTimes")}
-          </NotificationInline>
-        ) : null}
-        {durationIsInvalid ? (
-          <NotificationInline type="alert">
-            {t("Allocation.errors.requestedDurationIsIncorrect")}
-          </NotificationInline>
-        ) : null}
-      </DetailContainer>
+      <TimeRequested applicationSection={applicationSection} />
+      {/* logic: if in edit mode / not allocated -> check against selection
+       * if allocated -> check against allocated time
+       * always show error
+       * TODO error should be shown for some cases where the selection is not valid
+       */}
+      {/*error ? (
+        <NotificationInline type="error">{error}</NotificationInline>
+      ) : null*/}
+      {isTimeMismatch ? (
+        <NotificationInline type="alert">
+          {t("Allocation.errors.selectionOutsideOfRequestedTimes")}
+        </NotificationInline>
+      ) : null}
+      {durationIsInvalid ? (
+        <NotificationInline type="alert">
+          {t("Allocation.errors.requestedDurationIsIncorrect")}
+        </NotificationInline>
+      ) : null}
       <Actions>
         <Button
           variant="primary"

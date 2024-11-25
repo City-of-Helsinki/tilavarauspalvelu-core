@@ -40,11 +40,6 @@ const StickyContent = styled.div`
   }
 `;
 
-const Name = styled(H2).attrs({ $legacy: true })`
-  margin-top: 0;
-  margin-bottom: var(--spacing-2-xs);
-`;
-
 type Props = {
   name: string;
   tagline: string;
@@ -56,10 +51,12 @@ export function StickyHeader({ name, tagline, buttons }: Props): JSX.Element {
     <Sticky>
       <StickyContent>
         <div>
-          <Name>{name}</Name>
+          <H2 $marginTop="none" $marginBottom="2-xs">
+            {name}
+          </H2>
           <div>{tagline}</div>
         </div>
-        <ButtonContainer $noMargin>{buttons}</ButtonContainer>
+        <ButtonContainer>{buttons}</ButtonContainer>
       </StickyContent>
     </Sticky>
   );

@@ -25,6 +25,7 @@ import {
   type ReservationUnitFilterQueryT,
   type SectionNodeT,
 } from "./modules/applicationRoundAllocation";
+import { Flex } from "common/styles/util";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
 // TODO not perfect (aligment issues with the last columns and grid end),
@@ -40,20 +41,6 @@ const Content = styled.div`
   @media (width > ${breakpoints.l}) {
     gap: var(--spacing-l);
   }
-`;
-
-const ApplicationEventList = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: var(--spacing-s);
-`;
-
-const ApplicationEventsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  /* most children have 2rem gap, but one has 1rem */
-  gap: var(--spacing-s);
 `;
 
 const StyledAccordion = styled(Accordion)<{ $fontLarge?: boolean }>`
@@ -75,12 +62,6 @@ const StyledAccordion = styled(Accordion)<{ $fontLarge?: boolean }>`
   }
 `;
 
-const EventGroupListWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2-xs);
-`;
-
 function EventGroupList({
   applicationSections,
   reservationUnit,
@@ -97,7 +78,7 @@ function EventGroupList({
   }
 
   return (
-    <EventGroupListWrapper>
+    <Flex $gap="2-xs">
       {applicationSections.map((ae) => (
         <ApplicationSectionCard
           key={`${ae.pk}-${reservationUnit?.pk}`}
@@ -107,7 +88,7 @@ function EventGroupList({
           refetch={refetch}
         />
       ))}
-    </EventGroupListWrapper>
+    </Flex>
   );
 }
 
@@ -261,65 +242,63 @@ function ApplicationSectionColumn({
   );
 
   return (
-    <ApplicationEventList>
-      <ApplicationEventsContainer>
-        <StyledAccordion
-          initiallyOpen
-          $fontLarge
-          headingLevel="h3"
-          heading={t("Allocation.inAllocationHeader")}
-        >
-          <p>{t("Allocation.selectApplicant")}</p>
-          <EventGroupList
-            applicationSections={unallocatedApplicationEvents}
-            reservationUnit={reservationUnit}
-            type="unallocated"
-            refetch={refetchApplicationEvents}
-          />
-        </StyledAccordion>
-        <H4 as="h2" style={{ margin: 0 }}>
-          {t("Allocation.allocatedHeader")}
-        </H4>
-        <StyledAccordion
-          headingLevel="h3"
-          heading={t("Allocation.partiallyAllocatedHeader")}
-          disabled={partiallyAllocated.length === 0}
-          initiallyOpen
-        >
-          <EventGroupList
-            applicationSections={partiallyAllocated}
-            reservationUnit={reservationUnit}
-            type="partial"
-            refetch={refetchApplicationEvents}
-          />
-        </StyledAccordion>
-        <StyledAccordion
-          headingLevel="h3"
-          heading={t("Allocation.allocatedApplicants")}
-          disabled={allocated.length === 0}
-          initiallyOpen
-        >
-          <EventGroupList
-            applicationSections={allocated}
-            reservationUnit={reservationUnit}
-            type="allocated"
-            refetch={refetchApplicationEvents}
-          />
-        </StyledAccordion>
-        <StyledAccordion
-          headingLevel="h3"
-          heading={t("Allocation.declinedApplicants")}
-          disabled={locked.length === 0}
-          initiallyOpen
-        >
-          <EventGroupList
-            applicationSections={locked}
-            reservationUnit={reservationUnit}
-            type="declined"
-            refetch={refetchApplicationEvents}
-          />
-        </StyledAccordion>
-      </ApplicationEventsContainer>
-    </ApplicationEventList>
+    <Flex $gap="s">
+      <StyledAccordion
+        initiallyOpen
+        $fontLarge
+        headingLevel="h3"
+        heading={t("Allocation.inAllocationHeader")}
+      >
+        <p>{t("Allocation.selectApplicant")}</p>
+        <EventGroupList
+          applicationSections={unallocatedApplicationEvents}
+          reservationUnit={reservationUnit}
+          type="unallocated"
+          refetch={refetchApplicationEvents}
+        />
+      </StyledAccordion>
+      <H4 as="h2" $noMargin>
+        {t("Allocation.allocatedHeader")}
+      </H4>
+      <StyledAccordion
+        headingLevel="h3"
+        heading={t("Allocation.partiallyAllocatedHeader")}
+        disabled={partiallyAllocated.length === 0}
+        initiallyOpen
+      >
+        <EventGroupList
+          applicationSections={partiallyAllocated}
+          reservationUnit={reservationUnit}
+          type="partial"
+          refetch={refetchApplicationEvents}
+        />
+      </StyledAccordion>
+      <StyledAccordion
+        headingLevel="h3"
+        heading={t("Allocation.allocatedApplicants")}
+        disabled={allocated.length === 0}
+        initiallyOpen
+      >
+        <EventGroupList
+          applicationSections={allocated}
+          reservationUnit={reservationUnit}
+          type="allocated"
+          refetch={refetchApplicationEvents}
+        />
+      </StyledAccordion>
+      <StyledAccordion
+        headingLevel="h3"
+        heading={t("Allocation.declinedApplicants")}
+        disabled={locked.length === 0}
+        initiallyOpen
+      >
+        <EventGroupList
+          applicationSections={locked}
+          reservationUnit={reservationUnit}
+          type="declined"
+          refetch={refetchApplicationEvents}
+        />
+      </StyledAccordion>
+    </Flex>
   );
 }

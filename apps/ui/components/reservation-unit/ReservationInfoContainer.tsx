@@ -8,7 +8,7 @@ import { formatDate } from "@/modules/util";
 import { H4 } from "common/src/common/typography";
 import styled from "styled-components";
 
-const Subheading = styled(H4).attrs({ as: "h3" })`
+const Subheading = styled(H4).attrs({ as: "h2", $noMargin: true })`
   border-bottom: 1px solid var(--color-black-50);
   padding-bottom: var(--spacing-s);
 `;
@@ -69,9 +69,7 @@ export function ReservationInfoContainer({
   // TODO this should be a list
   return (
     <div data-testid="reservation-unit__reservation-info">
-      <Subheading $noMargin>
-        {t("reservationCalendar:reservationInfo")}
-      </Subheading>
+      <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
       {isReservable && <ReservationMinMaxDaysBefore {...reservationUnit} />}
       <ReservationStatus reservationUnit={reservationUnit} />
       {reservationUnitIsReservable && (

@@ -41,11 +41,11 @@ export const OptionalFilters = styled(ShowAllContainer)<ShowAllContainerProps>`
 export const BottomContainer = styled(Flex).attrs({
   $justify: "space-between",
   $align: "center",
+  $marginTop: "m",
 })`
   /* TODO have to use this or add gap to the parent
    * there is an issue with the grid above on desktop (not mobile) having an extra gap
    */
-  margin-top: var(--spacing-m);
   /* have to use flex-flow: otherwise on desktop the button will be split to the second line */
   flex-flow: column nowrap;
   @media (min-width: ${breakpoints.m}) {

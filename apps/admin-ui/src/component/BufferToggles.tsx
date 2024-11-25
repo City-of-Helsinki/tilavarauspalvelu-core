@@ -2,7 +2,7 @@ import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Checkbox, Tooltip } from "hds-react";
 import { useTranslation } from "react-i18next";
-import styled from "styled-components";
+import { Flex } from "common/styles/util";
 
 type BufferControllerProps = {
   name: "bufferTimeBefore" | "bufferTimeAfter";
@@ -35,18 +35,6 @@ function BufferController({ name, seconds, control }: BufferControllerProps) {
   );
 }
 
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-s);
-`;
-
-const LabelWithTooltip = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: var(--spacing-xs);
-`;
-
 export function BufferToggles({
   before,
   after,
@@ -62,11 +50,11 @@ export function BufferToggles({
   }
 
   return (
-    <Wrapper>
-      <LabelWithTooltip>
+    <Flex $gap="s">
+      <Flex $gap="xs" $direction="row">
         {t("reservationApplication:buffers.label")}
         <Tooltip>{t("reservationApplication:buffers.tooltip")}</Tooltip>
-      </LabelWithTooltip>
+      </Flex>
       {before !== 0 && (
         <BufferController
           name="bufferTimeBefore"
@@ -81,6 +69,6 @@ export function BufferToggles({
           seconds={after}
         />
       )}
-    </Wrapper>
+    </Flex>
   );
 }
