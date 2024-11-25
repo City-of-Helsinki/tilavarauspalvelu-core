@@ -73,7 +73,7 @@ class BaseExternalServiceClient:
     ################
 
     @classmethod
-    def generic(cls, method: Literal["get", "post", "put"], url: str, **kwargs) -> Response:
+    def generic(cls, method: Literal["get", "post", "put"], url: str, **kwargs: Any) -> Response:
         return request(method, url, **kwargs, timeout=cls.REQUEST_TIMEOUT_SECONDS)
 
     @classmethod

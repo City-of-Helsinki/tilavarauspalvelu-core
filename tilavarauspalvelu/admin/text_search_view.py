@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from admin_data_views.typing import TableContext
 from admin_data_views.utils import render_with_table_view
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 @render_with_table_view
-def text_search_list_view(request: HttpRequest, **kwargs) -> TableContext:
+def text_search_list_view(request: HttpRequest, **kwargs: Any) -> TableContext:
     """Show all text searches in a table view."""
     data: dict[str, str] = cache.get_many(cache.keys("text_search:*"))
 

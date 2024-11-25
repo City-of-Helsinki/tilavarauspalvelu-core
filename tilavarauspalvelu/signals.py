@@ -46,7 +46,7 @@ def reservation_create(
     instance: Reservation,
     *,
     raw: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> None:
     if not raw and settings.SAVE_RESERVATION_STATISTICS:
         # Note that many-to-many relationships are not yet available at this time so
@@ -67,7 +67,7 @@ def reservation_create(
 
 
 @receiver(post_delete, sender=Reservation, dispatch_uid="reservation_delete")
-def reservation_delete(sender: type[Reservation], **kwargs) -> None:  # noqa: ARG001
+def reservation_delete(sender: type[Reservation], **kwargs: Any) -> None:  # noqa: ARG001
     if settings.UPDATE_AFFECTING_TIME_SPANS:
         update_affecting_time_spans_task.delay(using=kwargs.get("using"))
 

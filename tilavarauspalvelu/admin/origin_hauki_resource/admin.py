@@ -1,16 +1,24 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django import forms
 from django.contrib import admin
-from django.db.models import Count, QuerySet
+from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.admin.reservable_time_span.admin import ReservableTimeSpanInline
 from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitInline
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
 from tilavarauspalvelu.models import OriginHaukiResource
-from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "OriginHaukiResourceAdmin",
@@ -18,7 +26,7 @@ __all__ = [
 
 
 class OriginHaukiResourceAdminForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if self.instance.opening_hours_hash == NEVER_ANY_OPENING_HOURS_HASH:
             self.Meta.help_texts["opening_hours_hash"] += " " + _(

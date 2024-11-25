@@ -1,19 +1,22 @@
-import datetime
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any, NotRequired, TypedDict, Unpack
 
 from django.conf import settings
 
 from tilavarauspalvelu.exceptions import HaukiAPIError, HaukiConfigurationError
-from tilavarauspalvelu.utils.opening_hours.hauki_api_types import (
-    HaukiAPIDatePeriod,
-    HaukiAPIOpeningHoursResponseItem,
-    HaukiAPIResource,
-    HaukiAPIResourceListResponse,
-)
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponse
+    import datetime
+
+    from tilavarauspalvelu.utils.opening_hours.hauki_api_types import (
+        HaukiAPIDatePeriod,
+        HaukiAPIOpeningHoursResponse,
+        HaukiAPIOpeningHoursResponseItem,
+        HaukiAPIResource,
+        HaukiAPIResourceListResponse,
+    )
 
 __all__ = [
     "HaukiAPIClient",
@@ -169,7 +172,7 @@ class HaukiAPIClient(BaseExternalServiceClient):
     ###############
 
     @classmethod
-    def get_date_periods(cls, *, hauki_resource_id: int, **kwargs) -> list[HaukiAPIDatePeriod]:
+    def get_date_periods(cls, *, hauki_resource_id: int, **kwargs: Any) -> list[HaukiAPIDatePeriod]:
         """
         Fetch a single resource's DatePeriods.
 

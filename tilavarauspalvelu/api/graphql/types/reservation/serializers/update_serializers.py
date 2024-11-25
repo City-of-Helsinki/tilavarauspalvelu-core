@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationBaseSaveSerializer):
     instance: Reservation
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.fields["state"].read_only = False
         self.fields["state"].required = False

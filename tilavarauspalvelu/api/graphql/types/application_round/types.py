@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import graphene
@@ -8,15 +10,14 @@ from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.enums import ApplicationRoundReservationCreationStatusChoice, ApplicationRoundStatusChoice
 from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit
-from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
-from tilavarauspalvelu.typing import GQLInfo
 from utils.db import SubqueryCount
 
 from .filtersets import ApplicationRoundFilterSet
 from .permissions import ApplicationRoundPermission
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import AnyUser
+    from tilavarauspalvelu.models.application_round.queryset import ApplicationRoundQuerySet
+    from tilavarauspalvelu.typing import Any, AnyUser, GQLInfo
 
 
 class ApplicationRoundNode(DjangoNode):
@@ -91,5 +92,5 @@ class ApplicationRoundNode(DjangoNode):
         return root.is_setting_handled_allowed
 
     @classmethod
-    def pre_optimization_hook(cls, queryset: ApplicationRoundQuerySet, *args) -> models.QuerySet:
+    def pre_optimization_hook(cls, queryset: ApplicationRoundQuerySet, *args: Any) -> models.QuerySet:
         return queryset.with_permissions()

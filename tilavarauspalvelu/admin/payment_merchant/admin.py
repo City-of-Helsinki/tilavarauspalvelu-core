@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
@@ -56,7 +60,7 @@ class PaymentMerchantForm(forms.ModelForm):
             "id": _("Value comes from the Merchant Experience API"),
         }
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         instance: PaymentMerchant | None = kwargs.get("instance")
         if instance and instance.id:

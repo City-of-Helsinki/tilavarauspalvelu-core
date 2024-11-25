@@ -222,7 +222,7 @@ ignore = [
     "PLR2004",  # magic-value-comparison
     "PLW2901",  # redefined-loop-name
 ]
-dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"
 
 [tool.ruff.lint.extend-per-file-ignores]
 "local_settings*.py" = [
@@ -341,6 +341,12 @@ banned-from = [
 
 [tool.ruff.lint.flake8-self]
 extend-ignore-names = ["_base_manager", "_default_manager",  "_meta", "_mptt_meta", "_defaults", "_errors"]
+
+[tool.ruff.lint.flake8-unused-arguments]
+ignore-variadic-names = true
+
+[tool.ruff.lint.flake8-gettext]
+extend-function-names = ["pgettext", "pgettext_lazy", "gettext_lazy"]
 
 [tool.ruff.lint.pylint]
 max-returns = 8
