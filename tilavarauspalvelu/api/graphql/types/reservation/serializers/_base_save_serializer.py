@@ -27,6 +27,8 @@ if TYPE_CHECKING:
 
 
 class ReservationBaseSaveSerializer(OldPrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin):
+    instance: Reservation
+
     reservation_unit_pks = serializers.ListField(
         child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
         source="reservation_units",
@@ -128,15 +130,19 @@ class ReservationBaseSaveSerializer(OldPrimaryKeySerializer, ReservationPriceMix
         self.fields["num_persons"].required = False
         self.fields["purpose_pk"].required = False
 
+    def _get_reservation_units(self, data: dict[str, Any]) -> list[ReservationUnit]:
+        reservation_units = data.get("reservation_units", getattr(self.instance, "reservation_units", None))
+        if hasattr(reservation_units, "all"):
+            reservation_units = reservation_units.all()
+        return reservation_units
+
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         begin: datetime.datetime = data.get("begin", getattr(self.instance, "begin", None))
         end: datetime.datetime = data.get("end", getattr(self.instance, "end", None))
         begin = begin.astimezone(DEFAULT_TIMEZONE)
         end = end.astimezone(DEFAULT_TIMEZONE)
 
-        reservation_units = data.get("reservation_units", getattr(self.instance, "reservation_units", None))
-        if hasattr(reservation_units, "all"):
-            reservation_units = reservation_units.all()
+        reservation_units = self._get_reservation_units(data)
 
         sku = None
         for reservation_unit in reservation_units:

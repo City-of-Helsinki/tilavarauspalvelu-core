@@ -36,41 +36,25 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationBase
         self.fields["reservation_unit_pks"].required = False
         self.fields["purpose_pk"].required = False
 
-    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+    def check_can_make_changes(self) -> None:
         if self.instance.state != ReservationStateChoice.CREATED.value:
             msg = "Reservation cannot be changed anymore."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.CHANGES_NOT_ALLOWED)
 
-        new_state = data.get("state", self.instance.state)
-        if new_state not in {ReservationStateChoice.CANCELLED.value, ReservationStateChoice.CREATED.value}:
-            msg = f"Setting the reservation state to '{getattr(new_state, 'value', new_state)}' is not allowed."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.STATE_CHANGE_NOT_ALLOWED)
-
-        data = super().validate(data)
-        data["state"] = new_state
-
-        reservation_units = data.get("reservation_units", getattr(self.instance, "reservation_units", None))
-        if hasattr(reservation_units, "all"):
-            reservation_units = reservation_units.all()
-
-        for reservation_unit in reservation_units:
-            self.check_metadata_fields(data, reservation_unit)
-
-        # If the reservation as applying_for_free_of_charge True then we require free_of_charge_reason.
-        if data.get("applying_for_free_of_charge", self.instance.applying_for_free_of_charge) and not data.get(
-            "free_of_charge_reason", self.instance.free_of_charge_reason
+    def check_free_of_charge_reason_is_given(self, data: dict[str, Any]) -> None:
+        if (
+            data.get("applying_for_free_of_charge", self.instance.applying_for_free_of_charge)
+            and not data.get("free_of_charge_reason", self.instance.free_of_charge_reason)  #
         ):
             msg = "Free of charge reason is mandatory when applying for free of charge."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.REQUIRES_REASON_FOR_APPLYING_FREE_OF_CHARGE)
 
-        return data
-
-    @property
-    def validated_data(self):
-        validated_data = super().validated_data
-        validated_data["user"] = self.instance.user  # Do not change the user.
-        validated_data["confirmed_at"] = local_datetime()
-        return validated_data
+    def check_change_state(self, data: dict[str, Any]) -> str:
+        new_state = data.get("state", self.instance.state)
+        if new_state not in {ReservationStateChoice.CANCELLED.value, ReservationStateChoice.CREATED.value}:
+            msg = f"Setting the reservation state to '{getattr(new_state, 'value', new_state)}' is not allowed."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.STATE_CHANGE_NOT_ALLOWED)
+        return new_state
 
     def check_metadata_fields(self, data: dict[str, Any], reservation_unit: ReservationUnit) -> None:
         # Even marked in the metadata set to be mandatory, yet these never should be for private person.
@@ -107,3 +91,24 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationBase
                     ValidationErrorCodes.REQUIRED_FIELD_MISSING,
                     to_camel_case(internal_field_name),
                 )
+
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        self.check_can_make_changes()
+        self.check_free_of_charge_reason_is_given(data)
+        new_state = self.check_change_state(data)
+
+        data = super().validate(data)
+        data["state"] = new_state
+
+        reservation_units = self._get_reservation_units(data)
+        for reservation_unit in reservation_units:
+            self.check_metadata_fields(data, reservation_unit)
+
+        return data
+
+    @property
+    def validated_data(self):
+        validated_data = super().validated_data
+        validated_data["user"] = self.instance.user  # Do not change the user.
+        validated_data["confirmed_at"] = local_datetime()
+        return validated_data
