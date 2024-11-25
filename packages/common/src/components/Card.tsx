@@ -10,7 +10,7 @@ export type CardProps = {
   heading: string;
   headingTestId?: string;
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
-  text: string;
+  text?: string;
   textTestId?: string;
   variant?: CardVariant;
   backgroundColor?: string;
@@ -166,7 +166,7 @@ export default function Card({
   heading,
   headingTestId,
   headingLevel = 3,
-  text,
+  text = "",
   textTestId,
   variant = "default",
   backgroundColor = "var(--color-black-5)",

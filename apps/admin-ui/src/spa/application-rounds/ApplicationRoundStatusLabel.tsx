@@ -19,9 +19,9 @@ type RoundStatus = {
   group: string;
 };
 
-const getApplicationRoundStatus = (
-  status: ApplicationRoundStatusChoice | undefined
-): RoundStatus => {
+export function getApplicationRoundStatus(
+  status: Maybe<ApplicationRoundStatusChoice> | undefined
+): RoundStatus {
   switch (status) {
     case ApplicationRoundStatusChoice.Open:
       return {
@@ -66,7 +66,7 @@ const getApplicationRoundStatus = (
         label: status ?? "-",
       };
   }
-};
+}
 
 export function ApplicationRoundStatusLabel({
   status,
