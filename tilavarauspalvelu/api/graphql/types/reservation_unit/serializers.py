@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 from auditlog.models import LogEntry
@@ -21,7 +23,7 @@ from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from datetime import timedelta
+    import datetime
 
 __all__ = [
     "ReservationUnitSerializer",
@@ -128,8 +130,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
         - max_reservation_duration
         - reservation_start_interval
         """
-        min_duration: timedelta | None = self.get_or_default("min_reservation_duration", data)
-        max_duration: timedelta | None = self.get_or_default("max_reservation_duration", data)
+        min_duration: datetime.timedelta | None = self.get_or_default("min_reservation_duration", data)
+        max_duration: datetime.timedelta | None = self.get_or_default("max_reservation_duration", data)
         start_interval: str | None = self.get_or_default("reservation_start_interval", data)
 
         if min_duration and max_duration and min_duration > max_duration:

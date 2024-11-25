@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import datetime
 from decimal import Decimal
 
 import factory
@@ -24,7 +26,7 @@ class OrderFactory(GenericFactory[Order]):
     order_id = uuid.uuid4()
     namespace = "tilavaraus"
     user = str(uuid.uuid4())
-    created_at = datetime.now(tz=get_default_timezone())
+    created_at = datetime.datetime.now(tz=get_default_timezone())
     items = []
     price_net = Decimal("10.0")
     price_vat = Decimal("2.4")
@@ -64,5 +66,5 @@ class PaymentFactory(GenericFactory[Payment]):
     description = "Mock description"
     additional_info = '{"payment_method": creditcards}'
     token = uuid.uuid4()
-    timestamp = datetime.now(tz=get_default_timezone())
+    timestamp = datetime.datetime.now(tz=get_default_timezone())
     payment_method_label = "Visa"

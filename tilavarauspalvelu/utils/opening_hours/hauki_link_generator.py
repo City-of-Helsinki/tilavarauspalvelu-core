@@ -1,12 +1,17 @@
+from __future__ import annotations
+
+import datetime
 import hashlib
 import hmac
-import uuid
-from datetime import timedelta
+from typing import TYPE_CHECKING
 from urllib.parse import quote_plus, urlencode
 
 from django.conf import settings
 
 from utils.date_utils import local_datetime
+
+if TYPE_CHECKING:
+    import uuid
 
 
 def generate_hauki_link(reservation_unit_uuid: uuid.UUID | str, username: str, organization_id: str) -> str | None:
@@ -27,7 +32,7 @@ def generate_hauki_link(reservation_unit_uuid: uuid.UUID | str, username: str, o
         "hsa_username": username,
         "hsa_organization": organization_id,
         "hsa_created_at": now.isoformat(),
-        "hsa_valid_until": (now + timedelta(minutes=hauki_expire_time_minutes)).isoformat(),
+        "hsa_valid_until": (now + datetime.timedelta(minutes=hauki_expire_time_minutes)).isoformat(),
         "hsa_resource": f"{settings.HAUKI_ORIGIN_ID}:{reservation_unit_uuid}",
         "hsa_has_organization_rights": "true",
     }

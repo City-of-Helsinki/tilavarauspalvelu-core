@@ -1,4 +1,6 @@
-from datetime import UTC, datetime, timedelta
+from __future__ import annotations
+
+import datetime
 from typing import TYPE_CHECKING
 
 import pytest
@@ -16,24 +18,24 @@ pytestmark = [
     pytest.mark.django_db,
 ]
 
-NOW = datetime(2023, 5, 25, 12, 23, 0, tzinfo=UTC)
+NOW = datetime.datetime(2023, 5, 25, 12, 23, 0, tzinfo=datetime.UTC)
 
 
 @freeze_time(NOW)
 def test_reservation_unit__get_next_reservation():
     space: Space = SpaceFactory.create()
     reservation_unit: ReservationUnit = ReservationUnitFactory.create(spaces=[space])
-    now = datetime.now(tz=UTC)
+    now = datetime.datetime.now(tz=datetime.UTC)
     reservation_blocked = ReservationFactory.create(
-        begin=(now + timedelta(hours=1)),
-        end=(now + timedelta(hours=2)),
+        begin=(now + datetime.timedelta(hours=1)),
+        end=(now + datetime.timedelta(hours=2)),
         reservation_units=[reservation_unit],
         type=ReservationTypeChoice.BLOCKED,
         state=ReservationStateChoice.CONFIRMED,
     )
     reservation = ReservationFactory.create(
-        begin=(now + timedelta(hours=2)),
-        end=(now + timedelta(hours=3)),
+        begin=(now + datetime.timedelta(hours=2)),
+        end=(now + datetime.timedelta(hours=3)),
         reservation_units=[reservation_unit],
         state=ReservationStateChoice.CONFIRMED,
     )

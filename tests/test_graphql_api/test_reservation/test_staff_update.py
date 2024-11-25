@@ -1,4 +1,6 @@
-from datetime import datetime, timedelta
+from __future__ import annotations
+
+import datetime
 
 import freezegun
 import pytest
@@ -31,14 +33,14 @@ def test_reservation__staff_update__reservation_block_whole_day(graphql):
     )
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
-        start_datetime=datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
-        end_datetime=datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
+        start_datetime=datetime.datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime.datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
     )
     reservation = ReservationFactory.create_for_reservation_unit(
         name="foo",
         reservation_unit=reservation_unit,
-        begin=datetime(2023, 1, 1, 8, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime(2023, 1, 1, 9, tzinfo=DEFAULT_TIMEZONE),
+        begin=datetime.datetime(2023, 1, 1, 8, tzinfo=DEFAULT_TIMEZONE),
+        end=datetime.datetime(2023, 1, 1, 9, tzinfo=DEFAULT_TIMEZONE),
         state=ReservationStateChoice.CONFIRMED.value,
     )
 
@@ -47,8 +49,8 @@ def test_reservation__staff_update__reservation_block_whole_day(graphql):
 
     input_data = {
         "pk": reservation.pk,
-        "begin": datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "end": datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "begin": datetime.datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "end": datetime.datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
     }
 
     response = graphql(ADJUST_STAFF_MUTATION, input_data=input_data)
@@ -56,10 +58,10 @@ def test_reservation__staff_update__reservation_block_whole_day(graphql):
 
     reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
     assert reservation is not None
-    assert reservation.begin == datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.end == datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.buffer_time_before == timedelta(hours=12)
-    assert reservation.buffer_time_after == timedelta(hours=11)
+    assert reservation.begin == datetime.datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.end == datetime.datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.buffer_time_before == datetime.timedelta(hours=12)
+    assert reservation.buffer_time_after == datetime.timedelta(hours=11)
 
 
 @freezegun.freeze_time("2021-01-01")
@@ -71,14 +73,14 @@ def test_reservation__staff_update__reservation_block_whole_day__ignore_given_bu
     )
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
-        start_datetime=datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
-        end_datetime=datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
+        start_datetime=datetime.datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime.datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
     )
     reservation = ReservationFactory.create_for_reservation_unit(
         name="foo",
         reservation_unit=reservation_unit,
-        begin=datetime(2023, 1, 1, 8, tzinfo=DEFAULT_TIMEZONE),
-        end=datetime(2023, 1, 1, 9, tzinfo=DEFAULT_TIMEZONE),
+        begin=datetime.datetime(2023, 1, 1, 8, tzinfo=DEFAULT_TIMEZONE),
+        end=datetime.datetime(2023, 1, 1, 9, tzinfo=DEFAULT_TIMEZONE),
         state=ReservationStateChoice.CONFIRMED.value,
     )
 
@@ -87,10 +89,10 @@ def test_reservation__staff_update__reservation_block_whole_day__ignore_given_bu
 
     input_data = {
         "pk": reservation.pk,
-        "begin": datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "end": datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "bufferTimeBefore": timedelta_to_json(timedelta(hours=1)),
-        "bufferTimeAfter": timedelta_to_json(timedelta(hours=1)),
+        "begin": datetime.datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "end": datetime.datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "bufferTimeBefore": timedelta_to_json(datetime.timedelta(hours=1)),
+        "bufferTimeAfter": timedelta_to_json(datetime.timedelta(hours=1)),
     }
 
     response = graphql(ADJUST_STAFF_MUTATION, input_data=input_data)
@@ -98,7 +100,7 @@ def test_reservation__staff_update__reservation_block_whole_day__ignore_given_bu
 
     reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
     assert reservation is not None
-    assert reservation.begin == datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.end == datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.buffer_time_before == timedelta(hours=12)
-    assert reservation.buffer_time_after == timedelta(hours=11)
+    assert reservation.begin == datetime.datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.end == datetime.datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.buffer_time_before == datetime.timedelta(hours=12)
+    assert reservation.buffer_time_after == datetime.timedelta(hours=11)

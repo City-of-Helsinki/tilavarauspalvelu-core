@@ -1,4 +1,6 @@
-from datetime import timedelta
+from __future__ import annotations
+
+import datetime
 from decimal import Decimal
 
 import freezegun
@@ -53,7 +55,7 @@ def test_get_verkkokauppa_order_params__to_json():
     assert json["customer"]["email"] == "test@localhost"
     assert json["customer"]["phone"] == ""
     assert json["lastValidPurchaseDateTime"] == (
-        local_datetime() + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+        local_datetime() + datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
     ).strftime("%Y-%m-%dT%H:%M:%S")
 
     assert len(json["items"]) == 1

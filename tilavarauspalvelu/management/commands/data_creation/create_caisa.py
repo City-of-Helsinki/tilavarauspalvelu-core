@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import datetime
-from datetime import date, timedelta
 
 from tests.factories import (
     EquipmentCategoryFactory,
@@ -274,7 +275,7 @@ def _create_caisa() -> None:
         name_fi="Varauksen alkuun asti",
         name_en="Varauksen alkuun asti",
         name_sv="Varauksen alkuun asti",
-        can_be_cancelled_time_before=timedelta(seconds=1),
+        can_be_cancelled_time_before=datetime.timedelta(seconds=1),
         needs_handling=False,
     )
     cancel_rule_14_days = ReservationUnitCancellationRuleFactory.create(
@@ -282,7 +283,7 @@ def _create_caisa() -> None:
         name_fi="14 vrk ennen alkamista",
         name_en="14 days before start",
         name_sv="14 dagar innan start",
-        can_be_cancelled_time_before=timedelta(days=14),
+        can_be_cancelled_time_before=datetime.timedelta(days=14),
         needs_handling=False,
     )
 
@@ -696,8 +697,8 @@ def _create_caisa() -> None:
         ),
         terms_of_use_en="English terms of use goes here.",
         terms_of_use_sv="Svenska användarvillkor finns här.",
-        min_reservation_duration=timedelta(hours=1),
-        max_reservation_duration=timedelta(hours=6),
+        min_reservation_duration=datetime.timedelta(hours=1),
+        max_reservation_duration=datetime.timedelta(hours=6),
         min_persons=1,
         max_persons=50,
         surface_area=100,
@@ -748,7 +749,7 @@ def _create_caisa() -> None:
     aina_kasiteltava_kellarikerros.payment_types.add(payment_type_online)
     ReservationUnitPricingFactory.create(
         reservation_unit=aina_kasiteltava_kellarikerros,
-        begins=date(2023, 1, 1),
+        begins=datetime.date(2023, 1, 1),
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=40.0,
@@ -803,8 +804,8 @@ def _create_caisa() -> None:
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
         terms_of_use="",
-        min_reservation_duration=timedelta(minutes=30),
-        max_reservation_duration=timedelta(hours=3),
+        min_reservation_duration=datetime.timedelta(minutes=30),
+        max_reservation_duration=datetime.timedelta(hours=3),
         min_persons=None,
         max_persons=1,
         surface_area=100,
@@ -839,7 +840,7 @@ def _create_caisa() -> None:
     maksuton_mankeli.qualifiers.add(qualifier_under_15)
     ReservationUnitPricingFactory.create(
         reservation_unit=maksuton_mankeli,
-        begins=date(2023, 1, 1),
+        begins=datetime.date(2023, 1, 1),
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
@@ -916,8 +917,8 @@ def _create_caisa() -> None:
         terms_of_use='<p><span style="color: rgb(0, 0, 0);">Varaus tulee maksaa verkkokaupassa.</span></p>',
         terms_of_use_en="English terms of use goes here.",
         terms_of_use_sv="Svenska användarvillkor finns här.",
-        min_reservation_duration=timedelta(hours=1),
-        max_reservation_duration=timedelta(hours=6),
+        min_reservation_duration=datetime.timedelta(hours=1),
+        max_reservation_duration=datetime.timedelta(hours=6),
         min_persons=4,
         max_persons=6,
         surface_area=50,
@@ -963,7 +964,7 @@ def _create_caisa() -> None:
     aina_maksullinen_aitio.payment_types.add(payment_type_online)
     ReservationUnitPricingFactory.create(
         reservation_unit=aina_maksullinen_aitio,
-        begins=date(2023, 1, 1),
+        begins=datetime.date(2023, 1, 1),
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=40.0,
         highest_price=40.0,
@@ -1021,8 +1022,8 @@ def _create_caisa() -> None:
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
         terms_of_use="",
-        min_reservation_duration=timedelta(minutes=30),
-        max_reservation_duration=timedelta(hours=5),
+        min_reservation_duration=datetime.timedelta(minutes=30),
+        max_reservation_duration=datetime.timedelta(hours=5),
         min_persons=None,
         max_persons=5,
         surface_area=10,
@@ -1070,7 +1071,7 @@ def _create_caisa() -> None:
     alennuskelpoinen_aula.payment_types.add(payment_type_online)
     ReservationUnitPricingFactory.create(
         reservation_unit=alennuskelpoinen_aula,
-        begins=date(2023, 1, 1),
+        begins=datetime.date(2023, 1, 1),
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=30.0,
@@ -1119,8 +1120,8 @@ def _create_caisa() -> None:
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
         terms_of_use="",
-        min_reservation_duration=timedelta(minutes=30),
-        max_reservation_duration=timedelta(hours=5),
+        min_reservation_duration=datetime.timedelta(minutes=30),
+        max_reservation_duration=datetime.timedelta(hours=5),
         min_persons=5,
         max_persons=15,
         surface_area=5,
@@ -1153,7 +1154,7 @@ def _create_caisa() -> None:
     perumiskelvoton_parveke.equipments.add(equipment_billiard_table)
     ReservationUnitPricingFactory.create(
         reservation_unit=perumiskelvoton_parveke,
-        begins=date(2023, 1, 1),
+        begins=datetime.date(2023, 1, 1),
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
@@ -1197,8 +1198,8 @@ def _create_caisa() -> None:
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
         terms_of_use="",
-        min_reservation_duration=timedelta(minutes=30),
-        max_reservation_duration=timedelta(hours=1),
+        min_reservation_duration=datetime.timedelta(minutes=30),
+        max_reservation_duration=datetime.timedelta(hours=1),
         min_persons=None,
         max_persons=30,
         surface_area=15,
@@ -1247,7 +1248,7 @@ def _create_caisa() -> None:
     perumiskelvoton_patio.payment_types.add(payment_type_online)
     ReservationUnitPricingFactory.create(
         reservation_unit=perumiskelvoton_patio,
-        begins=date(2023, 1, 1),
+        begins=datetime.date(2023, 1, 1),
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=30.0,
@@ -1299,8 +1300,8 @@ def _create_caisa() -> None:
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
         terms_of_use="",
-        min_reservation_duration=timedelta(minutes=30),
-        max_reservation_duration=timedelta(hours=11),
+        min_reservation_duration=datetime.timedelta(minutes=30),
+        max_reservation_duration=datetime.timedelta(hours=11),
         min_persons=None,
         max_persons=14,
         surface_area=37,
@@ -1347,7 +1348,7 @@ def _create_caisa() -> None:
     )
     ReservationUnitPricingFactory.create(
         reservation_unit=toistuvien_varausten_toimisto,
-        begins=date(2023, 1, 1),
+        begins=datetime.date(2023, 1, 1),
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
@@ -1393,13 +1394,13 @@ def _create_caisa() -> None:
         description_en="English description goes here.",
         description_sv="Svensk beskrivning går här.",
         terms_of_use="",
-        min_reservation_duration=timedelta(minutes=30),
-        max_reservation_duration=timedelta(hours=3),
+        min_reservation_duration=datetime.timedelta(minutes=30),
+        max_reservation_duration=datetime.timedelta(hours=3),
         min_persons=None,
         max_persons=47,
         surface_area=103,
-        buffer_time_before=timedelta(minutes=30),
-        buffer_time_after=timedelta(minutes=30),
+        buffer_time_before=datetime.timedelta(minutes=30),
+        buffer_time_after=datetime.timedelta(minutes=30),
         reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES,
         reservations_min_days_before=0,
         reservations_max_days_before=90,
@@ -1434,7 +1435,7 @@ def _create_caisa() -> None:
     )
     ReservationUnitPricingFactory.create(
         reservation_unit=tauotettu_takkahuone,
-        begins=date(2023, 1, 1),
+        begins=datetime.date(2023, 1, 1),
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,
@@ -1490,8 +1491,8 @@ def _create_caisa() -> None:
         ),
         terms_of_use_en="English terms of use goes here.",
         terms_of_use_sv="Svenska användarvillkor finns här.",
-        min_reservation_duration=timedelta(hours=1),
-        max_reservation_duration=timedelta(hours=4),
+        min_reservation_duration=datetime.timedelta(hours=1),
+        max_reservation_duration=datetime.timedelta(hours=4),
         min_persons=0,
         max_persons=15,
         surface_area=40,
@@ -1533,7 +1534,7 @@ def _create_caisa() -> None:
     )
     ReservationUnitPricingFactory.create(
         reservation_unit=aina_kasiteltava_kammio,
-        begins=date(2023, 1, 1),
+        begins=datetime.date(2023, 1, 1),
         price_unit=PriceUnit.PRICE_UNIT_PER_HOUR,
         lowest_price=0.0,
         highest_price=0.0,

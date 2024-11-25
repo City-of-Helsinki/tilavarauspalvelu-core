@@ -1,15 +1,19 @@
+from __future__ import annotations
+
 import datetime
-from datetime import timedelta
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from django.utils.timezone import get_default_timezone, now
 from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
-from tilavarauspalvelu.models import Application, ApplicationRound, ReservationUnit
+from tilavarauspalvelu.models import Application
 from utils.date_utils import local_datetime
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationRound, ReservationUnit
 
 __all__ = [
     "ApplicationBuilder",
@@ -144,7 +148,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
         this_moment = now()
         application = cls.create(
             cancelled_date=None,
-            sent_date=this_moment - timedelta(days=2),
+            sent_date=this_moment - datetime.timedelta(days=2),
             application_round=application_round,
         )
         application_section = ApplicationSectionFactory.create(

@@ -1,6 +1,8 @@
+from __future__ import annotations
+
+import datetime
 import uuid
 from dataclasses import dataclass
-from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from typing import Any
@@ -49,11 +51,11 @@ class Payment:
     description: str | None
     additional_info: str
     token: str
-    timestamp: datetime  # When the Payment was created in the webshop, usually later than PaymentOrder.created_at
+    timestamp: datetime.datetime  # When Payment was created in the webshop, usually later than PaymentOrder.created_at
     payment_method_label: str
 
     @classmethod
-    def from_json(cls, json: dict[str, Any]) -> "Payment":
+    def from_json(cls, json: dict[str, Any]) -> Payment:
         try:
             return Payment(
                 payment_id=json["paymentId"],
@@ -78,8 +80,8 @@ class Payment:
             raise ParsePaymentError(msg) from err
 
     @classmethod
-    def _parse_datetime(cls, string: str) -> datetime:
-        return datetime.strptime(string, "%Y%m%d-%H%M%S").astimezone(settings.VERKKOKAUPPA_TIMEZONE)
+    def _parse_datetime(cls, string: str) -> datetime.datetime:
+        return datetime.datetime.strptime(string, "%Y%m%d-%H%M%S").astimezone(settings.VERKKOKAUPPA_TIMEZONE)
 
 
 @dataclass(frozen=True)
@@ -88,7 +90,7 @@ class Refund:
     order_id: uuid.UUID
     namespace: str
     user: str
-    created_at: datetime
+    created_at: datetime.datetime
     status: str
     customer_first_name: str | None
     customer_last_name: str | None
@@ -97,7 +99,7 @@ class Refund:
     refund_reason: str | None
 
     @classmethod
-    def from_json(cls, json: dict[str, Any]) -> "Refund":
+    def from_json(cls, json: dict[str, Any]) -> Refund:
         from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
 
         try:
@@ -127,10 +129,10 @@ class RefundStatusResult:
     refund_transaction_id: uuid.UUID
     namespace: str
     status: str
-    created_at: datetime
+    created_at: datetime.datetime
 
     @classmethod
-    def from_json(cls, json: dict[str, Any]) -> "RefundStatusResult":
+    def from_json(cls, json: dict[str, Any]) -> RefundStatusResult:
         from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
 
         try:

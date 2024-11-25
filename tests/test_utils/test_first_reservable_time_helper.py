@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from typing import NamedTuple, cast
 
@@ -25,24 +27,24 @@ pytestmark = [
 ]
 
 
-def _time(*, hour=0, minute=0) -> datetime:
-    return datetime(2024, 1, 1, hour, minute, 0, tzinfo=DEFAULT_TIMEZONE)
+def _time(*, hour=0, minute=0) -> datetime.datetime:
+    return datetime.datetime(2024, 1, 1, hour, minute, 0, tzinfo=DEFAULT_TIMEZONE)
 
 
 @dataclass
 class ReservationBuffers:
-    buffer_time_before: timedelta
-    buffer_time_after: timedelta
+    buffer_time_before: datetime.timedelta
+    buffer_time_after: datetime.timedelta
 
     def __init__(self, buffer_time_before: int | None, buffer_time_after: int | None):
-        self.buffer_time_before = timedelta(minutes=buffer_time_before or 0)
-        self.buffer_time_after = timedelta(minutes=buffer_time_after or 0)
+        self.buffer_time_before = datetime.timedelta(minutes=buffer_time_before or 0)
+        self.buffer_time_after = datetime.timedelta(minutes=buffer_time_after or 0)
 
 
 class ReservationUnitAndReservationBufferParams(NamedTuple):
-    buffer_time_before: timedelta
-    buffer_time_after: timedelta
-    first_reservable_time: datetime
+    buffer_time_before: datetime.timedelta
+    buffer_time_after: datetime.timedelta
+    first_reservable_time: datetime.datetime
     reservation_buffers: list[ReservationBuffers] = [ReservationBuffers(None, None), ReservationBuffers(None, None)]
 
 
@@ -64,8 +66,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │         ══                                   │
             "ReservationUnit -0+0": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(),
-                buffer_time_after=timedelta(),
+                buffer_time_before=datetime.timedelta(),
+                buffer_time_after=datetime.timedelta(),
                 first_reservable_time=_time(hour=2, minute=0),
             ),
             # ┌──────────────────────────────────────────────┐
@@ -73,8 +75,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │         ──══                                 │
             "ReservationUnit -30+0": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(minutes=30),
-                buffer_time_after=timedelta(),
+                buffer_time_before=datetime.timedelta(minutes=30),
+                buffer_time_after=datetime.timedelta(),
                 first_reservable_time=_time(hour=2, minute=30),
             ),
             # ┌──────────────────────────────────────────────┐
@@ -82,8 +84,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │                     ────────══               │
             "ReservationUnit -120+0": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(minutes=120),
-                buffer_time_after=timedelta(),
+                buffer_time_before=datetime.timedelta(minutes=120),
+                buffer_time_after=datetime.timedelta(),
                 first_reservable_time=_time(hour=7, minute=0),
             ),
             # ┌──────────────────────────────────────────────┐
@@ -91,8 +93,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │         ══──                                 │
             "ReservationUnit -0+30": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(),
-                buffer_time_after=timedelta(minutes=30),
+                buffer_time_before=datetime.timedelta(),
+                buffer_time_after=datetime.timedelta(minutes=30),
                 first_reservable_time=_time(hour=2, minute=0),
             ),
             # ┌──────────────────────────────────────────────┐
@@ -100,8 +102,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │                     ══────────               │
             "ReservationUnit -0+120": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(),
-                buffer_time_after=timedelta(minutes=120),
+                buffer_time_before=datetime.timedelta(),
+                buffer_time_after=datetime.timedelta(minutes=120),
                 first_reservable_time=_time(hour=5, minute=0),
             ),
             # ┌──────────────────────────────────────────────┐
@@ -109,8 +111,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │         ──══──                               │
             "ReservationUnit -30+30": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(minutes=30),
-                buffer_time_after=timedelta(minutes=30),
+                buffer_time_before=datetime.timedelta(minutes=30),
+                buffer_time_after=datetime.timedelta(minutes=30),
                 first_reservable_time=_time(hour=2, minute=30),
             ),
             # ┌──────────────────────────────────────────────┐
@@ -118,8 +120,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │                     ────══────               │
             "ReservationUnit -60+60": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(minutes=60),
-                buffer_time_after=timedelta(minutes=60),
+                buffer_time_before=datetime.timedelta(minutes=60),
+                buffer_time_after=datetime.timedelta(minutes=60),
                 first_reservable_time=_time(hour=6, minute=0),
             ),
             # ┌──────────────────────────────────────────────┐
@@ -127,8 +129,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │                     ──══──────               │
             "ReservationUnit -30+90": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(minutes=30),
-                buffer_time_after=timedelta(minutes=90),
+                buffer_time_before=datetime.timedelta(minutes=30),
+                buffer_time_after=datetime.timedelta(minutes=90),
                 first_reservable_time=_time(hour=5, minute=30),
             ),
             # ┌──────────────────────────────────────────────┐
@@ -136,8 +138,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▁▁▄▄████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │         ──══                                 │
             "ReservationUnit -30+0 | Reservation -0+0, -30+0": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(minutes=30),
-                buffer_time_after=timedelta(),
+                buffer_time_before=datetime.timedelta(minutes=30),
+                buffer_time_after=datetime.timedelta(),
                 first_reservable_time=_time(hour=2, minute=30),
                 reservation_buffers=[ReservationBuffers(None, None), ReservationBuffers(30, None)],
             ),
@@ -146,8 +148,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▄▄▄▄▄▄████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │                     ──══                     │
             "ReservationUnit -30+0 | Reservation -0+0, -90+0": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(minutes=30),
-                buffer_time_after=timedelta(),
+                buffer_time_before=datetime.timedelta(minutes=30),
+                buffer_time_after=datetime.timedelta(),
                 first_reservable_time=_time(hour=5, minute=30),
                 reservation_buffers=[ReservationBuffers(None, None), ReservationBuffers(90, None)],
             ),
@@ -156,8 +158,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▁▁▁▁▄▄▄▄████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │                     ────══                   │
             "ReservationUnit -60+0 | Reservation -0+0, -60+0": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(minutes=60),
-                buffer_time_after=timedelta(),
+                buffer_time_before=datetime.timedelta(minutes=60),
+                buffer_time_after=datetime.timedelta(),
                 first_reservable_time=_time(hour=6, minute=0),
                 reservation_buffers=[ReservationBuffers(None, None), ReservationBuffers(60, None)],
             ),
@@ -166,8 +168,8 @@ class ReservationUnitAndReservationBufferParams(NamedTuple):
             # │ ░░░░████▄▄▄▄▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
             # │         ────══                               │
             "ReservationUnit -60+0 | Reservation -0+60, -0+0": ReservationUnitAndReservationBufferParams(
-                buffer_time_before=timedelta(minutes=60),
-                buffer_time_after=timedelta(),
+                buffer_time_before=datetime.timedelta(minutes=60),
+                buffer_time_after=datetime.timedelta(),
                 first_reservable_time=_time(hour=3, minute=0),
                 reservation_buffers=[ReservationBuffers(None, 60), ReservationBuffers(0, None)],
             ),
@@ -190,7 +192,7 @@ def test__find_first_reservable_time_span_for_reservation_unit__different_buffer
     origin_hauki_resource = OriginHaukiResourceFactory.create(
         id=999,
         opening_hours_hash="test_hash",
-        latest_fetched_date=date(2024, 12, 31),
+        latest_fetched_date=datetime.date(2024, 12, 31),
     )
 
     reservation_unit = ReservationUnitFactory(
@@ -260,12 +262,12 @@ def test__find_first_reservable_time_span_for_reservation_unit__buffer_goes_thro
     origin_hauki_resource = OriginHaukiResourceFactory.create(
         id=999,
         opening_hours_hash="test_hash",
-        latest_fetched_date=date(2024, 12, 31),
+        latest_fetched_date=datetime.date(2024, 12, 31),
     )
     reservation_unit = ReservationUnitFactory(
         origin_hauki_resource=origin_hauki_resource,
-        buffer_time_before=timedelta(minutes=120),
-        buffer_time_after=timedelta(minutes=120),
+        buffer_time_before=datetime.timedelta(minutes=120),
+        buffer_time_after=datetime.timedelta(minutes=120),
         reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
     )
 
@@ -307,10 +309,10 @@ def test__find_first_reservable_time_span_for_reservation_unit__interval_is_long
     # │ ░░░░░░░░░░░░▁▁▁▁████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁░░░░░░░░ │
     # │                     ════════                 │
 
-    origin_hauki_resource = OriginHaukiResourceFactory.create(id=999, latest_fetched_date=date(2024, 12, 31))
+    origin_hauki_resource = OriginHaukiResourceFactory.create(id=999, latest_fetched_date=datetime.date(2024, 12, 31))
     reservation_unit = ReservationUnitFactory(
         origin_hauki_resource=origin_hauki_resource,
-        min_reservation_duration=timedelta(minutes=15),
+        min_reservation_duration=datetime.timedelta(minutes=15),
         reservation_start_interval=ReservationStartInterval.INTERVAL_120_MINUTES.value,
     )
     reservation_unit.affected_time_spans = []
@@ -353,8 +355,8 @@ def test__find_first_reservable_time_span_for_reservation_unit__max_duration_is_
     Rounded down max duration: 12 hours
     """
     reservation_unit = ReservationUnitFactory(
-        min_reservation_duration=timedelta(minutes=140),
-        max_reservation_duration=timedelta(minutes=200),
+        min_reservation_duration=datetime.timedelta(minutes=140),
+        max_reservation_duration=datetime.timedelta(minutes=200),
         reservation_start_interval=ReservationStartInterval.INTERVAL_120_MINUTES.value,
     )
     reservation_unit.affected_time_spans = []

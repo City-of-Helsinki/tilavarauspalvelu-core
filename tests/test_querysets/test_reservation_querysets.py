@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 from collections import defaultdict
-from datetime import UTC, datetime
 
 import pytest
 
@@ -17,9 +19,9 @@ pytestmark = [
 NEXT_YEAR = local_date().year + 1
 
 
-def _datetime(year=NEXT_YEAR, month=5, day=1, hour=0, minute=0) -> datetime:
+def _datetime(year=NEXT_YEAR, month=5, day=1, hour=0, minute=0) -> datetime.datetime:
     # Convert to UTC to match timezone returned by GQL endpoint
-    return datetime(year, month, day, hour, minute, tzinfo=DEFAULT_TIMEZONE).astimezone(UTC)
+    return datetime.datetime(year, month, day, hour, minute, tzinfo=DEFAULT_TIMEZONE).astimezone(datetime.UTC)
 
 
 def _create_test_reservations_for_all_reservation_units() -> None:

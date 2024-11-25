@@ -1,13 +1,14 @@
+from __future__ import annotations
+
+import datetime
 import json
 from dataclasses import asdict, dataclass
-from datetime import UTC, date, datetime, time, timedelta
 from functools import partial
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import freezegun
 import pytest
 from django.core.cache import cache
-from graphene_django_extensions.testing.client import GQLResponse
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tests.factories import (
@@ -25,11 +26,16 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import CachedReservableTime
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from .helpers import reservation_units_query
+
+if TYPE_CHECKING:
+    from graphene_django_extensions.testing.client import GQLResponse
+
+    from tilavarauspalvelu.models import ReservationUnit
 
 # Applied to all tests
 pytestmark = [
@@ -44,13 +50,13 @@ reservation_units_reservable_query = partial(
 NEXT_YEAR = local_date().year + 1
 
 
-def _datetime(year=NEXT_YEAR, month=1, day=1, hour=0, minute=0) -> datetime:
+def _datetime(year=NEXT_YEAR, month=1, day=1, hour=0, minute=0) -> datetime.datetime:
     # Convert to UTC to match timezone returned by GQL endpoint
-    return datetime(year, month, day, hour, minute).astimezone(DEFAULT_TIMEZONE).astimezone(UTC)
+    return datetime.datetime(year, month, day, hour, minute).astimezone(DEFAULT_TIMEZONE).astimezone(datetime.UTC)
 
 
-def _date(year=NEXT_YEAR, month=1, day=1) -> date:
-    return date(year, month, day)
+def _date(year=NEXT_YEAR, month=1, day=1) -> datetime.date:
+    return datetime.date(year, month, day)
 
 
 def is_closed(response: GQLResponse, *, node: int = 0) -> bool:
@@ -60,15 +66,19 @@ def is_closed(response: GQLResponse, *, node: int = 0) -> bool:
 
 def frt(response: GQLResponse, *, node: int = 0) -> str | None:
     """Get first reservable time as ISO 8601 string from response"""
-    first_reservable_time = response.node(node)["firstReservableDatetime"]
+    first_reservable_time: str = response.node(node)["firstReservableDatetime"]
     if first_reservable_time is None:
         return None
-    return datetime.fromisoformat(first_reservable_time).astimezone(DEFAULT_TIMEZONE).isoformat(timespec="seconds")
+    return (
+        datetime.datetime.fromisoformat(first_reservable_time)
+        .astimezone(DEFAULT_TIMEZONE)
+        .isoformat(timespec="seconds")
+    )
 
 
 def dt(*, year: int = NEXT_YEAR, month: int = 1, day: int = 1, hour: int = 0, minute: int = 0) -> str:
     """Get time in local timezone as ISO 8601 string"""
-    return datetime(year, month, day, hour, minute, tzinfo=DEFAULT_TIMEZONE).isoformat(timespec="seconds")
+    return datetime.datetime(year, month, day, hour, minute, tzinfo=DEFAULT_TIMEZONE).isoformat(timespec="seconds")
 
 
 NOW = _datetime()
@@ -90,7 +100,7 @@ def reservation_unit() -> ReservationUnit:
     origin_hauki_resource = OriginHaukiResourceFactory.create(
         id=999,
         opening_hours_hash="test_hash",
-        latest_fetched_date=_date() - timedelta(days=1),
+        latest_fetched_date=_date() - datetime.timedelta(days=1),
     )
     return ReservationUnitFactory.create(
         origin_hauki_resource=origin_hauki_resource,
@@ -101,8 +111,8 @@ def reservation_unit() -> ReservationUnit:
         reservations_max_days_before=None,
         min_reservation_duration=None,
         max_reservation_duration=None,
-        buffer_time_before=timedelta(),
-        buffer_time_after=timedelta(),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
     )
 
 
@@ -125,8 +135,8 @@ def create_child_for_reservation_unit(reservation_unit: ReservationUnit) -> Rese
         reservations_max_days_before=None,
         min_reservation_duration=None,
         max_reservation_duration=None,
-        buffer_time_before=timedelta(),
-        buffer_time_after=timedelta(),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
         reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
         origin_hauki_resource=reservation_unit.origin_hauki_resource,
         spaces=[child_space],
@@ -145,10 +155,10 @@ class ReservableFilters:
 
     def __init__(
         self,
-        date_start: date | None = None,
-        date_end: date | None = None,
-        time_start: time | None = None,
-        time_end: time | None = None,
+        date_start: datetime.date | None = None,
+        date_end: datetime.date | None = None,
+        time_start: datetime.time | None = None,
+        time_end: datetime.time | None = None,
         minimum_duration_minutes: int | None = None,
         show_only_reservable: bool | None = None,
     ):
@@ -163,24 +173,24 @@ class ReservableFilters:
 @dataclass
 class ReservationUnitOverrides:
     reservation_start_interval: str | None = None
-    reservation_begins: datetime | None = None
-    reservation_ends: datetime | None = None
-    publish_ends: datetime | None = None
+    reservation_begins: datetime.datetime | None = None
+    reservation_ends: datetime.datetime | None = None
+    publish_ends: datetime.datetime | None = None
     reservations_min_days_before: int | None = None
     reservations_max_days_before: int | None = None
-    min_reservation_duration: timedelta | None = None
-    max_reservation_duration: timedelta | None = None
-    buffer_time_before: timedelta | None = None
-    buffer_time_after: timedelta | None = None
+    min_reservation_duration: datetime.timedelta | None = None
+    max_reservation_duration: datetime.timedelta | None = None
+    buffer_time_before: datetime.timedelta | None = None
+    buffer_time_after: datetime.timedelta | None = None
 
 
 @dataclass
 class ApplicationStatusParams:
     status: ApplicationRoundStatusChoice
-    sent_date: datetime | None = None
-    handled_date: datetime | None = None
-    reservation_period_begin: date | None = None
-    reservation_period_end: date | None = None
+    sent_date: datetime.datetime | None = None
+    handled_date: datetime.datetime | None = None
+    reservation_period_begin: datetime.date | None = None
+    reservation_period_end: datetime.date | None = None
     reservation_units: list[ReservationUnit] | None = None
 
 
@@ -237,13 +247,13 @@ def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_ex
         {
             "Date Start is in the past": ReservableParams(
                 filters=ReservableFilters(
-                    date_start=(NOW - timedelta(days=1)).date(),
+                    date_start=(NOW - datetime.timedelta(days=1)).date(),
                 ),
                 result="'reservable_date_start' must be not be in the past.",
             ),
             "Date End is in the past": ReservableParams(
                 filters=ReservableFilters(
-                    date_end=(NOW - timedelta(days=1)).date(),
+                    date_end=(NOW - datetime.timedelta(days=1)).date(),
                 ),
                 result="'reservable_date_end' must be not be in the past.",
             ),
@@ -256,8 +266,8 @@ def test__reservation_unit__first_reservable_time__no_results_time_spans_dont_ex
             ),
             "Time Start and End filters exact start time": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=15),
-                    time_end=time(hour=15),
+                    time_start=datetime.time(hour=15),
+                    time_end=datetime.time(hour=15),
                 ),
                 result="'reservable_time_start' must be before 'reservable_time_end'.",
             ),
@@ -305,25 +315,25 @@ def test__reservation_unit__first_reservable_time__filters__invalid_values(graph
             ),
             "No Results | Time Start is when time span ends": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=19),
+                    time_start=datetime.time(hour=19),
                 ),
                 result=ReservableNode(is_closed=True),
             ),
             "No Results | Time Start is after all reservable times have ended": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=19, minute=1),
+                    time_start=datetime.time(hour=19, minute=1),
                 ),
                 result=ReservableNode(is_closed=True),
             ),
             "No Results | Time End is when time span starts": ReservableParams(
                 filters=ReservableFilters(
-                    time_end=time(hour=15),
+                    time_end=datetime.time(hour=15),
                 ),
                 result=ReservableNode(is_closed=True),
             ),
             "No Results | Time End is before any reservable time begins": ReservableParams(
                 filters=ReservableFilters(
-                    time_end=time(hour=14, minute=59),
+                    time_end=datetime.time(hour=14, minute=59),
                 ),
                 result=ReservableNode(is_closed=True),
             ),
@@ -335,7 +345,7 @@ def test__reservation_unit__first_reservable_time__filters__invalid_values(graph
             ),
             "No Results | Time Start and Minimum duration cause reservable time to be too short": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=18, minute=1),
+                    time_start=datetime.time(hour=18, minute=1),
                     minimum_duration_minutes=60,
                 ),
                 result=ReservableNode(is_closed=False),
@@ -400,18 +410,18 @@ def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no
             ),
             "Basic | Only Time Start": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=13),
+                    time_start=datetime.time(hour=13),
                 ),
             ),
             "Basic | Only Time End": ReservableParams(
                 filters=ReservableFilters(
-                    time_end=time(hour=14),
+                    time_end=datetime.time(hour=14),
                 ),
             ),
             "Basic | Start & End Time | Filters same as time span": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=13),
-                    time_end=time(hour=14),
+                    time_start=datetime.time(hour=13),
+                    time_end=datetime.time(hour=14),
                 ),
             ),
             "Basic | Only reservable_minimum_duration_minutes| Shorter than time span": ReservableParams(
@@ -438,8 +448,8 @@ def test__reservation_unit__first_reservable_time__filters__too_strict_causes_no
                 filters=ReservableFilters(
                     date_start=_date(),
                     date_end=_date(day=30),
-                    time_start=time(),
-                    time_end=time(hour=23, minute=59),
+                    time_start=datetime.time(),
+                    time_end=datetime.time(hour=23, minute=59),
                     minimum_duration_minutes=30,
                     show_only_reservable=False,
                 ),
@@ -467,8 +477,8 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
     # 31st Dec 13:00 - 14:00 (1h)
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
-        start_datetime=_datetime(hour=13) - timedelta(days=1),
-        end_datetime=_datetime(hour=14) - timedelta(days=1),
+        start_datetime=_datetime(hour=13) - datetime.timedelta(days=1),
+        end_datetime=_datetime(hour=14) - datetime.timedelta(days=1),
     )
     # Next available Reservable Time Span
     # 1st Jan 13:00 - 14:00 (1h)
@@ -502,7 +512,7 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
             ),
             "Simple | Time End filter is early in the morning": ReservableParams(
                 filters=ReservableFilters(
-                    time_end=time(hour=9),
+                    time_end=datetime.time(hour=9),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -520,7 +530,7 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
             ),
             "Simple | Time Start is after Time Span start time, return valid next interval": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=12, minute=1),
+                    time_start=datetime.time(hour=12, minute=1),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -529,7 +539,7 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
             ),
             "Simple | Time Start filter is at next interval, since it's valid it should be returned": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=12, minute=1),
+                    time_start=datetime.time(hour=12, minute=1),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -538,8 +548,8 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
             ),
             "Simple | Time Start and End filters together match time span exactly": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=16),
-                    time_end=time(hour=20),
+                    time_start=datetime.time(hour=16),
+                    time_end=datetime.time(hour=20),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -548,8 +558,8 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
             ),
             "Simple | Time Start and End only partially contain the ReservableTimeSpan from start": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=16, minute=1),
-                    time_end=time(hour=20),
+                    time_start=datetime.time(hour=16, minute=1),
+                    time_end=datetime.time(hour=20),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -558,8 +568,8 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
             ),
             "Simple | Time Start and End only partially contain the ReservableTimeSpan from end": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=16),
-                    time_end=time(hour=19, minute=59),
+                    time_start=datetime.time(hour=16),
+                    time_end=datetime.time(hour=19, minute=59),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -568,7 +578,7 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
             ),
             "Simple | Time Start late at night, reservation ends at midnight": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=22),
+                    time_start=datetime.time(hour=22),
                     minimum_duration_minutes=120,
                 ),
                 result=ReservableNode(
@@ -579,7 +589,7 @@ def test__query_reservation_unit_reservable__filters__should_not_exclude_time_sp
             "Simple | Time Start is at midnight on time spans second day": ReservableParams(
                 filters=ReservableFilters(
                     date_start=_date(day=16),
-                    time_start=time(hour=0),
+                    time_start=datetime.time(hour=0),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -646,7 +656,7 @@ def test__reservation_unit__first_reservable_time__filters__simple(graphql, rese
         {
             "Same day timespans | Time Start is after first time span": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=14),
+                    time_start=datetime.time(hour=14),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -655,7 +665,7 @@ def test__reservation_unit__first_reservable_time__filters__simple(graphql, rese
             ),
             "Same day timespans | Time start in the middle of first time span": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=11),
+                    time_start=datetime.time(hour=11),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -664,7 +674,7 @@ def test__reservation_unit__first_reservable_time__filters__simple(graphql, rese
             ),
             "Same day timespans | Time start in the middle of first time span, minimum duration": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=11),
+                    time_start=datetime.time(hour=11),
                     minimum_duration_minutes=120,
                 ),
                 result=ReservableNode(
@@ -674,8 +684,8 @@ def test__reservation_unit__first_reservable_time__filters__simple(graphql, rese
             ),
             "Same day timespans | Time start in first time span, ends in last last, minimum duration": ReservableParams(
                 filters=ReservableFilters(
-                    time_start=time(hour=11),
-                    time_end=time(hour=17),
+                    time_start=datetime.time(hour=11),
+                    time_end=datetime.time(hour=17),
                     minimum_duration_minutes=120,
                 ),
                 result=ReservableNode(
@@ -730,8 +740,8 @@ def test__reservation_unit__first_reservable_time__filters__multiple_time_spans_
             "Multi-day | Time on the first day": ReservableParams(
                 filters=ReservableFilters(
                     date_start=_date(day=1),
-                    time_start=time(hour=14),
-                    time_end=time(hour=16),
+                    time_start=datetime.time(hour=14),
+                    time_end=datetime.time(hour=16),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -741,8 +751,8 @@ def test__reservation_unit__first_reservable_time__filters__multiple_time_spans_
             "Multi-day | Time on the second day": ReservableParams(
                 filters=ReservableFilters(
                     date_start=_date(day=2),
-                    time_start=time(hour=14),
-                    time_end=time(hour=16),
+                    time_start=datetime.time(hour=14),
+                    time_end=datetime.time(hour=16),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -751,7 +761,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_time_spans_
             ),
             "Multi-day | Time End filter causes midnight of second day to be returned": ReservableParams(
                 filters=ReservableFilters(
-                    time_end=time(hour=12, minute=59),
+                    time_end=datetime.time(hour=12, minute=59),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -884,7 +894,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
             ),
             "ReservationUnit Settings | min_reservation_duration": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    min_reservation_duration=timedelta(hours=2),
+                    min_reservation_duration=datetime.timedelta(hours=2),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -893,7 +903,7 @@ def test__reservation_unit__first_reservable_time__filters__multiple_days_long_t
             ),
             "ReservationUnit Settings | max_reservation_duration": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    max_reservation_duration=timedelta(hours=2),
+                    max_reservation_duration=datetime.timedelta(hours=2),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -950,7 +960,7 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
         {
             "Advanced | Min duration is longer than Max duration allowed by reservation unit": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    max_reservation_duration=timedelta(
+                    max_reservation_duration=datetime.timedelta(
                         minutes=120,
                     ),
                 ),
@@ -964,7 +974,7 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
             ),
             "Advanced | Greater minimum durations is used > min_reservation_duration": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    min_reservation_duration=timedelta(minutes=61),
+                    min_reservation_duration=datetime.timedelta(minutes=61),
                 ),
                 filters=ReservableFilters(
                     minimum_duration_minutes=60,
@@ -976,7 +986,7 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
             ),
             "Advanced | Greater minimum durations is used > reservable_minimum_duration_minutes": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    min_reservation_duration=timedelta(minutes=60),
+                    min_reservation_duration=datetime.timedelta(minutes=60),
                 ),
                 filters=ReservableFilters(
                     minimum_duration_minutes=61,
@@ -991,7 +1001,7 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
                     reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
                 ),
                 filters=ReservableFilters(
-                    time_start=time(hour=13, minute=1),
+                    time_start=datetime.time(hour=13, minute=1),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -1003,7 +1013,7 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
                     reservation_start_interval=ReservationStartInterval.INTERVAL_30_MINUTES.value,
                 ),
                 filters=ReservableFilters(
-                    time_start=time(hour=13, minute=1),
+                    time_start=datetime.time(hour=13, minute=1),
                     minimum_duration_minutes=31,
                 ),
                 result=ReservableNode(
@@ -1016,7 +1026,7 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
                     reservation_start_interval=ReservationStartInterval.INTERVAL_60_MINUTES.value,
                 ),
                 filters=ReservableFilters(
-                    time_start=time(hour=13, minute=1),
+                    time_start=datetime.time(hour=13, minute=1),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -1028,7 +1038,7 @@ def test__reservation_unit__first_reservable_time__reservation_unit_settings(
                     reservation_start_interval=ReservationStartInterval.INTERVAL_90_MINUTES.value,
                 ),
                 filters=ReservableFilters(
-                    time_start=time(hour=13, minute=1),
+                    time_start=datetime.time(hour=13, minute=1),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -1788,9 +1798,9 @@ def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_tim
     └────────────────────────────────────────────────────┘
     """
     reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES.value
-    reservation_unit.buffer_time_before = timedelta(minutes=60)
-    reservation_unit.buffer_time_after = timedelta(minutes=60)
-    reservation_unit.min_reservation_duration = timedelta(minutes=30)
+    reservation_unit.buffer_time_before = datetime.timedelta(minutes=60)
+    reservation_unit.buffer_time_after = datetime.timedelta(minutes=60)
+    reservation_unit.min_reservation_duration = datetime.timedelta(minutes=30)
     reservation_unit.save()
 
     # 1st Jan 10:00 - 12:00 (2h)
@@ -1815,8 +1825,8 @@ def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_tim
         {
             "Buffers | Different length buffers are overlapping": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    buffer_time_before=timedelta(minutes=60),
-                    buffer_time_after=timedelta(minutes=60),
+                    buffer_time_before=datetime.timedelta(minutes=60),
+                    buffer_time_after=datetime.timedelta(minutes=60),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -1825,8 +1835,8 @@ def test__reservation_unit__first_reservable_time__buffers__goes_over_closed_tim
             ),
             "Buffers | Asymmetric different length buffers are overlapping": RU_ReservableParams(
                 reservation_unit_settings=ReservationUnitOverrides(
-                    buffer_time_before=timedelta(),
-                    buffer_time_after=timedelta(minutes=60),
+                    buffer_time_before=datetime.timedelta(),
+                    buffer_time_after=datetime.timedelta(minutes=60),
                 ),
                 result=ReservableNode(
                     is_closed=False,
@@ -1868,8 +1878,8 @@ def test__reservation_unit__first_reservable_time__buffers__different_length_buf
     │                                   ═──              │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit.buffer_time_before = timedelta(minutes=30)
-    reservation_unit.buffer_time_after = timedelta(minutes=30)
+    reservation_unit.buffer_time_before = datetime.timedelta(minutes=30)
+    reservation_unit.buffer_time_after = datetime.timedelta(minutes=30)
     reservation_unit.save()
 
     reservation_unit_60: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
@@ -1948,14 +1958,14 @@ def test__reservation_unit__first_reservable_time__buffers__start_and_end_same_t
     """
     reservation_unit_30: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_30.name = "ReservationUnit 30 min buffer"
-    reservation_unit_30.buffer_time_before = timedelta()
-    reservation_unit_30.buffer_time_after = timedelta(minutes=30)
+    reservation_unit_30.buffer_time_before = datetime.timedelta()
+    reservation_unit_30.buffer_time_after = datetime.timedelta(minutes=30)
     reservation_unit_30.save()
 
     reservation_unit_60: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_60.name = "ReservationUnit 60 min buffer"
-    reservation_unit_60.buffer_time_before = timedelta()
-    reservation_unit_60.buffer_time_after = timedelta(minutes=60)
+    reservation_unit_60.buffer_time_before = datetime.timedelta()
+    reservation_unit_60.buffer_time_after = datetime.timedelta(minutes=60)
     reservation_unit_60.save()
 
     # 1st Jan 10:00 - 20:00 (10h)
@@ -2035,14 +2045,14 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
     """
     reservation_unit_30: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_30.name = "ReservationUnit 30 min buffer"
-    reservation_unit_30.buffer_time_before = timedelta(minutes=30)
-    reservation_unit_30.buffer_time_after = timedelta()
+    reservation_unit_30.buffer_time_before = datetime.timedelta(minutes=30)
+    reservation_unit_30.buffer_time_after = datetime.timedelta()
     reservation_unit_30.save()
 
     reservation_unit_60: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_60.name = "ReservationUnit 60 min buffer"
-    reservation_unit_60.buffer_time_before = timedelta(minutes=60)
-    reservation_unit_60.buffer_time_after = timedelta()
+    reservation_unit_60.buffer_time_before = datetime.timedelta(minutes=60)
+    reservation_unit_60.buffer_time_after = datetime.timedelta()
     reservation_unit_60.save()
 
     # 1st Jan 10:00 - 20:00 (10h)
@@ -2128,14 +2138,14 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
     """
     reservation_unit_30: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_30.name = "ReservationUnit 30 min buffer"
-    reservation_unit_30.buffer_time_before = timedelta(minutes=30)
-    reservation_unit_30.buffer_time_after = timedelta()
+    reservation_unit_30.buffer_time_before = datetime.timedelta(minutes=30)
+    reservation_unit_30.buffer_time_after = datetime.timedelta()
     reservation_unit_30.save()
 
     reservation_unit_60: ReservationUnit = create_child_for_reservation_unit(reservation_unit)
     reservation_unit_60.name = "ReservationUnit 60 min buffer"
-    reservation_unit_60.buffer_time_before = timedelta(minutes=60)
-    reservation_unit_60.buffer_time_after = timedelta()
+    reservation_unit_60.buffer_time_before = datetime.timedelta(minutes=60)
+    reservation_unit_60.buffer_time_after = datetime.timedelta()
     reservation_unit_60.save()
 
     # 1st Jan 10:30-20:00 (9h 30min)
@@ -2179,7 +2189,7 @@ def test__reservation_unit__first_reservable_time__buffers__different_before_buf
 ########################################################################################################################
 
 
-@freezegun.freeze_time(datetime(NEXT_YEAR, 1, 1, 10, microsecond=1).astimezone(DEFAULT_TIMEZONE))
+@freezegun.freeze_time(datetime.datetime(NEXT_YEAR, 1, 1, 10, microsecond=1).astimezone(DEFAULT_TIMEZONE))
 def test__reservation_unit__first_reservable_time__round_current_time_to_the_next_minute(graphql, reservation_unit):
     """
     This is a regression test for a bug that was found during manual testing.
@@ -2231,7 +2241,7 @@ def test__reservation_unit__first_reservable_time__extra_long_interval(graphql, 
     │                     ══  ══  ══  ══  ══             │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit.min_reservation_duration = timedelta(minutes=60)
+    reservation_unit.min_reservation_duration = datetime.timedelta(minutes=60)
     reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_120_MINUTES.value
     reservation_unit.save()
 
@@ -2302,9 +2312,9 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
     │                             ──══──                 │
     └────────────────────────────────────────────────────┘
     """
-    reservation_unit.min_reservation_duration = timedelta(minutes=60)
-    reservation_unit.buffer_time_before = timedelta(minutes=60)
-    reservation_unit.buffer_time_after = timedelta(minutes=60)
+    reservation_unit.min_reservation_duration = datetime.timedelta(minutes=60)
+    reservation_unit.buffer_time_before = datetime.timedelta(minutes=60)
+    reservation_unit.buffer_time_after = datetime.timedelta(minutes=60)
     reservation_unit.save()
 
     # 1st Jan 10:00 - 16:00 (6h)
@@ -2319,8 +2329,8 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
         reservation_units=[reservation_unit],
         begin=_datetime(hour=12),
         end=_datetime(hour=14),
-        buffer_time_before=timedelta(minutes=300),  # This buffer should be completely ignored
-        buffer_time_after=timedelta(minutes=300),  # This buffer should be completely ignored
+        buffer_time_before=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
+        buffer_time_after=datetime.timedelta(minutes=300),  # This buffer should be completely ignored
         type=ReservationTypeChoice.BLOCKED,
         state=ReservationStateChoice.CONFIRMED,
     )
@@ -2329,19 +2339,19 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
     AffectingTimeSpan.refresh()
 
     # Buffer does not overlap with BLOCKED reservation at all
-    response = graphql(reservation_units_reservable_query(reservable_time_start=time(hour=10).isoformat()))
+    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=10).isoformat()))
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=10)
     assert is_closed(response) is False
 
     # Buffer overlaps with BLOCKED reservation from the end, which should be allowed
-    response = graphql(reservation_units_reservable_query(reservable_time_start=time(hour=11).isoformat()))
+    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=11).isoformat()))
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=11)
     assert is_closed(response) is False
 
     # Buffer overlaps with BLOCKED reservation from the start, which should be allowed
-    response = graphql(reservation_units_reservable_query(reservable_time_start=time(hour=12).isoformat()))
+    response = graphql(reservation_units_reservable_query(reservable_time_start=datetime.time(hour=12).isoformat()))
     assert response.has_errors is False, response
     assert frt(response) == dt(hour=14)
     assert is_closed(response) is False
@@ -2350,7 +2360,7 @@ def test__reservation_unit__first_reservable_time__blocked_type_reservation_can_
 ########################################################################################################################
 
 
-@freezegun.freeze_time(datetime(2024, 1, 1, hour=8, tzinfo=DEFAULT_TIMEZONE))
+@freezegun.freeze_time(datetime.datetime(2024, 1, 1, hour=8, tzinfo=DEFAULT_TIMEZONE))
 def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffers_overlap(graphql, reservation_unit):
     """
     This is a regression test for a bug that was found during manual testing.
@@ -2380,8 +2390,8 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
     └────────────────────────────────────────────────────┘
     """
     reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES.value
-    reservation_unit.buffer_time_before = timedelta(minutes=15)
-    reservation_unit.buffer_time_after = timedelta(minutes=15)
+    reservation_unit.buffer_time_before = datetime.timedelta(minutes=15)
+    reservation_unit.buffer_time_after = datetime.timedelta(minutes=15)
     reservation_unit.save()
 
     # 1st Jan 17:00 - 22:00 (5h)
@@ -2395,8 +2405,8 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
     ReservationFactory.create(
         begin=_datetime(hour=17),
         end=_datetime(hour=18),
-        buffer_time_before=timedelta(),
-        buffer_time_after=timedelta(),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
         reservation_units=[reservation_unit],
         state=ReservationStateChoice.CREATED,
     )
@@ -2405,8 +2415,8 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
     ReservationFactory.create(
         begin=_datetime(hour=18, minute=30),
         end=_datetime(hour=19, minute=30),
-        buffer_time_before=timedelta(),
-        buffer_time_after=timedelta(),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
         reservation_units=[reservation_unit],
         state=ReservationStateChoice.CREATED,
     )
@@ -2415,8 +2425,8 @@ def test_reservation_unit__first_reservable_time__duration_exactly_min_but_buffe
     ReservationFactory.create(
         begin=_datetime(hour=20),
         end=_datetime(hour=21),
-        buffer_time_before=timedelta(minutes=15),
-        buffer_time_after=timedelta(minutes=30),
+        buffer_time_before=datetime.timedelta(minutes=15),
+        buffer_time_after=datetime.timedelta(minutes=30),
         reservation_units=[reservation_unit],
         state=ReservationStateChoice.CREATED,
     )
@@ -2846,13 +2856,13 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
         str(reservation_unit_2): CachedReservableTime(
             frt=None,
             closed=True,
-            valid_until=local_datetime() - timedelta(minutes=1),  # invalid
+            valid_until=local_datetime() - datetime.timedelta(minutes=1),  # invalid
         ).to_dict(),
         # Second page
         str(reservation_unit): CachedReservableTime(
-            frt=datetime.fromisoformat("2025-01-01T10:00:00+02:00"),
+            frt=datetime.datetime.fromisoformat("2025-01-01T10:00:00+02:00"),
             closed=False,
-            valid_until=local_datetime() + timedelta(minutes=1),  # valid
+            valid_until=local_datetime() + datetime.timedelta(minutes=1),  # valid
         ).to_dict(),
     }
     cache_key = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import timedelta
+import datetime
 from typing import NamedTuple
 
 import pytest
@@ -183,12 +183,12 @@ def test_sort_banner_notifications_by_start_date(graphql, order_by, expected):
     BannerNotificationBuilder().active().create(
         message="1",
         target=BannerNotificationTarget.ALL,
-        active_from=today - timedelta(days=1),
+        active_from=today - datetime.timedelta(days=1),
     )
     BannerNotificationBuilder().active().create(
         message="2",
         target=BannerNotificationTarget.ALL,
-        active_from=today - timedelta(days=2),
+        active_from=today - datetime.timedelta(days=2),
     )
     BannerNotificationFactory.create(
         message="3",
@@ -251,12 +251,12 @@ def test_sort_banner_notifications_by_end_date(graphql, order_by, expected):
     BannerNotificationBuilder().active().create(
         message="1",
         target=BannerNotificationTarget.ALL,
-        active_until=today + timedelta(days=1),
+        active_until=today + datetime.timedelta(days=1),
     )
     BannerNotificationBuilder().active().create(
         message="2",
         target=BannerNotificationTarget.ALL,
-        active_until=today + timedelta(days=2),
+        active_until=today + datetime.timedelta(days=2),
     )
     BannerNotificationFactory.create(
         message="3",

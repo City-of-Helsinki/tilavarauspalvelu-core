@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import datetime
 import uuid
-from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -24,11 +24,11 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation, ReservationUnit
 
 
-def parse_datetime(string: str | None) -> datetime | None:
+def parse_datetime(string: str | None) -> datetime.datetime | None:
     if string is None:
         return None
 
-    return datetime.fromisoformat(string).astimezone(settings.VERKKOKAUPPA_TIMEZONE)
+    return datetime.datetime.fromisoformat(string).astimezone(settings.VERKKOKAUPPA_TIMEZONE)
 
 
 def get_formatted_reservation_time(reservation: Reservation) -> str:
@@ -125,7 +125,7 @@ def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams
             phone="",
         ),
         last_valid_purchase_datetime=(
-            local_datetime() + timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
+            local_datetime() + datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
         ),
     )
 

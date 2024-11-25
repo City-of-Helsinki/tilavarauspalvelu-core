@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import timedelta
+import datetime
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import ReservationStartInterval
@@ -77,7 +77,7 @@ class ReservationUnitFirstReservableTimeHelper:
 
         self.minimum_duration_minutes = max(
             parent.filter_minimum_duration_minutes,
-            int((reservation_unit.min_reservation_duration or timedelta()).total_seconds() / 60),
+            int((reservation_unit.min_reservation_duration or datetime.timedelta()).total_seconds() / 60),
             start_interval_minutes,  # Minimum duration must be at least as long as the start interval
         )
 
@@ -174,7 +174,7 @@ class ReservationUnitFirstReservableTimeHelper:
         reservation_unit_closed_time_spans.extend(
             TimeSpanElement(
                 start_datetime=local_start_of_day(application_round.reservation_period_begin),
-                end_datetime=local_start_of_day(application_round.reservation_period_end) + timedelta(days=1),
+                end_datetime=local_start_of_day(application_round.reservation_period_end) + datetime.timedelta(days=1),
                 is_reservable=False,
             )
             for application_round in self.reservation_unit.application_rounds.all()
@@ -199,7 +199,8 @@ class ReservationUnitFirstReservableTimeHelper:
                 TimeSpanElement(
                     start_datetime=local_datetime_min(),
                     end_datetime=(
-                        local_start_of_day(now) + timedelta(days=self.reservation_unit.reservations_min_days_before)
+                        local_start_of_day(now)
+                        + datetime.timedelta(days=self.reservation_unit.reservations_min_days_before)
                     ),
                     is_reservable=False,
                 )
@@ -207,7 +208,7 @@ class ReservationUnitFirstReservableTimeHelper:
         if self.reservation_unit.reservations_max_days_before:
             reservation_unit_closed_time_spans.append(
                 TimeSpanElement(
-                    start_datetime=now + timedelta(days=self.reservation_unit.reservations_max_days_before),
+                    start_datetime=now + datetime.timedelta(days=self.reservation_unit.reservations_max_days_before),
                     end_datetime=local_datetime_max(),
                     is_reservable=False,
                 )

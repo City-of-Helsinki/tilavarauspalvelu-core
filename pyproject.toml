@@ -317,7 +317,7 @@ banned-from = [
     # Python standard libraries
     "base64",
     "csv",
-    # "datetime",
+    "datetime",
     "hashlib",
     "hmac",
     "json",

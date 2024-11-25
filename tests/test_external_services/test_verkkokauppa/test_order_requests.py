@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 from urllib.parse import urljoin
@@ -27,7 +29,7 @@ create_order_params: CreateOrderParams = CreateOrderParams(
     price_net=Decimal("100.0"),
     price_vat=Decimal("24.0"),
     price_total=Decimal("124.0"),
-    last_valid_purchase_datetime=datetime(2022, 11, 24, 12, 0, 0, tzinfo=UTC),
+    last_valid_purchase_datetime=datetime.datetime(2022, 11, 24, 12, 0, 0, tzinfo=datetime.UTC),
     items=[
         OrderItemParams(
             product_id=uuid.UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),

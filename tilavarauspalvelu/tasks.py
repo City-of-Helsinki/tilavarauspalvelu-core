@@ -5,7 +5,6 @@ import json
 import logging
 import uuid
 from contextlib import suppress
-from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING, Literal
 
@@ -284,7 +283,7 @@ def update_reservation_unit_pricings_tax_percentage(
         level="info",
     )
 
-    change_date = date.fromisoformat(change_date)  # e.g. "2024-09-01"
+    change_date = datetime.date.fromisoformat(change_date)  # e.g. "2024-09-01"
     current_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(current_tax))
     future_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(future_tax))
 

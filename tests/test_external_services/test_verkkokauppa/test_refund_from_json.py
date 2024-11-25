@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import datetime
 
 import pytest
 from django.conf import settings
@@ -32,7 +34,7 @@ def test_verkkokauppa__refund__from_json():
     assert refund.order_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
     assert refund.namespace == "tilavaraus"
     assert refund.user == "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"
-    assert refund.created_at == datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+    assert refund.created_at == datetime.datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
     assert refund.status == "confirmed"
     assert refund.customer_first_name == "First"
     assert refund.customer_last_name == "Last"
@@ -52,7 +54,7 @@ def test_verkkokauppa__refund__from_json__optional_fields_not_included():
 
     assert refund.namespace == "tilavaraus"
     assert refund.user == "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"
-    assert refund.created_at == datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+    assert refund.created_at == datetime.datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
 
     assert refund.status == "confirmed"
     assert refund.customer_first_name is None

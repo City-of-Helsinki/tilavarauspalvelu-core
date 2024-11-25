@@ -1,4 +1,6 @@
-from datetime import timedelta
+from __future__ import annotations
+
+import datetime
 
 from tests.test_external_services.test_hauki.test_reservable_time_spans_client import _get_date
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
@@ -101,15 +103,15 @@ def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_sa
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=14),
-            buffer_time_before=timedelta(hours=1),
-            buffer_time_after=timedelta(hours=1),
+            buffer_time_before=datetime.timedelta(hours=1),
+            buffer_time_after=datetime.timedelta(hours=1),
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=14),
             end_datetime=_get_date(hour=16),
-            buffer_time_before=timedelta(hours=1),
-            buffer_time_after=timedelta(hours=1),
+            buffer_time_before=datetime.timedelta(hours=1),
+            buffer_time_after=datetime.timedelta(hours=1),
             is_reservable=False,
         ),
     ]
@@ -118,8 +120,8 @@ def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_sa
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=16),
-            buffer_time_before=timedelta(hours=1),
-            buffer_time_after=timedelta(hours=1),
+            buffer_time_before=datetime.timedelta(hours=1),
+            buffer_time_after=datetime.timedelta(hours=1),
             is_reservable=False,
         )
     ]
@@ -130,15 +132,15 @@ def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_sa
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=14),
-            buffer_time_before=timedelta(hours=1),  # 11:00
-            buffer_time_after=timedelta(hours=1),  # 15:00
+            buffer_time_before=datetime.timedelta(hours=1),  # 11:00
+            buffer_time_after=datetime.timedelta(hours=1),  # 15:00
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=14),
             end_datetime=_get_date(hour=16),
-            buffer_time_before=timedelta(hours=4),  # 10:00
-            buffer_time_after=timedelta(hours=4),  # 20:00
+            buffer_time_before=datetime.timedelta(hours=4),  # 10:00
+            buffer_time_after=datetime.timedelta(hours=4),  # 20:00
             is_reservable=False,
         ),
     ]
@@ -147,8 +149,8 @@ def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_sa
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=16),
-            buffer_time_before=timedelta(hours=2),  # 10:00
-            buffer_time_after=timedelta(hours=4),  # 20:00
+            buffer_time_before=datetime.timedelta(hours=2),  # 10:00
+            buffer_time_after=datetime.timedelta(hours=4),  # 20:00
             is_reservable=False,
         )
     ]
@@ -159,15 +161,15 @@ def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_sa
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=14),
-            buffer_time_before=timedelta(hours=4),  # 08:00
-            buffer_time_after=timedelta(hours=4),  # 18:00
+            buffer_time_before=datetime.timedelta(hours=4),  # 08:00
+            buffer_time_after=datetime.timedelta(hours=4),  # 18:00
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=14),
             end_datetime=_get_date(hour=16),
-            buffer_time_before=timedelta(hours=1),  # 13:00
-            buffer_time_after=timedelta(hours=1),  # 17:00
+            buffer_time_before=datetime.timedelta(hours=1),  # 13:00
+            buffer_time_after=datetime.timedelta(hours=1),  # 17:00
             is_reservable=False,
         ),
     ]
@@ -176,8 +178,8 @@ def test__merge_overlapping_time_span_elements__buffers__start_and_end_at_the_sa
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=16),
-            buffer_time_before=timedelta(hours=4),  # 08:00
-            buffer_time_after=timedelta(hours=2),  # 18:00
+            buffer_time_before=datetime.timedelta(hours=4),  # 08:00
+            buffer_time_after=datetime.timedelta(hours=2),  # 18:00
             is_reservable=False,
         )
     ]
@@ -188,15 +190,15 @@ def test__merge_overlapping_time_span_elements__buffers__overlapping():
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=15),
-            buffer_time_before=timedelta(hours=1),
-            buffer_time_after=timedelta(hours=1),
+            buffer_time_before=datetime.timedelta(hours=1),
+            buffer_time_after=datetime.timedelta(hours=1),
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=13),
             end_datetime=_get_date(hour=16),
-            buffer_time_before=timedelta(hours=1),
-            buffer_time_after=timedelta(hours=1),
+            buffer_time_before=datetime.timedelta(hours=1),
+            buffer_time_after=datetime.timedelta(hours=1),
             is_reservable=False,
         ),
     ]
@@ -205,8 +207,8 @@ def test__merge_overlapping_time_span_elements__buffers__overlapping():
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=16),
-            buffer_time_before=timedelta(hours=1),
-            buffer_time_after=timedelta(hours=1),
+            buffer_time_before=datetime.timedelta(hours=1),
+            buffer_time_after=datetime.timedelta(hours=1),
             is_reservable=False,
         )
     ]
@@ -217,15 +219,15 @@ def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reserv
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=13),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=14),
             end_datetime=_get_date(hour=15),
-            buffer_time_before=timedelta(hours=4),
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(hours=4),
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
     ]
@@ -238,15 +240,15 @@ def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reserv
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=13),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(hours=4),
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(hours=4),
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=14),
             end_datetime=_get_date(hour=15),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
     ]
@@ -259,15 +261,15 @@ def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reserv
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=13),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=14),
             end_datetime=_get_date(hour=15),
-            buffer_time_before=timedelta(hours=2),  # 12:00
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(hours=2),  # 12:00
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
     ]
@@ -276,15 +278,15 @@ def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reserv
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=13),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=14),
             end_datetime=_get_date(hour=15),
-            buffer_time_before=timedelta(hours=1),  # 13:00
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(hours=1),  # 13:00
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
     ]
@@ -295,15 +297,15 @@ def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reserv
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=13),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(hours=2),  # 15:00
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(hours=2),  # 15:00
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=14),
             end_datetime=_get_date(hour=15),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
     ]
@@ -312,15 +314,15 @@ def test__merge_overlapping_time_span_elements__buffers__not_overlapping__reserv
         TimeSpanElement(
             start_datetime=_get_date(hour=12),
             end_datetime=_get_date(hour=13),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(hours=1),  # 14:00
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(hours=1),  # 14:00
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=14),
             end_datetime=_get_date(hour=15),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
     ]
@@ -331,15 +333,15 @@ def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffers_a
         TimeSpanElement(
             start_datetime=_get_date(hour=10),
             end_datetime=_get_date(hour=20),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=11),
             end_datetime=_get_date(hour=19),
-            buffer_time_before=timedelta(hours=2),  # 09:00
-            buffer_time_after=timedelta(hours=2),  # 21:00
+            buffer_time_before=datetime.timedelta(hours=2),  # 09:00
+            buffer_time_after=datetime.timedelta(hours=2),  # 21:00
             is_reservable=False,
         ),
     ]
@@ -348,8 +350,8 @@ def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffers_a
         TimeSpanElement(
             start_datetime=_get_date(hour=10),
             end_datetime=_get_date(hour=20),
-            buffer_time_before=timedelta(hours=1),  # 09:00
-            buffer_time_after=timedelta(hours=1),  # 21:00
+            buffer_time_before=datetime.timedelta(hours=1),  # 09:00
+            buffer_time_after=datetime.timedelta(hours=1),  # 21:00
             is_reservable=False,
         ),
     ]
@@ -361,15 +363,15 @@ def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffer_ar
         TimeSpanElement(
             start_datetime=_get_date(hour=10),
             end_datetime=_get_date(hour=20),
-            buffer_time_before=timedelta(hours=2),
-            buffer_time_after=timedelta(hours=2),
+            buffer_time_before=datetime.timedelta(hours=2),
+            buffer_time_after=datetime.timedelta(hours=2),
             is_reservable=False,
         ),
         TimeSpanElement(
             start_datetime=_get_date(hour=11),
             end_datetime=_get_date(hour=21),
-            buffer_time_before=timedelta(),
-            buffer_time_after=timedelta(),
+            buffer_time_before=datetime.timedelta(),
+            buffer_time_after=datetime.timedelta(),
             is_reservable=False,
         ),
     ]
@@ -378,8 +380,8 @@ def test__merge_overlapping_time_span_elements__buffers__fully_inside__buffer_ar
         TimeSpanElement(
             start_datetime=_get_date(hour=10),
             end_datetime=_get_date(hour=21),
-            buffer_time_before=timedelta(hours=2),  # 08:00
-            buffer_time_after=timedelta(hours=1),  # 22:00
+            buffer_time_before=datetime.timedelta(hours=2),  # 08:00
+            buffer_time_after=datetime.timedelta(hours=1),  # 22:00
             is_reservable=False,
         ),
     ]

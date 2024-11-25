@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import math
-from datetime import date, timedelta
 
 from django.db.models import DurationField, F, OuterRef
 from django.db.models.functions import Coalesce
@@ -10,8 +12,8 @@ from utils.db import SubquerySum
 
 def get_resources_total_hours_per_resource(
     hauki_resource_ids: list[int],
-    period_start_date: date,
-    period_end_date: date,
+    period_start_date: datetime.date,
+    period_end_date: datetime.date,
 ) -> dict[str, int]:
     origin_hauki_resources = OriginHaukiResource.objects.filter(id__in=hauki_resource_ids).annotate(
         duration=Coalesce(
@@ -23,7 +25,7 @@ def get_resources_total_hours_per_resource(
                 aggregate_field="duration",
                 output_field=DurationField(),
             ),
-            timedelta(),
+            datetime.timedelta(),
         ),
     )
 

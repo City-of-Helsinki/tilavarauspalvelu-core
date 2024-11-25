@@ -1,4 +1,6 @@
-from datetime import datetime, timedelta
+from __future__ import annotations
+
+import datetime
 
 import pytest
 from django.utils.timezone import get_default_timezone
@@ -30,8 +32,8 @@ pytestmark = [
 )
 @freeze_time("2022-11-05T10:00:00")
 def test_get_formatted_reservation_time(language, result):
-    begin = datetime.now().astimezone(tz=get_default_timezone())
-    end = begin + timedelta(hours=2)
+    begin = datetime.datetime.now().astimezone(tz=get_default_timezone())
+    end = begin + datetime.timedelta(hours=2)
     reservation = ReservationFactory.create(begin=begin, end=end, reservee_language=language)
     date = get_formatted_reservation_time(reservation)
     assert date == result

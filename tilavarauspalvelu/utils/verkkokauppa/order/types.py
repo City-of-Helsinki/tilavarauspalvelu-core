@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 import uuid
 from dataclasses import dataclass
-from datetime import datetime
 from decimal import Decimal
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from django.conf import settings
 
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import ParseOrderError
 from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    import datetime
 
 
 @dataclass(frozen=True)
@@ -67,8 +71,8 @@ class OrderItem:
     period_frequency: int | None
     period_unit: str | None
     period_count: int | None
-    start_date: datetime | None
-    billing_start_date: datetime | None
+    start_date: datetime.datetime | None
+    billing_start_date: datetime.datetime | None
 
 
 @dataclass(frozen=True)
@@ -87,7 +91,7 @@ class Order:
     order_id: uuid.UUID
     namespace: str
     user: str
-    created_at: datetime
+    created_at: datetime.datetime
     items: list[OrderItem]
     price_net: Decimal | None
     price_vat: Decimal | None
@@ -100,7 +104,7 @@ class Order:
     type: OrderType
 
     @classmethod
-    def from_json(cls, json: dict[str, Any]) -> "Order":
+    def from_json(cls, json: dict[str, Any]) -> Order:
         from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
 
         subscription_id = json.get("subscriptionId")
@@ -182,7 +186,7 @@ class CreateOrderParams:
     price_net: Decimal
     price_vat: Decimal
     price_total: Decimal
-    last_valid_purchase_datetime: datetime
+    last_valid_purchase_datetime: datetime.datetime
 
     def to_json(self) -> dict[str, Any]:
         return {
