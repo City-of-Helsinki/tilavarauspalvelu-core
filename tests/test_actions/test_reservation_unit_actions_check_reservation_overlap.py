@@ -1,4 +1,6 @@
-from datetime import timedelta
+from __future__ import annotations
+
+import datetime
 
 import pytest
 
@@ -46,7 +48,7 @@ def test_reservation_unit__check_reservation_overlap__no_reservations_no_overlap
     res_unit_parent,
 ):
     begin = local_datetime()
-    end = begin + timedelta(minutes=120)
+    end = begin + datetime.timedelta(minutes=120)
 
     assert not res_unit_parent.actions.check_reservation_overlap(begin, end)
 
@@ -55,7 +57,7 @@ def test_reservation_unit__check_reservation_overlap__same_space__same_time__ove
     res_unit_parent,
 ):
     begin = local_datetime()
-    end = begin + timedelta(minutes=120)
+    end = begin + datetime.timedelta(minutes=120)
 
     ReservationFactory.create(
         reservation_units=[res_unit_parent],
@@ -74,7 +76,7 @@ def test_reservation_unit__check_reservation_overlap__child__same_time__overlaps
     res_unit_child_1,
 ):
     begin = local_datetime()
-    end = begin + timedelta(minutes=120)
+    end = begin + datetime.timedelta(minutes=120)
 
     ReservationFactory.create(
         reservation_units=[res_unit_child_1],
@@ -93,7 +95,7 @@ def test_reservation_unit__check_reservation_overlap__sibling__same_time__does_n
     res_unit_child_2,
 ):
     begin = local_datetime()
-    end = begin + timedelta(minutes=120)
+    end = begin + datetime.timedelta(minutes=120)
 
     ReservationFactory.create(
         reservation_units=[res_unit_child_1],
@@ -109,11 +111,11 @@ def test_reservation_unit__check_reservation_overlap__same_space__partly_same_ti
     res_unit_child_1,
 ):
     begin = local_datetime()
-    end = begin + timedelta(minutes=120)
+    end = begin + datetime.timedelta(minutes=120)
 
     ReservationFactory.create(
         reservation_units=[res_unit_child_1],
-        begin=begin + timedelta(minutes=30),
+        begin=begin + datetime.timedelta(minutes=30),
         end=end,
         state=ReservationStateChoice.CREATED,
     )
@@ -128,11 +130,11 @@ def test_reservation_unit__check_reservation_overlap__child__partly_same_time__o
     res_unit_child_1,
 ):
     begin = local_datetime()
-    end = begin + timedelta(minutes=120)
+    end = begin + datetime.timedelta(minutes=120)
 
     ReservationFactory.create(
         reservation_units=[res_unit_child_1],
-        begin=begin + timedelta(minutes=30),
+        begin=begin + datetime.timedelta(minutes=30),
         end=end,
         state=ReservationStateChoice.CREATED,
     )
@@ -147,7 +149,7 @@ def test_reservation_unit__check_reservation_overlap__child_of_child__same_time_
     res_unit_child_2_child,
 ):
     begin = local_datetime()
-    end = begin + timedelta(minutes=120)
+    end = begin + datetime.timedelta(minutes=120)
 
     ReservationFactory.create(
         reservation_units=[res_unit_child_2_child],
@@ -166,7 +168,7 @@ def test_reservation_unit__check_reservation_overlap__child_of_sibling__same_tim
     res_unit_child_2_child,
 ):
     begin = local_datetime()
-    end = begin + timedelta(minutes=120)
+    end = begin + datetime.timedelta(minutes=120)
 
     ReservationFactory.create(
         reservation_units=[res_unit_child_2_child],
@@ -182,7 +184,7 @@ def test_reservation_unit__check_reservation_overlap__child_parent__same_time__o
     res_unit_child_2_child,
 ):
     begin = local_datetime()
-    end = begin + timedelta(minutes=120)
+    end = begin + datetime.timedelta(minutes=120)
 
     ReservationFactory.create(
         reservation_units=[res_unit_child_2],

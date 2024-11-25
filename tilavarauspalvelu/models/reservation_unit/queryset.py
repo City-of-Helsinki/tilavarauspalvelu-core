@@ -12,8 +12,8 @@ from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper 
 from utils.db import ArrayUnnest, NowTT
 
 if TYPE_CHECKING:
+    import datetime
     from collections.abc import Callable, Generator
-    from datetime import date, time
     from decimal import Decimal
 
     from query_optimizer.validators import PaginationArgs
@@ -34,10 +34,10 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
     def with_first_reservable_time(
         self,
         *,
-        filter_date_start: date | None,
-        filter_date_end: date | None,
-        filter_time_start: time | None,
-        filter_time_end: time | None,
+        filter_date_start: datetime.date | None,
+        filter_date_end: datetime.date | None,
+        filter_time_start: datetime.time | None,
+        filter_time_end: datetime.time | None,
         minimum_duration_minutes: float | Decimal | None,
         show_only_reservable: bool = False,
         pagination_args: PaginationArgs | None = None,

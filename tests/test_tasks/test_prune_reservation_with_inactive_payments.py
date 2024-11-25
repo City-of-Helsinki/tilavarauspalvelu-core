@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import timedelta
 
 import pytest
 from freezegun import freeze_time
@@ -17,7 +19,7 @@ pytestmark = [
 
 
 def test_prune_reservation_with_inactive_payments__deletes():
-    with freeze_time(local_datetime() - timedelta(minutes=5)):
+    with freeze_time(local_datetime() - datetime.timedelta(minutes=5)):
         PaymentOrderFactory.create(
             reservation__state=ReservationStateChoice.WAITING_FOR_PAYMENT,
             remote_id=uuid.uuid4(),
@@ -32,7 +34,7 @@ def test_prune_reservation_with_inactive_payments__deletes():
 def test_prune_reservation_with_inactive_payments__reservations_with_fresh_payments_are_not_deleted():
     now = local_datetime()
 
-    with freeze_time(now - timedelta(minutes=4)):
+    with freeze_time(now - datetime.timedelta(minutes=4)):
         PaymentOrderFactory.create(
             reservation__state=ReservationStateChoice.WAITING_FOR_PAYMENT,
             remote_id=uuid.uuid4(),
@@ -51,7 +53,7 @@ def test_prune_reservation_with_inactive_payments__reservations_with_fresh_payme
 
 
 def test_prune_reservation_with_inactive_payments__reservations_with_other_states_are_not_deleted():
-    with freeze_time(local_datetime() - timedelta(minutes=5)):
+    with freeze_time(local_datetime() - datetime.timedelta(minutes=5)):
         for state, _ in ReservationStateChoice.choices:
             if state == ReservationStateChoice.WAITING_FOR_PAYMENT:
                 continue
@@ -62,7 +64,7 @@ def test_prune_reservation_with_inactive_payments__reservations_with_other_state
 
 
 def test_prune_reservation_with_inactive_payments__reservations_without_remote_id_are_not_deleted():
-    with freeze_time(local_datetime() - timedelta(minutes=5)):
+    with freeze_time(local_datetime() - datetime.timedelta(minutes=5)):
         PaymentOrderFactory.create(
             reservation__state=ReservationStateChoice.WAITING_FOR_PAYMENT,
             status=OrderStatus.CANCELLED,

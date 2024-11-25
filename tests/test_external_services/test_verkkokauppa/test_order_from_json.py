@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import datetime
 from decimal import Decimal
 
 from django.conf import settings
@@ -63,7 +65,7 @@ def test_order_from_json():
     assert order.order_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
     assert order.namespace == "tilavaraus"
     assert order.user == "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6"
-    assert order.created_at == datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+    assert order.created_at == datetime.datetime(2021, 2, 25, 10, 22, 59, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
     assert order.items[0].order_item_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
     assert order.items[0].order_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
     assert order.items[0].product_id == uuid.UUID("b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6")
@@ -103,4 +105,4 @@ def test_order_from_json__created_at_no_milliseconds():
     data["createdAt"] = "2021-02-25T10:23:00"
     order = Order.from_json(data)
 
-    assert order.created_at == datetime(2021, 2, 25, 10, 23, 0, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+    assert order.created_at == datetime.datetime(2021, 2, 25, 10, 23, 0, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)

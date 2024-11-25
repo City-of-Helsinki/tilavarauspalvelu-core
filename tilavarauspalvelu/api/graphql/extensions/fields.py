@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import timedelta
+import datetime
 from typing import Any
 
 from django.core.exceptions import ValidationError
@@ -11,7 +11,7 @@ from rest_framework import serializers
 
 
 class MinDurationValidator(MinValueValidator):
-    def clean(self, x: timedelta) -> int:
+    def clean(self, x: datetime.timedelta) -> int:
         return int(x.total_seconds())
 
 
@@ -22,18 +22,18 @@ class DurationField(serializers.IntegerField):
         super().__init__(**kwargs)
         self.validators.append(MinDurationValidator(0))
 
-    def to_internal_value(self, data: str) -> timedelta:
+    def to_internal_value(self, data: str) -> datetime.timedelta:
         try:
-            return timedelta(seconds=int(data))
+            return datetime.timedelta(seconds=int(data))
         except ValueError:
             self.fail("invalid")
 
-    def to_representation(self, value: timedelta) -> int:
+    def to_representation(self, value: datetime.timedelta) -> int:
         return int(value.total_seconds())
 
     def get_attribute(self, instance: Any) -> int | None:
         value = super().get_attribute(instance)
-        if isinstance(value, timedelta):
+        if isinstance(value, datetime.timedelta):
             return int(value.total_seconds())
         return value
 

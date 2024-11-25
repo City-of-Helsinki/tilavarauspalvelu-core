@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import re
-from datetime import date
 from typing import Any, NamedTuple
 
 import pytest
@@ -63,7 +65,7 @@ def test_update_user_from_profile():
     # - The user's profile id and date of birth are updated
     user.refresh_from_db()
     assert user.profile_id == "foo"
-    assert user.date_of_birth == date(2001, 1, 1)
+    assert user.date_of_birth == datetime.date(2001, 1, 1)
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)
@@ -101,19 +103,19 @@ def test_update_user_from_profile_logs_to_sentry_if_raises():
 @pytest.mark.parametrize(
     ("id_number", "expected"),
     [
-        ("010101+1234", date(1801, 1, 1)),
-        ("020201-1234", date(1901, 2, 2)),
-        ("030301A1234", date(2001, 3, 3)),
-        ("040401B1234", date(2001, 4, 4)),
-        ("050501C1234", date(2001, 5, 5)),
-        ("060601D1234", date(2001, 6, 6)),
-        ("070701E1234", date(2001, 7, 7)),
-        ("080801F1234", date(2001, 8, 8)),
-        ("090901U1234", date(1901, 9, 9)),
-        ("101001V1234", date(1901, 10, 10)),
-        ("111101W1234", date(1901, 11, 11)),
-        ("121201X1234", date(1901, 12, 12)),
-        ("130101Y1234", date(1901, 1, 13)),
+        ("010101+1234", datetime.date(1801, 1, 1)),
+        ("020201-1234", datetime.date(1901, 2, 2)),
+        ("030301A1234", datetime.date(2001, 3, 3)),
+        ("040401B1234", datetime.date(2001, 4, 4)),
+        ("050501C1234", datetime.date(2001, 5, 5)),
+        ("060601D1234", datetime.date(2001, 6, 6)),
+        ("070701E1234", datetime.date(2001, 7, 7)),
+        ("080801F1234", datetime.date(2001, 8, 8)),
+        ("090901U1234", datetime.date(1901, 9, 9)),
+        ("101001V1234", datetime.date(1901, 10, 10)),
+        ("111101W1234", datetime.date(1901, 11, 11)),
+        ("121201X1234", datetime.date(1901, 12, 12)),
+        ("130101Y1234", datetime.date(1901, 1, 13)),
         ("010101H1234", None),
         ("010101-123", None),
         ("01010-12345", None),

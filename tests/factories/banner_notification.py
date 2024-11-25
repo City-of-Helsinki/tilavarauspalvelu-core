@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import timedelta
+import datetime
 from typing import Self
 
 from factory import LazyAttribute, fuzzy
@@ -48,22 +48,22 @@ class BannerNotificationBuilder(ModelFactoryBuilder[BannerNotification]):
     def active(self) -> Self:
         now = local_datetime()
         self.kwargs.setdefault("draft", False)
-        self.kwargs.setdefault("active_from", now - timedelta(days=1))
-        self.kwargs.setdefault("active_until", now + timedelta(days=1))
+        self.kwargs.setdefault("active_from", now - datetime.timedelta(days=1))
+        self.kwargs.setdefault("active_until", now + datetime.timedelta(days=1))
         return self
 
     def scheduled(self) -> Self:
         now = local_datetime()
         self.kwargs.setdefault("draft", False)
-        self.kwargs.setdefault("active_from", now + timedelta(days=1))
-        self.kwargs.setdefault("active_until", now + timedelta(days=2))
+        self.kwargs.setdefault("active_from", now + datetime.timedelta(days=1))
+        self.kwargs.setdefault("active_until", now + datetime.timedelta(days=2))
         return self
 
     def past(self) -> Self:
         now = local_datetime()
         self.kwargs.setdefault("draft", False)
-        self.kwargs.setdefault("active_from", now - timedelta(days=2))
-        self.kwargs.setdefault("active_until", now - timedelta(days=1))
+        self.kwargs.setdefault("active_from", now - datetime.timedelta(days=2))
+        self.kwargs.setdefault("active_until", now - datetime.timedelta(days=1))
         return self
 
     def bold_messages(self) -> Self:

@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import datetime
-from datetime import date
 
 import pytest
 
@@ -45,8 +46,8 @@ def test_application_section__create(graphql):
     assert section.purpose_id == data["purpose"]
     assert section.reservation_min_duration == datetime.timedelta(seconds=data["reservationMinDuration"])
     assert section.reservation_max_duration == datetime.timedelta(seconds=data["reservationMaxDuration"])
-    assert section.reservations_begin_date == date.fromisoformat(data["reservationsBeginDate"])
-    assert section.reservations_end_date == date.fromisoformat(data["reservationsEndDate"])
+    assert section.reservations_begin_date == datetime.date.fromisoformat(data["reservationsBeginDate"])
+    assert section.reservations_end_date == datetime.date.fromisoformat(data["reservationsEndDate"])
     assert section.applied_reservations_per_week == data["appliedReservationsPerWeek"]
 
     assert section.suitable_time_ranges.count() == 1

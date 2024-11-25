@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 from collections import defaultdict
-from datetime import datetime
 from types import NoneType
 from typing import Any
 
@@ -30,12 +32,12 @@ class BannerNotificationSerializer(NestingModelSerializer):
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         errors: dict[str, list[str]] = defaultdict(list)
 
-        active_from: datetime | None = self.get_or_default("active_from", attrs)
-        active_until: datetime | None = self.get_or_default("active_until", attrs)
+        active_from: datetime.datetime | None = self.get_or_default("active_from", attrs)
+        active_until: datetime.datetime | None = self.get_or_default("active_until", attrs)
         draft: bool = self.get_or_default("draft", attrs)
         message: str = self.get_or_default("message", attrs)
 
-        if not isinstance(active_from, type(active_until)) or not isinstance(active_from, datetime | NoneType):
+        if not isinstance(active_from, type(active_until)) or not isinstance(active_from, datetime.datetime | NoneType):
             msg = "Both 'active_from' and 'active_until' must be either set or null."
             errors["active_until"].append(msg)
             errors["active_from"].append(msg)

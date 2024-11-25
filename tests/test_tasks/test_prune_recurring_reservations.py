@@ -1,4 +1,6 @@
-from datetime import timedelta
+from __future__ import annotations
+
+import datetime
 
 import pytest
 from freezegun import freeze_time
@@ -15,7 +17,7 @@ pytestmark = [
 
 
 def test_prune_recurring_reservations__recurring_reservations_without_reservations_are_deleted():
-    with freeze_time(local_datetime() - timedelta(days=1)):
+    with freeze_time(local_datetime() - datetime.timedelta(days=1)):
         RecurringReservationFactory.create()
 
     prune_recurring_reservations()
@@ -24,7 +26,7 @@ def test_prune_recurring_reservations__recurring_reservations_without_reservatio
 
 
 def test_prune_recurring_reservations__recurring_reservations_with_reservations_are_not_deleted():
-    with freeze_time(local_datetime() - timedelta(days=1)):
+    with freeze_time(local_datetime() - datetime.timedelta(days=1)):
         RecurringReservationFactory.create(reservations__name="foo")
 
     prune_recurring_reservations()
@@ -33,7 +35,7 @@ def test_prune_recurring_reservations__recurring_reservations_with_reservations_
 
 
 def test_prune_recurring_reservations__recurring_reservations_deletion_respects_remove_older_than_days():
-    with freeze_time(local_datetime() - timedelta(hours=23, minutes=59)):
+    with freeze_time(local_datetime() - datetime.timedelta(hours=23, minutes=59)):
         RecurringReservationFactory.create()
 
     prune_recurring_reservations()

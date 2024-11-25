@@ -1,4 +1,6 @@
-from datetime import datetime
+from __future__ import annotations
+
+import datetime
 from typing import Any, NamedTuple
 
 import pytest
@@ -29,8 +31,8 @@ class Params(NamedTuple):
             ),
             "Missing message": Params(
                 params={
-                    "active_from": datetime(2021, 1, 1),
-                    "active_until": datetime(2021, 1, 2),
+                    "active_from": datetime.datetime(2021, 1, 1),
+                    "active_until": datetime.datetime(2021, 1, 2),
                     "message": "",
                 },
             ),
@@ -60,14 +62,14 @@ def test_constraint_non_draft_notifications_must_have_active_period_and_message(
         {
             "Missing active until": Params(
                 params={
-                    "active_from": datetime(2021, 1, 1),
+                    "active_from": datetime.datetime(2021, 1, 1),
                     "active_until": None,
                 },
             ),
             "Missing active from": Params(
                 params={
                     "active_from": None,
-                    "active_until": datetime(2021, 1, 2),
+                    "active_until": datetime.datetime(2021, 1, 2),
                 },
             ),
         },

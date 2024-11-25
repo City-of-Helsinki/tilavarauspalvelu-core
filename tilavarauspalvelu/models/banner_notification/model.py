@@ -13,7 +13,7 @@ from utils.fields.model import StrChoiceField
 from .queryset import BANNER_LEVEL_SORT_ORDER, BANNER_TARGET_SORT_ORDER, BannerNotificationManager
 
 if TYPE_CHECKING:
-    from datetime import datetime
+    import datetime
 
     from .actions import BannerNotificationActions
 
@@ -29,8 +29,8 @@ class BannerNotification(models.Model):
     draft: bool = models.BooleanField(default=True)
     level: str = StrChoiceField(enum=BannerNotificationLevel)
     target: str = StrChoiceField(enum=BannerNotificationTarget)
-    active_from: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
-    active_until: datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    active_from: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
+    active_until: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
 
     objects = BannerNotificationManager()
 

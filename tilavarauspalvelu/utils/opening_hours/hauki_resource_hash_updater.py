@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import datetime
 import logging
-from datetime import datetime, time
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
@@ -94,7 +94,7 @@ class HaukiResourceHashUpdater:
             # If there are any ReservableTimeSpans that overlap with the cutoff date, have them end at the cutoff date.
             # This way we can keep all past data, and have the new data start from the cutoff date.
             origin_hauki_resource.reservable_time_spans.filter(end_datetime__gte=cutoff_date).update(
-                end_datetime=datetime.combine(cutoff_date, time.min, tzinfo=DEFAULT_TIMEZONE)
+                end_datetime=datetime.datetime.combine(cutoff_date, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
             )
 
             self.resources_updated.append(origin_hauki_resource)

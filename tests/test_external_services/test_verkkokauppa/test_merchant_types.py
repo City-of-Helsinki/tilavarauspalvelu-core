@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import datetime
 from typing import Any
 
 import pytest
@@ -88,8 +90,8 @@ def test_verkkokauppa__merchant_types__merchant__from_json():
     expected = Merchant(
         id=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
         namespace="tilanvaraus",
-        created_at=datetime(2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
-        updated_at=datetime(2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
+        created_at=datetime.datetime(2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
+        updated_at=datetime.datetime(2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
         name="Test Merchant",
         street="Test Street 1",
         zip="00112",
@@ -109,8 +111,8 @@ def test_verkkokauppa__merchant_types__merchant__from_json__empty_configurations
     expected = Merchant(
         id=uuid.UUID("7107df38-5985-39c9-8c83-ffe18bff24f5"),
         namespace="tilanvaraus",
-        created_at=datetime(2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
-        updated_at=datetime(2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
+        created_at=datetime.datetime(2022, 9, 26, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
+        updated_at=datetime.datetime(2022, 9, 27, 10, 11, 12, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
         name="",
         street="",
         zip="",

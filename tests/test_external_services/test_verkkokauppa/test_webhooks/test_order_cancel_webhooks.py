@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import datetime
 from decimal import Decimal
 
 import pytest
@@ -25,7 +27,7 @@ def _create_mock_order(order_id: uuid.UUID, status: str = "") -> Order:
         order_id=order_id,
         namespace="tilanvaraus",
         user=str(uuid.uuid4()),
-        created_at=datetime.now(tz=get_default_timezone()),
+        created_at=datetime.datetime.now(tz=get_default_timezone()),
         items=[],
         price_net=Decimal(100),
         price_vat=Decimal(24),

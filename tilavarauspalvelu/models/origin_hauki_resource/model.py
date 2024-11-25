@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from .queryset import OriginHaukiResourceManager
 
 if TYPE_CHECKING:
-    from datetime import datetime
+    import datetime
 
     from .actions import OriginHaukiResourceActions
 
@@ -25,7 +25,7 @@ class OriginHaukiResource(models.Model):
     # Hauki API hash for opening hours, which is used to determine if the opening hours have changed
     opening_hours_hash: str = models.CharField(max_length=64, blank=True)
     # Latest date fetched from Hauki opening hours API
-    latest_fetched_date: datetime.date = models.DateField(blank=True, null=True)
+    latest_fetched_date: datetime.datetime.date = models.DateField(blank=True, null=True)
 
     objects = OriginHaukiResourceManager()
 
@@ -47,5 +47,5 @@ class OriginHaukiResource(models.Model):
 
         return OriginHaukiResourceActions(self)
 
-    def is_reservable(self, start_datetime: datetime, end_datetime: datetime) -> bool:
+    def is_reservable(self, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> bool:
         return self.reservable_time_spans.fully_fill_period(start=start_datetime, end=end_datetime).exists()

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -31,7 +33,7 @@ create_order_params: CreateOrderParams = CreateOrderParams(
     price_net=Decimal("100.0"),
     price_vat=Decimal("24.0"),
     price_total=Decimal("124.0"),
-    last_valid_purchase_datetime=datetime(2022, 11, 24, 12, 0, 0, tzinfo=UTC),
+    last_valid_purchase_datetime=datetime.datetime(2022, 11, 24, 12, 0, 0, tzinfo=datetime.UTC),
     items=[
         OrderItemParams(
             product_id=uuid.UUID("306ab20a-6b30-3ce3-95e8-fef818e6c30e"),
@@ -184,7 +186,7 @@ def test_verkkokauppa__order_types__order__from_json():
         order_id=uuid.UUID("79ccf2c7-afcf-3e49-80bd-38867c586f8f"),
         namespace="test-namespace",
         user="test-user",
-        created_at=datetime(2021, 11, 12, 12, 40, 41, 873597, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
+        created_at=datetime.datetime(2021, 11, 12, 12, 40, 41, 873597, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
         items=[
             OrderItem(
                 order_item_id=uuid.UUID("10e64522-bc1b-4758-b8c0-14d42e0719d4"),

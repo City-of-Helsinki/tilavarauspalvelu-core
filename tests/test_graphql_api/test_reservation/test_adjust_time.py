@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import datetime
-from datetime import timedelta
 from decimal import Decimal
 
 import freezegun
@@ -395,7 +396,7 @@ def test_reservation__update__reservation_block_whole_day__ignore_given_buffers(
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
-        cancellation_rule__can_be_cancelled_time_before=timedelta(hours=0),
+        cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(hours=0),
     )
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
@@ -427,18 +428,18 @@ def test_reservation__update__reservation_block_whole_day__ignore_given_buffers(
     assert reservation is not None
     assert reservation.begin == datetime.datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.end == datetime.datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.buffer_time_before == timedelta(hours=12)
-    assert reservation.buffer_time_after == timedelta(hours=11)
+    assert reservation.buffer_time_before == datetime.timedelta(hours=12)
+    assert reservation.buffer_time_after == datetime.timedelta(hours=11)
 
 
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__update__update_reservation_buffer_on_adjust(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        buffer_time_before=timedelta(hours=1),
-        buffer_time_after=timedelta(hours=1),
+        buffer_time_before=datetime.timedelta(hours=1),
+        buffer_time_after=datetime.timedelta(hours=1),
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         spaces=[SpaceFactory.create()],
-        cancellation_rule__can_be_cancelled_time_before=timedelta(hours=0),
+        cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(hours=0),
     )
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
@@ -455,8 +456,8 @@ def test_reservation__update__update_reservation_buffer_on_adjust(graphql):
     )
 
     # Changing the reservation unit buffers. These should be applied to the reservation when it is adjusted.
-    reservation_unit.buffer_time_before = timedelta(hours=2)
-    reservation_unit.buffer_time_after = timedelta(hours=2)
+    reservation_unit.buffer_time_before = datetime.timedelta(hours=2)
+    reservation_unit.buffer_time_after = datetime.timedelta(hours=2)
     reservation_unit.save()
 
     user = UserFactory.create_with_unit_role(units=[reservation_unit.unit])
@@ -476,5 +477,5 @@ def test_reservation__update__update_reservation_buffer_on_adjust(graphql):
     assert reservation.begin == datetime.datetime(2023, 1, 1, 12, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.end == datetime.datetime(2023, 1, 1, 13, tzinfo=DEFAULT_TIMEZONE)
     # New reservation unit buffers are applied automatically on adjust.
-    assert reservation.buffer_time_before == timedelta(hours=2)
-    assert reservation.buffer_time_after == timedelta(hours=2)
+    assert reservation.buffer_time_before == datetime.timedelta(hours=2)
+    assert reservation.buffer_time_after == datetime.timedelta(hours=2)

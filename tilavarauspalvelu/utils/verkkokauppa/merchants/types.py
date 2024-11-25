@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import uuid
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from tilavarauspalvelu.utils.verkkokauppa.merchants.exceptions import ParseMerchantError, ParseMerchantInfoError
+
+if TYPE_CHECKING:
+    import datetime
 
 
 @dataclass(frozen=True)
@@ -20,7 +24,7 @@ class MerchantInfo:
     shop_id: str
 
     @classmethod
-    def from_json(cls, json: dict[str, Any]) -> "MerchantInfo":
+    def from_json(cls, json: dict[str, Any]) -> MerchantInfo:
         try:
             return MerchantInfo(
                 name=json.get("merchantName", ""),
@@ -43,8 +47,8 @@ class MerchantInfo:
 class Merchant:
     id: uuid.UUID
     namespace: str
-    created_at: datetime
-    updated_at: datetime
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
     name: str
     street: str
     zip: str
@@ -57,7 +61,7 @@ class Merchant:
     shop_id: str
 
     @classmethod
-    def from_json(cls, json: dict[str, Any]) -> "Merchant":
+    def from_json(cls, json: dict[str, Any]) -> Merchant:
         from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
 
         try:

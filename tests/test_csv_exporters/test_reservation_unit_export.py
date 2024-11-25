@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import itertools
-from datetime import datetime
 from decimal import Decimal
 
 import pytest
@@ -25,8 +27,8 @@ def test_reservation_unit_export_multiple():
     # - There are two "complete"/"full" reservation units in the system
     reservation_units = ReservationUnitFactory.create_batch(
         2,
-        reservation_begins=datetime(2022, 1, 1, tzinfo=timezone.get_default_timezone()),
-        reservation_ends=datetime(2022, 2, 1, tzinfo=timezone.get_default_timezone()),
+        reservation_begins=datetime.datetime(2022, 1, 1, tzinfo=timezone.get_default_timezone()),
+        reservation_ends=datetime.datetime(2022, 2, 1, tzinfo=timezone.get_default_timezone()),
         spaces__name="Space",
         resources__name="Resource",
         qualifiers__name="Qualifier",
@@ -228,8 +230,8 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
     # given:
     # - There is one reservation unit with the given missing data in the system
     data = {
-        "reservation_begins": datetime(2022, 1, 1, tzinfo=timezone.get_default_timezone()),
-        "reservation_ends": datetime(2022, 2, 1, tzinfo=timezone.get_default_timezone()),
+        "reservation_begins": datetime.datetime(2022, 1, 1, tzinfo=timezone.get_default_timezone()),
+        "reservation_ends": datetime.datetime(2022, 2, 1, tzinfo=timezone.get_default_timezone()),
         "spaces__name": "Space",
         "resources__name": "Resource",
         "qualifiers__name": "Qualifier",

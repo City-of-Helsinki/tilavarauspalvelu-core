@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import datetime
 
 import pytest
 from django.conf import settings
@@ -36,7 +38,9 @@ def test__refund_status__from_json():
     assert refund_status.refund_transaction_id == uuid.UUID("61b2d842-ce04-11ed-9991-c7842594818f")
     assert refund_status.namespace == "tilanvaraus"
     assert refund_status.status == "refund_paid_online"
-    assert refund_status.created_at == datetime(2023, 3, 29, 7, 36, 13, 576000, tzinfo=settings.VERKKOKAUPPA_TIMEZONE)
+    assert refund_status.created_at == datetime.datetime(
+        2023, 3, 29, 7, 36, 13, 576000, tzinfo=settings.VERKKOKAUPPA_TIMEZONE
+    )
 
 
 @patch_method(SentryLogger.log_exception)

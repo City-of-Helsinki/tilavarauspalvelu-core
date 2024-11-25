@@ -1,10 +1,15 @@
-from datetime import datetime
+from __future__ import annotations
+
+import datetime
+from typing import TYPE_CHECKING
 
 from admin_data_views.typing import TableContext
 from admin_data_views.utils import render_with_table_view
 from django.conf import settings
 from django.core.cache import cache
-from django.http import HttpRequest
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 @render_with_table_view
@@ -17,7 +22,7 @@ def text_search_list_view(request: HttpRequest, **kwargs) -> TableContext:
     searches: list[str] = []
     for key, value in data.items():
         _, location, timestamp = key.split(":", maxsplit=2)
-        timestamps.append(datetime.fromisoformat(timestamp).isoformat(timespec="seconds"))
+        timestamps.append(datetime.datetime.fromisoformat(timestamp).isoformat(timespec="seconds"))
         locations.append(location.capitalize().replace("_", " "))
         searches.append(value)
 

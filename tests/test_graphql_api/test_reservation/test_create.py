@@ -1,4 +1,6 @@
-from datetime import datetime, timedelta
+from __future__ import annotations
+
+import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, NamedTuple
 
@@ -122,18 +124,18 @@ def test_reservation__create__use_longest_buffer_times_if_reserving_multiple_res
     #
     reservation_unit_1 = ReservationUnitFactory.create_reservable_now(
         sku="foo",
-        buffer_time_before=timedelta(),
-        buffer_time_after=timedelta(),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
     )
     reservation_unit_2 = ReservationUnitFactory.create_reservable_now(
         sku="foo",
-        buffer_time_before=timedelta(minutes=90),
-        buffer_time_after=timedelta(),
+        buffer_time_before=datetime.timedelta(minutes=90),
+        buffer_time_after=datetime.timedelta(),
     )
     reservation_unit_3 = ReservationUnitFactory.create_reservable_now(
         sku="foo",
-        buffer_time_before=timedelta(),
-        buffer_time_after=timedelta(minutes=15),
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(minutes=15),
     )
 
     data = get_create_data(
@@ -171,7 +173,7 @@ def test_reservation__create__overlapping_reservation(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
 
     begin = next_hour(plus_hours=1)
-    end = begin + timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
 
     # An overlapping reservation
     ReservationFactory.create(
@@ -192,12 +194,12 @@ def test_reservation__create__overlapping_reservation(graphql):
 
 
 class BufferParams(NamedTuple):
-    reservation_delta_time: timedelta
+    reservation_delta_time: datetime.timedelta
     error_message: str
-    reservation_buffer_before: timedelta = timedelta()
-    reservation_buffer_after: timedelta = timedelta()
-    reservation_unit_buffer_before: timedelta = timedelta()
-    reservation_unit_buffer_after: timedelta = timedelta()
+    reservation_buffer_before: datetime.timedelta = datetime.timedelta()
+    reservation_buffer_after: datetime.timedelta = datetime.timedelta()
+    reservation_unit_buffer_before: datetime.timedelta = datetime.timedelta()
+    reservation_unit_buffer_after: datetime.timedelta = datetime.timedelta()
 
 
 @pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.BLOCKED, ReservationTypeChoice.NORMAL])
@@ -205,23 +207,23 @@ class BufferParams(NamedTuple):
     **parametrize_helper(
         {
             "Reservation Buffer Before": BufferParams(
-                reservation_delta_time=-timedelta(hours=1),
-                reservation_unit_buffer_before=timedelta(minutes=1),
+                reservation_delta_time=-datetime.timedelta(hours=1),
+                reservation_unit_buffer_before=datetime.timedelta(minutes=1),
                 error_message="Reservation overlaps with reservation before due to buffer time.",
             ),
             "Reservation Buffer After": BufferParams(
-                reservation_delta_time=timedelta(hours=1),
-                reservation_unit_buffer_after=timedelta(minutes=1),
+                reservation_delta_time=datetime.timedelta(hours=1),
+                reservation_unit_buffer_after=datetime.timedelta(minutes=1),
                 error_message="Reservation overlaps with reservation after due to buffer time.",
             ),
             "Reservation Unit Buffer Before": BufferParams(
-                reservation_delta_time=-timedelta(hours=1),
-                reservation_unit_buffer_before=timedelta(minutes=1),
+                reservation_delta_time=-datetime.timedelta(hours=1),
+                reservation_unit_buffer_before=datetime.timedelta(minutes=1),
                 error_message="Reservation overlaps with reservation before due to buffer time.",
             ),
             "Reservation Unit Buffer After": BufferParams(
-                reservation_delta_time=timedelta(hours=1),
-                reservation_unit_buffer_after=timedelta(minutes=1),
+                reservation_delta_time=datetime.timedelta(hours=1),
+                reservation_unit_buffer_after=datetime.timedelta(minutes=1),
                 error_message="Reservation overlaps with reservation after due to buffer time.",
             ),
         }
@@ -243,7 +245,7 @@ def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
     )
 
     begin = next_hour(plus_hours=1)
-    end = begin + timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
 
     ReservationFactory.create(
         begin=begin + reservation_delta_time,
@@ -304,7 +306,7 @@ def test_reservation__create__reservation_unit_in_open_application_round(graphql
 
 def test_reservation__create__reservation_unit_max_reservation_duration_exceeded(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        max_reservation_duration=timedelta(minutes=30),
+        max_reservation_duration=datetime.timedelta(minutes=30),
     )
 
     graphql.login_with_superuser()
@@ -316,7 +318,7 @@ def test_reservation__create__reservation_unit_max_reservation_duration_exceeded
 
 def test_reservation__create__reservation_unit_min_reservation_duration_subceeded(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        min_reservation_duration=timedelta(hours=3),
+        min_reservation_duration=datetime.timedelta(hours=3),
     )
 
     graphql.login_with_superuser()
@@ -336,7 +338,7 @@ def test_reservation__create__start_time_does_not_match_reservation_start_interv
     )
 
     begin = next_hour(plus_hours=1, plus_minutes=1)  # NOTE! 1 minute after the next hour
-    end = begin + timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
 
     graphql.login_with_superuser()
     data = get_create_data(reservation_unit, begin=begin, end=end)
@@ -402,7 +404,7 @@ def test_reservation__create__reservation_unit_reservation_and_publish_in_the_pa
     is_error,
 ):
     begin = next_hour(plus_hours=1)
-    end = begin + timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_begins=next_hour(plus_days=reservation_begins_delta) if reservation_begins_delta else None,
@@ -448,7 +450,7 @@ def test_reservation__create__max_reservations_per_user__over(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
     begin = next_hour(plus_hours=1)
-    end = begin + timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
 
     user = graphql.login_with_superuser()
     ReservationFactory.create(
@@ -459,7 +461,11 @@ def test_reservation__create__max_reservations_per_user__over(graphql):
         user=user,
     )
 
-    data = get_create_data(reservation_unit, begin=begin + timedelta(hours=1), end=end + timedelta(hours=1))
+    data = get_create_data(
+        reservation_unit,
+        begin=begin + datetime.timedelta(hours=1),
+        end=end + datetime.timedelta(hours=1),
+    )
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.error_message() == "Maximum number of active reservations for this reservation unit exceeded."
@@ -469,7 +475,7 @@ def test_reservation__create__max_reservations_per_user__non_normal_reservation(
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
     begin = next_hour(plus_hours=3)
-    end = begin + timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
 
     # Seasonal reservations don't count towards the `max_reservations_per_user` limit
     user = graphql.login_with_superuser()
@@ -504,12 +510,12 @@ def test_reservation__create__max_reservations_per_user__past_reservations(graph
     reservation_unit = ReservationUnitFactory.create_reservable_now(max_reservations_per_user=1)
 
     begin = next_hour(plus_hours=1)
-    end = begin + timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
 
     user = graphql.login_with_superuser()
     ReservationFactory.create(
-        begin=begin - timedelta(hours=3),
-        end=end - timedelta(hours=3),
+        begin=begin - datetime.timedelta(hours=3),
+        end=end - datetime.timedelta(hours=3),
         state=ReservationStateChoice.CONFIRMED,
         reservation_units=[reservation_unit],
         user=user,
@@ -531,7 +537,7 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
     reservation_unit_2 = ReservationUnitFactory.create()
 
     begin = next_hour(plus_hours=1)
-    end = begin + timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
 
     user = graphql.login_with_superuser()
     ReservationFactory.create(
@@ -566,12 +572,12 @@ def test_reservation__create__max_reservations_per_user__reservations_for_other_
     )
 
     begin = next_hour(plus_hours=1)
-    end = begin + timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
 
     user = graphql.login_with_superuser()
     ReservationFactory.create(
-        begin=begin + timedelta(hours=1),
-        end=end + timedelta(hours=1),
+        begin=begin + datetime.timedelta(hours=1),
+        end=end + datetime.timedelta(hours=1),
         state=ReservationStateChoice.CONFIRMED,
         reservation_units=[reservation_unit_2],
         user=user,
@@ -794,7 +800,7 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
     )
 
     future_pricing = ReservationUnitPricingFactory(
-        begins=now + timedelta(days=1),
+        begins=now + datetime.timedelta(days=1),
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
         highest_price=Decimal(10),
         tax_percentage__value=Decimal(24),
@@ -802,7 +808,7 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
     )
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, begin=now + timedelta(days=1, hours=1))
+    data = get_create_data(reservation_unit, begin=now + datetime.timedelta(days=1, hours=1))
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
@@ -999,8 +1005,8 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
     )
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
-        start_datetime=datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
-        end_datetime=datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
+        start_datetime=datetime.datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime.datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
     )
 
     graphql.login_with_regular_user()
@@ -1008,8 +1014,8 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
     input_data = {
         "name": "foo",
         "description": "bar",
-        "begin": datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "end": datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "begin": datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "end": datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         "reservationUnitPks": [reservation_unit.pk],
     }
 
@@ -1018,10 +1024,10 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
 
     reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
     assert reservation is not None
-    assert reservation.begin == datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.end == datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.buffer_time_before == timedelta(hours=12)
-    assert reservation.buffer_time_after == timedelta(hours=11)
+    assert reservation.begin == datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.end == datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.buffer_time_before == datetime.timedelta(hours=12)
+    assert reservation.buffer_time_after == datetime.timedelta(hours=11)
 
 
 @freezegun.freeze_time("2021-01-01")
@@ -1033,8 +1039,8 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
     )
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
-        start_datetime=datetime(2022, 12, 31, 0, tzinfo=DEFAULT_TIMEZONE),
-        end_datetime=datetime(2023, 1, 3, 0, tzinfo=DEFAULT_TIMEZONE),
+        start_datetime=datetime.datetime(2022, 12, 31, 0, tzinfo=DEFAULT_TIMEZONE),
+        end_datetime=datetime.datetime(2023, 1, 3, 0, tzinfo=DEFAULT_TIMEZONE),
     )
 
     graphql.login_with_regular_user()
@@ -1042,8 +1048,8 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
     input_data = {
         "name": "foo",
         "description": "bar",
-        "begin": datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "end": datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "begin": datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "end": datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         "reservationUnitPks": [reservation_unit.pk],
     }
 
@@ -1052,18 +1058,18 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
 
     reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
     assert reservation is not None
-    assert reservation.begin == datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.end == datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.buffer_time_before == timedelta(hours=0)
-    assert reservation.buffer_time_after == timedelta(hours=0)
+    assert reservation.begin == datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.end == datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.buffer_time_before == datetime.timedelta(hours=0)
+    assert reservation.buffer_time_after == datetime.timedelta(hours=0)
 
 
 @freezegun.freeze_time("2021-01-01 12:00")
 @pytest.mark.parametrize(
     ("new_reservation_begin_delta", "error_message"),
     [
-        (timedelta(hours=-3), "Reservation overlaps with reservation after due to buffer time."),
-        (timedelta(hours=3), "Reservation overlaps with reservation before due to buffer time."),
+        (datetime.timedelta(hours=-3), "Reservation overlaps with reservation after due to buffer time."),
+        (datetime.timedelta(hours=3), "Reservation overlaps with reservation before due to buffer time."),
     ],
 )
 def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_new_reservation(
@@ -1078,7 +1084,7 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
     )
 
     begin = next_hour(plus_hours=1)
-    end = begin + timedelta(hours=1)
+    end = begin + datetime.timedelta(hours=1)
 
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,

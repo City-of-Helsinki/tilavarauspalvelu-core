@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
@@ -46,7 +48,7 @@ def test_verkkokauppa__payment_types__payment__from_json():
         description="Test description",
         additional_info='{"payment_method": nordea}',
         token="354477a1a009a1514fa3cc1132179a60163f5650aaf27ec98bb98158b04e0a63",
-        timestamp=datetime(2021, 11, 15, 12, 26, 45, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
+        timestamp=datetime.datetime(2021, 11, 15, 12, 26, 45, tzinfo=settings.VERKKOKAUPPA_TIMEZONE),
         payment_method_label="Nordea",
     )
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import timedelta
+import datetime
 from functools import cached_property
 from typing import TYPE_CHECKING
 
@@ -18,8 +18,6 @@ from utils.db import NowTT, SubqueryCount
 from .queryset import ApplicationSectionManager
 
 if TYPE_CHECKING:
-    from datetime import date
-
     from tilavarauspalvelu.models import AgeGroup, Application, ReservationPurpose
 
     from .actions import ApplicationSectionActions
@@ -38,12 +36,12 @@ class ApplicationSection(SerializableMixin, models.Model):
 
     name: str = models.CharField(max_length=100)
     num_persons: int = models.PositiveIntegerField()
-    reservations_begin_date: date = models.DateField()
-    reservations_end_date: date = models.DateField()
+    reservations_begin_date: datetime.date = models.DateField()
+    reservations_end_date: datetime.date = models.DateField()
 
     # Slot request
-    reservation_min_duration: timedelta = models.DurationField()
-    reservation_max_duration: timedelta = models.DurationField()
+    reservation_min_duration: datetime.timedelta = models.DurationField()
+    reservation_max_duration: datetime.timedelta = models.DurationField()
     applied_reservations_per_week: int = models.PositiveIntegerField()
 
     application: Application = models.ForeignKey(
@@ -91,8 +89,12 @@ class ApplicationSection(SerializableMixin, models.Model):
             models.CheckConstraint(
                 check=models.Q(
                     # 1440 minutes = 24 hours (1 extra minute to include 24 hours exactly)
-                    reservation_min_duration__in=[timedelta(minutes=minutes) for minutes in range(30, 1441, 30)],
-                    reservation_max_duration__in=[timedelta(minutes=minutes) for minutes in range(30, 1441, 30)],
+                    reservation_min_duration__in=[
+                        datetime.timedelta(minutes=minutes) for minutes in range(30, 1441, 30)
+                    ],
+                    reservation_max_duration__in=[
+                        datetime.timedelta(minutes=minutes) for minutes in range(30, 1441, 30)
+                    ],
                 ),
                 name="durations_multiple_of_30_minutes_max_24_hours",
                 violation_error_message=_(

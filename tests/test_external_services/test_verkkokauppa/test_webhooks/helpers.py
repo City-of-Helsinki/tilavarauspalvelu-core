@@ -1,5 +1,7 @@
+from __future__ import annotations
+
+import datetime
 import uuid
-from datetime import datetime
 from decimal import Decimal
 
 from django.utils.timezone import get_default_timezone
@@ -22,7 +24,7 @@ def get_mock_order_payment_api(remote_id: uuid.UUID, payment_id: uuid.UUID, stat
         description=None,
         additional_info='{"payment_method": "creditcards"}',
         token=str(uuid.uuid4()),
-        timestamp=datetime.now(tz=get_default_timezone()),
+        timestamp=datetime.datetime.now(tz=get_default_timezone()),
         payment_method_label="Visa",
     )
 
@@ -34,5 +36,5 @@ def get_mock_order_refund_api(order_id: uuid.UUID, refund_id: uuid.UUID, status:
         refund_transaction_id=uuid.uuid4(),
         namespace="tilanvaraus",
         status=status or RefundStatus.PAID_ONLINE.value,
-        created_at=datetime.now(tz=get_default_timezone()),
+        created_at=datetime.datetime.now(tz=get_default_timezone()),
     )

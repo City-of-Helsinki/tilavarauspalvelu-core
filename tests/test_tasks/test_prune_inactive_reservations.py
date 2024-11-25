@@ -1,4 +1,6 @@
-from datetime import timedelta
+from __future__ import annotations
+
+import datetime
 
 import pytest
 
@@ -15,7 +17,7 @@ pytestmark = [
 
 
 def test_prune_inactive_reservations__deletes_old_reservations_with_state_created():
-    twenty_minutes_ago = local_datetime() - timedelta(minutes=20)
+    twenty_minutes_ago = local_datetime() - datetime.timedelta(minutes=20)
     ReservationFactory.create(created_at=twenty_minutes_ago, state=ReservationStateChoice.CREATED)
 
     prune_inactive_reservations()
@@ -24,7 +26,7 @@ def test_prune_inactive_reservations__deletes_old_reservations_with_state_create
 
 
 def test_prune_inactive_reservations__does_not_delete_inactive_reservations_with_state():
-    twenty_minutes_ago = local_datetime() - timedelta(minutes=20)
+    twenty_minutes_ago = local_datetime() - datetime.timedelta(minutes=20)
 
     for state, _ in ReservationStateChoice.choices:
         if state == ReservationStateChoice.CREATED:
@@ -37,7 +39,7 @@ def test_prune_inactive_reservations__does_not_delete_inactive_reservations_with
 
 
 def test_prune_inactive_reservations__does_not_delete_recent_reservations():
-    under_twenty_minutes_ago = local_datetime() - timedelta(minutes=19)
+    under_twenty_minutes_ago = local_datetime() - datetime.timedelta(minutes=19)
     ReservationFactory.create(created_at=under_twenty_minutes_ago, state=ReservationStateChoice.CREATED)
 
     prune_inactive_reservations()
