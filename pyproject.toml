@@ -96,6 +96,10 @@ extend-exclude = [
     "venv",
 ]
 
+[tool.ruff.format]
+# Enable reformatting of code snippets in docstrings.
+docstring-code-format = true
+
 [tool.ruff.lint]
 explicit-preview-rules = true
 preview = true
