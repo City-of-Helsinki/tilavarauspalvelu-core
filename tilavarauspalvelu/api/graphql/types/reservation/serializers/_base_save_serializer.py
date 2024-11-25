@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from django.conf import settings
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework import serializers
 
@@ -21,13 +20,10 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
 )
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from utils.date_utils import DEFAULT_TIMEZONE
-from utils.external_service.errors import ExternalServiceError
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import AnyUser, WSGIRequest
+    from tilavarauspalvelu.typing import AnyUser
 
 
 class ReservationBaseSaveSerializer(OldPrimaryKeySerializer, ReservationPriceMixin, ReservationSchedulingMixin):
@@ -175,9 +171,6 @@ class ReservationBaseSaveSerializer(OldPrimaryKeySerializer, ReservationPriceMix
             data["tax_percentage_value"] = price_calculation_result.tax_percentage_value
             data["non_subsidised_price"] = price_calculation_result.non_subsidised_price
 
-        if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA:
-            self._prefill_reservation_from_profile(data)
-
         return data
 
     @staticmethod
@@ -198,28 +191,6 @@ class ReservationBaseSaveSerializer(OldPrimaryKeySerializer, ReservationPriceMix
             buffer_time_after = max(after, buffer_time_after)
 
         return buffer_time_before, buffer_time_after
-
-    def _prefill_reservation_from_profile(self, data: dict[str, Any]) -> None:
-        request: WSGIRequest = self.context["request"]
-        user: AnyUser = request.user
-        if user.is_anonymous:
-            return
-
-        id_token = user.id_token
-        if id_token is None or id_token.is_ad_login:
-            return
-
-        try:
-            prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session=request.session)
-        except ExternalServiceError:
-            return
-        except Exception as error:
-            msg = "Unexpected error reading profile data"
-            SentryLogger.log_exception(error, details=msg, user=user.pk)
-            return
-
-        if prefill_info is not None:
-            data.update({key: value for key, value in prefill_info.items() if value is not None})
 
     def check_sku(self, current_sku: str, new_sku: str) -> None:
         if current_sku is not None and current_sku != new_sku:

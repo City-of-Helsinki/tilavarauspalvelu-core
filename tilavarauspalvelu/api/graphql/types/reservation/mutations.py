@@ -23,9 +23,9 @@ from .permissions import (
 from .serializers import (
     ReservationAdjustTimeSerializer,
     ReservationApproveSerializer,
-    ReservationBaseSaveSerializer,
     ReservationCancellationSerializer,
     ReservationConfirmSerializer,
+    ReservationCreateSerializer,
     ReservationDenySerializer,
     ReservationRefundSerializer,
     ReservationRequiresHandlingSerializer,
@@ -46,7 +46,7 @@ __all__ = [
 
 class ReservationCreateMutation(CreateMutation):
     class Meta:
-        serializer_class = ReservationBaseSaveSerializer
+        serializer_class = ReservationCreateSerializer
         permission_classes = [ReservationPermission]
 
 
