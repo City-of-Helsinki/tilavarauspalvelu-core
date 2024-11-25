@@ -215,7 +215,6 @@ ignore = [
     "PLR2044",  # empty-comment
 
     # To be enabled in the future
-    "DJ001",    # Allow `null=True` in text-based fields TODO: Remove this ignore once the issues are fixed.
     "PLR2004",  # magic-value-comparison
     "PLW2901",  # redefined-loop-name
 ]
