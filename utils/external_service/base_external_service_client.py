@@ -2,6 +2,7 @@ import json
 from typing import Any, Literal
 
 from requests import Response, request
+from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from utils.external_service.errors import ExternalServiceParseJSONError, ExternalServiceRequestError
 
@@ -80,7 +81,7 @@ class BaseExternalServiceClient:
     def get(cls, *, url: str, params: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
         response = cls.generic("get", url=url, params=params, headers=cls._get_headers(headers))
 
-        if response.status_code >= 500:
+        if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
             cls.handle_500_error(response)
 
         return response
@@ -89,7 +90,7 @@ class BaseExternalServiceClient:
     def post(cls, *, url: str, json: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
         response = cls.generic("post", url=url, json=json, headers=cls._get_mutate_headers(headers))
 
-        if response.status_code >= 500:
+        if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
             cls.handle_500_error(response)
 
         return response
@@ -98,7 +99,7 @@ class BaseExternalServiceClient:
     def put(cls, *, url: str, json: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
         response = cls.generic("put", url=url, json=json, headers=cls._get_mutate_headers(headers))
 
-        if response.status_code >= 500:
+        if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
             cls.handle_500_error(response)
 
         return response

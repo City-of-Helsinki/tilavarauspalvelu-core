@@ -3,6 +3,7 @@ from typing import Any
 
 from django.conf import settings
 from requests import RequestException, Response
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
 from tilavarauspalvelu.utils.verkkokauppa import constants as verkkokauppa_constants
 from tilavarauspalvelu.utils.verkkokauppa.exceptions import VerkkokauppaConfigurationError
@@ -76,10 +77,10 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             )
             response_json = cls.response_json(response)
 
-            if response.status_code == 404:
+            if response.status_code == HTTP_404_NOT_FOUND:
                 msg = f"Order not found: {response_json.get('errors')}"
                 raise GetOrderError(msg)
-            if response.status_code != 200:
+            if response.status_code != HTTP_200_OK:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise GetOrderError(msg)
 
@@ -102,7 +103,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             )
             response_json = cls.response_json(response)
 
-            if response.status_code != 201:
+            if response.status_code != HTTP_201_CREATED:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise CreateOrderError(msg)
 
@@ -125,9 +126,9 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             )
             response_json = cls.response_json(response)
 
-            if response.status_code == 404:
+            if response.status_code == HTTP_404_NOT_FOUND:
                 return None
-            if response.status_code != 200:
+            if response.status_code != HTTP_200_OK:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise CancelOrderError(msg)
 
@@ -155,10 +156,10 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             )
             response_json = cls.response_json(response)
 
-            if response.status_code == 404:
+            if response.status_code == HTTP_404_NOT_FOUND:
                 return None
 
-            if response.status_code != 200:
+            if response.status_code != HTTP_200_OK:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise GetPaymentError(msg)
 
@@ -179,10 +180,10 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             )
             response_json = cls.response_json(response)
 
-            if response.status_code == 404:
+            if response.status_code == HTTP_404_NOT_FOUND:
                 return None
 
-            if response.status_code != 200:
+            if response.status_code != HTTP_200_OK:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise GetRefundStatusError(msg)
 
@@ -204,7 +205,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             )
             response_json = cls.response_json(response)
 
-            if response.status_code > 200:
+            if response.status_code > HTTP_200_OK:
                 SentryLogger.log_message(
                     message=f"Call to Payment Experience API refund endpoint failed with status {response.status_code}",
                     details=f"Response body: {response.text}",
@@ -243,10 +244,10 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             response = cls.get(url=url)
             response_json = cls.response_json(response)
 
-            if response.status_code == 404:
+            if response.status_code == HTTP_404_NOT_FOUND:
                 return None
 
-            if response.status_code != 200:
+            if response.status_code != HTTP_200_OK:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise GetMerchantError(msg)
 
@@ -267,7 +268,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             )
             response_json = cls.response_json(response)
 
-            if response.status_code != 201:
+            if response.status_code != HTTP_201_CREATED:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise CreateMerchantError(msg)
 
@@ -291,10 +292,10 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             )
             response_json = cls.response_json(response)
 
-            if response.status_code == 404:
+            if response.status_code == HTTP_404_NOT_FOUND:
                 msg = f"{action_fail}: merchant {merchant_uuid} not found"
                 raise UpdateMerchantError(msg)
-            if response.status_code != 200:
+            if response.status_code != HTTP_200_OK:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise UpdateMerchantError(msg)
 
@@ -320,7 +321,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             )
             response_json = cls.response_json(response)
 
-            if response.status_code != 201:
+            if response.status_code != HTTP_201_CREATED:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise CreateProductError(msg)
 
@@ -355,7 +356,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
             )
             response_json = cls.response_json(response)
 
-            if response.status_code != 201:
+            if response.status_code != HTTP_201_CREATED:
                 msg = f"{action_fail}: {response_json.get('errors')}"
                 raise CreateOrUpdateAccountingError(msg)
 
@@ -401,7 +402,7 @@ class VerkkokauppaAPIClient(BaseExternalServiceClient):
         """
         false_500_error_codes = ["failed-to-get-payment-for-order", "failed-to-get-refund-payment-for-order"]
 
-        if response.status_code == 500:
+        if response.status_code == HTTP_500_INTERNAL_SERVER_ERROR:
             response_json = cls.response_json(response)
             errors = response_json.get("errors", [])
             if len(errors) > 0 and errors[0].get("code") in false_500_error_codes:

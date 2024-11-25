@@ -195,7 +195,7 @@ class FirstReservableTimeHelper:
             msg = "'reservable_time_start' must be before 'reservable_time_end'."
             raise ValueError(msg)
 
-        if minimum_duration_minutes is not None and int(minimum_duration_minutes) < 15:
+        if minimum_duration_minutes is not None and int(minimum_duration_minutes) < 15:  # noqa: PLR2004
             msg = "'minimum_duration_minutes' can not be less than '15'."
             raise ValueError(msg)
 

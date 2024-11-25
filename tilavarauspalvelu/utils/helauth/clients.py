@@ -9,6 +9,7 @@ from django.conf import settings
 from django.utils.functional import classproperty
 from graphene_django_extensions.utils import get_nested
 from requests import HTTPError
+from rest_framework.status import HTTP_200_OK
 from social_django.models import DjangoStorage
 from social_django.strategy import DjangoStrategy
 
@@ -189,7 +190,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
 
     @classmethod
     def response_json(cls, response: Response) -> dict[str, Any]:
-        if response.status_code != 200:
+        if response.status_code != HTTP_200_OK:
             raise ExternalServiceRequestError(response, cls.SERVICE_NAME)
 
         response_data = super().response_json(response)

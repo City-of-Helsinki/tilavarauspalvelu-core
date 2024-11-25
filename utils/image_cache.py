@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from easy_thumbnails.files import get_thumbnailer
 from requests import request
+from rest_framework.status import HTTP_200_OK
 
 from tilavarauspalvelu.tasks import purge_image_cache
 from utils.sentry import SentryLogger
@@ -45,7 +46,7 @@ def purge(path: str) -> None:
         timeout=60,
     )
 
-    if response.status_code != 200:
+    if response.status_code != HTTP_200_OK:
         SentryLogger.log_message(
             message="Purging an image cache failed",
             details=f"Purging an image cache failed with status code {response.status_code}. "

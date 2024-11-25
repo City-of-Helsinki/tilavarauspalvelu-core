@@ -178,7 +178,8 @@ class ReservationFilterSet(ModelFilterSet):
         if EMAIL_DOMAIN_PATTERN.match(value):
             return qs.filter(Q(user__email__icontains=value) | Q(reservee_email__icontains=value))
 
-        if len(value) >= 3:
+        min_search_text_length = 3
+        if len(value) >= min_search_text_length:
             fields = (
                 "pk",
                 "name",

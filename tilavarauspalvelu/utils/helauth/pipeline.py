@@ -136,7 +136,7 @@ def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
     users: list[User] = list(
         User.objects.filter(email__iexact=email, profile_id="", is_active=True).order_by("-date_joined")[:2]
     )
-    if len(users) < 2:
+    if len(users) < 2:  # noqa: PLR2004
         return
 
     new_user = users[0]
