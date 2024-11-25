@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 from django.db.models.functions import Concat, Trim
-from django.utils.timezone import now
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import lookup_property
@@ -74,7 +74,7 @@ class Reservation(SerializableMixin, models.Model):
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
-    created_at: datetime.datetime | None = models.DateTimeField(null=True, default=now)
+    created_at: datetime.datetime | None = models.DateTimeField(null=True, default=timezone.now)  # noqa: TID251
 
     # Pricing details
     price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)

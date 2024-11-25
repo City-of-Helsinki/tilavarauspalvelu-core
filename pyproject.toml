@@ -230,6 +230,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$|^opt
 ]
 "utils/date_utils.py" = [
     "PLR0917",  # Can have as many positional arguments as needed.
+    "TID251"    # Can use banned imports here (e.g. datetime.datetime.now)
 ]
 "tilavarauspalvelu/management/commands/data_creation/*.py" = [
     "PLR0913",  # Can take as many arguments as needed.
@@ -271,6 +272,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^args$|^kwargs$|^opt
     "N815",     # Allow whatever variable names in tests
     "PLR0917",  # Allow as many positional arguments as needed in tests
     "S311",     # Pseudo-random generators are fine here.
+    "TID251"    # Can use banned imports here (e.g. datetime.datetime.now)
 ]
 
 [tool.ruff.lint.isort]
@@ -306,6 +308,9 @@ quote-annotations = false
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "django.core.handlers.wsgi.WSGIRequest".msg = "Use `tilavarauspalvelu.typing.WSGIRequest` instead."
+"datetime.datetime.now".msg = "Use `utils.date_utils.local_datetime` instead."
+"django.utils.timezone.now".msg = "Use `utils.date_utils.local_datetime` instead."
+"django.utils.timezone.get_default_timezone".msg = "Use `utils.date_utils.DEFAULT_TIMEZONE` instead."
 
 [tool.ruff.lint.flake8-import-conventions]
 banned-from = [

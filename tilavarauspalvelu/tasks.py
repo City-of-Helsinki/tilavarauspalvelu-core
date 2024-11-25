@@ -14,7 +14,6 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.db.transaction import atomic
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.exceptions import InvalidImageFormatError
 from elasticsearch_django.index import create_index, delete_index, update_index
@@ -121,7 +120,7 @@ def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str) -
 
 @app.task(name="remove_old_personal_info_view_logs")
 def remove_old_personal_info_view_logs() -> None:
-    remove_lt = timezone.now() - timezone.timedelta(days=365 * 2)
+    remove_lt = local_datetime() - datetime.timedelta(days=365 * 2)
     PersonalInfoViewLog.objects.filter(access_time__lt=remove_lt).delete()
 
 

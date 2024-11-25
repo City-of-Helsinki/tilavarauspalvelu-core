@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import datetime
 from typing import TYPE_CHECKING
 
 import pytest
-from django.utils import timezone
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory
@@ -10,7 +11,7 @@ from tests.factories.application import ApplicationBuilder
 from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
 from tilavarauspalvelu.services.csv_export import ApplicationRoundApplicationsCSVExporter
 from tilavarauspalvelu.services.csv_export.application_round_applications_exporter import ApplicationExportRow
-from utils.date_utils import local_date_string, local_timedelta_string
+from utils.date_utils import local_date_string, local_datetime, local_timedelta_string
 
 from .helpers import Missing, MissingParams, mock_csv_writer
 
@@ -196,7 +197,7 @@ def test_application_round_applications_export__missing_data(graphql, column_val
         reservation_period_end=datetime.datetime(2023, 2, 8),
     )
     data = {
-        "sent_date": timezone.now(),
+        "sent_date": local_datetime(),
         "application_round": application_round,
         "applicant_type": ApplicantTypeChoice.COMPANY.value,
         "home_city__name": "Helsinki",

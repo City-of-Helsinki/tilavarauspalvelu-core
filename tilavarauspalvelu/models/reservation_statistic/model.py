@@ -33,7 +33,7 @@ class ReservationStatistic(models.Model):
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     reservation_handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     reservation_confirmed_at: datetime.datetime | None = models.DateTimeField(null=True)
-    reservation_created_at: datetime.datetime | None = models.DateTimeField(null=True, default=timezone.now)
+    reservation_created_at: datetime.datetime | None = models.DateTimeField(null=True, default=timezone.now)  # noqa: TID251
 
     price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     price_net: Decimal = models.DecimalField(max_digits=20, decimal_places=6, default=0)

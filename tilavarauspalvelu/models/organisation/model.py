@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 from functools import cached_property
 from typing import TYPE_CHECKING
 
@@ -11,7 +10,7 @@ from helsinki_gdpr.models import SerializableMixin
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.enums import OrganizationTypeChoice
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import local_datetime
 from utils.fields.model import StrChoiceField
 
 from .queryset import OrganisationManager
@@ -30,7 +29,7 @@ def year_not_in_future(year: int | None) -> None:
     if year is None:
         return
 
-    current_date = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+    current_date = local_datetime()
 
     if current_date.year < year:
         msg = _("is after current year")

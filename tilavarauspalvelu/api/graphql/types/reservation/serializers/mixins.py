@@ -5,9 +5,6 @@ import math
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-from django.utils import timezone
-from django.utils.timezone import get_default_timezone
-
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.enums import (
     PriceUnit,
@@ -15,7 +12,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     ReservationUnitPublishingState,
 )
-from utils.date_utils import local_datetime, local_start_of_day
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_start_of_day
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -180,7 +177,7 @@ class ReservationSchedulingMixin:
             msg = f"Reservation unit is not reservable due to its status: '{state}'."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNIT_NOT_RESERVABLE)
 
-        now = timezone.now()
+        now = local_datetime()
 
         is_invalid_begin = self._get_is_invalid_begin(reservation_unit, now)
 
@@ -333,7 +330,7 @@ class ReservationSchedulingMixin:
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
         possible_start_times = set()
 
-        start_time = datetime.datetime.combine(begin.date(), datetime.time()).astimezone(get_default_timezone())
+        start_time = datetime.datetime.combine(begin.date(), datetime.time()).astimezone(DEFAULT_TIMEZONE)
         end_time = start_time + datetime.timedelta(hours=23, minutes=59, seconds=59)
         while start_time < end_time:
             possible_start_times.add(start_time.time())

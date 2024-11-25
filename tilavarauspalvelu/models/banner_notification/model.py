@@ -4,10 +4,10 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationState, BannerNotificationTarget
+from utils.date_utils import local_datetime
 from utils.fields.model import StrChoiceField
 
 from .queryset import BANNER_LEVEL_SORT_ORDER, BANNER_TARGET_SORT_ORDER, BannerNotificationManager
@@ -102,15 +102,14 @@ class BannerNotification(models.Model):
         if self.draft or self.active_from is None or self.active_until is None:
             return False
 
-        now = timezone.now()
-        return self.active_from <= now <= self.active_until
+        return self.active_from <= local_datetime() <= self.active_until
 
     @property
     def is_scheduled(self) -> bool:
         if self.draft or self.active_from is None or self.active_until is None:
             return False
 
-        return self.active_from > timezone.now()
+        return self.active_from > local_datetime()
 
     @property
     def state(self) -> BannerNotificationState:

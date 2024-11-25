@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import TYPE_CHECKING, Any
 
@@ -196,7 +198,7 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
             )
             self.check_reservation_intervals_for_staff_reservation(reservation_unit, begin)
 
-        now = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
+        now = local_datetime()
         data["handled_at"] = now
         data["confirmed_at"] = now
         data["state"] = ReservationStateChoice.CONFIRMED.value
