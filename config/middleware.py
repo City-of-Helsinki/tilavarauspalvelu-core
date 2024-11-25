@@ -95,7 +95,7 @@ class QueryLoggingMiddleware:
             return self.get_response(request)
 
     @contextlib.contextmanager
-    def query_logger(self, request: WSGIRequest) -> Generator[None, None, None]:
+    def query_logger(self, request: WSGIRequest) -> Generator[None]:
         query_log = []
         start = time.perf_counter_ns()
         try:

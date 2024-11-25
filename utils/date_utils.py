@@ -480,7 +480,7 @@ def get_periods_between(
     *,
     interval: int = 7,
     tzinfo: zoneinfo.ZoneInfo | datetime.timezone | None = None,
-) -> Generator[tuple[datetime.datetime, datetime.datetime], None, None]:
+) -> Generator[tuple[datetime.datetime, datetime.datetime]]:
     """
     Generate datetimes based on the given start and end dates (both inclusive).
 
@@ -516,7 +516,7 @@ def get_date_range(
     start_date: datetime.date,
     *,
     number: int,
-) -> Generator[datetime.date, None, None]:
+) -> Generator[datetime.date]:
     """
     Generate dates from the given start date (inclusive) until the given number of dates have been generated.
 
@@ -532,7 +532,7 @@ def get_time_range(
     end_time: datetime.time,
     *,
     delta_seconds: int = 3600,  # 1 hour
-) -> Generator[datetime.time, None, None]:
+) -> Generator[datetime.time]:
     """
     Generate times from the given start time (inclusive)
     for every given number of seconds (default: 1 hour)

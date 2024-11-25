@@ -57,7 +57,7 @@ class CSVWriterMock(mock.MagicMock):
 
 
 @contextmanager
-def mock_csv_writer() -> Generator[CSVWriterMock, None, None]:
+def mock_csv_writer() -> Generator[CSVWriterMock]:
     path = "tilavarauspalvelu.services.csv_export._base_exporter.csv.writer"
     with mock.patch(path, new_callable=CSVWriterMock) as mock_file:
         yield mock_file

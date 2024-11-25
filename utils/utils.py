@@ -85,7 +85,7 @@ class with_indices(Generic[T]):  # noqa: N801, RUF100
         self.seq = _seq
         self.item_deleted: bool = False
 
-    def __iter__(self) -> Generator[tuple[int, T], None, None]:
+    def __iter__(self) -> Generator[tuple[int, T]]:
         i: int = 0
         next_item: T = None
         gen = enumerate(self.seq)

@@ -46,7 +46,7 @@ def main() -> int:
     return 0
 
 
-def _get_languages() -> Generator[str, None, None]:
+def _get_languages() -> Generator[str]:
     # Enables adding more languages
     yield from ["fi", "sv"]
 
@@ -96,7 +96,7 @@ def _get_current_translations() -> list[TranslationData]:
 
 
 @contextmanager
-def working_directory(directory: Path) -> Generator[None, None, None]:
+def working_directory(directory: Path) -> Generator[None]:
     current_path = Path.cwd()
     try:
         os.chdir(directory)
