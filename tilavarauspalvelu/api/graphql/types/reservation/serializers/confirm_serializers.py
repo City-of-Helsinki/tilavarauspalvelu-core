@@ -67,16 +67,21 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             return PaymentType.INVOICE
         return PaymentType.ONLINE
 
-    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        data = super().validate(data)
-
+    def check_has_payment_order(self) -> None:
         if self.instance.payment_order.exists() == 1:
             msg = "Reservation cannot be changed anymore because it is attached to a payment order"
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.CHANGES_NOT_ALLOWED)
 
+    def check_reservation_units_count(self):
         if self.instance.reservation_units.count() > 1:
             msg = "Reservations with multiple reservation units are not supported."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.MULTIPLE_RESERVATION_UNITS)
+
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        data = super().validate(data)
+
+        self.check_has_payment_order()
+        self.check_reservation_units_count()
 
         # If reservation requires handling, it can't be confirmed here and needs to be manually handled by the staff
         if not self.instance.requires_handling:
@@ -114,18 +119,33 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
 
         return validated_data
 
+    def _create_order_in_verkkokauppa(self) -> Order:
+        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
+            return create_mock_verkkokauppa_order(self.instance)
+
+        order_params: CreateOrderParams = get_verkkokauppa_order_params(self.instance)
+        try:
+            return VerkkokauppaAPIClient.create_order(order_params=order_params)
+        except CreateOrderError as err:
+            sentry_msg = "Creating order in Verkkokauppa failed"
+            SentryLogger.log_exception(err, details=sentry_msg, reservation_id=self.instance.pk)
+            msg = "Upstream service call failed. Unable to confirm the reservation."
+            raise ValidationErrorWithCode(msg, ValidationErrorCodes.UPSTREAM_CALL_FAILED) from err
+
     def save(self, **kwargs) -> Reservation:
         self.fields.pop("payment_type")
         state = self.validated_data["state"]
 
-        if (
+        should_create_payment_order = (
             state
             in {
                 ReservationStateChoice.CONFIRMED.value,
                 ReservationStateChoice.WAITING_FOR_PAYMENT.value,
             }
             and self.instance.price_net > 0
-        ):
+        )
+
+        if should_create_payment_order:
             payment_type = self.validated_data["payment_type"].upper()
 
             if payment_type == PaymentType.ON_SITE:
@@ -139,19 +159,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
                     reservation=self.instance,
                 )
             else:
-                if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-                    verkkokauppa_order: Order = create_mock_verkkokauppa_order(self.instance)
-                else:
-                    order_params: CreateOrderParams = get_verkkokauppa_order_params(self.instance)
-
-                    try:
-                        verkkokauppa_order: Order = VerkkokauppaAPIClient.create_order(order_params=order_params)
-                    except CreateOrderError as err:
-                        SentryLogger.log_exception(
-                            err, details="Creating order in Verkkokauppa failed", reservation_id=self.instance.pk
-                        )
-                        msg = "Upstream service call failed. Unable to confirm the reservation."
-                        raise ValidationErrorWithCode(msg, ValidationErrorCodes.UPSTREAM_CALL_FAILED) from err
+                verkkokauppa_order: Order = self._create_order_in_verkkokauppa()
 
                 PaymentOrder.objects.create(
                     payment_type=payment_type,
