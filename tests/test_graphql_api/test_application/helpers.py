@@ -1,13 +1,17 @@
+from __future__ import annotations
+
 import datetime
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
-from tilavarauspalvelu.models import Application, ApplicationRound
 
 from tests.factories import AgeGroupFactory, CityFactory, ReservationPurposeFactory, ReservationUnitFactory
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Application, ApplicationRound
 
 applications_query = partial(build_query, "applications", connection=True, order_by="pkAsc")
 

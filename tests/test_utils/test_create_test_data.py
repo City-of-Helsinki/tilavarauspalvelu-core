@@ -1,6 +1,9 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import django.apps
 import pytest
-from django.db import models
 
 from tilavarauspalvelu.management.commands.create_test_data import create_test_data
 from tilavarauspalvelu.models import (
@@ -22,6 +25,9 @@ from tilavarauspalvelu.models import (
 )
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.sql_log.model import SQLLog
+
+if TYPE_CHECKING:
+    from django.db import models
 
 models_that_should_be_empty: list[type[models.Model]] = [
     AbilityGroup,

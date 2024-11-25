@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import base64
 import datetime
 import json
-from collections.abc import Iterable
 from dataclasses import asdict
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 from uuid import uuid4  # noqa: ICN003
 
 import factory
@@ -13,11 +14,16 @@ from factory import LazyAttribute, LazyFunction
 from social_django.models import UserSocialAuth
 
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
-from tilavarauspalvelu.models import Unit, UnitGroup, User
+from tilavarauspalvelu.models import User
 from tilavarauspalvelu.utils.helauth.typing import IDToken
 from utils.date_utils import local_datetime
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from tilavarauspalvelu.models import Unit, UnitGroup
 
 __all__ = [
     "UserFactory",

@@ -23,6 +23,8 @@ Note: The following structure is required by Faker:
 Add the provider function names to `tests.factories._typing.CustomProviders` for typing support!
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 
 from django.conf import settings

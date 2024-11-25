@@ -1,10 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
 
-from tilavarauspalvelu.models import ReservationUnit
-
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit
 
 
 @pytest.fixture(autouse=True)

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from tilavarauspalvelu.enums import UserRoleChoice
 from tilavarauspalvelu.models import GeneralRole
 

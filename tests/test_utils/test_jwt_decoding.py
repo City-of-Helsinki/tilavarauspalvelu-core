@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from tilavarauspalvelu.utils.helauth.utils import get_jwt_payload
 
 

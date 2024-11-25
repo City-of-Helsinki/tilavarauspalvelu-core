@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from factory import LazyAttribute, Sequence
 
 from tilavarauspalvelu.models import ReservationDenyReason

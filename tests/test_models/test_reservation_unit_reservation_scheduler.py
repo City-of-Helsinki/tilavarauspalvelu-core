@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import ReservationStateChoice
-from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
@@ -15,6 +17,9 @@ from tests.factories import (
     ReservationUnitFactory,
     SpaceFactory,
 )
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit
 
 
 def _get_date(*, month=1, day=1) -> datetime.date:

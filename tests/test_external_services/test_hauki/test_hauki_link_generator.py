@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hmac
 from urllib import parse
 

@@ -1,20 +1,19 @@
+from __future__ import annotations
+
 import datetime
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
 from tilavarauspalvelu.enums import ReservationTypeChoice, WeekdayChoice
-from tilavarauspalvelu.models import (
-    AffectingTimeSpan,
-    RecurringReservation,
-    ReservationUnit,
-    ReservationUnitHierarchy,
-    User,
-)
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
 from utils.date_utils import local_date, local_time
 
 from tests.factories import RecurringReservationFactory
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import RecurringReservation, ReservationUnit, User
 
 recurring_reservations_query = partial(build_query, "recurringReservations", connection=True, order_by="nameAsc")
 

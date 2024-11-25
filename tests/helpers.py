@@ -1,21 +1,26 @@
-from collections.abc import Callable
+from __future__ import annotations
+
 from functools import wraps
-from typing import Any, NamedTuple, ParamSpec, Self, TypeVar
+from typing import TYPE_CHECKING, Any, NamedTuple, ParamSpec, Self, TypeVar
 from unittest import mock
 from unittest.mock import patch
 
 import polib
 import pytest
 from django.conf import settings
-from django.http import HttpRequest
 from django.utils import translation
 from django.utils.functional import lazy
 from django.utils.translation import trans_real
 from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClient
 
-from tilavarauspalvelu.enums import UserRoleChoice
-from tilavarauspalvelu.models import User
-from tilavarauspalvelu.typing import Lang
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from django.http import HttpRequest
+
+    from tilavarauspalvelu.enums import UserRoleChoice
+    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.typing import Lang
 
 __all__ = [
     "GraphQLClient",

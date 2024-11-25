@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import factory
 
 from tilavarauspalvelu.models import OriginHaukiResource

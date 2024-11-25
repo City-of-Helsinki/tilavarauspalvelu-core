@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import datetime
 import math
 import random
 from decimal import Decimal
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from factory import LazyAttribute, fuzzy
 
@@ -13,7 +15,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
-from tilavarauspalvelu.models import Reservation, ReservationUnit, ReservationUnitPricing, User
+from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_start_of_day, next_hour, utc_datetime
 
 from ._base import (
@@ -24,6 +26,9 @@ from ._base import (
     ModelFactoryBuilder,
     ReverseForeignKeyFactory,
 )
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing, User
 
 __all__ = [
     "ReservationBuilder",

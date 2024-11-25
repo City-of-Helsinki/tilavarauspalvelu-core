@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from tilavarauspalvelu.models import Person
 
 from ._base import FakerFI, GenericDjangoModelFactory, ReverseForeignKeyFactory

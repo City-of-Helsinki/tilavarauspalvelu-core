@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from factory import LazyAttribute
 
 from tilavarauspalvelu.enums import ResourceLocationType

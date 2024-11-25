@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from decimal import Decimal
 
 BASE_TEMPLATE_CONTEXT_EN = {

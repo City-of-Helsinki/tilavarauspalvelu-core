@@ -1,13 +1,19 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import pytest
 from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import BannerNotificationTarget, UserRoleChoice
-from tilavarauspalvelu.models import User
 
 from tests.factories import BannerNotificationFactory
 from tests.factories.banner_notification import BannerNotificationBuilder
 
 from .helpers import FieldParams, TargetParams, UserType, UserTypeParams
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import User
 
 # Applied to all tests
 pytestmark = [

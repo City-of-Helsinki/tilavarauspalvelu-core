@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from django.contrib.admin import AdminSite
 from django.test import RequestFactory

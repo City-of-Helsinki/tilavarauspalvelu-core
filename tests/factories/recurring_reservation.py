@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import TYPE_CHECKING, Any
 
@@ -103,7 +105,7 @@ class RecurringReservationFactory(GenericDjangoModelFactory[RecurringReservation
         Reservation.objects.bulk_create(reservations)
 
         # Add reservation units.
-        ReservationReservationUnit: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
+        ReservationReservationUnit: type[models.Model] = Reservation.reservation_units.through
         reservation_reservation_units: list[ReservationReservationUnit] = [
             ReservationReservationUnit(
                 reservation=reservation,
