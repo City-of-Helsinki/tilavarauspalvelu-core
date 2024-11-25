@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from admin_data_views.settings import admin_data_settings
 from admin_data_views.typing import TableContext
@@ -9,16 +11,17 @@ from django.utils.html import format_html
 
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.typing import Lang, WSGIRequest
 
 from .utils import get_mock_data
 
 if TYPE_CHECKING:
     from django.utils.safestring import SafeString
 
+    from tilavarauspalvelu.typing import Lang, WSGIRequest
+
 
 @render_with_table_view
-def email_templates_admin_list_view(request: WSGIRequest, **kwargs) -> TableContext:
+def email_templates_admin_list_view(request: WSGIRequest, **kwargs: Any) -> TableContext:
     links_html: list[SafeString] = []
     links_text: list[SafeString] = []
     tester_links: list[SafeString] = []

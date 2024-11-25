@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from tinymce.widgets import TinyMCE
@@ -7,7 +11,7 @@ from tilavarauspalvelu.models import ReservationUnit, TermsOfUse
 
 
 class ReservationUnitAdminForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         qs = TermsOfUse.objects.all()
         self.base_fields["pricing_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PRICING)
         self.base_fields["payment_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PAYMENT)

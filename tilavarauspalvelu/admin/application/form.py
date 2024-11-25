@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from graphene_django_extensions.fields import EnumChoiceField
@@ -11,7 +15,7 @@ class ApplicationSectionInlineAdminForm(forms.ModelForm):
     status = EnumChoiceField(enum=ApplicationSectionStatusChoice, required=False, disabled=True)
     suitable_days_of_the_week = forms.CharField()
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         instance: ApplicationSection | None = kwargs.get("instance")
         if instance:
             kwargs.setdefault("initial", {})
@@ -69,7 +73,7 @@ class ApplicationAdminForm(forms.ModelForm):
         },
     )
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         instance: Application | None = kwargs.get("instance")
         if instance is not None:
             kwargs.setdefault("initial", {})

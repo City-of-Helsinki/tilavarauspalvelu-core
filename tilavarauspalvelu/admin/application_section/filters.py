@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.contrib import admin
 from django.db import models
@@ -25,7 +25,7 @@ class ApplicationRoundStatusFilter(admin.SimpleListFilter):
     title = _("Application round status")
     parameter_name = "round_status"
 
-    def lookups(self, *args) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return ApplicationRoundStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -39,7 +39,7 @@ class ApplicationStatusFilter(admin.SimpleListFilter):
     title = _("Application status")
     parameter_name = "application_status"
 
-    def lookups(self, *args) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return ApplicationStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -53,7 +53,7 @@ class ApplicationSectionStatusFilter(admin.SimpleListFilter):
     title = _("Application section status")
     parameter_name = "section_status"
 
-    def lookups(self, *args) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return ApplicationSectionStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -67,7 +67,7 @@ class AgeGroupFilter(admin.SimpleListFilter):
     title = _("Age group")
     parameter_name = "age_group"
 
-    def lookups(self, *args) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return AgeGroup.objects.annotate(
             repr=models.Case(
                 models.When(maximum=None, then=Concat("minimum", models.Value("+"), output_field=models.CharField())),
@@ -87,7 +87,7 @@ class ReservationPurposeFilter(admin.SimpleListFilter):
     title = _("Reservation purpose")
     parameter_name = "purpose"
 
-    def lookups(self, *args) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return ReservationPurpose.objects.values_list("id", "name")
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:

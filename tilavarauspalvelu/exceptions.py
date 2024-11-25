@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 from utils.external_service.errors import ExternalServiceError
 
 
@@ -10,7 +14,7 @@ class EmailBuilderConfigurationError(Exception):
 
 
 class EmailTemplateValidationError(Exception):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         if len(args) > 0:
             self.message = args[0]
 

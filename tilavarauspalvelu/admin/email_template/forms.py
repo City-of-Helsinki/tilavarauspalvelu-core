@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from django import forms
 
@@ -81,7 +81,7 @@ class ReservationUnitSelectForm(forms.Form):
         widget=forms.Select(attrs={"id": "test_email_reservation_unit_select"}),
     )
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         runit_choices = [(None, "-")] + [
             (runit.pk, f"{runit.name} - {safe_getattr(runit, "unit.name")}")

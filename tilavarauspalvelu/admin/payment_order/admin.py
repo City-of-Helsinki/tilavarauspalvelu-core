@@ -61,7 +61,7 @@ class PaymentOrderForm(forms.ModelForm):
             "refund_id": _("Available only when order has been refunded"),
         }
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Add reservation and reservation unit to the reservation field help text."""
         super().__init__(*args, **kwargs)
         payment_order: PaymentOrder | None = kwargs.get("instance")

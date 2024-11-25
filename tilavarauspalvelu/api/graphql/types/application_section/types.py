@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
@@ -7,12 +11,14 @@ from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, UserRoleChoice
 from tilavarauspalvelu.models import Application, ApplicationSection, User
-from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
-from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
-from tilavarauspalvelu.typing import GQLInfo
 
 from .filtersets import ApplicationSectionFilterSet
 from .permissions import ApplicationSectionPermission
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
+    from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
+    from tilavarauspalvelu.typing import GQLInfo
 
 
 class ApplicationSectionNode(DjangoNode):
@@ -92,5 +98,5 @@ class ApplicationSectionNode(DjangoNode):
         return queryset
 
     @classmethod
-    def _add_units_for_permissions(cls, queryset: ApplicationQuerySet, *args) -> models.QuerySet:
+    def _add_units_for_permissions(cls, queryset: ApplicationQuerySet, *args: Any) -> models.QuerySet:
         return queryset.with_permissions()

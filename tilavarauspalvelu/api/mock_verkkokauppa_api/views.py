@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import uuid
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -9,11 +11,11 @@ from django.views.generic import TemplateView
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.models import PaymentOrder
-from tilavarauspalvelu.typing import WSGIRequest
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
+    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "MockVerkkokauppaView",
@@ -46,7 +48,7 @@ class MockVerkkokauppaView(TemplateView):
             reservation.state = ReservationStateChoice.CONFIRMED
             reservation.save()
 
-    def get(self, request: WSGIRequest, *args, **kwargs) -> HttpResponseRedirect:
+    def get(self, request: WSGIRequest, *args: Any, **kwargs: Any) -> HttpResponseRedirect:
         payment_order = self.get_payment_order(order_uuid=kwargs.get("order_uuid"))
 
         context = {
@@ -55,7 +57,7 @@ class MockVerkkokauppaView(TemplateView):
         }
         return super().get(request, *args, **kwargs, **context)
 
-    def post(self, request: WSGIRequest, *args, **kwargs) -> HttpResponseRedirect | HttpResponse:
+    def post(self, request: WSGIRequest, *args: Any, **kwargs: Any) -> HttpResponseRedirect | HttpResponse:
         payment_order = self.get_payment_order(order_uuid=kwargs.get("order_uuid"))
         frontend_url = settings.MOCK_VERKKOKAUPPA_FRONTEND_URL.strip("/")
 

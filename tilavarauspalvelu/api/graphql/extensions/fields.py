@@ -18,7 +18,7 @@ class MinDurationValidator(MinValueValidator):
 class DurationField(serializers.IntegerField):
     default_error_messages = {"invalid": _("A valid integer is required.")}
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.validators.append(MinDurationValidator(0))
 
@@ -66,7 +66,7 @@ class OldChoiceValidator:
 
 
 class OldChoiceCharField(serializers.CharField):
-    def __init__(self, choices: tuple[tuple[str, str]], **kwargs) -> None:
+    def __init__(self, choices: tuple[tuple[str, str]], **kwargs: Any) -> None:
         super().__init__(**kwargs)
         choice_validator = OldChoiceValidator(choices)
         self.validators.append(choice_validator)

@@ -36,7 +36,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         write_only=True,
     )
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         # All fields should be read-only, except for the lookup
         # field (PK) which should be included in the input
@@ -132,7 +132,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             msg = "Upstream service call failed. Unable to confirm the reservation."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.UPSTREAM_CALL_FAILED) from err
 
-    def save(self, **kwargs) -> Reservation:
+    def save(self, **kwargs: Any) -> Reservation:
         self.fields.pop("payment_type")
         state = self.validated_data["state"]
 

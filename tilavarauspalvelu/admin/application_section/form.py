@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -53,7 +57,7 @@ class SuitableTimeRangeInlineAdminForm(forms.ModelForm):
         ),
     )
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         instance: SuitableTimeRange | None = kwargs.get("instance")
         if instance:
             kwargs.setdefault("initial", {})
@@ -109,7 +113,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         },
     )
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         instance: ApplicationSection | None = kwargs.get("instance")
         if instance:
             kwargs.setdefault("initial", {})

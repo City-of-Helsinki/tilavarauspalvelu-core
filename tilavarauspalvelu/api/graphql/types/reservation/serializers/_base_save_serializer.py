@@ -90,7 +90,7 @@ class ReservationBaseSaveSerializer(OldPrimaryKeySerializer, ReservationPriceMix
             "non_subsidised_price_net",
         ]
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.fields["state"].read_only = True
         self.fields["reservation_unit_pks"].write_only = True

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.contrib import admin
 from django.db.models import Q
@@ -25,7 +25,7 @@ class ApplicationRoundFilter(admin.SimpleListFilter):
     title = _("Application Round")
     parameter_name = "application_round"
 
-    def lookups(self, *args) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return ApplicationRound.objects.filter(
             Q(sent_date__isnull=True) | Q(handled_date__isnull=True),
         ).values_list("id", "name")
@@ -41,7 +41,7 @@ class ApplicationRoundStatusFilter(admin.SimpleListFilter):
     title = _("Application round status")
     parameter_name = "round_status"
 
-    def lookups(self, *args) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return ApplicationRoundStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -57,7 +57,7 @@ class ApplicationStatusFilter(admin.SimpleListFilter):
     title = _("Application status")
     parameter_name = "application_status"
 
-    def lookups(self, *args) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return ApplicationStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -71,7 +71,7 @@ class ApplicationSectionStatusFilter(admin.SimpleListFilter):
     title = _("Application section status")
     parameter_name = "section_status"
 
-    def lookups(self, *args) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return ApplicationSectionStatusChoice.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
@@ -85,7 +85,7 @@ class DayOfTheWeekFilter(admin.SimpleListFilter):
     title = _("Day of the week")
     parameter_name = "day_of_the_week"
 
-    def lookups(self, *args) -> list[tuple[str, str]]:
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
         return Weekday.choices
 
     def queryset(self, request: WSGIRequest, queryset: QuerySet) -> QuerySet:
