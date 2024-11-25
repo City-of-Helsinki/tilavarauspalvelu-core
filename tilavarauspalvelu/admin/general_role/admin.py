@@ -1,9 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.models import GeneralRole
-from tilavarauspalvelu.typing import WSGIRequest
+
+if TYPE_CHECKING:
+    from django import forms
+    from django.db import models
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "GeneralRoleAdmin",
@@ -61,7 +69,7 @@ class GeneralRoleAdmin(admin.ModelAdmin):
             )
         )
 
-    def save_model(self, request: WSGIRequest, obj: GeneralRole, form, change: bool) -> GeneralRole:  # noqa: FBT001
+    def save_model(self, request: WSGIRequest, obj: GeneralRole, form: forms.ModelForm, change: bool) -> None:  # noqa: FBT001
         obj.assigner = request.user
         return super().save_model(request, obj, form, change)
 

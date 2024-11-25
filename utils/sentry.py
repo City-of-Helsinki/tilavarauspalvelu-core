@@ -1,9 +1,13 @@
-from collections.abc import Callable
+from __future__ import annotations
+
 from functools import wraps
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from django.conf import settings
 from sentry_sdk import capture_exception, capture_message, new_scope
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 LogLevelStr = Literal["fatal", "critical", "error", "warning", "info", "debug"]
 
@@ -17,7 +21,7 @@ class SentryLogger:
             capture_message(message, level=level)
 
     @staticmethod
-    def log_exception(err: Exception, details: str, **extra) -> None:
+    def log_exception(err: Exception, details: str, **extra: Any) -> None:
         with new_scope() as scope:
             scope.set_extra("details", details)
 

@@ -8,7 +8,7 @@ from utils.date_utils import local_end_of_day, local_start_of_day
 
 
 class TimezoneAwareDateField(forms.DateField):
-    def __init__(self, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self.use_end_of_day = kwargs.pop("use_end_of_day", False)
         super().__init__(**kwargs)
 

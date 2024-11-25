@@ -221,7 +221,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
         if prefill_info is not None:
             data.update({key: value for key, value in prefill_info.items() if value is not None})
 
-    def check_sku(self, current_sku, new_sku) -> None:
+    def check_sku(self, current_sku: str, new_sku: str) -> None:
         if current_sku is not None and current_sku != new_sku:
             msg = "An ambiguous SKU cannot be assigned for this reservation."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.AMBIGUOUS_SKU)
@@ -239,7 +239,7 @@ class ReservationCreateSerializer(OldPrimaryKeySerializer, ReservationPriceMixin
             msg = "Maximum number of active reservations for this reservation unit exceeded."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED)
 
-    def check_reservation_kind(self, reservation_unit) -> None:
+    def check_reservation_kind(self, reservation_unit: ReservationUnit) -> None:
         if reservation_unit.reservation_kind == ReservationKind.SEASON:
             msg = "Reservation unit is only available or seasonal booking."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON)

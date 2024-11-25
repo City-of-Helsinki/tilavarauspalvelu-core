@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import django_filters
 from django.db import models
 from graphene_django_extensions import ModelFilterSet
@@ -52,7 +54,12 @@ class RecurringReservationFilterSet(ModelFilterSet):
             ("reservation_unit__unit__name_sv", "unit_name_sv"),
         ]
 
-    def get_reservation_unit_name(self, qs, name: str, value: str) -> models.QuerySet[RecurringReservation]:
+    def get_reservation_unit_name(
+        self,
+        qs: models.QuerySet[RecurringReservation],
+        name: str,
+        value: str,
+    ) -> models.QuerySet[RecurringReservation]:
         language = name[-2:]
         words = value.split(",")
 

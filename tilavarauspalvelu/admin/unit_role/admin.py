@@ -1,9 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.models import UnitRole
-from tilavarauspalvelu.typing import WSGIRequest
+
+if TYPE_CHECKING:
+    from django import forms
+    from django.db import models
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "UnitRoleAdmin",
@@ -76,7 +84,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
             )
         )
 
-    def save_model(self, request: WSGIRequest, obj: UnitRole, form, change: bool) -> UnitRole:  # noqa: FBT001
+    def save_model(self, request: WSGIRequest, obj: UnitRole, form: forms.ModelForm, change: bool) -> UnitRole:  # noqa: FBT001
         obj.assigner = request.user
         return super().save_model(request, obj, form, change)
 

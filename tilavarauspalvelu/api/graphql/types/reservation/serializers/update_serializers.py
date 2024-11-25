@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from graphene.utils.str_converters import to_camel_case
 
@@ -7,8 +9,10 @@ from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUp
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.create_serializers import ReservationCreateSerializer
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice
-from tilavarauspalvelu.models import Reservation
 from utils.date_utils import DEFAULT_TIMEZONE
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Reservation, ReservationUnit
 
 
 class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCreateSerializer):
@@ -67,7 +71,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationCrea
         validated_data["confirmed_at"] = datetime.datetime.now().astimezone(DEFAULT_TIMEZONE)
         return validated_data
 
-    def check_metadata_fields(self, data, reservation_unit) -> None:
+    def check_metadata_fields(self, data: dict[str, Any], reservation_unit: ReservationUnit) -> None:
         # Even marked in the metadata set to be mandatory, yet these never should be for private person.
         non_mandatory_fields_for_person = [
             "reservee_organisation_name",

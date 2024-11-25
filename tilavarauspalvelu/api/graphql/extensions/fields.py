@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import timedelta
 from typing import Any
 
@@ -20,13 +22,13 @@ class DurationField(serializers.IntegerField):
         super().__init__(**kwargs)
         self.validators.append(MinDurationValidator(0))
 
-    def to_internal_value(self, data) -> timedelta:
+    def to_internal_value(self, data: str) -> timedelta:
         try:
             return timedelta(seconds=int(data))
         except ValueError:
             self.fail("invalid")
 
-    def to_representation(self, value) -> int:
+    def to_representation(self, value: timedelta) -> int:
         return int(value.total_seconds())
 
     def get_attribute(self, instance: Any) -> int | None:
@@ -41,7 +43,7 @@ class OldChoiceValidator:
     message = _('Choice "%(choice)s" is not allowed. Allowed choices are: %(allowed_choices)s.')
     code = "invalid_choice"
 
-    def __init__(self, allowed_choices) -> None:
+    def __init__(self, allowed_choices: tuple[tuple[str, str]]) -> None:
         if len(allowed_choices) > 0 and isinstance(allowed_choices[0][0], int):
             self.allowed_choices = [choice[0] for choice in allowed_choices]
         else:
@@ -64,7 +66,7 @@ class OldChoiceValidator:
 
 
 class OldChoiceCharField(serializers.CharField):
-    def __init__(self, choices, **kwargs) -> None:
+    def __init__(self, choices: tuple[tuple[str, str]], **kwargs) -> None:
         super().__init__(**kwargs)
         choice_validator = OldChoiceValidator(choices)
         self.validators.append(choice_validator)

@@ -353,7 +353,7 @@ def update_reservation_unit_pricings_tax_percentage(
     max_retries=5,
     retry_backoff=True,
 )
-def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
+def refresh_reservation_unit_product_mapping(reservation_unit_pk: int) -> None:
     reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
@@ -392,7 +392,7 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk) -> None:
     max_retries=5,
     retry_backoff=True,
 )
-def refresh_reservation_unit_accounting(reservation_unit_pk) -> None:
+def refresh_reservation_unit_accounting(reservation_unit_pk: int) -> None:
     reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
