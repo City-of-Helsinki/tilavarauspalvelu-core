@@ -1,9 +1,9 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
-from django.db import models
-from django.http import FileResponse
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -15,13 +15,19 @@ from tilavarauspalvelu.admin.reservation_unit_image.admin import ReservationUnit
 from tilavarauspalvelu.admin.reservation_unit_pricing.admin import ReservationUnitPricingInline
 from tilavarauspalvelu.enums import ReservationKind
 from tilavarauspalvelu.models import ReservationUnit
-from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
 from tilavarauspalvelu.services.csv_export import ReservationUnitExporter
-from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from utils.sentry import SentryLogger
 
 from .form import ReservationUnitAdminForm
+
+if TYPE_CHECKING:
+    from django import forms
+    from django.db import models
+    from django.http import FileResponse
+
+    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ReservationUnitInline(admin.TabularInline):
@@ -239,7 +245,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
 
         return response
 
-    def save_model(self, request, obj, form, change) -> None:
+    def save_model(self, request: WSGIRequest, obj: ReservationUnit, form: forms.ModelForm, change: bool) -> None:  # noqa: FBT001
         super().save_model(request, obj, form, change)
 
         # Update ReservableTimeSpans for HaukiResource when ReservationUnit is saved

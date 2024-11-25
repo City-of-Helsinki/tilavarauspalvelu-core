@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from graphene.utils.str_converters import to_camel_case
 from graphql import GraphQLError
 from rest_framework import serializers
@@ -5,7 +7,7 @@ from rest_framework.exceptions import ErrorDetail
 
 
 class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
-    def _check_id_list(self, id_list, field_name) -> None:
+    def _check_id_list(self, id_list, field_name) -> None:  # noqa: ANN001
         for identifier in id_list:
             try:
                 int(identifier)

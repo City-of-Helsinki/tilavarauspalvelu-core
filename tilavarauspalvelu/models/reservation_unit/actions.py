@@ -112,7 +112,7 @@ class ReservationUnitHaukiExporter:
         except (ExternalServiceError, KeyError, IndexError, TypeError):
             return None
 
-    def _create_hauki_resource(self, hauki_resource_data) -> None:
+    def _create_hauki_resource(self, hauki_resource_data: dict[str, Any]) -> None:
         """Create a new HaukiResource in Hauki API for the ReservationUnit."""
         # New Hauki Resource, create it in Hauki API and update the reservation unit
         response_data: HaukiAPIResource = HaukiAPIClient.create_resource(data=hauki_resource_data)
@@ -123,7 +123,7 @@ class ReservationUnitHaukiExporter:
         self.reservation_unit.origin_hauki_resource = origin_hauki_resource
         self.reservation_unit.save()
 
-    def _update_hauki_resource(self, hauki_resource_data) -> None:
+    def _update_hauki_resource(self, hauki_resource_data: dict[str, Any]) -> None:
         """Update the Hauki Resource in Hauki API with ReservationUnits data."""
         hauki_resource_data["id"] = self.reservation_unit.origin_hauki_resource.id
 

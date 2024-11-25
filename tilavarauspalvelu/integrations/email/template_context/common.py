@@ -216,7 +216,7 @@ def get_staff_login_link() -> str:
     return f"{url_base}/kasittely"
 
 
-def get_staff_reservations_ext_link(*, booking_number) -> str:
+def get_staff_reservations_ext_link(*, booking_number: int) -> str:
     url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
     return f"{url_base}/kasittely/reservations/{booking_number}"
 

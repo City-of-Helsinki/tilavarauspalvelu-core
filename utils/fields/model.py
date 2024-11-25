@@ -1,8 +1,12 @@
-from typing import Any
+from __future__ import annotations
 
-from django import forms
+from typing import TYPE_CHECKING, Any
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+if TYPE_CHECKING:
+    from django import forms
 
 __all__ = [
     "IntChoiceField",
@@ -51,7 +55,7 @@ class IntChoiceField(models.IntegerField):
         kwargs["enum"] = self.enum
         return name, path, args, kwargs
 
-    def validate(self, value: int | None, model_instance) -> None:
+    def validate(self, value: int | None, model_instance: models.Model) -> None:
         original_choices = self.choices
         try:
             self.choices = self.enum.choices
@@ -88,10 +92,10 @@ class InRange(models.Lookup):  # pragma: no cover
     lookup_name = "in_range"
     prepare_rhs = False
 
-    def get_db_prep_lookup(self, value: range, connection) -> tuple[str, list[int]]:  # noqa: ARG002
+    def get_db_prep_lookup(self, value: range, connection) -> tuple[str, list[int]]:  # noqa: ARG002 ANN001
         return "%s, %s, %s", [value.start, value.stop, value.step]
 
-    def as_sql(self, compiler, connection) -> tuple[str, list]:
+    def as_sql(self, compiler, connection) -> tuple[str, list]:  # noqa: ANN001
         _, lhs_params = self.process_lhs(compiler, connection)
         _, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params

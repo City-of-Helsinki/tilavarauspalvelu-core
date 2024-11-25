@@ -1,22 +1,27 @@
+from __future__ import annotations
+
 import datetime
 import math
-from collections.abc import Iterable
 from decimal import Decimal
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.utils import timezone
 from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
 from tilavarauspalvelu.enums import (
     PriceUnit,
     ReservationStartInterval,
     ReservationTypeChoice,
     ReservationUnitPublishingState,
 )
-from tilavarauspalvelu.models import Reservation, ReservationUnit
 from utils.date_utils import local_datetime, local_start_of_day
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
+    from tilavarauspalvelu.models import Reservation, ReservationUnit
 
 
 class PriceCalculationResult:
@@ -143,7 +148,7 @@ class ReservationSchedulingMixin:
     instance: Reservation | None
 
     @classmethod
-    def _get_is_invalid_begin(cls, reservation_unit, now: datetime.datetime) -> bool:
+    def _get_is_invalid_begin(cls, reservation_unit: ReservationUnit, now: datetime.datetime) -> bool:
         return (reservation_unit.reservation_begins and now < reservation_unit.reservation_begins) or (
             reservation_unit.publish_begins and now < reservation_unit.publish_begins
         )

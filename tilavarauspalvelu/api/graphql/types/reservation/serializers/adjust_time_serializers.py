@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 
@@ -11,8 +13,11 @@ from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import (
 )
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.models import Reservation, ReservationUnit
+from tilavarauspalvelu.models import Reservation
 from utils.date_utils import DEFAULT_TIMEZONE
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit
 
 
 class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, ReservationPriceMixin, ReservationSchedulingMixin):
@@ -83,7 +88,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
 
         return data
 
-    def check_begin(self, begin, end) -> None:
+    def check_begin(self, begin: datetime.datetime, end: datetime.datetime) -> None:
         if begin > end:
             msg = "End cannot be before begin"
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
@@ -113,7 +118,7 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
             msg = "Reservation time change needs manual handling."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_NOT_ALLOWED)
 
-    def check_and_handle_pricing(self, data) -> None:
+    def check_and_handle_pricing(self, data: dict[str, Any]) -> None:
         if self.instance.price > 0:
             msg = "Reservation time cannot be changed due to its price"
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_NOT_ALLOWED)

@@ -1,19 +1,26 @@
+from __future__ import annotations
+
 import contextlib
 import logging
 import time
 import traceback
-from collections.abc import Callable, Generator
 from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.db import connection
-from django.http import HttpResponse
 
-from tilavarauspalvelu.typing import QueryInfo, WSGIRequest
+from tilavarauspalvelu.typing import QueryInfo
 from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Generator
+
+    from django.http import HttpResponse
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +32,7 @@ class MultipleProxyMiddleware:
         "HTTP_X_FORWARDED_SERVER",
     ]
 
-    def __init__(self, get_response) -> None:
+    def __init__(self, get_response: Callable[[WSGIRequest], HttpResponse]) -> None:
         self.get_response = get_response
 
     def __call__(self, request: WSGIRequest) -> HttpResponse:
