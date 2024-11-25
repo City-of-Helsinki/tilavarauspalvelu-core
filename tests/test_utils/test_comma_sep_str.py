@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from utils.utils import comma_sep_str

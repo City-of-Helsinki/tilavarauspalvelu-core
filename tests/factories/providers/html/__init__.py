@@ -1,6 +1,11 @@
-from collections.abc import Sequence
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from faker.providers.lorem import Provider as LoremProvider
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 localized: bool = True
 

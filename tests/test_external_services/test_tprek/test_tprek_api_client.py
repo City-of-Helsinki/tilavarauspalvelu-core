@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from tilavarauspalvelu.utils.importers.tprek_api_client import TprekAPIClient
 from utils.date_utils import local_datetime
 

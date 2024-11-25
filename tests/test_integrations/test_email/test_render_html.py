@@ -1,4 +1,6 @@
 # Note: Contexts are tested separately with translations!
+from __future__ import annotations
+
 import datetime
 from decimal import Decimal
 from inspect import cleandoc

@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import datetime
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
 from tilavarauspalvelu.enums import Weekday
-from tilavarauspalvelu.models import ReservationUnitOption
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnitOption
 
 allocations_query = partial(build_query, "allocatedTimeSlots", connection=True, order_by="pkAsc")
 

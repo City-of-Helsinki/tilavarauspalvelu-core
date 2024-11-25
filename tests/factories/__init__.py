@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .ability_group import AbilityGroupFactory
 from .address import AddressFactory
 from .age_group import AgeGroupFactory

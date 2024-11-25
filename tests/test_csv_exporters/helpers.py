@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 import dataclasses
-from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 from unittest import mock
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 @dataclasses.dataclass

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from utils.elasticsearch import build_elastic_query_str
 
 

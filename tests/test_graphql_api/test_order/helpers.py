@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import uuid
 from functools import partial
+from typing import TYPE_CHECKING
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tilavarauspalvelu.models import PaymentOrder, User
-
 from tests.factories import PaymentOrderFactory, ReservationFactory, ReservationUnitFactory
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import PaymentOrder, User
 
 order_query = partial(
     build_query,

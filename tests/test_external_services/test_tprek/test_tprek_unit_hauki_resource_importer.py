@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitHaukiResourceIdImporter

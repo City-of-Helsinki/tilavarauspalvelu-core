@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient

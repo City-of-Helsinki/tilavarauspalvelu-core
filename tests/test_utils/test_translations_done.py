@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from config.hooks.translations_done import main

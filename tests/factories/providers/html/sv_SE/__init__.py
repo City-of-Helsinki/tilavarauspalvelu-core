@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from faker.providers.lorem.la import Provider as LoremProvider
 
 from tests.factories.providers.html import Provider as HTMLProvider

@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import ReservationTypeChoice, UserRoleChoice
-from tilavarauspalvelu.models import ApplicationSection, ReservationCancelReason, User
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -15,6 +17,9 @@ from tests.factories import (
 )
 
 from .helpers import CANCEL_SECTION_SERIES_MUTATION, create_reservation_series
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationSection, ReservationCancelReason, User
 
 # Applied to all tests
 pytestmark = [

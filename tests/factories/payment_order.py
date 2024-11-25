@@ -1,15 +1,20 @@
+from __future__ import annotations
+
 import uuid
 from decimal import Decimal
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 import factory
 from django.conf import settings
 from django.urls import reverse
 
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType
-from tilavarauspalvelu.models import PaymentOrder, Reservation
+from tilavarauspalvelu.models import PaymentOrder
 
 from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Reservation
 
 __all__ = [
     "PaymentOrderBuilder",

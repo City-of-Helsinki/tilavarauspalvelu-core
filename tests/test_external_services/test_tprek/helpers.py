@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 SINGLE_TPREK_UNIT_JSON = {
     "id": 999,
     "dept_id": "test-department-id",

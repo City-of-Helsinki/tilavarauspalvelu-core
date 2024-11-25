@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 from enum import Enum, auto
 from functools import partial
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tilavarauspalvelu.enums import BannerNotificationTarget
+if TYPE_CHECKING:
+    from tilavarauspalvelu.enums import BannerNotificationTarget
 
 banner_notifications_query = partial(build_query, "bannerNotifications", connection=True, order_by="pkAsc")
 

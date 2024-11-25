@@ -1,8 +1,13 @@
-from collections.abc import Iterable
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.models import ReservationMetadataSet
 
 from ._base import FakerFI, GenericDjangoModelFactory, ManyToManyFactory, ReverseForeignKeyFactory
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 __all__ = [
     "ReservationMetadataSetFactory",

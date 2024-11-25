@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import datetime
-from collections.abc import Collection
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 import pytest
 from django.core.exceptions import ValidationError
@@ -8,6 +9,9 @@ from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.typing import TimeSlot
 from tilavarauspalvelu.utils.validators import validate_reservable_times_begin_end, validate_reservable_times_overlap
+
+if TYPE_CHECKING:
+    from collections.abc import Collection
 
 
 class TimeslotParams(NamedTuple):

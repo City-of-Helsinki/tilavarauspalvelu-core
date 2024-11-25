@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 import datetime
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
 import factory
 from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
-from tilavarauspalvelu.models import Application, ApplicationSection
+from tilavarauspalvelu.models import ApplicationSection
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Application
 
 __all__ = [
     "ApplicationSectionBuilder",

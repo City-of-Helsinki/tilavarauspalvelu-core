@@ -1,9 +1,13 @@
-import datetime
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan
 
 from ._base import ForeignKeyFactory, GenericDjangoModelFactory
+
+if TYPE_CHECKING:
+    import datetime
 
 __all__ = [
     "ReservableTimeSpanFactory",

@@ -1,15 +1,20 @@
+from __future__ import annotations
+
 import datetime
 from functools import partial
+from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
 import pytest
 from graphene_django_extensions.testing import build_query
 from graphql_relay import to_global_id
 
-from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit
 
 # Applied to all tests
 pytestmark = [

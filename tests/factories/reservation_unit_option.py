@@ -1,10 +1,15 @@
-from typing import Self
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Self
 
 import factory
 
-from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption
+from tilavarauspalvelu.models import ReservationUnitOption
 
 from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationSection
 
 
 class ReservationUnitOptionFactory(GenericDjangoModelFactory[ReservationUnitOption]):
