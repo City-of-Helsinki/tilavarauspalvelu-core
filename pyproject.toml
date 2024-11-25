@@ -202,9 +202,6 @@ ignore = [
     # Code style preference
     "COM812",   # missing-trailing-comma
 
-    # Allow first argument of a method to NOT be `self`.
-    "N805",     # invalid-first-argument-name-for-method
-
     # No need to annotate mutable class variables with `typing.ClassVar`
     "RUF012",   # mutable-class-default
 
@@ -350,6 +347,13 @@ ignore-variadic-names = true
 
 [tool.ruff.lint.flake8-gettext]
 extend-function-names = ["pgettext", "pgettext_lazy", "gettext_lazy"]
+
+[tool.ruff.lint.pep8-naming]
+classmethod-decorators = [
+    "classproperty",
+    "permission",
+]
+extend-ignore-names = ["root"]   # Allow using `root` as the first argument name.
 
 [tool.ruff.lint.pylint]
 max-returns = 8
