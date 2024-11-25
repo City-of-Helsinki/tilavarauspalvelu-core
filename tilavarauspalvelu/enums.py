@@ -362,7 +362,7 @@ class CustomerTypeChoice(models.TextChoices):
     INDIVIDUAL = "INDIVIDUAL", pgettext_lazy("CustomerType", "Individual")
 
     @classproperty
-    def organisation(self) -> list[str]:
+    def organisation(cls) -> list[str]:
         return [  # type: ignore[return-value]
             CustomerTypeChoice.BUSINESS.value,
             CustomerTypeChoice.NONPROFIT.value,
@@ -378,7 +378,7 @@ class ReservationStateChoice(models.TextChoices):
     DENIED = "DENIED", pgettext_lazy("ReservationState", "Denied")
 
     @classproperty
-    def states_going_to_occur(self) -> list[str]:
+    def states_going_to_occur(cls) -> list[str]:
         return [  # type: ignore[return-type]
             ReservationStateChoice.CREATED.value,
             ReservationStateChoice.CONFIRMED.value,
@@ -387,21 +387,21 @@ class ReservationStateChoice(models.TextChoices):
         ]
 
     @classproperty
-    def states_that_can_change_to_handling(self) -> list[str]:
+    def states_that_can_change_to_handling(cls) -> list[str]:
         return [  # type: ignore[return-type]
             ReservationStateChoice.CONFIRMED.value,
             ReservationStateChoice.DENIED.value,
         ]
 
     @classproperty
-    def states_that_can_change_to_deny(self) -> list[str]:
+    def states_that_can_change_to_deny(cls) -> list[str]:
         return [  # type: ignore[return-type]
             ReservationStateChoice.REQUIRES_HANDLING.value,
             ReservationStateChoice.CONFIRMED.value,
         ]
 
     @classproperty
-    def states_that_can_be_deleted(self) -> list[str]:
+    def states_that_can_be_deleted(cls) -> list[str]:
         # "Alustava varaus" / "tentative reservation"
         return [  # type: ignore[return-type]
             ReservationStateChoice.CREATED.value,
@@ -409,7 +409,7 @@ class ReservationStateChoice(models.TextChoices):
         ]
 
     @classproperty
-    def doesnt_block_anonymization(self) -> list[str]:
+    def doesnt_block_anonymization(cls) -> list[str]:
         return [  # type: ignore[return-type]
             ReservationStateChoice.CANCELLED.value,
             ReservationStateChoice.DENIED.value,
