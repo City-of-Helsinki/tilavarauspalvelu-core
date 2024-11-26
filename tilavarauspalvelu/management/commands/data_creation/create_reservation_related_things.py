@@ -757,7 +757,7 @@ def _fetch_image(image_url: str, path: Path) -> None:
     try:
         response = requests.get(image_url, timeout=8)
         response.raise_for_status()
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         msg = f"Could not download image from '{image_url}': {e}"
         print(msg)  # noqa: T201, RUF100
         return

@@ -59,7 +59,7 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
         tprek_unit_importer = TprekUnitImporter()
         try:
             tprek_unit_importer.update_unit_from_tprek(units, force_update=True)
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             details = f"Tried to import units from TPREK: '{units.values_list('pk', flat=True)}'"
             SentryLogger.log_exception(err, details=details)
             self.message_user(request, f"Error while importing units from TPREK: {err}", level=messages.ERROR)

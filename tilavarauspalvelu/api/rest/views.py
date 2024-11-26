@@ -46,7 +46,7 @@ def reservation_ical(request: WSGIRequest, pk: int) -> FileResponse | JsonRespon
 
     try:
         ical = reservation.actions.to_ical()
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         return JsonResponse(data={"detail": str(exc)}, status=500)
 
     buffer = io.BytesIO()
@@ -105,7 +105,7 @@ def terms_of_use_pdf(request: WSGIRequest) -> FileResponse | JsonResponse:
 
     try:
         pdf = render_to_pdf("terms_of_use/booking_terms.jinja", **context)
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001
         data = {"detail": f"PDF could not be rendered: {error}"}
         return JsonResponse(data=data, status=500)
 
@@ -133,7 +133,7 @@ def readiness_check(request: WSGIRequest) -> JsonResponse:
         connection.ensure_connection()
         apps.check_apps_ready()
         apps.check_models_ready()
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001
         return JsonResponse({"status": "NOT_READY", "error": str(error)}, status=503)
 
     return JsonResponse({"status": "READY"}, status=200)

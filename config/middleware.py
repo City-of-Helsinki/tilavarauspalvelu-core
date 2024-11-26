@@ -70,7 +70,7 @@ class GraphQLSentryMiddleware:
     def resolve(self, next_, root, info, **kwargs):
         try:
             return next_(root, info, **kwargs)
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             SentryLogger.log_exception(err, "Error in GraphQL query")
             return err
 
@@ -79,7 +79,7 @@ class GraphQLErrorLoggingMiddleware:
     def resolve(self, next_, root, info, **kwargs):
         try:
             return next_(root, info, **kwargs)
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             logger.info(traceback.format_exc())
             return err
 
@@ -126,7 +126,7 @@ class QueryLoggingMiddleware:
                         body=request.body,
                         duration_ms=total_duration_ms,
                     )
-            except Exception as error:
+            except Exception as error:  # noqa: BLE001
                 SentryLogger.log_exception(error, "Error in QueryLoggingMiddleware")
 
     def log(  # noqa: PLR0917

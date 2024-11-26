@@ -109,7 +109,7 @@ select = [
     "ANN",      # flake8-annotations
     "ARG",      # flake8-unused-arguments
     "B",        # flake8-bugbear
-    #"BLE",     # flake8-blind-except  # TODO: Enable this and fix (7) issues
+    "BLE",      # flake8-blind-except
     "C4",       # flake8-comprehensions
     "COM",      # flake8-commas
     "D200",     # pydocstyle: One-line docstring should fit on one line

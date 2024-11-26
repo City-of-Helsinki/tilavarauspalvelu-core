@@ -486,7 +486,7 @@ class KeyCloakClient(BaseExternalServiceClient):
                 if "error" in error_data and error_data["error"] == "invalid_grant":
                     session["keycloak_refresh_token_expired"] = True
 
-            except Exception:
+            except Exception:  # noqa: BLE001
                 msg = f"Unable to refresh keycloak token for user {int(user.pk)}: {error.response.text}"
                 SentryLogger.log_exception(error, details=msg)
 
