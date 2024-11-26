@@ -9,7 +9,6 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.db.transaction import atomic
@@ -100,8 +99,8 @@ def update_units_from_tprek() -> None:
 
 @app.task(name="save_personal_info_view_log")
 def save_personal_info_view_log(user_id: int, viewer_user_id: int, field: str) -> None:
-    user = get_user_model().objects.filter(id=user_id).first()
-    viewer_user = get_user_model().objects.filter(id=viewer_user_id).first()
+    user = User.objects.filter(id=user_id).first()
+    viewer_user = User.objects.filter(id=viewer_user_id).first()
 
     # Do not log own views.
     if user == viewer_user:

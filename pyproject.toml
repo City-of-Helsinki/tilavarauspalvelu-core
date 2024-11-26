@@ -311,9 +311,15 @@ quote-annotations = false
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "django.core.handlers.wsgi.WSGIRequest".msg = "Use `tilavarauspalvelu.typing.WSGIRequest` instead."
+
 "datetime.datetime.now".msg = "Use `utils.date_utils.local_datetime` instead."
 "django.utils.timezone.now".msg = "Use `utils.date_utils.local_datetime` instead."
 "django.utils.timezone.get_default_timezone".msg = "Use `utils.date_utils.DEFAULT_TIMEZONE` instead."
+
+"graphene_django_extensions.typing.GQLInfo".msg = "Use `tilavarauspalvelu.typing.GQLInfo` instead."
+"query_optimizer.typing.GQLInfo".msg = "Use `tilavarauspalvelu.typing.GQLInfo` instead."
+
+"django.contrib.auth.get_user_model".msg = "Use `tilavarauspalvelu.models.User` instead."
 
 [tool.ruff.lint.flake8-import-conventions]
 banned-from = [
