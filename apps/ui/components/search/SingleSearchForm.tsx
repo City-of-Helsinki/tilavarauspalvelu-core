@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { useTranslation } from "next-i18next";
-import { IconSearch, TextInput } from "hds-react";
+import { Checkbox, IconSearch, TextInput } from "hds-react";
 import { type SubmitHandler, useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { addYears, startOfDay } from "date-fns";
@@ -8,7 +8,7 @@ import { TimeRangePicker } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
 import { fromUIDate } from "@/modules/util";
 import { getDurationOptions, participantCountOptions } from "@/modules/const";
-import { Checkbox, DateRangePicker } from "@/components/form";
+import { DateRangePicker } from "@/components/form";
 import { FilterTagList } from "./FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";

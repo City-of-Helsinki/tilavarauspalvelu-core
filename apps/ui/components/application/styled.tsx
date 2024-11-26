@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { Notification } from "hds-react";
-import LabelValue from "../common/LabelValue";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { breakpoints, fontMedium, fontRegular } from "common";
 import { AccordionWithState } from "@/components/Accordion";
@@ -23,8 +22,6 @@ export const StyledNotification = styled(Notification)`
     top: -2px;
   }
 `;
-
-export const StyledLabelValue = styled(LabelValue).attrs({ theme: "thin" })``;
 
 export const ApplicationSection = styled.section`
   display: flex;
