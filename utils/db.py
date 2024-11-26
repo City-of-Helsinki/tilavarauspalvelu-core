@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import ast
-from collections.abc import Iterable
 from inspect import cleandoc
-from typing import Any, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
@@ -22,6 +23,9 @@ __all__ = [
 ]
 
 from lookup_property.converters.utils import ast_attribute, ast_function
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class SubqueryAggregate(models.Subquery):

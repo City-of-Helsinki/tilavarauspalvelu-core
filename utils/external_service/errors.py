@@ -1,9 +1,12 @@
-import json
-from typing import Any
+from __future__ import annotations
 
-from requests import Response
+import json
+from typing import TYPE_CHECKING, Any
 
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from requests import Response
 
 
 class ExternalServiceError(Exception):
