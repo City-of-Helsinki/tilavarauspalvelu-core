@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.auth.hashers import make_password
 
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice

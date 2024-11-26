@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import datetime
 import itertools
 import random
 from decimal import Decimal
 from itertools import cycle
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import requests
 from django.conf import settings
@@ -28,9 +31,7 @@ from tilavarauspalvelu.models import (
     ReservationMetadataField,
     ReservationMetadataSet,
     ReservationPurpose,
-    ReservationUnit,
     ReservationUnitCancellationRule,
-    ReservationUnitImage,
     ReservationUnitPaymentType,
     Service,
     Space,
@@ -65,7 +66,12 @@ from tests.factories import (
     TermsOfUseFactory,
 )
 
-from .utils import FieldCombination, Percentage, PurposeData, SetName, with_logs
+from .utils import FieldCombination, PurposeData, SetName, with_logs
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit, ReservationUnitImage
+
+    from .utils import Percentage
 
 
 @with_logs

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -5,5 +7,5 @@ if TYPE_CHECKING:
 
 
 class ReservationUnitCancellationRuleActions:
-    def __init__(self, reservation_unit_cancellation_rule: "ReservationUnitCancellationRule") -> None:
+    def __init__(self, reservation_unit_cancellation_rule: ReservationUnitCancellationRule) -> None:
         self.reservation_unit_cancellation_rule = reservation_unit_cancellation_rule

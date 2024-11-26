@@ -1,9 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
-from django.db.models import QuerySet
-from django.http import FileResponse
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
@@ -16,8 +18,13 @@ from tilavarauspalvelu.services.csv_export import (
     ApplicationRoundApplicationsCSVExporter,
     ApplicationRoundResultCSVExporter,
 )
-from tilavarauspalvelu.typing import WSGIRequest
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from django.http import FileResponse
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 @admin.register(ApplicationRound)

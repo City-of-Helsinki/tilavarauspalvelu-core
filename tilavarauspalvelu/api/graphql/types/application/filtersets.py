@@ -1,15 +1,22 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import django_filters
-from django.db import models
-from django.db.models import QuerySet
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice
 from tilavarauspalvelu.models import Application
-from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
 from utils.db import text_search
 from utils.utils import log_text_search
+
+if TYPE_CHECKING:
+    from django.db import models
+    from django.db.models import QuerySet
+
+    from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
 
 __all__ = [
     "ApplicationFilterSet",

@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import mjml
 from django.template.loader import get_template
 
-from tilavarauspalvelu.enums import EmailType
-from tilavarauspalvelu.typing import EmailContext
-
 if TYPE_CHECKING:
     from django_jinja.backend import Template
+
+    from tilavarauspalvelu.enums import EmailType
+    from tilavarauspalvelu.typing import EmailContext
 
 
 __all__ = [

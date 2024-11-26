@@ -1,10 +1,14 @@
-from typing import Self
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Self
 
 from django.db import models
 
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationTarget
-from tilavarauspalvelu.typing import AnyUser
 from utils.db import NowTT
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "BANNER_LEVEL_SORT_ORDER",

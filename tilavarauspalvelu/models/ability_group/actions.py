@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -5,5 +7,5 @@ if TYPE_CHECKING:
 
 
 class AbilityGroupActions:
-    def __init__(self, ability_group: "AbilityGroup") -> None:
+    def __init__(self, ability_group: AbilityGroup) -> None:
         self.ability_group = ability_group

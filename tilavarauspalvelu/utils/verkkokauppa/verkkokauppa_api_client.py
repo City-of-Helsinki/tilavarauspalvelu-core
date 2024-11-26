@@ -1,8 +1,9 @@
-import uuid
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
-from requests import RequestException, Response
+from requests import RequestException
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
 from tilavarauspalvelu.utils.verkkokauppa import constants as verkkokauppa_constants
@@ -13,19 +14,14 @@ from tilavarauspalvelu.utils.verkkokauppa.merchants.exceptions import (
     ParseMerchantError,
     UpdateMerchantError,
 )
-from tilavarauspalvelu.utils.verkkokauppa.merchants.types import (
-    CreateMerchantParams,
-    Merchant,
-    MerchantInfo,
-    UpdateMerchantParams,
-)
+from tilavarauspalvelu.utils.verkkokauppa.merchants.types import Merchant, MerchantInfo
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import (
     CancelOrderError,
     CreateOrderError,
     GetOrderError,
     ParseOrderError,
 )
-from tilavarauspalvelu.utils.verkkokauppa.order.types import CreateOrderParams, Order
+from tilavarauspalvelu.utils.verkkokauppa.order.types import Order
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import (
     GetPaymentError,
     GetRefundStatusError,
@@ -41,15 +37,19 @@ from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import (
     ParseAccountingError,
     ParseProductError,
 )
-from tilavarauspalvelu.utils.verkkokauppa.product.types import (
-    Accounting,
-    CreateOrUpdateAccountingParams,
-    CreateProductParams,
-    Product,
-)
+from tilavarauspalvelu.utils.verkkokauppa.product.types import Accounting, Product
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    import uuid
+
+    from requests import Response
+
+    from tilavarauspalvelu.utils.verkkokauppa.merchants.types import CreateMerchantParams, UpdateMerchantParams
+    from tilavarauspalvelu.utils.verkkokauppa.order.types import CreateOrderParams
+    from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
 
 __all__ = [
     "VerkkokauppaAPIClient",

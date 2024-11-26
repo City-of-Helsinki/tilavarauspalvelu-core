@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib import admin
 from import_export.admin import ExportMixin
 from import_export.formats.base_formats import CSV

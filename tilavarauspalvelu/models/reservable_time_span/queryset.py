@@ -1,9 +1,13 @@
-import datetime
-from typing import Self
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Self
 
 from django.db import models
 
 from utils.date_utils import normalize_as_datetime
+
+if TYPE_CHECKING:
+    import datetime
 
 __all__ = [
     "ReservableTimeSpanManager",

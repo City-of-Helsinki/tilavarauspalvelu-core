@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -5,5 +7,5 @@ if TYPE_CHECKING:
 
 
 class ReservationUnitOptionActions:
-    def __init__(self, reservation_unit_options: "ReservationUnitOption") -> None:
+    def __init__(self, reservation_unit_options: ReservationUnitOption) -> None:
         self.reservation_unit_options = reservation_unit_options

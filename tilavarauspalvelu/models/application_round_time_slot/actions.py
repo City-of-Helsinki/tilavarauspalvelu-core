@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -5,5 +7,5 @@ if TYPE_CHECKING:
 
 
 class ApplicationRoundTimeSlotActions:
-    def __init__(self, application_round_time_slot: "ApplicationRoundTimeSlot") -> None:
+    def __init__(self, application_round_time_slot: ApplicationRoundTimeSlot) -> None:
         self.application_round_time_slot = application_round_time_slot

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -5,5 +7,5 @@ if TYPE_CHECKING:
 
 
 class TaxPercentageActions:
-    def __init__(self, tax_percentage: "TaxPercentage") -> None:
+    def __init__(self, tax_percentage: TaxPercentage) -> None:
         self.tax_percentage = tax_percentage

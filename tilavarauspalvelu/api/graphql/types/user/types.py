@@ -1,4 +1,6 @@
-import datetime
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import graphene
 from django.db.models import Value
@@ -8,9 +10,13 @@ from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.models import User
 from tilavarauspalvelu.tasks import save_personal_info_view_log
-from tilavarauspalvelu.typing import GQLInfo
 
 from .permissions import UserPermission
+
+if TYPE_CHECKING:
+    import datetime
+
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "ApplicantNode",

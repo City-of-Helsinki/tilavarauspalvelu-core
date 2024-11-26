@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import uuid
 from dataclasses import dataclass
 from typing import Any
@@ -27,7 +29,7 @@ class Product:
     merchant_id: uuid.UUID
 
     @classmethod
-    def from_json(cls, json: dict[str, Any]) -> "Product":
+    def from_json(cls, json: dict[str, Any]) -> Product:
         try:
             return Product(
                 product_id=uuid.UUID(json["productId"]),
@@ -89,7 +91,7 @@ class Accounting:
     balance_profit_center: str
 
     @classmethod
-    def from_json(cls, json: dict[str, Any]) -> "Accounting":
+    def from_json(cls, json: dict[str, Any]) -> Accounting:
         try:
             return Accounting(
                 product_id=json["productId"],

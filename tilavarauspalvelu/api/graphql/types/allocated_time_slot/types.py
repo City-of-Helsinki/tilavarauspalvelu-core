@@ -1,13 +1,20 @@
-from django.db import models
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice
 from tilavarauspalvelu.models import AllocatedTimeSlot
-from tilavarauspalvelu.typing import GQLInfo
 
 from .filtersets import AllocatedTimeSlotFilterSet
 from .permissions import AllocatedTimeSlotPermission
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "AllocatedTimeSlotNode",

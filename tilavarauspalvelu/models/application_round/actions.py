@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -10,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class ApplicationRoundActions:
-    def __init__(self, application_round: "ApplicationRound") -> None:
+    def __init__(self, application_round: ApplicationRound) -> None:
         self.application_round = application_round
 
     def reset_application_round_allocation(self) -> None:

@@ -1,15 +1,16 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any, Self
 
 from graphene_django_extensions import UpdateMutation
 from graphene_django_extensions.bases import DjangoMutation
-
-from tilavarauspalvelu.typing import GQLInfo
 
 from .permissions import UserPermission, UserStaffPermission
 from .serializers import CurrentUserUpdateSerializer, UserStaffUpdateSerializer
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "CurrentUserUpdateMutation",

@@ -1,8 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import django_filters
 from graphene_django_extensions import ModelFilterSet
 
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
-from tilavarauspalvelu.models.banner_notification.queryset import BannerNotificationQuerySet
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models.banner_notification.queryset import BannerNotificationQuerySet
 
 __all__ = [
     "BannerNotificationFilterSet",

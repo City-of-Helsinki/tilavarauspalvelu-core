@@ -1,6 +1,11 @@
-import datetime
+from __future__ import annotations
 
-from tilavarauspalvelu.models import ReservableTimeSpan
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import datetime
+
+    from tilavarauspalvelu.models import ReservableTimeSpan
 
 
 def can_reserve_based_on_opening_hours(

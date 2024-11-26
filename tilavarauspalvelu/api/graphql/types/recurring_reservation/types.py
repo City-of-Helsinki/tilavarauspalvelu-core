@@ -1,12 +1,19 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
-from django.db import models
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import RecurringReservation
-from tilavarauspalvelu.typing import GQLInfo
 
 from .filtersets import RecurringReservationFilterSet
 from .permissions import RecurringReservationPermission
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "RecurringReservationNode",

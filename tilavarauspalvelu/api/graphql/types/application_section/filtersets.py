@@ -1,8 +1,9 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import django_filters
 from django.db import models
-from django.db.models import QuerySet
 from django.db.models.functions import Lower
 from graphene_django_extensions.filters import (
     EnumMultipleChoiceFilter,
@@ -19,9 +20,13 @@ from tilavarauspalvelu.enums import (
     Priority,
 )
 from tilavarauspalvelu.models import ApplicationSection
-from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
 from utils.db import text_search
 from utils.utils import log_text_search
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
+    from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
 
 __all__ = [
     "ApplicationSectionFilterSet",

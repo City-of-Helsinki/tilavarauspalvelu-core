@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -5,5 +7,5 @@ if TYPE_CHECKING:
 
 
 class PurposeActions:
-    def __init__(self, purpose: "Purpose") -> None:
+    def __init__(self, purpose: Purpose) -> None:
         self.purpose = purpose

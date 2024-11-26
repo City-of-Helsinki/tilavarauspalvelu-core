@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 

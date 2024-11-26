@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 from rest_framework import viewsets
-from rest_framework.request import Request
 from rest_framework.response import Response
 
 from tilavarauspalvelu.enums import OrderStatus
@@ -18,6 +19,8 @@ from .serializers import WebhookOrderCancelSerializer, WebhookPaymentSerializer,
 
 if TYPE_CHECKING:
     import uuid
+
+    from rest_framework.request import Request
 
 
 class WebhookOrderPaidViewSet(viewsets.GenericViewSet):

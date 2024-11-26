@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import datetime
 import random
+from typing import TYPE_CHECKING
 
 from django.db import models
 
@@ -11,26 +14,16 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
-    TermsOfUseTypeChoices,
     WeekdayChoice,
 )
 from tilavarauspalvelu.models import (
-    AgeGroup,
-    City,
-    OriginHaukiResource,
     PaymentOrder,
-    RecurringReservation,
     RejectedOccurrence,
     Reservation,
     ReservationCancelReason,
     ReservationDenyReason,
-    ReservationMetadataSet,
-    ReservationPurpose,
     ReservationUnit,
-    ReservationUnitCancellationRule,
     ReservationUnitPricing,
-    TaxPercentage,
-    TermsOfUse,
     User,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, combine, get_date_range, get_periods_between, local_date, local_datetime
@@ -41,7 +34,23 @@ from tests.factories.reservation import NextDateError, ReservationBuilder
 
 from .create_reservation_related_things import _create_cancel_reasons, _create_deny_reasons
 from .create_reservation_units import _create_reservation_unit_for_recurring_reservations
-from .utils import SetName, weighted_choice, with_logs
+from .utils import weighted_choice, with_logs
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+    from tilavarauspalvelu.models import (
+        AgeGroup,
+        City,
+        OriginHaukiResource,
+        RecurringReservation,
+        ReservationMetadataSet,
+        ReservationPurpose,
+        ReservationUnitCancellationRule,
+        TaxPercentage,
+        TermsOfUse,
+    )
+
+    from .utils import SetName
 
 
 @with_logs

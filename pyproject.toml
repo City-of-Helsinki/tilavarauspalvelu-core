@@ -269,7 +269,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^na
     "SLF",      # Allow accessing private members in tests
     "TID251"    # Can use banned imports here (e.g. datetime.datetime.now)
 ]
-"tilavarauspalvelu/*"       = ["I002"]  # missing-required-import
+"tilavarauspalvelu/api/graphql/types/application_round_time_slot/types.py" = ["I002"]  # FIXME Somehow importing `TYPE_CHECKING` to this file causes ImportError for `tilavarauspalvelu.api.graphql.schema.schema`
 "local_settings.py"         = ["I002"]  # missing-required-import
 "local_settings_example.py" = ["I002"]  # missing-required-import
 "manage.py"                 = ["I002"]  # missing-required-import

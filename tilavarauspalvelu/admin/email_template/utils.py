@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.integrations.email.template_context import (
@@ -18,8 +21,10 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_staff_notification_reservation_requires_handling,
     get_context_for_user_anonymization,
 )
-from tilavarauspalvelu.typing import EmailContext, Lang
 from utils.date_utils import local_datetime
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
     "get_mock_data",

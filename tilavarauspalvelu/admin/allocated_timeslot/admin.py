@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
-from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
@@ -12,7 +15,11 @@ from tilavarauspalvelu.admin.allocated_timeslot.filters import (
 )
 from tilavarauspalvelu.admin.allocated_timeslot.form import AllocatedTimeSlotAdminForm
 from tilavarauspalvelu.models import AllocatedTimeSlot
-from tilavarauspalvelu.typing import WSGIRequest
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 @admin.register(AllocatedTimeSlot)

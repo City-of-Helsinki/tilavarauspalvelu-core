@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import itertools
 import random
@@ -17,21 +19,12 @@ from tilavarauspalvelu.enums import (
     TermsOfUseTypeChoices,
 )
 from tilavarauspalvelu.models import (
-    OriginHaukiResource,
-    PaymentAccounting,
-    PaymentMerchant,
     PaymentProduct,
-    ReservationMetadataSet,
     ReservationUnit,
-    ReservationUnitCancellationRule,
     ReservationUnitImage,
-    ReservationUnitPaymentType,
     ReservationUnitPricing,
-    ReservationUnitType,
     Resource,
     Space,
-    TaxPercentage,
-    TermsOfUse,
     Unit,
 )
 from tilavarauspalvelu.tasks import create_reservation_unit_thumbnails_and_urls
@@ -67,7 +60,6 @@ from .utils import (
     HandlingInfo,
     PaidReservationUnitData,
     PaymentTypeInfo,
-    Percentage,
     PriceInfo,
     ReservableWindowInfo,
     ReservationKindInfo,
@@ -82,6 +74,20 @@ from .utils import (
 
 if TYPE_CHECKING:
     from django.db import models
+
+    from tilavarauspalvelu.models import (
+        OriginHaukiResource,
+        PaymentAccounting,
+        PaymentMerchant,
+        ReservationMetadataSet,
+        ReservationUnitCancellationRule,
+        ReservationUnitPaymentType,
+        ReservationUnitType,
+        TaxPercentage,
+        TermsOfUse,
+    )
+
+    from .utils import Percentage
 
 
 @with_logs

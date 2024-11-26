@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from graphene_django_extensions.filters import IntMultipleChoiceFilter, ModelFilterSet
 
 from tilavarauspalvelu.models import ReservationUnitOption

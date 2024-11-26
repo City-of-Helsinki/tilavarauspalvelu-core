@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from rest_framework import routers
 
 from .views import WebhookOrderCancelViewSet, WebhookOrderPaidViewSet, WebhookRefundViewSet

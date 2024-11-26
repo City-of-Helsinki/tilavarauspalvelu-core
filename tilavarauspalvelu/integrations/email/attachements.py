@@ -1,6 +1,12 @@
-from tilavarauspalvelu.models import Reservation
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from tilavarauspalvelu.typing import EmailAttachment
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Reservation
 
 __all__ = [
     "get_reservation_ical_attachment",

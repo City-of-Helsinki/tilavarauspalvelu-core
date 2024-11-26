@@ -1,11 +1,16 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.errors import GQLCodeError
 from graphene_django_extensions.permissions import BasePermission
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.models import ReservationUnit, Unit
-from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import Unit
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ReservationUnit
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "ReservationUnitAllPermission",

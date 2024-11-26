@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import re
 from typing import TYPE_CHECKING
 
 import django_filters
 from django.db import models
-from django.db.models import Case, CharField, F, Q, QuerySet, Value, When
+from django.db.models import Case, CharField, F, Q, Value, When
 from django.db.models.functions import Concat
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
@@ -21,6 +23,8 @@ from utils.db import text_search
 from utils.utils import log_text_search
 
 if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
     from tilavarauspalvelu.typing import AnyUser
 
 EMAIL_DOMAIN_PATTERN = re.compile(r"^@\w[.\w]{0,254}$")

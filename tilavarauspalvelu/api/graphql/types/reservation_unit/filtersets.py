@@ -1,16 +1,16 @@
+from __future__ import annotations
+
 import base64
 from typing import TYPE_CHECKING, Any
 
 import django_filters
-from django.db import models
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 from elasticsearch_django.models import SearchQuery
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
 from tilavarauspalvelu.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.models import ReservationUnit
-from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
 from utils.elasticsearch import build_elastic_query_str
 from utils.utils import log_text_search
 
@@ -18,8 +18,11 @@ if TYPE_CHECKING:
     import datetime
     from decimal import Decimal
 
+    from django.db import models
+    from django.db.models import QuerySet
     from query_optimizer.validators import PaginationArgs
 
+    from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
     from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [

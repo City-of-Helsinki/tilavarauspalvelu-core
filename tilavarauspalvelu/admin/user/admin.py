@@ -1,13 +1,19 @@
+from __future__ import annotations
+
 import datetime
+from typing import TYPE_CHECKING
 
 from django.contrib import admin
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.models import GeneralRole, UnitRole, User
-from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.helauth.typing import LoginMethod
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class GeneralRoleInlineAdmin(admin.TabularInline):

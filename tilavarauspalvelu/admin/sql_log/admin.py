@@ -1,15 +1,23 @@
-import uuid
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from django import forms
 from django.contrib import admin
-from django.utils.safestring import SafeString, mark_safe
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateTimeRangeFilter
 
 from tilavarauspalvelu.admin.helpers import ImmutableModelAdmin
 from tilavarauspalvelu.models.sql_log.model import SQLLog
-from tilavarauspalvelu.models.sql_log.queryset import SQLLogQuerySet
-from tilavarauspalvelu.typing import WSGIRequest
+
+if TYPE_CHECKING:
+    import uuid
+
+    from django.utils.safestring import SafeString
+
+    from tilavarauspalvelu.models.sql_log.queryset import SQLLogQuerySet
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class SQLLogAdminInlineForm(forms.ModelForm):

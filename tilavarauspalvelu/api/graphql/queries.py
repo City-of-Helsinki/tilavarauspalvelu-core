@@ -5,6 +5,8 @@ Note that the type should be imported here even if it's not imported to `schema.
 simply so that it's registered before any mutations.
 """
 
+from __future__ import annotations
+
 from .types.ability_group.types import AbilityGroupNode
 from .types.address.types import AddressNode
 from .types.age_group.types import AgeGroupNode

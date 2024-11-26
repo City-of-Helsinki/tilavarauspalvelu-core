@@ -1,8 +1,14 @@
-from django.db.models import QuerySet
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from tilavarauspalvelu.models import ReservationUnitType
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 __all__ = [
     "ReservationUnitTypeFilterSet",

@@ -1,8 +1,12 @@
-from typing import Protocol
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Protocol
 
 import django_filters
-from django.db.models import QuerySet
 from django_filters.constants import EMPTY_VALUES
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 
 class OrderingFunc(Protocol):

@@ -1,11 +1,10 @@
-import datetime
-from collections.abc import Collection
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 import graphene
 from django.conf import settings
 from django.contrib.auth import logout
-from django.db import models
 from graphene import Field
 from graphene_django.debug import DjangoDebug
 from graphene_django_extensions.errors import GQLNotFoundError
@@ -15,9 +14,7 @@ from query_optimizer.compiler import optimize
 from tilavarauspalvelu.enums import UserPermissionChoice
 from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, Reservation, User
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
-from tilavarauspalvelu.typing import GQLInfo
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
-from tilavarauspalvelu.utils.helauth.typing import UserProfileInfo
 
 from .mutations import (
     AllocatedTimeSlotCreateMutation,
@@ -126,7 +123,13 @@ from .queries import (
 from .types.merchants.permissions import PaymentOrderPermission
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import AnyUser
+    import datetime
+    from collections.abc import Collection
+
+    from django.db import models
+
+    from tilavarauspalvelu.typing import AnyUser, GQLInfo
+    from tilavarauspalvelu.utils.helauth.typing import UserProfileInfo
 
 
 class Query(graphene.ObjectType):

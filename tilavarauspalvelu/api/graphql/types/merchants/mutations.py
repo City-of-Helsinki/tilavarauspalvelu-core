@@ -1,17 +1,22 @@
-import uuid
-from typing import Any, NamedTuple
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 from graphene_django_extensions.bases import DjangoMutation
 
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.models import PaymentOrder
-from tilavarauspalvelu.typing import GQLInfo
 from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
 from utils.sentry import SentryLogger
 
 from .permissions import OrderRefreshPermission
 from .serializers import RefreshOrderInputSerializer, RefreshOrderOutputSerializer
+
+if TYPE_CHECKING:
+    import uuid
+
+    from tilavarauspalvelu.typing import GQLInfo
 
 
 class RefreshOrderMutationOutput(NamedTuple):

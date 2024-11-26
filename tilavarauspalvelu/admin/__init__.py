@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .ability_group.admin import AbilityGroupAdmin
 from .address.admin import AddressAdmin
 from .age_group.admin import AgeGroupAdmin

@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
 from tilavarauspalvelu.models import UnitGroup
-from tilavarauspalvelu.typing import WSGIRequest
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "UnitGroupAdmin",
