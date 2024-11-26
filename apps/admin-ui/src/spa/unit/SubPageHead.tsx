@@ -19,27 +19,20 @@ const Name = styled.p`
   margin: 0;
 `;
 
-// TODO use Flex
-const AddressSection = styled(Flex).attrs({
-  $gap: "xs",
-  $align: "center",
-  $direction: "row",
-})``;
-
 export function SubPageHead({ title, unit }: IProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
-    <div>
-      <H1>{title}</H1>
-      <AddressSection>
+    <>
+      <H1 $noMargin>{title}</H1>
+      <Flex $gap="xs" $align="center" $direction="row">
         <IconLocation aria-hidden="true" />
         <div>
           <Name>{unit?.nameFi}</Name>
           <span>{t("Unit.address")}</span>:{" "}
           <span>{formatAddress(unit.location)}</span>
         </div>
-      </AddressSection>
-    </div>
+      </Flex>
+    </>
   );
 }

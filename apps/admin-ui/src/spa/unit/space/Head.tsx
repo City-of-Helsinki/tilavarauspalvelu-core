@@ -55,7 +55,7 @@ export function Head({
 
   return (
     <div>
-      <H1>{title}</H1>
+      <H1 $noMargin>{title}</H1>
       <Address>
         {unit?.location
           ? formatAddress(unit?.location)

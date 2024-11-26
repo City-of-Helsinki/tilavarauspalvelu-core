@@ -24,6 +24,7 @@ import {
 import { base64encode } from "common/src/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { LinkPrev } from "@/component/LinkPrev";
 
 const Form = styled.form`
   display: flex;
@@ -129,16 +130,17 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
       });
       successToast({
         text: t("SpaceEditor.spaceUpdatedNotification"),
-        label: t("SpaceEditor.spaceUpdated"),
       });
       refetch();
+      history(-1);
     } catch (e) {
       errorToast({ text: t("SpaceEditor.saveFailed") });
     }
   };
 
   return (
-    <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+    <>
+      <LinkPrev route="../.." />
       <Head
         title={data?.space?.parent?.nameFi || t("SpaceEditor.noParent")}
         space={data?.space}
@@ -146,50 +148,52 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
         surfaceArea={watch("surfaceArea") || undefined}
       />
       <H2 $noMargin>{t("SpaceEditor.details")}</H2>
-      <FormErrorSummary errors={errors} />
-      <Section>
-        <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
-        <SpaceHierarchy space={data?.space} />
-        <Controller
-          control={control}
-          name="parent"
-          render={({ field: { onChange, value } }) => (
-            <ParentSelector
-              helperText={t("SpaceModal.page1.parentHelperText")}
-              label={t("SpaceModal.page1.parentLabel")}
-              onChange={(parentPk) => onChange(parentPk)}
-              value={value}
-              placeholder={t("SpaceModal.page1.parentPlaceholder")}
-              unitPk={unit}
-              selfPk={space}
-            />
-          )}
-        />
-      </Section>
-      <Section>
-        <SubHeading>{t("SpaceEditor.other")}</SubHeading>
-        <SpaceForm form={form} />
-      </Section>
-      <ButtonContainer>
-        <Button
-          variant="secondary"
-          theme="black"
-          type="button"
-          onClick={() => history(-1)}
-          disabled={isMutationLoading}
-        >
-          {t("SpaceEditor.cancel")}
-        </Button>
-        <Button
-          disabled={!isDirty}
-          variant="primary"
-          type="submit"
-          isLoading={isMutationLoading}
-        >
-          {t("SpaceEditor.save")}
-        </Button>
-      </ButtonContainer>
-    </Form>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <FormErrorSummary errors={errors} />
+        <Section>
+          <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
+          <SpaceHierarchy space={data?.space} />
+          <Controller
+            control={control}
+            name="parent"
+            render={({ field: { onChange, value } }) => (
+              <ParentSelector
+                helperText={t("SpaceModal.page1.parentHelperText")}
+                label={t("SpaceModal.page1.parentLabel")}
+                onChange={(parentPk) => onChange(parentPk)}
+                value={value}
+                placeholder={t("SpaceModal.page1.parentPlaceholder")}
+                unitPk={unit}
+                selfPk={space}
+              />
+            )}
+          />
+        </Section>
+        <Section>
+          <SubHeading>{t("SpaceEditor.other")}</SubHeading>
+          <SpaceForm form={form} />
+        </Section>
+        <ButtonContainer>
+          <Button
+            variant="secondary"
+            theme="black"
+            type="button"
+            onClick={() => history(-1)}
+            disabled={isMutationLoading}
+          >
+            {t("SpaceEditor.cancel")}
+          </Button>
+          <Button
+            disabled={!isDirty}
+            variant="primary"
+            type="submit"
+            isLoading={isMutationLoading}
+          >
+            {t("SpaceEditor.save")}
+          </Button>
+        </ButtonContainer>
+      </Form>
+    </>
   );
 }
 

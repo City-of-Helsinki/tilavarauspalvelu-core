@@ -1,12 +1,14 @@
 import styled from "styled-components";
 import { Tag } from "hds-react";
 import type { StatusLabelType as HDSStatusLabelType } from "hds-react";
+import { Flex } from "../styles/util";
 
-export const FilterTags = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--spacing-s);
+export const FilterTags = styled(Flex).attrs({
+  $gap: "s",
+  $direction: "row",
+  $wrap: "wrap",
+  $align: "center",
+})`
   flex-grow: 1;
 `;
 

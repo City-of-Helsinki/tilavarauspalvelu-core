@@ -16,6 +16,7 @@ import { errorToast } from "common/src/common/toast";
 import Error404 from "@/common/Error404";
 import { fontBold, H2 } from "common";
 import { Flex } from "common/styles/util";
+import { LinkPrev } from "@/component/LinkPrev";
 
 interface IProps {
   [key: string]: string;
@@ -92,6 +93,7 @@ function SpacesResources(): JSX.Element {
           refetch={refetch}
         />
       </Modal>
+      <LinkPrev />
       <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
       <TableHead>
         <H2 $noMargin>{t("Unit.spaces")}</H2>

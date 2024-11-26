@@ -23,6 +23,7 @@ import {
   type ResourceUpdateForm,
 } from "./modules/resourceEditor";
 import { ResourceEditorFields } from "./EditForm";
+import { LinkPrev } from "@/component/LinkPrev";
 
 type Props = {
   resourcePk?: number;
@@ -106,8 +107,8 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
       successToast({
         text: t("ResourceEditor.resourceUpdatedNotification"),
-        label: t("ResourceEditor.resourceUpdated"),
       });
+      refetch();
       history(-1);
     } catch (error) {
       errorToast({ text: t("ResourceModal.saveError") });
@@ -119,6 +120,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 
   return (
     <>
+      <LinkPrev route="../.." />
       <SubPageHead
         unit={unit}
         title={resource.nameFi || t("ResourceEditor.defaultHeading")}
