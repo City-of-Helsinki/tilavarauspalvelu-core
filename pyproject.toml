@@ -269,7 +269,6 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^na
     "SLF",      # Allow accessing private members in tests
     "TID251"    # Can use banned imports here (e.g. datetime.datetime.now)
 ]
-"config/*"                  = ["I002"]  # missing-required-import
 "tilavarauspalvelu/*"       = ["I002"]  # missing-required-import
 "local_settings.py"         = ["I002"]  # missing-required-import
 "local_settings_example.py" = ["I002"]  # missing-required-import

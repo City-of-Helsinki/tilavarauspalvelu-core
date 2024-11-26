@@ -1,6 +1,12 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from auditlog.registry import auditlog
 from django.conf import settings
-from django.db.models.base import ModelBase
+
+if TYPE_CHECKING:
+    from django.db.models.base import ModelBase
 
 
 class AuditLogger:
