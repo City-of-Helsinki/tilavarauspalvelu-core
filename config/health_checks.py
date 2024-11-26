@@ -37,7 +37,7 @@ class RedisSentinelHealthCheck(BaseHealthCheckBackend):
             self.add_error(ServiceUnavailable("Unable to connect to Redis: Timeout."), error)
         except exceptions.ConnectionError as error:
             self.add_error(ServiceUnavailable("Unable to connect to Redis: Connection Error"), error)
-        except BaseException as error:
+        except BaseException as error:  # noqa: BLE001
             self.add_error(ServiceUnavailable("Unknown error"), error)
         else:
             logger.debug("Connection established. Redis sentinel is healthy.")

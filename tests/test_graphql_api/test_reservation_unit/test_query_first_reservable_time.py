@@ -2516,7 +2516,7 @@ def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql
     #  8) Fetch reservation units for response
     try:
         response.assert_query_count(8)  # Locally only 8 queries are made
-    except BaseException:
+    except BaseException:  # noqa: BLE001
         response.assert_query_count(10)  # In CI, sometimes 10 queries are made, but we don't know why. This is fine.
 
 

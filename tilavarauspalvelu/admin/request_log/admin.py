@@ -125,7 +125,7 @@ class RequestLogAdmin(ImmutableModelAdmin):
         try:
             exporter = SQLLogCSVExporter(queryset=queryset)
             response = exporter.to_file_response()
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001
             self.message_user(request, f"Error while exporting results: {error}", level=messages.ERROR)
             SentryLogger.log_exception(error, "Error while exporting SQL log results")
             return None

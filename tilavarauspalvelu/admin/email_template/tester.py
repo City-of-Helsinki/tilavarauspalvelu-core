@@ -38,7 +38,7 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
 
     try:
         email_type = EmailType(email_type)
-    except Exception:
+    except ValueError:
         return HttpResponse(f"Invalid email type: {email_type}")
 
     tester_form_class = select_tester_form(email_type=email_type)

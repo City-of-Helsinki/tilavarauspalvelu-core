@@ -10,7 +10,7 @@ __all__ = [
 def get_reservation_ical_attachment(reservation: Reservation) -> EmailAttachment | None:
     try:
         ical = reservation.actions.to_ical()
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         SentryLogger.log_exception(exc, "Failed to generate iCal attachment for reservation email.")
         return None
 

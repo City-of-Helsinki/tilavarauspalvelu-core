@@ -69,7 +69,7 @@ def email_templates_admin_list_view(request: WSGIRequest, **kwargs: Any) -> Tabl
 def email_type_admin_view(request: WSGIRequest, email_type: str) -> HttpResponse:
     try:
         email_type = EmailType(email_type)
-    except Exception:
+    except ValueError:
         return HttpResponse("Invalid email type")
 
     as_html = request.GET.get("text", "false").lower() not in {"true", "1", "t"}

@@ -79,7 +79,7 @@ class IDToken:
 
         try:
             payload = get_jwt_payload(token)
-        except Exception:
+        except Exception:  # noqa: BLE001
             return None
 
         return cls(

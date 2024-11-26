@@ -41,7 +41,7 @@ class ReservationCreateSerializer(ReservationBaseSaveSerializer):
             prefill_info = HelsinkiProfileClient.get_reservation_prefill_info(user=user, session=request.session)
         except ExternalServiceError:
             return
-        except Exception as error:
+        except Exception as error:  # noqa: BLE001
             msg = "Unexpected error reading profile data"
             SentryLogger.log_exception(error, details=msg, user=user.pk)
             return
