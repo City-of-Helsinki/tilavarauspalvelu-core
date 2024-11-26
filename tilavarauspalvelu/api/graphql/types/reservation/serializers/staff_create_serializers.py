@@ -211,7 +211,7 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
 
         return data
 
-    def validate_type(self, reservation_type):
+    def validate_type(self, reservation_type: str) -> str:
         allowed_types = [
             ReservationTypeChoice.BLOCKED.value,
             ReservationTypeChoice.STAFF.value,

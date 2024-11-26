@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 from pathlib import Path
@@ -10,7 +12,7 @@ BASE_PATH = str(Path(__file__).resolve().parent.parent)
 
 
 class TVPFormatter(logging.Formatter):
-    def format(self, record):
+    def format(self, record: logging.LogRecord) -> str:
         extra = {"dotpath": self.get_dotpath(record), "url": "-", "headers": "-", "user_id": "-"}
         if hasattr(record, "request"):
             request: WSGIRequest = record.request

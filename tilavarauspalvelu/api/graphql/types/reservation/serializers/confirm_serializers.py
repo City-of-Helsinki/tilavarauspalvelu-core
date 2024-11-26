@@ -48,7 +48,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
     class Meta(ReservationUpdateSerializer.Meta):
         fields = ["payment_type", *ReservationUpdateSerializer.Meta.fields]
 
-    def _get_default_payment_type(self):
+    def _get_default_payment_type(self) -> PaymentType:
         reservation_unit = self.instance.reservation_units.first()
         payment_types = reservation_unit.payment_types
 
@@ -72,7 +72,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
             msg = "Reservation cannot be changed anymore because it is attached to a payment order"
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.CHANGES_NOT_ALLOWED)
 
-    def check_reservation_units_count(self):
+    def check_reservation_units_count(self) -> None:
         if self.instance.reservation_units.count() > 1:
             msg = "Reservations with multiple reservation units are not supported."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.MULTIPLE_RESERVATION_UNITS)
@@ -106,7 +106,7 @@ class ReservationConfirmSerializer(ReservationUpdateSerializer):
         return data
 
     @property
-    def validated_data(self):
+    def validated_data(self) -> dict[str, Any]:
         validated_data = super().validated_data
         payment_type = validated_data.get("payment_type", "").upper()
 

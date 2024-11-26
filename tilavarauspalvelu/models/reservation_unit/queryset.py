@@ -114,7 +114,7 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
         return self.filter(is_draft=False, is_archived=False)
 
     @property
-    def _is_visible(self):
+    def _is_visible(self) -> Q:
         return (
             Q(publish_begins__lte=NowTT())  #
             | Q(publish_begins__isnull=True)

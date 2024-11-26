@@ -40,7 +40,7 @@ class ReservationUnitInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None) -> bool:
         return False
 
-    def reservation_unit_link(self, obj):
+    def reservation_unit_link(self, obj) -> str:
         url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=(obj.pk,))
 
         return format_html(f"<a href={url}>{obj.name_fi}</a>")
@@ -205,7 +205,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
     def reservation_state(self, obj: ReservationUnit) -> str:
         return obj.reservation_state
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: WSGIRequest) -> models.QuerySet[ReservationUnit]:
         return (
             super()
             .get_queryset(request)

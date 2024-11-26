@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Any
+
 from django import forms
 from django.contrib import admin
 from django.core.exceptions import ValidationError
@@ -15,7 +19,7 @@ class ReservationMetadataSetForm(forms.ModelForm):
             "required_fields",
         ]
 
-    def clean(self):
+    def clean(self) -> dict[str, Any]:
         supported = set(self.cleaned_data.get("supported_fields"))
         required = set(self.cleaned_data.get("required_fields"))
         if not required.issubset(supported):

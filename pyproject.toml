@@ -299,15 +299,20 @@ section-order = [
 sections.testing = ["tests"]
 
 [tool.ruff.lint.flake8-annotations]
-allow-star-arg-any = true
-ignore-fully-untyped = true
-mypy-init-return = true
 suppress-dummy-args = true
-suppress-none-returning = true
 
 [tool.ruff.lint.flake8-type-checking]
 strict = true
 quote-annotations = false
+exempt-modules = [
+    "typing",
+    "ast",
+    "lookup_property",
+    "graphql",
+    "graphene_django",
+    "graphene_django_extensions",
+    "tilavarauspalvelu.api.graphql",
+]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "django.core.handlers.wsgi.WSGIRequest".msg = "Use `tilavarauspalvelu.typing.WSGIRequest` instead."

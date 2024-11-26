@@ -300,7 +300,7 @@ class HaukiResourceState(models.TextChoices):
     MAINTENANCE = "maintenance", pgettext_lazy("HaukiResourceState", "Maintenance")
 
     @classmethod
-    def accessible_states(cls):
+    def accessible_states(cls) -> list[HaukiResourceState]:
         """
         States indicating the space can be accessed in some way,
         whether the access is restricted (e.g. via key or reservation)
@@ -317,7 +317,7 @@ class HaukiResourceState(models.TextChoices):
         ]
 
     @classmethod
-    def reservable_states(cls):
+    def reservable_states(cls) -> list[HaukiResourceState]:
         """States indicating the space can be reserved in some way."""
         return [
             cls.OPEN_AND_RESERVABLE,
@@ -326,7 +326,7 @@ class HaukiResourceState(models.TextChoices):
         ]
 
     @classmethod
-    def closed_states(cls):
+    def closed_states(cls) -> list[HaukiResourceState | None]:
         """States indicating the space is closed and inaccessible."""
         return [
             None,
@@ -349,7 +349,7 @@ class HaukiResourceState(models.TextChoices):
         return self in HaukiResourceState.closed_states()
 
     @classmethod
-    def get(cls, state):
+    def get(cls, state: str) -> HaukiResourceState:
         try:
             return HaukiResourceState(state)
         except ValueError:
@@ -916,14 +916,14 @@ class ApplicationStatusChoice(models.TextChoices):
         return self == ApplicationStatusChoice.IN_ALLOCATION
 
     @DynamicClassAttribute
-    def can_send(self):
+    def can_send(self) -> bool:
         return self in {
             ApplicationStatusChoice.DRAFT,
             ApplicationStatusChoice.RECEIVED,
         }
 
     @DynamicClassAttribute
-    def can_cancel(self):
+    def can_cancel(self) -> bool:
         return self in {
             ApplicationStatusChoice.DRAFT,
             ApplicationStatusChoice.RECEIVED,

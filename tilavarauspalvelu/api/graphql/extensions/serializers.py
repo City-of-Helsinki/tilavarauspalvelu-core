@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 from graphene.utils.str_converters import to_camel_case
 from graphql import GraphQLError
 from rest_framework import serializers
 from rest_framework.exceptions import ErrorDetail
+
+if TYPE_CHECKING:
+    from django.db import models
 
 
 class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
@@ -15,7 +20,7 @@ class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
                 msg = f"Wrong type of id: {identifier} for {field_name}"
                 raise GraphQLError(msg) from err
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data: Any) -> Any:
         try:
             int_val = super().to_internal_value(data)
         except serializers.ValidationError as err:
@@ -56,12 +61,12 @@ class OldPrimaryKeySerializerBase(serializers.ModelSerializer):
 class OldPrimaryKeySerializer(OldPrimaryKeySerializerBase):
     pk = serializers.IntegerField(read_only=True)
 
-    def get_pk(self, instance):
+    def get_pk(self, instance: models.Model) -> int:
         return instance.id
 
 
 class OldPrimaryKeyUpdateSerializer(OldPrimaryKeySerializerBase):
     pk = serializers.IntegerField(required=True)
 
-    def get_pk(self, instance):
+    def get_pk(self, instance: models.Model) -> int:
         return instance.id
