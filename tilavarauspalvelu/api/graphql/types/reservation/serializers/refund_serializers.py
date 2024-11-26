@@ -45,7 +45,7 @@ class ReservationRefundSerializer(OldPrimaryKeySerializer):
 
         return super().validate(data)
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any) -> Reservation:
         instance = super().save(**kwargs)
         refund_paid_reservation_task.delay(instance.pk)
         return instance

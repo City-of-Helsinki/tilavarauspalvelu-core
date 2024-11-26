@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.db import connection
+from graphql import GraphQLFieldResolver
 
 from tilavarauspalvelu.typing import QueryInfo
 from utils.date_utils import local_datetime
@@ -20,7 +21,8 @@ if TYPE_CHECKING:
 
     from django.http import HttpResponse
 
-    from tilavarauspalvelu.typing import WSGIRequest
+    from tilavarauspalvelu.typing import GQLInfo, WSGIRequest
+
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +69,7 @@ class KeycloakRefreshTokenExpiredMiddleware:
 
 
 class GraphQLSentryMiddleware:
-    def resolve(self, next_, root, info, **kwargs):
+    def resolve(self, next_: GraphQLFieldResolver, root: Any, info: GQLInfo, **kwargs: Any) -> Any:
         try:
             return next_(root, info, **kwargs)
         except Exception as err:  # noqa: BLE001
@@ -76,7 +78,7 @@ class GraphQLSentryMiddleware:
 
 
 class GraphQLErrorLoggingMiddleware:
-    def resolve(self, next_, root, info, **kwargs):
+    def resolve(self, next_: GraphQLFieldResolver, root: Any, info: GQLInfo, **kwargs: Any) -> Any:
         try:
             return next_(root, info, **kwargs)
         except Exception as err:  # noqa: BLE001

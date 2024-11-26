@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import django_filters
-from django.db import models
+from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
 
 from tilavarauspalvelu.models import RecurringReservation, ReservationUnit, ReservationUnitType, Unit, User
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 __all__ = [
     "RecurringReservationFilterSet",
@@ -56,38 +61,53 @@ class RecurringReservationFilterSet(ModelFilterSet):
 
     def get_reservation_unit_name(
         self,
-        qs: models.QuerySet[RecurringReservation],
+        qs: QuerySet[RecurringReservation],
         name: str,
         value: str,
-    ) -> models.QuerySet[RecurringReservation]:
+    ) -> QuerySet[RecurringReservation]:
         language = name[-2:]
         words = value.split(",")
 
-        query = models.Q()
+        query = Q()
         for word in words:
             word = word.strip()
             if language == "en":
-                query |= models.Q(reservation_unit__name_en__istartswith=word)
+                query |= Q(reservation_unit__name_en__istartswith=word)
             elif language == "sv":
-                query |= models.Q(reservation_unit__name_sv__istartswith=word)
+                query |= Q(reservation_unit__name_sv__istartswith=word)
             else:
-                query |= models.Q(reservation_unit__name_fi__istartswith=word)
+                query |= Q(reservation_unit__name_fi__istartswith=word)
 
         return qs.filter(query).distinct()
 
-    def get_unit(self, qs, name, value):
+    def get_unit(
+        self,
+        qs: QuerySet[RecurringReservation],
+        name: str,
+        value: list[int],
+    ) -> QuerySet[RecurringReservation]:
         if not value:
             return qs
 
         return qs.filter(reservation_unit__unit__in=value)
 
-    def get_reservation_unit(self, qs, name, value):
+    def get_reservation_unit(
+        self,
+        qs: QuerySet[RecurringReservation],
+        name: str,
+        value: list[int],
+    ) -> QuerySet[RecurringReservation]:
         if not value:
             return qs
 
         return qs.filter(reservation_unit__in=value)
 
-    def get_reservation_unit_type(self, qs, name, value):
+    def get_reservation_unit_type(
+        self,
+        qs: QuerySet[RecurringReservation],
+        name: str,
+        value: list[str],
+    ) -> QuerySet[RecurringReservation]:
         if not value:
             return qs
         return qs.filter(reservation_unit__reservation_unit_type__in=value)

@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+
+if TYPE_CHECKING:
+    from django.db import models
 
 
 class MinDurationValidator(MinValueValidator):
@@ -49,7 +52,7 @@ class OldChoiceValidator:
         else:
             self.allowed_choices = [choice[0].upper() for choice in allowed_choices]
 
-    def __call__(self, value):
+    def __call__(self, value: Any) -> None:
         original_value = value
         if isinstance(value, str):
             value = value.upper()
@@ -71,12 +74,12 @@ class OldChoiceCharField(serializers.CharField):
         choice_validator = OldChoiceValidator(choices)
         self.validators.append(choice_validator)
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data: Any) -> Any:
         if isinstance(data, str):
             data = data.lower()
         return super().to_internal_value(data)
 
-    def get_attribute(self, instance):
+    def get_attribute(self, instance: models.Model) -> Any:
         value = super().get_attribute(instance)
         if isinstance(value, str):
             return value.upper()

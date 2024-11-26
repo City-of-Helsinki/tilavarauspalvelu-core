@@ -144,7 +144,7 @@ class AffectingTimeSpan(models.Model):
     # For migrations.
 
     @classmethod
-    def create_migration(cls):
+    def create_migration(cls) -> migrations.RunSQL:
         return migrations.RunSQL(sql=cls.__forward_sql(), reverse_sql=cls.__reverse_sql())
 
     @classmethod

@@ -1,14 +1,18 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import graphene
 from django import forms
-from django.db import models
 from graphene_django.converter import convert_django_field
 from graphene_django.forms.converter import convert_form_field, get_form_field_description
 from graphene_django.registry import Registry
 from lookup_property.field import LookupPropertyField
 
-from tilavarauspalvelu.typing import GQLInfo
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "EnumChoiceField",
@@ -84,17 +88,17 @@ class EnumMultipleChoiceField(forms.MultipleChoiceField):
 
 
 @convert_form_field.register(IntChoiceField)
-def convert_form_field_to_int(field):
+def convert_form_field_to_int(field: IntChoiceField) -> graphene.Int:
     return graphene.Int(description=get_form_field_description(field), required=field.required)
 
 
 @convert_form_field.register(IntMultipleChoiceField)
-def convert_form_field_to_list_of_int(field):
+def convert_form_field_to_list_of_int(field: IntMultipleChoiceField) -> graphene.List:
     return graphene.List(graphene.Int, description=get_form_field_description(field), required=field.required)
 
 
 @convert_form_field.register(EnumChoiceField)
-def convert_form_field_to_enum(field):
+def convert_form_field_to_enum(field: EnumChoiceField) -> graphene.Enum:
     return graphene.Enum.from_enum(field.enum)(
         description=get_form_field_description(field),
         required=field.required,
@@ -102,7 +106,7 @@ def convert_form_field_to_enum(field):
 
 
 @convert_form_field.register(EnumMultipleChoiceField)
-def convert_form_field_to_enum_list(field):
+def convert_form_field_to_enum_list(field: EnumMultipleChoiceField) -> graphene.List:
     return graphene.List(
         graphene.Enum.from_enum(field.enum),
         description=get_form_field_description(field),
@@ -114,7 +118,7 @@ def convert_form_field_to_enum_list(field):
 def convert_lookup_field(field: LookupPropertyField, registry: Registry | None = None) -> graphene.Dynamic:
     model = field.model
 
-    def dynamic_type():
+    def dynamic_type() -> graphene.Field | None:
         _type = registry.get_type_for_model(model)
         if not _type:
             return None

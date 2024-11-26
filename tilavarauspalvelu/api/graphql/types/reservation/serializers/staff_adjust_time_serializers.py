@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 from typing import TYPE_CHECKING, Any
 
@@ -49,7 +51,7 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
             },
         }
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: Any) -> Reservation:
         instance = super().save(**kwargs)
 
         now = local_datetime()

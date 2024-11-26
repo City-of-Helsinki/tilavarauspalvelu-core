@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
 from django.db import models
 from modeltranslation.admin import TranslationAdmin
 
 from tilavarauspalvelu.models import EquipmentCategory
-from tilavarauspalvelu.typing import WSGIRequest
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 @admin.register(EquipmentCategory)

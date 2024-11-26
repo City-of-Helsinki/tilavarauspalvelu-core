@@ -1,10 +1,9 @@
-from decimal import Decimal
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from django.contrib import admin, messages
 from django.contrib.admin import helpers
-from django.db import models
-from django.db.models import QuerySet
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from more_admin_filters import MultiSelectFilter
@@ -15,11 +14,17 @@ from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import PaymentOrder, Reservation, ReservationDenyReason
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
-from tilavarauspalvelu.typing import WSGIRequest
 from utils.date_utils import local_datetime
 
 from .filters import PaidReservationListFilter, RecurringReservationListFilter
 from .form import ReservationAdminForm
+
+if TYPE_CHECKING:
+    from decimal import Decimal
+
+    from django.db.models import QuerySet
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ReservationInline(admin.TabularInline):
@@ -200,15 +205,15 @@ class ReservationAdmin(admin.ModelAdmin):
     ]
     inlines = [PaymentOrderInline]
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: WSGIRequest) -> QuerySet[Reservation]:
         return super().get_queryset(request).prefetch_related("reservation_units")
 
     def get_search_results(
         self,
         request: WSGIRequest,
-        queryset: models.QuerySet,
+        queryset: QuerySet,
         search_term: Any,
-    ) -> tuple[models.QuerySet, bool]:
+    ) -> tuple[QuerySet, bool]:
         queryset, may_have_duplicates = super().get_search_results(request, queryset, search_term)
 
         if str(search_term).isdigit():

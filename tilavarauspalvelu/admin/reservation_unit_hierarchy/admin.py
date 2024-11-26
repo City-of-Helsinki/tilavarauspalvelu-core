@@ -1,9 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django.contrib import admin
 
 from tilavarauspalvelu.models import ReservationUnitHierarchy
-from tilavarauspalvelu.typing import WSGIRequest
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 @admin.register(ReservationUnitHierarchy)
@@ -22,11 +28,11 @@ class ReservationUnitHierarchyAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         ReservationUnitHierarchy.refresh()
         self.message_user(request, "Reservation unit hierarchy was refreshed successfully.")
 
-    def has_add_permission(self, request) -> bool:
+    def has_add_permission(self, request: WSGIRequest) -> bool:
         return False
 
-    def has_delete_permission(self, request, obj=None) -> bool:
+    def has_delete_permission(self, request: WSGIRequest, obj=None) -> bool:
         return False
 
-    def has_change_permission(self, request, obj=None) -> bool:
+    def has_change_permission(self, request: WSGIRequest, obj=None) -> bool:
         return True

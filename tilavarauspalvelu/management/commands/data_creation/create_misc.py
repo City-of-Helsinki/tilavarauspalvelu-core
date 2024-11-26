@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Literal
 
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
@@ -19,7 +21,7 @@ from .utils import with_logs
 
 
 @with_logs
-def _create_banner_notifications():
+def _create_banner_notifications() -> list[BannerNotification]:
     banner_notifications: list[BannerNotification] = [
         (
             BannerNotificationBuilder()

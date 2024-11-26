@@ -107,7 +107,7 @@ class ReservationUpdateSerializer(OldPrimaryKeyUpdateSerializer, ReservationBase
         return data
 
     @property
-    def validated_data(self):
+    def validated_data(self) -> dict[str, Any]:
         validated_data = super().validated_data
         validated_data["user"] = self.instance.user  # Do not change the user.
         validated_data["confirmed_at"] = local_datetime()
