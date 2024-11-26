@@ -1,20 +1,26 @@
+from __future__ import annotations
+
 import calendar
 import datetime
 import zoneinfo
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
 from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
-from tilavarauspalvelu.models import OriginHaukiResource, ReservableTimeSpan
+from tilavarauspalvelu.models import ReservableTimeSpan
 from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseItem
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import (
     merge_overlapping_time_span_elements,
     override_reservable_with_closed_time_spans,
 )
 from utils.date_utils import local_date
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import OriginHaukiResource
+    from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseItem
 
 
 class ReservableTimeSpanClient:

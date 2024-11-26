@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -8,8 +12,10 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_GET, require_POST
 
-from tilavarauspalvelu.typing import WSGIRequest
 from utils.utils import update_query_params
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 @require_GET

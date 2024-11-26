@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 from graphene_django_extensions.permissions import BasePermission

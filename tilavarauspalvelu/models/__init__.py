@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .ability_group.model import AbilityGroup
 from .address.model import Address
 from .affecting_time_span.model import AffectingTimeSpan

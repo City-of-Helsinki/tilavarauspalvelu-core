@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.auth.models import Group, Permission
 
 from tilavarauspalvelu.enums import UserRoleChoice

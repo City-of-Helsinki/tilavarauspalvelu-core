@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -5,5 +7,5 @@ if TYPE_CHECKING:
 
 
 class AllocatedTimeSlotActions:
-    def __init__(self, allocated_time_slot: "AllocatedTimeSlot") -> None:
+    def __init__(self, allocated_time_slot: AllocatedTimeSlot) -> None:
         self.allocated_time_slot = allocated_time_slot

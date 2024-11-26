@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import django_filters
 from django.db import models
 from graphene_django_extensions import ModelFilterSet

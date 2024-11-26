@@ -1,10 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
-from django.db import models
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import ReservationUnitPricing
-from tilavarauspalvelu.models.reservation_unit_pricing.queryset import ReservationUnitPricingQuerySet
-from tilavarauspalvelu.typing import GQLInfo
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.models.reservation_unit_pricing.queryset import ReservationUnitPricingQuerySet
+    from tilavarauspalvelu.typing import GQLInfo
 
 
 class ReservationUnitPricingNode(DjangoNode):

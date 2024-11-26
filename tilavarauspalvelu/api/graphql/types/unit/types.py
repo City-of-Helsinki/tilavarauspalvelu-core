@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from graphene_django_extensions import DjangoNode
 
 from tilavarauspalvelu.models import Unit
-from tilavarauspalvelu.typing import AnyUser
 
 from .filtersets import UnitAllFilterSet, UnitFilterSet
 from .permissions import UnitAllPermission, UnitPermission
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "UnitNode",

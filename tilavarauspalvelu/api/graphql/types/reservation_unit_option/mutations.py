@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from graphene_django_extensions import UpdateMutation
 
 from .permissions import ReservationUnitOptionPermission

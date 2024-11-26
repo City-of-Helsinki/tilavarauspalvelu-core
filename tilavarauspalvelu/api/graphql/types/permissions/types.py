@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
-from django.db import models
 from graphene import ObjectType
 from graphene_django_extensions import DjangoNode
 from query_optimizer import ManuallyOptimizedField
@@ -7,7 +10,11 @@ from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.enums import UserPermissionChoice
 from tilavarauspalvelu.models import GeneralRole, Unit, UnitGroup, UnitRole
-from tilavarauspalvelu.typing import AnyUser, GQLInfo
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.typing import AnyUser, GQLInfo
 
 __all__ = [
     "GeneralRoleNode",

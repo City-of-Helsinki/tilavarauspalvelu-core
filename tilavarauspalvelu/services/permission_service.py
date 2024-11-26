@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from tilavarauspalvelu.models import GeneralRole, UnitRole, User
 
 __all__ = [

@@ -1,10 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.models import Location
-from tilavarauspalvelu.typing import GQLInfo
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "LocationNode",

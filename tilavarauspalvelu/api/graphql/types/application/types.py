@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
-from django.db import models
 from django.db.models import Q
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
@@ -10,11 +13,15 @@ from tilavarauspalvelu.api.graphql.types.application_section.types import Applic
 from tilavarauspalvelu.api.graphql.types.user.types import ApplicantNode
 from tilavarauspalvelu.enums import ApplicationStatusChoice, UserRoleChoice
 from tilavarauspalvelu.models import Application, ApplicationRound, User
-from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
-from tilavarauspalvelu.typing import GQLInfo
 
 from .filtersets import ApplicationFilterSet
 from .permissions import ApplicationPermission
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "ApplicationNode",

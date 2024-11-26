@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
 from django.db import models
 from django.db.models import OuterRef
@@ -9,14 +13,17 @@ from rest_framework.reverse import reverse
 
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.models import PaymentOrder, Reservation, ReservationUnit, User
-from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
-from tilavarauspalvelu.typing import AnyUser, GQLInfo
+from tilavarauspalvelu.models import Reservation, ReservationUnit, User
 from utils.db import SubqueryArray
 from utils.utils import ical_hmac_signature
 
 from .filtersets import ReservationFilterSet
 from .permissions import ReservationPermission
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import PaymentOrder
+    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
+    from tilavarauspalvelu.typing import AnyUser, GQLInfo
 
 __all__ = [
     "ReservationNode",

@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
-from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
@@ -17,8 +20,12 @@ from tilavarauspalvelu.admin.application_section.form import (
 )
 from tilavarauspalvelu.admin.suitable_time_range.admin import SuitableTimeRangeInline
 from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption
-from tilavarauspalvelu.typing import WSGIRequest
 from utils.utils import comma_sep_str
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class ApplicationSectionInline(admin.TabularInline):

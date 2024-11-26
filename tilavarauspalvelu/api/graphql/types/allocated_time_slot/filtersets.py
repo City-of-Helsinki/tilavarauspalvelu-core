@@ -1,14 +1,21 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import django_filters
-from django.db import models
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
 from tilavarauspalvelu.models import AllocatedTimeSlot
-from tilavarauspalvelu.models.allocated_timeslot.queryset import AllocatedTimeSlotQuerySet
 from utils.db import text_search
 from utils.utils import log_text_search
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.models.allocated_timeslot.queryset import AllocatedTimeSlotQuerySet
 
 __all__ = [
     "AllocatedTimeSlotFilterSet",

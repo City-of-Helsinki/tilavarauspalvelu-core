@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from tilavarauspalvelu.utils.verkkokauppa.exceptions import VerkkokauppaError
 
 

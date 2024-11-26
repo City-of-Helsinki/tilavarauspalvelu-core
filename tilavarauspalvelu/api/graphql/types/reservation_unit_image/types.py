@@ -1,12 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
 from tilavarauspalvelu.models import ReservationUnitImage
-from tilavarauspalvelu.typing import GQLInfo
 
 from .permissions import ReservationUnitImagePermission
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import GQLInfo
 
 
 class ReservationUnitImageNode(DjangoNode):

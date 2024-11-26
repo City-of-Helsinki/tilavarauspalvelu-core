@@ -1,15 +1,19 @@
+from __future__ import annotations
+
 import datetime
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import requests
 from django.conf import settings
 from django.contrib.gis.geos import Point
-from requests import Response
 
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
+
+if TYPE_CHECKING:
+    from requests import Response
 
 
 @dataclass
@@ -28,7 +32,7 @@ class TprekUnitData:
     tprek_last_modified: datetime.datetime | None
 
     @classmethod
-    def from_response_json(cls, response_json: dict[str, Any]) -> "TprekUnitData":
+    def from_response_json(cls, response_json: dict[str, Any]) -> TprekUnitData:
         try:
             modified_time = response_json.get("modified_time")
             tprek_last_modified = datetime.datetime.fromisoformat(modified_time).replace(tzinfo=DEFAULT_TIMEZONE)
@@ -65,7 +69,7 @@ class TprekLocationData:
     coordinates: Point | None
 
     @classmethod
-    def from_response_json(cls, response_json: dict[str, Any]) -> "TprekLocationData":
+    def from_response_json(cls, response_json: dict[str, Any]) -> TprekLocationData:
         coordinates = None
         if (lat := response_json.get("latitude")) and (lon := response_json.get("longitude")):
             coordinates = Point(lon, lat)

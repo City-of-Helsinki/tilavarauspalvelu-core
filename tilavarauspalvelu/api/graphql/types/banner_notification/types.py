@@ -1,13 +1,19 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
 from graphene_django_extensions import DjangoNode
 from graphene_django_extensions.permissions import restricted_field
 
 from tilavarauspalvelu.enums import BannerNotificationState
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
-from tilavarauspalvelu.typing import GQLInfo
 
 from .filtersets import BannerNotificationFilterSet
 from .permissions import BannerNotificationPermission
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "BannerNotificationNode",

@@ -1,9 +1,14 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.permissions import BasePermission
 
-from tilavarauspalvelu.models import Resource, Space
-from tilavarauspalvelu.typing import AnyUser
+from tilavarauspalvelu.models import Space
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import Resource
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "ResourcePermission",

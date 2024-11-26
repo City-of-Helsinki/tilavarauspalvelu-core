@@ -1,7 +1,11 @@
-from typing import Any
+from __future__ import annotations
 
-from django.core.management import CommandParser
+from typing import TYPE_CHECKING, Any
+
 from django.core.management.commands import makemessages
+
+if TYPE_CHECKING:
+    from django.core.management import CommandParser
 
 
 class Command(makemessages.Command):

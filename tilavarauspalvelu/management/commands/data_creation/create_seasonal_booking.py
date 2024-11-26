@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import datetime
 import random
-from collections.abc import Generator
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from tilavarauspalvelu.enums import (
     ApplicantTypeChoice,
@@ -13,16 +14,12 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import (
     Address,
-    AgeGroup,
     AllocatedTimeSlot,
     Application,
-    ApplicationRound,
     ApplicationRoundTimeSlot,
     ApplicationSection,
-    City,
     Organisation,
     Person,
-    ReservationPurpose,
     ReservationUnit,
     ReservationUnitOption,
     SuitableTimeRange,
@@ -60,6 +57,11 @@ from .utils import (
     weighted_choice,
     with_logs,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+    from tilavarauspalvelu.models import AgeGroup, ApplicationRound, City, ReservationPurpose
 
 
 @with_logs

@@ -1,10 +1,11 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.models import ApplicationSection
-from tilavarauspalvelu.typing import AnyUser
 
 from .permissions import (
     ApplicationSectionPermission,
@@ -15,10 +16,14 @@ from .serializers import (
     ApplicationSectionReservationCancellationInputSerializer,
     ApplicationSectionReservationCancellationOutputSerializer,
     ApplicationSectionSerializer,
-    CancellationOutput,
     RejectAllSectionOptionsSerializer,
     RestoreAllSectionOptionsSerializer,
 )
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import AnyUser
+
+    from .serializers import CancellationOutput
 
 __all__ = [
     "ApplicationSectionCreateMutation",

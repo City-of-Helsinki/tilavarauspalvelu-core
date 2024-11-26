@@ -1,21 +1,28 @@
+from __future__ import annotations
+
 import re
+from typing import TYPE_CHECKING
 
 from django import forms
 from django.contrib import admin, messages
 from django.db import models
 from django.db.models.functions import Coalesce
-from django.http import FileResponse
-from django.utils.safestring import SafeString, mark_safe
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from rangefilter.filters import DateTimeRangeFilterBuilder, NumericRangeFilterBuilder
 
 from tilavarauspalvelu.admin.helpers import ImmutableModelAdmin
 from tilavarauspalvelu.admin.sql_log.admin import SQLLogAdminInline
 from tilavarauspalvelu.models.request_log.model import RequestLog
-from tilavarauspalvelu.models.request_log.queryset import RequestLogQuerySet
 from tilavarauspalvelu.services.csv_export import SQLLogCSVExporter
-from tilavarauspalvelu.typing import WSGIRequest
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from django.http import FileResponse
+    from django.utils.safestring import SafeString
+
+    from tilavarauspalvelu.models.request_log.queryset import RequestLogQuerySet
+    from tilavarauspalvelu.typing import WSGIRequest
 
 
 class RequestLogAdminForm(forms.ModelForm):

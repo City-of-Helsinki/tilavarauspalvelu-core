@@ -5,6 +5,7 @@
 #
 # error_codes.ERROR_CODE_NAME
 #
+from __future__ import annotations
 
 ENTITY_NOT_FOUND = "ENTITY_NOT_FOUND"
 REQUIRED_FIELD_MISSING = "REQUIRED_FIELD_MISSING"

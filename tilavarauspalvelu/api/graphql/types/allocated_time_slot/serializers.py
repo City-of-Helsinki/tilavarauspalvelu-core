@@ -1,14 +1,20 @@
-import datetime
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import Weekday
-from tilavarauspalvelu.models import AllocatedTimeSlot, ApplicationSection, ReservationUnitOption, SuitableTimeRange
+from tilavarauspalvelu.models import AllocatedTimeSlot, SuitableTimeRange
 from utils.date_utils import time_difference, timedelta_to_json
+
+if TYPE_CHECKING:
+    import datetime
+
+    from tilavarauspalvelu.enums import Weekday
+    from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption
 
 __all__ = [
     "AllocatedTimeSlotCreateSerializer",

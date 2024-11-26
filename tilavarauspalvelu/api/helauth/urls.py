@@ -3,6 +3,8 @@
 # Using `helusers/urls.py` will not add the URLs to the file's `urlpatterns` unless
 # `helusers.tunnistamo_oidc.TunnistamoOIDCAuth` is specifically included in the
 # `AUTHENTICATION_BACKENDS` setting.
+from __future__ import annotations
+
 from django.urls import path
 
 from .views import login_view, logout_view

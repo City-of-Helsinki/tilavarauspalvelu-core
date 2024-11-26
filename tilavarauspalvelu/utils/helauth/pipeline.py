@@ -1,17 +1,22 @@
+from __future__ import annotations
+
 import contextlib
-from typing import Any, TypedDict, Unpack
+from typing import TYPE_CHECKING, Any, TypedDict, Unpack
 
 from django.db import models
 from django.db.models.functions import Concat
-from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
-from social_django.models import DjangoStorage, UserSocialAuth
-from social_django.strategy import DjangoStrategy
 
 from tilavarauspalvelu.models import User
-from tilavarauspalvelu.typing import WSGIRequest
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import IDToken
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
+    from social_django.models import DjangoStorage, UserSocialAuth
+    from social_django.strategy import DjangoStrategy
+
+    from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
     "fetch_additional_info_for_user_from_helsinki_profile",

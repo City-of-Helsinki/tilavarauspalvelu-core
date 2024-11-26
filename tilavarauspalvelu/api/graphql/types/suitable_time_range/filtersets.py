@@ -1,11 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import django_filters
-from django.db.models import QuerySet
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
 from tilavarauspalvelu.enums import Priority
 from tilavarauspalvelu.models import SuitableTimeRange
-from tilavarauspalvelu.models.suitable_time_range.queryset import SuitableTimeRangeQuerySet
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
+    from tilavarauspalvelu.models.suitable_time_range.queryset import SuitableTimeRangeQuerySet
 
 
 class SuitableTimeRangeFilterSet(ModelFilterSet):

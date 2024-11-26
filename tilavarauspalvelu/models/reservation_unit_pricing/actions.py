@@ -1,4 +1,5 @@
-import datetime
+from __future__ import annotations
+
 import math
 from decimal import Decimal
 from typing import TYPE_CHECKING
@@ -6,11 +7,13 @@ from typing import TYPE_CHECKING
 from tilavarauspalvelu.enums import PriceUnit
 
 if TYPE_CHECKING:
+    import datetime
+
     from .model import ReservationUnitPricing
 
 
 class ReservationUnitPricingActions:
-    def __init__(self, pricing: "ReservationUnitPricing") -> None:
+    def __init__(self, pricing: ReservationUnitPricing) -> None:
         self.pricing = pricing
 
     def calculate_reservation_price(self, duration: datetime.timedelta, *, subsidised: bool = False) -> Decimal:

@@ -1,14 +1,19 @@
+from __future__ import annotations
+
 import csv
 import dataclasses
 from abc import ABC, abstractmethod
-from collections.abc import Iterable, Iterator
 from dataclasses import asdict
 from io import StringIO
 from itertools import chain
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
-from django.db import models
 from django.http import FileResponse
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+
+    from django.db import models
 
 
 @dataclasses.dataclass

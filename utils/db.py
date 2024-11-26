@@ -11,6 +11,10 @@ from django.db.models import Func
 from django.db.transaction import get_connection
 from lookup_property import State
 from lookup_property.converters.expressions import expression_to_ast
+from lookup_property.converters.utils import ast_attribute, ast_function
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 __all__ = [
     "ArrayRemove",
@@ -21,11 +25,6 @@ __all__ = [
     "SubquerySum",
     "text_search",
 ]
-
-from lookup_property.converters.utils import ast_attribute, ast_function
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable
 
 
 class SubqueryAggregate(models.Subquery):

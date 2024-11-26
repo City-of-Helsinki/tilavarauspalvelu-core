@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -5,5 +7,5 @@ if TYPE_CHECKING:
 
 
 class KeywordCategoryActions:
-    def __init__(self, keyword_category: "KeywordCategory") -> None:
+    def __init__(self, keyword_category: KeywordCategory) -> None:
         self.keyword_category = keyword_category

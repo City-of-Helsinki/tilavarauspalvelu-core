@@ -1,9 +1,10 @@
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions import CreateMutation, UpdateMutation
 
 from tilavarauspalvelu.enums import ReservationStateChoice
-from tilavarauspalvelu.models import RecurringReservation
 from utils.date_utils import local_datetime
 
 from .permissions import RecurringReservationPermission
@@ -14,6 +15,9 @@ from .serializers import (
     ReservationSeriesRescheduleSerializer,
     ReservationSeriesUpdateSerializer,
 )
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import RecurringReservation
 
 __all__ = [
     "ReservationSeriesCreateMutation",

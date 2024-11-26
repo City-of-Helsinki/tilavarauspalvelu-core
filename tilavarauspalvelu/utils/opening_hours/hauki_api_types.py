@@ -1,6 +1,9 @@
-from typing import Any, Literal, TypedDict
+from __future__ import annotations
 
-from tilavarauspalvelu.enums import HaukiResourceState
+from typing import TYPE_CHECKING, Any, Literal, TypedDict
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.enums import HaukiResourceState
 
 ##########
 # Common #

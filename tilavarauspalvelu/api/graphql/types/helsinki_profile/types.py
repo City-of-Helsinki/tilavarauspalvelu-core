@@ -1,4 +1,5 @@
-import datetime
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import graphene
@@ -7,14 +8,16 @@ from graphql import GraphQLError
 from query_optimizer.selections import get_field_selections
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.models import Application, Reservation, User
+from tilavarauspalvelu.models import Application, Reservation
 from tilavarauspalvelu.tasks import save_personal_info_view_log
-from tilavarauspalvelu.typing import GQLInfo
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.utils.helauth.typing import LoginMethod, UserProfileInfo
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import AnyUser
+    import datetime
+
+    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.typing import AnyUser, GQLInfo
 
 __all__ = [
     "HelsinkiProfileDataNode",

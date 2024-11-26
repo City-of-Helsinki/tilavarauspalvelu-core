@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Any
 
 import graphene
@@ -8,7 +10,6 @@ from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMut
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.typing import AnyUser
 from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
 
 from .permissions import (
@@ -38,6 +39,7 @@ from .serializers import (
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import PaymentOrder
+    from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
     "ReservationCreateMutation",

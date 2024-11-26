@@ -1,13 +1,19 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import graphene
 from graphene_django_extensions import DjangoNode
 from query_optimizer import MultiField
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType
 from tilavarauspalvelu.models import PaymentMerchant, PaymentOrder, PaymentProduct
-from tilavarauspalvelu.typing import GQLInfo
 from utils.date_utils import local_datetime
 
 from .permissions import PaymentOrderPermission
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
     "PaymentMerchantNode",

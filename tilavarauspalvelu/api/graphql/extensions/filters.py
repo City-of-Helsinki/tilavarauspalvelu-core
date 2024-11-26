@@ -1,10 +1,14 @@
-import datetime
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 import django_filters
 from django import forms
 
 from utils.date_utils import local_end_of_day, local_start_of_day
+
+if TYPE_CHECKING:
+    import datetime
 
 
 class TimezoneAwareDateField(forms.DateField):
