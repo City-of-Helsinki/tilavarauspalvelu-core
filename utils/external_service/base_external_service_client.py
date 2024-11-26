@@ -1,10 +1,15 @@
-import json
-from typing import Any, Literal
+from __future__ import annotations
 
-from requests import Response, request
+import json
+from typing import TYPE_CHECKING, Any, Literal
+
+from requests import request
 from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from utils.external_service.errors import ExternalServiceParseJSONError, ExternalServiceRequestError
+
+if TYPE_CHECKING:
+    from requests import Response
 
 
 class BaseExternalServiceClient:

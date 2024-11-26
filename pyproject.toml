@@ -271,7 +271,6 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^na
 ]
 "config/*"                  = ["I002"]  # missing-required-import
 "tilavarauspalvelu/*"       = ["I002"]  # missing-required-import
-"utils/*"                   = ["I002"]  # missing-required-import
 "local_settings.py"         = ["I002"]  # missing-required-import
 "local_settings_example.py" = ["I002"]  # missing-required-import
 "manage.py"                 = ["I002"]  # missing-required-import

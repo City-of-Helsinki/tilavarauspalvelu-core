@@ -1,13 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 from urllib.parse import urljoin
 
 from django.conf import settings
-from django.db import models
 from easy_thumbnails.files import get_thumbnailer
 from requests import request
 from rest_framework.status import HTTP_200_OK
 
 from tilavarauspalvelu.tasks import purge_image_cache
 from utils.sentry import SentryLogger
+
+if TYPE_CHECKING:
+    from django.db import models
 
 
 class ImageCacheConfigurationError(Exception):

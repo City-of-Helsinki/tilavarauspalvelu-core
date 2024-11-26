@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 __all__ = [
     "build_elastic_query_str",
     "parse_search_words",
