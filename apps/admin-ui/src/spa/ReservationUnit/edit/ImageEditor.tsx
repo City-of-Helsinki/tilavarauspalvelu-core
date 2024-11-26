@@ -41,9 +41,6 @@ const FileInputContainer = styled.div`
   & button {
     --background-color-hover: var(--color-black-5);
     --color-hover: var(--color-black);
-    --background-color-focus: transparent;
-    --color-focus: var(--color-black) --focus-outline-color:
-      var(--color-focus-outline);
     --color: var(--color-black);
     --border-color: var(--color-black);
   }
