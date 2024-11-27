@@ -54,9 +54,8 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         # 'id' handled separately in `get_search_results()`
         "name",
         "unit__name",
-        "unit__service_sectors__name",
     ]
-    search_help_text = _("Search by ID, name, unit name, or service sector name")
+    search_help_text = _("Search by ID, name or unit name")
 
     # List
     list_display = [

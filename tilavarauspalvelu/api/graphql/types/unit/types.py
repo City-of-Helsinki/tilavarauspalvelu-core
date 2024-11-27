@@ -38,7 +38,6 @@ class UnitNode(DjangoNode):
             "reservation_units",
             "spaces",
             "location",
-            "service_sectors",
             "unit_groups",
         ]
         restricted_fields = {

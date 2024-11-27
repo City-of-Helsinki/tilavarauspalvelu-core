@@ -9,7 +9,7 @@ from graphene_django_extensions.testing import build_query
 
 from tilavarauspalvelu.enums import ReservationKind
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceSectorFactory, UnitFactory, UserFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UserFactory
 
 from .helpers import units_query
 
@@ -26,21 +26,6 @@ def test_units__filter__by_name(graphql):
 
     graphql.login_with_superuser()
     response = graphql(units_query(nameFi="111"))
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": unit.pk}
-
-
-def test_units__filter__by_service_sector(graphql):
-    unit = UnitFactory.create()
-    UnitFactory.create()
-    UnitFactory.create()
-    sector = ServiceSectorFactory.create(units=[unit])
-
-    graphql.login_with_superuser()
-    response = graphql(units_query(service_sector=sector.pk))
 
     assert response.has_errors is False
 

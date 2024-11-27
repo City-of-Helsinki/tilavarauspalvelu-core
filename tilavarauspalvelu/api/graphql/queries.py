@@ -44,7 +44,6 @@ from .types.reservation_unit_pricing.types import ReservationUnitPricingNode
 from .types.reservation_unit_type.types import ReservationUnitTypeNode
 from .types.resource.types import ResourceNode
 from .types.service.types import ServiceNode
-from .types.service_sector.types import ServiceSectorNode
 from .types.space.types import SpaceNode
 from .types.suitable_time_range.types import SuitableTimeRangeNode
 from .types.tax_percentage.types import TaxPercentageNode
@@ -100,7 +99,6 @@ __all__ = [
     "ReservationUnitTypeNode",
     "ResourceNode",
     "ServiceNode",
-    "ServiceSectorNode",
     "SpaceNode",
     "SuitableTimeRangeNode",
     "TaxPercentageNode",

@@ -21,7 +21,6 @@ from tilavarauspalvelu.models import (
     ReservationStatistic,
     ReservationStatisticsReservationUnit,
     ReservationUnitImage,
-    ServiceSector,
 )
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.sql_log.model import SQLLog
@@ -46,7 +45,6 @@ models_that_should_be_empty: list[type[models.Model]] = [
     ReservationStatisticsReservationUnit,
     ReservationUnitImage,
     SQLLog,
-    ServiceSector,
 ]
 
 

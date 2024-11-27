@@ -33,7 +33,6 @@ from .models import (
     ReservationUnitType,
     Resource,
     Service,
-    ServiceSector,
     Space,
     TermsOfUse,
     Unit,
@@ -94,11 +93,6 @@ class RealEstateTranslationOptions(TranslationOptions):
 
 @register(Building)
 class BuildingTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register(ServiceSector)
-class ServiceSectorTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 

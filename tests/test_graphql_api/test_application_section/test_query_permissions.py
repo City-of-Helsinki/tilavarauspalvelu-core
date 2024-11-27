@@ -64,20 +64,13 @@ def test_application_sections__query__perms__regular_user(graphql):
 
 
 def test_application_sections__query__perms__general_admin(graphql):
-    # given:
-    # - There are two application sections in different service sectors
-    # - A general service sector admin is using the system
     section_1 = ApplicationSectionFactory.create_in_status_unallocated()
     section_2 = ApplicationSectionFactory.create_in_status_unallocated()
     user = UserFactory.create_with_general_role()
     graphql.force_login(user)
 
-    # when:
-    # - The user queries for application sections
     response = graphql(sections_query())
 
-    # then:
-    # - The response contains sections from both sectors
     assert len(response.edges) == 2
     assert response.node(0) == {"pk": section_1.pk}
     assert response.node(1) == {"pk": section_2.pk}

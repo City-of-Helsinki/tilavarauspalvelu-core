@@ -100,8 +100,6 @@ class UnitFilterSet(ModelFilterSet, UnitFilterSetMixin):
     name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
     name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
 
-    service_sector = django_filters.NumberFilter(field_name="service_sectors__pk")
-
     only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
 
     # These filters use information across the relationship between Unit and ReservationUnit.

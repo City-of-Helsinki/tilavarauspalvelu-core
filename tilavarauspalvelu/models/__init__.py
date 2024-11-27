@@ -53,7 +53,6 @@ from .reservation_unit_pricing.model import ReservationUnitPricing
 from .reservation_unit_type.model import ReservationUnitType
 from .resource.model import Resource
 from .service.model import Service
-from .service_sector.model import ServiceSector
 from .space.model import Space
 from .sql_log.model import SQLLog
 from .suitable_time_range.model import SuitableTimeRange
@@ -121,7 +120,6 @@ __all__ = [
     "Resource",
     "SQLLog",
     "Service",
-    "ServiceSector",
     "Space",
     "SuitableTimeRange",
     "TaxPercentage",

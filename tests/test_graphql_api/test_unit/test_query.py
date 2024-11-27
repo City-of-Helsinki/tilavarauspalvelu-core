@@ -41,9 +41,6 @@ def test_units__query(graphql):
         location {
             addressStreetFi
         }
-        serviceSectors {
-            nameFi
-        }
         unitGroups {
             nameFi
         }
@@ -73,7 +70,6 @@ def test_units__query(graphql):
         "location": None,
         "paymentMerchant": None,
         "reservationUnits": [],
-        "serviceSectors": [],
         "unitGroups": [],
         "spaces": [],
     }

@@ -59,5 +59,4 @@ class UnitFactory(GenericDjangoModelFactory[Unit]):
     reservation_units = ReverseForeignKeyFactory("tests.factories.ReservationUnitFactory")
 
     unit_roles = ManyToManyFactory("tests.factories.UnitRoleFactory")
-    service_sectors = ManyToManyFactory("tests.factories.ServiceSectorFactory")
     unit_groups = ManyToManyFactory("tests.factories.UnitGroupFactory")

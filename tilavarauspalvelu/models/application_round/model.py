@@ -34,8 +34,7 @@ class ApplicationRound(models.Model):
     """
     Application round for seasonal booking.
     Contains the application, reservation, and public display periods,
-    as well as the reservation units or service sectors that can
-    be applied for, and for what purposes.
+    as well as the reservation units that can be applied for, and for what purposes.
     """
 
     name: str = models.CharField(max_length=255)

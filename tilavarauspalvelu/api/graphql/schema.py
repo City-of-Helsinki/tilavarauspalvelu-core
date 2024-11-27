@@ -111,7 +111,6 @@ from .queries import (
     ReservationUnitNode,
     ReservationUnitTypeNode,
     ResourceNode,
-    ServiceSectorNode,
     SpaceNode,
     TaxPercentageNode,
     TermsOfUseNode,
@@ -231,7 +230,6 @@ class Query(graphene.ObjectType):
     terms_of_use = TermsOfUseNode.Connection()
     banner_notification = BannerNotificationNode.Node()
     banner_notifications = BannerNotificationNode.Connection()
-    service_sectors = ServiceSectorNode.Connection()
     unit_groups = UnitGroupNode.Connection()
     #
     # Debug
