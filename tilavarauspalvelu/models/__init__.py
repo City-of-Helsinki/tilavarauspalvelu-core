@@ -52,7 +52,6 @@ from .reservation_unit_payment_type.model import ReservationUnitPaymentType
 from .reservation_unit_pricing.model import ReservationUnitPricing
 from .reservation_unit_type.model import ReservationUnitType
 from .resource.model import Resource
-from .service.model import Service
 from .space.model import Space
 from .sql_log.model import SQLLog
 from .suitable_time_range.model import SuitableTimeRange
@@ -119,7 +118,6 @@ __all__ = [
     "ReservationUnitType",
     "Resource",
     "SQLLog",
-    "Service",
     "Space",
     "SuitableTimeRange",
     "TaxPercentage",

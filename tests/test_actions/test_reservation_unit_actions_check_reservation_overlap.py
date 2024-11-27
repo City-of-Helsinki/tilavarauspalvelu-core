@@ -8,7 +8,7 @@ from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.models import ReservationUnitHierarchy
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory, ReservationUnitFactory, ServiceFactory, SpaceFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, SpaceFactory
 
 # Applied to all tests
 pytestmark = [
@@ -17,46 +17,37 @@ pytestmark = [
 
 
 @pytest.fixture
-def services():
-    return ServiceFactory.create_batch(3)
-
-
-@pytest.fixture
-def res_unit_parent(services):
+def res_unit_parent():
     space_parent = SpaceFactory.create()
-    return ReservationUnitFactory.create(services=services, spaces=[space_parent])
+    return ReservationUnitFactory.create(spaces=[space_parent])
 
 
 @pytest.fixture
-def res_unit_child_1(services, res_unit_parent):
+def res_unit_child_1(res_unit_parent):
     space_child_1 = SpaceFactory.create(parent=res_unit_parent.spaces.first())
-    return ReservationUnitFactory.create(services=services, spaces=[space_child_1])
+    return ReservationUnitFactory.create(spaces=[space_child_1])
 
 
 @pytest.fixture
-def res_unit_child_2(services, res_unit_parent):
+def res_unit_child_2(res_unit_parent):
     space_child_2 = SpaceFactory.create(parent=res_unit_parent.spaces.first())
-    return ReservationUnitFactory.create(services=services, spaces=[space_child_2])
+    return ReservationUnitFactory.create(spaces=[space_child_2])
 
 
 @pytest.fixture
-def res_unit_child_2_child(services, res_unit_child_2):
+def res_unit_child_2_child(res_unit_child_2):
     space_child_2_child = SpaceFactory.create(parent=res_unit_child_2.spaces.first())
-    return ReservationUnitFactory.create(services=services, spaces=[space_child_2_child])
+    return ReservationUnitFactory.create(spaces=[space_child_2_child])
 
 
-def test_reservation_unit__check_reservation_overlap__no_reservations_no_overlaps(
-    res_unit_parent,
-):
+def test_reservation_unit__check_reservation_overlap__no_reservations_no_overlaps(res_unit_parent):
     begin = local_datetime()
     end = begin + datetime.timedelta(minutes=120)
 
     assert not res_unit_parent.actions.check_reservation_overlap(begin, end)
 
 
-def test_reservation_unit__check_reservation_overlap__same_space__same_time__overlaps(
-    res_unit_parent,
-):
+def test_reservation_unit__check_reservation_overlap__same_space__same_time__overlaps(res_unit_parent):
     begin = local_datetime()
     end = begin + datetime.timedelta(minutes=120)
 

@@ -33,7 +33,6 @@ def test_reservation_unit_export_multiple():
         spaces__name="Space",
         resources__name="Resource",
         qualifiers__name="Qualifier",
-        services__name="Service",
         purposes__name="Purpose",
         equipments__name="Equipment",
         payment_terms__name="Payment terms",
@@ -130,7 +129,6 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.max_reservations_per_user
     assert row_2[next(index)] == reservation_unit_1.allow_reservations_without_opening_hours
     assert row_2[next(index)] == reservation_unit_1.is_archived
-    assert row_2[next(index)] == reservation_unit_1.services.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.purposes.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.require_introduction
     assert row_2[next(index)] == reservation_unit_1.equipments.first().name_fi
@@ -155,10 +153,6 @@ def test_reservation_unit_export_multiple():
             "Missing Qualifiers": MissingParams(
                 missing=Missing(deleted=["qualifiers__name"]),
                 column_value_mapping={"Qualifiers": ""},
-            ),
-            "Missing Services": MissingParams(
-                missing=Missing(deleted=["services__name"]),
-                column_value_mapping={"Services": ""},
             ),
             "Missing Purposes": MissingParams(
                 missing=Missing(deleted=["purposes__name"]),
@@ -236,7 +230,6 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
         "spaces__name": "Space",
         "resources__name": "Resource",
         "qualifiers__name": "Qualifier",
-        "services__name": "Service",
         "purposes__name": "Purpose",
         "equipments__name": "Equipment",
         "payment_terms__name": "Payment terms",

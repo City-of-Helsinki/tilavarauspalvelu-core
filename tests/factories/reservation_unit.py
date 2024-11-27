@@ -127,7 +127,6 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     resources = ManyToManyFactory("tests.factories.ResourceFactory")
     purposes = ManyToManyFactory("tests.factories.PurposeFactory")
     equipments = ManyToManyFactory("tests.factories.EquipmentFactory")
-    services = ManyToManyFactory("tests.factories.ServiceFactory")
     payment_types = ManyToManyFactory("tests.factories.ReservationUnitPaymentTypeFactory")
     qualifiers = ManyToManyFactory("tests.factories.QualifierFactory")
     keyword_groups = ManyToManyFactory("tests.factories.KeywordGroupFactory")

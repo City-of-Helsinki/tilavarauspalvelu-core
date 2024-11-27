@@ -87,7 +87,6 @@ class ReservationUnitExportRow(BaseExportRow):
     maximum_number_of_active_reservations_per_user: str | int = ""
     allow_reservations_without_opening_hours: str | bool = ""
     is_reservation_unit_archived: str | bool = ""
-    services: str = ""
     purposes: str = ""
     require_introduction: str | bool = ""
     equipments: str = ""
@@ -123,7 +122,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 "resources",
                 "purposes",
                 "equipments",
-                "services",
                 "payment_types",
                 "qualifiers",
                 models.Prefetch("pricings", ReservationUnitPricing.objects.active()),
@@ -225,7 +223,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 maximum_number_of_active_reservations_per_user="Maximum number of active reservations per user",
                 allow_reservations_without_opening_hours="Allow reservations without opening hours",
                 is_reservation_unit_archived="Is reservation unit archived",
-                services="Services",
                 purposes="Purposes",
                 require_introduction="Require introduction",
                 equipments="Equipments",
@@ -333,7 +330,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 maximum_number_of_active_reservations_per_user=instance.max_reservations_per_user,
                 allow_reservations_without_opening_hours=instance.allow_reservations_without_opening_hours,
                 is_reservation_unit_archived=instance.is_archived,
-                services=", ".join(service.name_fi for service in instance.services.all()),
                 purposes=", ".join(purpose.name_fi for purpose in instance.purposes.all()),
                 require_introduction=instance.require_introduction,
                 equipments=", ".join(equipment.name_fi for equipment in instance.equipments.all()),

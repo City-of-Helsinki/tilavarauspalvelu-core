@@ -4,7 +4,6 @@ import datetime
 import itertools
 import random
 from decimal import Decimal
-from itertools import cycle
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -13,7 +12,7 @@ from django.conf import settings
 from django.contrib.gis.geos import Point
 
 from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
-from tilavarauspalvelu.enums import PaymentType, ReservationUnitImageType, ServiceTypeChoices, TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import PaymentType, ReservationUnitImageType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import (
     AgeGroup,
     City,
@@ -33,7 +32,6 @@ from tilavarauspalvelu.models import (
     ReservationPurpose,
     ReservationUnitCancellationRule,
     ReservationUnitPaymentType,
-    Service,
     Space,
     TaxPercentage,
     TermsOfUse,
@@ -61,7 +59,6 @@ from tests.factories import (
     ReservationUnitCancellationRuleFactory,
     ReservationUnitImageFactory,
     ReservationUnitPaymentTypeFactory,
-    ServiceFactory,
     TaxPercentageFactory,
     TermsOfUseFactory,
 )
@@ -228,20 +225,6 @@ def _create_purposes() -> list[Purpose]:
         purposes.append(purpose)
 
     return Purpose.objects.bulk_create(purposes)
-
-
-@with_logs
-def _create_services() -> list[Service]:
-    service_types = cycle(ServiceTypeChoices.values)
-
-    services = [
-        ServiceFactory.build(
-            service_type=next(service_types),
-        )
-        for _ in range(10)
-    ]
-
-    return Service.objects.bulk_create(services)
 
 
 @with_logs

@@ -226,11 +226,6 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         related_name="reservation_units",
         blank=True,
     )
-    services = models.ManyToManyField(
-        "tilavarauspalvelu.Service",
-        related_name="reservation_units",
-        blank=True,
-    )
     payment_types = models.ManyToManyField(
         "tilavarauspalvelu.ReservationUnitPaymentType",
         related_name="reservation_units",
@@ -514,9 +509,6 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                 "resources_name_fi": ",".join([r.name_fi for r in self.resources.all()]),
                 "resources_name_en": ",".join([r.name_en or "" for r in self.resources.all()]),
                 "resources_name_sv": ",".join([r.name_sv or "" for r in self.resources.all()]),
-                "services_name_fi": ",".join([s.name_fi or "" for s in self.services.all()]),
-                "services_name_en": ",".join([s.name_en or "" for s in self.services.all()]),
-                "services_name_sv": ",".join([s.name_sv or "" for s in self.services.all()]),
                 "purposes_name_fi": ",".join([p.name_fi or "" for p in self.purposes.all()]),
                 "purposes_name_en": ",".join([p.name_en or "" for p in self.purposes.all()]),
                 "purposes_name_sv": ",".join([p.name_sv or "" for p in self.purposes.all()]),

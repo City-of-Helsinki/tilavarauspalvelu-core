@@ -28,7 +28,6 @@ from tests.factories import (
     ReservationUnitFactory,
     ReservationUnitPaymentTypeFactory,
     ResourceFactory,
-    ServiceFactory,
     SpaceFactory,
     TermsOfUseFactory,
     UserFactory,
@@ -384,9 +383,6 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         equipments {
             nameFi
         }
-        services {
-            nameFi
-        }
         paymentTypes {
             code
         }
@@ -406,7 +402,6 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         resources=[ResourceFactory.create()],
         purposes=[PurposeFactory.create()],
         equipments=[EquipmentFactory.create()],
-        services=[ServiceFactory.create()],
         payment_types=[ReservationUnitPaymentTypeFactory.create()],
         qualifiers=[QualifierFactory.create()],
         application_rounds=[ApplicationRoundFactory.create()],
@@ -439,11 +434,6 @@ def test_reservation_unit__query__all_many_to_many_relations(graphql):
         "equipments": [
             {
                 "nameFi": reservation_unit.equipments.first().name_fi,
-            },
-        ],
-        "services": [
-            {
-                "nameFi": reservation_unit.services.first().name_fi,
             },
         ],
         "paymentTypes": [

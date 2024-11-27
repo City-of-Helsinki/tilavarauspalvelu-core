@@ -48,7 +48,6 @@ from .create_reservation_related_things import (
     _create_purposes,
     _create_qualifiers,
     _create_reservation_unit_payment_types,
-    _create_services,
     _fetch_and_build_reservation_unit_image,
 )
 from .create_seasonal_booking import _create_application_round_time_slots
@@ -188,14 +187,12 @@ def _create_reservation_units(
     equipments = _create_equipments()
     purposes = _create_purposes()
     qualifiers = _create_qualifiers()
-    services = _create_services()
 
     reservation_units = list(ReservationUnit.objects.all())
     for reservation_unit in reservation_units:
         reservation_unit.equipments.add(*random_subset(equipments))
         reservation_unit.purposes.add(*random_subset(purposes))
         reservation_unit.qualifiers.add(*random_subset(qualifiers))
-        reservation_unit.services.add(*random_subset(services))
 
     return reservation_units
 

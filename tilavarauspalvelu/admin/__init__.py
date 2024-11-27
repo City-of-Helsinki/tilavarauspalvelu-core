@@ -38,7 +38,6 @@ from .reservation_unit_image.admin import ReservationUnitImageAdmin
 from .reservation_unit_pricing.admin import ReservationUnitPricingAdmin
 from .reservation_unit_type.admin import ReservationUnitTypeAdmin
 from .resource.admin import ResourceAdmin
-from .service.admin import ServiceAdmin
 from .space.admin import SpaceAdmin
 from .sql_log.admin import SQLLogAdmin
 from .tax_percentage.admin import TaxPercentageAdmin
@@ -88,7 +87,6 @@ __all__ = [
     "ReservationUnitTypeAdmin",
     "ResourceAdmin",
     "SQLLogAdmin",
-    "ServiceAdmin",
     "SpaceAdmin",
     "TaxPercentageAdmin",
     "TermsOfUseAdmin",

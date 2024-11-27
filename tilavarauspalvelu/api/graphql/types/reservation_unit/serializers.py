@@ -102,7 +102,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "resources",
             "purposes",
             "equipments",
-            "services",
             "payment_types",
             "qualifiers",
             #

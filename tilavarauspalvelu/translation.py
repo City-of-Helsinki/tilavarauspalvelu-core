@@ -32,7 +32,6 @@ from .models import (
     ReservationUnitCancellationRule,
     ReservationUnitType,
     Resource,
-    Service,
     Space,
     TermsOfUse,
     Unit,
@@ -54,11 +53,6 @@ __all__ = [
     "get_translated",
     "translate_for_user",
 ]
-
-
-@register(Service)
-class ServiceTranslationOptions(TranslationOptions):
-    fields = ["name"]
 
 
 @register(TermsOfUse)

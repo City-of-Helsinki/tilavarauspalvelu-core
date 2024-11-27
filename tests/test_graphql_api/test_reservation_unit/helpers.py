@@ -17,7 +17,6 @@ from tests.factories import (
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
     ResourceFactory,
-    ServiceFactory,
     SpaceFactory,
     TaxPercentageFactory,
     UnitFactory,
@@ -53,7 +52,6 @@ UPDATE_MUTATION = build_mutation("updateReservationUnit", "ReservationUnitUpdate
 def get_create_non_draft_input_data() -> dict[str, Any]:
     unit = UnitFactory.create()
     space = SpaceFactory.create(unit=unit)
-    service = ServiceFactory.create()
     resource = ResourceFactory.create(space=space)
     reservation_unit_type = ReservationUnitTypeFactory.create()
     rule = ReservationUnitCancellationRuleFactory.create()
@@ -73,7 +71,6 @@ def get_create_non_draft_input_data() -> dict[str, Any]:
         "contactInformation": "contact info",
         "spaces": [space.id],
         "resources": [resource.id],
-        "services": [service.id],
         "unit": unit.id,
         "reservationUnitType": reservation_unit_type.id,
         "surfaceArea": 100,
@@ -110,7 +107,6 @@ def get_create_non_draft_input_data() -> dict[str, Any]:
 def get_create_draft_input_data(**overrides: Any) -> dict[str, Any]:
     unit = UnitFactory.create()
     space = SpaceFactory.create(unit=unit)
-    service = ServiceFactory.create()
     resource = ResourceFactory.create(space=space)
     reservation_unit_type = ReservationUnitTypeFactory.create()
 
@@ -126,7 +122,6 @@ def get_create_draft_input_data(**overrides: Any) -> dict[str, Any]:
         "descriptionSv": "desc SV",
         "spaces": [space.id],
         "resources": [resource.id],
-        "services": [service.id],
         "unit": unit.id,
         "reservationUnitType": reservation_unit_type.id,
         **overrides,
