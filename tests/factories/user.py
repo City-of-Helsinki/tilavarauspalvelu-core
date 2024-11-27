@@ -70,7 +70,6 @@ class UserFactory(GenericDjangoModelFactory[User]):
     assigned_general_roles = ReverseForeignKeyFactory("tests.factories.GeneralRoleFactory")
     unit_roles = ReverseForeignKeyFactory("tests.factories.UnitRoleFactory")
     assigned_unit_roles = ReverseForeignKeyFactory("tests.factories.UnitRoleFactory")
-    introductions = ReverseForeignKeyFactory("tests.factories.IntroductionFactory")
 
     @classmethod
     def create_superuser(cls, **kwargs: Any) -> User:

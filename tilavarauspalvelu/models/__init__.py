@@ -14,7 +14,6 @@ from .city.model import City
 from .equipment.model import Equipment
 from .equipment_category.model import EquipmentCategory
 from .general_role.model import GeneralRole
-from .introduction.model import Introduction
 from .keyword.model import Keyword
 from .keyword_category.model import KeywordCategory
 from .keyword_group.model import KeywordGroup
@@ -75,7 +74,6 @@ __all__ = [
     "Equipment",
     "EquipmentCategory",
     "GeneralRole",
-    "Introduction",
     "Keyword",
     "KeywordCategory",
     "KeywordGroup",

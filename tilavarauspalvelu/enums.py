@@ -51,7 +51,6 @@ __all__ = [
     "ReservationUnitPublishingState",
     "ReservationUnitReservationState",
     "ResourceLocationType",
-    "ServiceTypeChoices",
     "TermsOfUseTypeChoices",
     "TimezoneProperty",
     "TimezoneRuleProperty",
@@ -68,12 +67,6 @@ class ReservationNotification(models.TextChoices):
     ALL = "all"
     ONLY_HANDLING_REQUIRED = "only_handling_required"
     NONE = "none"
-
-
-class ServiceTypeChoices(models.TextChoices):
-    INTRODUCTION = "introduction", _("Introduction")
-    CATERING = "catering", _("Catering")
-    CONFIGURATION = "configuration", _("Configuration")
 
 
 class TermsOfUseTypeChoices(models.TextChoices):
