@@ -24,7 +24,6 @@ from .models import (
     Organisation,
     Purpose,
     Qualifier,
-    RealEstate,
     ReservationCancelReason,
     ReservationDenyReason,
     ReservationPurpose,
@@ -78,11 +77,6 @@ class UnitGroupTranslationOptions(TranslationOptions):
 @register(Unit)
 class UnitTranslationOptions(TranslationOptions):
     fields = ["name", "description", "short_description"]
-
-
-@register(RealEstate)
-class RealEstateTranslationOptions(TranslationOptions):
-    fields = ["name"]
 
 
 @register(Building)

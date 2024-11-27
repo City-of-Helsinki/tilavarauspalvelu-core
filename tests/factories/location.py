@@ -31,5 +31,4 @@ class LocationFactory(GenericDjangoModelFactory[Location]):
 
     space = ForwardOneToOneFactory("tests.factories.SpaceFactory")
     building = ForwardOneToOneFactory("tests.factories.BuildingFactory")
-    real_estate = ForwardOneToOneFactory("tests.factories.RealEstateFactory")
     unit = ForwardOneToOneFactory("tests.factories.UnitFactory")

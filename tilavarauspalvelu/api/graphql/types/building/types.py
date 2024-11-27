@@ -15,6 +15,5 @@ class BuildingName(DjangoNode):
         fields = [
             "pk",
             "name",
-            "real_estate",
             "surface_area",
         ]

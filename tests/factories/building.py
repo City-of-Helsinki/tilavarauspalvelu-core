@@ -8,7 +8,6 @@ from ._base import (
     FakerEN,
     FakerFI,
     FakerSV,
-    ForeignKeyFactory,
     GenericDjangoModelFactory,
     ReverseForeignKeyFactory,
     ReverseOneToOneFactory,
@@ -30,7 +29,6 @@ class BuildingFactory(GenericDjangoModelFactory[Building]):
 
     surface_area = FakerFI("pydecimal", min_value=1, max_value=100)
 
-    real_estate = ForeignKeyFactory("tests.factories.RealEstateFactory")
     location = ReverseOneToOneFactory("tests.factories.LocationFactory")
 
     spaces = ReverseForeignKeyFactory("tests.factories.SpaceFactory")

@@ -30,7 +30,6 @@ from .person.model import Person
 from .personal_info_view_log.model import PersonalInfoViewLog
 from .purpose.model import Purpose
 from .qualifier.model import Qualifier
-from .real_estate.model import RealEstate
 from .recurring_reservation.model import RecurringReservation
 from .rejected_occurrence.model import RejectedOccurrence
 from .request_log.model import RequestLog
@@ -94,7 +93,6 @@ __all__ = [
     "ProfileUser",
     "Purpose",
     "Qualifier",
-    "RealEstate",
     "RecurringReservation",
     "RejectedOccurrence",
     "RequestLog",
