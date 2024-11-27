@@ -115,9 +115,6 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
         if must_be_cancelled_before < now:
             msg = "Reservation time cannot be changed because the cancellation period has expired."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_TIME_PAST)
-        if cancel_rule.needs_handling:
-            msg = "Reservation time change needs manual handling."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_NOT_ALLOWED)
 
     def check_and_handle_pricing(self, data: dict[str, Any]) -> None:
         if self.instance.price > 0:

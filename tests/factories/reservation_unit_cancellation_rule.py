@@ -23,7 +23,6 @@ class ReservationUnitCancellationRuleFactory(GenericDjangoModelFactory[Reservati
     name_en = FakerEN("word")
     name_sv = FakerSV("word")
 
-    needs_handling = False
     can_be_cancelled_time_before = datetime.timedelta(hours=24)
 
     reservation_units = ReverseForeignKeyFactory("tests.factories.ReservationUnitFactory")

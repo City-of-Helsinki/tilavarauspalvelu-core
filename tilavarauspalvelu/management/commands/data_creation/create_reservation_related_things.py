@@ -333,7 +333,6 @@ def _create_cancellation_rules() -> list[ReservationUnitCancellationRule]:
     non_handling_rules = [
         ReservationUnitCancellationRuleFactory.build(
             can_be_cancelled_time_before=datetime.timedelta(days=i),
-            needs_handling=False,
         )
         for i in range(2)
     ]

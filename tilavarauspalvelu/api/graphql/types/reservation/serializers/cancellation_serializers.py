@@ -72,10 +72,6 @@ class ReservationCancellationSerializer(NestingModelSerializer):
                 msg = "Reservation cannot be cancelled because the cancellation period is over."
                 raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
 
-            if cancel_rule.needs_handling:
-                msg = "Reservation cancellation needs manual handling."
-                raise ValidationError(msg, code=error_codes.RESERVATION_REQUIRES_MANUAL_HANDLING)
-
         return data
 
     def save(self, **kwargs: Any) -> Reservation:

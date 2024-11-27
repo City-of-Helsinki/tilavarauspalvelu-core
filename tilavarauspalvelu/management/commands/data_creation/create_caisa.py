@@ -277,7 +277,6 @@ def _create_caisa() -> None:
         name_en="Varauksen alkuun asti",
         name_sv="Varauksen alkuun asti",
         can_be_cancelled_time_before=datetime.timedelta(seconds=1),
-        needs_handling=False,
     )
     cancel_rule_14_days = ReservationUnitCancellationRuleFactory.create(
         name="14 vrk ennen alkamista",
@@ -285,7 +284,6 @@ def _create_caisa() -> None:
         name_en="14 days before start",
         name_sv="14 dagar innan start",
         can_be_cancelled_time_before=datetime.timedelta(days=14),
-        needs_handling=False,
     )
 
     ###########################################################################################################

@@ -12,5 +12,4 @@ class ReservationUnitCancellationRuleAdmin(TranslationAdmin):
     list_display = [
         "name",
         "can_be_cancelled_time_before",
-        "needs_handling",
     ]

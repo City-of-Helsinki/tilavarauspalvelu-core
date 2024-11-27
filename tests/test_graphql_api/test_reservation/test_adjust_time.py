@@ -111,18 +111,6 @@ def test_reservation__adjust_time__cancellation_rule_time_limit_exceed(graphql):
     assert response.error_message() == "Reservation time cannot be changed because the cancellation period has expired."
 
 
-def test_reservation__adjust_time__cancellation_rule_has_needs_handling(graphql):
-    reservation = ReservationFactory.create_for_time_adjustment(
-        reservation_units__cancellation_rule__needs_handling=True,
-    )
-
-    graphql.login_with_superuser()
-    data = get_adjust_data(reservation)
-    response = graphql(ADJUST_MUTATION, data)
-
-    assert response.error_message() == "Reservation time change needs manual handling."
-
-
 def test_reservation__adjust_time__reservation_is_already_handled(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(handled_at=local_datetime())
 
