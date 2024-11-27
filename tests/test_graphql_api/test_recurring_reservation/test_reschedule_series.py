@@ -699,3 +699,59 @@ def test_recurring_reservations__reschedule_series__create_statistics__partial(g
     # But those statistics should be for different reservations.
     after = list(ReservationStatistic.objects.order_by("reservation").values_list("reservation", flat=True))
     assert before != after
+
+
+@freeze_time(local_datetime(year=2023, month=12, day=4, hour=10, minute=30))  # Monday
+def test_recurring_reservations__reschedule_series__same_day_ongoing_reservation(graphql):
+    recurring_reservation = create_reservation_series()
+
+    data = get_minimal_reschedule_data(recurring_reservation, beginTime="11:00:00")
+
+    graphql.login_with_superuser()
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False
+
+    # Series entries start at 11:00 instead of 10:00.
+    recurring_reservation.refresh_from_db()
+    assert recurring_reservation.begin_time == local_time(hour=11)
+
+    reservations = list(recurring_reservation.reservations.order_by("begin").all())
+    assert len(reservations) == 9
+    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=10)
+    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[3].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[4].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[5].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[6].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[7].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[8].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+
+
+@freeze_time(local_datetime(year=2023, month=12, day=4, hour=8))  # Monday
+def test_recurring_reservations__reschedule_series__same_day_future_reservation(graphql):
+    recurring_reservation = create_reservation_series()
+
+    data = get_minimal_reschedule_data(recurring_reservation, beginTime="11:00:00")
+
+    graphql.login_with_superuser()
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False
+
+    # Series entries start at 11:00 instead of 10:00.
+    recurring_reservation.refresh_from_db()
+    assert recurring_reservation.begin_time == local_time(hour=11)
+
+    reservations = list(recurring_reservation.reservations.order_by("begin").all())
+    assert len(reservations) == 9
+    assert reservations[0].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[1].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[2].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[3].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[4].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[5].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[6].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[7].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+    assert reservations[8].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)

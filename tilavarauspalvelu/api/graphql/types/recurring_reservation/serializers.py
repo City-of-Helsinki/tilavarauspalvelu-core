@@ -441,7 +441,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         return data
 
     def save(self, **kwargs: Any) -> RecurringReservation:
-        skip_dates: list[datetime.date] = self.initial_data.get("skip_dates", [])
+        skip_dates: set[datetime.date] = set(self.initial_data.get("skip_dates", []))
         buffer_time_before: datetime.timedelta | None = self.initial_data.get("buffer_time_before")
         buffer_time_after: datetime.timedelta | None = self.initial_data.get("buffer_time_after")
 
@@ -472,35 +472,40 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         instance: RecurringReservation,
         buffer_time_before: datetime.timedelta | None,
         buffer_time_after: datetime.timedelta | None,
-        skip_dates: list[datetime.date],
+        skip_dates: set[datetime.date],
     ) -> list[Reservation]:
         now = local_datetime()
         today = now.date()
 
-        # New reservations can overlap with existing reservations in this series
+        # New reservations can overlap with existing reservations in this series,
+        # since the existing ones will be deleted.
         old_reservation_ids: list[int] = list(instance.reservations.values_list("pk", flat=True))
 
         # Skip generating reservations for any dates where there is currently a non-confirmed reservation.
         # It's unlikely that the reserver will want or can have the same date even if the time is changed.
         # Any exceptions can be handled after the fact.
-        skip_dates += list(
-            instance.reservations.exclude(
-                state=ReservationStateChoice.CONFIRMED,
-            ).values_list("begin__date", flat=True)
-        )
+        skip_dates |= set(instance.reservations.unconfirmed().values_list("begin__date", flat=True))
 
         reservation_details = self.get_reservation_details(instance)
         reservation_details["buffer_time_before"] = buffer_time_before or datetime.timedelta()
         reservation_details["buffer_time_after"] = buffer_time_after or datetime.timedelta()
 
-        # Only recreate reservations from this moment onwards
-        if instance.begin_date < today:
-            skip_dates += [
+        # If the series has already started:
+        if instance.begin_date <= today:
+            # Only create reservation to the future.
+            skip_dates |= {
                 instance.begin_date + datetime.timedelta(days=delta)  #
                 for delta in range((today - instance.begin_date).days)
-            ]
-            if combine(today, instance.begin_time, tzinfo=DEFAULT_TIMEZONE) < now:
-                skip_dates.append(today)
+            }
+
+            # If new reservation would already have started, don't create it.
+            if combine(today, instance.begin_time, tzinfo=DEFAULT_TIMEZONE) <= now:
+                skip_dates.add(today)
+
+            # If series already has a reservation that is ongoing or in the past, don't create new one for today.
+            todays_reservation: Reservation | None = instance.reservations.filter(begin__date=today).first()
+            if todays_reservation is not None and todays_reservation.begin.astimezone(DEFAULT_TIMEZONE) <= now:
+                skip_dates.add(today)
 
         slots = instance.actions.pre_calculate_slots(
             check_buffers=True,
