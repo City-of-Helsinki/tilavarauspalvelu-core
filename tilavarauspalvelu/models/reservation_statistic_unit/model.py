@@ -22,7 +22,7 @@ __all__ = [
 class ReservationStatisticsReservationUnit(models.Model):
     name = models.CharField(max_length=255)
     unit_name = models.CharField(max_length=255)
-    unit_tprek_id = models.CharField(max_length=255, null=True)  # noqa: DJ001
+    unit_tprek_id = models.CharField(max_length=255, default="")
 
     reservation_statistics = models.ForeignKey(
         "tilavarauspalvelu.ReservationStatistic",
@@ -74,7 +74,7 @@ class ReservationStatisticsReservationUnit(models.Model):
             stat_unit.reservation_statistics = statistic
             stat_unit.reservation_unit = reservation_unit
             stat_unit.unit_name = getattr(reservation_unit.unit, "name", "")
-            stat_unit.unit_tprek_id = getattr(reservation_unit.unit, "tprek_id", "")
+            stat_unit.unit_tprek_id = getattr(reservation_unit.unit, "tprek_id", "") or ""
 
             to_save.append(stat_unit)
 
