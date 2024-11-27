@@ -7,9 +7,8 @@ import {
   IconPen,
   IconQuestionCircle,
 } from "hds-react";
-import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { fontMedium, H1 } from "common/src/common/typography";
+import { H1 } from "common/src/common/typography";
 import {
   type Maybe,
   OrderStatus,
@@ -25,19 +24,6 @@ import { gql } from "@apollo/client";
 import { ExternalLink } from "@/component/ExternalLink";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
-
-const Tagline = styled.p`
-  font-size: var(--fontsize-body-xl);
-  margin-bottom: var(--spacing-xs);
-`;
-
-const DateTime = styled(Flex).attrs({
-  $gap: "xs",
-})`
-  > a {
-    ${fontMedium}
-  }
-`;
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
@@ -71,7 +57,7 @@ export const APPLICATION_LINK_QUERY = gql`
   }
 `;
 
-const getStatusLabelType = (s?: Maybe<OrderStatus>): StatusLabelType => {
+function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {
   switch (s) {
     case OrderStatus.Paid:
     case OrderStatus.Refunded:
@@ -85,11 +71,12 @@ const getStatusLabelType = (s?: Maybe<OrderStatus>): StatusLabelType => {
     default:
       return "neutral";
   }
-};
+}
 
-const getReservationStateLabelProps = (
-  s?: Maybe<ReservationStateChoice>
-): { type: StatusLabelType; icon: JSX.Element } => {
+function getReservationStateLabelProps(s?: Maybe<ReservationStateChoice>): {
+  type: StatusLabelType;
+  icon: JSX.Element;
+} {
   switch (s) {
     case ReservationStateChoice.Created:
       return { type: "draft", icon: <IconPen aria-hidden="true" /> };
@@ -109,7 +96,7 @@ const getReservationStateLabelProps = (
         icon: <IconQuestionCircle aria-hidden="true" />,
       };
   }
-};
+}
 
 const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
   ({ reservation, tagline, overrideTitle, noMargin }: Props, ref) => {
@@ -158,18 +145,16 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
             )}
           </Flex>
         </TitleSection>
-        <Tagline data-testid="reservation_title_section__tagline">
-          {tagline}
-        </Tagline>
-        <DateTime>
+        <p data-testid="reservation_title_section__tagline">{tagline}</p>
+        <Flex $gap="xs" $direction="row">
           {t("RequestedReservation.createdAt")}{" "}
           {formatDateTime(reservation.createdAt ?? "")}
           {applicationLink !== "" && (
-            <ExternalLink to={applicationLink} size="s">
+            <ExternalLink to={applicationLink} size="s" isBold>
               {`${t("RequestedReservation.applicationLink")}: ${applicationPk}-${sectionPk}`}
             </ExternalLink>
           )}
-        </DateTime>
+        </Flex>
       </div>
     );
   }

@@ -13,8 +13,6 @@ const Value = styled.div`
   line-height: var(--lineheight-l);
 `;
 
-const Wrapper = styled.div``;
-
 interface IValueBoxProps {
   label: string;
   value: string | undefined | null | JSX.Element;
@@ -28,9 +26,9 @@ export function ValueBox({
   ...rest
 }: IValueBoxProps): JSX.Element {
   return (
-    <Wrapper {...rest}>
+    <div {...rest}>
       <Label>{label}</Label>
       <Value>{value || "-"}</Value>
-    </Wrapper>
+    </div>
   );
 }

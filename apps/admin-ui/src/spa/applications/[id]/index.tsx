@@ -15,7 +15,14 @@ import {
 import { isEqual, trim } from "lodash";
 import { type ApolloQueryResult } from "@apollo/client";
 import { type TFunction } from "i18next";
-import { H1, H3, H4, H5, Strong } from "common/src/common/typography";
+import {
+  fontMedium,
+  H1,
+  H3,
+  H4,
+  H5,
+  Strong,
+} from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import {
@@ -56,6 +63,7 @@ import { errorToast } from "common/src/common/toast";
 import { Flex, TitleSection } from "common/styles/util";
 import { StatusLabelType } from "common/src/tags";
 import { StatusLabel } from "common/src/components";
+import { ApplicationDatas, Summary } from "@/styles/util";
 
 type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
 type ApplicationSectionType = NonNullable<
@@ -129,27 +137,8 @@ function ApplicationStatusBlock({
   );
 }
 
-const CardContentContainer = styled.div`
-  display: grid;
-  gap: var(--spacing-m);
-  grid-template-columns: 1fr;
-  @media (min-width: ${breakpoints.m}) {
-    grid-template-columns: 1fr 1fr;
-  }
-`;
-
-const EventProps = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-l);
-  word-break: break-all;
-`;
-
-const Label = styled.span``;
-
 const Value = styled.span`
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-weight: 700;
+  ${fontMedium}
 `;
 
 const Accordion = styled(AccordionBase)`
@@ -162,33 +151,6 @@ const Accordion = styled(AccordionBase)`
 
 const PreCard = styled.div`
   font-size: var(--fontsize-body-s);
-`;
-
-const EventSchedules = styled.div`
-  gap: var(--spacing-l);
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  @media (min-width: ${breakpoints.xl}) {
-    display: grid;
-    grid-template-columns: 1fr 16em;
-  }
-`;
-
-const SchedulesCardContainer = styled.div`
-  gap: var(--spacing-m);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: 100%;
-
-  @media (min-width: ${breakpoints.xl}) {
-    display: flex;
-    flex-direction: column;
-  }
-  h5:nth-of-type(1) {
-    margin-top: 0;
-  }
 `;
 
 const EventSchedule = styled.div`
@@ -260,7 +222,7 @@ const KV = ({
   dataId?: string;
 }): JSX.Element => (
   <div key={k}>
-    <Label id={k}>{k}</Label>:{" "}
+    <span id={k}>{k}</span>:{" "}
     <Value aria-labelledby={k} data-testid={dataId}>
       {v || "-"}
     </Value>
@@ -627,7 +589,7 @@ function ApplicationSectionDetails({
   return (
     <ScrollIntoView key={section.pk} hash={hash}>
       <Accordion heading={heading} initiallyOpen>
-        <EventProps>
+        <ApplicationDatas>
           {section.ageGroup && (
             <ValueBox
               label={t("ApplicationEvent.ageGroup")}
@@ -657,7 +619,7 @@ function ApplicationSectionDetails({
             value={`${section.appliedReservationsPerWeek}`}
           />
           <ValueBox label={t("ApplicationEvent.dates")} value={dates} />
-        </EventProps>
+        </ApplicationDatas>
         <Flex $justify="space-between" $direction="row" $align="center">
           <H4 as="h3">{t("ApplicationEvent.requestedReservationUnits")}</H4>
           <RejectAllOptionsButton
@@ -678,7 +640,7 @@ function ApplicationSectionDetails({
           ))}
         </ApplicationSectionsContainer>
         <H4 as="h3">{t("ApplicationEvent.requestedTimes")}</H4>
-        <EventSchedules>
+        <Flex $gap="l">
           <TimeSelector applicationSection={section} />
           <Card
             border
@@ -688,12 +650,12 @@ function ApplicationSectionDetails({
               "--padding-vertical": "var(--spacing-m)",
             }}
           >
-            <SchedulesCardContainer>
+            <ApplicationDatas>
               <SchedulesContent as={section} priority={Priority.Primary} />
               <SchedulesContent as={section} priority={Priority.Secondary} />
-            </SchedulesCardContainer>
+            </ApplicationDatas>
           </Card>
-        </EventSchedules>
+        </Flex>
       </Accordion>
     </ScrollIntoView>
   );
@@ -923,34 +885,22 @@ function ApplicationDetails({
             refetch={refetch}
           />
         </div>
-        <Card
-          theme={{
-            "--background-color": "var(--color-black-5)",
-            "--padding-horizontal": "var(--spacing-m)",
-            "--padding-vertical": "var(--spacing-m)",
-          }}
-        >
-          <CardContentContainer>
-            <Flex $gap="s">
-              <KV
-                k={t("Application.applicantType")}
-                v={t(`Application.applicantTypes.${application.applicantType}`)}
-                dataId="application-details__data--applicant-type"
-              />
-              <KV k={t("common.homeCity")} v={homeCity} />
-              {isOrganisation && (
-                <KV
-                  k={t("Application.coreActivity")}
-                  v={application.organisation?.coreBusinessFi || "-"}
-                />
-              )}
-            </Flex>
-            <Flex $gap="s">
-              <KV k={t("Application.numHours")} v="-" />
-              <KV k={t("Application.numTurns")} v="-" />
-            </Flex>
-          </CardContentContainer>
-        </Card>
+        <Summary>
+          <KV
+            k={t("Application.applicantType")}
+            v={t(`Application.applicantTypes.${application.applicantType}`)}
+            dataId="application-details__data--applicant-type"
+          />
+          <KV k={t("common.homeCity")} v={homeCity} />
+          {isOrganisation && (
+            <KV
+              k={t("Application.coreActivity")}
+              v={application.organisation?.coreBusinessFi || "-"}
+            />
+          )}
+          <KV k={t("Application.numHours")} v="-" />
+          <KV k={t("Application.numTurns")} v="-" />
+        </Summary>
         <Accordion
           heading={t("RequestedReservation.workingMemo")}
           initiallyOpen={application.workingMemo.length > 0}
@@ -972,7 +922,7 @@ function ApplicationDetails({
         <H3 as="h2" $noMargin>
           {t("Application.customerBasicInfo")}
         </H3>
-        <EventProps>
+        <ApplicationDatas>
           <ValueBox
             label={t("Application.authenticatedUser")}
             value={application.user?.email}
@@ -1008,11 +958,11 @@ function ApplicationDetails({
             label={t("Application.headings.userBirthDate")}
             value={<BirthDate applicationPk={application.pk ?? 0} />}
           />
-        </EventProps>
+        </ApplicationDatas>
         <H3 as="h2" $noMargin>
           {t("Application.contactPersonInformation")}
         </H3>
-        <EventProps>
+        <ApplicationDatas>
           <ValueBox
             label={t("Application.contactPersonFirstName")}
             value={application.contactPerson?.firstName}
@@ -1029,13 +979,13 @@ function ApplicationDetails({
             label={t("Application.contactPersonPhoneNumber")}
             value={application.contactPerson?.phoneNumber}
           />
-        </EventProps>
+        </ApplicationDatas>
         {isOrganisation ? (
           <>
             <H3 as="h2" $noMargin>
               {t("Application.contactInformation")}
             </H3>
-            <EventProps>
+            <ApplicationDatas>
               <ValueBox
                 label={t("common.streetAddress")}
                 value={application.organisation?.address?.streetAddressFi}
@@ -1048,7 +998,7 @@ function ApplicationDetails({
                 label={t("common.postalDistrict")}
                 value={application.organisation?.address?.cityFi}
               />
-            </EventProps>
+            </ApplicationDatas>
           </>
         ) : null}
         {hasBillingAddress ? (
@@ -1058,7 +1008,7 @@ function ApplicationDetails({
                 ? t("Application.contactInformation")
                 : t("common.billingAddress")}
             </H3>
-            <EventProps>
+            <ApplicationDatas>
               <ValueBox
                 label={t("common.streetAddress")}
                 value={application.billingAddress?.streetAddressFi}
@@ -1071,7 +1021,7 @@ function ApplicationDetails({
                 label={t("common.postalDistrict")}
                 value={application.billingAddress?.cityFi}
               />
-            </EventProps>
+            </ApplicationDatas>
           </>
         ) : null}
       </>

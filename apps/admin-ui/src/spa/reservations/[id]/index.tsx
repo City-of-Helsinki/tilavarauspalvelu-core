@@ -3,10 +3,9 @@ import { trim } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import type { TFunction } from "i18next";
 import { add, startOfISOWeek } from "date-fns";
-import { breakpoints } from "common/src/common/style";
 import {
   CustomerTypeChoice,
   type ReservationQuery,
@@ -37,63 +36,22 @@ import { useRecurringReservations } from "@/hooks";
 import ApprovalButtonsRecurring from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { base64encode, isPriceFree } from "common/src/helpers";
-import { fontMedium } from "common";
 import { formatAgeGroup } from "@/common/util";
 import Error404 from "@/common/Error404";
 import { Accordion as AccordionBase } from "hds-react";
+import {
+  ApplicationDatas,
+  KVWrapper,
+  Label,
+  Summary,
+  Value,
+} from "@/styles/util";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
 const Accordion = styled(AccordionBase).attrs({
   closeButton: false,
 })``;
-
-const ApplicationDatas = styled.div`
-  display: grid;
-  gap: var(--spacing-l);
-  grid-template-columns: 1fr;
-  @media (min-width: ${breakpoints.m}) {
-    grid-template-columns: 1fr 1fr;
-  }
-`;
-
-const Summary = styled(ApplicationDatas)`
-  padding: var(--spacing-m);
-  gap: var(--spacing-s);
-  background: var(--color-black-5);
-`;
-
-const Label = styled.div<{ $isSummary?: boolean }>`
-  ${({ $isSummary }) =>
-    $isSummary &&
-    css`
-      color: var(--color-black-70);
-      display: inline-block;
-    `};
-`;
-const Value = styled.div<{ $isSummary?: boolean }>`
-  word-wrap: break-word;
-  overflow-wrap: anywhere;
-  ${({ $isSummary }) =>
-    $isSummary
-      ? css`
-          ${fontMedium}
-          white-space: pre-wrap;
-          display: inline-block;
-        `
-      : css`
-          font-size: var(--fontsize-body-l);
-        `};
-`;
-const KVWrapper = styled.div<{ $isWide?: boolean; $isSummary?: boolean }>`
-  grid-column: ${({ $isWide }) => ($isWide ? "1 / -1" : "")};
-  ${({ $isSummary }) =>
-    $isSummary &&
-    css`
-      display: flex;
-      gap: var(--spacing-2-xs);
-    `};
-`;
 
 function DataWrapper({
   label,
