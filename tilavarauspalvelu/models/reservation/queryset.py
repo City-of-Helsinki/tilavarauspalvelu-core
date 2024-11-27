@@ -91,6 +91,9 @@ class ReservationQuerySet(models.QuerySet):
         """Filter reservations have yet not begun."""
         return self.going_to_occur().filter(begin__gt=local_datetime())
 
+    def unconfirmed(self) -> Self:
+        return self.exclude(state=ReservationStateChoice.CONFIRMED)
+
     def inactive(self, older_than_minutes: int) -> Self:
         """Filter 'draft' reservations, which are older than X minutes old, and can be assumed to be inactive."""
         return self.filter(
