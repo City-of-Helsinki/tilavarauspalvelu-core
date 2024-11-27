@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     import datetime
 
     from tilavarauspalvelu.models import AbilityGroup, AgeGroup, AllocatedTimeSlot, ReservationUnit, User
+    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
     from .actions import RecurringReservationActions
 
@@ -83,6 +84,9 @@ class RecurringReservation(models.Model):
         null=True,
         blank=True,
     )
+
+    # Reverse relation typing helpers.
+    reservations: ReservationQuerySet
 
     objects = RecurringReservationManager()
 

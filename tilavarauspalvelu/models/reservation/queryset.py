@@ -24,14 +24,14 @@ __all__ = [
 
 
 class ReservationQuerySet(models.QuerySet):
-    def with_buffered_begin_and_end(self: Self) -> Self:
+    def with_buffered_begin_and_end(self) -> Self:
         """Annotate the queryset with buffered begin and end times."""
         return self.annotate(
             buffered_begin=models.F("begin") - models.F("buffer_time_before"),
             buffered_end=models.F("end") + models.F("buffer_time_after"),
         )
 
-    def filter_buffered_reservations_period(self: Self, start_date: datetime.date, end_date: datetime.date) -> Self:
+    def filter_buffered_reservations_period(self, start_date: datetime.date, end_date: datetime.date) -> Self:
         """Filter reservations that are on the given period."""
         return (
             self.with_buffered_begin_and_end()
@@ -43,40 +43,40 @@ class ReservationQuerySet(models.QuerySet):
             .order_by("buffered_begin")
         )
 
-    def total_duration(self: Self) -> datetime.timedelta:
+    def total_duration(self) -> datetime.timedelta:
         return (
             self.annotate(duration=models.F("end") - models.F("begin"))
             .aggregate(total_duration=models.Sum("duration"))
             .get("total_duration")
         ) or datetime.timedelta()
 
-    def total_seconds(self: Self) -> int:
+    def total_seconds(self) -> int:
         return int(self.total_duration().total_seconds())
 
-    def within_application_round_period(self: Self, app_round: ApplicationRound) -> Self:
+    def within_application_round_period(self, app_round: ApplicationRound) -> Self:
         return self.within_period(
             app_round.reservation_period_begin,
             app_round.reservation_period_end,
         )
 
-    def within_period(self: Self, period_start: datetime.date, period_end: datetime.date) -> Self:
+    def within_period(self, period_start: datetime.date, period_end: datetime.date) -> Self:
         """All reservation fully withing a period."""
         return self.filter(
             begin__date__gte=period_start,
             end__date__lte=period_end,
         )
 
-    def overlapping_period(self: Self, period_start: datetime.date, period_end: datetime.date) -> Self:
+    def overlapping_period(self, period_start: datetime.date, period_end: datetime.date) -> Self:
         """All reservations that overlap with a period, even partially."""
         return self.filter(
             begin__date__lte=period_end,
             end__date__gte=period_start,
         )
 
-    def going_to_occur(self: Self) -> Self:
+    def going_to_occur(self) -> Self:
         return self.filter(state__in=ReservationStateChoice.states_going_to_occur)
 
-    def active(self: Self) -> Self:
+    def active(self) -> Self:
         """
         Filter reservations that have not ended yet.
 
@@ -87,14 +87,14 @@ class ReservationQuerySet(models.QuerySet):
         """
         return self.going_to_occur().filter(end__gte=local_datetime())
 
-    def inactive(self: Self, older_than_minutes: int) -> Self:
+    def inactive(self, older_than_minutes: int) -> Self:
         """Filter 'draft' reservations, which are older than X minutes old, and can be assumed to be inactive."""
         return self.filter(
             state=ReservationStateChoice.CREATED,
             created_at__lte=local_datetime() - datetime.timedelta(minutes=older_than_minutes),
         )
 
-    def with_inactive_payments(self: Self) -> Self:
+    def with_inactive_payments(self) -> Self:
         expiration_time = local_datetime() - datetime.timedelta(minutes=settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES)
         return self.filter(
             state=ReservationStateChoice.WAITING_FOR_PAYMENT,
@@ -103,7 +103,7 @@ class ReservationQuerySet(models.QuerySet):
             payment_order__created_at__lte=expiration_time,
         )
 
-    def affecting_reservations(self: Self, units: list[int] = (), reservation_units: list[int] = ()) -> Self:
+    def affecting_reservations(self, units: list[int] = (), reservation_units: list[int] = ()) -> Self:
         """Filter reservations that affect other reservations in the given units and/or reservation units."""
         from tilavarauspalvelu.models import ReservationUnit
 
@@ -167,7 +167,7 @@ class ReservationQuerySet(models.QuerySet):
             item.units_for_permissions = [unit for unit in units if item.pk in unit.reservation_ids]
 
     def filter_for_user_num_active_reservations(
-        self: Self,
+        self,
         reservation_unit: ReservationUnit | models.OuterRef,
         user: AnyUser,
     ) -> Self:
