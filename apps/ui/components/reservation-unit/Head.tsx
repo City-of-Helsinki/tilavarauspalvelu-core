@@ -7,7 +7,7 @@ import { formatDuration } from "common/src/common/util";
 import { fontRegular, H1, H3 } from "common/src/common/typography";
 import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
 import { formatDate, getTranslation, orderImages } from "@/modules/util";
-import IconWithText from "../common/IconWithText";
+import { IconWithText } from "../common/IconWithText";
 import { Images } from "./Images";
 import {
   getActivePricing,
@@ -120,14 +120,6 @@ const IconListWrapper = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 `;
 
-const StyledIconWithText = styled(IconWithText)`
-  display: grid;
-  align-items: flex-start;
-  white-space: pre-line;
-  line-height: var(--lineheight-l);
-  margin-top: unset;
-`;
-
 function IconList({
   reservationUnit,
   subventionSuffix,
@@ -206,7 +198,7 @@ function IconList({
   return (
     <IconListWrapper>
       {iconsTexts.map(({ icon, key, text }) => (
-        <StyledIconWithText key={key} icon={icon} text={text} />
+        <IconWithText key={key} icon={icon} text={text} />
       ))}
     </IconListWrapper>
   );

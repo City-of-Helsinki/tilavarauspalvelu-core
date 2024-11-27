@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import type { OptionType } from "common/types/common";
-import { H2, H3 } from "common/src/common/typography";
+import { fontBold, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   ReservationUnitOrderingChoices,
@@ -26,7 +26,7 @@ import { AutoGrid, Flex } from "common/styles/util";
 import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
-import IconWithText from "../common/IconWithText";
+import { IconWithText } from "../common/IconWithText";
 import { getReservationUnitPath } from "@/modules/urls";
 
 const Container = styled.div`
@@ -59,9 +59,8 @@ const Container = styled.div`
 `;
 
 const Name = styled.span`
-  font-family: var(--font-bold);
+  ${fontBold}
   font-size: var(--fontsize-heading-m);
-  font-weight: bold;
 
   a {
     text-decoration: none;
@@ -69,15 +68,11 @@ const Name = styled.span`
   }
 `;
 
-const Unit = styled.div`
-  margin-top: var(--spacing-2-xs);
-`;
-
-const Main = styled.span`
+const Main = styled(Flex).attrs({ $gap: "2-xs" })`
   grid-area: name;
 `;
 
-const Props = styled.span`
+const IconContainer = styled(Flex).attrs({ $gap: "xs" })`
   font-size: var(--fontsize-body-s);
 `;
 
@@ -86,19 +81,6 @@ const Image = styled.img`
   object-fit: cover;
   width: 178px;
   height: 185px;
-`;
-
-const LinkContent = styled.span`
-  margin-top: var(--spacing-xs);
-  display: flex;
-  flex-direction: row;
-  align-items: middle;
-  font-family: var(--font-bold);
-  font-size: var(--fontsize-body-m);
-`;
-
-const LinkText = styled.span`
-  margin-left: var(--spacing-xs);
 `;
 
 function ReservationUnitCard({
@@ -135,19 +117,19 @@ function ReservationUnitCard({
       <Image alt={name} src={imgSrc} />
       <Main>
         <Name>{name}</Name>
-        <Unit>{unitName}</Unit>
+        <span>{unitName}</span>
         <Link
           href={getReservationUnitPath(reservationUnit.pk)}
           target="_blank"
           rel="noopener noreferrer"
         >
-          <LinkContent>
+          <Flex $direction="row" $gap="2-xs" $align="center">
+            <span>{t("reservationUnitModal:openLinkToNewTab")}</span>
             <IconLinkExternal />
-            <LinkText>{t("reservationUnitModal:openLinkToNewTab")}</LinkText>
-          </LinkContent>
+          </Flex>
         </Link>
       </Main>
-      <Props>
+      <IconContainer>
         {reservationUnitTypeName && (
           <IconWithText
             icon={<IconInfoCircle />}
@@ -163,10 +145,10 @@ function ReservationUnitCard({
         {getAddressAlt(reservationUnit) && (
           <IconWithText
             icon={<IconLocation />}
-            text={getAddressAlt(reservationUnit) || ""}
+            text={getAddressAlt(reservationUnit) ?? ""}
           />
         )}
-      </Props>
+      </IconContainer>
       <Button
         iconRight={<IconArrowRight />}
         onClick={handle}

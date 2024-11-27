@@ -5,23 +5,17 @@ import { Trans, useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
 import { H5 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
-import IconWithText from "../common/IconWithText";
 import { ApplicationSectionFormValue } from "./Form";
+import { Flex } from "common/styles/util";
+import { IconWithText } from "../common/IconWithText";
 
 type Props = {
   applicationSection?: ApplicationSectionFormValue;
   name: string;
 };
 
-const Message = styled.div`
-  font-size: var(--fontsize-body-l);
-  margin-bottom: var(--spacing-m);
-`;
-
-const CustomIconWithText = styled(IconWithText)`
-  font-size: var(--fontsize-body-m);
-  margin-top: var(--spacing-2-xs);
-  white-space: unset;
+const Message = styled.p`
+  margin-top: 0;
 `;
 
 const SubHeadLine = styled(H5).attrs({
@@ -30,11 +24,11 @@ const SubHeadLine = styled(H5).attrs({
   margin-top: var(--spacing-layout-m);
 `;
 
-const Box = styled.div`
+const Box = styled(Flex).attrs({
+  $gap: "xs",
+})`
   border: 2px solid var(--color-black);
   padding: var(--spacing-l) var(--spacing-m);
-  white-space: pre-line;
-  line-height: var(--lineheight-xl);
 `;
 
 const numHours = (
@@ -100,6 +94,33 @@ export function ApplicationEventSummary({
     return null;
   }
 
+  const icons = [
+    {
+      icon: <IconGroup aria-hidden="true" style={{ flexShrink: 0 }} />,
+      text: t("applicationEventSummary:numPersons", {
+        count: numPersons ?? 0,
+      }),
+    },
+    {
+      icon: <IconClock aria-hidden="true" style={{ flexShrink: 0 }} />,
+      text: t(
+        `applicationEventSummary:${
+          minDuration === maxDuration ? "minDuration" : "durations"
+        }`,
+        {
+          minDuration: displayDuration(applicationSection.minDuration, t),
+          maxDuration: displayDuration(applicationSection.maxDuration, t),
+        }
+      ),
+    },
+    {
+      icon: <IconCalendar aria-hidden="true" style={{ flexShrink: 0 }} />,
+      text: t("applicationEventSummary:eventsPerWeek", {
+        count: appliedReservationsPerWeek,
+      }),
+    },
+  ];
+
   return (
     <>
       <SubHeadLine>
@@ -115,30 +136,9 @@ export function ApplicationEventSummary({
             components={{ bold: <strong />, br: <br /> }}
           />
         </Message>
-        <CustomIconWithText
-          icon={<IconGroup aria-hidden />}
-          text={t("applicationEventSummary:numPersons", {
-            count: numPersons ?? 0,
-          })}
-        />
-        <CustomIconWithText
-          icon={<IconClock aria-hidden />}
-          text={t(
-            `applicationEventSummary:${
-              minDuration === maxDuration ? "minDuration" : "durations"
-            }`,
-            {
-              minDuration: displayDuration(applicationSection.minDuration, t),
-              maxDuration: displayDuration(applicationSection.maxDuration, t),
-            }
-          )}
-        />
-        <CustomIconWithText
-          icon={<IconCalendar aria-hidden />}
-          text={t("applicationEventSummary:eventsPerWeek", {
-            count: appliedReservationsPerWeek,
-          })}
-        />
+        {icons.map((icon) => (
+          <IconWithText key={icon.text} {...icon} />
+        ))}
       </Box>
     </>
   );
