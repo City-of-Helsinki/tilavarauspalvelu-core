@@ -227,7 +227,22 @@ def test_recurring_reservations__reschedule_series__empty_series(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
-        "Reservation series must have at least one reservation to reschedule",
+        "Reservation series must have at least one future reservation to reschedule",
+    ]
+
+
+@freeze_time(local_datetime(year=2024, month=12, day=1))
+def test_recurring_reservations__reschedule_series__all_reservations_in_the_past(graphql):
+    recurring_reservation = create_reservation_series()
+
+    data = get_minimal_reschedule_data(recurring_reservation)
+
+    graphql.login_with_superuser()
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation series must have at least one future reservation to reschedule",
     ]
 
 
@@ -387,125 +402,6 @@ def test_recurring_reservations__reschedule_series__details_from_reservation__ne
     assert reservations[7].name == "baz"
     assert reservations[8].name == "baz"
     assert reservations[9].name == "baz"
-
-
-@freeze_time(local_datetime(year=2024, month=2, day=1))  # Thursday
-def test_recurring_reservations__reschedule_series__details_from_reservation__no_next_use_previous(graphql):
-    recurring_reservation = create_reservation_series(reservations__name="foo")
-
-    # The last reservation's details are used since there is no next reservation.
-    reservation: Reservation = recurring_reservation.reservations.order_by("begin").last()
-    reservation.name = "bar"
-    reservation.save()
-
-    data = get_minimal_reschedule_data(recurring_reservation, endDate="2024-02-05")  # Monday
-
-    graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
-
-    assert response.has_errors is False
-
-    reservations = list(recurring_reservation.reservations.order_by("begin").all())
-    assert len(reservations) == 10
-    # Past reservations don't have their details changed.
-    assert reservations[0].name == "foo"
-    assert reservations[1].name == "foo"
-    assert reservations[2].name == "foo"
-    assert reservations[3].name == "foo"
-    assert reservations[4].name == "foo"
-    assert reservations[5].name == "foo"
-    assert reservations[6].name == "foo"
-    assert reservations[7].name == "foo"
-    # Previously last reservation.
-    assert reservations[8].name == "bar"
-    # Future reservations have details from the last reservation.
-    assert reservations[9].name == "bar"
-
-
-@freeze_time(local_datetime(year=2024, month=1, day=1))  # Friday
-def test_recurring_reservations__reschedule_series__details_from_reservation__use_cancelled(graphql):
-    recurring_reservation = create_reservation_series(reservations__name="foo")
-
-    # Change name for the next reservation.
-    reservation: Reservation = recurring_reservation.reservations.filter(begin__date=local_date()).first()
-    reservation.name = "bar"
-    reservation.save()
-
-    # All reservations are cancelled, so we must use the next one's details, even if it's cancelled.
-    recurring_reservation.reservations.update(state=ReservationStateChoice.CANCELLED)
-
-    data = get_minimal_reschedule_data(recurring_reservation, weekdays=[WeekdayChoice.TUESDAY])
-
-    graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
-
-    assert response.has_errors is False
-
-    reservations = list(recurring_reservation.reservations.order_by("begin").all())
-    assert len(reservations) == 14
-
-    # Past reservations don't have their details changed.
-    assert reservations[0].name == "foo"
-    assert reservations[1].name == "foo"
-    assert reservations[2].name == "foo"
-    assert reservations[3].name == "foo"
-
-    # Future reservations have details from the next reservation cancelled reservation.
-    # The old reservation still exists, since we don't remove cancelled reservations.
-    # New reservations' state is CONFIRMED instead of CANCELLED, other details are the same.
-    assert reservations[4].name == "bar"  # Previous reservation, where new details are from.
-    assert reservations[4].begin.date() == local_date(year=2024, month=1, day=1)
-    assert reservations[4].state == ReservationStateChoice.CANCELLED
-    assert reservations[5].name == "bar"
-    assert reservations[5].begin.date() == local_date(year=2024, month=1, day=2)
-    assert reservations[5].state == ReservationStateChoice.CONFIRMED
-
-    assert reservations[6].name == "foo"
-    assert reservations[7].name == "bar"
-    assert reservations[8].name == "foo"
-    assert reservations[9].name == "bar"
-    assert reservations[10].name == "foo"
-    assert reservations[11].name == "bar"
-    assert reservations[12].name == "foo"
-    assert reservations[13].name == "bar"
-
-
-@freeze_time(local_datetime(year=2024, month=2, day=1))  # Friday
-def test_recurring_reservations__reschedule_series__details_from_reservation__use_cancelled__use_previous(graphql):
-    recurring_reservation = create_reservation_series(reservations__name="foo")
-
-    # Change name for the next reservation.
-    reservation: Reservation = recurring_reservation.reservations.order_by("begin").last()
-    reservation.name = "bar"
-    reservation.save()
-
-    # All reservations are cancelled, so we must use the previous one's details, even if it's cancelled.
-    recurring_reservation.reservations.update(state=ReservationStateChoice.CANCELLED)
-
-    data = get_minimal_reschedule_data(recurring_reservation, endDate="2024-02-05")  # Monday
-
-    graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
-
-    assert response.has_errors is False
-
-    reservations = list(recurring_reservation.reservations.order_by("begin").all())
-    assert len(reservations) == 10
-
-    # Past reservations don't have their details changed.
-    assert reservations[0].name == "foo"
-    assert reservations[1].name == "foo"
-    assert reservations[2].name == "foo"
-    assert reservations[3].name == "foo"
-    assert reservations[5].name == "foo"
-    assert reservations[6].name == "foo"
-    assert reservations[7].name == "foo"
-    # Previously last reservation, where new details are from.
-    assert reservations[8].name == "bar"
-    assert reservations[8].state == ReservationStateChoice.CANCELLED
-    # Future reservations have details from the last reservation, but are CONFIRMED instead of CANCELLED.
-    assert reservations[9].name == "bar"
-    assert reservations[9].state == ReservationStateChoice.CONFIRMED
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
