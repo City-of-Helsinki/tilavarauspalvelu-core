@@ -418,9 +418,9 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         end_time: datetime.time = self.get_or_default("end_time", data)
         interval = ReservationStartInterval(self.instance.reservation_unit.reservation_start_interval)
 
-        if not self.instance.reservations.exists():
-            msg = "Reservation series must have at least one reservation to reschedule"
-            raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_NO_RESERVATIONS)
+        if not self.instance.reservations.future().exists():
+            msg = "Reservation series must have at least one future reservation to reschedule"
+            raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_NO_FUTURE_RESERVATIONS)
 
         now = local_datetime()
         first_reservation = self.instance.reservations.order_by("begin").first()
@@ -527,23 +527,12 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         return instance.actions.bulk_create_reservation_for_periods(slots.non_overlapping, reservation_details)
 
     def get_reservation_details(self, instance: RecurringReservation) -> ReservationDetails:
-        """
-        Use reservation details from the next reservation relative to the current time that is going to occur.
-        If there is no next reservation, use the previous reservation.
-        If there are not reservations this way, check cancelled and denied reservations as well.
-
-        We validated previously that there is at least one reservation in the series,
-        so we can safely assume that we will have at least one reservation to get details from.
-        """
         now = local_datetime()
 
-        next_reservation = instance.reservations.filter(begin__gte=now).going_to_occur().order_by("begin").first()
-        if next_reservation is None:
-            next_reservation = instance.reservations.filter(begin__lt=now).going_to_occur().order_by("-begin").first()
-        if next_reservation is None:
-            next_reservation = instance.reservations.filter(begin__gte=now).order_by("begin").first()
-        if next_reservation is None:
-            next_reservation = instance.reservations.filter(begin__lt=now).order_by("-begin").first()
+        # Use reservation details from the next reservation relative to the current time that is going to occur.
+        # We validated previously that there is at least one future reservation in the series,
+        # so we can safely assume that we will have at least one reservation to get details from.
+        next_reservation: Reservation = instance.reservations.future().order_by("begin").first()
 
         return ReservationDetails(
             name=next_reservation.name,
