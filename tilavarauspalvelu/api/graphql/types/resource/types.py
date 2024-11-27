@@ -20,8 +20,6 @@ class ResourceNode(DjangoNode):
             "name",
             "location_type",
             "space",
-            "buffer_time_before",
-            "buffer_time_after",
         ]
         filterset_class = ResourceFilterSet
         permission_classes = [ResourcePermission]

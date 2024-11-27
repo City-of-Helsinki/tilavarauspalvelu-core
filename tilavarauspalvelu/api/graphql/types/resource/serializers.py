@@ -21,8 +21,6 @@ class ResourceSerializer(NestingModelSerializer):
             "name",
             "location_type",
             "space",
-            "buffer_time_before",
-            "buffer_time_after",
         ]
 
     def validate_location_type(self, value: Any) -> str:

@@ -11,8 +11,6 @@ from tilavarauspalvelu.enums import ResourceLocationType
 from .queryset import ResourceManager
 
 if TYPE_CHECKING:
-    import datetime
-
     from tilavarauspalvelu.models import Space
 
     from .actions import ResourceActions
@@ -31,9 +29,6 @@ class Resource(models.Model):
         choices=ResourceLocationType.choices,
         default=ResourceLocationType.FIXED.value,
     )
-
-    buffer_time_before: datetime.timedelta | None = models.DurationField(blank=True, null=True)  # Deprecated
-    buffer_time_after: datetime.timedelta | None = models.DurationField(blank=True, null=True)  # Deprecated
 
     space: Space | None = models.ForeignKey(
         "tilavarauspalvelu.Space",

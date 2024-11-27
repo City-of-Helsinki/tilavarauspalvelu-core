@@ -23,8 +23,6 @@ class ResourceFactory(GenericDjangoModelFactory[Resource]):
     name_sv = FakerSV("word")
 
     location_type = ResourceLocationType.FIXED
-    buffer_time_before = None
-    buffer_time_after = None
 
     space = ForeignKeyFactory("tests.factories.SpaceFactory", required=True)
 

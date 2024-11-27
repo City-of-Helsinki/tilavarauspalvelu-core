@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import datetime
-
 import pytest
 from graphql_relay import to_global_id
 
@@ -26,8 +24,6 @@ def test_resources__query__all_fields(graphql):
         nameSv
         nameEn
         locationType
-        bufferTimeBefore
-        bufferTimeAfter
         space {
             pk
         }
@@ -45,38 +41,9 @@ def test_resources__query__all_fields(graphql):
         "nameSv": resource.name_sv,
         "nameEn": resource.name_en,
         "locationType": resource.location_type.upper(),
-        "bufferTimeBefore": resource.buffer_time_before,
-        "bufferTimeAfter": resource.buffer_time_after,
         "space": {
             "pk": resource.space.pk,
         },
-    }
-
-
-def test_resource__buffer_times(graphql):
-    resource = ResourceFactory.create(
-        buffer_time_before=datetime.timedelta(minutes=15),
-        buffer_time_after=datetime.timedelta(minutes=30),
-    )
-
-    graphql.login_with_superuser()
-
-    fields = """
-        pk
-        bufferTimeBefore
-        bufferTimeAfter
-    """
-
-    global_id = to_global_id("ResourceNode", resource.pk)
-    query = resource_query(fields=fields, id=global_id)
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert response.first_query_object == {
-        "pk": resource.pk,
-        "bufferTimeBefore": resource.buffer_time_before.total_seconds(),
-        "bufferTimeAfter": resource.buffer_time_after.total_seconds(),
     }
 
 
