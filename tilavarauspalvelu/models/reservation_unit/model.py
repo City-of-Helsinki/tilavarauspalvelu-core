@@ -236,11 +236,6 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         related_name="reservation_units",
         blank=True,
     )
-    keyword_groups = models.ManyToManyField(  # Deprecated
-        "tilavarauspalvelu.KeywordGroup",
-        related_name="reservation_units",
-        blank=True,
-    )
 
     # Translated field hints
     name_fi: str | None
@@ -503,9 +498,6 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
                 "space_name_fi": ",".join([s.name_fi or "" for s in self.spaces.all()]),
                 "space_name_en": ",".join([s.name_en or "" for s in self.spaces.all()]),
                 "space_name_sv": ",".join([s.name_sv or "" for s in self.spaces.all()]),
-                "keyword_groups_name_fi": ",".join([k.name_fi or "" for k in self.keyword_groups.all()]),
-                "keyword_groups_en": ",".join([k.name_e or "" for k in self.keyword_groups.all()]),
-                "keyword_groups_sv": ",".join([k.name_sv or "" for k in self.keyword_groups.all()]),
                 "resources_name_fi": ",".join([r.name_fi for r in self.resources.all()]),
                 "resources_name_en": ",".join([r.name_en or "" for r in self.resources.all()]),
                 "resources_name_sv": ",".join([r.name_sv or "" for r in self.resources.all()]),

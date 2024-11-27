@@ -20,7 +20,6 @@ from .types.city.types import CityNode
 from .types.equipment.types import EquipmentAllNode, EquipmentNode
 from .types.equipment_category.types import EquipmentCategoryNode
 from .types.helsinki_profile.types import HelsinkiProfileDataNode
-from .types.keyword.types import KeywordCategoryNode, KeywordGroupNode, KeywordNode
 from .types.location.types import LocationNode
 from .types.merchants.types import PaymentMerchantNode, PaymentOrderNode, PaymentProductNode
 from .types.organisation.types import OrganisationNode
@@ -68,9 +67,6 @@ __all__ = [
     "EquipmentNode",
     "GeneralRoleNode",
     "HelsinkiProfileDataNode",
-    "KeywordCategoryNode",
-    "KeywordGroupNode",
-    "KeywordNode",
     "LocationNode",
     "OrganisationNode",
     "PaymentMerchantNode",

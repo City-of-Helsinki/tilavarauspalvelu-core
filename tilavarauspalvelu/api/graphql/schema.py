@@ -92,9 +92,6 @@ from .queries import (
     EquipmentCategoryNode,
     EquipmentNode,
     HelsinkiProfileDataNode,
-    KeywordCategoryNode,
-    KeywordGroupNode,
-    KeywordNode,
     PaymentOrderNode,
     PermissionCheckerType,
     PurposeNode,
@@ -176,9 +173,6 @@ class Query(graphene.ObjectType):
     metadata_sets = ReservationMetadataSetNode.Connection()
     purposes = PurposeNode.Connection()
     qualifiers = QualifierNode.Connection()
-    keyword_categories = KeywordCategoryNode.Connection()
-    keyword_groups = KeywordGroupNode.Connection()
-    keywords = KeywordNode.Connection()
     #
     # Reservations
     reservation = ReservationNode.Node()

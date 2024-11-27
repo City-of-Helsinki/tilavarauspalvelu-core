@@ -13,9 +13,6 @@ from .city import CityFactory
 from .equipment import EquipmentFactory
 from .equipment_category import EquipmentCategoryFactory
 from .general_role import GeneralRoleFactory
-from .keyword import KeywordFactory
-from .keyword_category import KeywordCategoryFactory
-from .keyword_group import KeywordGroupFactory
 from .location import LocationFactory
 from .organisation import OrganisationFactory
 from .origin_hauki_resource import OriginHaukiResourceFactory
@@ -67,9 +64,6 @@ __all__ = [
     "EquipmentCategoryFactory",
     "EquipmentFactory",
     "GeneralRoleFactory",
-    "KeywordCategoryFactory",
-    "KeywordFactory",
-    "KeywordGroupFactory",
     "LocationFactory",
     "OrderCustomerFactory",
     "OrderFactory",

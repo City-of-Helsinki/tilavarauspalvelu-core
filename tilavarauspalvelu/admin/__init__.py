@@ -12,9 +12,6 @@ from .city.admin import CityAdmin
 from .equipment.admin import EquipmentAdmin
 from .equipment_category.admin import EquipmentCategoryAdmin
 from .general_role.admin import GeneralRoleAdmin
-from .keyword.admin import KeywordAdmin
-from .keyword_category.admin import KeywordCategoryAdmin
-from .keyword_group.admin import KeywordGroupAdmin
 from .organisation.admin import OrganisationAdmin
 from .origin_hauki_resource.admin import OriginHaukiResourceAdmin
 from .payment_accounting.admin import PaymentAccountingAdmin
@@ -60,9 +57,6 @@ __all__ = [
     "EquipmentAdmin",
     "EquipmentCategoryAdmin",
     "GeneralRoleAdmin",
-    "KeywordAdmin",
-    "KeywordCategoryAdmin",
-    "KeywordGroupAdmin",
     "OrganisationAdmin",
     "OriginHaukiResourceAdmin",
     "PaymentAccountingAdmin",

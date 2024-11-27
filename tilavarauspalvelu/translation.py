@@ -16,9 +16,6 @@ from .models import (
     City,
     Equipment,
     EquipmentCategory,
-    Keyword,
-    KeywordCategory,
-    KeywordGroup,
     Location,
     Organisation,
     Purpose,
@@ -117,21 +114,6 @@ class ReservationUnitTranslationOptions(TranslationOptions):
 
 @register(ReservationUnitType)
 class ReservationUnitTypeTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register(KeywordCategory)
-class KeywordCategoryTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register(KeywordGroup)
-class KeywordGroupTranslationOptions(TranslationOptions):
-    fields = ["name"]
-
-
-@register(Keyword)
-class KeywordTranslationOptions(TranslationOptions):
     fields = ["name"]
 
 

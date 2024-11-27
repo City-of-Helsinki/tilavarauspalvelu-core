@@ -8,9 +8,6 @@ import pytest
 from tilavarauspalvelu.management.commands.create_test_data import create_test_data
 from tilavarauspalvelu.models import (
     AbilityGroup,
-    Keyword,
-    KeywordCategory,
-    KeywordGroup,
     PaymentOrder,
     PersonalInfoViewLog,
     RecurringReservation,
@@ -27,9 +24,6 @@ if TYPE_CHECKING:
 
 models_that_should_be_empty: list[type[models.Model]] = [
     AbilityGroup,
-    Keyword,
-    KeywordCategory,
-    KeywordGroup,
     PaymentOrder,
     PersonalInfoViewLog,
     RecurringReservation,

@@ -10,7 +10,6 @@ from utils.date_utils import local_datetime
 from tests.factories import (
     ApplicationRoundFactory,
     EquipmentFactory,
-    KeywordGroupFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
     UnitFactory,
@@ -338,37 +337,6 @@ def test_reservation_unit__filter__by_min_persons_lte(graphql):
     assert response.node(0) == {"pk": reservation_unit_1.pk}
     assert response.node(1) == {"pk": reservation_unit_2.pk}
     assert response.node(2) == {"pk": reservation_unit_3.pk}
-
-
-def test_reservation_unit__filter__by_keyword_group(graphql):
-    keyword_group_1 = KeywordGroupFactory.create()
-    keyword_group_2 = KeywordGroupFactory.create()
-    reservation_unit = ReservationUnitFactory.create(keyword_groups=[keyword_group_1])
-    ReservationUnitFactory.create(keyword_groups=[keyword_group_2])
-
-    query = reservation_units_query(keywordGroups=keyword_group_1.pk)
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": reservation_unit.pk}
-
-
-def test_reservation_unit__filter__by_multiple_keyword_groups(graphql):
-    keyword_group_1 = KeywordGroupFactory.create(name="foo")
-    keyword_group_2 = KeywordGroupFactory.create(name="bar")
-    keyword_group_3 = KeywordGroupFactory.create(name="baz")
-    reservation_unit_1 = ReservationUnitFactory.create(keyword_groups=[keyword_group_1])
-    reservation_unit_2 = ReservationUnitFactory.create(keyword_groups=[keyword_group_2])
-    ReservationUnitFactory.create(keyword_groups=[keyword_group_3])
-
-    query = reservation_units_query(keywordGroups=[keyword_group_1.pk, keyword_group_2.pk])
-    response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": reservation_unit_1.pk}
-    assert response.node(1) == {"pk": reservation_unit_2.pk}
 
 
 def test_reservation_unit__filter__by_name_fi(graphql):

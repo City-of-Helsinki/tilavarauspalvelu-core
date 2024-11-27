@@ -132,7 +132,6 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                     "resources",
                     "equipments",
                     "purposes",
-                    "keyword_groups",
                     "qualifiers",
                 ],
             },
@@ -178,7 +177,6 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         "qualifiers",
         "resources",
         "equipments",
-        "keyword_groups",
         "payment_types",
     ]
     readonly_fields = [

@@ -14,9 +14,6 @@ from .city.model import City
 from .equipment.model import Equipment
 from .equipment_category.model import EquipmentCategory
 from .general_role.model import GeneralRole
-from .keyword.model import Keyword
-from .keyword_category.model import KeywordCategory
-from .keyword_group.model import KeywordGroup
 from .location.model import Location
 from .organisation.model import Organisation
 from .origin_hauki_resource.model import OriginHaukiResource
@@ -74,9 +71,6 @@ __all__ = [
     "Equipment",
     "EquipmentCategory",
     "GeneralRole",
-    "Keyword",
-    "KeywordCategory",
-    "KeywordGroup",
     "Location",
     "Organisation",
     "OriginHaukiResource",
