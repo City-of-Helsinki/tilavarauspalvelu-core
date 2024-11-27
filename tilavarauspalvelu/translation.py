@@ -13,7 +13,6 @@ from .models import (
     Address,
     ApplicationRound,
     BannerNotification,
-    Building,
     City,
     Equipment,
     EquipmentCategory,
@@ -77,11 +76,6 @@ class UnitGroupTranslationOptions(TranslationOptions):
 @register(Unit)
 class UnitTranslationOptions(TranslationOptions):
     fields = ["name", "description", "short_description"]
-
-
-@register(Building)
-class BuildingTranslationOptions(TranslationOptions):
-    fields = ["name"]
 
 
 @register(Location)

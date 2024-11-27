@@ -34,7 +34,6 @@ class SpaceNode(DjangoNode):
             "surface_area",
             "code",
             "parent",
-            "building",
             "unit",
             "resources",
             "children",

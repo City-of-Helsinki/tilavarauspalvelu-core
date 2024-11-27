@@ -21,10 +21,7 @@ __all__ = [
 
 
 class Unit(models.Model):
-    """
-    Model representation of Unit as in "office" or "premises" that could contain
-    separate building etc.
-    """
+    """Model representation of Unit as in "office" or "premises" that could contain spaces."""
 
     rank: int = models.PositiveIntegerField(default=0, db_index=True)  # Used for ordering
 

@@ -14,7 +14,7 @@ from .queryset import LocationManager
 if TYPE_CHECKING:
     from django.contrib.gis.geos import Point
 
-    from tilavarauspalvelu.models import Building, Space, Unit
+    from tilavarauspalvelu.models import Space, Unit
 
     from .actions import LocationActions
 
@@ -38,13 +38,6 @@ class Location(models.Model):
 
     space: Space | None = models.OneToOneField(
         "tilavarauspalvelu.Space",
-        related_name="location",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
-    building: Building | None = models.OneToOneField(
-        "tilavarauspalvelu.Building",
         related_name="location",
         on_delete=models.CASCADE,
         null=True,

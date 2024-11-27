@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from django.db import models
 
     from tilavarauspalvelu.models import (
-        Building,
         Location,
         PaymentAccounting,
         PaymentMerchant,
@@ -189,11 +188,6 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if location is None:
             return ""
         return location.address
-
-    def get_building(self) -> Building:
-        # For now, we assume that if reservation has multiple spaces they all have same building
-        spaces = self.reservation_unit.spaces.all()
-        return next((space.building for space in spaces if hasattr(space, "building")), None)
 
     def get_max_persons(self) -> int | None:
         # Sum of max persons for all spaces because group can be divided to different spaces

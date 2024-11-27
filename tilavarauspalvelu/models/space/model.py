@@ -14,7 +14,7 @@ from utils.db import SubqueryArray
 from .queryset import SpaceManager
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Building, Unit
+    from tilavarauspalvelu.models import Unit
 
     from .actions import SpaceActions
 
@@ -33,13 +33,6 @@ class Space(MPTTModel):
     parent: Space | None = TreeForeignKey(
         "self",
         related_name="children",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-    building: Building | None = models.ForeignKey(
-        "tilavarauspalvelu.Building",
-        related_name="spaces",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

@@ -19,6 +19,5 @@ class SpaceSerializer(NestingModelSerializer):
             "max_persons",
             "code",
             "unit",
-            "building",
             "parent",
         ]

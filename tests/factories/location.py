@@ -30,5 +30,4 @@ class LocationFactory(GenericDjangoModelFactory[Location]):
     coordinates = None  # `django.contrib.gis.geos.Point`
 
     space = ForwardOneToOneFactory("tests.factories.SpaceFactory")
-    building = ForwardOneToOneFactory("tests.factories.BuildingFactory")
     unit = ForwardOneToOneFactory("tests.factories.UnitFactory")

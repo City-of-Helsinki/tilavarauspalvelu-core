@@ -8,7 +8,6 @@ import pytest
 from tilavarauspalvelu.management.commands.create_test_data import create_test_data
 from tilavarauspalvelu.models import (
     AbilityGroup,
-    Building,
     Introduction,
     Keyword,
     KeywordCategory,
@@ -29,7 +28,6 @@ if TYPE_CHECKING:
 
 models_that_should_be_empty: list[type[models.Model]] = [
     AbilityGroup,
-    Building,
     Introduction,
     Keyword,
     KeywordCategory,

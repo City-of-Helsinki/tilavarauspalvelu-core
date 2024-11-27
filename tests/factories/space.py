@@ -33,7 +33,6 @@ class SpaceFactory(GenericDjangoModelFactory[Space]):
     code = FakerFI("word")
 
     parent = ForeignKeyFactory("tests.factories.SpaceFactory")
-    building = ForeignKeyFactory("tests.factories.BuildingFactory")
     unit = ForeignKeyFactory("tests.factories.UnitFactory", required=True)
 
     location = ReverseOneToOneFactory("tests.factories.LocationFactory")
