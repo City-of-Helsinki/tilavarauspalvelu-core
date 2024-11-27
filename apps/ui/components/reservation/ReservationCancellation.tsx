@@ -3,14 +3,13 @@ import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { Button, IconArrowRight, IconCross, IconSignout } from "hds-react";
 import { useTranslation } from "next-i18next";
-import NotificationBox from "common/src/common/NotificationBox";
 import { fontMedium, H1 } from "common/src/common/typography";
 import {
   useCancelReservationMutation,
   type ReservationQuery,
   type ReservationCancelReasonsQuery,
 } from "@gql/gql-types";
-import { IconButton, ShowAllContainer } from "common/src/components";
+import { IconButton } from "common/src/components";
 import Sanitize from "../common/Sanitize";
 import { getTranslation } from "@/modules/util";
 import { ReservationInfoCard } from "./ReservationInfoCard";
@@ -25,6 +24,8 @@ import { ControlledSelect } from "common/src/components/form";
 import { AutoGrid, ButtonContainer, Flex } from "common/styles/util";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { getReservationPath } from "@/modules/urls";
+import TermsBox from "common/src/termsbox/TermsBox";
+import { AccordionWithState } from "../Accordion";
 
 type CancelReasonsQ = NonNullable<
   ReservationCancelReasonsQuery["reservationCancelReasons"]
@@ -39,12 +40,6 @@ type Props = {
   reasons: CancelReasonsNode[];
   reservation: NonNullable<NodeT>;
 };
-
-const TermsContainer = styled(ShowAllContainer)`
-  .ShowAllContainer__ToggleButton {
-    color: var(--color-bus);
-  }
-`;
 
 const Actions = styled(ButtonContainer).attrs({
   $justify: "space-between",
@@ -158,7 +153,7 @@ export function ReservationCancellation(props: Props): JSX.Element {
     : t("reservations:reservationCancelledBody");
 
   const cancellationTerms =
-    reservationUnit?.cancellationTerms != null
+    reservationUnit.cancellationTerms != null
       ? getTranslation(reservationUnit?.cancellationTerms, "text")
       : null;
 
@@ -179,18 +174,13 @@ export function ReservationCancellation(props: Props): JSX.Element {
         {!isSuccess ? (
           <>
             <p>{t("reservations:cancelInfoBody")}</p>
-            <TermsContainer
-              showAllLabel={t("reservations:showCancellationTerms")}
-              showLessLabel={t("reservations:hideCancellationTerms")}
-              maximumNumber={0}
-            >
-              {cancellationTerms != null && (
-                <NotificationBox
-                  heading={t("reservationUnit:cancellationTerms")}
-                  body={<Sanitize html={cancellationTerms} />}
-                />
-              )}
-            </TermsContainer>
+            {cancellationTerms != null && (
+              <AccordionWithState
+                heading={t("reservationUnit:cancellationTerms")}
+              >
+                <TermsBox body={<Sanitize html={cancellationTerms ?? ""} />} />
+              </AccordionWithState>
+            )}
             <Form onSubmit={handleSubmit(onSubmit)}>
               <AutoGrid>
                 <ControlledSelect

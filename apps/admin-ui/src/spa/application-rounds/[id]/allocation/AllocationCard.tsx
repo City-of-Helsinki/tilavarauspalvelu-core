@@ -9,7 +9,6 @@ import {
   type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { NotificationInline } from "common/src/components/NotificationInline";
 import { convertWeekday } from "common/src/conversion";
 import { SemiBold } from "common";
 import { formatDuration } from "@/common/util";
@@ -31,6 +30,7 @@ import {
 } from "./hooks";
 import { getApplicantName } from "@/helpers";
 import { Flex } from "common/styles/util";
+import { NotificationInline } from "./NotificationInline";
 
 type Props = {
   applicationSection: SectionNodeT;

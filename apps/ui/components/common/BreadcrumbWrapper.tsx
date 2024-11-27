@@ -1,6 +1,6 @@
 import React from "react";
 import { useMedia } from "react-use";
-import { Breadcrumb, RouteItem } from "common/src/breadcrumb/Breadcrumb";
+import { Breadcrumb, RouteItem } from "./Breadcrumb";
 import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import Link, { LinkProps } from "next/link";

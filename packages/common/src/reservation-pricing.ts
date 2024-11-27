@@ -1,17 +1,14 @@
-import { Maybe, PriceUnit } from "../gql/gql-types";
+import { type Maybe, PriceUnit } from "../gql/gql-types";
 import { toNumber } from "./helpers";
 import formatters from "./number-formatters";
 
-export const getPriceUnitMinutes = (unit: PriceUnit): number => {
+function getPriceUnitMinutes(unit: PriceUnit): number {
   switch (unit) {
     case PriceUnit.Per_15Mins:
-    case "PER_15_MINS":
       return 15;
     case PriceUnit.Per_30Mins:
-    case "PER_30_MINS":
       return 30;
     case PriceUnit.PerHour:
-    case "PER_HOUR":
       return 60;
     case PriceUnit.PerHalfDay:
     case PriceUnit.PerDay:
@@ -19,9 +16,9 @@ export const getPriceUnitMinutes = (unit: PriceUnit): number => {
     default:
       return 1;
   }
-};
+}
 
-export const getPriceFractionMinutes = (unit: PriceUnit): number => {
+function getPriceFractionMinutes(unit: PriceUnit): number {
   switch (unit) {
     case PriceUnit.Per_15Mins:
     case PriceUnit.Per_30Mins:
@@ -30,12 +27,12 @@ export const getPriceFractionMinutes = (unit: PriceUnit): number => {
     default:
       return 1;
   }
-};
+}
 
-export const getUnRoundedReservationVolume = (
+export function getUnRoundedReservationVolume(
   minutes: number,
   unit: PriceUnit
-): number => {
+): number {
   const wholeMinutes = getPriceUnitMinutes(unit);
 
   if (!minutes || wholeMinutes === 1) {
@@ -57,14 +54,6 @@ export const getUnRoundedReservationVolume = (
   const slots = Math.ceil(totalFractions * fraction);
 
   return wholeUnits + slots / totalFractions;
-};
-
-export function getReservationVolume(minutes: number, unit: PriceUnit): number {
-  if (!minutes) {
-    return 1;
-  }
-
-  return getUnRoundedReservationVolume(minutes, unit);
 }
 
 export function getReservationPrice(

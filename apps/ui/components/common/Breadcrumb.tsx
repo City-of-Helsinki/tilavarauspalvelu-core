@@ -1,7 +1,7 @@
 import React, { ElementType, Fragment } from "react";
 import styled, { css } from "styled-components";
 import { IconAngleLeft, IconAngleRight } from "hds-react";
-import { fontMedium } from "../common/typography";
+import { fontMedium } from "common";
 
 export type RouteItem = {
   title: string;

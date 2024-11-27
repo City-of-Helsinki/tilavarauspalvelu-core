@@ -1,4 +1,7 @@
-import { formatters as getFormatters, getReservationVolume } from "common";
+import {
+  formatters as getFormatters,
+  getUnRoundedReservationVolume,
+} from "common";
 import { flatten, trim, uniq } from "lodash";
 import {
   addMinutes,
@@ -279,6 +282,14 @@ export type GetPriceType = {
   pricing: PricingFieldsFragment;
   minutes?: number; // additional minutes for total price calculation
 };
+
+function getReservationVolume(minutes: number, unit: PriceUnit): number {
+  if (!minutes) {
+    return 1;
+  }
+
+  return getUnRoundedReservationVolume(minutes, unit);
+}
 
 // TODO rewrite this return number normally
 // and a separate function to format it to string

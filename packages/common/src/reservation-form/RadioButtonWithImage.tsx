@@ -1,6 +1,7 @@
 import { capitalize } from "lodash";
 import React, { ReactElement } from "react";
 import styled from "styled-components";
+import { Flex } from "../../styles/util";
 
 type Props = {
   id: string;
@@ -12,7 +13,7 @@ type Props = {
 
 const height = "100px";
 
-const Wrapper = styled.button<{ $checked: boolean }>`
+const Button = styled.button<{ $checked: boolean }>`
   --color-border: var(--color-black-30);
   --color-checked: var(--color-bus);
 
@@ -31,12 +32,13 @@ const Wrapper = styled.button<{ $checked: boolean }>`
   padding: 0;
 `;
 
-const InnerWrapper = styled.div<{ $checked: boolean }>`
+const InnerWrapper = styled(Flex).attrs({
+  $gap: "none",
+  $align: "center",
+})<{ $checked: boolean }>`
   border: 4px double transparent;
   padding: var(--spacing-xs);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+
   box-sizing: inherit;
   height: 100%;
 
@@ -62,26 +64,28 @@ const HiddenInput = styled.input`
   height: 0;
 `;
 
-const RadioButtonWithImage = ({
+function RadioButtonWithImage({
   id,
   icon,
   label,
   checked,
   onClick,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
+  const clickHandler = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onClick();
+  };
+  const keyDownHandler = (e: React.KeyboardEvent) => {
+    if ([" ", "Enter"].includes(e.key)) {
+      e.preventDefault();
+      onClick();
+    }
+  };
   return (
-    <Wrapper
-      onClick={(e) => {
-        e.preventDefault();
-        onClick();
-      }}
+    <Button
+      onClick={clickHandler}
       tabIndex={0}
-      onKeyDown={(e) => {
-        if ([" ", "Enter"].includes(e.key)) {
-          e.preventDefault();
-          onClick();
-        }
-      }}
+      onKeyDown={keyDownHandler}
       $checked={checked}
     >
       <InnerWrapper $checked={checked}>
@@ -96,8 +100,8 @@ const RadioButtonWithImage = ({
           onChange={() => {}}
         />
       </InnerWrapper>
-    </Wrapper>
+    </Button>
   );
-};
+}
 
 export default RadioButtonWithImage;
