@@ -65,7 +65,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     variables: {
       user: user.pk,
       status: VALID_STATUSES,
-      orderBy: [ApplicationOrderingChoices.PkDesc],
+      orderBy: [ApplicationOrderingChoices.SentDateDesc],
     },
   });
 
@@ -153,7 +153,7 @@ function ApplicationsPage({
     variables: {
       user: currentUser?.pk ?? 0,
       status: VALID_STATUSES,
-      orderBy: [ApplicationOrderingChoices.PkDesc],
+      orderBy: [ApplicationOrderingChoices.SentDateDesc],
     },
   });
 
