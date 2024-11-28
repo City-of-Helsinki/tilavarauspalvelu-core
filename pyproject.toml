@@ -24,7 +24,6 @@ django-mptt = "0.16.0"
 django-redis = "5.4.0"
 djangorestframework = "3.15.2"
 easy-thumbnails = "2.10"
-elasticsearch-django = "8.5.2"
 graphene-django = "3.2.2"
 graphene-django-extensions = "0.4.9"
 helsinki-profile-gdpr-api = "0.2.0"
@@ -228,6 +227,14 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^na
 "local_settings*.py" = [
     "ERA001",   # Commented code is fine here.
 ]
+"tilavarauspalvelu/migrations/*.py" = [
+    "ANN",      # No need to annotate migrations
+    "ARG",      # Allow unused arguments allowed in migrations
+]
+"config/settings.py" = [
+    "ANN",      # No need to annotate settings
+    "ARG",      # Allow unused arguments allowed in settings
+]
 "utils/date_utils.py" = [
     "PLR0917",  # Can have as many positional arguments as needed.
     "TID251"    # Can use banned imports here (e.g. datetime.datetime.now)
@@ -390,7 +397,6 @@ DJANGO_SETTINGS_MODULE = "config.settings"
 DJANGO_SETTINGS_ENVIRONMENT = "AutomatedTests"
 markers = [
     "slow: Marks a test that takes a long time to run.",
-    "enable_elasticsearch: Mark a test that should be run with Elasticsearch enabled.",
 ]
 python_files = [
     "tests.py",

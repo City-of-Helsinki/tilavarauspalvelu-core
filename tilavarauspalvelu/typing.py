@@ -38,6 +38,7 @@ class permission(classmethod): ...  # noqa: N801
 
 type AnyUser = User | AnonymousUser
 type Lang = Literal["fi", "sv", "en"]
+type TextSearchLang = Literal["finnish", "english", "swedish"]
 type M2MAction = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
 type EmailContext = dict[str, str | None]
 

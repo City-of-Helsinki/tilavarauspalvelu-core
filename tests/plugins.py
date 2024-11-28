@@ -67,23 +67,13 @@ def setup_now_tt():
 
 @pytest.hookimpl()
 def pytest_addoption(parser: pytest.Parser) -> None:
-    parser.addoption("--skip-elastic", action="store_true", default=False, help="Skip tests that need Elasticsearch.")
     parser.addoption("--skip-slow", action="store_true", default=False, help="Skip slow running tests.")
 
 
 @pytest.hookimpl()
 def pytest_collection_modifyitems(config, items):
     skip_slow = config.getoption("--skip-slow")
-    skip_elastic = config.getoption("--skip-elastic")
 
     for item in items:
         if skip_slow and "slow" in item.keywords:
             item.add_marker(pytest.mark.skip(reason="Skipped due to --skip-slow option"))
-
-        if "enable_elasticsearch" in item.keywords:
-            # Enable Elasticsearch for this test
-            item.add_marker(pytest.mark.xdist_group(name="enable_elasticsearch"))
-
-            # Skip this test if --inelastic option was given
-            if skip_elastic:
-                item.add_marker(pytest.mark.skip(reason="Skipped due to --skip-elastic"))

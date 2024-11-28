@@ -4,21 +4,21 @@ import base64
 from typing import TYPE_CHECKING, Any
 
 import django_filters
+from django.contrib.postgres.search import SearchQuery
+from django.db import models
 from django.db.models import Q
-from elasticsearch_django.models import SearchQuery
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
 from tilavarauspalvelu.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.models import ReservationUnit
-from utils.elasticsearch import build_elastic_query_str
-from utils.utils import log_text_search
+from utils.db import build_search
+from utils.utils import get_text_search_language
 
 if TYPE_CHECKING:
     import datetime
     from decimal import Decimal
 
-    from django.db import models
     from django.db.models import QuerySet
     from query_optimizer.validators import PaginationArgs
 
@@ -139,15 +139,21 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
             ("reservation_unit_type__rank", "type_rank"),
         ]
 
-    @staticmethod
-    def get_text_search(qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
-        query_str = build_elastic_query_str(search_words=value)
-        if not query_str:
-            return qs
-
-        log_text_search(where="reservation_units", text=value)
-        sq = SearchQuery.do_search("reservation_units", {"query_string": {"query": query_str}})
-        return qs.from_search_results(sq)
+    def get_text_search(self, qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
+        language = get_text_search_language(self.request)
+        search = build_search(value)
+        query = SearchQuery(value=search, config=language, search_type="raw")
+        match language:
+            # Do search mostly with full text search, but also search some columns with containment search.
+            # PostgreSQL full text search doesn't support postfix searching, so things like "room" won't find
+            # reservation units with names like "workroom" or "bathroom". Don't do this for all fields to keep
+            # performance reasonable.
+            case "finnish":
+                return qs.filter(models.Q(search_vector_fi=query) | models.Q(name_fi__icontains=value))
+            case "english":
+                return qs.filter(models.Q(search_vector_en=query) | models.Q(name_en__icontains=value))
+            case "swedish":
+                return qs.filter(models.Q(search_vector_sv=query) | models.Q(name_sv__icontains=value))
 
     @staticmethod
     def get_max_persons_gte(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:

@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import datetime
 import uuid
 
 import django.contrib.postgres.fields
 import django.db.models.deletion
 import easy_thumbnails.fields
-import elasticsearch_django.models
 from django.conf import settings
 from django.db import migrations, models
 
@@ -233,7 +234,6 @@ class Migration(migrations.Migration):
                 "ordering": ["rank", "id"],
                 "base_manager_name": "objects",
             },
-            bases=(elasticsearch_django.models.SearchDocumentMixin, models.Model),
         ),
         migrations.CreateModel(
             name="Equipment",

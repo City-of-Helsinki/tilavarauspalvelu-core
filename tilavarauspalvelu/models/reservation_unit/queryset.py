@@ -3,9 +3,9 @@ from __future__ import annotations
 from itertools import islice
 from typing import TYPE_CHECKING, Self
 
+from django.contrib.postgres.search import SearchVector
 from django.db import connections, models
 from django.db.models import Q, prefetch_related_objects
-from elasticsearch_django.models import SearchDocumentManagerMixin, SearchResultsQuerySet
 from lookup_property import L
 
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
@@ -30,7 +30,7 @@ __all__ = [
 type ReservationUnitPK = int
 
 
-class ReservationUnitQuerySet(SearchResultsQuerySet):
+class ReservationUnitQuerySet(models.QuerySet):
     def with_first_reservable_time(
         self,
         *,
@@ -130,7 +130,76 @@ class ReservationUnitQuerySet(SearchResultsQuerySet):
     def hidden(self) -> Self:
         return self.published().exclude(self._is_visible)
 
+    def update_search_vectors(self, reservation_unit_pk: int | None = None) -> None:
+        qs = self.select_related(
+            "unit",
+            "reservation_unit_type",
+        ).prefetch_related(
+            "spaces",
+            "resources",
+            "purposes",
+            "equipments",
+        )
+        if reservation_unit_pk is not None:
+            qs = qs.filter(pk=reservation_unit_pk)
 
-class ReservationUnitManager(SearchDocumentManagerMixin.from_queryset(ReservationUnitQuerySet)):
-    def get_search_queryset(self, index: str = "_all") -> models.QuerySet:  # noqa: ARG002
-        return self.get_queryset()
+        reservation_units: list[ReservationUnit] = list(qs)
+
+        for reservation_unit in reservation_units:
+            for lang in ("fi", "en", "sv"):
+                setattr(
+                    reservation_unit,
+                    f"search_vector_{lang}",
+                    SearchVector(
+                        models.F("pk"),
+                        models.F(f"name_{lang}"),
+                        models.F(f"description_{lang}"),
+                        #
+                        # Joins are not allowed in search vectors, so we compute them as values beforehand.
+                        models.Value(
+                            getattr(reservation_unit.unit, f"name_{lang}", ""),
+                        ),
+                        models.Value(
+                            getattr(reservation_unit.reservation_unit_type, f"name_{lang}", ""),
+                        ),
+                        models.Value(
+                            " ".join(
+                                name
+                                for inst in reservation_unit.spaces.all()
+                                if (name := getattr(inst, f"name_{lang}", ""))
+                            ),
+                        ),
+                        models.Value(
+                            " ".join(
+                                name
+                                for inst in reservation_unit.resources.all()
+                                if (name := getattr(inst, f"name_{lang}", ""))
+                            ),
+                        ),
+                        models.Value(
+                            " ".join(
+                                name
+                                for inst in reservation_unit.purposes.all()
+                                if (name := getattr(inst, f"name_{lang}", ""))
+                            ),
+                        ),
+                        models.Value(
+                            " ".join(
+                                name
+                                for inst in reservation_unit.equipments.all()
+                                if (name := getattr(inst, f"name_{lang}", ""))
+                            ),
+                        ),
+                        #
+                        config="english" if lang == "en" else "swedish" if lang == "sv" else "finnish",
+                    ),
+                )
+
+        self.model.objects.bulk_update(
+            reservation_units,
+            ["search_vector_fi", "search_vector_en", "search_vector_sv"],
+        )
+
+
+class ReservationUnitManager(models.Manager.from_queryset(ReservationUnitQuerySet)):
+    use_in_migrations = True

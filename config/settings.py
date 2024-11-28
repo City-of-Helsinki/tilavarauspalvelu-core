@@ -73,7 +73,6 @@ class Common(Environment):
         "django_extensions",
         "django_filters",
         "easy_thumbnails",
-        "elasticsearch_django",
         "graphene_django",
         "import_export",
         "mptt",
@@ -444,44 +443,6 @@ class Common(Environment):
             }
         }
 
-    # --- Elasticsearch settings -------------------------------------------------------------------------------------
-
-    ELASTICSEARCH_URL = values.StringValue()
-    DISABLE_ELASTICSEARCH_INDEXES = values.BooleanValue(default=False)
-
-    @classproperty
-    def SEARCH_SETTINGS(cls):
-        return {
-            "connections": {
-                "default": cls.ELASTICSEARCH_URL,
-            },
-            "indexes": (
-                {}
-                if cls.DISABLE_ELASTICSEARCH_INDEXES
-                else {
-                    "reservation_units": {
-                        "models": [
-                            "tilavarauspalvelu.ReservationUnit",
-                        ]
-                    }
-                }
-            ),
-            "settings": {
-                # batch size for ES bulk api operations
-                "chunk_size": 500,
-                # default page size for search results
-                "page_size": 10000,
-                # set to True to connect post_save/delete signals
-                "auto_sync": True,
-                # List of models which will never auto_sync even if auto_sync is True
-                "never_auto_sync": [],
-                # if true, then indexes must have mapping files
-                "strict_validation": False,
-                # Path to the elasticsearch mapping files
-                "mappings_dir": str(Common.BASE_DIR / "config" / "elasticsearch"),
-            },
-        }
-
     # --- Admin data views ------------------------------------------------------------------------------------------
 
     ADMIN_DATA_VIEWS = {
@@ -521,6 +482,7 @@ class Common(Environment):
     TPREK_UNIT_URL = values.URLValue()
     GRAPHQL_CODEGEN_ENABLED = False
     UPDATE_RESERVATION_UNIT_HIERARCHY = True
+    UPDATE_SEARCH_VECTORS = True
     UPDATE_AFFECTING_TIME_SPANS = True
     SAVE_RESERVATION_STATISTICS = True
     REBUILD_SPACE_HIERARCHY = True
@@ -563,7 +525,6 @@ class EmptyDefaults:
 
     DATABASES = {}
     REDIS_URL = ""
-    ELASTICSEARCH_URL = ""
 
     STATIC_ROOT = Common.BASE_DIR / "staticroot"
     MEDIA_ROOT = Common.BASE_DIR / "media"
@@ -684,22 +645,13 @@ class Local(Common, overrides_from=LocalMixin):
 
     REDIS_URL = values.StringValue(default="redis://127.0.0.1:6379/0")
 
-    # --- Elasticsearch settings -------------------------------------------------------------------------------------
-
-    ELASTICSEARCH_URL = values.StringValue(default="http://localhost:9200")
-
-    @classproperty
-    def SEARCH_SETTINGS(cls):
-        search_settings = super().SEARCH_SETTINGS
-        search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "config" / "elasticsearch")
-        return search_settings
-
     # --- Misc settings-----------------------------------------------------------------------------------------------
 
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
     UPDATE_RESERVATION_UNIT_HIERARCHY = values.BooleanValue(default=True)
+    UPDATE_SEARCH_VECTORS = values.BooleanValue(default=True)
     UPDATE_AFFECTING_TIME_SPANS = values.BooleanValue(default=True)
     SAVE_RESERVATION_STATISTICS = values.BooleanValue(default=True)
     REBUILD_SPACE_HIERARCHY = values.BooleanValue(default=True)
@@ -741,7 +693,6 @@ class Docker(Common, overrides_from=DockerMixin):
     SOCIAL_AUTH_TUNNISTAMO_INACTIVE_USER_URL = "http://localhost:3000/deactivated-account"
 
     REDIS_URL = values.StringValue(default="redis://redis:6379/0")
-    ELASTICSEARCH_URL = values.StringValue(default="http://elastic:9200")
 
     @classproperty
     def CELERY_BROKER_URL(cls):
@@ -865,17 +816,6 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
 
     REDIS_URL = values.StringValue(default="redis://localhost:6379/0")
 
-    # --- Elasticsearch settings -------------------------------------------------------------------------------------
-
-    ELASTICSEARCH_URL = values.StringValue(default="http://localhost:9200")
-
-    @classproperty
-    def SEARCH_SETTINGS(cls):
-        search_settings = super().SEARCH_SETTINGS
-        search_settings["settings"]["mappings_dir"] = str(Common.BASE_DIR / "config" / "elasticsearch")
-        search_settings["settings"]["auto_sync"] = False
-        return search_settings
-
     # --- Misc settings ----------------------------------------------------------------------------------------------
 
     CACHES = {
@@ -891,7 +831,11 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     # since they slow them down a lot in CI. Refresh should be called manually when needed.
     UPDATE_RESERVATION_UNIT_HIERARCHY = False
     UPDATE_AFFECTING_TIME_SPANS = False
+    # Turn off search vector updates from signals during tests.
+    UPDATE_SEARCH_VECTORS = False
+    # Turn off reservation unit thumbnail updates from signals during tests.
     UPDATE_RESERVATION_UNIT_THUMBNAILS = False
+    # Turn off image downloads during tests.
     DOWNLOAD_IMAGES_FOR_TEST_DATA = False
     # Turn off statistics saving during tests for performance reasons
     SAVE_RESERVATION_STATISTICS = False
