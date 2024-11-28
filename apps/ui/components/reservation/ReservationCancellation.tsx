@@ -26,6 +26,7 @@ import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { getReservationPath } from "@/modules/urls";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { AccordionWithState } from "../Accordion";
+import { breakpoints } from "common";
 
 type CancelReasonsQ = NonNullable<
   ReservationCancelReasonsQuery["reservationCancelReasons"]
@@ -53,15 +54,10 @@ const Form = styled.form`
   }
 `;
 
-const ReturnLinkContainer = styled(Flex).attrs({
-  $gap: "none",
-  $alig: "flex-start",
-})``;
-
 function ReturnLinkList({ apiBaseUrl }: { apiBaseUrl: string }): JSX.Element {
   const { t } = useTranslation();
   return (
-    <ReturnLinkContainer>
+    <Flex $gap="none" $align="flex-start">
       <IconButton
         href="/reservations"
         label={t("reservations:gotoReservations")}
@@ -77,7 +73,7 @@ function ReturnLinkList({ apiBaseUrl }: { apiBaseUrl: string }): JSX.Element {
         onClick={() => signOut(apiBaseUrl)}
         label={t("common:logout")}
       />
-    </ReturnLinkContainer>
+    </Flex>
   );
 }
 
@@ -86,7 +82,26 @@ type FormValues = {
   description?: string;
 };
 
-// TODO there is also pages/reservation/cancel.tsx (what is that?)
+const StyledInfoCard = styled(ReservationInfoCard)`
+  @media (min-width: ${breakpoints.m}) {
+    grid-row: 1 / span 2;
+    grid-column: -1;
+  }
+`;
+
+const Wrapper = styled(Flex)`
+  @media (min-width: ${breakpoints.m}) {
+    grid-row: 2 / -1;
+    grid-column: 1 / span 2;
+  }
+`;
+
+const TitleSection = styled.div`
+  @media (min-width: ${breakpoints.m}) {
+    grid-column: 1 / span 2;
+  }
+`;
+
 export function ReservationCancellation(props: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const { apiBaseUrl } = props;
@@ -161,22 +176,19 @@ export function ReservationCancellation(props: Props): JSX.Element {
 
   return (
     <ReservationPageWrapper>
-      <div>
+      <TitleSection>
         <H1 $noMargin>{title}</H1>
         <p>{ingress}</p>
-      </div>
-      <ReservationInfoCard
-        reservation={reservation}
-        type="confirmed"
-        style={{ gridRowEnd: "span 4" }}
-      />
-      <Flex style={{ gridRow: "2 / -1" }}>
+      </TitleSection>
+      <StyledInfoCard reservation={reservation} type="confirmed" />
+      <Wrapper>
         {!isSuccess ? (
           <>
-            <p>{t("reservations:cancelInfoBody")}</p>
+            <p style={{ margin: 0 }}>{t("reservations:cancelInfoBody")}</p>
             {cancellationTerms != null && (
               <AccordionWithState
                 heading={t("reservationUnit:cancellationTerms")}
+                disableBottomMargin
               >
                 <TermsBox body={<Sanitize html={cancellationTerms ?? ""} />} />
               </AccordionWithState>
@@ -217,7 +229,7 @@ export function ReservationCancellation(props: Props): JSX.Element {
             <ReturnLinkList apiBaseUrl={apiBaseUrl} />
           </>
         )}
-      </Flex>
+      </Wrapper>
     </ReservationPageWrapper>
   );
 }
