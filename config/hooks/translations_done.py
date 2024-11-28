@@ -29,6 +29,7 @@ class TranslationData:
 class MissingTranslations:
     missing_languages: set[str] = field(default_factory=set)
     not_included_previous: set[str] = field(default_factory=set)
+    removed: set[str] = field(default_factory=set)
     fuzzy: set[str] = field(default_factory=set)
 
 
@@ -52,34 +53,50 @@ def _get_languages() -> Generator[str]:
 
 
 def _find_missing_translations(
-    items: list[TranslationData],
+    translations: list[TranslationData],
     *,
     check_swedish_for_contexts: Collection[str] = (),
 ) -> dict[str, MissingTranslations]:
     """
-    Find missing translations in the current translations.
+    Find missing, removed, or fuzzy translations in the current translations.
 
-    :param items: Translation data before running the command for this check.
+    :param translations: Translation data before running the command for this check.
     :params check_swedish_for_contexts: When using `pgettext`, these are the 'contexts' that will
                                         be checked for Swedish translations. Other translations are not checked.
     """
     missing: dict[str, MissingTranslations] = defaultdict(MissingTranslations)
-    for item in items:
-        pofile = polib.pofile(item.path)
+    for prev_translation in translations:
+        pofile = polib.pofile(prev_translation.path)
+        known: set[str] = set()
+
         for entry in pofile:
-            if item.lang == "sv" and entry.msgctxt not in check_swedish_for_contexts:
+            if prev_translation.lang == "sv" and entry.msgctxt not in check_swedish_for_contexts:
                 continue
 
             key = entry.msgid
             if entry.msgctxt is not None:
                 key = f"{entry.msgctxt} | {key}"
 
+            known.add(key)
+
             if not entry.msgstr:
-                missing[key].missing_languages.add(item.lang)
-            if entry not in item.contents:
-                missing[key].not_included_previous.add(item.lang)
+                missing[key].missing_languages.add(prev_translation.lang)
+            if entry not in prev_translation.contents:
+                missing[key].not_included_previous.add(prev_translation.lang)
             if "fuzzy" in entry.flags:
-                missing[key].fuzzy.add(item.lang)
+                missing[key].fuzzy.add(prev_translation.lang)
+
+        for entry in prev_translation.contents:
+            if prev_translation.lang == "sv" and entry.msgctxt not in check_swedish_for_contexts:
+                continue
+
+            key = entry.msgid
+            if entry.msgctxt is not None:
+                key = f"{entry.msgctxt} | {key}"
+
+            if key not in known:
+                missing[key].removed.add(prev_translation.lang)
+
     return missing
 
 
@@ -119,9 +136,12 @@ def _run_translation_command() -> None:
 
 def _print_errors(missing: dict[str, MissingTranslations]) -> None:
     print("\nIncomplete translations:")  # noqa: T201, RUF100
-    for info in missing.values():
+    for msg, info in missing.items():
+        print(f"  {msg}")  # noqa: T201, RUF100
         if len(info.missing_languages) > 0:
             print("    ↳ Empty:", ", ".join(sorted(info.missing_languages)))  # noqa: T201, RUF100
+        if len(info.removed) > 0:
+            print("    ↳ Removed:", ", ".join(sorted(info.removed)))  # noqa: T201, RUF100
         if len(info.not_included_previous) > 0:
             print("    ↳ New:", ", ".join(sorted(info.not_included_previous)))  # noqa: T201, RUF100
         if len(info.fuzzy) > 0:
