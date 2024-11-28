@@ -2,20 +2,23 @@ from __future__ import annotations
 
 from django.test import override_settings
 
+from tilavarauspalvelu.integrations.email.dataclasses import EmailData
 from tilavarauspalvelu.integrations.email.sending import (
     send_emails_in_batches_task,
     send_multiple_emails_in_batches_task,
 )
-from tilavarauspalvelu.typing import EmailAttachment, EmailData
+from tilavarauspalvelu.typing import EmailAttachment
 
 
 @override_settings(SEND_EMAILS=True)
 def test_send_emails_in_batches_task(outbox):
     send_emails_in_batches_task(
-        recipients=["user@example.com"],
-        subject="subject",
-        text_content="content",
-        html_content="<html>content</html>",
+        EmailData(
+            recipients=["user@example.com"],
+            subject="subject",
+            text_content="content",
+            html_content="<html>content</html>",
+        )
     )
 
     assert len(outbox) == 1
@@ -29,10 +32,12 @@ def test_send_emails_in_batches_task(outbox):
 @override_settings(SEND_EMAILS=False)
 def test_send_emails_in_batches_task__sent_emails_off(outbox):
     send_emails_in_batches_task(
-        recipients=["user@example.com"],
-        subject="subject",
-        text_content="content",
-        html_content="<html>content</html>",
+        EmailData(
+            recipients=["user@example.com"],
+            subject="subject",
+            text_content="content",
+            html_content="<html>content</html>",
+        )
     )
 
     assert len(outbox) == 0
@@ -41,10 +46,12 @@ def test_send_emails_in_batches_task__sent_emails_off(outbox):
 @override_settings(SEND_EMAILS=True, EMAIL_MAX_RECIPIENTS=2)
 def test_send_emails_in_batches_task__multiple_batches(outbox):
     send_emails_in_batches_task(
-        recipients=["user1@example.com", "user2@example.com", "user3@example.com"],
-        subject="subject",
-        text_content="content",
-        html_content="<html>content</html>",
+        EmailData(
+            recipients=["user1@example.com", "user2@example.com", "user3@example.com"],
+            subject="subject",
+            text_content="content",
+            html_content="<html>content</html>",
+        )
     )
 
     assert len(outbox) == 2
@@ -63,11 +70,13 @@ def test_send_emails_in_batches_task__multiple_batches(outbox):
 @override_settings(SEND_EMAILS=True)
 def test_send_emails_in_batches_task__attachments(outbox):
     send_emails_in_batches_task(
-        recipients=["user@example.com"],
-        subject="subject",
-        text_content="content",
-        html_content="<html>content</html>",
-        attachments=[EmailAttachment(filename="file.txt", content="content", mimetype="text/plain")],
+        EmailData(
+            recipients=["user@example.com"],
+            subject="subject",
+            text_content="content",
+            html_content="<html>content</html>",
+            attachments=[EmailAttachment(filename="file.txt", content="content", mimetype="text/plain")],
+        )
     )
 
     assert len(outbox) == 1

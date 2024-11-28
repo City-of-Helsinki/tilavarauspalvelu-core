@@ -7,11 +7,11 @@ from django.db import models
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice, EmailType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import Application, User
-from tilavarauspalvelu.typing import EmailData
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.sentry import SentryLogger
 
 from .attachements import get_reservation_ical_attachment
+from .dataclasses import EmailData
 from .find_language import get_application_email_language, get_reservation_email_language
 from .find_recipients import (
     get_application_email_recipients,
@@ -20,7 +20,6 @@ from .find_recipients import (
     get_reservation_staff_notification_recipients_by_language,
     get_users_by_email_language,
 )
-from .rendering import render_html, render_text
 from .sending import send_emails_in_batches_task, send_multiple_emails_in_batches_task
 from .template_context import (
     get_context_for_application_handled,
@@ -74,16 +73,8 @@ class EmailService:
 
         for language, recipients in recipients_by_language.items():
             context = get_context_for_application_handled(language=language)
-
-            emails.append(
-                EmailData(
-                    recipients=list(recipients),
-                    subject=context["title"],
-                    text_content=render_text(email_type=email_type, context=context),
-                    html_content=render_html(email_type=email_type, context=context),
-                    attachments=[],
-                )
-            )
+            email = EmailData.build(recipients, context, email_type)
+            emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
         applications.update(results_ready_notification_sent_date=local_datetime())
@@ -108,16 +99,8 @@ class EmailService:
 
         for language, recipients in recipients_by_language.items():
             context = get_context_for_application_in_allocation(language=language)
-
-            emails.append(
-                EmailData(
-                    recipients=list(recipients),
-                    subject=context["title"],
-                    text_content=render_text(email_type=email_type, context=context),
-                    html_content=render_html(email_type=email_type, context=context),
-                    attachments=[],
-                )
-            )
+            email = EmailData.build(recipients, context, email_type)
+            emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
         applications.update(in_allocation_notification_sent_date=local_datetime())
@@ -147,12 +130,8 @@ class EmailService:
 
         email_type = EmailType.APPLICATION_RECEIVED
         context = get_context_for_application_received(language=language)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
 
     # Permissions ######################################################################################################
 
@@ -174,15 +153,8 @@ class EmailService:
         for language, recipients in recipients_by_language.items():
             context = get_context_for_permission_deactivation(language=language)
 
-            emails.append(
-                EmailData(
-                    recipients=list(recipients),
-                    subject=context["title"],
-                    text_content=render_text(email_type=email_type, context=context),
-                    html_content=render_html(email_type=email_type, context=context),
-                    attachments=[],
-                )
-            )
+            email = EmailData.build(recipients, context, email_type)
+            emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
         users.update(sent_email_about_deactivating_permissions=True)
@@ -204,16 +176,8 @@ class EmailService:
 
         for language, recipients in recipients_by_language.items():
             context = get_context_for_user_anonymization(language=language)
-
-            emails.append(
-                EmailData(
-                    recipients=list(recipients),
-                    subject=context["title"],
-                    text_content=render_text(email_type=email_type, context=context),
-                    html_content=render_html(email_type=email_type, context=context),
-                    attachments=[],
-                )
-            )
+            email = EmailData.build(recipients, context, email_type)
+            emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
         users.update(sent_email_about_anonymization=True)
@@ -250,13 +214,8 @@ class EmailService:
         email_type = EmailType.RESERVATION_APPROVED
         context = get_context_for_reservation_approved(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-            attachments=[attachment] if attachment else None,
-        )
+        email = EmailData.build(recipients, context, email_type, attachment=attachment)
+        send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
     def send_reservation_cancelled_email(reservation: Reservation, *, language: Lang | None = None) -> None:
@@ -283,12 +242,8 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_CANCELLED
         context = get_context_for_reservation_cancelled(reservation, language=language)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
     def send_reservation_confirmed_email(reservation: Reservation, *, language: Lang | None = None) -> None:
@@ -316,13 +271,8 @@ class EmailService:
         email_type = EmailType.RESERVATION_CONFIRMED
         context = get_context_for_reservation_confirmed(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-            attachments=[attachment] if attachment else None,
-        )
+        email = EmailData.build(recipients, context, email_type, attachment=attachment)
+        send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
     def send_reservation_modified_email(reservation: Reservation, *, language: Lang | None = None) -> None:
@@ -350,13 +300,8 @@ class EmailService:
         email_type = EmailType.RESERVATION_MODIFIED
         context = get_context_for_reservation_modified(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-            attachments=[attachment] if attachment else None,
-        )
+        email = EmailData.build(recipients, context, email_type, attachment=attachment)
+        send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
     def send_reservation_rejected_email(reservation: Reservation, *, language: Lang | None = None) -> None:
@@ -391,12 +336,8 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_REJECTED
         context = get_context_for_reservation_rejected(reservation, language=language)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
     def send_reservation_requires_handling_email(reservation: Reservation, *, language: Lang | None = None) -> None:
@@ -431,12 +372,8 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_REQUIRES_HANDLING
         context = get_context_for_reservation_requires_handling(reservation, language=language)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
 
     @staticmethod
     def send_reservation_requires_payment_email(reservation: Reservation, *, language: Lang | None = None) -> None:
@@ -463,12 +400,8 @@ class EmailService:
 
         email_type = EmailType.RESERVATION_REQUIRES_PAYMENT
         context = get_context_for_reservation_requires_payment(reservation, language=language)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
 
     # Staff ############################################################################################################
 
@@ -497,16 +430,8 @@ class EmailService:
 
         for language, recipients in recipients_by_language.items():
             context = get_context_for_staff_notification_reservation_made(reservation, language=language)
-
-            emails.append(
-                EmailData(
-                    recipients=list(recipients),
-                    subject=context["title"],
-                    text_content=render_text(email_type=email_type, context=context),
-                    html_content=render_html(email_type=email_type, context=context),
-                    attachments=[],
-                )
-            )
+            email = EmailData.build(recipients, context, email_type)
+            emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)
 
@@ -535,15 +460,7 @@ class EmailService:
 
         for language, recipients in recipients_by_language.items():
             context = get_context_for_staff_notification_reservation_requires_handling(reservation, language=language)
-
-            emails.append(
-                EmailData(
-                    recipients=list(recipients),
-                    subject=context["title"],
-                    text_content=render_text(email_type=email_type, context=context),
-                    html_content=render_html(email_type=email_type, context=context),
-                    attachments=[],
-                )
-            )
+            email = EmailData.build(recipients, context, email_type)
+            emails.append(email)
 
         send_multiple_emails_in_batches_task.delay(emails=emails)

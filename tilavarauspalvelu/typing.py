@@ -19,7 +19,6 @@ __all__ = [
     "AffectedTimeSpan",
     "AnyUser",
     "EmailContext",
-    "EmailData",
     "GQLInfo",
     "Lang",
     "M2MAction",
@@ -92,14 +91,6 @@ class EmailAttachment(TypedDict):
     filename: str
     content: str
     mimetype: str
-
-
-class EmailData(TypedDict):
-    recipients: list[str]
-    subject: str
-    text_content: str
-    html_content: str
-    attachments: list[EmailAttachment]
 
 
 @dataclass
