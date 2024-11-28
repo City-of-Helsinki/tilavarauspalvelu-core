@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import {
-  Card,
   IconCheck,
   IconEnvelope,
   Button,
@@ -510,6 +509,24 @@ type ColumnType = {
   transform: (data: DataType) => ReactNode;
 };
 
+const TimeSection = styled(Flex).attrs({
+  $gap: "l",
+})`
+  & > div:first-child {
+    flex-grow: 1;
+  }
+  & > div:last-child {
+    flex-shrink: 0;
+    grid-template-columns: repeat(2, 1fr);
+    @media (min-width: ${breakpoints.l}) {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (min-width: ${breakpoints.l}) {
+    flex-direction: row;
+  }
+`;
+
 function ApplicationSectionDetails({
   section,
   application,
@@ -640,22 +657,13 @@ function ApplicationSectionDetails({
           ))}
         </ApplicationSectionsContainer>
         <H4 as="h3">{t("ApplicationEvent.requestedTimes")}</H4>
-        <Flex $gap="l">
+        <TimeSection>
           <TimeSelector applicationSection={section} />
-          <Card
-            border
-            theme={{
-              "--background-color": "var(--color-black-5)",
-              "--padding-horizontal": "var(--spacing-m)",
-              "--padding-vertical": "var(--spacing-m)",
-            }}
-          >
-            <ApplicationDatas>
-              <SchedulesContent as={section} priority={Priority.Primary} />
-              <SchedulesContent as={section} priority={Priority.Secondary} />
-            </ApplicationDatas>
-          </Card>
-        </Flex>
+          <Summary>
+            <SchedulesContent as={section} priority={Priority.Primary} />
+            <SchedulesContent as={section} priority={Priority.Secondary} />
+          </Summary>
+        </TimeSection>
       </Accordion>
     </ScrollIntoView>
   );
