@@ -42,7 +42,7 @@ export function SelectFilter({
 
   const value = new URLSearchParams(searchParams).get(name) ?? "";
   const convertedValue =
-    typeof options.values === "string" ? value : Number(value);
+    typeof options[0].value === "string" ? value : Number(value);
 
   const label = t(`filters.label.${name}`);
   const placeholder = t("common.select");
