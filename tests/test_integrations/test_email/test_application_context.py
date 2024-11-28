@@ -22,6 +22,8 @@ from tests.test_integrations.test_email.helpers import (
     CLOSING_POLITE_CONTEXT_SV,
 )
 
+# type: EmailType.APPLICATION_HANDLED ##################################################################################
+
 
 @freeze_time("2024-01-01")
 def test_get_context__application_handled__en():
@@ -92,6 +94,9 @@ def test_get_context__application_handled__sv():
         **CLOSING_POLITE_CONTEXT_SV,
         **AUTOMATIC_REPLY_CONTEXT_SV,
     }
+
+
+# type: EmailType.APPLICATION_IN_ALLOCATION ############################################################################
 
 
 @freeze_time("2024-01-01")
@@ -171,6 +176,9 @@ def test_get_context__application_in_allocation__sv():
         **CLOSING_POLITE_CONTEXT_SV,
         **AUTOMATIC_REPLY_CONTEXT_SV,
     }
+
+
+# type: EmailType.APPLICATION_RECEIVED #################################################################################
 
 
 @freeze_time("2024-01-01")

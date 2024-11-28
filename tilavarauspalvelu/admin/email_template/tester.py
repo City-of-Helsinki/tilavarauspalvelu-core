@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from admin_data_views.settings import admin_data_settings
+from django import forms
 from django.contrib import admin, messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
@@ -13,11 +14,37 @@ from tilavarauspalvelu.enums import EmailType, Language
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
 from tilavarauspalvelu.models import ReservationUnit
+from utils.utils import safe_getattr
 
-from .forms import ReservationUnitSelectForm, TemplateSwitcherForm, select_tester_form
+from .forms import select_tester_form
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
+
+
+class TemplateSwitcherForm(forms.Form):
+    """Allows switching between templates in the email tester."""
+
+    email_type = forms.ChoiceField(
+        choices=EmailType.choices,
+        widget=forms.Select(attrs={"id": "test_email_template_select"}),
+    )
+
+
+class ReservationUnitSelectForm(forms.Form):
+    """Allows pre-filling the email tester from a reservation unit."""
+
+    reservation_unit = forms.ChoiceField(
+        widget=forms.Select(attrs={"id": "test_email_reservation_unit_select"}),
+    )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        runit_choices = [(None, "-")] + [
+            (runit.pk, f"{runit.name} - {safe_getattr(runit, 'unit.name')}")
+            for runit in ReservationUnit.objects.select_related("unit").order_by("name_fi")
+        ]
+        self.fields["reservation_unit"].choices = runit_choices
 
 
 def email_tester_admin_redirect_view(request: WSGIRequest, email_type: str | None = None) -> HttpResponseRedirect:
