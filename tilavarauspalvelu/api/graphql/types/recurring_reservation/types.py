@@ -27,6 +27,7 @@ class RecurringReservationNode(DjangoNode):
         model = RecurringReservation
         fields = [
             "pk",
+            "ext_uuid",
             "user",
             "age_group",
             "ability_group",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import uuid
 from decimal import Decimal
 from functools import cached_property
 from typing import TYPE_CHECKING
@@ -46,6 +47,7 @@ __all__ = [
 
 class Reservation(SerializableMixin, models.Model):
     # Basic information
+    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
     sku: str = models.CharField(max_length=255, blank=True, default="")
     name: str = models.CharField(max_length=255, blank=True, default="")
     description: str = models.CharField(max_length=255, blank=True, default="")

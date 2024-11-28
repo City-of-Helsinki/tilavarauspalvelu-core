@@ -102,6 +102,7 @@ class ReservationAdmin(admin.ModelAdmin):
             {
                 "fields": [
                     "id",
+                    "ext_uuid",
                     "sku",
                     "name",
                     "description",
@@ -197,6 +198,7 @@ class ReservationAdmin(admin.ModelAdmin):
     ]
     readonly_fields = [
         "id",
+        "ext_uuid",
         "handled_at",
         "confirmed_at",
         "created_at",

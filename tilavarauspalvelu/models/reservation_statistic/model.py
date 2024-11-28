@@ -136,6 +136,7 @@ class ReservationStatistic(models.Model):
     recurrence_begin_date: datetime.date | None = models.DateField(null=True)
     recurrence_end_date: datetime.date | None = models.DateField(null=True)
     recurrence_uuid: str = models.CharField(max_length=255, default="", blank=True)
+    reservation_uuid: str = models.CharField(max_length=255, default="", blank=True)
     reservee_uuid: str = models.CharField(max_length=255, default="", blank=True)
     reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
     is_applied: bool = models.BooleanField(default=False, blank=True)
@@ -204,7 +205,8 @@ class ReservationStatistic(models.Model):
         statistic.purpose_name = reservation.purpose.name if reservation.purpose else ""
         statistic.recurrence_begin_date = getattr(recurring_reservation, "begin_date", None)
         statistic.recurrence_end_date = getattr(recurring_reservation, "end_date", None)
-        statistic.recurrence_uuid = getattr(recurring_reservation, "uuid", "")
+        statistic.recurrence_uuid = str(getattr(recurring_reservation, "ext_uuid", ""))
+        statistic.reservation_uuid = str(reservation.ext_uuid)
         statistic.reservation = reservation
         statistic.reservation_confirmed_at = reservation.confirmed_at
         statistic.reservation_created_at = reservation.created_at

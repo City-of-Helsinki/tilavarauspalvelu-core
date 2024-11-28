@@ -1146,6 +1146,10 @@ msgid "Paid reservation"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
+msgid "External UUID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "SKU"
 msgstr ""
@@ -1303,6 +1307,10 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reason for cancellation"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "ID for external systems to use"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py

@@ -96,7 +96,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.purpose_name == reservation.purpose.name
     assert stat.recurrence_begin_date == recurring.begin_date
     assert stat.recurrence_end_date == recurring.end_date
-    assert stat.recurrence_uuid == str(recurring.uuid)
+    assert stat.recurrence_uuid == str(recurring.ext_uuid)
     assert stat.reservation == reservation
     assert stat.reservation_confirmed_at == reservation.confirmed_at
     assert stat.reservation_created_at == reservation.created_at

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import uuid as uuid_
+import uuid
 from functools import cached_property
 from typing import TYPE_CHECKING
 
@@ -27,9 +27,9 @@ __all__ = [
 
 
 class RecurringReservation(models.Model):
+    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
     name: str = models.CharField(max_length=255, blank=True, default="")
     description: str = models.CharField(max_length=500, blank=True, default="")
-    uuid: uuid_.UUID = models.UUIDField(default=uuid_.uuid4, editable=False, unique=True)
     created: datetime.datetime = models.DateTimeField(auto_now_add=True)
 
     begin_date: datetime.date | None = models.DateField(null=True)

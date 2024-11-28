@@ -116,6 +116,7 @@ class ReservationNode(DjangoNode):
         fields = [
             #
             "pk",
+            "ext_uuid",
             "name",
             "description",
             "num_persons",

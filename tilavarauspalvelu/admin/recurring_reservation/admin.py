@@ -10,12 +10,16 @@ from tilavarauspalvelu.models import RecurringReservation
 class RecurringReservationAdmin(admin.ModelAdmin):
     # List
     list_display = [
+        "ext_uuid",
         "name",
         "reservation_unit",
         "allocated_time_slot",
         "begin_date",
         "end_date",
         "recurrence_in_days",
+    ]
+    readonly_fields = [
+        "ext_uuid",
     ]
 
     # Form
