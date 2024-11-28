@@ -1,12 +1,19 @@
 import { sortBy } from "lodash";
-import { useOptionsQuery } from "@gql/gql-types";
+import {
+  ReservationPurposeOrderingChoices,
+  useOptionsQuery,
+} from "@gql/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 
 export function useOptions() {
-  const { data: optionsData } = useOptionsQuery();
+  const { data: optionsData } = useOptionsQuery({
+    variables: {
+      reservationPurposesOrderBy: [ReservationPurposeOrderingChoices.RankAsc],
+    },
+  });
 
-  const purpose = sortBy(
-    optionsData?.reservationPurposes?.edges || [],
-    "node.nameFi"
+  const purpose = filterNonNullable(
+    optionsData?.reservationPurposes?.edges
   ).map((purposeType) => ({
     label: purposeType?.node?.nameFi ?? "",
     value: Number(purposeType?.node?.pk),

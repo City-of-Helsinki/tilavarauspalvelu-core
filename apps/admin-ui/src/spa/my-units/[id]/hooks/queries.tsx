@@ -6,8 +6,10 @@ import {
 import { LOCATION_FRAGMENT } from "common/src/queries/fragments";
 
 export const OPTIONS_QUERY = gql`
-  query Options {
-    reservationPurposes {
+  query Options(
+    $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
+  ) {
+    reservationPurposes(orderBy: $reservationPurposesOrderBy) {
       edges {
         node {
           id
