@@ -14,6 +14,7 @@ from tilavarauspalvelu.tasks import (
     refresh_reservation_unit_product_mapping,
     update_affecting_time_spans_task,
     update_reservation_unit_hierarchy_task,
+    update_reservation_unit_search_vectors_task,
 )
 from utils.date_utils import local_datetime
 from utils.image_cache import purge_previous_image_cache
@@ -96,6 +97,9 @@ def reservation_unit_saved(instance: ReservationUnit, *, created: bool, **kwargs
     if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and created:
         update_reservation_unit_hierarchy_task.delay(using=kwargs.get("using"))
 
+    if settings.UPDATE_SEARCH_VECTORS:
+        update_reservation_unit_search_vectors_task.delay(reservation_unit_pk=instance.pk)
+
 
 @receiver(post_delete, sender=ReservationUnit, dispatch_uid="reservation_unit_deleted")
 def reservation_unit_deleted(*args: Any, **kwargs: Any) -> None:
@@ -104,15 +108,41 @@ def reservation_unit_deleted(*args: Any, **kwargs: Any) -> None:
 
 
 @receiver(m2m_changed, sender=ReservationUnit.spaces.through, dispatch_uid="reservation_unit_spaces_modified")
-def reservation_unit_spaces_modified(action: Action, *args: Any, **kwargs: Any) -> None:
-    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in {"post_add", "post_remove", "post_clear"}:
+def reservation_unit_spaces_modified(action: Action, instance: ReservationUnit, *args: Any, **kwargs: Any) -> None:
+    post_modify = action in {"post_add", "post_remove", "post_clear"}
+
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and post_modify:
         update_reservation_unit_hierarchy_task.delay(using=kwargs.get("using"))
+
+    if settings.UPDATE_SEARCH_VECTORS and post_modify:
+        update_reservation_unit_search_vectors_task.delay(reservation_unit_pk=instance.pk)
 
 
 @receiver(m2m_changed, sender=ReservationUnit.resources.through, dispatch_uid="reservation_unit_resources_modified")
-def reservation_unit_resources_modified(action: Action, *args: Any, **kwargs: Any) -> None:
-    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and action in {"post_add", "post_remove", "post_clear"}:
+def reservation_unit_resources_modified(action: Action, instance: ReservationUnit, *args: Any, **kwargs: Any) -> None:
+    post_modify = action in {"post_add", "post_remove", "post_clear"}
+
+    if settings.UPDATE_RESERVATION_UNIT_HIERARCHY and post_modify:
         update_reservation_unit_hierarchy_task.delay(using=kwargs.get("using"))
+
+    if settings.UPDATE_SEARCH_VECTORS and post_modify:
+        update_reservation_unit_search_vectors_task.delay(reservation_unit_pk=instance.pk)
+
+
+@receiver(m2m_changed, sender=ReservationUnit.purposes.through, dispatch_uid="reservation_unit_purposes_modified")
+def reservation_unit_purposes_modified(action: Action, instance: ReservationUnit, *args: Any, **kwargs: Any) -> None:
+    post_modify = action in {"post_add", "post_remove", "post_clear"}
+
+    if settings.UPDATE_SEARCH_VECTORS and post_modify:
+        update_reservation_unit_search_vectors_task.delay(reservation_unit_pk=instance.pk)
+
+
+@receiver(m2m_changed, sender=ReservationUnit.equipments.through, dispatch_uid="reservation_unit_equipments_modified")
+def reservation_unit_equipments_modified(action: Action, instance: ReservationUnit, *args: Any, **kwargs: Any) -> None:
+    post_modify = action in {"post_add", "post_remove", "post_clear"}
+
+    if settings.UPDATE_SEARCH_VECTORS and post_modify:
+        update_reservation_unit_search_vectors_task.delay(reservation_unit_pk=instance.pk)
 
 
 @receiver(user_logged_in, dispatch_uid="user_logged_in")

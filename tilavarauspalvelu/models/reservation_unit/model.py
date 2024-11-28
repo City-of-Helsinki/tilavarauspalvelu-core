@@ -6,9 +6,9 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from elasticsearch_django.models import SearchDocumentMixin
 from lookup_property import L, lookup_property
 
 from config.utils.auditlog_util import AuditLogger
@@ -46,7 +46,7 @@ __all__ = [
 ]
 
 
-class ReservationUnit(SearchDocumentMixin, models.Model):
+class ReservationUnit(models.Model):
     # IDs
 
     sku: str = models.CharField(max_length=255, blank=True, default="")
@@ -236,6 +236,12 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         related_name="reservation_units",
         blank=True,
     )
+
+    # Pre-calculated search vector.
+
+    search_vector_fi = SearchVectorField()
+    search_vector_en = SearchVectorField()
+    search_vector_sv = SearchVectorField()
 
     # Translated field hints
     name_fi: str | None
@@ -483,39 +489,6 @@ class ReservationUnit(SearchDocumentMixin, models.Model):
         )
 
         return case  # type: ignore[return-value]  # noqa: RET504
-
-    # ElasticSearch
-    def as_search_document(self, *, index: str) -> dict | None:
-        if index == "reservation_units":
-            return {
-                "pk": self.pk,
-                "name_fi": self.name_fi,
-                "name_en": self.name_en,
-                "name_sv": self.name_sv,
-                "description_fi": self.description_fi,
-                "description_en": self.description_en,
-                "description_sv": self.description_sv,
-                "space_name_fi": ",".join([s.name_fi or "" for s in self.spaces.all()]),
-                "space_name_en": ",".join([s.name_en or "" for s in self.spaces.all()]),
-                "space_name_sv": ",".join([s.name_sv or "" for s in self.spaces.all()]),
-                "resources_name_fi": ",".join([r.name_fi for r in self.resources.all()]),
-                "resources_name_en": ",".join([r.name_en or "" for r in self.resources.all()]),
-                "resources_name_sv": ",".join([r.name_sv or "" for r in self.resources.all()]),
-                "purposes_name_fi": ",".join([p.name_fi or "" for p in self.purposes.all()]),
-                "purposes_name_en": ",".join([p.name_en or "" for p in self.purposes.all()]),
-                "purposes_name_sv": ",".join([p.name_sv or "" for p in self.purposes.all()]),
-                "reservation_unit_type_name_fi": getattr(self.reservation_unit_type, "name_fi", ""),
-                "reservation_unit_type_name_en": getattr(self.reservation_unit_type, "name_en", ""),
-                "reservation_unit_type_name_sv": getattr(self.reservation_unit_type, "name_sv", ""),
-                "equipments_name_fi": ",".join([e.name_fi or "" for e in self.equipments.all()]),
-                "equipments_name_en": ",".join([e.name_en or "" for e in self.equipments.all()]),
-                "equipments_name_sv": ",".join([e.name_sv or "" for e in self.equipments.all()]),
-                "unit_name_fi": getattr(self.unit, "name_fi", ""),
-                "unit_name_en": getattr(self.unit, "name_en", ""),
-                "unit_name_sv": getattr(self.unit, "name_sv", ""),
-            }
-
-        return None
 
 
 AuditLogger.register(

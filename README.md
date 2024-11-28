@@ -39,7 +39,6 @@ The preferred contact method is through Helsinki City Slack.
 - [PostgreSQL] (with the [PostGIS] extension) for database needs
 - [Redis] for in-memory caching
 - [Celery] for scheduling and background task handling
-- [Elasticsearch] you know, for search
 - [Poetry] for dependency management
 - [Docker] for containerization
 - [Django] as the web framework
@@ -87,13 +86,7 @@ To generate test data, follow the steps below.
 make bash
 ```
 
-2. (Re)create elastic search index.
-
-```shell
-make indices
-```
-
-3. Generate test data.
+2. Generate test data.
 
 ```shell
 make generate
@@ -112,7 +105,6 @@ Before you start, you'll need the following dependencies:
 - [Make] ([Windows][Make (Windows)], [Mac][Make (Mac)])
 - [PostgreSQL] (with the [PostGIS] extension) (version 13 or newer)
 - [Redis] (version 7 or newer)
-- [Elasticsearch] (version 8.8)
 - [GDAL] (version compatible with Django, check their documentation for more info)
     - Ubuntu: `sudo apt-get install gdal-bin`
     - Mac: `brew install gdal`
@@ -126,7 +118,7 @@ Before you start, you'll need the following dependencies:
 > change over time, so please refer to the official documentation for each dependency
 > on how to set them up correctly.
 
-> You can skip the dependencies for Postgres, Redis, and Elasticsearch by running
+> You can skip the dependencies for Postgres and Redis by running
 > them using Docker. To do this, install [Docker] and run `make services`.
 
 Now, follow the steps below.
@@ -166,19 +158,13 @@ poetry run make hooks
 poetry run make migrate
 ```
 
-6. (Re)create elastic search indices
-
-```shell
-poetry run make indices
-```
-
-7. Generate test data
+6. Generate test data
 
 ```shell
 poetry run make generate
 ```
 
-8. Start the server
+7. Start the server
 
 ```shell
 poetry run make dev
@@ -193,7 +179,6 @@ Tests are run with `pytest`.
 Some flags that can save time when running tests:
 
 - To skip slow-running tests: `pytest --skip-slow`
-- To skip tests requiring Elasticsearch: `pytest --skip-elastic`
 - To retain test database between runs: `pytest --reuse-db`
 - To skip migration-checks at the start of tests: `pytest --no-migrations`
 - To run tests in parallel: `pytest -n 8 --dist=loadscope` (=8 cores, use `-n auto` to use all available cores)
@@ -308,7 +293,6 @@ In settings there are four configurations:
 [django-helusers]: https://github.com/City-of-Helsinki/django-helusers
 [Django]: https://www.djangoproject.com/
 [Docker]: https://www.docker.com/
-[Elasticsearch]: https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html
 [GDAL]: https://gdal.org/index.html
 [gettext]: https://www.gnu.org/software/gettext/
 [Graphene]: https://github.com/graphql-python/graphene-django

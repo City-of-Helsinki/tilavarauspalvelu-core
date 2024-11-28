@@ -1,54 +1,20 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NamedTuple
+from typing import NamedTuple
 
 import pytest
-from elasticsearch_django.settings import get_client
 from graphene_django_extensions.testing.utils import parametrize_helper
+
+from tilavarauspalvelu.models import ReservationUnit
 
 from tests.factories import ReservationUnitFactory, SpaceFactory
 
 from .helpers import reservation_units_query
 
-if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ReservationUnit
-
 # Applied to all tests
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.enable_elasticsearch,
 ]
-
-
-els_client = get_client()
-
-
-def _force_elastic_update(reservation_unit: ReservationUnit) -> None:
-    els_client.update(
-        index=reservation_unit.search_indexes[0],
-        id=reservation_unit.pk,
-        refresh="wait_for",
-        doc={"session": "state"},
-    )
-
-
-def test_reservation_unit__filter__by_text_search_and_other_filters(graphql):
-    # given:
-    # - There are two reservation units with different equipments
-    reservation_unit = ReservationUnitFactory.create(name="foo")
-    ReservationUnitFactory.create(name="foo bar")
-
-    _force_elastic_update(reservation_unit)
-
-    # when:
-    # - The user requests reservation units with a specific equipment
-    response = graphql(reservation_units_query(text_search="foo", unit=reservation_unit.unit.pk))
-
-    # then:
-    # - The response contains only the expected reservation unit
-    assert response.has_errors is False, response
-    assert len(response.edges) == 1, response
-    assert response.node(0) == {"pk": reservation_unit.pk}
 
 
 class Params(NamedTuple):
@@ -126,7 +92,7 @@ class Params(NamedTuple):
         ),
     })
 )
-def test_reservation_unit__filter__by_text_search__type_fi(graphql, text_search, fields, expected):
+def test_reservation_unit__filter__by_text_search(graphql, text_search, fields, expected):
     space = SpaceFactory.create(
         name_fi="space name fi",
         name_en="space name en",
@@ -147,9 +113,10 @@ def test_reservation_unit__filter__by_text_search__type_fi(graphql, text_search,
         spaces=[space],
     )
 
-    _force_elastic_update(reservation_unit)
+    ReservationUnit.objects.update_search_vectors()
 
-    response = graphql(reservation_units_query(text_search=text_search, fields="pk " + fields))
+    query = reservation_units_query(text_search=text_search, fields="pk " + fields)
+    response = graphql(query)
 
     assert response.has_errors is False, response
     expect_results = expected is not None
@@ -158,3 +125,20 @@ def test_reservation_unit__filter__by_text_search__type_fi(graphql, text_search,
         assert response.node(0) == {"pk": reservation_unit.pk, **expected}
     else:
         assert len(response.edges) == 0, response
+
+
+def test_reservation_unit__filter__by_text_search__and_other_filters(graphql):
+    reservation_unit = ReservationUnitFactory.create(name="foo")
+    ReservationUnitFactory.create(name="foo bar")
+
+    ReservationUnit.objects.update_search_vectors()
+
+    query = reservation_units_query(text_search="foo", unit=reservation_unit.unit.pk)
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+# TODO: Add more tests for special cases.

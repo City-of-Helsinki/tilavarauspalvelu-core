@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Annotated, Any, Literal, NamedTuple, ParamSpec
 
 from django.test import override_settings
 
-from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
+from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnit, ReservationUnitHierarchy
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable, Sequence, Sized
@@ -94,12 +94,17 @@ def refresh_materialized_views_at_the_end(func: Callable[P, None]) -> Callable[P
             UPDATE_AFFECTING_TIME_SPANS=False,
             UPDATE_RESERVATION_UNIT_HIERARCHY=False,
             SAVE_RESERVATION_STATISTICS=False,
+            UPDATE_SEARCH_VECTORS=False,
         ):
             try:
                 func(*args, **kwargs)
             finally:
+                print("Refreshing reservation unit hierarchy...")  # noqa: T201, RUF100
                 ReservationUnitHierarchy.refresh()
+                print("Refreshing affecting time spans...")  # noqa: T201, RUF100
                 AffectingTimeSpan.refresh()
+                print("Refreshing search vectors...")  # noqa: T201, RUF100
+                ReservationUnit.objects.update_search_vectors()
 
     return wrapper
 

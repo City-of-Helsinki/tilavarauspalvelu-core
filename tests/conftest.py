@@ -33,14 +33,6 @@ def _sentry_require_mocking(request):
         yield
 
 
-@pytest.fixture(autouse=True)
-def _enable_elasticsearch(request, settings):
-    """Enable syncing to Elasticsearch for the duration of the test."""
-    use_elasticsearch = "enable_elasticsearch" in request.keywords
-
-    settings.SEARCH_SETTINGS["settings"]["auto_sync"] = use_elasticsearch
-
-
 @pytest.fixture
 def outbox() -> list[EmailMessage]:
     from django.core import mail

@@ -14,7 +14,7 @@ from lookup_property.converters.expressions import expression_to_ast
 from lookup_property.converters.utils import ast_attribute, ast_function
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Collection
 
 __all__ = [
     "ArrayRemove",
@@ -254,9 +254,11 @@ TQuerySet = TypeVar("TQuerySet")
 
 def text_search(
     qs: TQuerySet,
-    fields: Iterable[str],
+    fields: Collection[str],
     text: str,
+    *,
     language: Literal["finnish", "english", "swedish"] = "finnish",
+    or_contains: bool = False,
 ) -> TQuerySet:
     """
     Query with postgres full text search.
@@ -266,6 +268,8 @@ def text_search(
     :param fields: Fields to search.
     :param text: Text to search for.
     :param language: Language to search in.
+    :param or_contains: Search results with a LIKE query in addition to full text search.
+                        This makes the search slower, but complements full text search with partial matches.
     """
     # If this becomes slow, look into optimisation strategies here:
     # https://docs.djangoproject.com/en/5.1/ref/contrib/postgres/search/#performance
@@ -274,23 +278,28 @@ def text_search(
     search = build_search(text)
     query = SearchQuery(value=search, config=language, search_type="raw")
     rank = SearchRank(vector, query)
-    return qs.annotate(ts_vector=vector, ts_rank=rank).filter(ts_vector=query)
+    q = models.Q(ts_vector=query)
+    if or_contains:
+        for field in fields:
+            q |= models.Q(**{f"{field}__icontains": text})
+    return qs.annotate(ts_vector=vector, ts_rank=rank).filter(q)
 
 
 def build_search(text: str) -> str:
     """
     Build raw postgres full text search query from text.
 
-    Replace single quotes with two single quotes so that they are treated as whitespace in the search.
-    Quote search terms, and support prefix matching.
+    Quote search terms and do prefix matching.
     Match all search terms with the OR operator.
+
+    Replace single quotes and hyphens in words with spaces so they are treated as whitespace in the search,
+    e.g. "Moe's" becomes "Moe s" and "3D-printer" becomes "3D printer".
 
     Ref. https://www.postgresql.org/docs/current/datatype-textsearch.html#DATATYPE-TSQUERY
     """
     search_terms: list[str] = []
-    for value in text.split(" "):
+    for value in text.replace("'", " ").replace("-", " ").split(" "):
         if value:
-            value = value.replace("'", "''")
             value = f"'{value}':*"
             search_terms.append(value)
     return " | ".join(search_terms)

@@ -79,9 +79,6 @@ generate:
 hooks:
 	@pre-commit install
 
-indices:
-	@python manage.py rebuild_search_index reservation_units
-
 lint:
 	@pre-commit run --all-files
 
@@ -95,7 +92,7 @@ run:
 	@docker compose up --detach --build
 
 services:
-	@docker compose up --detach --build db elastic redis
+	@docker compose up --detach --build db redis
 
 stop:
 	@docker compose stop

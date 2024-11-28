@@ -14,7 +14,6 @@ from django.db.models import Prefetch, Q
 from django.db.transaction import atomic
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.exceptions import InvalidImageFormatError
-from elasticsearch_django.index import create_index, delete_index, update_index
 from lookup_property import L
 
 from config.celery import app
@@ -674,22 +673,11 @@ def log_to_sentry_if_suspicious(request_log: RequestLog, duration_ms: int) -> No
         SentryLogger.log_message(msg, details=details, level="warning")
 
 
-@app.task(name="Update ReservationUnit Elastic index")
-def update_reservation_unit_elastic_index() -> None:
-    index = next(iter(settings.SEARCH_SETTINGS["indexes"].keys()))
-    update_index(index)
+@app.task(name="Update ReservationUnit Search vectors")
+def update_reservation_unit_search_vectors_task(reservation_unit_pk: int | None = None) -> None:
+    from tilavarauspalvelu.models import ReservationUnit
 
-
-@app.task(name="Create ReservationUnit Elastic index")
-def create_reservation_unit_elastic_index() -> None:
-    index = next(iter(settings.SEARCH_SETTINGS["indexes"].keys()))
-    create_index(index)
-
-
-@app.task(name="Delete ReservationUnit Elastic index")
-def delete_reservation_unit_elastic_index() -> None:
-    index = next(iter(settings.SEARCH_SETTINGS["indexes"].keys()))
-    delete_index(index)
+    ReservationUnit.objects.update_search_vectors(reservation_unit_pk=reservation_unit_pk)
 
 
 @app.task(name="deactivate_old_permissions")

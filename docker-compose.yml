@@ -17,21 +17,6 @@ services:
     volumes:
       - tvp-postgres:/var/lib/postgresql/data
 
-  elastic:
-    container_name: tvp-elastic
-    image: "docker.elastic.co/elasticsearch/elasticsearch:8.8.0"
-    environment:
-      xpack.security.enabled: false
-      discovery.type: single-node
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    ports:
-      - "127.0.0.1:9200:9200"
-    volumes:
-      - tvp-elastic:/usr/share/elasticsearch/data
-
   redis:
     container_name: tvp-redis
     image: "redis:7-alpine"
@@ -86,8 +71,6 @@ services:
 volumes:
   tvp-postgres:
   tvp-media:
-  tvp-elastic:
-    driver: local
 
 networks:
   default:
