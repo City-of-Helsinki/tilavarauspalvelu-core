@@ -1472,7 +1472,7 @@ msgid "Required fields must be a subset of supported fields"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
-msgid "Search by ID, name, unit name, or service sector name"
+msgid "Search by ID, name or unit name"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
@@ -1521,15 +1521,7 @@ msgid "Spaces"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Keyword groups"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Resources"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Services"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -1750,10 +1742,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment product"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Keyword gruops"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -2018,18 +2006,6 @@ msgstr ""
 
 #: tilavarauspalvelu/api/helauth/views.py
 msgid "You have been successfully logged out."
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgid "Introduction"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgid "Catering"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgid "Configuration"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
@@ -3206,14 +3182,6 @@ msgid ""
 "are set, 'active_until' must be after 'active_from'."
 msgstr ""
 
-#: tilavarauspalvelu/models/building/model.py
-msgid "building"
-msgstr ""
-
-#: tilavarauspalvelu/models/building/model.py
-msgid "buildings"
-msgstr ""
-
 #: tilavarauspalvelu/models/city/model.py
 msgid "city"
 msgstr ""
@@ -3244,38 +3212,6 @@ msgstr ""
 
 #: tilavarauspalvelu/models/general_role/model.py
 msgid "general roles"
-msgstr ""
-
-#: tilavarauspalvelu/models/introduction/model.py
-msgid "introduction"
-msgstr ""
-
-#: tilavarauspalvelu/models/introduction/model.py
-msgid "introductions"
-msgstr ""
-
-#: tilavarauspalvelu/models/keyword/model.py
-msgid "keyword"
-msgstr ""
-
-#: tilavarauspalvelu/models/keyword/model.py
-msgid "keywords"
-msgstr ""
-
-#: tilavarauspalvelu/models/keyword_category/model.py
-msgid "keyword category"
-msgstr ""
-
-#: tilavarauspalvelu/models/keyword_category/model.py
-msgid "keyword categories"
-msgstr ""
-
-#: tilavarauspalvelu/models/keyword_group/model.py
-msgid "keyword group"
-msgstr ""
-
-#: tilavarauspalvelu/models/keyword_group/model.py
-msgid "keyword groups"
 msgstr ""
 
 #: tilavarauspalvelu/models/location/model.py
@@ -3386,14 +3322,6 @@ msgstr ""
 
 #: tilavarauspalvelu/models/qualifier/model.py
 msgid "qualifiers"
-msgstr ""
-
-#: tilavarauspalvelu/models/real_estate/model.py
-msgid "real estate"
-msgstr ""
-
-#: tilavarauspalvelu/models/real_estate/model.py
-msgid "real estates"
 msgstr ""
 
 #: tilavarauspalvelu/models/recurring_reservation/model.py
@@ -3609,22 +3537,6 @@ msgstr ""
 
 #: tilavarauspalvelu/models/resource/model.py
 msgid "resources"
-msgstr ""
-
-#: tilavarauspalvelu/models/service/model.py
-msgid "service"
-msgstr ""
-
-#: tilavarauspalvelu/models/service/model.py
-msgid "services"
-msgstr ""
-
-#: tilavarauspalvelu/models/service_sector/model.py
-msgid "service sector"
-msgstr ""
-
-#: tilavarauspalvelu/models/service_sector/model.py
-msgid "service sectors"
 msgstr ""
 
 #: tilavarauspalvelu/models/space/model.py

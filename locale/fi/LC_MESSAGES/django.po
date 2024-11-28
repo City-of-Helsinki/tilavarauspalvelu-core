@@ -1515,8 +1515,8 @@ msgid "Required fields must be a subset of supported fields"
 msgstr "Vaadittujen kenttien täytyy olla tuettujen kenttien alijoukko"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
-msgid "Search by ID, name, unit name, or service sector name"
-msgstr "Etsi ID:llä, nimellä, toimipisteen nimellä tai palvelualueen nimellä"
+msgid "Search by ID, name or unit name"
+msgstr "Etsi ID:llä, nimellä tai toimipisteen nimellä"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Reservation restrictions"
@@ -1564,16 +1564,8 @@ msgid "Spaces"
 msgstr "Tilat"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Keyword groups"
-msgstr "Avainsanan ryhmät"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Resources"
 msgstr "Resurssit"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Services"
-msgstr "Palvelut"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Qualifiers"
@@ -1794,10 +1786,6 @@ msgstr "UUID"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment product"
 msgstr "Maksutuote"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Keyword gruops"
-msgstr "Avainsanan ryhmä"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment terms for the reservation unit."
@@ -2080,18 +2068,6 @@ msgstr ""
 #: tilavarauspalvelu/api/helauth/views.py
 msgid "You have been successfully logged out."
 msgstr "Sinut on nyt kirjattu ulos."
-
-#: tilavarauspalvelu/enums.py
-msgid "Introduction"
-msgstr "Perehdytys"
-
-#: tilavarauspalvelu/enums.py
-msgid "Catering"
-msgstr "Tarjoilu"
-
-#: tilavarauspalvelu/enums.py
-msgid "Configuration"
-msgstr "Konfiguraatio"
 
 #: tilavarauspalvelu/enums.py
 msgid "Generic terms"
@@ -3272,14 +3248,6 @@ msgstr ""
 "'active_from' ja 'active_until' täytyy olla joko tyhjiä tai asetettuja. Jos "
 "molemmat on asetettu, 'active_until' täytyy olla 'active_from' jälkeen."
 
-#: tilavarauspalvelu/models/building/model.py
-msgid "building"
-msgstr "rakennus"
-
-#: tilavarauspalvelu/models/building/model.py
-msgid "buildings"
-msgstr "rakennukset"
-
 #: tilavarauspalvelu/models/city/model.py
 msgid "city"
 msgstr "kotikunta"
@@ -3311,38 +3279,6 @@ msgstr "yleinen rooli"
 #: tilavarauspalvelu/models/general_role/model.py
 msgid "general roles"
 msgstr "yleiset roolit"
-
-#: tilavarauspalvelu/models/introduction/model.py
-msgid "introduction"
-msgstr "perehdytys"
-
-#: tilavarauspalvelu/models/introduction/model.py
-msgid "introductions"
-msgstr "perehdytykset"
-
-#: tilavarauspalvelu/models/keyword/model.py
-msgid "keyword"
-msgstr "avainsana"
-
-#: tilavarauspalvelu/models/keyword/model.py
-msgid "keywords"
-msgstr "avainsanat"
-
-#: tilavarauspalvelu/models/keyword_category/model.py
-msgid "keyword category"
-msgstr "avainsanakategoria"
-
-#: tilavarauspalvelu/models/keyword_category/model.py
-msgid "keyword categories"
-msgstr "avainsanakategoriat"
-
-#: tilavarauspalvelu/models/keyword_group/model.py
-msgid "keyword group"
-msgstr "avainsanajoukko"
-
-#: tilavarauspalvelu/models/keyword_group/model.py
-msgid "keyword groups"
-msgstr "avainsanajoukot"
 
 #: tilavarauspalvelu/models/location/model.py
 msgid "location"
@@ -3455,14 +3391,6 @@ msgstr "tarkenne"
 #: tilavarauspalvelu/models/qualifier/model.py
 msgid "qualifiers"
 msgstr "tarkenteet"
-
-#: tilavarauspalvelu/models/real_estate/model.py
-msgid "real estate"
-msgstr "kiinteistö"
-
-#: tilavarauspalvelu/models/real_estate/model.py
-msgid "real estates"
-msgstr "kiinteistöt"
 
 #: tilavarauspalvelu/models/recurring_reservation/model.py
 msgid "recurring reservation"
@@ -3678,22 +3606,6 @@ msgstr "resurssi"
 #: tilavarauspalvelu/models/resource/model.py
 msgid "resources"
 msgstr "resurssit"
-
-#: tilavarauspalvelu/models/service/model.py
-msgid "service"
-msgstr "palvelu"
-
-#: tilavarauspalvelu/models/service/model.py
-msgid "services"
-msgstr "palvelut"
-
-#: tilavarauspalvelu/models/service_sector/model.py
-msgid "service sector"
-msgstr "palvelualue"
-
-#: tilavarauspalvelu/models/service_sector/model.py
-msgid "service sectors"
-msgstr "palvelualueet"
 
 #: tilavarauspalvelu/models/space/model.py
 msgid "space"
