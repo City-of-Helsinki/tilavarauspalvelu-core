@@ -2113,58 +2113,72 @@ msgid "Notification manager"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Application handled"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Application in allocation"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Application received"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Permission deactivation"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "User anonymization"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgid "Reservation cancelled"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgid "Reservation confirmed"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Reservation approved"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgid "Reservation requires handling"
+msgctxt "EmailType"
+msgid "Reservation cancelled"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Reservation confirmed"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Reservation modified"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgid "Reservation requires payment"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Reservation rejected"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Reservation requires handling"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Reservation requires payment"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Staff notification reservation made"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Staff notification reservation requires handling"
 msgstr ""
 
@@ -2953,6 +2967,26 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
+msgid "Your booking has been confirmed with the following discount:"
+msgstr "Din bokning har bekräftats med följande rabatt:"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking is now confirmed"
+msgstr "Din bokning har bekräftats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking is confirmed"
+msgstr "Din bokning är bekräftad"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Additional information about your booking"
+msgstr "Mer information om din bokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Your booking has been cancelled"
 msgstr "Din bokning har avbokats"
 
@@ -2978,23 +3012,23 @@ msgstr "Du har gjort en ny bokning"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Additional information about your booking"
-msgstr "Mer information om din bokning"
+msgid "Your booking has been updated"
+msgstr "Din bokning har uppdaterats"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking has been confirmed with the following discount:"
-msgstr "Din bokning har bekräftats med följande rabatt:"
+msgid "Unfortunately your booking cannot be confirmed"
+msgstr "Tyvärr kan vi inte bekräfta din bokning"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking is now confirmed"
-msgstr "Din bokning har bekräftats"
+msgid "Reason"
+msgstr "Orsak"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking is confirmed"
-msgstr "Din bokning är bekräftad"
+msgid "Additional information"
+msgstr "Mer information"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
@@ -3019,11 +3053,6 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking has been updated"
-msgstr "Din bokning har uppdaterats"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
 msgid "Pay the booking"
 msgstr "Betala bokningen"
 
@@ -3036,21 +3065,6 @@ msgstr "Din bokning har bekräftats och kan betalas"
 msgctxt "Email"
 msgid "Due date"
 msgstr "Förfallodatum"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Unfortunately your booking cannot be confirmed"
-msgstr "Tyvärr kan vi inte bekräfta din bokning"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Reason"
-msgstr "Orsak"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Additional information"
-msgstr "Mer information"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format

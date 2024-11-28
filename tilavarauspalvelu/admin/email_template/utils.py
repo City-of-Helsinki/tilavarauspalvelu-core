@@ -54,51 +54,23 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
     pending_instructions = "[KÄSITELTÄVÄN VARAUKSEN OHJEET]"
 
     match email_type:
+        # Application ##################################################################################################
+
         case EmailType.APPLICATION_HANDLED:
             return get_context_for_application_handled(language=language)
-
         case EmailType.APPLICATION_IN_ALLOCATION:
             return get_context_for_application_in_allocation(language=language)
-
         case EmailType.APPLICATION_RECEIVED:
             return get_context_for_application_received(language=language)
 
+        # Permissions ##################################################################################################
+
         case EmailType.PERMISSION_DEACTIVATION:
             return get_context_for_permission_deactivation(language=language)
-
         case EmailType.USER_ANONYMIZATION:
             return get_context_for_user_anonymization(language=language)
 
-        case EmailType.RESERVATION_CANCELLED:
-            return get_context_for_reservation_cancelled(
-                email_recipient_name=email_recipient_name,
-                cancel_reason=cancel_reason,
-                reservation_unit_name=reservation_unit_name,
-                unit_name=unit_name,
-                unit_location=unit_location,
-                begin_datetime=begin,
-                end_datetime=end,
-                price=price,
-                tax_percentage=tax_percentage,
-                booking_number=booking_number,
-                cancelled_instructions=cancelled_instructions,
-                language=language,
-            )
-
-        case EmailType.RESERVATION_CONFIRMED:
-            return get_context_for_reservation_confirmed(
-                email_recipient_name=email_recipient_name,
-                reservation_unit_name=reservation_unit_name,
-                unit_name=unit_name,
-                unit_location=unit_location,
-                begin_datetime=begin,
-                end_datetime=end,
-                price=price,
-                tax_percentage=tax_percentage,
-                booking_number=booking_number,
-                confirmed_instructions=confirmed_instructions,
-                language=language,
-            )
+        # Reservation ##################################################################################################
 
         case EmailType.RESERVATION_APPROVED:
             return get_context_for_reservation_approved(
@@ -115,7 +87,62 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 confirmed_instructions=confirmed_instructions,
                 language=language,
             )
-
+        case EmailType.RESERVATION_CANCELLED:
+            return get_context_for_reservation_cancelled(
+                email_recipient_name=email_recipient_name,
+                cancel_reason=cancel_reason,
+                reservation_unit_name=reservation_unit_name,
+                unit_name=unit_name,
+                unit_location=unit_location,
+                begin_datetime=begin,
+                end_datetime=end,
+                price=price,
+                tax_percentage=tax_percentage,
+                booking_number=booking_number,
+                cancelled_instructions=cancelled_instructions,
+                language=language,
+            )
+        case EmailType.RESERVATION_CONFIRMED:
+            return get_context_for_reservation_confirmed(
+                email_recipient_name=email_recipient_name,
+                reservation_unit_name=reservation_unit_name,
+                unit_name=unit_name,
+                unit_location=unit_location,
+                begin_datetime=begin,
+                end_datetime=end,
+                price=price,
+                tax_percentage=tax_percentage,
+                booking_number=booking_number,
+                confirmed_instructions=confirmed_instructions,
+                language=language,
+            )
+        case EmailType.RESERVATION_MODIFIED:
+            return get_context_for_reservation_modified(
+                email_recipient_name=email_recipient_name,
+                reservation_unit_name=reservation_unit_name,
+                unit_name=unit_name,
+                unit_location=unit_location,
+                begin_datetime=begin,
+                end_datetime=end,
+                price=price,
+                tax_percentage=tax_percentage,
+                booking_number=booking_number,
+                confirmed_instructions=confirmed_instructions,
+                language=language,
+            )
+        case EmailType.RESERVATION_REJECTED:
+            return get_context_for_reservation_rejected(
+                email_recipient_name=email_recipient_name,
+                reservation_unit_name=reservation_unit_name,
+                unit_name=unit_name,
+                unit_location=unit_location,
+                begin_datetime=begin,
+                end_datetime=end,
+                rejection_reason=rejection_reason,
+                booking_number=booking_number,
+                cancelled_instructions=cancelled_instructions,
+                language=language,
+            )
         case EmailType.RESERVATION_REQUIRES_HANDLING:
             return get_context_for_reservation_requires_handling(
                 email_recipient_name=email_recipient_name,
@@ -132,22 +159,6 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 pending_instructions=pending_instructions,
                 language=language,
             )
-
-        case EmailType.RESERVATION_MODIFIED:
-            return get_context_for_reservation_modified(
-                email_recipient_name=email_recipient_name,
-                reservation_unit_name=reservation_unit_name,
-                unit_name=unit_name,
-                unit_location=unit_location,
-                begin_datetime=begin,
-                end_datetime=end,
-                price=price,
-                tax_percentage=tax_percentage,
-                booking_number=booking_number,
-                confirmed_instructions=confirmed_instructions,
-                language=language,
-            )
-
         case EmailType.RESERVATION_REQUIRES_PAYMENT:
             return get_context_for_reservation_requires_payment(
                 email_recipient_name=email_recipient_name,
@@ -164,19 +175,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 language=language,
             )
 
-        case EmailType.RESERVATION_REJECTED:
-            return get_context_for_reservation_rejected(
-                email_recipient_name=email_recipient_name,
-                reservation_unit_name=reservation_unit_name,
-                unit_name=unit_name,
-                unit_location=unit_location,
-                begin_datetime=begin,
-                end_datetime=end,
-                rejection_reason=rejection_reason,
-                booking_number=booking_number,
-                cancelled_instructions=cancelled_instructions,
-                language=language,
-            )
+        # Staff ########################################################################################################
 
         case EmailType.STAFF_NOTIFICATION_RESERVATION_MADE:
             return get_context_for_staff_notification_reservation_made(
@@ -190,7 +189,6 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 booking_number=booking_number,
                 language=language,
             )
-
         case EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING:
             return get_context_for_staff_notification_reservation_requires_handling(
                 reservee_name=reservee_name,

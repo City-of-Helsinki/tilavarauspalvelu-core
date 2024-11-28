@@ -49,133 +49,7 @@ __all__ = [
 # See how '@overload' is used to make the two implementations work from one function.
 
 
-@overload
-def get_context_for_reservation_cancelled(
-    reservation: Reservation,
-    *,
-    language: Lang,
-) -> EmailContext: ...
-
-
-@overload
-def get_context_for_reservation_cancelled(
-    *,
-    language: Lang,
-    email_recipient_name: str,
-    cancel_reason: str,
-    reservation_unit_name: str,
-    unit_name: str,
-    unit_location: str,
-    begin_datetime: datetime.datetime,
-    end_datetime: datetime.datetime,
-    price: Decimal,
-    tax_percentage: Decimal,
-    booking_number: int,
-    cancelled_instructions: str,
-) -> EmailContext: ...
-
-
-@get_translated
-def get_context_for_reservation_cancelled(
-    reservation: Reservation | None = None,
-    *,
-    language: Lang,
-    **data: Any,
-) -> EmailContext:
-    if reservation is not None:
-        data: dict[str, Any] = {
-            "email_recipient_name": reservation.actions.get_email_reservee_name(),
-            "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language=language),
-            "cancelled_instructions": reservation.actions.get_instructions(kind="cancelled", language=language),
-            **params_for_base_info(reservation=reservation, language=language),
-            **params_for_price_info(reservation=reservation),
-        }
-
-    return {
-        "title": pgettext("Email", "Your booking has been cancelled"),
-        "text_reservation_cancelled": pgettext("Email", "Your booking has been cancelled"),
-        "cancel_reason_label": pgettext("Email", "Your reason for cancellation"),
-        "cancel_reason": data["cancel_reason"],
-        "instructions_label": pgettext("Email", "Additional information about cancellation"),
-        "instructions": data["cancelled_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
-        **get_contex_for_reservation_basic_info(
-            reservation_unit_name=data["reservation_unit_name"],
-            unit_name=data["unit_name"],
-            unit_location=data["unit_location"],
-            begin_datetime=data["begin_datetime"],
-            end_datetime=data["end_datetime"],
-        ),
-        **get_contex_for_reservation_price(
-            price=data["price"],
-            tax_percentage=data["tax_percentage"],
-            booking_number=data["booking_number"],
-        ),
-        **get_contex_for_closing(language=language),
-    }
-
-
-@overload
-def get_context_for_reservation_confirmed(
-    reservation: Reservation,
-    *,
-    language: Lang,
-) -> EmailContext: ...
-
-
-@overload
-def get_context_for_reservation_confirmed(
-    *,
-    language: Lang,
-    email_recipient_name: str,
-    reservation_unit_name: str,
-    unit_name: str,
-    unit_location: str,
-    begin_datetime: datetime.datetime,
-    end_datetime: datetime.datetime,
-    price: Decimal,
-    tax_percentage: Decimal,
-    booking_number: int,
-    confirmed_instructions: str,
-) -> EmailContext: ...
-
-
-@get_translated
-def get_context_for_reservation_confirmed(
-    reservation: Reservation | None = None,
-    *,
-    language: Lang,
-    **data: Any,
-) -> EmailContext:
-    if reservation is not None:
-        data: dict[str, Any] = {
-            "email_recipient_name": reservation.actions.get_email_reservee_name(),
-            "confirmed_instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
-            **params_for_base_info(reservation=reservation, language=language),
-            **params_for_price_info(reservation=reservation),
-        }
-
-    return {
-        "title": pgettext("Email", "Thank you for your booking at Varaamo"),
-        "text_reservation_confirmed": pgettext("Email", "You have made a new booking"),
-        "instructions_label": pgettext("Email", "Additional information about your booking"),
-        "instructions": data["confirmed_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
-        **get_contex_for_reservation_basic_info(
-            reservation_unit_name=data["reservation_unit_name"],
-            unit_name=data["unit_name"],
-            unit_location=data["unit_location"],
-            begin_datetime=data["begin_datetime"],
-            end_datetime=data["end_datetime"],
-        ),
-        **get_contex_for_reservation_price(
-            price=data["price"],
-            tax_percentage=data["tax_percentage"],
-            booking_number=data["booking_number"],
-        ),
-        **get_contex_for_reservation_manage_link(language=language),
-        **get_contex_for_closing_polite(language=language),
-    }
+# type: EmailType.RESERVATION_APPROVED #################################################################################
 
 
 @overload
@@ -247,6 +121,274 @@ def get_context_for_reservation_approved(
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
     }
+
+
+# type: EmailType.RESERVATION_CANCELLED ################################################################################
+
+
+@overload
+def get_context_for_reservation_cancelled(
+    reservation: Reservation,
+    *,
+    language: Lang,
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_reservation_cancelled(
+    *,
+    language: Lang,
+    email_recipient_name: str,
+    cancel_reason: str,
+    reservation_unit_name: str,
+    unit_name: str,
+    unit_location: str,
+    begin_datetime: datetime.datetime,
+    end_datetime: datetime.datetime,
+    price: Decimal,
+    tax_percentage: Decimal,
+    booking_number: int,
+    cancelled_instructions: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_reservation_cancelled(
+    reservation: Reservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if reservation is not None:
+        data: dict[str, Any] = {
+            "email_recipient_name": reservation.actions.get_email_reservee_name(),
+            "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language=language),
+            "cancelled_instructions": reservation.actions.get_instructions(kind="cancelled", language=language),
+            **params_for_base_info(reservation=reservation, language=language),
+            **params_for_price_info(reservation=reservation),
+        }
+
+    return {
+        "title": pgettext("Email", "Your booking has been cancelled"),
+        "text_reservation_cancelled": pgettext("Email", "Your booking has been cancelled"),
+        "cancel_reason_label": pgettext("Email", "Your reason for cancellation"),
+        "cancel_reason": data["cancel_reason"],
+        "instructions_label": pgettext("Email", "Additional information about cancellation"),
+        "instructions": data["cancelled_instructions"],
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
+        **get_contex_for_reservation_basic_info(
+            reservation_unit_name=data["reservation_unit_name"],
+            unit_name=data["unit_name"],
+            unit_location=data["unit_location"],
+            begin_datetime=data["begin_datetime"],
+            end_datetime=data["end_datetime"],
+        ),
+        **get_contex_for_reservation_price(
+            price=data["price"],
+            tax_percentage=data["tax_percentage"],
+            booking_number=data["booking_number"],
+        ),
+        **get_contex_for_closing(language=language),
+    }
+
+
+# type: EmailType.RESERVATION_CONFIRMED ################################################################################
+
+
+@overload
+def get_context_for_reservation_confirmed(
+    reservation: Reservation,
+    *,
+    language: Lang,
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_reservation_confirmed(
+    *,
+    language: Lang,
+    email_recipient_name: str,
+    reservation_unit_name: str,
+    unit_name: str,
+    unit_location: str,
+    begin_datetime: datetime.datetime,
+    end_datetime: datetime.datetime,
+    price: Decimal,
+    tax_percentage: Decimal,
+    booking_number: int,
+    confirmed_instructions: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_reservation_confirmed(
+    reservation: Reservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if reservation is not None:
+        data: dict[str, Any] = {
+            "email_recipient_name": reservation.actions.get_email_reservee_name(),
+            "confirmed_instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
+            **params_for_base_info(reservation=reservation, language=language),
+            **params_for_price_info(reservation=reservation),
+        }
+
+    return {
+        "title": pgettext("Email", "Thank you for your booking at Varaamo"),
+        "text_reservation_confirmed": pgettext("Email", "You have made a new booking"),
+        "instructions_label": pgettext("Email", "Additional information about your booking"),
+        "instructions": data["confirmed_instructions"],
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
+        **get_contex_for_reservation_basic_info(
+            reservation_unit_name=data["reservation_unit_name"],
+            unit_name=data["unit_name"],
+            unit_location=data["unit_location"],
+            begin_datetime=data["begin_datetime"],
+            end_datetime=data["end_datetime"],
+        ),
+        **get_contex_for_reservation_price(
+            price=data["price"],
+            tax_percentage=data["tax_percentage"],
+            booking_number=data["booking_number"],
+        ),
+        **get_contex_for_reservation_manage_link(language=language),
+        **get_contex_for_closing_polite(language=language),
+    }
+
+
+# type: EmailType.RESERVATION_MODIFIED #################################################################################
+
+
+@overload
+def get_context_for_reservation_modified(
+    reservation: Reservation,
+    *,
+    language: Lang,
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_reservation_modified(
+    *,
+    language: Lang,
+    email_recipient_name: str,
+    reservation_unit_name: str,
+    unit_name: str,
+    unit_location: str,
+    begin_datetime: datetime.datetime,
+    end_datetime: datetime.datetime,
+    price: Decimal,
+    tax_percentage: Decimal,
+    booking_number: int,
+    confirmed_instructions: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_reservation_modified(
+    reservation: Reservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if reservation is not None:
+        data: dict[str, Any] = {
+            "email_recipient_name": reservation.actions.get_email_reservee_name(),
+            "confirmed_instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
+            **params_for_base_info(reservation=reservation, language=language),
+            **params_for_price_info(reservation=reservation),
+        }
+
+    return {
+        "title": pgettext("Email", "Your booking has been updated"),
+        "text_reservation_modified": pgettext("Email", "Your booking has been updated"),
+        "instructions_label": pgettext("Email", "Additional information about your booking"),
+        "instructions": data["confirmed_instructions"],
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
+        **get_contex_for_reservation_basic_info(
+            reservation_unit_name=data["reservation_unit_name"],
+            unit_name=data["unit_name"],
+            unit_location=data["unit_location"],
+            begin_datetime=data["begin_datetime"],
+            end_datetime=data["end_datetime"],
+        ),
+        **get_contex_for_reservation_price(
+            price=data["price"],
+            tax_percentage=data["tax_percentage"],
+            booking_number=data["booking_number"],
+        ),
+        **get_contex_for_reservation_manage_link(language=language),
+        **get_contex_for_closing_polite(language=language),
+    }
+
+
+# type: EmailType.RESERVATION_REJECTED #################################################################################
+
+
+@overload
+def get_context_for_reservation_rejected(
+    reservation: Reservation,
+    *,
+    language: Lang,
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_reservation_rejected(
+    *,
+    language: Lang,
+    email_recipient_name: str,
+    reservation_unit_name: str,
+    unit_name: str,
+    unit_location: str,
+    begin_datetime: datetime.datetime,
+    end_datetime: datetime.datetime,
+    rejection_reason: str,
+    booking_number: int,
+    cancelled_instructions: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_reservation_rejected(
+    reservation: Reservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if reservation is not None:
+        data: dict[str, Any] = {
+            "email_recipient_name": reservation.actions.get_email_reservee_name(),
+            "cancelled_instructions": reservation.actions.get_instructions(kind="cancelled", language=language),
+            "rejection_reason": get_attr_by_language(reservation.deny_reason, "reason", language),
+            "booking_number": reservation.id,
+            **params_for_base_info(reservation=reservation, language=language),
+        }
+
+    return {
+        "title": pgettext("Email", "Unfortunately your booking cannot be confirmed"),
+        "text_reservation_rejected": pgettext("Email", "Unfortunately your booking cannot be confirmed"),
+        "rejection_reason_label": pgettext("Email", "Reason"),
+        "rejection_reason": data["rejection_reason"],
+        "booking_number_label": pgettext("Email", "Booking number"),
+        "booking_number": str(data["booking_number"]),
+        "instructions_label": pgettext("Email", "Additional information"),
+        "instructions": data["cancelled_instructions"],
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
+        **get_contex_for_reservation_basic_info(
+            reservation_unit_name=data["reservation_unit_name"],
+            unit_name=data["unit_name"],
+            unit_location=data["unit_location"],
+            begin_datetime=data["begin_datetime"],
+            end_datetime=data["end_datetime"],
+        ),
+        **get_contex_for_closing(language=language),
+    }
+
+
+# type: EmailType.RESERVATION_REQUIRES_HANDLING ########################################################################
 
 
 @overload
@@ -322,67 +464,7 @@ def get_context_for_reservation_requires_handling(
     }
 
 
-@overload
-def get_context_for_reservation_modified(
-    reservation: Reservation,
-    *,
-    language: Lang,
-) -> EmailContext: ...
-
-
-@overload
-def get_context_for_reservation_modified(
-    *,
-    language: Lang,
-    email_recipient_name: str,
-    reservation_unit_name: str,
-    unit_name: str,
-    unit_location: str,
-    begin_datetime: datetime.datetime,
-    end_datetime: datetime.datetime,
-    price: Decimal,
-    tax_percentage: Decimal,
-    booking_number: int,
-    confirmed_instructions: str,
-) -> EmailContext: ...
-
-
-@get_translated
-def get_context_for_reservation_modified(
-    reservation: Reservation | None = None,
-    *,
-    language: Lang,
-    **data: Any,
-) -> EmailContext:
-    if reservation is not None:
-        data: dict[str, Any] = {
-            "email_recipient_name": reservation.actions.get_email_reservee_name(),
-            "confirmed_instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
-            **params_for_base_info(reservation=reservation, language=language),
-            **params_for_price_info(reservation=reservation),
-        }
-
-    return {
-        "title": pgettext("Email", "Your booking has been updated"),
-        "text_reservation_modified": pgettext("Email", "Your booking has been updated"),
-        "instructions_label": pgettext("Email", "Additional information about your booking"),
-        "instructions": data["confirmed_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
-        **get_contex_for_reservation_basic_info(
-            reservation_unit_name=data["reservation_unit_name"],
-            unit_name=data["unit_name"],
-            unit_location=data["unit_location"],
-            begin_datetime=data["begin_datetime"],
-            end_datetime=data["end_datetime"],
-        ),
-        **get_contex_for_reservation_price(
-            price=data["price"],
-            tax_percentage=data["tax_percentage"],
-            booking_number=data["booking_number"],
-        ),
-        **get_contex_for_reservation_manage_link(language=language),
-        **get_contex_for_closing_polite(language=language),
-    }
+# type: EmailType.RESERVATION_REQUIRES_PAYMENT #########################################################################
 
 
 @overload
@@ -457,65 +539,7 @@ def get_context_for_reservation_requires_payment(
     }
 
 
-@overload
-def get_context_for_reservation_rejected(
-    reservation: Reservation,
-    *,
-    language: Lang,
-) -> EmailContext: ...
-
-
-@overload
-def get_context_for_reservation_rejected(
-    *,
-    language: Lang,
-    email_recipient_name: str,
-    reservation_unit_name: str,
-    unit_name: str,
-    unit_location: str,
-    begin_datetime: datetime.datetime,
-    end_datetime: datetime.datetime,
-    rejection_reason: str,
-    booking_number: int,
-    cancelled_instructions: str,
-) -> EmailContext: ...
-
-
-@get_translated
-def get_context_for_reservation_rejected(
-    reservation: Reservation | None = None,
-    *,
-    language: Lang,
-    **data: Any,
-) -> EmailContext:
-    if reservation is not None:
-        data: dict[str, Any] = {
-            "email_recipient_name": reservation.actions.get_email_reservee_name(),
-            "cancelled_instructions": reservation.actions.get_instructions(kind="cancelled", language=language),
-            "rejection_reason": get_attr_by_language(reservation.deny_reason, "reason", language),
-            "booking_number": reservation.id,
-            **params_for_base_info(reservation=reservation, language=language),
-        }
-
-    return {
-        "title": pgettext("Email", "Unfortunately your booking cannot be confirmed"),
-        "text_reservation_rejected": pgettext("Email", "Unfortunately your booking cannot be confirmed"),
-        "rejection_reason_label": pgettext("Email", "Reason"),
-        "rejection_reason": data["rejection_reason"],
-        "booking_number_label": pgettext("Email", "Booking number"),
-        "booking_number": str(data["booking_number"]),
-        "instructions_label": pgettext("Email", "Additional information"),
-        "instructions": data["cancelled_instructions"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
-        **get_contex_for_reservation_basic_info(
-            reservation_unit_name=data["reservation_unit_name"],
-            unit_name=data["unit_name"],
-            unit_location=data["unit_location"],
-            begin_datetime=data["begin_datetime"],
-            end_datetime=data["end_datetime"],
-        ),
-        **get_contex_for_closing(language=language),
-    }
+# type: EmailType.STAFF_NOTIFICATION_RESERVATION_MADE ##################################################################
 
 
 @overload
@@ -590,6 +614,9 @@ def get_context_for_staff_notification_reservation_made(
         ),
         **get_contex_for_closing_staff(),
     }
+
+
+# type: EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING #####################################################
 
 
 @overload

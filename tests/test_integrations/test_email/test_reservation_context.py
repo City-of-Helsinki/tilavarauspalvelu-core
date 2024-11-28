@@ -49,203 +49,7 @@ from tests.test_integrations.test_email.helpers import (
     RESERVATION_PRICE_RANGE_INFO_CONTEXT_SV,
 )
 
-
-@freeze_time("2024-01-01")
-def test_get_context__reservation_cancelled__en():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_cancelled(
-            email_recipient_name="John Doe",
-            cancel_reason="This is a reason",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            booking_number=12,
-            cancelled_instructions="This are the instructions",
-            language="en",
-        )
-
-    assert context == {
-        "cancel_reason": "This is a reason",
-        "cancel_reason_label": "Your reason for cancellation",
-        "instructions": "This are the instructions",
-        "instructions_label": "Additional information about cancellation",
-        "email_recipient_name": "John Doe",
-        "title": "Your booking has been cancelled",
-        "text_reservation_cancelled": "Your booking has been cancelled",
-        **BASE_TEMPLATE_CONTEXT_EN,
-        **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **RESERVATION_PRICE_INFO_CONTEXT_EN,
-        **CLOSING_CONTEXT_EN,
-        **AUTOMATIC_REPLY_CONTEXT_EN,
-    }
-
-
-@freeze_time("2024-01-01")
-def test_get_context__reservation_cancelled__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_cancelled(
-            email_recipient_name="Mikko Mallikas",
-            cancel_reason="Tässä on syyni",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            booking_number=12,
-            cancelled_instructions="Tässä ovat ohjeet",
-            language="fi",
-        )
-
-    assert context == {
-        "cancel_reason": "Tässä on syyni",
-        "cancel_reason_label": "Peruutuksen syy",
-        "instructions": "Tässä ovat ohjeet",
-        "instructions_label": "Lisätietoa peruutuksesta",
-        "email_recipient_name": "Mikko Mallikas",
-        "text_reservation_cancelled": "Varauksesi on peruttu",
-        "title": "Varauksesi on peruttu",
-        **BASE_TEMPLATE_CONTEXT_FI,
-        **RESERVATION_BASIC_INFO_CONTEXT_FI,
-        **RESERVATION_PRICE_INFO_CONTEXT_FI,
-        **CLOSING_CONTEXT_FI,
-        **AUTOMATIC_REPLY_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01")
-def test_get_context__reservation_cancelled__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_cancelled(
-            email_recipient_name="Magnus Persson",
-            cancel_reason="Här är anledningen",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            booking_number=12,
-            cancelled_instructions="Här är instruktionerna",
-            language="sv",
-        )
-
-    assert context == {
-        "cancel_reason": "Här är anledningen",
-        "cancel_reason_label": "Din anledning till avbokning",
-        "instructions": "Här är instruktionerna",
-        "instructions_label": "Mer information om avbokning",
-        "email_recipient_name": "Magnus Persson",
-        "text_reservation_cancelled": "Din bokning har avbokats",
-        "title": "Din bokning har avbokats",
-        **BASE_TEMPLATE_CONTEXT_SV,
-        **RESERVATION_BASIC_INFO_CONTEXT_SV,
-        **RESERVATION_PRICE_INFO_CONTEXT_SV,
-        **CLOSING_CONTEXT_SV,
-        **AUTOMATIC_REPLY_CONTEXT_SV,
-    }
-
-
-@freeze_time("2024-01-01")
-def test_get_context__reservation_confirmed__en():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_confirmed(
-            email_recipient_name="John Doe",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            booking_number=12,
-            confirmed_instructions="These are the instructions",
-            language="en",
-        )
-
-    assert context == {
-        "email_recipient_name": "John Doe",
-        "instructions": "These are the instructions",
-        "instructions_label": "Additional information about your booking",
-        "text_reservation_confirmed": "You have made a new booking",
-        "title": "Thank you for your booking at Varaamo",
-        **BASE_TEMPLATE_CONTEXT_EN,
-        **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **RESERVATION_PRICE_INFO_CONTEXT_EN,
-        **RESERVATION_MANAGE_LINK_CONTEXT_EN,
-        **CLOSING_POLITE_CONTEXT_EN,
-        **AUTOMATIC_REPLY_CONTEXT_EN,
-    }
-
-
-@freeze_time("2024-01-01")
-def test_get_context__reservation_confirmed__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_confirmed(
-            email_recipient_name="Mikko Mallikas",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            booking_number=12,
-            confirmed_instructions="Nämä ovat ohjeet",
-            language="fi",
-        )
-
-    assert context == {
-        "email_recipient_name": "Mikko Mallikas",
-        "instructions": "Nämä ovat ohjeet",
-        "instructions_label": "Lisätietoa varauksestasi",
-        "text_reservation_confirmed": "Olet tehnyt uuden varauksen",
-        "title": "Kiitos varauksestasi Varaamossa",
-        **BASE_TEMPLATE_CONTEXT_FI,
-        **RESERVATION_BASIC_INFO_CONTEXT_FI,
-        **RESERVATION_PRICE_INFO_CONTEXT_FI,
-        **RESERVATION_MANAGE_LINK_CONTEXT_FI,
-        **CLOSING_POLITE_CONTEXT_FI,
-        **AUTOMATIC_REPLY_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01")
-def test_get_context__reservation_confirmed__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_confirmed(
-            email_recipient_name="Magnus Persson",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            booking_number=12,
-            confirmed_instructions="Här är instruktionerna",
-            language="sv",
-        )
-
-    assert context == {
-        "email_recipient_name": "Magnus Persson",
-        "instructions": "Här är instruktionerna",
-        "instructions_label": "Mer information om din bokning",
-        "text_reservation_confirmed": "Du har gjort en ny bokning",
-        "title": "Tack för din bokning på Varaamo",
-        **BASE_TEMPLATE_CONTEXT_SV,
-        **RESERVATION_BASIC_INFO_CONTEXT_SV,
-        **RESERVATION_PRICE_INFO_CONTEXT_SV,
-        **RESERVATION_MANAGE_LINK_CONTEXT_SV,
-        **CLOSING_POLITE_CONTEXT_SV,
-        **AUTOMATIC_REPLY_CONTEXT_SV,
-    }
+# type: EmailType.RESERVATION_APPROVED #################################################################################
 
 
 @freeze_time("2024-01-01")
@@ -446,6 +250,414 @@ def test_get_context__reservation_approved__discount__sv():
     }
 
 
+# type: EmailType.RESERVATION_CANCELLED ################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_cancelled__en():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_cancelled(
+            email_recipient_name="John Doe",
+            cancel_reason="This is a reason",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal("12.30"),
+            tax_percentage=Decimal("25.5"),
+            booking_number=12,
+            cancelled_instructions="This are the instructions",
+            language="en",
+        )
+
+    assert context == {
+        "cancel_reason": "This is a reason",
+        "cancel_reason_label": "Your reason for cancellation",
+        "instructions": "This are the instructions",
+        "instructions_label": "Additional information about cancellation",
+        "email_recipient_name": "John Doe",
+        "title": "Your booking has been cancelled",
+        "text_reservation_cancelled": "Your booking has been cancelled",
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **RESERVATION_PRICE_INFO_CONTEXT_EN,
+        **CLOSING_CONTEXT_EN,
+        **AUTOMATIC_REPLY_CONTEXT_EN,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_cancelled__fi():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_cancelled(
+            email_recipient_name="Mikko Mallikas",
+            cancel_reason="Tässä on syyni",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal("12.30"),
+            tax_percentage=Decimal("25.5"),
+            booking_number=12,
+            cancelled_instructions="Tässä ovat ohjeet",
+            language="fi",
+        )
+
+    assert context == {
+        "cancel_reason": "Tässä on syyni",
+        "cancel_reason_label": "Peruutuksen syy",
+        "instructions": "Tässä ovat ohjeet",
+        "instructions_label": "Lisätietoa peruutuksesta",
+        "email_recipient_name": "Mikko Mallikas",
+        "text_reservation_cancelled": "Varauksesi on peruttu",
+        "title": "Varauksesi on peruttu",
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **RESERVATION_PRICE_INFO_CONTEXT_FI,
+        **CLOSING_CONTEXT_FI,
+        **AUTOMATIC_REPLY_CONTEXT_FI,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_cancelled__sv():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_cancelled(
+            email_recipient_name="Magnus Persson",
+            cancel_reason="Här är anledningen",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal("12.30"),
+            tax_percentage=Decimal("25.5"),
+            booking_number=12,
+            cancelled_instructions="Här är instruktionerna",
+            language="sv",
+        )
+
+    assert context == {
+        "cancel_reason": "Här är anledningen",
+        "cancel_reason_label": "Din anledning till avbokning",
+        "instructions": "Här är instruktionerna",
+        "instructions_label": "Mer information om avbokning",
+        "email_recipient_name": "Magnus Persson",
+        "text_reservation_cancelled": "Din bokning har avbokats",
+        "title": "Din bokning har avbokats",
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **RESERVATION_PRICE_INFO_CONTEXT_SV,
+        **CLOSING_CONTEXT_SV,
+        **AUTOMATIC_REPLY_CONTEXT_SV,
+    }
+
+
+# type: EmailType.RESERVATION_CONFIRMED ################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_confirmed__en():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_confirmed(
+            email_recipient_name="John Doe",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal("12.30"),
+            tax_percentage=Decimal("25.5"),
+            booking_number=12,
+            confirmed_instructions="These are the instructions",
+            language="en",
+        )
+
+    assert context == {
+        "email_recipient_name": "John Doe",
+        "instructions": "These are the instructions",
+        "instructions_label": "Additional information about your booking",
+        "text_reservation_confirmed": "You have made a new booking",
+        "title": "Thank you for your booking at Varaamo",
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **RESERVATION_PRICE_INFO_CONTEXT_EN,
+        **RESERVATION_MANAGE_LINK_CONTEXT_EN,
+        **CLOSING_POLITE_CONTEXT_EN,
+        **AUTOMATIC_REPLY_CONTEXT_EN,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_confirmed__fi():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_confirmed(
+            email_recipient_name="Mikko Mallikas",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal("12.30"),
+            tax_percentage=Decimal("25.5"),
+            booking_number=12,
+            confirmed_instructions="Nämä ovat ohjeet",
+            language="fi",
+        )
+
+    assert context == {
+        "email_recipient_name": "Mikko Mallikas",
+        "instructions": "Nämä ovat ohjeet",
+        "instructions_label": "Lisätietoa varauksestasi",
+        "text_reservation_confirmed": "Olet tehnyt uuden varauksen",
+        "title": "Kiitos varauksestasi Varaamossa",
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **RESERVATION_PRICE_INFO_CONTEXT_FI,
+        **RESERVATION_MANAGE_LINK_CONTEXT_FI,
+        **CLOSING_POLITE_CONTEXT_FI,
+        **AUTOMATIC_REPLY_CONTEXT_FI,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_confirmed__sv():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_confirmed(
+            email_recipient_name="Magnus Persson",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal("12.30"),
+            tax_percentage=Decimal("25.5"),
+            booking_number=12,
+            confirmed_instructions="Här är instruktionerna",
+            language="sv",
+        )
+
+    assert context == {
+        "email_recipient_name": "Magnus Persson",
+        "instructions": "Här är instruktionerna",
+        "instructions_label": "Mer information om din bokning",
+        "text_reservation_confirmed": "Du har gjort en ny bokning",
+        "title": "Tack för din bokning på Varaamo",
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **RESERVATION_PRICE_INFO_CONTEXT_SV,
+        **RESERVATION_MANAGE_LINK_CONTEXT_SV,
+        **CLOSING_POLITE_CONTEXT_SV,
+        **AUTOMATIC_REPLY_CONTEXT_SV,
+    }
+
+
+# type: EmailType.RESERVATION_MODIFIED #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_modified__en():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_modified(
+            email_recipient_name="John Doe",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal("12.30"),
+            tax_percentage=Decimal("25.5"),
+            booking_number=12,
+            confirmed_instructions="These are the instructions",
+            language="en",
+        )
+
+    assert context == {
+        "email_recipient_name": "John Doe",
+        "text_reservation_modified": "Your booking has been updated",
+        "instructions_label": "Additional information about your booking",
+        "instructions": "These are the instructions",
+        "title": "Your booking has been updated",
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **RESERVATION_PRICE_INFO_CONTEXT_EN,
+        **RESERVATION_MANAGE_LINK_CONTEXT_EN,
+        **CLOSING_POLITE_CONTEXT_EN,
+        **AUTOMATIC_REPLY_CONTEXT_EN,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_modified__fi():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_modified(
+            email_recipient_name="Mikko Mallikas",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal("12.30"),
+            tax_percentage=Decimal("25.5"),
+            booking_number=12,
+            confirmed_instructions="Tässä ovat ohjeet",
+            language="fi",
+        )
+
+    assert context == {
+        "email_recipient_name": "Mikko Mallikas",
+        "text_reservation_modified": "Varaustasi on muutettu",
+        "instructions_label": "Lisätietoa varauksestasi",
+        "instructions": "Tässä ovat ohjeet",
+        "title": "Varaustasi on muutettu",
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **RESERVATION_PRICE_INFO_CONTEXT_FI,
+        **RESERVATION_MANAGE_LINK_CONTEXT_FI,
+        **CLOSING_POLITE_CONTEXT_FI,
+        **AUTOMATIC_REPLY_CONTEXT_FI,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_modified__sv():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_modified(
+            email_recipient_name="Magnus Persson",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal("12.30"),
+            tax_percentage=Decimal("25.5"),
+            booking_number=12,
+            confirmed_instructions="Här är instruktionerna",
+            language="sv",
+        )
+
+    assert context == {
+        "email_recipient_name": "Magnus Persson",
+        "text_reservation_modified": "Din bokning har uppdaterats",
+        "instructions_label": "Mer information om din bokning",
+        "instructions": "Här är instruktionerna",
+        "title": "Din bokning har uppdaterats",
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **RESERVATION_PRICE_INFO_CONTEXT_SV,
+        **RESERVATION_MANAGE_LINK_CONTEXT_SV,
+        **CLOSING_POLITE_CONTEXT_SV,
+        **AUTOMATIC_REPLY_CONTEXT_SV,
+    }
+
+
+# type: EmailType.RESERVATION_REJECTED #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_rejected__en():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_rejected(
+            email_recipient_name="John Doe",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            rejection_reason="This is the rejection reason",
+            booking_number=12,
+            cancelled_instructions="These are the instructions",
+            language="en",
+        )
+
+    assert context == {
+        "email_recipient_name": "John Doe",
+        "booking_number_label": "Booking number",
+        "booking_number": "12",
+        "rejection_reason_label": "Reason",
+        "rejection_reason": "This is the rejection reason",
+        "text_reservation_rejected": "Unfortunately your booking cannot be confirmed",
+        "instructions_label": "Additional information",
+        "instructions": "These are the instructions",
+        "title": "Unfortunately your booking cannot be confirmed",
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **CLOSING_CONTEXT_EN,
+        **AUTOMATIC_REPLY_CONTEXT_EN,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_rejected__fi():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_rejected(
+            email_recipient_name="Mikko Mallikas",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            rejection_reason="Tässä on hylkäyksen syy",
+            booking_number=12,
+            cancelled_instructions="Tässä ovat ohjeet",
+            language="fi",
+        )
+
+    assert context == {
+        "email_recipient_name": "Mikko Mallikas",
+        "booking_number_label": "Varausnumero",
+        "booking_number": "12",
+        "rejection_reason_label": "Syy",
+        "rejection_reason": "Tässä on hylkäyksen syy",
+        "text_reservation_rejected": "Valitettavasti varaustasi ei voida vahvistaa",
+        "instructions_label": "Lisätietoa",
+        "instructions": "Tässä ovat ohjeet",
+        "title": "Valitettavasti varaustasi ei voida vahvistaa",
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **CLOSING_CONTEXT_FI,
+        **AUTOMATIC_REPLY_CONTEXT_FI,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context__reservation_rejected__sv():
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_rejected(
+            email_recipient_name="Magnus Persson",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            rejection_reason="Här är orsaken till avslagningen",
+            booking_number=12,
+            cancelled_instructions="Här är instruktionerna",
+            language="sv",
+        )
+
+    assert context == {
+        "email_recipient_name": "Magnus Persson",
+        "booking_number_label": "Bokningsnummer",
+        "booking_number": "12",
+        "rejection_reason_label": "Orsak",
+        "rejection_reason": "Här är orsaken till avslagningen",
+        "text_reservation_rejected": "Tyvärr kan vi inte bekräfta din bokning",
+        "instructions_label": "Mer information",
+        "instructions": "Här är instruktionerna",
+        "title": "Tyvärr kan vi inte bekräfta din bokning",
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **CLOSING_CONTEXT_SV,
+        **AUTOMATIC_REPLY_CONTEXT_SV,
+    }
+
+
+# type: EmailType.RESERVATION_REQUIRES_HANDLING ########################################################################
+
+
 @freeze_time("2024-01-01")
 def test_get_context__reservation_requires_handling__en():
     with TranslationsFromPOFiles():
@@ -600,100 +812,7 @@ def test_get_context__reservation_requires_handling__subsidised():
     }
 
 
-@freeze_time("2024-01-01")
-def test_get_context__reservation_modified__en():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_modified(
-            email_recipient_name="John Doe",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            booking_number=12,
-            confirmed_instructions="These are the instructions",
-            language="en",
-        )
-
-    assert context == {
-        "email_recipient_name": "John Doe",
-        "text_reservation_modified": "Your booking has been updated",
-        "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
-        "title": "Your booking has been updated",
-        **BASE_TEMPLATE_CONTEXT_EN,
-        **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **RESERVATION_PRICE_INFO_CONTEXT_EN,
-        **RESERVATION_MANAGE_LINK_CONTEXT_EN,
-        **CLOSING_POLITE_CONTEXT_EN,
-        **AUTOMATIC_REPLY_CONTEXT_EN,
-    }
-
-
-@freeze_time("2024-01-01")
-def test_get_context__reservation_modified__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_modified(
-            email_recipient_name="Mikko Mallikas",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            booking_number=12,
-            confirmed_instructions="Tässä ovat ohjeet",
-            language="fi",
-        )
-
-    assert context == {
-        "email_recipient_name": "Mikko Mallikas",
-        "text_reservation_modified": "Varaustasi on muutettu",
-        "instructions_label": "Lisätietoa varauksestasi",
-        "instructions": "Tässä ovat ohjeet",
-        "title": "Varaustasi on muutettu",
-        **BASE_TEMPLATE_CONTEXT_FI,
-        **RESERVATION_BASIC_INFO_CONTEXT_FI,
-        **RESERVATION_PRICE_INFO_CONTEXT_FI,
-        **RESERVATION_MANAGE_LINK_CONTEXT_FI,
-        **CLOSING_POLITE_CONTEXT_FI,
-        **AUTOMATIC_REPLY_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01")
-def test_get_context__reservation_modified__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_modified(
-            email_recipient_name="Magnus Persson",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            booking_number=12,
-            confirmed_instructions="Här är instruktionerna",
-            language="sv",
-        )
-
-    assert context == {
-        "email_recipient_name": "Magnus Persson",
-        "text_reservation_modified": "Din bokning har uppdaterats",
-        "instructions_label": "Mer information om din bokning",
-        "instructions": "Här är instruktionerna",
-        "title": "Din bokning har uppdaterats",
-        **BASE_TEMPLATE_CONTEXT_SV,
-        **RESERVATION_BASIC_INFO_CONTEXT_SV,
-        **RESERVATION_PRICE_INFO_CONTEXT_SV,
-        **RESERVATION_MANAGE_LINK_CONTEXT_SV,
-        **CLOSING_POLITE_CONTEXT_SV,
-        **AUTOMATIC_REPLY_CONTEXT_SV,
-    }
+# type: EmailType.RESERVATION_REQUIRES_PAYMENT #########################################################################
 
 
 @freeze_time("2024-01-01")
@@ -807,103 +926,7 @@ def test_get_context__reservation_requires_payment__sv():
     }
 
 
-@freeze_time("2024-01-01")
-def test_get_context__reservation_rejected__en():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_rejected(
-            email_recipient_name="John Doe",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            rejection_reason="This is the rejection reason",
-            booking_number=12,
-            cancelled_instructions="These are the instructions",
-            language="en",
-        )
-
-    assert context == {
-        "email_recipient_name": "John Doe",
-        "booking_number_label": "Booking number",
-        "booking_number": "12",
-        "rejection_reason_label": "Reason",
-        "rejection_reason": "This is the rejection reason",
-        "text_reservation_rejected": "Unfortunately your booking cannot be confirmed",
-        "instructions_label": "Additional information",
-        "instructions": "These are the instructions",
-        "title": "Unfortunately your booking cannot be confirmed",
-        **BASE_TEMPLATE_CONTEXT_EN,
-        **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **CLOSING_CONTEXT_EN,
-        **AUTOMATIC_REPLY_CONTEXT_EN,
-    }
-
-
-@freeze_time("2024-01-01")
-def test_get_context__reservation_rejected__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_rejected(
-            email_recipient_name="Mikko Mallikas",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            rejection_reason="Tässä on hylkäyksen syy",
-            booking_number=12,
-            cancelled_instructions="Tässä ovat ohjeet",
-            language="fi",
-        )
-
-    assert context == {
-        "email_recipient_name": "Mikko Mallikas",
-        "booking_number_label": "Varausnumero",
-        "booking_number": "12",
-        "rejection_reason_label": "Syy",
-        "rejection_reason": "Tässä on hylkäyksen syy",
-        "text_reservation_rejected": "Valitettavasti varaustasi ei voida vahvistaa",
-        "instructions_label": "Lisätietoa",
-        "instructions": "Tässä ovat ohjeet",
-        "title": "Valitettavasti varaustasi ei voida vahvistaa",
-        **BASE_TEMPLATE_CONTEXT_FI,
-        **RESERVATION_BASIC_INFO_CONTEXT_FI,
-        **CLOSING_CONTEXT_FI,
-        **AUTOMATIC_REPLY_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01")
-def test_get_context__reservation_rejected__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_rejected(
-            email_recipient_name="Magnus Persson",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test location",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            rejection_reason="Här är orsaken till avslagningen",
-            booking_number=12,
-            cancelled_instructions="Här är instruktionerna",
-            language="sv",
-        )
-
-    assert context == {
-        "email_recipient_name": "Magnus Persson",
-        "booking_number_label": "Bokningsnummer",
-        "booking_number": "12",
-        "rejection_reason_label": "Orsak",
-        "rejection_reason": "Här är orsaken till avslagningen",
-        "text_reservation_rejected": "Tyvärr kan vi inte bekräfta din bokning",
-        "instructions_label": "Mer information",
-        "instructions": "Här är instruktionerna",
-        "title": "Tyvärr kan vi inte bekräfta din bokning",
-        **BASE_TEMPLATE_CONTEXT_SV,
-        **RESERVATION_BASIC_INFO_CONTEXT_SV,
-        **CLOSING_CONTEXT_SV,
-        **AUTOMATIC_REPLY_CONTEXT_SV,
-    }
+# type: EmailType.STAFF_NOTIFICATION_RESERVATION_MADE ##################################################################
 
 
 @freeze_time("2024-01-01")
@@ -1012,6 +1035,9 @@ def test_get_context__staff_notification_reservation_made__sv():
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **CLOSING_STAFF_CONTEXT_SV,
     }
+
+
+# type: EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING #####################################################
 
 
 @freeze_time("2024-01-01")

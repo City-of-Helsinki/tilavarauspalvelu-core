@@ -22,6 +22,9 @@ __all__ = [
 ]
 
 
+# type: EmailType.PERMISSION_DEACTIVATION ##############################################################################
+
+
 @get_translated
 def get_context_for_permission_deactivation(*, language: Lang) -> EmailContext:
     link = get_staff_login_link()
@@ -39,6 +42,9 @@ def get_context_for_permission_deactivation(*, language: Lang) -> EmailContext:
         **get_contex_for_base_template(),
         **get_contex_for_closing(language=language),
     }
+
+
+# type: EmailType.USER_ANONYMIZATION ###################################################################################
 
 
 @get_translated

@@ -26,6 +26,8 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_user_anonymization,
 )
 
+# Application ##########################################################################################################
+
 
 @freeze_time("2024-01-01")
 def test_render_application_handled_email__text():
@@ -111,6 +113,9 @@ def test_render_application_received_email__text():
     )
 
 
+# Permissions ##########################################################################################################
+
+
 @freeze_time("2024-01-01")
 def test_render_permission_deactivation__text():
     context = get_context_for_permission_deactivation(language="en")
@@ -154,6 +159,119 @@ def test_render_user_anonymization__text():
         You can extend the validity of your user account by logging into the service at:
         https://fake.varaamo.hel.fi/en
 
+        Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
+
+        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        """
+    )
+
+
+# Reservation ##########################################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_render_reservation_approved__text():
+    context = get_context_for_reservation_approved(
+        language="en",
+        email_recipient_name="John Doe",
+        reservation_unit_name="Test reservation unit",
+        unit_name="Test unit",
+        unit_location="Test location",
+        begin_datetime=datetime.datetime(2024, 1, 1, 12),
+        end_datetime=datetime.datetime(2024, 1, 1, 14),
+        price=Decimal("12.30"),
+        non_subsidised_price=Decimal("12.30"),
+        tax_percentage=Decimal("25.5"),
+        booking_number=12,
+        confirmed_instructions="These are the instructions",
+    )
+    text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
+
+    manage = (
+        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
+        "and cancellation on the 'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
+    )
+
+    assert text_content == cleandoc(
+        f"""
+        Hi John Doe,
+
+        Your booking is now confirmed.
+
+        Test reservation unit
+        Test unit
+        Test location
+
+        From: 1.1.2024 at 12:00
+        To: 1.1.2024 at 14:00
+
+        Price: 12,30 € (incl. VAT 25.5 %)
+        Booking number: 12
+
+        Additional information about your booking:
+        These are the instructions
+
+        {manage}
+
+        Thank you for choosing Varaamo!
+        Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
+
+        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        """
+    )
+
+
+@freeze_time("2024-01-01")
+def test_render_reservation_approved__discount__text():
+    context = get_context_for_reservation_approved(
+        language="en",
+        email_recipient_name="John Doe",
+        reservation_unit_name="Test reservation unit",
+        unit_name="Test unit",
+        unit_location="Test location",
+        begin_datetime=datetime.datetime(2024, 1, 1, 12),
+        end_datetime=datetime.datetime(2024, 1, 1, 14),
+        price=Decimal("12.30"),
+        non_subsidised_price=Decimal("15.30"),
+        tax_percentage=Decimal("25.5"),
+        booking_number=12,
+        confirmed_instructions="These are the instructions",
+    )
+    text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
+
+    manage = (
+        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
+        "and cancellation on the 'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
+    )
+
+    assert text_content == cleandoc(
+        f"""
+        Hi John Doe,
+
+        Your booking has been confirmed with the following discount:
+
+        Test reservation unit
+        Test unit
+        Test location
+
+        From: 1.1.2024 at 12:00
+        To: 1.1.2024 at 14:00
+
+        Price: 12,30 € (incl. VAT 25.5 %)
+        Booking number: 12
+
+        Additional information about your booking:
+        These are the instructions
+
+        {manage}
+
+        Thank you for choosing Varaamo!
         Kind regards
         Varaamo
 
@@ -267,8 +385,8 @@ def test_render_reservation_confirmed__text():
 
 
 @freeze_time("2024-01-01")
-def test_render_reservation_approved__text():
-    context = get_context_for_reservation_approved(
+def test_render_reservation_modified__text():
+    context = get_context_for_reservation_modified(
         language="en",
         email_recipient_name="John Doe",
         reservation_unit_name="Test reservation unit",
@@ -277,23 +395,23 @@ def test_render_reservation_approved__text():
         begin_datetime=datetime.datetime(2024, 1, 1, 12),
         end_datetime=datetime.datetime(2024, 1, 1, 14),
         price=Decimal("12.30"),
-        non_subsidised_price=Decimal("12.30"),
         tax_percentage=Decimal("25.5"),
         booking_number=12,
         confirmed_instructions="These are the instructions",
     )
-    text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
+    text_content = render_text(email_type=EmailType.RESERVATION_MODIFIED, context=context)
 
     manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
-        "and cancellation on the 'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
+        "Manage your booking at Varaamo. You can check the details of your booking and "
+        "Varaamo's terms of contract and cancellation on the 'My bookings' page: "
+        "https://fake.varaamo.hel.fi/en/reservations."
     )
 
     assert text_content == cleandoc(
         f"""
         Hi John Doe,
 
-        Your booking is now confirmed.
+        Your booking has been updated.
 
         Test reservation unit
         Test unit
@@ -322,8 +440,8 @@ def test_render_reservation_approved__text():
 
 
 @freeze_time("2024-01-01")
-def test_render_reservation_approved__discount__text():
-    context = get_context_for_reservation_approved(
+def test_render_reservation_rejected__text():
+    context = get_context_for_reservation_rejected(
         language="en",
         email_recipient_name="John Doe",
         reservation_unit_name="Test reservation unit",
@@ -331,24 +449,18 @@ def test_render_reservation_approved__discount__text():
         unit_location="Test location",
         begin_datetime=datetime.datetime(2024, 1, 1, 12),
         end_datetime=datetime.datetime(2024, 1, 1, 14),
-        price=Decimal("12.30"),
-        non_subsidised_price=Decimal("15.30"),
-        tax_percentage=Decimal("25.5"),
+        rejection_reason="This is the rejection reason",
         booking_number=12,
-        confirmed_instructions="These are the instructions",
+        cancelled_instructions="These are the instructions",
     )
-    text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
-
-    manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
-        "and cancellation on the 'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
-    )
+    text_content = render_text(email_type=EmailType.RESERVATION_REJECTED, context=context)
 
     assert text_content == cleandoc(
-        f"""
+        """
         Hi John Doe,
 
-        Your booking has been confirmed with the following discount:
+        Unfortunately your booking cannot be confirmed.
+        Reason: This is the rejection reason
 
         Test reservation unit
         Test unit
@@ -357,15 +469,11 @@ def test_render_reservation_approved__discount__text():
         From: 1.1.2024 at 12:00
         To: 1.1.2024 at 14:00
 
-        Price: 12,30 € (incl. VAT 25.5 %)
         Booking number: 12
 
-        Additional information about your booking:
+        Additional information:
         These are the instructions
 
-        {manage}
-
-        Thank you for choosing Varaamo!
         Kind regards
         Varaamo
 
@@ -507,61 +615,6 @@ def test_render_reservation_requires_handling__subsidised__text():
 
 
 @freeze_time("2024-01-01")
-def test_render_reservation_modified__text():
-    context = get_context_for_reservation_modified(
-        language="en",
-        email_recipient_name="John Doe",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        price=Decimal("12.30"),
-        tax_percentage=Decimal("25.5"),
-        booking_number=12,
-        confirmed_instructions="These are the instructions",
-    )
-    text_content = render_text(email_type=EmailType.RESERVATION_MODIFIED, context=context)
-
-    manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and "
-        "Varaamo's terms of contract and cancellation on the 'My bookings' page: "
-        "https://fake.varaamo.hel.fi/en/reservations."
-    )
-
-    assert text_content == cleandoc(
-        f"""
-        Hi John Doe,
-
-        Your booking has been updated.
-
-        Test reservation unit
-        Test unit
-        Test location
-
-        From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
-
-        Price: 12,30 € (incl. VAT 25.5 %)
-        Booking number: 12
-
-        Additional information about your booking:
-        These are the instructions
-
-        {manage}
-
-        Thank you for choosing Varaamo!
-        Kind regards
-        Varaamo
-
-        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
-
-        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
-        """
-    )
-
-
-@freeze_time("2024-01-01")
 def test_render_reservation_requires_payment__text():
     context = get_context_for_reservation_requires_payment(
         language="en",
@@ -621,49 +674,7 @@ def test_render_reservation_requires_payment__text():
     )
 
 
-@freeze_time("2024-01-01")
-def test_render_reservation_rejected__text():
-    context = get_context_for_reservation_rejected(
-        language="en",
-        email_recipient_name="John Doe",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        rejection_reason="This is the rejection reason",
-        booking_number=12,
-        cancelled_instructions="These are the instructions",
-    )
-    text_content = render_text(email_type=EmailType.RESERVATION_REJECTED, context=context)
-
-    assert text_content == cleandoc(
-        """
-        Hi John Doe,
-
-        Unfortunately your booking cannot be confirmed.
-        Reason: This is the rejection reason
-
-        Test reservation unit
-        Test unit
-        Test location
-
-        From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
-
-        Booking number: 12
-
-        Additional information:
-        These are the instructions
-
-        Kind regards
-        Varaamo
-
-        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
-
-        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
-        """
-    )
+# Staff ################################################################################################################
 
 
 @freeze_time("2024-01-01")
