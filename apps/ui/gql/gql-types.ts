@@ -389,7 +389,6 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  keywordGroups?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -1132,114 +1131,6 @@ export enum ImageType {
   Other = "OTHER",
 }
 
-export type KeywordCategoryNode = Node & {
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  keywordGroups: Array<KeywordGroupNode>;
-  name: Scalars["String"]["output"];
-  nameEn?: Maybe<Scalars["String"]["output"]>;
-  nameFi?: Maybe<Scalars["String"]["output"]>;
-  nameSv?: Maybe<Scalars["String"]["output"]>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
-};
-
-export type KeywordCategoryNodeKeywordGroupsArgs = {
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<KeywordGroupOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-};
-
-export type KeywordCategoryNodeConnection = {
-  /** Contains the nodes in this connection. */
-  edges: Array<Maybe<KeywordCategoryNodeEdge>>;
-  /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount?: Maybe<Scalars["Int"]["output"]>;
-};
-
-/** A Relay edge containing a `KeywordCategoryNode` and its cursor. */
-export type KeywordCategoryNodeEdge = {
-  /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
-  /** The item at the end of the edge */
-  node?: Maybe<KeywordCategoryNode>;
-};
-
-export type KeywordGroupNode = Node & {
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  keywords: Array<KeywordNode>;
-  name: Scalars["String"]["output"];
-  nameEn?: Maybe<Scalars["String"]["output"]>;
-  nameFi?: Maybe<Scalars["String"]["output"]>;
-  nameSv?: Maybe<Scalars["String"]["output"]>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
-};
-
-export type KeywordGroupNodeKeywordsArgs = {
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<KeywordOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-};
-
-export type KeywordGroupNodeConnection = {
-  /** Contains the nodes in this connection. */
-  edges: Array<Maybe<KeywordGroupNodeEdge>>;
-  /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount?: Maybe<Scalars["Int"]["output"]>;
-};
-
-/** A Relay edge containing a `KeywordGroupNode` and its cursor. */
-export type KeywordGroupNodeEdge = {
-  /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
-  /** The item at the end of the edge */
-  node?: Maybe<KeywordGroupNode>;
-};
-
-/** Ordering fields for the 'KeywordGroup' model. */
-export enum KeywordGroupOrderingChoices {
-  PkAsc = "pkAsc",
-  PkDesc = "pkDesc",
-}
-
-export type KeywordNode = Node & {
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn?: Maybe<Scalars["String"]["output"]>;
-  nameFi?: Maybe<Scalars["String"]["output"]>;
-  nameSv?: Maybe<Scalars["String"]["output"]>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
-};
-
-export type KeywordNodeConnection = {
-  /** Contains the nodes in this connection. */
-  edges: Array<Maybe<KeywordNodeEdge>>;
-  /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount?: Maybe<Scalars["Int"]["output"]>;
-};
-
-/** A Relay edge containing a `KeywordNode` and its cursor. */
-export type KeywordNodeEdge = {
-  /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
-  /** The item at the end of the edge */
-  node?: Maybe<KeywordNode>;
-};
-
-/** Ordering fields for the 'Keyword' model. */
-export enum KeywordOrderingChoices {
-  PkAsc = "pkAsc",
-  PkDesc = "pkDesc",
-}
-
 export type LocationNode = Node & {
   addressCity: Scalars["String"]["output"];
   addressCityEn?: Maybe<Scalars["String"]["output"]>;
@@ -1898,9 +1789,6 @@ export type Query = {
   equipmentCategory?: Maybe<EquipmentCategoryNode>;
   equipments?: Maybe<EquipmentNodeConnection>;
   equipmentsAll?: Maybe<Array<EquipmentAllNode>>;
-  keywordCategories?: Maybe<KeywordCategoryNodeConnection>;
-  keywordGroups?: Maybe<KeywordGroupNodeConnection>;
-  keywords?: Maybe<KeywordNodeConnection>;
   metadataSets?: Maybe<ReservationMetadataSetNodeConnection>;
   order?: Maybe<PaymentOrderNode>;
   /** Get information about the user, using Helsinki profile if necessary. */
@@ -1923,7 +1811,6 @@ export type Query = {
   reservations?: Maybe<ReservationNodeConnection>;
   resource?: Maybe<ResourceNode>;
   resources?: Maybe<ResourceNodeConnection>;
-  serviceSectors?: Maybe<ServiceSectorNodeConnection>;
   space?: Maybe<SpaceNode>;
   spaces?: Maybe<SpaceNodeConnection>;
   taxPercentages?: Maybe<TaxPercentageNodeConnection>;
@@ -2141,45 +2028,6 @@ export type QueryEquipmentsAllArgs = {
   orderBy?: InputMaybe<Array<InputMaybe<EquipmentOrderingChoices>>>;
 };
 
-export type QueryKeywordCategoriesArgs = {
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  before?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  last?: InputMaybe<Scalars["Int"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<KeywordGroupOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-};
-
-export type QueryKeywordGroupsArgs = {
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  before?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  last?: InputMaybe<Scalars["Int"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<KeywordGroupOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-};
-
-export type QueryKeywordsArgs = {
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  before?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  last?: InputMaybe<Scalars["Int"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<KeywordOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-};
-
 export type QueryMetadataSetsArgs = {
   after?: InputMaybe<Scalars["String"]["input"]>;
   before?: InputMaybe<Scalars["String"]["input"]>;
@@ -2359,7 +2207,6 @@ export type QueryReservationUnitsArgs = {
   first?: InputMaybe<Scalars["Int"]["input"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  keywordGroups?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -2477,14 +2324,6 @@ export type QueryResourcesArgs = {
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
-export type QueryServiceSectorsArgs = {
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  before?: InputMaybe<Scalars["String"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  last?: InputMaybe<Scalars["Int"]["input"]>;
-  offset?: InputMaybe<Scalars["Int"]["input"]>;
-};
-
 export type QuerySpaceArgs = {
   id: Scalars["ID"]["input"];
 };
@@ -2565,7 +2404,6 @@ export type QueryUnitsArgs = {
   ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
-  serviceSector?: InputMaybe<Scalars["Decimal"]["input"]>;
 };
 
 export type QueryUnitsAllArgs = {
@@ -2597,6 +2435,7 @@ export type RecurringReservationNode = Node & {
   description: Scalars["String"]["output"];
   endDate?: Maybe<Scalars["Date"]["output"]>;
   endTime?: Maybe<Scalars["Time"]["output"]>;
+  extId: Scalars["UUID"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -3115,6 +2954,7 @@ export type ReservationNode = Node & {
   denyReason?: Maybe<ReservationDenyReasonNode>;
   description?: Maybe<Scalars["String"]["output"]>;
   end: Scalars["DateTime"]["output"];
+  extId: Scalars["UUID"]["output"];
   freeOfChargeReason?: Maybe<Scalars["String"]["output"]>;
   handledAt?: Maybe<Scalars["DateTime"]["output"]>;
   handlingDetails?: Maybe<Scalars["String"]["output"]>;
@@ -3168,7 +3008,6 @@ export type ReservationNodeReservationUnitsArgs = {
   equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  keywordGroups?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -3706,7 +3545,6 @@ export type ReservationUnitCancellationRuleNode = Node & {
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
-  needsHandling: Scalars["Boolean"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
@@ -3801,7 +3639,6 @@ export type ReservationUnitCreateMutationInput = {
   reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
   resources?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   serviceSpecificTerms?: InputMaybe<Scalars["String"]["input"]>;
-  services?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   spaces?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
   termsOfUse?: InputMaybe<Scalars["String"]["input"]>;
@@ -3873,7 +3710,6 @@ export type ReservationUnitCreateMutationPayload = {
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   serviceSpecificTerms?: Maybe<Scalars["String"]["output"]>;
-  services?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   spaces?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
   termsOfUse?: Maybe<Scalars["String"]["output"]>;
@@ -4011,7 +3847,6 @@ export type ReservationUnitNode = Node & {
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources: Array<ResourceNode>;
   serviceSpecificTerms?: Maybe<TermsOfUseNode>;
-  services: Array<ServiceNode>;
   spaces: Array<SpaceNode>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
   termsOfUse?: Maybe<Scalars["String"]["output"]>;
@@ -4387,7 +4222,6 @@ export type ReservationUnitUpdateMutationInput = {
   reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
   resources?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   serviceSpecificTerms?: InputMaybe<Scalars["String"]["input"]>;
-  services?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   spaces?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
   termsOfUse?: InputMaybe<Scalars["String"]["input"]>;
@@ -4459,7 +4293,6 @@ export type ReservationUnitUpdateMutationPayload = {
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   serviceSpecificTerms?: Maybe<Scalars["String"]["output"]>;
-  services?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   spaces?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
   termsOfUse?: Maybe<Scalars["String"]["output"]>;
@@ -4584,8 +4417,6 @@ export enum ReserveeType {
 }
 
 export type ResourceCreateMutationInput = {
-  bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
   locationType?: InputMaybe<LocationType>;
   name: Scalars["String"]["input"];
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -4596,8 +4427,6 @@ export type ResourceCreateMutationInput = {
 };
 
 export type ResourceCreateMutationPayload = {
-  bufferTimeAfter?: Maybe<Scalars["Duration"]["output"]>;
-  bufferTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
   locationType?: Maybe<LocationType>;
   name?: Maybe<Scalars["String"]["output"]>;
   nameEn?: Maybe<Scalars["String"]["output"]>;
@@ -4622,8 +4451,6 @@ export enum ResourceLocationType {
 }
 
 export type ResourceNode = Node & {
-  bufferTimeAfter?: Maybe<Scalars["Duration"]["output"]>;
-  bufferTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   locationType?: Maybe<ResourceLocationType>;
@@ -4658,8 +4485,6 @@ export enum ResourceOrderingChoices {
 }
 
 export type ResourceUpdateMutationInput = {
-  bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
   locationType?: InputMaybe<LocationType>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -4670,8 +4495,6 @@ export type ResourceUpdateMutationInput = {
 };
 
 export type ResourceUpdateMutationPayload = {
-  bufferTimeAfter?: Maybe<Scalars["Duration"]["output"]>;
-  bufferTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
   locationType?: Maybe<LocationType>;
   name?: Maybe<Scalars["String"]["output"]>;
   nameEn?: Maybe<Scalars["String"]["output"]>;
@@ -4697,55 +4520,6 @@ export type RestoreAllSectionOptionsMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
-export type ServiceNode = Node & {
-  bufferTimeAfter?: Maybe<Scalars["Duration"]["output"]>;
-  bufferTimeBefore?: Maybe<Scalars["Duration"]["output"]>;
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn?: Maybe<Scalars["String"]["output"]>;
-  nameFi?: Maybe<Scalars["String"]["output"]>;
-  nameSv?: Maybe<Scalars["String"]["output"]>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
-  serviceType: ServiceType;
-};
-
-export type ServiceSectorNode = Node & {
-  /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn?: Maybe<Scalars["String"]["output"]>;
-  nameFi?: Maybe<Scalars["String"]["output"]>;
-  nameSv?: Maybe<Scalars["String"]["output"]>;
-  pk?: Maybe<Scalars["Int"]["output"]>;
-};
-
-export type ServiceSectorNodeConnection = {
-  /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ServiceSectorNodeEdge>>;
-  /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount?: Maybe<Scalars["Int"]["output"]>;
-};
-
-/** A Relay edge containing a `ServiceSectorNode` and its cursor. */
-export type ServiceSectorNodeEdge = {
-  /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
-  /** The item at the end of the edge */
-  node?: Maybe<ServiceSectorNode>;
-};
-
-/** An enumeration. */
-export enum ServiceType {
-  /** Tarjoilu */
-  Catering = "CATERING",
-  /** Konfiguraatio */
-  Configuration = "CONFIGURATION",
-  /** Perehdytys */
-  Introduction = "INTRODUCTION",
-}
-
 export type SetApplicationRoundHandledMutationInput = {
   pk: Scalars["Int"]["input"];
 };
@@ -4763,7 +4537,6 @@ export type SetApplicationRoundResultsSentMutationPayload = {
 };
 
 export type SpaceCreateMutationInput = {
-  building?: InputMaybe<Scalars["Int"]["input"]>;
   code?: InputMaybe<Scalars["String"]["input"]>;
   maxPersons?: InputMaybe<Scalars["Int"]["input"]>;
   name: Scalars["String"]["input"];
@@ -4777,7 +4550,6 @@ export type SpaceCreateMutationInput = {
 };
 
 export type SpaceCreateMutationPayload = {
-  building?: Maybe<Scalars["Int"]["output"]>;
   code?: Maybe<Scalars["String"]["output"]>;
   maxPersons?: Maybe<Scalars["Int"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
@@ -4868,7 +4640,6 @@ export enum SpaceOrderingChoices {
 }
 
 export type SpaceUpdateMutationInput = {
-  building?: InputMaybe<Scalars["Int"]["input"]>;
   code?: InputMaybe<Scalars["String"]["input"]>;
   maxPersons?: InputMaybe<Scalars["Int"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
@@ -4882,7 +4653,6 @@ export type SpaceUpdateMutationInput = {
 };
 
 export type SpaceUpdateMutationPayload = {
-  building?: Maybe<Scalars["Int"]["output"]>;
   code?: Maybe<Scalars["String"]["output"]>;
   maxPersons?: Maybe<Scalars["Int"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
@@ -5071,7 +4841,6 @@ export type UnitGroupNodeUnitsArgs = {
   ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
-  serviceSector?: InputMaybe<Scalars["Decimal"]["input"]>;
 };
 
 export type UnitGroupNodeConnection = {
@@ -5107,7 +4876,6 @@ export type UnitNode = Node & {
   phone: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
   reservationUnits: Array<ReservationUnitNode>;
-  serviceSectors: Array<ServiceSectorNode>;
   shortDescription: Scalars["String"]["output"];
   shortDescriptionEn?: Maybe<Scalars["String"]["output"]>;
   shortDescriptionFi?: Maybe<Scalars["String"]["output"]>;
@@ -5130,7 +4898,6 @@ export type UnitNodeReservationUnitsArgs = {
   equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  keywordGroups?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -5260,7 +5027,6 @@ export type UnitRoleNodeUnitsArgs = {
   ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
-  serviceSector?: InputMaybe<Scalars["Decimal"]["input"]>;
 };
 
 export type UnitUpdateMutationInput = {
@@ -6311,7 +6077,6 @@ export type CancellationRuleFieldsFragment = {
   cancellationRule?: {
     id: string;
     canBeCancelledTimeBefore?: number | null;
-    needsHandling: boolean;
   } | null;
 };
 
@@ -6390,7 +6155,6 @@ export type ListReservationsQuery = {
           cancellationRule?: {
             id: string;
             canBeCancelledTimeBefore?: number | null;
-            needsHandling: boolean;
           } | null;
           pricings: Array<{
             id: string;
@@ -6560,7 +6324,6 @@ export type ReservationQuery = {
       cancellationRule?: {
         id: string;
         canBeCancelledTimeBefore?: number | null;
-        needsHandling: boolean;
       } | null;
       metadataSet?: {
         id: string;
@@ -8299,7 +8062,6 @@ export const CancellationRuleFieldsFragmentDoc = gql`
     cancellationRule {
       id
       canBeCancelledTimeBefore
-      needsHandling
     }
   }
 `;

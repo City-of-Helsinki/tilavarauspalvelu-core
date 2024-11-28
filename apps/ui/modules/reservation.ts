@@ -158,8 +158,6 @@ export function isReservationCancellable(
   // TODO why can't user cancel if the reservation is waiting for handling?
   if (reservation.state !== ReservationStateChoice.Confirmed) return false;
   if (reservationUnit.cancellationRule == null) return false;
-  // TODO why isn't the user allowed to cancel if the reservation has been handled?
-  if (reservationUnit.cancellationRule.needsHandling) return false;
   if (isTooCloseToCancel(reservation)) {
     return false;
   }
@@ -276,10 +274,7 @@ export function getWhyReservationCantBeChanged(
   }
 
   const reservationUnit = reservation.reservationUnits?.[0];
-  if (
-    reservationUnit?.cancellationRule == null ||
-    reservationUnit.cancellationRule.needsHandling
-  ) {
+  if (reservationUnit?.cancellationRule == null) {
     return "CANCELLATION_NOT_ALLOWED";
   }
 

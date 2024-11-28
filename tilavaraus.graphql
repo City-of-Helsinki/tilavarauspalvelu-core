@@ -402,7 +402,6 @@ type ApplicationRoundNode implements Node {
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
-    keywordGroups: [Int]
     maxPersonsGte: Decimal
     maxPersonsLte: Decimal
     minPersonsGte: Decimal
@@ -1297,156 +1296,6 @@ enum ImageType {
   OTHER
 }
 
-type KeywordCategoryNode implements Node {
-  """
-  The ID of the object
-  """
-  id: ID!
-  keywordGroups(
-    nameEn: String
-    nameFi: String
-    nameSv: String
-    """
-    Järjestä
-    """
-    orderBy: [KeywordGroupOrderingChoices]
-    pk: [Int]
-  ): [KeywordGroupNode!]!
-  name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  pk: Int
-}
-
-type KeywordCategoryNodeConnection {
-  """
-  Contains the nodes in this connection.
-  """
-  edges: [KeywordCategoryNodeEdge]!
-  """
-  Pagination data for this connection.
-  """
-  pageInfo: PageInfo!
-  totalCount: Int
-}
-
-"""
-A Relay edge containing a `KeywordCategoryNode` and its cursor.
-"""
-type KeywordCategoryNodeEdge {
-  """
-  A cursor for use in pagination
-  """
-  cursor: String!
-  """
-  The item at the end of the edge
-  """
-  node: KeywordCategoryNode
-}
-
-type KeywordGroupNode implements Node {
-  """
-  The ID of the object
-  """
-  id: ID!
-  keywords(
-    nameEn: String
-    nameFi: String
-    nameSv: String
-    """
-    Järjestä
-    """
-    orderBy: [KeywordOrderingChoices]
-    pk: [Int]
-  ): [KeywordNode!]!
-  name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  pk: Int
-}
-
-type KeywordGroupNodeConnection {
-  """
-  Contains the nodes in this connection.
-  """
-  edges: [KeywordGroupNodeEdge]!
-  """
-  Pagination data for this connection.
-  """
-  pageInfo: PageInfo!
-  totalCount: Int
-}
-
-"""
-A Relay edge containing a `KeywordGroupNode` and its cursor.
-"""
-type KeywordGroupNodeEdge {
-  """
-  A cursor for use in pagination
-  """
-  cursor: String!
-  """
-  The item at the end of the edge
-  """
-  node: KeywordGroupNode
-}
-
-"""
-Ordering fields for the 'KeywordGroup' model.
-"""
-enum KeywordGroupOrderingChoices {
-  pkAsc
-  pkDesc
-}
-
-type KeywordNode implements Node {
-  """
-  The ID of the object
-  """
-  id: ID!
-  name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  pk: Int
-}
-
-type KeywordNodeConnection {
-  """
-  Contains the nodes in this connection.
-  """
-  edges: [KeywordNodeEdge]!
-  """
-  Pagination data for this connection.
-  """
-  pageInfo: PageInfo!
-  totalCount: Int
-}
-
-"""
-A Relay edge containing a `KeywordNode` and its cursor.
-"""
-type KeywordNodeEdge {
-  """
-  A cursor for use in pagination
-  """
-  cursor: String!
-  """
-  The item at the end of the edge
-  """
-  node: KeywordNode
-}
-
-"""
-Ordering fields for the 'Keyword' model.
-"""
-enum KeywordOrderingChoices {
-  pkAsc
-  pkDesc
-}
-
 type LocationNode implements Node {
   addressCity: String!
   addressCityEn: String
@@ -2299,51 +2148,6 @@ type Query {
     """
     orderBy: [EquipmentOrderingChoices]
   ): [EquipmentAllNode!]
-  keywordCategories(
-    after: String
-    before: String
-    first: Int
-    last: Int
-    nameEn: String
-    nameFi: String
-    nameSv: String
-    offset: Int
-    """
-    Järjestä
-    """
-    orderBy: [KeywordGroupOrderingChoices]
-    pk: [Int]
-  ): KeywordCategoryNodeConnection
-  keywordGroups(
-    after: String
-    before: String
-    first: Int
-    last: Int
-    nameEn: String
-    nameFi: String
-    nameSv: String
-    offset: Int
-    """
-    Järjestä
-    """
-    orderBy: [KeywordGroupOrderingChoices]
-    pk: [Int]
-  ): KeywordGroupNodeConnection
-  keywords(
-    after: String
-    before: String
-    first: Int
-    last: Int
-    nameEn: String
-    nameFi: String
-    nameSv: String
-    offset: Int
-    """
-    Järjestä
-    """
-    orderBy: [KeywordOrderingChoices]
-    pk: [Int]
-  ): KeywordNodeConnection
   metadataSets(
     after: String
     before: String
@@ -2540,7 +2344,6 @@ type Query {
     first: Int
     isDraft: Boolean
     isVisible: Boolean
-    keywordGroups: [Int]
     last: Int
     maxPersonsGte: Decimal
     maxPersonsLte: Decimal
@@ -2664,13 +2467,6 @@ type Query {
     orderBy: [ResourceOrderingChoices]
     pk: [Int]
   ): ResourceNodeConnection
-  serviceSectors(
-    after: String
-    before: String
-    first: Int
-    last: Int
-    offset: Int
-  ): ServiceSectorNodeConnection
   space(
     """
     The ID of the object
@@ -2763,7 +2559,6 @@ type Query {
     ownReservations: Boolean
     pk: [Int]
     publishedReservationUnits: Boolean
-    serviceSector: Decimal
   ): UnitNodeConnection
   unitsAll(
     nameEn: String
@@ -2800,6 +2595,7 @@ type RecurringReservationNode implements Node {
   description: String!
   endDate: Date
   endTime: Time
+  extId: UUID!
   """
   The ID of the object
   """
@@ -3410,6 +3206,7 @@ type ReservationNode implements Node {
   denyReason: ReservationDenyReasonNode
   description: String
   end: DateTime!
+  extId: UUID!
   freeOfChargeReason: String
   handledAt: DateTime
   handlingDetails: String
@@ -3442,7 +3239,6 @@ type ReservationNode implements Node {
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
-    keywordGroups: [Int]
     maxPersonsGte: Decimal
     maxPersonsLte: Decimal
     minPersonsGte: Decimal
@@ -4089,7 +3885,6 @@ type ReservationUnitCancellationRuleNode implements Node {
   nameEn: String
   nameFi: String
   nameSv: String
-  needsHandling: Boolean!
   pk: Int
 }
 
@@ -4188,7 +3983,6 @@ input ReservationUnitCreateMutationInput {
   reservationsMinDaysBefore: Int
   resources: [Int]
   serviceSpecificTerms: String
-  services: [Int]
   spaces: [Int]
   surfaceArea: Int
   termsOfUse: String
@@ -4260,7 +4054,6 @@ type ReservationUnitCreateMutationPayload {
   reservationsMinDaysBefore: Int
   resources: [Int]
   serviceSpecificTerms: String
-  services: [Int]
   spaces: [Int]
   surfaceArea: Int
   termsOfUse: String
@@ -4497,7 +4290,6 @@ type ReservationUnitNode implements Node {
     pk: [Int]
   ): [ResourceNode!]!
   serviceSpecificTerms: TermsOfUseNode
-  services: [ServiceNode!]!
   spaces(
     nameEn: String
     nameEn_Icontains: String
@@ -4810,7 +4602,6 @@ input ReservationUnitUpdateMutationInput {
   reservationsMinDaysBefore: Int
   resources: [Int]
   serviceSpecificTerms: String
-  services: [Int]
   spaces: [Int]
   surfaceArea: Int
   termsOfUse: String
@@ -4882,7 +4673,6 @@ type ReservationUnitUpdateMutationPayload {
   reservationsMinDaysBefore: Int
   resources: [Int]
   serviceSpecificTerms: String
-  services: [Int]
   spaces: [Int]
   surfaceArea: Int
   termsOfUse: String
@@ -5027,8 +4817,6 @@ enum ReserveeType {
 }
 
 input ResourceCreateMutationInput {
-  bufferTimeAfter: Duration
-  bufferTimeBefore: Duration
   locationType: LocationType
   name: String!
   nameEn: String
@@ -5039,8 +4827,6 @@ input ResourceCreateMutationInput {
 }
 
 type ResourceCreateMutationPayload {
-  bufferTimeAfter: Duration
-  bufferTimeBefore: Duration
   locationType: LocationType
   name: String
   nameEn: String
@@ -5067,8 +4853,6 @@ enum ResourceLocationType {
 }
 
 type ResourceNode implements Node {
-  bufferTimeAfter: Duration
-  bufferTimeBefore: Duration
   """
   The ID of the object
   """
@@ -5117,8 +4901,6 @@ enum ResourceOrderingChoices {
 }
 
 input ResourceUpdateMutationInput {
-  bufferTimeAfter: Duration
-  bufferTimeBefore: Duration
   locationType: LocationType
   name: String
   nameEn: String
@@ -5129,8 +4911,6 @@ input ResourceUpdateMutationInput {
 }
 
 type ResourceUpdateMutationPayload {
-  bufferTimeAfter: Duration
-  bufferTimeBefore: Duration
   locationType: LocationType
   name: String
   nameEn: String
@@ -5156,77 +4936,6 @@ type RestoreAllSectionOptionsMutationPayload {
   pk: Int
 }
 
-type ServiceNode implements Node {
-  bufferTimeAfter: Duration
-  bufferTimeBefore: Duration
-  """
-  The ID of the object
-  """
-  id: ID!
-  name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  pk: Int
-  serviceType: ServiceType!
-}
-
-type ServiceSectorNode implements Node {
-  """
-  The ID of the object
-  """
-  id: ID!
-  name: String!
-  nameEn: String
-  nameFi: String
-  nameSv: String
-  pk: Int
-}
-
-type ServiceSectorNodeConnection {
-  """
-  Contains the nodes in this connection.
-  """
-  edges: [ServiceSectorNodeEdge]!
-  """
-  Pagination data for this connection.
-  """
-  pageInfo: PageInfo!
-  totalCount: Int
-}
-
-"""
-A Relay edge containing a `ServiceSectorNode` and its cursor.
-"""
-type ServiceSectorNodeEdge {
-  """
-  A cursor for use in pagination
-  """
-  cursor: String!
-  """
-  The item at the end of the edge
-  """
-  node: ServiceSectorNode
-}
-
-"""
-An enumeration.
-"""
-enum ServiceType {
-  """
-  Tarjoilu
-  """
-  CATERING
-  """
-  Konfiguraatio
-  """
-  CONFIGURATION
-  """
-  Perehdytys
-  """
-  INTRODUCTION
-}
-
 input SetApplicationRoundHandledMutationInput {
   pk: Int!
 }
@@ -5244,7 +4953,6 @@ type SetApplicationRoundResultsSentMutationPayload {
 }
 
 input SpaceCreateMutationInput {
-  building: Int
   code: String
   maxPersons: Int
   name: String!
@@ -5258,7 +4966,6 @@ input SpaceCreateMutationInput {
 }
 
 type SpaceCreateMutationPayload {
-  building: Int
   code: String
   maxPersons: Int
   name: String
@@ -5365,7 +5072,6 @@ enum SpaceOrderingChoices {
 }
 
 input SpaceUpdateMutationInput {
-  building: Int
   code: String
   maxPersons: Int
   name: String
@@ -5379,7 +5085,6 @@ input SpaceUpdateMutationInput {
 }
 
 type SpaceUpdateMutationPayload {
-  building: Int
   code: String
   maxPersons: Int
   name: String
@@ -5647,7 +5352,6 @@ type UnitGroupNode implements Node {
     ownReservations: Boolean
     pk: [Int]
     publishedReservationUnits: Boolean
-    serviceSector: Decimal
   ): [UnitNode!]!
 }
 
@@ -5707,7 +5411,6 @@ type UnitNode implements Node {
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
-    keywordGroups: [Int]
     maxPersonsGte: Decimal
     maxPersonsLte: Decimal
     minPersonsGte: Decimal
@@ -5750,7 +5453,6 @@ type UnitNode implements Node {
     typeRankLte: Decimal
     unit: [Int]
   ): [ReservationUnitNode!]!
-  serviceSectors: [ServiceSectorNode!]!
   shortDescription: String!
   shortDescriptionEn: String
   shortDescriptionFi: String
@@ -5860,7 +5562,6 @@ type UnitRoleNode implements Node {
     ownReservations: Boolean
     pk: [Int]
     publishedReservationUnits: Boolean
-    serviceSector: Decimal
   ): [UnitNode!]!
   user: UserNode!
 }

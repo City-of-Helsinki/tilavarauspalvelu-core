@@ -1035,7 +1035,6 @@ describe("isReservationUnitReservable", () => {
       reservationPendingInstructions: "",
       reservationStartInterval: ReservationStartInterval.Interval_15Mins,
       resources: [],
-      services: [],
       spaces: [],
       maxPersons: 10,
       uuid: "be4fa7a2-05b7-11ee-be56-0242ac120004",

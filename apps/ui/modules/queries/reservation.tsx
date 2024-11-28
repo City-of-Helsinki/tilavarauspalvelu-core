@@ -62,7 +62,6 @@ const CANCELLATION_RULE_FRAGMENT = gql`
     cancellationRule {
       id
       canBeCancelledTimeBefore
-      needsHandling
     }
   }
 `;

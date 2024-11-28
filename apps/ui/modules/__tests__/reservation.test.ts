@@ -35,7 +35,6 @@ function createMockReservationUnit({
   reservationsMinDaysBefore,
   reservationEnds,
   canBeCancelledTimeBefore,
-  needsHandling,
 }: {
   reservationsMinDaysBefore?: number;
   reservationEnds?: Date;
@@ -46,7 +45,6 @@ function createMockReservationUnit({
     canBeCancelledTimeBefore: canBeCancelledTimeBefore ?? 0,
     id: "fr8ejifod",
     name: "Cancellation rule",
-    needsHandling: needsHandling ?? false,
   };
   return {
     authentication: Authentication.Weak,
@@ -85,7 +83,6 @@ function createMockReservationUnit({
     qualifiers: [],
     equipments: [],
     resources: [],
-    services: [],
     spaces: [],
     cancellationRule,
     reservations: [],
@@ -256,12 +253,10 @@ describe("isReservationCancellable", () => {
   function constructInput({
     begin,
     state,
-    needsHandling,
     canBeCancelledTimeBefore,
   }: {
     begin: Date; // reservation begin time
     state?: ReservationStateChoice; // reservation state
-    needsHandling?: boolean; // if the reservation unit needs handling
     canBeCancelledTimeBefore?: number; // in seconds
   }) {
     return {
@@ -269,7 +264,6 @@ describe("isReservationCancellable", () => {
         begin,
         state: state ?? ReservationStateChoice.Confirmed,
         reservationUnit: createMockReservationUnit({
-          needsHandling: needsHandling ?? false,
           canBeCancelledTimeBefore: canBeCancelledTimeBefore ?? 0,
         }),
       }),
@@ -304,14 +298,6 @@ describe("isReservationCancellable", () => {
     const input = constructInput({
       begin: addDays(new Date(), 1),
       state: ReservationStateChoice.WaitingForPayment,
-    });
-    expect(isReservationCancellable(input)).toBe(false);
-  });
-
-  test("NO for reservation unit that needs handling", () => {
-    const input = constructInput({
-      begin: addDays(new Date(), 1),
-      needsHandling: true,
     });
     expect(isReservationCancellable(input)).toBe(false);
   });
