@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import EmailType, Language
-from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
+from tilavarauspalvelu.integrations.email.dataclasses import EmailData
 from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
 from tilavarauspalvelu.models import ReservationUnit
 from utils.utils import safe_getattr
@@ -80,14 +80,10 @@ def email_tester_admin_view(request: WSGIRequest, email_type: str) -> HttpRespon
     if request.method == "POST":
         tester_form = tester_form_class(data=request.POST)
         if tester_form.is_valid():
+            recipients = [tester_form.cleaned_data["send_to"]]
             context = tester_form.to_context()
-
-            send_emails_in_batches_task(
-                recipients=[tester_form.cleaned_data["send_to"]],
-                subject=context["title"],
-                text_content=render_text(email_type=email_type, context=context),
-                html_content=render_html(email_type=email_type, context=context),
-            )
+            email = EmailData.build(recipients=recipients, context=context, email_type=email_type)
+            send_emails_in_batches_task(email)
 
             messages.add_message(
                 request=request,
