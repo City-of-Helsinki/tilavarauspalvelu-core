@@ -1298,10 +1298,13 @@ export type Mutation = {
   deleteBannerNotification?: Maybe<BannerNotificationDeleteMutationPayload>;
   deleteEquipment?: Maybe<EquipmentDeleteMutationPayload>;
   deleteEquipmentCategory?: Maybe<EquipmentCategoryDeleteMutationPayload>;
+  /** @deprecated Renamed to 'deleteTentativeReservation'. */
   deleteReservation?: Maybe<ReservationDeleteMutationPayload>;
   deleteReservationUnitImage?: Maybe<ReservationUnitImageDeleteMutationPayload>;
   deleteResource?: Maybe<ResourceDeleteMutationPayload>;
   deleteSpace?: Maybe<SpaceDeleteMutationPayload>;
+  /** Used only for deleting a reservation before it is confirmed. */
+  deleteTentativeReservation?: Maybe<ReservationDeleteTentativeMutationPayload>;
   denyReservation?: Maybe<ReservationDenyMutationPayload>;
   denyReservationSeries?: Maybe<ReservationSeriesDenyMutationPayload>;
   refreshOrder?: Maybe<RefreshOrderMutationPayload>;
@@ -1450,6 +1453,10 @@ export type MutationDeleteResourceArgs = {
 
 export type MutationDeleteSpaceArgs = {
   input: SpaceDeleteMutationInput;
+};
+
+export type MutationDeleteTentativeReservationArgs = {
+  input: ReservationDeleteTentativeMutationInput;
 };
 
 export type MutationDenyReservationArgs = {
@@ -2986,6 +2993,15 @@ export type ReservationDeleteMutationInput = {
 };
 
 export type ReservationDeleteMutationPayload = {
+  deleted?: Maybe<Scalars["Boolean"]["output"]>;
+};
+
+export type ReservationDeleteTentativeMutationInput = {
+  pk: Scalars["ID"]["input"];
+};
+
+/** Used only for deleting a reservation before it is confirmed. */
+export type ReservationDeleteTentativeMutationPayload = {
   deleted?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
@@ -6615,7 +6631,6 @@ export type ReservationDenyReasonsQuery = {
 };
 
 export type ReservationUnitsFilterParamsQueryVariables = Exact<{
-  after?: InputMaybe<Scalars["String"]["input"]>;
   unit?: InputMaybe<
     | Array<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
@@ -10924,7 +10939,6 @@ export const ReservationUnitsFilterParamsDocument = gql`
  * @example
  * const { data, loading, error } = useReservationUnitsFilterParamsQuery({
  *   variables: {
- *      after: // value for 'after'
  *      unit: // value for 'unit'
  *      orderBy: // value for 'orderBy'
  *   },
@@ -11095,7 +11109,6 @@ export const UnitsFilterDocument = gql`
  * @example
  * const { data, loading, error } = useUnitsFilterQuery({
  *   variables: {
- *      after: // value for 'after'
  *      orderBy: // value for 'orderBy'
  *   },
  * });

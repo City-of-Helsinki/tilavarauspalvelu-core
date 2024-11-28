@@ -1566,6 +1566,7 @@ type Mutation {
   deleteReservation(
     input: ReservationDeleteMutationInput!
   ): ReservationDeleteMutationPayload
+    @deprecated(reason: "Renamed to 'deleteTentativeReservation'.")
   deleteReservationUnitImage(
     input: ReservationUnitImageDeleteMutationInput!
   ): ReservationUnitImageDeleteMutationPayload
@@ -1573,6 +1574,12 @@ type Mutation {
     input: ResourceDeleteMutationInput!
   ): ResourceDeleteMutationPayload
   deleteSpace(input: SpaceDeleteMutationInput!): SpaceDeleteMutationPayload
+  """
+  Used only for deleting a reservation before it is confirmed.
+  """
+  deleteTentativeReservation(
+    input: ReservationDeleteTentativeMutationInput!
+  ): ReservationDeleteTentativeMutationPayload
   denyReservation(
     input: ReservationDenyMutationInput!
   ): ReservationDenyMutationPayload
@@ -3241,6 +3248,17 @@ input ReservationDeleteMutationInput {
 }
 
 type ReservationDeleteMutationPayload {
+  deleted: Boolean
+}
+
+input ReservationDeleteTentativeMutationInput {
+  pk: ID!
+}
+
+"""
+Used only for deleting a reservation before it is confirmed.
+"""
+type ReservationDeleteTentativeMutationPayload {
   deleted: Boolean
 }
 
