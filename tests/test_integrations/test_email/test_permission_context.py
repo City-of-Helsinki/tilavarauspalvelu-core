@@ -21,6 +21,8 @@ from tests.test_integrations.test_email.helpers import (
     CLOSING_CONTEXT_SV,
 )
 
+# type: EmailType.PERMISSION_DEACTIVATION ##############################################################################
+
 
 @freeze_time("2024-01-01")
 def test_get_context__permission_deactivation__en():
@@ -80,6 +82,9 @@ def test_get_context__permission_deactivation__sv():
         **CLOSING_CONTEXT_SV,
         **AUTOMATIC_REPLY_CONTEXT_SV,
     }
+
+
+# type: EmailType.USER_ANONYMIZATION ###################################################################################
 
 
 @freeze_time("2024-01-01")

@@ -51,41 +51,42 @@ __all__ = [
 class EmailService:
     """Service for sending email notifications available in the system."""
 
-    @staticmethod
-    def send_application_received_email(
-        application: Application,
-        *,
-        language: Lang | None = None,
-    ) -> None:
-        """
-        Sends email about the application being received.
+    # Application ######################################################################################################
 
-        :param application: The application the email concerns.
-        :param language: The language of the email. Determine from application if not given.
-        """
-        # Prevent accidental sending of wrong email.
-        if application.status != ApplicationStatusChoice.RECEIVED:
+    @staticmethod
+    def send_application_handled_emails() -> None:
+        """Sends email to applicants when application round has its allocation results available."""
+        applications = Application.objects.should_send_handled_email().order_by("created_date")
+        if not applications:
+            SentryLogger.log_message("Zero applications require the 'application handled' email to be sent")
             return
 
-        recipients = get_application_email_recipients(application=application)
-        if not recipients:
+        recipients_by_language = get_recipients_for_applications_by_language(applications)
+        if not recipients_by_language:
             SentryLogger.log_message(
-                "No recipients for application received email",
-                details={"application": application.pk},
+                "No recipients for application handled emails",
+                details={"applications": ",".join(str(application.pk) for application in applications)},
             )
             return
 
-        if language is None:
-            language = get_application_email_language(application=application)
+        emails: list[EmailData] = []
+        email_type = EmailType.APPLICATION_HANDLED
 
-        email_type = EmailType.APPLICATION_RECEIVED
-        context = get_context_for_application_received(language=language)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+        for language, recipients in recipients_by_language.items():
+            context = get_context_for_application_handled(language=language)
+
+            emails.append(
+                EmailData(
+                    recipients=list(recipients),
+                    subject=context["title"],
+                    text_content=render_text(email_type=email_type, context=context),
+                    html_content=render_html(email_type=email_type, context=context),
+                    attachments=[],
+                )
+            )
+
+        send_multiple_emails_in_batches_task.delay(emails=emails)
+        applications.update(results_ready_notification_sent_date=local_datetime())
 
     @staticmethod
     def send_application_in_allocation_emails() -> None:
@@ -122,39 +123,38 @@ class EmailService:
         applications.update(in_allocation_notification_sent_date=local_datetime())
 
     @staticmethod
-    def send_application_handled_emails() -> None:
-        """Sends email to applicants when application round has its allocation results available."""
-        applications = Application.objects.should_send_handled_email().order_by("created_date")
-        if not applications:
-            SentryLogger.log_message("Zero applications require the 'application handled' email to be sent")
+    def send_application_received_email(application: Application, *, language: Lang | None = None) -> None:
+        """
+        Sends email about the application being received.
+
+        :param application: The application the email concerns.
+        :param language: The language of the email. Determine from application if not given.
+        """
+        # Prevent accidental sending of wrong email.
+        if application.status != ApplicationStatusChoice.RECEIVED:
             return
 
-        recipients_by_language = get_recipients_for_applications_by_language(applications)
-        if not recipients_by_language:
+        recipients = get_application_email_recipients(application=application)
+        if not recipients:
             SentryLogger.log_message(
-                "No recipients for application handled emails",
-                details={"applications": ",".join(str(application.pk) for application in applications)},
+                "No recipients for application received email",
+                details={"application": application.pk},
             )
             return
 
-        emails: list[EmailData] = []
-        email_type = EmailType.APPLICATION_HANDLED
+        if language is None:
+            language = get_application_email_language(application=application)
 
-        for language, recipients in recipients_by_language.items():
-            context = get_context_for_application_handled(language=language)
+        email_type = EmailType.APPLICATION_RECEIVED
+        context = get_context_for_application_received(language=language)
+        send_emails_in_batches_task.delay(
+            recipients=recipients,
+            subject=context["title"],
+            text_content=render_text(email_type=email_type, context=context),
+            html_content=render_html(email_type=email_type, context=context),
+        )
 
-            emails.append(
-                EmailData(
-                    recipients=list(recipients),
-                    subject=context["title"],
-                    text_content=render_text(email_type=email_type, context=context),
-                    html_content=render_html(email_type=email_type, context=context),
-                    attachments=[],
-                )
-            )
-
-        send_multiple_emails_in_batches_task.delay(emails=emails)
-        applications.update(results_ready_notification_sent_date=local_datetime())
+    # Permissions ######################################################################################################
 
     @staticmethod
     def send_permission_deactivation_emails() -> None:
@@ -218,86 +218,10 @@ class EmailService:
         send_multiple_emails_in_batches_task.delay(emails=emails)
         users.update(sent_email_about_anonymization=True)
 
-    @staticmethod
-    def send_reservation_cancelled_email(
-        reservation: Reservation,
-        *,
-        language: Lang | None = None,
-    ) -> None:
-        """
-        Sends an email about the reservation being cancelled.
-
-        :param reservation: The reservation the email concerns.
-        :param language: The language of the email. Determine from reservation if not given.
-        """
-        # Prevent accidental sending of wrong email.
-        if reservation.state != ReservationStateChoice.CANCELLED:
-            return
-
-        recipients = get_reservation_email_recipients(reservation=reservation)
-        if not recipients:
-            SentryLogger.log_message(
-                "No recipients for reservation cancelled email",
-                details={"reservation": reservation.pk},
-            )
-            return
-
-        if language is None:
-            language = get_reservation_email_language(reservation=reservation)
-
-        email_type = EmailType.RESERVATION_CANCELLED
-        context = get_context_for_reservation_cancelled(reservation, language=language)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+    # Reservation ######################################################################################################
 
     @staticmethod
-    def send_reservation_confirmed_email(
-        reservation: Reservation,
-        *,
-        language: Lang | None = None,
-    ) -> None:
-        """
-        Sends an email about the reservation being confirmed.
-
-        :param reservation: The reservation the email concerns.
-        :param language: The language of the email. Determine from reservation if not given.
-        """
-        # Prevent accidental sending of wrong email.
-        if reservation.state not in ReservationStateChoice.CONFIRMED:
-            return
-
-        recipients = get_reservation_email_recipients(reservation=reservation)
-        if not recipients:
-            SentryLogger.log_message(
-                "No recipients for reservation confirmed email",
-                details={"reservation": reservation.pk},
-            )
-            return
-
-        if language is None:
-            language = get_reservation_email_language(reservation=reservation)
-
-        email_type = EmailType.RESERVATION_CONFIRMED
-        context = get_context_for_reservation_confirmed(reservation, language=language)
-        attachment = get_reservation_ical_attachment(reservation)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-            attachments=[attachment] if attachment else None,
-        )
-
-    @staticmethod
-    def send_reservation_approved_email(
-        reservation: Reservation,
-        *,
-        language: Lang | None = None,
-    ) -> None:
+    def send_reservation_approved_email(reservation: Reservation, *, language: Lang | None = None) -> None:
         """
         Sends an email about the reservation being approved in handling.
 
@@ -335,11 +259,147 @@ class EmailService:
         )
 
     @staticmethod
-    def send_reservation_requires_handling_email(
-        reservation: Reservation,
-        *,
-        language: Lang | None = None,
-    ) -> None:
+    def send_reservation_cancelled_email(reservation: Reservation, *, language: Lang | None = None) -> None:
+        """
+        Sends an email about the reservation being cancelled.
+
+        :param reservation: The reservation the email concerns.
+        :param language: The language of the email. Determine from reservation if not given.
+        """
+        # Prevent accidental sending of wrong email.
+        if reservation.state != ReservationStateChoice.CANCELLED:
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for reservation cancelled email",
+                details={"reservation": reservation.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.RESERVATION_CANCELLED
+        context = get_context_for_reservation_cancelled(reservation, language=language)
+        send_emails_in_batches_task.delay(
+            recipients=recipients,
+            subject=context["title"],
+            text_content=render_text(email_type=email_type, context=context),
+            html_content=render_html(email_type=email_type, context=context),
+        )
+
+    @staticmethod
+    def send_reservation_confirmed_email(reservation: Reservation, *, language: Lang | None = None) -> None:
+        """
+        Sends an email about the reservation being confirmed.
+
+        :param reservation: The reservation the email concerns.
+        :param language: The language of the email. Determine from reservation if not given.
+        """
+        # Prevent accidental sending of wrong email.
+        if reservation.state not in ReservationStateChoice.CONFIRMED:
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for reservation confirmed email",
+                details={"reservation": reservation.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.RESERVATION_CONFIRMED
+        context = get_context_for_reservation_confirmed(reservation, language=language)
+        attachment = get_reservation_ical_attachment(reservation)
+        send_emails_in_batches_task.delay(
+            recipients=recipients,
+            subject=context["title"],
+            text_content=render_text(email_type=email_type, context=context),
+            html_content=render_html(email_type=email_type, context=context),
+            attachments=[attachment] if attachment else None,
+        )
+
+    @staticmethod
+    def send_reservation_modified_email(reservation: Reservation, *, language: Lang | None = None) -> None:
+        """
+        Sends an email about the reservation being modified.
+
+        :param reservation: The reservation the email concerns.
+        :param language: The language of the email. Determine from reservation if not given.
+        """
+        # Only send emails if reservation is not in the past.
+        if local_datetime() >= reservation.end.astimezone(DEFAULT_TIMEZONE):
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for reservation modified email",
+                details={"reservation": reservation.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.RESERVATION_MODIFIED
+        context = get_context_for_reservation_modified(reservation, language=language)
+        attachment = get_reservation_ical_attachment(reservation)
+        send_emails_in_batches_task.delay(
+            recipients=recipients,
+            subject=context["title"],
+            text_content=render_text(email_type=email_type, context=context),
+            html_content=render_html(email_type=email_type, context=context),
+            attachments=[attachment] if attachment else None,
+        )
+
+    @staticmethod
+    def send_reservation_rejected_email(reservation: Reservation, *, language: Lang | None = None) -> None:
+        """
+        Sends an email about the reservation being rejected in handling.
+
+        :param reservation: The reservation the email concerns.
+        :param language: The language of the email. Determine from reservation if not given.
+        """
+        # Prevent accidental sending of wrong email.
+        if reservation.state != ReservationStateChoice.DENIED:
+            return
+
+        # Only send emails if reservation is not in the past.
+        if local_datetime() >= reservation.end.astimezone(DEFAULT_TIMEZONE):
+            return
+
+        # Don't send notifications for reservations not made by the reservee themselves.
+        if reservation.type != ReservationTypeChoice.NORMAL:
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for reservation rejected email",
+                details={"reservation": reservation.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.RESERVATION_REJECTED
+        context = get_context_for_reservation_rejected(reservation, language=language)
+        send_emails_in_batches_task.delay(
+            recipients=recipients,
+            subject=context["title"],
+            text_content=render_text(email_type=email_type, context=context),
+            html_content=render_html(email_type=email_type, context=context),
+        )
+
+    @staticmethod
+    def send_reservation_requires_handling_email(reservation: Reservation, *, language: Lang | None = None) -> None:
         """
         Sends an email about the reservation requiring handling.
 
@@ -379,49 +439,7 @@ class EmailService:
         )
 
     @staticmethod
-    def send_reservation_modified_email(
-        reservation: Reservation,
-        *,
-        language: Lang | None = None,
-    ) -> None:
-        """
-        Sends an email about the reservation being modified.
-
-        :param reservation: The reservation the email concerns.
-        :param language: The language of the email. Determine from reservation if not given.
-        """
-        # Only send emails if reservation is not in the past.
-        if local_datetime() >= reservation.end.astimezone(DEFAULT_TIMEZONE):
-            return
-
-        recipients = get_reservation_email_recipients(reservation=reservation)
-        if not recipients:
-            SentryLogger.log_message(
-                "No recipients for reservation modified email",
-                details={"reservation": reservation.pk},
-            )
-            return
-
-        if language is None:
-            language = get_reservation_email_language(reservation=reservation)
-
-        email_type = EmailType.RESERVATION_MODIFIED
-        context = get_context_for_reservation_modified(reservation, language=language)
-        attachment = get_reservation_ical_attachment(reservation)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-            attachments=[attachment] if attachment else None,
-        )
-
-    @staticmethod
-    def send_reservation_requires_payment_email(
-        reservation: Reservation,
-        *,
-        language: Lang | None = None,
-    ) -> None:
+    def send_reservation_requires_payment_email(reservation: Reservation, *, language: Lang | None = None) -> None:
         """
         Sends an email about the reservation requiring payment.
 
@@ -452,49 +470,7 @@ class EmailService:
             html_content=render_html(email_type=email_type, context=context),
         )
 
-    @staticmethod
-    def send_reservation_rejected_email(
-        reservation: Reservation,
-        *,
-        language: Lang | None = None,
-    ) -> None:
-        """
-        Sends an email about the reservation being rejected in handling.
-
-        :param reservation: The reservation the email concerns.
-        :param language: The language of the email. Determine from reservation if not given.
-        """
-        # Prevent accidental sending of wrong email.
-        if reservation.state != ReservationStateChoice.DENIED:
-            return
-
-        # Only send emails if reservation is not in the past.
-        if local_datetime() >= reservation.end.astimezone(DEFAULT_TIMEZONE):
-            return
-
-        # Don't send notifications for reservations not made by the reservee themselves.
-        if reservation.type != ReservationTypeChoice.NORMAL:
-            return
-
-        recipients = get_reservation_email_recipients(reservation=reservation)
-        if not recipients:
-            SentryLogger.log_message(
-                "No recipients for reservation rejected email",
-                details={"reservation": reservation.pk},
-            )
-            return
-
-        if language is None:
-            language = get_reservation_email_language(reservation=reservation)
-
-        email_type = EmailType.RESERVATION_REJECTED
-        context = get_context_for_reservation_rejected(reservation, language=language)
-        send_emails_in_batches_task.delay(
-            recipients=recipients,
-            subject=context["title"],
-            text_content=render_text(email_type=email_type, context=context),
-            html_content=render_html(email_type=email_type, context=context),
-        )
+    # Staff ############################################################################################################
 
     @staticmethod
     def send_staff_notification_reservation_made_email(reservation: Reservation) -> None:
