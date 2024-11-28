@@ -244,25 +244,38 @@ UserPermissionChoice = models.TextChoices("UserPermissionChoice", UserRoleChoice
 
 
 class EmailType(models.TextChoices):
-    APPLICATION_HANDLED = "application_handled", _("Application handled")
-    APPLICATION_IN_ALLOCATION = "application_in_allocation", _("Application in allocation")
-    APPLICATION_RECEIVED = "application_received", _("Application received")
-    PERMISSION_DEACTIVATION = "permission_deactivation", _("Permission deactivation")
-    USER_ANONYMIZATION = "user_anonymization", _("User anonymization")
-    RESERVATION_CANCELLED = "reservation_cancelled", _("Reservation cancelled")
-    RESERVATION_CONFIRMED = "reservation_confirmed", _("Reservation confirmed")
-    RESERVATION_APPROVED = "reservation_approved", _("Reservation approved")
-    RESERVATION_REQUIRES_HANDLING = "reservation_requires_handling", _("Reservation requires handling")
-    RESERVATION_MODIFIED = "reservation_modified", _("Reservation modified")
-    RESERVATION_REQUIRES_PAYMENT = "reservation_requires_payment", _("Reservation requires payment")
-    RESERVATION_REJECTED = "reservation_rejected", _("Reservation rejected")
+    # Application
+    APPLICATION_HANDLED = "application_handled", pgettext_lazy("EmailType", "Application handled")
+    APPLICATION_IN_ALLOCATION = "application_in_allocation", pgettext_lazy("EmailType", "Application in allocation")
+    APPLICATION_RECEIVED = "application_received", pgettext_lazy("EmailType", "Application received")
+
+    # Permissions
+    PERMISSION_DEACTIVATION = "permission_deactivation", pgettext_lazy("EmailType", "Permission deactivation")
+    USER_ANONYMIZATION = "user_anonymization", pgettext_lazy("EmailType", "User anonymization")
+
+    # Reservation
+    RESERVATION_APPROVED = "reservation_approved", pgettext_lazy("EmailType", "Reservation approved")
+    RESERVATION_CANCELLED = "reservation_cancelled", pgettext_lazy("EmailType", "Reservation cancelled")
+    RESERVATION_CONFIRMED = "reservation_confirmed", pgettext_lazy("EmailType", "Reservation confirmed")
+    RESERVATION_MODIFIED = "reservation_modified", pgettext_lazy("EmailType", "Reservation modified")
+    RESERVATION_REJECTED = "reservation_rejected", pgettext_lazy("EmailType", "Reservation rejected")
+    RESERVATION_REQUIRES_HANDLING = (
+        "reservation_requires_handling",
+        pgettext_lazy("EmailType", "Reservation requires handling"),
+    )
+    RESERVATION_REQUIRES_PAYMENT = (
+        "reservation_requires_payment",
+        pgettext_lazy("EmailType", "Reservation requires payment"),
+    )
+
+    # Staff
     STAFF_NOTIFICATION_RESERVATION_MADE = (
         "staff_notification_reservation_made",
-        _("Staff notification reservation made"),
+        pgettext_lazy("EmailType", "Staff notification reservation made"),
     )
     STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING = (
         "staff_notification_reservation_requires_handling",
-        _("Staff notification reservation requires handling"),
+        pgettext_lazy("EmailType", "Staff notification reservation requires handling"),
     )
 
     @enum.property

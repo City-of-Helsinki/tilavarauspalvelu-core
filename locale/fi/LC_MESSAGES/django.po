@@ -2179,58 +2179,72 @@ msgid "Notification manager"
 msgstr "Ilmoituksen hallitsija."
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Application handled"
 msgstr "Kausivaraushakemus käsitelty"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Application in allocation"
 msgstr "Kausivaraushakemus käsittelyssä"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Application received"
 msgstr "Kausivaraushakemus vastaanotettu"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Permission deactivation"
 msgstr "Käyttöoikeuksien deaktivointi"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "User anonymization"
 msgstr "Käyttäjän anonymisointi"
 
 #: tilavarauspalvelu/enums.py
-msgid "Reservation cancelled"
-msgstr "Varaus peruttu"
-
-#: tilavarauspalvelu/enums.py
-msgid "Reservation confirmed"
-msgstr "Varaus vahvistettu"
-
-#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Reservation approved"
 msgstr "Varaus hyväksytty"
 
 #: tilavarauspalvelu/enums.py
-msgid "Reservation requires handling"
-msgstr "Varaus odottaa käsittelyä"
+msgctxt "EmailType"
+msgid "Reservation cancelled"
+msgstr "Varaus peruttu"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Reservation confirmed"
+msgstr "Varaus vahvistettu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Reservation modified"
 msgstr "Varausta muokattu"
 
 #: tilavarauspalvelu/enums.py
-msgid "Reservation requires payment"
-msgstr "Varaus odottaa maksua"
-
-#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Reservation rejected"
 msgstr "Varaus hylätty"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Reservation requires handling"
+msgstr "Varaus odottaa käsittelyä"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Reservation requires payment"
+msgstr "Varaus odottaa maksua"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Staff notification reservation made"
 msgstr "Käsittelijä ilmoitus uudesta varauksesta"
 
 #: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Staff notification reservation requires handling"
 msgstr "Käsittelijän ilmoitus käsittelyä vaativasta varauksesta"
 
@@ -3017,6 +3031,26 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
+msgid "Your booking has been confirmed with the following discount:"
+msgstr "Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus:"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking is now confirmed"
+msgstr "Varauksesi on nyt vahvistettu"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking is confirmed"
+msgstr "Varauksesi on vahvistettu"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Additional information about your booking"
+msgstr "Lisätietoa varauksestasi"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Your booking has been cancelled"
 msgstr "Varauksesi on peruttu"
 
@@ -3042,23 +3076,23 @@ msgstr "Olet tehnyt uuden varauksen"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Additional information about your booking"
-msgstr "Lisätietoa varauksestasi"
+msgid "Your booking has been updated"
+msgstr "Varaustasi on muutettu"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking has been confirmed with the following discount:"
-msgstr "Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus:"
+msgid "Unfortunately your booking cannot be confirmed"
+msgstr "Valitettavasti varaustasi ei voida vahvistaa"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking is now confirmed"
-msgstr "Varauksesi on nyt vahvistettu"
+msgid "Reason"
+msgstr "Syy"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking is confirmed"
-msgstr "Varauksesi on vahvistettu"
+msgid "Additional information"
+msgstr "Lisätietoa"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
@@ -3082,11 +3116,6 @@ msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Your booking has been updated"
-msgstr "Varaustasi on muutettu"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
 msgid "Pay the booking"
 msgstr "Maksa varaus"
 
@@ -3099,21 +3128,6 @@ msgstr "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla"
 msgctxt "Email"
 msgid "Due date"
 msgstr "Eräpäivä"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Unfortunately your booking cannot be confirmed"
-msgstr "Valitettavasti varaustasi ei voida vahvistaa"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Reason"
-msgstr "Syy"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Additional information"
-msgstr "Lisätietoa"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format

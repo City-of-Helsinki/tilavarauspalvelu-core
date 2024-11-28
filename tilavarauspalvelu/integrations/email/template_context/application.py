@@ -23,6 +23,9 @@ __all__ = [
 ]
 
 
+# type: EmailType.APPLICATION_HANDLED ##################################################################################
+
+
 @get_translated
 def get_context_for_application_handled(*, language: Lang) -> EmailContext:
     link = get_my_applications_ext_link(language=language)
@@ -38,6 +41,9 @@ def get_context_for_application_handled(*, language: Lang) -> EmailContext:
         **get_contex_for_base_template(),
         **get_contex_for_closing_polite(language=language),
     }
+
+
+# type: EmailType.APPLICATION_IN_ALLOCATION ############################################################################
 
 
 @get_translated
@@ -60,6 +66,9 @@ def get_context_for_application_in_allocation(*, language: Lang) -> EmailContext
         **get_contex_for_base_template(),
         **get_contex_for_closing_polite(language=language),
     }
+
+
+# type: EmailType.APPLICATION_RECEIVED #################################################################################
 
 
 @get_translated

@@ -222,6 +222,7 @@ ignore = [
     "PLW2901",  # redefined-loop-name
 ]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^name$|^obj$|^request$|^user|^view$|^input_data$|^filters$"
+task-tags = ["TODO", "FIXME", "XXX", "type"]
 
 [tool.ruff.lint.extend-per-file-ignores]
 "local_settings*.py" = [
