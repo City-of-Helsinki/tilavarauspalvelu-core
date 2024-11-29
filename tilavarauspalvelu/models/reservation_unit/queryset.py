@@ -155,6 +155,9 @@ class ReservationUnitQuerySet(models.QuerySet):
                         models.F(f"name_{lang}"),
                         models.F(f"description_{lang}"),
                         #
+                        # Additional search terms
+                        models.Value(" ".join(term for term in reservation_unit.search_terms)),
+                        #
                         # Joins are not allowed in search vectors, so we compute them as values beforehand.
                         models.Value(
                             getattr(reservation_unit.unit, f"name_{lang}", ""),

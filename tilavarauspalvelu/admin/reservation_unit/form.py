@@ -4,6 +4,7 @@ from typing import Any
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from subforms.fields import DynamicArrayField
 from tinymce.widgets import TinyMCE
 
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
@@ -11,6 +12,17 @@ from tilavarauspalvelu.models import ReservationUnit, TermsOfUse
 
 
 class ReservationUnitAdminForm(forms.ModelForm):
+    search_terms = DynamicArrayField(
+        required=False,
+        default=list,
+        label=_("Search terms"),
+        help_text=_(
+            "Additional search terms that will bring up this reservation unit when making text searches "
+            "in the customer UI. These terms should be added to make sure search results using text search in "
+            "links from external sources work regardless of the UI language."
+        ),
+    )
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         qs = TermsOfUse.objects.all()
         self.base_fields["pricing_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PRICING)
@@ -97,6 +109,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "payment_accounting": _("Payment accounting"),
             "uuid": _("UUID"),
             "payment_product": _("Payment product"),
+            "search_terms": _("Search terms"),
         }
         help_texts = {
             "sku": _("SKU"),
@@ -180,4 +193,9 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "payment_accounting": _("Payment accounting information"),
             "uuid": _("UUID"),
             "payment_product": _("Product used for payments"),
+            "search_terms": _(
+                "Additional search terms that will bring up this reservation unit when making text searches "
+                "in the customer UI. These terms should be added to make sure search results using text search in "
+                "links from external sources work regardless of the UI language."
+            ),
         }

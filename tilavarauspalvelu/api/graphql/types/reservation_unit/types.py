@@ -133,6 +133,9 @@ class ReservationUnitNode(DjangoNode):
             "publishing_state",
             "reservation_state",
             #
+            # List fields
+            "search_terms",
+            #
             # Forward many-to-one related
             "unit",
             "reservation_unit_type",

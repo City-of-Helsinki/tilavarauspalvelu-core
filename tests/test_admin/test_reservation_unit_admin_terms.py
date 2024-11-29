@@ -40,7 +40,7 @@ def test_reservation_unit_admin__terms_validation__pricing_terms__accepts_type_p
     ReservationUnitModelForm = reservation_unit_admin.get_form(request, obj=reservation_unit)
     form = ReservationUnitModelForm(instance=reservation_unit, data=data)
 
-    assert form.is_valid()
+    assert form.is_valid(), form.errors
 
 
 def test_reservation_unit_admin__terms_validation__pricing_terms__errors_when_type_not_pricing():
@@ -57,7 +57,7 @@ def test_reservation_unit_admin__terms_validation__pricing_terms__errors_when_ty
     ReservationUnitModelForm = reservation_unit_admin.get_form(request, obj=reservation_unit)
     form = ReservationUnitModelForm(instance=reservation_unit, data=data)
 
-    assert not form.is_valid()
+    assert not form.is_valid(), form.errors
 
 
 def test_reservation_unit_admin__terms_validation__payment_terms__accepts_type_payment():
@@ -74,7 +74,7 @@ def test_reservation_unit_admin__terms_validation__payment_terms__accepts_type_p
     ReservationUnitModelForm = reservation_unit_admin.get_form(request, obj=reservation_unit)
     form = ReservationUnitModelForm(instance=reservation_unit, data=data)
 
-    assert form.is_valid()
+    assert form.is_valid(), form.errors
 
 
 def test_reservation_unit_admin__terms_validation__payment_terms__errors_when_type_not_payment():
@@ -91,7 +91,7 @@ def test_reservation_unit_admin__terms_validation__payment_terms__errors_when_ty
     ReservationUnitModelForm = reservation_unit_admin.get_form(request, obj=reservation_unit)
     form = ReservationUnitModelForm(instance=reservation_unit, data=data)
 
-    assert not form.is_valid()
+    assert not form.is_valid(), form.errors
 
 
 def test_reservation_unit_admin__terms_validation__cancellation_terms__accepts_type_cancellation():
@@ -108,7 +108,7 @@ def test_reservation_unit_admin__terms_validation__cancellation_terms__accepts_t
     ReservationUnitModelForm = reservation_unit_admin.get_form(request, obj=reservation_unit)
     form = ReservationUnitModelForm(instance=reservation_unit, data=data)
 
-    assert form.is_valid()
+    assert form.is_valid(), form.errors
 
 
 def test_reservation_unit_admin__terms_validation__cancellation_terms__errors_when_type_not_cancellation():
@@ -125,7 +125,7 @@ def test_reservation_unit_admin__terms_validation__cancellation_terms__errors_wh
     ReservationUnitModelForm = reservation_unit_admin.get_form(request, obj=reservation_unit)
     form = ReservationUnitModelForm(instance=reservation_unit, data=data)
 
-    assert not form.is_valid()
+    assert not form.is_valid(), form.errors
 
 
 def test_reservation_unit_admin__terms_validation__service_specific_terms__accepts_type_service():
@@ -142,7 +142,7 @@ def test_reservation_unit_admin__terms_validation__service_specific_terms__accep
     ReservationUnitModelForm = reservation_unit_admin.get_form(request, obj=reservation_unit)
     form = ReservationUnitModelForm(instance=reservation_unit, data=data)
 
-    assert form.is_valid()
+    assert form.is_valid(), form.errors
 
 
 def test_reservation_unit_admin__terms_validation__service_specific_terms__errors_when_type_not_service():
@@ -159,4 +159,4 @@ def test_reservation_unit_admin__terms_validation__service_specific_terms__error
     ReservationUnitModelForm = reservation_unit_admin.get_form(request, obj=reservation_unit)
     form = ReservationUnitModelForm(instance=reservation_unit, data=data)
 
-    assert not form.is_valid()
+    assert not form.is_valid(), form.errors

@@ -6,6 +6,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -116,6 +117,10 @@ class ReservationUnit(models.Model):
         default=ReservationKind.DIRECT_AND_SEASON.value,
         db_index=True,
     )
+
+    # List fields
+
+    search_terms = ArrayField(models.CharField(max_length=255), blank=True, default=list)
 
     # Many-to-One related
 
@@ -237,7 +242,7 @@ class ReservationUnit(models.Model):
         blank=True,
     )
 
-    # Pre-calculated search vector.
+    # Pre-calculated search vectors.
 
     search_vector_fi = SearchVectorField()
     search_vector_en = SearchVectorField()

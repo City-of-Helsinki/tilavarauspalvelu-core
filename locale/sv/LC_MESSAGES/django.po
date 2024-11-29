@@ -1505,6 +1505,11 @@ msgid "Instructions"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Search terms"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Publishing state"
 msgstr ""
 
@@ -1914,6 +1919,14 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Product used for payments"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Additional search terms that will bring up this reservation unit when making "
+"text searches in the customer UI. These terms should be added to make sure "
+"search results using text search in links from external sources work "
+"regardless of the UI language."
 msgstr ""
 
 #: tilavarauspalvelu/admin/space/admin.py
