@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from typing import NamedTuple
+import dataclasses
+from typing import Literal, NamedTuple
 
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.models import ReservationUnit
 
-from tests.factories import ReservationUnitFactory, SpaceFactory
+from tests.factories import ReservationUnitFactory
 
 from .helpers import reservation_units_query
 
@@ -17,114 +18,215 @@ pytestmark = [
 ]
 
 
+@dataclasses.dataclass
+class SearchableData:
+    name: str = "-"
+    name_en: str = "-"
+    name_sv: str = "-"
+    description: str = "-"
+    description_en: str = "-"
+    description_sv: str = "-"
+    unit__name: str = "-"
+    unit__name_en: str = "-"
+    unit__name_sv: str = "-"
+    reservation_unit_type__name: str = "-"
+    reservation_unit_type__name_en: str = "-"
+    reservation_unit_type__name_sv: str = "-"
+    spaces__name: str = "-"
+    spaces__name_en: str = "-"
+    spaces__name_sv: str = "-"
+    resources__name: str = "-"
+    resources__name_en: str = "-"
+    resources__name_sv: str = "-"
+    purposes__name: str = "-"
+    purposes__name_en: str = "-"
+    purposes__name_sv: str = "-"
+    equipments__name: str = "-"
+    equipments__name_en: str = "-"
+    equipments__name_sv: str = "-"
+    search_terms: list[str] = dataclasses.field(default_factory=list)
+
+
 class Params(NamedTuple):
     text_search: str
-    fields: str
-    expected: dict | None
+    reservation_unit_data: SearchableData
+    has_results: bool = True
+    language: Literal["fi", "sv", "en"] = "fi"
 
 
 @pytest.mark.parametrize(
     **parametrize_helper({
-        "No results": Params(
+        "no results": Params(
             text_search="foo",
-            fields="nameFi",
-            expected=None,
+            reservation_unit_data=SearchableData(),
+            has_results=False,
         ),
-        "Name FI": Params(
-            text_search="Test name fi",
-            fields="nameFi",
-            expected={"nameFi": "test name fi"},
+        "match name fi": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(name="foo"),
         ),
-        "Name EN": Params(
-            text_search="Test name en",
-            fields="nameEn",
-            expected={"nameEn": "test name en"},
+        "match name en": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(name_en="foo"),
+            language="en",
         ),
-        "Name SV": Params(
-            text_search="Test name sv",
-            fields="nameSv",
-            expected={"nameSv": "test name sv"},
+        "match name sv": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(name_sv="foo"),
+            language="sv",
         ),
-        "Type FI": Params(
-            text_search="Test type fi",
-            fields="nameFi reservationUnitType{nameFi}",
-            expected={"nameFi": "test name fi", "reservationUnitType": {"nameFi": "test type fi"}},
+        "dont match different language name": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(name="foo"),
+            language="sv",
+            has_results=False,
         ),
-        "Type EN": Params(
-            text_search="Test type en",
-            fields="nameEn reservationUnitType{nameEn}",
-            expected={"nameEn": "test name en", "reservationUnitType": {"nameEn": "test type en"}},
+        "match name prefix": Params(
+            text_search="post",
+            reservation_unit_data=SearchableData(name="postal"),
         ),
-        "Type SV": Params(
-            text_search="Test type sv",
-            fields="nameSv reservationUnitType{nameSv}",
-            expected={"nameSv": "test name sv", "reservationUnitType": {"nameSv": "test type sv"}},
+        "match name postfix": Params(
+            text_search="room",
+            reservation_unit_data=SearchableData(name="workroom"),
         ),
-        "Description FI": Params(
-            text_search="Lorem ipsum fi",
-            fields="nameFi descriptionFi",
-            expected={"nameFi": "test name fi", "descriptionFi": "Lorem ipsum fi"},
+        "match description fi": Params(
+            text_search="kuvaus",
+            reservation_unit_data=SearchableData(description="Tässä on kuvaus minun yksikkööni"),
         ),
-        "Description EN": Params(
-            text_search="Lorem ipsum en",
-            fields="nameEn descriptionEn",
-            expected={"nameEn": "test name en", "descriptionEn": "Lorem ipsum en"},
+        "match description en": Params(
+            text_search="description",
+            reservation_unit_data=SearchableData(description_en="Here is a description of my unit"),
+            language="en",
         ),
-        "Description SV": Params(
-            text_search="Lorem ipsum sv",
-            fields="nameSv descriptionSv",
-            expected={"nameSv": "test name sv", "descriptionSv": "Lorem ipsum sv"},
+        "match description ev": Params(
+            text_search="beskrivning",
+            reservation_unit_data=SearchableData(description_sv="Här är en beskrivning av min enhet"),
+            language="sv",
         ),
-        "Space name FI": Params(
-            text_search="space name fi",
-            fields="nameFi spaces{nameFi}",
-            expected={"nameFi": "test name fi", "spaces": [{"nameFi": "space name fi"}]},
+        "match description p-tags": Params(
+            text_search="kuvaus",
+            reservation_unit_data=SearchableData(description="<p>Tässä on kuvaus minun yksikkööni</p>"),
         ),
-        "Space name EN": Params(
-            text_search="space name en",
-            fields="nameEn spaces{nameEn}",
-            expected={"nameEn": "test name en", "spaces": [{"nameEn": "space name en"}]},
+        "match description p-tags split": Params(
+            text_search="kuvaus",
+            reservation_unit_data=SearchableData(description="<p>Tässä on</p><p>kuvaus minun yksikkööni</p>"),
         ),
-        "Space name SV": Params(
-            text_search="space name sv",
-            fields="nameSv spaces{nameSv}",
-            expected={"nameSv": "test name sv", "spaces": [{"nameSv": "space name sv"}]},
+        "match unit name fi": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(unit__name="foo"),
+        ),
+        "match unit name en": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(unit__name_en="foo"),
+            language="en",
+        ),
+        "match unit name sv": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(unit__name_sv="foo"),
+            language="sv",
+        ),
+        "match reservation unit type name fi": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(reservation_unit_type__name="foo"),
+        ),
+        "match reservation unit type name en": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(reservation_unit_type__name_en="foo"),
+            language="en",
+        ),
+        "match reservation unit type name sv": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(reservation_unit_type__name_sv="foo"),
+            language="sv",
+        ),
+        "match space name fi": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(spaces__name="foo"),
+        ),
+        "match space name en": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(spaces__name_en="foo"),
+            language="en",
+        ),
+        "match space name sv": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(spaces__name_sv="foo"),
+            language="sv",
+        ),
+        "match resource name fi": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(resources__name="foo"),
+        ),
+        "match resource name en": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(resources__name_en="foo"),
+            language="en",
+        ),
+        "match resource name sv": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(resources__name_sv="foo"),
+            language="sv",
+        ),
+        "match purpose name fi": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(purposes__name="foo"),
+        ),
+        "match purpose name en": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(purposes__name_en="foo"),
+            language="en",
+        ),
+        "match purpose name sv": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(purposes__name_sv="foo"),
+            language="sv",
+        ),
+        "match equipment name fi": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(equipments__name="foo"),
+        ),
+        "match equipment name en": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(equipments__name_en="foo"),
+            language="en",
+        ),
+        "match equipment name sv": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(equipments__name_sv="foo"),
+            language="sv",
+        ),
+        "match search terms fi": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(search_terms=["foo"]),
+        ),
+        "match search terms en": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(search_terms=["foo"]),
+            language="en",
+        ),
+        "match search terms sv": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(search_terms=["foo"]),
+            language="sv",
+        ),
+        "match different grammatical case": Params(
+            text_search="tila pukinmäessä",
+            reservation_unit_data=SearchableData(description="sijaitsee pukinmäen kirjaston vieressä"),
         ),
     })
 )
-def test_reservation_unit__filter__by_text_search(graphql, text_search, fields, expected):
-    space = SpaceFactory.create(
-        name_fi="space name fi",
-        name_en="space name en",
-        name_sv="space name sv",
-    )
-    reservation_unit = ReservationUnitFactory.create(
-        name="test name fi",
-        name_fi="test name fi",
-        name_en="test name en",
-        name_sv="test name sv",
-        description_fi="Lorem ipsum fi",
-        description_sv="Lorem ipsum sv",
-        description_en="Lorem ipsum en",
-        reservation_unit_type__name="test type fi",
-        reservation_unit_type__name_fi="test type fi",
-        reservation_unit_type__name_en="test type en",
-        reservation_unit_type__name_sv="test type sv",
-        spaces=[space],
-    )
-
+def test_reservation_unit__filter__by_text_search(graphql, text_search, reservation_unit_data, has_results, language):
+    ReservationUnitFactory.create(**dataclasses.asdict(reservation_unit_data))
     ReservationUnit.objects.update_search_vectors()
 
-    query = reservation_units_query(text_search=text_search, fields="pk " + fields)
+    graphql.login_with_superuser(preferred_language=language)
+
+    query = reservation_units_query(text_search=text_search)
     response = graphql(query)
 
     assert response.has_errors is False, response
-    expect_results = expected is not None
-    if expect_results:
-        assert len(response.edges) == 1, response
-        assert response.node(0) == {"pk": reservation_unit.pk, **expected}
-    else:
-        assert len(response.edges) == 0, response
+
+    assert len(response.edges) == (1 if has_results else 0)
 
 
 def test_reservation_unit__filter__by_text_search__and_other_filters(graphql):
@@ -139,6 +241,3 @@ def test_reservation_unit__filter__by_text_search__and_other_filters(graphql):
     assert response.has_errors is False, response
     assert len(response.edges) == 1, response
     assert response.node(0) == {"pk": reservation_unit.pk}
-
-
-# TODO: Add more tests for special cases.
