@@ -146,7 +146,7 @@ class ReservationUnitQuerySet(models.QuerySet):
         reservation_units: list[ReservationUnit] = list(qs)
 
         for reservation_unit in reservation_units:
-            for lang in ("fi", "en", "sv"):
+            for lang, config in (("fi", "finnish"), ("en", "english"), ("sv", "swedish")):
                 setattr(
                     reservation_unit,
                     f"search_vector_{lang}",
@@ -194,7 +194,7 @@ class ReservationUnitQuerySet(models.QuerySet):
                             ),
                         ),
                         #
-                        config="english" if lang == "en" else "swedish" if lang == "sv" else "finnish",
+                        config=config,
                     ),
                 )
 
