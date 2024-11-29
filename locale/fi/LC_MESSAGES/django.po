@@ -1548,6 +1548,11 @@ msgid "Instructions"
 msgstr "Ohjeet"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Search terms"
+msgstr "Hakusanat"
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Publishing state"
 msgstr "Julkaisun tila"
 
@@ -1972,6 +1977,19 @@ msgstr "Maksujen kirjanpidon tiliöintitiedot"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Product used for payments"
 msgstr "Tuote, jota käytetään maksuihin"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Additional search terms that will bring up this reservation unit when making "
+"text searches in the customer UI. These terms should be added to make sure "
+"search results using text search in links from external sources work "
+"regardless of the UI language."
+msgstr ""
+"Ylimääräiset hakusanat, joilla tätä varausyksikköä on mahdollista hakea "
+"tekstihaun kautta asiakaskäyttöliittymässä. Hakusanoja tulee lisätä tähän "
+"listaan silloin kun halutaan taata, että järjestelmän ulkopuolelta tulevissa "
+"linkeissä käytettävät hakusanat tuottavat oikeat hakutulokset "
+"käyttöliittymän kielestä rippumatta."
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"

@@ -87,6 +87,9 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "reservation_kind",
             "publishing_state",
             #
+            # List fields
+            "search_terms",
+            #
             # Forward many-to-one related
             "unit",
             "reservation_unit_type",

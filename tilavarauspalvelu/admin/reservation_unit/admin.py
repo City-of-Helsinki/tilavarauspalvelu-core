@@ -170,6 +170,14 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                 ],
             },
         ],
+        [
+            _("Search terms"),
+            {
+                "fields": [
+                    "search_terms",
+                ],
+            },
+        ],
     ]
     filter_horizontal = [
         "spaces",
