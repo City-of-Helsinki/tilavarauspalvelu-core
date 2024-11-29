@@ -1,4 +1,6 @@
 # ruff: noqa: N802
+from __future__ import annotations
+
 import os
 import zoneinfo
 from pathlib import Path
@@ -85,7 +87,6 @@ class Common(Environment):
         "health_check.db",
         "health_check.cache",
         "health_check.contrib.celery",
-        "health_check.contrib.celery_ping",
         # Our app
         "tilavarauspalvelu",
     ]
@@ -414,7 +415,7 @@ class Common(Environment):
     CELERY_PROCESSED_FOLDER = values.StringValue(default="/broker/processed/")
 
     @classproperty
-    def CELERY_BROKER_URL(cls):
+    def CELERY_BROKER_URL(cls) -> str:
         return "filesystem://"
 
     @classproperty
@@ -959,7 +960,7 @@ class Platta(Common, use_environ=True):
     # --- Celery settings --------------------------------------------------------------------------------------------
 
     @classproperty
-    def CELERY_BROKER_URL(cls):
+    def CELERY_BROKER_URL(cls) -> str:
         return f"sentinel://:{cls.REDIS_PASSWORD}@{cls.REDIS_SENTINEL_SERVICE}"
 
     @classproperty
