@@ -44,7 +44,7 @@ function RecurringReservationDoneInner({
       </H1>
       <p>{t(`successInfo`)}</p>
       <RecurringReservationsView recurringPk={recurringPk} />
-      <Flex $direction="row" $justify="flex-end" $wrap="wrap">
+      <Flex $direction="row" $justifyContent="flex-end" $wrap="wrap">
         <ButtonLikeLink to="../../.." relative="path">
           {t(`buttonToUnit`)}
         </ButtonLikeLink>

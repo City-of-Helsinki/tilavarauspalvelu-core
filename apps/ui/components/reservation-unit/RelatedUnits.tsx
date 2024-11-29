@@ -21,7 +21,7 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 import { getReservationUnitPath } from "@/modules/urls";
-import { H4 } from "common";
+import { H3 } from "common";
 
 type RelatedQueryT = NonNullable<
   RelatedReservationUnitsQuery["reservationUnits"]
@@ -48,8 +48,7 @@ export function RelatedUnits({
   }
   return (
     <div style={style} className={className}>
-      {/* TODO weird header size, check the Accordion so this matches them */}
-      <H4 as="h2">{t("reservationUnit:relatedReservationUnits")}</H4>
+      <H3 as="h2">{t("reservationUnit:relatedReservationUnits")}</H3>
       <Carousel
         slidesToShow={isMobile ? 1 : isWideMobile ? 2 : 3}
         slidesToScroll={isMobile ? 1 : isWideMobile ? 2 : 3}

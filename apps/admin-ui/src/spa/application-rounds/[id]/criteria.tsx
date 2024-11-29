@@ -9,10 +9,9 @@ import { useApplicationRoundCriteriaQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { formatDate } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
-import Loader from "@/component/Loader";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import TimeframeStatus from "../TimeframeStatus";
-import { Flex } from "common/styles/util";
+import { CenterSpinner, Flex, TitleSection } from "common/styles/util";
 
 interface IRouteParams {
   [key: string]: string;
@@ -94,7 +93,7 @@ function Criteria({
   );
 
   if (loading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
   if (applicationRound == null) {
     return <div>Error: failed to load application round</div>;
@@ -102,11 +101,9 @@ function Criteria({
 
   return (
     <>
-      <div>
-        <H1 $marginTop="l" $marginBottom="xs">
-          {applicationRound.nameFi}
-        </H1>
-        <Flex $direction="row" $justify="space-between" $wrap="wrap">
+      <TitleSection>
+        <H1 $noMargin>{applicationRound.nameFi}</H1>
+        <Flex $direction="row" $justifyContent="space-between" $wrap="wrap">
           <TimeframeStatus
             applicationPeriodBegin={applicationRound.applicationPeriodBegin}
             applicationPeriodEnd={applicationRound.applicationPeriodEnd}
@@ -116,7 +113,7 @@ function Criteria({
             <span>{t("ApplicationRound.attachedReservationUnits")}</span>
           </span>
         </Flex>
-      </div>
+      </TitleSection>
       <Accordion
         heading={t("ApplicationRound.searchAndUsageTimeRanges")}
         initiallyOpen

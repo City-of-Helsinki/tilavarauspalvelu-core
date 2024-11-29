@@ -15,13 +15,12 @@ import { getApplicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 import { truncate } from "@/helpers";
-import Loader from "@/component/Loader";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { TableLink } from "@/styles/util";
 import { CustomTable } from "@/component/Table";
 import Error404 from "@/common/Error404";
 import { Accordion } from "hds-react";
-import { Flex } from "common/styles/util";
+import { CenterSpinner, Flex } from "common/styles/util";
 
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,
@@ -100,7 +99,7 @@ function AllApplicationRounds(): JSX.Element | null {
   );
 
   if (loading && allApplicationRounds == null) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   if (allApplicationRounds == null || error != null) {

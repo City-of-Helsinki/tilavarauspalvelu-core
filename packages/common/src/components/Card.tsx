@@ -54,8 +54,8 @@ const Wrapper = styled.div<{ $bgColor: string }>`
 
 const ImageWrapper = styled(Flex).attrs({
   $gap: "none",
-  $align: "center",
-  $justify: "center",
+  $alignItems: "center",
+  $justifyContent: "center",
   $direction: "row",
 })`
   overflow: hidden;
@@ -393,7 +393,7 @@ function Tags({ tags }: Readonly<{ tags?: JSX.Element[] }>) {
 
 const InfoItem = styled(Flex).attrs({
   $gap: "2-xs",
-  $align: "center",
+  $alignItems: "center",
   $direction: "row",
 })`
   font-size: var(--fontsize-body-s);

@@ -14,7 +14,6 @@ import {
   ReservationChangeFormSchema,
 } from "@/schemas";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
-import Loader from "@/component/Loader";
 import { HR } from "@/component/Table";
 import { useOptions } from "@/hooks";
 import { useReservationEditData } from "./hooks";
@@ -22,7 +21,7 @@ import { useStaffReservationMutation } from "../hooks";
 import { filterNonNullable } from "common/src/helpers";
 import { flattenMetadata } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
-import { ButtonContainer } from "common/styles/util";
+import { ButtonContainer, CenterSpinner } from "common/styles/util";
 import { createTagString } from "./util";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { LinkPrev } from "@/component/LinkPrev";
@@ -235,7 +234,7 @@ export function EditPage() {
   return (
     <EditPageWrapper reservation={reservation} title={t("title")}>
       {loading ? (
-        <Loader />
+        <CenterSpinner />
       ) : !reservation ? (
         t("Reservation failed to load", { pk: id })
       ) : !reservationUnit ? (

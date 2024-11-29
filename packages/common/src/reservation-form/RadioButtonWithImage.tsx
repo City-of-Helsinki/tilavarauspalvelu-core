@@ -34,7 +34,7 @@ const Button = styled.button<{ $checked: boolean }>`
 
 const InnerWrapper = styled(Flex).attrs({
   $gap: "none",
-  $align: "center",
+  $alignItems: "center",
 })<{ $checked: boolean }>`
   border: 4px double transparent;
   padding: var(--spacing-xs);

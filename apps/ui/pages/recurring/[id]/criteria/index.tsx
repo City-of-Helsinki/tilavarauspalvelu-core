@@ -34,10 +34,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     fetchPolicy: "no-cache",
     query: ApplicationRoundsUiDocument,
   });
-  const applicationRound =
-    data?.applicationRounds?.edges
-      .map((n) => n?.node)
-      .find((n) => n?.pk === id) ?? null;
+  const applicationRound = data?.applicationRounds?.edges
+    .map((n) => n?.node)
+    .find((n) => n?.pk === id);
 
   const notFound = applicationRound == null;
   return {

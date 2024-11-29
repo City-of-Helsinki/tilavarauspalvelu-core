@@ -316,10 +316,16 @@ const PageContentWrapper = styled(Flex).attrs({
 })`
   grid-column: 1 / -2;
 
-  @media (width > ${breakpoints.l}) {
+  @media (min-width: ${breakpoints.l}) {
     grid-row: 2 / -1;
     grid-column: 1;
   }
+`;
+
+const StyledRelatedUnits = styled(RelatedUnits)`
+  grid-row: -1;
+  grid-column: 1 / -1;
+  max-width: calc(--tilavaraus-page-max-width - var(--spacing-layout-s) * 2);
 `;
 
 function ReservationUnit({
@@ -776,15 +782,7 @@ function ReservationUnit({
       />
       {/* TODO this breaks the layout when inside a grid (the RelatedUnits) */}
       {shouldDisplayBottomWrapper && (
-        <RelatedUnits
-          units={relatedReservationUnits}
-          style={{
-            gridRow: "-1",
-            gridColumn: "1 / -1",
-            // TODO use a variable
-            maxWidth: "calc(1200px - var(--spacing-layout-s) * 2)",
-          }}
-        />
+        <StyledRelatedUnits units={relatedReservationUnits} />
       )}
     </ReservationUnitPageWrapper>
   );

@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { errorToast } from "common/src/common/toast";
 import { UserPermissionChoice, useApplicationRoundQuery } from "@gql/gql-types";
-import Loader from "@/component/Loader";
 import { Review } from "./review";
 import { useCheckPermission } from "@/hooks";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
+import { CenterSpinner } from "common/styles/util";
 
 function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const { t } = useTranslation();
@@ -50,7 +50,7 @@ function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   }, [data]);
 
   if (loading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   if (!applicationRound) {

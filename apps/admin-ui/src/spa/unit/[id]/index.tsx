@@ -7,13 +7,12 @@ import { fontBold, fontMedium, H1, H2, H3 } from "common/src/common/typography";
 import { useUnitQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
-import Loader from "@/component/Loader";
 import { ExternalLink } from "@/component/ExternalLink";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";
 import { ReservationUnitList } from "./ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
-import { Flex } from "common/styles/util";
+import { CenterSpinner, Flex } from "common/styles/util";
 
 interface IProps {
   [key: string]: string;
@@ -51,8 +50,8 @@ const StyledBoldButton = styled(Button)`
 `;
 
 const EmptyContainer = styled(Flex).attrs({
-  $align: "center",
-  $justify: "center",
+  $alignItems: "center",
+  $justifyContent: "center",
 })`
   background-color: var(--tilavaraus-admin-gray);
   min-height: 20rem;
@@ -77,7 +76,7 @@ function Unit(): JSX.Element {
   const hasSpacesResources = Boolean(unit?.spaces?.length);
 
   if (isLoading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   // TODO separate invalid route and no unit found errors
@@ -89,8 +88,8 @@ function Unit(): JSX.Element {
 
   const UNIT_REGISTRY_LINK = `https://asiointi.hel.fi/tprperhe/TPR/UI/ServicePoint/ServicePointEdit/`;
   return (
-    <Flex>
-      <Flex $direction="row" $align="center">
+    <>
+      <Flex $direction="row" $alignItems="center">
         <Image src="https://tilavaraus.hel.fi/v1/media/reservation_unit_images/liikumistila2.jfif.250x250_q85_crop.jpg" />
         <Heading>
           <H1 $noMargin>{unit?.nameFi}</H1>
@@ -120,7 +119,7 @@ function Unit(): JSX.Element {
         {t("Unit.maintainOpeningHours")}
       </ExternalLink>
       <H2 $noMargin>{t("Unit.reservationUnitTitle")}</H2>
-      <Flex $direction="row" $justify="space-between">
+      <Flex $direction="row" $justifyContent="space-between">
         {reservationUnits.length > 0 ? (
           <ResourceUnitCount>
             {t("Unit.reservationUnits", {
@@ -151,7 +150,7 @@ function Unit(): JSX.Element {
           <H3 as="p">{t("Unit.noReservationUnitsTitle")}</H3>
         </EmptyContainer>
       )}
-    </Flex>
+    </>
   );
 }
 

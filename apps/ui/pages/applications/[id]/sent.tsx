@@ -3,14 +3,17 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { H1 } from "common";
+import { fontMedium, H1 } from "common";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
 import { applicationsPath } from "@/modules/urls";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { FontMedium } from "@/components/application/styled";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+
+const FontMedium = styled.div`
+  ${fontMedium}
+`;
 
 const Paragraph = styled.p`
   white-space: pre-wrap;

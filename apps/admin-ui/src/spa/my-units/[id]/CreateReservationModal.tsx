@@ -22,7 +22,6 @@ import {
 } from "@/schemas";
 import { breakpoints } from "common/src/common/style";
 import { useCheckCollisions } from "@/hooks";
-import Loader from "@/component/Loader";
 import { dateTime, getNormalizedInterval, parseDateTimeSafe } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
@@ -31,6 +30,7 @@ import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { flattenMetadata } from "@/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { errorToast, successToast } from "common/src/common/toast";
+import { CenterSpinner } from "common/styles/util";
 
 type ReservationUnitType = NonNullable<ReservationUnitQuery["reservationUnit"]>;
 
@@ -395,7 +395,7 @@ export function CreateReservationModal({
   const { reservationUnit } = data ?? {};
 
   if (loading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   return (

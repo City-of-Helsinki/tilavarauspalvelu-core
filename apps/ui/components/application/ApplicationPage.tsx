@@ -20,7 +20,7 @@ const InnerContainer = styled.div<{ $hideStepper: boolean }>`
   grid-template-rows: repeat(3, auto);
 
   grid-template-columns: 1fr;
-  @media (width > ${breakpoints.l}) {
+  @media (min-width: ${breakpoints.l}) {
     grid-template-columns: ${({ $hideStepper }) =>
       $hideStepper ? `1fr;` : `23em 1fr;`};
   }
@@ -31,7 +31,7 @@ const StyledNotesWhenApplying = styled(NotesWhenApplying)`
 `;
 
 const ChildWrapper = styled.div`
-  @media (width > ${breakpoints.l}) {
+  @media (min-width: ${breakpoints.l}) {
     grid-column: 2;
     grid-row: 1 / -1;
   }

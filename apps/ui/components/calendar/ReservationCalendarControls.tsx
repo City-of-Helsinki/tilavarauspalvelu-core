@@ -61,11 +61,6 @@ const TogglerDate = styled.div`
 `;
 
 const Content = styled.div<{ $isAnimated: boolean }>`
-  /* kinda clean solution to the problem, scales effortlessly
-   * causes no pop-out because the content doesn't fit etc.
-   * TODO: fix some positions so for example submit button is always aligned to the bottom right
-   * TODO: there is empty space on the row of the toggle button
-   * */
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
   gap: var(--spacing-xs);
@@ -202,7 +197,7 @@ export function ReservationCalendarControls({
       {/* TODO the submit button part should be refactored so that we hide the other buttons instead of
        * adding a second submit button */}
       {focusSlot.isReservable && !areControlsVisible && (
-        <Flex $align="flex-end">{submitButton}</Flex>
+        <Flex $alignItems="flex-end">{submitButton}</Flex>
       )}
       <Transition
         mountOnEnter
@@ -311,7 +306,11 @@ function ControlledToggler({
   });
 
   return (
-    <Flex $align="flex-start" $justify="space-between" $direction="row">
+    <Flex
+      $alignItems="flex-start"
+      $justifyContent="space-between"
+      $direction="row"
+    >
       <TogglerLabel>
         {focusSlot.isReservable ? (
           <TogglerLabelContent

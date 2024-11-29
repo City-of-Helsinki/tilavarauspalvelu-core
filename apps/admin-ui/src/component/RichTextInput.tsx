@@ -37,21 +37,8 @@ const Asterix = styled.span`
   transform: translateY(var(--spacing-3-xs));
 `;
 
-const ErrorText = styled.div`
+const ErrorText = styled.span`
   color: var(--color-error);
-  display: block;
-  font-size: var(--fontsize-body-m);
-  line-height: var(--lineheight-l);
-  margin-top: var(--spacing-3-xs);
-  padding-left: var(--spacing-2-xs);
-  white-space: pre-line;
-`;
-
-// TODO replace with Flex
-const AlignVertically = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 `;
 
 const StyledReactQuill = styled(ReactQuill)<{
@@ -93,7 +80,7 @@ function RichTextInput({
 }: Props): JSX.Element {
   return (
     <Container {...rest} $disabled={disabled} id={`${id}-container`}>
-      <Flex $justify="space-between" $direction="row">
+      <Flex $justifyContent="space-between" $direction="row">
         <Label htmlFor={id}>
           {label} {required ? <Asterix>*</Asterix> : null}
         </Label>
@@ -108,10 +95,10 @@ function RichTextInput({
         $error={errorText !== undefined}
       />
       {errorText ? (
-        <AlignVertically>
+        <Flex $alignItems="center" $direction="row" $gap="xs">
           <IconAlertCircleFill color="var(--color-error)" />
           <ErrorText className="hds-text-input--invalid">{errorText}</ErrorText>
-        </AlignVertically>
+        </Flex>
       ) : (
         ""
       )}

@@ -12,7 +12,7 @@ export function IconWithText({
   ...rest
 }: IconWithTextProps): JSX.Element {
   return (
-    <Flex $gap="xs" $align="center" $direction="row" {...rest}>
+    <Flex $gap="xs" $alignItems="center" $direction="row" {...rest}>
       {text && (
         <>
           {icon}

@@ -43,7 +43,7 @@ type Props = {
 };
 
 const Actions = styled(ButtonContainer).attrs({
-  $justify: "space-between",
+  $justifyContent: "space-between",
 })`
   grid-column: 1 / -1;
 `;
@@ -57,7 +57,7 @@ const Form = styled.form`
 function ReturnLinkList({ apiBaseUrl }: { apiBaseUrl: string }): JSX.Element {
   const { t } = useTranslation();
   return (
-    <Flex $gap="none" $align="flex-start">
+    <Flex $gap="none" $alignItems="flex-start">
       <IconButton
         href="/reservations"
         label={t("reservations:gotoReservations")}

@@ -79,11 +79,6 @@ const DetailRow = styled.div`
   }
 `;
 
-const Actions = styled(Flex).attrs({
-  $gap: "s",
-  $justify: "space-between",
-})``;
-
 const StyledAccordion = styled(Accordion)`
   --header-font-size: 1rem;
 
@@ -191,7 +186,7 @@ export function AllocatedCard({
           {t("Allocation.errors.allocatedDurationIsIncorrect")}
         </NotificationInline>
       ) : null}
-      <Actions>
+      <Flex $gap="s" $justifyContent="space-between">
         <Button
           size="small"
           variant="secondary"
@@ -205,7 +200,7 @@ export function AllocatedCard({
         <Button size="small" disabled onClick={handleChangeSlot}>
           {t("Allocation.changeSlot")}
         </Button>
-      </Actions>
+      </Flex>
     </Wrapper>
   );
 }
@@ -317,7 +312,7 @@ export function SuitableTimeCard({
           {t("Allocation.errors.requestedDurationIsIncorrect")}
         </NotificationInline>
       ) : null}
-      <Actions>
+      <Flex $gap="s" $justifyContent="space-between">
         <Button
           variant="primary"
           size="small"
@@ -327,7 +322,7 @@ export function SuitableTimeCard({
         >
           {t("Allocation.acceptSlot", { duration: selectionDurationString })}
         </Button>
-      </Actions>
+      </Flex>
     </Wrapper>
   );
 }

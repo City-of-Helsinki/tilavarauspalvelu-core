@@ -8,7 +8,7 @@ export const mainStyles = css`
   width: 100%;
 
   /* don't add gaps for empty elements */
-  & > *:empty {
+  & > :not(img):empty {
     display: none;
   }
 
@@ -17,7 +17,7 @@ export const mainStyles = css`
   flex-grow: 1;
 
   gap: var(--spacing-m);
-  @media (width > ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.m}) {
     gap: var(--spacing-l);
   }
 

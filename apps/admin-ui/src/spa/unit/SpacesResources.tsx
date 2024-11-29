@@ -4,7 +4,6 @@ import { useTranslation } from "next-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useUnitQuery } from "@gql/gql-types";
-import Loader from "@/component/Loader";
 import { ResourcesTable } from "./ResourcesTable";
 import { SpacesTable } from "./SpacesTable";
 import { SubPageHead } from "./SubPageHead";
@@ -15,19 +14,13 @@ import { base64encode } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import Error404 from "@/common/Error404";
 import { fontBold, H2 } from "common";
-import { Flex } from "common/styles/util";
+import { CenterSpinner, Flex } from "common/styles/util";
 import { LinkPrev } from "@/component/LinkPrev";
 
 interface IProps {
   [key: string]: string;
   unitPk: string;
 }
-
-const TableHead = styled(Flex).attrs({
-  $direction: "row",
-  $justify: "space-between",
-  $align: "center",
-})``;
 
 const ActionButton = styled(Button)`
   span {
@@ -71,7 +64,7 @@ function SpacesResources(): JSX.Element {
   } = useModal();
 
   if (isLoading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   const { unit } = data ?? {};
@@ -95,7 +88,11 @@ function SpacesResources(): JSX.Element {
       </Modal>
       <LinkPrev />
       <SubPageHead title={t("Unit.spacesAndResources")} unit={unit} />
-      <TableHead>
+      <Flex
+        $direction="row"
+        $justifyContent="space-between"
+        $alignItems="center"
+      >
         <H2 $noMargin>{t("Unit.spaces")}</H2>
         <ActionButton
           ref={newSpacesButtonRef}
@@ -105,9 +102,13 @@ function SpacesResources(): JSX.Element {
         >
           {t("Unit.addSpace")}
         </ActionButton>
-      </TableHead>
+      </Flex>
       <SpacesTable unit={unit} refetch={refetch} />
-      <TableHead>
+      <Flex
+        $direction="row"
+        $justifyContent="space-between"
+        $alignItems="center"
+      >
         <H2 $noMargin>{t("Unit.resources")}</H2>
         <ActionButton
           disabled={unit.spaces.length === 0}
@@ -126,7 +127,7 @@ function SpacesResources(): JSX.Element {
         >
           {t("Unit.addResource")}
         </ActionButton>
-      </TableHead>
+      </Flex>
       <ResourcesTable unit={unit} refetch={refetch} />
       <Modal
         id="resource-modal"

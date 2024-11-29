@@ -7,7 +7,6 @@ import { Tabs } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import { parseAddress } from "@/common/util";
 import { getRecurringReservationUrl } from "@/common/urls";
-import Loader from "@/component/Loader";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
 import { UnitReservations } from "./UnitReservations";
 import { base64encode, filterNonNullable } from "common/src/helpers";
@@ -16,7 +15,7 @@ import { UserPermissionChoice, useUnitViewQuery } from "@gql/gql-types";
 import { useCheckPermission } from "@/hooks";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { LinkPrev } from "@/component/LinkPrev";
-import { TabWrapper } from "common/styles/util";
+import { CenterSpinner, TabWrapper, TitleSection } from "common/styles/util";
 
 type Params = {
   unitId: string;
@@ -25,7 +24,7 @@ type Params = {
 
 const LocationOnlyOnDesktop = styled.p`
   display: none;
-  @media (width > ${breakpoints.s}) {
+  @media (min-width: ${breakpoints.s}) {
     display: block;
   }
 `;
@@ -66,7 +65,7 @@ export function MyUnitView() {
   };
 
   if (loading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
   if (!unit || !isPkValid) {
     return (
@@ -90,14 +89,14 @@ export function MyUnitView() {
 
   return (
     <>
-      <div>
-        <H1 $marginTop="l">{unit?.nameFi}</H1>
+      <TitleSection>
+        <H1 $noMargin>{unit?.nameFi}</H1>
         {unit.location && (
           <LocationOnlyOnDesktop>
             {parseAddress(unit.location)}
           </LocationOnlyOnDesktop>
         )}
-      </div>
+      </TitleSection>
       <div>
         <ButtonLikeLink
           to={canCreateReservations ? recurringReservationUrl : ""}

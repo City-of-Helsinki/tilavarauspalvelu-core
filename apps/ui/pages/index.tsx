@@ -19,7 +19,6 @@ import { Purposes } from "@/components/index/Purposes";
 import { Units } from "@/components/index/Units";
 import { createApolloClient } from "@/modules/apolloClient";
 import { filterNonNullable } from "common/src/helpers";
-import { Flex } from "common/styles/util";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -27,12 +26,12 @@ function Home({ purposes, units }: Props): JSX.Element {
   const { t } = useTranslation(["home", "common"]);
 
   return (
-    <Flex>
+    <>
       <Head heading={t("head.heading")} text={t("head.text")} />
       <Purposes purposes={purposes} />
       <Units units={units} />
       <SearchGuides />
-    </Flex>
+    </>
   );
 }
 

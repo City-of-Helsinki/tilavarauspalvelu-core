@@ -35,14 +35,17 @@ function Content({
   return (
     // TODO Hydration errors
     <ClientOnly>
-      <Flex data-testid="list-with-pagination__list--container" $align="center">
+      <Flex
+        data-testid="list-with-pagination__list--container"
+        $alignItems="center"
+      >
         {items.map((item) => item)}
         {loadingMore ? (
           <div>
             <CenterSpinner data-testid="loading-spinner__pagination" />
           </div>
         ) : (
-          <Flex $justify="center">
+          <Flex $justifyContent="center">
             <HitCountSummary data-testid="list-with-pagination__pagination--summary">
               {hitCountSummary}
             </HitCountSummary>

@@ -29,7 +29,7 @@ import styled from "styled-components";
 const TabPanel = styled(Tabs.TabPanel)`
   && {
     margin-top: var(--spacing-l);
-    @media (width > ${BREAKPOINT}) {
+    @media (min-width: ${BREAKPOINT}) {
       margin-top: var(--spacing-xl);
     }
   }

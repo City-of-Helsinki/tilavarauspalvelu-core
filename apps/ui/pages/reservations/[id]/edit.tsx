@@ -51,7 +51,7 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 const StepperWrapper = styled.div`
   grid-column: 1 / -1;
   grid-row: 1;
-  @media (width > ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.m}) {
     grid-column: 1 / span 1;
   }
 `;

@@ -28,7 +28,6 @@ import {
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
-import Loader from "@/component/Loader";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
   checkValidDate,
@@ -48,7 +47,7 @@ import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { errorToast, successToast } from "common/src/common/toast";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
-import { Flex, TitleSection } from "common/styles/util";
+import { CenterSpinner, Flex, TitleSection } from "common/styles/util";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
@@ -163,8 +162,8 @@ function BannerNotificationStatusLabel({
 }
 
 const ButtonContainerCommon = styled(Flex).attrs({
-  $justify: "space-between",
-  $align: "center",
+  $justifyContent: "space-between",
+  $alignItems: "center",
   $gap: "l",
   $direction: "row",
 })``;
@@ -724,7 +723,7 @@ function PageWrapped({ pk }: { pk?: number }) {
   return (
     <>
       {isLoading ? (
-        <Loader />
+        <CenterSpinner />
       ) : (
         <LoadedContent isNew={isNew} notification={notification} />
       )}

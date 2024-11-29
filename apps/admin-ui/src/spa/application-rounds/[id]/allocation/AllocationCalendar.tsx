@@ -45,12 +45,12 @@ const Wrapper = styled.div`
   user-select: none;
   margin-top: var(--spacing-l);
   grid-template-columns: 36px repeat(7, 32px);
-  @media (width > ${breakpoints.xl}) {
+  @media (min-width: ${breakpoints.xl}) {
     grid-template-columns: 36px repeat(7, 48px);
   }
 
   /* custom breakpoint since this is the only page that really cares about having 1200px for content (not content + navi) */
-  @media (width > 1400px) {
+  @media (min-width: 1400px) {
     grid-template-columns: 36px repeat(7, 60px);
   }
 `;

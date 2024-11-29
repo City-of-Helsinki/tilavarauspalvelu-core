@@ -7,11 +7,11 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
-import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
 import { useSearchParams } from "react-router-dom";
 import { errorToast } from "common/src/common/toast";
+import { CenterSpinner } from "common/styles/util";
 
 function transformOrderBy(
   orderBy: string,
@@ -146,7 +146,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
   );
 
   if (loading && resUnits.length === 0) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   return (

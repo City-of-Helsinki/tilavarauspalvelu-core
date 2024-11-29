@@ -11,7 +11,7 @@ import { breakpoints } from "../common/style";
 
 const DateNavigationWrapper = styled(Flex).attrs({
   $direction: "row",
-  $align: "center",
+  $alignItems: "center",
 })`
   flex-grow: 1;
   > span {
@@ -119,8 +119,8 @@ export function Toolbar({ onNavigate, onView, view, date }: ToolbarProps) {
     <Flex
       $direction="row"
       $gap="xs"
-      $justify="space-between"
-      $align="center"
+      $justifyContent="space-between"
+      $alignItems="center"
       $wrap="wrap"
       className="rbc-toolbar"
     >

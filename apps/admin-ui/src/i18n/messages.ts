@@ -970,47 +970,6 @@ const translations: ITranslations = {
       level: ["Tyyppi"],
     },
   },
-  StageInfo: {
-    stagesOfHandling: ["Käsittelyn vaiheet"],
-    stage1: {
-      title: ["Odota haun umpeutumista"],
-      body: ["Haku on avoinna {{data}} asti."],
-    },
-    stage2: {
-      title: [
-        "Tarkasta lista ja neuvottele esihenkilösi kanssa mahdollisista hylkäyksistä",
-      ],
-      body: [
-        "Hakemukset tulee esitarkastaa ja poistaa listalta aiheettomat hakemukset (esim. tuplahakemukset tai leikillään jätetyt hakemukset). Sovi esihenkilösi kanssa, saatko hylkäysehdotuksillesi myös esihenkilön hyväksynnän. Tämän jälkeen voit edetä jaon käynnistämiseen.",
-      ],
-    },
-    stage3: {
-      title: ["Käynnistä ehdotusten luominen"],
-      body: [
-        "Käynnistä ehdotusten luominen Jaa-painikkeesta. Kone tuottaa ehdotuksia ennalta määritetyille ryhmille sovitussa tärkeysjärjestyksessä.",
-      ],
-    },
-    stage4: {
-      title: [
-        "Hyväksy tai hylkää ehdotukset ja uudelleenkäynnistä jako, kunnes kaikki ehdotukset on käsitelty",
-      ],
-      body: [
-        "Käsittele jaon tuottamat vuoroehdotukset. Voit käynnistää jaon aina uudelleen niin monta kertaa kuin haluat. Jaon uudelleenkäynnistys on järkevää erityisesti silloin, kun ehdotuksia on hylätty ja tilaa on vapautunut. Voit edetä esihenkilöhyväksynnän valmisteluun, kun kaikki ehdotukset on käsitelty.",
-      ],
-    },
-    stage5: {
-      title: ["Lähetä koko käsittelyn lopputulos esihenkilösi hyväksyttäväksi"],
-      body: [
-        "Varmista esikatselunäkymästä, että päätöskokonaisuus vaikuttaa valmiilta, ja siirrä kokonaisuus esihenkilötarkistukseen. Esihenkilösi päättää, voidaanko päätökset toimittaa asiakkaille vai täytyykö niihin vielä tehdä muutoksia.",
-      ],
-    },
-    stage6: {
-      title: ["Odota esihenkilösi hyväksyntää tai mahdollisia muutospyyntöjä"],
-      body: [
-        "Et pysty siirron jälkeen enää tekemään käsittelyä, joten odota esihenkilöpäätöstä. Asiakkaat saavat päätökset, jos esihenkilö hyväksyy vuoroajan.",
-      ],
-    },
-  },
   Units: {
     description: [
       "Alla näet kaikki toimipisteet, joihin sinulla on käyttöoikeus. Voit luoda ja hallita tiloja, resursseja sekä varausyksiköitä toimipisteen sivulta. Toimipisteen tietoja hallitaan",

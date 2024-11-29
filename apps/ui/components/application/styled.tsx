@@ -6,7 +6,6 @@ import { AccordionWithState } from "@/components/Accordion";
 import { H5 } from "common/src/common/typography";
 import { Flex, FullRow } from "common/styles/util";
 
-// TODO this belongs to application view page
 export const StyledNotification = styled(Notification)`
   line-height: var(--fontsize-heading-m);
   margin-top: var(--spacing-m);
@@ -58,7 +57,7 @@ export const ApplicationInfoContainer = styled.div`
 `;
 
 export const InfoItemContainer = styled(Flex).attrs({
-  align: "flex-end",
+  alignItems: "flex-end",
   gap: "none",
 })<{ $fullWidth?: boolean }>`
   box-sizing: border-box;
@@ -84,7 +83,7 @@ export const InfoItemContainer = styled(Flex).attrs({
 `;
 
 export const InfoItem = styled(Flex).attrs({
-  $align: "stretch",
+  $alignItems: "stretch",
   $marginTop: "m",
   $marginBottom: "m",
 })`
@@ -171,11 +170,6 @@ export const TermsAccordion = styled(AccordionWithState)`
 
 export const CompactTermsBox = styled(TermsBox)`
   margin-bottom: 0;
-`;
-
-// TODO this isn't thought through (naming wise, use cases etc.)
-export const FontMedium = styled.div`
-  ${fontMedium}
 `;
 
 export const SpanTwoColumns = styled(FullRow).attrs({ as: "span" })``;

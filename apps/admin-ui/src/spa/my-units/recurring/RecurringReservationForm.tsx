@@ -387,7 +387,7 @@ function RecurringReservationForm({
 
           <Flex
             $direction="row"
-            $justify="flex-end"
+            $justifyContent="flex-end"
             style={{ gridColumn: "1 / -1" }}
           >
             {/* cancel is disabled while sending because we have no rollback */}

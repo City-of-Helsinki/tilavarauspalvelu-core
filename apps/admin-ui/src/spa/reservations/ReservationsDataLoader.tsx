@@ -9,13 +9,13 @@ import {
 } from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
-import Loader from "@/component/Loader";
 import { ReservationsTable } from "./ReservationsTable";
 import { fromUIDate, toApiDate } from "common/src/common/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import { useSearchParams } from "react-router-dom";
 import { transformReservationTypeSafe } from "common/src/conversion";
 import { errorToast } from "common/src/common/toast";
+import { CenterSpinner } from "common/styles/util";
 
 function transformPaymentStatusSafe(t: string): OrderStatusWithFree | null {
   switch (t) {
@@ -173,7 +173,7 @@ export function ReservationsDataLoader(): JSX.Element {
   const totalCount = currData?.reservations?.totalCount;
 
   if (loading && reservations.length === 0) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   return (

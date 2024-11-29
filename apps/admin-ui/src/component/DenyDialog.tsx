@@ -16,9 +16,8 @@ import {
   type ReservationQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import Loader from "@/component/Loader";
 import { Select } from "@/component/Select";
-import { Flex } from "common/styles/util";
+import { CenterSpinner, Flex } from "common/styles/util";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "@/hooks";
 import { filterNonNullable } from "common/src/helpers";
@@ -233,7 +232,7 @@ const DialogContent = ({
   if (loading || inProgress) {
     return (
       <Dialog.Content>
-        <Loader />
+        <CenterSpinner />
       </Dialog.Content>
     );
   }

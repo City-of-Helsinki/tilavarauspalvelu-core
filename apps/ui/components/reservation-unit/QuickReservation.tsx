@@ -211,7 +211,7 @@ export function QuickReservation({
           }
         />
       </div>
-      <Flex $direction="row" $justify="space-between">
+      <Flex $direction="row" $justifyContent="space-between">
         <Price data-testid="quick-reservation-price">
           {focusSlot?.isReservable && (
             <>

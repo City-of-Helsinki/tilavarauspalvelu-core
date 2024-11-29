@@ -173,7 +173,7 @@ export function ReservationUnitList({
         maxWidth={breakpoints.l}
         fullHeight
         actions={
-          <Flex $align="flex-end">
+          <Flex $alignItems="flex-end">
             <Button onClick={() => setShowModal(false)}>
               {t("reservationUnitModal:returnToApplication")}
             </Button>

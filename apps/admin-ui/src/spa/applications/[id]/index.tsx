@@ -48,7 +48,6 @@ import { WEEKDAYS } from "common/src/const";
 import { formatNumber, formatDate, formatAgeGroups } from "@/common/util";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import { Accordion as AccordionBase } from "@/component/Accordion";
-import Loader from "@/component/Loader";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/component/StickyHeader";
@@ -59,7 +58,7 @@ import { getApplicantName } from "@/helpers";
 import Error404 from "@/common/Error404";
 import { useCheckPermission } from "@/hooks";
 import { errorToast } from "common/src/common/toast";
-import { Flex, TitleSection } from "common/styles/util";
+import { CenterSpinner, Flex, TitleSection } from "common/styles/util";
 import { StatusLabelType } from "common/src/tags";
 import { StatusLabel } from "common/src/components";
 import { ApplicationDatas, Summary } from "@/styles/util";
@@ -637,7 +636,11 @@ function ApplicationSectionDetails({
           />
           <ValueBox label={t("ApplicationEvent.dates")} value={dates} />
         </ApplicationDatas>
-        <Flex $justify="space-between" $direction="row" $align="center">
+        <Flex
+          $justifyContent="space-between"
+          $direction="row"
+          $alignItems="center"
+        >
           <H4 as="h3">{t("ApplicationEvent.requestedReservationUnits")}</H4>
           <RejectAllOptionsButton
             section={section}
@@ -829,7 +832,7 @@ function ApplicationDetails({
   const applicationRound = application?.applicationRound ?? undefined;
 
   if (isLoading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   if (error) {

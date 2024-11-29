@@ -94,7 +94,7 @@ function ReservationUnitImage({
   const { t } = useTranslation();
   return (
     <Flex $gap="s">
-      <Flex $direction="row" $gap="m" $justify="space-between">
+      <Flex $direction="row" $gap="m" $justifyContent="space-between">
         {isMain ? (
           <span>{t("ImageEditor.mainImage")}</span>
         ) : (

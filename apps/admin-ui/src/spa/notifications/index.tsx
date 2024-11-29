@@ -9,7 +9,6 @@ import {
   useBannerNotificationsAdminListQuery,
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
-import Loader from "@/component/Loader";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "@/helpers";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
@@ -26,7 +25,7 @@ import {
   IconQuestionCircleFill,
 } from "hds-react";
 import { getNotificationUrl } from "@/common/urls";
-import { TitleSection } from "common/styles/util";
+import { CenterSpinner, TitleSection } from "common/styles/util";
 
 const getStatusLabelProps = (
   state: BannerNotificationState | null | undefined
@@ -189,7 +188,7 @@ function Page() {
         </ButtonLikeLink>
       </TitleSection>
       {loading && notifications.length === 0 ? (
-        <Loader />
+        <CenterSpinner />
       ) : (
         <>
           <NotificationsTable

@@ -12,7 +12,6 @@ import {
   VALID_ALLOCATION_APPLICATION_STATUSES,
 } from "@/common/const";
 import { errorToast } from "common/src/common/toast";
-import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
 import { ApplicationEventsTable, SORT_KEYS } from "./ApplicationEventsTable";
@@ -20,6 +19,7 @@ import {
   transformApplicantType,
   transformApplicationSectionStatus,
 } from "./utils";
+import { CenterSpinner } from "common/styles/util";
 
 type Props = {
   applicationRoundPk: number;
@@ -63,7 +63,7 @@ export function ApplicationEventDataLoader({
 
   const dataToUse = data ?? previousData;
   if (loading && !dataToUse) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   const applicationSections = filterNonNullable(

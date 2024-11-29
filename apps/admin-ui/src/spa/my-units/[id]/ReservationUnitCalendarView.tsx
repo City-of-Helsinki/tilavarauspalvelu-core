@@ -50,7 +50,7 @@ export function ReservationUnitCalendarView({
           id="reservation-unit"
         />
       </AutoGrid>
-      <Flex $justify="center" $direction="row">
+      <Flex $justifyContent="center" $direction="row">
         <WeekNavigation
           date={begin}
           onPrev={() => {

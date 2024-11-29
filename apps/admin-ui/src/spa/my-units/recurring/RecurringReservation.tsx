@@ -2,10 +2,10 @@ import { H1 } from "common/src/common/typography";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import Loader from "@/component/Loader";
 import { RecurringReservationForm } from "./RecurringReservationForm";
 import { useRecurringReservationsUnits } from "./hooks";
 import { LinkPrev } from "@/component/LinkPrev";
+import { CenterSpinner } from "common/styles/util";
 
 type Params = {
   unitId: string;
@@ -18,7 +18,7 @@ function RecurringReservationInner({ unitId }: { unitId: number }) {
   const { loading, reservationUnits } = useRecurringReservationsUnits(unitId);
 
   if (loading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   return (

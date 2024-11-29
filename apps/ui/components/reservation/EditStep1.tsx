@@ -71,13 +71,13 @@ const Actions = styled.div`
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-row: 2;
-  @media (width > ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.m}) {
     grid-row: 1 / span 2;
   }
 `;
 
 const StyledForm = styled.form`
-  @media (width > ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.m}) {
     grid-row: 2 / -1;
     grid-column: 1 / span 1;
   }

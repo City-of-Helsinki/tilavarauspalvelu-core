@@ -126,8 +126,8 @@ export function UnitReservations(): JSX.Element {
       <Flex
         $gap="none"
         $direction="row"
-        $justify="space-between"
-        $align="center"
+        $justifyContent="space-between"
+        $alignItems="center"
       >
         <Button
           variant="secondary"

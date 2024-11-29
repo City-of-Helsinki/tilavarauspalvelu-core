@@ -5,9 +5,9 @@ import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
 import { More } from "@/component/More";
-import Loader from "@/component/Loader";
 import { UnitsTable } from "./UnitsTable";
 import { useSearchParams } from "react-router-dom";
+import { CenterSpinner } from "common/styles/util";
 
 type Props = {
   isMyUnits?: boolean;
@@ -44,7 +44,7 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
   const unitsArr = filterNonNullable(units?.edges?.map((e) => e?.node));
 
   if (loading && unitsArr.length === 0) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   return (

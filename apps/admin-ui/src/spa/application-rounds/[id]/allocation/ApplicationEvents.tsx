@@ -38,7 +38,7 @@ const Content = styled.div`
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: var(--spacing-s);
-  @media (width > ${breakpoints.l}) {
+  @media (min-width: ${breakpoints.l}) {
     gap: var(--spacing-l);
   }
 `;

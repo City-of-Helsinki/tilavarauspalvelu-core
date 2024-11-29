@@ -39,7 +39,7 @@ const IconListWrapper = styled.div`
   grid-row: subgrid;
   grid-column: 1 / -1;
   grid-template-columns: auto;
-  @media (width > ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.m}) {
     gap: var(--spacing-s);
     grid-template-columns: auto 1fr 2fr;
   }
@@ -52,14 +52,14 @@ const ButtonListWrapper = styled.div`
   align-items: end;
   justify-content: end;
 
-  @media (width > ${breakpoints.s}) {
+  @media (min-width: ${breakpoints.s}) {
     grid-column-start: -1;
     grid-row: 1 / span 2;
   }
   & > button:last-child > span {
     display: none;
   }
-  @media (width > ${breakpoints.s}) {
+  @media (min-width: ${breakpoints.s}) {
     & > button:last-child > span {
       display: inline;
     }
@@ -68,7 +68,7 @@ const ButtonListWrapper = styled.div`
 
 const IconLabel = styled(Flex).attrs({
   $gap: "xs",
-  $align: "center",
+  $alignItems: "center",
   $direction: "row",
 })`
   /* truncate the first child span while not touch the postfix */

@@ -276,7 +276,7 @@ export function Review({
       <TitleSection>
         <div>
           <H1 $noMargin>{applicationRound.nameFi}</H1>
-          <Flex $justify="flex-start" $direction="row" $marginTop="xs">
+          <Flex $justifyContent="flex-start" $direction="row" $marginTop="xs">
             <TimeframeStatus
               applicationPeriodBegin={applicationRound.applicationPeriodBegin}
               applicationPeriodEnd={applicationRound.applicationPeriodEnd}
@@ -289,13 +289,11 @@ export function Review({
       {/* NOTE this check blocks users that don't have permissions to end the allocation
        * so for them it's always showing the allocation tool
        */}
-      <Flex $justify="space-between" $direction="row-reverse" $align="center">
-        {isEndingAllowed || isHandled ? (
-          <EndAllocation
-            applicationRound={applicationRound}
-            refetch={refetch}
-          />
-        ) : null}
+      <Flex
+        $justifyContent="space-between"
+        $direction="row-reverse"
+        $alignItems="center"
+      >
         {!isHandled && (
           <>
             {isAllocationEnabled ? (
@@ -309,6 +307,12 @@ export function Review({
             )}
           </>
         )}
+        {isEndingAllowed || isHandled ? (
+          <EndAllocation
+            applicationRound={applicationRound}
+            refetch={refetch}
+          />
+        ) : null}
       </Flex>
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTabIndex}>

@@ -232,9 +232,14 @@ export function TimeSelector({
           <Day key={`day-${d}`} head={t(`dayLong.${d}`)} cells={cells[d]} />
         ))}
       </CalendarContainer>
-      <Flex $direction="row" $align="center">
+      <Flex $direction="row" $alignItems="center">
         {cellTypes.map((cell) => (
-          <Flex $gap="xs" $align="center" $direction="row" key={cell.label}>
+          <Flex
+            $gap="xs"
+            $alignItems="center"
+            $direction="row"
+            key={cell.label}
+          >
             <LegendBox type={cell.type} />
             <NoWrap>{cell.label}</NoWrap>
           </Flex>

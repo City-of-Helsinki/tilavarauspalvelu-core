@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import type { AppProps } from "next/app";
-// why?
-import "hds-core/lib/base.css";
 import "common/styles/global.scss";
 import "../styles/global.scss";
 import { ApolloProvider } from "@apollo/client";

@@ -8,13 +8,13 @@ import { BannerNotificationsList } from "common/src/components";
 import { BannerNotificationTarget } from "@gql/gql-types";
 import ScrollToTop from "../common/ScrollToTop";
 import Navigation from "./Navigation";
-import Loader from "./Loader";
 import { MainLander } from "./MainLander";
 import { ToastContainer } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks/auth";
 import { hasAnyPermission } from "@/modules/permissionHelper";
 import { mainStyles } from "common/styles/layout";
+import { CenterSpinner } from "common/styles/util";
 
 type Props = {
   apiBaseUrl: string;
@@ -46,7 +46,7 @@ export default function PageWrapper({
     <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e, feedbackUrl)}>
       <ClientOnly>
         <Navigation apiBaseUrl={apiBaseUrl} />
-        <Suspense fallback={<Loader />}>
+        <Suspense fallback={<CenterSpinner />}>
           <Content>
             {hasAccess && (
               <BannerNotificationsList

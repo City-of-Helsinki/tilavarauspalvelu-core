@@ -9,11 +9,11 @@ import {
 import { filterNonNullable } from "common/src/helpers";
 import { LIST_PAGE_SIZE } from "@/common/const";
 import { errorToast } from "common/src/common/toast";
-import Loader from "@/component/Loader";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
 import { ApplicationsTable, SORT_KEYS } from "./ApplicationsTable";
 import { transformApplicantType, transformApplicationStatuses } from "./utils";
+import { CenterSpinner } from "common/styles/util";
 
 type Props = {
   applicationRoundPk: number;
@@ -52,7 +52,7 @@ export function ApplicationDataLoader({
 
   const dataToUse = data ?? previousData;
   if (loading && !dataToUse) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   const applications = filterNonNullable(

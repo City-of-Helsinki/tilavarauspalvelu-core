@@ -20,10 +20,10 @@ type Props = {
 };
 
 const Wrapper = styled(Flex).attrs({
-  $align: "center",
+  $alignItems: "center",
   $direction: "row",
   $gap: "xs",
-  $justify: "flex-end",
+  $justifyContent: "flex-end",
   $wrap: "wrap",
 })`
   flex-grow: 1;

@@ -35,7 +35,7 @@ export function More({
   };
 
   return (
-    <Flex $direction="row" $justify="center">
+    <Flex $direction="row" $justifyContent="center">
       {totalCount > count ? (
         <div style={{ textAlign: "center" }}>
           <Counts>

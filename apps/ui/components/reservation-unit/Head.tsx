@@ -71,7 +71,7 @@ const Wrapper = styled.div`
   display: grid;
   gap: var(--spacing-m);
   grid-template-columns: 1fr;
-  @media (width > ${breakpoints.l}) {
+  @media (min-width: ${breakpoints.l}) {
     grid-template-columns: 1fr 1fr;
   }
 `;

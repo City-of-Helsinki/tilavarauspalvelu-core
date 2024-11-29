@@ -43,8 +43,13 @@ import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { H1, H4, fontBold } from "common/src/common/typography";
 import { breakpoints } from "common";
-import { AutoGrid, FullRow, Flex, TitleSection } from "common/styles/util";
-import Loader from "@/component/Loader";
+import {
+  AutoGrid,
+  FullRow,
+  Flex,
+  TitleSection,
+  CenterSpinner,
+} from "common/styles/util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
 import { parseAddress, getTranslatedError } from "@/common/util";
@@ -96,7 +101,7 @@ const StyledContainerMedium = styled(Flex)`
 
   /* NOTE some magic values so the sticky buttons don't hide the bottom of the page */
   padding-bottom: 16rem;
-  @media (width > ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.m}) {
     padding-bottom: 8rem;
   }
 `;
@@ -181,7 +186,7 @@ const ButtonsStripe = styled.div`
   & > *:nth-child(2) {
     display: none;
   }
-  @media (width > ${breakpoints.s}) {
+  @media (min-width: ${breakpoints.s}) {
     & > *:nth-child(2) {
       display: flex;
     }
@@ -333,7 +338,7 @@ const RadioFieldGroup = styled(FieldGroup)`
     display: grid;
     gap: 1rem;
     align-items: center;
-    @media (width > ${breakpoints.s}) {
+    @media (min-width: ${breakpoints.s}) {
       grid-template-columns: repeat(3, 1fr);
     }
   }
@@ -1133,7 +1138,7 @@ function PricingSection({
             ))}
         {isPaid && (
           // TODO this should be outside the pricing type because it's reservation unit wide
-          <Flex $justify="space-between" $direction="row">
+          <Flex $justifyContent="space-between" $direction="row">
             <Controller
               control={control}
               name="canApplyFreeOfCharge"
@@ -1984,7 +1989,7 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   }, [data, reset]);
 
   if (isLoading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   const unitPk = Number(unitPkString);

@@ -10,7 +10,7 @@ type Props = {
 const Container = styled(Flex).attrs({
   $gap: "xs",
   $direction: "row",
-  $align: "center",
+  $alignItems: "center",
 })`
   max-width: 14em;
   font-size: var(--fontsize-body-s);

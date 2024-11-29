@@ -24,14 +24,19 @@ type Props = {
 };
 
 const Top = styled(Flex).attrs({
-  $justify: "space-between",
+  $justifyContent: "space-between",
   $direction: "row",
   $wrap: "wrap",
 })`
   width: 100%;
 
   & > * {
-    flex-grow: 1;
+    flex-grow: 0;
+  }
+  @media (max-width: ${breakpoints.s}) {
+    & > * {
+      flex-grow: 1;
+    }
   }
 `;
 
@@ -45,7 +50,7 @@ const PurposeContainer = styled(ShowAllContainer)`
 `;
 
 const PurposeItem = styled(Flex).attrs({
-  gap: "xs",
+  $gap: "xs",
 })`
   &:hover {
     text-decoration: underline;
@@ -65,12 +70,6 @@ const Image = styled.img`
     height: 180px;
   }
 `;
-
-const Title = styled(Flex).attrs({
-  $direction: "row",
-  $align: "center",
-  $gap: "xs",
-})``;
 
 export function Purposes({ purposes }: Props): JSX.Element {
   const { t, i18n } = useTranslation(["home", "common"]);
@@ -110,10 +109,10 @@ export function Purposes({ purposes }: Props): JSX.Element {
           >
             <PurposeItem data-testid="front-page__purposes--purpose">
               <Image src={getImg(item)} alt="" aria-hidden="true" />
-              <Title>
+              <Flex $direction="row" $gap="xs" $alignItems="center">
                 <span>{getName(item)} </span>
                 <IconArrowRight size="s" aria-hidden="true" />
-              </Title>
+              </Flex>
             </PurposeItem>
           </PurposeLink>
         ))}

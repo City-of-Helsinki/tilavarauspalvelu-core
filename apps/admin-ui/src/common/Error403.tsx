@@ -11,7 +11,6 @@ import { env } from "@/env.mjs";
 import { ButtonContainer, Flex } from "common/styles/util";
 
 const Wrapper = styled.div`
-  padding: var(--spacing-layout-s);
   word-break: break-word;
   gap: var(--spacing-layout-m);
   h1 {
@@ -27,7 +26,6 @@ const Wrapper = styled.div`
 
   @media (min-width: ${breakpoints.l}) {
     grid-template-columns: minmax(400px, 600px) 400px;
-    margin: 0 auto;
     h1 {
       font-size: 4em;
     }

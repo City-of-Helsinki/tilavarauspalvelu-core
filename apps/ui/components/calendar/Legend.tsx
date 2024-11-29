@@ -17,7 +17,7 @@ type Props = {
 
 const Wrapper = styled(Flex).attrs({
   $wrap: "wrap",
-  $justify: "space-between",
+  $justifyContent: "space-between",
   $direction: "row",
 })`
   margin-top: var(--spacing-m);

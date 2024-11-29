@@ -35,8 +35,8 @@ export const Heading = styled(H1)`
 `;
 
 const Content = styled(Flex).attrs({
-  $align: "center",
-  $justify: "center",
+  $alignItems: "center",
+  $justifyContent: "center",
 })`
   color: var(--color-white);
   width: 100%;

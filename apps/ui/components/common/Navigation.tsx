@@ -207,7 +207,7 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: HeaderProps) {
         <Header.ActionBarItem
           fixedRightPosition
           id="user-menu"
-          label={userName ?? ""}
+          label={userName}
           icon={<IconUser />}
         >
           <a href={profileLink} target="_blank" rel="noopener norreferrer">

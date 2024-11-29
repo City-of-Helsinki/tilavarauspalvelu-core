@@ -34,7 +34,7 @@ export const AutoGrid = styled.div<{
       $largeGap ? " var(--spacing-xl)" : "var(--spacing-m)"}
     var(--spacing-m);
 
-  & > :empty {
+  & > :not(img):empty {
     display: none;
   }
 `;
@@ -59,14 +59,14 @@ export const Flex = styled.div<{
   $gap?: SpacingSize;
   $marginTop?: SpacingSize;
   $marginBottom?: SpacingSize;
-  $justify?:
+  $justifyContent?:
     | "center"
     | "flex-start"
     | "flex-end"
     | "space-between"
     | "space-around"
     | "space-evenly";
-  $align?: "center" | "flex-start" | "flex-end" | "baseline" | "stretch";
+  $alignItems?: "center" | "flex-start" | "flex-end" | "baseline" | "stretch";
   $wrap?: "wrap" | "nowrap";
   $width?: "full" | "auto";
 }>`
@@ -75,8 +75,8 @@ export const Flex = styled.div<{
   gap: ${({ $gap }) =>
     $gap != null ? `var(--spacing-${$gap})` : "var(--spacing-m)"};
   flex-direction: ${({ $direction }) => $direction ?? "column"};
-  justify-content: ${({ $justify }) => $justify ?? "initial"};
-  align-items: ${({ $align }) => $align ?? "initial"};
+  justify-content: ${({ $justifyContent }) => $justifyContent ?? "initial"};
+  align-items: ${({ $alignItems }) => $alignItems ?? "initial"};
   margin-top: ${({ $marginTop }) =>
     $marginTop ? `var(--spacing-${$marginTop})` : "0"};
   margin-bottom: ${({ $marginBottom }) =>
@@ -89,7 +89,7 @@ export const Flex = styled.div<{
 // three buttons need a 1, 1/2, 1/2 layout on mobile (100% width total, two rows)
 // four buttons need 1/2, 1/2, 1/2, 1/2 layout on mobile (100% width total, two rows)
 export const ButtonContainer = styled.div<{
-  $justify?:
+  $justifyContent?:
     | "center"
     | "flex-start"
     | "flex-end"
@@ -106,7 +106,7 @@ export const ButtonContainer = styled.div<{
   margin-bottom: ${({ $marginBottom }) =>
     `var(--spacing-${$marginBottom ?? "none"})`};
   margin-top: ${({ $marginTop }) => `var(--spacing-${$marginTop ?? "none"})`};
-  justify-content: ${({ $justify }) => $justify ?? "flex-end"};
+  justify-content: ${({ $justifyContent }) => $justifyContent ?? "flex-end"};
 
   @media (max-width: ${breakpoints.s}) {
     flex-direction: column;
@@ -135,9 +135,9 @@ export const TabWrapper = styled.div`
 /// With breadcrumbs, use $noMargin.
 export const TitleSection = styled(Flex).attrs({
   $direction: "row",
-  $justify: "space-between",
+  $justifyContent: "space-between",
   $wrap: "wrap",
-  $align: "center",
+  $alignItems: "center",
   $gap: "xs",
 })<{ $noMargin?: boolean }>`
   margin-top: ${({ $noMargin }) => ($noMargin ? "0" : "var(--spacing-l)")};

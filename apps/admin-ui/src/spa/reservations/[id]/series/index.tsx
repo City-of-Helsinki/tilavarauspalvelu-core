@@ -20,7 +20,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { format, isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
 import { Label } from "@/styles/layout";
-import { AutoGrid, ButtonContainer } from "common/styles/util";
+import { AutoGrid, ButtonContainer, CenterSpinner } from "common/styles/util";
 import { H1 } from "common";
 import { LinkPrev } from "@/component/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -57,7 +57,6 @@ import {
 } from "common/src/apolloUtils";
 import { generateReservations } from "@/spa/my-units/recurring/generateReservations";
 import Error404 from "@/common/Error404";
-import Loader from "@/component/Loader";
 
 type NodeT = NonNullable<
   SeriesPageQuery["reservation"]
@@ -299,7 +298,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     removedReservations.length;
 
   if (loading && !recurringReservation) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
   if (error || !recurringReservation) {
     return <Error404 />;

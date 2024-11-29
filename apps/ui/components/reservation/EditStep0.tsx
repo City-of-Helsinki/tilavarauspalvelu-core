@@ -221,7 +221,9 @@ export function EditStep0({
       {/* TODO on mobile in the design this is after the calendar but before action buttons */}
       {termsOfUse !== "" && (
         <PinkBox>
-          <H4 as="h2">{t("reservations:reservationInfoBoxHeading")}</H4>
+          <H4 as="h2" $marginTop="none">
+            {t("reservations:reservationInfoBoxHeading")}
+          </H4>
           <Sanitize html={termsOfUse} />
         </PinkBox>
       )}

@@ -13,9 +13,8 @@ import {
   useReservationQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import Loader from "@/component/Loader";
 import { useModal } from "@/context/ModalContext";
-import { ButtonContainer } from "common/styles/util";
+import { ButtonContainer, CenterSpinner } from "common/styles/util";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/component/StickyHeader";
 import { ReservationWorkingMemo } from "@/component/WorkingMemo";
@@ -396,7 +395,7 @@ function RequestedReservation({
         reservation={reservation}
         tagline={reservationTagline}
       />
-      <ButtonContainer $justify="flex-start">
+      <ButtonContainer $justifyContent="flex-start">
         <ButtonsWithPermChecks
           reservation={reservation}
           onReservationUpdated={refetch}
@@ -557,7 +556,7 @@ export function ReservationPage() {
 
   // Loader check first
   if (loading && reservation == null) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   // NOTE incorrect ids don't return an error (they return a null)

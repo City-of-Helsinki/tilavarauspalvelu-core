@@ -36,7 +36,7 @@ const BackgroundContainer = styled.div`
 
 const InnerContainer = styled(Flex).attrs({
   $direction: "row",
-  $align: "center",
+  $alignItems: "center",
   $wrap: "wrap",
 })`
   max-width: var(--tilavaraus-page-max-width);

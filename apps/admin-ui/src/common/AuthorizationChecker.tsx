@@ -1,13 +1,13 @@
 import React, { Suspense } from "react";
 import { useSessionSuspense } from "@/hooks/auth";
 import { MainLander } from "@/component/MainLander";
-import Loader from "@/component/Loader";
 import Error403 from "./Error403";
 import { UserPermissionChoice } from "@gql/gql-types";
 import {
   hasAnyPermission,
   hasSomePermission,
 } from "@/modules/permissionHelper";
+import { CenterSpinner } from "common/styles/util";
 
 export function AuthorizationChecker({
   apiUrl,
@@ -31,7 +31,7 @@ export function AuthorizationChecker({
 
   // Use suspense to avoid flash of unauthorised content
   return (
-    <Suspense fallback={<Loader />}>
+    <Suspense fallback={<CenterSpinner />}>
       {hasAccess ? (
         children
       ) : (

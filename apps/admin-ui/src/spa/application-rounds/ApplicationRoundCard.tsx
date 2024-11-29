@@ -27,7 +27,7 @@ const Times = styled(Flex).attrs({
   $gap: "m",
   $direction: "row",
   $wrap: "wrap",
-  $justify: "space-between",
+  $justifyContent: "space-between",
 })`
   padding-bottom: var(--spacing-s);
 `;
@@ -49,7 +49,7 @@ function ReservationPeriod({
   reservationPeriodEnd: string;
 }): JSX.Element {
   return (
-    <Flex $gap="xs" $direction="row" $align="center">
+    <Flex $gap="xs" $direction="row" $alignItems="center">
       <IconCalendar size="xs" />
       {formatDate(reservationPeriodBegin)}-{formatDate(reservationPeriodEnd)}
     </Flex>
@@ -102,7 +102,7 @@ export function ApplicationRoundCard({
           reservationPeriodEnd={applicationRound.reservationPeriodEnd}
         />
       </Times>
-      <Flex $gap="m" $direction="row" $justify="space-between">
+      <Flex $gap="m" $direction="row" $justifyContent="space-between">
         <Stat
           value={applicationRound.reservationUnitCount ?? 0}
           label={t("ApplicationRound.reservationUnitCount", {

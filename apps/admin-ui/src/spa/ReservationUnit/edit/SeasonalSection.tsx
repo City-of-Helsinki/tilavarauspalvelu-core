@@ -41,7 +41,7 @@ const SeasonRowWrapper = styled.div`
 
   /* difference between xl and l is huge, but l is not enough here
    * container query or responsive grid would fix the responsiveness */
-  @media (width > ${breakpoints.xl}) {
+  @media (min-width: ${breakpoints.xl}) {
     grid-template-areas:
       ".   a0 a0 . a1 a1 . ."
       "day a0 a0 b a1 a1 controls controls"
@@ -73,7 +73,7 @@ const SeasonalTimeWrapper = styled.div`
   margin-bottom: var(--spacing-xs);
   gap: var(--spacing-2-xs);
 
-  @media (width > ${breakpoints.xl}) {
+  @media (min-width: ${breakpoints.xl}) {
     grid-column-end: unset;
     grid-row: 1 / -1;
     margin: 0 var(--spacing-l);
@@ -101,7 +101,7 @@ const alignToInput = css`
 const AndSpan = styled.span`
   ${alignToInput}
   display: none;
-  @media (width > ${breakpoints.xl}) {
+  @media (min-width: ${breakpoints.xl}) {
     display: inline-block;
   }
 `;
@@ -112,7 +112,7 @@ const DayLabel = styled.span`
   font-size: var(--fontsize-body-xl);
   grid-area: day;
   margin-bottom: var(--spacing-xs);
-  @media (width > ${breakpoints.xl}) {
+  @media (min-width: ${breakpoints.xl}) {
     margin-bottom: 0;
   }
 `;
@@ -285,7 +285,7 @@ const SeasonalInnerWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: var(--spacing-m);
-  @media (width > ${breakpoints.xl}) {
+  @media (min-width: ${breakpoints.xl}) {
     gap: var(--spacing-2-xl);
   }
 `;

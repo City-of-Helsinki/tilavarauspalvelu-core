@@ -7,7 +7,7 @@ export const FilterTags = styled(Flex).attrs({
   $gap: "s",
   $direction: "row",
   $wrap: "wrap",
-  $align: "center",
+  $alignItems: "center",
 })`
   flex-grow: 1;
 `;

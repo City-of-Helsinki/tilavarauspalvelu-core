@@ -403,8 +403,8 @@ function Reservation({
         <Flex style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
           <Flex
             $direction="row"
-            $align="center"
-            $justify="space-between"
+            $alignItems="center"
+            $justifyContent="space-between"
             $wrap="wrap"
           >
             <H1 $noMargin data-testid="reservation__name">

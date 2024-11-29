@@ -10,8 +10,7 @@ import {
   useSpaceQuery,
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
-import Loader from "@/component/Loader";
-import { ButtonContainer } from "common/styles/util";
+import { ButtonContainer, CenterSpinner } from "common/styles/util";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { Head } from "./Head";
 import { SpaceHierarchy } from "./SpaceHierarchy";
@@ -32,7 +31,6 @@ const Form = styled.form`
   flex-direction: column;
   max-width: var(--prose-width);
 `;
-const Section = styled.section``;
 
 const SubHeading = styled.div`
   font-family: var(--tilavaraus-admin-font-bold);
@@ -95,7 +93,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
   const isLoading = isQueryLoading;
 
   if (isLoading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   if (error != null) {
@@ -150,7 +148,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
       <H2 $noMargin>{t("SpaceEditor.details")}</H2>
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
         <FormErrorSummary errors={errors} />
-        <Section>
+        <section>
           <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
           <SpaceHierarchy space={data?.space} />
           <Controller
@@ -168,11 +166,11 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
               />
             )}
           />
-        </Section>
-        <Section>
+        </section>
+        <section>
           <SubHeading>{t("SpaceEditor.other")}</SubHeading>
           <SpaceForm form={form} />
-        </Section>
+        </section>
         <ButtonContainer>
           <Button
             variant="secondary"

@@ -5,6 +5,7 @@ module.exports ={
     "hooks",
   ],
   rules: {
+    "media-feature-range-notation": "prefix",
     // temp rules after upgrade
     "no-empty-source": null,
     "media-query-no-invalid": null,

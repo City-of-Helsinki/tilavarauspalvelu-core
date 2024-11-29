@@ -57,7 +57,7 @@ import { ReservationPageWrapper } from "@/components/reservations/styles";
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
   grid-row: 2;
-  @media (width > ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.m}) {
     grid-column: span 1 / -1;
     grid-row: 1 / span 2;
   }
@@ -75,7 +75,7 @@ const PinkBox = styled(PinkBoxBase)`
 const StyledForm = styled.form`
   grid-column: 1 / -1;
   grid-row: 3;
-  @media (width > ${breakpoints.m}) {
+  @media (min-width: ${breakpoints.m}) {
     grid-column: span 1;
     grid-row: 2 / -1;
   }
@@ -381,7 +381,9 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         />
         {termsOfUse && (
           <PinkBox>
-            <H4 as="h2">{t("reservations:reservationInfoBoxHeading")}</H4>
+            <H4 as="h2" $marginTop="none">
+              {t("reservations:reservationInfoBoxHeading")}
+            </H4>
             <Sanitize html={termsOfUse} />
           </PinkBox>
         )}

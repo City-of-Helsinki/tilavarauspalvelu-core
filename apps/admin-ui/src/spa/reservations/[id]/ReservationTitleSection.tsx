@@ -124,7 +124,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
       <div>
         <TitleSection $noMargin={noMargin} ref={ref}>
           <H1 $noMargin>{overrideTitle ?? getName(reservation, t)}</H1>
-          <Flex $direction="row" $align="center">
+          <Flex $direction="row" $alignItems="center">
             {order?.status != null && (
               <StatusLabel
                 type={paymentStatusLabelType}

@@ -25,7 +25,7 @@ export function SubPageHead({ title, unit }: IProps): JSX.Element {
   return (
     <>
       <H1 $noMargin>{title}</H1>
-      <Flex $gap="xs" $align="center" $direction="row">
+      <Flex $gap="xs" $alignItems="center" $direction="row">
         <IconLocation aria-hidden="true" />
         <div>
           <Name>{unit?.nameFi}</Name>

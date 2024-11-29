@@ -12,11 +12,11 @@ import {
 } from "@gql/gql-types";
 import { More } from "@/component/More";
 import React from "react";
-import Loader from "@/component/Loader";
 import { filterNonNullable } from "common/src/helpers";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { useTranslation } from "next-i18next";
 import { getFilteredUnits } from "./utils";
+import { CenterSpinner } from "common/styles/util";
 
 type Props = {
   applicationRoundPk: number;
@@ -61,7 +61,7 @@ function RejectedOccurrencesDataLoader({
   const dataToUse = data ?? previousData;
 
   if (loading && !dataToUse) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   const totalCount = dataToUse?.rejectedOccurrences?.edges.length ?? 0;

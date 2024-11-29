@@ -75,7 +75,7 @@ export const BREAKPOINT = breakpoints.m;
 const TableWrapper = styled.div`
   /* TODO move this to a more general TableWrapper shared with admin-ui */
   /* Mobile uses cards, so no horizontal scroll */
-  @media (width > ${BREAKPOINT}) {
+  @media (min-width: ${BREAKPOINT}) {
     /* NOTE this requires using buttons (or other elements with padding) on every row */
     & tbody > tr > td {
       padding-top: 0;
@@ -90,7 +90,7 @@ const TableWrapper = styled.div`
     }
   }
 
-  @media (width <= ${BREAKPOINT}) {
+  @media (max-width: ${BREAKPOINT}) {
     && table {
       /* border can't be in tr because it can't be styled */
       --border-width: 1px;
@@ -287,7 +287,7 @@ type ApplicationSectionT = NonNullable<QueryT["applicationSections"]>[0];
 
 const OnlyForMobile = styled.span`
   display: inline;
-  @media (width > ${BREAKPOINT}) {
+  @media (min-width: ${BREAKPOINT}) {
     display: none;
   }
 `;
@@ -301,7 +301,7 @@ const IconTextWrapper = styled.span`
   > svg {
     display: inline;
   }
-  @media (width > ${BREAKPOINT}) {
+  @media (min-width: ${BREAKPOINT}) {
     > svg {
       display: none;
     }
@@ -501,7 +501,7 @@ const CancelButton = styled(Button).attrs({
 `;
 
 const StyledStatusLabel = styled(StatusLabel)`
-  @media (width <= ${BREAKPOINT}) {
+  @media (max-width: ${BREAKPOINT}) {
     position: absolute;
     right: var(--spacing-s);
     top: var(--spacing-s);
@@ -805,7 +805,7 @@ export function ApplicationSection({
       <ReservationUnitTable reservationUnits={reservationUnits} />
       <H3>{t("application:view.reservationsTab.reservationsTitle")}</H3>
       <ReservationsTable reservations={reservations} />
-      <ButtonContainer $justify="center">
+      <ButtonContainer $justifyContent="center">
         <ButtonLikeLink
           href={getApplicationSectionPath(
             applicationSection.pk,

@@ -22,8 +22,8 @@ const ToggleButton = styled.button`
 `;
 
 const Heading = styled(Flex).attrs({
-  $align: "center",
-  $justify: "space-between",
+  $alignItems: "center",
+  $justifyContent: "space-between",
   $direction: "row",
 })<{ $disabled: boolean }>`
   cursor: pointer;

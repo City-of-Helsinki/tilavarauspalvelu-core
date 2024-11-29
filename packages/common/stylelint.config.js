@@ -2,6 +2,7 @@ module.exports = {
   extends: ["stylelint-config-standard"],
   customSyntax: "postcss-styled-syntax",
   rules: {
+    "media-feature-range-notation": "prefix",
     // temp rules after upgrade
     "no-empty-source": null,
     "media-query-no-invalid": null,

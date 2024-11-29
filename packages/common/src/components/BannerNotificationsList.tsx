@@ -54,7 +54,7 @@ const BannerNotificationText = styled.div`
   a {
     text-decoration: underline;
   }
-  @media (width < ${breakpoints.xl}) {
+  @media (max-width: ${breakpoints.xl}) {
     padding-right: var(--spacing-l);
   }
 `;

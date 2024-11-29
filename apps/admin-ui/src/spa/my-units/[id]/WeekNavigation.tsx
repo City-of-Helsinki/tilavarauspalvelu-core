@@ -18,7 +18,7 @@ function WeekNavigation({ date, onNext, onPrev }: Props): JSX.Element {
   const week = getISOWeek(d);
 
   return (
-    <Flex $align="center" $direction="row">
+    <Flex $alignItems="center" $direction="row">
       <Button
         aria-label={t("common.prev")}
         size="small"

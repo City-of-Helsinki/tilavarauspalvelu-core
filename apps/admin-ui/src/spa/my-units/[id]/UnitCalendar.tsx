@@ -31,7 +31,7 @@ import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
 import { CreateReservationModal } from "./CreateReservationModal";
 import { useCheckPermission } from "@/hooks";
-import Loader from "@/component/Loader";
+import { CenterSpinner } from "common/styles/util";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {
@@ -528,7 +528,7 @@ export function UnitCalendar({
   const containerHeight = windowHeight - margins;
 
   if (isLoading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   return (

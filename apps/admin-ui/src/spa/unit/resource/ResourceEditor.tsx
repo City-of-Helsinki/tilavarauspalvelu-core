@@ -12,8 +12,7 @@ import {
   useUnitWithSpacesAndResourcesQuery,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import Loader from "@/component/Loader";
-import { ButtonContainer } from "common/styles/util";
+import { ButtonContainer, CenterSpinner } from "common/styles/util";
 import { SubPageHead } from "../SubPageHead";
 import { errorToast, successToast } from "common/src/common/toast";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
@@ -86,7 +85,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   }, [data, reset]);
 
   if (isLoading) {
-    return <Loader />;
+    return <CenterSpinner />;
   }
 
   // TODO errors (pk error, query error etc.)

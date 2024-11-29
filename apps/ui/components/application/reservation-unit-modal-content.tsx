@@ -123,7 +123,7 @@ function ReservationUnitCard({
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Flex $direction="row" $gap="2-xs" $align="center">
+          <Flex $direction="row" $gap="2-xs" $alignItems="center">
             <span>{t("reservationUnitModal:openLinkToNewTab")}</span>
             <IconLinkExternal />
           </Flex>
@@ -275,7 +275,7 @@ export function ReservationUnitModalContent({
           defaultValue={emptyOption}
         />
       </AutoGrid>
-      <Flex $align="flex-end">
+      <Flex $alignItems="flex-end">
         <Button isLoading={loading} onClick={(_) => refetch()}>
           {t("common:search")}
         </Button>

@@ -8,8 +8,8 @@ import { Flex } from "common/styles/util";
 import { breakpoints } from "common";
 
 const Overlay = styled(Flex).attrs({
-  $justify: "center",
-  $align: "center",
+  $justifyContent: "center",
+  $alignItems: "center",
 })`
   position: fixed;
   inset: 0;
