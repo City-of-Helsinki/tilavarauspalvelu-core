@@ -3,6 +3,7 @@
 import {
   type LocalizationLanguages,
   getLocalizationLang,
+  toNumber,
 } from "common/src/helpers";
 import {
   type QueryReservationUnitsArgs,
@@ -20,11 +21,11 @@ import {
   getTranslationSafe,
   toApiDate,
 } from "common/src/common/util";
-import { type ParsedUrlQuery } from "node:querystring";
 import { fromUIDate } from "./util";
 import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
 import { type ApolloClient } from "@apollo/client";
+import { type ReadonlyURLSearchParams } from "next/navigation";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
@@ -71,7 +72,7 @@ function transformOrderByTypeRank(
 }
 
 function transformOrderBy(
-  orderBy: string,
+  orderBy: string | null,
   desc: boolean,
   language: LocalizationLanguages
 ): ReservationUnitOrderingChoices | null {
@@ -125,80 +126,96 @@ function ignoreMaybeArray<T>(value: T | T[]): T {
   return Array.isArray(value) ? value[0] : value;
 }
 
-export function processVariables(
-  values: ParsedUrlQuery,
-  language: string,
-  reservationKind: ReservationKind
-): QueryReservationUnitsArgs {
-  const sortCriteria = values.sort;
-  const desc = values.order === "desc";
-  const orderBy = sortCriteria
-    ? transformSortString(ignoreMaybeArray(sortCriteria), language, desc)
-    : null;
-  const startDate = fromUIDate(ignoreMaybeArray(values.startDate ?? ""));
-  const endDate = fromUIDate(ignoreMaybeArray(values.endDate ?? ""));
-  const today = startOfDay(new Date());
+type ProcessVariablesParams =
+  | {
+      values: ReadonlyURLSearchParams;
+      language: string;
+      kind: ReservationKind.Direct;
+    }
+  | {
+      values: ReadonlyURLSearchParams;
+      language: string;
+      kind: ReservationKind.Season;
+      applicationRound: number;
+    };
+export function processVariables({
+  values,
+  language,
+  kind,
+  ...rest
+}: ProcessVariablesParams): QueryReservationUnitsArgs {
+  const sortCriteria = values.getAll("sort");
+  const desc = values.getAll("order").includes("desc");
+  const orderBy = transformSortString(
+    ignoreMaybeArray(sortCriteria),
+    language,
+    desc
+  );
 
-  const dur =
-    values.duration != null ? Number(ignoreMaybeArray(values.duration)) : null;
+  const today = startOfDay(new Date());
+  const startDate = fromUIDate(ignoreMaybeArray(values.getAll("startDate")));
+  const reservableDateStart =
+    startDate && startDate >= today ? toApiDate(startDate) : null;
+  const endDate = fromUIDate(ignoreMaybeArray(values.getAll("endDate")));
+  const reservableDateEnd =
+    endDate && endDate >= today ? toApiDate(endDate) : null;
+
+  const dur = Number(ignoreMaybeArray(values.getAll("duration")));
   const duration = dur != null && dur > 0 ? dur : null;
-  const isSeasonal = reservationKind === ReservationKind.Season;
+  const isSeasonal = kind === ReservationKind.Season;
+  const textSearch = ignoreMaybeArray(values.getAll("textSearch"));
+  const minPersons = toNumber(ignoreMaybeArray(values.getAll("minPersons")));
+  const maxPersons = toNumber(ignoreMaybeArray(values.getAll("maxPersons")));
+  const purposes = paramToIntegers(values.getAll("purposes"));
+  const unit = paramToIntegers(values.getAll("unit"));
+  const reservationUnitTypes = paramToIntegers(
+    values.getAll("reservationUnitTypes")
+  );
+  const equipments = paramToIntegers(values.getAll("equipments"));
+  const showOnlyReservable =
+    ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
+  const applicationRound =
+    "applicationRound" in rest && isSeasonal ? rest.applicationRound : null;
+  const timeEnd = ignoreMaybeArray(values.getAll("timeEnd"));
+  const timeBegin = ignoreMaybeArray(values.getAll("timeBegin"));
   return {
-    ...(values.textSearch != null
+    ...(textSearch !== ""
       ? {
-          textSearch: ignoreMaybeArray(values.textSearch),
+          textSearch,
         }
       : {}),
-    ...(values.minPersons != null
+    ...(minPersons != null && minPersons >= 0
       ? {
-          minPersons: parseInt(ignoreMaybeArray(values.minPersons), 10),
+          minPersons,
         }
       : {}),
-    ...(values.maxPersons != null
+    ...(maxPersons != null && maxPersons >= 0
       ? {
-          maxPersons: parseInt(ignoreMaybeArray(values.maxPersons), 10),
+          maxPersons,
         }
       : {}),
-    ...(values.purposes != null
+    purposes,
+    unit,
+    reservationUnitType: reservationUnitTypes,
+    equipments,
+    ...(startDate != null
       ? {
-          purposes: paramToIntegers(values.purposes),
+          reservableDateStart,
         }
       : {}),
-    ...(values.unit != null
+    ...(endDate != null
       ? {
-          unit: paramToIntegers(values.unit),
+          reservableDateEnd,
         }
       : {}),
-    ...(values.reservationUnitTypes != null
+    ...(timeBegin != null && timeBegin !== ""
       ? {
-          reservationUnitType: paramToIntegers(values.reservationUnitTypes),
+          reservableTimeStart: timeBegin,
         }
       : {}),
-    ...(values.equipments != null
+    ...(timeEnd != null && timeEnd !== ""
       ? {
-          equipments: paramToIntegers(values.equipments),
-        }
-      : {}),
-    ...(values.startDate != null
-      ? {
-          reservableDateStart:
-            startDate && startDate >= today ? toApiDate(startDate) : null,
-        }
-      : {}),
-    ...(values.endDate != null
-      ? {
-          reservableDateEnd:
-            endDate && endDate >= today ? toApiDate(endDate) : null,
-        }
-      : {}),
-    ...(values.timeBegin != null && values.timeBegin !== ""
-      ? {
-          reservableTimeStart: ignoreMaybeArray(values.timeBegin),
-        }
-      : {}),
-    ...(values.timeEnd != null && values.timeEnd !== ""
-      ? {
-          reservableTimeEnd: ignoreMaybeArray(values.timeEnd),
+          reservableTimeEnd: timeEnd,
         }
       : {}),
     ...(duration != null
@@ -206,19 +223,19 @@ export function processVariables(
           reservableMinimumDurationMinutes: duration.toString(),
         }
       : {}),
-    ...(!isSeasonal && ignoreMaybeArray(values.showOnlyReservable) !== "false"
+    ...(!isSeasonal && showOnlyReservable
       ? {
           showOnlyReservable: true,
         }
       : {}),
-    ...(values.id != null && isSeasonal
-      ? { applicationRound: paramToIntegers(values.id) }
+    ...(isSeasonal && applicationRound != null && applicationRound > 0
+      ? { applicationRound: [applicationRound] }
       : {}),
     first: SEARCH_PAGING_LIMIT,
     orderBy,
     isDraft: false,
     isVisible: true,
-    reservationKind,
+    reservationKind: kind,
   };
 }
 
@@ -252,16 +269,9 @@ export function mapQueryParamToNumber(
   if (param == null) return null;
   if (param === "") return null;
   if (Array.isArray(param)) {
-    const v = Number(param[0]);
-    if (Number.isNaN(v)) {
-      return null;
-    }
-    return v;
+    return toNumber(param[0]);
   }
-  if (Number.isNaN(Number(param))) {
-    return null;
-  }
-  return Number(param);
+  return toNumber(param);
 }
 
 export function mapQueryParamToNumberArray(

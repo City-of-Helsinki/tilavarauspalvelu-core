@@ -1,8 +1,9 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { FilterTags, StyledTag, ResetButton } from "common/src/tags";
-import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
+import { useSearchModify } from "@/hooks/useSearchValues";
 import { type TFunction } from "i18next";
+import { useSearchParams } from "next/navigation";
 
 type FilterTagProps = {
   filters: readonly string[];
@@ -48,18 +49,25 @@ export function FilterTagList({
   const { t } = useTranslation();
 
   const { handleRemoveTag, handleResetTags } = useSearchModify();
-  const formValues = useSearchValues();
+  const searchValues = useSearchParams();
 
-  const formValueKeys = Object.keys(formValues);
-  const filterOrder = filters;
-  const sortedValues = [...formValueKeys].sort(
-    (a, b) => filterOrder.indexOf(a) - filterOrder.indexOf(b)
+  const possibleKeys = searchValues.keys() ?? ([] as const);
+
+  const formValueKeys: string[] = [];
+  for (const key of possibleKeys) {
+    if (!formValueKeys.includes(key)) {
+      formValueKeys.push(key);
+    }
+  }
+
+  const keys = [...formValueKeys].sort(
+    (a, b) => filters.indexOf(a) - filters.indexOf(b)
   );
 
-  const filteredTags = sortedValues
+  const filteredTags = keys
     .filter((key) => !hideList.includes(key))
     .filter((key) => {
-      const value = formValues[key];
+      const value = searchValues.get(key);
       if (value == null || value === "") {
         return false;
       }
@@ -74,32 +82,29 @@ export function FilterTagList({
   return (
     <FilterTags data-testid="search-form__filter--tags">
       {filteredTags.map((key) => {
+        const value = searchValues.getAll(key);
         const label = t(`searchForm:filters.${key}`, {
           label: key,
-          value: formValues[key],
-          count: Number(formValues[key]),
+          value,
+          count: value.length,
         });
-        const value = formValues[key];
-        // This should never happen, but for type completeness
-        if (value == null || value === "") {
-          return null;
-        }
         // Still have the old string encoded values (key=v1,v2,v3) for backwards compatibility
         // but support the better array version (key=v1&key=v2&key=v3) for new code
         const isMultiSelect = multiSelectFilters.includes(key);
         if (isMultiSelect) {
-          const values = Array.isArray(value) ? value : value.split(",");
-          return values.map((subValue) => (
+          const isOldFormat = value.length === 1 && value[0].includes(",");
+          const values = isOldFormat ? value[0].split(",") : value;
+          return values.map((val) => (
             <StyledTag
-              id={`filter-tag__${key}-${subValue}`}
-              onClick={() => handleRemoveTag([subValue], key)}
-              onDelete={() => handleRemoveTag([subValue], key)}
-              key={`${key}-${subValue}`}
+              id={`filter-tag__${key}-${val}`}
+              onClick={() => handleRemoveTag(key, val)}
+              onDelete={() => handleRemoveTag(key, val)}
+              key={`${key}-${val}`}
               aria-label={t(`searchForm:removeFilter`, {
-                value: translateTag(key, subValue),
+                value: translateTag(key, val),
               })}
             >
-              {translateTag(key, subValue)}
+              {translateTag(key, val)}
             </StyledTag>
           ));
         }
@@ -107,8 +112,8 @@ export function FilterTagList({
         return (
           <StyledTag
             id={`filter-tag__${key}`}
-            onDelete={() => handleRemoveTag([key])}
-            // Why is there no onClick here?
+            onDelete={() => handleRemoveTag(key)}
+            onClick={() => handleRemoveTag(key)}
             key={key}
             aria-label={t(`searchForm:removeFilter`, {
               value: label,

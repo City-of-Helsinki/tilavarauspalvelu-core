@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { useTranslation } from "next-i18next";
 import { Checkbox, IconSearch, TextInput } from "hds-react";
 import { type SubmitHandler, useForm, Controller } from "react-hook-form";
@@ -11,8 +11,7 @@ import { getDurationOptions, participantCountOptions } from "@/modules/const";
 import { DateRangePicker } from "@/components/form";
 import { FilterTagList } from "./FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
-import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
-import { type ParsedUrlQuery } from "node:querystring";
+import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledMultiSelect } from "./ControlledMultiSelect";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import {
@@ -27,19 +26,11 @@ import {
   OptionalFilters,
   StyledSubmitButton,
 } from "./styled";
+import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 
 const StyledCheckBox = styled(Checkbox)`
   margin: 0 !important;
   grid-column: -2 / span 1;
-`;
-
-const SingleLabelRangeWrapper = styled(SingleLabelInputGroup)<{
-  label: string;
-  children: ReactNode;
-}>`
-  & > div:not(:first-child) {
-    margin-top: var(--spacing-s);
-  }
 `;
 
 type FormValues = {
@@ -60,29 +51,28 @@ type FormValues = {
   textSearch: string;
 };
 
-function mapQueryToForm(query: ParsedUrlQuery): FormValues {
-  const dur = mapQueryParamToNumber(query.duration);
+function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
+  const dur = mapQueryParamToNumber(params.getAll("duration"));
   const duration = dur != null && dur > 0 ? dur : null;
   const showOnlyReservable =
-    mapSingleBooleanParamToFormValue(query.showOnlyReservable) ?? true;
+    mapSingleBooleanParamToFormValue(params.getAll("showOnlyReservable")) ??
+    true;
   return {
-    purposes: mapQueryParamToNumberArray(query.purposes),
-    unit: mapQueryParamToNumberArray(query.unit),
-    equipments: mapQueryParamToNumberArray(query.equipments),
+    purposes: mapQueryParamToNumberArray(params.getAll("purposes")),
+    unit: mapQueryParamToNumberArray(params.getAll("unit")),
+    equipments: mapQueryParamToNumberArray(params.getAll("equipments")),
     reservationUnitTypes: mapQueryParamToNumberArray(
-      query.reservationUnitTypes
+      params.getAll("reservationUnitTypes")
     ),
-    // ?
-    timeBegin: mapSingleParamToFormValue(query.timeBegin) ?? null,
-    timeEnd: mapSingleParamToFormValue(query.timeEnd) ?? null,
-    startDate: mapSingleParamToFormValue(query.startDate) ?? null,
-    endDate: mapSingleParamToFormValue(query.endDate) ?? null,
-    // number params
+    timeBegin: mapSingleParamToFormValue(params.getAll("timeBegin")),
+    timeEnd: mapSingleParamToFormValue(params.getAll("timeEnd")),
+    startDate: mapSingleParamToFormValue(params.getAll("startDate")),
+    endDate: mapSingleParamToFormValue(params.getAll("endDate")),
     duration,
-    minPersons: mapQueryParamToNumber(query.minPersons) ?? null,
-    maxPersons: mapQueryParamToNumber(query.maxPersons) ?? null,
+    minPersons: mapQueryParamToNumber(params.getAll("minPersons")),
+    maxPersons: mapQueryParamToNumber(params.getAll("maxPersons")),
     showOnlyReservable,
-    textSearch: mapSingleParamToFormValue(query.textSearch) ?? "",
+    textSearch: mapSingleParamToFormValue(params.getAll("textSearch")) ?? "",
   };
 }
 
@@ -125,18 +115,17 @@ export function SingleSearchForm({
   isLoading: boolean;
 }): JSX.Element | null {
   const { handleSearch } = useSearchModify();
-
   const { t } = useTranslation();
-  const unitTypeOptions = reservationUnitTypeOptions;
-  const durationOptions = getDurationOptions(t);
-
-  const searchValues = useSearchValues();
+  const searchValues = useSearchParams();
   // TODO the users of this should be using watch
   const formValues = mapQueryToForm(searchValues);
-  const { handleSubmit, setValue, getValues, control, register } =
-    useForm<FormValues>({
-      values: formValues,
-    });
+  const form = useForm<FormValues>({
+    values: formValues,
+  });
+
+  const { handleSubmit, setValue, getValues, control, register } = form;
+  const unitTypeOptions = reservationUnitTypeOptions;
+  const durationOptions = getDurationOptions(t);
 
   const translateTag = (key: string, value: string): string | undefined => {
     // Handle possible number / string comparison
@@ -195,7 +184,7 @@ export function SingleSearchForm({
           options={equipmentsOptions}
           label={t("searchForm:equipmentsFilter")}
         />
-        <SingleLabelRangeWrapper label={t("common:dateLabel")}>
+        <SingleLabelInputGroup label={t("common:dateLabel")}>
           <DateRangePicker
             startDate={fromUIDate(String(getValues("startDate")))}
             endDate={fromUIDate(String(getValues("endDate")))}
@@ -220,8 +209,8 @@ export function SingleSearchForm({
               endMaxDate: addYears(new Date(), 2),
             }}
           />
-        </SingleLabelRangeWrapper>
-        <SingleLabelRangeWrapper label={t("common:timeLabel")}>
+        </SingleLabelInputGroup>
+        <SingleLabelInputGroup label={t("common:timeLabel")}>
           <TimeRangePicker
             control={control}
             names={{ begin: "timeBegin", end: "timeEnd" }}
@@ -235,7 +224,7 @@ export function SingleSearchForm({
             }}
             clearable={{ begin: true, end: true }}
           />
-        </SingleLabelRangeWrapper>
+        </SingleLabelInputGroup>
         <ControlledSelect
           name="duration"
           control={control}

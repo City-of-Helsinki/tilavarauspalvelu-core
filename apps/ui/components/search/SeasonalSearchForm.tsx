@@ -3,9 +3,8 @@ import { useTranslation } from "next-i18next";
 import { TextInput, IconSearch } from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { participantCountOptions } from "@/modules/const";
-import { useSearchModify, useSearchValues } from "@/hooks/useSearchValues";
+import { useSearchModify } from "@/hooks/useSearchValues";
 import { FilterTagList } from "./FilterTagList";
-import { ParsedUrlQuery } from "node:querystring";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { ControlledMultiSelect } from "./ControlledMultiSelect";
 import { BottomContainer, Filters, StyledSubmitButton } from "./styled";
@@ -14,7 +13,9 @@ import {
   mapQueryParamToNumberArray,
   mapSingleParamToFormValue,
 } from "@/modules/search";
-import SingleLabelInputGroup from "../common/SingleLabelInputGroup";
+import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
+import { type URLSearchParams } from "node:url";
+import { useSearchParams } from "next/navigation";
 
 const filterOrder = [
   "applicationRound",
@@ -36,16 +37,16 @@ type FormValues = {
 };
 
 // TODO combine as much as possible with the one in single-search (move them to a common place)
-function mapQueryToForm(query: ParsedUrlQuery): FormValues {
+function mapQueryToForm(query: URLSearchParams): FormValues {
   return {
-    purposes: mapQueryParamToNumberArray(query.purposes),
-    unit: mapQueryParamToNumberArray(query.unit),
+    purposes: mapQueryParamToNumberArray(query.getAll("purposes")),
+    unit: mapQueryParamToNumberArray(query.getAll("unit")),
     reservationUnitTypes: mapQueryParamToNumberArray(
-      query.reservationUnitTypes
+      query.getAll("reservationUnitTypes")
     ),
-    minPersons: mapQueryParamToNumber(query.minPersons) ?? null,
-    maxPersons: mapQueryParamToNumber(query.maxPersons) ?? null,
-    textSearch: mapSingleParamToFormValue(query.textSearch) ?? "",
+    minPersons: mapQueryParamToNumber(query.getAll("minPersons")),
+    maxPersons: mapQueryParamToNumber(query.getAll("maxPersons")),
+    textSearch: mapSingleParamToFormValue(query.getAll("textSearch")) ?? "",
   };
 }
 
@@ -65,7 +66,7 @@ export function SeasonalSearchForm({
 
   const { handleSearch } = useSearchModify();
 
-  const searchValues = useSearchValues();
+  const searchValues = useSearchParams();
   const { control, register, handleSubmit } = useForm<FormValues>({
     values: mapQueryToForm(searchValues),
   });

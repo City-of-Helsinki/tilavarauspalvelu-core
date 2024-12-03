@@ -14,10 +14,10 @@ import ReservationUnitCard from "@/components/search/SingleSearchReservationUnit
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions, processVariables } from "@/modules/search";
-import { useSearchValues } from "@/hooks/useSearchValues";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SortingComponent } from "@/components/SortingComponent";
 import { Flex } from "common/styles/util";
+import { useSearchParams } from "next/navigation";
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
@@ -44,13 +44,13 @@ function SearchSingle({
 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
-  const searchValues = useSearchValues();
+  const searchValues = useSearchParams();
 
-  const vars = processVariables(
-    searchValues,
-    i18n.language,
-    ReservationKind.Direct
-  );
+  const vars = processVariables({
+    values: searchValues,
+    language: i18n.language,
+    kind: ReservationKind.Direct,
+  });
   const query = useSearchQuery(vars);
   const { data, isLoading, error, fetchMore, previousData } = query;
 

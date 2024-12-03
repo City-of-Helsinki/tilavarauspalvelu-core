@@ -69,18 +69,18 @@ export const fromMondayFirst = (day: 0 | 1 | 2 | 3 | 4 | 5 | 6) =>
 
 export type LocalizationLanguages = "fi" | "sv" | "en";
 
-export const getLocalizationLang = (code: string): LocalizationLanguages => {
-  if (code.startsWith("fi")) {
+export function getLocalizationLang(code?: string): LocalizationLanguages {
+  if (code?.startsWith("fi")) {
     return "fi";
   }
-  if (code.startsWith("sv")) {
+  if (code?.startsWith("sv")) {
     return "sv";
   }
-  if (code.startsWith("en")) {
+  if (code?.startsWith("en")) {
     return "en";
   }
   return "fi";
-};
+}
 
 export const isBrowser = typeof window !== "undefined";
 

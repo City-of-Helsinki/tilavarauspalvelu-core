@@ -1,28 +1,24 @@
-import { type Url } from "next/dist/shared/lib/router/router";
 import { useRouter } from "next/router";
-import { type ParsedUrlQuery } from "node:querystring";
-import { type UrlObject } from "node:url";
-
-// TODO should take a list of keys or use a type instead of a record so we can remove invalid keys
-export function useSearchValues() {
-  const router = useRouter();
-  const parsed = router.query;
-  if (!parsed.sort) {
-    parsed.sort = "name";
-  }
-  if (!parsed.order) {
-    parsed.order = "asc";
-  }
-
-  return parsed;
-}
+import { useSearchParams } from "next/navigation";
+import { type ParsedUrlQueryInput } from "node:querystring";
 
 export function useSearchModify() {
   const router = useRouter();
-  const searchValues = useSearchValues();
+  const searchValues = useSearchParams();
 
-  const handleRouteChange = (url: Url) => {
-    router.replace(url, undefined, { shallow: true, scroll: false });
+  const handleRouteChange = (query: URLSearchParams | ParsedUrlQueryInput) => {
+    if (query instanceof URLSearchParams) {
+      // [id] param is not included in the URLSearchParams object but required when routing
+      if (router.query.id) {
+        query.set("id", router.query.id as string);
+      }
+      router.replace({ query: query.toString() }, undefined, {
+        shallow: true,
+        scroll: false,
+      });
+    } else {
+      router.replace({ query }, undefined, { shallow: true, scroll: false });
+    }
   };
 
   // TODO type this properly (not a Record)
@@ -38,6 +34,7 @@ export function useSearchModify() {
     const v = Number(ref) > 0 ? Number(ref) : null;
     const nextRef = v != null ? v + 1 : 1;
 
+    // TODO can this be refactored to use the URLSearchParams object?
     const newValues = {
       ...criteria,
       sort: newSort,
@@ -45,35 +42,27 @@ export function useSearchModify() {
       ...(force ? { ref: nextRef } : {}),
     };
 
-    // NOTE without this next router can't handle [id] pages
-    const url: UrlObject = {
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        ...newValues,
-      },
+    const query: ParsedUrlQueryInput = {
+      ...router.query,
+      ...newValues,
     };
-    handleRouteChange(url);
+    handleRouteChange(query);
   };
 
   /// @param hideList - list of keys to ignore when resetting the query
   const handleResetTags = (hideList: readonly string[]) => {
-    const keys = Object.keys(searchValues);
-    const newValues = keys.reduce<ParsedUrlQuery>((acc, key) => {
-      if (hideList.includes(key)) {
-        acc[key] = searchValues[key];
+    const params = new URLSearchParams();
+    for (const key of hideList) {
+      const values = searchValues.getAll(key);
+      for (const value of values) {
+        params.append(key, value);
       }
-      return acc;
-    }, {});
-    // NOTE for some reason we don't have to fix [id] pages here
-    handleRouteChange({ query: newValues });
+    }
+
+    handleRouteChange(params);
   };
 
-  // TODO is there a case where we remove the whole key: array<string>? and not just single values
-  // also we can do a lot simpler variant of this, just remove the key from the query instead of constructing a new query
-  // TODO what are the use cases for array input?
-  // TODO what are the use cases for subItemKey? and can it be null?
-  const handleRemoveTag = (key: string[], subItemKey?: string) => {
+  const handleRemoveTag = (key: string, value?: string) => {
     // Forbidding resetting all filters (need to rework this so we always remove a single value)
     if (key.length === 0) {
       throw new Error("key must have at least one value");
@@ -82,29 +71,23 @@ export function useSearchModify() {
     // Oh this allows for a case of removing a single value? or no
     // yeah, the subItemKey is the actual query key we are finding from
     // the key: [] is the values we are removing
-    let newValues = {};
-    if (subItemKey) {
-      const values = searchValues[subItemKey];
-      if (values != null && typeof values === "string") {
-        const newValue = values.split(",").filter((n) => !key?.includes(n));
-        newValues = {
-          ...searchValues,
-          [subItemKey]: newValue.join(","),
-        };
-      } else if (values != null && Array.isArray(values)) {
-        const newValue = values.filter((n) => !key?.includes(n));
-        newValues = {
-          ...searchValues,
-          [subItemKey]: newValue,
-        };
+    const newValues = new URLSearchParams(searchValues);
+    if (value) {
+      const values = searchValues.getAll(key);
+      const isOldFormat = values.length === 1 && values[0].includes(",");
+      if (isOldFormat) {
+        const newVal = isOldFormat ? values[0].split(",") : values;
+        const newValue = newVal.filter((n) => n !== value);
+        newValues.set(key, newValue.join(","));
+      } else {
+        newValues.delete(key, value);
       }
-    } else if (key) {
-      const { [`${key}`]: _, ...rest } = searchValues;
-      newValues = rest;
+    } else {
+      newValues.delete(key);
     }
 
-    handleRouteChange({ query: newValues });
+    handleRouteChange(newValues);
   };
 
-  return { handleSearch, handleRemoveTag, handleResetTags };
+  return { handleSearch, handleRemoveTag, handleResetTags, handleRouteChange };
 }

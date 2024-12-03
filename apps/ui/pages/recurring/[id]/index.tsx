@@ -26,10 +26,10 @@ import {
   mapQueryParamToNumber,
   processVariables,
 } from "@/modules/search";
-import { useSearchValues } from "@/hooks/useSearchValues";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SortingComponent } from "@/components/SortingComponent";
 import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -71,7 +71,7 @@ function SeasonalSearch({
 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const searchValues = useSearchValues();
+  const searchValues = useSearchParams();
 
   const applicationRoundPk = mapQueryParamToNumber(router.query.id);
   const selectedApplicationRound = applicationRounds.find(
@@ -86,11 +86,12 @@ function SeasonalSearch({
     // Hide other application rounds' reservation units
   } = useReservationUnitsList(selectedApplicationRound);
 
-  const variables = processVariables(
-    searchValues,
-    i18n.language,
-    ReservationKind.Season
-  );
+  const variables = processVariables({
+    values: searchValues,
+    language: i18n.language,
+    kind: ReservationKind.Season,
+    applicationRound: applicationRoundPk ?? 0,
+  });
   const query = useSearchQuery(variables);
   const { data, isLoading, error, fetchMore, previousData } = query;
 
