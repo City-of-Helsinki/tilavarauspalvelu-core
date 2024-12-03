@@ -161,7 +161,7 @@ export function RejectedOccurrencesTable({
   isLoading,
   sort,
   sortChanged: onSortChanged,
-}: Props) {
+}: Readonly<Props>) {
   const { t } = useTranslation();
 
   const rows = rejectedOccurrences.map((ro) => timeSlotMapper(t, ro));

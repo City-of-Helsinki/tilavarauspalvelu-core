@@ -73,6 +73,7 @@ function createClient(apiBaseUrl: string) {
             applicationSections: relayStylePagination(),
             allocatedTimeSlots: relayStylePagination(),
             bannerNotifications: relayStylePagination(),
+            rejectedOccurrences: relayStylePagination(),
           },
         },
       },

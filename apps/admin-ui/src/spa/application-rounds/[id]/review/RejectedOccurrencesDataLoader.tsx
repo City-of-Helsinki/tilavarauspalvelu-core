@@ -16,6 +16,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { useTranslation } from "next-i18next";
 import { getFilteredUnits } from "./utils";
+import { LIST_PAGE_SIZE } from "@/common/const";
 import { CenterSpinner } from "common/styles/util";
 
 type Props = {
@@ -38,6 +39,7 @@ function RejectedOccurrencesDataLoader({
   const { data, previousData, loading, fetchMore } =
     useRejectedOccurrencesQuery({
       variables: {
+        first: LIST_PAGE_SIZE,
         applicationRound: applicationRoundPk,
         unit: getFilteredUnits(unitFilter, unitOptions),
         reservationUnit: reservationUnitFilter
@@ -115,10 +117,14 @@ function transformOrderBy(
       return desc
         ? [RejectedOccurrenceOrderingChoices.ApplicationSectionNameDesc]
         : [RejectedOccurrenceOrderingChoices.ApplicationSectionNameAsc];
+    case "rejected_unit_name_fi":
+      return desc
+        ? [RejectedOccurrenceOrderingChoices.UnitNameDesc]
+        : [RejectedOccurrenceOrderingChoices.UnitNameAsc];
     case "rejected_reservation_unit_name_fi":
       return desc
-        ? [RejectedOccurrenceOrderingChoices.ReservationUnitPkDesc]
-        : [RejectedOccurrenceOrderingChoices.ReservationUnitPkAsc];
+        ? [RejectedOccurrenceOrderingChoices.ReservationUnitNameDesc]
+        : [RejectedOccurrenceOrderingChoices.ReservationUnitNameAsc];
     case "time_of_occurrence":
       return desc
         ? [RejectedOccurrenceOrderingChoices.BeginDatetimeDesc]
