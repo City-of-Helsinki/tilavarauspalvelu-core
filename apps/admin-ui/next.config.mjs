@@ -31,6 +31,7 @@ const config = {
   },
   sassOptions: {
     includePaths: [join(ROOT_PATH, "src")],
+    silenceDeprecations: ["legacy-js-api"],
   },
   i18n: {
     locales: ["fi"],
