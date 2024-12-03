@@ -9,9 +9,6 @@ import {
   ApplicationRoundStatusChoice,
   ReservationKind,
   ApplicationRoundOrderingChoices,
-  type SearchReservationUnitsQuery,
-  type SearchReservationUnitsQueryVariables,
-  SearchReservationUnitsDocument,
   type ApplicationRoundsUiQuery,
   type ApplicationRoundsUiQueryVariables,
   ApplicationRoundsUiDocument,
@@ -39,7 +36,7 @@ import { useRouter } from "next/router";
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale, query } = ctx;
+  const { locale } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
@@ -57,22 +54,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     data.applicationRounds?.edges.map((n) => n?.node)
   ).filter((ar) => ar.status === ApplicationRoundStatusChoice.Open);
 
-  const values = query;
-  const { data: searchData } = await apolloClient.query<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >({
-    query: SearchReservationUnitsDocument,
-    fetchPolicy: "no-cache",
-    variables: processVariables(values, locale ?? "fi", ReservationKind.Season),
-  });
-
   const opts = await getSearchOptions(apolloClient, "seasonal", locale ?? "");
   return {
     props: {
       ...commonProps,
       ...opts,
-      data: searchData,
       applicationRounds,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
@@ -86,7 +72,6 @@ const Ingress = styled(HeroSubheading)`
 `;
 
 function SeasonalSearch({
-  data: initialData,
   applicationRounds,
   unitOptions,
   reservationUnitTypeOptions,
@@ -115,9 +100,9 @@ function SeasonalSearch({
     ReservationKind.Season
   );
   const query = useSearchQuery(variables);
-  const { data, isLoading, error, fetchMore } = query;
+  const { data, isLoading, error, fetchMore, previousData } = query;
 
-  const currData = data ?? initialData;
+  const currData = data ?? previousData;
   const reservationUnits = filterNonNullable(
     currData?.reservationUnits?.edges?.map((e) => e?.node)
   );

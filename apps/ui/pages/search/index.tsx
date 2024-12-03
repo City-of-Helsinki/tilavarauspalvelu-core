@@ -6,12 +6,7 @@ import { useMedia } from "react-use";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { breakpoints } from "common/src/common/style";
 import { H1 } from "common/src/common/typography";
-import {
-  ReservationKind,
-  SearchReservationUnitsDocument,
-  type SearchReservationUnitsQueryVariables,
-  type SearchReservationUnitsQuery,
-} from "@gql/gql-types";
+import { ReservationKind } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { isBrowser } from "@/modules/const";
 import { SingleSearchForm } from "@/components/search/SingleSearchForm";
@@ -26,22 +21,9 @@ import { SortingComponent } from "@/components/SortingComponent";
 import { Flex } from "common/styles/util";
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale, query } = ctx;
+  const { locale } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-  const variables = processVariables(
-    query,
-    locale ?? "fi",
-    ReservationKind.Direct
-  );
-  const { data } = await apolloClient.query<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >({
-    query: SearchReservationUnitsDocument,
-    fetchPolicy: "no-cache",
-    variables,
-  });
   const opts = await getSearchOptions(apolloClient, "direct", locale ?? "");
 
   return {
@@ -49,7 +31,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
       ...opts,
-      data,
     },
   };
 }
@@ -57,7 +38,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 function SearchSingle({
-  data: initialData,
   unitOptions,
   reservationUnitTypeOptions,
   purposeOptions,
@@ -73,9 +53,9 @@ function SearchSingle({
     ReservationKind.Direct
   );
   const query = useSearchQuery(vars);
-  const { data, isLoading, error, fetchMore } = query;
+  const { data, isLoading, error, fetchMore, previousData } = query;
 
-  const currData = data ?? initialData;
+  const currData = data ?? previousData;
   const reservationUnits = filterNonNullable(
     currData?.reservationUnits?.edges?.map((e) => e?.node)
   );
