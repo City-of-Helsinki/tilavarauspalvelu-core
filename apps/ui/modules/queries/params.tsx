@@ -8,22 +8,18 @@ export const SEARCH_FORM_PARAMS_UNIT = gql`
     $onlySeasonalBookable: Boolean
     $orderBy: [UnitOrderingChoices]
   ) {
-    units(
+    unitsAll(
       publishedReservationUnits: $publishedReservationUnits
       ownReservations: $ownReservations
       onlyDirectBookable: $onlyDirectBookable
       onlySeasonalBookable: $onlySeasonalBookable
       orderBy: $orderBy
     ) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-      }
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
     }
   }
 `;

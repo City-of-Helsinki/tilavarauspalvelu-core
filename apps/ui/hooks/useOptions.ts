@@ -1,6 +1,12 @@
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import { type Maybe, useOptionsQuery, type OptionsQuery } from "@gql/gql-types";
+import {
+  type Maybe,
+  type OptionsQuery,
+  ReservationPurposeOrderingChoices,
+  ReservationUnitTypeOrderingChoices,
+  useOptionsQuery,
+} from "@gql/gql-types";
 import { participantCountOptions } from "@/modules/const";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { getParameterLabel } from "@/modules/util";
@@ -8,8 +14,14 @@ import { getParameterLabel } from "@/modules/util";
 // There is a duplicate in admin-ui but it doesn't have translations
 // export so we can use this on SSR
 export const OPTIONS_QUERY = gql`
-  query Options {
-    reservationUnitTypes {
+  query Options(
+    $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderingChoices]
+    $purposesOrderBy: [PurposeOrderingChoices]
+    $unitsOrderBy: [UnitOrderingChoices]
+    $equipmentsOrderBy: [EquipmentOrderingChoices]
+    $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
+  ) {
+    reservationUnitTypes(orderBy: $reservationUnitTypesOrderBy) {
       edges {
         node {
           id
@@ -20,7 +32,7 @@ export const OPTIONS_QUERY = gql`
         }
       }
     }
-    purposes {
+    purposes(orderBy: $purposesOrderBy) {
       edges {
         node {
           id
@@ -31,7 +43,7 @@ export const OPTIONS_QUERY = gql`
         }
       }
     }
-    reservationPurposes {
+    reservationPurposes(orderBy: $reservationPurposesOrderBy) {
       edges {
         node {
           id
@@ -63,16 +75,19 @@ export const OPTIONS_QUERY = gql`
         }
       }
     }
-    equipments {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-      }
+    equipmentsAll(orderBy: $equipmentsOrderBy) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    unitsAll(orderBy: $unitsOrderBy) {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
     }
   }
 `;
@@ -124,7 +139,12 @@ function sortAgeGroups(ageGroups: AgeGroup[]): AgeGroup[] {
 export function useOptions() {
   const { i18n } = useTranslation();
 
-  const { data, loading: isLoading } = useOptionsQuery();
+  const { data, loading: isLoading } = useOptionsQuery({
+    variables: {
+      reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
+      reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
+    },
+  });
   const ageGroups = filterNonNullable(
     data?.ageGroups?.edges?.map((edge) => edge?.node)
   );
@@ -137,13 +157,6 @@ export function useOptions() {
   const purposes = filterNonNullable(
     data?.reservationPurposes?.edges?.map((edge) => edge?.node)
   );
-
-  const params = {
-    ageGroups,
-    cities,
-    reservationUnitTypes,
-    purposes,
-  };
 
   const lang = getLocalizationLang(i18n.language);
   const ageGroupOptions = filterNonNullable(sortAgeGroups(ageGroups)).map(
@@ -178,6 +191,13 @@ export function useOptions() {
     purposeOptions,
     reservationUnitTypeOptions,
     participantCountOptions,
+  };
+
+  const params = {
+    ageGroups,
+    cities,
+    reservationUnitTypes,
+    purposes,
   };
 
   return { isLoading, options, params };

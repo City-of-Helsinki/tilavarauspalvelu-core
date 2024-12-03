@@ -67,9 +67,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       orderBy: [UnitOrderingChoices.RankAsc],
     },
   });
-  const units = filterNonNullable(
-    unitData?.units?.edges?.map((edge) => edge?.node)
-  );
+  const units = filterNonNullable(unitData?.unitsAll);
 
   return {
     props: {

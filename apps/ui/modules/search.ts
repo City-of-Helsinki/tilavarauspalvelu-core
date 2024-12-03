@@ -12,8 +12,12 @@ import {
   ReservationUnitOrderingChoices,
   type OptionsQuery,
   OptionsDocument,
-  type SearchFormParamsUnitQueryVariables,
-  type SearchFormParamsUnitQuery,
+  EquipmentOrderingChoices,
+  UnitOrderingChoices,
+  ReservationUnitTypeOrderingChoices,
+  PurposeOrderingChoices,
+  SearchFormParamsUnitQuery,
+  SearchFormParamsUnitQueryVariables,
   SearchFormParamsUnitDocument,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
@@ -294,16 +298,21 @@ export async function getSearchOptions(
   const lang = convertLanguageCode(locale ?? "");
   const { data: optionsData } = await apolloClient.query<OptionsQuery>({
     query: OptionsDocument,
+    variables: {
+      reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
+      purposesOrderBy: PurposeOrderingChoices.RankAsc,
+      unitsOrderBy: UnitOrderingChoices.NameFiAsc,
+      equipmentsOrderBy: EquipmentOrderingChoices.CategoryRankAsc,
+    },
   });
+
   const reservationUnitTypes = filterNonNullable(
     optionsData?.reservationUnitTypes?.edges?.map((edge) => edge?.node)
   );
   const purposes = filterNonNullable(
     optionsData?.purposes?.edges?.map((edge) => edge?.node)
   );
-  const equipments = filterNonNullable(
-    optionsData?.equipments?.edges?.map((edge) => edge?.node)
-  );
+  const equipments = filterNonNullable(optionsData?.equipmentsAll);
 
   const reservationUnitTypeOptions = reservationUnitTypes.map((n) => ({
     value: n.pk ?? 0,
@@ -317,7 +326,6 @@ export async function getSearchOptions(
     value: n.pk ?? 0,
     label: getTranslationSafe(n, "name", lang),
   }));
-
   const { data: unitData } = await apolloClient.query<
     SearchFormParamsUnitQuery,
     SearchFormParamsUnitQueryVariables
@@ -329,9 +337,7 @@ export async function getSearchOptions(
       ...(page === "seasonal" ? { onlySeasonalBookable: true } : {}),
     },
   });
-  const unitOptions = filterNonNullable(
-    unitData?.units?.edges?.map((e) => e?.node)
-  ).map((node) => ({
+  const unitOptions = filterNonNullable(unitData?.unitsAll).map((node) => ({
     value: node.pk ?? 0,
     label: getTranslationSafe(node, "name", lang),
   }));

@@ -34,7 +34,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
   );
   const unitsInApplicationRound = filterNonNullable(uniq(resUnitPks));
   const { data } = useSearchFormParamsUnitQuery();
-  const units = filterNonNullable(data?.units?.edges?.map((e) => e?.node))
+  const units = filterNonNullable(data?.unitsAll)
     .filter((u) => u.pk != null && unitsInApplicationRound.includes(u.pk))
     .map((u) => ({
       pk: u.pk ?? 0,
