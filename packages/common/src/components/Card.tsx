@@ -89,8 +89,10 @@ const Image = styled.img`
   object-position: center;
   width: 100%;
   height: 100%;
+  max-height: 146px;
   @media (max-width: ${breakpoints.m}) {
     min-height: 220px;
+    max-height: 220px;
   }
 `;
 
