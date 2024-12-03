@@ -1,3 +1,4 @@
+import { type Url } from "next/dist/shared/lib/router/router";
 import { useRouter } from "next/router";
 import { type ParsedUrlQuery } from "node:querystring";
 import { type UrlObject } from "node:url";
@@ -19,6 +20,10 @@ export function useSearchValues() {
 export function useSearchModify() {
   const router = useRouter();
   const searchValues = useSearchValues();
+
+  const handleRouteChange = (url: Url) => {
+    router.replace(url, undefined, { shallow: true, scroll: false });
+  };
 
   // TODO type this properly (not a Record)
   const handleSearch = (criteria: Record<string, unknown>, force: boolean) => {
@@ -48,7 +53,7 @@ export function useSearchModify() {
         ...newValues,
       },
     };
-    router.replace(url, undefined, { shallow: true });
+    handleRouteChange(url);
   };
 
   /// @param hideList - list of keys to ignore when resetting the query
@@ -61,9 +66,7 @@ export function useSearchModify() {
       return acc;
     }, {});
     // NOTE for some reason we don't have to fix [id] pages here
-    router.replace({
-      query: newValues,
-    });
+    handleRouteChange({ query: newValues });
   };
 
   // TODO is there a case where we remove the whole key: array<string>? and not just single values
@@ -100,9 +103,7 @@ export function useSearchModify() {
       newValues = rest;
     }
 
-    router.replace({
-      query: newValues,
-    });
+    handleRouteChange({ query: newValues });
   };
 
   return { handleSearch, handleRemoveTag, handleResetTags };

@@ -8,7 +8,6 @@ import { breakpoints } from "common/src/common/style";
 import { H1 } from "common/src/common/typography";
 import { ReservationKind } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { isBrowser } from "@/modules/const";
 import { SingleSearchForm } from "@/components/search/SingleSearchForm";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
 import ReservationUnitCard from "@/components/search/SingleSearchReservationUnitCard";
@@ -69,7 +68,6 @@ function SearchSingle({
   useEffect(() => {
     if (
       window.location.hash === "#content" &&
-      isBrowser &&
       isMobile &&
       currData?.reservationUnits != null &&
       content?.current?.offsetTop != null
