@@ -376,19 +376,9 @@ function Texts({
   );
 }
 
-const addKey = (Component: JSX.Element, key: number): JSX.Element => {
-  return React.cloneElement(Component, {
-    key: Component.props.key ?? key,
-  });
-};
-
 function Tags({ tags }: Readonly<{ tags?: JSX.Element[] }>) {
   if (!tags) return null;
-  return (
-    <TagContainer data-test-id="card__tags">
-      {tags.map((tag, i) => addKey(tag, i))}
-    </TagContainer>
-  );
+  return <TagContainer data-test-id="card__tags">{tags}</TagContainer>;
 }
 
 const InfoItem = styled(Flex).attrs({
@@ -407,13 +397,13 @@ function Infos({
 }>) {
   if (!infos) return null;
   return (
-    <InfoContainer data-testId="data-testId">
+    <InfoContainer>
       {infos.map((info) => (
         <Info
           key={info.value}
           value={info.value}
           icon={info.icon}
-          data-test-id={info.testId}
+          data-testid={info.testId}
         />
       ))}
     </InfoContainer>
@@ -423,9 +413,10 @@ function Infos({
 function Info({
   value,
   icon,
+  ...rest
 }: Readonly<{ value: string; icon?: JSX.Element }>) {
   return (
-    <InfoItem>
+    <InfoItem {...rest}>
       {icon}
       <span>{value}</span>
     </InfoItem>
@@ -434,7 +425,5 @@ function Info({
 
 function Buttons({ buttons }: Readonly<{ buttons?: JSX.Element[] }>) {
   if (!buttons) return null;
-  return (
-    <ButtonContainer>{buttons.map((btn, i) => addKey(btn, i))}</ButtonContainer>
-  );
+  return <ButtonContainer>{buttons}</ButtonContainer>;
 }
