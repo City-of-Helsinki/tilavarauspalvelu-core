@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import styled from "styled-components";
 import type { GetServerSidePropsContext } from "next";
 import { Notification } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -15,7 +14,6 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
-import { HeroSubheading } from "@/modules/style/typography";
 import { createApolloClient } from "@/modules/apolloClient";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { ReservationUnitCard } from "@/components/search/ReservationUnitCard";
@@ -65,12 +63,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-// Uses larger font size
-// TODO should move the default 0 margin to the typography file
-const Ingress = styled(HeroSubheading)`
-  margin: 0;
-`;
-
 function SeasonalSearch({
   applicationRounds,
   unitOptions,
@@ -116,8 +108,10 @@ function SeasonalSearch({
         </Notification>
       ) : null}
       <BreadcrumbWrapper route={["/recurring", "search"]} />
-      <H1 $noMargin>{t("search:recurring.heading")}</H1>
-      <Ingress>{t("search:recurring.text")}</Ingress>
+      <div>
+        <H1 $noMargin>{t("search:recurring.heading")}</H1>
+        <p>{t("search:recurring.text")}</p>
+      </div>
       <SeasonalSearchForm
         unitOptions={unitOptions}
         reservationUnitTypeOptions={reservationUnitTypeOptions}

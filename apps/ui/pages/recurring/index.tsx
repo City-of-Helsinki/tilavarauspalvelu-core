@@ -11,7 +11,6 @@ import {
   type ApplicationRoundsUiQueryVariables,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { HeroSubheading } from "@/modules/style/typography";
 import { ApplicationRoundCard } from "@/components/recurring/ApplicationRoundCard";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -79,7 +78,7 @@ function RecurringLander({ applicationRounds }: Props): JSX.Element {
         <H1 $marginTop="l" $marginBottom="none">
           {t("recurringLander:heading")}
         </H1>
-        <HeroSubheading>{t("recurringLander:subHeading")}</HeroSubheading>
+        <p>{t("recurringLander:subHeading")}</p>
       </div>
       <>
         {activeApplicationRounds.length > 0 ? (
