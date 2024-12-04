@@ -14,6 +14,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_rejected,
     get_context_for_reservation_requires_handling,
     get_context_for_reservation_requires_payment,
+    get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
 )
@@ -47,6 +48,9 @@ from tests.test_integrations.test_email.helpers import (
     RESERVATION_PRICE_RANGE_INFO_CONTEXT_EN,
     RESERVATION_PRICE_RANGE_INFO_CONTEXT_FI,
     RESERVATION_PRICE_RANGE_INFO_CONTEXT_SV,
+    SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
+    SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
+    SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
 )
 
 # type: EmailType.RESERVATION_APPROVED #################################################################################
@@ -922,6 +926,93 @@ def test_get_context__reservation_requires_payment__sv():
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
         **RESERVATION_MANAGE_LINK_CONTEXT_SV,
         **CLOSING_POLITE_CONTEXT_SV,
+        **AUTOMATIC_REPLY_CONTEXT_SV,
+    }
+
+
+# type: EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_rejected_single__en():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_rejected_single(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            rejection_reason="[HYLKÄYKSEN SYY]",
+            language="en",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "The space reservation included in your seasonal booking has been cancelled",
+        "text_reservation_rejected": "The space reservation included in your seasonal booking has been cancelled",
+        "rejection_reason_label": "Reason",
+        "rejection_reason": "[HYLKÄYKSEN SYY]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **CLOSING_CONTEXT_EN,
+        **AUTOMATIC_REPLY_CONTEXT_EN,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_rejected_single__fi():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_rejected_single(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            rejection_reason="[HYLKÄYKSEN SYY]",
+            language="fi",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Kausivaraukseesi kuuluva tilavaraus on peruttu",
+        "text_reservation_rejected": "Kausivaraukseesi kuuluva tilavaraus on peruttu",
+        "rejection_reason_label": "Syy",
+        "rejection_reason": "[HYLKÄYKSEN SYY]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **CLOSING_CONTEXT_FI,
+        **AUTOMATIC_REPLY_CONTEXT_FI,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_rejected_single__sv():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_rejected_single(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            rejection_reason="[HYLKÄYKSEN SYY]",
+            language="sv",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Lokalbokningen som ingår i din säsongsbokning har avbokats",
+        "text_reservation_rejected": "Lokalbokningen som ingår i din säsongsbokning har avbokats",
+        "rejection_reason_label": "Orsak",
+        "rejection_reason": "[HYLKÄYKSEN SYY]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **CLOSING_CONTEXT_SV,
         **AUTOMATIC_REPLY_CONTEXT_SV,
     }
 

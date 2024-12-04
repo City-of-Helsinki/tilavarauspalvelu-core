@@ -17,6 +17,7 @@ from .common import (
     get_contex_for_reservation_manage_link,
     get_contex_for_reservation_price,
     get_contex_for_reservation_price_range,
+    get_contex_for_seasonal_reservation_check_details_url,
     get_my_reservations_ext_link,
     get_staff_reservations_ext_link,
     params_for_base_info,
@@ -39,6 +40,7 @@ __all__ = [
     "get_context_for_reservation_rejected",
     "get_context_for_reservation_requires_handling",
     "get_context_for_reservation_requires_payment",
+    "get_context_for_seasonal_reservation_rejected_single",
     "get_context_for_staff_notification_reservation_made",
     "get_context_for_staff_notification_reservation_requires_handling",
 ]
@@ -536,6 +538,62 @@ def get_context_for_reservation_requires_payment(
         ),
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
+    }
+
+
+# type: EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE #################################################################
+
+
+@overload
+def get_context_for_seasonal_reservation_rejected_single(
+    reservation: Reservation, *, language: Lang
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_seasonal_reservation_rejected_single(
+    *,
+    language: Lang,
+    email_recipient_name: str,
+    reservation_unit_name: str,
+    unit_name: str,
+    unit_location: str,
+    begin_datetime: datetime.datetime,
+    end_datetime: datetime.datetime,
+    rejection_reason: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_seasonal_reservation_rejected_single(
+    reservation: Reservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if reservation is not None:
+        data: dict[str, Any] = {
+            "email_recipient_name": reservation.actions.get_email_reservee_name(),
+            "rejection_reason": get_attr_by_language(reservation.deny_reason, "reason", language),
+            **params_for_base_info(reservation=reservation, language=language),
+        }
+
+    title = pgettext("Email", "The space reservation included in your seasonal booking has been cancelled")
+    return {
+        "title": title,
+        "text_reservation_rejected": title,
+        "rejection_reason_label": pgettext("Email", "Reason"),
+        "rejection_reason": data["rejection_reason"],
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
+        **get_contex_for_reservation_basic_info(
+            reservation_unit_name=data["reservation_unit_name"],
+            unit_name=data["unit_name"],
+            unit_location=data["unit_location"],
+            begin_datetime=data["begin_datetime"],
+            end_datetime=data["end_datetime"],
+        ),
+        **get_contex_for_seasonal_reservation_check_details_url(language=language),
+        **get_contex_for_closing(language=language),
     }
 
 

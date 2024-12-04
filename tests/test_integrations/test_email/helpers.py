@@ -237,3 +237,20 @@ RESERVATION_MANAGE_LINK_CONTEXT_SV = {
         "'Mina bokningar'</a>."
     ),
 }
+
+
+SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN = {
+    "check_booking_details_text": "You can check your booking details at",
+    "check_booking_details_url": "https://fake.varaamo.hel.fi/en/applications",
+    "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/en/applications">https://fake.varaamo.hel.fi/en/applications</a>',
+}
+SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI = {
+    "check_booking_details_text": "Voit käydä tarkistamassa varauksesi tiedot osoitteessa",
+    "check_booking_details_url": "https://fake.varaamo.hel.fi/applications",
+    "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/applications">https://fake.varaamo.hel.fi/applications</a>',
+}
+SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV = {
+    "check_booking_details_text": "Du kan kontrollera dina bokningsuppgifter på",
+    "check_booking_details_url": "https://fake.varaamo.hel.fi/sv/applications",
+    "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/sv/applications">https://fake.varaamo.hel.fi/sv/applications</a>',
+}

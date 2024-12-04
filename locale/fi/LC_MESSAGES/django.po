@@ -1561,6 +1561,19 @@ msgid "Reservation state"
 msgstr "Varattavuuden tila"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Additional search terms that will bring up this reservation unit when making "
+"text searches in the customer UI. These terms should be added to make sure "
+"search results using text search in links from external sources work "
+"regardless of the UI language."
+msgstr ""
+"Ylimääräiset hakusanat, joilla tätä varausyksikköä on mahdollista hakea "
+"tekstihaun kautta asiakaskäyttöliittymässä. Hakusanoja tulee lisätä tähän "
+"listaan silloin kun halutaan taata, että järjestelmän ulkopuolelta tulevissa "
+"linkeissä käytettävät hakusanat tuottavat oikeat hakutulokset "
+"käyttöliittymän kielestä rippumatta."
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Description (Finnish)"
 msgstr "Kuvaus (Suomeksi)"
 
@@ -1978,19 +1991,6 @@ msgstr "Maksujen kirjanpidon tiliöintitiedot"
 msgid "Product used for payments"
 msgstr "Tuote, jota käytetään maksuihin"
 
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"Additional search terms that will bring up this reservation unit when making "
-"text searches in the customer UI. These terms should be added to make sure "
-"search results using text search in links from external sources work "
-"regardless of the UI language."
-msgstr ""
-"Ylimääräiset hakusanat, joilla tätä varausyksikköä on mahdollista hakea "
-"tekstihaun kautta asiakaskäyttöliittymässä. Hakusanoja tulee lisätä tähän "
-"listaan silloin kun halutaan taata, että järjestelmän ulkopuolelta tulevissa "
-"linkeissä käytettävät hakusanat tuottavat oikeat hakutulokset "
-"käyttöliittymän kielestä rippumatta."
-
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
 msgstr "Etsi nimellä tai toimipisteen nimellä"
@@ -2231,6 +2231,11 @@ msgstr "Varaus odottaa käsittelyä"
 msgctxt "EmailType"
 msgid "Reservation requires payment"
 msgstr "Varaus odottaa maksua"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Seasonal reservation rejected single"
+msgstr "Kausivaraus hylätty yksittäinen"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
@@ -2980,6 +2985,11 @@ msgctxt "Email"
 msgid "Booking number"
 msgstr "Varausnumero"
 
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "You can check your booking details at"
+msgstr "Voit käydä tarkistamassa varauksesi tiedot osoitteessa"
+
 #: tilavarauspalvelu/integrations/email/template_context/permissions.py
 msgctxt "Email"
 msgid "Your staff access to Varaamo is expiring"
@@ -3122,6 +3132,12 @@ msgstr "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla"
 msgctxt "Email"
 msgid "Due date"
 msgstr "Eräpäivä"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid ""
+"The space reservation included in your seasonal booking has been cancelled"
+msgstr "Kausivaraukseesi kuuluva tilavaraus on peruttu"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
