@@ -3132,9 +3132,9 @@ msgstr "Eräpäivä"
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
 msgctxt "Email"
-msgid "New booking %(booking_number)s has been made for %(unit_name)s"
+msgid "New booking %(reservation_id)s has been made for %(unit_name)s"
 msgstr ""
-"Toimipisteeseen %(unit_name)s on tehty uusi tilavaraus %(booking_number)s"
+"Toimipisteeseen %(unit_name)s on tehty uusi tilavaraus %(reservation_id)s"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
@@ -3156,9 +3156,9 @@ msgstr "Voit tarkistaa varauksen tiedot osoitteessa"
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
 msgctxt "Email"
-msgid "New booking %(booking_number)s requires handling at unit %(unit_name)s"
+msgid "New booking %(reservation_id)s requires handling at unit %(unit_name)s"
 msgstr ""
-"Uusi tilavaraus %(booking_number)s odottaa käsittelyä toimipisteessä "
+"Uusi tilavaraus %(reservation_id)s odottaa käsittelyä toimipisteessä "
 "%(unit_name)s"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py

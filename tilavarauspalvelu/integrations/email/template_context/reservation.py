@@ -73,7 +73,7 @@ def get_context_for_reservation_approved(
     price: Decimal,
     non_subsidised_price: Decimal,
     tax_percentage: Decimal,
-    booking_number: int,
+    reservation_id: int,
     confirmed_instructions: str,
 ) -> EmailContext: ...
 
@@ -116,7 +116,7 @@ def get_context_for_reservation_approved(
         **get_contex_for_reservation_price(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
-            booking_number=data["booking_number"],
+            reservation_id=data["reservation_id"],
         ),
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
@@ -147,7 +147,7 @@ def get_context_for_reservation_cancelled(
     end_datetime: datetime.datetime,
     price: Decimal,
     tax_percentage: Decimal,
-    booking_number: int,
+    reservation_id: int,
     cancelled_instructions: str,
 ) -> EmailContext: ...
 
@@ -186,7 +186,7 @@ def get_context_for_reservation_cancelled(
         **get_contex_for_reservation_price(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
-            booking_number=data["booking_number"],
+            reservation_id=data["reservation_id"],
         ),
         **get_contex_for_closing(language=language),
     }
@@ -215,7 +215,7 @@ def get_context_for_reservation_confirmed(
     end_datetime: datetime.datetime,
     price: Decimal,
     tax_percentage: Decimal,
-    booking_number: int,
+    reservation_id: int,
     confirmed_instructions: str,
 ) -> EmailContext: ...
 
@@ -251,7 +251,7 @@ def get_context_for_reservation_confirmed(
         **get_contex_for_reservation_price(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
-            booking_number=data["booking_number"],
+            reservation_id=data["reservation_id"],
         ),
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
@@ -281,7 +281,7 @@ def get_context_for_reservation_modified(
     end_datetime: datetime.datetime,
     price: Decimal,
     tax_percentage: Decimal,
-    booking_number: int,
+    reservation_id: int,
     confirmed_instructions: str,
 ) -> EmailContext: ...
 
@@ -317,7 +317,7 @@ def get_context_for_reservation_modified(
         **get_contex_for_reservation_price(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
-            booking_number=data["booking_number"],
+            reservation_id=data["reservation_id"],
         ),
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
@@ -346,7 +346,7 @@ def get_context_for_reservation_rejected(
     begin_datetime: datetime.datetime,
     end_datetime: datetime.datetime,
     rejection_reason: str,
-    booking_number: int,
+    reservation_id: int,
     cancelled_instructions: str,
 ) -> EmailContext: ...
 
@@ -363,7 +363,7 @@ def get_context_for_reservation_rejected(
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
             "cancelled_instructions": reservation.actions.get_instructions(kind="cancelled", language=language),
             "rejection_reason": get_attr_by_language(reservation.deny_reason, "reason", language),
-            "booking_number": reservation.id,
+            "reservation_id": reservation.id,
             **params_for_base_info(reservation=reservation, language=language),
         }
 
@@ -373,7 +373,7 @@ def get_context_for_reservation_rejected(
         "rejection_reason_label": pgettext("Email", "Reason"),
         "rejection_reason": data["rejection_reason"],
         "booking_number_label": pgettext("Email", "Booking number"),
-        "booking_number": str(data["booking_number"]),
+        "reservation_id": str(data["reservation_id"]),
         "instructions_label": pgettext("Email", "Additional information"),
         "instructions": data["cancelled_instructions"],
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
@@ -413,7 +413,7 @@ def get_context_for_reservation_requires_handling(
     subsidised_price: Decimal,
     applying_for_free_of_charge: bool,
     tax_percentage: Decimal,
-    booking_number: int,
+    reservation_id: int,
     pending_instructions: str,
 ) -> EmailContext: ...
 
@@ -456,7 +456,7 @@ def get_context_for_reservation_requires_handling(
             price=data["price"],
             subsidised_price=data["subsidised_price"],
             tax_percentage=data["tax_percentage"],
-            booking_number=data["booking_number"],
+            reservation_id=data["reservation_id"],
             applying_for_free_of_charge=data["applying_for_free_of_charge"],
         ),
         **get_contex_for_reservation_manage_link(language=language),
@@ -488,7 +488,7 @@ def get_context_for_reservation_requires_payment(
     price: Decimal,
     tax_percentage: Decimal,
     payment_due_date: datetime.date,
-    booking_number: int,
+    reservation_id: int,
     confirmed_instructions: str,
 ) -> EmailContext: ...
 
@@ -532,7 +532,7 @@ def get_context_for_reservation_requires_payment(
         **get_contex_for_reservation_price(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
-            booking_number=data["booking_number"],
+            reservation_id=data["reservation_id"],
         ),
         **get_contex_for_reservation_manage_link(language=language),
         **get_contex_for_closing_polite(language=language),
@@ -561,7 +561,7 @@ def get_context_for_staff_notification_reservation_made(
     unit_location: str,
     begin_datetime: datetime.datetime,
     end_datetime: datetime.datetime,
-    booking_number: int,
+    reservation_id: int,
 ) -> EmailContext: ...
 
 
@@ -576,17 +576,17 @@ def get_context_for_staff_notification_reservation_made(
         data: dict[str, Any] = {
             "reservee_name": reservation.actions.get_email_reservee_name(),
             "reservation_name": reservation.name,
-            "booking_number": reservation.id,
+            "reservation_id": reservation.id,
             **params_for_base_info(reservation=reservation, language=language),
         }
 
-    link = get_staff_reservations_ext_link(booking_number=data["booking_number"])
+    link = get_staff_reservations_ext_link(reservation_id=data["reservation_id"])
 
     return {
         "title": (
-            pgettext("Email", "New booking %(booking_number)s has been made for %(unit_name)s")
+            pgettext("Email", "New booking %(reservation_id)s has been made for %(unit_name)s")
             % {
-                "booking_number": data["booking_number"],
+                "reservation_id": data["reservation_id"],
                 "unit_name": data["unit_name"],
             }
         ),
@@ -600,7 +600,7 @@ def get_context_for_staff_notification_reservation_made(
         "reservee_name_label": pgettext("Email", "Reservee name"),
         "reservee_name": data["reservee_name"],
         "booking_number_label": pgettext("Email", "Booking number"),
-        "booking_number": str(data["booking_number"]),
+        "reservation_id": str(data["reservation_id"]),
         "text_check_details": pgettext("Email", "You can view the booking at"),
         "staff_reservations_ext_link_html": create_anchor_tag(link=link),
         "staff_reservations_ext_link": link,
@@ -638,7 +638,7 @@ def get_context_for_staff_notification_reservation_requires_handling(
     unit_location: str | None = None,
     begin_datetime: datetime.datetime | None = None,
     end_datetime: datetime.datetime | None = None,
-    booking_number: int | None = None,
+    reservation_id: int | None = None,
 ) -> EmailContext: ...
 
 
@@ -653,17 +653,17 @@ def get_context_for_staff_notification_reservation_requires_handling(
         data: dict[str, Any] = {
             "reservee_name": reservation.actions.get_email_reservee_name(),
             "reservation_name": reservation.name,
-            "booking_number": reservation.id,
+            "reservation_id": reservation.id,
             **params_for_base_info(reservation=reservation, language=language),
         }
 
-    link = get_staff_reservations_ext_link(booking_number=data["booking_number"])
+    link = get_staff_reservations_ext_link(reservation_id=data["reservation_id"])
 
     return {
         "title": (
-            pgettext("Email", "New booking %(booking_number)s requires handling at unit %(unit_name)s")
+            pgettext("Email", "New booking %(reservation_id)s requires handling at unit %(unit_name)s")
             % {
-                "booking_number": data["booking_number"],
+                "reservation_id": data["reservation_id"],
                 "unit_name": data["unit_name"],
             }
         ),
@@ -677,7 +677,7 @@ def get_context_for_staff_notification_reservation_requires_handling(
         "reservee_name_label": pgettext("Email", "Reservee name"),
         "reservee_name": data["reservee_name"],
         "booking_number_label": pgettext("Email", "Booking number"),
-        "booking_number": str(data["booking_number"]),
+        "reservation_id": str(data["reservation_id"]),
         "text_check_details": pgettext("Email", "You can view and handle the booking at"),
         "staff_reservations_ext_link_html": create_anchor_tag(link=link),
         "staff_reservations_ext_link": link,

@@ -3069,8 +3069,8 @@ msgstr "Förfallodatum"
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
 msgctxt "Email"
-msgid "New booking %(booking_number)s has been made for %(unit_name)s"
-msgstr "Ny bokning %(booking_number)s har gjorts för %(unit_name)s"
+msgid "New booking %(reservation_id)s has been made for %(unit_name)s"
+msgstr "Ny bokning %(reservation_id)s har gjorts för %(unit_name)s"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
@@ -3091,9 +3091,9 @@ msgstr "Du kan se bokningen på"
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
 msgctxt "Email"
-msgid "New booking %(booking_number)s requires handling at unit %(unit_name)s"
+msgid "New booking %(reservation_id)s requires handling at unit %(unit_name)s"
 msgstr ""
-"Ny bokningsförfrågan %(booking_number)s för %(unit_name)s väntar på at "
+"Ny bokningsförfrågan %(reservation_id)s för %(unit_name)s väntar på at "
 "behandlats"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py

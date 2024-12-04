@@ -113,7 +113,7 @@ class ReservationBasicInfoFormMixin:
 class ReservationPriceFormMixin:
     price = forms.DecimalField(decimal_places=2, initial=Decimal("5.00"), widget=number_widget)
     tax_percentage = forms.DecimalField(decimal_places=2, initial=Decimal("25.50"), widget=number_widget)
-    booking_number = forms.IntegerField(initial=0, widget=number_widget)
+    reservation_id = forms.IntegerField(initial=0, widget=number_widget)
 
 
 class ConfirmedInstructionsFormMixin:
@@ -222,7 +222,7 @@ class ReservationApprovedEmailTemplateTesterForm(
             price=self.cleaned_data["price"],
             non_subsidised_price=self.cleaned_data["non_subsidised_price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
-            booking_number=self.cleaned_data["booking_number"],
+            reservation_id=self.cleaned_data["reservation_id"],
             confirmed_instructions=self.cleaned_data["confirmed_instructions"],
         )
 
@@ -259,7 +259,7 @@ class ReservationCancelledEmailTemplateTesterForm(
             end_datetime=self.cleaned_data["end_datetime"],
             price=self.cleaned_data["price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
-            booking_number=self.cleaned_data["booking_number"],
+            reservation_id=self.cleaned_data["reservation_id"],
             cancelled_instructions=self.cleaned_data["cancelled_instructions"],
         )
 
@@ -293,7 +293,7 @@ class ReservationConfirmedEmailTemplateTesterForm(
             end_datetime=self.cleaned_data["end_datetime"],
             price=self.cleaned_data["price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
-            booking_number=self.cleaned_data["booking_number"],
+            reservation_id=self.cleaned_data["reservation_id"],
             confirmed_instructions=self.cleaned_data["confirmed_instructions"],
         )
 
@@ -327,7 +327,7 @@ class ReservationModifiedEmailTemplateTesterForm(
             end_datetime=self.cleaned_data["end_datetime"],
             price=self.cleaned_data["price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
-            booking_number=self.cleaned_data["booking_number"],
+            reservation_id=self.cleaned_data["reservation_id"],
             confirmed_instructions=self.cleaned_data["confirmed_instructions"],
         )
 
@@ -336,7 +336,7 @@ class ReservationRejectedEmailTemplateTesterForm(
     CancelledInstructionsFormMixin,
     ReservationBaseForm,
 ):
-    booking_number = forms.IntegerField(initial=0, widget=number_widget)
+    reservation_id = forms.IntegerField(initial=0, widget=number_widget)
     rejection_reason = forms.CharField(initial="[HYLKÄYKSEN SYY]", widget=text_widget)
 
     @classmethod
@@ -362,7 +362,7 @@ class ReservationRejectedEmailTemplateTesterForm(
             begin_datetime=self.cleaned_data["begin_datetime"],
             end_datetime=self.cleaned_data["end_datetime"],
             rejection_reason=self.cleaned_data["rejection_reason"],
-            booking_number=self.cleaned_data["booking_number"],
+            reservation_id=self.cleaned_data["reservation_id"],
             cancelled_instructions=self.cleaned_data["cancelled_instructions"],
         )
 
@@ -399,7 +399,7 @@ class ReservationRequiresHandlingEmailTemplateTesterForm(
             subsidised_price=self.cleaned_data["subsidised_price"],
             applying_for_free_of_charge=self.cleaned_data["applying_for_free_of_charge"],
             tax_percentage=self.cleaned_data["tax_percentage"],
-            booking_number=self.cleaned_data["booking_number"],
+            reservation_id=self.cleaned_data["reservation_id"],
             pending_instructions=self.cleaned_data["pending_instructions"],
         )
 
@@ -436,7 +436,7 @@ class ReservationRequiresPaymentEmailTemplateTesterForm(
             price=self.cleaned_data["price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
             payment_due_date=self.cleaned_data["payment_due_date"],
-            booking_number=self.cleaned_data["booking_number"],
+            reservation_id=self.cleaned_data["reservation_id"],
             confirmed_instructions=self.cleaned_data["confirmed_instructions"],
         )
 
@@ -447,7 +447,7 @@ class ReservationRequiresPaymentEmailTemplateTesterForm(
 class StaffNotificationReservationMadeEmailTemplateTesterForm(ReservationBaseForm):
     reservation_name = forms.CharField(initial="[VARAUKSEN NIMI]", widget=text_widget)
     reservee_name = forms.CharField(initial="[VARAAJAN NIMI]", widget=text_widget)
-    booking_number = forms.IntegerField(initial=0, widget=number_widget)
+    reservation_id = forms.IntegerField(initial=0, widget=number_widget)
 
     @classmethod
     def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
@@ -469,14 +469,14 @@ class StaffNotificationReservationMadeEmailTemplateTesterForm(ReservationBaseFor
             unit_location=self.cleaned_data["unit_location"],
             begin_datetime=self.cleaned_data["begin_datetime"],
             end_datetime=self.cleaned_data["end_datetime"],
-            booking_number=self.cleaned_data["booking_number"],
+            reservation_id=self.cleaned_data["reservation_id"],
         )
 
 
 class StaffNotificationReservationRequiresHandlingEmailTemplateTesterForm(ReservationBaseForm):
     reservation_name = forms.CharField(initial="[VARAUKSEN NIMI]", widget=text_widget)
     reservee_name = forms.CharField(initial="[VARAAJAN NIMI]", widget=text_widget)
-    booking_number = forms.IntegerField(initial=0, widget=number_widget)
+    reservation_id = forms.IntegerField(initial=0, widget=number_widget)
 
     @classmethod
     def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
@@ -498,5 +498,5 @@ class StaffNotificationReservationRequiresHandlingEmailTemplateTesterForm(Reserv
             unit_location=self.cleaned_data["unit_location"],
             begin_datetime=self.cleaned_data["begin_datetime"],
             end_datetime=self.cleaned_data["end_datetime"],
-            booking_number=self.cleaned_data["booking_number"],
+            reservation_id=self.cleaned_data["reservation_id"],
         )
