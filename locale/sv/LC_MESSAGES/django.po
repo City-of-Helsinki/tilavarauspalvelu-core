@@ -2172,6 +2172,10 @@ msgctxt "EmailType"
 msgid "Reservation requires payment"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Seasonal reservation cancelled single"
+msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
