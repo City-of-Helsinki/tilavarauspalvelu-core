@@ -5,6 +5,13 @@
   "500": {
     "body": "Något oväntat hände"
   },
+  "deactivatedAccount": {
+    "heading": "Ditt användar-ID är inte giltigt.",
+    "subHeadingA": "Var god och kontakta vår kundtjänst via email på",
+    "subHeadingB": "eller via Ta kontakt-formuläret.",
+    "email": "varaamo@hel.fi",
+    "button": "Ta kontakt"
+  },
   "applicationMutation": {
     "Validation error": "Ett fel uppstod i API-anropet",
     "Form validation error": "Formuläret innehåller fel",

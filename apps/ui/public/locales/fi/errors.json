@@ -5,6 +5,13 @@
   "500": {
     "body": "Jotain meni pieleen"
   },
+  "deactivatedAccount": {
+    "heading": "Käyttäjätunnuksesi ei ole voimassa.",
+    "subHeadingA": "Ota yhteyttä asiakaspalveluun sähköpostitse",
+    "subHeadingB": "tai Ota yhteyttä-lomakkeella.",
+    "email": "varaamo@hel.fi",
+    "button": "Ota yhteyttä"
+  },
   "applicationMutation": {
     "Validation error": "Virheellinen rajapintakutsu",
     "Form validation error": "Virheellinen lomake",

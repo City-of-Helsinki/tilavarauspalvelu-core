@@ -74,4 +74,14 @@ i18n.addResourceBundle("fi", "forms", {
   invalidEmail: "Sähköpostin tulee olla oikeassa muodossa (sisältäen @-merkin)",
 });
 
+i18n.addResourceBundle("fi", "errors", {
+  deactivatedAccount: {
+    heading: "Käyttäjätunnuksesi ei ole voimassa.",
+    subHeadingA: "Ota yhteyttä asiakaspalveluun sähköpostitse",
+    subHeadingB: "tai Ota yhteyttä-lomakkeella.",
+    email: "varaamo@hel.fi",
+    button: "Ota yhteyttä",
+  },
+});
+
 export default i18n;

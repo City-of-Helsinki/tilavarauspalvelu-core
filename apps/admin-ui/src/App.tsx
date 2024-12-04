@@ -14,6 +14,7 @@ import NotificationsRouter from "./spa/notifications/router";
 import Error404 from "./common/Error404";
 import { UserPermissionChoice } from "@gql/gql-types";
 import { UnitsRouter } from "./spa/unit/router";
+import DeactivatedAccount from "common/src/components/DeactivatedAccount";
 
 const Units = dynamic(() => import("./spa/unit"));
 
@@ -150,6 +151,15 @@ function ClientApp({
               feedbackUrl,
               UserPermissionChoice.CanManageNotifications
             )}
+          />
+          <Route
+            path="/deactivated-account"
+            element={
+              <DeactivatedAccount
+                feedbackUrl={feedbackUrl}
+                imgSrc={`${PUBLIC_URL}/images/deactivated-account.png`}
+              />
+            }
           />
         </Routes>
       </PageWrapper>

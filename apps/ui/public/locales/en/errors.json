@@ -5,6 +5,13 @@
   "500": {
     "body": "Something unexpected happened"
   },
+  "deactivatedAccount": {
+    "heading": "Your User ID is not valid.",
+    "subHeadingA": "Please contact support via email at",
+    "subHeadingB": "or via the Contact us form.",
+    "email": "varaamo@hel.fi",
+    "button": "Contact us"
+  },
   "applicationMutation": {
     "Validation error": "Error in the API call",
     "Form validation error": "Form validation error",
