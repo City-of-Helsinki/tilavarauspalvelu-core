@@ -9,6 +9,7 @@ import pytest
 from django.test import override_settings
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import ReservationCancelReason
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
@@ -23,6 +24,7 @@ pytestmark = [
 ]
 
 
+@patch_method(EmailService.send_reservation_cancelled_email)
 @pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
 def test_reservation__cancel__success(graphql, reservation_type):
     reservation = ReservationFactory.create_for_cancellation(type=reservation_type)
@@ -39,6 +41,8 @@ def test_reservation__cancel__success(graphql, reservation_type):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CANCELLED
     assert reservation.cancel_reason == reasons[0]
+
+    assert EmailService.send_reservation_cancelled_email.called is True
 
 
 def test_reservation__cancel__adds_cancel_details(graphql):
