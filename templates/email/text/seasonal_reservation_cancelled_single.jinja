@@ -1,0 +1,10 @@
+{{ salutation | safe }} {{ email_recipient_name | safe }},
+
+{{ text_reservation_cancelled | sentence | safe }}
+{{ cancel_reason_label | safe }}: {{ cancel_reason }}
+
+{% include "email/text/partials/reservation_basic_info.jinja" %}
+
+{{ check_booking_details_text | safe }}: {{ check_booking_details_url | safe }}
+
+{% include "email/text/partials/closing.jinja" %}
