@@ -11,7 +11,7 @@ def gen_vectors(apps, schema_editor) -> None:
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("tilavarauspalvelu", "0047_add_reservation_unit_search_vectors"),
+        ("tilavarauspalvelu", "0048_reservationunit_search_terms"),
     ]
 
     operations = [migrations.RunPython(gen_vectors, migrations.RunPython.noop)]

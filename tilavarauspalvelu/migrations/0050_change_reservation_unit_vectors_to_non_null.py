@@ -7,7 +7,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("tilavarauspalvelu", "0048_populate_reservation_unit_vectors"),
+        ("tilavarauspalvelu", "0049_populate_reservation_unit_vectors"),
     ]
 
     operations = [
