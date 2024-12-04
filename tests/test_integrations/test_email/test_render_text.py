@@ -555,6 +555,37 @@ def test_render_reservation_requires_payment__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_seasonal_reservation_cancelled_single_text():
+    context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, language="en")
+    text_content = render_text(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, context=context)
+
+    assert text_content == cleandoc(
+        """
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
+
+        The space reservation included in your seasonal booking has been cancelled.
+        Reason: [PERUUTUKSEN SYY]
+
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
+
+        From: 1.1.2024 at 12:00
+        To: 2.1.2024 at 15:00
+
+        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications
+
+        Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
+
+        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        """
+    )
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_seasonal_reservation_rejected_single__text():
     context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE, context=context)

@@ -14,6 +14,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_rejected,
     get_context_for_reservation_requires_handling,
     get_context_for_reservation_requires_payment,
+    get_context_for_seasonal_reservation_cancelled_single,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
@@ -926,6 +927,99 @@ def test_get_context__reservation_requires_payment__sv():
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
         **RESERVATION_MANAGE_LINK_CONTEXT_SV,
         **CLOSING_POLITE_CONTEXT_SV,
+        **AUTOMATIC_REPLY_CONTEXT_SV,
+    }
+
+
+# type: EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_cancelled_single__en():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_cancelled_single(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            cancel_reason="[PERUUTUKSEN SYY]",
+            language="en",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "The space reservation included in your seasonal booking has been cancelled",
+        "text_reservation_cancelled": "The space reservation included in your seasonal booking has been cancelled",
+        "cancel_reason_label": "Reason",
+        "cancel_reason": "[PERUUTUKSEN SYY]",
+        "check_booking_details_text": "You can check your booking details at",
+        "check_booking_details_url": "https://fake.varaamo.hel.fi/en/applications",
+        "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/en/applications">https://fake.varaamo.hel.fi/en/applications</a>',
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **CLOSING_CONTEXT_EN,
+        **AUTOMATIC_REPLY_CONTEXT_EN,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_cancelled_single__fi():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_cancelled_single(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            cancel_reason="[PERUUTUKSEN SYY]",
+            language="fi",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Kausivaraukseesi kuuluva tilavaraus on peruttu",
+        "text_reservation_cancelled": "Kausivaraukseesi kuuluva tilavaraus on peruttu",
+        "cancel_reason_label": "Syy",
+        "cancel_reason": "[PERUUTUKSEN SYY]",
+        "check_booking_details_text": "Voit käydä tarkistamassa varauksesi tiedot osoitteessa",
+        "check_booking_details_url": "https://fake.varaamo.hel.fi/applications",
+        "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/applications">https://fake.varaamo.hel.fi/applications</a>',
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **CLOSING_CONTEXT_FI,
+        **AUTOMATIC_REPLY_CONTEXT_FI,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_cancelled_single__sv():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_cancelled_single(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            cancel_reason="[PERUUTUKSEN SYY]",
+            language="sv",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Lokalbokningen som ingår i din säsongsbokning har avbokats",
+        "text_reservation_cancelled": "Lokalbokningen som ingår i din säsongsbokning har avbokats",
+        "cancel_reason_label": "Orsak",
+        "cancel_reason": "[PERUUTUKSEN SYY]",
+        "check_booking_details_text": "Du kan kontrollera dina bokningsuppgifter på",
+        "check_booking_details_url": "https://fake.varaamo.hel.fi/sv/applications",
+        "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/sv/applications">https://fake.varaamo.hel.fi/sv/applications</a>',
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **CLOSING_CONTEXT_SV,
         **AUTOMATIC_REPLY_CONTEXT_SV,
     }
 
