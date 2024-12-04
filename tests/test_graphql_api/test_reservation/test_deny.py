@@ -17,8 +17,10 @@ pytestmark = [
 ]
 
 
-def test_reservation__deny__state_is_confirmed(graphql):
-    reservation = ReservationFactory.create_for_deny(state=ReservationStateChoice.CONFIRMED)
+@override_settings(SEND_EMAILS=True)
+@pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
+def test_reservation__deny__state_is_confirmed(graphql, reservation_type, outbox):
+    reservation = ReservationFactory.create_for_deny(state=ReservationStateChoice.CONFIRMED, type=reservation_type)
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
@@ -28,6 +30,8 @@ def test_reservation__deny__state_is_confirmed(graphql):
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
+
+    assert len(outbox) == 1
 
 
 def test_reservation__deny__status_not_allowed_states(graphql):

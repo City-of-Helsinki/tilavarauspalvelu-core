@@ -2234,6 +2234,11 @@ msgstr "Varaus odottaa maksua"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
+msgid "Seasonal reservation rejected single"
+msgstr "Kausivaraus hylätty yksittäinen"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Staff notification reservation made"
 msgstr "Käsittelijä ilmoitus uudesta varauksesta"
 
@@ -3122,6 +3127,17 @@ msgstr "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla"
 msgctxt "Email"
 msgid "Due date"
 msgstr "Eräpäivä"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid ""
+"The space reservation included in your seasonal booking has been cancelled."
+msgstr "Kausivaraukseesi kuuluva tilavaraus on peruttu."
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "You can check your booking details at"
+msgstr "Voit käydä tarkistamassa varauksesi tiedot osoitteessa"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
