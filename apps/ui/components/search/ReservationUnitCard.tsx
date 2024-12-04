@@ -17,7 +17,7 @@ import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 
 type Node = ReservationUnitCardFieldsFragment;
-interface IProps {
+interface CardProps {
   reservationUnit: Node;
   selectReservationUnit: (reservationUnit: Node) => void;
   containsReservationUnit: (reservationUnit: Node) => boolean;
@@ -29,7 +29,7 @@ export function ReservationUnitCard({
   selectReservationUnit,
   containsReservationUnit,
   removeReservationUnit,
-}: IProps): JSX.Element {
+}: CardProps): JSX.Element {
   const { t } = useTranslation();
 
   const name = getReservationUnitName(reservationUnit);

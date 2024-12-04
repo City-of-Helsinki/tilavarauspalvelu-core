@@ -12,7 +12,7 @@ import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
 
-interface Props {
+interface CardProps {
   applicationRound: ApplicationRoundFieldsFragment;
 }
 
@@ -43,7 +43,9 @@ function translateRoundDate(
   }
 }
 
-export function ApplicationRoundCard({ applicationRound }: Props): JSX.Element {
+export function ApplicationRoundCard({
+  applicationRound,
+}: CardProps): JSX.Element {
   const { t } = useTranslation();
 
   const state = applicationRound.status;

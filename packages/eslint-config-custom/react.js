@@ -98,7 +98,6 @@ module.exports = defineConfig({
     "@typescript-eslint/no-unsafe-return": 0,
     "@typescript-eslint/no-unnecessary-type-arguments": 0,
     // TODO there should be rules for this already
-    "@typescript-eslint/naming-convention": 0,
     "no-implicit-coercion": 0,
     "import/no-named-as-default-member": 0,
     "import/no-named-as-default": 0,
@@ -181,7 +180,6 @@ module.exports = defineConfig({
       },
     ],
     "react/destructuring-assignment": 0,
-    "react/jsx-props-no-spreading": 0,
     "react/prop-types": 0,
     "react/require-default-props": 0,
     "react/static-property-placement": 0,
@@ -192,6 +190,10 @@ module.exports = defineConfig({
         unnamedComponents: ["function-expression", "arrow-function"],
       },
     ],
+    // Custom rule to enforce data-testid attribute naming
+    'react/no-unknown-property': ['error', {
+      requireDataLowercase: true,
+    }],
     // There seems to be no other way to override this than disabling it and rewriting the rules in the naming-convention
     "@typescript-eslint/camelcase": ["off"],
     "@typescript-eslint/no-empty-function": 0,

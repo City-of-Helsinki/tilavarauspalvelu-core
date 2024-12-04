@@ -22,7 +22,7 @@ import { Flex } from "common/styles/util";
 import { breakpoints } from "common";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
-interface Props {
+interface HeadProps {
   reservationUnit: QueryT;
   reservationUnitIsReservable?: boolean;
   subventionSuffix?: JSX.Element;
@@ -80,7 +80,7 @@ export function Head({
   reservationUnit,
   reservationUnitIsReservable,
   subventionSuffix,
-}: Props): JSX.Element {
+}: HeadProps): JSX.Element {
   const reservationUnitName = getReservationUnitName(reservationUnit);
   const unitName = getUnitName(reservationUnit.unit ?? undefined);
 
@@ -123,7 +123,7 @@ const IconListWrapper = styled.div`
 function IconList({
   reservationUnit,
   subventionSuffix,
-}: Pick<Props, "reservationUnit" | "subventionSuffix">): JSX.Element {
+}: Pick<HeadProps, "reservationUnit" | "subventionSuffix">): JSX.Element {
   const { t } = useTranslation();
 
   const minDur = reservationUnit.minReservationDuration ?? 0;

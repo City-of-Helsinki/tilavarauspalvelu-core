@@ -9,7 +9,7 @@ import {
   type UseControllerProps,
 } from "react-hook-form";
 
-interface Props<T extends FieldValues> extends UseControllerProps<T> {
+interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
   label: string;
@@ -47,7 +47,7 @@ export function ControlledSelect<T extends FieldValues>({
   multiselect,
   disabled,
   afterChange,
-}: Props<T>): JSX.Element {
+}: SelectProps<T>): JSX.Element {
   const { t } = useTranslation(["common"]);
   const {
     field: { value, onChange },

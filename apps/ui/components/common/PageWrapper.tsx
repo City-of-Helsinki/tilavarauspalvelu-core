@@ -8,7 +8,7 @@ import Navigation from "./Navigation";
 import { InProgressReservationNotification } from "@/components/reservations/UnpaidReservationNotification";
 import { mainStyles } from "common/styles/layout";
 
-interface Props {
+interface PageProps {
   children: React.ReactNode;
   overrideBackgroundColor?: string;
   apiBaseUrl: string;
@@ -27,7 +27,7 @@ function PageWrapper({
   feedbackUrl,
   children,
   version,
-}: Props): JSX.Element {
+}: PageProps): JSX.Element {
   return (
     <>
       <Head>
