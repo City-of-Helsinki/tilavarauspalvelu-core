@@ -19,6 +19,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_rejected,
     get_context_for_reservation_requires_handling,
     get_context_for_reservation_requires_payment,
+    get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
     get_context_for_user_anonymization,
@@ -67,6 +68,9 @@ def select_tester_form(*, email_type: EmailType) -> type[BaseEmailTemplateForm] 
             return ReservationRequiresHandlingEmailTemplateTesterForm
         case EmailType.RESERVATION_REQUIRES_PAYMENT:
             return ReservationRequiresPaymentEmailTemplateTesterForm
+
+        case EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE:
+            return SeasonalReservationRejectedSingleTemplateTesterForm
 
         # Staff
         case EmailType.STAFF_NOTIFICATION_RESERVATION_MADE:
@@ -391,6 +395,24 @@ class ReservationRequiresPaymentEmailTemplateTesterForm(
             payment_due_date=self.cleaned_data["payment_due_date"],
             reservation_id=self.cleaned_data["reservation_id"],
             confirmed_instructions=self.cleaned_data["confirmed_instructions"],
+        )
+
+
+class SeasonalReservationRejectedSingleTemplateTesterForm(ReservationBaseForm):
+    reservation_id = forms.IntegerField(initial=0, widget=number_widget)
+    rejection_reason = forms.CharField(initial="[HYLKÄYKSEN SYY]", widget=text_widget)
+
+    @classmethod
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+        return {
+            **super().get_initial_data_from_reservation_unit(instance, language=language),
+        }
+
+    def to_context(self) -> EmailContext:
+        return get_context_for_seasonal_reservation_rejected_single(
+            **super().get_context_params(),
+            email_recipient_name=self.cleaned_data["email_recipient_name"],
+            rejection_reason=self.cleaned_data["rejection_reason"],
         )
 
 
