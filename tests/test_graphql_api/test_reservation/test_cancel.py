@@ -23,8 +23,9 @@ pytestmark = [
 ]
 
 
+@override_settings(SEND_EMAILS=True)
 @pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
-def test_reservation__cancel__success(graphql, reservation_type):
+def test_reservation__cancel__success(graphql, reservation_type, outbox):
     reservation = ReservationFactory.create_for_cancellation(type=reservation_type)
 
     graphql.login_with_superuser()
@@ -39,6 +40,8 @@ def test_reservation__cancel__success(graphql, reservation_type):
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CANCELLED
     assert reservation.cancel_reason == reasons[0]
+
+    assert len(outbox) == 1
 
 
 def test_reservation__cancel__adds_cancel_details(graphql):
