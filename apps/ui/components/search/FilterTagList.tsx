@@ -124,7 +124,7 @@ export function FilterTagList({
         <ResetButton
           onClick={() => handleResetTags(hideList)}
           onDelete={() => handleResetTags(hideList)}
-          data-test-id="search-form__reset-button"
+          data-testid="search-form__reset-button"
         >
           {t("searchForm:resetForm")}
         </ResetButton>

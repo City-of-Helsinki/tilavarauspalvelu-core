@@ -185,7 +185,7 @@ export function EditStep1({
             variant="primary"
             type="submit"
             disabled={isSubmitting || !termsAccepted}
-            data-testid="reservation-edit__button--submit"
+            data-testid="reservation__button--continue"
             isLoading={isSubmitting}
             loadingText={t("reservations:saveNewTimeLoading")}
           >

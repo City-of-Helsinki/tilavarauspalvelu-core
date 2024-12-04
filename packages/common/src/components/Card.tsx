@@ -364,21 +364,21 @@ function Texts({
           <Header
             className="card__header"
             as={headingElement}
-            data-test-id={headingTestId ?? "card__heading"}
+            data-testid={headingTestId ?? "card__heading"}
           >
             {heading}
           </Header>
         }
         link={link}
       />
-      <Text data-test-id={textTestId ?? "card__content"}>{text}</Text>
+      <Text data-testid={textTestId ?? "card__content"}>{text}</Text>
     </TextContainer>
   );
 }
 
 function Tags({ tags }: Readonly<{ tags?: JSX.Element[] }>) {
   if (!tags) return null;
-  return <TagContainer data-test-id="card__tags">{tags}</TagContainer>;
+  return <TagContainer data-testid="card__tags">{tags}</TagContainer>;
 }
 
 const InfoItem = styled(Flex).attrs({

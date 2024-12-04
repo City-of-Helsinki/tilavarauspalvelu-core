@@ -87,7 +87,7 @@ export function SearchGuides(): JSX.Element {
       color="primary"
       src="images/guide-recurring.png"
     >
-      <InfoContainer data-test-id="search-guide__recurring">
+      <InfoContainer data-testid="search-guide__recurring">
         <H3 as="h2" $noMargin>
           {t("infoRecurring.heading")}
         </H3>

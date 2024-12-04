@@ -53,7 +53,7 @@ function Content({
               <Button
                 onClick={fetchMore}
                 variant="secondary"
-                data-test-id="list-with-pagination__button--paginate"
+                data-testid="list-with-pagination__button--paginate"
               >
                 {t("common:showMore")}
               </Button>

@@ -267,7 +267,7 @@ export function EditStep0({
             iconRight={<IconArrowRight aria-hidden />}
             disabled={!focusSlot.isReservable || !isDirty}
             type="submit"
-            data-testid="reservation-edit__button--continue"
+            data-testid="reservation__button--continue"
             isLoading={isLoading}
             loadingText={t("reservationCalendar:nextStepLoading")}
           >

@@ -301,7 +301,7 @@ function SubmitFragment(
           type="submit"
           isLoading={props.reservationForm.formState.isSubmitting}
           loadingText={props.loadingText}
-          data-test="quick-reservation__button--submit"
+          data-testid="quick-reservation__button--submit"
         >
           {props.buttonText}
         </SubmitButton>

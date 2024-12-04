@@ -116,7 +116,7 @@ export function Step0({
           type="submit"
           disabled={submitDisabled}
           iconRight={<IconArrowRight aria-hidden />}
-          data-testid="reservation__button--update"
+          data-testid="reservation__button--continue"
           isLoading={isSubmitting}
           loadingText={t("reservationCalendar:nextStepLoading")}
         >

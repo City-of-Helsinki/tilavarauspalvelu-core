@@ -82,7 +82,7 @@ export function Step1({
           iconRight={
             requiresHandling ? <IconArrowRight aria-hidden /> : undefined
           }
-          data-test="reservation__button--update"
+          data-testid="reservation__button--continue"
           isLoading={isSubmitting}
           loadingText={loadingText}
           disabled={!areTermsAccepted}
@@ -93,7 +93,7 @@ export function Step1({
           variant="secondary"
           iconLeft={<IconArrowLeft aria-hidden />}
           onClick={() => setStep(0)}
-          data-test="reservation__button--cancel"
+          data-testid="reservation__button--cancel"
         >
           {t("common:prev")}
         </Button>
