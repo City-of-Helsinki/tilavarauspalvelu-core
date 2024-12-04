@@ -2,12 +2,9 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
-  ReservationCancelReasonsDocument,
-  type ReservationCancelReasonsQuery,
-  type ReservationCancelReasonsQueryVariables,
-  ReservationDocument,
-  type ReservationQuery,
-  type ReservationQueryVariables,
+  ReservationCancelPageDocument,
+  type ReservationCancelPageQuery,
+  type ReservationCancelPageQueryVariables,
 } from "@gql/gql-types";
 import { ReservationCancellation } from "@/components/reservation/ReservationCancellation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -17,6 +14,7 @@ import { isReservationCancellable } from "@/modules/reservation";
 import { getReservationPath } from "@/modules/urls";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { useTranslation } from "next-i18next";
+import { gql } from "@apollo/client";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -57,30 +55,19 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
   if (Number.isFinite(Number(pk))) {
-    const typename = "ReservationNode";
-    const id = base64encode(`${typename}:${pk}`);
-    const { data: reservationData } = await client.query<
-      ReservationQuery,
-      ReservationQueryVariables
+    const id = base64encode(`ReservationNode:${pk}`);
+    const { data } = await client.query<
+      ReservationCancelPageQuery,
+      ReservationCancelPageQueryVariables
     >({
-      query: ReservationDocument,
+      query: ReservationCancelPageDocument,
       fetchPolicy: "no-cache",
       variables: { id },
     });
-    const { reservation } = reservationData || {};
-
-    const { data: cancelReasonsData } = await client.query<
-      ReservationCancelReasonsQuery,
-      ReservationCancelReasonsQueryVariables
-    >({
-      query: ReservationCancelReasonsDocument,
-      fetchPolicy: "no-cache",
-    });
+    const { reservation } = data || {};
 
     const reasons = filterNonNullable(
-      cancelReasonsData?.reservationCancelReasons?.edges.map(
-        (edge) => edge?.node
-      )
+      data?.reservationCancelReasons?.edges.map((edge) => edge?.node)
     );
 
     const canCancel =
@@ -116,5 +103,40 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
+
+export const RESERVATION_CANCEL_PAGE_QUERY = gql`
+  query ReservationCancelPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      ...ReservationInfoCard
+      pk
+      name
+      begin
+      end
+      state
+      reservationUnits {
+        id
+        ...CancellationRuleFields
+        cancellationTerms {
+          id
+          textEn
+          textFi
+          textSv
+        }
+      }
+    }
+    reservationCancelReasons {
+      edges {
+        node {
+          id
+          pk
+          reasonFi
+          reasonEn
+          reasonSv
+        }
+      }
+    }
+  }
+`;
 
 export default ReservationCancelPage;

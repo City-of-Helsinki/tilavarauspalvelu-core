@@ -44,9 +44,9 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
           reservations(orderBy: [beginAsc], beginDate: $beginDate) {
             id
             pk
-            begin
             end
             state
+            ...CanUserCancelReservation
           }
         }
       }

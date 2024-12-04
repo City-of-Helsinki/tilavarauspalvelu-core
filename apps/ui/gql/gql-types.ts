@@ -2435,7 +2435,7 @@ export type RecurringReservationNode = Node & {
   description: Scalars["String"]["output"];
   endDate?: Maybe<Scalars["Date"]["output"]>;
   endTime?: Maybe<Scalars["Time"]["output"]>;
-  extId: Scalars["UUID"]["output"];
+  extUuid: Scalars["UUID"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -2954,7 +2954,7 @@ export type ReservationNode = Node & {
   denyReason?: Maybe<ReservationDenyReasonNode>;
   description?: Maybe<Scalars["String"]["output"]>;
   end: Scalars["DateTime"]["output"];
-  extId: Scalars["UUID"]["output"];
+  extUuid: Scalars["UUID"]["output"];
   freeOfChargeReason?: Maybe<Scalars["String"]["output"]>;
   handledAt?: Maybe<Scalars["DateTime"]["output"]>;
   handlingDetails?: Maybe<Scalars["String"]["output"]>;
@@ -5428,9 +5428,16 @@ export type ApplicationSectionReservationFragment = {
         reservations: Array<{
           id: string;
           pk?: number | null;
-          begin: string;
           end: string;
           state?: ReservationStateChoice | null;
+          begin: string;
+          reservationUnits: Array<{
+            id: string;
+            cancellationRule?: {
+              id: string;
+              canBeCancelledTimeBefore?: number | null;
+            } | null;
+          }>;
         }>;
       } | null;
     }>;
@@ -5487,9 +5494,16 @@ export type ApplicationReservationsQuery = {
             reservations: Array<{
               id: string;
               pk?: number | null;
-              begin: string;
               end: string;
               state?: ReservationStateChoice | null;
+              begin: string;
+              reservationUnits: Array<{
+                id: string;
+                cancellationRule?: {
+                  id: string;
+                  canBeCancelledTimeBefore?: number | null;
+                } | null;
+              }>;
             }>;
           } | null;
         }>;
@@ -6074,6 +6088,7 @@ export type ConfirmReservationMutation = {
 };
 
 export type CancellationRuleFieldsFragment = {
+  id: string;
   cancellationRule?: {
     id: string;
     canBeCancelledTimeBefore?: number | null;
@@ -6196,6 +6211,19 @@ export type OrderFieldsFragment = {
   paymentType: PaymentType;
   receiptUrl?: string | null;
   checkoutUrl?: string | null;
+};
+
+export type CanUserCancelReservationFragment = {
+  id: string;
+  state?: ReservationStateChoice | null;
+  begin: string;
+  reservationUnits: Array<{
+    id: string;
+    cancellationRule?: {
+      id: string;
+      canBeCancelledTimeBefore?: number | null;
+    } | null;
+  }>;
 };
 
 export type ReservationStateQueryVariables = Exact<{
@@ -6369,24 +6397,6 @@ export type ReservationQuery = {
       maximum?: number | null;
     } | null;
     homeCity?: { id: string; pk?: number | null; name: string } | null;
-  } | null;
-};
-
-export type ReservationCancelReasonsQueryVariables = Exact<{
-  [key: string]: never;
-}>;
-
-export type ReservationCancelReasonsQuery = {
-  reservationCancelReasons?: {
-    edges: Array<{
-      node?: {
-        id: string;
-        pk?: number | null;
-        reasonFi?: string | null;
-        reasonEn?: string | null;
-        reasonSv?: string | null;
-      } | null;
-    } | null>;
   } | null;
 };
 
@@ -7754,9 +7764,16 @@ export type ApplicationSectionViewQuery = {
               reservations: Array<{
                 id: string;
                 pk?: number | null;
-                begin: string;
                 end: string;
                 state?: ReservationStateChoice | null;
+                begin: string;
+                reservationUnits: Array<{
+                  id: string;
+                  cancellationRule?: {
+                    id: string;
+                    canBeCancelledTimeBefore?: number | null;
+                  } | null;
+                }>;
               }>;
             } | null;
           }>;
@@ -7937,6 +7954,75 @@ export type ApplicationViewQuery = {
   } | null;
 };
 
+export type ReservationCancelPageQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationCancelPageQuery = {
+  reservation?: {
+    id: string;
+    pk?: number | null;
+    name?: string | null;
+    begin: string;
+    end: string;
+    state?: ReservationStateChoice | null;
+    taxPercentageValue?: string | null;
+    price?: string | null;
+    reservationUnits: Array<{
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+      reservationBegins?: string | null;
+      reservationEnds?: string | null;
+      cancellationTerms?: {
+        id: string;
+        textEn?: string | null;
+        textFi?: string | null;
+        textSv?: string | null;
+      } | null;
+      images: Array<{
+        id: string;
+        imageUrl?: string | null;
+        largeUrl?: string | null;
+        mediumUrl?: string | null;
+        smallUrl?: string | null;
+        imageType: ImageType;
+      }>;
+      unit?: {
+        id: string;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+      } | null;
+      cancellationRule?: {
+        id: string;
+        canBeCancelledTimeBefore?: number | null;
+      } | null;
+      pricings: Array<{
+        id: string;
+        begins: string;
+        priceUnit: PriceUnit;
+        lowestPrice: string;
+        highestPrice: string;
+        taxPercentage: { id: string; pk?: number | null; value: string };
+      }>;
+    }>;
+  } | null;
+  reservationCancelReasons?: {
+    edges: Array<{
+      node?: {
+        id: string;
+        pk?: number | null;
+        reasonFi?: string | null;
+        reasonEn?: string | null;
+        reasonSv?: string | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export const PricingFieldsFragmentDoc = gql`
   fragment PricingFields on ReservationUnitPricingNode {
     id
@@ -8000,6 +8086,26 @@ export const ReservationInfoCardFragmentDoc = gql`
   ${PriceReservationUnitFragmentDoc}
   ${ImageFragmentDoc}
 `;
+export const CancellationRuleFieldsFragmentDoc = gql`
+  fragment CancellationRuleFields on ReservationUnitNode {
+    id
+    cancellationRule {
+      id
+      canBeCancelledTimeBefore
+    }
+  }
+`;
+export const CanUserCancelReservationFragmentDoc = gql`
+  fragment CanUserCancelReservation on ReservationNode {
+    id
+    state
+    begin
+    reservationUnits {
+      ...CancellationRuleFields
+    }
+  }
+  ${CancellationRuleFieldsFragmentDoc}
+`;
 export const ApplicationSectionReservationFragmentDoc = gql`
   fragment ApplicationSectionReservation on ApplicationSectionNode {
     id
@@ -8042,14 +8148,15 @@ export const ApplicationSectionReservationFragmentDoc = gql`
           reservations(orderBy: [beginAsc], beginDate: $beginDate) {
             id
             pk
-            begin
             end
             state
+            ...CanUserCancelReservation
           }
         }
       }
     }
   }
+  ${CanUserCancelReservationFragmentDoc}
 `;
 export const ApplicationRoundFieldsFragmentDoc = gql`
   fragment ApplicationRoundFields on ApplicationRoundNode {
@@ -8078,14 +8185,6 @@ export const ApplicationRoundFieldsFragmentDoc = gql`
         id
         pk
       }
-    }
-  }
-`;
-export const CancellationRuleFieldsFragmentDoc = gql`
-  fragment CancellationRuleFields on ReservationUnitNode {
-    cancellationRule {
-      id
-      canBeCancelledTimeBefore
     }
   }
 `;
@@ -9915,7 +10014,6 @@ export const ListReservationsDocument = gql`
           }
           isBlocked
           reservationUnits {
-            id
             ...CancellationRuleFields
           }
         }
@@ -10207,91 +10305,6 @@ export type ReservationSuspenseQueryHookResult = ReturnType<
 export type ReservationQueryResult = Apollo.QueryResult<
   ReservationQuery,
   ReservationQueryVariables
->;
-export const ReservationCancelReasonsDocument = gql`
-  query ReservationCancelReasons {
-    reservationCancelReasons {
-      edges {
-        node {
-          id
-          pk
-          reasonFi
-          reasonEn
-          reasonSv
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useReservationCancelReasonsQuery__
- *
- * To run a query within a React component, call `useReservationCancelReasonsQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationCancelReasonsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationCancelReasonsQuery({
- *   variables: {
- *   },
- * });
- */
-export function useReservationCancelReasonsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ReservationCancelReasonsQuery,
-    ReservationCancelReasonsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ReservationCancelReasonsQuery,
-    ReservationCancelReasonsQueryVariables
-  >(ReservationCancelReasonsDocument, options);
-}
-export function useReservationCancelReasonsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationCancelReasonsQuery,
-    ReservationCancelReasonsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationCancelReasonsQuery,
-    ReservationCancelReasonsQueryVariables
-  >(ReservationCancelReasonsDocument, options);
-}
-export function useReservationCancelReasonsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationCancelReasonsQuery,
-        ReservationCancelReasonsQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationCancelReasonsQuery,
-    ReservationCancelReasonsQueryVariables
-  >(ReservationCancelReasonsDocument, options);
-}
-export type ReservationCancelReasonsQueryHookResult = ReturnType<
-  typeof useReservationCancelReasonsQuery
->;
-export type ReservationCancelReasonsLazyQueryHookResult = ReturnType<
-  typeof useReservationCancelReasonsLazyQuery
->;
-export type ReservationCancelReasonsSuspenseQueryHookResult = ReturnType<
-  typeof useReservationCancelReasonsSuspenseQuery
->;
-export type ReservationCancelReasonsQueryResult = Apollo.QueryResult<
-  ReservationCancelReasonsQuery,
-  ReservationCancelReasonsQueryVariables
 >;
 export const AdjustReservationTimeDocument = gql`
   mutation AdjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
@@ -11446,4 +11459,115 @@ export type ApplicationViewSuspenseQueryHookResult = ReturnType<
 export type ApplicationViewQueryResult = Apollo.QueryResult<
   ApplicationViewQuery,
   ApplicationViewQueryVariables
+>;
+export const ReservationCancelPageDocument = gql`
+  query ReservationCancelPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      ...ReservationInfoCard
+      pk
+      name
+      begin
+      end
+      state
+      reservationUnits {
+        id
+        ...CancellationRuleFields
+        cancellationTerms {
+          id
+          textEn
+          textFi
+          textSv
+        }
+      }
+    }
+    reservationCancelReasons {
+      edges {
+        node {
+          id
+          pk
+          reasonFi
+          reasonEn
+          reasonSv
+        }
+      }
+    }
+  }
+  ${ReservationInfoCardFragmentDoc}
+  ${CancellationRuleFieldsFragmentDoc}
+`;
+
+/**
+ * __useReservationCancelPageQuery__
+ *
+ * To run a query within a React component, call `useReservationCancelPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationCancelPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationCancelPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationCancelPageQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationCancelPageQuery,
+    ReservationCancelPageQueryVariables
+  > &
+    (
+      | { variables: ReservationCancelPageQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationCancelPageQuery,
+    ReservationCancelPageQueryVariables
+  >(ReservationCancelPageDocument, options);
+}
+export function useReservationCancelPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationCancelPageQuery,
+    ReservationCancelPageQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationCancelPageQuery,
+    ReservationCancelPageQueryVariables
+  >(ReservationCancelPageDocument, options);
+}
+export function useReservationCancelPageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationCancelPageQuery,
+        ReservationCancelPageQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationCancelPageQuery,
+    ReservationCancelPageQueryVariables
+  >(ReservationCancelPageDocument, options);
+}
+export type ReservationCancelPageQueryHookResult = ReturnType<
+  typeof useReservationCancelPageQuery
+>;
+export type ReservationCancelPageLazyQueryHookResult = ReturnType<
+  typeof useReservationCancelPageLazyQuery
+>;
+export type ReservationCancelPageSuspenseQueryHookResult = ReturnType<
+  typeof useReservationCancelPageSuspenseQuery
+>;
+export type ReservationCancelPageQueryResult = Apollo.QueryResult<
+  ReservationCancelPageQuery,
+  ReservationCancelPageQueryVariables
 >;

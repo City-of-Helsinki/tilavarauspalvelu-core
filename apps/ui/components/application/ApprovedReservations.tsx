@@ -51,6 +51,7 @@ import { CenterSpinner } from "../common/common";
 import { useMedia } from "react-use";
 import { ButtonContainer, Flex } from "common/styles/util";
 import { useRouter } from "next/router";
+import { isReservationCancellable } from "@/modules/reservation";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
@@ -448,6 +449,7 @@ type ReservationsTableElem = {
     "nameSv" | "nameFi" | "nameEn" | "id" | "pk"
   >;
   status: "" | "rejected" | "modified";
+  isCancellable: boolean;
   pk: number;
 };
 
@@ -600,11 +602,11 @@ function ReservationsTable({
       key: "cancelButton",
       headerName: "",
       isSortable: false,
-      transform: ({ pk, status }: ReservationsTableElem) => (
+      transform: ({ pk, isCancellable }: ReservationsTableElem) => (
         <CancelButton
           onClick={() => handleCancel(pk)}
-          disabled={status === "rejected"}
-          // TODO on mobile this should be hidden behind a popover (for now it's hidden)
+          disabled={!isCancellable}
+          // FIXME on mobile this should be hidden behind a popover (for now it's hidden)
           className="hide-on-mobile"
         >
           {t("common:cancel")}
@@ -694,6 +696,7 @@ function sectionToreservations(
         ...rest,
         reservationUnit: r.reservationUnit,
         status: "rejected",
+        isCancellable: false,
         pk: 0,
       };
     });
@@ -705,7 +708,9 @@ function sectionToreservations(
     return r.reservations.map((res) => {
       const { isModified, ...rest } = toTimeString(t, res, r.allocatedTimeSlot);
 
+      const isCancellable = isReservationCancellable(res);
       const status =
+        res.state === ReservationStateChoice.Cancelled ||
         res.state === ReservationStateChoice.Denied
           ? "rejected"
           : isModified
@@ -715,6 +720,7 @@ function sectionToreservations(
         ...rest,
         reservationUnit: r.reservationUnit,
         status,
+        isCancellable: isCancellable && status !== "rejected",
         pk: res.pk ?? 0,
       };
     });

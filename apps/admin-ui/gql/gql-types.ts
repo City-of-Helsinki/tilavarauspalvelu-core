@@ -2435,7 +2435,7 @@ export type RecurringReservationNode = Node & {
   description: Scalars["String"]["output"];
   endDate?: Maybe<Scalars["Date"]["output"]>;
   endTime?: Maybe<Scalars["Time"]["output"]>;
-  extId: Scalars["UUID"]["output"];
+  extUuid: Scalars["UUID"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -2954,7 +2954,7 @@ export type ReservationNode = Node & {
   denyReason?: Maybe<ReservationDenyReasonNode>;
   description?: Maybe<Scalars["String"]["output"]>;
   end: Scalars["DateTime"]["output"];
-  extId: Scalars["UUID"]["output"];
+  extUuid: Scalars["UUID"]["output"];
   freeOfChargeReason?: Maybe<Scalars["String"]["output"]>;
   handledAt?: Maybe<Scalars["DateTime"]["output"]>;
   handlingDetails?: Maybe<Scalars["String"]["output"]>;

@@ -20,7 +20,8 @@ import {
   OrderStatus,
   type ReservationOrderStatusFragment,
   type CancellationRuleFieldsFragment,
-  BlockingReservationFieldsFragment,
+  type BlockingReservationFieldsFragment,
+  type CanUserCancelReservationFragment,
 } from "@gql/gql-types";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { getIntervalMinutes } from "common/src/conversion";
@@ -136,14 +137,8 @@ function isTooCloseToCancel(
   return cancelLatest < now;
 }
 
-type CanUserCancelReservationProps = Pick<
-  NonNullable<ReservationNodeT>,
-  "state" | "begin"
-> & {
-  reservationUnits?: Maybe<Array<CancellationRuleFieldsFragment>> | undefined;
-};
 export function isReservationCancellable(
-  reservation: CanUserCancelReservationProps
+  reservation: CanUserCancelReservationFragment
 ): boolean {
   const reservationUnit = reservation.reservationUnits?.[0];
   const isReservationCancelled =
@@ -246,7 +241,7 @@ export type CanReservationBeChangedProps = {
     ReservationNode,
     "begin" | "end" | "isHandled" | "state" | "price"
   > &
-    CanUserCancelReservationProps;
+    CanUserCancelReservationFragment;
   reservableTimes: ReservableMap;
   newReservation: PendingReservation;
   reservationUnit: IsReservableFieldsFragment;

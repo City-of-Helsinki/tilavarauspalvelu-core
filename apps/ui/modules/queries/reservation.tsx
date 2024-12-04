@@ -59,6 +59,7 @@ export const CONFIRM_RESERVATION = gql`
 
 const CANCELLATION_RULE_FRAGMENT = gql`
   fragment CancellationRuleFields on ReservationUnitNode {
+    id
     cancellationRule {
       id
       canBeCancelledTimeBefore
@@ -119,7 +120,6 @@ export const LIST_RESERVATIONS = gql`
           }
           isBlocked
           reservationUnits {
-            id
             ...CancellationRuleFields
           }
         }
@@ -162,6 +162,17 @@ export const ORDER_FRAGMENT = gql`
     paymentType
     receiptUrl
     checkoutUrl
+  }
+`;
+
+export const CAN_USER_CANCEL_RESERVATION_FRAGMENT = gql`
+  fragment CanUserCancelReservation on ReservationNode {
+    id
+    state
+    begin
+    reservationUnits {
+      ...CancellationRuleFields
+    }
   }
 `;
 
@@ -219,24 +230,6 @@ export const GET_RESERVATION = gql`
         ...CancellationRuleFields
       }
       isHandled
-    }
-  }
-`;
-
-// TODO combine these into params query (similarly to as in admin-ui)
-// where are they even used?
-export const GET_RESERVATION_CANCEL_REASONS = gql`
-  query ReservationCancelReasons {
-    reservationCancelReasons {
-      edges {
-        node {
-          id
-          pk
-          reasonFi
-          reasonEn
-          reasonSv
-        }
-      }
     }
   }
 `;

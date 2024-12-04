@@ -2595,7 +2595,7 @@ type RecurringReservationNode implements Node {
   description: String!
   endDate: Date
   endTime: Time
-  extId: UUID!
+  extUuid: UUID!
   """
   The ID of the object
   """
@@ -3206,7 +3206,7 @@ type ReservationNode implements Node {
   denyReason: ReservationDenyReasonNode
   description: String
   end: DateTime!
-  extId: UUID!
+  extUuid: UUID!
   freeOfChargeReason: String
   handledAt: DateTime
   handlingDetails: String

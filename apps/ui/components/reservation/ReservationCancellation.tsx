@@ -6,8 +6,7 @@ import { useTranslation } from "next-i18next";
 import { fontMedium, H1 } from "common/src/common/typography";
 import {
   useCancelReservationMutation,
-  type ReservationQuery,
-  type ReservationCancelReasonsQuery,
+  type ReservationCancelPageQuery,
 } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import Sanitize from "../common/Sanitize";
@@ -29,13 +28,13 @@ import { breakpoints } from "common";
 import Error from "next/error";
 
 type CancelReasonsQ = NonNullable<
-  ReservationCancelReasonsQuery["reservationCancelReasons"]
+  ReservationCancelPageQuery["reservationCancelReasons"]
 >;
 type CancelReasonsEdge = NonNullable<CancelReasonsQ["edges"]>;
 type CancelReasonsNode = NonNullable<
   NonNullable<CancelReasonsEdge[number]>["node"]
 >;
-type NodeT = ReservationQuery["reservation"];
+type NodeT = ReservationCancelPageQuery["reservation"];
 type Props = {
   apiBaseUrl: string;
   reasons: CancelReasonsNode[];
@@ -114,7 +113,12 @@ export function ReservationCancellation(props: Props): JSX.Element {
         <H1 $noMargin>{title}</H1>
         <p>{ingress}</p>
       </div>
-      {/* TODO replace this if part of an application */}
+      {/* TODO replace this if part of an application
+       * annoying thing here is that this adds unnecessary fields to the query
+       * we only need application fields or reservation fields
+       * another option would be
+       * to split the pages in two so we can do separate SSR queries and append this element on the page level
+       */}
       <StyledInfoCard reservation={reservation} type="confirmed" />
       <Flex>
         {!isSuccess ? (
