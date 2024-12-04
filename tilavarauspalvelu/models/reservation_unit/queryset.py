@@ -156,14 +156,19 @@ class ReservationUnitQuerySet(models.QuerySet):
                         models.F(f"description_{lang}"),
                         #
                         # Additional search terms
-                        models.Value(" ".join(term for term in reservation_unit.search_terms)),
+                        models.Value(
+                            " ".join(term for term in reservation_unit.search_terms),
+                            output_field=models.CharField(),
+                        ),
                         #
                         # Joins are not allowed in search vectors, so we compute them as values beforehand.
                         models.Value(
-                            getattr(reservation_unit.unit, f"name_{lang}", ""),
+                            getattr(reservation_unit.unit, f"name_{lang}", "") or "",
+                            output_field=models.CharField(),
                         ),
                         models.Value(
-                            getattr(reservation_unit.reservation_unit_type, f"name_{lang}", ""),
+                            getattr(reservation_unit.reservation_unit_type, f"name_{lang}", "") or "",
+                            output_field=models.CharField(),
                         ),
                         models.Value(
                             " ".join(
@@ -171,6 +176,7 @@ class ReservationUnitQuerySet(models.QuerySet):
                                 for inst in reservation_unit.spaces.all()
                                 if (name := getattr(inst, f"name_{lang}", ""))
                             ),
+                            output_field=models.CharField(),
                         ),
                         models.Value(
                             " ".join(
@@ -178,6 +184,7 @@ class ReservationUnitQuerySet(models.QuerySet):
                                 for inst in reservation_unit.resources.all()
                                 if (name := getattr(inst, f"name_{lang}", ""))
                             ),
+                            output_field=models.CharField(),
                         ),
                         models.Value(
                             " ".join(
@@ -185,6 +192,7 @@ class ReservationUnitQuerySet(models.QuerySet):
                                 for inst in reservation_unit.purposes.all()
                                 if (name := getattr(inst, f"name_{lang}", ""))
                             ),
+                            output_field=models.CharField(),
                         ),
                         models.Value(
                             " ".join(
@@ -192,6 +200,7 @@ class ReservationUnitQuerySet(models.QuerySet):
                                 for inst in reservation_unit.equipments.all()
                                 if (name := getattr(inst, f"name_{lang}", ""))
                             ),
+                            output_field=models.CharField(),
                         ),
                         #
                         config=config,
