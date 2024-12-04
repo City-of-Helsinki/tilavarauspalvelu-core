@@ -11,7 +11,6 @@ import {
 } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import Sanitize from "../common/Sanitize";
-import { getTranslation } from "@/modules/util";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { signOut } from "common/src/browserHelpers";
 import { ReservationPageWrapper } from "../reservations/styles";
@@ -27,6 +26,7 @@ import { getReservationPath } from "@/modules/urls";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { AccordionWithState } from "../Accordion";
 import { breakpoints } from "common";
+import Error from "next/error";
 
 type CancelReasonsQ = NonNullable<
   ReservationCancelReasonsQuery["reservationCancelReasons"]
@@ -90,12 +90,48 @@ const StyledInfoCard = styled(ReservationInfoCard)`
 `;
 
 export function ReservationCancellation(props: Props): JSX.Element {
-  const { t, i18n } = useTranslation();
-  const { apiBaseUrl } = props;
-
   const [isSuccess, setIsSuccess] = useState(false);
+  const { t } = useTranslation();
 
+  const { reservation } = props;
+
+  const title = !isSuccess
+    ? t("reservations:cancelReservation")
+    : t("reservations:reservationCancelledTitle");
+  const ingress = !isSuccess
+    ? t("reservations:cancelReservationBody")
+    : t("reservations:reservationCancelledBody");
+
+  const handleNext = () => {
+    setIsSuccess(true);
+  };
+
+  // TODO check that the reservation hasn't been cancelled already
+
+  return (
+    <ReservationPageWrapper>
+      <div>
+        <H1 $noMargin>{title}</H1>
+        <p>{ingress}</p>
+      </div>
+      {/* TODO replace this if part of an application */}
+      <StyledInfoCard reservation={reservation} type="confirmed" />
+      <Flex>
+        {!isSuccess ? (
+          <CancellationForm {...props} onNext={handleNext} />
+        ) : (
+          <CancellationSuccess {...props} />
+        )}
+      </Flex>
+    </ReservationPageWrapper>
+  );
+}
+
+function CancellationForm(props: Props & { onNext: () => void }): JSX.Element {
+  const { reservation, onNext } = props;
+  const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
+
   const reasons = props.reasons.map((node) => ({
     label: getTranslationSafe(node, "reason", lang),
     value: node?.pk ?? 0,
@@ -110,17 +146,7 @@ export function ReservationCancellation(props: Props): JSX.Element {
     register("reason", { required: true });
     register("description");
   }, [register]);
-
-  const { reservation } = props;
-
-  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
-  const instructions = reservationUnit
-    ? getTranslationSafe(
-        reservationUnit,
-        "reservationCancelledInstructions",
-        lang
-      )
-    : null;
+  const reservationUnit = reservation.reservationUnits.find(() => true);
 
   const onSubmit = (formData: FormValues) => {
     if (!reservation.pk || !formData.reason) {
@@ -138,7 +164,7 @@ export function ReservationCancellation(props: Props): JSX.Element {
         },
       });
       // TODO redirect to a success page (or back to the reservation page with a toast is preferable)
-      setIsSuccess(true);
+      onNext();
       window.scrollTo(0, 0);
     } catch (e) {
       errorToast({
@@ -147,76 +173,76 @@ export function ReservationCancellation(props: Props): JSX.Element {
     }
   };
 
-  const title = !isSuccess
-    ? t("reservations:cancelReservation")
-    : t("reservations:reservationCancelledTitle");
-  const ingress = !isSuccess
-    ? t("reservations:cancelReservationBody")
-    : t("reservations:reservationCancelledBody");
-
   const cancellationTerms =
-    reservationUnit.cancellationTerms != null
-      ? getTranslation(reservationUnit?.cancellationTerms, "text")
+    reservationUnit?.cancellationTerms != null
+      ? getTranslationSafe(reservationUnit?.cancellationTerms, "text", lang)
       : null;
 
-  // TODO check that the reservation hasn't been cancelled already
+  return (
+    <>
+      <p style={{ margin: 0 }}>{t("reservations:cancelInfoBody")}</p>
+      {cancellationTerms != null && (
+        <AccordionWithState
+          heading={t("reservationUnit:cancellationTerms")}
+          disableBottomMargin
+        >
+          <TermsBox body={<Sanitize html={cancellationTerms ?? ""} />} />
+        </AccordionWithState>
+      )}
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <AutoGrid>
+          <ControlledSelect
+            name="reason"
+            control={control}
+            label={t("reservations:cancelReason")}
+            options={reasons}
+            required
+          />
+          <Actions>
+            <ButtonLikeLink
+              data-testid="reservation-cancel__button--back"
+              href={getReservationPath(reservation.pk)}
+            >
+              <IconCross aria-hidden="true" />
+              {t("reservations:cancelReservationCancellation")}
+            </ButtonLikeLink>
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={!watch("reason")}
+              data-testid="reservation-cancel__button--cancel"
+              isLoading={loading}
+            >
+              {t("reservations:cancelReservation")}
+            </Button>
+          </Actions>
+        </AutoGrid>
+      </Form>
+    </>
+  );
+}
+
+function CancellationSuccess(props: Props): JSX.Element {
+  const { apiBaseUrl } = props;
+  const reservationUnit = props.reservation.reservationUnits.find(() => true);
+  const { i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
+
+  // Should never happen but we can't enforce it in the type system
+  if (reservationUnit == null) {
+    return <Error statusCode={404} />;
+  }
+
+  const instructions = getTranslationSafe(
+    reservationUnit,
+    "reservationCancelledInstructions",
+    lang
+  );
 
   return (
-    <ReservationPageWrapper>
-      <div>
-        <H1 $noMargin>{title}</H1>
-        <p>{ingress}</p>
-      </div>
-      <StyledInfoCard reservation={reservation} type="confirmed" />
-      <Flex>
-        {!isSuccess ? (
-          <>
-            <p style={{ margin: 0 }}>{t("reservations:cancelInfoBody")}</p>
-            {cancellationTerms != null && (
-              <AccordionWithState
-                heading={t("reservationUnit:cancellationTerms")}
-                disableBottomMargin
-              >
-                <TermsBox body={<Sanitize html={cancellationTerms ?? ""} />} />
-              </AccordionWithState>
-            )}
-            <Form onSubmit={handleSubmit(onSubmit)}>
-              <AutoGrid>
-                <ControlledSelect
-                  name="reason"
-                  control={control}
-                  label={t("reservations:cancelReason")}
-                  options={reasons}
-                  required
-                />
-                <Actions>
-                  <ButtonLikeLink
-                    data-testid="reservation-cancel__button--back"
-                    href={getReservationPath(reservation.pk)}
-                  >
-                    <IconCross aria-hidden="true" />
-                    {t("reservations:cancelReservationCancellation")}
-                  </ButtonLikeLink>
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    disabled={!watch("reason")}
-                    data-testid="reservation-cancel__button--cancel"
-                    isLoading={loading}
-                  >
-                    {t("reservations:cancelReservation")}
-                  </Button>
-                </Actions>
-              </AutoGrid>
-            </Form>
-          </>
-        ) : (
-          <>
-            {isSuccess && instructions && <p>{instructions}</p>}
-            <ReturnLinkList apiBaseUrl={apiBaseUrl} />
-          </>
-        )}
-      </Flex>
-    </ReservationPageWrapper>
+    <>
+      {instructions && <p>{instructions}</p>}
+      <ReturnLinkList apiBaseUrl={apiBaseUrl} />
+    </>
   );
 }

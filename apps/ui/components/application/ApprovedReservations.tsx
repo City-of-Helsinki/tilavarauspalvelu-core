@@ -50,6 +50,7 @@ import { AccordionWithIcons } from "../AccordionWithIcons";
 import { CenterSpinner } from "../common/common";
 import { useMedia } from "react-use";
 import { ButtonContainer, Flex } from "common/styles/util";
+import { useRouter } from "next/router";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
@@ -517,9 +518,10 @@ function ReservationsTable({
   const { t } = useTranslation();
 
   const lang = getLocalizationLang(i18n.language);
+  const router = useRouter();
 
   const handleCancel = (pk: number) => {
-    errorToast({ text: `Not implemented: cancel reservation: ${pk}` });
+    router.push(`/reservations/${pk}/cancel`);
   };
 
   const cols = [
