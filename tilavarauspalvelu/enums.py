@@ -268,6 +268,12 @@ class EmailType(models.TextChoices):
         pgettext_lazy("EmailType", "Reservation requires payment"),
     )
 
+    SEASONAL_RESERVATION_REJECTED_SINGLE = (
+        "seasonal_reservation_rejected_single",
+        pgettext_lazy("EmailType", "Seasonal reservation rejected single"),
+    )
+    """Staff rejects a single reservation in a seasonal reservation series"""
+
     # Staff
     STAFF_NOTIFICATION_RESERVATION_MADE = (
         "staff_notification_reservation_made",

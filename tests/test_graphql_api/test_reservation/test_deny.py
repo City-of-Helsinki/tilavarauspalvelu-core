@@ -6,9 +6,11 @@ import pytest
 from django.test import override_settings
 
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory
+from tests.helpers import patch_method
 
 from .helpers import DENY_MUTATION, get_deny_data
 
@@ -17,8 +19,10 @@ pytestmark = [
 ]
 
 
-def test_reservation__deny__state_is_confirmed(graphql):
-    reservation = ReservationFactory.create_for_deny(state=ReservationStateChoice.CONFIRMED)
+@patch_method(EmailService.send_reservation_rejected_email)
+@pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
+def test_reservation__deny__state_is_confirmed(graphql, reservation_type):
+    reservation = ReservationFactory.create_for_deny(state=ReservationStateChoice.CONFIRMED, type=reservation_type)
 
     graphql.login_with_superuser()
     input_data = get_deny_data(reservation)
@@ -28,6 +32,8 @@ def test_reservation__deny__state_is_confirmed(graphql):
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
+
+    assert EmailService.send_reservation_rejected_email.called is True
 
 
 def test_reservation__deny__status_not_allowed_states(graphql):
