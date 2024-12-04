@@ -48,7 +48,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
     applying_for_free_of_charge = True
     payment_due_date = end.date()
     tax_percentage = Decimal("25.5")
-    booking_number = 1234
+    reservation_id = 1234
     confirmed_instructions = "[HYVÄKSYTYN VARAUKSEN OHJEET]"
     cancelled_instructions = "[PERUUTETUN VARAUKSEN OHJEET]"
     pending_instructions = "[KÄSITELTÄVÄN VARAUKSEN OHJEET]"
@@ -83,7 +83,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 price=price,
                 non_subsidised_price=non_subsidised_price,
                 tax_percentage=tax_percentage,
-                booking_number=booking_number,
+                reservation_id=reservation_id,
                 confirmed_instructions=confirmed_instructions,
                 language=language,
             )
@@ -98,7 +98,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 end_datetime=end,
                 price=price,
                 tax_percentage=tax_percentage,
-                booking_number=booking_number,
+                reservation_id=reservation_id,
                 cancelled_instructions=cancelled_instructions,
                 language=language,
             )
@@ -112,7 +112,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 end_datetime=end,
                 price=price,
                 tax_percentage=tax_percentage,
-                booking_number=booking_number,
+                reservation_id=reservation_id,
                 confirmed_instructions=confirmed_instructions,
                 language=language,
             )
@@ -126,7 +126,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 end_datetime=end,
                 price=price,
                 tax_percentage=tax_percentage,
-                booking_number=booking_number,
+                reservation_id=reservation_id,
                 confirmed_instructions=confirmed_instructions,
                 language=language,
             )
@@ -139,7 +139,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 begin_datetime=begin,
                 end_datetime=end,
                 rejection_reason=rejection_reason,
-                booking_number=booking_number,
+                reservation_id=reservation_id,
                 cancelled_instructions=cancelled_instructions,
                 language=language,
             )
@@ -155,7 +155,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 subsidised_price=subsidised_price,
                 applying_for_free_of_charge=applying_for_free_of_charge,
                 tax_percentage=tax_percentage,
-                booking_number=booking_number,
+                reservation_id=reservation_id,
                 pending_instructions=pending_instructions,
                 language=language,
             )
@@ -170,7 +170,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 price=price,
                 tax_percentage=tax_percentage,
                 payment_due_date=payment_due_date,
-                booking_number=booking_number,
+                reservation_id=reservation_id,
                 confirmed_instructions=confirmed_instructions,
                 language=language,
             )
@@ -186,7 +186,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 unit_location=unit_location,
                 begin_datetime=begin,
                 end_datetime=end,
-                booking_number=booking_number,
+                reservation_id=reservation_id,
                 language=language,
             )
         case EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING:
@@ -198,7 +198,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | No
                 unit_location=unit_location,
                 begin_datetime=begin,
                 end_datetime=end,
-                booking_number=booking_number,
+                reservation_id=reservation_id,
                 language=language,
             )
 

@@ -3,7 +3,7 @@
 {{ text_staff_reservation_made | safe }}: {{ reservation_name }}.
 
 {{ reservee_name_label | safe }}: {{ reservee_name }}
-{{ booking_number_label | safe }}: {{ booking_number }}
+{{ booking_number_label | safe }}: {{ reservation_id }}
 
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 
