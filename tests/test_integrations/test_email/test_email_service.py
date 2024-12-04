@@ -1031,6 +1031,30 @@ def test_email_service__send_reservation_requires_payment_email__price_zero(outb
     assert len(outbox) == 0
 
 
+# type: EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE #################################################################
+
+
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01")
+def test_email_service__send_seasonal_reservation_rejected_single(outbox):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.DENIED,
+        type=ReservationTypeChoice.SEASONAL,
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_units__name="foo",
+        begin=datetime.datetime(2024, 1, 1, 10, 0),
+        end=datetime.datetime(2024, 1, 1, 12, 0),
+    )
+
+    EmailService.send_reservation_rejected_email(reservation)
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "The space reservation included in your seasonal booking has been cancelled"
+    assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
+
+
 # type: EmailType.STAFF_NOTIFICATION_RESERVATION_MADE ##################################################################
 
 

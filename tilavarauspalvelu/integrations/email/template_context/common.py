@@ -148,6 +148,16 @@ def get_contex_for_reservation_price_range(
     }
 
 
+def get_contex_for_seasonal_reservation_check_details_url(*, language: Lang) -> EmailContext:
+    link = get_my_applications_ext_link(language=language)
+
+    return {
+        "check_booking_details_text": pgettext("Email", "You can check your booking details at"),
+        "check_booking_details_url_html": create_anchor_tag(link=link, text=link),
+        "check_booking_details_url": link,
+    }
+
+
 # --- Params for contexts ------------------------------------------------------------------------------------------
 
 
