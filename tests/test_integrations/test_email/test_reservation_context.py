@@ -65,7 +65,7 @@ def test_get_context__reservation_approved__en():
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="These are the instructions",
             language="en",
         )
@@ -98,7 +98,7 @@ def test_get_context__reservation_approved__discount__en():
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="These are the instructions",
             language="en",
         )
@@ -131,7 +131,7 @@ def test_get_context__reservation_approved__fi():
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="Tässä ovat ohjeet",
             language="fi",
         )
@@ -164,7 +164,7 @@ def test_get_context__reservation_approved__discount__fi():
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="Tässä ovat ohjeet",
             language="fi",
         )
@@ -197,7 +197,7 @@ def test_get_context__reservation_approved__sv():
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="Här är instruktionerna",
             language="sv",
         )
@@ -230,7 +230,7 @@ def test_get_context__reservation_approved__discount__sv():
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="Här är instruktionerna",
             language="sv",
         )
@@ -266,7 +266,7 @@ def test_get_context__reservation_cancelled__en():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             cancelled_instructions="This are the instructions",
             language="en",
         )
@@ -300,7 +300,7 @@ def test_get_context__reservation_cancelled__fi():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             cancelled_instructions="Tässä ovat ohjeet",
             language="fi",
         )
@@ -334,7 +334,7 @@ def test_get_context__reservation_cancelled__sv():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             cancelled_instructions="Här är instruktionerna",
             language="sv",
         )
@@ -370,7 +370,7 @@ def test_get_context__reservation_confirmed__en():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="These are the instructions",
             language="en",
         )
@@ -402,7 +402,7 @@ def test_get_context__reservation_confirmed__fi():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="Nämä ovat ohjeet",
             language="fi",
         )
@@ -434,7 +434,7 @@ def test_get_context__reservation_confirmed__sv():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="Här är instruktionerna",
             language="sv",
         )
@@ -469,7 +469,7 @@ def test_get_context__reservation_modified__en():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="These are the instructions",
             language="en",
         )
@@ -501,7 +501,7 @@ def test_get_context__reservation_modified__fi():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="Tässä ovat ohjeet",
             language="fi",
         )
@@ -533,7 +533,7 @@ def test_get_context__reservation_modified__sv():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="Här är instruktionerna",
             language="sv",
         )
@@ -567,7 +567,7 @@ def test_get_context__reservation_rejected__en():
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="This is the rejection reason",
-            booking_number=12,
+            reservation_id=12,
             cancelled_instructions="These are the instructions",
             language="en",
         )
@@ -575,7 +575,7 @@ def test_get_context__reservation_rejected__en():
     assert context == {
         "email_recipient_name": "John Doe",
         "booking_number_label": "Booking number",
-        "booking_number": "12",
+        "reservation_id": "12",
         "rejection_reason_label": "Reason",
         "rejection_reason": "This is the rejection reason",
         "text_reservation_rejected": "Unfortunately your booking cannot be confirmed",
@@ -600,7 +600,7 @@ def test_get_context__reservation_rejected__fi():
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="Tässä on hylkäyksen syy",
-            booking_number=12,
+            reservation_id=12,
             cancelled_instructions="Tässä ovat ohjeet",
             language="fi",
         )
@@ -608,7 +608,7 @@ def test_get_context__reservation_rejected__fi():
     assert context == {
         "email_recipient_name": "Mikko Mallikas",
         "booking_number_label": "Varausnumero",
-        "booking_number": "12",
+        "reservation_id": "12",
         "rejection_reason_label": "Syy",
         "rejection_reason": "Tässä on hylkäyksen syy",
         "text_reservation_rejected": "Valitettavasti varaustasi ei voida vahvistaa",
@@ -633,7 +633,7 @@ def test_get_context__reservation_rejected__sv():
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="Här är orsaken till avslagningen",
-            booking_number=12,
+            reservation_id=12,
             cancelled_instructions="Här är instruktionerna",
             language="sv",
         )
@@ -641,7 +641,7 @@ def test_get_context__reservation_rejected__sv():
     assert context == {
         "email_recipient_name": "Magnus Persson",
         "booking_number_label": "Bokningsnummer",
-        "booking_number": "12",
+        "reservation_id": "12",
         "rejection_reason_label": "Orsak",
         "rejection_reason": "Här är orsaken till avslagningen",
         "text_reservation_rejected": "Tyvärr kan vi inte bekräfta din bokning",
@@ -672,7 +672,7 @@ def test_get_context__reservation_requires_handling__en():
             subsidised_price=Decimal("12.30"),
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             pending_instructions="These are the instructions",
             language="en",
         )
@@ -710,7 +710,7 @@ def test_get_context__reservation_requires_handling__fi():
             subsidised_price=Decimal("12.30"),
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             pending_instructions="Tässä ovat ohjeet",
             language="fi",
         )
@@ -748,7 +748,7 @@ def test_get_context__reservation_requires_handling__sv():
             subsidised_price=Decimal("12.30"),
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             pending_instructions="Här är instruktionerna",
             language="sv",
         )
@@ -786,7 +786,7 @@ def test_get_context__reservation_requires_handling__subsidised():
             subsidised_price=Decimal("10.30"),
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
-            booking_number=12,
+            reservation_id=12,
             pending_instructions="These are the instructions",
             language="en",
         )
@@ -828,7 +828,7 @@ def test_get_context__reservation_requires_payment__en():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="These are the instructions",
             language="en",
         )
@@ -865,7 +865,7 @@ def test_get_context__reservation_requires_payment__fi():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="Tässä ovat ohjeet",
             language="fi",
         )
@@ -902,7 +902,7 @@ def test_get_context__reservation_requires_payment__sv():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
-            booking_number=12,
+            reservation_id=12,
             confirmed_instructions="Här är instruktionerna",
             language="sv",
         )
@@ -940,7 +940,7 @@ def test_get_context__staff_notification_reservation_made__en():
             unit_location="Test location",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            booking_number=12,
+            reservation_id=12,
             language="en",
         )
 
@@ -948,7 +948,7 @@ def test_get_context__staff_notification_reservation_made__en():
         "email_recipient_name": None,
         "reservation_name": "Test reservation",
         "booking_number_label": "Booking number",
-        "booking_number": "12",
+        "reservation_id": "12",
         "reservee_name_label": "Reservee name",
         "reservee_name": "John Doe",
         "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
@@ -976,7 +976,7 @@ def test_get_context__staff_notification_reservation_made__fi():
             unit_location="Test location",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            booking_number=12,
+            reservation_id=12,
             language="fi",
         )
 
@@ -984,7 +984,7 @@ def test_get_context__staff_notification_reservation_made__fi():
         "email_recipient_name": None,
         "reservation_name": "Test reservation",
         "booking_number_label": "Varausnumero",
-        "booking_number": "12",
+        "reservation_id": "12",
         "reservee_name_label": "Varaajan nimi",
         "reservee_name": "Mikko Mallikas",
         "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
@@ -1012,7 +1012,7 @@ def test_get_context__staff_notification_reservation_made__sv():
             unit_location="Test location",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            booking_number=12,
+            reservation_id=12,
             language="sv",
         )
 
@@ -1020,7 +1020,7 @@ def test_get_context__staff_notification_reservation_made__sv():
         "email_recipient_name": None,
         "reservation_name": "Test reservation",
         "booking_number_label": "Bokningsnummer",
-        "booking_number": "12",
+        "reservation_id": "12",
         "reservee_name_label": "Bokare",
         "reservee_name": "Magnus Persson",
         "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
@@ -1051,7 +1051,7 @@ def test_get_context__staff_notification_reservation_requires_handling__en():
             unit_location="Test location",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            booking_number=12,
+            reservation_id=12,
             language="en",
         )
 
@@ -1059,7 +1059,7 @@ def test_get_context__staff_notification_reservation_requires_handling__en():
         "email_recipient_name": None,
         "reservation_name": "Test reservation",
         "booking_number_label": "Booking number",
-        "booking_number": "12",
+        "reservation_id": "12",
         "reservee_name_label": "Reservee name",
         "reservee_name": "John Doe",
         "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
@@ -1089,7 +1089,7 @@ def test_get_context__staff_notification_reservation_requires_handling__fi():
             unit_location="Test location",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            booking_number=12,
+            reservation_id=12,
             language="fi",
         )
 
@@ -1097,7 +1097,7 @@ def test_get_context__staff_notification_reservation_requires_handling__fi():
         "email_recipient_name": None,
         "reservation_name": "Test reservation",
         "booking_number_label": "Varausnumero",
-        "booking_number": "12",
+        "reservation_id": "12",
         "reservee_name_label": "Varaajan nimi",
         "reservee_name": "Mikko Mallikas",
         "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
@@ -1127,7 +1127,7 @@ def test_get_context__staff_notification_reservation_requires_handling__sv():
             unit_location="Test location",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            booking_number=12,
+            reservation_id=12,
             language="sv",
         )
 
@@ -1135,7 +1135,7 @@ def test_get_context__staff_notification_reservation_requires_handling__sv():
         "email_recipient_name": None,
         "reservation_name": "Test reservation",
         "booking_number_label": "Bokningsnummer",
-        "booking_number": "12",
+        "reservation_id": "12",
         "reservee_name_label": "Bokare",
         "reservee_name": "Magnus Persson",
         "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",

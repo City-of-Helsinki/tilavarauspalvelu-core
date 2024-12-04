@@ -185,7 +185,7 @@ def test_render_reservation_approved__text():
         price=Decimal("12.30"),
         non_subsidised_price=Decimal("12.30"),
         tax_percentage=Decimal("25.5"),
-        booking_number=12,
+        reservation_id=12,
         confirmed_instructions="These are the instructions",
     )
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
@@ -240,7 +240,7 @@ def test_render_reservation_approved__discount__text():
         price=Decimal("12.30"),
         non_subsidised_price=Decimal("15.30"),
         tax_percentage=Decimal("25.5"),
-        booking_number=12,
+        reservation_id=12,
         confirmed_instructions="These are the instructions",
     )
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
@@ -295,7 +295,7 @@ def test_render_reservation_cancelled__text():
         end_datetime=datetime.datetime(2024, 1, 1, 14),
         price=Decimal("12.30"),
         tax_percentage=Decimal("25.5"),
-        booking_number=12,
+        reservation_id=12,
         cancelled_instructions="These are the instructions",
     )
     text_content = render_text(email_type=EmailType.RESERVATION_CANCELLED, context=context)
@@ -342,7 +342,7 @@ def test_render_reservation_confirmed__text():
         end_datetime=datetime.datetime(2024, 1, 1, 14),
         price=Decimal("12.30"),
         tax_percentage=Decimal("25.5"),
-        booking_number=12,
+        reservation_id=12,
         confirmed_instructions="These are the instructions",
     )
     text_content = render_text(email_type=EmailType.RESERVATION_CONFIRMED, context=context)
@@ -396,7 +396,7 @@ def test_render_reservation_modified__text():
         end_datetime=datetime.datetime(2024, 1, 1, 14),
         price=Decimal("12.30"),
         tax_percentage=Decimal("25.5"),
-        booking_number=12,
+        reservation_id=12,
         confirmed_instructions="These are the instructions",
     )
     text_content = render_text(email_type=EmailType.RESERVATION_MODIFIED, context=context)
@@ -450,7 +450,7 @@ def test_render_reservation_rejected__text():
         begin_datetime=datetime.datetime(2024, 1, 1, 12),
         end_datetime=datetime.datetime(2024, 1, 1, 14),
         rejection_reason="This is the rejection reason",
-        booking_number=12,
+        reservation_id=12,
         cancelled_instructions="These are the instructions",
     )
     text_content = render_text(email_type=EmailType.RESERVATION_REJECTED, context=context)
@@ -498,7 +498,7 @@ def test_render_reservation_requires_handling__text():
         subsidised_price=Decimal("12.30"),
         applying_for_free_of_charge=True,
         tax_percentage=Decimal("25.5"),
-        booking_number=12,
+        reservation_id=12,
         pending_instructions="These are the instructions",
     )
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, context=context)
@@ -563,7 +563,7 @@ def test_render_reservation_requires_handling__subsidised__text():
         subsidised_price=Decimal("10.30"),
         applying_for_free_of_charge=True,
         tax_percentage=Decimal("25.5"),
-        booking_number=12,
+        reservation_id=12,
         pending_instructions="These are the instructions",
     )
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, context=context)
@@ -627,7 +627,7 @@ def test_render_reservation_requires_payment__text():
         price=Decimal("12.30"),
         tax_percentage=Decimal("25.5"),
         payment_due_date=datetime.date(2024, 2, 1),
-        booking_number=12,
+        reservation_id=12,
         confirmed_instructions="These are the instructions",
     )
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, context=context)
@@ -688,7 +688,7 @@ def test_render_reservation_staff_notification_reservation_made__text():
         unit_location="Test location",
         begin_datetime=datetime.datetime(2024, 1, 1, 12),
         end_datetime=datetime.datetime(2024, 1, 1, 14),
-        booking_number=12,
+        reservation_id=12,
     )
     text_content = render_text(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE, context=context)
 
@@ -730,7 +730,7 @@ def test_render_reservation_staff_notification_reservation_requires_handling__te
         unit_location="Test location",
         begin_datetime=datetime.datetime(2024, 1, 1, 12),
         end_datetime=datetime.datetime(2024, 1, 1, 14),
-        booking_number=12,
+        reservation_id=12,
     )
     text_content = render_text(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING, context=context)
 
