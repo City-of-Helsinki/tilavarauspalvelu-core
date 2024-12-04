@@ -137,7 +137,7 @@ function StartApplicationBar({
           disabled={isSaving}
           iconEnd={<IconArrowRight aria-hidden="true" />}
         >
-          {isMobile ? t("shoppingCart:nextShort") : t("shoppingCart:next")}
+          {t("shoppingCart:nextShort")}
         </Button>
       </InnerContainer>
     </BackgroundContainer>
