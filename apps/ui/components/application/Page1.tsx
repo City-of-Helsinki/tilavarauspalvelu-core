@@ -3,7 +3,7 @@ import {
   ButtonSize,
   ButtonVariant,
   IconArrowRight,
-  IconPlusCircle,
+  IconPlus,
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
@@ -143,17 +143,16 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
           />
         ) : null
       )}
-      <Button
-        id="addApplicationEvent"
-        size={ButtonSize.Small}
-        variant={ButtonVariant.Supplementary}
-        iconStart={<IconPlusCircle aria-hidden="true" />}
-        onClick={handleAddNewApplicationEvent}
-      >
-        {t("application:Page1.createNew")}
-      </Button>
-      <ButtonContainer>
-        <div />
+      <ButtonContainer $justifyContent="space-between">
+        <Button
+          id="addApplicationEvent"
+          variant={ButtonVariant.Secondary}
+          iconStart={<IconPlus aria-hidden="true" />}
+          onClick={handleAddNewApplicationEvent}
+          size={ButtonSize.Small}
+        >
+          {t("application:Page1.createNew")}
+        </Button>
         <Button
           id="button__application--next"
           iconEnd={<IconArrowRight aria-hidden="true" />}
