@@ -117,14 +117,14 @@ def get_contex_for_reservation_manage_link(*, language: Lang) -> EmailContext:
     }
 
 
-def get_contex_for_reservation_price(*, price: Decimal, tax_percentage: Decimal, booking_number: int) -> EmailContext:
+def get_contex_for_reservation_price(*, price: Decimal, tax_percentage: Decimal, reservation_id: int) -> EmailContext:
     return {
         "price_label": pgettext("Email", "Price"),
         "price": price,
         "vat_included_label": pgettext("Email", "incl. VAT"),
         "tax_percentage": tax_percentage,
         "booking_number_label": pgettext("Email", "Booking number"),
-        "booking_number": str(booking_number),
+        "reservation_id": str(reservation_id),
     }
 
 
@@ -133,7 +133,7 @@ def get_contex_for_reservation_price_range(
     price: Decimal,
     subsidised_price: Decimal,
     tax_percentage: Decimal,
-    booking_number: int,
+    reservation_id: int,
     applying_for_free_of_charge: bool,
 ) -> EmailContext:
     return {
@@ -144,7 +144,7 @@ def get_contex_for_reservation_price_range(
         "vat_included_label": pgettext("Email", "incl. VAT"),
         "tax_percentage": tax_percentage,
         "booking_number_label": pgettext("Email", "Booking number"),
-        "booking_number": str(booking_number),
+        "reservation_id": str(reservation_id),
     }
 
 
@@ -168,7 +168,7 @@ def params_for_price_info(*, reservation: Reservation) -> dict[str, Any]:
     return {
         "price": reservation.price,
         "tax_percentage": reservation.tax_percentage_value,
-        "booking_number": reservation.id,
+        "reservation_id": reservation.id,
     }
 
 
@@ -183,7 +183,7 @@ def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
         "subsidised_price": subsidised_price,
         "applying_for_free_of_charge": reservation.applying_for_free_of_charge,
         "tax_percentage": reservation.tax_percentage_value,
-        "booking_number": reservation.id,
+        "reservation_id": reservation.id,
     }
 
 
@@ -216,9 +216,9 @@ def get_staff_login_link() -> str:
     return f"{url_base}/kasittely"
 
 
-def get_staff_reservations_ext_link(*, booking_number: int) -> str:
+def get_staff_reservations_ext_link(*, reservation_id: int) -> str:
     url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
-    return f"{url_base}/kasittely/reservations/{booking_number}"
+    return f"{url_base}/kasittely/reservations/{reservation_id}"
 
 
 def get_feedback_ext_link(*, language: Lang) -> str:

@@ -5,7 +5,7 @@
     <mj-text>{{ rejection_reason_label | safe }}: {{ rejection_reason | safe }}</mj-text>
     {% include "email/html/partials/reservation_basic_info.jinja" %}
     <mj-spacer />
-    <mj-text>{{ booking_number_label | safe }}: {{ booking_number }}</mj-text>
+    <mj-text>{{ booking_number_label | safe }}: {{ reservation_id }}</mj-text>
 {% endblock %}
 
 {% block content_secondary %}

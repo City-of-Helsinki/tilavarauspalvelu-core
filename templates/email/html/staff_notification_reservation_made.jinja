@@ -4,7 +4,7 @@
     <mj-text>{{ text_staff_reservation_made | safe }}: <b>{{ reservation_name | safe }}</b>.</mj-text>
     <mj-spacer />
     <mj-text>{{ reservee_name_label | safe }}: {{ reservee_name | safe }}</mj-text>
-    <mj-text>{{ booking_number_label | safe }}: {{ booking_number }}</mj-text>
+    <mj-text>{{ booking_number_label | safe }}: {{ reservation_id }}</mj-text>
     {% include "email/html/partials/reservation_basic_info.jinja" %}
 {% endblock %}
 
