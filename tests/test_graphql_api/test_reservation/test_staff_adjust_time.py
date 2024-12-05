@@ -20,8 +20,9 @@ pytestmark = [
 
 
 @override_settings(SEND_EMAILS=True)
-def test_reservation__staff_adjust_time__send_email_if_type_normal(graphql, outbox):
-    reservation = ReservationFactory.create_for_time_adjustment()
+@pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
+def test_reservation__staff_adjust_time__send_email_if_type_normal_or_seasonal(graphql, reservation_type, outbox):
+    reservation = ReservationFactory.create_for_time_adjustment(type=reservation_type)
 
     graphql.login_with_superuser()
     data = get_staff_adjust_data(reservation)
@@ -30,7 +31,10 @@ def test_reservation__staff_adjust_time__send_email_if_type_normal(graphql, outb
     assert response.has_errors is False, response.errors
 
     assert len(outbox) == 1
-    assert outbox[0].subject == "Your booking has been updated"
+    if reservation_type == ReservationTypeChoice.NORMAL:
+        assert outbox[0].subject == "Your booking has been updated"
+    else:
+        assert outbox[0].subject == "The time of the space reservation included in your seasonal booking has changed"
 
 
 @override_settings(SEND_EMAILS=True)

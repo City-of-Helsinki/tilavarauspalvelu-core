@@ -72,6 +72,8 @@ def select_tester_form(*, email_type: EmailType) -> type[BaseEmailTemplateForm] 
 
         case EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE:
             return SeasonalReservationCancelledSingleTemplateTesterForm
+        case EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE:
+            return SeasonalReservationModifiedSingleTemplateTesterForm
         case EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE:
             return SeasonalReservationRejectedSingleTemplateTesterForm
 
@@ -416,6 +418,22 @@ class SeasonalReservationCancelledSingleTemplateTesterForm(ReservationBaseForm):
             **super().get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             cancel_reason=self.cleaned_data["cancel_reason"],
+        )
+
+
+class SeasonalReservationModifiedSingleTemplateTesterForm(ReservationBaseForm):
+    reservation_id = forms.IntegerField(initial=0, widget=number_widget)
+
+    @classmethod
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+        return {
+            **super().get_initial_data_from_reservation_unit(instance, language=language),
+        }
+
+    def to_context(self) -> EmailContext:
+        return get_context_for_seasonal_reservation_cancelled_single(
+            **super().get_context_params(),
+            email_recipient_name=self.cleaned_data["email_recipient_name"],
         )
 
 
