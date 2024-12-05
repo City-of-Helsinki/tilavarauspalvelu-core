@@ -465,6 +465,8 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
                 reservation_pks=[reservation.pk for reservation in reservations],
             )
 
+        # TODO: Email notification
+
         return instance
 
     def recreate_reservations(
@@ -664,6 +666,8 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
             create_or_update_reservation_statistics.delay(
                 reservation_pks=[reservation.pk for reservation in reservations],
             )
+
+        # TODO: Email notification
 
         return self.instance
 

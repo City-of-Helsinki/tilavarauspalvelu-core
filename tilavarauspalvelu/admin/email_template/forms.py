@@ -69,8 +69,16 @@ def select_tester_form(*, email_type: EmailType) -> type[BaseEmailTemplateForm] 
         case EmailType.RESERVATION_REQUIRES_PAYMENT:
             return ReservationRequiresPaymentEmailTemplateTesterForm
 
+        case EmailType.SEASONAL_RESERVATION_CANCELLED_SERIES:
+            return SeasonalReservationCancelledSeriesTemplateTesterForm
         case EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE:
             return SeasonalReservationCancelledSingleTemplateTesterForm
+        case EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES:
+            return SeasonalReservationModifiedSeriesTemplateTesterForm
+        case EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE:
+            return SeasonalReservationModifiedSingleTemplateTesterForm
+        case EmailType.SEASONAL_RESERVATION_REJECTED_SERIES:
+            return SeasonalReservationRejectedSeriesTemplateTesterForm
         case EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE:
             return SeasonalReservationRejectedSingleTemplateTesterForm
 
@@ -405,7 +413,23 @@ class ReservationRequiresPaymentEmailTemplateTesterForm(
         )
 
 
+class SeasonalReservationCancelledSeriesTemplateTesterForm(ReservationBaseForm):
+    pass
+
+
 class SeasonalReservationCancelledSingleTemplateTesterForm(ReservationBaseForm):
+    pass
+
+
+class SeasonalReservationModifiedSeriesTemplateTesterForm(ReservationBaseForm):
+    pass
+
+
+class SeasonalReservationModifiedSingleTemplateTesterForm(ReservationBaseForm):
+    pass
+
+
+class SeasonalReservationRejectedSeriesTemplateTesterForm(ReservationBaseForm):
     pass
 
 

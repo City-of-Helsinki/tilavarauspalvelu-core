@@ -555,6 +555,11 @@ def test_render_reservation_requires_payment__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_seasonal_reservation_cancelled_series_text():
+    pass
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_seasonal_reservation_cancelled_single_text():
     context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, context=context)
@@ -583,6 +588,21 @@ def test_render_seasonal_reservation_cancelled_single_text():
         Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
         """
     )
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_seasonal_reservation_modified_series__text():
+    pass
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_seasonal_reservation_modified_single__text():
+    pass
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_seasonal_reservation_rejected_series__text():
+    pass
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")

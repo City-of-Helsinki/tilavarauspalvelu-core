@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     import datetime
     from decimal import Decimal
 
-    from tilavarauspalvelu.models import Reservation
+    from tilavarauspalvelu.models import RecurringReservation, Reservation
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
@@ -40,7 +40,11 @@ __all__ = [
     "get_context_for_reservation_rejected",
     "get_context_for_reservation_requires_handling",
     "get_context_for_reservation_requires_payment",
+    "get_context_for_seasonal_reservation_cancelled_series",
     "get_context_for_seasonal_reservation_cancelled_single",
+    "get_context_for_seasonal_reservation_modified_series",
+    "get_context_for_seasonal_reservation_modified_single",
+    "get_context_for_seasonal_reservation_rejected_series",
     "get_context_for_seasonal_reservation_rejected_single",
     "get_context_for_staff_notification_reservation_made",
     "get_context_for_staff_notification_reservation_requires_handling",
@@ -542,6 +546,32 @@ def get_context_for_reservation_requires_payment(
     }
 
 
+# type: EmailType.SEASONAL_RESERVATION_CANCELLED_SERIES ################################################################
+
+
+@overload
+def get_context_for_seasonal_reservation_cancelled_series(
+    reservation_series: RecurringReservation, *, language: Lang
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_seasonal_reservation_cancelled_series(
+    *,  # TODO
+    language: Lang,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_seasonal_reservation_cancelled_series(
+    reservation_series: RecurringReservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    pass
+
+
 # type: EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE ################################################################
 
 
@@ -596,6 +626,84 @@ def get_context_for_seasonal_reservation_cancelled_single(
         **get_contex_for_seasonal_reservation_check_details_url(language=language),
         **get_contex_for_closing(language=language),
     }
+
+
+# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES #################################################################
+
+
+@overload
+def get_context_for_seasonal_reservation_modified_series(
+    reservation_series: RecurringReservation, *, language: Lang
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_seasonal_reservation_modified_series(
+    *,
+    language: Lang,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_seasonal_reservation_modified_series(
+    reservation_series: RecurringReservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    pass
+
+
+# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE #################################################################
+
+
+@overload
+def get_context_for_seasonal_reservation_modified_single(
+    reservation: Reservation, *, language: Lang
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_seasonal_reservation_modified_single(
+    *,
+    language: Lang,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_seasonal_reservation_modified_single(
+    reservation: Reservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    pass
+
+
+# type: EmailType.SEASONAL_RESERVATION_REJECTED_SERIES #################################################################
+
+
+@overload
+def get_context_for_seasonal_reservation_rejected_series(
+    reservation_series: RecurringReservation, *, language: Lang
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_seasonal_reservation_rejected_series(
+    *,
+    language: Lang,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_seasonal_reservation_rejected_series(
+    reservation_series: RecurringReservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    pass
 
 
 # type: EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE #################################################################

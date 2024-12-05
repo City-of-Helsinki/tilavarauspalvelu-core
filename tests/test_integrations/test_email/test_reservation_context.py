@@ -931,6 +931,24 @@ def test_get_context__reservation_requires_payment__sv():
     }
 
 
+# type: EmailType.SEASONAL_RESERVATION_CANCELLED_SERIES #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_cancelled_series__en():
+    pass
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_cancelled_series__fi():
+    pass
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_cancelled_series__sv():
+    pass
+
+
 # type: EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE #################################################################################
 
 
@@ -1022,6 +1040,60 @@ def test_get_context_for_seasonal_reservation_cancelled_single__sv():
         **CLOSING_CONTEXT_SV,
         **AUTOMATIC_REPLY_CONTEXT_SV,
     }
+
+
+# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_series__en():
+    pass
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_series__fi():
+    pass
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_series__sv():
+    pass
+
+
+# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_single__en():
+    pass
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_single__fi():
+    pass
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_single__sv():
+    pass
+
+
+# type: EmailType.SEASONAL_RESERVATION_REJECTED_SERIES #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_rejected_series__en():
+    pass
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_rejected_series__fi():
+    pass
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for__seasonal_reservation_rejected_series_sv():
+    pass
 
 
 # type: EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE #################################################################################

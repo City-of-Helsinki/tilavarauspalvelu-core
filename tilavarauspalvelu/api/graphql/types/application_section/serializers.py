@@ -283,6 +283,8 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             cancel_details=self.validated_data.get("cancel_details", ""),
         )
 
+        # TODO: Email notification
+
         return data
 
 

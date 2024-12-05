@@ -1,0 +1,30 @@
+{% extends "email/html/partials/base.jinja" %}
+
+{% block content_main %}
+    <mj-text>{{ text_reservation_rejected | sentence | safe }}</mj-text>
+    <mj-text>{{ rejection_reason_label | safe }}: {{ rejection_reason | safe }}</mj-text>
+    {% include "email/html/partials/reservation_basic_info.jinja" %}
+    <mj-spacer />
+    <mj-text>{{ booking_number_label | safe }}: {{ reservation_id }}</mj-text>
+{% endblock %}
+
+{% block content_secondary %}
+    {% include "email/html/partials/instructions.jinja" %}
+{% endblock %}
+
+{% block content_closing %}
+    {% include "email/html/partials/closing.jinja" %}
+{% endblock %}
+
+
+Hi {{reservee_name}},
+All space reservations included in your seasonal booking have been cancelled.
+Reason: {{cancel_reason}}
+Seasonal booking: [hakemuksen osan nimi], [kausivarauskierroksen nimi]
+You can check your booking details at https://tilavaraus.test.hel.ninja/applications
+Thank you for choosing Varaamo!
+Kind regards,
+Varaamo
+This is an automated message, please do not reply.
+Send us feedback on Varaamo: {{feedback_ext_link}}
+Book the city’s premises and equipment for your use at {{varaamo_ext_link}}

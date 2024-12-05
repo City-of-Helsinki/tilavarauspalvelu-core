@@ -268,11 +268,35 @@ class EmailType(models.TextChoices):
         pgettext_lazy("EmailType", "Reservation requires payment"),
     )
 
+    SEASONAL_RESERVATION_CANCELLED_SERIES = (
+        "seasonal_reservation_cancelled_series",
+        pgettext_lazy("EmailType", "Seasonal reservation cancelled series"),
+    )
+    """User cancels their seasonal reservation series"""
+
     SEASONAL_RESERVATION_CANCELLED_SINGLE = (
         "seasonal_reservation_cancelled_single",
         pgettext_lazy("EmailType", "Seasonal reservation cancelled single"),
     )
     """User cancels one of their seasonal reservations"""
+
+    SEASONAL_RESERVATION_MODIFIED_SERIES = (
+        "seasonal_reservation_modified_series",
+        pgettext_lazy("EmailType", "Seasonal reservation modified series"),
+    )
+    """Staff modifies a seasonal reservation series"""
+
+    SEASONAL_RESERVATION_MODIFIED_SINGLE = (
+        "seasonal_reservation_modified_single",
+        pgettext_lazy("EmailType", "Seasonal reservation modified single"),
+    )
+    """Staff modifies a single seasonal reservation"""
+
+    SEASONAL_RESERVATION_REJECTED_SERIES = (
+        "seasonal_reservation_rejected_series",
+        pgettext_lazy("EmailType", "Seasonal reservation rejected series"),
+    )
+    """Staff rejects a seasonal reservation series"""
 
     SEASONAL_RESERVATION_REJECTED_SINGLE = (
         "seasonal_reservation_rejected_single",

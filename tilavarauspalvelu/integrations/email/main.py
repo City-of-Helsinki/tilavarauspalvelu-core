@@ -34,6 +34,7 @@ from .template_context import (
     get_context_for_reservation_requires_handling,
     get_context_for_reservation_requires_payment,
     get_context_for_seasonal_reservation_cancelled_single,
+    get_context_for_seasonal_reservation_modified_single,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
@@ -304,8 +305,13 @@ class EmailService:
         if language is None:
             language = get_reservation_email_language(reservation=reservation)
 
-        email_type = EmailType.RESERVATION_MODIFIED
-        context = get_context_for_reservation_modified(reservation, language=language)
+        if reservation.type == ReservationTypeChoice.SEASONAL:
+            email_type = EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE
+            context = get_context_for_seasonal_reservation_modified_single(reservation, language=language)
+        else:
+            email_type = EmailType.RESERVATION_MODIFIED
+            context = get_context_for_reservation_modified(reservation, language=language)
+
         attachment = get_reservation_ical_attachment(reservation)
         email = EmailData.build(recipients, context, email_type, attachment=attachment)
         send_emails_in_batches_task.delay(email_data=email)

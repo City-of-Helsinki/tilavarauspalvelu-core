@@ -696,6 +696,11 @@ def test_render_reservation_requires_payment__html():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_seasonal_reservation_cancelled_series__html():
+    pass
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_seasonal_reservation_cancelled_single__html():
     context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, language="en")
     html_content = render_html(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, context=context)
@@ -732,6 +737,21 @@ def test_render_seasonal_reservation_cancelled_single__html():
         (C) City of Helsinki 2024
         """
     )
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_seasonal_reservation_modified_series__html():
+    pass
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_seasonal_reservation_modified_single__html():
+    pass
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_seasonal_reservation_rejected_series__html():
+    pass
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")

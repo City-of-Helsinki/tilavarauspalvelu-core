@@ -16,8 +16,9 @@ pytestmark = [
 ]
 
 
-def test_reservation__staff_modify(graphql):
-    reservation = ReservationFactory.create_for_staff_update()
+@pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL])
+def test_reservation__staff_modify(graphql, reservation_type):
+    reservation = ReservationFactory.create_for_staff_update(type=reservation_type)
 
     graphql.login_with_superuser()
     data = get_staff_modify_data(reservation)

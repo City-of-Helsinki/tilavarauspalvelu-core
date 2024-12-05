@@ -2234,8 +2234,28 @@ msgstr "Varaus odottaa maksua"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
+msgid "Seasonal reservation cancelled series"
+msgstr "Kausivaraus peruttu sarja"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Seasonal reservation cancelled single"
 msgstr "Kausivaraus peruttu yksittäinen"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified series"
+msgstr "Kausivaraus muokattu sarja"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified single"
+msgstr "Kausivaraus muokattu yksittäinen"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
+msgid "Seasonal reservation rejected series"
+msgstr "Kausivaraus hylätty sarja"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
