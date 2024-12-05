@@ -33,13 +33,6 @@ import { breakpoints } from "common";
 import { InlineStyledLink } from "@/styles/util";
 import { BackLinkList } from "@/components/reservation/CancelledLinkSet";
 
-const StyledInfoCard = styled(ReservationInfoCard)`
-  @media (min-width: ${breakpoints.m}) {
-    grid-row: 1 / span 2;
-    grid-column: -1;
-  }
-`;
-
 function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
   const { t } = useTranslation();
   const routes = [
@@ -63,7 +56,7 @@ function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
     <>
       <BreadcrumbWrapper route={routes} />
       <ReservationPageWrapper $nRows={4}>
-        <StyledInfoCard reservation={reservation} type="confirmed" />
+        <ReservationInfoCard reservation={reservation} type="confirmed" />
         <ReservationConfirmation
           apiBaseUrl={apiBaseUrl}
           reservation={reservation}
@@ -76,7 +69,6 @@ function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
 const Wrapper = styled(Flex)`
   @media (min-width: ${breakpoints.m}) {
     grid-row: 1 / -1;
-    grid-column: span 2;
   }
 `;
 

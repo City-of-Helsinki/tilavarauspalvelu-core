@@ -84,21 +84,8 @@ type FormValues = {
 
 const StyledInfoCard = styled(ReservationInfoCard)`
   @media (min-width: ${breakpoints.m}) {
-    grid-row: 1 / span 2;
-    grid-column: -1;
-  }
-`;
-
-const Wrapper = styled(Flex)`
-  @media (min-width: ${breakpoints.m}) {
-    grid-row: 2 / -1;
-    grid-column: 1 / span 2;
-  }
-`;
-
-const TitleSection = styled.div`
-  @media (min-width: ${breakpoints.m}) {
-    grid-column: 1 / span 2;
+    grid-row: 1 / -1;
+    grid-column: 2;
   }
 `;
 
@@ -176,12 +163,12 @@ export function ReservationCancellation(props: Props): JSX.Element {
 
   return (
     <ReservationPageWrapper>
-      <TitleSection>
+      <div>
         <H1 $noMargin>{title}</H1>
         <p>{ingress}</p>
-      </TitleSection>
+      </div>
       <StyledInfoCard reservation={reservation} type="confirmed" />
-      <Wrapper>
+      <Flex>
         {!isSuccess ? (
           <>
             <p style={{ margin: 0 }}>{t("reservations:cancelInfoBody")}</p>
@@ -229,7 +216,7 @@ export function ReservationCancellation(props: Props): JSX.Element {
             <ReturnLinkList apiBaseUrl={apiBaseUrl} />
           </>
         )}
-      </Wrapper>
+      </Flex>
     </ReservationPageWrapper>
   );
 }
