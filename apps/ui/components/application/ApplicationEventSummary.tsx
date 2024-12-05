@@ -3,7 +3,7 @@ import { IconCalendar, IconClock, IconGroup } from "hds-react";
 import React from "react";
 import { Trans, useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
-import { H5 } from "common/src/common/typography";
+import { H4 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
 import { ApplicationSectionFormValue } from "./Form";
 import { Flex } from "common/styles/util";
@@ -18,8 +18,8 @@ const Message = styled.p`
   margin-top: 0;
 `;
 
-const SubHeadLine = styled(H5).attrs({
-  as: "h2",
+const SubHeadLine = styled(H4).attrs({
+  as: "h3",
 })`
   margin-top: var(--spacing-layout-m);
 `;
