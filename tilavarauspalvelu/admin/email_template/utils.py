@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.integrations.email.template_context import (
@@ -31,27 +31,27 @@ __all__ = [
 ]
 
 
-def get_mock_data(*, email_type: EmailType, language: Lang) -> EmailContext | None:  # noqa: PLR0912, PLR0911
-    email_recipient_name = "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]"
-    reservee_name = "[VARAAJAN NIMI]"
-    reservation_name = "[VARAUKSEN NIMI]"
-    cancel_reason = "[PERUUTUKSEN SYY]"
-    rejection_reason = "[HYLKÄYKSEN SYY]"
-    reservation_unit_name = "[VARAUSYKSIKÖN NIMI]"
-    unit_name = "[TOIMIPISTEEN NIMI]"
-    unit_location = "[TOIMIPISTEEN OSOITE]"
-    begin = local_datetime()
-    end = begin + datetime.timedelta(days=1, hours=3)
-    price = Decimal("12.30")
-    subsidised_price = Decimal("10.30")
-    non_subsidised_price = Decimal("15.30")
-    applying_for_free_of_charge = True
-    payment_due_date = end.date()
-    tax_percentage = Decimal("25.5")
-    reservation_id = 1234
-    confirmed_instructions = "[HYVÄKSYTYN VARAUKSEN OHJEET]"
-    cancelled_instructions = "[PERUUTETUN VARAUKSEN OHJEET]"
-    pending_instructions = "[KÄSITELTÄVÄN VARAUKSEN OHJEET]"
+def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> EmailContext | None:  # noqa: PLR0912, PLR0911
+    email_recipient_name = kwargs.get("email_recipient_name", "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]")
+    reservee_name = kwargs.get("reservee_name", "[VARAAJAN NIMI]")
+    reservation_name = kwargs.get("reservation_name", "[VARAUKSEN NIMI]")
+    cancel_reason = kwargs.get("cancel_reason", "[PERUUTUKSEN SYY]")
+    rejection_reason = kwargs.get("rejection_reason", "[HYLKÄYKSEN SYY]")
+    reservation_unit_name = kwargs.get("reservation_unit_name", "[VARAUSYKSIKÖN NIMI]")
+    unit_name = kwargs.get("unit_name", "[TOIMIPISTEEN NIMI]")
+    unit_location = kwargs.get("unit_location", "[TOIMIPISTEEN OSOITE]")
+    begin = kwargs.get("begin", local_datetime())
+    end = kwargs.get("end", begin + datetime.timedelta(days=1, hours=3))
+    price = kwargs.get("price", Decimal("12.30"))
+    subsidised_price = kwargs.get("subsidised_price", Decimal("10.30"))
+    non_subsidised_price = kwargs.get("non_subsidised_price", Decimal("15.30"))
+    applying_for_free_of_charge = kwargs.get("applying_for_free_of_charge", True)
+    payment_due_date = kwargs.get("payment_due_date", end.date())
+    tax_percentage = kwargs.get("tax_percentage", Decimal("25.5"))
+    reservation_id = kwargs.get("reservation_id", 1234)
+    confirmed_instructions = kwargs.get("confirmed_instructions", "[HYVÄKSYTYN VARAUKSEN OHJEET]")
+    cancelled_instructions = kwargs.get("cancelled_instructions", "[PERUUTETUN VARAUKSEN OHJEET]")
+    pending_instructions = kwargs.get("pending_instructions", "[KÄSITELTÄVÄN VARAUKSEN OHJEET]")
 
     match email_type:
         # Application ##################################################################################################

@@ -1,37 +1,21 @@
 # Note: Contexts are tested separately with translations!
 from __future__ import annotations
 
-import datetime
 from decimal import Decimal
 from inspect import cleandoc
 
 from freezegun import freeze_time
 
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.integrations.email.rendering import render_text
-from tilavarauspalvelu.integrations.email.template_context import (
-    get_context_for_application_handled,
-    get_context_for_application_in_allocation,
-    get_context_for_application_received,
-    get_context_for_permission_deactivation,
-    get_context_for_reservation_approved,
-    get_context_for_reservation_cancelled,
-    get_context_for_reservation_confirmed,
-    get_context_for_reservation_modified,
-    get_context_for_reservation_rejected,
-    get_context_for_reservation_requires_handling,
-    get_context_for_reservation_requires_payment,
-    get_context_for_staff_notification_reservation_made,
-    get_context_for_staff_notification_reservation_requires_handling,
-    get_context_for_user_anonymization,
-)
 
 # Application ##########################################################################################################
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_application_handled_email__text():
-    context = get_context_for_application_handled(language="en")
+    context = get_mock_data(email_type=EmailType.APPLICATION_HANDLED, language="en")
     text_content = render_text(email_type=EmailType.APPLICATION_HANDLED, context=context)
 
     body = (
@@ -57,9 +41,9 @@ def test_render_application_handled_email__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_application_in_allocation_email__text():
-    context = get_context_for_application_in_allocation(language="en")
+    context = get_mock_data(email_type=EmailType.APPLICATION_IN_ALLOCATION, language="en")
     text_content = render_text(email_type=EmailType.APPLICATION_IN_ALLOCATION, context=context)
 
     body = (
@@ -85,9 +69,9 @@ def test_render_application_in_allocation_email__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_application_received_email__text():
-    context = get_context_for_application_received(language="en")
+    context = get_mock_data(email_type=EmailType.APPLICATION_RECEIVED, language="en")
     text_content = render_text(email_type=EmailType.APPLICATION_RECEIVED, context=context)
 
     body = (
@@ -116,9 +100,9 @@ def test_render_application_received_email__text():
 # Permissions ##########################################################################################################
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_permission_deactivation__text():
-    context = get_context_for_permission_deactivation(language="en")
+    context = get_mock_data(email_type=EmailType.PERMISSION_DEACTIVATION, language="en")
     text_content = render_text(email_type=EmailType.PERMISSION_DEACTIVATION, context=context)
 
     assert text_content == cleandoc(
@@ -140,9 +124,9 @@ def test_render_permission_deactivation__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_user_anonymization__text():
-    context = get_context_for_user_anonymization(language="en")
+    context = get_mock_data(email_type=EmailType.USER_ANONYMIZATION, language="en")
     text_content = render_text(email_type=EmailType.USER_ANONYMIZATION, context=context)
 
     message = (
@@ -172,21 +156,13 @@ def test_render_user_anonymization__text():
 # Reservation ##########################################################################################################
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_approved__text():
-    context = get_context_for_reservation_approved(
+    context = get_mock_data(
+        email_type=EmailType.RESERVATION_APPROVED,
         language="en",
-        email_recipient_name="John Doe",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
         price=Decimal("12.30"),
         non_subsidised_price=Decimal("12.30"),
-        tax_percentage=Decimal("25.5"),
-        reservation_id=12,
-        confirmed_instructions="These are the instructions",
     )
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
 
@@ -197,22 +173,22 @@ def test_render_reservation_approved__text():
 
     assert text_content == cleandoc(
         f"""
-        Hi John Doe,
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         Your booking is now confirmed.
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
-        Booking number: 12
+        Booking number: 1234
 
         Additional information about your booking:
-        These are the instructions
+        [HYVÄKSYTYN VARAUKSEN OHJEET]
 
         {manage}
 
@@ -227,22 +203,9 @@ def test_render_reservation_approved__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_approved__discount__text():
-    context = get_context_for_reservation_approved(
-        language="en",
-        email_recipient_name="John Doe",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        price=Decimal("12.30"),
-        non_subsidised_price=Decimal("15.30"),
-        tax_percentage=Decimal("25.5"),
-        reservation_id=12,
-        confirmed_instructions="These are the instructions",
-    )
+    context = get_mock_data(email_type=EmailType.RESERVATION_APPROVED, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
 
     manage = (
@@ -252,22 +215,22 @@ def test_render_reservation_approved__discount__text():
 
     assert text_content == cleandoc(
         f"""
-        Hi John Doe,
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         Your booking has been confirmed with the following discount:
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
-        Booking number: 12
+        Booking number: 1234
 
         Additional information about your booking:
-        These are the instructions
+        [HYVÄKSYTYN VARAUKSEN OHJEET]
 
         {manage}
 
@@ -282,43 +245,30 @@ def test_render_reservation_approved__discount__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_cancelled__text():
-    context = get_context_for_reservation_cancelled(
-        language="en",
-        email_recipient_name="John Doe",
-        cancel_reason="This is a reason",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        price=Decimal("12.30"),
-        tax_percentage=Decimal("25.5"),
-        reservation_id=12,
-        cancelled_instructions="These are the instructions",
-    )
+    context = get_mock_data(email_type=EmailType.RESERVATION_CANCELLED, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_CANCELLED, context=context)
 
     assert text_content == cleandoc(
         """
-        Hi John Doe,
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         Your booking has been cancelled.
-        Your reason for cancellation: This is a reason
+        Your reason for cancellation: [PERUUTUKSEN SYY]
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
-        Booking number: 12
+        Booking number: 1234
 
         Additional information about cancellation:
-        These are the instructions
+        [PERUUTETUN VARAUKSEN OHJEET]
 
         Kind regards
         Varaamo
@@ -330,21 +280,9 @@ def test_render_reservation_cancelled__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_confirmed__text():
-    context = get_context_for_reservation_confirmed(
-        language="en",
-        email_recipient_name="John Doe",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        price=Decimal("12.30"),
-        tax_percentage=Decimal("25.5"),
-        reservation_id=12,
-        confirmed_instructions="These are the instructions",
-    )
+    context = get_mock_data(email_type=EmailType.RESERVATION_CONFIRMED, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_CONFIRMED, context=context)
 
     manage = (
@@ -354,22 +292,22 @@ def test_render_reservation_confirmed__text():
 
     assert text_content == cleandoc(
         f"""
-        Hi John Doe,
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         You have made a new booking.
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
-        Booking number: 12
+        Booking number: 1234
 
         Additional information about your booking:
-        These are the instructions
+        [HYVÄKSYTYN VARAUKSEN OHJEET]
 
         {manage}
 
@@ -384,21 +322,9 @@ def test_render_reservation_confirmed__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_modified__text():
-    context = get_context_for_reservation_modified(
-        language="en",
-        email_recipient_name="John Doe",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        price=Decimal("12.30"),
-        tax_percentage=Decimal("25.5"),
-        reservation_id=12,
-        confirmed_instructions="These are the instructions",
-    )
+    context = get_mock_data(email_type=EmailType.RESERVATION_MODIFIED, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_MODIFIED, context=context)
 
     manage = (
@@ -409,22 +335,22 @@ def test_render_reservation_modified__text():
 
     assert text_content == cleandoc(
         f"""
-        Hi John Doe,
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         Your booking has been updated.
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
-        Booking number: 12
+        Booking number: 1234
 
         Additional information about your booking:
-        These are the instructions
+        [HYVÄKSYTYN VARAUKSEN OHJEET]
 
         {manage}
 
@@ -439,40 +365,29 @@ def test_render_reservation_modified__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_rejected__text():
-    context = get_context_for_reservation_rejected(
-        language="en",
-        email_recipient_name="John Doe",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        rejection_reason="This is the rejection reason",
-        reservation_id=12,
-        cancelled_instructions="These are the instructions",
-    )
+    context = get_mock_data(email_type=EmailType.RESERVATION_REJECTED, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_REJECTED, context=context)
 
     assert text_content == cleandoc(
         """
-        Hi John Doe,
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         Unfortunately your booking cannot be confirmed.
-        Reason: This is the rejection reason
+        Reason: [HYLKÄYKSEN SYY]
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
-        Booking number: 12
+        Booking number: 1234
 
         Additional information:
-        These are the instructions
+        [PERUUTETUN VARAUKSEN OHJEET]
 
         Kind regards
         Varaamo
@@ -484,22 +399,14 @@ def test_render_reservation_rejected__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_requires_handling__text():
-    context = get_context_for_reservation_requires_handling(
+    context = get_mock_data(
+        email_type=EmailType.RESERVATION_REQUIRES_HANDLING,
         language="en",
-        email_recipient_name="John Doe",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
         price=Decimal("12.30"),
         subsidised_price=Decimal("12.30"),
-        applying_for_free_of_charge=True,
-        tax_percentage=Decimal("25.5"),
-        reservation_id=12,
-        pending_instructions="These are the instructions",
+        non_subsidised_price=Decimal("12.30"),
     )
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, context=context)
 
@@ -517,24 +424,24 @@ def test_render_reservation_requires_handling__text():
 
     assert text_content == cleandoc(
         f"""
-        Hi John Doe,
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         You have made a new booking request.
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
-        Booking number: 12
+        Booking number: 1234
 
         {confirm}
 
         Additional information about your booking:
-        These are the instructions
+        [KÄSITELTÄVÄN VARAUKSEN OHJEET]
 
         {manage}
 
@@ -549,23 +456,9 @@ def test_render_reservation_requires_handling__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_requires_handling__subsidised__text():
-    context = get_context_for_reservation_requires_handling(
-        language="en",
-        email_recipient_name="John Doe",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        price=Decimal("12.30"),
-        subsidised_price=Decimal("10.30"),
-        applying_for_free_of_charge=True,
-        tax_percentage=Decimal("25.5"),
-        reservation_id=12,
-        pending_instructions="These are the instructions",
-    )
+    context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, context=context)
 
     confirm = (
@@ -582,24 +475,24 @@ def test_render_reservation_requires_handling__subsidised__text():
 
     assert text_content == cleandoc(
         f"""
-        Hi John Doe,
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         You have made a new booking request.
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
         Price: 10,30 - 12,30 € (incl. VAT 25.5 %)
-        Booking number: 12
+        Booking number: 1234
 
         {confirm}
 
         Additional information about your booking:
-        These are the instructions
+        [KÄSITELTÄVÄN VARAUKSEN OHJEET]
 
         {manage}
 
@@ -614,22 +507,9 @@ def test_render_reservation_requires_handling__subsidised__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_requires_payment__text():
-    context = get_context_for_reservation_requires_payment(
-        language="en",
-        email_recipient_name="John Doe",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        price=Decimal("12.30"),
-        tax_percentage=Decimal("25.5"),
-        payment_due_date=datetime.date(2024, 2, 1),
-        reservation_id=12,
-        confirmed_instructions="These are the instructions",
-    )
+    context = get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, language="en")
     text_content = render_text(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, context=context)
 
     manage = (
@@ -640,26 +520,26 @@ def test_render_reservation_requires_payment__text():
 
     assert text_content == cleandoc(
         f"""
-        Hi John Doe,
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         Your booking has been confirmed, and can be paid.
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
-        Booking number: 12
+        Booking number: 1234
 
-        Due date: 1.2.2024
+        Due date: 2.1.2024
 
         Pay the booking: https://fake.varaamo.hel.fi/en/reservations
 
         Additional information about your booking:
-        These are the instructions
+        [HYVÄKSYTYN VARAUKSEN OHJEET]
 
         {manage}
 
@@ -677,39 +557,29 @@ def test_render_reservation_requires_payment__text():
 # Staff ################################################################################################################
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_staff_notification_reservation_made__text():
-    context = get_context_for_staff_notification_reservation_made(
-        language="en",
-        reservee_name="John Doe",
-        reservation_name="Test reservation",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        reservation_id=12,
-    )
+    context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE, language="en")
     text_content = render_text(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE, context=context)
 
     assert text_content == cleandoc(
         """
         Hi,
 
-        A new booking has been confirmed for Test reservation unit: Test reservation.
+        A new booking has been confirmed for [VARAUSYKSIKÖN NIMI]: [VARAUKSEN NIMI].
 
-        Reservee name: John Doe
-        Booking number: 12
+        Reservee name: [VARAAJAN NIMI]
+        Booking number: 1234
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
         You can view the booking at:
-        https://fake.varaamo.hel.fi/kasittely/reservations/12
+        https://fake.varaamo.hel.fi/kasittely/reservations/1234
 
         Kind regards
         Varaamo
@@ -719,39 +589,29 @@ def test_render_reservation_staff_notification_reservation_made__text():
     )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_staff_notification_reservation_requires_handling__text():
-    context = get_context_for_staff_notification_reservation_requires_handling(
-        language="en",
-        reservee_name="John Doe",
-        reservation_name="Test reservation",
-        reservation_unit_name="Test reservation unit",
-        unit_name="Test unit",
-        unit_location="Test location",
-        begin_datetime=datetime.datetime(2024, 1, 1, 12),
-        end_datetime=datetime.datetime(2024, 1, 1, 14),
-        reservation_id=12,
-    )
+    context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING, language="en")
     text_content = render_text(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING, context=context)
 
     assert text_content == cleandoc(
         """
         Hi,
 
-        A booking request for Test reservation unit is waiting for processing: Test reservation
+        A booking request for [VARAUSYKSIKÖN NIMI] is waiting for processing: [VARAUKSEN NIMI]
 
-        Reservee name: John Doe
-        Booking number: 12
+        Reservee name: [VARAAJAN NIMI]
+        Booking number: 1234
 
-        Test reservation unit
-        Test unit
-        Test location
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
 
         From: 1.1.2024 at 12:00
-        To: 1.1.2024 at 14:00
+        To: 2.1.2024 at 15:00
 
         You can view and handle the booking at:
-        https://fake.varaamo.hel.fi/kasittely/reservations/12
+        https://fake.varaamo.hel.fi/kasittely/reservations/1234
 
         Kind regards
         Varaamo
