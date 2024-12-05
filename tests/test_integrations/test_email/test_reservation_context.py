@@ -15,6 +15,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_handling,
     get_context_for_reservation_requires_payment,
     get_context_for_seasonal_reservation_cancelled_single,
+    get_context_for_seasonal_reservation_modified_single,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
@@ -1017,6 +1018,84 @@ def test_get_context_for_seasonal_reservation_cancelled_single__sv():
         "check_booking_details_text": "Du kan kontrollera dina bokningsuppgifter på",
         "check_booking_details_url": "https://fake.varaamo.hel.fi/sv/applications",
         "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/sv/applications">https://fake.varaamo.hel.fi/sv/applications</a>',
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **CLOSING_CONTEXT_SV,
+        **AUTOMATIC_REPLY_CONTEXT_SV,
+    }
+
+
+# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_single__en():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_modified_single(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            language="en",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "The time of the space reservation included in your seasonal booking has changed",
+        "text_reservation_modified": "The time of the space reservation included in your seasonal booking has changed",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **CLOSING_CONTEXT_EN,
+        **AUTOMATIC_REPLY_CONTEXT_EN,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_single__fi():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_modified_single(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            language="fi",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut",
+        "text_reservation_modified": "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **CLOSING_CONTEXT_FI,
+        **AUTOMATIC_REPLY_CONTEXT_FI,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_single__sv():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_modified_single(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test location",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            language="sv",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats",
+        "text_reservation_modified": "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **CLOSING_CONTEXT_SV,

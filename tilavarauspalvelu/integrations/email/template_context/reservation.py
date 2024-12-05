@@ -41,6 +41,7 @@ __all__ = [
     "get_context_for_reservation_requires_handling",
     "get_context_for_reservation_requires_payment",
     "get_context_for_seasonal_reservation_cancelled_single",
+    "get_context_for_seasonal_reservation_modified_single",
     "get_context_for_seasonal_reservation_rejected_single",
     "get_context_for_staff_notification_reservation_made",
     "get_context_for_staff_notification_reservation_requires_handling",
@@ -585,6 +586,58 @@ def get_context_for_seasonal_reservation_cancelled_single(
         "text_reservation_cancelled": title,
         "cancel_reason_label": pgettext("Email", "Reason"),
         "cancel_reason": data["cancel_reason"],
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
+        **get_contex_for_reservation_basic_info(
+            reservation_unit_name=data["reservation_unit_name"],
+            unit_name=data["unit_name"],
+            unit_location=data["unit_location"],
+            begin_datetime=data["begin_datetime"],
+            end_datetime=data["end_datetime"],
+        ),
+        **get_contex_for_seasonal_reservation_check_details_url(language=language),
+        **get_contex_for_closing(language=language),
+    }
+
+
+# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE #################################################################
+
+
+@overload
+def get_context_for_seasonal_reservation_modified_single(
+    reservation: Reservation, *, language: Lang
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_seasonal_reservation_modified_single(
+    *,
+    language: Lang,
+    email_recipient_name: str,
+    reservation_unit_name: str,
+    unit_name: str,
+    unit_location: str,
+    begin_datetime: datetime.datetime,
+    end_datetime: datetime.datetime,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_seasonal_reservation_modified_single(
+    reservation: Reservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if reservation is not None:
+        data: dict[str, Any] = {
+            "email_recipient_name": reservation.actions.get_email_reservee_name(),
+            **params_for_base_info(reservation=reservation, language=language),
+        }
+
+    title = pgettext("Email", "The time of the space reservation included in your seasonal booking has changed")
+    return {
+        "title": title,
+        "text_reservation_modified": title,
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],

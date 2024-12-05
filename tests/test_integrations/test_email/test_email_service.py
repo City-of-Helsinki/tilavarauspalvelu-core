@@ -1055,6 +1055,30 @@ def test_email_service__send_seasonal_reservation_cancelled_single(outbox):
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
 
 
+# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE #################################################################
+
+
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01")
+def test_email_service__send_seasonal_reservation_modified_single(outbox):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.SEASONAL,
+        reservee_email="reservee@email.com",
+        user__email="user@email.com",
+        reservation_units__name="foo",
+        begin=datetime.datetime(2024, 1, 1, 10, 0),
+        end=datetime.datetime(2024, 1, 1, 12, 0),
+    )
+
+    EmailService.send_reservation_modified_email(reservation)
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "The time of the space reservation included in your seasonal booking has changed"
+    assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
+
+
 # type: EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE #################################################################
 
 

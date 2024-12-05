@@ -18,6 +18,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_handling,
     get_context_for_reservation_requires_payment,
     get_context_for_seasonal_reservation_cancelled_single,
+    get_context_for_seasonal_reservation_modified_single,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
@@ -186,6 +187,16 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 begin_datetime=begin,
                 end_datetime=end,
                 cancel_reason=cancel_reason,
+                language=language,
+            )
+        case EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE:
+            return get_context_for_seasonal_reservation_modified_single(
+                email_recipient_name=email_recipient_name,
+                reservation_unit_name=reservation_unit_name,
+                unit_name=unit_name,
+                unit_location=unit_location,
+                begin_datetime=begin,
+                end_datetime=end,
                 language=language,
             )
         case EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE:
