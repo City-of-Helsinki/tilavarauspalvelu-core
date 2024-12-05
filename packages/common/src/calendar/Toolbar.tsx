@@ -36,7 +36,7 @@ const Label = styled(NoWrap)`
 `;
 
 /* TODO rewrite this to use inheritable button styles (or HDS buttons) */
-const Btn = styled.button<{
+export const ToolbarBtn = styled.button.attrs({ type: "button" })<{
   $borderless?: boolean;
   $active?: boolean;
 }>`
@@ -80,9 +80,16 @@ type ToolbarProps = {
   onView: (n: View) => void;
   view: string;
   date: Date;
+  children?: React.ReactNode;
 };
 
-export function Toolbar({ onNavigate, onView, view, date }: ToolbarProps) {
+export function Toolbar({
+  onNavigate,
+  onView,
+  view,
+  date,
+  children,
+}: ToolbarProps) {
   const culture = { locale: fi };
   const { t } = useTranslation();
 
@@ -124,59 +131,55 @@ export function Toolbar({ onNavigate, onView, view, date }: ToolbarProps) {
       $wrap="wrap"
       className="rbc-toolbar"
     >
-      <div>
-        <Btn
-          type="button"
+      <Flex $direction="row">
+        <ToolbarBtn
           onClick={() => onNavigate("TODAY")}
           aria-label={t("reservationCalendar:showCurrentDay")}
         >
           {t("common:today")}
-        </Btn>
-      </div>
+        </ToolbarBtn>
+        {children}
+      </Flex>
       <DateNavigationWrapper>
-        <Btn
+        <ToolbarBtn
           $borderless
-          type="button"
           onClick={() => onNavigate("PREV")}
           aria-label={t("reservationCalendar:showPrevious", {
             view: t(`common:${view}`).toLowerCase(),
           })}
         >
           <IconAngleLeft />
-        </Btn>
+        </ToolbarBtn>
         <Label>{title}</Label>
-        <Btn
+        <ToolbarBtn
           $borderless
-          type="button"
           onClick={() => onNavigate("NEXT")}
           aria-label={t("reservationCalendar:showNext", {
             view: t(`common:${view}`).toLowerCase(),
           })}
         >
           <IconAngleRight />
-        </Btn>
+        </ToolbarBtn>
       </DateNavigationWrapper>
       <div>
-        <Btn
+        <ToolbarBtn
           $active={view === "day"}
-          type="button"
           onClick={() => onView("day")}
           aria-label={t("reservationCalendar:showView", {
             view: t("common:day").toLowerCase(),
           })}
         >
           {t("common:day")}
-        </Btn>
-        <Btn
+        </ToolbarBtn>
+        <ToolbarBtn
           $active={view === "week"}
-          type="button"
           onClick={() => onView("week")}
           aria-label={t("reservationCalendar:showView", {
             view: t("common:week").toLowerCase(),
           })}
         >
           {t("common:week")}
-        </Btn>
+        </ToolbarBtn>
       </div>
     </Flex>
   );

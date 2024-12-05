@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CommonCalendar, { CalendarEvent } from "common/src/calendar/Calendar";
-import { Toolbar } from "common/src/calendar/Toolbar";
+import { Toolbar, ToolbarBtn } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
@@ -106,9 +106,9 @@ function Calendar({
                 reservation={reservation}
                 permission={UserPermissionChoice.CanManageReservations}
               >
-                <button type="button" onClick={handleEditTimeClick}>
+                <ToolbarBtn onClick={handleEditTimeClick}>
                   {t("Reservation.EditTimeModal.acceptBtn")}
-                </button>
+                </ToolbarBtn>
               </VisibleIfPermission>
             )}
           </Toolbar>
