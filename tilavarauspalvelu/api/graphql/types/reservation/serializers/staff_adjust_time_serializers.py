@@ -8,7 +8,7 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
-from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
@@ -54,11 +54,8 @@ class StaffReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reserv
     def save(self, **kwargs: Any) -> Reservation:
         instance = super().save(**kwargs)
 
-        now = local_datetime()
-        if instance.type == ReservationTypeChoice.NORMAL and now < instance.end.astimezone(DEFAULT_TIMEZONE):
-            EmailService.send_reservation_modified_email(reservation=instance)
-            if instance.state == ReservationStateChoice.REQUIRES_HANDLING:
-                EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
+        EmailService.send_reservation_modified_email(reservation=instance)
+        EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
 
         return instance
 
