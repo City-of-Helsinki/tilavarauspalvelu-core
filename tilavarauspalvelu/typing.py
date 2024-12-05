@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal, Protocol, TypedDict
 
 from django.contrib.auth.models import AnonymousUser
@@ -39,7 +40,7 @@ type AnyUser = User | AnonymousUser
 type Lang = Literal["fi", "sv", "en"]
 type TextSearchLang = Literal["finnish", "english", "swedish"]
 type M2MAction = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
-type EmailContext = dict[str, str | None]
+type EmailContext = dict[str, str | int | datetime.datetime | Decimal | None]
 
 
 class AffectedTimeSpan(TypedDict):
