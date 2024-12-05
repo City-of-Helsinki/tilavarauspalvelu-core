@@ -8,6 +8,7 @@ import pytest
 from django.test import override_settings
 
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
@@ -21,6 +22,7 @@ from tests.factories import (
     SpaceFactory,
     UserFactory,
 )
+from tests.helpers import patch_method
 
 from .helpers import ADJUST_MUTATION, get_adjust_data
 
@@ -29,8 +31,8 @@ pytestmark = [
 ]
 
 
-@override_settings(SEND_EMAILS=True)
-def test_reservation__adjust_time__success(graphql, outbox):
+@patch_method(EmailService.send_reservation_modified_email)
+def test_reservation__adjust_time__success(graphql):
     reservation = ReservationFactory.create_for_time_adjustment()
     reservation_begin = reservation.begin
     reservation_end = reservation.end
@@ -45,8 +47,7 @@ def test_reservation__adjust_time__success(graphql, outbox):
     assert reservation.begin != reservation_begin
     assert reservation.end != reservation_end
 
-    assert len(outbox) == 1
-    assert outbox[0].subject == "Your booking has been updated"
+    assert EmailService.send_reservation_modified_email.called is True
 
 
 def test_reservation__adjust_time__wrong_state(graphql):
