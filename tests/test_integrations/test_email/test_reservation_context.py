@@ -17,6 +17,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_seasonal_reservation_cancelled_single,
     get_context_for_seasonal_reservation_modified_series,
     get_context_for_seasonal_reservation_modified_single,
+    get_context_for_seasonal_reservation_rejected_series,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
@@ -1192,6 +1193,108 @@ def test_get_context_for_seasonal_reservation_modified_single__sv():
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **CLOSING_CONTEXT_SV,
+        **AUTOMATIC_REPLY_CONTEXT_SV,
+    }
+
+
+# type: EmailType.SEASONAL_RESERVATION_REJECTED_SERIES #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_rejected_series__en():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_rejected_series(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            weekday_value="[VIIKONPÄIVÄ]",
+            time_value="[KELLONAIKA]",
+            application_section_name="[HAKEMUKSEN OSAN NIMI]",
+            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
+            language="en",
+            rejection_reason="[HYLKÄYKSEN SYY]",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Your seasonal booking has been cancelled",
+        "text_reservation_rejected": "All space reservations included in your seasonal booking have been cancelled",
+        "seasonal_booking_label": "Seasonal Booking",
+        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
+        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
+        "weekday_label": "Day",
+        "weekday_value": "[VIIKONPÄIVÄ]",
+        "time_label": "Time",
+        "time_value": "[KELLONAIKA]",
+        "rejection_reason_label": "Reason",
+        "rejection_reason": "[HYLKÄYKSEN SYY]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **CLOSING_CONTEXT_EN,
+        **AUTOMATIC_REPLY_CONTEXT_EN,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_rejected_series__fi():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_rejected_series(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            weekday_value="[VIIKONPÄIVÄ]",
+            time_value="[KELLONAIKA]",
+            application_section_name="[HAKEMUKSEN OSAN NIMI]",
+            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
+            rejection_reason="[HYLKÄYKSEN SYY]",
+            language="fi",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Kausivarauksesi on peruttu",
+        "text_reservation_rejected": "Kaikki kausivaraukseesi kuuluvat tilavaraukset on peruttu",
+        "seasonal_booking_label": "Kausivaraus",
+        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
+        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
+        "weekday_label": "Päivä",
+        "weekday_value": "[VIIKONPÄIVÄ]",
+        "time_label": "Kellonaika",
+        "time_value": "[KELLONAIKA]",
+        "rejection_reason_label": "Syy",
+        "rejection_reason": "[HYLKÄYKSEN SYY]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **CLOSING_CONTEXT_FI,
+        **AUTOMATIC_REPLY_CONTEXT_FI,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for__seasonal_reservation_rejected_series_sv():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_rejected_series(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            weekday_value="[VIIKONPÄIVÄ]",
+            time_value="[KELLONAIKA]",
+            application_section_name="[HAKEMUKSEN OSAN NIMI]",
+            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
+            rejection_reason="[HYLKÄYKSEN SYY]",
+            language="sv",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Din säsongsbokning har avbokats",
+        "text_reservation_rejected": "Alla lokalbokningar som ingår i din säsongsbokning har avbokats",
+        "seasonal_booking_label": "Säsongsbokning",
+        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
+        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
+        "weekday_label": "Dag",
+        "weekday_value": "[VIIKONPÄIVÄ]",
+        "time_label": "Tid",
+        "time_value": "[KELLONAIKA]",
+        "rejection_reason_label": "Orsak",
+        "rejection_reason": "[HYLKÄYKSEN SYY]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
+        **BASE_TEMPLATE_CONTEXT_SV,
         **CLOSING_CONTEXT_SV,
         **AUTOMATIC_REPLY_CONTEXT_SV,
     }
