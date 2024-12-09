@@ -1,25 +1,30 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, overload
 
 from django.utils.translation import pgettext
 
-from tilavarauspalvelu.translation import get_translated
+from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 
 from .common import (
     create_anchor_tag,
     get_contex_for_base_template,
+    get_contex_for_closing,
     get_contex_for_closing_polite,
+    get_contex_for_seasonal_reservation_check_details_url,
     get_my_applications_ext_link,
+    params_for_application_section_info,
 )
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationSection
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
     "get_context_for_application_handled",
     "get_context_for_application_in_allocation",
     "get_context_for_application_received",
+    "get_context_for_application_section_cancelled",
 ]
 
 
@@ -88,4 +93,58 @@ def get_context_for_application_received(*, language: Lang) -> EmailContext:
         "text_view_application": text_view_application % {"page": text} + f": {link}",
         **get_contex_for_base_template(),
         **get_contex_for_closing_polite(language=language),
+    }
+
+
+# type: EmailType.APPLICATION_SECTION_CANCELLED ########################################################################
+
+
+@overload
+def get_context_for_application_section_cancelled(
+    application_section: ApplicationSection, *, language: Lang
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_application_section_cancelled(
+    *,
+    language: Lang,
+    cancel_reason: str,
+    email_recipient_name: str,
+    weekday_value: str,
+    time_value: str,
+    application_section_name: str,
+    application_round_name: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_application_section_cancelled(
+    application_section: ApplicationSection | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if application_section is not None:
+        reservation = application_section.actions.get_last_reservation()
+
+        data: dict[str, Any] = {
+            "email_recipient_name": reservation.actions.get_email_reservee_name(),
+            "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language),
+            **params_for_application_section_info(application_section=application_section, language=language),
+        }
+
+    return {
+        "title": pgettext("Email", "Your seasonal booking has been cancelled"),
+        "text_reservation_cancelled": pgettext(
+            "Email", "All space reservations included in your seasonal booking have been cancelled"
+        ),
+        "cancel_reason_label": pgettext("Email", "Reason"),
+        "cancel_reason": data["cancel_reason"],
+        "seasonal_booking_label": pgettext("Email", "Seasonal Booking"),
+        "application_section_name": data["application_section_name"],
+        "application_round_name": data["application_round_name"],
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
+        **get_contex_for_seasonal_reservation_check_details_url(language=language),
+        **get_contex_for_closing(language=language),
     }

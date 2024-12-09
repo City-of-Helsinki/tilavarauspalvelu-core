@@ -249,6 +249,12 @@ class EmailType(models.TextChoices):
     APPLICATION_IN_ALLOCATION = "application_in_allocation", pgettext_lazy("EmailType", "Application in allocation")
     APPLICATION_RECEIVED = "application_received", pgettext_lazy("EmailType", "Application received")
 
+    APPLICATION_SECTION_CANCELLED = (
+        "application_section_cancelled",
+        pgettext_lazy("EmailType", "Application section cancelled"),
+    )
+    """User cancels all reservations in their application section"""
+
     # Permissions
     PERMISSION_DEACTIVATION = "permission_deactivation", pgettext_lazy("EmailType", "Permission deactivation")
     USER_ANONYMIZATION = "user_anonymization", pgettext_lazy("EmailType", "User anonymization")

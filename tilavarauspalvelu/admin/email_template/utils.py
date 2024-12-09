@@ -9,6 +9,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
     get_context_for_application_received,
+    get_context_for_application_section_cancelled,
     get_context_for_permission_deactivation,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
@@ -71,6 +72,17 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
             return get_context_for_application_in_allocation(language=language)
         case EmailType.APPLICATION_RECEIVED:
             return get_context_for_application_received(language=language)
+
+        case EmailType.APPLICATION_SECTION_CANCELLED:
+            return get_context_for_application_section_cancelled(
+                email_recipient_name=email_recipient_name,
+                weekday_value=weekday_value,
+                time_value=time_value,
+                application_section_name=application_section_name,
+                application_round_name=application_round_name,
+                cancel_reason=cancel_reason,
+                language=language,
+            )
 
         # Permissions ##################################################################################################
 
