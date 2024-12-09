@@ -1,0 +1,15 @@
+{% extends "email/html/partials/base.jinja" %}
+
+{% block content_main %}
+    <mj-text>{{ text_reservation_cancelled | sentence | safe }}</mj-text>
+    <mj-text>{{ cancel_reason_label | safe }}: {{ cancel_reason | safe }}</mj-text>
+    {% include "email/html/partials/application_section_name.jinja" %}
+    <mj-spacer />
+    <mj-text>{{ check_booking_details_text | safe }}: {{ check_booking_details_url_html | safe }}</mj-text>
+{% endblock %}
+
+{% block content_secondary %}{% endblock %}
+
+{% block content_closing %}
+    {% include "email/html/partials/closing.jinja" %}
+{% endblock %}

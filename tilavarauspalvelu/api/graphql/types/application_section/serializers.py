@@ -15,6 +15,7 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_option.serializers imp
 )
 from tilavarauspalvelu.api.graphql.types.suitable_time_range.serializers import SuitableTimeRangeSerializer
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
@@ -282,6 +283,9 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             cancel_reason=self.validated_data["cancel_reason"],
             cancel_details=self.validated_data.get("cancel_details", ""),
         )
+
+        if cancellable_reservations.count():
+            EmailService.send_application_section_cancelled(application_section=self.instance)
 
         return data
 
