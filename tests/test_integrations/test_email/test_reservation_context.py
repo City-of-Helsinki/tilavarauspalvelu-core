@@ -15,6 +15,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_handling,
     get_context_for_reservation_requires_payment,
     get_context_for_seasonal_reservation_cancelled_single,
+    get_context_for_seasonal_reservation_modified_series,
     get_context_for_seasonal_reservation_modified_single,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
@@ -1020,6 +1021,99 @@ def test_get_context_for_seasonal_reservation_cancelled_single__sv():
         "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/sv/applications">https://fake.varaamo.hel.fi/sv/applications</a>',
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **CLOSING_CONTEXT_SV,
+        **AUTOMATIC_REPLY_CONTEXT_SV,
+    }
+
+
+# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES #################################################################################
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_series__en():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_modified_series(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            weekday_value="[VIIKONPÄIVÄ]",
+            time_value="[KELLONAIKA]",
+            application_section_name="[HAKEMUKSEN OSAN NIMI]",
+            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
+            language="en",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "The time of the space reservation included in your seasonal booking has changed",
+        "text_reservation_modified": "The time of the space reservation included in your seasonal booking has changed",
+        "seasonal_booking_label": "Seasonal Booking",
+        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
+        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
+        "weekday_label": "Day",
+        "weekday_value": "[VIIKONPÄIVÄ]",
+        "time_label": "Time",
+        "time_value": "[KELLONAIKA]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **CLOSING_CONTEXT_EN,
+        **AUTOMATIC_REPLY_CONTEXT_EN,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_series__fi():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_modified_series(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            weekday_value="[VIIKONPÄIVÄ]",
+            time_value="[KELLONAIKA]",
+            application_section_name="[HAKEMUKSEN OSAN NIMI]",
+            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
+            language="fi",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut",
+        "text_reservation_modified": "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut",
+        "seasonal_booking_label": "Kausivaraus",
+        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
+        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
+        "weekday_label": "Päivä",
+        "weekday_value": "[VIIKONPÄIVÄ]",
+        "time_label": "Kellonaika",
+        "time_value": "[KELLONAIKA]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **CLOSING_CONTEXT_FI,
+        **AUTOMATIC_REPLY_CONTEXT_FI,
+    }
+
+
+@freeze_time("2024-01-01")
+def test_get_context_for_seasonal_reservation_modified_series__sv():
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_modified_series(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            weekday_value="[VIIKONPÄIVÄ]",
+            time_value="[KELLONAIKA]",
+            application_section_name="[HAKEMUKSEN OSAN NIMI]",
+            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
+            language="sv",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "title": "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats",
+        "text_reservation_modified": "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats",
+        "seasonal_booking_label": "Säsongsbokning",
+        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
+        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
+        "weekday_label": "Dag",
+        "weekday_value": "[VIIKONPÄIVÄ]",
+        "time_label": "Tid",
+        "time_value": "[KELLONAIKA]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
+        **BASE_TEMPLATE_CONTEXT_SV,
         **CLOSING_CONTEXT_SV,
         **AUTOMATIC_REPLY_CONTEXT_SV,
     }
