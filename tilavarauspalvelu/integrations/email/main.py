@@ -25,6 +25,7 @@ from .template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
     get_context_for_application_received,
+    get_context_for_application_section_cancelled,
     get_context_for_permission_deactivation,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
@@ -44,7 +45,7 @@ from .template_context import (
 )
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import RecurringReservation, Reservation
+    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
     from tilavarauspalvelu.typing import Lang
 
 __all__ = [
@@ -135,6 +136,33 @@ class EmailService:
 
         email_type = EmailType.APPLICATION_RECEIVED
         context = get_context_for_application_received(language=language)
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
+
+    @staticmethod
+    def send_application_section_cancelled(
+        application_section: ApplicationSection,
+        *,
+        language: Lang | None = None,
+    ) -> None:
+        """Sends an email that the whole application section was cancelled by the user"""
+        reservation: Reservation | None = application_section.actions.get_last_reservation()
+        if reservation is None:
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for application section cancelled email",
+                details={"application_section": application_section.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.APPLICATION_SECTION_CANCELLED
+        context = get_context_for_application_section_cancelled(application_section, language=language)
         email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
