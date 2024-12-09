@@ -7,6 +7,7 @@ type Props = {
 };
 
 const StyledContent = styled.div`
+  word-break: break-word;
   p:empty {
     display: none;
   }
