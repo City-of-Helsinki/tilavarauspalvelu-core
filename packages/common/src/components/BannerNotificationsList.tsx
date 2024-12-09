@@ -48,8 +48,8 @@ const BannerNotificationBackground = styled.div`
 
 const BannerNotificationText = styled.div`
   font-size: var(--fontsize-body-m);
-  p {
-    display: inline;
+  p:first-of-type {
+    margin-top: 0;
   }
   a {
     text-decoration: underline;
