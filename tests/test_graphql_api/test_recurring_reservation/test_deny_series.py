@@ -4,9 +4,11 @@ import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationDenyReasonFactory
+from tests.helpers import patch_method
 
 from .helpers import DENY_SERIES_MUTATION, create_reservation_series
 
@@ -16,6 +18,7 @@ pytestmark = [
 ]
 
 
+@patch_method(EmailService.send_seasonal_reservation_rejected_series_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__deny_series(graphql):
     reason = ReservationDenyReasonFactory.create()
@@ -48,6 +51,8 @@ def test_recurring_reservations__deny_series(graphql):
     assert all(reservation.deny_reason != reason for reservation in past_reservations)
     assert all(reservation.handling_details != "Handling details" for reservation in past_reservations)
     assert all(reservation.handled_at is None for reservation in past_reservations)
+
+    assert EmailService.send_seasonal_reservation_rejected_series_email.called is True
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))

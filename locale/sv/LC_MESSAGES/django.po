@@ -2183,6 +2183,11 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
+msgid "Seasonal reservation rejected series"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Seasonal reservation rejected single"
 msgstr ""
 
@@ -3087,11 +3092,6 @@ msgstr "Förfallodatum"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Seasonal Booking"
-msgstr "Säsongsbokning"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
 msgid ""
 "The space reservation included in your seasonal booking has been cancelled"
 msgstr "Lokalbokningen som ingår i din säsongsbokning har avbokats"
@@ -3105,6 +3105,11 @@ msgstr "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
+msgid "Seasonal Booking"
+msgstr "Säsongsbokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Day"
 msgstr "Dag"
 
@@ -3112,6 +3117,17 @@ msgstr "Dag"
 msgctxt "Email"
 msgid "Time"
 msgstr "Tid"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your seasonal booking has been cancelled"
+msgstr "Din säsongsbokning har avbokats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid ""
+"All space reservations included in your seasonal booking have been cancelled"
+msgstr "Alla lokalbokningar som ingår i din säsongsbokning har avbokats"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format

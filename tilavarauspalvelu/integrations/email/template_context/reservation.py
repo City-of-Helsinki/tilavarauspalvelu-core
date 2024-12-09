@@ -45,6 +45,7 @@ __all__ = [
     "get_context_for_seasonal_reservation_cancelled_single",
     "get_context_for_seasonal_reservation_modified_series",
     "get_context_for_seasonal_reservation_modified_single",
+    "get_context_for_seasonal_reservation_rejected_series",
     "get_context_for_seasonal_reservation_rejected_single",
     "get_context_for_staff_notification_reservation_made",
     "get_context_for_staff_notification_reservation_requires_handling",
@@ -703,6 +704,66 @@ def get_context_for_seasonal_reservation_modified_single(
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
         ),
+        **get_contex_for_seasonal_reservation_check_details_url(language=language),
+        **get_contex_for_closing(language=language),
+    }
+
+
+# type: EmailType.SEASONAL_RESERVATION_REJECTED_SERIES #################################################################
+
+
+@overload
+def get_context_for_seasonal_reservation_rejected_series(
+    reservation_series: RecurringReservation, *, language: Lang
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_seasonal_reservation_rejected_series(
+    *,
+    language: Lang,
+    rejection_reason: str,
+    email_recipient_name: str,
+    weekday_value: str,
+    time_value: str,
+    application_section_name: str,
+    application_round_name: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_seasonal_reservation_rejected_series(
+    reservation_series: RecurringReservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if reservation_series is not None:
+        section = reservation_series.actions.get_application_section()
+        reservation = reservation_series.reservations.first()
+
+        data: dict[str, Any] = {
+            "email_recipient_name": reservation_series.actions.get_email_reservee_name(),
+            "rejection_reason": get_attr_by_language(reservation.deny_reason, "reason", language),
+            **params_for_reservation_series_info(reservation_series=reservation_series),
+            **params_for_application_section_info(application_section=section, language=language),
+        }
+
+    return {
+        "title": pgettext("Email", "Your seasonal booking has been cancelled"),
+        "text_reservation_rejected": pgettext(
+            "Email", "All space reservations included in your seasonal booking have been cancelled"
+        ),
+        "rejection_reason_label": pgettext("Email", "Reason"),
+        "rejection_reason": data["rejection_reason"],
+        "seasonal_booking_label": pgettext("Email", "Seasonal Booking"),
+        "application_section_name": data["application_section_name"],
+        "application_round_name": data["application_round_name"],
+        "weekday_label": pgettext("Email", "Day"),
+        "weekday_value": data["weekday_value"],
+        "time_label": pgettext("Email", "Time"),
+        "time_value": data["time_value"],
+        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_seasonal_reservation_check_details_url(language=language),
         **get_contex_for_closing(language=language),
     }
