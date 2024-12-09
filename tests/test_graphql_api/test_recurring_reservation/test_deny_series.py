@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pytest
+from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import ReservationStateChoice
@@ -16,8 +17,9 @@ pytestmark = [
 ]
 
 
+@override_settings(SEND_EMAILS=True)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_recurring_reservations__deny_series(graphql):
+def test_recurring_reservations__deny_series(graphql, outbox):
     reason = ReservationDenyReasonFactory.create()
 
     reservation_series = create_reservation_series()
@@ -48,6 +50,8 @@ def test_recurring_reservations__deny_series(graphql):
     assert all(reservation.deny_reason != reason for reservation in past_reservations)
     assert all(reservation.handling_details != "Handling details" for reservation in past_reservations)
     assert all(reservation.handled_at is None for reservation in past_reservations)
+
+    assert len(outbox) == 1
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
