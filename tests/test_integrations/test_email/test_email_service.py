@@ -18,7 +18,14 @@ from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMI
 from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
 
-from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, UnitFactory, UserFactory
+from tests.factories import (
+    ApplicationFactory,
+    ApplicationRoundFactory,
+    ApplicationSectionFactory,
+    ReservationFactory,
+    UnitFactory,
+    UserFactory,
+)
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_graphql_api.test_recurring_reservation.helpers import create_reservation_series
 
@@ -206,6 +213,38 @@ def test_email_service__send_application_received_email__no_recipients(outbox):
 
     assert SentryLogger.log_message.call_count == 1
     assert SentryLogger.log_message.call_args.args[0] == "No recipients for application received email"
+
+
+# type: EmailType.APPLICATION_SECTION_CANCELLED ########################################################################
+
+
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01")
+def test_email_service__send_application_section_cancelled_email(outbox):
+    application_section = ApplicationSectionFactory.create_in_status_handled(application__user__email="user@email.com")
+
+    create_reservation_series(
+        user=application_section.application.user,
+        allocated_time_slot__reservation_unit_option__application_section=application_section,
+        reservations__reservee_email="reservee@email.com",
+    )
+
+    EmailService.send_application_section_cancelled(application_section=application_section)
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "Your seasonal booking has been cancelled"
+    assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
+
+
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01")
+def test_email_service__send_application_section_cancelled_email__no_reservations_email_not_sent(outbox):
+    application_section = ApplicationSectionFactory.create_in_status_handled(application__user__email="user@email.com")
+
+    EmailService.send_application_section_cancelled(application_section=application_section)
+
+    assert len(outbox) == 0
 
 
 # type: EmailType.PERMISSION_DEACTIVATION ##############################################################################

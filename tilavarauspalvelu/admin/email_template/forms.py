@@ -11,6 +11,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
     get_context_for_application_received,
+    get_context_for_application_section_cancelled,
     get_context_for_permission_deactivation,
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
@@ -49,6 +50,9 @@ def select_tester_form(*, email_type: EmailType) -> type[BaseEmailTemplateForm] 
             return ApplicationInAllocationEmailTemplateTesterForm
         case EmailType.APPLICATION_RECEIVED:
             return ApplicationReceivedEmailTemplateTesterForm
+
+        case EmailType.APPLICATION_SECTION_CANCELLED:
+            return ApplicationSectionCancelledTemplateTesterForm
 
         # Permissions
         case EmailType.PERMISSION_DEACTIVATION:
@@ -215,6 +219,25 @@ class ApplicationInAllocationEmailTemplateTesterForm(BaseEmailTemplateForm):
 class ApplicationReceivedEmailTemplateTesterForm(BaseEmailTemplateForm):
     def to_context(self) -> EmailContext:
         return get_context_for_application_received(**super().get_context_params())
+
+
+class ApplicationSectionCancelledTemplateTesterForm(EmailRecipientFormMixin, BaseEmailTemplateForm):
+    weekday_value = forms.CharField(initial="Maanantai")
+    time_value = forms.CharField(initial="13:00-15:00")
+    application_section_name = forms.CharField(initial="[HAKEMUKSEN OSAN NIMI]")
+    application_round_name = forms.CharField(initial="[KAUSIVARAUSKIERROKSEN NIMI]")
+    cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
+
+    def to_context(self) -> EmailContext:
+        return get_context_for_application_section_cancelled(
+            **super().get_context_params(),
+            email_recipient_name=self.cleaned_data["email_recipient_name"],
+            weekday_value=self.cleaned_data["weekday_value"],
+            time_value=self.cleaned_data["time_value"],
+            application_section_name=self.cleaned_data["application_section_name"],
+            application_round_name=self.cleaned_data["application_round_name"],
+            cancel_reason=self.cleaned_data["cancel_reason"],
+        )
 
 
 # Permissions ##########################################################################################################

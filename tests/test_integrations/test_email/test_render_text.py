@@ -97,6 +97,32 @@ def test_render_application_received_email__text():
     )
 
 
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_application_section_cancelled_email_text():
+    context = get_mock_data(email_type=EmailType.APPLICATION_SECTION_CANCELLED, language="en")
+    text_content = render_text(email_type=EmailType.APPLICATION_SECTION_CANCELLED, context=context)
+
+    assert text_content == cleandoc(
+        """
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
+
+        All space reservations included in your seasonal booking have been cancelled.
+        Reason: [PERUUTUKSEN SYY]
+
+        Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
+
+        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications
+
+        Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
+
+        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        """
+    )
+
+
 # Permissions ##########################################################################################################
 
 
@@ -653,8 +679,8 @@ def test_render_seasonal_reservation_rejected_series__text():
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         All space reservations included in your seasonal booking have been cancelled.
-
         Reason: [HYLKÄYKSEN SYY]
+
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
 
         Day: Monday
