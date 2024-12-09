@@ -20,6 +20,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_handling,
     get_context_for_reservation_requires_payment,
     get_context_for_seasonal_reservation_cancelled_single,
+    get_context_for_seasonal_reservation_modified_series,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
@@ -72,6 +73,8 @@ def select_tester_form(*, email_type: EmailType) -> type[BaseEmailTemplateForm] 
 
         case EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE:
             return SeasonalReservationCancelledSingleTemplateTesterForm
+        case EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES:
+            return SeasonalReservationModifiedSeriesTemplateTesterForm
         case EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE:
             return SeasonalReservationModifiedSingleTemplateTesterForm
         case EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE:
@@ -418,6 +421,23 @@ class SeasonalReservationCancelledSingleTemplateTesterForm(ReservationBaseForm):
             **super().get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             cancel_reason=self.cleaned_data["cancel_reason"],
+        )
+
+
+class SeasonalReservationModifiedSeriesTemplateTesterForm(EmailRecipientFormMixin, BaseEmailTemplateForm):
+    weekday_value = forms.CharField(initial="Maanantai")
+    time_value = forms.CharField(initial="13:00-15:00")
+    application_section_name = forms.CharField(initial="[HAKEMUKSEN OSAN NIMI]")
+    application_round_name = forms.CharField(initial="[KAUSIVARAUSKIERROKSEN NIMI]")
+
+    def to_context(self) -> EmailContext:
+        return get_context_for_seasonal_reservation_modified_series(
+            **super().get_context_params(),
+            email_recipient_name=self.cleaned_data["email_recipient_name"],
+            weekday_value=self.cleaned_data["weekday_value"],
+            time_value=self.cleaned_data["time_value"],
+            application_section_name=self.cleaned_data["application_section_name"],
+            application_round_name=self.cleaned_data["application_round_name"],
         )
 
 

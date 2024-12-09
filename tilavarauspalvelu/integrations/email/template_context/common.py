@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 from django.conf import settings
 from django.utils.translation import pgettext
 
+from tilavarauspalvelu.enums import Weekday
 from tilavarauspalvelu.translation import get_attr_by_language
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.utils import update_query_params
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
     import datetime
     from decimal import Decimal
 
-    from tilavarauspalvelu.models import Reservation, ReservationUnit
+    from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation, ReservationUnit
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 
@@ -194,6 +195,20 @@ def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
         "applying_for_free_of_charge": reservation.applying_for_free_of_charge,
         "tax_percentage": reservation.tax_percentage_value,
         "reservation_id": reservation.id,
+    }
+
+
+def params_for_reservation_series_info(*, reservation_series: RecurringReservation) -> dict[str, Any]:
+    return {
+        "weekday_value": Weekday.from_week_day(int(reservation_series.weekdays)).label,
+        "time_value": f"{reservation_series.begin_time}-{reservation_series.end_time}",
+    }
+
+
+def params_for_application_section_info(*, application_section: ApplicationSection, language: Lang) -> dict[str, Any]:
+    return {
+        "application_section_name": application_section.name,
+        "application_round_name": get_attr_by_language(application_section.application, "name", language=language),
     }
 
 

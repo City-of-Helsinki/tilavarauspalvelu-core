@@ -6,7 +6,13 @@ import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import Language, ReservationNotification, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    Language,
+    ReservationNotification,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+    Weekday,
+)
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_datetime
@@ -14,6 +20,7 @@ from utils.sentry import SentryLogger
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory, ReservationFactory, UnitFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
+from tests.test_graphql_api.test_recurring_reservation.helpers import create_reservation_series
 
 pytestmark = [
     pytest.mark.django_db,
@@ -1052,6 +1059,28 @@ def test_email_service__send_seasonal_reservation_cancelled_single(outbox):
     assert len(outbox) == 1
 
     assert outbox[0].subject == "The space reservation included in your seasonal booking has been cancelled"
+    assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
+
+
+# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES #################################################################
+
+
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01")
+def test_email_service__send_seasonal_reservation_modified_series(outbox):
+    reservation_series = create_reservation_series(
+        user__email="user@email.com",
+        allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        reservations__type=ReservationTypeChoice.SEASONAL,
+        allocated_time_slot__reservation_unit_option__application_section__name="Foo",
+    )
+    reservation_series.reservations.update(reservee_email="reservee@email.com")
+
+    EmailService.send_seasonal_reservation_modified_series_email(reservation_series=reservation_series)
+
+    assert len(outbox) == 1
+
+    assert outbox[0].subject == "The time of the space reservation included in your seasonal booking has changed"
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
 
 

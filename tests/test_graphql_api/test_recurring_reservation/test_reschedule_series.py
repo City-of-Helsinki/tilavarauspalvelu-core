@@ -6,12 +6,14 @@ from typing import TYPE_CHECKING
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import ReservationStateChoice, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationStateChoice, Weekday, WeekdayChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationStatistic, ReservationUnitHierarchy
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_time
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
+from tests.helpers import patch_method
 
 from .helpers import RESCHEDULE_SERIES_MUTATION, create_reservation_series, get_minimal_reschedule_data
 
@@ -24,9 +26,10 @@ pytestmark = [
 ]
 
 
+@patch_method(EmailService.send_seasonal_reservation_modified_series_email)
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
 def test_recurring_reservations__reschedule_series__change_begin_date(graphql):
-    recurring_reservation = create_reservation_series()
+    recurring_reservation = create_reservation_series(allocated_time_slot__day_of_the_week=Weekday.MONDAY)
 
     # Change begin date to the next Tuesday.
     # This should remove the first reservation from the series.
@@ -51,6 +54,8 @@ def test_recurring_reservations__reschedule_series__change_begin_date(graphql):
     assert reservations[5].begin.date() == local_date(year=2024, month=1, day=15)
     assert reservations[6].begin.date() == local_date(year=2024, month=1, day=22)
     assert reservations[7].begin.date() == local_date(year=2024, month=1, day=29)
+
+    assert EmailService.send_seasonal_reservation_modified_series_email.called is True
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))  # Friday
