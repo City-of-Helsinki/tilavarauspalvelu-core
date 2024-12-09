@@ -38,7 +38,7 @@ export const ApplicantTypeSelector = (): JSX.Element => {
   );
 
   return (
-    <>
+    <div>
       <Prefix>{t("application:Page3.as.prefix")}</Prefix>
       {choices.map((id) => (
         <Container key={id}>
@@ -51,6 +51,6 @@ export const ApplicantTypeSelector = (): JSX.Element => {
           />
         </Container>
       ))}
-    </>
+    </div>
   );
 };

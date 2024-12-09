@@ -35,6 +35,7 @@ import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import { Button, IconArrowRight } from "hds-react";
 import { ButtonContainer } from "common/styles/util";
+import styled from "styled-components";
 
 function Buttons({
   applicationPk,
@@ -176,6 +177,12 @@ function Page3(): JSX.Element | null {
   }
 }
 
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+`;
+
 function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
   const { pk: appPk } = props;
   const router = useRouter();
@@ -269,11 +276,11 @@ function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
         application={application}
         isDirty={isDirty}
       >
-        <form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <Form noValidate onSubmit={handleSubmit(onSubmit)}>
           <ApplicantTypeSelector />
           <Page3 />
           <Buttons applicationPk={application.pk} submitDisabled={!isValid} />
-        </form>
+        </Form>
       </ApplicationPageWrapper>
     </FormProvider>
   );

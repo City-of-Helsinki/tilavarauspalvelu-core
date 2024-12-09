@@ -175,6 +175,6 @@ export const CompactTermsBox = styled(TermsBox)`
 export const SpanTwoColumns = styled(FullRow).attrs({ as: "span" })``;
 
 export const FormSubHeading = styled(H5).attrs({ as: "h2" })`
-  margin: var(--spacing-m) 0 0 0;
+  margin: 0;
   grid-column: 1 / -1;
 `;
