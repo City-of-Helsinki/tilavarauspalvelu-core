@@ -49,6 +49,9 @@ const StyledReactQuill = styled(ReactQuill)<{
   > div {
     font-size: var(--fontsize-body-l);
     font-family: var(--font-regular);
+    p {
+      margin-bottom: var(--spacing-s);
+    }
   }
 `;
 
