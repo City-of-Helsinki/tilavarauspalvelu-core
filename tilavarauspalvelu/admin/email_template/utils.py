@@ -18,6 +18,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_handling,
     get_context_for_reservation_requires_payment,
     get_context_for_seasonal_reservation_cancelled_single,
+    get_context_for_seasonal_reservation_modified_series,
     get_context_for_seasonal_reservation_modified_single,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
@@ -55,6 +56,10 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
     confirmed_instructions = kwargs.get("confirmed_instructions", "[HYVÄKSYTYN VARAUKSEN OHJEET]")
     cancelled_instructions = kwargs.get("cancelled_instructions", "[PERUUTETUN VARAUKSEN OHJEET]")
     pending_instructions = kwargs.get("pending_instructions", "[KÄSITELTÄVÄN VARAUKSEN OHJEET]")
+    weekday_value = kwargs.get("weekday_value", "Monday")
+    time_value = kwargs.get("time_value", "13:00-15:00")
+    application_section_name = kwargs.get("application_section_name", "[HAKEMUKSEN OSAN NIMI]")
+    application_round_name = kwargs.get("application_round_name", "[KAUSIVARAUSKIERROKSEN NIMI]")
 
     match email_type:
         # Application ##################################################################################################
@@ -187,6 +192,15 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 begin_datetime=begin,
                 end_datetime=end,
                 cancel_reason=cancel_reason,
+                language=language,
+            )
+        case EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES:
+            return get_context_for_seasonal_reservation_modified_series(
+                email_recipient_name=email_recipient_name,
+                weekday_value=weekday_value,
+                time_value=time_value,
+                application_section_name=application_section_name,
+                application_round_name=application_round_name,
                 language=language,
             )
         case EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE:

@@ -6,7 +6,7 @@ from itertools import chain
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from tilavarauspalvelu.enums import RejectionReadinessChoice
-from tilavarauspalvelu.models import AffectingTimeSpan, RejectedOccurrence, Reservation
+from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationSection, RejectedOccurrence, Reservation
 from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 
@@ -327,3 +327,15 @@ class RecurringReservationActions:
         )
 
         return RejectedOccurrence.objects.bulk_create(occurrences)
+
+    def get_application_section(self) -> ApplicationSection | None:
+        return ApplicationSection.objects.filter(
+            reservation_unit_options__allocated_time_slots__recurring_reservation=self.recurring_reservation
+        ).first()
+
+    def get_email_reservee_name(self) -> str:
+        reservation: Reservation | None = self.recurring_reservation.reservations.last()
+
+        if reservation is not None:
+            return reservation.actions.get_email_reservee_name()
+        return ""

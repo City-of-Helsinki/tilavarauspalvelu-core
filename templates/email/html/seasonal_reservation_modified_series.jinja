@@ -1,0 +1,18 @@
+{% extends "email/html/partials/base.jinja" %}
+
+{% block content_main %}
+    <mj-text>{{ text_reservation_modified | sentence | safe }}</mj-text>
+    {% include "email/html/partials/application_section_name.jinja" %}
+    <mj-spacer />
+    <mj-text font-size="16px">{{ weekday_label | safe }}: {{ weekday_value | safe }}</mj-text>
+    <mj-text font-size="16px">{{ time_label | safe }}: {{ time_value | safe }}</mj-text>
+    <mj-spacer />
+    <mj-text>{{ check_booking_details_text | safe }}: {{ check_booking_details_url_html | safe }}</mj-text>
+{% endblock %}
+
+{% block content_secondary %}{% endblock %}
+
+{% block content_closing %}
+    {% include "email/html/partials/closing.jinja" %}
+{% endblock %}
+}}
