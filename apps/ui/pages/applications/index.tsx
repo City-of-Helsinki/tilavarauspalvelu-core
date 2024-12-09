@@ -17,7 +17,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { ApplicationsGroup } from "@/components/applications/ApplicationsGroup";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import { useCurrentUser } from "@/hooks/user";
+import { useCurrentUser } from "@/hooks";
 import { H1 } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];

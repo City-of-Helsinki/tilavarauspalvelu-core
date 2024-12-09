@@ -12,7 +12,7 @@ import { getTranslation } from "@/modules/util";
 import { useOptions } from "@/hooks/useOptions";
 import { ApplicationEvent } from "./ApplicationEvent";
 import { type ApplicationFormValues } from "./Form";
-import useReservationUnitsList from "@/hooks/useReservationUnitList";
+import { useReservationUnitList } from "@/hooks";
 import { ButtonContainer } from "common/styles/util";
 
 type Node = NonNullable<ApplicationQuery["application"]>;
@@ -52,7 +52,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
   const { setValue, register, unregister, watch, handleSubmit } = form;
   // get the user selected defaults for reservationUnits field
   const { reservationUnits: selectedReservationUnits } =
-    useReservationUnitsList(applicationRound);
+    useReservationUnitList(applicationRound);
 
   const applicationSections = watch("applicationSections");
 

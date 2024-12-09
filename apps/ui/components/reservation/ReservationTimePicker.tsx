@@ -46,7 +46,7 @@ import { PendingReservation } from "@/modules/types";
 import { getTimeString } from "@/modules/reservationUnit";
 import { UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "../reservation-unit/schema";
-import { useCurrentUser } from "@/hooks/user";
+import { useCurrentUser } from "@/hooks";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { CalendarEventBuffer } from "common";
 

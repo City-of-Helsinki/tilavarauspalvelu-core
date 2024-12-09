@@ -17,7 +17,7 @@ import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { ReservationUnitCard } from "@/components/search/ReservationUnitCard";
-import useReservationUnitsList from "@/hooks/useReservationUnitList";
+import { useReservationUnitList } from "@/hooks";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
 import StartApplicationBar from "@/components/common/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -84,7 +84,7 @@ function SeasonalSearch({
     containsReservationUnit,
     clearSelections,
     // Hide other application rounds' reservation units
-  } = useReservationUnitsList(selectedApplicationRound);
+  } = useReservationUnitList(selectedApplicationRound);
 
   const variables = processVariables({
     values: searchValues,

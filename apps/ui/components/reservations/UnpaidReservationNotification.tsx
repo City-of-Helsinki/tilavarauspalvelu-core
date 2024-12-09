@@ -12,7 +12,7 @@ import {
   useDeleteReservationMutation,
 } from "@gql/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
-import { useCurrentUser } from "@/hooks/user";
+import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
 import { ApolloError } from "@apollo/client";

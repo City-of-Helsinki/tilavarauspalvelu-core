@@ -18,7 +18,7 @@ import {
   ApplicationFormSchemaRefined,
 } from "@/components/application/Form";
 import { getValidationErrors } from "common/src/apolloUtils";
-import useReservationUnitsList from "@/hooks/useReservationUnitList";
+import { useReservationUnitList } from "@/hooks";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
@@ -186,7 +186,7 @@ function ApplicationRootPage({ slug, data }: PropsNarrowed): JSX.Element {
     };
 
   const { reservationUnits: selectedReservationUnits } =
-    useReservationUnitsList(applicationRound);
+    useReservationUnitList(applicationRound);
 
   const begin = new Date(applicationRound.reservationPeriodBegin);
   const end = new Date(applicationRound.reservationPeriodEnd);

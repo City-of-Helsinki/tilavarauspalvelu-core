@@ -19,7 +19,7 @@ type HookVars = {
 /// @param round filter the reservation units by the application round
 /// Problem with this is that the current system is not based on around requiring an application round
 /// but the actual use case is, so have to do filtering case by case.
-function useReservationUnitsList(
+export function useReservationUnitList(
   round: HookVars | undefined
 ): ReservationUnitList {
   const [list, setList] = useSessionStorage<NodeList>(
@@ -69,5 +69,3 @@ function useReservationUnitsList(
     reservationUnits: getReservationUnits(),
   };
 }
-
-export default useReservationUnitsList;
