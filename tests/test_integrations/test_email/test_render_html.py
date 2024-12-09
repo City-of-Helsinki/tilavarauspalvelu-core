@@ -809,6 +809,43 @@ def test_render_seasonal_reservation_modified_single__html():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_seasonal_reservation_rejected_series__html():
+    context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SERIES, language="en")
+    html_content = render_html(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SERIES, context=context)
+    text_content = html_email_to_text(html_content)
+
+    assert text_content == cleandoc(
+        """
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
+
+        All space reservations included in your seasonal booking have been cancelled.
+
+        Reason: [HYLKÄYKSEN SYY]
+        Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
+        Day: Monday
+        Time: 13:00-15:00
+        You can check your booking details at: <https://fake.varaamo.hel.fi/en/applications>
+
+        Kind regards
+        Varaamo
+        This is an automated message, please do not reply.
+        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
+        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
+
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        (C) City of Helsinki 2024
+        """
+    )
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_seasonal_reservation_rejected_single__html():
     context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE, language="en")
     html_content = render_html(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE, context=context)

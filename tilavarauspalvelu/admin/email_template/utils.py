@@ -20,6 +20,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_seasonal_reservation_cancelled_single,
     get_context_for_seasonal_reservation_modified_series,
     get_context_for_seasonal_reservation_modified_single,
+    get_context_for_seasonal_reservation_rejected_series,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
@@ -211,6 +212,16 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 unit_location=unit_location,
                 begin_datetime=begin,
                 end_datetime=end,
+                language=language,
+            )
+        case EmailType.SEASONAL_RESERVATION_REJECTED_SERIES:
+            return get_context_for_seasonal_reservation_rejected_series(
+                email_recipient_name=email_recipient_name,
+                weekday_value=weekday_value,
+                time_value=time_value,
+                application_section_name=application_section_name,
+                application_round_name=application_round_name,
+                rejection_reason=rejection_reason,
                 language=language,
             )
         case EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE:

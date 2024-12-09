@@ -2255,6 +2255,11 @@ msgstr "Kausivaraus muokattu yksittäinen"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
+msgid "Seasonal reservation rejected series"
+msgstr "Kausivaraus hylätty sarja"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Seasonal reservation rejected single"
 msgstr "Kausivaraus hylätty yksittäinen"
 
@@ -3156,11 +3161,6 @@ msgstr "Eräpäivä"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Seasonal Booking"
-msgstr "Kausivaraus"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
 msgid ""
 "The space reservation included in your seasonal booking has been cancelled"
 msgstr "Kausivaraukseesi kuuluva tilavaraus on peruttu"
@@ -3174,6 +3174,11 @@ msgstr "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
+msgid "Seasonal Booking"
+msgstr "Kausivaraus"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
 msgid "Day"
 msgstr "Päivä"
 
@@ -3181,6 +3186,17 @@ msgstr "Päivä"
 msgctxt "Email"
 msgid "Time"
 msgstr "Kellonaika"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your seasonal booking has been cancelled"
+msgstr "Kausivarauksesi on peruttu"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid ""
+"All space reservations included in your seasonal booking have been cancelled"
+msgstr "Kaikki kausivaraukseesi kuuluvat tilavaraukset on peruttu"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format

@@ -36,6 +36,7 @@ from .template_context import (
     get_context_for_seasonal_reservation_cancelled_single,
     get_context_for_seasonal_reservation_modified_series,
     get_context_for_seasonal_reservation_modified_single,
+    get_context_for_seasonal_reservation_rejected_series,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
     get_context_for_staff_notification_reservation_requires_handling,
@@ -456,6 +457,36 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES
         context = get_context_for_seasonal_reservation_modified_series(reservation_series, language=language)
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
+
+    @staticmethod
+    def send_seasonal_reservation_rejected_series_email(
+        reservation_series: RecurringReservation,
+        *,
+        language: Lang | None = None,
+    ) -> None:
+        reservation: Reservation | None = reservation_series.reservations.last()
+        if reservation is None:
+            return
+        if reservation.type != ReservationTypeChoice.SEASONAL:
+            return
+        if reservation_series.actions.get_application_section() is None:
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for reservation series rejected email",
+                details={"reservation_series": reservation_series.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.SEASONAL_RESERVATION_REJECTED_SERIES
+        context = get_context_for_seasonal_reservation_rejected_series(reservation_series, language=language)
         email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
