@@ -18,6 +18,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeStaffChoice,
     WeekdayChoice,
 )
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import RecurringReservation, Reservation, ReservationDenyReason, ReservationStatistic
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
@@ -464,6 +465,8 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             create_or_update_reservation_statistics.delay(
                 reservation_pks=[reservation.pk for reservation in reservations],
             )
+
+        EmailService.send_seasonal_reservation_modified_series_email(instance)
 
         return instance
 
