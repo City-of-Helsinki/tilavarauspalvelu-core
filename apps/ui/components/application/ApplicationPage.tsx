@@ -4,15 +4,15 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import {
   ApplicantTypeChoice,
-  ApplicationStatusChoice,
   type ApplicationQuery,
+  ApplicationStatusChoice,
 } from "@gql/gql-types";
 import { useRouter } from "next/router";
-import Stepper, { StepperProps } from "./Stepper";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 import { Breadcrumb } from "../common/Breadcrumb";
-import { H1 } from "common";
+import { fontBold, H1 } from "common";
+import { Stepper as HDSStepper, StepState } from "hds-react";
 
 const InnerContainer = styled.div<{ $hideStepper: boolean }>`
   display: grid;
@@ -34,6 +34,12 @@ const ChildWrapper = styled.div`
   @media (min-width: ${breakpoints.l}) {
     grid-column: 2;
     grid-row: 1 / -1;
+  }
+`;
+
+const StyledStepper = styled(HDSStepper)`
+  [class*="Stepper-module_selected"] {
+    ${fontBold}
   }
 `;
 
@@ -91,21 +97,41 @@ export function ApplicationPageWrapper({
   translationKeyPrefix,
   headContent,
   overrideText,
-  isDirty,
   children,
 }: ApplicationPageProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
+  const { asPath, push } = router;
 
   const pages = ["page1", "page2", "page3", "preview"] as const;
 
   const hideStepper =
     pages.filter((x) => router.asPath.match(`/${x}`)).length === 0;
-  const steps: StepperProps = {
-    steps: pages.map((x, i) => ({ slug: x, step: i })),
-    completedStep: application ? calculateCompletedStep(application) : 0,
-    basePath: getApplicationPath(application?.pk),
-    isFormDirty: isDirty ?? false,
+
+  const steps = pages.map((x, i) => ({
+    label: t(`application:navigation.${x}`),
+    state:
+      calculateCompletedStep(application) === i
+        ? StepState.available
+        : calculateCompletedStep(application) < i
+          ? StepState.disabled
+          : StepState.completed,
+  }));
+
+  const handleStepClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const target = e.currentTarget;
+    const s =
+      Number(
+        target.getAttribute("data-testid")?.replace("hds-stepper-step-", "")
+      ) + 1;
+    if (s === 4 ? asPath.endsWith("preview") : asPath.includes(`page${s}`)) {
+      return; // already on the page, so do nothing
+    }
+    if (s === 4) {
+      push(`${getApplicationPath(application?.pk)}preview`);
+    } else {
+      push(`${getApplicationPath(application?.pk)}page${s}`);
+    }
   };
 
   const title = t(`${translationKeyPrefix}.heading`);
@@ -121,6 +147,7 @@ export function ApplicationPageWrapper({
       title: t("breadcrumb:application"),
     },
   ] as const;
+  const selectedStep = asPath.charAt(asPath.length - 1);
 
   return (
     <>
@@ -129,8 +156,15 @@ export function ApplicationPageWrapper({
         <H1 $noMargin>{title}</H1>
         <p>{subTitle}</p>
       </div>
+      {hideStepper ? null : (
+        <StyledStepper
+          language={i18n.language}
+          steps={steps}
+          selectedStep={selectedStep === "w" ? 3 : Number(selectedStep) - 1} //calculateCompletedStep(application)}
+          onStepClick={handleStepClick}
+        />
+      )}
       <InnerContainer $hideStepper={hideStepper}>
-        {hideStepper ? null : <Stepper {...steps} />}
         <>
           {/* TODO preview / view should not maybe display these notes */}
           <StyledNotesWhenApplying

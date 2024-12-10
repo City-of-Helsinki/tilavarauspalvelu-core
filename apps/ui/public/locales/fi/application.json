@@ -115,7 +115,7 @@
     "email": "Hakemukselle liitettävä sähköpostiosoite",
     "emailNotification": "Kaikki hakemukseen liittyvät viestit lähetetään alla olevaan sähköpostiin",
     "subHeading": {
-      "basicInfo": "Varaajan perustiedot",
+      "basicInfo": "Hakijan perustiedot",
       "postalAddress": "Postiosoite",
       "billingAddress": "Laskutusosoite",
       "contactInfo": "Yhteyshenkilön tiedot"
@@ -243,7 +243,7 @@
   "navigation": {
     "page1": "Varauksen tiedot",
     "page2": "Varauksen ajankohta",
-    "page3": "Varaajan tiedot",
+    "page3": "Hakijan tiedot",
     "preview": "Tarkista ja lähetä"
   }
 }
