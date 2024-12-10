@@ -171,6 +171,7 @@ export const CAN_USER_CANCEL_RESERVATION_FRAGMENT = gql`
     state
     begin
     reservationUnits {
+      id
       ...CancellationRuleFields
     }
   }

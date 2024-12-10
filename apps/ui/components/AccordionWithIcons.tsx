@@ -32,7 +32,7 @@ const ClosedAccordionWrapper = styled.div`
   padding: var(--spacing-s);
 `;
 
-const IconListWrapper = styled.div`
+const IconListWrapper = styled.ul`
   display: grid;
   gap: var(--spacing-xs);
 
@@ -123,7 +123,7 @@ export function AccordionWithIcons({
         <Heading as={`h${headingLevel}`}>{heading}</Heading>
         <IconListWrapper>
           {icons.map(({ text, icon, textPostfix }) => (
-            <IconLabel key={text}>
+            <IconLabel key={text} as="li">
               {icon}
               <span>{text}</span>
               <span>{textPostfix}</span>

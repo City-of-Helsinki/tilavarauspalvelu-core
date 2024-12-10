@@ -332,6 +332,11 @@ function Reservation({
     successMessage: t("reservations:saveNewTimeSuccess"),
   });
 
+  useToastIfQueryParam({
+    key: "deleted",
+    successMessage: t("reservations:reservationCancelledTitle"),
+  });
+
   const { begin, end } = reservation;
   const timeString = capitalize(
     formatDateTimeRange(t, new Date(begin), new Date(end))

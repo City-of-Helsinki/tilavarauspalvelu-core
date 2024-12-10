@@ -21,7 +21,10 @@ import {
 import { getImageSource } from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
 import { Flex } from "common/styles/util";
-import { convertLanguageCode } from "common/src/common/util";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 type Type = "pending" | "confirmed" | "complete";
 
@@ -138,6 +141,11 @@ export function ReservationInfoCard({
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
 
+  const unitName =
+    reservationUnit.unit != null
+      ? getTranslationSafe(reservationUnit.unit, "name", lang)
+      : "-";
+
   // TODO why does this not use the Card component?
   return (
     <Wrapper $type={type} className={className} style={style}>
@@ -159,11 +167,7 @@ export function ReservationInfoCard({
             </span>
           </Subheading>
         )}
-        <Subheading>
-          {reservationUnit.unit != null
-            ? getTranslation(reservationUnit.unit, "name")
-            : "-"}
-        </Subheading>
+        <Subheading>{unitName}</Subheading>
         <div data-testid="reservation__reservation-info-card__duration">
           <Strong>
             {capitalize(timeString)}, {formatDuration(duration, t)}

@@ -40,6 +40,10 @@ const nextConfig = {
         source: "/search/single",
         destination: "/search",
       },
+      {
+        source: "/applications/:id/view/:reservationId/cancel",
+        destination: "/reservations/:reservationId/cancel",
+      },
     ];
   },
   sassOptions: {

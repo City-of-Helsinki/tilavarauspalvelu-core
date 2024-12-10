@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next";
 import { getTranslation } from "@/modules/util";
 import Sanitize from "../common/Sanitize";
 import { type ReservationUnitPageQuery } from "@/gql/gql-types";
+import { Flex } from "common/styles/util";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -49,7 +50,7 @@ export function AcceptTerms({
   );
 
   return (
-    <>
+    <Flex>
       <TermsBox
         id="cancellation-and-payment-terms"
         heading={paymentTermsHeading}
@@ -90,6 +91,6 @@ export function AcceptTerms({
         accepted={isTermsAccepted.space}
         setAccepted={(val) => setIsTermsAccepted("space", val)}
       />
-    </>
+    </Flex>
   );
 }

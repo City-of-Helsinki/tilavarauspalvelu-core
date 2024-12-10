@@ -11,17 +11,39 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
-import { getReservationPath } from "@/modules/urls";
+import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
+import { type TFunction } from "i18next";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
-  const { t } = useTranslation();
-  const { reservation } = props;
-  const routes = [
+function getBreadcrumbs(
+  t: TFunction,
+  reservation: PropsNarrowed["reservation"]
+) {
+  const applicationPk =
+    reservation?.recurringReservation?.allocatedTimeSlot?.reservationUnitOption
+      ?.applicationSection?.application?.pk;
+  if (applicationPk) {
+    return [
+      {
+        slug: "/applications",
+        title: t("breadcrumb:applications"),
+      },
+      {
+        slug: getApplicationPath(applicationPk, "view"),
+        title: t("breadcrumb:application", { id: applicationPk }),
+      },
+      {
+        // NOTE Don't set slug. It hides the mobile breadcrumb
+        slug: "",
+        title: t("reservations:cancelReservation"),
+      },
+    ];
+  }
+  return [
     {
       slug: "/reservations",
       title: t("breadcrumb:reservations"),
@@ -36,7 +58,12 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
       title: t("reservations:cancelReservation"),
     },
   ];
+}
 
+function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
+  const { t } = useTranslation();
+  const { reservation } = props;
+  const routes = getBreadcrumbs(t, reservation);
   return (
     <>
       <BreadcrumbWrapper route={routes} />
@@ -122,6 +149,30 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
           textEn
           textFi
           textSv
+        }
+      }
+      recurringReservation {
+        id
+        name
+        allocatedTimeSlot {
+          id
+          pk
+          reservationUnitOption {
+            id
+            applicationSection {
+              id
+              application {
+                id
+                pk
+                applicationRound {
+                  id
+                  termsOfUse {
+                    ...TermsOfUseTextFields
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }

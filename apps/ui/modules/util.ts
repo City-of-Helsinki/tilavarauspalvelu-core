@@ -11,7 +11,11 @@ import {
 } from "common/src/common/util";
 import type { ImageFragment, LocationFieldsI18nFragment } from "@gql/gql-types";
 import { isBrowser } from "./const";
-import { type LocalizationLanguages } from "common/src/helpers";
+import {
+  formatMinutes,
+  timeToMinutes,
+  type LocalizationLanguages,
+} from "common/src/helpers";
 
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
@@ -300,4 +304,48 @@ export function getDayTimes(
         )}`
     )
     .join(", ");
+}
+
+/// Creates time and date strings for reservations
+/// @param t - translation function
+/// @param res - reservation object
+/// @param orig - original reservation object (use undefined if not possible to modify)
+export function formatDateTimeStrings(
+  t: TFunction,
+  reservation: {
+    begin: string;
+    end: string;
+  },
+  orig?: {
+    beginTime: string;
+    endTime: string;
+  },
+  trailingMinutes = false
+): { date: Date; time: string; dayOfWeek: string; isModified: boolean } {
+  const start = new Date(reservation.begin);
+  const end = new Date(reservation.end);
+  const dayOfWeek = t(`weekDayLong.${start.getDay()}`);
+
+  const originalBeginMins = orig != null ? timeToMinutes(orig.beginTime) : -1;
+  const originalEndMins = orig != null ? timeToMinutes(orig.endTime) : -1;
+
+  const beginMins = toMinutes(start);
+  const endMins = toMinutes(end);
+  const isModified =
+    orig != null &&
+    (originalBeginMins !== beginMins || originalEndMins !== endMins);
+  const btime = formatMinutes(beginMins, trailingMinutes);
+  const etime = formatMinutes(endMins, trailingMinutes);
+  const time = `${btime} - ${etime}`;
+  return {
+    date: start,
+    time,
+    dayOfWeek,
+    isModified,
+  };
+}
+
+/// Converts a date to minutes discarding date and seconds
+function toMinutes(d: Date): number {
+  return d.getHours() * 60 + d.getMinutes();
 }

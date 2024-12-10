@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { Notification } from "hds-react";
-import TermsBox from "common/src/termsbox/TermsBox";
 import { breakpoints, fontMedium, fontRegular } from "common";
 import { AccordionWithState } from "@/components/Accordion";
 import { H5 } from "common/src/common/typography";
@@ -166,10 +165,6 @@ export const TermsAccordion = styled(AccordionWithState)`
   [class^="Button-module_label"] div {
     font-size: var(--fontsize-heading-s);
   }
-`;
-
-export const CompactTermsBox = styled(TermsBox)`
-  margin-bottom: 0;
 `;
 
 export const SpanTwoColumns = styled(FullRow).attrs({ as: "span" })``;

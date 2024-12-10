@@ -45,7 +45,10 @@ function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
     <>
       <BreadcrumbWrapper route={route} />
       <H1 $noMargin>{heading}</H1>
-      <AllReservations applicationSection={applicationSection} />
+      <AllReservations
+        applicationSection={applicationSection}
+        application={application}
+      />
     </>
   );
 }

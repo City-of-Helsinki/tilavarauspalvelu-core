@@ -25,6 +25,7 @@ import { gql } from "@apollo/client";
 import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { H1 } from "common";
 import styled from "styled-components";
+import { useToastIfQueryParam } from "@/hooks";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {
@@ -40,6 +41,11 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
 
   type TabOptions = "reservations" | "application";
   const [tab, setTab] = useState<TabOptions>("reservations");
+
+  useToastIfQueryParam({
+    key: "deletedReservationPk",
+    successMessage: t("application:preview.reservationDeleted"),
+  });
 
   const handleTabChange = (tab_: TabOptions) => {
     setTab(tab_);

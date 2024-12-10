@@ -205,7 +205,8 @@
     "userAcceptsTerms": "I have read and I accept the Terms of Agreement and the Additional booking conditions.",
     "subHeading": {
       "applicationInfo": "Application information"
-    }
+    },
+    "reservationDeleted": "Booking cancelled."
   },
   "applicationEventStatus": {
     "UNALLOCATED": "Unallocated",

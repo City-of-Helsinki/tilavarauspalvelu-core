@@ -23,29 +23,23 @@ export type Props = {
 const Wrapper = styled.div`
   --background-color: var(--color-silver-light);
   --border-color: var(--color-bus);
-  --margin-bottom-desktop: var(--spacing-layout-m);
-  --margin-bottom-mobile: var(--spacing-l);
 
   background-color: var(--background-color);
   border-top: 8px solid var(--border-color);
-  font-size: var(--fontsize-body-m);
-  margin-bottom: var(--margin-bottom-mobile);
-
-  @media (min-width: ${breakpoints.m}) {
-    margin-bottom: var(--margin-bottom-desktop);
-  }
 `;
 
 const Content = styled.div`
   max-height: 18.75rem;
   min-height: 7.5rem;
   overflow-y: auto;
-  white-space: pre-line;
   padding: var(--spacing-m) var(--spacing-s) var(--spacing-s);
-  line-height: var(--lineheight-l);
 
   @media (min-width: ${breakpoints.m}) {
     padding-right: var(--spacing-3-xl);
+  }
+
+  p:first-of-type {
+    margin-top: 0;
   }
 `;
 

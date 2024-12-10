@@ -12,12 +12,12 @@ import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
 import {
   ApplicationSection,
   ApplicationSectionHeader,
-  CompactTermsBox,
   StyledNotification,
   TermsAccordion as Accordion,
 } from "./styled";
 import { ApplicationEventList } from "./ApplicationEventList";
 import Sanitize from "../common/Sanitize";
+import TermsBox from "common/src/termsbox/TermsBox";
 
 type Node = NonNullable<ApplicationQuery["application"]>;
 export function ViewApplication({
@@ -54,7 +54,7 @@ export function ViewApplication({
           heading={t("reservationUnit:termsOfUse")}
           open
         >
-          <CompactTermsBox
+          <TermsBox
             id="preview.acceptTermsOfUse"
             body={<Sanitize html={getTranslation(tos, "text")} />}
           />
@@ -62,7 +62,7 @@ export function ViewApplication({
       )}
       {tos2 && (
         <Accordion heading={t("application:preview.reservationUnitTerms")} open>
-          <CompactTermsBox
+          <TermsBox
             id="preview.acceptServiceSpecificTerms"
             body={<Sanitize html={getTranslation(tos2, "text")} />}
             /* TODO TermsBox has accepted and checkbox we could use but for now leaving the single
