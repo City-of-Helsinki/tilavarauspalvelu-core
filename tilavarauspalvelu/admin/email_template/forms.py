@@ -88,6 +88,8 @@ def select_tester_form(*, email_type: EmailType) -> type[BaseEmailTemplateForm] 
             return SeasonalReservationRejectedSingleTemplateTesterForm
 
         # Staff
+        case EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED:
+            return StaffNotificationApplicationSectionCancelledTemplateTesterForm
         case EmailType.STAFF_NOTIFICATION_RESERVATION_MADE:
             return StaffNotificationReservationMadeEmailTemplateTesterForm
         case EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING:
@@ -560,4 +562,19 @@ class StaffNotificationReservationRequiresHandlingEmailTemplateTesterForm(Reserv
             reservee_name=self.cleaned_data["reservee_name"],
             reservation_name=self.cleaned_data["reservation_name"],
             reservation_id=self.cleaned_data["reservation_id"],
+        )
+
+
+class StaffNotificationApplicationSectionCancelledTemplateTesterForm(EmailRecipientFormMixin, BaseEmailTemplateForm):
+    application_section_name = forms.CharField(initial="[HAKEMUKSEN OSAN NIMI]")
+    application_round_name = forms.CharField(initial="[KAUSIVARAUSKIERROKSEN NIMI]")
+    cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
+
+    def to_context(self) -> EmailContext:
+        return get_context_for_application_section_cancelled(
+            **super().get_context_params(),
+            email_recipient_name=self.cleaned_data["email_recipient_name"],
+            application_section_name=self.cleaned_data["application_section_name"],
+            application_round_name=self.cleaned_data["application_round_name"],
+            cancel_reason=self.cleaned_data["cancel_reason"],
         )

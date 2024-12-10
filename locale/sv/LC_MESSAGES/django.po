@@ -2198,6 +2198,11 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
+msgid "Staff notification application section cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Staff notification reservation made"
 msgstr ""
 
@@ -2894,6 +2899,18 @@ msgstr "Dag"
 msgctxt "Email"
 msgid "Time"
 msgstr "Tid"
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+msgctxt "Email"
+msgid "The customer has canceled the seasonal booking"
+msgstr "Kunden har avbokat säsongsbokningen"
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+msgctxt "Email"
+msgid ""
+"The customer has canceled all space reservations included in the seasonal "
+"booking"
+msgstr "Kunden har avbokat alla lokalbokningar som ingår i säsongsbokningen"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"

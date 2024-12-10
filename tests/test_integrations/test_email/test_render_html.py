@@ -923,6 +923,38 @@ def test_render_seasonal_reservation_rejected_single__html():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_staff_notification_application_section_cancelled_email__html():
+    context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, language="en")
+    html_content = render_html(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, context=context)
+    text_content = html_email_to_text(html_content)
+
+    assert text_content == cleandoc(
+        """
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        **Hi,**
+
+        The customer has canceled all space reservations included in the seasonal booking.
+
+        Reason: [PERUUTUKSEN SYY]
+        Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
+
+        Kind regards
+        Varaamo
+        This is an automated message, please do not reply.
+
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        (C) City of Helsinki 2024
+        """
+    )
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_staff_notification_reservation_made__html():
     context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE, language="en")
     html_content = render_html(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE, context=context)

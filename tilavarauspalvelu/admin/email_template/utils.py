@@ -27,6 +27,9 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_staff_notification_reservation_requires_handling,
     get_context_for_user_anonymization,
 )
+from tilavarauspalvelu.integrations.email.template_context.application import (
+    get_context_for_staff_notification_application_section_cancelled,
+)
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
@@ -250,6 +253,13 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
 
         # Staff ########################################################################################################
 
+        case EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED:
+            return get_context_for_staff_notification_application_section_cancelled(
+                application_section_name=application_section_name,
+                application_round_name=application_round_name,
+                cancel_reason=cancel_reason,
+                language=language,
+            )
         case EmailType.STAFF_NOTIFICATION_RESERVATION_MADE:
             return get_context_for_staff_notification_reservation_made(
                 reservee_name=reservee_name,

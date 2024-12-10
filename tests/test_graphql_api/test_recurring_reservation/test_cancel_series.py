@@ -6,6 +6,7 @@ import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
@@ -14,6 +15,7 @@ from tests.factories import (
     ReservationCancelReasonFactory,
     UserFactory,
 )
+from tests.helpers import patch_method
 
 from .helpers import CANCEL_SECTION_SERIES_MUTATION, create_reservation_series
 
@@ -23,6 +25,8 @@ pytestmark = [
 ]
 
 
+@patch_method(EmailService.send_application_section_cancelled)
+@patch_method(EmailService.send_staff_notification_application_section_cancelled)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__cancel_section_series__cancel_whole_remaining(graphql):
     reason = ReservationCancelReasonFactory.create()
@@ -58,6 +62,9 @@ def test_recurring_reservations__cancel_section_series__cancel_whole_remaining(g
 
     assert response.first_query_object == {"cancelled": 5, "future": 5}
     assert reservation_series.reservations.count() == 9
+
+    assert EmailService.send_application_section_cancelled.called is True
+    assert EmailService.send_staff_notification_application_section_cancelled.called is True
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))

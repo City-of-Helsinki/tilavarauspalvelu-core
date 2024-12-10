@@ -123,6 +123,29 @@ def test_render_application_section_cancelled_email_text():
     )
 
 
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_staff_notification_application_section_cancelled_email_text():
+    context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, language="en")
+    text_content = render_text(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, context=context)
+
+    assert text_content == cleandoc(
+        """
+        Hi,
+
+        The customer has canceled all space reservations included in the seasonal booking.
+
+        Reason: [PERUUTUKSEN SYY]
+
+        Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
+
+        Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply.
+        """
+    )
+
+
 # Permissions ##########################################################################################################
 
 
