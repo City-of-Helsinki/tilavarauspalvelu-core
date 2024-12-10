@@ -57,6 +57,7 @@ def test_reservation__query__all_fields(graphql):
         denyReason { reason }
         description
         end
+        extUuid
         freeOfChargeReason
         handledAt
         handlingDetails
@@ -117,6 +118,7 @@ def test_reservation__query__all_fields(graphql):
         "denyReason": None,
         "description": reservation.description,
         "end": reservation.end.isoformat(),
+        "extUuid": str(reservation.ext_uuid),
         "freeOfChargeReason": reservation.free_of_charge_reason,
         "handledAt": reservation.handled_at,
         "handlingDetails": reservation.handling_details,

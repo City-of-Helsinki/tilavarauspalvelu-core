@@ -28,6 +28,7 @@ def test_recurring_reservations__query(graphql):
 
     fields = """
         pk
+        extUuid
         name
         description
         beginDate
@@ -78,6 +79,7 @@ def test_recurring_reservations__query(graphql):
     assert len(response.edges) == 1
     assert response.node(0) == {
         "pk": recurring_reservation.pk,
+        "extUuid": str(recurring_reservation.ext_uuid),
         "name": recurring_reservation.name,
         "description": recurring_reservation.description,
         "beginDate": recurring_reservation.begin_date.isoformat(),
