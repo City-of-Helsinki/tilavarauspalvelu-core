@@ -1,0 +1,20 @@
+{% extends "email/html/partials/base.jinja" %}
+
+{% block content_main %}
+    <mj-text>{{ text_reservation_cancelled | sentence | safe }}</mj-text>
+    <mj-text>{{ cancel_reason_label | safe }}: {{ cancel_reason | safe }}</mj-text>
+    {% include "email/html/partials/application_section_name.jinja" %}
+
+    <mj-spacer />
+    <mj-text>{{ view_booking_at_label | safe }}:</mj-text>
+    {% for series in cancelled_reservation_series %}
+        <mj-text>{{ series.weekday | safe }}: {{ series.time | safe }}</mj-text>
+        <mj-text><a href="{{ series.url | safe }}">{{ series.url | safe }}</a></mj-text>
+    {% endfor %}
+{% endblock %}
+
+{% block content_secondary %}{% endblock %}
+
+{% block content_closing %}
+    {% include "email/html/partials/closing_staff.jinja" %}
+{% endblock %}

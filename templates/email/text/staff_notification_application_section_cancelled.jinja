@@ -1,0 +1,14 @@
+{{ salutation | safe }},
+
+{{ text_reservation_cancelled | sentence | safe }}
+
+{{ cancel_reason_label | safe }}: {{ cancel_reason | safe }}
+
+{% include "email/text/partials/application_section_name.jinja" %}
+
+{{ view_booking_at_label | safe }}:
+
+{% for series in cancelled_reservation_series %}{{ series.weekday | safe }} {{ series.time | safe }}
+{{ series.url | safe }}
+{% endfor %}
+{% include "email/text/partials/closing_staff.jinja" %}

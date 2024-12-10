@@ -43,6 +43,7 @@ from .template_context import (
     get_context_for_staff_notification_reservation_requires_handling,
     get_context_for_user_anonymization,
 )
+from .template_context.application import get_context_for_staff_notification_application_section_cancelled
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
@@ -519,6 +520,33 @@ class EmailService:
         send_emails_in_batches_task.delay(email_data=email)
 
     # Staff ############################################################################################################
+
+    @staticmethod
+    def send_staff_notification_application_section_cancelled(application_section: ApplicationSection) -> None:
+        """Sends an email to Staff that the whole application section was cancelled by the user"""
+        reservation: Reservation | None = application_section.actions.get_last_reservation()
+        if reservation is None:
+            return
+
+        recipients_by_language = get_reservation_staff_notification_recipients_by_language(reservation)
+        if not recipients_by_language:
+            SentryLogger.log_message(
+                "No recipients for staff notification application section cancelled email",
+                details={"reservation": reservation.pk},
+            )
+            return
+
+        emails: list[EmailData] = []
+        email_type = EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED
+
+        for language, recipients in recipients_by_language.items():
+            context = get_context_for_staff_notification_application_section_cancelled(
+                application_section, language=language
+            )
+            email = EmailData.build(recipients, context, email_type)
+            emails.append(email)
+
+        send_multiple_emails_in_batches_task.delay(emails=emails)
 
     @staticmethod
     def send_staff_notification_reservation_made_email(reservation: Reservation) -> None:

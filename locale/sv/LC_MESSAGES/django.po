@@ -2204,6 +2204,11 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
+msgid "Staff notification application section cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Staff notification reservation made"
 msgstr ""
 
@@ -2890,16 +2895,22 @@ msgid "Seasonal Booking"
 msgstr "Säsongsbokning"
 
 #: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Day"
-msgstr "Dag"
+msgid "The customer has canceled the seasonal booking"
+msgstr "Kunden har avbokat säsongsbokningen"
+
+#: tilavarauspalvelu/integrations/email/template_context/application.py
+msgctxt "Email"
+msgid ""
+"The customer has canceled all space reservations included in the seasonal "
+"booking"
+msgstr "Kunden har avbokat alla lokalbokningar som ingår i säsongsbokningen"
 
 #: tilavarauspalvelu/integrations/email/template_context/application.py
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Time"
-msgstr "Tid"
+msgid "You can view the booking at"
+msgstr "Du kan se bokningen på"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3147,6 +3158,16 @@ msgid ""
 msgstr "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Day"
+msgstr "Dag"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Time"
+msgstr "Tid"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
 msgctxt "Email"
 msgid "New booking %(reservation_id)s has been made for %(unit_name)s"
@@ -3162,11 +3183,6 @@ msgstr "En ny bokningsförfrågan för %(reservation_unit_name)s har bekräftats
 msgctxt "Email"
 msgid "Reservee name"
 msgstr "Bokare"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "You can view the booking at"
-msgstr "Du kan se bokningen på"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format

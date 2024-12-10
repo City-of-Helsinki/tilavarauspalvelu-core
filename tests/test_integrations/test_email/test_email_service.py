@@ -1221,6 +1221,47 @@ def test_email_service__send_seasonal_reservation_rejected_single(outbox):
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
 
 
+# type: EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED ########################################################################
+
+
+@override_settings(SEND_EMAILS=True)
+@freeze_time("2024-01-01")
+def test_email_service__send_staff_notification_application_section_cancelled_email(outbox):
+    unit = UnitFactory.create(name="foo", name_en="foo")
+
+    UserFactory.create_with_unit_role(
+        units=[unit],
+        email="admin1@email.com",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="fi",
+    )
+    UserFactory.create_with_unit_role(
+        units=[unit],
+        email="admin2@email.com",
+        reservation_notification=ReservationNotification.ALL,
+        preferred_language="en",
+    )
+
+    application_section = ApplicationSectionFactory.create_in_status_handled(application__user__email="user@email.com")
+    create_reservation_series(
+        reservation_unit__unit=unit,
+        user=application_section.application.user,
+        allocated_time_slot__reservation_unit_option__application_section=application_section,
+        reservations__reservee_email="reservee@email.com",
+    )
+
+    with TranslationsFromPOFiles():
+        EmailService.send_staff_notification_application_section_cancelled(application_section=application_section)
+
+    assert len(outbox) == 2
+
+    assert outbox[0].subject == "Asiakas on perunut kausivarauksen"
+    assert sorted(outbox[0].bcc) == ["admin1@email.com"]
+
+    assert outbox[1].subject == "The customer has canceled the seasonal booking"
+    assert sorted(outbox[1].bcc) == ["admin2@email.com"]
+
+
 # type: EmailType.STAFF_NOTIFICATION_RESERVATION_MADE ##################################################################
 
 

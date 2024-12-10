@@ -273,9 +273,10 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             .distinct()
         )
 
+        cancellable_reservations_count = cancellable_reservations.count()
         data = CancellationOutput(
             expected_cancellations=future_reservations.count(),
-            actual_cancellations=cancellable_reservations.count(),
+            actual_cancellations=cancellable_reservations_count,
         )
 
         cancellable_reservations.update(
@@ -284,8 +285,9 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             cancel_details=self.validated_data.get("cancel_details", ""),
         )
 
-        if cancellable_reservations.count():
+        if cancellable_reservations_count:
             EmailService.send_application_section_cancelled(application_section=self.instance)
+            EmailService.send_staff_notification_application_section_cancelled(application_section=self.instance)
 
         return data
 
