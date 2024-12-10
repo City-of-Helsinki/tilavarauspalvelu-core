@@ -211,7 +211,12 @@ class Params(NamedTuple):
         ),
         "match different grammatical case": Params(
             text_search="tila pukinmäessä",
-            reservation_unit_data=SearchableData(description="sijaitsee pukinmäen kirjaston vieressä"),
+            reservation_unit_data=SearchableData(description="tila sijaitsee pukinmäen kirjaston vieressä"),
+        ),
+        "not all search terms are found": Params(
+            text_search="tenniskenttä kannelmäki",
+            reservation_unit_data=SearchableData(description="Tämä on uusi tenniskenttä"),
+            has_results=False,
         ),
     })
 )
