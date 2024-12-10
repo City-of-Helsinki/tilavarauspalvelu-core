@@ -39,7 +39,7 @@ function getBreadcrumbs(
       {
         // NOTE Don't set slug. It hides the mobile breadcrumb
         slug: "",
-        title: t("reservations:cancelReservation"),
+        title: t("reservations:cancel.reservation"),
       },
     ];
   }
@@ -55,7 +55,7 @@ function getBreadcrumbs(
     {
       // NOTE Don't set slug. It hides the mobile breadcrumb
       slug: "",
-      title: t("reservations:cancelReservation"),
+      title: t("reservations:cancel.reservation"),
     },
   ];
 }

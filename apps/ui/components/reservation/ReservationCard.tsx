@@ -94,7 +94,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
         key="cancel"
         width="full"
       >
-        {t("reservations:cancelReservationAbbreviated")}
+        {t("reservations:cancel.reservationAbbreviated")}
         <IconCross aria-hidden />
       </ButtonLikeLink>
     );

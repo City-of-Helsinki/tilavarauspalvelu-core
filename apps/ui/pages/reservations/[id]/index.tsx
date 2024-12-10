@@ -466,8 +466,8 @@ function Reservation({
                 data-testid="reservation-detail__button--cancel"
               >
                 {t(
-                  `reservations:cancel${
-                    isBeingHandled ? "Application" : "Reservation"
+                  `reservations:cancel.${
+                    isBeingHandled ? "application" : "reservation"
                   }`
                 )}
                 <IconCross aria-hidden />

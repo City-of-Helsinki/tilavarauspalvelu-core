@@ -260,7 +260,7 @@ export function EditStep0({
             data-testid="reservation-edit__button--cancel"
           >
             <IconCross aria-hidden />
-            {t("reservations:cancelEditReservationTime")}
+            {t("reservations:cancelButton")}
           </ButtonLikeLink>
           <Button
             variant="primary"

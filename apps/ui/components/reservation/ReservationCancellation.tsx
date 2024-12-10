@@ -102,9 +102,6 @@ export function ReservationCancellation(props: Props): JSX.Element {
 
   const { reservation } = props;
 
-  const title = t("reservations:cancelReservation");
-  const ingress = t("reservations:cancelReservationBody");
-
   const handleNext = () => {
     const redirectUrl = getBackPath(reservation);
     if (isPartOfApplication(reservation)) {
@@ -116,13 +113,21 @@ export function ReservationCancellation(props: Props): JSX.Element {
     }
   };
 
-  // TODO check that the reservation hasn't been cancelled already
+  const isApplication = isPartOfApplication(reservation);
+  const title = t("reservations:cancel.reservation");
+  const ingress = isApplication
+    ? t("reservations:cancel.ingressApplication")
+    : t("reservations:cancel.ingress");
+  const infoBody = isApplication
+    ? t("reservations:cancel.infoBodyApplication")
+    : t("reservations:cancel.infoBody");
 
   return (
     <ReservationPageWrapper>
       <div>
         <H1 $noMargin>{title}</H1>
         <p>{ingress}</p>
+        <p>{infoBody}</p>
       </div>
       {reservation.recurringReservation ? (
         <ApplicationInfoCard reservation={reservation} />
@@ -234,7 +239,7 @@ function CancellationForm(props: Props & { onNext: () => void }): JSX.Element {
       onNext();
     } catch (e) {
       errorToast({
-        text: t("reservations:reservationCancellationFailed"),
+        text: t("reservations:cancel.mutationFailed"),
       });
     }
   };
@@ -244,7 +249,6 @@ function CancellationForm(props: Props & { onNext: () => void }): JSX.Element {
 
   return (
     <>
-      <p style={{ margin: 0 }}>{t("reservations:cancelInfoBody")}</p>
       {cancellationTerms != null && (
         <AccordionWithState
           heading={t("reservationUnit:cancellationTerms")}
@@ -258,7 +262,7 @@ function CancellationForm(props: Props & { onNext: () => void }): JSX.Element {
           <ControlledSelect
             name="reason"
             control={control}
-            label={t("reservations:cancelReason")}
+            label={t("reservations:cancel.reason")}
             options={reasons}
             required
           />
@@ -268,7 +272,7 @@ function CancellationForm(props: Props & { onNext: () => void }): JSX.Element {
               href={backLink}
             >
               <IconCross aria-hidden="true" />
-              {t("reservations:cancelReservationCancellation")}
+              {t("reservations:cancelButton")}
             </ButtonLikeLink>
             <Button
               variant="primary"
@@ -277,7 +281,7 @@ function CancellationForm(props: Props & { onNext: () => void }): JSX.Element {
               data-testid="reservation-cancel__button--cancel"
               isLoading={loading}
             >
-              {t("reservations:cancelReservation")}
+              {t("reservations:cancel.reservation")}
             </Button>
           </Actions>
         </AutoGrid>
