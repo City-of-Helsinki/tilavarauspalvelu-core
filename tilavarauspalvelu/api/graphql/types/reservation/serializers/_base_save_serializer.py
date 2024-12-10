@@ -23,6 +23,7 @@ from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPur
 from utils.date_utils import DEFAULT_TIMEZONE
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.models import User
     from tilavarauspalvelu.typing import AnyUser
 
 
@@ -142,10 +143,12 @@ class ReservationBaseSaveSerializer(OldPrimaryKeySerializer, ReservationPriceMix
         begin = begin.astimezone(DEFAULT_TIMEZONE)
         end = end.astimezone(DEFAULT_TIMEZONE)
 
+        request_user: AnyUser = self.context["request"].user
         reservation_units = self._get_reservation_units(data)
 
         sku = None
         for reservation_unit in reservation_units:
+            self.check_if_reservee_should_be_adult(reservation_unit, request_user)
             self.check_reservation_time(reservation_unit)
             self.check_reservation_overlap(reservation_unit, begin, end)
             self.check_reservation_duration(reservation_unit, begin, end)
@@ -164,7 +167,6 @@ class ReservationBaseSaveSerializer(OldPrimaryKeySerializer, ReservationPriceMix
         data["state"] = ReservationStateChoice.CREATED.value
         data["buffer_time_before"], data["buffer_time_after"] = self._calculate_buffers(begin, end, reservation_units)
 
-        request_user: AnyUser = self.context["request"].user
         data["user"] = None if request_user.is_anonymous else request_user
         data["reservee_used_ad_login"] = (
             False if request_user.is_anonymous else getattr(request_user.id_token, "is_ad_login", False)
@@ -220,3 +222,21 @@ class ReservationBaseSaveSerializer(OldPrimaryKeySerializer, ReservationPriceMix
         if reservation_unit.reservation_kind == ReservationKind.SEASON:
             msg = "Reservation unit is only available or seasonal booking."
             raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_UNIT_TYPE_IS_SEASON)
+
+    def check_if_reservee_should_be_adult(self, reservation_unit: ReservationUnit, user: User) -> None:
+        if self.instance is not None:
+            # Only check for creation
+            return
+
+        if not reservation_unit.require_adult_reservee:
+            return
+
+        # AD users are currently never under age since we have blocked students from signing in.
+        if user.actions.is_ad_user:
+            return
+
+        if user.actions.is_of_age:
+            return
+
+        msg = "Reservation unit can only be booked by an adult reservee"
+        raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_ADULT_RESERVEE_REQUIRED)

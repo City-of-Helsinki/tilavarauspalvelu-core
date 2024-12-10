@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import freezegun
 import pytest
+from freezegun import freeze_time
 from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
@@ -19,7 +20,14 @@ from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helauth.typing import ADLoginAMR
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_end_of_day, local_start_of_day, next_hour
+from utils.date_utils import (
+    DEFAULT_TIMEZONE,
+    local_date,
+    local_datetime,
+    local_end_of_day,
+    local_start_of_day,
+    next_hour,
+)
 from utils.decimal_utils import round_decimal
 
 from tests.factories import (
@@ -1125,3 +1133,87 @@ def test_reservation__create__reservee_used_ad_login(graphql, amr, expected):
 
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
     assert reservation.reservee_used_ad_login is expected
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation__create__require_adult_reservee__is_adult(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
+
+    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi", date_of_birth=local_date(2006, 1, 1))
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.filter(pk=response.first_query_object["pk"]).first()
+    assert reservation is not None
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation__create__require_adult_reservee__is_under_age(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
+
+    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi", date_of_birth=local_date(2006, 1, 2))
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Reservation unit can only be booked by an adult reservee"
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation__create__require_adult_reservee__is_under_age__reservation_unit_allows(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=False)
+
+    user = UserFactory.create(social_auth__extra_data__amr="suomi_fi", date_of_birth=local_date(2006, 1, 2))
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.filter(pk=response.first_query_object["pk"]).first()
+    assert reservation is not None
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation__create__require_adult_reservee__is_ad_user(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
+
+    user = UserFactory.create(social_auth__extra_data__amr="helsinkiazuread", date_of_birth=local_date(2006, 1, 1))
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.filter(pk=response.first_query_object["pk"]).first()
+    assert reservation is not None
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation__create__require_adult_reservee__no_id_token(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(require_adult_reservee=True)
+
+    # We don't have an ID token, so we don't know if this is an AD user.
+    # Still, we have have a birthday that indicates they are an adult.
+    user = UserFactory.create(date_of_birth=local_date(2006, 1, 1))
+
+    graphql.force_login(user)
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation = Reservation.objects.filter(pk=response.first_query_object["pk"]).first()
+    assert reservation is not None

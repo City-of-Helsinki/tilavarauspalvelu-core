@@ -98,6 +98,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     is_draft = False
     is_archived = False
     require_introduction = False
+    require_adult_reservee = False
     require_reservation_handling = False
     reservation_block_whole_day = False
     can_apply_free_of_charge = False
