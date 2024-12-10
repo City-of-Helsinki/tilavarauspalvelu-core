@@ -125,6 +125,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         model = ApplicationSection
         fields = []  # Use fields from ModelAdmin
         labels = {
+            "ext_uuid": _("External UUID"),
             "name": _("Name"),
             "status": _("Status"),
             "num_persons": _("Number of persons"),
@@ -138,6 +139,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "purpose": _("Purpose"),
         }
         help_texts = {
+            "ext_uuid": _("ID for external systems to use"),
             "name": _("Name that describes this section."),
             "num_persons": _("Number of persons that are excepted to attend this section."),
             "reservation_min_duration": _("Minimum duration that should be allocated for this section."),

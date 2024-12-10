@@ -92,6 +92,7 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
             {
                 "fields": [
                     "id",
+                    "ext_uuid",
                     "name",
                     "status",
                     "application",
@@ -114,7 +115,10 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
             },
         ],
     ]
-    readonly_fields = ["id"]
+    readonly_fields = [
+        "id",
+        "ext_uuid",
+    ]
     inlines = [
         SuitableTimeRangeInline,
         ReservationUnitOptionInline,
