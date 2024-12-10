@@ -29,6 +29,7 @@ class ApplicationSectionNode(DjangoNode):
         model = ApplicationSection
         fields = [
             "pk",
+            "ext_uuid",
             "name",
             "num_persons",
             "reservations_begin_date",
