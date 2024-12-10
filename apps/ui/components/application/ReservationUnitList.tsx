@@ -1,5 +1,7 @@
 import {
   Button,
+  ButtonVariant,
+  IconArrowUndo,
   IconPlus,
   Notification,
   NotificationSize,
@@ -184,8 +186,12 @@ export function ReservationUnitList({
         maxWidth={breakpoints.l}
         fullHeight
         actions={
-          <Flex $alignItems="flex-end">
-            <Button onClick={() => setShowModal(false)}>
+          <Flex $alignItems="center">
+            <Button
+              iconStart={<IconArrowUndo aria-hidden="true" />}
+              onClick={() => setShowModal(false)}
+              variant={ButtonVariant.Supplementary}
+            >
               {t("reservationUnitModal:returnToApplication")}
             </Button>
           </Flex>

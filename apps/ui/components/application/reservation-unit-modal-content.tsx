@@ -2,7 +2,6 @@ import {
   IconArrowRight,
   IconGroup,
   IconInfoCircle,
-  IconLocation,
   TextInput,
   Select,
   IconLinkExternal,
@@ -10,12 +9,14 @@ import {
   ButtonVariant,
   ButtonSize,
   LoadingSpinner,
+  IconCross,
+  IconSearch,
+  IconSize,
 } from "hds-react";
 import React, { ChangeEvent, useState } from "react";
-import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { fontBold, H2, H3 } from "common/src/common/typography";
+import { H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
   ReservationUnitOrderingChoices,
@@ -29,65 +30,20 @@ import {
   toNumber,
 } from "common/src/helpers";
 import { AutoGrid, Flex } from "common/styles/util";
-import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
+import { getMainImage, getTranslation } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
-import { IconWithText } from "../common/IconWithText";
 import { getReservationUnitPath } from "@/modules/urls";
 import { convertLanguageCode } from "common/src/common/util";
+import Card from "common/src/components/Card";
+import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 
-const Container = styled.div`
-  width: 100%;
-  display: grid;
-  gap: var(--spacing-s);
-  align-items: start;
-
-  @media (max-width: ${breakpoints.l}) {
-    grid-template-areas:
-      "image name"
-      "image a"
-      "props props";
-    grid-template-columns: 180px auto;
+const ImageSizeWrapper = styled.div`
+  @media (min-width: ${breakpoints.m}) {
+    [class*="card__ImageWrapper"] {
+      max-height: 140px !important;
+    }
   }
-
-  @media (max-width: ${breakpoints.m}) {
-    grid-template-areas:
-      "image"
-      "name"
-      "props"
-      "a";
-    grid-template-columns: auto;
-  }
-
-  grid-template:
-    "image name a"
-    "image props props";
-  grid-template-columns: 180px auto 230px;
-`;
-
-const Name = styled.span`
-  ${fontBold}
-  font-size: var(--fontsize-heading-m);
-
-  a {
-    text-decoration: none;
-    color: var(--color-black-90);
-  }
-`;
-
-const Main = styled(Flex).attrs({ $gap: "2-xs" })`
-  grid-area: name;
-`;
-
-const IconContainer = styled(Flex).attrs({ $gap: "xs" })`
-  font-size: var(--fontsize-body-s);
-`;
-
-const Image = styled.img`
-  grid-area: image;
-  object-fit: cover;
-  width: 178px;
-  height: 185px;
 `;
 
 function ReservationUnitCard({
@@ -118,53 +74,55 @@ function ReservationUnitCard({
 
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "small");
-
+  const infos = [
+    {
+      icon: <IconInfoCircle />,
+      value: reservationUnitTypeName ?? "",
+    },
+    {
+      icon: <IconGroup />,
+      value: reservationUnit.maxPersons?.toString() ?? "",
+    },
+  ];
+  const buttons = [
+    <ButtonLikeLink
+      key="link"
+      href={getReservationUnitPath(reservationUnit.pk)}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        whiteSpace: "nowrap",
+      }}
+    >
+      {t("reservationUnitModal:openLinkToNewTab")}
+      <IconLinkExternal size={IconSize.ExtraSmall} />
+    </ButtonLikeLink>,
+    <Button
+      key="toggle"
+      iconEnd={
+        isSelected ? (
+          <IconCross aria-hidden="true" />
+        ) : (
+          <IconArrowRight aria-hidden="true" />
+        )
+      }
+      onClick={handle}
+      size={ButtonSize.Small}
+      variant={isSelected ? ButtonVariant.Danger : ButtonVariant.Secondary}
+    >
+      {buttonText}
+    </Button>,
+  ];
   return (
-    <Container>
-      <Image alt={name} src={imgSrc} />
-      <Main>
-        <Name>{name}</Name>
-        <span>{unitName}</span>
-        <Link
-          href={getReservationUnitPath(reservationUnit.pk)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Flex $direction="row" $gap="2-xs" $alignItems="center">
-            <span>{t("reservationUnitModal:openLinkToNewTab")}</span>
-            <IconLinkExternal />
-          </Flex>
-        </Link>
-      </Main>
-      <IconContainer>
-        {reservationUnitTypeName && (
-          <IconWithText
-            icon={<IconInfoCircle />}
-            text={reservationUnitTypeName}
-          />
-        )}
-        {reservationUnit.maxPersons && (
-          <IconWithText
-            icon={<IconGroup />}
-            text={`${reservationUnit.maxPersons}`}
-          />
-        )}
-        {getAddressAlt(reservationUnit) && (
-          <IconWithText
-            icon={<IconLocation />}
-            text={getAddressAlt(reservationUnit) ?? ""}
-          />
-        )}
-      </IconContainer>
-      <Button
-        iconEnd={<IconArrowRight aria-hidden="true" />}
-        onClick={handle}
-        size={ButtonSize.Small}
-        variant={isSelected ? ButtonVariant.Danger : ButtonVariant.Secondary}
-      >
-        {buttonText}
-      </Button>
-    </Container>
+    <ImageSizeWrapper>
+      <Card
+        heading={name ?? ""}
+        imageSrc={imgSrc}
+        text={unitName}
+        infos={infos}
+        buttons={buttons}
+      />
+    </ImageSizeWrapper>
   );
 }
 
@@ -294,7 +252,7 @@ export function ReservationUnitModalContent({
       <Flex $alignItems="flex-end">
         <Button
           variant={loading ? ButtonVariant.Clear : ButtonVariant.Primary}
-          iconStart={loading ? <LoadingSpinner small /> : undefined}
+          iconStart={loading ? <LoadingSpinner small /> : <IconSearch aria-hidden="true" />}
           disabled={loading}
           onClick={(_) => refetch()}
         >

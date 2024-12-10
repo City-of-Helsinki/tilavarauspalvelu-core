@@ -22,6 +22,7 @@ const ModalElement = styled(Flex)<{ $maxWidth?: string; $height?: string }>`
   --modal-max-width: 800px;
 
   background: var(--color-white);
+  border-top: 8px solid var(--color-bus);
   max-width: ${({ $maxWidth }) => $maxWidth ?? "var(--modal-max-width)"};
   width: 90%;
   position: relative;
@@ -87,7 +88,7 @@ function Modal({
   actions,
   maxWidth,
   fullHeight,
-}: Props): JSX.Element | null {
+}: Readonly<Props>): JSX.Element | null {
   const { t } = useTranslation();
 
   if (!isBrowser) {
