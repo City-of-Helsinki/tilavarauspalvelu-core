@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING, Any, overload
 
 from django.utils.translation import pgettext
 
+from tilavarauspalvelu.enums import WeekdayChoice
+from tilavarauspalvelu.models import RecurringReservation
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 
 from .common import (
@@ -11,9 +13,12 @@ from .common import (
     get_contex_for_base_template,
     get_contex_for_closing,
     get_contex_for_closing_polite,
+    get_contex_for_closing_staff,
     get_contex_for_seasonal_reservation_check_details_url,
     get_my_applications_ext_link,
+    get_staff_reservations_ext_link,
     params_for_application_section_info,
+    params_for_reservation_series_info,
 )
 
 if TYPE_CHECKING:
@@ -147,4 +152,83 @@ def get_context_for_application_section_cancelled(
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_seasonal_reservation_check_details_url(language=language),
         **get_contex_for_closing(language=language),
+    }
+
+
+# type: EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED #####################################################
+
+
+@overload
+def get_context_for_staff_notification_application_section_cancelled(
+    application_section: ApplicationSection, *, language: Lang, **data: Any
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_staff_notification_application_section_cancelled(
+    *,
+    language: Lang,
+    cancel_reason: str,
+    application_section_name: str,
+    application_round_name: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_staff_notification_application_section_cancelled(
+    application_section: ApplicationSection | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if application_section is not None:
+        reservation = application_section.actions.get_last_reservation()
+
+        reservation_series = RecurringReservation.objects.filter(
+            allocated_time_slot__reservation_unit_option__application_section=application_section
+        ).prefetch_related("reservations")
+
+        reservation_series_data = [
+            {
+                **params_for_reservation_series_info(reservation_series=series),
+                "reservation_url": get_staff_reservations_ext_link(
+                    reservation_id=series.reservations.values_list("pk").last()
+                ),
+            }
+            for series in reservation_series
+        ]
+
+        data: dict[str, Any] = {
+            "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language),
+            "cancelled_reservation_series": reservation_series_data,
+            **params_for_application_section_info(application_section=application_section, language=language),
+        }
+    else:
+        data["cancelled_reservation_series"] = [
+            {
+                "weekday": WeekdayChoice.MONDAY.label,
+                "time": "13:00-15:00",
+                "url": get_staff_reservations_ext_link(reservation_id=1234),
+            },
+            {
+                "weekday": WeekdayChoice.TUESDAY.label,
+                "time": "21:00-22:00",
+                "url": get_staff_reservations_ext_link(reservation_id=5678),
+            },
+        ]
+
+    return {
+        "title": pgettext("Email", "The customer has canceled the seasonal booking"),
+        "text_reservation_cancelled": pgettext(
+            "Email", "The customer has canceled all space reservations included in the seasonal booking"
+        ),
+        "cancel_reason_label": pgettext("Email", "Reason"),
+        "cancel_reason": data["cancel_reason"],
+        "seasonal_booking_label": pgettext("Email", "Seasonal Booking"),
+        "view_booking_at_label": pgettext("Email", "You can view the booking at"),
+        "application_section_name": data["application_section_name"],
+        "application_round_name": data["application_round_name"],
+        "cancelled_reservation_series": data["cancelled_reservation_series"],
+        **get_contex_for_base_template(),
+        **get_contex_for_closing_staff(),
     }

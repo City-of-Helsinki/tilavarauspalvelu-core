@@ -733,6 +733,36 @@ def test_render_seasonal_reservation_rejected_single__text():
 
 
 @freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_staff_notification_application_section_cancelled_email_text():
+    context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, language="en")
+    text_content = render_text(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, context=context)
+
+    assert text_content == cleandoc(
+        """
+        Hi,
+
+        The customer has canceled all space reservations included in the seasonal booking.
+
+        Reason: [PERUUTUKSEN SYY]
+
+        Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
+
+        You can view the booking at:
+
+        Monday 13:00-15:00
+        https://fake.varaamo.hel.fi/kasittely/reservations/1234
+        Tuesday 21:00-22:00
+        https://fake.varaamo.hel.fi/kasittely/reservations/5678
+
+        Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply.
+        """
+    )
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_staff_notification_reservation_made__text():
     context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE, language="en")
     text_content = render_text(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE, context=context)

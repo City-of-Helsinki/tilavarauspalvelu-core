@@ -305,6 +305,10 @@ class EmailType(models.TextChoices):
     """Staff rejects a single reservation in a seasonal reservation series"""
 
     # Staff
+    STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED = (
+        "staff_notification_application_section_cancelled",
+        pgettext_lazy("EmailType", "Staff notification application section cancelled"),
+    )
     STAFF_NOTIFICATION_RESERVATION_MADE = (
         "staff_notification_reservation_made",
         pgettext_lazy("EmailType", "Staff notification reservation made"),
