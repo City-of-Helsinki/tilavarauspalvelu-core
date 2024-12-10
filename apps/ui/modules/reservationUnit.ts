@@ -1,10 +1,12 @@
 import {
   formatters as getFormatters,
+  getReservationPrice,
   getUnRoundedReservationVolume,
 } from "common";
 import { flatten, trim, uniq } from "lodash";
 import {
   addMinutes,
+  differenceInMinutes,
   getHours,
   getMinutes,
   isAfter,
@@ -45,7 +47,7 @@ import {
 import { type PricingFieldsFragment } from "common/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getIntervalMinutes } from "common/src/conversion";
-import { isPriceFree } from "common/src/helpers";
+import { isPriceFree, LocalizationLanguages } from "common/src/helpers";
 import { type TFunction } from "i18next";
 
 function formatTimeObject(time: { h: number; m: number }): string {
@@ -352,6 +354,43 @@ export function getReservationUnitPrice(
     pricing,
     minutes,
   });
+}
+
+// TODO use a fragment
+// TODO why do we need both this and getPriceString?
+export function getPrice(
+  t: TFunction,
+  reservation: {
+    reservationUnits: PriceReservationUnitFragment[];
+    price?: Maybe<string> | undefined;
+    state?: Maybe<ReservationStateChoice> | undefined;
+    begin: string;
+    end: string;
+  },
+  lang: LocalizationLanguages,
+  reservationUnitPriceOnly = false
+): string | null {
+  const reservationUnit = reservation.reservationUnits.find(() => true);
+  const begin = new Date(reservation.begin);
+  const end = new Date(reservation.end);
+  const minutes = differenceInMinutes(end, begin);
+  const showReservationUnitPrice =
+    reservationUnitPriceOnly ||
+    reservation.state === ReservationStateChoice.RequiresHandling;
+  if (showReservationUnitPrice && reservationUnit) {
+    return getReservationUnitPrice({
+      t,
+      reservationUnit,
+      pricingDate: begin,
+      minutes,
+    });
+  }
+  return getReservationPrice(
+    reservation.price ?? undefined,
+    t("prices:priceFree"),
+    true,
+    lang
+  );
 }
 
 export function isReservationUnitFreeOfCharge(
