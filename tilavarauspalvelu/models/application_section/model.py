@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import uuid
 from functools import cached_property
 from typing import TYPE_CHECKING
 
@@ -33,6 +34,8 @@ class ApplicationSection(SerializableMixin, models.Model):
     Represents a section of an application, which contains the reservation unit options
     and suitable time ranges that can be used fulfill the slot request included in it.
     """
+
+    ext_uuid: uuid.UUID = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)  # ID for external systems
 
     name: str = models.CharField(max_length=100)
     num_persons: int = models.PositiveIntegerField()
