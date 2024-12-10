@@ -22,7 +22,7 @@ type Cell = {
 };
 
 export type TimeSelectorFormValues = {
-  reservationUnitPk: number;
+  reservationUnitPks: number[];
   priority: ApplicationEventSchedulePriority;
 };
 
@@ -486,7 +486,7 @@ function OptionSelector({
         options={priorityOptions}
       />
       <ControlledSelect
-        name="reservationUnitPk"
+        name="reservationUnitPks"
         label={t("application:Page2.reservationUnitSelectLabel")}
         control={control}
         options={reservationUnitOptions}

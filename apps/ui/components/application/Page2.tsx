@@ -16,11 +16,7 @@ import {
   type ApplicationQuery,
   type ApplicationRoundTimeSlotNode,
 } from "@gql/gql-types";
-import {
-  filterNonNullable,
-  getLocalizationLang,
-  truncate,
-} from "common/src/helpers";
+import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import type {
   ApplicationSectionFormValue,
   ApplicationEventScheduleFormType,
@@ -54,9 +50,6 @@ type DailyOpeningHours = Pick<
   ApplicationRoundTimeSlotNode,
   "weekday" | "closed" | "reservableTimes"
 >[];
-
-// Mobile layout breaks if the select options are too long
-const MAX_SELECT_OPTION_LENGTH = 28;
 
 const StyledNotification = styled(Notification)`
   margin-top: var(--spacing-m);
@@ -251,45 +244,39 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
 
 function Page2({ application, onNext }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
-  const initialReservationUnitPk =
-    application?.applicationSections?.[0]?.reservationUnitOptions?.[0]
-      ?.reservationUnit?.pk ?? 0;
+  const initialReservationUnitPks =
+    application?.applicationSections?.map(
+      (n) => n.reservationUnitOptions[0].reservationUnit.pk ?? 0
+    ) ?? [];
 
   const timeSelectorForm = useForm<TimeSelectorFormValues>({
     defaultValues: {
-      reservationUnitPk: initialReservationUnitPk,
+      reservationUnitPks: initialReservationUnitPks,
       priority: 300,
     },
   });
-  const reservationUnitPk = timeSelectorForm.watch("reservationUnitPk");
+  const reservationUnitPks = timeSelectorForm.watch("reservationUnitPks");
 
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
-  // TODO why are we taking the first one only here?
-  const applicationSection = application?.applicationSections?.[0] ?? null;
-  const resUnitOptions = filterNonNullable(
-    applicationSection?.reservationUnitOptions
-  );
-  // TODO check for nulls in the subfields
-  const resUnits = filterNonNullable(
-    resUnitOptions.map((n) => n?.reservationUnit)
-  );
-  const reservationUnitOptions = resUnits
-    .map((n) => ({
-      value: n?.pk ?? 0,
-      label: getTranslationSafe(n, "name", getLocalizationLang(i18n.language)),
-    }))
-    .map(({ value, label }) => ({
-      value,
-      label: truncate(label, MAX_SELECT_OPTION_LENGTH),
-    }));
-  // TODO why is this done like this?
-  const openingHours = filterNonNullable(
-    resUnits.find((n) => n.pk === reservationUnitPk)?.applicationRoundTimeSlots
-  );
-
   const { getValues, setValue, watch, handleSubmit } =
     useFormContext<ApplicationFormValues>();
+
+  const allOpeningHours = filterNonNullable(
+    application.applicationSections
+  ).map((as) =>
+    as.reservationUnitOptions.map((ruo) => ({
+      pk: ruo.reservationUnit.pk ?? 0,
+      openingHours: ruo.reservationUnit.applicationRoundTimeSlots,
+    }))
+  );
+  const reservationUnitOpeningHours = filterNonNullable(
+    application?.applicationSections
+  ).map(
+    (_as, index) =>
+      allOpeningHours[index].find((n) => n.pk === reservationUnitPks[index])
+        ?.openingHours
+  );
 
   const applicationSections = filterNonNullable(watch("applicationSections"));
 
@@ -308,8 +295,8 @@ function Page2({ application, onNext }: Props): JSX.Element {
       }) ?? []
     );
   };
-  const selectorData = applicationSections.map((ae) =>
-    aesToCells(convertToSchedule(ae), openingHours)
+  const selectorData = applicationSections.map((ae, index) =>
+    aesToCells(convertToSchedule(ae), reservationUnitOpeningHours[index])
   );
   const setSelectorData = (selected: typeof selectorData) => {
     // So this returns them as:
@@ -440,6 +427,19 @@ function Page2({ application, onNext }: Props): JSX.Element {
             priority: 200,
             day: convertWeekday(a.dayOfTheWeek),
           }));
+        const reservationUnitOptions = filterNonNullable(
+          application?.applicationSections?.[index].reservationUnitOptions
+        )
+          .map((n) => n.reservationUnit)
+          .map((n) => ({
+            value: n?.pk ?? 0,
+            label: getTranslationSafe(
+              n,
+              "name",
+              getLocalizationLang(i18n.language)
+            ),
+          }));
+
         return (
           <Accordion
             open={index === 0}
@@ -476,6 +476,7 @@ function Page2({ application, onNext }: Props): JSX.Element {
           onClose={() => setMinDurationMsg(false)}
           closeButtonLabelText={t("common:close")}
           data-testid="application__page2--notification-min-duration"
+          style={{ marginBottom: "var(--spacing-m)" }}
         >
           {applicationSections?.length === 1
             ? t("application:Page2.notification.minDuration.bodySingle")
