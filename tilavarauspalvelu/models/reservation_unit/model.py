@@ -94,6 +94,7 @@ class ReservationUnit(models.Model):
     is_draft: bool = models.BooleanField(default=False, blank=True, db_index=True)
     is_archived: bool = models.BooleanField(default=False, db_index=True)
     require_introduction: bool = models.BooleanField(default=False)
+    require_adult_reservee: bool = models.BooleanField(default=False, blank=True)
     require_reservation_handling: bool = models.BooleanField(default=False, blank=True)
     reservation_block_whole_day: bool = models.BooleanField(default=False, blank=True)
     can_apply_free_of_charge: bool = models.BooleanField(default=False, blank=True)
