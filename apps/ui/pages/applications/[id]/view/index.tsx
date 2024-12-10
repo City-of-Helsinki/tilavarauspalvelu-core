@@ -9,7 +9,12 @@ import {
   getCommonServerSideProps,
   getGenericTerms,
 } from "@/modules/serverUtils";
-import { base64encode, getLocalizationLang } from "common/src/helpers";
+import {
+  base64encode,
+  getLocalizationLang,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
 import {
   ApplicationStatusChoice,
   ApplicationViewDocument,
@@ -26,6 +31,7 @@ import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { H1 } from "common";
 import styled from "styled-components";
 import { useToastIfQueryParam } from "@/hooks";
+import { useRouter } from "next/router";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {
@@ -38,6 +44,7 @@ const TabPanel = styled(Tabs.TabPanel)`
 
 function View({ application, tos }: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
 
   type TabOptions = "reservations" | "application";
   const [tab, setTab] = useState<TabOptions>("reservations");
@@ -45,6 +52,30 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
   useToastIfQueryParam({
     key: "deletedReservationPk",
     successMessage: t("application:preview.reservationDeleted"),
+  });
+
+  const translateDeletedSectionMessage = () => {
+    const { query } = router;
+    if (query.cancelled && query.future) {
+      const cancelled = toNumber(ignoreMaybeArray(query.cancelled));
+      const future = toNumber(ignoreMaybeArray(query.future));
+      if (cancelled != null && cancelled === future) {
+        return t("application:preview.applicationSectionCancelledAll", {
+          cancelled,
+        });
+      } else if (cancelled != null && future != null) {
+        return t("application:preview.applicationSectionCancelled", {
+          cancelled,
+          future,
+        });
+      }
+    }
+    return "Unknown error";
+  };
+
+  useToastIfQueryParam({
+    key: ["cancelled", "future"],
+    successMessage: translateDeletedSectionMessage,
   });
 
   const handleTabChange = (tab_: TabOptions) => {

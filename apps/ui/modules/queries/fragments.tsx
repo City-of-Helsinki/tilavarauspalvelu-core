@@ -91,3 +91,13 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     ...MetadataSets
   }
 `;
+
+export const CANCEL_REASON_FRAGMENT = gql`
+  fragment CancelReasonFields on ReservationCancelReasonNode {
+    id
+    pk
+    reasonFi
+    reasonEn
+    reasonSv
+  }
+`;

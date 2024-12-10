@@ -51,6 +51,7 @@ function createMockReservationUnit({
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
     canApplyFreeOfCharge: false,
+    searchTerms: [],
     contactInformation: "",
     description: "",
     rank: 0,

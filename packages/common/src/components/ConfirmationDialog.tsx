@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next";
 
 type Props = {
   acceptLabel?: string;
+  acceptIcon?: React.ReactNode;
   cancelLabel?: string;
   onAccept?: () => void;
   onCancel?: () => void;
@@ -16,7 +17,7 @@ type Props = {
 
 // TODO opening the dialog scrolls the page to the top
 export function ConfirmationDialog(props: Props): JSX.Element | null {
-  const { onAccept, onCancel, variant, isOpen } = props;
+  const { onAccept, onCancel, acceptIcon, variant, isOpen } = props;
   const { acceptLabel, cancelLabel, heading, content } = props;
   const { t } = useTranslation();
 
@@ -46,11 +47,15 @@ export function ConfirmationDialog(props: Props): JSX.Element | null {
         {content || t("confirm.text")}
       </Dialog.Content>
       <Dialog.ActionButtons>
-        <Button variant={variant} onClick={() => onAccept?.()}>
-          {acceptLabel || t("common.approve")}
-        </Button>
         <Button variant="secondary" theme="black" onClick={() => onCancel?.()}>
           {cancelLabel || t("common.cancel")}
+        </Button>
+        <Button
+          variant={variant}
+          onClick={() => onAccept?.()}
+          iconLeft={acceptIcon}
+        >
+          {acceptLabel || t("common.approve")}
         </Button>
       </Dialog.ActionButtons>
     </Dialog>

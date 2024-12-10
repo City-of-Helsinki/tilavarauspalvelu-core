@@ -179,11 +179,7 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
     reservationCancelReasons {
       edges {
         node {
-          id
-          pk
-          reasonFi
-          reasonEn
-          reasonSv
+          ...CancelReasonFields
         }
       }
     }

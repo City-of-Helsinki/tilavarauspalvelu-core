@@ -26,6 +26,15 @@
   "weekDay.5": "Pe",
   "weekDay.6": "La",
   "weekDay.7": "Su",
+  "weekdayLongEnum": {
+    "FRIDAY": "Perjantai",
+    "MONDAY": "Maanantai",
+    "SATURDAY": "Lauantai",
+    "SUNDAY": "Sunnuntai",
+    "THURSDAY": "Torstai",
+    "TUESDAY": "Tiistai",
+    "WEDNESDAY": "Keskiviikko"
+  },
   "month.0": "Tammikuu",
   "month.1": "Helmikuu",
   "month.2": "Maaliskuu",

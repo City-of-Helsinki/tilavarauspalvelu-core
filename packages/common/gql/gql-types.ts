@@ -550,6 +550,7 @@ export type ApplicationSectionNode = Node & {
   allocations?: Maybe<Scalars["Int"]["output"]>;
   application: ApplicationNode;
   appliedReservationsPerWeek: Scalars["Int"]["output"];
+  extUuid: Scalars["UUID"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -1777,6 +1778,7 @@ export type Query = {
   application?: Maybe<ApplicationNode>;
   applicationRound?: Maybe<ApplicationRoundNode>;
   applicationRounds?: Maybe<ApplicationRoundNodeConnection>;
+  applicationSection?: Maybe<ApplicationSectionNode>;
   applicationSections?: Maybe<ApplicationSectionNodeConnection>;
   applications?: Maybe<ApplicationNodeConnection>;
   bannerNotification?: Maybe<BannerNotificationNode>;
@@ -1906,6 +1908,10 @@ export type QueryApplicationRoundsArgs = {
   onlyWithPermissions?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ApplicationRoundOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+};
+
+export type QueryApplicationSectionArgs = {
+  id: Scalars["ID"]["input"];
 };
 
 export type QueryApplicationSectionsArgs = {
@@ -3638,6 +3644,7 @@ export type ReservationUnitCreateMutationInput = {
   reservationsMaxDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
   reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
   resources?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  searchTerms?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
   serviceSpecificTerms?: InputMaybe<Scalars["String"]["input"]>;
   spaces?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
@@ -3709,6 +3716,7 @@ export type ReservationUnitCreateMutationPayload = {
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  searchTerms?: Maybe<Array<Maybe<Scalars["String"]["output"]>>>;
   serviceSpecificTerms?: Maybe<Scalars["String"]["output"]>;
   spaces?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
@@ -3846,6 +3854,7 @@ export type ReservationUnitNode = Node & {
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources: Array<ResourceNode>;
+  searchTerms: Array<Scalars["String"]["output"]>;
   serviceSpecificTerms?: Maybe<TermsOfUseNode>;
   spaces: Array<SpaceNode>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
@@ -4221,6 +4230,7 @@ export type ReservationUnitUpdateMutationInput = {
   reservationsMaxDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
   reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
   resources?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  searchTerms?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
   serviceSpecificTerms?: InputMaybe<Scalars["String"]["input"]>;
   spaces?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
@@ -4292,6 +4302,7 @@ export type ReservationUnitUpdateMutationPayload = {
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  searchTerms?: Maybe<Array<Maybe<Scalars["String"]["output"]>>>;
   serviceSpecificTerms?: Maybe<Scalars["String"]["output"]>;
   spaces?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;

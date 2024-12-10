@@ -31,6 +31,18 @@
     "reason": "Reason for the cancellation",
     "mutationFailed": "Failed to cancel the booking"
   },
+  "cancelSection": {
+    "title": "Cancel all bookings",
+    "ingress": "You are about to cancel the entire seasonal booking, including all associated bookings.",
+    "body": "We want to make the Varaamo service even better. We would love to hear why you are cancelling your seasonal booking.",
+    "reservations": "bookings",
+    "dateLabel": "Seasonal booking for the period",
+    "modal": {
+      "title": "Are you sure you want to cancel all bookings?",
+      "body": "If you select \"Cancel bookings\", all your bookings will be deleted and cannot be restored. You can return to the previous view by selecting \"Previous\".",
+      "btnAccept": "Cancel bookings"
+    }
+  },
   "reservationCancelledTitle": "Your booking has been cancelled!",
   "redoReservation": "Make a new booking",
   "upcomingReservations": "Upcoming",

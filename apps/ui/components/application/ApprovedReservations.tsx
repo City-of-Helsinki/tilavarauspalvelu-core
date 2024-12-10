@@ -6,12 +6,11 @@ import {
   ReservationStateChoice,
 } from "@/gql/gql-types";
 import {
-  getApplicationPath,
+  getApplicationReservationPath,
   getApplicationSectionPath,
   getReservationUnitPath,
 } from "@/modules/urls";
 import { breakpoints, fontMedium, fontRegular, H5 } from "common";
-import { errorToast } from "common/src/common/toast";
 import {
   getTranslationSafe,
   toApiDate,
@@ -528,9 +527,7 @@ function ReservationsTable({
   const router = useRouter();
 
   const handleCancel = (pk: number) => {
-    const appPath = getApplicationPath(application.pk, "view");
-    const url = `${appPath}/${pk}/cancel`;
-    router.push(url);
+    router.push(getApplicationReservationPath(application.pk, pk));
   };
 
   const cols = [
@@ -805,17 +802,16 @@ export function ApplicationSection({
           {t("application:view.reservationsTab.showAllReservations")}
           <IconLinkExternal />
         </ButtonLikeLink>
-        <Button
-          variant="secondary"
-          theme="black"
-          size="small"
-          onClick={() => {
-            errorToast({ text: "Not implemented: cancel application" });
-          }}
-          iconRight={<IconCross />}
+        <ButtonLikeLink
+          href={getApplicationSectionPath(
+            applicationSection.pk,
+            application.pk,
+            "cancel"
+          )}
         >
           {t("application:view.reservationsTab.cancelApplication")}
-        </Button>
+          <IconCross />
+        </ButtonLikeLink>
       </ButtonContainer>
     </Flex>
   );

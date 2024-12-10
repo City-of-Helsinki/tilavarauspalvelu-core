@@ -23,6 +23,8 @@ export type CardProps = {
   infos?: { value: string; icon?: JSX.Element; testId?: string }[];
   buttons?: JSX.Element[];
   children?: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
 };
 
 const Wrapper = styled.div<{ $bgColor: string }>`
@@ -183,6 +185,8 @@ export default function Card({
   infos,
   buttons,
   children,
+  className,
+  style,
 }: Readonly<CardProps>): JSX.Element {
   const wrapperClasses = [`card--${variant ?? "default"}`];
   let itemCount = 1; // Texts are always present
@@ -198,7 +202,8 @@ export default function Card({
   return (
     <Wrapper
       $bgColor={backgroundColor}
-      className={wrapperClasses.join(" ")}
+      className={`${className} ${wrapperClasses.join(" ")}`}
+      style={style}
       data-testid={testId}
     >
       {imageSrc && (

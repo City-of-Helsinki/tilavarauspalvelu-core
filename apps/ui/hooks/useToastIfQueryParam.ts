@@ -7,8 +7,8 @@ export function useToastIfQueryParam({
   key,
   successMessage,
 }: {
-  key: string;
-  successMessage: string;
+  key: string | string[];
+  successMessage: string | (() => string);
 }) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -19,7 +19,13 @@ export function useToastIfQueryParam({
       const { pathname, query } = router;
       // NOTE ParsedQuery is a Record<string, string>
       const params = new URLSearchParams(query as Record<string, string>);
-      params.delete(key);
+      if (Array.isArray(key)) {
+        for (const k of key) {
+          params.delete(k);
+        }
+      } else {
+        params.delete(key);
+      }
 
       router.replace(
         {
@@ -35,9 +41,18 @@ export function useToastIfQueryParam({
     };
     const q = router.query;
 
-    if (q[key]) {
+    const text =
+      typeof successMessage === "string" ? successMessage : successMessage();
+    if (Array.isArray(key)) {
+      if (key.every((k) => q[k])) {
+        successToast({
+          text,
+        });
+        removeTimeUpdatedParam();
+      }
+    } else if (q[key]) {
       successToast({
-        text: successMessage,
+        text,
       });
       removeTimeUpdatedParam();
     }

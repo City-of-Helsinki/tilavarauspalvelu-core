@@ -151,3 +151,14 @@ export const CANCEL_APPLICATION_MUTATION = gql`
     }
   }
 `;
+
+export const CANCEL_APPLICATION_SECTION_MUTATION = gql`
+  mutation CancelApplicationSection(
+    $input: ApplicationSectionReservationCancellationMutationInput!
+  ) {
+    cancelAllApplicationSectionReservations(input: $input) {
+      future
+      cancelled
+    }
+  }
+`;

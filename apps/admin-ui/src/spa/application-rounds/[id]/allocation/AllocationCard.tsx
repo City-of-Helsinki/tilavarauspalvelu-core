@@ -383,8 +383,8 @@ function TimeRequested({
   const durationString = createDurationString(applicationSection, t);
 
   const aes = filterNonNullable(applicationSection?.suitableTimeRanges);
-  const primaryTimes = formatTimeRangeList(aes, Priority.Primary);
-  const secondaryTimes = formatTimeRangeList(aes, Priority.Secondary);
+  const primaryTimes = formatTimeRangeList(t, aes, Priority.Primary);
+  const secondaryTimes = formatTimeRangeList(t, aes, Priority.Secondary);
 
   return (
     <div>

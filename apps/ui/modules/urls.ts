@@ -47,14 +47,28 @@ export function getApplicationPath(
   return `${applicationsPrefix}/${pk}/${page ?? ""}`;
 }
 
+type ApplicationReservationPages = "cancel";
+export function getApplicationReservationPath(
+  applicationPk: Maybe<number> | undefined,
+  reservationPk: Maybe<number> | undefined,
+  page: ApplicationReservationPages = "cancel"
+): string {
+  if (applicationPk == null || reservationPk == null) {
+    return "";
+  }
+  return `${getApplicationPath(applicationPk)}reservations/${reservationPk}/${page}`;
+}
+
+type ApplicationSectionPages = "view" | "cancel";
 export function getApplicationSectionPath(
   sectionPk: Maybe<number> | undefined,
-  applicationPk: Maybe<number> | undefined
+  applicationPk: Maybe<number> | undefined,
+  page: ApplicationSectionPages = "view"
 ): string {
   if (applicationPk == null || sectionPk == null) {
     return "";
   }
-  return `${getApplicationPath(applicationPk, "view")}/${sectionPk}`;
+  return `${getApplicationPath(applicationPk)}sections/${sectionPk}/${page}`;
 }
 
 type ReservationPages = "cancel" | "edit" | "confirmation";

@@ -31,6 +31,18 @@
     "reason": "Perumisen syy",
     "mutationFailed": "Varauksen peruminen epäonnistui"
   },
+  "cancelSection": {
+    "title": "Peru kaikki varaukset",
+    "ingress": "Olet perumassa koko kausivarauksen eli kaikki siihen kuuluvat tilavaraukset.",
+    "body": "Haluamme tehdä Varaamosta entistä paremman. Kuulisimme mielellämme syyn kausivarauksen perumiseen.",
+    "reservations": "varausta",
+    "dateLabel": "Kausivaraus kaudelle",
+    "modal": {
+      "title": "Haluatko varmasti perua kaikki varaukset?",
+      "body": "Jos valitset \"Peru varaukset\", kaikki varauksesi poistetaan eikä niitä voi palauttaa. Voit palata takaisin edelliseen näkymään valitsemalla \"Takaisin\".",
+      "btnAccept": "Peru varaukset"
+    }
+  },
   "reservationCancelledTitle": "Varauksesi on peruttu!",
   "redoReservation": "Varaa uudelleen",
   "upcomingReservations": "Tulevat",

@@ -550,6 +550,7 @@ export type ApplicationSectionNode = Node & {
   allocations?: Maybe<Scalars["Int"]["output"]>;
   application: ApplicationNode;
   appliedReservationsPerWeek: Scalars["Int"]["output"];
+  extUuid: Scalars["UUID"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -1777,6 +1778,7 @@ export type Query = {
   application?: Maybe<ApplicationNode>;
   applicationRound?: Maybe<ApplicationRoundNode>;
   applicationRounds?: Maybe<ApplicationRoundNodeConnection>;
+  applicationSection?: Maybe<ApplicationSectionNode>;
   applicationSections?: Maybe<ApplicationSectionNodeConnection>;
   applications?: Maybe<ApplicationNodeConnection>;
   bannerNotification?: Maybe<BannerNotificationNode>;
@@ -1906,6 +1908,10 @@ export type QueryApplicationRoundsArgs = {
   onlyWithPermissions?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ApplicationRoundOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+};
+
+export type QueryApplicationSectionArgs = {
+  id: Scalars["ID"]["input"];
 };
 
 export type QueryApplicationSectionsArgs = {
@@ -3638,6 +3644,7 @@ export type ReservationUnitCreateMutationInput = {
   reservationsMaxDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
   reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
   resources?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  searchTerms?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
   serviceSpecificTerms?: InputMaybe<Scalars["String"]["input"]>;
   spaces?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
@@ -3709,6 +3716,7 @@ export type ReservationUnitCreateMutationPayload = {
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  searchTerms?: Maybe<Array<Maybe<Scalars["String"]["output"]>>>;
   serviceSpecificTerms?: Maybe<Scalars["String"]["output"]>;
   spaces?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
@@ -3846,6 +3854,7 @@ export type ReservationUnitNode = Node & {
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources: Array<ResourceNode>;
+  searchTerms: Array<Scalars["String"]["output"]>;
   serviceSpecificTerms?: Maybe<TermsOfUseNode>;
   spaces: Array<SpaceNode>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
@@ -4221,6 +4230,7 @@ export type ReservationUnitUpdateMutationInput = {
   reservationsMaxDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
   reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
   resources?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  searchTerms?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
   serviceSpecificTerms?: InputMaybe<Scalars["String"]["input"]>;
   spaces?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
@@ -4292,6 +4302,7 @@ export type ReservationUnitUpdateMutationPayload = {
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   reservationsMinDaysBefore?: Maybe<Scalars["Int"]["output"]>;
   resources?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  searchTerms?: Maybe<Array<Maybe<Scalars["String"]["output"]>>>;
   serviceSpecificTerms?: Maybe<Scalars["String"]["output"]>;
   spaces?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   surfaceArea?: Maybe<Scalars["Int"]["output"]>;
@@ -5779,6 +5790,17 @@ export type CancelApplicationMutation = {
   cancelApplication?: { pk?: number | null } | null;
 };
 
+export type CancelApplicationSectionMutationVariables = Exact<{
+  input: ApplicationSectionReservationCancellationMutationInput;
+}>;
+
+export type CancelApplicationSectionMutation = {
+  cancelAllApplicationSectionReservations?: {
+    future?: number | null;
+    cancelled?: number | null;
+  } | null;
+};
+
 export type ApplicationRoundFieldsFragment = {
   pk?: number | null;
   id: string;
@@ -5992,6 +6014,14 @@ export type ReservationUnitFieldsFragment = {
     requiredFields: Array<{ id: string; fieldName: string }>;
     supportedFields: Array<{ id: string; fieldName: string }>;
   } | null;
+};
+
+export type CancelReasonFieldsFragment = {
+  id: string;
+  pk?: number | null;
+  reasonFi?: string | null;
+  reasonEn?: string | null;
+  reasonSv?: string | null;
 };
 
 export type SearchFormParamsUnitQueryVariables = Exact<{
@@ -7704,6 +7734,75 @@ export type TermsOfUseQuery = {
   } | null;
 };
 
+export type ApplicationSectionCancelQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ApplicationSectionCancelQuery = {
+  applicationSection?: {
+    pk?: number | null;
+    id: string;
+    name: string;
+    reservationsBeginDate: string;
+    reservationsEndDate: string;
+    reservationUnitOptions: Array<{
+      id: string;
+      reservationUnit: {
+        id: string;
+        pk?: number | null;
+        nameEn?: string | null;
+        nameFi?: string | null;
+        nameSv?: string | null;
+      };
+      allocatedTimeSlots: Array<{
+        id: string;
+        dayOfTheWeek: Weekday;
+        beginTime: string;
+        endTime: string;
+        recurringReservation?: {
+          id: string;
+          reservations: Array<{
+            id: string;
+            state?: ReservationStateChoice | null;
+            begin: string;
+            reservationUnits: Array<{
+              id: string;
+              cancellationRule?: {
+                id: string;
+                canBeCancelledTimeBefore?: number | null;
+              } | null;
+            }>;
+          }>;
+        } | null;
+      }>;
+    }>;
+    application: {
+      id: string;
+      pk?: number | null;
+      applicationRound: {
+        id: string;
+        termsOfUse?: {
+          id: string;
+          textFi?: string | null;
+          textEn?: string | null;
+          textSv?: string | null;
+        } | null;
+      };
+    };
+  } | null;
+  reservationCancelReasons?: {
+    edges: Array<{
+      node?: {
+        id: string;
+        pk?: number | null;
+        reasonFi?: string | null;
+        reasonEn?: string | null;
+        reasonSv?: string | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type ApplicationSectionViewQueryVariables = Exact<{
   pk: Scalars["Int"]["input"];
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
@@ -8214,6 +8313,15 @@ export const ApplicationRoundFieldsFragmentDoc = gql`
         pk
       }
     }
+  }
+`;
+export const CancelReasonFieldsFragmentDoc = gql`
+  fragment CancelReasonFields on ReservationCancelReasonNode {
+    id
+    pk
+    reasonFi
+    reasonEn
+    reasonSv
   }
 `;
 export const ReservationOrderStatusFragmentDoc = gql`
@@ -9389,6 +9497,60 @@ export type CancelApplicationMutationOptions = Apollo.BaseMutationOptions<
   CancelApplicationMutation,
   CancelApplicationMutationVariables
 >;
+export const CancelApplicationSectionDocument = gql`
+  mutation CancelApplicationSection(
+    $input: ApplicationSectionReservationCancellationMutationInput!
+  ) {
+    cancelAllApplicationSectionReservations(input: $input) {
+      future
+      cancelled
+    }
+  }
+`;
+export type CancelApplicationSectionMutationFn = Apollo.MutationFunction<
+  CancelApplicationSectionMutation,
+  CancelApplicationSectionMutationVariables
+>;
+
+/**
+ * __useCancelApplicationSectionMutation__
+ *
+ * To run a mutation, you first call `useCancelApplicationSectionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelApplicationSectionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cancelApplicationSectionMutation, { data, loading, error }] = useCancelApplicationSectionMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCancelApplicationSectionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CancelApplicationSectionMutation,
+    CancelApplicationSectionMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CancelApplicationSectionMutation,
+    CancelApplicationSectionMutationVariables
+  >(CancelApplicationSectionDocument, options);
+}
+export type CancelApplicationSectionMutationHookResult = ReturnType<
+  typeof useCancelApplicationSectionMutation
+>;
+export type CancelApplicationSectionMutationResult =
+  Apollo.MutationResult<CancelApplicationSectionMutation>;
+export type CancelApplicationSectionMutationOptions =
+  Apollo.BaseMutationOptions<
+    CancelApplicationSectionMutation,
+    CancelApplicationSectionMutationVariables
+  >;
 export const ApplicationRoundPeriodsDocument = gql`
   query ApplicationRoundPeriods {
     applicationRounds {
@@ -11297,6 +11459,136 @@ export type TermsOfUseQueryResult = Apollo.QueryResult<
   TermsOfUseQuery,
   TermsOfUseQueryVariables
 >;
+export const ApplicationSectionCancelDocument = gql`
+  query ApplicationSectionCancel($id: ID!) {
+    applicationSection(id: $id) {
+      pk
+      id
+      name
+      reservationsBeginDate
+      reservationsEndDate
+      reservationUnitOptions {
+        id
+        reservationUnit {
+          id
+          pk
+          nameEn
+          nameFi
+          nameSv
+        }
+        allocatedTimeSlots {
+          id
+          dayOfTheWeek
+          beginTime
+          endTime
+          recurringReservation {
+            id
+            reservations {
+              id
+              state
+              ...CanUserCancelReservation
+            }
+          }
+        }
+      }
+      application {
+        id
+        pk
+        applicationRound {
+          id
+          termsOfUse {
+            ...TermsOfUseTextFields
+          }
+        }
+      }
+    }
+    reservationCancelReasons {
+      edges {
+        node {
+          ...CancelReasonFields
+        }
+      }
+    }
+  }
+  ${CanUserCancelReservationFragmentDoc}
+  ${TermsOfUseTextFieldsFragmentDoc}
+  ${CancelReasonFieldsFragmentDoc}
+`;
+
+/**
+ * __useApplicationSectionCancelQuery__
+ *
+ * To run a query within a React component, call `useApplicationSectionCancelQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationSectionCancelQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationSectionCancelQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useApplicationSectionCancelQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationSectionCancelQuery,
+    ApplicationSectionCancelQueryVariables
+  > &
+    (
+      | { variables: ApplicationSectionCancelQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationSectionCancelQuery,
+    ApplicationSectionCancelQueryVariables
+  >(ApplicationSectionCancelDocument, options);
+}
+export function useApplicationSectionCancelLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationSectionCancelQuery,
+    ApplicationSectionCancelQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationSectionCancelQuery,
+    ApplicationSectionCancelQueryVariables
+  >(ApplicationSectionCancelDocument, options);
+}
+export function useApplicationSectionCancelSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationSectionCancelQuery,
+        ApplicationSectionCancelQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationSectionCancelQuery,
+    ApplicationSectionCancelQueryVariables
+  >(ApplicationSectionCancelDocument, options);
+}
+export type ApplicationSectionCancelQueryHookResult = ReturnType<
+  typeof useApplicationSectionCancelQuery
+>;
+export type ApplicationSectionCancelLazyQueryHookResult = ReturnType<
+  typeof useApplicationSectionCancelLazyQuery
+>;
+export type ApplicationSectionCancelSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationSectionCancelSuspenseQuery
+>;
+export type ApplicationSectionCancelQueryResult = Apollo.QueryResult<
+  ApplicationSectionCancelQuery,
+  ApplicationSectionCancelQueryVariables
+>;
 export const ApplicationSectionViewDocument = gql`
   query ApplicationSectionView($pk: Int!, $beginDate: Date = null) {
     applicationSections(pk: [$pk]) {
@@ -11536,11 +11828,7 @@ export const ReservationCancelPageDocument = gql`
     reservationCancelReasons {
       edges {
         node {
-          id
-          pk
-          reasonFi
-          reasonEn
-          reasonSv
+          ...CancelReasonFields
         }
       }
     }
@@ -11548,6 +11836,7 @@ export const ReservationCancelPageDocument = gql`
   ${ReservationInfoCardFragmentDoc}
   ${CancellationRuleFieldsFragmentDoc}
   ${TermsOfUseTextFieldsFragmentDoc}
+  ${CancelReasonFieldsFragmentDoc}
 `;
 
 /**

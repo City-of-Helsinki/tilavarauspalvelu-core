@@ -221,6 +221,19 @@ export function formatApiTimeInterval({
   return `${btime}–${etime}`;
 }
 
+/// Primary use case is to clip out seconds from backend time strings
+/// Assumed only to be used for backend time strings which are in format HH:MM or HH:MM:SS
+/// NOTE does not handle incorrect time strings (ex. bar:foo)
+/// NOTE does not have any boundary checks (ex. 25:99 is allowed)
+export function convertTime(t: Maybe<string> | undefined): string {
+  if (t == null || t === "") {
+    return "";
+  }
+  // NOTE split has incorrect typing
+  const [h, m, _]: Array<string | undefined> = t.split(":");
+  return `${h ?? "00"}:${m ?? "00"}`;
+}
+
 export function calculateMedian(numbers: number[]): number {
   const sorted = [...numbers].sort((a, b) => a - b);
   const middle = Math.floor(sorted.length / 2);
@@ -239,4 +252,8 @@ export function constructUrl(basePath: string, page: string): string {
   const hasSlash = startSlash || endSlash;
   const separator = hasSlash ? "" : "/";
   return `${basePath}${separator}${page}`;
+}
+
+export function ignoreMaybeArray<T>(value: T | T[]): T {
+  return Array.isArray(value) ? value[0] : value;
 }

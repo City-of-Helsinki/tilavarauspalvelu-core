@@ -1,4 +1,4 @@
-import { filterNonNullable, toNumber } from "common/src/helpers";
+import { convertTime, filterNonNullable, toNumber } from "common/src/helpers";
 import {
   fromApiDate,
   fromUIDate,
@@ -761,19 +761,6 @@ function convertImage(image?: Node["images"][0]): ImageFormType {
   };
 }
 
-/// Primary use case is to clip out seconds from backend time strings
-/// Assumed only to be used for backend time strings which are in format HH:MM or HH:MM:SS
-/// NOTE does not handle incorrect time strings (ex. bar:foo)
-/// NOTE does not have any boundary checks (ex. 25:99 is allowed)
-const convertTime = (t?: string) => {
-  if (t == null || t === "") {
-    return "";
-  }
-  // NOTE split has incorrect typing
-  const [h, m, _]: Array<string | undefined> = t.split(":");
-  return `${h ?? "00"}:${m ?? "00"}`;
-};
-
 // Always return all 7 days
 // Always return at least one reservableTime
 function convertSeasonalList(
@@ -785,7 +772,7 @@ function convertSeasonalList(
 
     const times = filterNonNullable(season?.reservableTimes).map((rt) => ({
       begin: convertTime(rt.begin),
-      end: convertTime(rt?.end),
+      end: convertTime(rt.end),
     }));
     return {
       pk: season?.pk ?? 0,

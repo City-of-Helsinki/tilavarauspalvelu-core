@@ -7,7 +7,6 @@ import {
   ApplicationSectionAllocationsQuery,
   ApplicationRoundFilterQuery,
 } from "@gql/gql-types";
-import i18next from "i18next";
 import { type TFunction } from "next-i18next";
 import { filterNonNullable } from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
@@ -151,11 +150,11 @@ export function parseApiTime(time: string): number | null {
   return h1 + m1 / 60;
 }
 
-export const getTimeSeries = (
+export function getTimeSeries(
   day: string,
   begin: string,
   end: string
-): string[] => {
+): string[] {
   const [, startHours, startMinutes] = begin.split("-").map(Number);
   const [, endHours, endMinutes] = end.split("-").map(Number);
   const timeSlots: string[] = [];
@@ -168,15 +167,15 @@ export const getTimeSeries = (
   if (endMinutes === 0) timeSlots.pop();
 
   return timeSlots;
-};
+}
 
-// TODO is this parse? or format? it looks like a format
 function formatTimeRange(
+  t: TFunction,
   range: Pick<SuitableTimeRangeNode, "dayOfTheWeek" | "beginTime" | "endTime">
 ): string {
   // TODO convert the day of the week
   const day = convertWeekday(range.dayOfTheWeek);
-  const weekday = i18next.t(`dayShort.${day}`);
+  const weekday = t(`dayShort.${day}`);
   // TODO don't use substring to convert times (wrap it in a function)
   return `${weekday} ${Number(
     range.beginTime.substring(0, 2)
@@ -184,6 +183,7 @@ function formatTimeRange(
 }
 
 export function formatTimeRangeList(
+  t: TFunction,
   aes: Pick<
     SuitableTimeRangeNode,
     "dayOfTheWeek" | "beginTime" | "endTime" | "priority"
@@ -196,7 +196,7 @@ export function formatTimeRangeList(
   );
 
   return filterNonNullable(schedules)
-    .map((schedule) => formatTimeRange(schedule))
+    .map((schedule) => formatTimeRange(t, schedule))
     .join(", ");
 }
 

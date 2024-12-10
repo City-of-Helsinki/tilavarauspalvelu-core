@@ -35,6 +35,7 @@ const nextConfig = {
         source: "/reservation/confirmation/:id",
         destination: "/reservations/:id/confirmation",
       },
+      // old series/:reservation cancel url
       {
         // Old search url
         source: "/search/single",
@@ -42,6 +43,10 @@ const nextConfig = {
       },
       {
         source: "/applications/:id/view/:reservationId/cancel",
+        destination: "/reservations/:reservationId/cancel",
+      },
+      {
+        source: "/applications/:id/reservations/:reservationId/cancel",
         destination: "/reservations/:reservationId/cancel",
       },
     ];

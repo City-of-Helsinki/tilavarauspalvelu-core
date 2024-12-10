@@ -1,20 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled, { css } from "styled-components";
-import { useForm } from "react-hook-form";
-import {
-  Button,
-  IconClock,
-  IconCross,
-  IconEuroSign,
-  IconLocation,
-} from "hds-react";
+import { IconClock, IconEuroSign, IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { fontMedium, H1, H4 } from "common/src/common/typography";
+import { H1 } from "common/src/common/typography";
 import {
+  type CancelReasonFieldsFragment,
   useCancelReservationMutation,
   type ReservationCancelPageQuery,
 } from "@gql/gql-types";
-import Sanitize from "../common/Sanitize";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { ReservationPageWrapper } from "../reservations/styles";
 import {
@@ -23,52 +16,18 @@ import {
   toUIDate,
 } from "common/src/common/util";
 import { errorToast } from "common/src/common/toast";
-import { ControlledSelect } from "common/src/components/form";
-import { AutoGrid, ButtonContainer, Flex } from "common/styles/util";
-import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
-import TermsBox from "common/src/termsbox/TermsBox";
-import { AccordionWithState } from "../Accordion";
 import { breakpoints } from "common";
 import { getPrice } from "@/modules/reservationUnit";
 import { formatDateTimeStrings } from "@/modules/util";
 import { LocalizationLanguages } from "common/src/helpers";
 import { useRouter } from "next/router";
-
-type CancelReasonsQ = NonNullable<
-  ReservationCancelPageQuery["reservationCancelReasons"]
->;
-type CancelReasonsEdge = NonNullable<CancelReasonsQ["edges"]>;
-type CancelReasonsNode = NonNullable<
-  NonNullable<CancelReasonsEdge[number]>["node"]
->;
-type NodeT = ReservationCancelPageQuery["reservation"];
-type Props = {
-  apiBaseUrl: string;
-  reasons: CancelReasonsNode[];
-  reservation: NonNullable<NodeT>;
-};
-
-const Actions = styled(ButtonContainer).attrs({
-  $justifyContent: "space-between",
-})`
-  grid-column: 1 / -1;
-`;
-
-const Form = styled.form`
-  label {
-    ${fontMedium};
-  }
-`;
-
-type FormValues = {
-  reason: number;
-  description?: string;
-};
+import { type CancelFormValues, CancellationForm } from "../CancellationForm";
+import { Card } from "common/src/components";
 
 const infoCss = css`
   @media (min-width: ${breakpoints.m}) {
-    grid-row: 1 / -1;
+    grid-row: 1 / span 2;
     grid-column: 2;
   }
 `;
@@ -77,39 +36,50 @@ const StyledInfoCard = styled(ReservationInfoCard)`
   ${infoCss}
 `;
 
-const ApplicationInfo = styled(Flex).attrs({ $gap: "2-xs" })`
-  background-color: var(--color-silver-light);
-  padding: var(--spacing-m);
-  ${infoCss}
-`;
+type NodeT = ReservationCancelPageQuery["reservation"];
+type CancellationProps = {
+  apiBaseUrl: string;
+  reasons: CancelReasonFieldsFragment[];
+  reservation: NonNullable<NodeT>;
+};
 
-const IconList = styled(Flex).attrs({
-  $gap: "2-xs",
-})`
-  list-style: none;
-  padding: 0;
-  margin: var(--spacing-2-xs) 0 0;
-  li {
-    display: flex;
-    gap: var(--spacing-xs);
-    align-items: center;
-  }
-`;
-
-export function ReservationCancellation(props: Props): JSX.Element {
-  const { t } = useTranslation();
+export function ReservationCancellation(props: CancellationProps): JSX.Element {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
 
   const { reservation } = props;
 
+  const [cancelReservation, { loading }] = useCancelReservationMutation();
+
+  const backLink = getBackPath(reservation);
   const handleNext = () => {
-    const redirectUrl = getBackPath(reservation);
-    if (isPartOfApplication(reservation)) {
-      if (redirectUrl) {
-        router.push(`${redirectUrl}?deletedReservationPk=${reservation.pk}`);
-      }
-    } else if (redirectUrl) {
-      router.push(`${redirectUrl}?deleted=true`);
+    const queryParam = isPartOfApplication(reservation)
+      ? `deletedReservationPk=${reservation.pk}`
+      : "deleted=true";
+    if (backLink) {
+      router.push(`${backLink}?${queryParam}`);
+    }
+  };
+
+  const onSubmit = async (formData: CancelFormValues) => {
+    if (!reservation.pk || !formData.reason) {
+      return;
+    }
+    const { reason } = formData;
+    try {
+      await cancelReservation({
+        variables: {
+          input: {
+            pk: reservation.pk,
+            cancelReason: reason,
+          },
+        },
+      });
+      handleNext();
+    } catch (e) {
+      errorToast({
+        text: t("reservations:cancel.mutationFailed"),
+      });
     }
   };
 
@@ -121,6 +91,9 @@ export function ReservationCancellation(props: Props): JSX.Element {
   const infoBody = isApplication
     ? t("reservations:cancel.infoBodyApplication")
     : t("reservations:cancel.infoBody");
+
+  const lang = convertLanguageCode(i18n.language);
+  const cancellationTerms = getTranslatedTerms(reservation, lang);
 
   return (
     <ReservationPageWrapper>
@@ -134,17 +107,25 @@ export function ReservationCancellation(props: Props): JSX.Element {
       ) : (
         <StyledInfoCard reservation={reservation} type="confirmed" />
       )}
-      <Flex>
-        <CancellationForm {...props} onNext={handleNext} />
-      </Flex>
+      <CancellationForm
+        onNext={onSubmit}
+        isLoading={loading}
+        cancelReasons={props.reasons}
+        cancellationTerms={cancellationTerms}
+        backLink={backLink}
+      />
     </ReservationPageWrapper>
   );
 }
 
+const ApplicationInfo = styled(Card)`
+  ${infoCss}
+`;
+
 function ApplicationInfoCard({
   reservation,
 }: {
-  reservation: Props["reservation"];
+  reservation: CancellationProps["reservation"];
 }) {
   // NOTE assumes that the name of the recurringReservation is copied from applicationSection when it's created
   const name = reservation.recurringReservation?.name;
@@ -166,135 +147,39 @@ function ApplicationInfoCard({
 
   const icons = [
     {
-      text: time,
       icon: <IconClock aria-hidden="true" />,
+      value: time,
     },
     {
       icon: <IconLocation aria-hidden="true" />,
-      text: reservationUnitName,
+      value: reservationUnitName,
     },
     {
       icon: <IconEuroSign aria-hidden="true" />,
-      text: price,
+      value: price ?? "",
     },
   ];
 
+  const text = `${toUIDate(date)} - ${dayOfWeek}`;
   return (
-    <ApplicationInfo>
-      <H4 as="h2" $noMargin>
-        {name}
-      </H4>
-      <div>
-        {toUIDate(date)}
-        {" - "}
-        {dayOfWeek}
-      </div>
-      <IconList>
-        {icons.map(({ text, icon }) => (
-          <li key={text}>
-            {icon}
-            {text}
-          </li>
-        ))}
-      </IconList>
-    </ApplicationInfo>
+    <ApplicationInfo
+      heading={name ?? ""}
+      text={text}
+      variant="vertical"
+      infos={icons}
+    />
   );
 }
 
-function CancellationForm(props: Props & { onNext: () => void }): JSX.Element {
-  const { reservation, onNext } = props;
-  const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
-
-  const reasons = props.reasons.map((node) => ({
-    label: getTranslationSafe(node, "reason", lang),
-    value: node?.pk ?? 0,
-  }));
-
-  const [cancelReservation, { loading }] = useCancelReservationMutation();
-
-  const form = useForm<FormValues>();
-  const { register, handleSubmit, watch, control } = form;
-
-  useEffect(() => {
-    register("reason", { required: true });
-    register("description");
-  }, [register]);
-
-  const onSubmit = async (formData: FormValues) => {
-    if (!reservation.pk || !formData.reason) {
-      return;
-    }
-    const { reason, description } = formData;
-    try {
-      await cancelReservation({
-        variables: {
-          input: {
-            pk: reservation.pk,
-            cancelReason: reason,
-            cancelDetails: description,
-          },
-        },
-      });
-      onNext();
-    } catch (e) {
-      errorToast({
-        text: t("reservations:cancel.mutationFailed"),
-      });
-    }
-  };
-
-  const cancellationTerms = getTranslatedTerms(reservation, lang);
-  const backLink = getBackPath(reservation);
-
-  return (
-    <>
-      {cancellationTerms != null && (
-        <AccordionWithState
-          heading={t("reservationUnit:cancellationTerms")}
-          disableBottomMargin
-        >
-          <TermsBox body={<Sanitize html={cancellationTerms} />} />
-        </AccordionWithState>
-      )}
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <AutoGrid>
-          <ControlledSelect
-            name="reason"
-            control={control}
-            label={t("reservations:cancel.reason")}
-            options={reasons}
-            required
-          />
-          <Actions>
-            <ButtonLikeLink
-              data-testid="reservation-cancel__button--back"
-              href={backLink}
-            >
-              <IconCross aria-hidden="true" />
-              {t("reservations:cancelButton")}
-            </ButtonLikeLink>
-            <Button
-              variant="primary"
-              type="submit"
-              disabled={!watch("reason")}
-              data-testid="reservation-cancel__button--cancel"
-              isLoading={loading}
-            >
-              {t("reservations:cancel.reservation")}
-            </Button>
-          </Actions>
-        </AutoGrid>
-      </Form>
-    </>
-  );
-}
-
-function isPartOfApplication(reservation: NodeT): boolean {
+function isPartOfApplication(
+  reservation: Pick<NonNullable<NodeT>, "recurringReservation">
+): boolean {
   return reservation?.recurringReservation != null;
 }
 
-function getBackPath(reservation: NodeT): string {
+function getBackPath(
+  reservation: Pick<NonNullable<NodeT>, "recurringReservation" | "pk">
+): string {
   if (reservation == null) {
     return "";
   }
@@ -309,7 +194,10 @@ function getBackPath(reservation: NodeT): string {
 
 /// For applications use application round terms of use
 function getTranslatedTerms(
-  reservation: Props["reservation"],
+  reservation: Pick<
+    NonNullable<NodeT>,
+    "recurringReservation" | "reservationUnits" | "pk"
+  >,
   lang: LocalizationLanguages
 ) {
   if (reservation.recurringReservation) {

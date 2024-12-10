@@ -1014,6 +1014,7 @@ describe("isReservationUnitReservable", () => {
       bufferTimeBefore: 0,
       authentication: Authentication.Strong,
       canApplyFreeOfCharge: false,
+      searchTerms: [],
       contactInformation: "",
       description: "",
       equipments: [],

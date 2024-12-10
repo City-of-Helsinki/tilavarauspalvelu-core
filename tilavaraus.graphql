@@ -581,6 +581,7 @@ type ApplicationSectionNode implements Node {
   allocations: Int
   application: ApplicationNode!
   appliedReservationsPerWeek: Int!
+  extUuid: UUID!
   """
   The ID of the object
   """
@@ -2011,6 +2012,12 @@ type Query {
     orderBy: [ApplicationRoundOrderingChoices]
     pk: [Int]
   ): ApplicationRoundNodeConnection
+  applicationSection(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): ApplicationSectionNode
   applicationSections(
     after: String
     ageGroup: [Int]
@@ -3982,6 +3989,7 @@ input ReservationUnitCreateMutationInput {
   reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
   resources: [Int]
+  searchTerms: [String]
   serviceSpecificTerms: String
   spaces: [Int]
   surfaceArea: Int
@@ -4053,6 +4061,7 @@ type ReservationUnitCreateMutationPayload {
   reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
   resources: [Int]
+  searchTerms: [String]
   serviceSpecificTerms: String
   spaces: [Int]
   surfaceArea: Int
@@ -4289,6 +4298,7 @@ type ReservationUnitNode implements Node {
     orderBy: [ResourceOrderingChoices]
     pk: [Int]
   ): [ResourceNode!]!
+  searchTerms: [String!]!
   serviceSpecificTerms: TermsOfUseNode
   spaces(
     nameEn: String
@@ -4601,6 +4611,7 @@ input ReservationUnitUpdateMutationInput {
   reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
   resources: [Int]
+  searchTerms: [String]
   serviceSpecificTerms: String
   spaces: [Int]
   surfaceArea: Int
@@ -4672,6 +4683,7 @@ type ReservationUnitUpdateMutationPayload {
   reservationsMaxDaysBefore: Int
   reservationsMinDaysBefore: Int
   resources: [Int]
+  searchTerms: [String]
   serviceSpecificTerms: String
   spaces: [Int]
   surfaceArea: Int

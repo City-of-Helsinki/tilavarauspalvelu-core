@@ -4,6 +4,7 @@ import {
   type LocalizationLanguages,
   getLocalizationLang,
   toNumber,
+  ignoreMaybeArray,
 } from "common/src/helpers";
 import {
   type QueryReservationUnitsArgs,
@@ -120,10 +121,6 @@ function paramToIntegers(param: string | string[]): number[] {
   // and JS is silly about empty strings getting coerced to 0 and not NaN
   const num = param !== "" ? Number(param) : Number.NaN;
   return Number.isInteger(num) ? [num] : [];
-}
-
-function ignoreMaybeArray<T>(value: T | T[]): T {
-  return Array.isArray(value) ? value[0] : value;
 }
 
 type ProcessVariablesParams =

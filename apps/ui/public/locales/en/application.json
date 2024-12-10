@@ -206,7 +206,9 @@
     "subHeading": {
       "applicationInfo": "Application information"
     },
-    "reservationDeleted": "Booking cancelled."
+    "reservationDeleted": "Booking cancelled.",
+    "applicationSectionCancelled": "Cancelled {{ cancelled }} / {{ future }} booking.",
+    "applicationSectionCancelledAll": "All {{ cancelled }} bookings cancelled."
   },
   "applicationEventStatus": {
     "UNALLOCATED": "Unallocated",

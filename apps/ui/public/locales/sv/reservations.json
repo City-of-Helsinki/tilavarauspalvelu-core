@@ -31,6 +31,18 @@
     "reason": "Orsak till avbokningen",
     "mutationFailed": "Bokningen kunde inte avbokas"
   },
+  "cancelSection": {
+    "title": "Avboka alla bokningar",
+    "ingress": "Du håller på att avboka hela säsongsbokningen, inklusive alla tillhörande bokningar.",
+    "body": "Vi vill göra Varaamo ännu bättre. Vi vill gärna veta varför du avbokar din säsöngsbokning.",
+    "reservations": "bokningar",
+    "dateLabel": "Säsongsbokning för perioden",
+    "modal": {
+      "title": "Är du säker på att du vill avboka alla bokningar?",
+      "body": "Om du väljer \"Avboka bokningar\" kommer alla dina bokningar att raderas och kan inte återställas. Du kan återgå till föregående vy genom att välja \"Tillbaka\".",
+      "btnAccept": "Avboka bokningar"
+    }
+  },
   "reservationCancelledTitle": "Din bokning har avbokats!",
   "redoReservation": "Boka på nytt",
   "upcomingReservations": "Kommande",

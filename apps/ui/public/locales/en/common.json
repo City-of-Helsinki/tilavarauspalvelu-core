@@ -26,6 +26,15 @@
   "weekDay.5": "Fr",
   "weekDay.6": "Sa",
   "weekDay.7": "Su",
+  "weekdayLongEnum": {
+    "FRIDAY": "Friday",
+    "MONDAY": "Monday",
+    "SATURDAY": "Saturday",
+    "SUNDAY": "Sunday",
+    "THURSDAY": "Thursday",
+    "TUESDAY": "Tuesday",
+    "WEDNESDAY": "Wednesday"
+  },
   "month.0": "January",
   "month.1": "February",
   "month.2": "March",
