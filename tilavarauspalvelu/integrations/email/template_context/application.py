@@ -185,6 +185,8 @@ def get_context_for_staff_notification_application_section_cancelled(
             **params_for_application_section_info(application_section=application_section, language=language),
         }
 
+    # TODO: Add all RecurringReservations to the context
+
     return {
         "title": pgettext("Email", "The customer has canceled the seasonal booking"),
         "text_reservation_cancelled": pgettext(
