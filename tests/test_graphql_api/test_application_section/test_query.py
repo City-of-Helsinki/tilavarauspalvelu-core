@@ -23,6 +23,7 @@ def test_application_section__query__all_fields(graphql):
 
     fields = """
         pk
+        extUuid
         name
         numPersons
         reservationsBeginDate
@@ -64,6 +65,7 @@ def test_application_section__query__all_fields(graphql):
     assert len(response.edges) == 2, response
     assert response.node(0) == {
         "pk": section.pk,
+        "extUuid": str(section.ext_uuid),
         "name": section.name,
         "numPersons": section.num_persons,
         "reservationsBeginDate": section.reservations_begin_date.isoformat(),
