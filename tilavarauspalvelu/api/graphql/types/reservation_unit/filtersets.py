@@ -141,7 +141,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
 
     def get_text_search(self, qs: ReservationUnitQuerySet, name: str, value: str) -> QuerySet:
         language = get_text_search_language(self.request)
-        search = build_search(value)
+        search = build_search(value, separator="&")
         query = SearchQuery(value=search, config=language, search_type="raw")
         match language:
             # Do search mostly with full text search, but also search some columns with containment search.

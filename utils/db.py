@@ -285,12 +285,16 @@ def text_search(
     return qs.annotate(ts_vector=vector, ts_rank=rank).filter(q)
 
 
-def build_search(text: str) -> str:
+def build_search(text: str, *, separator: Literal["|", "&", "<->"] = "|") -> str:
     """
     Build raw postgres full text search query from text.
 
     Quote search terms and do prefix matching.
-    Match all search terms with the OR operator.
+    Match all search terms with the given operator:
+      | = or
+      & = and
+      <-> = Followed by
+      <3> = Followed by less than 3 "words" away (<1> same as <->)
 
     Replace single quotes and hyphens in words with spaces so they are treated as whitespace in the search,
     e.g. "Moe's" becomes "Moe s" and "3D-printer" becomes "3D printer".
@@ -302,4 +306,4 @@ def build_search(text: str) -> str:
         if value:
             value = f"'{value}':*"
             search_terms.append(value)
-    return " | ".join(search_terms)
+    return f" {separator} ".join(search_terms)
