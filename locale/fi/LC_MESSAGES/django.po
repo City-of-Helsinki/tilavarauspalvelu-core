@@ -1879,8 +1879,12 @@ msgid "Max reservations per user"
 msgstr "Maksimi varauksia per käyttäjä"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Does the reservations of this require a handling"
-msgstr "Vaativatko tämän varausyksikön varaukset käsittelyn"
+msgid "Require adult reservee"
+msgstr "Vaaditaan täysi-ikäinen varaaja"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Require reservation handling"
+msgstr "Vaaditaan varausten käsittely"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Authentication"
@@ -2062,7 +2066,13 @@ msgstr "Maksimi määrä aktiivisia varauksia per käyttäjä"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
-"Does reservations of this reservation unit need to be handled before they're "
+"Do reservations to this reservation unit require the reservee to be a legal "
+"adult?"
+msgstr "Vaativatko tämän varausksikön varaukset varaajan olevan täysi-ikäinen?"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Do reservations to this reservation unit need to be handled before they're "
 "confirmed."
 msgstr ""
 "Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan "

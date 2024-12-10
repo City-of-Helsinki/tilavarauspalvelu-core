@@ -1831,7 +1831,11 @@ msgid "Max reservations per user"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Does the reservations of this require a handling"
+msgid "Require adult reservee"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Require reservation handling"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -2003,7 +2007,13 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
-"Does reservations of this reservation unit need to be handled before they're "
+"Do reservations to this reservation unit require the reservee to be a legal "
+"adult?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Do reservations to this reservation unit need to be handled before they're "
 "confirmed."
 msgstr ""
 
