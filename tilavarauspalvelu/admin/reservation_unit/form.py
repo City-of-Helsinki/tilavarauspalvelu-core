@@ -96,7 +96,8 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "publish_ends": _("Publish ends"),
             "metadata_set": _("Reservation metadata set"),
             "max_reservations_per_user": _("Max reservations per user"),
-            "require_reservation_handling": _("Does the reservations of this require a handling"),
+            "require_adult_reservee": _("Require adult reservee"),
+            "require_reservation_handling": _("Require reservation handling"),
             "authentication": _("Authentication"),
             "reservation_kind": _("Reservation kind"),
             "payment_types": _("Payment types"),
@@ -176,8 +177,11 @@ class ReservationUnitAdminForm(forms.ModelForm):
                 "and required form fields for this reservation unit."
             ),
             "max_reservations_per_user": _("Maximum number of active reservations per user"),
+            "require_adult_reservee": _(
+                "Do reservations to this reservation unit require the reservee to be a legal adult?",
+            ),
             "require_reservation_handling": _(
-                "Does reservations of this reservation unit need to be handled before they're confirmed."
+                "Do reservations to this reservation unit need to be handled before they're confirmed."
             ),
             "authentication": _("Authentication required for reserving this reservation unit."),
             "reservation_kind": _("What kind of reservations are to be booked with this reservation unit."),

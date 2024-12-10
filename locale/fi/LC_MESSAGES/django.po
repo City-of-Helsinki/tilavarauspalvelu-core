@@ -709,6 +709,11 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
+msgid "External UUID"
+msgstr "Ulkoinen UUID"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Number of persons"
 msgstr "Henkilömäärä"
 
@@ -723,6 +728,11 @@ msgstr "Varausten loppumispäivä"
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Purpose"
 msgstr "Käyttötarkoitus"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "ID for external systems to use"
+msgstr "Tunniste ulkoisten järjestelmien käyttöön"
 
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Name that describes this section."
@@ -1189,10 +1199,6 @@ msgid "Paid reservation"
 msgstr "Maksullinen varaus"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "External UUID"
-msgstr "Ulkoinen UUID"
-
-#: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "SKU"
 msgstr "SKU"
@@ -1351,10 +1357,6 @@ msgstr "Syy hylkäämiselle"
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reason for cancellation"
 msgstr "Syy perumiselle"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "ID for external systems to use"
-msgstr "Tunniste ulkoisten järjestelmien käyttöön"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "SKU for this particular reservation"
@@ -1561,6 +1563,19 @@ msgid "Reservation state"
 msgstr "Varattavuuden tila"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Additional search terms that will bring up this reservation unit when making "
+"text searches in the customer UI. These terms should be added to make sure "
+"search results using text search in links from external sources work "
+"regardless of the UI language."
+msgstr ""
+"Ylimääräiset hakusanat, joilla tätä varausyksikköä on mahdollista hakea "
+"tekstihaun kautta asiakaskäyttöliittymässä. Hakusanoja tulee lisätä tähän "
+"listaan silloin kun halutaan taata, että järjestelmän ulkopuolelta tulevissa "
+"linkeissä käytettävät hakusanat tuottavat oikeat hakutulokset "
+"käyttöliittymän kielestä rippumatta."
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Description (Finnish)"
 msgstr "Kuvaus (Suomeksi)"
 
@@ -1749,8 +1764,12 @@ msgid "Max reservations per user"
 msgstr "Maksimi varauksia per käyttäjä"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Does the reservations of this require a handling"
-msgstr "Vaativatko tämän varausyksikön varaukset käsittelyn"
+msgid "Require adult reservee"
+msgstr "Vaaditaan täysi-ikäinen varaaja"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Require reservation handling"
+msgstr "Vaaditaan varausten käsittely"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Authentication"
@@ -1932,7 +1951,13 @@ msgstr "Maksimi määrä aktiivisia varauksia per käyttäjä"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
-"Does reservations of this reservation unit need to be handled before they're "
+"Do reservations to this reservation unit require the reservee to be a legal "
+"adult?"
+msgstr "Vaativatko tämän varausksikön varaukset varaajan olevan täysi-ikäinen?"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Do reservations to this reservation unit need to be handled before they're "
 "confirmed."
 msgstr ""
 "Vaativatko tämän varausyksikön varaukset käsittelyn ennen kuin ne voidaan "
@@ -1977,19 +2002,6 @@ msgstr "Maksujen kirjanpidon tiliöintitiedot"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Product used for payments"
 msgstr "Tuote, jota käytetään maksuihin"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"Additional search terms that will bring up this reservation unit when making "
-"text searches in the customer UI. These terms should be added to make sure "
-"search results using text search in links from external sources work "
-"regardless of the UI language."
-msgstr ""
-"Ylimääräiset hakusanat, joilla tätä varausyksikköä on mahdollista hakea "
-"tekstihaun kautta asiakaskäyttöliittymässä. Hakusanoja tulee lisätä tähän "
-"listaan silloin kun halutaan taata, että järjestelmän ulkopuolelta tulevissa "
-"linkeissä käytettävät hakusanat tuottavat oikeat hakutulokset "
-"käyttöliittymän kielestä rippumatta."
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
