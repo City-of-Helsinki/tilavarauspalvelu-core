@@ -135,6 +135,7 @@ class Query(graphene.ObjectType):
     application_rounds = ApplicationRoundNode.Connection()
     application = ApplicationNode.Node()
     applications = ApplicationNode.Connection()
+    application_section = ApplicationSectionNode.Node()
     application_sections = ApplicationSectionNode.Connection()
     allocated_time_slots = AllocatedTimeSlotNode.Connection()
     affecting_allocated_time_slots = DjangoListField(
