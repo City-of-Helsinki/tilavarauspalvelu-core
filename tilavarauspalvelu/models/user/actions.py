@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from social_django.models import UserSocialAuth
 
 from tilavarauspalvelu.enums import (
@@ -25,7 +26,7 @@ from tilavarauspalvelu.models import (
     UnitRole,
 )
 from tilavarauspalvelu.typing import UserAnonymizationInfo
-from utils.date_utils import local_datetime
+from utils.date_utils import local_date, local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -187,3 +188,27 @@ class UserActions:
             has_open_applications=has_open_applications,
             has_open_payments=has_open_payments,
         )
+
+    @property
+    def is_ad_user(self) -> bool:
+        id_token = self.user.id_token
+        return id_token is not None and id_token.is_ad_login
+
+    @property
+    def is_profile_user(self) -> bool:
+        id_token = self.user.id_token
+        return id_token is not None and id_token.is_profile_login
+
+    @property
+    def user_age(self) -> int | None:
+        birthday = self.user.date_of_birth
+        if birthday is None:
+            return None
+        return relativedelta(local_date(), birthday).years
+
+    @property
+    def is_of_age(self) -> bool:
+        user_age = self.user_age
+        if user_age is None:
+            return False
+        return user_age >= settings.USER_IS_ADULT_AT_AGE

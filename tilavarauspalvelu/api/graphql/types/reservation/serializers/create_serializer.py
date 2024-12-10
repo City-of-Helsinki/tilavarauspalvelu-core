@@ -12,12 +12,11 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.typing import AnyUser, WSGIRequest
 
 
 class ReservationCreateSerializer(ReservationBaseSaveSerializer):
-    instance: Reservation
+    instance: None
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         data = super().validate(data)
