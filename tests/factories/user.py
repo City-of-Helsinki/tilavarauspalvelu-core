@@ -13,8 +13,8 @@ from django.utils.crypto import get_random_string
 from factory import LazyAttribute, LazyFunction
 from social_django.models import UserSocialAuth
 
+from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
-from tilavarauspalvelu.integrations.helauth.typing import IDToken
 from tilavarauspalvelu.models import User
 from utils.date_utils import local_datetime
 

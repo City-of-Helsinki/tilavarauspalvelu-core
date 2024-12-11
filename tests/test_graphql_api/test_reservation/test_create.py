@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
+    ADLoginAMR,
     CustomerTypeChoice,
     PriceUnit,
     ReservationKind,
@@ -17,7 +18,6 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
-from tilavarauspalvelu.integrations.helauth.typing import ADLoginAMR
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from utils.date_utils import (

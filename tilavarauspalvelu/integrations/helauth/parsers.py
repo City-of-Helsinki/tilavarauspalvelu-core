@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from graphene_django_extensions.utils import get_nested
 
+from tilavarauspalvelu.enums import LoginMethod
 from tilavarauspalvelu.integrations.helauth.typing import (
     BirthdayInfo,
-    LoginMethod,
     ProfileForeignAddress,
     ProfileLocalAddress,
     ReservationPrefillInfo,

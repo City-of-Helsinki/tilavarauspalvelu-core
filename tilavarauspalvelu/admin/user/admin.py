@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.integrations.helauth.typing import LoginMethod
+from tilavarauspalvelu.enums import LoginMethod
 from tilavarauspalvelu.models import GeneralRole, UnitRole, User
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 

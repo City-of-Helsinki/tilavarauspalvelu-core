@@ -11,8 +11,8 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
 
+from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
-from tilavarauspalvelu.integrations.helauth.typing import IDToken
 from tilavarauspalvelu.integrations.helauth.utils import get_jwt_payload
 from tilavarauspalvelu.services.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE

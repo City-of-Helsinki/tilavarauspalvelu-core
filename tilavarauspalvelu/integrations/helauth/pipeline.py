@@ -1,68 +1,33 @@
 from __future__ import annotations
 
-import contextlib
-from typing import TYPE_CHECKING, Any, TypedDict, Unpack
+from typing import TYPE_CHECKING, Any, Unpack
 
 from django.db import models
 from django.db.models.functions import Concat
 
-from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
-from tilavarauspalvelu.integrations.helauth.typing import IDToken
+from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import User
+from tilavarauspalvelu.models import Application, GeneralRole, RecurringReservation, Reservation, UnitRole, User
+
+from .clients import HelsinkiProfileClient
+from .utils import use_request_user
 
 if TYPE_CHECKING:
-    from helusers.tunnistamo_oidc import TunnistamoOIDCAuth
-    from social_django.models import DjangoStorage, UserSocialAuth
-    from social_django.strategy import DjangoStrategy
-
     from tilavarauspalvelu.typing import WSGIRequest
 
+    from .typing import PipelineArgs
+
 __all__ = [
-    "fetch_additional_info_for_user_from_helsinki_profile",
+    "migrate_from_tunnistamo_to_keycloak",
     "update_user_from_profile",
 ]
 
 
-class UserDetails(TypedDict):
-    email: str
-    first_name: str | None
-    last_name: str | None
-    fullname: str | None
-    username: str | None
+def fetch_additional_info_for_user_from_helsinki_profile(**kwargs: Unpack[PipelineArgs]) -> dict[str, Any]:
+    user = kwargs["user"]
+    response = kwargs["response"]
+    request = kwargs["request"]
 
-
-class OIDCResponse(TypedDict):
-    access_token: str
-    email: str
-    email_verified: bool
-    expires_in: int
-    id_token: str
-    nickname: str
-    refresh_token: str
-    sub: str
-    token_type: str
-
-
-class ExtraKwargs(TypedDict):
-    details: UserDetails
-    is_new: bool
-    new_association: bool
-    pipeline_index: int
-    social: UserSocialAuth
-    storage: DjangoStorage
-    strategy: DjangoStrategy
-    uid: str
-    username: str
-
-
-def fetch_additional_info_for_user_from_helsinki_profile(
-    backend: TunnistamoOIDCAuth,  # noqa: ARG001
-    request: WSGIRequest,
-    response: OIDCResponse,
-    user: User | None = None,
-    **kwargs: Unpack[ExtraKwargs],
-) -> dict[str, Any]:
     if user is None:
         return {"user": user}
 
@@ -73,21 +38,7 @@ def fetch_additional_info_for_user_from_helsinki_profile(
     return {"user": user}
 
 
-@contextlib.contextmanager
-def use_request_user(request: WSGIRequest, user: User) -> None:
-    """
-    Use the provided user as the request user for the duration of the context.
-    This is needed during login, since the request user is still anonymous.
-    """
-    original_user = request.user
-    try:
-        request.user = user
-        yield
-    finally:
-        request.user = original_user
-
-
-@SentryLogger.log_if_raises("Helsinki profile: Failed to update user from profile")
+@SentryLogger.log_if_raises("Login: Failed to update user from profile")
 def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) -> None:
     user = user or request.user
     if user.is_anonymous:
@@ -111,13 +62,10 @@ def update_user_from_profile(request: WSGIRequest, *, user: User | None = None) 
     user.save()
 
 
-def migrate_user_from_tunnistamo_to_keycloak(
-    backend: TunnistamoOIDCAuth,  # noqa: ARG001
-    request: WSGIRequest,
-    response: OIDCResponse,
-    user: User | None = None,
-    **kwargs: Unpack[ExtraKwargs],
-) -> dict[str, Any]:
+def migrate_user_from_tunnistamo_to_keycloak(**kwargs: Unpack[PipelineArgs]) -> dict[str, Any]:
+    user = kwargs["user"]
+    response = kwargs["response"]
+
     if user is None:
         return {"user": user}
 
@@ -133,7 +81,7 @@ def migrate_user_from_tunnistamo_to_keycloak(
     return {"user": user}
 
 
-@SentryLogger.log_if_raises("Keycloak migration: Failed to migrate user from tunnistamo to keycloak")
+@SentryLogger.log_if_raises("Login: Failed to migrate user from tunnistamo to keycloak")
 def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
     # Look at the two most recent AD users with the same email address (no profile ID).
     # There can be more, but the most recent one is the new Keycloak user and the other one
@@ -152,8 +100,6 @@ def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
     new_user.is_superuser = old_user.is_superuser
     new_user.reservation_notification = old_user.reservation_notification
     new_user.save()
-
-    from tilavarauspalvelu.models import Application, GeneralRole, RecurringReservation, Reservation, UnitRole
 
     # Migrate general roles.
     GeneralRole.objects.filter(user=old_user).update(user=new_user)
