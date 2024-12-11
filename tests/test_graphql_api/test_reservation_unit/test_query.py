@@ -139,7 +139,6 @@ def test_reservation_unit__query__all_fields(graphql):
 
         isDraft
         isArchived
-        requireIntroduction
         requireReservationHandling
         reservationBlockWholeDay
         canApplyFreeOfCharge
@@ -220,7 +219,6 @@ def test_reservation_unit__query__all_fields(graphql):
         #
         "isDraft": reservation_unit.is_draft,
         "isArchived": reservation_unit.is_archived,
-        "requireIntroduction": reservation_unit.require_introduction,
         "requireReservationHandling": reservation_unit.require_reservation_handling,
         "reservationBlockWholeDay": reservation_unit.reservation_block_whole_day,
         "canApplyFreeOfCharge": reservation_unit.can_apply_free_of_charge,

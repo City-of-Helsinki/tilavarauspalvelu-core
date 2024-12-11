@@ -130,7 +130,6 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.allow_reservations_without_opening_hours
     assert row_2[next(index)] == reservation_unit_1.is_archived
     assert row_2[next(index)] == reservation_unit_1.purposes.first().name_fi
-    assert row_2[next(index)] == reservation_unit_1.require_introduction
     assert row_2[next(index)] == reservation_unit_1.equipments.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.publishing_state
     assert row_2[next(index)] == reservation_unit_1.reservation_state

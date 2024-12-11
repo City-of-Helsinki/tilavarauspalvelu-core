@@ -88,7 +88,6 @@ class ReservationUnitExportRow(BaseExportRow):
     allow_reservations_without_opening_hours: str | bool = ""
     is_reservation_unit_archived: str | bool = ""
     purposes: str = ""
-    require_introduction: str | bool = ""
     equipments: str = ""
     state: str = ""
     reservation_state: str = ""
@@ -224,7 +223,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 allow_reservations_without_opening_hours="Allow reservations without opening hours",
                 is_reservation_unit_archived="Is reservation unit archived",
                 purposes="Purposes",
-                require_introduction="Require introduction",
                 equipments="Equipments",
                 state="State",
                 reservation_state="Reservation state",
@@ -331,7 +329,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 allow_reservations_without_opening_hours=instance.allow_reservations_without_opening_hours,
                 is_reservation_unit_archived=instance.is_archived,
                 purposes=", ".join(purpose.name_fi for purpose in instance.purposes.all()),
-                require_introduction=instance.require_introduction,
                 equipments=", ".join(equipment.name_fi for equipment in instance.equipments.all()),
                 state=instance.publishing_state,
                 reservation_state=instance.reservation_state,

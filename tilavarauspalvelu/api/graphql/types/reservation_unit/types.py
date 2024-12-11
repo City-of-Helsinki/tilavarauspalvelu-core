@@ -125,7 +125,6 @@ class ReservationUnitNode(DjangoNode):
             # Booleans
             "is_draft",
             "is_archived",
-            "require_introduction",
             "require_reservation_handling",
             "reservation_block_whole_day",
             "can_apply_free_of_charge",

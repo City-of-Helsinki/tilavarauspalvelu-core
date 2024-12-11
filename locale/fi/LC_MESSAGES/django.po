@@ -1736,10 +1736,6 @@ msgid "Reservation unit type"
 msgstr "Varausyksikön tyyppi"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Require introduction"
-msgstr "Vaatii perehdytyksen"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Equipments"
 msgstr "Varusteet"
 
