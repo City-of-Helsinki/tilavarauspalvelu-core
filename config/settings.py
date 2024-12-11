@@ -507,6 +507,9 @@ class Common(Environment):
     PERMISSION_NOTIFICATION_BEFORE_DAYS = values.IntegerValue(default=14)
     RAISE_ERROR_ON_REFRESH_FAILURE = False
 
+    # Allows faking membership to certain AD groups for testing automatic role assignment
+    FAKE_SUPERUSER_AD_GROUPS = values.ListValue(default=[])
+
     ICAL_HASH_SECRET = values.StringValue()
 
 

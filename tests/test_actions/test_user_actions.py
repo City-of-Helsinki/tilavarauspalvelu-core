@@ -146,6 +146,26 @@ def test_user_actions__get_ad_group_roles__ad_group_doesnt_match__dont_allow_per
     assert roles == {}
 
 
+def test_user_actions__get_ad_group_roles__fake_superuser_ad_groups(settings):
+    settings.FAKE_SUPERUSER_AD_GROUPS = ["oodi__varaamo__admin__123"]
+
+    unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
+    user = UserFactory.create(is_superuser=True)
+    roles = user.actions.get_ad_group_roles()
+
+    assert roles == {UserRoleChoice.ADMIN: {unit.id}}
+
+
+def test_user_actions__get_ad_group_roles__fake_superuser_ad_groups__not_superuser(settings):
+    settings.FAKE_SUPERUSER_AD_GROUPS = ["oodi__varaamo__admin__123"]
+
+    UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
+    user = UserFactory.create()
+    roles = user.actions.get_ad_group_roles()
+
+    assert roles == {}
+
+
 def test_user_actions__update_unit_roles_from_ad_groups__add_new_role():
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__admin__123")

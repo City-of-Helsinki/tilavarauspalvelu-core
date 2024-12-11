@@ -235,6 +235,9 @@ class UserActions:
             .values_list("upper_name", flat=True)
         )
 
+        if self.user.is_superuser and settings.FAKE_SUPERUSER_AD_GROUPS:
+            ad_group_names.update(name.upper() for name in settings.FAKE_SUPERUSER_AD_GROUPS)
+
         units_by_role: dict[UserRoleChoice, set[int]] = {}
 
         for ad_group_name in ad_group_names:
