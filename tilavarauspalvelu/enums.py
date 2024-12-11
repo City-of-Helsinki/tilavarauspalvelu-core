@@ -236,6 +236,14 @@ class UserRoleChoice(models.TextChoices):
             key=operator.itemgetter(0),
         )
 
+    @classmethod
+    def allowed_roles_for_ad_permissions(cls) -> set[UserRoleChoice]:
+        return {
+            UserRoleChoice.VIEWER,
+            UserRoleChoice.RESERVER,
+            UserRoleChoice.HANDLER,
+        }
+
 
 # There is the disadvantage that we don't get autocomplete of permissions like this,
 # but we also don't duplicate permissions from the roles above. This should be fine,
