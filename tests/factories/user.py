@@ -11,6 +11,7 @@ import factory
 from django.conf import settings
 from django.utils.crypto import get_random_string
 from factory import LazyAttribute, LazyFunction
+from helusers.models import ADGroup
 from social_django.models import UserSocialAuth
 
 from tilavarauspalvelu.dataclasses import IDToken
@@ -18,7 +19,7 @@ from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
 from tilavarauspalvelu.models import User
 from utils.date_utils import local_datetime
 
-from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory
+from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ManyToManyFactory, ReverseForeignKeyFactory
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -26,6 +27,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import Unit, UnitGroup
 
 __all__ = [
+    "ADGroupFactory",
     "UserFactory",
     "UserSocialAuthFactory",
 ]
@@ -52,6 +54,7 @@ class UserFactory(GenericDjangoModelFactory[User]):
     department_name = None  # str
 
     social_auth = ReverseForeignKeyFactory("tests.factories.user.UserSocialAuthFactory")
+    ad_groups = ManyToManyFactory("tests.factories.ADGroupFactory")
 
     # From our model
     tvp_uuid = LazyFunction(uuid4)
@@ -110,6 +113,14 @@ class UserSocialAuthFactory(GenericDjangoModelFactory[UserSocialAuth]):
         if not create:
             return
         self.extra_data = extra_data or get_extra_data(self, **kwargs)
+
+
+class ADGroupFactory(GenericDjangoModelFactory[ADGroup]):
+    class Meta:
+        model = ADGroup
+
+    name = FakerFI("word")
+    display_name = FakerFI("word")
 
 
 def get_extra_data(instance: UserSocialAuth, **kwargs: Any) -> dict[str, Any]:

@@ -47,10 +47,11 @@ from .terms_of_use import TermsOfUseFactory
 from .unit import UnitFactory
 from .unit_group import UnitGroupFactory
 from .unit_role import UnitRoleFactory
-from .user import UserFactory, UserSocialAuthFactory
+from .user import ADGroupFactory, UserFactory, UserSocialAuthFactory
 from .verkkokauppa import OrderCustomerFactory, OrderFactory, PaymentFactory
 
 __all__ = [
+    "ADGroupFactory",
     "AbilityGroupFactory",
     "AddressFactory",
     "AgeGroupFactory",
