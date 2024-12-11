@@ -4,7 +4,7 @@ import pytest
 
 from tests.factories import PaymentMerchantFactory, UnitFactory, UnitGroupFactory, UserFactory
 
-from .helpers import units_query
+from .helpers import units_all_query, units_query
 
 # Applied to all tests
 pytestmark = [
@@ -91,3 +91,19 @@ def test_units__query__show_payment_merchant_with_permissions(graphql):
 
     assert len(response.edges) == 1
     assert response.node(0) == {"nameFi": unit.name, "paymentMerchant": {"name": unit.payment_merchant.name}}
+
+
+def test_unit_all__filter__only_with_permission__general_admin(graphql):
+    unit_1 = UnitFactory.create()
+    unit_2 = UnitFactory.create()
+
+    user = UserFactory.create_with_general_role()
+    graphql.force_login(user)
+
+    query = units_all_query(onlyWithPermission=True)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.first_query_object) == 2
+    assert response.first_query_object[0] == {"pk": unit_1.pk}
+    assert response.first_query_object[1] == {"pk": unit_2.pk}
