@@ -39,6 +39,8 @@ class Unit(models.Model):
 
     search_terms = ArrayField(models.CharField(max_length=255), blank=True, default=list)
 
+    allow_permissions_from_ad_groups: bool = models.BooleanField(default=False)
+
     origin_hauki_resource = models.ForeignKey(
         "tilavarauspalvelu.OriginHaukiResource",
         related_name="units",
