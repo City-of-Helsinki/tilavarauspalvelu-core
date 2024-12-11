@@ -22,7 +22,7 @@ from utils.date_utils import TimeSlot, local_datetime, local_timedelta_string, m
 from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationSection, Organisation
+    from tilavarauspalvelu.models import ApplicationSection, Organisation, User
     from tilavarauspalvelu.typing import AnyUser
 
 
@@ -61,6 +61,13 @@ class ApplicationCreateSerializer(NestingModelSerializer):
                 "allow_null": True,
             },
         }
+
+    def validate_user(self, user: User) -> User:
+        if user.actions.is_ad_user or user.actions.is_of_age:
+            return user
+
+        msg = "Application can only be created by an adult reservee"
+        raise ValidationError(msg, error_codes.APPLICATION_ADULT_RESERVEE_REQUIRED)
 
 
 class ApplicationUpdateSerializer(ApplicationCreateSerializer):
