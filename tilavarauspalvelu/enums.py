@@ -1073,3 +1073,21 @@ class BannerNotificationState(models.TextChoices):
     DRAFT = "DRAFT", pgettext_lazy("BannerNotificationState", "Draft")
     SCHEDULED = "SCHEDULED", pgettext_lazy("BannerNotificationState", "Scheduled")
     ACTIVE = "ACTIVE", pgettext_lazy("BannerNotificationState", "Active")
+
+
+class ADLoginAMR(enum.Enum):
+    HELSINKI_ADFS = "helsinki_adfs"
+    HELSINKIAD = "helsinkiad"
+    HELSINKIAZUREAD = "helsinkiazuread"
+    EDUAD = "eduad"
+
+
+class ProfileLoginAMR(enum.Enum):
+    SUOMI_FI = "suomi_fi"
+    HELTUNNISTUSSUOMIFI = "heltunnistussuomifi"
+
+
+class LoginMethod(enum.Enum):
+    PROFILE = "PROFILE"
+    AD = "AD"
+    OTHER = "OTHER"

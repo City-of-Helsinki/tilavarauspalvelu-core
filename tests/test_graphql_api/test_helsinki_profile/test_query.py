@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
+from tilavarauspalvelu.enums import ADLoginAMR, LoginMethod, ProfileLoginAMR
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
-from tilavarauspalvelu.utils.helauth.typing import ADLoginAMR, LoginMethod, ProfileLoginAMR
 from utils.sentry import SentryLogger
 
 from tests.factories import ApplicationFactory, ReservationFactory, UserFactory
