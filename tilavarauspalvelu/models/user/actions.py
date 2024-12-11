@@ -258,7 +258,7 @@ class UserActions:
                 continue
 
             for role in info_parts[:-1]:
-                if role not in UserRoleChoice:
+                if role not in UserRoleChoice.allowed_roles_for_ad_permissions():
                     continue
 
                 user_role = UserRoleChoice(role)
