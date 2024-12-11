@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import pytest
 
+from utils.date_utils import local_datetime
+
 from tests.factories import ApplicationRoundFactory
 
 from .helpers import CREATE_MUTATION, get_application_create_data
@@ -33,7 +35,7 @@ def test_regular_user_can_create_application(graphql):
     # - There is an open application round
     # - A regular user is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_with_regular_user()
+    graphql.login_with_regular_user(date_of_birth=local_datetime(2006, 1, 1))
 
     # when:
     # - User tries to create a new application
