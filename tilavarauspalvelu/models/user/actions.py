@@ -251,6 +251,9 @@ class UserActions:
             if unit is None:
                 continue
 
+            if not unit.allow_permissions_from_ad_groups:
+                continue
+
             for role in info_parts[:-1]:
                 if role not in UserRoleChoice:
                     continue

@@ -155,6 +155,8 @@ class User(AbstractUser):
         unit_role: UnitRole
         for unit_role in self.unit_roles.filter(role_active=True).prefetch_related("units", "unit_groups"):
             for unit in unit_role.units.all():
+                if unit_role.from_ad_group and not unit.allow_permissions_from_ad_groups:
+                    continue
                 self._unit_roles.setdefault(int(unit.pk), []).append(UserRoleChoice(unit_role.role))
             for unit_group in unit_role.unit_groups.all():
                 self._unit_group_roles.setdefault(int(unit_group.pk), []).append(UserRoleChoice(unit_role.role))

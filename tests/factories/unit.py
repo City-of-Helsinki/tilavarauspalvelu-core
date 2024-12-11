@@ -52,6 +52,8 @@ class UnitFactory(GenericDjangoModelFactory[Unit]):
 
     rank = factory.Sequence(lambda i: i)
 
+    allow_permissions_from_ad_groups = False
+
     origin_hauki_resource = ForeignKeyFactory("tests.factories.OriginHaukiResourceFactory")
     payment_merchant = ForeignKeyFactory("tests.factories.PaymentMerchantFactory")
     payment_accounting = ForeignKeyFactory("tests.factories.PaymentAccountingFactory")
