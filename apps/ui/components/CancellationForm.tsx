@@ -5,7 +5,6 @@ import { Button, IconCross } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { fontMedium } from "common/src/common/typography";
 import { type CancelReasonFieldsFragment } from "@gql/gql-types";
-import Sanitize from "./common/Sanitize";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -16,6 +15,7 @@ import { ButtonLikeLink } from "./common/ButtonLikeLink";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { AccordionWithState } from "./Accordion";
 import { breakpoints } from "common";
+import { Sanitize } from "common/src/components/Sanitize";
 
 const Actions = styled(ButtonContainer).attrs({
   $justifyContent: "space-between",

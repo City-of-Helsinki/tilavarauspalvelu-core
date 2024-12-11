@@ -11,7 +11,7 @@ import {
 import { H1 } from "common/src/common/typography";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
-import Sanitize from "@/components/common/Sanitize";
+import { Sanitize } from "common/src/components/Sanitize";
 import {
   convertLanguageCode,
   getTranslationSafe,

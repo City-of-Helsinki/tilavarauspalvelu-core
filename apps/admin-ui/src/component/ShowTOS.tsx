@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
 import { Maybe, type TermsOfUseNode } from "@gql/gql-types";
+import { Sanitize } from "common/src/components/Sanitize";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx
 // see if we can combine them (and other Terms later with parameters)
@@ -22,12 +23,22 @@ const Terms = styled.div`
   }
 `;
 
-const TOSElement = ({ title, text }: { title: string; text: string }) => (
-  <Terms>
-    <h3>{title}</h3>
-    <p>{text}</p>
-  </Terms>
-);
+function TOSElement({
+  title,
+  text,
+  isHtml,
+}: {
+  title: string;
+  text: string;
+  isHtml?: boolean;
+}) {
+  return (
+    <Terms>
+      <h3>{title}</h3>
+      {isHtml ? <Sanitize html={text} /> : <p>{text}</p>}
+    </Terms>
+  );
+}
 
 // TODO use a fragment
 type TOSNode = Pick<TermsOfUseNode, "textFi">;
@@ -77,6 +88,7 @@ const ShowTOS = ({ reservationUnit }: { reservationUnit: Node }) => {
       <TOSElement
         title={t("tos.generalTermsTitle")}
         text={genericTerms?.textFi ?? ""}
+        isHtml
       />
     </div>
   );

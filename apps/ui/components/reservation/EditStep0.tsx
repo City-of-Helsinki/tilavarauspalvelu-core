@@ -34,7 +34,7 @@ import { ReservationTimePicker } from "./ReservationTimePicker";
 import { QuickReservation } from "../reservation-unit/QuickReservation";
 import { getNextAvailableTime } from "../reservation-unit/utils";
 import { ReservationInfoCard } from "./ReservationInfoCard";
-import Sanitize from "@/components/common/Sanitize";
+import { Sanitize } from "common/src/components/Sanitize";
 import { type RoundPeriod } from "@/modules/reservable";
 import { PinkBox as PinkBoxBase } from "./styles";
 import { H4 } from "common";

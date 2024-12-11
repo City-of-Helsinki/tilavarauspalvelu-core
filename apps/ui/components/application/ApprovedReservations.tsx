@@ -40,7 +40,7 @@ import {
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import Sanitize from "../common/Sanitize";
+import { Sanitize } from "common/src/components/Sanitize";
 import { LinkLikeButton } from "common/styles/buttonCss";
 import { type TFunction } from "i18next";
 import { convertWeekday } from "common/src/conversion";

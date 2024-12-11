@@ -11,6 +11,7 @@ const StyledContent = styled.div`
   p:empty {
     display: none;
   }
+
   /* old data has extra line-breaks instead of just using <p> */
   p br {
     display: none;
@@ -51,7 +52,7 @@ const config = {
   },
 };
 
-function Sanitize({ html }: Props): JSX.Element | null {
+export function Sanitize({ html }: Props): JSX.Element | null {
   if (!html) {
     return null;
   }
@@ -64,5 +65,3 @@ function Sanitize({ html }: Props): JSX.Element | null {
     />
   );
 }
-
-export default Sanitize;

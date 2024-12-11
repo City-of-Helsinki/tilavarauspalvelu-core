@@ -30,7 +30,7 @@ import {
   getReservationUnitPath,
   getSingleSearchPath,
 } from "@/modules/urls";
-import Sanitize from "@/components/common/Sanitize";
+import { Sanitize } from "common/src/components/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import {
   getCheckoutUrl,

@@ -2,7 +2,7 @@ import React from "react";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { useTranslation } from "next-i18next";
 import { getTranslation } from "@/modules/util";
-import Sanitize from "../common/Sanitize";
+import { Sanitize } from "common/src/components/Sanitize";
 import { type ReservationUnitPageQuery } from "@/gql/gql-types";
 import { Flex } from "common/styles/util";
 

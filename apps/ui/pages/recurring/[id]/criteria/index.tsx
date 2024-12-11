@@ -10,7 +10,7 @@ import {
 } from "@gql/gql-types";
 import { breakpoints, H1 } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
-import Sanitize from "@/components/common/Sanitize";
+import { Sanitize } from "common/src/components/Sanitize";
 import { getTranslation } from "@/modules/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { getApplicationRoundName } from "@/modules/applicationRound";

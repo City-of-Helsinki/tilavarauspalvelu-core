@@ -2,7 +2,7 @@ import { Dialog, IconInfoCircleFill } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { BlackButton } from "../../styles/util";
-import Sanitize from "./Sanitize";
+import { Sanitize } from "common/src/components/Sanitize";
 
 type Props = {
   id: string;

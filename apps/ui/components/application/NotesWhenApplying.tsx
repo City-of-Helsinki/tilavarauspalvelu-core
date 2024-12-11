@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { getTranslationSafe } from "common/src/common/util";
 import { getLocalizationLang } from "common/src/helpers";
-import Sanitize from "@/components/common/Sanitize";
+import { Sanitize } from "common/src/components/Sanitize";
 import { H4 } from "common";
 
 const NotesBox = styled.div`

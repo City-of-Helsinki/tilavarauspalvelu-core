@@ -300,9 +300,6 @@ importers:
       react-use:
         specifier: ^17.5.1
         version: 17.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      sanitize-html:
-        specifier: ^2.13.0
-        version: 2.13.0
       sass:
         specifier: ^1.81.0
         version: 1.81.0
@@ -349,9 +346,6 @@ importers:
       '@types/react-transition-group':
         specifier: ^4.4.11
         version: 4.4.11
-      '@types/sanitize-html':
-        specifier: ^2.13.0
-        version: 2.13.0
       '@types/styled-components':
         specifier: ^5.1.29
         version: 5.1.34
@@ -442,6 +436,9 @@ importers:
       react-use:
         specifier: ^17.5.1
         version: 17.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      sanitize-html:
+        specifier: ^2.13.0
+        version: 2.13.0
       styled-components:
         specifier: 5.3.11
         version: 5.3.11(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1)
@@ -479,6 +476,9 @@ importers:
       '@types/react-dom':
         specifier: 18.3.0
         version: 18.3.0
+      '@types/sanitize-html':
+        specifier: ^2.13.0
+        version: 2.13.0
       '@types/styled-components':
         specifier: ^5.1.29
         version: 5.1.34
@@ -7463,12 +7463,12 @@ snapshots:
   '@babel/code-frame@7.24.7':
     dependencies:
       '@babel/highlight': 7.24.7
-      picocolors: 1.1.0
+      picocolors: 1.1.1
 
   '@babel/code-frame@7.25.7':
     dependencies:
       '@babel/highlight': 7.25.7
-      picocolors: 1.1.0
+      picocolors: 1.1.1
 
   '@babel/code-frame@7.26.2':
     dependencies:
@@ -7653,7 +7653,7 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.7
       chalk: 2.4.2
       js-tokens: 4.0.0
-      picocolors: 1.1.0
+      picocolors: 1.1.1
 
   '@babel/highlight@7.25.7':
     dependencies:
@@ -14247,7 +14247,7 @@ snapshots:
   postcss@8.4.45:
     dependencies:
       nanoid: 3.3.7
-      picocolors: 1.1.0
+      picocolors: 1.1.1
       source-map-js: 1.2.1
 
   postgres-array@2.0.0: {}
@@ -15213,7 +15213,7 @@ snapshots:
       css-tree: 2.3.1
       css-what: 6.1.0
       csso: 5.0.5
-      picocolors: 1.1.0
+      picocolors: 1.1.1
 
   swap-case@2.0.2:
     dependencies:

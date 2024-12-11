@@ -15,7 +15,7 @@ import {
   TermsAccordion as Accordion,
 } from "./styled";
 import { ApplicationEventList } from "./ApplicationEventList";
-import Sanitize from "../common/Sanitize";
+import { Sanitize } from "common/src/components/Sanitize";
 import TermsBox from "common/src/termsbox/TermsBox";
 import {
   convertLanguageCode,
