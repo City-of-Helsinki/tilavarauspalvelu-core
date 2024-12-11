@@ -6,41 +6,20 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
-from django.forms import ModelForm
-from django.forms.widgets import Textarea
 from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TabbedTranslationAdmin
-from subforms.fields import DynamicArrayField
 
 from tilavarauspalvelu.admin.location.admin import LocationInline
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
 from tilavarauspalvelu.models import Unit
 
+from .form import UnitAdminForm
+
 if TYPE_CHECKING:
     from django.db.models import QuerySet
 
     from tilavarauspalvelu.typing import WSGIRequest
-
-
-class UnitAdminForm(ModelForm):
-    search_terms = DynamicArrayField(
-        required=False,
-        default=list,
-        label=_("Search terms"),
-        help_text=_(
-            "Additional search terms that will bring up this unit's reservation units when making text searches "
-            "in the customer UI. These terms should be added to make sure search results using text search in "
-            "links from external sources work regardless of the UI language."
-        ),
-    )
-
-    class Meta:
-        model = Unit
-        fields = []  # Use fields from ModelAdmin
-        widgets = {
-            "short_description": Textarea(),
-        }
 
 
 @admin.register(Unit)
@@ -69,20 +48,56 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
 
     # Form
     form = UnitAdminForm
-    fields = [
-        "name",
-        "tprek_id",
-        "tprek_department_id",
-        "tprek_last_modified",
-        "description",
-        "short_description",
-        "search_terms",
-        "web_page",
-        "email",
-        "phone",
-        "origin_hauki_resource",
-        "payment_merchant",
-        "payment_accounting",
+    fieldsets = [
+        [
+            _("Basic information"),
+            {
+                "fields": [
+                    "name",
+                    "description",
+                    "short_description",
+                    "web_page",
+                    "email",
+                    "phone",
+                    "search_terms",
+                ],
+            },
+        ],
+        [
+            _("TPRek"),
+            {
+                "fields": [
+                    "tprek_id",
+                    "tprek_department_id",
+                    "tprek_last_modified",
+                ],
+            },
+        ],
+        [
+            _("Hauki"),
+            {
+                "fields": [
+                    "origin_hauki_resource",
+                ],
+            },
+        ],
+        [
+            _("Payment information"),
+            {
+                "fields": [
+                    "payment_merchant",
+                    "payment_accounting",
+                ],
+            },
+        ],
+        [
+            _("Permission information"),
+            {
+                "fields": [
+                    "allow_permissions_from_ad_groups",
+                ],
+            },
+        ],
     ]
     inlines = [LocationInline]
     readonly_fields = [
