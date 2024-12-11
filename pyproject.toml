@@ -235,6 +235,7 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 "config/settings.py" = [
     "ANN",      # No need to annotate settings
     "ARG",      # Allow unused arguments allowed in settings
+    "S101",     # Asserts are fine in settings
 ]
 "utils/date_utils.py" = [
     "PLR0917",  # Can have as many positional arguments as needed.

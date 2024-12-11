@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.db import models
 from django.db.models.functions import Upper
 from social_django.models import UserSocialAuth
@@ -209,6 +210,9 @@ class UserActions:
             .annotate(upper_name=Upper("name"))
             .values_list("upper_name", flat=True)
         )
+
+        if self.user.is_superuser and settings.FAKE_SUPERUSER_AD_GROUPS:
+            ad_group_names.update(name.upper() for name in settings.FAKE_SUPERUSER_AD_GROUPS)
 
         units_by_role: dict[UserRoleChoice, set[int]] = {}
 
