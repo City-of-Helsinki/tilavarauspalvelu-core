@@ -317,6 +317,7 @@ def update_reservation_unit_pricings_tax_percentage(
                 lowest_price=pricing.lowest_price,
                 highest_price=pricing.highest_price,
                 reservation_unit=pricing.reservation_unit,
+                is_activated_on_begins=True,
             ).save()
 
     # Log any unhandled future pricings
