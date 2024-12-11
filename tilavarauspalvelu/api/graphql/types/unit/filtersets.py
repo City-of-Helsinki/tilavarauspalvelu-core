@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from django.db import models
 
     from tilavarauspalvelu.models.unit.queryset import UnitQuerySet
-    from tilavarauspalvelu.typing import AnyUser
+    from tilavarauspalvelu.typing import AnyUser, WSGIRequest
 
 __all__ = [
     "UnitAllFilterSet",
@@ -24,6 +24,8 @@ __all__ = [
 
 
 class UnitFilterSetMixin:
+    request: WSGIRequest
+
     def filter_by_only_with_permission(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
         if not value:
             return qs
@@ -44,6 +46,28 @@ class UnitFilterSetMixin:
 
         return qs.filter(Q(id__in=u_ids) | Q(unit_groups__in=g_ids)).distinct()
 
+    # These filters use information across the relationship between Unit and ReservationUnit.
+    # FilterSets apply individual filters in separate `queryset.filter(...)` calls.
+    #
+    # Due to how Django works when spanning `to-many` relationships in qs.filter(...) calls,
+    # (see https://docs.djangoproject.com/en/5.0/topics/db/queries/#spanning-multi-valued-relationships),
+    # this means that using a combination of these filters would result in a queryset where
+    # ANY of their conditions are true for ANY ReservationUnit linked to a given Unit.
+    #     e.g. using `published_reservation_units=True` and `only_direct_bookable=True`
+    #     would return all Units where ANY of their ReservationUnit are EITHER published OR directly bookable.
+    #
+    # In this case, this is incorrect, since we want less permissive behavior:
+    #     e.g. the aforementioned filter should return all Units where ANY of their ReservationUnit are
+    #     BOTH published AND directly bookable.
+    #
+    # The incorrect behavior also has the side effect of adding multiple SQL joins to the
+    # many-to-many though table between Unit and ReservationUnit, which makes the query
+    # slower, since more duplication is needed.
+    #
+    # To prevent this, we need these filters to execute in order, and set `queryset.query.filter_is_sticky = True`
+    # to indicate to the queryset that it should reuse joins it found from one filter to the next.
+    # Note that this only applies until the next time the queryset is cloned, (e.g. when using
+    # `queryset.filter(...)` or `.distinct()`) and thus needs to be reapplied between them.
     @staticmethod
     def filter_by_published_reservation_units(qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
         now = local_datetime()
@@ -92,6 +116,18 @@ class UnitFilterSetMixin:
         qs.query.filter_is_sticky = True
         return qs.distinct()
 
+    def filter_by_own_reservations(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
+        user = self.request.user
+
+        if user.is_anonymous:
+            return qs.none()
+
+        # Prevent multiple joins, see explanation above.
+        qs.query.filter_is_sticky = True
+        qs = qs.filter(Q(reservation_units__reservations__user=user, _negated=not value))
+        qs.query.filter_is_sticky = True
+        return qs.distinct()
+
 
 class UnitFilterSet(ModelFilterSet, UnitFilterSetMixin):
     pk = IntMultipleChoiceFilter()
@@ -102,28 +138,7 @@ class UnitFilterSet(ModelFilterSet, UnitFilterSetMixin):
 
     only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
 
-    # These filters use information across the relationship between Unit and ReservationUnit.
-    # FilterSets apply individual filters in separate `queryset.filter(...)` calls.
-    #
-    # Due to how Django works when spanning `to-many` relationships in qs.filter(...) calls,
-    # (see https://docs.djangoproject.com/en/5.0/topics/db/queries/#spanning-multi-valued-relationships),
-    # this means that using a combination of these filters would result in a queryset where
-    # ANY of their conditions are true for ANY ReservationUnit linked to a given Unit.
-    #     e.g. using `published_reservation_units=True` and `only_direct_bookable=True`
-    #     would return all Units where ANY of their ReservationUnit are EITHER published OR directly bookable.
-    #
-    # In this case, this is incorrect, since we want less permissive behavior:
-    #     e.g. the aforementioned filter should return all Units where ANY of their ReservationUnit are
-    #     BOTH published AND directly bookable.
-    #
-    # The incorrect behavior also has the side effect of adding multiple SQL joins to the
-    # many-to-many though table between Unit and ReservationUnit, which makes the query
-    # slower, since more duplication is needed.
-    #
-    # To prevent this, we need these filters to execute in order, and set `queryset.query.filter_is_sticky = True`
-    # to indicate to the queryset that it should reuse joins it found from one filter to the next.
-    # Note that this only applies until the next time the queryset is cloned, (e.g. when using
-    # `queryset.filter(...)` or `.distinct()`) and thus needs to be reapplied between them.
+    # These filters, need to be defined in sequence (to be executed in sequence). See explanation in UnitFilterSetMixin.
     published_reservation_units = django_filters.BooleanFilter(method="filter_by_published_reservation_units")
     own_reservations = django_filters.BooleanFilter(method="filter_by_own_reservations")
     only_direct_bookable = django_filters.BooleanFilter(method="filter_by_only_direct_bookable")
@@ -149,18 +164,6 @@ class UnitFilterSet(ModelFilterSet, UnitFilterSetMixin):
             "unit_group_name_sv",
         ]
 
-    def filter_by_own_reservations(self, qs: models.QuerySet, name: str, value: bool) -> models.QuerySet:
-        user = self.request.user
-
-        if user.is_anonymous:
-            return qs.none()
-
-        # Prevent multiple joins, see explanation above.
-        qs.query.filter_is_sticky = True
-        qs = qs.filter(Q(reservation_units__reservations__user=user, _negated=not value))
-        qs.query.filter_is_sticky = True
-        return qs.distinct()
-
     @staticmethod
     def order_by_reservation_units_count(qs: UnitQuerySet, desc: bool) -> models.QuerySet:
         return qs.order_by_reservation_units_count(desc=desc)
@@ -184,7 +187,18 @@ class UnitFilterSet(ModelFilterSet, UnitFilterSetMixin):
 
 class UnitAllFilterSet(ModelFilterSet, UnitFilterSetMixin):
     unit = IntMultipleChoiceFilter()
+
+    name_fi = django_filters.CharFilter(field_name="name_fi", lookup_expr="istartswith")
+    name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
+    name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
+
     only_with_permission = django_filters.BooleanFilter(method="filter_by_only_with_permission")
+
+    # These filters, need to be defined in sequence (to be executed in sequence). See explanation in UnitFilterSetMixin.
+    published_reservation_units = django_filters.BooleanFilter(method="filter_by_published_reservation_units")
+    own_reservations = django_filters.BooleanFilter(method="filter_by_own_reservations")
+    only_direct_bookable = django_filters.BooleanFilter(method="filter_by_only_direct_bookable")
+    only_seasonal_bookable = django_filters.BooleanFilter(method="filter_by_only_seasonal_bookable")
 
     class Meta:
         model = Unit
