@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import operator
 import uuid
+from functools import reduce
 from typing import TYPE_CHECKING
 
 from auditlog.models import LogEntry
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.db import models
+from django.db.models.functions import Upper
 from social_django.models import UserSocialAuth
 
 from tilavarauspalvelu.enums import (
@@ -14,6 +18,7 @@ from tilavarauspalvelu.enums import (
     ReservationNotification,
     ReservationStateChoice,
     ReservationTypeChoice,
+    UserRoleChoice,
 )
 from tilavarauspalvelu.models import (
     Address,
@@ -23,6 +28,7 @@ from tilavarauspalvelu.models import (
     Person,
     RecurringReservation,
     Reservation,
+    Unit,
     UnitRole,
 )
 from tilavarauspalvelu.typing import UserAnonymizationInfo
@@ -212,3 +218,99 @@ class UserActions:
         if user_age is None:
             return False
         return user_age >= settings.USER_IS_ADULT_AT_AGE
+
+    def get_ad_group_roles(self) -> dict[UserRoleChoice, set[int]]:
+        """
+        Parse information from user's AD groups for creating unit roles.
+
+        AD groups that give role should be of format `<prefix>__varaamo__<roles>__<tprek_id>` where:
+         - '<prefix>': can be anything (usually identifies the unit)
+         - '<roles>': roles matching `UserRoleChoice` the user should have (separated by "__")
+         - '<tprek_id>': `Unit.tprek_id` for the unit the role is for.
+        """
+        identifier = "__VARAAMO__"
+        ad_group_names: set[str] = set(
+            self.user.ad_groups.filter(name__icontains=identifier)
+            .annotate(upper_name=Upper("name"))
+            .values_list("upper_name", flat=True)
+        )
+
+        units_by_role: dict[UserRoleChoice, set[int]] = {}
+
+        for ad_group_name in ad_group_names:
+            parts = ad_group_name.split(identifier, maxsplit=1)
+            if len(parts) != 2:  # noqa: PLR2004
+                continue
+
+            info_parts = parts[1].split("__")
+            if len(info_parts) < 2:  # noqa: PLR2004
+                continue
+
+            tprek_id = info_parts[-1]
+            unit = Unit.objects.filter(tprek_id=tprek_id).first()
+            if unit is None:
+                continue
+
+            for role in info_parts[:-1]:
+                if role not in UserRoleChoice:
+                    continue
+
+                user_role = UserRoleChoice(role)
+                units_by_role.setdefault(user_role, set()).add(unit.id)
+
+        return units_by_role
+
+    def update_unit_roles_from_ad_groups(self) -> None:
+        current_ad_roles = self.get_ad_group_roles()
+        existing_ad_roles = {
+            UserRoleChoice(role.role): role  #
+            for role in self.user.unit_roles.filter(from_ad_group=True).prefetch_related("units")
+        }
+
+        UnitRoleUnit: type[models.Model] = UnitRole.units.through  # noqa: N806
+
+        roles_to_add: list[UnitRole] = []
+        role_units_to_add: list[UnitRoleUnit] = []
+        role_unit_remove_conditions: list[models.Q] = []
+
+        for user_role, current_unit_ids in current_ad_roles.items():
+            # Pop role from existing roles to indicate that it shouldn't be removed.
+            role = existing_ad_roles.pop(user_role, None)
+
+            # If current role is not defined in existing roles, add a new role.
+            if role is None:
+                new_role = UnitRole(user=self.user, role=user_role, from_ad_group=True)
+                roles_to_add.append(new_role)
+                role_units_to_add.extend(  #
+                    UnitRoleUnit(unitrole=new_role, unit_id=unit_id) for unit_id in current_unit_ids
+                )
+                continue
+
+            exiting_unit_ids: set[int] = {unit.id for unit in role.units.all()}
+
+            # If current role has been added to new units, add them to the role.
+            new_unit_ids = current_unit_ids - exiting_unit_ids
+            if new_unit_ids:
+                role_units_to_add.extend(  #
+                    UnitRoleUnit(unitrole=role, unit_id=unit_id) for unit_id in new_unit_ids
+                )
+
+            # If current role no longer includes some units, remove those units from the role.
+            old_unit_ids = exiting_unit_ids - current_unit_ids
+            if old_unit_ids:
+                condition = models.Q(unit_id__in=list(old_unit_ids), unitrole_id=role.id)
+                role_unit_remove_conditions.append(condition)
+
+        if role_unit_remove_conditions:
+            remove_condition = reduce(operator.or_, role_unit_remove_conditions, models.Q())
+            UnitRoleUnit.objects.filter(remove_condition).delete()
+
+        if existing_ad_roles:
+            remove_ids = [role.id for role in existing_ad_roles.values()]
+            UnitRole.objects.filter(id__in=remove_ids).delete()
+
+        if roles_to_add:
+            UnitRole.objects.bulk_create(roles_to_add)
+
+        if role_units_to_add:
+            UnitRoleUnit.objects.bulk_create(role_units_to_add)

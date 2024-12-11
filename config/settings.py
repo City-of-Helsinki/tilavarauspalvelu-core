@@ -325,6 +325,7 @@ class Common(Environment):
         *SOCIAL_AUTH_PIPELINE,
         "tilavarauspalvelu.integrations.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
         "tilavarauspalvelu.integrations.helauth.pipeline.migrate_user_from_tunnistamo_to_keycloak",
+        "tilavarauspalvelu.integrations.helauth.pipeline.update_roles_from_ad_groups",
     )
 
     @classproperty

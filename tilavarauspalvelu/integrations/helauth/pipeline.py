@@ -128,3 +128,18 @@ def migrate_from_tunnistamo_to_keycloak(*, email: str) -> None:
         is_active=False,
         last_name=Concat(models.F("last_name"), models.Value(" EXPIRED")),
     )
+
+
+def update_roles_from_ad_groups(**kwargs: Unpack[PipelineArgs]) -> dict[str, Any]:
+    user = kwargs["user"]
+
+    if user is None:
+        return {"user": user}
+
+    try:
+        user.actions.update_unit_roles_from_ad_groups()
+    except Exception as error:  # noqa: BLE001
+        msg = "Login: Failed to update user roles from AD groups"
+        SentryLogger.log_exception(error, msg, user_id=user.id)
+
+    return {"user": user}
