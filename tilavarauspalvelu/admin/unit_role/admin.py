@@ -44,6 +44,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "units",
         "unit_groups",
         "role_active",
+        "from_ad_group",
     ]
 
     # Form
@@ -54,6 +55,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "assigner",
         "created",
         "modified",
+        "from_ad_group",
         "units",
         "unit_groups",
     ]
@@ -61,6 +63,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "assigner",
         "created",
         "modified",
+        "from_ad_group",
     ]
     autocomplete_fields = [
         "user",

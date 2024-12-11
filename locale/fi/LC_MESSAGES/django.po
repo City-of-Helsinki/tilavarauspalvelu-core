@@ -183,7 +183,7 @@ msgstr "Luotu"
 #: tilavarauspalvelu/admin/application_section/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
-#: tilavarauspalvelu/admin/user/admin.py
+#: tilavarauspalvelu/admin/unit/admin.py tilavarauspalvelu/admin/user/admin.py
 msgid "Basic information"
 msgstr "Perustiedot"
 
@@ -419,6 +419,7 @@ msgstr ""
 #: tilavarauspalvelu/admin/organisation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/unit/form.py
 msgid "Name"
 msgstr "Nimi"
 
@@ -827,7 +828,7 @@ msgid "Search by username, email, first name or last name"
 msgstr "Etsi käyttäjänimellä, sähköpostilla, etu- tai sukunimellä"
 
 #: tilavarauspalvelu/admin/organisation/admin.py
-#: tilavarauspalvelu/admin/person/admin.py
+#: tilavarauspalvelu/admin/person/admin.py tilavarauspalvelu/admin/unit/form.py
 msgid "Email"
 msgstr "Sähköposti"
 
@@ -1209,6 +1210,7 @@ msgstr "SKU"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/unit/form.py
 msgid "Description"
 msgstr "Kuvaus"
 
@@ -1804,10 +1806,12 @@ msgid "Order number"
 msgstr "Järjestysnumero"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/unit/form.py
 msgid "Payment merchant"
 msgstr "Kauppias"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/unit/form.py
 msgid "Payment accounting"
 msgstr "Kirjanpidon tiliöintitieto"
 
@@ -2044,6 +2048,70 @@ msgstr "Etsi SQL:llä, rajapintakutsun polulla, sisällöllä tai ID:llä"
 #: tilavarauspalvelu/admin/unit/admin.py
 msgid "Search by name or TPREK ID"
 msgstr "Etsi nimellä tai TPREK ID:llä"
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "TPRek"
+msgstr "Toimipaikkarekisteri"
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "Hauki"
+msgstr "Hauki"
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "Payment information"
+msgstr "Maksutiedot"
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid "Permission information"
+msgstr "Käyttöoikeustiedot"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "Short description"
+msgstr "Lyhyt kuvaus"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "Web page"
+msgstr "Verkkosivut"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "Phone"
+msgstr "Puhelinnumero"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "TPRek ID"
+msgstr "Toimipaikkarekisteri-tunnus"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "TPRek department ID"
+msgstr "Toimipaikkarekisterin organisaatiotunnus"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "TPRek last modified"
+msgstr "Toimipaikkarekisterin tietoja muokattu viimeksi"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "Hauki resource"
+msgstr "Aukiolosovelluksen resurssi"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "Allow permissions from AD groups"
+msgstr "Sallitaanko AD-ryhmistä perityt käyttöoikeudet"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "Unit contact email"
+msgstr "Toimipisteen sähköpostiosoite"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid "Unit contact phone number"
+msgstr "Toimipisteen puhelinnumero"
+
+#: tilavarauspalvelu/admin/unit/form.py
+msgid ""
+"Should users be allowed to perform actions for this unit based on roles they "
+"have received automatically from AD groups?"
+msgstr ""
+"Sallitaanko käyttäjien tekevän toimintoja toimipisteessä AD-ryhmistä "
+"automaattisesti annettujen käyttöoikeuksien perusteella?"
 
 #: tilavarauspalvelu/admin/unit_group/admin.py
 msgid "Search by name"
