@@ -26,10 +26,10 @@ def get_application_email_recipients(application: Application) -> list[str]:
     recipients: set[str] = set()
 
     contact_person_email = getattr(application.contact_person, "email", None)
-    applicant_email = getattr(application.user, "email", None)
-
     if contact_person_email:
         recipients.add(contact_person_email.lower())
+
+    applicant_email = getattr(application.user, "email", None)
     if applicant_email:
         recipients.add(applicant_email.lower())
 
@@ -40,10 +40,10 @@ def get_reservation_email_recipients(reservation: Reservation) -> list[str]:
     """Get email notification recipients for the given reservation."""
     recipients: set[str] = set()
 
-    reservation_user_email = getattr(reservation.user, "email", None)
-
     if reservation.reservee_email:
         recipients.add(reservation.reservee_email.lower())
+
+    reservation_user_email = getattr(reservation.user, "email", None)
     if reservation_user_email:
         recipients.add(reservation.user.email.lower())
 

@@ -150,12 +150,10 @@ class EmailService:
         """Sends an email that the whole application section was cancelled by the user"""
         if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
-
-        reservation: Reservation | None = application_section.actions.get_last_reservation()
-        if reservation is None:
+        if application_section.actions.get_last_reservation() is None:
             return
 
-        recipients = get_reservation_email_recipients(reservation=reservation)
+        recipients = get_application_email_recipients(application=application_section.application)
         if not recipients:
             SentryLogger.log_message(
                 "No recipients for application section cancelled email",
@@ -164,7 +162,7 @@ class EmailService:
             return
 
         if language is None:
-            language = get_reservation_email_language(reservation=reservation)
+            language = get_application_email_language(application=application_section.application)
 
         email_type = EmailType.APPLICATION_SECTION_CANCELLED
         context = get_context_for_application_section_cancelled(application_section, language=language)
@@ -475,7 +473,8 @@ class EmailService:
         if reservation.type != ReservationTypeChoice.SEASONAL:
             return
 
-        recipients = get_reservation_email_recipients(reservation=reservation)
+        application = reservation_series.allocated_time_slot.reservation_unit_option.application_section.application
+        recipients = get_application_email_recipients(application=application)
         if not recipients:
             SentryLogger.log_message(
                 "No recipients for reservation series modified email",
@@ -484,7 +483,7 @@ class EmailService:
             return
 
         if language is None:
-            language = get_reservation_email_language(reservation=reservation)
+            language = get_application_email_language(application=application)
 
         email_type = EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES
         context = get_context_for_seasonal_reservation_modified_series(reservation_series, language=language)
@@ -507,7 +506,8 @@ class EmailService:
         if reservation.type != ReservationTypeChoice.SEASONAL:
             return
 
-        recipients = get_reservation_email_recipients(reservation=reservation)
+        application = reservation_series.allocated_time_slot.reservation_unit_option.application_section.application
+        recipients = get_application_email_recipients(application=application)
         if not recipients:
             SentryLogger.log_message(
                 "No recipients for reservation series rejected email",
@@ -516,7 +516,7 @@ class EmailService:
             return
 
         if language is None:
-            language = get_reservation_email_language(reservation=reservation)
+            language = get_application_email_language(application=application)
 
         email_type = EmailType.SEASONAL_RESERVATION_REJECTED_SERIES
         context = get_context_for_seasonal_reservation_rejected_series(reservation_series, language=language)
@@ -528,12 +528,9 @@ class EmailService:
     @staticmethod
     def send_staff_notification_application_section_cancelled(application_section: ApplicationSection) -> None:
         """Sends an email to Staff that the whole application section was cancelled by the user"""
-        application = application_section.application
-        if application.status != ApplicationStatusChoice.RESULTS_SENT:
+        if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
-
-        reservation: Reservation | None = application_section.actions.get_last_reservation()
-        if reservation is None:
+        if application_section.actions.get_last_reservation() is None:
             return
 
         recipients_by_language = get_application_section_staff_notification_recipients_by_language(application_section)
