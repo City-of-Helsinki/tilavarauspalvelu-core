@@ -234,19 +234,11 @@ class Application(SerializableMixin, models.Model):
             ),
             models.When(
                 models.Q(contact_person__isnull=False),
-                then=Concat(
-                    "contact_person__first_name",
-                    models.Value(" "),
-                    "contact_person__last_name",
-                ),
+                then=Concat("contact_person__first_name", models.Value(" "), "contact_person__last_name"),
             ),
             models.When(
                 models.Q(user__isnull=False),
-                then=Concat(
-                    "user__first_name",
-                    models.Value(" "),
-                    "user__last_name",
-                ),
+                then=Concat("user__first_name", models.Value(" "), "user__last_name"),
             ),
             default=models.Value(""),
             output_field=models.CharField(),

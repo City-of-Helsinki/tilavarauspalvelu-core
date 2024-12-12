@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any, overload
 
 from django.utils.translation import pgettext
 
-from tilavarauspalvelu.models import RecurringReservation
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 
 from .common import (
@@ -131,9 +130,8 @@ def get_context_for_application_section_cancelled(
 ) -> EmailContext:
     if application_section is not None:
         reservation = application_section.actions.get_last_reservation()
-
         data: dict[str, Any] = {
-            "email_recipient_name": reservation.actions.get_email_reservee_name(),
+            "email_recipient_name": application_section.application.applicant,
             "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language),
             **params_for_application_section_info(application_section=application_section, language=language),
         }
@@ -182,12 +180,6 @@ def get_context_for_staff_notification_application_section_cancelled(
     **data: Any,
 ) -> EmailContext:
     if application_section is not None:
-        reservation = application_section.actions.get_last_reservation()
-
-        reservation_series = RecurringReservation.objects.filter(
-            allocated_time_slot__reservation_unit_option__application_section=application_section
-        ).prefetch_related("reservations")
-
         reservation_series_data = [
             {
                 **params_for_reservation_series_info(reservation_series=series),
@@ -195,9 +187,10 @@ def get_context_for_staff_notification_application_section_cancelled(
                     reservation_id=series.reservations.values_list("pk").last()
                 ),
             }
-            for series in reservation_series
+            for series in application_section.actions.get_reservation_series()
         ]
 
+        reservation = application_section.actions.get_last_reservation()
         data: dict[str, Any] = {
             "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language),
             "cancelled_reservation_series": reservation_series_data,
