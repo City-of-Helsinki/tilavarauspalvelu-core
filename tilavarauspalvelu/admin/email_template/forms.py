@@ -187,7 +187,7 @@ class ReservationBaseForm(
     BaseEmailTemplateForm,
 ):
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
             "reservation_unit_name": get_attr_by_language(instance, "name", language),
@@ -270,7 +270,7 @@ class ReservationApprovedEmailTemplateTesterForm(
     non_subsidised_price = forms.DecimalField(decimal_places=2, initial=Decimal("10.00"), widget=number_widget)
 
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
             "confirmed_instructions": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
@@ -296,7 +296,7 @@ class ReservationCancelledEmailTemplateTesterForm(
     cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
 
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
             "cancelled_instructions": get_attr_by_language(instance, "reservation_cancelled_instructions", language),
@@ -320,7 +320,7 @@ class ReservationConfirmedEmailTemplateTesterForm(
     ReservationBaseForm,
 ):
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
             "confirmed_instructions": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
@@ -343,7 +343,7 @@ class ReservationModifiedEmailTemplateTesterForm(
     ReservationBaseForm,
 ):
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
             "confirmed_instructions": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
@@ -368,7 +368,7 @@ class ReservationRejectedEmailTemplateTesterForm(
     rejection_reason = forms.CharField(initial="[HYLKÄYKSEN SYY]", widget=text_widget)
 
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
             "cancelled_instructions": get_attr_by_language(instance, "reservation_cancelled_instructions", language),
@@ -393,7 +393,7 @@ class ReservationRequiresHandlingEmailTemplateTesterForm(
     applying_for_free_of_charge = forms.BooleanField(initial=False, required=False)
 
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
             "pending_instructions": get_attr_by_language(instance, "reservation_pending_instructions", language),
@@ -420,7 +420,7 @@ class ReservationRequiresPaymentEmailTemplateTesterForm(
     payment_due_date = forms.DateField(initial=local_date(), widget=date_widget)
 
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
             "confirmed_instructions": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
@@ -443,7 +443,7 @@ class SeasonalReservationCancelledSingleTemplateTesterForm(ReservationBaseForm):
     cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
 
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
         }
@@ -477,7 +477,7 @@ class SeasonalReservationModifiedSingleTemplateTesterForm(ReservationBaseForm):
     reservation_id = forms.IntegerField(initial=0, widget=number_widget)
 
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
         }
@@ -513,7 +513,7 @@ class SeasonalReservationRejectedSingleTemplateTesterForm(ReservationBaseForm):
     rejection_reason = forms.CharField(initial="[HYLKÄYKSEN SYY]", widget=text_widget)
 
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
         }
@@ -562,7 +562,7 @@ class StaffNotificationReservationMadeEmailTemplateTesterForm(ReservationBaseFor
     reservation_id = forms.IntegerField(initial=0, widget=number_widget)
 
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
         }
@@ -582,7 +582,7 @@ class StaffNotificationReservationRequiresHandlingEmailTemplateTesterForm(Reserv
     reservation_id = forms.IntegerField(initial=0, widget=number_widget)
 
     @classmethod
-    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
         }
