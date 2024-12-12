@@ -15,6 +15,7 @@ from .dataclasses import EmailData
 from .find_language import get_application_email_language, get_reservation_email_language
 from .find_recipients import (
     get_application_email_recipients,
+    get_application_section_staff_notification_recipients_by_language,
     get_recipients_for_applications_by_language,
     get_reservation_email_recipients,
     get_reservation_staff_notification_recipients_by_language,
@@ -527,18 +528,19 @@ class EmailService:
     @staticmethod
     def send_staff_notification_application_section_cancelled(application_section: ApplicationSection) -> None:
         """Sends an email to Staff that the whole application section was cancelled by the user"""
-        if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
+        application = application_section.application
+        if application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
 
         reservation: Reservation | None = application_section.actions.get_last_reservation()
         if reservation is None:
             return
 
-        recipients_by_language = get_reservation_staff_notification_recipients_by_language(reservation)
+        recipients_by_language = get_application_section_staff_notification_recipients_by_language(application_section)
         if not recipients_by_language:
             SentryLogger.log_message(
                 "No recipients for staff notification application section cancelled email",
-                details={"reservation": reservation.pk},
+                details={"application_section": application_section.pk},
             )
             return
 
