@@ -147,6 +147,9 @@ class EmailService:
         language: Lang | None = None,
     ) -> None:
         """Sends an email that the whole application section was cancelled by the user"""
+        if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
+            return
+
         reservation: Reservation | None = application_section.actions.get_last_reservation()
         if reservation is None:
             return
@@ -524,6 +527,9 @@ class EmailService:
     @staticmethod
     def send_staff_notification_application_section_cancelled(application_section: ApplicationSection) -> None:
         """Sends an email to Staff that the whole application section was cancelled by the user"""
+        if application_section.application.status != ApplicationStatusChoice.RESULTS_SENT:
+            return
+
         reservation: Reservation | None = application_section.actions.get_last_reservation()
         if reservation is None:
             return
