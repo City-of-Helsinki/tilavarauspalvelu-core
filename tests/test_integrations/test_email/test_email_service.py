@@ -221,7 +221,8 @@ def test_email_service__send_application_received_email__no_recipients(outbox):
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01")
 def test_email_service__send_application_section_cancelled_email(outbox):
-    application_section = ApplicationSectionFactory.create_in_status_handled(application__user__email="user@email.com")
+    application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
+    application_section = application.application_sections.first()
 
     create_reservation_series(
         user=application_section.application.user,
@@ -1242,7 +1243,8 @@ def test_email_service__send_staff_notification_application_section_cancelled_em
         preferred_language="en",
     )
 
-    application_section = ApplicationSectionFactory.create_in_status_handled(application__user__email="user@email.com")
+    application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
+    application_section = application.application_sections.first()
     create_reservation_series(
         reservation_unit__unit=unit,
         user=application_section.application.user,
