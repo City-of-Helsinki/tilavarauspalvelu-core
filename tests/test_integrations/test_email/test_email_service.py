@@ -23,6 +23,7 @@ from tests.factories import (
     ApplicationRoundFactory,
     ApplicationSectionFactory,
     ReservationFactory,
+    ReservationUnitFactory,
     UnitFactory,
     UserFactory,
 )
@@ -1228,32 +1229,44 @@ def test_email_service__send_seasonal_reservation_rejected_single(outbox):
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01")
 def test_email_service__send_staff_notification_application_section_cancelled_email(outbox):
-    unit = UnitFactory.create(name="foo", name_en="foo")
+    application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
+    application_section = application.application_sections.first()
+
+    reservation_unit_1 = ReservationUnitFactory.create()
+    reservation_unit_2 = ReservationUnitFactory.create()
 
     UserFactory.create_with_unit_role(
-        units=[unit],
+        units=[reservation_unit_1.unit],
         email="admin1@email.com",
         reservation_notification=ReservationNotification.ALL,
         preferred_language="fi",
     )
     UserFactory.create_with_unit_role(
-        units=[unit],
+        units=[reservation_unit_2.unit],
         email="admin2@email.com",
         reservation_notification=ReservationNotification.ALL,
         preferred_language="en",
     )
 
-    application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
-    application_section = application.application_sections.first()
     create_reservation_series(
-        reservation_unit__unit=unit,
-        user=application_section.application.user,
+        user=application.user,
+        reservation_unit=reservation_unit_1,
+        allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit_1,
+        allocated_time_slot__reservation_unit_option__application_section=application_section,
+        reservations__reservee_email="reservee@email.com",
+    )
+    create_reservation_series(
+        user=application.user,
+        reservation_unit=reservation_unit_2,
+        allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit_2,
         allocated_time_slot__reservation_unit_option__application_section=application_section,
         reservations__reservee_email="reservee@email.com",
     )
 
     with TranslationsFromPOFiles():
-        EmailService.send_staff_notification_application_section_cancelled(application_section=application_section)
+        EmailService.send_staff_notification_application_section_cancelled(
+            application_section=application.application_sections.first()
+        )
 
     assert len(outbox) == 2
 
