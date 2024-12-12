@@ -210,17 +210,17 @@ class ReservationBaseForm(
 
 class ApplicationHandledEmailTemplateTesterForm(BaseEmailTemplateForm):
     def to_context(self) -> EmailContext:
-        return get_context_for_application_handled(**super().get_context_params())
+        return get_context_for_application_handled(**self.get_context_params())
 
 
 class ApplicationInAllocationEmailTemplateTesterForm(BaseEmailTemplateForm):
     def to_context(self) -> EmailContext:
-        return get_context_for_application_in_allocation(**super().get_context_params())
+        return get_context_for_application_in_allocation(**self.get_context_params())
 
 
 class ApplicationReceivedEmailTemplateTesterForm(BaseEmailTemplateForm):
     def to_context(self) -> EmailContext:
-        return get_context_for_application_received(**super().get_context_params())
+        return get_context_for_application_received(**self.get_context_params())
 
 
 class ApplicationSectionCancelledTemplateTesterForm(EmailRecipientFormMixin, BaseEmailTemplateForm):
@@ -232,7 +232,7 @@ class ApplicationSectionCancelledTemplateTesterForm(EmailRecipientFormMixin, Bas
 
     def to_context(self) -> EmailContext:
         return get_context_for_application_section_cancelled(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             weekday_value=self.cleaned_data["weekday_value"],
             time_value=self.cleaned_data["time_value"],
@@ -247,12 +247,12 @@ class ApplicationSectionCancelledTemplateTesterForm(EmailRecipientFormMixin, Bas
 
 class PermissionDeactivationEmailTemplateTesterForm(BaseEmailTemplateForm):
     def to_context(self) -> EmailContext:
-        return get_context_for_permission_deactivation(**super().get_context_params())
+        return get_context_for_permission_deactivation(**self.get_context_params())
 
 
 class UserAnonymizationEmailTemplateTesterForm(BaseEmailTemplateForm):
     def to_context(self) -> EmailContext:
-        return get_context_for_user_anonymization(**super().get_context_params())
+        return get_context_for_user_anonymization(**self.get_context_params())
 
 
 # Reservation ##########################################################################################################
@@ -274,7 +274,7 @@ class ReservationApprovedEmailTemplateTesterForm(
 
     def to_context(self) -> EmailContext:
         return get_context_for_reservation_approved(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             price=self.cleaned_data["price"],
             non_subsidised_price=self.cleaned_data["non_subsidised_price"],
@@ -300,7 +300,7 @@ class ReservationCancelledEmailTemplateTesterForm(
 
     def to_context(self) -> EmailContext:
         return get_context_for_reservation_cancelled(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             cancel_reason=self.cleaned_data["cancel_reason"],
             price=self.cleaned_data["price"],
@@ -324,7 +324,7 @@ class ReservationConfirmedEmailTemplateTesterForm(
 
     def to_context(self) -> EmailContext:
         return get_context_for_reservation_confirmed(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             price=self.cleaned_data["price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
@@ -347,7 +347,7 @@ class ReservationModifiedEmailTemplateTesterForm(
 
     def to_context(self) -> EmailContext:
         return get_context_for_reservation_modified(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             price=self.cleaned_data["price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
@@ -372,7 +372,7 @@ class ReservationRejectedEmailTemplateTesterForm(
 
     def to_context(self) -> EmailContext:
         return get_context_for_reservation_rejected(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             rejection_reason=self.cleaned_data["rejection_reason"],
             reservation_id=self.cleaned_data["reservation_id"],
@@ -397,7 +397,7 @@ class ReservationRequiresHandlingEmailTemplateTesterForm(
 
     def to_context(self) -> EmailContext:
         return get_context_for_reservation_requires_handling(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             price=self.cleaned_data["price"],
             subsidised_price=self.cleaned_data["subsidised_price"],
@@ -424,7 +424,7 @@ class ReservationRequiresPaymentEmailTemplateTesterForm(
 
     def to_context(self) -> EmailContext:
         return get_context_for_reservation_requires_payment(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             price=self.cleaned_data["price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
@@ -446,7 +446,7 @@ class SeasonalReservationCancelledSingleTemplateTesterForm(ReservationBaseForm):
 
     def to_context(self) -> EmailContext:
         return get_context_for_seasonal_reservation_cancelled_single(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             cancel_reason=self.cleaned_data["cancel_reason"],
         )
@@ -460,7 +460,7 @@ class SeasonalReservationModifiedSeriesTemplateTesterForm(EmailRecipientFormMixi
 
     def to_context(self) -> EmailContext:
         return get_context_for_seasonal_reservation_modified_series(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             weekday_value=self.cleaned_data["weekday_value"],
             time_value=self.cleaned_data["time_value"],
@@ -480,7 +480,7 @@ class SeasonalReservationModifiedSingleTemplateTesterForm(ReservationBaseForm):
 
     def to_context(self) -> EmailContext:
         return get_context_for_seasonal_reservation_cancelled_single(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
         )
 
@@ -494,7 +494,7 @@ class SeasonalReservationRejectedSeriesTemplateTesterForm(EmailRecipientFormMixi
 
     def to_context(self) -> EmailContext:
         return get_context_for_seasonal_reservation_rejected_series(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             weekday_value=self.cleaned_data["weekday_value"],
             time_value=self.cleaned_data["time_value"],
@@ -516,7 +516,7 @@ class SeasonalReservationRejectedSingleTemplateTesterForm(ReservationBaseForm):
 
     def to_context(self) -> EmailContext:
         return get_context_for_seasonal_reservation_rejected_single(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             rejection_reason=self.cleaned_data["rejection_reason"],
         )
@@ -538,7 +538,7 @@ class StaffNotificationReservationMadeEmailTemplateTesterForm(ReservationBaseFor
 
     def to_context(self) -> EmailContext:
         return get_context_for_staff_notification_reservation_made(
-            **super().get_context_params(),
+            **self.get_context_params(),
             reservee_name=self.cleaned_data["reservee_name"],
             reservation_name=self.cleaned_data["reservation_name"],
             reservation_id=self.cleaned_data["reservation_id"],
@@ -558,7 +558,7 @@ class StaffNotificationReservationRequiresHandlingEmailTemplateTesterForm(Reserv
 
     def to_context(self) -> EmailContext:
         return get_context_for_staff_notification_reservation_requires_handling(
-            **super().get_context_params(),
+            **self.get_context_params(),
             reservee_name=self.cleaned_data["reservee_name"],
             reservation_name=self.cleaned_data["reservation_name"],
             reservation_id=self.cleaned_data["reservation_id"],
@@ -572,7 +572,7 @@ class StaffNotificationApplicationSectionCancelledTemplateTesterForm(EmailRecipi
 
     def to_context(self) -> EmailContext:
         return get_context_for_application_section_cancelled(
-            **super().get_context_params(),
+            **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             application_section_name=self.cleaned_data["application_section_name"],
             application_round_name=self.cleaned_data["application_round_name"],
