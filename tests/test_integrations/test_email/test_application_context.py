@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from freezegun import freeze_time
 
+from tilavarauspalvelu.enums import WeekdayChoice
 from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
@@ -12,6 +13,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
 from tilavarauspalvelu.integrations.email.template_context.application import (
     get_context_for_staff_notification_application_section_cancelled,
 )
+from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
 
 from tests.helpers import TranslationsFromPOFiles
 from tests.test_integrations.test_email.helpers import (
@@ -367,6 +369,18 @@ def test_get_context_for_staff_notification_application_section_cancelled__en():
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
             language="en",
+            cancelled_reservation_series=[
+                {
+                    "weekday": WeekdayChoice.MONDAY.label,
+                    "time": "13:00-15:00",
+                    "url": get_staff_reservations_ext_link(reservation_id=1234),
+                },
+                {
+                    "weekday": WeekdayChoice.TUESDAY.label,
+                    "time": "21:00-22:00",
+                    "url": get_staff_reservations_ext_link(reservation_id=5678),
+                },
+            ],
         )
 
     assert context == {
@@ -407,6 +421,18 @@ def test_get_context_for_staff_notification_application_section_cancelled__fi():
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
             language="fi",
+            cancelled_reservation_series=[
+                {
+                    "weekday": WeekdayChoice.MONDAY.label,
+                    "time": "13:00-15:00",
+                    "url": get_staff_reservations_ext_link(reservation_id=1234),
+                },
+                {
+                    "weekday": WeekdayChoice.TUESDAY.label,
+                    "time": "21:00-22:00",
+                    "url": get_staff_reservations_ext_link(reservation_id=5678),
+                },
+            ],
         )
 
     assert context == {
@@ -445,6 +471,18 @@ def test_get_context_for_staff_notification_application_section_cancelled_sv():
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
             language="sv",
+            cancelled_reservation_series=[
+                {
+                    "weekday": WeekdayChoice.MONDAY.label,
+                    "time": "13:00-15:00",
+                    "url": get_staff_reservations_ext_link(reservation_id=1234),
+                },
+                {
+                    "weekday": WeekdayChoice.TUESDAY.label,
+                    "time": "21:00-22:00",
+                    "url": get_staff_reservations_ext_link(reservation_id=5678),
+                },
+            ],
         )
 
     assert context == {

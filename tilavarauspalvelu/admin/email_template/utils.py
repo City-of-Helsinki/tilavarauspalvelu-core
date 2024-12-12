@@ -4,7 +4,7 @@ import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.enums import EmailType, WeekdayChoice
 from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
@@ -30,6 +30,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
 from tilavarauspalvelu.integrations.email.template_context.application import (
     get_context_for_staff_notification_application_section_cancelled,
 )
+from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
@@ -65,6 +66,21 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
     time_value = kwargs.get("time_value", "13:00-15:00")
     application_section_name = kwargs.get("application_section_name", "[HAKEMUKSEN OSAN NIMI]")
     application_round_name = kwargs.get("application_round_name", "[KAUSIVARAUSKIERROKSEN NIMI]")
+    cancelled_reservation_series = kwargs.get(
+        "cancelled_reservation_series",
+        [
+            {
+                "weekday": WeekdayChoice.MONDAY.label,
+                "time": "13:00-15:00",
+                "url": get_staff_reservations_ext_link(reservation_id=1234),
+            },
+            {
+                "weekday": WeekdayChoice.TUESDAY.label,
+                "time": "21:00-22:00",
+                "url": get_staff_reservations_ext_link(reservation_id=5678),
+            },
+        ],
+    )
 
     match email_type:
         # Application ##################################################################################################
@@ -258,6 +274,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 application_section_name=application_section_name,
                 application_round_name=application_round_name,
                 cancel_reason=cancel_reason,
+                cancelled_reservation_series=cancelled_reservation_series,
                 language=language,
             )
         case EmailType.STAFF_NOTIFICATION_RESERVATION_MADE:

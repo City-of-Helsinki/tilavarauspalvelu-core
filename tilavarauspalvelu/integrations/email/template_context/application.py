@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any, overload
 
 from django.utils.translation import pgettext
 
-from tilavarauspalvelu.enums import WeekdayChoice
 from tilavarauspalvelu.models import RecurringReservation
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 
@@ -171,6 +170,7 @@ def get_context_for_staff_notification_application_section_cancelled(
     cancel_reason: str,
     application_section_name: str,
     application_round_name: str,
+    cancelled_reservation_series: list[dict[str, str]],
 ) -> EmailContext: ...
 
 
@@ -203,19 +203,6 @@ def get_context_for_staff_notification_application_section_cancelled(
             "cancelled_reservation_series": reservation_series_data,
             **params_for_application_section_info(application_section=application_section, language=language),
         }
-    else:
-        data["cancelled_reservation_series"] = [
-            {
-                "weekday": WeekdayChoice.MONDAY.label,
-                "time": "13:00-15:00",
-                "url": get_staff_reservations_ext_link(reservation_id=1234),
-            },
-            {
-                "weekday": WeekdayChoice.TUESDAY.label,
-                "time": "21:00-22:00",
-                "url": get_staff_reservations_ext_link(reservation_id=5678),
-            },
-        ]
 
     return {
         "title": pgettext("Email", "The customer has canceled the seasonal booking"),

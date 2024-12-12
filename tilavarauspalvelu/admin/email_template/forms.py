@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Self
 
 from django import forms
 
-from tilavarauspalvelu.enums import EmailType, Language
+from tilavarauspalvelu.enums import EmailType, Language, WeekdayChoice
 from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
@@ -28,6 +28,10 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_staff_notification_reservation_requires_handling,
     get_context_for_user_anonymization,
 )
+from tilavarauspalvelu.integrations.email.template_context.application import (
+    get_context_for_staff_notification_application_section_cancelled,
+)
+from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
 from tilavarauspalvelu.translation import get_attr_by_language
 from utils.date_utils import local_date
 
@@ -525,6 +529,33 @@ class SeasonalReservationRejectedSingleTemplateTesterForm(ReservationBaseForm):
 # Staff ################################################################################################################
 
 
+class StaffNotificationApplicationSectionCancelledTemplateTesterForm(EmailRecipientFormMixin, BaseEmailTemplateForm):
+    application_section_name = forms.CharField(initial="[HAKEMUKSEN OSAN NIMI]")
+    application_round_name = forms.CharField(initial="[KAUSIVARAUSKIERROKSEN NIMI]")
+    cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
+
+    def to_context(self) -> EmailContext:
+        return get_context_for_staff_notification_application_section_cancelled(
+            **self.get_context_params(),
+            email_recipient_name=self.cleaned_data["email_recipient_name"],
+            application_section_name=self.cleaned_data["application_section_name"],
+            application_round_name=self.cleaned_data["application_round_name"],
+            cancel_reason=self.cleaned_data["cancel_reason"],
+            cancelled_reservation_series=[  # Hard to enter in a form, so we just hardcode these.
+                {
+                    "weekday": WeekdayChoice.MONDAY.label,
+                    "time": "13:00-15:00",
+                    "url": get_staff_reservations_ext_link(reservation_id=1234),
+                },
+                {
+                    "weekday": WeekdayChoice.TUESDAY.label,
+                    "time": "21:00-22:00",
+                    "url": get_staff_reservations_ext_link(reservation_id=5678),
+                },
+            ],
+        )
+
+
 class StaffNotificationReservationMadeEmailTemplateTesterForm(ReservationBaseForm):
     reservation_name = forms.CharField(initial="[VARAUKSEN NIMI]", widget=text_widget)
     reservee_name = forms.CharField(initial="[VARAAJAN NIMI]", widget=text_widget)
@@ -562,19 +593,4 @@ class StaffNotificationReservationRequiresHandlingEmailTemplateTesterForm(Reserv
             reservee_name=self.cleaned_data["reservee_name"],
             reservation_name=self.cleaned_data["reservation_name"],
             reservation_id=self.cleaned_data["reservation_id"],
-        )
-
-
-class StaffNotificationApplicationSectionCancelledTemplateTesterForm(EmailRecipientFormMixin, BaseEmailTemplateForm):
-    application_section_name = forms.CharField(initial="[HAKEMUKSEN OSAN NIMI]")
-    application_round_name = forms.CharField(initial="[KAUSIVARAUSKIERROKSEN NIMI]")
-    cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
-
-    def to_context(self) -> EmailContext:
-        return get_context_for_application_section_cancelled(
-            **self.get_context_params(),
-            email_recipient_name=self.cleaned_data["email_recipient_name"],
-            application_section_name=self.cleaned_data["application_section_name"],
-            application_round_name=self.cleaned_data["application_round_name"],
-            cancel_reason=self.cleaned_data["cancel_reason"],
         )
