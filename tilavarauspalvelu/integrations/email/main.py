@@ -473,8 +473,6 @@ class EmailService:
             return
         if reservation.type != ReservationTypeChoice.SEASONAL:
             return
-        if reservation_series.actions.get_application_section() is None:
-            return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
         if not recipients:
@@ -498,12 +496,14 @@ class EmailService:
         *,
         language: Lang | None = None,
     ) -> None:
+        # Do not send the email, if the reservation series not attached to an allocated time slot.
+        if reservation_series.allocated_time_slot is None:
+            return
+
         reservation: Reservation | None = reservation_series.reservations.last()
         if reservation is None:
             return
         if reservation.type != ReservationTypeChoice.SEASONAL:
-            return
-        if reservation_series.actions.get_application_section() is None:
             return
 
         recipients = get_reservation_email_recipients(reservation=reservation)
