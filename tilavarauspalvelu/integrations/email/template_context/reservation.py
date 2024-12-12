@@ -632,10 +632,10 @@ def get_context_for_seasonal_reservation_modified_series(
     **data: Any,
 ) -> EmailContext:
     if reservation_series is not None:
-        section = reservation_series.actions.get_application_section()
+        section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
 
         data: dict[str, Any] = {
-            "email_recipient_name": reservation_series.actions.get_email_reservee_name(),
+            "email_recipient_name": section.application.applicant,
             **params_for_reservation_series_info(reservation_series=reservation_series),
             **params_for_application_section_info(application_section=section, language=language),
         }
@@ -739,11 +739,11 @@ def get_context_for_seasonal_reservation_rejected_series(
     **data: Any,
 ) -> EmailContext:
     if reservation_series is not None:
-        section = reservation_series.actions.get_application_section()
+        section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
         reservation = reservation_series.reservations.first()
 
         data: dict[str, Any] = {
-            "email_recipient_name": reservation_series.actions.get_email_reservee_name(),
+            "email_recipient_name": section.application.applicant,
             "rejection_reason": get_attr_by_language(reservation.deny_reason, "reason", language),
             **params_for_reservation_series_info(reservation_series=reservation_series),
             **params_for_application_section_info(application_section=section, language=language),
