@@ -222,13 +222,15 @@ def test_email_service__send_application_received_email__no_recipients(outbox):
 @override_settings(SEND_EMAILS=True)
 @freeze_time("2024-01-01")
 def test_email_service__send_application_section_cancelled_email(outbox):
-    application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
+    application = ApplicationFactory.create_in_status_results_sent(
+        user__email="user@email.com",
+        contact_person__email="contact@email.com",
+    )
     application_section = application.application_sections.first()
 
     create_reservation_series(
         user=application_section.application.user,
         allocated_time_slot__reservation_unit_option__application_section=application_section,
-        reservations__reservee_email="reservee@email.com",
     )
 
     EmailService.send_application_section_cancelled(application_section=application_section)
@@ -236,7 +238,7 @@ def test_email_service__send_application_section_cancelled_email(outbox):
     assert len(outbox) == 1
 
     assert outbox[0].subject == "Your seasonal booking has been cancelled"
-    assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
+    assert sorted(outbox[0].bcc) == ["contact@email.com", "user@email.com"]
 
 
 @override_settings(SEND_EMAILS=True)
@@ -1110,10 +1112,10 @@ def test_email_service__send_seasonal_reservation_cancelled_single(outbox):
 @freeze_time("2024-01-01")
 def test_email_service__send_seasonal_reservation_modified_series(outbox):
     reservation_series = create_reservation_series(
-        user__email="user@email.com",
         reservations__type=ReservationTypeChoice.SEASONAL,
-        reservations__reservee_email="reservee@email.com",
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        allocated_time_slot__reservation_unit_option__application_section__application__user__email="user@email.com",
+        allocated_time_slot__reservation_unit_option__application_section__application__contact_person__email="contact@email.com",
     )
 
     EmailService.send_seasonal_reservation_modified_series_email(reservation_series=reservation_series)
@@ -1121,7 +1123,7 @@ def test_email_service__send_seasonal_reservation_modified_series(outbox):
     assert len(outbox) == 1
 
     assert outbox[0].subject == "The time of the space reservation included in your seasonal booking has changed"
-    assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
+    assert sorted(outbox[0].bcc) == ["contact@email.com", "user@email.com"]
 
 
 @override_settings(SEND_EMAILS=True)
@@ -1170,10 +1172,10 @@ def test_email_service__send_seasonal_reservation_modified_single(outbox):
 @freeze_time("2024-01-01")
 def test_email_service__send_seasonal_reservation_rejected_series(outbox):
     reservation_series = create_reservation_series(
-        user__email="user@email.com",
         reservations__type=ReservationTypeChoice.SEASONAL,
-        reservations__reservee_email="reservee@email.com",
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+        allocated_time_slot__reservation_unit_option__application_section__application__user__email="user@email.com",
+        allocated_time_slot__reservation_unit_option__application_section__application__contact_person__email="contact@email.com",
     )
 
     EmailService.send_seasonal_reservation_rejected_series_email(reservation_series=reservation_series)
@@ -1181,7 +1183,7 @@ def test_email_service__send_seasonal_reservation_rejected_series(outbox):
     assert len(outbox) == 1
 
     assert outbox[0].subject == "Your seasonal booking has been cancelled"
-    assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
+    assert sorted(outbox[0].bcc) == ["contact@email.com", "user@email.com"]
 
 
 @override_settings(SEND_EMAILS=True)
