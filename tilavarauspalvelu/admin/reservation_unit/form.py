@@ -54,6 +54,9 @@ class ReservationUnitAdminForm(forms.ModelForm):
         widgets = {
             "description": TinyMCE(),
             "terms_of_use": TinyMCE(),
+            "reservation_pending_instructions": TinyMCE(),
+            "reservation_confirmed_instructions": TinyMCE(),
+            "reservation_cancelled_instructions": TinyMCE(),
         }
         labels = {
             "sku": _("SKU"),
