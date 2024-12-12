@@ -752,7 +752,7 @@ def get_context_for_seasonal_reservation_rejected_series(
     return {
         "title": pgettext("Email", "Your seasonal booking has been cancelled"),
         "text_reservation_rejected": pgettext(
-            "Email", "All space reservations included in your seasonal booking have been cancelled"
+            "Email", "The space reservation included in your seasonal booking has been cancelled"
         ),
         "rejection_reason_label": pgettext("Email", "Reason"),
         "rejection_reason": data["rejection_reason"],

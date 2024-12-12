@@ -678,7 +678,7 @@ def test_render_seasonal_reservation_rejected_series__text():
         """
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
-        All space reservations included in your seasonal booking have been cancelled.
+        The space reservation included in your seasonal booking has been cancelled.
         Reason: [HYLKÄYKSEN SYY]
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
