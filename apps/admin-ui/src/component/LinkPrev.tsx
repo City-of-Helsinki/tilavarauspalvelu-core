@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 const StyledLink = styled(Link)`
   display: inline-flex;
   font-size: var(--fontsize-body-m);
-  color: var(--tilavaraus-admin-content-text-color);
+  color: var(--color-black-90);
   padding-right: var(--spacing-s);
   text-decoration: none;
   user-select: none;

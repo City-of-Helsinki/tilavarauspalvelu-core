@@ -22,6 +22,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResourceEditorFields } from "./EditForm";
 import { DialogActionsButtons } from "@/styles/util";
+import { fontMedium } from "common";
+import { Flex } from "common/styles/util";
 
 interface IProps {
   unit: UnitQuery["unit"];
@@ -30,14 +32,14 @@ interface IProps {
   refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
 }
 
-const UnitInfo = styled.div`
+const UnitInfo = styled(Flex).attrs({
+  $direction: "row",
+})`
   margin: var(--spacing-m) 0;
-  display: flex;
-  gap: var(--spacing-m);
 `;
 
 const Address = styled.span`
-  font-family: var(--tilavaraus-admin-font-bold);
+  ${fontMedium}
 `;
 
 export function NewResourceModal({
@@ -85,7 +87,6 @@ export function NewResourceModal({
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <CustomDialogHeader
-        id="dialog-title"
         title={t("ResourceModal.modalTitle")}
         close={closeModal}
       />

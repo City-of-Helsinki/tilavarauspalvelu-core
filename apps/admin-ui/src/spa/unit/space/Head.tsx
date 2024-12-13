@@ -7,7 +7,8 @@ import { breakpoints } from "common/src/common/style";
 import type { SpaceQuery } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import { getUnitUrl } from "@/common/urls";
-import { H1 } from "common";
+import { fontMedium, H1 } from "common";
+import { Flex } from "common/styles/util";
 
 interface IProps {
   title: string;
@@ -31,12 +32,12 @@ const Props = styled.div`
   }
 `;
 
-const Prop = styled.div<{ $disabled: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2-xs);
-  font-family: var(--tilavaraus-admin-font-medium);
-  font-weight: 500;
+const Prop = styled(Flex).attrs({
+  $direction: "row",
+  $alignItems: "center",
+  $gap: "2-xs",
+})<{ $disabled: boolean }>`
+  ${fontMedium}
   margin-bottom: var(--spacing-xs);
 
   ${({ $disabled }) => $disabled && "opacity: 0.4;"}

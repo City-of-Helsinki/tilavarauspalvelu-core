@@ -1,21 +1,6 @@
 :root {
-  --tilavaraus-admin-brand: #00005e;
-  --tilavaraus-admin-blue: var(--color-bus);
-  --tilavaraus-admin-blue-dark: #040091;
-  --tilavaraus-admin-status-not-handled: #0064b3;
-  --tilavaraus-admin-header-background-color: var(--tilavaraus-admin-brand);
-  --tilavaraus-admin-header-color: white;
-  --tilavaraus-admin-background-color: white;
-  --tilavaraus-admin-content-text-color: #1a1a1a;
-  --gray-light: #f7f7f8;
-  --tilavaraus-admin-gray: #efeff0;
-  --tilavaraus-admin-gray-darker: #f0f1f4;
-  --tilavaraus-ui-gray: var(--color-black-40);
   --tilavaraus-admin-handling-count-color: #ff8003;
-  /* TODO remove these variables and use the common ones directly */
-  --tilavaraus-admin-font: var(--font-regular);
-  --tilavaraus-admin-font-medium: var(--font-medium);
-  --tilavaraus-admin-font-bold: var(--font-bold);
+  --helper-color-invalid: #b01038;
 
   --tilavaraus-admin-stack-button-stripe: 799; /* one under hds dialog backdrop */
   --tilavaraus-admin-stack-notification: 801;
@@ -30,8 +15,6 @@
 
   --tilavaraus-calendar-selected: var(--color-bus);
   --tilavaraus-calendar-selected-secondary: #ffe977;
-
-  --helper-color-invalid: #b01038;
 
   /* button like links */
   --background-color-hover: var(--color-black-5);

@@ -1,58 +1,38 @@
-import React, { useEffect, useState } from "react";
-
+import React from "react";
 import { IconCross } from "hds-react";
 import styled from "styled-components";
+import { H4 } from "common";
+import { Flex } from "common/styles/util";
 
-const Title = styled.h3`
-  :focus {
-    border: 2px solid var(--color-coat-of-arms);
-  }
-`;
-
-const Container = styled.div`
-  display: flex;
-  margin: 0 var(--spacing-l);
+const Container = styled(Flex).attrs({
+  $direction: "row",
+  $alignItems: "center",
+  $gap: "var(--spacing-s)",
+  $justifyContent: "space-between",
+})`
+  padding: 0 var(--spacing-l);
 `;
 
 const Button = styled.button`
-  margin-left: auto;
   border: 0;
   background-color: transparent;
   cursor: pointer;
 `;
 
-const Extras = styled.div`
-  margin-left: auto;
-`;
-
 // Why? The default DialogHeader focuses the title every time the dialog is rendered.
-export const CustomDialogHeader = ({
-  id,
+export function CustomDialogHeader({
   title,
   extras,
   close = () => null,
 }: {
-  id: string;
   title: string;
   extras?: JSX.Element;
   close: () => void;
-}): JSX.Element => {
-  const [state, set] = useState(false);
-  const titleRef = React.createRef<HTMLHeadingElement>();
-
-  useEffect(() => {
-    if (!state && titleRef.current) {
-      titleRef.current.focus();
-      set(true);
-    }
-  }, [state, titleRef]);
-
+}): JSX.Element {
   return (
     <Container>
-      <Title id={id} tabIndex={-1} ref={titleRef}>
-        {title}
-      </Title>
-      {extras ? <Extras>{extras}</Extras> : <div />}
+      <H4 as="h2">{title}</H4>
+      {extras ? <div>{extras}</div> : null}
       <Button
         style={{ paddingRight: 0 }}
         type="button"
@@ -63,6 +43,6 @@ export const CustomDialogHeader = ({
       </Button>
     </Container>
   );
-};
+}
 
 CustomDialogHeader.componentName = "DialogHeader";

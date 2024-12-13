@@ -4,7 +4,19 @@ import { Link } from "react-router-dom";
 import { breakpoints, fontMedium } from "common";
 
 export const TableLink = styled(Link)`
+  --focus-ring-color: var(--color-coat-of-arms);
+  /* reserve space for focus ring */
+  border: 2px solid transparent;
+  padding: 0.25rem;
+  text-decoration: underline;
   color: black;
+
+  transition: border 0.2s ease-in-out;
+  :focus,
+  :hover {
+    outline: none;
+    border: 2px solid var(--focus-ring-color);
+  }
 `;
 
 // NOTE not using IconButton because of hover effect

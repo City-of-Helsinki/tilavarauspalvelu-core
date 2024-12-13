@@ -53,7 +53,7 @@ const EmptyContainer = styled(Flex).attrs({
   $alignItems: "center",
   $justifyContent: "center",
 })`
-  background-color: var(--tilavaraus-admin-gray);
+  background-color: var(--color-silver-medium-light);
   min-height: 20rem;
 `;
 

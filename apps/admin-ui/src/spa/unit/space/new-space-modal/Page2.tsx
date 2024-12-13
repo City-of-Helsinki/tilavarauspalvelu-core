@@ -43,7 +43,6 @@ export function Page2({
   return (
     <>
       <CustomDialogHeader
-        id="dialog-title"
         title={t(
           hasFixedParent
             ? "SpaceModal.page2.subSpaceModalTitle"

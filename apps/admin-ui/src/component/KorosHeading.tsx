@@ -12,7 +12,7 @@ interface IProps {
 }
 
 const Wrapper = styled.div<{ $image?: string }>`
-  --fill-color: var(--tilavaraus-admin-header-background-color);
+  --fill-color: var(--color-bus-dark);
   --background-color: var(--color-white);
 
   display: flex;

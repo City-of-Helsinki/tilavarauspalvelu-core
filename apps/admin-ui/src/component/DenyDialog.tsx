@@ -247,7 +247,6 @@ function DenyDialogWrapper({
     >
       <Flex>
         <CustomDialogHeader
-          id="modal-header"
           title={title ?? t("RequestedReservation.DenyDialog.title")}
           close={onClose}
         />

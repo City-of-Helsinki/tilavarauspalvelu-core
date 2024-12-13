@@ -41,7 +41,7 @@ import {
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { H1, H4, fontBold } from "common/src/common/typography";
+import { H1, H4, fontBold, fontMedium } from "common/src/common/typography";
 import { breakpoints } from "common";
 import {
   AutoGrid,
@@ -120,8 +120,7 @@ const SubAccordion = styled(Accordion)`
     flex-direction: row;
     > div {
       font-size: var(--fontsize-heading-xxs);
-      font-family: var(--tilavaraus-admin-font-medium);
-      font-weight: normal;
+      ${fontMedium}
       color: var(--color-bus);
       line-height: 1.5;
     }

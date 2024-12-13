@@ -3,7 +3,7 @@ import { Button, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { H2 } from "common/src/common/typography";
+import { H2, H3 } from "common/src/common/typography";
 import {
   useUpdateSpaceMutation,
   type SpaceUpdateMutationInput,
@@ -30,12 +30,6 @@ const Form = styled.form`
   gap: var(--spacing-m);
   flex-direction: column;
   max-width: var(--prose-width);
-`;
-
-const SubHeading = styled.div`
-  font-family: var(--tilavaraus-admin-font-bold);
-  font-size: var(--fontsize-heading-xs);
-  margin-bottom: var(--spacing-m);
 `;
 
 type Props = {
@@ -149,7 +143,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
       <Form noValidate onSubmit={handleSubmit(onSubmit)}>
         <FormErrorSummary errors={errors} />
         <section>
-          <SubHeading>{t("SpaceEditor.hierarchy")}</SubHeading>
+          <H3>{t("SpaceEditor.hierarchy")}</H3>
           <SpaceHierarchy space={data?.space} />
           <Controller
             control={control}
@@ -168,7 +162,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
           />
         </section>
         <section>
-          <SubHeading>{t("SpaceEditor.other")}</SubHeading>
+          <H3>{t("SpaceEditor.other")}</H3>
           <SpaceForm form={form} />
         </section>
         <ButtonContainer>

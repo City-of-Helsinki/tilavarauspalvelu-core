@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import type { SpaceQuery } from "@gql/gql-types";
+import { fontMedium } from "common";
 
 type Node = SpaceQuery["space"];
 type Props = {
@@ -8,8 +9,8 @@ type Props = {
 };
 
 const Tree = styled.div`
+  ${fontMedium}
   font-size: var(--fontsize-heading-m);
-  font-family: var(--tilavaraus-admin-font-bold);
   margin-bottom: var(--spacing-xs);
 `;
 

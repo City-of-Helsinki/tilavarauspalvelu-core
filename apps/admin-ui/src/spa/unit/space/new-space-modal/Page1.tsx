@@ -10,12 +10,12 @@ import {
   Name,
   Parent,
   StyledTag,
-  Title,
   UnitInfo,
 } from "./modules/newSpaceModal";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { SpaceUpdateForm } from "../SpaceForm";
 import { DialogActionsButtons } from "@/styles/util";
+import { H4 } from "common";
 
 export function Page1({
   unit,
@@ -40,7 +40,6 @@ export function Page1({
   return (
     <>
       <CustomDialogHeader
-        id="dialog-title"
         extras={<StyledTag>{t("SpaceModal.phase")} 1/2</StyledTag>}
         title={t(
           hasFixedParent
@@ -63,7 +62,7 @@ export function Page1({
             <Address>{parseAddress(unit?.location)}</Address>
           ) : null}
         </UnitInfo>
-        {!hasFixedParent ? <Title>{t("SpaceModal.page1.title")}</Title> : null}
+        {!hasFixedParent ? <H4>{t("SpaceModal.page1.title")}</H4> : null}
         {!hasFixedParent ? (
           <Controller
             control={control}

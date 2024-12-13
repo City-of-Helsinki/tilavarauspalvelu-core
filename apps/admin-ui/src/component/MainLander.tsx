@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { signIn } from "common/src/browserHelpers";
 import { Button, IconArrowRight, IconGroup } from "hds-react";
-import { H2 } from "common/src/common/typography";
+import { fontBold, H2 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { HERO_IMAGE_URL } from "@/common/const";
 import { KorosHeading, Heading } from "./KorosHeading";
@@ -18,9 +18,8 @@ const LoginBtn = styled(Button).attrs({
     "--color-focus": "var(--color-black)",
   } as React.CSSProperties,
 })`
-  font-family: var(--tilavaraus-admin-font-bold);
+  ${fontBold}
   font-size: var(--fontsize-heading-l);
-  font-weight: 700;
   margin-top: var(--spacing-m);
   padding: var(--spacing-xs) var(--spacing-m) var(--spacing-xs) var(--spacing-l);
   transform: scale(0.5);
