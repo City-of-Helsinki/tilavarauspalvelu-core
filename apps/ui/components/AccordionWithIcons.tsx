@@ -1,6 +1,8 @@
 import { breakpoints } from "common";
+import { toggleButtonCss } from "common/styles/buttonCss";
+import { truncatedText } from "common/styles/cssFragments";
 import { Flex } from "common/styles/util";
-import { Button, IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
+import { IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 
@@ -80,9 +82,7 @@ const IconLabel = styled(Flex).attrs({
   min-width: 0;
   max-width: 100%;
   span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    ${truncatedText}
   }
   span:last-child {
     flex-shrink: 0;
@@ -95,6 +95,10 @@ const IconLabel = styled(Flex).attrs({
 
 const Content = styled.div<{ $open: boolean }>`
   display: ${({ $open }) => ($open ? "block" : "none")};
+`;
+
+const ToggleButton = styled.button`
+  ${toggleButtonCss}
 `;
 
 /// Stylistically different from regular Accordion
@@ -136,23 +140,18 @@ export function AccordionWithIcons({
           ))}
         </IconListWrapper>
         <ButtonListWrapper>
-          <Button
-            key="toggle"
+          <ToggleButton
             onClick={handleToggle}
-            variant="supplementary"
-            theme="black"
             // we are hiding the text on mobile
             aria-label={isOpen ? t("common:close") : t("common:show")}
-            iconRight={
-              isOpen ? (
-                <IconAngleUp aria-hidden />
-              ) : (
-                <IconAngleDown aria-hidden />
-              )
-            }
           >
+            {isOpen ? (
+              <IconAngleUp aria-hidden />
+            ) : (
+              <IconAngleDown aria-hidden />
+            )}
             {isOpen ? t("common:close") : t("common:show")}
-          </Button>
+          </ToggleButton>
         </ButtonListWrapper>
       </ClosedAccordionWrapper>
       <Content $open={isOpen}>{children}</Content>

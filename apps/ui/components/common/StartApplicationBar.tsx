@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import ClientOnly from "common/src/ClientOnly";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
-import { truncatedText } from "@/styles/util";
 import { useRouter } from "next/router";
 import {
   ApplicationCreateMutationInput,
@@ -14,6 +13,7 @@ import {
 import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import { Flex, NoWrap } from "common/styles/util";
+import { truncatedText } from "common/styles/cssFragments";
 
 type Props = {
   count: number;

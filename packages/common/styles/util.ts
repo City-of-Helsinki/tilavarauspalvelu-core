@@ -81,6 +81,7 @@ export const Flex = styled.div<{
     $marginTop ? `var(--spacing-${$marginTop})` : "0"};
   margin-bottom: ${({ $marginBottom }) =>
     $marginBottom ? `var(--spacing-${$marginBottom})` : "0"};
+  width: ${({ $width }) => ($width === "full" ? "100%" : "auto")};
 `;
 
 // TODO refactor this to have parameters for gap

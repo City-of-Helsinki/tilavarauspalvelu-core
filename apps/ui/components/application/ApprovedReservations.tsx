@@ -54,6 +54,7 @@ import {
   ReservationCancellableReason,
 } from "@/modules/reservation";
 import { formatDateTimeStrings } from "@/modules/util";
+import { PopupMenu } from "common/src/components/PopupMenu";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
@@ -76,6 +77,10 @@ export const BREAKPOINT = breakpoints.m;
 
 // Tables can't do horizontal scroll without wrapping the table in a div
 // NOTE HDS Table can't be styled so have to wrap it in an extra div.
+// NOTE hide-on-desktop and hide-on-mobile function differently
+// - hide-on-desktop hides only the element
+// - hide-on-mobile hides the whole cell
+// they are needed for different use cases (e.g. on mobile empty cells create extra gaps)
 const TableWrapper = styled.div`
   /* TODO move this to a more general TableWrapper shared with admin-ui */
   /* Mobile uses cards, so no horizontal scroll */
@@ -91,6 +96,9 @@ const TableWrapper = styled.div`
         width: max-content;
         min-width: 100%;
       }
+    }
+    .hide-on-desktop {
+      display: none;
     }
   }
 
@@ -539,16 +547,45 @@ function ReservationsTable({
       key: "date",
       headerName: t("common:dateLabel"),
       isSortable: false,
-      transform: ({ date, dayOfWeek }: ReservationsTableElem) => (
-        <span aria-label={t("common:dateLabel")}>
-          <span>{toUIDate(date)}</span>
-          <OnlyForMobile>
-            {/* span removes whitespace */}
-            <pre style={{ display: "inline" }}>{" - "}</pre>
-            <span>{dayOfWeek}</span>
-          </OnlyForMobile>
-        </span>
-      ),
+      transform: ({
+        pk,
+        date,
+        dayOfWeek,
+        isCancellableReason,
+      }: ReservationsTableElem) => {
+        const isDisabled = isCancellableReason !== "";
+        const items = [
+          {
+            name: t("common:cancel"),
+            onClick: () => handleCancel(pk),
+            disabled: isDisabled,
+          },
+        ] as const;
+
+        return (
+          <Flex
+            $direction="row"
+            $gap="2-xs"
+            $justifyContent="space-between"
+            $width="full"
+          >
+            <span aria-label={t("common:dateLabel")}>
+              <span>{toUIDate(date)}</span>
+              <OnlyForMobile>
+                {/* span removes whitespace */}
+                <pre style={{ display: "inline" }}>{" - "}</pre>
+                <span>{dayOfWeek}</span>
+              </OnlyForMobile>
+            </span>
+            {!isDisabled ? (
+              <PopupMenu
+                items={items}
+                className="popover-menu-toggle hide-on-desktop"
+              />
+            ) : null}
+          </Flex>
+        );
+      },
     },
     {
       key: "dayOfWeek",
@@ -619,7 +656,7 @@ function ReservationsTable({
               ? t("common:cancel")
               : t(`reservations:modifyTimeReasons.${isCancellableReason}`)
           }
-          // TODO on mobile this should be hidden behind a popover (for now it's hidden)
+          // Corresponding mobile menu is on the first row
           className="hide-on-mobile"
         >
           {t("common:cancel")}
