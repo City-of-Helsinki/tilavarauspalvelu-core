@@ -38,7 +38,6 @@
     "common": "workspace:*",
     "date-fns": "^4.1.0",
     "eslint-config-custom": "workspace:*",
-    "focus-trap-react": "^10.2.3",
     "form-data": "^4.0.0",
     "graphql": "^16.9.0",
     "hds-core": "^3.11.0",

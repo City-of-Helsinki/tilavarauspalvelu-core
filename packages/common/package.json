@@ -21,6 +21,7 @@
     "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
     "eslint-config-custom": "workspace:*",
+    "focus-trap-react": "^10.2.3",
     "hds-react": "^3.11.0",
     "i18next": "^23.15.1",
     "lodash": "^4.17.21",

@@ -2,17 +2,15 @@ import React, { useRef, useState } from "react";
 import { IconGroup } from "hds-react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
-import styled from "styled-components";
 import { gql, type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   type Maybe,
-  type SpaceNode,
   useDeleteSpaceMutation,
-  UnitQuery,
+  type UnitQuery,
 } from "@gql/gql-types";
-import { PopupMenu } from "@/component/PopupMenu";
+import { PopupMenu } from "common/src/components/PopupMenu";
 import Modal, { useModal as useHDSModal } from "@/component/HDSModal";
 import { NewSpaceModal } from "./space/new-space-modal/NewSpaceModal";
 import { errorToast } from "common/src/common/toast";
@@ -21,27 +19,16 @@ import { getSpaceUrl } from "@/common/urls";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styles/util";
+import { Flex } from "common/styles/util";
 
 interface IProps {
   unit: UnitQuery["unit"];
   refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
 }
 
-const Prop = styled.div`
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2-xs);
-  font-family: var(--tilavaraus-admin-font-medium);
-  font-weight: 500;
-  margin-bottom: var(--spacing-xs);
-`;
+type SpaceT = NonNullable<UnitQuery["unit"]>["spaces"][0];
 
-const MaxPersons = styled.div`
-  display: flex;
-`;
-
-function countSubSpaces(space: SpaceNode): number {
+function countSubSpaces(space: Pick<SpaceT, "pk" | "children">): number {
   return (space.children || []).reduce(
     (p, c) => p + 1 + (c ? countSubSpaces(c) : 0),
     0
@@ -52,7 +39,7 @@ type SpacesTableColumn = {
   headerName: string;
   key: string;
   isSortable: boolean;
-  transform?: (space: SpaceNode) => JSX.Element | string;
+  transform?: (space: SpaceT) => JSX.Element | string;
 };
 
 export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
@@ -99,9 +86,9 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
   const history = useNavigate();
 
   const [spaceWaitingForDelete, setSpaceWaitingForDelete] =
-    useState<SpaceNode | null>(null);
+    useState<SpaceT | null>(null);
 
-  function handleRemoveSpace(space: SpaceNode) {
+  function handleRemoveSpace(space: SpaceT) {
     if (space && space.resources && space?.resources.length > 0) {
       errorToast({
         text: t("SpaceTable.removeConflictMessage"),
@@ -112,7 +99,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     setSpaceWaitingForDelete(space);
   }
 
-  function handeAddSubSpace(space: SpaceNode) {
+  function handeAddSubSpace(space: SpaceT) {
     openWithContent(
       <NewSpaceModal
         parentSpace={space}
@@ -123,7 +110,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     );
   }
 
-  function handleEditSpace(space: SpaceNode) {
+  function handleEditSpace(space: SpaceT) {
     const link = getSpaceUrl(space.pk, unit?.pk);
     if (link === "") {
       return;
@@ -136,7 +123,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     {
       headerName: t("Unit.headings.name"),
       key: "nameFi",
-      transform: (space: SpaceNode) => {
+      transform: (space: SpaceT) => {
         const { pk, nameFi } = space;
         const link = getSpaceUrl(pk, unit?.pk);
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
@@ -151,7 +138,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     {
       headerName: t("Unit.headings.code"),
       key: "code",
-      transform: ({ code }: SpaceNode) => trim(code),
+      transform: ({ code }: SpaceT) => trim(code),
       isSortable: false,
     },
     {
@@ -166,7 +153,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     {
       headerName: t("Unit.headings.surfaceArea"),
       key: "surfaceArea",
-      transform: ({ surfaceArea }: SpaceNode) =>
+      transform: ({ surfaceArea }: SpaceT) =>
         surfaceArea ? `${surfaceArea}m²` : "",
       isSortable: false,
     },
@@ -174,13 +161,19 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
       headerName: t("Unit.headings.maxPersons"),
       key: "maxPersons",
       // TODO this is weird it creates both the max Persons and the buttons to the same cell
-      transform: (space: SpaceNode) => (
-        <MaxPersons>
+      transform: (space: SpaceT) => (
+        <Flex
+          $gap="none"
+          $direction="row"
+          $justifyContent={
+            space.maxPersons != null ? "space-between" : "flex-end"
+          }
+        >
           {space.maxPersons != null && (
-            <Prop>
+            <Flex $gap="2-xs" $alignItems="center" $direction="row">
               <IconGroup />
               {space.maxPersons}
-            </Prop>
+            </Flex>
           )}
           <PopupMenu
             items={[
@@ -198,7 +191,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
               },
             ]}
           />
-        </MaxPersons>
+        </Flex>
       ),
       isSortable: false,
     },
@@ -210,8 +203,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
 
   // TODO add if no spaces => "Unit.noSpaces"
   return (
-    // has to be a grid otherwise inner table breaks
-    <div style={{ display: "grid" }}>
+    <>
       <CustomTable
         indexKey="pk"
         rows={rows}
@@ -242,7 +234,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
           }}
         />
       )}
-    </div>
+    </>
   );
 }
 

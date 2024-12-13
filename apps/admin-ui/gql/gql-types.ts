@@ -5799,6 +5799,7 @@ export type ResourceFieldsFragment = {
   id: string;
   pk?: number | null;
   nameFi?: string | null;
+  locationType?: ResourceLocationType | null;
   space?: {
     id: string;
     nameFi?: string | null;
@@ -5817,6 +5818,7 @@ export type SpaceFieldsFragment = {
     id: string;
     pk?: number | null;
     nameFi?: string | null;
+    locationType?: ResourceLocationType | null;
     space?: {
       id: string;
       nameFi?: string | null;
@@ -6136,6 +6138,7 @@ export type UnitQuery = {
         id: string;
         pk?: number | null;
         nameFi?: string | null;
+        locationType?: ResourceLocationType | null;
         space?: {
           id: string;
           nameFi?: string | null;
@@ -8962,6 +8965,7 @@ export const ResourceFieldsFragmentDoc = gql`
     id
     pk
     nameFi
+    locationType
     space {
       id
       nameFi

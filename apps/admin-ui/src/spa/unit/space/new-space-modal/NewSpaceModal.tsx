@@ -3,7 +3,6 @@ import { type ApolloQueryResult } from "@apollo/client";
 import {
   useCreateSpaceMutation,
   type SpaceCreateMutationInput,
-  type SpaceNode,
   type UnitQuery,
 } from "@gql/gql-types";
 import { Page1 } from "./Page1";
@@ -16,10 +15,12 @@ import { useTranslation } from "react-i18next";
 
 type Props = {
   unit: UnitQuery["unit"];
-  parentSpace?: SpaceNode;
+  parentSpace?: SpaceT;
   closeModal: () => void;
   refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
 };
+
+type SpaceT = NonNullable<UnitQuery["unit"]>["spaces"][0];
 
 export function NewSpaceModal({
   unit,
@@ -54,8 +55,6 @@ export function NewSpaceModal({
       closeModal();
       refetch();
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
       errorToast({ text: t("SpaceModal.page2.saveFailed") });
     }
   }

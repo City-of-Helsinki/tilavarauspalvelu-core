@@ -3,8 +3,9 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import FocusTrap from "focus-trap-react";
 import ReactDOM from "react-dom";
+import { Flex } from "../../styles/util";
 
-interface IProps {
+interface PopupMenuProps {
   items: {
     name: string;
     disabled?: boolean;
@@ -26,16 +27,15 @@ const MenuIcon = styled(IconMenuDots)`
 `;
 
 const Container = styled.div`
-  margin-left: auto;
   position: relative;
 `;
 
-const Popup = styled.div`
+const Popup = styled(Flex).attrs({ $gap: "none" })`
   display: flex;
   flex-direction: column;
   background-color: white;
   padding: 0;
-  z-index: var(--tilavaraus-admin-stack-popup-menu);
+  z-index: var(--tilavaraus-stack-popup-menu);
 
   border: 1px solid var(--color-black-50);
   :not(:has(> button:disabled)) {
@@ -78,7 +78,7 @@ const Overlay = styled.div`
 // - the popup is forced to open on the left side so using it on the left of a page would cause an overflow
 // - the popup will expand containers the buttons are inside of (like <table>, not the cell)
 // These seem to be ok for this use case, but for others would need some more work.
-export function PopupMenu({ items }: IProps): JSX.Element {
+export function PopupMenu({ items }: PopupMenuProps): JSX.Element {
   const buttonRef = useRef<HTMLDivElement>(null);
   const firstMenuItemRef = useRef<HTMLButtonElement>(null);
 
@@ -132,7 +132,7 @@ function PopupContent({
   closePopup,
   firstMenuItemRef,
 }: {
-  items: IProps["items"];
+  items: PopupMenuProps["items"];
   closePopup: () => void;
   firstMenuItemRef: React.RefObject<HTMLButtonElement>;
 }) {

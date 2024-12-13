@@ -1691,6 +1691,10 @@ const translations: ITranslations = {
       Kuvissa näkyviltä ihmisiltä tulee olla kuvauslupa. Kuvissa ei saa näkyä turvakameroita.`,
     ],
   },
+  locationType: {
+    FIXED: ["Kiinteä"],
+    MOVABLE: ["Siirrettävä"],
+  },
   priceUnit: {
     FIXED: ["Per kerta"],
     PER_15_MINS: ["Per 15 min"],

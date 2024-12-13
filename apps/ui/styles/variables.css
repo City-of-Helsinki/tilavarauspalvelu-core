@@ -20,13 +20,13 @@
   --tilavaraus-event-initial-border: var(--color-bus);
   --tilavaraus-event-reservation-color: #f9e9e8;
   --tilavaraus-event-reservation-border: var(--color-error);
-  --tilavaraus-stack-order-start-application-bar: 20;
-  --tilavaraus-stack-order-modal: 200;
+  --tilavaraus-stack-order-modal: 1000;
   --tilavaraus-stack-order-toast: 180;
   --tilavaraus-stack-order-sticky-container: 150;
   --tilavaraus-stack-order-tooltip: 100;
   --tilavaraus-stack-order-navigation: 100;
   --tilavaraus-stack-order-calendar-gutter: 101;
+  --tilavaraus-stack-order-start-application-bar: 20;
 
   --tilavaraus-page-max-width: 1200px;
 }

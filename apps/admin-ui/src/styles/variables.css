@@ -12,30 +12,22 @@
   --tilavaraus-admin-gray-darker: #f0f1f4;
   --tilavaraus-ui-gray: var(--color-black-40);
   --tilavaraus-admin-handling-count-color: #ff8003;
-  --container-width-xxl: 1440px;
-  --container-width-small: 944px;
-  --main-menu-width: 200px;
-  --ingress-container-width: 1080px;
   /* TODO remove these variables and use the common ones directly */
   --tilavaraus-admin-font: var(--font-regular);
   --tilavaraus-admin-font-medium: var(--font-medium);
   --tilavaraus-admin-font-bold: var(--font-bold);
 
-  --tilavaraus-admin-stack-modal: 1000;
-  --tilavaraus-admin-stack-seranwrap: 900;
-  --tilavaraus-admin-stack-dialog: 800;
   --tilavaraus-admin-stack-button-stripe: 799; /* one under hds dialog backdrop */
   --tilavaraus-admin-stack-notification: 801;
-  --tilavaraus-admin-stack-sticky-header: 700;
   --tilavaraus-admin-stack-popup-menu: 501;
   --tilavaraus-admin-stack-main-menu: 500;
   --tilavaraus-admin-stack-sticky-reservation-header: 101;
-  --tilavaraus-admin-stack-sticky-filters: 5;
-  --tilavaraus-admin-stack-calendar-buffer: 2;
   --tilavaraus-admin-stack-select-over-calendar: 12;
   --tilavaraus-admin-stack-calendar-header-times: 11;
   --tilavaraus-admin-stack-calendar-header-names: 10;
   --tilavaraus-stack-order-calendar-gutter: 9;
+  --tilavaraus-admin-stack-calendar-buffer: 2;
+
   --tilavaraus-calendar-selected: var(--color-bus);
   --tilavaraus-calendar-selected-secondary: #ffe977;
 

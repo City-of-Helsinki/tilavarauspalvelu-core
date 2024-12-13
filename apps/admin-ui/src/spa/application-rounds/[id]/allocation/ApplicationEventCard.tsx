@@ -23,7 +23,7 @@ import {
   AllocatedTimeSlotNodeT,
 } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
-import { PopupMenu } from "@/component/PopupMenu";
+import { PopupMenu } from "common/src/components/PopupMenu";
 import { type ApolloQueryResult } from "@apollo/client";
 import { getApplicationUrl } from "@/common/urls";
 import { errorToast } from "common/src/common/toast";

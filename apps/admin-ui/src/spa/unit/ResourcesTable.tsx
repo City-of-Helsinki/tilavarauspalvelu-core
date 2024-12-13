@@ -1,39 +1,36 @@
 import React, { useRef, useState } from "react";
 import { trim } from "lodash";
 import { useTranslation } from "react-i18next";
-import styled from "styled-components";
 import { gql, type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   useDeleteResourceMutation,
   type Maybe,
-  type ResourceNode,
   type UnitQuery,
 } from "@gql/gql-types";
-import { PopupMenu } from "@/component/PopupMenu";
+import { PopupMenu } from "common/src/components/PopupMenu";
 import { getResourceUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
 import { errorToast, successToast } from "common/src/common/toast";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styles/util";
+import { Flex } from "common/styles/util";
 
 interface IProps {
   unit: UnitQuery["unit"];
   refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
 }
 
-const ResourceNodeContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
+type SpaceT = NonNullable<UnitQuery["unit"]>["spaces"][0];
+type ResourceT = NonNullable<SpaceT>["resources"][0];
 
 type ResourcesTableColumn = {
   headerName: string;
   key: string;
   isSortable: boolean;
-  transform?: (space: ResourceNode) => JSX.Element | string;
+  transform?: (resource: ResourceT) => JSX.Element | string;
 };
 
 export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
@@ -49,7 +46,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
   const history = useNavigate();
 
   const [resourceWaitingForDelete, setResourceWaitingForDelete] =
-    useState<ResourceNode | null>(null);
+    useState<ResourceT | null>(null);
 
   function handleEditResource(pk: Maybe<number> | undefined) {
     if (pk == null || unit?.pk == null) {
@@ -58,7 +55,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     history(getResourceUrl(pk, unit.pk));
   }
 
-  function handleDeleteResource(resource: ResourceNode) {
+  function handleDeleteResource(resource: ResourceT) {
     if (resource.pk == null) {
       return;
     }
@@ -69,7 +66,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     {
       headerName: t("ResourceTable.headings.name"),
       key: `nameFi`,
-      transform: ({ pk, nameFi }: ResourceNode) => {
+      transform: ({ pk, nameFi }: ResourceT) => {
         const link = getResourceUrl(pk, unit?.pk);
         const name = nameFi != null && nameFi.length > 0 ? nameFi : "-";
         return (
@@ -83,14 +80,14 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     {
       headerName: t("ResourceTable.headings.unitName"),
       key: "space.unit.nameFi",
-      transform: ({ space }: ResourceNode) =>
+      transform: ({ space }: ResourceT) =>
         space?.unit?.nameFi ?? t("ResourceTable.noSpace"),
       isSortable: false,
     },
     {
       headerName: "",
       key: "type",
-      transform: (resource: ResourceNode) => (
+      transform: (resource: ResourceT) => (
         <ResourceMenu
           {...resource}
           onEdit={() => handleEditResource(resource.pk)}
@@ -101,14 +98,27 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     },
   ];
 
+  const handleConfirmDelete = async () => {
+    if (resourceWaitingForDelete?.pk == null) {
+      return;
+    }
+    try {
+      await deleteResource(resourceWaitingForDelete.pk);
+      successToast({ text: t("ResourceTable.removeSuccess") });
+      setResourceWaitingForDelete(null);
+      refetch();
+    } catch (error) {
+      errorToast({ text: t("ResourceTable.removeFailed") });
+    }
+  };
+
   const rows = resources ?? [];
 
   // TODO add if no resources:
   // const hasSpaces={Boolean(unit?.spaces?.length)}
   // noResultsKey={hasSpaces ? "Unit.noResources" : "Unit.noResourcesSpaces"}
   return (
-    // has to be a grid otherwise inner table breaks
-    <div style={{ display: "grid" }}>
+    <>
       <CustomTable indexKey="pk" rows={rows} cols={cols} />
       {resourceWaitingForDelete && (
         <ConfirmationDialog
@@ -121,22 +131,10 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
           acceptLabel={t("ResourceTable.removeConfirmationAccept")}
           cancelLabel={t("ResourceTable.removeConfirmationCancel")}
           onCancel={() => setResourceWaitingForDelete(null)}
-          onAccept={async () => {
-            if (resourceWaitingForDelete.pk == null) {
-              return;
-            }
-            try {
-              await deleteResource(resourceWaitingForDelete.pk);
-              successToast({ text: t("ResourceTable.removeSuccess") });
-              setResourceWaitingForDelete(null);
-              refetch();
-            } catch (error) {
-              errorToast({ text: t("ResourceTable.removeFailed") });
-            }
-          }}
+          onAccept={handleConfirmDelete}
         />
       )}
-    </div>
+    </>
   );
 }
 
@@ -152,13 +150,20 @@ function ResourceMenu({
   locationType,
   onEdit,
   onDelete,
-}: ResourceNode & { onDelete: () => void; onEdit: () => void }) {
+}: ResourceT & { onDelete: () => void; onEdit: () => void }) {
   const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
 
+  const type = locationType ? t(`locationType.${locationType}`) : "-";
   return (
-    <ResourceNodeContainer ref={ref}>
-      <span>{locationType}</span>
+    <Flex
+      $gap="none"
+      $direction="row"
+      $alignItems="center"
+      $justifyContent="space-between"
+      ref={ref}
+    >
+      <span>{type}</span>
       <PopupMenu
         items={[
           {
@@ -171,6 +176,6 @@ function ResourceMenu({
           },
         ]}
       />
-    </ResourceNodeContainer>
+    </Flex>
   );
 }

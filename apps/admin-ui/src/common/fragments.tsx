@@ -26,6 +26,7 @@ export const RESOURCE_FRAGMENT = gql`
     id
     pk
     nameFi
+    locationType
     space {
       id
       nameFi

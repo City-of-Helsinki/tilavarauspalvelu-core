@@ -6,4 +6,5 @@
   /* the colour is not a variable in hds, but it's the visited link colour in their component */
   --link-visited-color: #551a8b;
   --spacing-none: 0;
+  --tilavaraus-stack-popup-menu: 501;
 }

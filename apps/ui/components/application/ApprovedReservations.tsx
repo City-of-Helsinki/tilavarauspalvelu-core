@@ -398,7 +398,6 @@ function ReservationUnitTable({
     },
   ];
 
-
   const getTranslation = (
     elem: ModalT | null,
     field: "name" | "reservationConfirmedInstructions"
