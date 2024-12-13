@@ -273,6 +273,8 @@ function RecurringReservationForm({
     removedReservations
   ).filter((x) => !x.isOverlapping);
 
+  const isDisabled = !isDirty || newReservationsToMake.length === 0;
+
   return (
     <FormProvider {...form}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -404,7 +406,7 @@ function RecurringReservationForm({
               type="submit"
               data-testid="recurring-reservation-form__submit-button"
               isLoading={isSubmitting}
-              disabled={!isDirty}
+              disabled={isDisabled}
             >
               {t("common.reserve")}
             </Button>

@@ -304,6 +304,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
     return <Error404 />;
   }
 
+  const isDisabled = Object.keys(errors).length > 0 || reservationsCount < 1;
+
   return (
     <>
       <LinkPrev />
@@ -402,7 +404,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
               }}
             >
               <ButtonLikeLink to="..">{t("common:cancel")}</ButtonLikeLink>
-              <Button size="small" type="submit">
+              <Button size="small" type="submit" disabled={isDisabled}>
                 {t("ReservationEditSeries.submit")}
               </Button>
             </ButtonContainer>
