@@ -29,12 +29,17 @@ const ClosedAccordionWrapper = styled.div`
   gap: var(--spacing-s);
 
   background-color: var(--color-black-10);
-  padding: var(--spacing-s);
+  padding: var(--spacing-m);
+  @media (min-width: ${breakpoints.m}) {
+    padding: var(--spacing-l);
+  }
 `;
 
 const IconListWrapper = styled.ul`
   display: grid;
   gap: var(--spacing-xs);
+  padding: 0;
+  margin: 0;
 
   grid-row: subgrid;
   grid-column: 1 / -1;

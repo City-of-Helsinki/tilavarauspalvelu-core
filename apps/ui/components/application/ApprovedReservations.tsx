@@ -329,6 +329,14 @@ type ReservationUnitTableElem = {
   time: string;
 };
 
+/// Have to asign min-height on desktop otherwise the table rows are too small
+/// can't assign it on mobile because it's card (and 44px is too much)
+const StyledLinkLikeButton = styled(LinkLikeButton)`
+  @media (min-width: ${BREAKPOINT}) {
+    min-height: 44px;
+  }
+`;
+
 function ReservationUnitTable({
   reservationUnits,
 }: {
@@ -379,20 +387,17 @@ function ReservationUnitTable({
       key: "helpLink",
       headerName: t("application:view.helpModal.title"),
       transform: ({ reservationUnit }: ReservationUnitTableElem) => (
-        <LinkLikeButton
-          onClick={() => setModal(reservationUnit)}
-          // Match the size of a small button
-          style={{ minHeight: "44px" }}
-        >
+        <StyledLinkLikeButton onClick={() => setModal(reservationUnit)}>
           <IconInfoCircle aria-hidden="true" />
           {isMobile
             ? t("application:view.helpLinkLong")
             : t("application:view.helpLink")}
-        </LinkLikeButton>
+        </StyledLinkLikeButton>
       ),
       isSortable: false,
     },
   ];
+
 
   const getTranslation = (
     elem: ModalT | null,

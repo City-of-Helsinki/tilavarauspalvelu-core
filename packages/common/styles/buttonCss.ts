@@ -68,7 +68,7 @@ export const LinkLikeButton = styled.button`
   cursor: pointer;
   font-size: var(--content-font-size);
   line-height: var(--content-line-height);
-  padding: var(--spacing-3-xs);
+  padding: 0;
   text-decoration: underline;
   &:hover {
     text-decoration: none;
