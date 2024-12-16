@@ -5459,202 +5459,6 @@ export type ApplicantFragment = {
     streetAddressFi?: string | null;
     cityFi?: string | null;
   } | null;
-  user?: {
-    id: string;
-    name?: string | null;
-    email: string;
-    pk?: number | null;
-  } | null;
-};
-
-export type ApplicationRoundFragment = {
-  id: string;
-  pk?: number | null;
-  nameFi?: string | null;
-  nameSv?: string | null;
-  nameEn?: string | null;
-  applicationPeriodBegin: string;
-  applicationPeriodEnd: string;
-  reservationPeriodBegin: string;
-  reservationPeriodEnd: string;
-  status?: ApplicationRoundStatusChoice | null;
-  applicationsCount?: number | null;
-  reservationUnitCount?: number | null;
-  statusTimestamp?: string | null;
-  reservationUnits: Array<{
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameSv?: string | null;
-    nameEn?: string | null;
-    minPersons?: number | null;
-    maxPersons?: number | null;
-    images: Array<{
-      id: string;
-      imageUrl?: string | null;
-      largeUrl?: string | null;
-      mediumUrl?: string | null;
-      smallUrl?: string | null;
-      imageType: ImageType;
-    }>;
-    unit?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameSv?: string | null;
-      nameEn?: string | null;
-    } | null;
-  }>;
-};
-
-export type ApplicationCommonFragment = {
-  id: string;
-  pk?: number | null;
-  status?: ApplicationStatusChoice | null;
-  lastModifiedDate: string;
-  applicantType?: ApplicantTypeChoice | null;
-  additionalInformation?: string | null;
-  applicationRound: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameSv?: string | null;
-    nameEn?: string | null;
-    applicationPeriodBegin: string;
-    applicationPeriodEnd: string;
-    reservationPeriodBegin: string;
-    reservationPeriodEnd: string;
-    status?: ApplicationRoundStatusChoice | null;
-    applicationsCount?: number | null;
-    reservationUnitCount?: number | null;
-    statusTimestamp?: string | null;
-    reservationUnits: Array<{
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameSv?: string | null;
-      nameEn?: string | null;
-      minPersons?: number | null;
-      maxPersons?: number | null;
-      images: Array<{
-        id: string;
-        imageUrl?: string | null;
-        largeUrl?: string | null;
-        mediumUrl?: string | null;
-        smallUrl?: string | null;
-        imageType: ImageType;
-      }>;
-      unit?: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameSv?: string | null;
-        nameEn?: string | null;
-      } | null;
-    }>;
-  };
-  applicationSections?: Array<{
-    id: string;
-    pk?: number | null;
-    name: string;
-    status?: ApplicationSectionStatusChoice | null;
-    reservationMaxDuration: number;
-    numPersons: number;
-    reservationsEndDate: string;
-    reservationsBeginDate: string;
-    appliedReservationsPerWeek: number;
-    reservationMinDuration: number;
-    suitableTimeRanges: Array<{
-      id: string;
-      pk?: number | null;
-      beginTime: string;
-      endTime: string;
-      dayOfTheWeek: Weekday;
-      priority: Priority;
-    }>;
-    purpose?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameSv?: string | null;
-      nameEn?: string | null;
-    } | null;
-    reservationUnitOptions: Array<{
-      id: string;
-      pk?: number | null;
-      preferredOrder: number;
-      reservationUnit: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-        unit?: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-          nameEn?: string | null;
-          nameSv?: string | null;
-        } | null;
-        applicationRoundTimeSlots: Array<{
-          id: string;
-          weekday: number;
-          closed: boolean;
-          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
-        }>;
-      };
-    }>;
-    ageGroup?: {
-      id: string;
-      pk?: number | null;
-      minimum: number;
-      maximum?: number | null;
-    } | null;
-  }> | null;
-  contactPerson?: {
-    id: string;
-    pk?: number | null;
-    firstName: string;
-    lastName: string;
-    email?: string | null;
-    phoneNumber?: string | null;
-  } | null;
-  organisation?: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    identifier?: string | null;
-    organisationType: OrganizationTypeChoice;
-    coreBusinessFi?: string | null;
-    yearEstablished?: number | null;
-    address?: {
-      id: string;
-      pk?: number | null;
-      postCode: string;
-      streetAddressFi?: string | null;
-      cityFi?: string | null;
-    } | null;
-  } | null;
-  homeCity?: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameEn?: string | null;
-    nameSv?: string | null;
-  } | null;
-  billingAddress?: {
-    id: string;
-    pk?: number | null;
-    postCode: string;
-    streetAddressFi?: string | null;
-    cityFi?: string | null;
-  } | null;
-  user?: {
-    id: string;
-    name?: string | null;
-    email: string;
-    pk?: number | null;
-  } | null;
 };
 
 export type ReserveeNameFieldsFragment = {
@@ -5801,103 +5605,6 @@ export const ApplicationNameFragmentDoc = gql`
     }
   }
 `;
-export const ApplicantFragmentDoc = gql`
-  fragment Applicant on ApplicationNode {
-    applicantType
-    contactPerson {
-      id
-      pk
-      firstName
-      lastName
-      email
-      phoneNumber
-    }
-    additionalInformation
-    organisation {
-      id
-      pk
-      nameFi
-      identifier
-      organisationType
-      coreBusinessFi
-      yearEstablished
-      address {
-        id
-        pk
-        postCode
-        streetAddressFi
-        cityFi
-      }
-    }
-    homeCity {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-    billingAddress {
-      id
-      pk
-      postCode
-      streetAddressFi
-      cityFi
-    }
-    user {
-      id
-      name
-      email
-      pk
-    }
-  }
-`;
-export const ImageFragmentDoc = gql`
-  fragment Image on ReservationUnitImageNode {
-    id
-    imageUrl
-    largeUrl
-    mediumUrl
-    smallUrl
-    imageType
-  }
-`;
-export const ApplicationRoundFragmentDoc = gql`
-  fragment ApplicationRound on ApplicationRoundNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
-    reservationUnits {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
-      minPersons
-      maxPersons
-      images {
-        ...Image
-      }
-      unit {
-        id
-        pk
-        nameFi
-        nameSv
-        nameEn
-      }
-    }
-    applicationPeriodBegin
-    applicationPeriodEnd
-    reservationPeriodBegin
-    reservationPeriodEnd
-    status
-    applicationsCount
-    reservationUnitCount
-    statusTimestamp
-  }
-  ${ImageFragmentDoc}
-`;
 export const ApplicationSectionDurationFragmentDoc = gql`
   fragment ApplicationSectionDuration on ApplicationSectionNode {
     reservationsEndDate
@@ -5976,23 +5683,49 @@ export const ApplicationSectionUiFragmentDoc = gql`
   }
   ${ApplicationSectionCommonFragmentDoc}
 `;
-export const ApplicationCommonFragmentDoc = gql`
-  fragment ApplicationCommon on ApplicationNode {
-    id
-    pk
-    status
-    lastModifiedDate
-    ...Applicant
-    applicationRound {
-      ...ApplicationRound
+export const ApplicantFragmentDoc = gql`
+  fragment Applicant on ApplicationNode {
+    applicantType
+    contactPerson {
+      id
+      pk
+      firstName
+      lastName
+      email
+      phoneNumber
     }
-    applicationSections {
-      ...ApplicationSectionUI
+    additionalInformation
+    organisation {
+      id
+      pk
+      nameFi
+      identifier
+      organisationType
+      coreBusinessFi
+      yearEstablished
+      address {
+        id
+        pk
+        postCode
+        streetAddressFi
+        cityFi
+      }
+    }
+    homeCity {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    billingAddress {
+      id
+      pk
+      postCode
+      streetAddressFi
+      cityFi
     }
   }
-  ${ApplicantFragmentDoc}
-  ${ApplicationRoundFragmentDoc}
-  ${ApplicationSectionUiFragmentDoc}
 `;
 export const ReserveeNameFieldsFragmentDoc = gql`
   fragment ReserveeNameFields on ReservationNode {
@@ -6058,6 +5791,16 @@ export const PricingFieldsFragmentDoc = gql`
       pk
       value
     }
+  }
+`;
+export const ImageFragmentDoc = gql`
+  fragment Image on ReservationUnitImageNode {
+    id
+    imageUrl
+    largeUrl
+    mediumUrl
+    smallUrl
+    imageType
   }
 `;
 export const LocationFieldsFragmentDoc = gql`

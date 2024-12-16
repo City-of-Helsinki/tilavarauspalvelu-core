@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { ApplicantTypeChoice, type ApplicationQuery } from "@gql/gql-types";
+import { type ApplicantFragment, ApplicantTypeChoice } from "@gql/gql-types";
 import {
   ApplicationInfoContainer,
   InfoItemContainer,
@@ -25,11 +25,13 @@ const LabelValue = ({
     </InfoItemContainer>
   );
 };
-type Node = NonNullable<ApplicationQuery["application"]>;
+
+type ApplicantT = Omit<ApplicantFragment, "homeCity" | "additionalInformation">;
+
 export function ApplicantInfoPreview({
   application,
 }: {
-  application: Node;
+  application: ApplicantT;
 }): JSX.Element {
   const { t } = useTranslation();
   const applicant = {

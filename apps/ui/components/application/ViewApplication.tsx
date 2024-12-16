@@ -2,12 +2,11 @@ import React from "react";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import {
-  type ApplicationQuery,
+  type ApplicationCommonFragment,
   ApplicationStatusChoice,
   type Maybe,
   type TermsOfUseTextFieldsFragment,
 } from "@gql/gql-types";
-import { getTranslation } from "@/modules/util";
 import { ApplicantInfoPreview } from "./ApplicantInfoPreview";
 import {
   ApplicationSection,
@@ -18,20 +17,26 @@ import {
 import { ApplicationEventList } from "./ApplicationEventList";
 import Sanitize from "../common/Sanitize";
 import TermsBox from "common/src/termsbox/TermsBox";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
-type Node = NonNullable<ApplicationQuery["application"]>;
+type ViewApplicationProps = {
+  application: ApplicationCommonFragment;
+  tos: Maybe<TermsOfUseTextFieldsFragment>;
+  acceptTermsOfUse?: boolean;
+  setAcceptTermsOfUse?: (value: boolean) => void;
+};
+
 export function ViewApplication({
   application,
   tos,
   acceptTermsOfUse,
   setAcceptTermsOfUse,
-}: {
-  application: Node;
-  tos: Maybe<TermsOfUseTextFieldsFragment>;
-  acceptTermsOfUse?: boolean;
-  setAcceptTermsOfUse?: (value: boolean) => void;
-}): JSX.Element {
-  const { t } = useTranslation();
+}: ViewApplicationProps): JSX.Element {
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
 
   const tos2 = application.applicationRound?.termsOfUse;
   const shouldShowNotification =
@@ -56,7 +61,7 @@ export function ViewApplication({
         >
           <TermsBox
             id="preview.acceptTermsOfUse"
-            body={<Sanitize html={getTranslation(tos, "text")} />}
+            body={<Sanitize html={getTranslationSafe(tos, "text", lang)} />}
           />
         </Accordion>
       )}
@@ -64,7 +69,7 @@ export function ViewApplication({
         <Accordion heading={t("application:preview.reservationUnitTerms")} open>
           <TermsBox
             id="preview.acceptServiceSpecificTerms"
-            body={<Sanitize html={getTranslation(tos2, "text")} />}
+            body={<Sanitize html={getTranslationSafe(tos2, "text", lang)} />}
             /* TODO TermsBox has accepted and checkbox we could use but for now leaving the single
              * page specific checkbox to accept all terms */
           />

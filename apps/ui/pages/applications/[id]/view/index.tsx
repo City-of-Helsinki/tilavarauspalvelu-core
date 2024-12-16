@@ -156,14 +156,6 @@ export const APPLICATION_VIEW_QUERY = gql`
   query ApplicationView($id: ID!) {
     application(id: $id) {
       ...ApplicationCommon
-      applicationRound {
-        id
-        sentDate
-        termsOfUse {
-          id
-          ...TermsOfUseFields
-        }
-      }
     }
   }
 `;

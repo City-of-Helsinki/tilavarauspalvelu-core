@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { IMAGE_FRAGMENT } from "./fragments";
 
 export const APPLICANT_NAME_FRAGMENT = gql`
   fragment ApplicationName on ApplicationNode {
@@ -139,69 +138,6 @@ export const APPLICANT_FRAGMENT = gql`
       postCode
       streetAddressFi
       cityFi
-    }
-    user {
-      id
-      name
-      email
-      pk
-    }
-  }
-`;
-
-const APPLICATION_ROUND_FRAGMENT = gql`
-  ${IMAGE_FRAGMENT}
-  fragment ApplicationRound on ApplicationRoundNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
-    reservationUnits {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
-      minPersons
-      maxPersons
-      images {
-        ...Image
-      }
-      unit {
-        id
-        pk
-        nameFi
-        nameSv
-        nameEn
-      }
-    }
-    applicationPeriodBegin
-    applicationPeriodEnd
-    reservationPeriodBegin
-    reservationPeriodEnd
-    status
-    applicationsCount
-    reservationUnitCount
-    statusTimestamp
-  }
-`;
-
-export const APPLICATION_FRAGMENT = gql`
-  ${APPLICATION_SECTION_UI_FRAGMENT}
-  ${APPLICANT_FRAGMENT}
-  ${APPLICATION_ROUND_FRAGMENT}
-  fragment ApplicationCommon on ApplicationNode {
-    id
-    pk
-    status
-    lastModifiedDate
-    ...Applicant
-    applicationRound {
-      ...ApplicationRound
-    }
-    applicationSections {
-      ...ApplicationSectionUI
     }
   }
 `;

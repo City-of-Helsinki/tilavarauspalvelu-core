@@ -8,6 +8,10 @@ export const APPLICATION_ADMIN_QUERY = gql`
     application(id: $id) {
       ...ApplicationAdmin
       workingMemo
+      user {
+        id
+        email
+      }
     }
   }
 `;

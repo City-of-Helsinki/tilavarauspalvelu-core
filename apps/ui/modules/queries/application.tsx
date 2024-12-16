@@ -100,6 +100,64 @@ export const APPLICATIONS = gql`
   }
 `;
 
+export const APPLICATION_ROUND_FRAGMENT = gql`
+  fragment ApplicationRoundForApplication on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    nameSv
+    nameEn
+    reservationUnits {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+      minPersons
+      maxPersons
+      images {
+        ...Image
+      }
+      unit {
+        id
+        pk
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+    applicationPeriodBegin
+    applicationPeriodEnd
+    reservationPeriodBegin
+    reservationPeriodEnd
+    status
+    applicationsCount
+    reservationUnitCount
+    statusTimestamp
+  }
+`;
+
+export const APPLICATION_FRAGMENT = gql`
+  fragment ApplicationCommon on ApplicationNode {
+    id
+    pk
+    status
+    lastModifiedDate
+    ...Applicant
+    applicationRound {
+      ...ApplicationRoundForApplication
+      sentDate
+      termsOfUse {
+        id
+        ...TermsOfUseFields
+      }
+    }
+    applicationSections {
+      ...ApplicationSectionUI
+    }
+  }
+`;
+
 // Commmon query for all application pages (except view)
 export const APPLICATION_QUERY = gql`
   query Application($id: ID!) {
@@ -107,14 +165,9 @@ export const APPLICATION_QUERY = gql`
       ...ApplicationCommon
       applicationRound {
         id
-        sentDate
         notesWhenApplyingFi
         notesWhenApplyingEn
         notesWhenApplyingSv
-        termsOfUse {
-          id
-          ...TermsOfUseFields
-        }
       }
     }
   }

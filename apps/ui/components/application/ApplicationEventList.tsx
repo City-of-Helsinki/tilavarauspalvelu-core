@@ -3,11 +3,12 @@ import type { TFunction } from "i18next";
 import { useTranslation } from "next-i18next";
 import {
   type AgeGroupNode,
-  type ApplicationQuery,
   type Maybe,
   type SuitableTimeRangeNode,
   Priority,
   ApplicationSectionStatusChoice,
+  type ApplicationSectionUiFragment,
+  type ApplicationCommonFragment,
 } from "@gql/gql-types";
 import { getTranslation } from "common/src/common/util";
 import { convertWeekday } from "common/src/conversion";
@@ -103,15 +104,17 @@ const InfoListItem = ({ label, value }: { label: string; value: string }) => (
   </li>
 );
 
-const SingleApplicationSection = ({
+type ApplicationSectionT = ApplicationSectionUiFragment;
+
+function SingleApplicationSection({
   applicationEvent,
   primaryTimes,
   secondaryTimes,
 }: {
-  applicationEvent: NonNullable<Node["applicationSections"]>[0];
+  applicationEvent: ApplicationSectionT;
   primaryTimes: ApplicationEventScheduleFormType[];
   secondaryTimes: ApplicationEventScheduleFormType[];
-}) => {
+}) {
   const { t } = useTranslation();
   const reservationUnits = filterNonNullable(
     applicationEvent.reservationUnitOptions
@@ -208,15 +211,16 @@ const SingleApplicationSection = ({
       </ApplicationInfoContainer>
     </ApplicationSection>
   );
-};
+}
 
 // NOTE: used by Preview and View
 // No form context unlike the edit pages, use application query result
-type Node = NonNullable<ApplicationQuery["application"]>;
+type ApplicationT = Pick<ApplicationCommonFragment, "applicationSections">;
+
 export function ApplicationEventList({
   application,
 }: {
-  application: Node;
+  application: ApplicationT;
 }): JSX.Element {
   const sections = filterNonNullable(application.applicationSections).map(
     (applicationEvent) => {
@@ -241,6 +245,7 @@ export function ApplicationEventList({
       );
     }
   );
+
   return <>{sections}</>;
 }
 
