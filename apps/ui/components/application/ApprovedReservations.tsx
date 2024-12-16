@@ -22,6 +22,7 @@ import {
   formatApiTimeInterval,
   fromMondayFirst,
   getLocalizationLang,
+  toNumber,
   type LocalizationLanguages,
 } from "common/src/helpers";
 import {
@@ -55,6 +56,7 @@ import {
 } from "@/modules/reservation";
 import { formatDateTimeStrings } from "@/modules/util";
 import { PopupMenu } from "common/src/components/PopupMenu";
+import { useSearchParams } from "next/navigation";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
@@ -236,6 +238,7 @@ function formatReservationTimes(
 
 export function ApprovedReservations({ application }: Props) {
   const { t, i18n } = useTranslation();
+  const searchParams = useSearchParams();
   const { data, loading } = useApplicationReservationsQuery({
     variables: {
       id: application.id,
@@ -243,8 +246,6 @@ export function ApprovedReservations({ application }: Props) {
     },
   });
   const { application: app } = data || {};
-
-  const lang = getLocalizationLang(i18n.language);
 
   const sections = filterNonNullable(
     app?.applicationSections?.filter((aes) => {
@@ -254,14 +255,19 @@ export function ApprovedReservations({ application }: Props) {
       return slots.length > 0;
     })
   );
-  const initiallyOpen = sections.length === 1;
+
+  const lang = getLocalizationLang(i18n.language);
+  const selectedSection = toNumber(searchParams.get("section"));
+  const hasOnlyOneSection = sections.length === 1;
+
   return (
     <Flex>
       {loading && <CenterSpinner />}
       {sections.map((aes) => (
         <AccordionWithIcons
           heading={aes.name}
-          initiallyOpen={initiallyOpen}
+          initiallyOpen={hasOnlyOneSection || selectedSection === aes.pk}
+          shouldScrollIntoView={selectedSection === aes.pk}
           headingLevel={2}
           icons={[
             {

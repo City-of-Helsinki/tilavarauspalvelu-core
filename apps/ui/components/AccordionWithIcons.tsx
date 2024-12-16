@@ -4,6 +4,7 @@ import { truncatedText } from "common/styles/cssFragments";
 import { Flex } from "common/styles/util";
 import { IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
 
 type Props = {
@@ -16,6 +17,8 @@ type Props = {
     textPostfix?: string;
     icon: React.ReactNode;
   }>;
+  id?: string;
+  shouldScrollIntoView?: boolean;
 };
 
 const Heading = styled.h2<{ as: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" }>`
@@ -111,12 +114,20 @@ export function AccordionWithIcons({
   initiallyOpen = false,
   icons = [],
   children,
+  shouldScrollIntoView,
   ...rest
 }: Props): JSX.Element {
   const { isOpen, openAccordion, closeAccordion } = useAccordion({
     initiallyOpen,
   });
   const { t } = useTranslation();
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (shouldScrollIntoView && ref.current) {
+      ref.current.scrollIntoView();
+    }
+  }, [shouldScrollIntoView]);
 
   const handleToggle = () => {
     if (isOpen) {
@@ -127,7 +138,7 @@ export function AccordionWithIcons({
   };
 
   return (
-    <div {...rest}>
+    <div {...rest} ref={ref}>
       <ClosedAccordionWrapper>
         <Heading as={`h${headingLevel}`}>{heading}</Heading>
         <IconListWrapper>

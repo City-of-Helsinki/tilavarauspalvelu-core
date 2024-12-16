@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "next-i18next";
 import { getTranslationSafe } from "common/src/common/util";
 import type { GetServerSidePropsContext } from "next";
@@ -32,6 +32,7 @@ import { H1 } from "common";
 import styled from "styled-components";
 import { useToastIfQueryParam } from "@/hooks";
 import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {
@@ -47,7 +48,6 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
   const router = useRouter();
 
   type TabOptions = "reservations" | "application";
-  const [tab, setTab] = useState<TabOptions>("reservations");
 
   useToastIfQueryParam({
     key: "deletedReservationPk",
@@ -78,9 +78,27 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
     successMessage: translateDeletedSectionMessage,
   });
 
-  const handleTabChange = (tab_: TabOptions) => {
-    setTab(tab_);
+  const searchParams = useSearchParams();
+
+  const handleRouteChange = (query: URLSearchParams) => {
+    // [id] param is not included in the URLSearchParams object but required when routing
+    if (router.query.id) {
+      query.set("id", router.query.id as string);
+    }
+    router.replace({ query: query.toString() }, undefined, {
+      shallow: true,
+      scroll: false,
+    });
   };
+
+  const handleTabChange = (tab_: TabOptions) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", tab_);
+    handleRouteChange(params);
+  };
+
+  const tab =
+    searchParams.get("tab") === "application" ? "application" : "reservations";
 
   const round = application.applicationRound;
   const lang = getLocalizationLang(i18n.language);
