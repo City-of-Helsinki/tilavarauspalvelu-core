@@ -7,6 +7,7 @@ from django.utils.translation import pgettext
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import local_date
+from utils.utils import convert_html_to_text
 
 from .common import (
     create_anchor_tag,
@@ -113,7 +114,8 @@ def get_context_for_reservation_approved(
         "title": pgettext("Email", "Your booking is confirmed"),
         "text_reservation_approved": text_reservation_approved,
         "instructions_label": pgettext("Email", "Additional information about your booking"),
-        "instructions": data["instructions"],
+        "instructions_html": data["instructions"],
+        "instructions_text": convert_html_to_text(data["instructions"]),
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -183,7 +185,8 @@ def get_context_for_reservation_cancelled(
         "cancel_reason_label": pgettext("Email", "Your reason for cancellation"),
         "cancel_reason": data["cancel_reason"],
         "instructions_label": pgettext("Email", "Additional information about cancellation"),
-        "instructions": data["instructions"],
+        "instructions_html": data["instructions"],
+        "instructions_text": convert_html_to_text(data["instructions"]),
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -248,7 +251,8 @@ def get_context_for_reservation_confirmed(
         "title": pgettext("Email", "Thank you for your booking at Varaamo"),
         "text_reservation_confirmed": pgettext("Email", "You have made a new booking"),
         "instructions_label": pgettext("Email", "Additional information about your booking"),
-        "instructions": data["instructions"],
+        "instructions_html": data["instructions"],
+        "instructions_text": convert_html_to_text(data["instructions"]),
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -314,7 +318,8 @@ def get_context_for_reservation_modified(
         "title": pgettext("Email", "Your booking has been updated"),
         "text_reservation_modified": pgettext("Email", "Your booking has been updated"),
         "instructions_label": pgettext("Email", "Additional information about your booking"),
-        "instructions": data["instructions"],
+        "instructions_html": data["instructions"],
+        "instructions_text": convert_html_to_text(data["instructions"]),
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -384,7 +389,8 @@ def get_context_for_reservation_rejected(
         "booking_number_label": pgettext("Email", "Booking number"),
         "reservation_id": str(data["reservation_id"]),
         "instructions_label": pgettext("Email", "Additional information"),
-        "instructions": data["instructions"],
+        "instructions_html": data["instructions"],
+        "instructions_text": convert_html_to_text(data["instructions"]),
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -452,7 +458,8 @@ def get_context_for_reservation_requires_handling(
             "We will contact you if further information is needed regarding your booking request.",
         ),
         "instructions_label": pgettext("Email", "Additional information about your booking"),
-        "instructions": data["instructions"],
+        "instructions_html": data["instructions"],
+        "instructions_text": convert_html_to_text(data["instructions"]),
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -529,7 +536,8 @@ def get_context_for_reservation_requires_payment(
         "pay_reservation_link_html": create_anchor_tag(link=link, text=text),
         "pay_reservation_link": f"{text}: {link}",
         "instructions_label": pgettext("Email", "Additional information about your booking"),
-        "instructions": data["instructions"],
+        "instructions_html": data["instructions"],
+        "instructions_text": convert_html_to_text(data["instructions"]),
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],

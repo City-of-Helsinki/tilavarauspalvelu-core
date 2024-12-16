@@ -4,12 +4,14 @@ import datetime
 import hashlib
 import hmac
 import operator
+import re
 import urllib.parse
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import get_language_from_request
+from html2text import html2text
 
 from utils.date_utils import local_datetime
 
@@ -184,3 +186,19 @@ def update_query_params(url: str, **params: str) -> str:
 
 def as_p_tags(texts: Iterable[str]) -> str:
     return "".join(f"<p>{p}</p>" for p in texts)
+
+
+def convert_html_to_text(html_text: str) -> str:
+    text = html2text(html_text, bodywidth=0)
+
+    # Link text and url are the same
+    # Remove angle-brackets from links `<url>` -> `url`
+    # If there is a dot after the link, add a space between the link and the dot.
+    text = re.sub(r"<(https?://[^>]+)>(\.?)", r"\1 \2", text)
+
+    # Link text and url are different
+    # Replace markdown-style links `[text](url)` with `text <url>`
+    text = re.sub(r"\[([^\]]+)\]\(((http|https)?://[^\)]+)\)", r"\1 <\2>", text)
+
+    # Remove any spaces between newline and the last newline, which is added by html2text
+    return text.replace(" \n", "\n").removesuffix("\n")
