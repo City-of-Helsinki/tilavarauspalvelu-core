@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 import pytest
 
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
@@ -11,6 +13,9 @@ from tests.factories.helsinki_profile import MyProfileDataFactory
 from tests.helpers import ResponseMock, patch_method
 
 from .helpers import profile_query
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import SessionMapping
 
 # Applied to all tests
 pytestmark = [
@@ -334,3 +339,19 @@ def test_helsinki_profile_data__query__unit_admin(graphql):
         "firstName": profile_data["verifiedPersonalInformation"]["firstName"],
         "lastName": profile_data["verifiedPersonalInformation"]["lastName"],
     }
+
+
+def test_helsinki_profile_data__query__keycloak_token_expired(graphql):
+    user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
+    application = ApplicationFactory.create(user=user)
+
+    graphql.login_with_superuser()
+    query = profile_query(application_id=application.id)
+
+    def change_session(session: SessionMapping, **kwargs: Any) -> None:
+        session["keycloak_refresh_token_expired"] = True
+
+    with patch_method(HelsinkiProfileClient.get_user_profile_info, side_effect=change_session):
+        response = graphql(query)
+
+    assert response.error_message() == "Keycloak refresh token is expired. Please log out and back in again."
