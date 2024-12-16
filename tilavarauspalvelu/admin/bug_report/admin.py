@@ -2,18 +2,21 @@ from __future__ import annotations
 
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from import_export.admin import ExportMixin
+from import_export.formats.base_formats import CSV
 
 from tilavarauspalvelu.models import BugReport
 
 
 @admin.register(BugReport)
-class BugReportAdmin(admin.ModelAdmin):
+class BugReportAdmin(ExportMixin, admin.ModelAdmin):
     # Functions
     search_fields = [
         "name",
         "description",
     ]
     search_help_text = _("Search by name or description")
+    formats = [CSV]
 
     # List
     list_display = [
