@@ -270,7 +270,7 @@ class UserActions:
         current_ad_roles = self.get_ad_group_roles()
         existing_ad_roles = {
             UserRoleChoice(role.role): role  #
-            for role in self.user.unit_roles.filter(from_ad_group=True).prefetch_related("units")
+            for role in self.user.unit_roles.filter(is_from_ad_group=True).prefetch_related("units")
         }
 
         UnitRoleUnit: type[models.Model] = UnitRole.units.through  # noqa: N806
@@ -285,7 +285,7 @@ class UserActions:
 
             # If current role is not defined in existing roles, add a new role.
             if role is None:
-                new_role = UnitRole(user=self.user, role=user_role, from_ad_group=True)
+                new_role = UnitRole(user=self.user, role=user_role, is_from_ad_group=True)
                 roles_to_add.append(new_role)
                 role_units_to_add.extend(  #
                     UnitRoleUnit(unitrole=new_role, unit_id=unit_id) for unit_id in current_unit_ids
