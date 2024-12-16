@@ -126,7 +126,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 non_subsidised_price=non_subsidised_price,
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
-                confirmed_instructions=confirmed_instructions,
+                instructions=confirmed_instructions,
                 language=language,
             )
         case EmailType.RESERVATION_CANCELLED:
@@ -141,7 +141,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 price=price,
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
-                cancelled_instructions=cancelled_instructions,
+                instructions=cancelled_instructions,
                 language=language,
             )
         case EmailType.RESERVATION_CONFIRMED:
@@ -155,7 +155,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 price=price,
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
-                confirmed_instructions=confirmed_instructions,
+                instructions=confirmed_instructions,
                 language=language,
             )
         case EmailType.RESERVATION_MODIFIED:
@@ -169,7 +169,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 price=price,
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
-                confirmed_instructions=confirmed_instructions,
+                instructions=confirmed_instructions,
                 language=language,
             )
         case EmailType.RESERVATION_REJECTED:
@@ -182,7 +182,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 end_datetime=end,
                 rejection_reason=rejection_reason,
                 reservation_id=reservation_id,
-                cancelled_instructions=cancelled_instructions,
+                instructions=cancelled_instructions,
                 language=language,
             )
         case EmailType.RESERVATION_REQUIRES_HANDLING:
@@ -198,7 +198,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 applying_for_free_of_charge=applying_for_free_of_charge,
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
-                pending_instructions=pending_instructions,
+                instructions=pending_instructions,
                 language=language,
             )
         case EmailType.RESERVATION_REQUIRES_PAYMENT:
@@ -213,7 +213,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 tax_percentage=tax_percentage,
                 payment_due_date=payment_due_date,
                 reservation_id=reservation_id,
-                confirmed_instructions=confirmed_instructions,
+                instructions=confirmed_instructions,
                 language=language,
             )
 
