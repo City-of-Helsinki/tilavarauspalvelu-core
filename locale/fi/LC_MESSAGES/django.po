@@ -709,6 +709,11 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
+msgid "External UUID"
+msgstr "Ulkoinen UUID"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Number of persons"
 msgstr "Henkilömäärä"
 
@@ -723,6 +728,11 @@ msgstr "Varausten loppumispäivä"
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Purpose"
 msgstr "Käyttötarkoitus"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "ID for external systems to use"
+msgstr "Tunniste ulkoisten järjestelmien käyttöön"
 
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Name that describes this section."
@@ -790,6 +800,10 @@ msgid ""
 msgstr ""
 "Onko ilmoitus luonnos. Luonnoksia ei näytetä käyttäjille, vaikka ne olisivat "
 "aktiivisia."
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Search by name or description"
+msgstr "Etsi nimellä tai kuvauksella"
 
 #: tilavarauspalvelu/admin/city/admin.py
 msgid "Municipality"
@@ -1189,10 +1203,6 @@ msgid "Paid reservation"
 msgstr "Maksullinen varaus"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "External UUID"
-msgstr "Ulkoinen UUID"
-
-#: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "SKU"
 msgstr "SKU"
@@ -1351,10 +1361,6 @@ msgstr "Syy hylkäämiselle"
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reason for cancellation"
 msgstr "Syy perumiselle"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "ID for external systems to use"
-msgstr "Tunniste ulkoisten järjestelmien käyttöön"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "SKU for this particular reservation"
@@ -1559,6 +1565,19 @@ msgstr "Julkaisun tila"
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Reservation state"
 msgstr "Varattavuuden tila"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Additional search terms that will bring up this reservation unit when making "
+"text searches in the customer UI. These terms should be added to make sure "
+"search results using text search in links from external sources work "
+"regardless of the UI language."
+msgstr ""
+"Ylimääräiset hakusanat, joilla tätä varausyksikköä on mahdollista hakea "
+"tekstihaun kautta asiakaskäyttöliittymässä. Hakusanoja tulee lisätä tähän "
+"listaan silloin kun halutaan taata, että järjestelmän ulkopuolelta tulevissa "
+"linkeissä käytettävät hakusanat tuottavat oikeat hakutulokset "
+"käyttöliittymän kielestä rippumatta."
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Description (Finnish)"
@@ -1977,19 +1996,6 @@ msgstr "Maksujen kirjanpidon tiliöintitiedot"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Product used for payments"
 msgstr "Tuote, jota käytetään maksuihin"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"Additional search terms that will bring up this reservation unit when making "
-"text searches in the customer UI. These terms should be added to make sure "
-"search results using text search in links from external sources work "
-"regardless of the UI language."
-msgstr ""
-"Ylimääräiset hakusanat, joilla tätä varausyksikköä on mahdollista hakea "
-"tekstihaun kautta asiakaskäyttöliittymässä. Hakusanoja tulee lisätä tähän "
-"listaan silloin kun halutaan taata, että järjestelmän ulkopuolelta tulevissa "
-"linkeissä käytettävät hakusanat tuottavat oikeat hakutulokset "
-"käyttöliittymän kielestä rippumatta."
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
@@ -3273,6 +3279,18 @@ msgid ""
 msgstr ""
 "'active_from' ja 'active_until' täytyy olla joko tyhjiä tai asetettuja. Jos "
 "molemmat on asetettu, 'active_until' täytyy olla 'active_from' jälkeen."
+
+#: tilavarauspalvelu/models/bug_report/model.py
+msgid "Someone else, who?"
+msgstr "Joku muu, kuka?"
+
+#: tilavarauspalvelu/models/bug_report/model.py
+msgid "bug report"
+msgstr "virheilmoitus"
+
+#: tilavarauspalvelu/models/bug_report/model.py
+msgid "bug reports"
+msgstr "virheilmoitukset"
 
 #: tilavarauspalvelu/models/city/model.py
 msgid "city"
