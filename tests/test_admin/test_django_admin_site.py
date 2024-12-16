@@ -9,9 +9,11 @@ from django.test import Client, override_settings
 from django.urls import reverse
 
 from tilavarauspalvelu.enums import EmailType
-from tilavarauspalvelu.models import RequestLog, Reservation, SQLLog
+from tilavarauspalvelu.models import BugReport, RequestLog, Reservation, SQLLog
+from tilavarauspalvelu.models.bug_report.model import BugReportPhaseChoice, BugReportUserChoice
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from utils.date_utils import local_datetime
 
 from tests import factories
 from tests.helpers import patch_method
@@ -46,6 +48,12 @@ def create_all_models():
             duration_ns=123,
             stack_info="stack_info",
         )
+        BugReport.objects.create(
+            name="Example",
+            phase=BugReportPhaseChoice.PULL_REQUEST,
+            found_by=BugReportUserChoice.MATTI,
+            found_at=local_datetime(),
+        )
 
         create_or_update_reservation_statistics(Reservation.objects.values_list("pk", flat=True))
 
@@ -78,6 +86,9 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
             # Edit & Delete views
             elif url_pattern.lookup_str.endswith((".change_view", ".delete_view")):
                 first_object = model.objects.first()
+                if first_object is None:
+                    pytest.fail(f"Did not find any objects for model '{model}'")
+
                 admin_url = reverse(f"admin:{url_pattern.name}", args=[first_object.pk])
 
                 assert client.get(admin_url).status_code == 200, admin_url
