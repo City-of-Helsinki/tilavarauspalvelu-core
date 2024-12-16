@@ -2422,8 +2422,12 @@ export type QueryUnitsAllArgs = {
   nameSv?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
+  onlyDirectBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  onlySeasonalBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<UnitOrderingChoices>>>;
+  ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
+  publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
