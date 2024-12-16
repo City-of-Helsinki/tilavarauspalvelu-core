@@ -74,7 +74,7 @@ def test_get_context__reservation_approved__en():
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -107,7 +107,7 @@ def test_get_context__reservation_approved__discount__en():
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -140,7 +140,7 @@ def test_get_context__reservation_approved__fi():
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -173,7 +173,7 @@ def test_get_context__reservation_approved__discount__fi():
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -206,7 +206,7 @@ def test_get_context__reservation_approved__sv():
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -239,7 +239,7 @@ def test_get_context__reservation_approved__discount__sv():
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -275,7 +275,7 @@ def test_get_context__reservation_cancelled__en():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            cancelled_instructions="This are the instructions",
+            instructions="This are the instructions",
             language="en",
         )
 
@@ -309,7 +309,7 @@ def test_get_context__reservation_cancelled__fi():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            cancelled_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -343,7 +343,7 @@ def test_get_context__reservation_cancelled__sv():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            cancelled_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -379,7 +379,7 @@ def test_get_context__reservation_confirmed__en():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -411,7 +411,7 @@ def test_get_context__reservation_confirmed__fi():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Nämä ovat ohjeet",
+            instructions="Nämä ovat ohjeet",
             language="fi",
         )
 
@@ -443,7 +443,7 @@ def test_get_context__reservation_confirmed__sv():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -478,7 +478,7 @@ def test_get_context__reservation_modified__en():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -510,7 +510,7 @@ def test_get_context__reservation_modified__fi():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -542,7 +542,7 @@ def test_get_context__reservation_modified__sv():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -576,7 +576,7 @@ def test_get_context__reservation_rejected__en():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="This is the rejection reason",
             reservation_id=12,
-            cancelled_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -609,7 +609,7 @@ def test_get_context__reservation_rejected__fi():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="Tässä on hylkäyksen syy",
             reservation_id=12,
-            cancelled_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -642,7 +642,7 @@ def test_get_context__reservation_rejected__sv():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="Här är orsaken till avslagningen",
             reservation_id=12,
-            cancelled_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -681,7 +681,7 @@ def test_get_context__reservation_requires_handling__en():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            pending_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -719,7 +719,7 @@ def test_get_context__reservation_requires_handling__fi():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            pending_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -757,7 +757,7 @@ def test_get_context__reservation_requires_handling__sv():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            pending_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -795,7 +795,7 @@ def test_get_context__reservation_requires_handling__subsidised():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            pending_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -837,7 +837,7 @@ def test_get_context__reservation_requires_payment__en():
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
             reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -874,7 +874,7 @@ def test_get_context__reservation_requires_payment__fi():
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
             reservation_id=12,
-            confirmed_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -911,7 +911,7 @@ def test_get_context__reservation_requires_payment__sv():
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
             reservation_id=12,
-            confirmed_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
