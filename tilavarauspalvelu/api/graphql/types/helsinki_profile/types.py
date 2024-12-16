@@ -91,6 +91,11 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
             session=info.context.session,
             fields=fields,
         )
+        if info.context.session.get("keycloak_refresh_token_expired", False):
+            msg = "Keycloak refresh token is expired. Please log out and back in again."
+            extensions = {"code": error_codes.HELSINKI_PROFILE_KEYCLOAK_REFRESH_TOKEN_EXPIRED}
+            raise GraphQLError(msg, extensions=extensions)
+
         if data is None:
             msg = "Helsinki profile token is not valid and could not be refreshed."
             extensions = {"code": error_codes.HELSINKI_PROFILE_TOKEN_INVALID}
