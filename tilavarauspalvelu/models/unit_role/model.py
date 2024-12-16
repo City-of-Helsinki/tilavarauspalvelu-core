@@ -52,6 +52,14 @@ class UnitRole(models.Model):
         verbose_name = _("unit role")
         verbose_name_plural = _("unit roles")
         ordering = ["pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["role", "user"],
+                name="unique_role_user_if_is_from_ad_group",
+                condition=models.Q(is_from_ad_group=True),
+                violation_error_message="Role for user must be unique for AD group based roles.",
+            ),
+        ]
 
     def __str__(self) -> str:
         return f"Unit Role '{self.role}' for {self.user.first_name} {self.user.last_name} ({self.user.email})"
