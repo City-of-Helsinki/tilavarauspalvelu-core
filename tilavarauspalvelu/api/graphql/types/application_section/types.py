@@ -6,11 +6,11 @@ import graphene
 from django.db import models
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
-from query_optimizer import AnnotatedField
+from query_optimizer import AnnotatedField, ManuallyOptimizedField
 from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, UserRoleChoice
-from tilavarauspalvelu.models import Application, ApplicationSection, User
+from tilavarauspalvelu.models import Application, ApplicationSection, Reservation, User
 
 from .filtersets import ApplicationSectionFilterSet
 from .permissions import ApplicationSectionPermission
@@ -24,6 +24,8 @@ if TYPE_CHECKING:
 class ApplicationSectionNode(DjangoNode):
     status = AnnotatedField(graphene.Enum.from_enum(ApplicationSectionStatusChoice), expression=L("status"))
     allocations = AnnotatedField(graphene.Int, expression=L("allocations"))
+
+    has_reservations = ManuallyOptimizedField(graphene.Boolean, required=True)
 
     class Meta:
         model = ApplicationSection
@@ -101,3 +103,15 @@ class ApplicationSectionNode(DjangoNode):
     @classmethod
     def _add_units_for_permissions(cls, queryset: ApplicationQuerySet, *args: Any) -> models.QuerySet:
         return queryset.with_permissions()
+
+    @staticmethod
+    def optimize_has_reservations(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
+        optimizer.annotations["has_reservations"] = models.Exists(
+            Reservation.objects.filter(
+                recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
+                    models.OuterRef("pk")
+                ),
+            )
+        )
+
+        return queryset
