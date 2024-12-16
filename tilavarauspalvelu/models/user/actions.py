@@ -268,6 +268,8 @@ class UserActions:
 
     def update_unit_roles_from_ad_groups(self) -> None:
         current_ad_roles = self.get_ad_group_roles()
+        # Assume here that we have one UnitRole per AD group role.
+        # This assertion is backed up by a unique constraint on UnitRole.
         existing_ad_roles = {
             UserRoleChoice(role.role): role  #
             for role in self.user.unit_roles.filter(is_from_ad_group=True).prefetch_related("units")
@@ -292,17 +294,17 @@ class UserActions:
                 )
                 continue
 
-            exiting_unit_ids: set[int] = {unit.id for unit in role.units.all()}
+            existing_unit_ids: set[int] = {unit.id for unit in role.units.all()}
 
             # If current role has been added to new units, add them to the role.
-            new_unit_ids = current_unit_ids - exiting_unit_ids
+            new_unit_ids = current_unit_ids - existing_unit_ids
             if new_unit_ids:
                 role_units_to_add.extend(  #
                     UnitRoleUnit(unitrole=role, unit_id=unit_id) for unit_id in new_unit_ids
                 )
 
             # If current role no longer includes some units, remove those units from the role.
-            old_unit_ids = exiting_unit_ids - current_unit_ids
+            old_unit_ids = existing_unit_ids - current_unit_ids
             if old_unit_ids:
                 condition = models.Q(unit_id__in=list(old_unit_ids), unitrole_id=role.id)
                 role_unit_remove_conditions.append(condition)
