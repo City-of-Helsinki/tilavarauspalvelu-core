@@ -10,6 +10,7 @@ from .application_round.model import ApplicationRound
 from .application_round_time_slot.model import ApplicationRoundTimeSlot
 from .application_section.model import ApplicationSection
 from .banner_notification.model import BannerNotification
+from .bug_report.model import BugReport
 from .city.model import City
 from .equipment.model import Equipment
 from .equipment_category.model import EquipmentCategory
@@ -67,6 +68,7 @@ __all__ = [
     "ApplicationRoundTimeSlot",
     "ApplicationSection",
     "BannerNotification",
+    "BugReport",
     "City",
     "Equipment",
     "EquipmentCategory",
