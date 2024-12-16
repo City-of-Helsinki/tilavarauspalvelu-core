@@ -106,7 +106,8 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
   const { sentDate } = application.applicationRound;
   const handledDate = sentDate ? new Date(sentDate) : new Date();
   const showReservations =
-    application.status === ApplicationStatusChoice.ResultsSent;
+    application.status === ApplicationStatusChoice.ResultsSent &&
+    application.applicationSections?.some((section) => section.hasReservations);
 
   return (
     <>

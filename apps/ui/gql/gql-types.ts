@@ -551,6 +551,7 @@ export type ApplicationSectionNode = Node & {
   application: ApplicationNode;
   appliedReservationsPerWeek: Scalars["Int"]["output"];
   extUuid: Scalars["UUID"]["output"];
+  hasReservations: Scalars["Boolean"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
@@ -5687,6 +5688,7 @@ export type ApplicationCommonFragment = {
     }>;
   };
   applicationSections?: Array<{
+    hasReservations: boolean;
     id: string;
     pk?: number | null;
     name: string;
@@ -5851,6 +5853,7 @@ export type ApplicationQuery = {
       }>;
     };
     applicationSections?: Array<{
+      hasReservations: boolean;
       id: string;
       pk?: number | null;
       name: string;
@@ -7502,6 +7505,7 @@ export type ApplicationSectionCommonFragment = {
 };
 
 export type ApplicationSectionUiFragment = {
+  hasReservations: boolean;
   id: string;
   pk?: number | null;
   name: string;
@@ -7944,6 +7948,7 @@ export type ApplicationViewQuery = {
       }>;
     };
     applicationSections?: Array<{
+      hasReservations: boolean;
       id: string;
       pk?: number | null;
       name: string;
@@ -8417,6 +8422,7 @@ export const ApplicationSectionCommonFragmentDoc = gql`
 export const ApplicationSectionUiFragmentDoc = gql`
   fragment ApplicationSectionUI on ApplicationSectionNode {
     ...ApplicationSectionCommon
+    hasReservations
     suitableTimeRanges {
       id
       pk
