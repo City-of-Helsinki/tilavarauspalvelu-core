@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="unitrole",
-            name="from_ad_group",
+            name="is_from_ad_group",
             field=models.BooleanField(default=False),
         ),
     ]

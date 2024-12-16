@@ -42,7 +42,7 @@ class UnitRole(models.Model):
     modified: datetime.datetime = models.DateTimeField(auto_now=True)
 
     role_active: bool = models.BooleanField(default=True)
-    from_ad_group: bool = models.BooleanField(default=False)
+    is_from_ad_group: bool = models.BooleanField(default=False)
 
     objects = UnitRoleManager()
 

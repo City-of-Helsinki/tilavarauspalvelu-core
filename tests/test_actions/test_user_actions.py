@@ -175,7 +175,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__remove_old_role():
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=True)
     user = UserFactory.create()
 
-    UnitRoleFactory.create(user=user, role=UserRoleChoice.ADMIN, units=[unit], from_ad_group=True)
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.ADMIN, units=[unit], is_from_ad_group=True)
 
     assert user.unit_roles.count() == 1
 
@@ -189,7 +189,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__add_new_and_remove_old_
     unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
 
-    UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_2], from_ad_group=True)
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_2], is_from_ad_group=True)
 
     user.actions.update_unit_roles_from_ad_groups()
 
@@ -206,7 +206,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__add_new_unit():
     ad_group_2 = ADGroupFactory.create(name="oodi__varaamo__handler__456")
     user = UserFactory.create(ad_groups=[ad_group_1, ad_group_2])
 
-    role = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_1], from_ad_group=True)
+    role = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_1], is_from_ad_group=True)
 
     user.actions.update_unit_roles_from_ad_groups()
 
@@ -229,7 +229,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__add_new_unit__multiple(
     ad_group_3 = ADGroupFactory.create(name="oodi__varaamo__handler__789")
     user = UserFactory.create(ad_groups=[ad_group_1, ad_group_2, ad_group_3])
 
-    role = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_1], from_ad_group=True)
+    role = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_1], is_from_ad_group=True)
 
     user.actions.update_unit_roles_from_ad_groups()
 
@@ -249,7 +249,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__remove_existing_unit():
     unit_2 = UnitFactory.create(tprek_id="456", allow_permissions_from_ad_groups=True)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
 
-    role = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_1, unit_2], from_ad_group=True)
+    role = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_1, unit_2], is_from_ad_group=True)
 
     user.actions.update_unit_roles_from_ad_groups()
 
@@ -272,7 +272,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__remove_existing_unit__m
         user=user,
         role=UserRoleChoice.HANDLER,
         units=[unit_1, unit_2, unit_3],
-        from_ad_group=True,
+        is_from_ad_group=True,
     )
 
     user.actions.update_unit_roles_from_ad_groups()
@@ -306,7 +306,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__roles_remain_as_is():
     ad_group_2 = ADGroupFactory.create(name="oodi__varaamo__handler__456")
     user = UserFactory.create(ad_groups=[ad_group_1, ad_group_2])
 
-    role = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_1, unit_2], from_ad_group=True)
+    role = UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit_1, unit_2], is_from_ad_group=True)
 
     user.actions.update_unit_roles_from_ad_groups()
 
@@ -327,7 +327,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__role_changed_units_rema
     ad_group_2 = ADGroupFactory.create(name="oodi__varaamo__handler__456")
     user = UserFactory.create(ad_groups=[ad_group_1, ad_group_2])
 
-    UnitRoleFactory.create(user=user, role=UserRoleChoice.RESERVER, units=[unit_1, unit_2], from_ad_group=True)
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.RESERVER, units=[unit_1, unit_2], is_from_ad_group=True)
 
     user.actions.update_unit_roles_from_ad_groups()
 
@@ -345,7 +345,7 @@ def test_user_actions__update_unit_roles_from_ad_groups__ad_roles_no_longer_allo
     unit = UnitFactory.create(tprek_id="123", allow_permissions_from_ad_groups=False)
     user = UserFactory.create(ad_groups__name="oodi__varaamo__handler__123")
 
-    UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit], from_ad_group=True)
+    UnitRoleFactory.create(user=user, role=UserRoleChoice.HANDLER, units=[unit], is_from_ad_group=True)
 
     user.actions.update_unit_roles_from_ad_groups()
 

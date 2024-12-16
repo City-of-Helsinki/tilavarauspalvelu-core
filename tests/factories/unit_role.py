@@ -23,4 +23,4 @@ class UnitRoleFactory(GenericDjangoModelFactory[UnitRole]):
     unit_groups = ManyToManyFactory("tests.factories.UnitGroupFactory")
 
     role_active = True
-    from_ad_group = False
+    is_from_ad_group = False
