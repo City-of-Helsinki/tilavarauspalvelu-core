@@ -683,6 +683,11 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
+msgid "External UUID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Number of persons"
 msgstr ""
 
@@ -696,6 +701,11 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Purpose"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "ID for external systems to use"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
@@ -756,6 +766,10 @@ msgstr ""
 msgid ""
 "Is the notification a draft. Drafts won't be shown to users, even if they "
 "would be active."
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Search by name or description"
 msgstr ""
 
 #: tilavarauspalvelu/admin/city/admin.py
@@ -1146,10 +1160,6 @@ msgid "Paid reservation"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "External UUID"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "SKU"
 msgstr ""
@@ -1307,10 +1317,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reason for cancellation"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "ID for external systems to use"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1515,6 +1521,14 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Reservation state"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"Additional search terms that will bring up this reservation unit when making "
+"text searches in the customer UI. These terms should be added to make sure "
+"search results using text search in links from external sources work "
+"regardless of the UI language."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -1919,14 +1933,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Product used for payments"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"Additional search terms that will bring up this reservation unit when making "
-"text searches in the customer UI. These terms should be added to make sure "
-"search results using text search in links from external sources work "
-"regardless of the UI language."
 msgstr ""
 
 #: tilavarauspalvelu/admin/space/admin.py
@@ -3201,6 +3207,18 @@ msgstr ""
 msgid ""
 "Both 'active_from' and 'active_until' must be either empty or set. If both "
 "are set, 'active_until' must be after 'active_from'."
+msgstr ""
+
+#: tilavarauspalvelu/models/bug_report/model.py
+msgid "Someone else, who?"
+msgstr ""
+
+#: tilavarauspalvelu/models/bug_report/model.py
+msgid "bug report"
+msgstr ""
+
+#: tilavarauspalvelu/models/bug_report/model.py
+msgid "bug reports"
 msgstr ""
 
 #: tilavarauspalvelu/models/city/model.py
