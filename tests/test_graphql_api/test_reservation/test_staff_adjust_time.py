@@ -93,7 +93,7 @@ def test_reservation__staff_adjust_time__begin_date_in_the_past(graphql):
     now = local_datetime()
     last_hour = now.replace(minute=0, second=0, microsecond=0)
 
-    begin = last_hour - datetime.timedelta(days=1)
+    begin = last_hour - datetime.timedelta(days=2)
     end = last_hour + datetime.timedelta(hours=2)
 
     graphql.login_with_superuser()
