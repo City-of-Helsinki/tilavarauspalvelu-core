@@ -11,8 +11,8 @@ from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 from helusers.models import AbstractUser
 
+from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
-from tilavarauspalvelu.utils.helauth.typing import IDToken
 from tilavarauspalvelu.utils.helauth.utils import get_jwt_payload
 from tilavarauspalvelu.utils.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE
@@ -155,6 +155,8 @@ class User(AbstractUser):
         unit_role: UnitRole
         for unit_role in self.unit_roles.filter(role_active=True).prefetch_related("units", "unit_groups"):
             for unit in unit_role.units.all():
+                if unit_role.is_from_ad_group and not unit.allow_permissions_from_ad_groups:
+                    continue
                 self._unit_roles.setdefault(int(unit.pk), []).append(UserRoleChoice(unit_role.role))
             for unit_group in unit_role.unit_groups.all():
                 self._unit_group_roles.setdefault(int(unit_group.pk), []).append(UserRoleChoice(unit_role.role))

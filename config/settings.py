@@ -325,6 +325,7 @@ class Common(Environment):
         *SOCIAL_AUTH_PIPELINE,
         "tilavarauspalvelu.utils.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
         "tilavarauspalvelu.utils.helauth.pipeline.migrate_user_from_tunnistamo_to_keycloak",
+        "tilavarauspalvelu.utils.helauth.pipeline.update_roles_from_ad_groups",
     )
 
     @classproperty
@@ -504,6 +505,9 @@ class Common(Environment):
     PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS = values.IntegerValue(default=365)
     PERMISSION_NOTIFICATION_BEFORE_DAYS = values.IntegerValue(default=14)
     RAISE_ERROR_ON_REFRESH_FAILURE = False
+
+    # Allows faking membership to certain AD groups for testing automatic role assignment
+    FAKE_SUPERUSER_AD_GROUPS = values.ListValue(default=[])
 
     ICAL_HASH_SECRET = values.StringValue()
 

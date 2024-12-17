@@ -7,12 +7,14 @@ from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.admin import TranslationAdmin
+from modeltranslation.admin import TabbedTranslationAdmin
 
 from tilavarauspalvelu.admin.location.admin import LocationInline
 from tilavarauspalvelu.models import Unit
 from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitImporter
 from utils.sentry import SentryLogger
+
+from .form import UnitAdminForm
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -21,7 +23,7 @@ if TYPE_CHECKING:
 
 
 @admin.register(Unit)
-class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
+class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
     # Functions
     actions = ["update_from_tprek"]
     search_fields = [
@@ -45,6 +47,57 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
     ordering = ["rank"]
 
     # Form
+    form = UnitAdminForm
+    fieldsets = [
+        [
+            _("Basic information"),
+            {
+                "fields": [
+                    "name",
+                    "description",
+                    "short_description",
+                    "web_page",
+                    "email",
+                    "phone",
+                ],
+            },
+        ],
+        [
+            _("TPRek"),
+            {
+                "fields": [
+                    "tprek_id",
+                    "tprek_department_id",
+                    "tprek_last_modified",
+                ],
+            },
+        ],
+        [
+            _("Hauki"),
+            {
+                "fields": [
+                    "origin_hauki_resource",
+                ],
+            },
+        ],
+        [
+            _("Payment information"),
+            {
+                "fields": [
+                    "payment_merchant",
+                    "payment_accounting",
+                ],
+            },
+        ],
+        [
+            _("Permission information"),
+            {
+                "fields": [
+                    "allow_permissions_from_ad_groups",
+                ],
+            },
+        ],
+    ]
     inlines = [LocationInline]
     readonly_fields = ["tprek_last_modified"]
 

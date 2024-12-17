@@ -36,6 +36,8 @@ class Unit(models.Model):
     email: str = models.EmailField(max_length=255, blank=True, default="")
     phone: str = models.CharField(max_length=255, blank=True, default="")
 
+    allow_permissions_from_ad_groups: bool = models.BooleanField(default=False)
+
     origin_hauki_resource = models.ForeignKey(
         "tilavarauspalvelu.OriginHaukiResource",
         related_name="units",

@@ -8,10 +8,11 @@ from graphql import GraphQLError
 from query_optimizer.selections import get_field_selections
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.enums import LoginMethod
 from tilavarauspalvelu.models import Application, Reservation
 from tilavarauspalvelu.tasks import save_personal_info_view_log
 from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
-from tilavarauspalvelu.utils.helauth.typing import LoginMethod, UserProfileInfo
+from tilavarauspalvelu.utils.helauth.typing import UserProfileInfo
 
 if TYPE_CHECKING:
     import datetime
