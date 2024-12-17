@@ -1560,10 +1560,6 @@ msgid "Reservation unit type"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Require introduction"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Equipments"
 msgstr ""
 
