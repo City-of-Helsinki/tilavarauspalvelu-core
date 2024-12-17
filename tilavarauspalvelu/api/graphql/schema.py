@@ -216,9 +216,14 @@ class Query(graphene.ObjectType):
     )
     profile_data = Field(
         HelsinkiProfileDataNode,
-        reservation_id=graphene.Int(),
-        application_id=graphene.Int(),
-        description="Get information about the user, using Helsinki profile if necessary.",
+        reservation_id=graphene.Int(description="View profile data for this reservation's user."),
+        application_id=graphene.Int(description="View profile data for this application's user."),
+        description=(
+            "Get information about a user from Helsinki profile. "
+            "If user is not a profile user, still return data stored in our database, e.g. first and last name. "
+            "Use only one of 'reservation_id' or 'application_id' to select the user. "
+            "This determines the required permissions to view the user's data."
+        ),
     )
     #
     # Misc.
