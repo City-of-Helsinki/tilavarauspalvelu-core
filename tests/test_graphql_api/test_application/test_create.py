@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import freezegun
 import pytest
 
 from tilavarauspalvelu.models import (
@@ -11,6 +12,7 @@ from tilavarauspalvelu.models import (
     ReservationUnitOption,
     SuitableTimeRange,
 )
+from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationRoundFactory
 from tests.test_graphql_api.test_application.helpers import get_application_create_data
@@ -28,7 +30,7 @@ def test_application__create(graphql):
     # - There is an open application round
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_with_superuser()
+    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
     # when:
     # - User tries to create a new application without sections
@@ -55,7 +57,7 @@ def test_application__create__with_application_sections(graphql):
     # - There is an open application round
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_with_superuser()
+    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
     assert Application.objects.count() == 0
 
@@ -90,7 +92,7 @@ def test_application__create__sub_serializer_error(graphql, field):
     # - There is an open application round
     # - A superuser is using the system
     application_round = ApplicationRoundFactory.create_in_status_open()
-    graphql.login_with_superuser()
+    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
 
     address_data = {
         "streetAddress": "Address",
@@ -116,3 +118,15 @@ def test_application__create__sub_serializer_error(graphql, field):
             "message": "This field may not be blank.",
         }
     ]
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_application__create__is_under_age(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_open()
+    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 2))
+
+    input_data = get_application_create_data(application_round)
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("user") == ["Application can only be created by an adult reservee"]
