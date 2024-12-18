@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 
 from tilavarauspalvelu.models import Reservation, TermsOfUse
-from tilavarauspalvelu.utils.pdf import render_to_pdf
+from tilavarauspalvelu.services.pdf import render_to_pdf
 from utils.utils import ical_hmac_signature
 
 if TYPE_CHECKING:
