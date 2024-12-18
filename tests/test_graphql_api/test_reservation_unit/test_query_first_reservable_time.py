@@ -18,7 +18,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
-from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import CachedReservableTime
+from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import CachedReservableTime
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import (

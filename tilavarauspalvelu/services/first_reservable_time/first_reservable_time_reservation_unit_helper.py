@@ -6,15 +6,15 @@ from typing import TYPE_CHECKING
 from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
-from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_reservable_time_span_helper import (
+from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_reservable_time_span_helper import (
     ReservableTimeSpanFirstReservableTimeHelper,
 )
-from tilavarauspalvelu.utils.first_reservable_time.utils import ReservableTimeOutput
+from tilavarauspalvelu.services.first_reservable_time.utils import ReservableTimeOutput
 from utils.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
-    from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
+    from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 
 
 class ReservationUnitFirstReservableTimeHelper:
