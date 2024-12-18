@@ -3,7 +3,7 @@
   "dateLabel": "Datum",
   "timeLabel": "Tid",
   "dateWithWeekday": "{{date, datetime}}",
-  "dayTimeSeparator": " kl",
+  "dayTimeSeparator": " kl.",
   "today": "I dag",
   "tomorrow": "I morgon",
   "day": "Dag",

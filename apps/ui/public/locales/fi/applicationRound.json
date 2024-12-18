@@ -2,7 +2,7 @@
   "card": {
     "applyButton": "Hae tiloja",
     "displayPastButton": "Näytä tilat",
-    "criteria": "Tutustu hakuohjeisiin",
+    "criteria": "Tutustu hakuehtoihin",
     "pending": "Haku avautuu {{opening}}",
     "open": "Haku auki {{until}} saakka",
     "past": "Haku sulkeutui {{closing}}",

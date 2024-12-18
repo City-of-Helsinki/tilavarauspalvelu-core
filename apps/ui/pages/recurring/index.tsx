@@ -56,22 +56,40 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
+function getDateTime(date: string | Date) {
+  return new Date(date).getTime();
+}
+
 function RecurringLander({ applicationRounds }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const activeApplicationRounds = applicationRounds.filter(
-    (ar) => ar.status === ApplicationRoundStatusChoice.Open
-  );
+  const activeApplicationRounds = applicationRounds
+    .filter((ar) => ar.status === ApplicationRoundStatusChoice.Open)
+    .sort(
+      (a, b) =>
+        getDateTime(b.applicationPeriodEnd) -
+        getDateTime(a.applicationPeriodEnd)
+    );
 
-  const pendingApplicationRounds = applicationRounds.filter(
-    (ar) => ar.status === ApplicationRoundStatusChoice.Upcoming
-  );
+  const pendingApplicationRounds = applicationRounds
+    .filter((ar) => ar.status === ApplicationRoundStatusChoice.Upcoming)
+    .sort(
+      (a, b) =>
+        getDateTime(a.applicationPeriodBegin) -
+        getDateTime(b.applicationPeriodBegin)
+    );
 
-  const pastApplicationRounds = applicationRounds.filter(
-    (ar) =>
-      ar.status !== ApplicationRoundStatusChoice.Open &&
-      ar.status !== ApplicationRoundStatusChoice.Upcoming
-  );
+  const pastApplicationRounds = applicationRounds
+    .filter(
+      (ar) =>
+        ar.status !== ApplicationRoundStatusChoice.Open &&
+        ar.status !== ApplicationRoundStatusChoice.Upcoming
+    )
+    .sort(
+      (a, b) =>
+        getDateTime(b.applicationPeriodEnd) -
+        getDateTime(a.applicationPeriodEnd)
+    );
 
   const routes = [
     {
