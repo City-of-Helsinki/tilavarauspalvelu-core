@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.utils.validators import is_numeric, validate_accounting_project
+from tilavarauspalvelu.validators import is_numeric, validate_accounting_project
 
 from .queryset import PaymentAccountingManager
 

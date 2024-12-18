@@ -6,7 +6,7 @@ from subforms.fields import DynamicArrayField, NestedFormField
 
 from tilavarauspalvelu.enums import WeekdayChoice
 from tilavarauspalvelu.models import ApplicationRoundTimeSlot
-from tilavarauspalvelu.utils.validators import validate_string_time
+from tilavarauspalvelu.validators import validate_string_time
 
 
 def remove_empty_timeslots(timeslots: list[dict[str, str]]) -> None:
