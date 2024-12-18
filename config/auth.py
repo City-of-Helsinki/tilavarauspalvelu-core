@@ -11,8 +11,8 @@ from tilavarauspalvelu.models import User
 from utils.utils import update_query_params
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.integrations.helauth.typing import TokenResponse
     from tilavarauspalvelu.typing import WSGIRequest
-    from tilavarauspalvelu.utils.helauth.typing import TokenResponse
 
 __all__ = [
     "ProxyModelBackend",

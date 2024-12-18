@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING, Any, TypedDict, Unpack
 from django.db import models
 from django.db.models.functions import Concat
 
+from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helauth.typing import IDToken
 from tilavarauspalvelu.models import User
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
-from tilavarauspalvelu.utils.helauth.typing import IDToken
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
