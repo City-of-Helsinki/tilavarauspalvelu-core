@@ -217,10 +217,10 @@ function RecurringReservationForm({
     const buffers = {
       before: data.bufferTimeBefore
         ? getBufferTime(reservationUnit.bufferTimeBefore, data.type)
-        : undefined,
+        : 0,
       after: data.bufferTimeAfter
         ? getBufferTime(reservationUnit.bufferTimeAfter, data.type)
-        : undefined,
+        : 0,
     };
 
     try {

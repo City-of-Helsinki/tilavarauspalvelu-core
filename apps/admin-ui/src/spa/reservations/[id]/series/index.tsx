@@ -222,8 +222,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
         endDate: toApiDateUnsafe(fromUIDateUnsafe(values.endingDate)),
         endTime: values.endTime,
         weekdays: values.repeatOnDays,
-        bufferTimeBefore: buffers.before?.toString(),
-        bufferTimeAfter: buffers.after?.toString(),
+        bufferTimeBefore: (buffers.before ?? 0).toString(),
+        bufferTimeAfter: (buffers.after ?? 0).toString(),
         skipDates: skipDates.map((x) => toApiDateUnsafe(x)),
       };
       const mutRes = await mutate({ variables: { input } });
