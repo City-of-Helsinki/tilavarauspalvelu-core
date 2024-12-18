@@ -74,7 +74,7 @@ def test_get_context__reservation_approved__en():
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            instructions='<p>These are the instructions <a href="https://foo.bar">link</a></p>',
             language="en",
         )
 
@@ -82,7 +82,8 @@ def test_get_context__reservation_approved__en():
         "email_recipient_name": "John Doe",
         "text_reservation_approved": "Your booking is now confirmed",
         "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
+        "instructions_html": '<p>These are the instructions <a href="https://foo.bar">link</a></p>',
+        "instructions_text": "These are the instructions link <https://foo.bar>",
         "title": "Your booking is confirmed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -107,7 +108,7 @@ def test_get_context__reservation_approved__discount__en():
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -115,7 +116,8 @@ def test_get_context__reservation_approved__discount__en():
         "email_recipient_name": "John Doe",
         "text_reservation_approved": "Your booking has been confirmed with the following discount:",
         "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
+        "instructions_html": "These are the instructions",
+        "instructions_text": "These are the instructions",
         "title": "Your booking is confirmed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -140,7 +142,7 @@ def test_get_context__reservation_approved__fi():
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -148,7 +150,8 @@ def test_get_context__reservation_approved__fi():
         "email_recipient_name": "Mikko Mallikas",
         "text_reservation_approved": "Varauksesi on nyt vahvistettu",
         "instructions_label": "Lisätietoa varauksestasi",
-        "instructions": "Tässä ovat ohjeet",
+        "instructions_html": "Tässä ovat ohjeet",
+        "instructions_text": "Tässä ovat ohjeet",
         "title": "Varauksesi on vahvistettu",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
@@ -173,7 +176,7 @@ def test_get_context__reservation_approved__discount__fi():
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -181,7 +184,8 @@ def test_get_context__reservation_approved__discount__fi():
         "email_recipient_name": "Mikko Mallikas",
         "text_reservation_approved": "Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus:",
         "instructions_label": "Lisätietoa varauksestasi",
-        "instructions": "Tässä ovat ohjeet",
+        "instructions_html": "Tässä ovat ohjeet",
+        "instructions_text": "Tässä ovat ohjeet",
         "title": "Varauksesi on vahvistettu",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
@@ -206,7 +210,7 @@ def test_get_context__reservation_approved__sv():
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -214,7 +218,8 @@ def test_get_context__reservation_approved__sv():
         "email_recipient_name": "Magnus Persson",
         "text_reservation_approved": "Din bokning har bekräftats",
         "instructions_label": "Mer information om din bokning",
-        "instructions": "Här är instruktionerna",
+        "instructions_html": "Här är instruktionerna",
+        "instructions_text": "Här är instruktionerna",
         "title": "Din bokning är bekräftad",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -239,7 +244,7 @@ def test_get_context__reservation_approved__discount__sv():
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -247,7 +252,8 @@ def test_get_context__reservation_approved__discount__sv():
         "email_recipient_name": "Magnus Persson",
         "text_reservation_approved": "Din bokning har bekräftats med följande rabatt:",
         "instructions_label": "Mer information om din bokning",
-        "instructions": "Här är instruktionerna",
+        "instructions_html": "Här är instruktionerna",
+        "instructions_text": "Här är instruktionerna",
         "title": "Din bokning är bekräftad",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -275,14 +281,15 @@ def test_get_context__reservation_cancelled__en():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            cancelled_instructions="This are the instructions",
+            instructions="This are the instructions",
             language="en",
         )
 
     assert context == {
         "cancel_reason": "This is a reason",
         "cancel_reason_label": "Your reason for cancellation",
-        "instructions": "This are the instructions",
+        "instructions_html": "This are the instructions",
+        "instructions_text": "This are the instructions",
         "instructions_label": "Additional information about cancellation",
         "email_recipient_name": "John Doe",
         "title": "Your booking has been cancelled",
@@ -309,14 +316,15 @@ def test_get_context__reservation_cancelled__fi():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            cancelled_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
     assert context == {
         "cancel_reason": "Tässä on syyni",
         "cancel_reason_label": "Peruutuksen syy",
-        "instructions": "Tässä ovat ohjeet",
+        "instructions_html": "Tässä ovat ohjeet",
+        "instructions_text": "Tässä ovat ohjeet",
         "instructions_label": "Lisätietoa peruutuksesta",
         "email_recipient_name": "Mikko Mallikas",
         "text_reservation_cancelled": "Varauksesi on peruttu",
@@ -343,14 +351,15 @@ def test_get_context__reservation_cancelled__sv():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            cancelled_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
     assert context == {
         "cancel_reason": "Här är anledningen",
         "cancel_reason_label": "Din anledning till avbokning",
-        "instructions": "Här är instruktionerna",
+        "instructions_html": "Här är instruktionerna",
+        "instructions_text": "Här är instruktionerna",
         "instructions_label": "Mer information om avbokning",
         "email_recipient_name": "Magnus Persson",
         "text_reservation_cancelled": "Din bokning har avbokats",
@@ -379,13 +388,14 @@ def test_get_context__reservation_confirmed__en():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
     assert context == {
         "email_recipient_name": "John Doe",
-        "instructions": "These are the instructions",
+        "instructions_html": "These are the instructions",
+        "instructions_text": "These are the instructions",
         "instructions_label": "Additional information about your booking",
         "text_reservation_confirmed": "You have made a new booking",
         "title": "Thank you for your booking at Varaamo",
@@ -411,13 +421,14 @@ def test_get_context__reservation_confirmed__fi():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Nämä ovat ohjeet",
+            instructions="Nämä ovat ohjeet",
             language="fi",
         )
 
     assert context == {
         "email_recipient_name": "Mikko Mallikas",
-        "instructions": "Nämä ovat ohjeet",
+        "instructions_html": "Nämä ovat ohjeet",
+        "instructions_text": "Nämä ovat ohjeet",
         "instructions_label": "Lisätietoa varauksestasi",
         "text_reservation_confirmed": "Olet tehnyt uuden varauksen",
         "title": "Kiitos varauksestasi Varaamossa",
@@ -443,13 +454,14 @@ def test_get_context__reservation_confirmed__sv():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
     assert context == {
         "email_recipient_name": "Magnus Persson",
-        "instructions": "Här är instruktionerna",
+        "instructions_html": "Här är instruktionerna",
+        "instructions_text": "Här är instruktionerna",
         "instructions_label": "Mer information om din bokning",
         "text_reservation_confirmed": "Du har gjort en ny bokning",
         "title": "Tack för din bokning på Varaamo",
@@ -478,7 +490,7 @@ def test_get_context__reservation_modified__en():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -486,7 +498,8 @@ def test_get_context__reservation_modified__en():
         "email_recipient_name": "John Doe",
         "text_reservation_modified": "Your booking has been updated",
         "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
+        "instructions_html": "These are the instructions",
+        "instructions_text": "These are the instructions",
         "title": "Your booking has been updated",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -510,7 +523,7 @@ def test_get_context__reservation_modified__fi():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -518,7 +531,8 @@ def test_get_context__reservation_modified__fi():
         "email_recipient_name": "Mikko Mallikas",
         "text_reservation_modified": "Varaustasi on muutettu",
         "instructions_label": "Lisätietoa varauksestasi",
-        "instructions": "Tässä ovat ohjeet",
+        "instructions_html": "Tässä ovat ohjeet",
+        "instructions_text": "Tässä ovat ohjeet",
         "title": "Varaustasi on muutettu",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
@@ -542,7 +556,7 @@ def test_get_context__reservation_modified__sv():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            confirmed_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -550,7 +564,8 @@ def test_get_context__reservation_modified__sv():
         "email_recipient_name": "Magnus Persson",
         "text_reservation_modified": "Din bokning har uppdaterats",
         "instructions_label": "Mer information om din bokning",
-        "instructions": "Här är instruktionerna",
+        "instructions_html": "Här är instruktionerna",
+        "instructions_text": "Här är instruktionerna",
         "title": "Din bokning har uppdaterats",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -576,7 +591,7 @@ def test_get_context__reservation_rejected__en():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="This is the rejection reason",
             reservation_id=12,
-            cancelled_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -588,7 +603,8 @@ def test_get_context__reservation_rejected__en():
         "rejection_reason": "This is the rejection reason",
         "text_reservation_rejected": "Unfortunately your booking cannot be confirmed",
         "instructions_label": "Additional information",
-        "instructions": "These are the instructions",
+        "instructions_html": "These are the instructions",
+        "instructions_text": "These are the instructions",
         "title": "Unfortunately your booking cannot be confirmed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -609,7 +625,7 @@ def test_get_context__reservation_rejected__fi():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="Tässä on hylkäyksen syy",
             reservation_id=12,
-            cancelled_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -621,7 +637,8 @@ def test_get_context__reservation_rejected__fi():
         "rejection_reason": "Tässä on hylkäyksen syy",
         "text_reservation_rejected": "Valitettavasti varaustasi ei voida vahvistaa",
         "instructions_label": "Lisätietoa",
-        "instructions": "Tässä ovat ohjeet",
+        "instructions_html": "Tässä ovat ohjeet",
+        "instructions_text": "Tässä ovat ohjeet",
         "title": "Valitettavasti varaustasi ei voida vahvistaa",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
@@ -642,7 +659,7 @@ def test_get_context__reservation_rejected__sv():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="Här är orsaken till avslagningen",
             reservation_id=12,
-            cancelled_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -654,7 +671,8 @@ def test_get_context__reservation_rejected__sv():
         "rejection_reason": "Här är orsaken till avslagningen",
         "text_reservation_rejected": "Tyvärr kan vi inte bekräfta din bokning",
         "instructions_label": "Mer information",
-        "instructions": "Här är instruktionerna",
+        "instructions_html": "Här är instruktionerna",
+        "instructions_text": "Här är instruktionerna",
         "title": "Tyvärr kan vi inte bekräfta din bokning",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -681,7 +699,7 @@ def test_get_context__reservation_requires_handling__en():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            pending_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -693,7 +711,8 @@ def test_get_context__reservation_requires_handling__en():
         ),
         "text_reservation_requires_handling": "You have made a new booking request",
         "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
+        "instructions_html": "These are the instructions",
+        "instructions_text": "These are the instructions",
         "title": "Your booking is waiting for processing",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -719,7 +738,7 @@ def test_get_context__reservation_requires_handling__fi():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            pending_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -731,7 +750,8 @@ def test_get_context__reservation_requires_handling__fi():
         ),
         "text_reservation_requires_handling": "Olet tehnyt alustavan varauksen",
         "instructions_label": "Lisätietoa varauksestasi",
-        "instructions": "Tässä ovat ohjeet",
+        "instructions_html": "Tässä ovat ohjeet",
+        "instructions_text": "Tässä ovat ohjeet",
         "title": "Varauksesi odottaa käsittelyä",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
@@ -757,7 +777,7 @@ def test_get_context__reservation_requires_handling__sv():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            pending_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -769,7 +789,8 @@ def test_get_context__reservation_requires_handling__sv():
         ),
         "text_reservation_requires_handling": "Du har gjort en ny bokningsförfrågan",
         "instructions_label": "Mer information om din bokning",
-        "instructions": "Här är instruktionerna",
+        "instructions_html": "Här är instruktionerna",
+        "instructions_text": "Här är instruktionerna",
         "title": "Din bokning väntar på att behandlas",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -795,7 +816,7 @@ def test_get_context__reservation_requires_handling__subsidised():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            pending_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -807,7 +828,8 @@ def test_get_context__reservation_requires_handling__subsidised():
         ),
         "text_reservation_requires_handling": "You have made a new booking request",
         "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
+        "instructions_html": "These are the instructions",
+        "instructions_text": "These are the instructions",
         "title": "Your booking is waiting for processing",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -837,7 +859,7 @@ def test_get_context__reservation_requires_payment__en():
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
             reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            instructions="These are the instructions",
             language="en",
         )
 
@@ -849,7 +871,8 @@ def test_get_context__reservation_requires_payment__en():
         "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/en/reservations">Pay the booking</a>',
         "pay_reservation_link": "Pay the booking: https://fake.varaamo.hel.fi/en/reservations",
         "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
+        "instructions_html": "These are the instructions",
+        "instructions_text": "These are the instructions",
         "title": "Your booking has been confirmed, and can be paid",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -874,7 +897,7 @@ def test_get_context__reservation_requires_payment__fi():
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
             reservation_id=12,
-            confirmed_instructions="Tässä ovat ohjeet",
+            instructions="Tässä ovat ohjeet",
             language="fi",
         )
 
@@ -886,7 +909,8 @@ def test_get_context__reservation_requires_payment__fi():
         "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/reservations">Maksa varaus</a>',
         "pay_reservation_link": "Maksa varaus: https://fake.varaamo.hel.fi/reservations",
         "instructions_label": "Lisätietoa varauksestasi",
-        "instructions": "Tässä ovat ohjeet",
+        "instructions_html": "Tässä ovat ohjeet",
+        "instructions_text": "Tässä ovat ohjeet",
         "title": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
@@ -911,7 +935,7 @@ def test_get_context__reservation_requires_payment__sv():
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
             reservation_id=12,
-            confirmed_instructions="Här är instruktionerna",
+            instructions="Här är instruktionerna",
             language="sv",
         )
 
@@ -923,7 +947,8 @@ def test_get_context__reservation_requires_payment__sv():
         "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/sv/reservations">Betala bokningen</a>',
         "pay_reservation_link": "Betala bokningen: https://fake.varaamo.hel.fi/sv/reservations",
         "instructions_label": "Mer information om din bokning",
-        "instructions": "Här är instruktionerna",
+        "instructions_html": "Här är instruktionerna",
+        "instructions_text": "Här är instruktionerna",
         "title": "Din bokning har bekräftats och kan betalas",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,

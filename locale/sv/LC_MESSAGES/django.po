@@ -2876,7 +2876,6 @@ msgid "Your seasonal booking has been cancelled"
 msgstr "Din säsongsbokning har avbokats"
 
 #: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
 msgid ""
 "All space reservations included in your seasonal booking have been cancelled"

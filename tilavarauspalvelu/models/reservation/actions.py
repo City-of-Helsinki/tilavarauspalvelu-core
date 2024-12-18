@@ -198,12 +198,7 @@ class ReservationActions:
             return f"{self.reservation.reservee_first_name} {self.reservation.reservee_last_name}".strip()
         return self.reservation.reservee_organisation_name
 
-    def get_instructions(
-        self,
-        *,
-        kind: Literal["confirmed", "pending", "cancelled"],
-        language: Lang,
-    ) -> str:
+    def get_instructions(self, *, kind: Literal["confirmed", "pending", "cancelled"], language: Lang) -> str:
         return "\n-\n".join(
             get_attr_by_language(reservation_unit, f"reservation_{kind}_instructions", language)
             for reservation_unit in self.reservation.reservation_units.all()
