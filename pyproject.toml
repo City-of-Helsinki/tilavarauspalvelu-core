@@ -38,6 +38,7 @@ social-auth-app-django = "5.4.2"
 uWSGI = { version = "2.0.28", markers = "sys_platform != 'win32'" }
 whitenoise = "6.8.2"
 xhtml2pdf = "0.2.16"
+html2text = "^2024.2.26"
 
 [tool.poetry.group.admin.dependencies]
 # Dependencies related to the admin panel or other "administrative" tasks.
