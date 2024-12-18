@@ -8,7 +8,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory, UserFactory

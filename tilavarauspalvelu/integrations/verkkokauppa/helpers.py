@@ -9,15 +9,15 @@ from django.conf import settings
 from django.urls import reverse
 
 from config.utils.date_util import localized_short_weekday
-from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct
-from tilavarauspalvelu.utils.verkkokauppa.exceptions import UnsupportedMetaKeyError
-from tilavarauspalvelu.utils.verkkokauppa.order.types import (
+from tilavarauspalvelu.integrations.verkkokauppa.exceptions import UnsupportedMetaKeyError
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     CreateOrderParams,
     Order,
     OrderCustomer,
     OrderItemMetaParams,
     OrderItemParams,
 )
+from tilavarauspalvelu.models import PaymentMerchant, PaymentProduct
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:

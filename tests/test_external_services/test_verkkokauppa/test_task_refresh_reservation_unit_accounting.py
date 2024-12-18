@@ -5,10 +5,10 @@ import uuid
 import pytest
 from django.test import override_settings
 
+from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
+from tilavarauspalvelu.integrations.verkkokauppa.product.types import CreateOrUpdateAccountingParams, Product
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting
-from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
-from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, Product
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 from tests.factories import (

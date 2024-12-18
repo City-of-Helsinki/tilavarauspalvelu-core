@@ -6,10 +6,10 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import GetMerchantError
+from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import CreateMerchantParams, UpdateMerchantParams
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentMerchant
-from tilavarauspalvelu.utils.verkkokauppa.merchants.exceptions import GetMerchantError
-from tilavarauspalvelu.utils.verkkokauppa.merchants.types import CreateMerchantParams, UpdateMerchantParams
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
 __all__ = [
     "PaymentMerchantAdmin",

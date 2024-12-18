@@ -9,6 +9,7 @@ from django.test import Client, override_settings
 from django.urls import reverse
 
 from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import BugReport, RequestLog, Reservation, SQLLog
 from tilavarauspalvelu.models.bug_report.model import (
     BugReportPhaseChoice,
@@ -17,7 +18,6 @@ from tilavarauspalvelu.models.bug_report.model import (
     BugReportUserChoice,
 )
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
 
 from tests import factories

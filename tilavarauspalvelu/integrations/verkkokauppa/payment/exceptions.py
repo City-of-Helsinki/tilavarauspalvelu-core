@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.utils.verkkokauppa.exceptions import VerkkokauppaError
+from tilavarauspalvelu.integrations.verkkokauppa.exceptions import VerkkokauppaError
 
 
 class PaymentError(VerkkokauppaError):
