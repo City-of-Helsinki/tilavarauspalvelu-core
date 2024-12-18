@@ -451,7 +451,7 @@ def create_reservation_unit_thumbnails_and_urls(pk: int | None = None) -> None:
 
 @app.task(name="purge_image_cache")
 def purge_image_cache(image_path: str) -> None:
-    from utils.image_cache import purge
+    from tilavarauspalvelu.integrations.image_cache import purge
 
     purge(image_path)
 
