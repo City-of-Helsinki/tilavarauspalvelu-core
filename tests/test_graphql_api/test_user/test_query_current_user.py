@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
 
 from tests.factories import UnitFactory, UserFactory, UserSocialAuthFactory
 from tests.helpers import patch_method

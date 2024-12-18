@@ -7,7 +7,7 @@ from django.conf import settings
 from tilavarauspalvelu.api.graphql.types.reservation.serializers._base_save_serializer import (
     ReservationBaseSaveSerializer,
 )
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
 

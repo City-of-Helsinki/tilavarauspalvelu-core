@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 from graphene_django_extensions.testing import build_mutation, build_query
 
 from tilavarauspalvelu.enums import ReservationTypeChoice
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
 from utils.date_utils import next_hour
 
 from tests.factories import ReservationCancelReasonFactory, ReservationDenyReasonFactory
