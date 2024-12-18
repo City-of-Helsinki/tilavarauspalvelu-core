@@ -6,6 +6,7 @@ from django.conf import settings
 from requests import RequestException
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa import constants as verkkokauppa_constants
 from tilavarauspalvelu.integrations.verkkokauppa.exceptions import VerkkokauppaConfigurationError
 from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import (
@@ -40,7 +41,6 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import (
 from tilavarauspalvelu.integrations.verkkokauppa.product.types import Accounting, Product
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     import uuid

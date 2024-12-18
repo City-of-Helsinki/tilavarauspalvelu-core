@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from django.conf import settings
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import ParseOrderError
 from utils.decimal_utils import round_decimal
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     import datetime

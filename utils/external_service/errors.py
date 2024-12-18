@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Any
 
-from utils.sentry import SentryLogger
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from requests import Response

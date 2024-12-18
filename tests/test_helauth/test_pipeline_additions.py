@@ -13,9 +13,9 @@ from tilavarauspalvelu.integrations.helauth.pipeline import (
     migrate_from_tunnistamo_to_keycloak,
     update_user_from_profile,
 )
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
-from utils.sentry import SentryLogger
 
 from tests.factories import (
     ApplicationFactory,

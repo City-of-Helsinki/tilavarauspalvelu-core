@@ -8,8 +8,8 @@ from tilavarauspalvelu.api.graphql.types.reservation.serializers._base_save_seri
     ReservationBaseSaveSerializer,
 )
 from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.external_service.errors import ExternalServiceError
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation

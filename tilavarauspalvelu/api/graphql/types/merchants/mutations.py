@@ -6,9 +6,9 @@ from graphene_django_extensions.bases import DjangoMutation
 
 from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
 from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.models import PaymentOrder
-from utils.sentry import SentryLogger
 
 from .permissions import OrderRefreshPermission
 from .serializers import RefreshOrderInputSerializer, RefreshOrderOutputSerializer

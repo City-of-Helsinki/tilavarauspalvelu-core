@@ -10,9 +10,9 @@ from django.utils.translation import gettext_lazy as _
 from modeltranslation.admin import TranslationAdmin
 
 from tilavarauspalvelu.admin.location.admin import LocationInline
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
 from tilavarauspalvelu.models import Unit
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet

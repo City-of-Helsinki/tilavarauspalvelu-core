@@ -13,12 +13,12 @@ from modeltranslation.admin import TranslationAdmin
 
 from tilavarauspalvelu.admin.application_round.form import ApplicationRoundAdminForm
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ApplicationRound
 from tilavarauspalvelu.services.csv_export import (
     ApplicationRoundApplicationsCSVExporter,
     ApplicationRoundResultCSVExporter,
 )
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet

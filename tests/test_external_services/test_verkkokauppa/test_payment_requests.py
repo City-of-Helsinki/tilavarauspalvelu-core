@@ -9,10 +9,10 @@ import pytest
 from django.conf import settings
 from requests import Timeout
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError, RefundPaymentError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.sentry import SentryLogger
 
 from tests.helpers import patch_method
 from tests.mocks import MockResponse

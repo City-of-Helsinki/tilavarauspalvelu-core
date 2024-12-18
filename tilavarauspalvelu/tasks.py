@@ -30,6 +30,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
@@ -70,7 +71,6 @@ from tilavarauspalvelu.services.pruning import (
 )
 from tilavarauspalvelu.translation import translate_for_user
 from utils.date_utils import local_date, local_datetime, local_end_of_day, local_start_of_day
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable

@@ -15,9 +15,9 @@ from tilavarauspalvelu.admin.reservation_unit_image.admin import ReservationUnit
 from tilavarauspalvelu.admin.reservation_unit_pricing.admin import ReservationUnitPricingInline
 from tilavarauspalvelu.enums import ReservationKind
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.services.csv_export import ReservationUnitExporter
-from utils.sentry import SentryLogger
 
 from .form import ReservationUnitAdminForm
 
