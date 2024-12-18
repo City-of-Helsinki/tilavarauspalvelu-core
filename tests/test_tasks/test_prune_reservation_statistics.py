@@ -4,7 +4,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 
 from tilavarauspalvelu.models import ReservationStatistic
-from tilavarauspalvelu.utils.pruning import prune_reservation_statistics
+from tilavarauspalvelu.services.pruning import prune_reservation_statistics
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory

@@ -62,13 +62,13 @@ from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDe
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.sql_log.model import SQLLog
 from tilavarauspalvelu.services.permission_service import deactivate_old_permissions
-from tilavarauspalvelu.translation import translate_for_user
-from tilavarauspalvelu.utils.pruning import (
+from tilavarauspalvelu.services.pruning import (
     prune_inactive_reservations,
     prune_recurring_reservations,
     prune_reservation_statistics,
     prune_reservation_with_inactive_payments,
 )
+from tilavarauspalvelu.translation import translate_for_user
 from utils.date_utils import local_date, local_datetime, local_end_of_day, local_start_of_day
 from utils.sentry import SentryLogger
 
