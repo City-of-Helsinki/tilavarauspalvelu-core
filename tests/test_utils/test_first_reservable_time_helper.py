@@ -9,6 +9,7 @@ import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import ReservationStartInterval
+from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import ReservationUnit
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_reservable_time_span_helper import (
@@ -17,7 +18,6 @@ from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_reserva
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_reservation_unit_helper import (
     ReservationUnitFirstReservableTimeHelper,
 )
-from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory, ReservationUnitFactory

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 @pytest.fixture(autouse=True)
 def _force_HaukiAPIClient_to_be_mocked():
     """Force 'HaukiAPIClient.generic' to be mocked in all tests."""
-    from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
+    from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 
     path = HaukiAPIClient.__module__ + "." + HaukiAPIClient.__qualname__ + ".generic"
     exception = NotImplementedError("'HaukiAPIClient.generic' must be mocked!")

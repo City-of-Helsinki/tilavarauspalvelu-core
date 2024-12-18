@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 
 from tilavarauspalvelu.exceptions import HaukiAPIError
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.models import ReservationUnit
-from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 from tests.helpers import patch_method

@@ -7,10 +7,10 @@ import freezegun
 import pytest
 
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+from tilavarauspalvelu.integrations.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from tilavarauspalvelu.models import ReservableTimeSpan
-from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory

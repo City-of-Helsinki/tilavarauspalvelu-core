@@ -19,10 +19,10 @@ from tilavarauspalvelu.enums import (
     WeekdayChoice,
 )
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from tilavarauspalvelu.models import RecurringReservation, Reservation, ReservationDenyReason, ReservationStatistic
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
-from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime
 from utils.fields.serializer import CurrentUserDefaultNullable, input_only_field
 

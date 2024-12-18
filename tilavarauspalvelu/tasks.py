@@ -28,6 +28,8 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     Weekday,
 )
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     AllocatedTimeSlot,
@@ -53,8 +55,6 @@ from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.sql_log.model import SQLLog
 from tilavarauspalvelu.services.permission_service import deactivate_old_permissions
 from tilavarauspalvelu.translation import translate_for_user
-from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.utils.pruning import (
     prune_inactive_reservations,
     prune_recurring_reservations,
@@ -123,7 +123,7 @@ def remove_old_personal_info_view_logs() -> None:
 
 @app.task(name="update_origin_hauki_resource_reservable_time_spans")
 def update_origin_hauki_resource_reservable_time_spans() -> None:
-    from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+    from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 
     logger.info("Updating OriginHaukiResource reservable time spans...")
     HaukiResourceHashUpdater().run()

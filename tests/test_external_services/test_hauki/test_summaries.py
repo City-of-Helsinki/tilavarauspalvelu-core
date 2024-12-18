@@ -4,7 +4,7 @@ import datetime
 
 import pytest
 
-from tilavarauspalvelu.utils.opening_hours.summaries import get_resources_total_hours_per_resource
+from tilavarauspalvelu.integrations.opening_hours.summaries import get_resources_total_hours_per_resource
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory
