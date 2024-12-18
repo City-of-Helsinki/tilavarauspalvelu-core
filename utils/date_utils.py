@@ -440,13 +440,11 @@ def datetime_range_as_string(*, start_datetime: datetime.datetime, end_datetime:
     return f"{start_str}-{end_str}"
 
 
-def time_difference(
-    _input_1: datetime.datetime | datetime.time,
-    _input_2: datetime.datetime | datetime.time,
-    /,
-) -> datetime.timedelta:
-    """Difference between two datetimes/times as timedelta."""
-    return time_as_timedelta(_input_1) - time_as_timedelta(_input_2)
+def time_difference(_from: datetime.time, _to: datetime.time, /) -> datetime.timedelta:
+    """Difference between two times as a timedelta."""
+    if _to == datetime.time():  # if end is at midnight
+        return datetime.timedelta(hours=24) - time_as_timedelta(_from)
+    return time_as_timedelta(_to) - time_as_timedelta(_from)
 
 
 class TimeSlot(TypedDict):

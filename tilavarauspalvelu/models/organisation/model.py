@@ -44,7 +44,7 @@ class Organisation(SerializableMixin, models.Model):
     active_members: int | None = models.PositiveIntegerField(null=True)
     core_business: str = models.TextField(blank=True)
 
-    organisation_type: OrganizationTypeChoice = StrChoiceField(
+    organisation_type: OrganizationTypeChoice = StrChoiceField(  # TODO: Deprecated
         enum=OrganizationTypeChoice,
         default=OrganizationTypeChoice.COMPANY,
     )

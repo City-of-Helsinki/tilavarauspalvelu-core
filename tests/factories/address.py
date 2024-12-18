@@ -24,7 +24,7 @@ class AddressFactory(GenericDjangoModelFactory[Address]):
     post_code = FakerFI("postcode")
 
     city = "Helsinki"
-    city_fi = city
+    city_fi = LazyAttribute(lambda i: i.city)
     city_en = "Helsinki"
     city_sv = "Helsingfors"
 
