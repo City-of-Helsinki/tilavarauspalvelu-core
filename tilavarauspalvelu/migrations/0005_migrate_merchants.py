@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import django.db.models.deletion
 from django.db import migrations, models
 
-import tilavarauspalvelu.utils.validators
+import tilavarauspalvelu.validators
 
 
 class Migration(migrations.Migration):
@@ -21,11 +23,11 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=128)),
                 (
                     "company_code",
-                    models.CharField(max_length=4, validators=[tilavarauspalvelu.utils.validators.is_numeric]),
+                    models.CharField(max_length=4, validators=[tilavarauspalvelu.validators.is_numeric]),
                 ),
                 (
                     "main_ledger_account",
-                    models.CharField(max_length=6, validators=[tilavarauspalvelu.utils.validators.is_numeric]),
+                    models.CharField(max_length=6, validators=[tilavarauspalvelu.validators.is_numeric]),
                 ),
                 ("vat_code", models.CharField(max_length=2)),
                 (
@@ -34,7 +36,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         default="",
                         max_length=10,
-                        validators=[tilavarauspalvelu.utils.validators.is_numeric],
+                        validators=[tilavarauspalvelu.validators.is_numeric],
                     ),
                 ),
                 (
@@ -43,7 +45,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         default="",
                         max_length=7,
-                        validators=[tilavarauspalvelu.utils.validators.is_numeric],
+                        validators=[tilavarauspalvelu.validators.is_numeric],
                     ),
                 ),
                 (
@@ -53,8 +55,8 @@ class Migration(migrations.Migration):
                         default="",
                         max_length=16,
                         validators=[
-                            tilavarauspalvelu.utils.validators.validate_accounting_project,
-                            tilavarauspalvelu.utils.validators.is_numeric,
+                            tilavarauspalvelu.validators.validate_accounting_project,
+                            tilavarauspalvelu.validators.is_numeric,
                         ],
                     ),
                 ),
@@ -64,7 +66,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         default="",
                         max_length=6,
-                        validators=[tilavarauspalvelu.utils.validators.is_numeric],
+                        validators=[tilavarauspalvelu.validators.is_numeric],
                     ),
                 ),
                 ("balance_profit_center", models.CharField(max_length=10)),

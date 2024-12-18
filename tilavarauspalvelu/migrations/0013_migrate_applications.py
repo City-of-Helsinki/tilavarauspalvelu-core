@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 
 import django.contrib.postgres.fields
@@ -9,7 +11,7 @@ from django.db import migrations, models
 
 import tilavarauspalvelu.enums
 import tilavarauspalvelu.models.organisation.model
-import tilavarauspalvelu.utils.validators
+import tilavarauspalvelu.validators
 import utils.fields.model
 
 
@@ -480,7 +482,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         default=list,
                         size=None,
-                        validators=[tilavarauspalvelu.utils.validators.validate_reservable_times],
+                        validators=[tilavarauspalvelu.validators.validate_reservable_times],
                     ),
                 ),
                 (
@@ -724,7 +726,7 @@ class Migration(migrations.Migration):
                 ),
                 name="durations_multiple_of_30_minutes_max_24_hours",
                 violation_error_message=(
-                    "Reservation min and max durations must be multiples of 30 minutes, " "up to a maximum of 24 hours."
+                    "Reservation min and max durations must be multiples of 30 minutes, up to a maximum of 24 hours."
                 ),
             ),
         ),

@@ -5,7 +5,7 @@ from typing import Any
 from graphene_django_extensions import NestingModelSerializer
 
 from tilavarauspalvelu.models import ApplicationRoundTimeSlot
-from tilavarauspalvelu.utils.validators import (
+from tilavarauspalvelu.validators import (
     TimeSlotSerializer,
     validate_reservable_times_begin_end,
     validate_reservable_times_overlap,
