@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from factory import LazyAttribute, fuzzy
 
 from tilavarauspalvelu.enums import OrganizationTypeChoice
@@ -38,3 +40,54 @@ class OrganisationFactory(GenericDjangoModelFactory[Organisation]):
     address = ForeignKeyFactory("tests.factories.AddressFactory", required=True)
 
     applications = ReverseForeignKeyFactory("tests.factories.ApplicationFactory")
+
+    @classmethod
+    def create_for_community_applicant(cls, **kwargs: Any) -> Organisation:
+        defaults = {
+            "name": "Test Community",
+            "organisation_type": OrganizationTypeChoice.RELIGIOUS_COMMUNITY,
+            "core_business": "Testing business",
+            "identifier": None,
+            **kwargs,
+        }
+
+        if "address" not in defaults:
+            defaults.setdefault("address__street_address", "Org address")
+            defaults.setdefault("address__post_code", "54321")
+            defaults.setdefault("address__city", "City")
+
+        return cls.create(**defaults)
+
+    @classmethod
+    def create_for_association_applicant(cls, **kwargs: Any) -> Organisation:
+        defaults = {
+            "name": "Test Association",
+            "organisation_type": OrganizationTypeChoice.PUBLIC_ASSOCIATION,
+            "core_business": "Testing business",
+            "identifier": None,
+            **kwargs,
+        }
+
+        if "address" not in defaults:
+            defaults.setdefault("address__street_address", "Org address")
+            defaults.setdefault("address__post_code", "54321")
+            defaults.setdefault("address__city", "City")
+
+        return cls.create(**defaults)
+
+    @classmethod
+    def create_for_company_applicant(cls, **kwargs: Any) -> Organisation:
+        defaults = {
+            "name": "Test Company",
+            "organisation_type": OrganizationTypeChoice.COMPANY,
+            "core_business": "Testing business",
+            "identifier": "123456-0",
+            **kwargs,
+        }
+
+        if "address" not in defaults:
+            defaults.setdefault("address__street_address", "Org address")
+            defaults.setdefault("address__post_code", "54321")
+            defaults.setdefault("address__city", "City")
+
+        return cls.create(**defaults)
