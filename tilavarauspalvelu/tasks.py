@@ -30,6 +30,14 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
+from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
+from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
+    CreateOrUpdateAccountingParams,
+    CreateProductParams,
+)
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     AllocatedTimeSlot,
@@ -61,11 +69,6 @@ from tilavarauspalvelu.utils.pruning import (
     prune_reservation_statistics,
     prune_reservation_with_inactive_payments,
 )
-from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
-from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
-from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
-from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_date, local_datetime, local_end_of_day, local_start_of_day
 from utils.sentry import SentryLogger
 

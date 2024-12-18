@@ -7,8 +7,8 @@ from django.utils.timezone import get_default_timezone
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import CustomerTypeChoice, Language
-from tilavarauspalvelu.utils.verkkokauppa.exceptions import UnsupportedMetaKeyError
-from tilavarauspalvelu.utils.verkkokauppa.helpers import (
+from tilavarauspalvelu.integrations.verkkokauppa.exceptions import UnsupportedMetaKeyError
+from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
     get_formatted_reservation_time,
     get_meta_label,
     get_verkkokauppa_order_params,

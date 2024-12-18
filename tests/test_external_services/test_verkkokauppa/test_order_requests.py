@@ -9,15 +9,19 @@ from urllib.parse import urljoin
 import pytest
 from requests import Timeout
 
-from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError, CreateOrderError, GetOrderError
-from tilavarauspalvelu.utils.verkkokauppa.order.types import (
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import (
+    CancelOrderError,
+    CreateOrderError,
+    GetOrderError,
+)
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     CreateOrderParams,
     Order,
     OrderCustomer,
     OrderItemMetaParams,
     OrderItemParams,
 )
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 from tests.helpers import patch_method

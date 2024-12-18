@@ -7,16 +7,16 @@ from django.conf import settings
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
-from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
-from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.types import PaymentStatus
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.utils.verkkokauppa.order.types import Order
-    from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment
+    from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
+    from tilavarauspalvelu.integrations.verkkokauppa.payment.types import Payment
 
     from .model import PaymentOrder
 

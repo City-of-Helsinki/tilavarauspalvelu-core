@@ -9,7 +9,7 @@ from typing import Any
 
 from django.conf import settings
 
-from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import (
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import (
     ParsePaymentError,
     ParseRefundError,
     ParseRefundStatusError,
@@ -100,7 +100,7 @@ class Refund:
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> Refund:
-        from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
+        from tilavarauspalvelu.integrations.verkkokauppa.helpers import parse_datetime
 
         try:
             return Refund(
@@ -133,7 +133,7 @@ class RefundStatusResult:
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> RefundStatusResult:
-        from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
+        from tilavarauspalvelu.integrations.verkkokauppa.helpers import parse_datetime
 
         try:
             return RefundStatusResult(

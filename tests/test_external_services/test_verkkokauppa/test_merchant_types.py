@@ -7,8 +7,8 @@ from typing import Any
 import pytest
 from django.conf import settings
 
-from tilavarauspalvelu.utils.verkkokauppa.merchants.exceptions import ParseMerchantError
-from tilavarauspalvelu.utils.verkkokauppa.merchants.types import (
+from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import ParseMerchantError
+from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import (
     CreateMerchantParams,
     Merchant,
     MerchantInfo,

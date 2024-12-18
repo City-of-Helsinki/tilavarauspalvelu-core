@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from django.conf import settings
 
-from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import ParseOrderError
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import ParseOrderError
 from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger
 
@@ -105,7 +105,7 @@ class Order:
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> Order:
-        from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
+        from tilavarauspalvelu.integrations.verkkokauppa.helpers import parse_datetime
 
         subscription_id = json.get("subscriptionId")
         try:

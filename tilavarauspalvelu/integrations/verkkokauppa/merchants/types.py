@@ -4,7 +4,7 @@ import uuid
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from tilavarauspalvelu.utils.verkkokauppa.merchants.exceptions import ParseMerchantError, ParseMerchantInfoError
+from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import ParseMerchantError, ParseMerchantInfoError
 
 if TYPE_CHECKING:
     import datetime
@@ -62,7 +62,7 @@ class Merchant:
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> Merchant:
-        from tilavarauspalvelu.utils.verkkokauppa.helpers import parse_datetime
+        from tilavarauspalvelu.integrations.verkkokauppa.helpers import parse_datetime
 
         try:
             configurations = json["configurations"]
