@@ -4,7 +4,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Any
 
-from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import ParseAccountingError, ParseProductError
+from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import ParseAccountingError, ParseProductError
 
 
 @dataclass(frozen=True)

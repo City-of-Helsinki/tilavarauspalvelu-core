@@ -6,9 +6,9 @@ import pytest
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
-from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.types import PaymentStatus
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 from tests.factories import PaymentFactory

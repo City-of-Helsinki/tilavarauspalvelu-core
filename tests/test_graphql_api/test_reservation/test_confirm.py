@@ -7,9 +7,9 @@ from django.test import override_settings
 from graphene_django_extensions.testing import build_mutation
 
 from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationNotification, ReservationStateChoice
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentOrder
-from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CreateOrderError
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 from tests.factories import (

@@ -8,7 +8,7 @@ import pytest
 from django.conf import settings
 
 from tilavarauspalvelu.enums import CustomerTypeChoice
-from tilavarauspalvelu.utils.verkkokauppa.helpers import get_verkkokauppa_order_params
+from tilavarauspalvelu.integrations.verkkokauppa.helpers import get_verkkokauppa_order_params
 from utils.date_utils import local_datetime
 
 from tests.factories import PaymentProductFactory, ReservationFactory, ReservationUnitFactory, UserFactory

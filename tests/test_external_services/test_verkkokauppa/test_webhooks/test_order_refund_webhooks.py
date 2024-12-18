@@ -6,8 +6,8 @@ import pytest
 from django.urls import reverse
 
 from tilavarauspalvelu.enums import OrderStatus
-from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetRefundStatusError
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetRefundStatusError
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 from tests.factories import PaymentOrderFactory

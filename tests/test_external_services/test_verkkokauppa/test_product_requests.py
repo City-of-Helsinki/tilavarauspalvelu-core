@@ -6,14 +6,17 @@ import pytest
 from django.conf import settings
 from requests import Timeout
 
-from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError, CreateProductError
-from tilavarauspalvelu.utils.verkkokauppa.product.types import (
+from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import (
+    CreateOrUpdateAccountingError,
+    CreateProductError,
+)
+from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
     Accounting,
     CreateOrUpdateAccountingParams,
     CreateProductParams,
     Product,
 )
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 from tests.helpers import patch_method

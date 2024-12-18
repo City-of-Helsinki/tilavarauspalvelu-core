@@ -5,8 +5,8 @@ import uuid
 import pytest
 from django.test import override_settings
 
-from tilavarauspalvelu.utils.verkkokauppa.product.types import Product
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.integrations.verkkokauppa.product.types import Product
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
 from tests.factories import PaymentMerchantFactory, ReservationUnitFactory, ReservationUnitPricingFactory
 from tests.helpers import patch_method

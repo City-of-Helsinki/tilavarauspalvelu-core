@@ -7,8 +7,8 @@ from decimal import Decimal
 import factory
 from django.utils.timezone import get_default_timezone
 
-from tilavarauspalvelu.utils.verkkokauppa.order.types import Order, OrderCustomer
-from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order, OrderCustomer
+from tilavarauspalvelu.integrations.verkkokauppa.payment.types import Payment
 
 from ._base import GenericFactory
 

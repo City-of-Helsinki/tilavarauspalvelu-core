@@ -6,23 +6,23 @@ from django.conf import settings
 from requests import RequestException
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
-from tilavarauspalvelu.utils.verkkokauppa import constants as verkkokauppa_constants
-from tilavarauspalvelu.utils.verkkokauppa.exceptions import VerkkokauppaConfigurationError
-from tilavarauspalvelu.utils.verkkokauppa.merchants.exceptions import (
+from tilavarauspalvelu.integrations.verkkokauppa import constants as verkkokauppa_constants
+from tilavarauspalvelu.integrations.verkkokauppa.exceptions import VerkkokauppaConfigurationError
+from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import (
     CreateMerchantError,
     GetMerchantError,
     ParseMerchantError,
     UpdateMerchantError,
 )
-from tilavarauspalvelu.utils.verkkokauppa.merchants.types import Merchant, MerchantInfo
-from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import (
+from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import Merchant, MerchantInfo
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import (
     CancelOrderError,
     CreateOrderError,
     GetOrderError,
     ParseOrderError,
 )
-from tilavarauspalvelu.utils.verkkokauppa.order.types import Order
-from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import (
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import (
     GetPaymentError,
     GetRefundStatusError,
     ParsePaymentError,
@@ -30,14 +30,14 @@ from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import (
     ParseRefundStatusError,
     RefundPaymentError,
 )
-from tilavarauspalvelu.utils.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
-from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import (
+from tilavarauspalvelu.integrations.verkkokauppa.payment.types import Payment, Refund, RefundStatusResult
+from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import (
     CreateOrUpdateAccountingError,
     CreateProductError,
     ParseAccountingError,
     ParseProductError,
 )
-from tilavarauspalvelu.utils.verkkokauppa.product.types import Accounting, Product
+from tilavarauspalvelu.integrations.verkkokauppa.product.types import Accounting, Product
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger
@@ -47,9 +47,12 @@ if TYPE_CHECKING:
 
     from requests import Response
 
-    from tilavarauspalvelu.utils.verkkokauppa.merchants.types import CreateMerchantParams, UpdateMerchantParams
-    from tilavarauspalvelu.utils.verkkokauppa.order.types import CreateOrderParams
-    from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
+    from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import CreateMerchantParams, UpdateMerchantParams
+    from tilavarauspalvelu.integrations.verkkokauppa.order.types import CreateOrderParams
+    from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
+        CreateOrUpdateAccountingParams,
+        CreateProductParams,
+    )
 
 __all__ = [
     "VerkkokauppaAPIClient",

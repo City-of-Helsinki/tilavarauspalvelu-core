@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.sentry import SentryLogger
 
 from tests.factories import UserFactory

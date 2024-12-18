@@ -6,8 +6,8 @@ import uuid
 import pytest
 from django.conf import settings
 
-from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import ParseRefundStatusError
-from tilavarauspalvelu.utils.verkkokauppa.payment.types import RefundStatusResult
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import ParseRefundStatusError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.types import RefundStatusResult
 from utils.sentry import SentryLogger
 
 from tests.helpers import patch_method

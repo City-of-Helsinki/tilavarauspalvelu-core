@@ -7,11 +7,11 @@ from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.types import PaymentStatus
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.tasks import update_expired_orders_task
-from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
-from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
-from tilavarauspalvelu.utils.verkkokauppa.payment.types import PaymentStatus
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
 from utils.sentry import SentryLogger
 
