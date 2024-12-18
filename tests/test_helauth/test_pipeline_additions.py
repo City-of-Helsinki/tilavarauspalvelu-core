@@ -7,9 +7,12 @@ from typing import Any, NamedTuple
 import pytest
 
 from tilavarauspalvelu.enums import ReservationNotification
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
-from tilavarauspalvelu.utils.helauth.parsers import ssn_to_date
-from tilavarauspalvelu.utils.helauth.pipeline import migrate_from_tunnistamo_to_keycloak, update_user_from_profile
+from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helauth.parsers import ssn_to_date
+from tilavarauspalvelu.integrations.helauth.pipeline import (
+    migrate_from_tunnistamo_to_keycloak,
+    update_user_from_profile,
+)
 from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
 from utils.sentry import SentryLogger

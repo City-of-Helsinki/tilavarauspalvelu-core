@@ -12,9 +12,9 @@ from query_optimizer import DjangoListField, optimize_single
 from query_optimizer.compiler import optimize
 
 from tilavarauspalvelu.enums import UserPermissionChoice
+from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, Reservation, User
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
 
 from .mutations import (
     AllocatedTimeSlotCreateMutation,
@@ -124,8 +124,8 @@ if TYPE_CHECKING:
 
     from django.db import models
 
+    from tilavarauspalvelu.integrations.helauth.typing import UserProfileInfo
     from tilavarauspalvelu.typing import AnyUser, GQLInfo
-    from tilavarauspalvelu.utils.helauth.typing import UserProfileInfo
 
 
 class Query(graphene.ObjectType):

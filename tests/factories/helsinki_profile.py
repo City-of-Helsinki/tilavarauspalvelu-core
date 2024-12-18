@@ -6,7 +6,7 @@ from typing import Any
 import factory
 from factory import fuzzy
 
-from tilavarauspalvelu.utils.helauth.typing import (
+from tilavarauspalvelu.integrations.helauth.typing import (
     PermanentAddress,
     PermanentForeignAddress,
     ProfileAddress,

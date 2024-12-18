@@ -14,8 +14,8 @@ from factory import LazyAttribute, LazyFunction
 from social_django.models import UserSocialAuth
 
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
+from tilavarauspalvelu.integrations.helauth.typing import IDToken
 from tilavarauspalvelu.models import User
-from tilavarauspalvelu.utils.helauth.typing import IDToken
 from utils.date_utils import local_datetime
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ReverseForeignKeyFactory

@@ -7,8 +7,7 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from graphene_django_extensions.utils import get_nested
 
-from tilavarauspalvelu.models import City
-from tilavarauspalvelu.utils.helauth.typing import (
+from tilavarauspalvelu.integrations.helauth.typing import (
     BirthdayInfo,
     LoginMethod,
     ProfileForeignAddress,
@@ -16,10 +15,10 @@ from tilavarauspalvelu.utils.helauth.typing import (
     ReservationPrefillInfo,
     UserProfileInfo,
 )
+from tilavarauspalvelu.models import City
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import User
-    from tilavarauspalvelu.utils.helauth.typing import (
+    from tilavarauspalvelu.integrations.helauth.typing import (
         PermanentAddress,
         PermanentForeignAddress,
         ProfileAddress,
@@ -29,6 +28,7 @@ if TYPE_CHECKING:
         ProfilePhone,
         VerifiedPersonalInfo,
     )
+    from tilavarauspalvelu.models import User
 
 __all__ = [
     "ProfileDataParser",

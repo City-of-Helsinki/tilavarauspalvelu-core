@@ -15,9 +15,9 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     ReservationTypeChoice,
 )
+from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helauth.typing import ADLoginAMR
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
-from tilavarauspalvelu.utils.helauth.typing import ADLoginAMR
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_end_of_day, local_start_of_day, next_hour
 from utils.decimal_utils import round_decimal
 from utils.sentry import SentryLogger
