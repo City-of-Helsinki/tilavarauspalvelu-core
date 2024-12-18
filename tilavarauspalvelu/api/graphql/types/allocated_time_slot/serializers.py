@@ -151,7 +151,7 @@ class AllocatedTimeSlotCreateSerializer(NestingModelSerializer):
         begin_time: datetime.time,
         end_time: datetime.time,
     ) -> None:
-        duration = time_difference(end_time, begin_time)
+        duration = time_difference(begin_time, end_time)
 
         if duration < section.reservation_min_duration:
             min_allowed = timedelta_to_json(section.reservation_min_duration)
