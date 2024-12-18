@@ -10,7 +10,7 @@ from django.db import migrations, models
 from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
 
-from utils.sentry import SentryLogger
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 from .queryset import ReservationUnitHierarchyManager
 

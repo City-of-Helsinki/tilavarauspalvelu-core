@@ -13,8 +13,8 @@ from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ProfileUser
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from promise import Promise

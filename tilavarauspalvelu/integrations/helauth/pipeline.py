@@ -8,8 +8,8 @@ from django.db.models.functions import Concat
 
 from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helauth.typing import IDToken
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import User
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from helusers.tunnistamo_oidc import TunnistamoOIDCAuth

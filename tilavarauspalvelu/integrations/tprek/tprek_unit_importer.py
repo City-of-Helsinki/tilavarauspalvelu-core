@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 from django.db.transaction import atomic
 
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekAPIClient
 from tilavarauspalvelu.models import Location, OriginHaukiResource
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet

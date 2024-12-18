@@ -12,9 +12,9 @@ from django.conf import settings
 from django.db import connection
 from graphql import GraphQLFieldResolver
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.typing import QueryInfo
 from utils.date_utils import local_datetime
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator

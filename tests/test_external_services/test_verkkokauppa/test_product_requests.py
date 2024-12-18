@@ -6,6 +6,7 @@ import pytest
 from django.conf import settings
 from requests import Timeout
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import (
     CreateOrUpdateAccountingError,
     CreateProductError,
@@ -17,7 +18,6 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
     Product,
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.sentry import SentryLogger
 
 from tests.helpers import patch_method
 from tests.mocks import MockResponse

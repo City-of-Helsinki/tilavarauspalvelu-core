@@ -17,10 +17,10 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helauth.typing import ADLoginAMR
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_end_of_day, local_start_of_day, next_hour
 from utils.decimal_utils import round_decimal
-from utils.sentry import SentryLogger
 
 from tests.factories import (
     AgeGroupFactory,

@@ -10,8 +10,8 @@ from freezegun import freeze_time
 from rest_framework.exceptions import ErrorDetail
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.sentry import SentryLogger
 
 from tests.factories import (
     AddressFactory,

@@ -7,11 +7,11 @@ from django.test import override_settings
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import PaymentStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import Reservation
-from utils.sentry import SentryLogger
 
 from tests.factories import OrderFactory, PaymentFactory, PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method

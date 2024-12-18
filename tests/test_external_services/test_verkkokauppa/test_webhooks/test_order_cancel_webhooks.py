@@ -9,10 +9,10 @@ from django.urls import reverse
 from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import GetOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.sentry import SentryLogger
 
 from tests.factories import PaymentOrderFactory
 from tests.helpers import patch_method

@@ -14,9 +14,9 @@ from tilavarauspalvelu.enums import (
     Weekday,
 )
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_datetime
-from utils.sentry import SentryLogger
 
 from tests.factories import (
     ApplicationFactory,

@@ -6,11 +6,11 @@ import re
 import pytest
 from django.utils.timezone import get_default_timezone
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekAPIClient
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitHaukiResourceIdImporter, TprekUnitImporter
 from tilavarauspalvelu.models import Location
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.sentry import SentryLogger
 
 from tests.factories import UnitFactory
 from tests.helpers import patch_method

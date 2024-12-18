@@ -9,6 +9,7 @@ from urllib.parse import urljoin
 import pytest
 from requests import Timeout
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import (
     CancelOrderError,
     CreateOrderError,
@@ -22,7 +23,6 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
     OrderItemParams,
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.sentry import SentryLogger
 
 from tests.helpers import patch_method
 from tests.mocks import MockResponse

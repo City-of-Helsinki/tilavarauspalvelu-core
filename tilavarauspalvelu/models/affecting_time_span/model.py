@@ -12,8 +12,8 @@ from django.db import migrations, models
 from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, timedelta_to_json
-from utils.sentry import SentryLogger
 
 from .queryset import AffectingTimeSpanManager
 

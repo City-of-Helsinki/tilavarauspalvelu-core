@@ -9,6 +9,7 @@ from tilavarauspalvelu.api.graphql.extensions.validation_errors import Validatio
 from tilavarauspalvelu.api.graphql.types.reservation.serializers.update_serializers import ReservationUpdateSerializer
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
     create_mock_verkkokauppa_order,
     get_verkkokauppa_order_params,
@@ -16,7 +17,6 @@ from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentOrder
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.verkkokauppa.order.types import CreateOrderParams, Order

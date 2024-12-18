@@ -15,10 +15,10 @@ from social_django.strategy import DjangoStrategy
 
 from config.auth import ProxyTunnistamoOIDCAuthBackend
 from tilavarauspalvelu.integrations.helauth.parsers import ProfileDataParser
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceError, ExternalServiceRequestError
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from requests import Response
