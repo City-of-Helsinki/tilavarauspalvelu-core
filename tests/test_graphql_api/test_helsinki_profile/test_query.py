@@ -6,7 +6,7 @@ import pytest
 
 from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.helauth.typing import ADLoginAMR, LoginMethod, ProfileLoginAMR
-from utils.sentry import SentryLogger
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 from tests.factories import ApplicationFactory, ReservationFactory, UserFactory
 from tests.factories.helsinki_profile import MyProfileDataFactory

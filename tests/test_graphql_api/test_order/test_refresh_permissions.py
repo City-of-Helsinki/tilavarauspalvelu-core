@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.sentry import SentryLogger
 
 from tests.factories import UserFactory
 from tests.helpers import patch_method

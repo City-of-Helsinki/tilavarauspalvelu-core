@@ -5,9 +5,9 @@ from decimal import Decimal
 
 import pytest
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservationUnitPricing
 from tilavarauspalvelu.tasks import update_reservation_unit_pricings_tax_percentage
-from utils.sentry import SentryLogger
 
 from tests.factories import ReservationUnitFactory, ReservationUnitPricingFactory
 from tests.helpers import patch_method

@@ -9,12 +9,12 @@ from typing import Any
 
 from django.conf import settings
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import (
     ParsePaymentError,
     ParseRefundError,
     ParseRefundStatusError,
 )
-from utils.sentry import SentryLogger
 
 
 class PaymentStatus(Enum):

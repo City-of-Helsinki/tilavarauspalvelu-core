@@ -6,13 +6,13 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from tilavarauspalvelu.enums import OrderStatus
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import GetOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError, GetRefundStatusError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import PaymentStatus, RefundStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentOrder
 from utils.date_utils import local_datetime
-from utils.sentry import SentryLogger
 
 from .permissions import WebhookPermission
 from .serializers import WebhookOrderCancelSerializer, WebhookPaymentSerializer, WebhookRefundSerializer

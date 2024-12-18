@@ -5,8 +5,8 @@ from unittest import mock
 import pytest
 from django.test import override_settings
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils import image_cache
-from utils.sentry import SentryLogger
 
 from tests.helpers import patch_method
 

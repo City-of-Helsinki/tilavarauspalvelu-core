@@ -6,9 +6,9 @@ from django.conf import settings
 from django.db import models
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice, EmailType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, User
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.sentry import SentryLogger
 
 from .attachements import get_reservation_ical_attachment
 from .dataclasses import EmailData

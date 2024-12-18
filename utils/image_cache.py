@@ -8,8 +8,8 @@ from easy_thumbnails.files import get_thumbnailer
 from requests import request
 from rest_framework.status import HTTP_200_OK
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.tasks import purge_image_cache
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from django.db import models
