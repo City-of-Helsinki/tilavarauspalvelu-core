@@ -8,7 +8,7 @@ from factory import fuzzy
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationStatusChoice, Priority, Weekday
 from tilavarauspalvelu.models import Application
-from utils.date_utils import local_datetime
+from utils.date_utils import local_datetime, local_time
 
 from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
 
@@ -101,6 +101,80 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
     @classmethod
     def create_in_status_cancelled(cls, **kwargs: Any) -> Application:
         return ApplicationBuilder().cancelled().create(**kwargs)
+
+    @classmethod
+    def create_application_ready_for_sending(cls, **kwargs: Any) -> Application:
+        """
+        Create an application that is ready to be sent (for individual applicant by default):
+        - is in an open application round
+        - is a draft
+        - has one application section
+        - section has a name
+        - section has a non-zero number of participants
+        - section has an age group
+        - section has a purpose
+        - section has applied for 1 reservation per week
+        - section has applied for minimum reservation duration of 1 hour
+        - section has one suitable timeslot, that is at least as long as the minimum reservation duration
+        - section has at lest one reservation unit option
+        - application is for an individual
+        - application has a contact person
+        - application has a billing address
+        """
+        from .application_round import ApplicationRoundFactory
+
+        round_kwargs = cls.pop_sub_kwargs("application_round", kwargs)
+        application_round = ApplicationRoundFactory.create_in_status_open(**round_kwargs)
+
+        defaults: dict[str, Any] = {
+            "application_round": application_round,
+            "applicant_type": ApplicantTypeChoice.INDIVIDUAL,
+            "cancelled_date": None,
+            "sent_date": None,
+            **kwargs,
+        }
+
+        if not any(arg.startswith("organisation") for arg in kwargs):
+            defaults.setdefault("organisation", None)
+
+        if not any(arg.startswith("home_city") for arg in kwargs):
+            defaults.setdefault("home_city", None)
+
+        if "contact_person" not in defaults:
+            defaults.setdefault("contact_person__first_name", "Test")
+            defaults.setdefault("contact_person__last_name", "User")
+            defaults.setdefault("contact_person__email", "test@example.com")
+            defaults.setdefault("contact_person__phone_number", "1234567890")
+
+        if "billing_address" not in defaults:
+            defaults.setdefault("billing_address__street_address", "Street")
+            defaults.setdefault("billing_address__post_code", "12345")
+            defaults.setdefault("billing_address__city", "City")
+
+        if "application_sections" not in kwargs:
+            defaults.setdefault("application_sections__name", "Test application section")
+            defaults.setdefault("application_sections__num_persons", 1)
+            defaults.setdefault("application_sections__applied_reservations_per_week", 1)
+            defaults.setdefault("application_sections__reservation_min_duration", datetime.timedelta(hours=1))
+            defaults.setdefault("application_sections__reservation_max_duration", datetime.timedelta(hours=2))
+
+            if "application_sections__purpose" not in kwargs:
+                defaults.setdefault("application_sections__purpose__name", "Test purpose")
+
+            if "application_sections__age_group" not in kwargs:
+                defaults.setdefault("application_sections__age_group__minimum", 1)
+                defaults.setdefault("application_sections__age_group__maximum", 10)
+
+            if "application_sections__reservation_unit_options" not in kwargs:
+                defaults.setdefault("application_sections__reservation_unit_options__preferred_order", 1)
+
+            if "application_sections__suitable_time_ranges" not in kwargs:
+                defaults.setdefault("application_sections__suitable_time_ranges__priority", Priority.PRIMARY)
+                defaults.setdefault("application_sections__suitable_time_ranges__day_of_the_week", Weekday.MONDAY)
+                defaults.setdefault("application_sections__suitable_time_ranges__begin_time", local_time(10, 0))
+                defaults.setdefault("application_sections__suitable_time_ranges__end_time", local_time(11, 0))
+
+        return cls.create(**defaults)
 
     @classmethod
     def create_application_ready_for_allocation(
