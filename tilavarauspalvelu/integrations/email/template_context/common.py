@@ -208,7 +208,9 @@ def params_for_reservation_series_info(*, reservation_series: RecurringReservati
 def params_for_application_section_info(*, application_section: ApplicationSection, language: Lang) -> dict[str, Any]:
     return {
         "application_section_name": application_section.name,
-        "application_round_name": get_attr_by_language(application_section.application, "name", language=language),
+        "application_round_name": get_attr_by_language(
+            application_section.application.application_round, "name", language=language
+        ),
     }
 
 
