@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from django.core.exceptions import ValidationError
 
-from tilavarauspalvelu.utils.validators import is_numeric, validate_accounting_project
+from tilavarauspalvelu.validators import is_numeric, validate_accounting_project
 
 
 def test_is_numeric():
