@@ -7,8 +7,8 @@ import pytest
 from graphql_relay import to_global_id
 
 from tilavarauspalvelu.exceptions import HaukiAPIError
+from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.models.reservation_unit.actions import ReservationUnitHaukiExporter
-from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 
 from tests.factories import OriginHaukiResourceFactory, ReservationUnitFactory
 from tests.helpers import patch_method

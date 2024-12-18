@@ -14,6 +14,7 @@ from query_optimizer.optimizer import QueryOptimizer
 from tilavarauspalvelu.api.graphql.types.location.types import LocationNode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
 from tilavarauspalvelu.enums import ReservationUnitPublishingState, ReservationUnitReservationState
+from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.models import (
     Location,
     OriginHaukiResource,
@@ -23,7 +24,6 @@ from tilavarauspalvelu.models import (
     Space,
     Unit,
 )
-from tilavarauspalvelu.utils.opening_hours.hauki_link_generator import generate_hauki_link
 from utils.date_utils import DEFAULT_TIMEZONE
 from utils.db import SubqueryCount
 

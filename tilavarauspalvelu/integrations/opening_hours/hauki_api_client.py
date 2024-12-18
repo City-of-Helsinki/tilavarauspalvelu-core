@@ -10,7 +10,7 @@ from utils.external_service.base_external_service_client import BaseExternalServ
 if TYPE_CHECKING:
     import datetime
 
-    from tilavarauspalvelu.utils.opening_hours.hauki_api_types import (
+    from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import (
         HaukiAPIDatePeriod,
         HaukiAPIOpeningHoursResponse,
         HaukiAPIOpeningHoursResponseItem,

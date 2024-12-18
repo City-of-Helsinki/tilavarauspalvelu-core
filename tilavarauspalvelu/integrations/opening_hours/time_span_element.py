@@ -10,7 +10,7 @@ from utils.date_utils import DEFAULT_TIMEZONE, combine, datetime_range_as_string
 if TYPE_CHECKING:
     import zoneinfo
 
-    from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseTime
+    from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIOpeningHoursResponseTime
 
 
 @dataclass(order=True, frozen=False)
