@@ -92,7 +92,7 @@ def rebuild_space_tree_hierarchy() -> None:
 
 @app.task(name="update_units_from_tprek")
 def update_units_from_tprek() -> None:
-    from tilavarauspalvelu.utils.tprek.tprek_unit_importer import TprekUnitImporter
+    from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
 
     units_to_update = Unit.objects.exclude(tprek_id__isnull=True)
     tprek_unit_importer = TprekUnitImporter()
