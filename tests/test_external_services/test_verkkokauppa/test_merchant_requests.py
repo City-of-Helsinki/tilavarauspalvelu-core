@@ -6,15 +6,15 @@ from typing import Any
 import pytest
 from django.conf import settings
 
-from tilavarauspalvelu.utils.verkkokauppa.merchants.exceptions import CreateMerchantError, UpdateMerchantError
-from tilavarauspalvelu.utils.verkkokauppa.merchants.types import (
+from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.merchants.exceptions import CreateMerchantError, UpdateMerchantError
+from tilavarauspalvelu.integrations.verkkokauppa.merchants.types import (
     CreateMerchantParams,
     Merchant,
     MerchantInfo,
     UpdateMerchantParams,
 )
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from utils.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
 from tests.helpers import patch_method
 from tests.mocks import MockResponse

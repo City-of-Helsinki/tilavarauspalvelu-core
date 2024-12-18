@@ -6,8 +6,8 @@ from itertools import chain
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from tilavarauspalvelu.enums import RejectionReadinessChoice
+from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import AffectingTimeSpan, RejectedOccurrence, Reservation
-from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 
 if TYPE_CHECKING:

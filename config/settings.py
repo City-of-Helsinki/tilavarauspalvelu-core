@@ -323,8 +323,8 @@ class Common(Environment):
     )
     SOCIAL_AUTH_TUNNISTAMO_PIPELINE = (
         *SOCIAL_AUTH_PIPELINE,
-        "tilavarauspalvelu.utils.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
-        "tilavarauspalvelu.utils.helauth.pipeline.migrate_user_from_tunnistamo_to_keycloak",
+        "tilavarauspalvelu.integrations.helauth.pipeline.fetch_additional_info_for_user_from_helsinki_profile",
+        "tilavarauspalvelu.integrations.helauth.pipeline.migrate_user_from_tunnistamo_to_keycloak",
     )
 
     @classproperty

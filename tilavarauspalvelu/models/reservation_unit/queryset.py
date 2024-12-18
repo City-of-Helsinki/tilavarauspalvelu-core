@@ -8,7 +8,7 @@ from django.db import connections, models
 from django.db.models import Q, prefetch_related_objects
 from lookup_property import L
 
-from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
+from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from utils.db import ArrayUnnest, NowTT
 
 if TYPE_CHECKING:

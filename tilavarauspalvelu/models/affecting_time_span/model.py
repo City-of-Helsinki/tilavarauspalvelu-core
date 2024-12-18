@@ -12,14 +12,14 @@ from django.db import migrations, models
 from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, timedelta_to_json
-from utils.sentry import SentryLogger
 
 from .queryset import AffectingTimeSpanManager
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
     from tilavarauspalvelu.models import Reservation
-    from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 
     from .actions import AffectingTimeSpanActions
 
@@ -130,7 +130,7 @@ class AffectingTimeSpan(models.Model):
         return local_datetime() - last_updated < max_allowed_age
 
     def as_time_span_element(self) -> TimeSpanElement:
-        from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+        from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 
         return TimeSpanElement(
             start_datetime=self.buffered_start_datetime + self.buffer_time_before,

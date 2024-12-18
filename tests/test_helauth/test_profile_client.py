@@ -8,13 +8,13 @@ import pytest
 from django.conf import settings
 from graphene_django_extensions.testing import parametrize_helper
 
-from tilavarauspalvelu.utils.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.external_service.errors import (
     ExternalServiceError,
     ExternalServiceParseJSONError,
     ExternalServiceRequestError,
 )
-from utils.sentry import SentryLogger
 
 from tests.factories import CityFactory, UserFactory
 from tests.factories.helsinki_profile import (

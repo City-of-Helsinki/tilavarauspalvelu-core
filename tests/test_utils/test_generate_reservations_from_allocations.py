@@ -16,6 +16,9 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     Weekday,
 )
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIDatePeriod
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     RecurringReservation,
@@ -23,10 +26,7 @@ from tilavarauspalvelu.models import (
     ReservationUnitHierarchy,
 )
 from tilavarauspalvelu.tasks import generate_reservation_series_from_allocations
-from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIDatePeriod
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_iso_format
-from utils.sentry import SentryLogger
 
 from tests.factories import AllocatedTimeSlotFactory, ReservationFactory
 from tests.helpers import patch_method

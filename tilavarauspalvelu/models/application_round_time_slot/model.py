@@ -8,7 +8,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import WeekdayChoice
-from tilavarauspalvelu.utils.validators import validate_reservable_times
+from tilavarauspalvelu.validators import validate_reservable_times
 from utils.fields.model import IntChoiceField
 
 from .queryset import ApplicationRoundTimeSlotManager

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from .queryset import ReservableTimeSpanManager

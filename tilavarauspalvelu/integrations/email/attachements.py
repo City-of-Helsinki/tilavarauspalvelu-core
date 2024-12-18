@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.typing import EmailAttachment
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation

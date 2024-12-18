@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.integrations.helauth.typing import LoginMethod
 from tilavarauspalvelu.models import GeneralRole, UnitRole, User
-from tilavarauspalvelu.utils.helauth.typing import LoginMethod
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:

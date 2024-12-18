@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitHaukiResourceIdImporter
-from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitHaukiResourceIdImporter
 
 from tests.factories import OriginHaukiResourceFactory, UnitFactory
 from tests.helpers import patch_method

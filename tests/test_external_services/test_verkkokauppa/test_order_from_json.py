@@ -6,7 +6,7 @@ from decimal import Decimal
 
 from django.conf import settings
 
-from tilavarauspalvelu.utils.verkkokauppa.order.types import Order
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
 
 order_json = {
     "orderId": "b6b6b6b6-b6b6-b6b6-b6b6-b6b6b6b6b6b6",

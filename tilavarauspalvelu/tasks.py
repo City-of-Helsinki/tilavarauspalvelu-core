@@ -28,6 +28,17 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     Weekday,
 )
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
+from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
+from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
+    CreateOrUpdateAccountingParams,
+    CreateProductParams,
+)
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     AllocatedTimeSlot,
@@ -52,22 +63,14 @@ from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDe
 from tilavarauspalvelu.models.request_log.model import RequestLog
 from tilavarauspalvelu.models.sql_log.model import SQLLog
 from tilavarauspalvelu.services.permission_service import deactivate_old_permissions
-from tilavarauspalvelu.translation import translate_for_user
-from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
-from tilavarauspalvelu.utils.pruning import (
+from tilavarauspalvelu.services.pruning import (
     prune_inactive_reservations,
     prune_recurring_reservations,
     prune_reservation_statistics,
     prune_reservation_with_inactive_payments,
 )
-from tilavarauspalvelu.utils.verkkokauppa.order.exceptions import CancelOrderError
-from tilavarauspalvelu.utils.verkkokauppa.payment.exceptions import GetPaymentError
-from tilavarauspalvelu.utils.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
-from tilavarauspalvelu.utils.verkkokauppa.product.types import CreateOrUpdateAccountingParams, CreateProductParams
-from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.translation import translate_for_user
 from utils.date_utils import local_date, local_datetime, local_end_of_day, local_start_of_day
-from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
@@ -89,7 +92,7 @@ def rebuild_space_tree_hierarchy() -> None:
 
 @app.task(name="update_units_from_tprek")
 def update_units_from_tprek() -> None:
-    from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitImporter
+    from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitImporter
 
     units_to_update = Unit.objects.exclude(tprek_id__isnull=True)
     tprek_unit_importer = TprekUnitImporter()
@@ -123,7 +126,7 @@ def remove_old_personal_info_view_logs() -> None:
 
 @app.task(name="update_origin_hauki_resource_reservable_time_spans")
 def update_origin_hauki_resource_reservable_time_spans() -> None:
-    from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
+    from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 
     logger.info("Updating OriginHaukiResource reservable time spans...")
     HaukiResourceHashUpdater().run()
@@ -448,7 +451,7 @@ def create_reservation_unit_thumbnails_and_urls(pk: int | None = None) -> None:
 
 @app.task(name="purge_image_cache")
 def purge_image_cache(image_path: str) -> None:
-    from utils.image_cache import purge
+    from tilavarauspalvelu.integrations.image_cache import purge
 
     purge(image_path)
 

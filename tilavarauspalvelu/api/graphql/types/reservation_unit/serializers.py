@@ -17,8 +17,8 @@ from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationUnitPublishingState, WeekdayChoice
+from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
-from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
 

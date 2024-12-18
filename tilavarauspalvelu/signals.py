@@ -7,6 +7,7 @@ from django.contrib.auth import user_logged_in
 from django.db.models.signals import m2m_changed, post_delete, post_save, pre_save
 from django.dispatch import receiver
 
+from tilavarauspalvelu.integrations.image_cache import purge_previous_image_cache
 from tilavarauspalvelu.models import Purpose, Reservation, ReservationUnit, ReservationUnitImage, Space
 from tilavarauspalvelu.tasks import (
     create_or_update_reservation_statistics,
@@ -17,7 +18,6 @@ from tilavarauspalvelu.tasks import (
     update_reservation_unit_search_vectors_task,
 )
 from utils.date_utils import local_datetime
-from utils.image_cache import purge_previous_image_cache
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
