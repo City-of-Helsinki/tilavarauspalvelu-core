@@ -5,13 +5,13 @@ import logging
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError, ReservableTimeSpanClientValueError
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.integrations.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from tilavarauspalvelu.models import OriginHaukiResource
-from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.utils.opening_hours.hauki_api_types import HaukiAPIResource
+    from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource
 
 logger = logging.getLogger(__name__)
 

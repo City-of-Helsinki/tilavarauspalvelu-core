@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
-from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import override_reservable_with_closed_time_spans
+from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import (
+    override_reservable_with_closed_time_spans,
+)
 
 from tests.test_external_services.test_hauki.test_reservable_time_spans_client import (
     _get_date,

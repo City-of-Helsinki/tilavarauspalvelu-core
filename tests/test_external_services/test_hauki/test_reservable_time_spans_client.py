@@ -8,17 +8,17 @@ from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import HaukiResourceState
 from tilavarauspalvelu.exceptions import ReservableTimeSpanClientNothingToDoError
-from tilavarauspalvelu.models import ReservableTimeSpan
-from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.utils.opening_hours.hauki_api_types import (
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import (
     HaukiAPIOpeningHoursResponseDate,
     HaukiAPIOpeningHoursResponseItem,
     HaukiAPIOpeningHoursResponseResource,
     HaukiAPIOpeningHoursResponseTime,
     HaukiTranslatedField,
 )
-from tilavarauspalvelu.utils.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
-from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.integrations.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
+from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.models import ReservableTimeSpan
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 
 from tests.helpers import patch_method

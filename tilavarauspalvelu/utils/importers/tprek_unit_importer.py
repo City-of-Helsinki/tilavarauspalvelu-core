@@ -6,17 +6,17 @@ from typing import TYPE_CHECKING
 
 from django.db.transaction import atomic
 
+from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.models import Location, OriginHaukiResource
 from tilavarauspalvelu.utils.importers.tprek_api_client import TprekAPIClient
-from tilavarauspalvelu.utils.opening_hours.hauki_api_client import HaukiAPIClient
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
 
+    from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource
     from tilavarauspalvelu.models import Unit
     from tilavarauspalvelu.utils.importers.tprek_api_client import TprekLocationData, TprekUnitData
-    from tilavarauspalvelu.utils.opening_hours import HaukiAPIResource
 
 logger = logging.getLogger(__name__)
 

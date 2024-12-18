@@ -12,12 +12,12 @@ from lookup_property import L
 from query_optimizer.utils import calculate_queryset_slice
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
+from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
 from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationRound, ReservableTimeSpan
 from tilavarauspalvelu.utils.first_reservable_time.first_reservable_time_reservation_unit_helper import (
     ReservationUnitFirstReservableTimeHelper,
 )
-from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
-from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
 from utils.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
 
 if TYPE_CHECKING:

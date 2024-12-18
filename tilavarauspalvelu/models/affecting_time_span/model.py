@@ -18,8 +18,8 @@ from utils.sentry import SentryLogger
 from .queryset import AffectingTimeSpanManager
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
     from tilavarauspalvelu.models import Reservation
-    from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
 
     from .actions import AffectingTimeSpanActions
 
@@ -130,7 +130,7 @@ class AffectingTimeSpan(models.Model):
         return local_datetime() - last_updated < max_allowed_age
 
     def as_time_span_element(self) -> TimeSpanElement:
-        from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+        from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 
         return TimeSpanElement(
             start_datetime=self.buffered_start_datetime + self.buffer_time_before,

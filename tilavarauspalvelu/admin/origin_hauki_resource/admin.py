@@ -12,8 +12,8 @@ from django.utils.translation import gettext_lazy as _
 from tilavarauspalvelu.admin.reservable_time_span.admin import ReservableTimeSpanInline
 from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitInline
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
+from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.models import OriginHaukiResource
-from tilavarauspalvelu.utils.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet

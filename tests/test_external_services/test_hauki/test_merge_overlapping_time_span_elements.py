@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import datetime
 
-from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
-from tilavarauspalvelu.utils.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
+from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
+from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
 
 from tests.test_external_services.test_hauki.test_reservable_time_spans_client import _get_date
 

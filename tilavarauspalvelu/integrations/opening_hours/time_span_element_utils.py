@@ -9,7 +9,7 @@ from utils.utils import with_indices
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from tilavarauspalvelu.utils.opening_hours.time_span_element import TimeSpanElement
+    from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 
 
 def merge_overlapping_time_span_elements(*time_span_lists: Iterable[TimeSpanElement]) -> list[TimeSpanElement]:
