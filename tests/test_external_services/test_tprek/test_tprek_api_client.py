@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.utils.tprek.tprek_api_client import TprekAPIClient
+from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekAPIClient
 from utils.date_utils import local_datetime
 
 from tests.helpers import patch_method
