@@ -8,7 +8,7 @@ from django.db.transaction import atomic
 
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.models import Location, OriginHaukiResource
-from tilavarauspalvelu.utils.importers.tprek_api_client import TprekAPIClient
+from tilavarauspalvelu.utils.tprek.tprek_api_client import TprekAPIClient
 from utils.sentry import SentryLogger
 
 if TYPE_CHECKING:
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource
     from tilavarauspalvelu.models import Unit
-    from tilavarauspalvelu.utils.importers.tprek_api_client import TprekLocationData, TprekUnitData
+    from tilavarauspalvelu.utils.tprek.tprek_api_client import TprekLocationData, TprekUnitData
 
 logger = logging.getLogger(__name__)
 

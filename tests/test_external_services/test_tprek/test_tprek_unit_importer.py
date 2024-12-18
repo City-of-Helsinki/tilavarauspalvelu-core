@@ -7,8 +7,8 @@ import pytest
 from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.models import Location
-from tilavarauspalvelu.utils.importers.tprek_api_client import TprekAPIClient
-from tilavarauspalvelu.utils.importers.tprek_unit_importer import TprekUnitHaukiResourceIdImporter, TprekUnitImporter
+from tilavarauspalvelu.utils.tprek.tprek_api_client import TprekAPIClient
+from tilavarauspalvelu.utils.tprek.tprek_unit_importer import TprekUnitHaukiResourceIdImporter, TprekUnitImporter
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.sentry import SentryLogger
 
