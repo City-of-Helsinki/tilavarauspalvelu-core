@@ -8146,6 +8146,179 @@ export type ReservationCancelPageQuery = {
   } | null;
 };
 
+export type ApplicationRecurringReservationQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ApplicationRecurringReservationQuery = {
+  recurringReservation?: {
+    id: string;
+    allocatedTimeSlot?: {
+      id: string;
+      reservationUnitOption: {
+        id: string;
+        applicationSection: {
+          id: string;
+          application: { id: string; pk?: number | null };
+        };
+      };
+    } | null;
+  } | null;
+};
+
+export type ReservationPageQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationPageQuery = {
+  reservation?: {
+    id: string;
+    pk?: number | null;
+    name?: string | null;
+    applyingForFreeOfCharge?: boolean | null;
+    begin: string;
+    end: string;
+    calendarUrl?: string | null;
+    state?: ReservationStateChoice | null;
+    reserveeFirstName?: string | null;
+    reserveeLastName?: string | null;
+    reserveeEmail?: string | null;
+    reserveePhone?: string | null;
+    reserveeType?: CustomerTypeChoice | null;
+    reserveeOrganisationName?: string | null;
+    reserveeId?: string | null;
+    reserveeIsUnregisteredAssociation?: boolean | null;
+    reserveeAddressStreet?: string | null;
+    reserveeAddressCity?: string | null;
+    reserveeAddressZip?: string | null;
+    billingFirstName?: string | null;
+    billingLastName?: string | null;
+    billingPhone?: string | null;
+    billingEmail?: string | null;
+    billingAddressStreet?: string | null;
+    billingAddressCity?: string | null;
+    billingAddressZip?: string | null;
+    description?: string | null;
+    numPersons?: number | null;
+    paymentOrder: Array<{
+      id: string;
+      status?: OrderStatus | null;
+      receiptUrl?: string | null;
+      checkoutUrl?: string | null;
+    }>;
+    recurringReservation?: { id: string } | null;
+    reservationUnits: Array<{
+      id: string;
+      canApplyFreeOfCharge: boolean;
+      pk?: number | null;
+      uuid: string;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+      reservationPendingInstructionsFi?: string | null;
+      reservationPendingInstructionsEn?: string | null;
+      reservationPendingInstructionsSv?: string | null;
+      reservationConfirmedInstructionsFi?: string | null;
+      reservationConfirmedInstructionsEn?: string | null;
+      reservationConfirmedInstructionsSv?: string | null;
+      reservationCancelledInstructionsFi?: string | null;
+      reservationCancelledInstructionsEn?: string | null;
+      reservationCancelledInstructionsSv?: string | null;
+      termsOfUseFi?: string | null;
+      termsOfUseEn?: string | null;
+      termsOfUseSv?: string | null;
+      minPersons?: number | null;
+      maxPersons?: number | null;
+      unit?: {
+        id: string;
+        tprekId?: string | null;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        location?: {
+          id: string;
+          latitude?: string | null;
+          longitude?: string | null;
+          addressStreetEn?: string | null;
+          addressStreetSv?: string | null;
+          addressCityEn?: string | null;
+          addressCitySv?: string | null;
+          addressStreetFi?: string | null;
+          addressZip: string;
+          addressCityFi?: string | null;
+        } | null;
+      } | null;
+      serviceSpecificTerms?: {
+        id: string;
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      cancellationTerms?: {
+        id: string;
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      paymentTerms?: {
+        id: string;
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      pricingTerms?: {
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        id: string;
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      pricings: Array<{
+        id: string;
+        begins: string;
+        priceUnit: PriceUnit;
+        lowestPrice: string;
+        highestPrice: string;
+        taxPercentage: { id: string; pk?: number | null; value: string };
+      }>;
+      images: Array<{
+        id: string;
+        imageUrl?: string | null;
+        largeUrl?: string | null;
+        mediumUrl?: string | null;
+        smallUrl?: string | null;
+        imageType: ImageType;
+      }>;
+      cancellationRule?: {
+        id: string;
+        canBeCancelledTimeBefore?: number | null;
+      } | null;
+      metadataSet?: {
+        id: string;
+        requiredFields: Array<{ id: string; fieldName: string }>;
+        supportedFields: Array<{ id: string; fieldName: string }>;
+      } | null;
+    }>;
+    purpose?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+    } | null;
+    ageGroup?: {
+      id: string;
+      pk?: number | null;
+      minimum: number;
+      maximum?: number | null;
+    } | null;
+    homeCity?: { id: string; pk?: number | null; name: string } | null;
+  } | null;
+};
+
 export const PricingFieldsFragmentDoc = gql`
   fragment PricingFields on ReservationUnitPricingNode {
     id
@@ -11892,4 +12065,214 @@ export type ReservationCancelPageSuspenseQueryHookResult = ReturnType<
 export type ReservationCancelPageQueryResult = Apollo.QueryResult<
   ReservationCancelPageQuery,
   ReservationCancelPageQueryVariables
+>;
+export const ApplicationRecurringReservationDocument = gql`
+  query ApplicationRecurringReservation($id: ID!) {
+    recurringReservation(id: $id) {
+      id
+      allocatedTimeSlot {
+        id
+        reservationUnitOption {
+          id
+          applicationSection {
+            id
+            application {
+              id
+              pk
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useApplicationRecurringReservationQuery__
+ *
+ * To run a query within a React component, call `useApplicationRecurringReservationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationRecurringReservationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationRecurringReservationQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useApplicationRecurringReservationQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationRecurringReservationQuery,
+    ApplicationRecurringReservationQueryVariables
+  > &
+    (
+      | {
+          variables: ApplicationRecurringReservationQueryVariables;
+          skip?: boolean;
+        }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationRecurringReservationQuery,
+    ApplicationRecurringReservationQueryVariables
+  >(ApplicationRecurringReservationDocument, options);
+}
+export function useApplicationRecurringReservationLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationRecurringReservationQuery,
+    ApplicationRecurringReservationQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationRecurringReservationQuery,
+    ApplicationRecurringReservationQueryVariables
+  >(ApplicationRecurringReservationDocument, options);
+}
+export function useApplicationRecurringReservationSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationRecurringReservationQuery,
+        ApplicationRecurringReservationQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationRecurringReservationQuery,
+    ApplicationRecurringReservationQueryVariables
+  >(ApplicationRecurringReservationDocument, options);
+}
+export type ApplicationRecurringReservationQueryHookResult = ReturnType<
+  typeof useApplicationRecurringReservationQuery
+>;
+export type ApplicationRecurringReservationLazyQueryHookResult = ReturnType<
+  typeof useApplicationRecurringReservationLazyQuery
+>;
+export type ApplicationRecurringReservationSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationRecurringReservationSuspenseQuery
+>;
+export type ApplicationRecurringReservationQueryResult = Apollo.QueryResult<
+  ApplicationRecurringReservationQuery,
+  ApplicationRecurringReservationQueryVariables
+>;
+export const ReservationPageDocument = gql`
+  query ReservationPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      name
+      ...ReserveeNameFields
+      ...ReserveeBillingFields
+      ...ReservationInfo
+      applyingForFreeOfCharge
+      begin
+      end
+      calendarUrl
+      state
+      paymentOrder {
+        id
+        status
+        receiptUrl
+        checkoutUrl
+      }
+      recurringReservation {
+        id
+      }
+      reservationUnits {
+        id
+        canApplyFreeOfCharge
+        ...ReservationUnitFields
+        ...CancellationRuleFields
+      }
+    }
+  }
+  ${ReserveeNameFieldsFragmentDoc}
+  ${ReserveeBillingFieldsFragmentDoc}
+  ${ReservationInfoFragmentDoc}
+  ${ReservationUnitFieldsFragmentDoc}
+  ${CancellationRuleFieldsFragmentDoc}
+`;
+
+/**
+ * __useReservationPageQuery__
+ *
+ * To run a query within a React component, call `useReservationPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationPageQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationPageQuery,
+    ReservationPageQueryVariables
+  > &
+    (
+      | { variables: ReservationPageQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ReservationPageQuery, ReservationPageQueryVariables>(
+    ReservationPageDocument,
+    options
+  );
+}
+export function useReservationPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationPageQuery,
+    ReservationPageQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationPageQuery,
+    ReservationPageQueryVariables
+  >(ReservationPageDocument, options);
+}
+export function useReservationPageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationPageQuery,
+        ReservationPageQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationPageQuery,
+    ReservationPageQueryVariables
+  >(ReservationPageDocument, options);
+}
+export type ReservationPageQueryHookResult = ReturnType<
+  typeof useReservationPageQuery
+>;
+export type ReservationPageLazyQueryHookResult = ReturnType<
+  typeof useReservationPageLazyQuery
+>;
+export type ReservationPageSuspenseQueryHookResult = ReturnType<
+  typeof useReservationPageSuspenseQuery
+>;
+export type ReservationPageQueryResult = Apollo.QueryResult<
+  ReservationPageQuery,
+  ReservationPageQueryVariables
 >;

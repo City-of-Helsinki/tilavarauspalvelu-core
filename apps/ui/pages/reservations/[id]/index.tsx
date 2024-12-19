@@ -18,9 +18,12 @@ import {
   ReservationStateChoice,
   type ReservationInfoFragment,
   type ReservationMetadataFieldNode,
-  ReservationDocument,
-  type ReservationQuery,
-  type ReservationQueryVariables,
+  type ReservationPageQuery,
+  type ReservationPageQueryVariables,
+  ReservationPageDocument,
+  type ApplicationRecurringReservationQuery,
+  type ApplicationRecurringReservationQueryVariables,
+  ApplicationRecurringReservationDocument,
   OrderStatus,
 } from "@gql/gql-types";
 import Link from "next/link";
@@ -56,13 +59,18 @@ import {
   ButtonLikeExternalLink,
 } from "@/components/common/ButtonLikeLink";
 import { ReservationPageWrapper } from "@/components/reservations/styles";
-import { getReservationPath, getReservationUnitPath } from "@/modules/urls";
+import {
+  getApplicationPath,
+  getReservationPath,
+  getReservationUnitPath,
+} from "@/modules/urls";
 import { useToastIfQueryParam } from "@/hooks";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
 import { Instructions } from "@/components/Instructions";
+import { gql } from "@apollo/client";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -583,7 +591,7 @@ function TermsInfo({
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-type NodeT = NonNullable<ReservationQuery["reservation"]>;
+type NodeT = NonNullable<ReservationPageQuery["reservation"]>;
 
 // TODO this should return 500 if the backend query fails (not 404), or 400 if the query is incorrect etc.
 // typically 500 would be MAX_COMPLEXITY issue (could also make it 400 but 400 should be invalid query, not too complex)
@@ -600,15 +608,40 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     // NOTE errors will fallback to 404
     const id = base64encode(`ReservationNode:${pk}`);
     const { data } = await apolloClient.query<
-      ReservationQuery,
-      ReservationQueryVariables
+      ReservationPageQuery,
+      ReservationPageQueryVariables
     >({
-      query: ReservationDocument,
+      query: ReservationPageDocument,
       fetchPolicy: "no-cache",
       variables: { id },
     });
 
     const { reservation } = data ?? {};
+
+    if (reservation?.recurringReservation != null) {
+      const recurringId = reservation.recurringReservation.id;
+      const { data: recurringData } = await apolloClient.query<
+        ApplicationRecurringReservationQuery,
+        ApplicationRecurringReservationQueryVariables
+      >({
+        query: ApplicationRecurringReservationDocument,
+        fetchPolicy: "no-cache",
+        variables: { id: recurringId },
+      });
+      const applicationPk =
+        recurringData?.recurringReservation?.allocatedTimeSlot
+          ?.reservationUnitOption?.applicationSection?.application?.pk;
+      return {
+        redirect: {
+          permanent: true,
+          destination: getApplicationPath(applicationPk, "view"),
+        },
+        props: {
+          notFound: true, // for prop narrowing
+        },
+      };
+    }
+
     if (reservation != null) {
       return {
         props: {
@@ -633,5 +666,59 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
+
+export const GET_APPLICATION_RECURRING_RESERVATION_QUERY = gql`
+  query ApplicationRecurringReservation($id: ID!) {
+    recurringReservation(id: $id) {
+      id
+      allocatedTimeSlot {
+        id
+        reservationUnitOption {
+          id
+          applicationSection {
+            id
+            application {
+              id
+              pk
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_RESERVATION_PAGE_QUERY = gql`
+  query ReservationPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      name
+      ...ReserveeNameFields
+      ...ReserveeBillingFields
+      ...ReservationInfo
+      applyingForFreeOfCharge
+      begin
+      end
+      calendarUrl
+      state
+      paymentOrder {
+        id
+        status
+        receiptUrl
+        checkoutUrl
+      }
+      recurringReservation {
+        id
+      }
+      reservationUnits {
+        id
+        canApplyFreeOfCharge
+        ...ReservationUnitFields
+        ...CancellationRuleFields
+      }
+    }
+  }
+`;
 
 export default Reservation;
