@@ -171,6 +171,7 @@ msgid "Search by user's first name, last name or reservation units name"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/bug_report/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Created at"
@@ -404,6 +405,7 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/bug_report/admin.py
 #: tilavarauspalvelu/admin/city/admin.py
 #: tilavarauspalvelu/admin/organisation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -769,7 +771,121 @@ msgid ""
 msgstr ""
 
 #: tilavarauspalvelu/admin/bug_report/admin.py
-msgid "Search by name or description"
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Description"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "GitHub release"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Jira ticket URL"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "GitHub PR URL"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Target application"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Fix priority"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Fix strategy"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Phase"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Real issue?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Found by"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Found at"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Fixed by"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Fixed at"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Updated at"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Name of the bug report"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Description for the bug report"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "GitHub release tag"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Which application was the bug found in?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "How urgently should this bug be fixed?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "In which way could this bug have been caught?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Phase in which the bug was found"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Was this a real issue or e.g. broken test?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Who found the bug?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "When was the bug found?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Who fixed the bug?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "When was the bug fixed?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "When was the bug report created?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "When was the bug report updated?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Search by name, description, Jira ticket URL or GitHub PR URL"
 msgstr ""
 
 #: tilavarauspalvelu/admin/city/admin.py
@@ -1162,11 +1278,6 @@ msgstr ""
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "SKU"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Description"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -2876,7 +2987,6 @@ msgid "Your seasonal booking has been cancelled"
 msgstr "Din säsongsbokning har avbokats"
 
 #: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
 msgid ""
 "All space reservations included in your seasonal booking have been cancelled"
@@ -3321,6 +3431,10 @@ msgstr ""
 
 #: tilavarauspalvelu/models/bug_report/model.py
 msgid "Someone else, who?"
+msgstr ""
+
+#: tilavarauspalvelu/models/bug_report/model.py
+msgid "Something else, what?"
 msgstr ""
 
 #: tilavarauspalvelu/models/bug_report/model.py
