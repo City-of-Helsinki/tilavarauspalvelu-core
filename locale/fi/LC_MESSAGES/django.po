@@ -173,6 +173,7 @@ msgid "Search by user's first name, last name or reservation units name"
 msgstr "Etsi käyttäjän etu- tai sukunimellä tai varausyksikön nimellä"
 
 #: tilavarauspalvelu/admin/application/admin.py
+#: tilavarauspalvelu/admin/bug_report/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Created at"
@@ -415,6 +416,7 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_round/form.py
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/bug_report/admin.py
 #: tilavarauspalvelu/admin/city/admin.py
 #: tilavarauspalvelu/admin/organisation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -802,8 +804,122 @@ msgstr ""
 "aktiivisia."
 
 #: tilavarauspalvelu/admin/bug_report/admin.py
-msgid "Search by name or description"
-msgstr "Etsi nimellä tai kuvauksella"
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Description"
+msgstr "Kuvaus"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "GitHub release"
+msgstr "GitHub julkaisu"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Jira ticket URL"
+msgstr "Jira tiketin osoite"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "GitHub PR URL"
+msgstr "GitHub PR osoite"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Target application"
+msgstr "Kohde sovellus"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Fix priority"
+msgstr "Korjauksen prioriteetti"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Fix strategy"
+msgstr "Korjauksen strategia"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Phase"
+msgstr "Vaihe"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Real issue?"
+msgstr "Oikea ongelma?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Found by"
+msgstr "Löytäjä"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Found at"
+msgstr "Löydetty"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Fixed by"
+msgstr "Korjaaja"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Fixed at"
+msgstr "Korjattu"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Updated at"
+msgstr "Päivitetty"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Name of the bug report"
+msgstr "Virheilmoituksen nimi"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Description for the bug report"
+msgstr "Virheilmoituksen kuvaus"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "GitHub release tag"
+msgstr "GitHub julkaisun tagi"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Which application was the bug found in?"
+msgstr "Missä sovelluksessa virhe löydettiin?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "How urgently should this bug be fixed?"
+msgstr "Kuinka pian virhe tulisi korjata?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "In which way could this bug have been caught?"
+msgstr "Millä tavalla tämän virhe olisi voinut saada kiinni?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Phase in which the bug was found"
+msgstr "Vaihe jossa virhe löydettiin"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Was this a real issue or e.g. broken test?"
+msgstr "Oliko virhe oikea, vai esim. rikkinäisen testin aiheuttama?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Who found the bug?"
+msgstr "Kuka löysi virheen?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "When was the bug found?"
+msgstr "Milloin virhe löydettiin?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Who fixed the bug?"
+msgstr "Kuka korjasi virheen?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "When was the bug fixed?"
+msgstr "Milloin virhe korjattiin?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "When was the bug report created?"
+msgstr "Milloin virheilmoitus tehtiin?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "When was the bug report updated?"
+msgstr "Milloin virheilmoitusta muokattiin viimeksi?"
+
+#: tilavarauspalvelu/admin/bug_report/admin.py
+msgid "Search by name, description, Jira ticket URL or GitHub PR URL"
+msgstr "Hae nimen, kuvauksen, jiratiketin osoitteen tai GitHub PR:n osoitteen avulla"
 
 #: tilavarauspalvelu/admin/city/admin.py
 msgid "Municipality"
@@ -1206,11 +1322,6 @@ msgstr "Maksullinen varaus"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "SKU"
 msgstr "SKU"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Description"
-msgstr "Kuvaus"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "State"
@@ -2940,7 +3051,6 @@ msgid "Your seasonal booking has been cancelled"
 msgstr "Kausivarauksesi on peruttu"
 
 #: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
 msgid ""
 "All space reservations included in your seasonal booking have been cancelled"
@@ -3393,6 +3503,10 @@ msgstr ""
 #: tilavarauspalvelu/models/bug_report/model.py
 msgid "Someone else, who?"
 msgstr "Joku muu, kuka?"
+
+#: tilavarauspalvelu/models/bug_report/model.py
+msgid "Something else, what?"
+msgstr "Jokin muu, mikä?"
 
 #: tilavarauspalvelu/models/bug_report/model.py
 msgid "bug report"
