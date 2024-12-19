@@ -124,6 +124,14 @@ const SecondaryActions = styled(Flex)`
   margin-top: var(--spacing-l);
 `;
 
+function formatReserveeName(
+  reservation: Pick<NodeT, "reserveeFirstName" | "reserveeLastName">
+): string {
+  return `${reservation.reserveeFirstName || ""} ${
+    reservation.reserveeLastName || ""
+  }`.trim();
+}
+
 function ReserveeBusinessInfo({
   reservation,
   supportedFields,
@@ -140,50 +148,52 @@ function ReserveeBusinessInfo({
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
 }): JSX.Element {
   const { t } = useTranslation();
+  const arr = [];
+  if (containsField(supportedFields, "reserveeOrganisationName")) {
+    arr.push({
+      key: "organisationName",
+      label: t("reservations:organisationName"),
+      value: reservation.reserveeOrganisationName || "-",
+      testId: "reservation__reservee-organisation-name",
+    });
+  }
+  if (containsField(supportedFields, "reserveeId")) {
+    arr.push({
+      key: "id",
+      label: t("reservations:reserveeId"),
+      value: reservation.reserveeId || "-",
+      testId: "reservation__reservee-id",
+    });
+  }
+  if (containsNameField(supportedFields)) {
+    arr.push({
+      key: "name",
+      label: t("reservations:contactName"),
+      value: formatReserveeName(reservation),
+      testId: "reservation__reservee-name",
+    });
+  }
+  if (containsField(supportedFields, "reserveePhone")) {
+    arr.push({
+      key: "phone",
+      label: t("reservations:contactPhone"),
+      value: reservation.reserveePhone ?? "-",
+      testId: "reservation__reservee-phone",
+    });
+  }
+  if (containsField(supportedFields, "reserveeEmail")) {
+    arr.push({
+      key: "email",
+      label: t("reservations:contactEmail"),
+      value: reservation.reserveeEmail ?? "-",
+      testId: "reservation__reservee-email",
+    });
+  }
   return (
     <>
-      {containsField(supportedFields, "reserveeOrganisationName") && (
-        <p>
-          {t("reservations:organisationName")}:{" "}
-          <span data-testid="reservation__reservee-organisation-name">
-            {reservation.reserveeOrganisationName || "-"}
-          </span>
-        </p>
-      )}
-      {containsField(supportedFields, "reserveeId") && (
-        <p>
-          {t("reservations:reserveeId")}:
-          <span data-testid="reservation__reservee-id">
-            {reservation.reserveeId || "-"}
-          </span>
-        </p>
-      )}
-      {containsNameField(supportedFields) && (
-        <p>
-          {t("reservations:contactName")}:{" "}
-          <span data-testid="reservation__reservee-name">
-            {`${reservation.reserveeFirstName || ""} ${
-              reservation.reserveeLastName || ""
-            }`.trim()}
-          </span>
-        </p>
-      )}
-      {containsField(supportedFields, "reserveePhone") && (
-        <p>
-          {t("reservations:contactPhone")}:
-          <span data-testid="reservation__reservee-phone">
-            {reservation.reserveePhone}
-          </span>
-        </p>
-      )}
-      {containsField(supportedFields, "reserveeEmail") && (
-        <p>
-          {t("reservations:contactEmail")}:
-          <span data-testid="reservation__reservee-email">
-            {reservation.reserveeEmail}
-          </span>
-        </p>
-      )}
+      {arr.map(({ key, ...rest }) => (
+        <LabelValuePair key={key} {...rest} />
+      ))}
     </>
   );
 }
@@ -203,9 +213,7 @@ function ReserveePersonInfo({
   if (containsNameField(supportedFields)) {
     arr.push({
       key: "name",
-      value: `${reservation.reserveeFirstName || ""} ${
-        reservation.reserveeLastName || ""
-      }`.trim(),
+      value: formatReserveeName(reservation),
     });
   }
   if (containsField(supportedFields, "reserveePhone")) {
@@ -222,12 +230,16 @@ function ReserveePersonInfo({
   }
   return (
     <>
-      {arr.map(({ key, value }) => (
-        <p key={key}>
-          {t(`common:${key}`)}:{" "}
-          <span data-testid={`reservation__reservee-${key}`}>{value}</span>
-        </p>
-      ))}
+      {arr
+        .map(({ key, value }) => ({
+          key,
+          label: t(`common:${key}`),
+          value,
+          testId: `reservation__reservee-${key}`,
+        }))
+        .map(({ key, ...rest }) => (
+          <LabelValuePair key={key} {...rest} />
+        ))}
     </>
   );
 }
@@ -296,15 +308,35 @@ function ReservationInfo({
   return (
     <div>
       <H4 as="h2">{t("reservationApplication:applicationInfo")}</H4>
-      {fields.map((field) => (
-        <p key={field}>
-          {t(`reservationApplication:label.common.${field}`)}:{" "}
-          <span data-testid={`reservation__${field}`}>
-            {getReservationValue(reservation, field) || "-"}
-          </span>
-        </p>
-      ))}
+      {fields
+        .map((field) => ({
+          key: field,
+          label: t(`reservationApplication:label.common.${field}`),
+          value: getReservationValue(reservation, field) ?? "-",
+          testId: `reservation__${field}`,
+        }))
+        .map(({ key, ...rest }) => (
+          <LabelValuePair key={key} {...rest} />
+        ))}
     </div>
+  );
+}
+
+type LabelValuePairProps = {
+  label: string;
+  value: string | number;
+  testId: string;
+};
+
+function LabelValuePair({
+  label,
+  value,
+  testId,
+}: LabelValuePairProps): JSX.Element {
+  return (
+    <p>
+      {label}: <span data-testid={testId}>{value}</span>
+    </p>
   );
 }
 
