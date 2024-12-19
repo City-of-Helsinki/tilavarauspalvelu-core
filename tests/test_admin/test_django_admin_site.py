@@ -10,7 +10,12 @@ from django.urls import reverse
 
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.models import BugReport, RequestLog, Reservation, SQLLog
-from tilavarauspalvelu.models.bug_report.model import BugReportPhaseChoice, BugReportUserChoice
+from tilavarauspalvelu.models.bug_report.model import (
+    BugReportPhaseChoice,
+    BugReportPriorityChoice,
+    BugReportTargetChoice,
+    BugReportUserChoice,
+)
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from tilavarauspalvelu.utils.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
@@ -50,7 +55,9 @@ def create_all_models():
         )
         BugReport.objects.create(
             name="Example",
-            phase=BugReportPhaseChoice.PULL_REQUEST,
+            target=BugReportTargetChoice.BACKEND,
+            priority=BugReportPriorityChoice.THIS_SPRINT,
+            found_in_phase=BugReportPhaseChoice.PULL_REQUEST,
             found_by=BugReportUserChoice.MATTI,
             found_at=local_datetime(),
         )
