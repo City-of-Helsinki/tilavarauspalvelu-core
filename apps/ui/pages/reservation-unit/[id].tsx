@@ -54,6 +54,7 @@ import {
   getFuturePricing,
   getPossibleTimesForDay,
   getPriceString,
+  getReservationUnitName,
   getTimeString,
   isReservationUnitPublished,
   isReservationUnitReservable,
@@ -650,7 +651,10 @@ function ReservationUnit({
           />
         )}
         <JustForDesktop customBreakpoint={breakpoints.l}>
-          <AddressSection reservationUnit={reservationUnit} />
+          <AddressSection
+            unit={reservationUnit.unit}
+            title={getReservationUnitName(reservationUnit) ?? "-"}
+          />
         </JustForDesktop>
       </div>
       <PageContentWrapper>
@@ -727,7 +731,10 @@ function ReservationUnit({
             open
           >
             <JustForMobile customBreakpoint={breakpoints.l}>
-              <AddressSection reservationUnit={reservationUnit} />
+              <AddressSection
+                unit={reservationUnit.unit}
+                title={getReservationUnitName(reservationUnit) ?? "-"}
+              />
             </JustForMobile>
             <MapComponent tprekId={reservationUnit.unit?.tprekId ?? ""} />
           </Accordion>

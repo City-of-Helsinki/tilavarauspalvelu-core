@@ -11,7 +11,6 @@ import {
 import { toApiDateUnsafe } from "common/src/common/util";
 import {
   type EquipmentNode,
-  ReservationStateChoice,
   PriceUnit,
   ReservationUnitPublishingState,
   type ReservationUnitNode,
@@ -29,7 +28,6 @@ import {
   getFuturePricing,
   getPossibleTimesForDay,
   getPriceString,
-  getReservationUnitInstructionsKey,
   getReservationUnitName,
   getReservationUnitPrice,
   getUnitName,
@@ -700,35 +698,6 @@ describe("getUnitName", () => {
     };
 
     expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
-  });
-});
-
-describe("getReservationUnitInstructionsKey", () => {
-  it("should return correct key pending states", () => {
-    expect(
-      getReservationUnitInstructionsKey(ReservationStateChoice.Created)
-    ).toEqual("reservationPendingInstructions");
-    expect(
-      getReservationUnitInstructionsKey(ReservationStateChoice.RequiresHandling)
-    ).toEqual("reservationPendingInstructions");
-  });
-
-  it("should return correct key cancelled states", () => {
-    expect(
-      getReservationUnitInstructionsKey(ReservationStateChoice.Cancelled)
-    ).toEqual("reservationCancelledInstructions");
-  });
-
-  it("should return correct key confirmed states", () => {
-    expect(
-      getReservationUnitInstructionsKey(ReservationStateChoice.Confirmed)
-    ).toEqual("reservationConfirmedInstructions");
-  });
-
-  it("should return no key for rest", () => {
-    expect(
-      getReservationUnitInstructionsKey(ReservationStateChoice.Denied)
-    ).toEqual(null);
   });
 });
 

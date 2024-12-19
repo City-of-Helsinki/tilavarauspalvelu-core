@@ -4,21 +4,18 @@ import styled from "styled-components";
 import { fontMedium, H4 } from "common/src/common/typography";
 import type {
   Maybe,
-  UnitNode,
   LocationFieldsI18nFragment,
-  ReservationUnitPageQuery,
+  UnitFieldsFragment,
 } from "@gql/gql-types";
 import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
 import { mapUrlPrefix } from "@/modules/const";
-import { getTranslation } from "@/modules/util";
 import { Flex } from "common/styles/util";
-
-type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
-type NodeT = Pick<QueryT, "unit">;
-type Props = {
-  reservationUnit: NodeT;
-};
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
+import { type LocalizationLanguages } from "common/src/helpers";
 
 const AddressSpan = styled.span`
   font-size: var(--fontsize-body-l);
@@ -41,7 +38,7 @@ const Links = styled(Flex).attrs({
 type UrlReturn = string;
 
 function createHslUrl(
-  locale: string,
+  locale: LocalizationLanguages,
   location?: Maybe<LocationFieldsI18nFragment>
 ): UrlReturn {
   if (!location) {
@@ -49,9 +46,11 @@ function createHslUrl(
   }
 
   const addressStreet =
-    getTranslation(location, "addressStreet") || location.addressStreetFi;
+    getTranslationSafe(location, "addressStreet", locale) ||
+    location.addressStreetFi;
   const addressCity =
-    getTranslation(location, "addressCity") || location.addressCityFi;
+    getTranslationSafe(location, "addressCity", locale) ||
+    location.addressCityFi;
 
   const destination = addressStreet
     ? encodeURI(`${addressStreet},${addressCity}`)
@@ -61,7 +60,7 @@ function createHslUrl(
 }
 
 function createGoogleUrl(
-  locale: string,
+  locale: LocalizationLanguages,
   location?: Maybe<LocationFieldsI18nFragment>
 ): UrlReturn {
   if (!location) {
@@ -69,9 +68,11 @@ function createGoogleUrl(
   }
 
   const addressStreet =
-    getTranslation(location, "addressStreet") || location.addressStreetFi;
+    getTranslationSafe(location, "addressStreet", locale) ||
+    location.addressStreetFi;
   const addressCity =
-    getTranslation(location, "addressCity") || location.addressCityFi;
+    getTranslationSafe(location, "addressCity", locale) ||
+    location.addressCityFi;
 
   const destination = addressStreet
     ? encodeURI(`${addressStreet},${addressCity}`)
@@ -81,8 +82,8 @@ function createGoogleUrl(
 }
 
 function createMapUrl(
-  locale: string,
-  unit?: Maybe<Pick<UnitNode, "tprekId">>
+  locale: LocalizationLanguages,
+  unit?: Maybe<Pick<UnitFieldsFragment, "tprekId">>
 ): string {
   if (!unit?.tprekId) {
     return "";
@@ -92,8 +93,8 @@ function createMapUrl(
 }
 
 function createAccessibilityUrl(
-  locale: string,
-  unit?: Maybe<Pick<UnitNode, "tprekId">>
+  locale: LocalizationLanguages,
+  unit?: Maybe<Pick<UnitFieldsFragment, "tprekId">>
 ): UrlReturn {
   if (!unit?.tprekId) {
     return "";
@@ -102,28 +103,32 @@ function createAccessibilityUrl(
   return `https://palvelukartta.hel.fi/${locale}/unit/${unit.tprekId}?p=1&t=accessibilityDetails`;
 }
 
-export function AddressSection({ reservationUnit }: Props): JSX.Element {
+type Props = {
+  title: string;
+  unit?: Maybe<UnitFieldsFragment> | undefined;
+};
+
+export function AddressSection({ title, unit }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
 
-  const { location } = reservationUnit.unit ?? {};
+  const { location } = unit ?? {};
+  const lang = convertLanguageCode(i18n.language);
+
   const addressStreet =
-    (location && getTranslation(location, "addressStreet")) ||
+    (location && getTranslationSafe(location, "addressStreet", lang)) ||
     location?.addressStreetFi;
   const addressCity =
-    (location && getTranslation(location, "addressCity")) ||
+    (location && getTranslationSafe(location, "addressCity", lang)) ||
     location?.addressCityFi;
 
-  const unitMapUrl = createMapUrl(i18n.language, reservationUnit?.unit);
-  const googleUrl = createGoogleUrl(i18n.language, location);
-  const hslUrl = createHslUrl(i18n.language, location);
-  const accessibilityUrl = createAccessibilityUrl(
-    i18n.language,
-    reservationUnit.unit
-  );
+  const unitMapUrl = createMapUrl(lang, unit);
+  const googleUrl = createGoogleUrl(lang, location);
+  const hslUrl = createHslUrl(lang, location);
+  const accessibilityUrl = createAccessibilityUrl(lang, unit);
 
   return (
     <div data-testid="reservation-unit__address--container">
-      <H4 as="h2">{getTranslation(reservationUnit, "name")}</H4>
+      <H4 as="h2">{title}</H4>
       {addressStreet && <AddressSpan>{addressStreet}</AddressSpan>}
       {location?.addressZip && addressCity && (
         <AddressSpan>{`, ${location?.addressZip} ${addressCity}`}</AddressSpan>

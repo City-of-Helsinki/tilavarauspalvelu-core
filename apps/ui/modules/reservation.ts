@@ -22,6 +22,7 @@ import {
   type CancellationRuleFieldsFragment,
   type BlockingReservationFieldsFragment,
   type CanUserCancelReservationFragment,
+  type ReservationInfoFragment,
 } from "@gql/gql-types";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { getIntervalMinutes } from "common/src/conversion";
@@ -359,41 +360,25 @@ export function canReservationTimeBeChanged({
   });
 }
 
-// FIXME this is awful: we don't use the Node type anymore, this is not type safe, it's not intuative what this does and why
 export function getReservationValue(
-  reservation: ReservationNode,
-  key: string
+  reservation: ReservationInfoFragment,
+  key: "purpose" | "numPersons" | "ageGroup" | "description"
 ): string | number | null {
-  switch (key) {
-    case "ageGroup": {
-      const { minimum, maximum } = reservation.ageGroup || {};
-      return minimum && maximum ? `${minimum} - ${maximum}` : null;
+  if (key === "ageGroup") {
+    const { minimum, maximum } = reservation.ageGroup || {};
+    return minimum && maximum ? `${minimum} - ${maximum}` : null;
+  } else if (key === "purpose") {
+    if (reservation.purpose != null) {
+      return getTranslation(reservation.purpose, "name");
     }
-    case "purpose": {
-      if (reservation.purpose != null) {
-        return getTranslation(reservation.purpose, "name");
-      }
-      return null;
-    }
-    case "homeCity": {
-      if (reservation.homeCity == null) {
-        return null;
-      }
-      return (
-        getTranslation(reservation.homeCity, "name") ||
-        reservation.homeCity.name
-      );
-    }
-    default: {
-      if (key in reservation) {
-        const val = reservation[key as keyof ReservationNode];
-        if (typeof val === "string" || typeof val === "number") {
-          return val;
-        }
-      }
-      return null;
+    return null;
+  } else if (key in reservation) {
+    const val = reservation[key as keyof ReservationInfoFragment];
+    if (typeof val === "string" || typeof val === "number") {
+      return val;
     }
   }
+  return null;
 }
 
 export function getCheckoutUrl(

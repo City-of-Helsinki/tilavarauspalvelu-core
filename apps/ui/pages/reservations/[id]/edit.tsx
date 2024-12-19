@@ -325,7 +325,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         props: {
           ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
-          key: `${pk}-edit-${locale}`,
           pk,
           reservation,
           options,

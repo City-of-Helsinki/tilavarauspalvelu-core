@@ -21,17 +21,13 @@ import {
 } from "@/modules/urls";
 import { Button, IconCalendar, IconLinkExternal } from "hds-react";
 import styled from "styled-components";
-import { H1, H4 } from "common/src/common/typography";
-import { getReservationUnitInstructionsKey } from "@/modules/reservationUnit";
+import { H1 } from "common/src/common/typography";
 import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { Flex } from "common/styles/util";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
 import { breakpoints } from "common";
 import { InlineStyledLink } from "@/styles/util";
 import { BackLinkList } from "@/components/reservation/CancelledLinkSet";
+import { Instructions } from "@/components/Instructions";
 
 function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
   const { t } = useTranslation();
@@ -113,36 +109,6 @@ function ReservationConfirmation({
   );
 }
 
-function Instructions({
-  reservation,
-}: {
-  reservation: Pick<PropsNarrowed["reservation"], "reservationUnits" | "state">;
-}) {
-  const { t, i18n } = useTranslation();
-
-  const reservationUnit = reservation.reservationUnits.find(() => true);
-  const lang = convertLanguageCode(i18n.language);
-  const instructionsKey = getReservationUnitInstructionsKey(reservation.state);
-  const instructionsText =
-    instructionsKey != null && reservationUnit != null
-      ? getTranslationSafe(reservationUnit, instructionsKey, lang)
-      : null;
-  const showInstructions =
-    reservationUnit != null &&
-    instructionsKey != null &&
-    instructionsText != null &&
-    instructionsText !== "";
-
-  return showInstructions ? (
-    <div>
-      <H4 $noMargin as="h2">
-        {t("reservations:reservationInfo")}
-      </H4>
-      <p>{instructionsText}</p>
-    </div>
-  ) : null;
-}
-
 function Actions({
   reservation,
 }: {
@@ -213,7 +179,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return {
         props: {
           reservation,
-          ...getCommonServerSideProps(),
+          ...commonProps,
           ...(await serverSideTranslations(locale ?? "fi")),
         },
       };
@@ -226,7 +192,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       notFound: true,
       ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
-      key: `${pk}-confirmation-${locale}`,
     },
   };
 }

@@ -8074,8 +8074,8 @@ export type ReservationCancelPageQuery = {
       reservationEnds?: string | null;
       cancellationTerms?: {
         id: string;
-        textEn?: string | null;
         textFi?: string | null;
+        textEn?: string | null;
         textSv?: string | null;
       } | null;
       images: Array<{
@@ -11777,10 +11777,7 @@ export const ReservationCancelPageDocument = gql`
         id
         ...CancellationRuleFields
         cancellationTerms {
-          id
-          textEn
-          textFi
-          textSv
+          ...TermsOfUseTextFields
         }
       }
       recurringReservation {

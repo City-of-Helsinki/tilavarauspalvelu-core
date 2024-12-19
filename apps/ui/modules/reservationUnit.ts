@@ -174,27 +174,6 @@ export function getUnitName(
   );
 }
 
-type InstructionsKey =
-  | "reservationPendingInstructions"
-  | "reservationCancelledInstructions"
-  | "reservationConfirmedInstructions";
-export function getReservationUnitInstructionsKey(
-  state: Maybe<ReservationStateChoice> | undefined
-): InstructionsKey | null {
-  switch (state) {
-    case ReservationStateChoice.Created:
-    case ReservationStateChoice.RequiresHandling:
-      return "reservationPendingInstructions";
-    case ReservationStateChoice.Cancelled:
-      return "reservationCancelledInstructions";
-    case ReservationStateChoice.Confirmed:
-      return "reservationConfirmedInstructions";
-    case ReservationStateChoice.Denied:
-    default:
-      return null;
-  }
-}
-
 function isActivePricing(pricing: PricingFieldsFragment): boolean {
   return new Date(pricing.begins) <= new Date();
 }

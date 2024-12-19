@@ -145,10 +145,7 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
         id
         ...CancellationRuleFields
         cancellationTerms {
-          id
-          textEn
-          textFi
-          textSv
+          ...TermsOfUseTextFields
         }
       }
       recurringReservation {

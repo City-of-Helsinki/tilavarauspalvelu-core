@@ -16,7 +16,7 @@ import { Flex, NoWrap } from "common/styles/util";
 import {
   CustomerTypeChoice,
   ReservationStateChoice,
-  type ReservationNode,
+  type ReservationInfoFragment,
   type ReservationMetadataFieldNode,
   ReservationDocument,
   type ReservationQuery,
@@ -25,7 +25,7 @@ import {
 } from "@gql/gql-types";
 import Link from "next/link";
 import { createApolloClient } from "@/modules/apolloClient";
-import { formatDateTimeRange, getTranslation } from "@/modules/util";
+import { formatDateTimeRange } from "@/modules/util";
 import Sanitize from "@/components/common/Sanitize";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import {
@@ -36,7 +36,6 @@ import {
   isReservationCancellable,
 } from "@/modules/reservation";
 import {
-  getReservationUnitInstructionsKey,
   getReservationUnitName,
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
@@ -59,6 +58,11 @@ import {
 import { ReservationPageWrapper } from "@/components/reservations/styles";
 import { getReservationPath, getReservationUnitPath } from "@/modules/urls";
 import { useToastIfQueryParam } from "@/hooks";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
+import { Instructions } from "@/components/Instructions";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -116,7 +120,15 @@ function ReserveeBusinessInfo({
   reservation,
   supportedFields,
 }: {
-  reservation: NodeT;
+  reservation: Pick<
+    NodeT,
+    | "reserveeOrganisationName"
+    | "reserveeId"
+    | "reserveeFirstName"
+    | "reserveeLastName"
+    | "reserveePhone"
+    | "reserveeEmail"
+  >;
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
 }): JSX.Element {
   const { t } = useTranslation();
@@ -172,38 +184,42 @@ function ReserveePersonInfo({
   reservation,
   supportedFields,
 }: {
-  reservation: NodeT;
+  reservation: Pick<
+    NodeT,
+    "reserveeEmail" | "reserveeFirstName" | "reserveeLastName" | "reserveePhone"
+  >;
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
 }) {
   const { t } = useTranslation();
+  const arr = [];
+  if (containsNameField(supportedFields)) {
+    arr.push({
+      key: "name",
+      value: `${reservation.reserveeFirstName || ""} ${
+        reservation.reserveeLastName || ""
+      }`.trim(),
+    });
+  }
+  if (containsField(supportedFields, "reserveePhone")) {
+    arr.push({
+      key: "phone",
+      value: reservation.reserveePhone ?? "-",
+    });
+  }
+  if (containsField(supportedFields, "reserveeEmail")) {
+    arr.push({
+      key: "email",
+      value: reservation.reserveeEmail ?? "-",
+    });
+  }
   return (
     <>
-      {containsNameField(supportedFields) && (
-        <p>
-          {t("common:name")}:{" "}
-          <span data-testid="reservation__reservee-name">
-            {`${reservation.reserveeFirstName || ""} ${
-              reservation.reserveeLastName || ""
-            }`.trim()}
-          </span>
+      {arr.map(({ key, value }) => (
+        <p key={key}>
+          {t(`common:${key}`)}:{" "}
+          <span data-testid={`reservation__reservee-${key}`}>{value}</span>
         </p>
-      )}
-      {containsField(supportedFields, "reserveePhone") && (
-        <p>
-          {t("common:phone")}:
-          <span data-testid="reservation__reservee-phone">
-            {reservation.reserveePhone || "-"}
-          </span>
-        </p>
-      )}
-      {containsField(supportedFields, "reserveeEmail") && (
-        <p>
-          {t("common:email")}:
-          <span data-testid="reservation__reservee-email">
-            {reservation.reserveeEmail || "-"}
-          </span>
-        </p>
-      )}
+      ))}
     </>
   );
 }
@@ -212,7 +228,16 @@ function ReserveeInfo({
   reservation,
   supportedFields,
 }: {
-  reservation: NodeT;
+  reservation: Pick<
+    NodeT,
+    | "reserveeType"
+    | "reserveeOrganisationName"
+    | "reserveeId"
+    | "reserveeFirstName"
+    | "reserveeLastName"
+    | "reserveePhone"
+    | "reserveeEmail"
+  >;
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
 }) {
   const { t } = useTranslation();
@@ -242,11 +267,16 @@ function ReservationInfo({
   reservation,
   supportedFields,
 }: {
-  reservation: NodeT;
+  reservation: ReservationInfoFragment;
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
 }) {
   const { t } = useTranslation();
-  const POSSIBLE_FIELDS = ["purpose", "numPersons", "ageGroup", "description"];
+  const POSSIBLE_FIELDS = [
+    "purpose",
+    "numPersons",
+    "ageGroup",
+    "description",
+  ] as const;
   const fields = POSSIBLE_FIELDS.filter((field) =>
     containsField(supportedFields, field)
   );
@@ -262,8 +292,7 @@ function ReservationInfo({
         <p key={field}>
           {t(`reservationApplication:label.common.${field}`)}:{" "}
           <span data-testid={`reservation__${field}`}>
-            {/* FIXME remove the value function */}
-            {getReservationValue(reservation as ReservationNode, field) || "-"}
+            {getReservationValue(reservation, field) || "-"}
           </span>
         </p>
       ))}
@@ -281,45 +310,7 @@ function Reservation({
 
   // NOTE typescript can't type array off index
   const order = reservation.paymentOrder.find(() => true);
-
-  const reservationUnit = reservation.reservationUnits?.[0] ?? null;
-  const instructionsKey =
-    reservation.state != null
-      ? getReservationUnitInstructionsKey(reservation.state)
-      : undefined;
-
-  const shouldDisplayPricingTerms: boolean = useMemo(() => {
-    if (!reservationUnit) {
-      return false;
-    }
-
-    const isFreeOfCharge = isReservationUnitFreeOfCharge(
-      reservationUnit.pricings,
-      new Date(reservation.begin)
-    );
-
-    return (
-      reservation.applyingForFreeOfCharge ||
-      (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge)
-    );
-  }, [reservation, reservationUnit]);
-
-  const paymentTermsContent =
-    reservationUnit.paymentTerms != null
-      ? getTranslation(reservationUnit.paymentTerms, "text")
-      : undefined;
-  const cancellationTermsContent =
-    reservationUnit.cancellationTerms != null
-      ? getTranslation(reservationUnit.cancellationTerms, "text")
-      : undefined;
-  const pricingTermsContent =
-    reservationUnit?.pricingTerms != null
-      ? getTranslation(reservationUnit?.pricingTerms, "text")
-      : undefined;
-  const serviceSpecificTermsContent =
-    reservationUnit.serviceSpecificTerms != null
-      ? getTranslation(reservationUnit.serviceSpecificTerms, "text")
-      : undefined;
+  const reservationUnit = reservation.reservationUnits.find(() => true);
 
   const modifyTimeReason = getWhyReservationCantBeChanged({ reservation });
   const canTimeBeModified = modifyTimeReason == null;
@@ -343,7 +334,7 @@ function Reservation({
   );
 
   const supportedFields = filterNonNullable(
-    reservationUnit.metadataSet?.supportedFields
+    reservationUnit?.metadataSet?.supportedFields
   );
 
   const isBeingHandled =
@@ -402,7 +393,7 @@ function Reservation({
           <SubHeading>
             <Link
               data-testid="reservation__reservation-unit"
-              href={getReservationUnitPath(reservationUnit.pk)}
+              href={getReservationUnitPath(reservationUnit?.pk)}
             >
               {getReservationUnitName(reservationUnit)}
             </Link>
@@ -420,7 +411,7 @@ function Reservation({
                 href={reservation.calendarUrl ?? ""}
               >
                 {t("reservations:saveToCalendar")}
-                <IconCalendar aria-hidden />
+                <IconCalendar aria-hidden="true" />
               </ButtonLikeExternalLink>
             )}
             {hasReceipt && (
@@ -431,7 +422,7 @@ function Reservation({
                 target="_blank"
               >
                 {t("reservations:downloadReceipt")}
-                <IconLinkExternal aria-hidden />
+                <IconLinkExternal aria-hidden="true" />
               </ButtonLikeExternalLink>
             )}
           </SecondaryActions>
@@ -446,7 +437,7 @@ function Reservation({
                 data-testid="reservation-detail__button--checkout"
               >
                 {t("reservations:payReservation")}
-                <IconArrowRight aria-hidden />
+                <IconArrowRight aria-hidden="true" />
               </ButtonLikeLink>
             )}
             {canTimeBeModified && (
@@ -456,7 +447,7 @@ function Reservation({
                 data-testid="reservation-detail__button--edit"
               >
                 {t("reservations:modifyReservationTime")}
-                <IconCalendar aria-hidden />
+                <IconCalendar aria-hidden="true" />
               </ButtonLikeLink>
             )}
             {isCancellable && (
@@ -470,20 +461,14 @@ function Reservation({
                     isBeingHandled ? "application" : "reservation"
                   }`
                 )}
-                <IconCross aria-hidden />
+                <IconCross aria-hidden="true" />
               </ButtonLikeLink>
             )}
           </Actions>
           <NotModifiableReason reservation={reservation} />
         </div>
         <Flex>
-          {instructionsKey &&
-            getTranslation(reservationUnit, instructionsKey) && (
-              <div>
-                <H4 as="h2">{t("reservations:reservationInfo")}</H4>
-                <p>{getTranslation(reservationUnit, instructionsKey)}</p>
-              </div>
-            )}
+          <Instructions reservation={reservation} />
           <ReservationInfo
             reservation={reservation}
             supportedFields={supportedFields}
@@ -492,53 +477,107 @@ function Reservation({
             reservation={reservation}
             supportedFields={supportedFields}
           />
-          <div>
-            {(paymentTermsContent || cancellationTermsContent) && (
-              <Accordion
-                heading={t(
-                  `reservationUnit:${
-                    paymentTermsContent
-                      ? "paymentAndCancellationTerms"
-                      : "cancellationTerms"
-                  }`
-                )}
-                theme="thin"
-                data-testid="reservation__payment-and-cancellation-terms"
-              >
-                {paymentTermsContent && <Sanitize html={paymentTermsContent} />}
-                {cancellationTermsContent && (
-                  <Sanitize html={cancellationTermsContent} />
-                )}
-              </Accordion>
-            )}
-            {shouldDisplayPricingTerms && pricingTermsContent && (
-              <Accordion
-                heading={t("reservationUnit:pricingTerms")}
-                theme="thin"
-                data-testid="reservation__pricing-terms"
-              >
-                <Sanitize html={pricingTermsContent} />
-              </Accordion>
-            )}
-            <Accordion
-              heading={t("reservationUnit:termsOfUse")}
-              theme="thin"
-              data-testid="reservation__terms-of-use"
-            >
-              {serviceSpecificTermsContent && (
-                <Sanitize html={serviceSpecificTermsContent} />
-              )}
-              {termsOfUse?.genericTerms != null && (
-                <Sanitize
-                  html={getTranslation(termsOfUse.genericTerms, "text")}
-                />
-              )}
-            </Accordion>
-          </div>
-          <AddressSection reservationUnit={reservationUnit} />
+          <TermsInfo reservation={reservation} termsOfUse={termsOfUse} />
+          <AddressSection
+            title={getReservationUnitName(reservationUnit) ?? "-"}
+            unit={reservationUnit?.unit}
+          />
         </Flex>
       </ReservationPageWrapper>
     </>
+  );
+}
+
+function TermsInfo({
+  reservation,
+  termsOfUse,
+}: {
+  reservation: Pick<
+    NodeT,
+    "reservationUnits" | "begin" | "applyingForFreeOfCharge"
+  >;
+  termsOfUse: PropsNarrowed["termsOfUse"];
+}) {
+  const { t, i18n } = useTranslation();
+  const reservationUnit = reservation.reservationUnits.find(() => true);
+  const shouldDisplayPricingTerms: boolean = useMemo(() => {
+    if (!reservationUnit) {
+      return false;
+    }
+
+    const isFreeOfCharge = isReservationUnitFreeOfCharge(
+      reservationUnit.pricings,
+      new Date(reservation.begin)
+    );
+
+    return (
+      reservation.applyingForFreeOfCharge ||
+      (reservationUnit.canApplyFreeOfCharge && !isFreeOfCharge)
+    );
+  }, [reservation, reservationUnit]);
+
+  const lang = convertLanguageCode(i18n.language);
+  const paymentTermsContent =
+    reservationUnit?.paymentTerms != null
+      ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
+      : undefined;
+  const cancellationTermsContent =
+    reservationUnit?.cancellationTerms != null
+      ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
+      : undefined;
+  const pricingTermsContent =
+    reservationUnit?.pricingTerms != null
+      ? getTranslationSafe(reservationUnit?.pricingTerms, "text", lang)
+      : undefined;
+  const serviceSpecificTermsContent =
+    reservationUnit?.serviceSpecificTerms != null
+      ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
+      : undefined;
+
+  return (
+    <div>
+      {(paymentTermsContent || cancellationTermsContent) && (
+        <Accordion
+          heading={t(
+            `reservationUnit:${
+              paymentTermsContent
+                ? "paymentAndCancellationTerms"
+                : "cancellationTerms"
+            }`
+          )}
+          theme="thin"
+          data-testid="reservation__payment-and-cancellation-terms"
+        >
+          {paymentTermsContent && <Sanitize html={paymentTermsContent} />}
+          {cancellationTermsContent && (
+            <Sanitize html={cancellationTermsContent} />
+          )}
+        </Accordion>
+      )}
+      {shouldDisplayPricingTerms && pricingTermsContent && (
+        <Accordion
+          heading={t("reservationUnit:pricingTerms")}
+          theme="thin"
+          data-testid="reservation__pricing-terms"
+        >
+          <Sanitize html={pricingTermsContent} />
+        </Accordion>
+      )}
+      <Accordion
+        heading={t("reservationUnit:termsOfUse")}
+        theme="thin"
+        data-testid="reservation__terms-of-use"
+      >
+        {serviceSpecificTermsContent && (
+          <Sanitize html={serviceSpecificTermsContent} />
+        )}
+        {termsOfUse?.genericTerms != null && (
+          <Sanitize
+            html={getTranslationSafe(termsOfUse.genericTerms, "text", lang)}
+          />
+        )}
+      </Accordion>
+    </div>
   );
 }
 
@@ -574,7 +613,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return {
         props: {
           ...commonProps,
-          key: `${id}-${locale}`,
           ...(await serverSideTranslations(locale ?? "fi")),
           reservation,
           termsOfUse: {
