@@ -31,6 +31,7 @@ from tilavarauspalvelu.integrations.email.template_context.application import (
     get_context_for_staff_notification_application_section_cancelled,
 )
 from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
+from tilavarauspalvelu.translation import get_translated
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
@@ -41,6 +42,7 @@ __all__ = [
 ]
 
 
+@get_translated
 def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> EmailContext | None:  # noqa: PLR0912, PLR0911
     email_recipient_name = kwargs.get("email_recipient_name", "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]")
     reservee_name = kwargs.get("reservee_name", "[VARAAJAN NIMI]")
@@ -62,7 +64,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
     confirmed_instructions = kwargs.get("confirmed_instructions", "[HYVÄKSYTYN VARAUKSEN OHJEET]")
     cancelled_instructions = kwargs.get("cancelled_instructions", "[PERUUTETUN VARAUKSEN OHJEET]")
     pending_instructions = kwargs.get("pending_instructions", "[KÄSITELTÄVÄN VARAUKSEN OHJEET]")
-    weekday_value = kwargs.get("weekday_value", "Monday")
+    weekday_value = kwargs.get("weekday_value", str(WeekdayChoice.MONDAY.label))
     time_value = kwargs.get("time_value", "13:00-15:00")
     application_section_name = kwargs.get("application_section_name", "[HAKEMUKSEN OSAN NIMI]")
     application_round_name = kwargs.get("application_round_name", "[KAUSIVARAUSKIERROKSEN NIMI]")
@@ -70,12 +72,12 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
         "cancelled_reservation_series",
         [
             {
-                "weekday": WeekdayChoice.MONDAY.label,
+                "weekday": str(WeekdayChoice.MONDAY.label),
                 "time": "13:00-15:00",
                 "url": get_staff_reservations_ext_link(reservation_id=1234),
             },
             {
-                "weekday": WeekdayChoice.TUESDAY.label,
+                "weekday": str(WeekdayChoice.TUESDAY.label),
                 "time": "21:00-22:00",
                 "url": get_staff_reservations_ext_link(reservation_id=5678),
             },
