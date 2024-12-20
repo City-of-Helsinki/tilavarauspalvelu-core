@@ -10,8 +10,8 @@ import {
 import { useRouter } from "next/router";
 import Stepper, { StepperProps } from "./Stepper";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
-import { getApplicationPath } from "@/modules/urls";
-import BreadcrumbWrapper from "../common/BreadcrumbWrapper";
+import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
+import { Breadcrumb } from "../common/Breadcrumb";
 import { H1 } from "common";
 
 const InnerContainer = styled.div<{ $hideStepper: boolean }>`
@@ -111,9 +111,20 @@ export function ApplicationPageWrapper({
   const title = t(`${translationKeyPrefix}.heading`);
   const subTitle =
     headContent || overrideText || t(`${translationKeyPrefix}.text`);
+
+  const routes = [
+    {
+      slug: applicationsPrefix,
+      title: t("breadcrumb:applications"),
+    },
+    {
+      title: t("breadcrumb:application"),
+    },
+  ] as const;
+
   return (
     <>
-      <BreadcrumbWrapper route={["/applications", "application"]} />
+      <Breadcrumb routes={routes} />
       <div>
         <H1 $noMargin>{title}</H1>
         <p>{subTitle}</p>

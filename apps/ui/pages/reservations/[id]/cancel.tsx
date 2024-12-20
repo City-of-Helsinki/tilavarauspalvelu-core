@@ -11,8 +11,12 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isReservationCancellable } from "@/modules/reservation";
-import { getApplicationPath, getReservationPath } from "@/modules/urls";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import {
+  getApplicationPath,
+  getReservationPath,
+  reservationsPrefix,
+} from "@/modules/urls";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { type TFunction } from "i18next";
@@ -45,7 +49,7 @@ function getBreadcrumbs(
   }
   return [
     {
-      slug: "/reservations",
+      slug: reservationsPrefix,
       title: t("breadcrumb:reservations"),
     },
     {
@@ -53,11 +57,9 @@ function getBreadcrumbs(
       title: t("reservations:reservationName", { id: reservation.pk }),
     },
     {
-      // NOTE Don't set slug. It hides the mobile breadcrumb
-      slug: "",
-      title: t("reservations:cancel.reservation"),
+      title: t("reservations:cancelReservation"),
     },
-  ];
+  ] as const;
 }
 
 function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
@@ -66,7 +68,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
   const routes = getBreadcrumbs(t, reservation);
   return (
     <>
-      <BreadcrumbWrapper route={routes} />
+      <Breadcrumb routes={routes} />
       <ReservationCancellation {...props} reservation={reservation} />
     </>
   );

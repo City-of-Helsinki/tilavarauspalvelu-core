@@ -12,21 +12,21 @@ import { breakpoints, H1 } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import Sanitize from "@/components/common/Sanitize";
 import { getTranslation } from "@/modules/util";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
+import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
   const id = Number(params?.id);
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  // TODO use a singular query for this
   const { data } = await apolloClient.query<
     ApplicationRoundsUiQuery,
     ApplicationRoundsUiQueryVariables
@@ -47,7 +47,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-};
+}
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -61,9 +61,24 @@ function Criteria({ applicationRound }: PropsNarrowed): JSX.Element | null {
   const { t } = useTranslation();
 
   const title = `${getApplicationRoundName(applicationRound)} ${t("applicationRound:criteria")}`;
+
+  const routes = [
+    {
+      slug: seasonalPrefix,
+      title: t("breadcrumb:recurring"),
+    },
+    {
+      title: getApplicationRoundName(applicationRound),
+      slug: getApplicationRoundPath(applicationRound.pk),
+    },
+    {
+      title: t("breadcrumb:criteria"),
+    },
+  ] as const;
+
   return (
     <>
-      <BreadcrumbWrapper route={["/recurring", "criteria"]} />
+      <Breadcrumb routes={routes} />
       <H1 $noMargin>{title}</H1>
       <ContentWrapper>
         <Sanitize html={getTranslation(applicationRound, "criteria")} />

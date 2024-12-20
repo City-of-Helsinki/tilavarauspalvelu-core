@@ -2,59 +2,60 @@ import { IconAngleRight } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
-import { fontMedium, H1 } from "common";
+import { H1 } from "common";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
-import { applicationsPath } from "@/modules/urls";
+import { applicationsPath, applicationsPrefix } from "@/modules/urls";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
-
-const FontMedium = styled.div`
-  ${fontMedium}
-`;
+import { toNumber } from "common/src/helpers";
 
 const Paragraph = styled.p`
-  white-space: pre-wrap;
-  margin-bottom: var(--spacing-xl);
-
-  @media (min-width: ${breakpoints.m}) {
-    max-width: 60%;
-  }
+  max-width: var(--prose-width);
 `;
 
 function Sent(): JSX.Element {
   const { t } = useTranslation();
 
+  const routes = [
+    {
+      slug: applicationsPrefix,
+      title: t("breadcrumb:applications"),
+    },
+    {
+      title: t("application:sent.heading"),
+    },
+  ] as const;
+
   return (
     <>
-      <BreadcrumbWrapper route={["/applications", "application"]} />
-      <H1>{t("application:sent.heading")}</H1>
-      <FontMedium as="p">{t("application:sent.subHeading")}</FontMedium>
+      <Breadcrumb routes={routes} />
+      <div>
+        <H1 $noMargin>{t("application:sent.heading")}</H1>
+        <Paragraph>{t("application:sent.subHeading")}</Paragraph>
+      </div>
       <Paragraph>{t("application:sent.body")}</Paragraph>
-      <ButtonLikeLink href={applicationsPath}>
-        {t("navigation:Item.applications")}
-        <IconAngleRight aria-hidden="true" />
-      </ButtonLikeLink>
+      <div>
+        <ButtonLikeLink href={applicationsPath}>
+          {t("navigation:Item.applications")}
+          <IconAngleRight aria-hidden="true" />
+        </ButtonLikeLink>
+      </div>
     </>
   );
 }
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale } = ctx;
-
-  // TODO should fetch on SSR but we need authentication for it
-  const { query } = ctx;
+  const { locale, query } = ctx;
   const { id } = query;
+  // TODO should fetch the application here to check it's actually sent
   const pkstring = Array.isArray(id) ? id[0] : id;
-  const pk = Number.isNaN(Number(pkstring)) ? undefined : Number(pkstring);
+  const pk = toNumber(pkstring);
   return {
     notFound: pk == null,
     props: {
       ...getCommonServerSideProps(),
-      key: locale ?? "fi",
-      id: pk ?? null,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };

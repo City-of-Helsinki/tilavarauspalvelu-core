@@ -21,6 +21,7 @@ import { toApiDate } from "common/src/common/util";
 import { addDays } from "date-fns";
 import { errorToast } from "common/src/common/toast";
 import { TabWrapper } from "common/styles/util";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 const StyledTabPanel = styled(TabPanel)`
   display: flex;
@@ -95,11 +96,16 @@ function Reservations(): JSX.Element | null {
     data?.reservations?.edges?.map((edge) => edge?.node)
   );
 
+  const routes = [
+    {
+      title: t("breadcrumb:reservations"),
+    },
+  ] as const;
+
   return (
     <>
-      <H1 $marginTop="l" $marginBottom="none">
-        {t(`navigation:Item.reservations`)}
-      </H1>
+      <Breadcrumb routes={routes} />
+      <H1 $noMargin>{t(`navigation:Item.reservations`)}</H1>
       {/* HDS tabs doesn't support data-testid */}
       <TabWrapper data-testid="Reservations--page__tab_container">
         <Tabs>

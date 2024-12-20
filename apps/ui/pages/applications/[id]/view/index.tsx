@@ -27,12 +27,13 @@ import {
   BREAKPOINT,
 } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { H1 } from "common";
 import styled from "styled-components";
 import { useToastIfQueryParam } from "@/hooks";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
+import { applicationsPrefix } from "@/modules/urls";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {
@@ -109,9 +110,19 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
     application.status === ApplicationStatusChoice.ResultsSent &&
     application.applicationSections?.some((section) => section.hasReservations);
 
+  const routes = [
+    {
+      slug: applicationsPrefix,
+      title: t("breadcrumb:applications"),
+    },
+    {
+      title: t("breadcrumb:application"),
+    },
+  ] as const;
+
   return (
     <>
-      <BreadcrumbWrapper route={["/applications", "application"]} />
+      <Breadcrumb routes={routes} />
       <H1 $noMargin>{applicationRoundName}</H1>
       {showReservations ? (
         <>

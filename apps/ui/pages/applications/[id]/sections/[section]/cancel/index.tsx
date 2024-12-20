@@ -20,7 +20,6 @@ import {
   formatApiTimeInterval,
 } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { useTranslation } from "next-i18next";
 import { gql } from "@apollo/client";
 import { breakpoints, H1 } from "common";
@@ -42,6 +41,7 @@ import { Card } from "common/src/components";
 import styled from "styled-components";
 import { isReservationCancellable } from "@/modules/reservation";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -131,7 +131,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
 
   return (
     <>
-      <BreadcrumbWrapper route={routes} />
+      <Breadcrumb routes={routes} />
       <ReservationPageWrapper>
         <div>
           <H1 $noMargin>{title}</H1>

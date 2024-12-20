@@ -13,12 +13,12 @@ import { H1 } from "common";
 import { AllReservations } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import { useTranslation } from "next-i18next";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
-import { getApplicationPath } from "@/modules/urls";
+import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 
 function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
   const { t, i18n } = useTranslation();
@@ -29,7 +29,7 @@ function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
   const lang = convertLanguageCode(i18n.language);
   const route = [
     {
-      slug: "/applications",
+      slug: applicationsPrefix,
       title: t("breadcrumb:applications"),
     },
     {
@@ -37,13 +37,13 @@ function ViewAll({ applicationSection }: PropsNarrowed): JSX.Element {
       title: getTranslationSafe(applicationRound, "name", lang),
     },
     {
-      slug: "",
       title: applicationSection.name,
     },
-  ];
+  ] as const;
+
   return (
     <>
-      <BreadcrumbWrapper route={route} />
+      <Breadcrumb routes={route} />
       <H1 $noMargin>{heading}</H1>
       <AllReservations
         applicationSection={applicationSection}

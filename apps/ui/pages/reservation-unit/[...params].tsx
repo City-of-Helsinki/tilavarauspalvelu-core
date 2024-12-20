@@ -25,7 +25,11 @@ import {
 } from "@gql/gql-types";
 import { type Inputs } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
-import { getReservationPath, getReservationUnitPath } from "@/modules/urls";
+import {
+  getReservationPath,
+  getReservationUnitPath,
+  getSingleSearchPath,
+} from "@/modules/urls";
 import Sanitize from "@/components/common/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import {
@@ -51,7 +55,7 @@ import {
 import { ApolloError } from "@apollo/client";
 import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Flex } from "common/styles/util";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationPageWrapper } from "@/components/reservations/styles";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
@@ -440,27 +444,26 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 }
 
 function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { reservation, reservationUnit } = props;
-  const lang = convertLanguageCode("fi");
+  const lang = convertLanguageCode(i18n.language);
   const routes = [
     {
-      slug: "/search",
+      slug: getSingleSearchPath(),
       title: t("breadcrumb:search"),
     },
     {
       slug: getReservationUnitPath(reservationUnit?.pk),
-      title: getTranslationSafe(reservationUnit, "name", lang) ?? "",
+      title: getTranslationSafe(reservationUnit, "name", lang) ?? "-",
     },
     {
-      // NOTE Don't set slug. It hides the mobile breadcrumb
       title: t("reservations:reservationName", { id: reservation.pk }),
     },
-  ];
+  ] as const;
 
   return (
     <>
-      <BreadcrumbWrapper route={routes} />
+      <Breadcrumb routes={routes} />
       <NewReservation {...props} />
     </>
   );

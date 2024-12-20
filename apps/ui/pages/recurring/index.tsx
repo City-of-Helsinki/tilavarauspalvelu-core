@@ -15,6 +15,7 @@ import { ApplicationRoundCard } from "@/components/recurring/ApplicationRoundCar
 import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Flex } from "common/styles/util";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -72,12 +73,17 @@ function RecurringLander({ applicationRounds }: Props): JSX.Element {
       ar.status !== ApplicationRoundStatusChoice.Upcoming
   );
 
+  const routes = [
+    {
+      title: t("breadcrumb:recurring"),
+    },
+  ] as const;
+
   return (
     <>
+      <Breadcrumb routes={routes} />
       <div>
-        <H1 $marginTop="l" $marginBottom="none">
-          {t("recurringLander:heading")}
-        </H1>
+        <H1 $noMargin>{t("recurringLander:heading")}</H1>
         <p>{t("recurringLander:subHeading")}</p>
       </div>
       <>

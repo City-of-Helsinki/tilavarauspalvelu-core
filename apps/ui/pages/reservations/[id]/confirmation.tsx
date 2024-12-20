@@ -13,11 +13,12 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ReservationPageWrapper } from "@/components/reservations/styles";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import {
   getReservationPath,
   getReservationUnitPath,
   reservationsPath,
+  reservationsPrefix,
 } from "@/modules/urls";
 import { Button, IconCalendar, IconLinkExternal } from "hds-react";
 import styled from "styled-components";
@@ -33,7 +34,7 @@ function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
   const { t } = useTranslation();
   const routes = [
     {
-      slug: "/reservations",
+      slug: reservationsPrefix,
       title: t("breadcrumb:reservations"),
     },
     {
@@ -41,16 +42,14 @@ function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
       title: t("reservations:reservationName", { id: reservation.pk }),
     },
     {
-      // NOTE Don't set slug. It hides the mobile breadcrumb
-      slug: "",
       title: t("breadcrumb:confirmation"),
     },
-  ];
+  ] as const;
 
   return (
     // TODO the info card used to be on top on mobile (now it's below)
     <>
-      <BreadcrumbWrapper route={routes} />
+      <Breadcrumb routes={routes} />
       <ReservationPageWrapper $nRows={4}>
         <ReservationInfoCard reservation={reservation} type="confirmed" />
         <ReservationConfirmation

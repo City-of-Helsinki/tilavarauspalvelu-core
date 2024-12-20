@@ -15,7 +15,8 @@ import {
   type DeleteReservationMutation,
   type DeleteReservationMutationVariables,
 } from "@/gql/gql-types";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { reservationsPrefix } from "@/modules/urls";
 
 // This is the callback page from webstore if user cancels the order
 // TODO this would be nicer if we could use a reservation/[id]/cancelled page (or reservation/[id])
@@ -28,20 +29,17 @@ function Cancel({ apiBaseUrl }: NarrowedProps): JSX.Element {
   const { t } = useTranslation();
   const routes = [
     {
-      slug: "/reservations",
+      slug: reservationsPrefix,
       title: t("breadcrumb:reservations"),
     },
     {
-      // NOTE Don't set slug. It hides the mobile breadcrumb
-      // TODO change this to "Peruttu" or something similar
-      title: t("reservations:reservationName", { id: 0 }),
+      title: t("reservations:cancelReservation"),
     },
-  ];
+  ] as const;
 
-  // using breadcrumbs because our page layout is clearer when all pages include them
   return (
     <>
-      <BreadcrumbWrapper route={routes} />
+      <Breadcrumb routes={routes} />
       <H1 $noMargin>{t("reservations:reservationCancelledTitle")}</H1>
       <CancelledLinkSet apiBaseUrl={apiBaseUrl} />
     </>

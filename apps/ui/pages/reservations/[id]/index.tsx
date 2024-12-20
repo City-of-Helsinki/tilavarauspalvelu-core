@@ -42,7 +42,7 @@ import {
   getReservationUnitName,
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationStatus } from "@/components/reservation/ReservationStatus";
 import { AddressSection } from "@/components/reservation-unit/Address";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
@@ -63,6 +63,7 @@ import {
   getApplicationPath,
   getReservationPath,
   getReservationUnitPath,
+  reservationsPrefix,
 } from "@/modules/urls";
 import { useToastIfQueryParam } from "@/hooks";
 import {
@@ -389,14 +390,13 @@ function Reservation({
 
   const routes = [
     {
-      slug: "/reservations",
+      slug: reservationsPrefix,
       title: t("breadcrumb:reservations"),
     },
     {
-      // NOTE Don't set slug. It hides the mobile breadcrumb
       title: t("reservations:reservationName", { id: reservation.pk }),
     },
-  ];
+  ] as const;
 
   const hasReceipt =
     order?.receiptUrl &&
@@ -405,7 +405,7 @@ function Reservation({
 
   return (
     <>
-      <BreadcrumbWrapper route={routes} />
+      <Breadcrumb routes={routes} />
       <ReservationPageWrapper data-testid="reservation__content" $nRows={3}>
         <Flex style={{ gridColumn: "1 / span 1", gridRow: "1 / span 1" }}>
           <Flex

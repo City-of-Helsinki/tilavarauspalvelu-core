@@ -19,6 +19,7 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useCurrentUser } from "@/hooks";
 import { H1 } from "common";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -174,12 +175,17 @@ function ApplicationsPage({
     }
   };
 
+  const routes = [
+    {
+      title: t("breadcrumb:applications"),
+    },
+  ] as const;
+
   return (
     <>
+      <Breadcrumb routes={routes} />
       <div>
-        <H1 $marginTop="l" $marginBottom="none">
-          {t("applications:heading")}
-        </H1>
+        <H1 $noMargin>{t("applications:heading")}</H1>
         <p>{t("applications:subHeading")}</p>
       </div>
       <ApplicationGroups

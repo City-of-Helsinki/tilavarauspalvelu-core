@@ -100,7 +100,7 @@ import {
   getSingleSearchPath,
 } from "@/modules/urls";
 import { Notification } from "hds-react";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { Flex } from "common/styles/util";
 import { SubmitButton } from "@/styles/util";
 
@@ -802,13 +802,12 @@ function ReservationUnitWrapped(props: PropsNarrowed) {
   const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
   const routes = [
     { slug: getSingleSearchPath(), title: t("breadcrumb:search") },
-    // NOTE Don't set slug. It hides the mobile breadcrumb
     { title: reservationUnitName ?? "-" },
-  ];
+  ] as const;
 
   return (
     <>
-      <BreadcrumbWrapper route={routes} />
+      <Breadcrumb routes={routes} />
       <ReservationUnit {...props} />
     </>
   );

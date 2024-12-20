@@ -18,6 +18,7 @@ import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SortingComponent } from "@/components/SortingComponent";
 import { Flex } from "common/styles/util";
 import { useSearchParams } from "next/navigation";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
@@ -80,16 +81,21 @@ function SearchSingle({
     }
   }, [content?.current?.offsetTop, currData?.reservationUnits, isMobile]);
 
+  const routes = [
+    {
+      title: t("breadcrumb:search"),
+    },
+  ] as const;
+
   return (
     <>
+      <Breadcrumb routes={routes} />
+      <H1 $noMargin>{t("search:single.heading")}</H1>
       {error ? (
         <Notification size="small" type="alert">
           {t("searchResultList:error")}
         </Notification>
       ) : null}
-      <H1 $marginTop="l" $marginBottom="none">
-        {t("search:single.heading")}
-      </H1>
       <SingleSearchForm
         unitOptions={unitOptions}
         reservationUnitTypeOptions={reservationUnitTypeOptions}

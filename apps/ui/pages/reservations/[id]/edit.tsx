@@ -40,8 +40,8 @@ import {
   transformReservation,
 } from "@/modules/reservation";
 import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
-import { getReservationPath } from "@/modules/urls";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
+import { getReservationPath, reservationsPrefix } from "@/modules/urls";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { breakpoints, H1 } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
@@ -234,7 +234,7 @@ function ReservationEditPageWrapper(props: PropsNarrowed): JSX.Element {
   const { reservation } = props;
   const routes = [
     {
-      slug: "/reservations",
+      slug: reservationsPrefix,
       title: t("breadcrumb:reservations"),
     },
     {
@@ -242,15 +242,13 @@ function ReservationEditPageWrapper(props: PropsNarrowed): JSX.Element {
       title: t("reservations:reservationName", { id: reservation.pk }),
     },
     {
-      // NOTE Don't set slug. It hides the mobile breadcrumb
-      slug: "",
       title: t("reservations:modifyReservationTime"),
     },
-  ];
+  ] as const;
 
   return (
     <>
-      <BreadcrumbWrapper route={routes} />
+      <Breadcrumb routes={routes} />
       <ReservationEditPage {...props} />
     </>
   );

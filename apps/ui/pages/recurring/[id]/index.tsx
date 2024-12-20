@@ -15,7 +15,6 @@ import {
 import { filterNonNullable } from "common/src/helpers";
 import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
-import BreadcrumbWrapper from "@/components/common/BreadcrumbWrapper";
 import { ReservationUnitCard } from "@/components/search/ReservationUnitCard";
 import { useReservationUnitList } from "@/hooks";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
@@ -30,6 +29,9 @@ import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SortingComponent } from "@/components/SortingComponent";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
+import { getApplicationRoundName } from "@/modules/applicationRound";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -101,18 +103,32 @@ function SeasonalSearch({
   );
   const pageInfo = currData?.reservationUnits?.pageInfo;
 
+  const routes = [
+    {
+      slug: seasonalPrefix,
+      title: t("breadcrumb:recurring"),
+    },
+    {
+      title: getApplicationRoundName(selectedApplicationRound),
+      slug: getApplicationRoundPath(applicationRoundPk),
+    },
+    {
+      title: t("breadcrumb:search"),
+    },
+  ] as const;
+
   return (
     <>
+      <Breadcrumb routes={routes} />
+      <div>
+        <H1 $noMargin>{t("search:recurring.heading")}</H1>
+        <p>{t("search:recurring.text")}</p>
+      </div>
       {error ? (
         <Notification size="small" type="alert">
           {t("searchResultList:error")}
         </Notification>
       ) : null}
-      <BreadcrumbWrapper route={["/recurring", "search"]} />
-      <div>
-        <H1 $noMargin>{t("search:recurring.heading")}</H1>
-        <p>{t("search:recurring.text")}</p>
-      </div>
       <SeasonalSearchForm
         unitOptions={unitOptions}
         reservationUnitTypeOptions={reservationUnitTypeOptions}
