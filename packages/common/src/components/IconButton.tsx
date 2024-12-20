@@ -7,6 +7,7 @@ import {
   focusStyles,
   visitedStyles,
 } from "../../styles/cssFragments";
+import { Flex } from "../../styles/util";
 
 interface IconButtonProps {
   // the button label text
@@ -23,13 +24,6 @@ interface IconButtonProps {
   style?: React.CSSProperties;
   [rest: string]: unknown; // any other params, like id/aria/testing/etc
 }
-
-// TODO can't define padding for this otherwise it's not aligned properly since we have no border
-// but a bit of padding around the focus outline would be nice
-const Container = styled.span`
-  display: flex;
-  align-items: center;
-`;
 
 const linkStyles = css`
   --color-link: var(--color-black);
@@ -83,12 +77,14 @@ const Anchor = styled.a`
   ${visitedStyles}
 `;
 
-const HoverWrapper = styled.span<{ $disabled?: boolean }>`
-  display: flex;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-3-xs);
+// TODO can't define padding for this otherwise it's not aligned properly since we have no border
+// but a bit of padding around the focus outline would be nice
+const Container = styled(Flex).attrs({
+  $gap: "xs",
+  $direction: "row",
+  $alignItems: "center",
+})<{ $disabled?: boolean }>`
   border-bottom: 1px solid transparent;
-  align-items: center;
   ${({ $disabled }) => $disabled && "pointer-events: none;"}
   &:hover {
     ${({ $disabled }) => !$disabled && "border-color: var(--color-black-30);"}
@@ -100,15 +96,7 @@ const HoverWrapper = styled.span<{ $disabled?: boolean }>`
 `;
 
 const Label = styled.span`
-  display: flex;
-  flex-direction: row;
   ${fontMedium}
-`;
-
-const IconContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const LinkElement = ({
@@ -120,11 +108,9 @@ const LinkElement = ({
   icon: React.ReactNode;
   disabled?: boolean;
 }) => (
-  <Container>
-    <HoverWrapper $disabled={disabled}>
-      <Label>{label}</Label>
-      {icon && <IconContainer>{icon}</IconContainer>}
-    </HoverWrapper>
+  <Container $disabled={disabled}>
+    <Label>{label}</Label>
+    {icon}
   </Container>
 );
 
@@ -134,7 +120,7 @@ type LinkWrapperProps = {
   href: string;
 };
 
-const LinkWrapper = ({ label, icon, href, ...rest }: LinkWrapperProps) => {
+function LinkWrapper({ label, icon, href, ...rest }: LinkWrapperProps) {
   const isExternal = href.startsWith("http");
 
   // next/link doesn't work with empty hrefs
@@ -157,25 +143,23 @@ const LinkWrapper = ({ label, icon, href, ...rest }: LinkWrapperProps) => {
       <LinkElement label={label} icon={icon} />
     </StyledLink>
   );
-};
+}
 
-/*
- *  @param {string} label - the button label text (required)
- *  @param {React.ReactNode} icon - an HDS-icon element (required)
- *  @param {string} [href] - the link URI (optional) if none is provided, renders a non-link button
- *  @param {boolean} [openInNewTab] - should the link open in a new tab (optional, default true if href begins "http...")
- *  @param {function} [onClick] - a function to execute upon clicking the button (optional)
- *  @returns {JSX.Element} A `<Link>` for internal or an `<a>` for external `href`s, with the `icon` aligned to the
- *  right of the `label` text. Can also be used as a non-link button via the `onClick` attribute (still renders an
- *  `<a>` element). Accepts other parameters through `...rest` - for id's, aria-attributes, testing etc.
- */
-const IconButton = ({
+function IconButtonImpl({
   icon,
   label,
   href,
   openInNewTab = !!href && href.startsWith("http"), // open external links in a new tab by default
   ...rest
-}: IconButtonProps): JSX.Element => {
+}: IconButtonProps): JSX.Element {
+  if (href == null || href === "") {
+    return (
+      <StyledLinkButton type="button" {...rest}>
+        <LinkElement label={label} icon={icon} />
+      </StyledLinkButton>
+    );
+  }
+
   const linkOptions = {
     href,
     target: openInNewTab ? "_blank" : undefined,
@@ -183,11 +167,7 @@ const IconButton = ({
     ...rest,
   };
 
-  return href == null ? (
-    <StyledLinkButton type="button" {...rest}>
-      <LinkElement label={label} icon={icon} />
-    </StyledLinkButton>
-  ) : (
+  return (
     <LinkWrapper
       {...rest}
       {...linkOptions}
@@ -196,6 +176,25 @@ const IconButton = ({
       icon={icon}
     />
   );
-};
+}
+
+/**
+ *  @prop {string} label - the button label text (required)
+ *  @prop {React.ReactNode} icon - an HDS-icon element (required)
+ *  @prop {string} [href] - the link URI (optional) if none is provided, renders a non-link button
+ *  @prop {boolean} [openInNewTab] - should the link open in a new tab (optional, default true if href begins "http...")
+ *  @prop {function} [onClick] - a function to execute upon clicking the button (optional)
+ *  @returns {JSX.Element} A `<Link>` for internal or an `<a>` for external `href`s, with the `icon` aligned to the
+ *  right of the `label` text. Can also be used as a non-link button via the `onClick` attribute (still renders an
+ *  `<a>` element). Accepts other parameters through `...rest` - for id's, aria-attributes, testing etc.
+ */
+function IconButton(props: IconButtonProps): JSX.Element {
+  return (
+    // Wrap inside a block so the inner element doesn't respond to clicks outside the content
+    <div>
+      <IconButtonImpl {...props} />
+    </div>
+  );
+}
 
 export default IconButton;

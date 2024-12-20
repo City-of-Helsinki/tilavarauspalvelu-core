@@ -23,11 +23,15 @@ export const anchorStyles = css`
   }
 `;
 
+// default z-order > 0 to draw the box shadow over other elements
 export const focusStyles = css`
   --background-color-focus: transparent;
   --color-focus: var(--color-black);
   --focus-outline-color: var(--color-focus-outline);
   --outline-width: 3px;
+  --z-index-focus: 1;
+
+  z-index: var(--z-index-focus);
 
   &:focus-within,
   &:focus-visible {

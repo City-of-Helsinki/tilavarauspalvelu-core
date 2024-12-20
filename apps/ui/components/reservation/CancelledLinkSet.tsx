@@ -22,12 +22,12 @@ function BaseLinkSet(props: Props): JSX.Element {
     "reservationUnitHome" in props ? props.reservationUnitHome : null;
 
   return (
-    <Flex>
+    <Flex $gap="2-xs">
       {resUnitUrl ? (
         <IconButton
           href={resUnitUrl}
           label={t("reservations:backToReservationUnit")}
-          icon={<IconArrowRight aria-hidden />}
+          icon={<IconArrowRight size="m" aria-hidden="true" />}
         />
       ) : (
         <IconButton
