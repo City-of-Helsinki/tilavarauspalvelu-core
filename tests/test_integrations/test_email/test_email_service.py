@@ -1173,6 +1173,7 @@ def test_email_service__send_seasonal_reservation_modified_single(outbox):
 def test_email_service__send_seasonal_reservation_rejected_series(outbox):
     reservation_series = create_reservation_series(
         reservations__type=ReservationTypeChoice.SEASONAL,
+        reservations__state=ReservationStateChoice.DENIED,
         allocated_time_slot__day_of_the_week=Weekday.MONDAY,
         allocated_time_slot__reservation_unit_option__application_section__application__user__email="user@email.com",
         allocated_time_slot__reservation_unit_option__application_section__application__contact_person__email="contact@email.com",

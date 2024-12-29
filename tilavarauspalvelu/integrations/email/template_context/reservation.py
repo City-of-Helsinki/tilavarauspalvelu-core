@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any, overload
 
 from django.utils.translation import pgettext
 
+from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import local_date
 
@@ -740,7 +741,7 @@ def get_context_for_seasonal_reservation_rejected_series(
 ) -> EmailContext:
     if reservation_series is not None:
         section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
-        reservation = reservation_series.reservations.first()
+        reservation = reservation_series.reservations.filter(state=ReservationStateChoice.DENIED).last()
 
         data: dict[str, Any] = {
             "email_recipient_name": section.application.applicant,
