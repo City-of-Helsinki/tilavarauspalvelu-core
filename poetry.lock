@@ -1038,13 +1038,13 @@ Django = ">=4.2"
 
 [[package]]
 name = "django-modeltranslation"
-version = "0.19.11"
+version = "0.19.12"
 description = "Translates Django models using a registration approach."
 optional = false
 python-versions = "*"
 files = [
-    {file = "django_modeltranslation-0.19.11-py3-none-any.whl", hash = "sha256:fe36ecb8d943aaa406e4045d34e2160e90b170b0c71c8d0b5336e5031030b202"},
-    {file = "django_modeltranslation-0.19.11.tar.gz", hash = "sha256:c65a2652554c22bbe11f5db2e81e0c66d58434077d31dce7089cc7bd3ce4e79c"},
+    {file = "django_modeltranslation-0.19.12-py3-none-any.whl", hash = "sha256:6f42811876cb36370a2a727f4669bf9fa086d3c2efad573aedf49f339ba48cd1"},
+    {file = "django_modeltranslation-0.19.12.tar.gz", hash = "sha256:d3a48c4b0e2a8033fc53a4e4d4d8c27c52e81bfbf00ae65fc76bd4ef64177d5b"},
 ]
 
 [package.dependencies]
@@ -3278,4 +3278,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1)", "tox"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.13,<3.14"
-content-hash = "12d09f8984a71b43c518da6519ae51d0c3a99b01d0e7730cecd6779478ac56cf"
+content-hash = "608ca6a53b7c2318c6d8aed9781d888f9172ad7b5d2581cca46da8e83b0380c5"
