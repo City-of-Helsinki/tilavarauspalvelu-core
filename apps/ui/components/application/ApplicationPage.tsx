@@ -92,13 +92,38 @@ type ApplicationPageProps = {
   headContent?: React.ReactNode;
 };
 
+const getStep = (slug: string) => {
+  switch (slug) {
+    case "page1":
+      return 0;
+    case "page2":
+      return 1;
+    case "page3":
+      return 2;
+    case "preview":
+      return 3;
+    default:
+      return 0;
+  }
+};
+
+const getStepState = (completedStep: number, step: number) => {
+  if (completedStep === step) {
+    return StepState.completed;
+  }
+  if (completedStep > step) {
+    return StepState.completed;
+  }
+  return StepState.disabled;
+};
+
 export function ApplicationPageWrapper({
   application,
   translationKeyPrefix,
   headContent,
   overrideText,
   children,
-}: ApplicationPageProps): JSX.Element {
+}: Readonly<ApplicationPageProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const { asPath, push } = router;
@@ -107,30 +132,26 @@ export function ApplicationPageWrapper({
 
   const hideStepper =
     pages.filter((x) => router.asPath.match(`/${x}`)).length === 0;
-
+  const completedStep = calculateCompletedStep(application);
   const steps = pages.map((x, i) => ({
     label: t(`application:navigation.${x}`),
-    state:
-      calculateCompletedStep(application) === i
-        ? StepState.available
-        : calculateCompletedStep(application) < i
-          ? StepState.disabled
-          : StepState.completed,
+    state: getStepState(completedStep, i),
   }));
 
-  const handleStepClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const target = e.currentTarget;
-    const s =
-      Number(
-        target.getAttribute("data-testid")?.replace("hds-stepper-step-", "")
-      ) + 1;
-    if (s === 4 ? asPath.endsWith("preview") : asPath.includes(`page${s}`)) {
+  const handleStepClick = (i: number) => {
+    if (Number.isNaN(i) || i > 3) return; // invalid step
+    const targetPageIndex = i + 1;
+    if (
+      targetPageIndex === 4
+        ? asPath.endsWith("preview")
+        : asPath.includes(`page${targetPageIndex}`)
+    ) {
       return; // already on the page, so do nothing
     }
-    if (s === 4) {
+    if (targetPageIndex === 4) {
       push(`${getApplicationPath(application?.pk)}preview`);
     } else {
-      push(`${getApplicationPath(application?.pk)}page${s}`);
+      push(`${getApplicationPath(application?.pk)}page${targetPageIndex}`);
     }
   };
 
@@ -147,7 +168,6 @@ export function ApplicationPageWrapper({
       title: t("breadcrumb:application"),
     },
   ] as const;
-  const selectedStep = asPath.charAt(asPath.length - 1);
 
   return (
     <>
@@ -160,8 +180,8 @@ export function ApplicationPageWrapper({
         <StyledStepper
           language={i18n.language}
           steps={steps}
-          selectedStep={selectedStep === "w" ? 3 : Number(selectedStep) - 1} //calculateCompletedStep(application)}
-          onStepClick={handleStepClick}
+          selectedStep={getStep(asPath.split("/").pop() ?? "page1")}
+          onStepClick={(_e, i) => handleStepClick(i)}
         />
       )}
       <InnerContainer $hideStepper={hideStepper}>

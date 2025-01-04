@@ -245,12 +245,10 @@ export function ReservationUnitCard({
         <OrderButtonContainer>
           <DeleteContainer>
             <DeleteButton
-              iconEnd={undefined}
               variant={ButtonVariant.Supplementary}
               size={ButtonSize.Small}
-              onClick={() => {
-                onDelete(reservationUnit);
-              }}
+              iconEnd={undefined}
+              onClick={() => onDelete(reservationUnit)}
             >
               {t("reservationUnitList:buttonRemove")}
             </DeleteButton>
