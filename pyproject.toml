@@ -62,7 +62,7 @@ django-celery-results = "2.5.1"
 django-debug-toolbar = "4.4.5"  # Can't be updated past 4.4.5 until django-graphiql-debug-toolbar is updated
 django-graphiql-debug-toolbar = "0.2.0"
 factory-boy = "3.3.1"
-faker = "33.1.0"
+faker = "33.3.0"
 freezegun = "1.5.1"
 html2text = "2024.2.26"
 polib = "1.2.0"
@@ -76,7 +76,7 @@ pytest-xdist = "3.6.1"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.0.1"
-ruff = "0.8.4"
+ruff = "0.8.6"
 ruff-lsp = "0.0.59"
 
 [tool.poetry.plugins.pytest11]
