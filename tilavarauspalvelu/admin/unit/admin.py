@@ -6,8 +6,11 @@ from admin_extra_buttons.decorators import button
 from admin_extra_buttons.mixins import ExtraButtonsMixin
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
+from django.forms import ModelForm
+from django.forms.widgets import Textarea
 from django.utils.translation import gettext_lazy as _
-from modeltranslation.admin import TranslationAdmin
+from modeltranslation.admin import TabbedTranslationAdmin
+from subforms.fields import DynamicArrayField
 
 from tilavarauspalvelu.admin.location.admin import LocationInline
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -20,8 +23,28 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
 
 
+class UnitAdminForm(ModelForm):
+    search_terms = DynamicArrayField(
+        required=False,
+        default=list,
+        label=_("Search terms"),
+        help_text=_(
+            "Additional search terms that will bring up this unit's reservation units when making text searches "
+            "in the customer UI. These terms should be added to make sure search results using text search in "
+            "links from external sources work regardless of the UI language."
+        ),
+    )
+
+    class Meta:
+        model = Unit
+        fields = []  # Use fields from ModelAdmin
+        widgets = {
+            "short_description": Textarea(),
+        }
+
+
 @admin.register(Unit)
-class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
+class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
     # Functions
     actions = ["update_from_tprek"]
     search_fields = [
@@ -45,8 +68,37 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TranslationAdmin):
     ordering = ["rank"]
 
     # Form
+    form = UnitAdminForm
+    fields = [
+        "name",
+        "tprek_id",
+        "tprek_department_id",
+        "tprek_last_modified",
+        "description",
+        "short_description",
+        "search_terms",
+        "web_page",
+        "email",
+        "phone",
+        "origin_hauki_resource",
+        "payment_merchant",
+        "payment_accounting",
+    ]
     inlines = [LocationInline]
-    readonly_fields = ["tprek_last_modified"]
+    readonly_fields = [
+        "tprek_last_modified",
+    ]
+
+    def get_queryset(self, request: WSGIRequest) -> QuerySet[Unit]:
+        return (
+            super()
+            .get_queryset(request)
+            .select_related(
+                "origin_hauki_resource",
+                "payment_merchant",
+                "payment_accounting",
+            )
+        )
 
     @admin.action
     def update_from_tprek(self, request: WSGIRequest, queryset: QuerySet[Unit]) -> None:
