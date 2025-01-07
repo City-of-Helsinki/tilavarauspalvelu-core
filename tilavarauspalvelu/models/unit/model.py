@@ -4,6 +4,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -35,6 +36,8 @@ class Unit(models.Model):
     web_page: str = models.URLField(max_length=255, blank=True, default="")
     email: str = models.EmailField(max_length=255, blank=True, default="")
     phone: str = models.CharField(max_length=255, blank=True, default="")
+
+    search_terms = ArrayField(models.CharField(max_length=255), blank=True, default=list)
 
     origin_hauki_resource = models.ForeignKey(
         "tilavarauspalvelu.OriginHaukiResource",
