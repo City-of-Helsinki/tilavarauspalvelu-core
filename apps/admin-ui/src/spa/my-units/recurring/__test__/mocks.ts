@@ -1,4 +1,4 @@
-import { addHours, getYear, nextMonday, set } from "date-fns";
+import { addHours, nextMonday, set } from "date-fns";
 import {
   Authentication,
   ReservationKind,
@@ -54,7 +54,7 @@ const arrays = {
   spaces: [],
 };
 
-export function createUnits(): ReservationUnitFragment[] {
+export function createReservationUnits(): ReservationUnitFragment[] {
   return [
     {
       ...unitCommon,
@@ -80,9 +80,9 @@ const emptyTerms = {
   termsType: TermsType.PaymentTerms,
 };
 
-// Use next year for all tests (today to two years in the future is allowed in the form)
-// NOTE using jest fake timers would be better but they timeout the tests
-export const YEAR = getYear(new Date()) + 1;
+// TODO remove and use fakeTimers with doNotFake option
+// requires refactoring the mocks to use constructors instead of static values
+export const YEAR = 2024;
 
 const supportedFields = [
   "reservee_type",

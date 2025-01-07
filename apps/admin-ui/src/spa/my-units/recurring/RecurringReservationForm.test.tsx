@@ -16,14 +16,14 @@ import {
   YEAR,
   mocks,
   mondayMorningReservations,
-  createUnits,
+  createReservationUnits,
 } from "./__test__/mocks";
 
 function customRender() {
   return render(
     <MemoryRouter>
       <MockedProvider mocks={mocks} addTypename={false}>
-        <RecurringReservationForm reservationUnits={createUnits()} />
+        <RecurringReservationForm reservationUnits={createReservationUnits()} />
       </MockedProvider>
     </MemoryRouter>
   );
@@ -41,6 +41,25 @@ const getReservationUnitBtn = () => {
 beforeEach(() => {
   // Hide radio button warnings
   jest.spyOn(console, "warn").mockImplementation(() => {});
+});
+// TODO these should be set in the test setup
+beforeAll(() => {
+  jest.useFakeTimers({
+    now: new Date(2024, 0, 1, 0, 0, 0),
+    // NOTE without these the tests will fail with a timeout (async doesn't work properly)
+    doNotFake: [
+      "nextTick",
+      "setImmediate",
+      "clearImmediate",
+      "setInterval",
+      "clearInterval",
+      "setTimeout",
+      "clearTimeout",
+    ],
+  });
+});
+afterAll(() => {
+  jest.useRealTimers();
 });
 
 test("Render recurring reservation form with all but unit field disabled", async () => {
@@ -60,7 +79,7 @@ test("Render recurring reservation form with all but unit field disabled", async
     selector: "ul",
   });
 
-  const units = createUnits();
+  const units = createReservationUnits();
   expect(units[0].nameFi).toBeDefined();
   expect(units[1].nameFi).toBeDefined();
   expect(listbox).toBeInTheDocument();
@@ -107,7 +126,7 @@ async function selectUnit() {
   const listbox = screen.getByLabelText(/reservationUnit/, {
     selector: "ul",
   });
-  const units = createUnits();
+  const units = createReservationUnits();
   expect(units[0].nameFi).toBeDefined();
   const unitName = units[0].nameFi!;
 
