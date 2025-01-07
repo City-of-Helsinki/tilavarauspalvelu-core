@@ -2573,7 +2573,7 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
     assert len(cached_value) == 2
     assert cached_value[str(reservation_unit_2.pk)]["frt"] == "None"
     assert cached_value[str(reservation_unit_2.pk)]["closed"] == "True"
-    assert cached_value[str(reservation_unit.pk)]["frt"] == "2025-01-01T10:00:00+02:00"
+    assert cached_value[str(reservation_unit.pk)]["frt"] == dt(hour=10)
     assert cached_value[str(reservation_unit.pk)]["closed"] == "False"
 
     # Check that there was no additional queries
@@ -2624,7 +2624,7 @@ def test__reservation_unit__first_reservable_time__previous_page_not_cached(grap
     assert len(cached_value) == 2
     assert cached_value[str(reservation_unit_2.pk)]["frt"] == "None"
     assert cached_value[str(reservation_unit_2.pk)]["closed"] == "True"
-    assert cached_value[str(reservation_unit.pk)]["frt"] == "2025-01-01T10:00:00+02:00"
+    assert cached_value[str(reservation_unit.pk)]["frt"] == dt(hour=10)
     assert cached_value[str(reservation_unit.pk)]["closed"] == "False"
 
     # Check that there was no additional queries
