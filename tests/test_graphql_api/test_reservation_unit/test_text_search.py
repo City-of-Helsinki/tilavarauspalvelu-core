@@ -246,3 +246,19 @@ def test_reservation_unit__filter__by_text_search__and_other_filters(graphql):
     assert response.has_errors is False, response
     assert len(response.edges) == 1, response
     assert response.node(0) == {"pk": reservation_unit.pk}
+
+
+def test_reservation_unit__filter__by_text_search__unauthenticated_user(graphql):
+    # Django translations are inactive during testing, so `get_language_from_request`
+    # always returns `settings.LANGUAGE_CODE`, see `django.utils.translation.trans_null.get_language_from_request`
+
+    reservation_unit_data = SearchableData(description="Kuvaus")
+    reservation_unit = ReservationUnitFactory.create(**dataclasses.asdict(reservation_unit_data))
+    ReservationUnit.objects.update_search_vectors()
+
+    query = reservation_units_query(text_search="kuvaus")
+    response = graphql(query)
+
+    assert response.has_errors is False, response
+    assert len(response.edges) == 1, response
+    assert response.node(0) == {"pk": reservation_unit.pk}

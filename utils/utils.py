@@ -122,7 +122,9 @@ def get_text_search_language(request: HttpRequest) -> TextSearchLang:
     Use preferred language if user is authenticated, otherwise use the language from the request.
     """
     user: AnyUser = request.user
-    lang_code = user.preferred_language if user.is_authenticated else get_language_from_request(request)
+    lang_code = (
+        user.preferred_language if user.is_authenticated else get_language_from_request(request, check_path=True)
+    )
     return "swedish" if lang_code == "sv" else "english" if lang_code == "en" else "finnish"
 
 
