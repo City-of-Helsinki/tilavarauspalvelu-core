@@ -15,7 +15,9 @@ def htmlize(text: str | None) -> str:
     if text.startswith("<"):
         return text
 
-    text = re.sub(r"(.{1,})", r"<p>\1</p>", text)
+    # Convert linebreaks to paragraphs
+    pattern = r"(.{1,})"  # Match any characters, with a minimum length of 1 (Essentially get rows with content)
+    text = re.sub(pattern, r"<p>\1</p>", text)
     return text.replace("\n", "")  # Remove linebreaks
 
 

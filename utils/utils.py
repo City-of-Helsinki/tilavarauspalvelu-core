@@ -191,14 +191,34 @@ def as_p_tags(texts: Iterable[str]) -> str:
 def convert_html_to_text(html_text: str) -> str:
     text = html2text(html_text, bodywidth=0)
 
-    # Link text and url are the same
+    # Link text and url are the same:
     # Remove angle-brackets from links `<url>` -> `url`
     # If there is a dot after the link, add a space between the link and the dot.
-    text = re.sub(r"<(https?://[^>]+)>(\.?)", r"\1 \2", text)
 
-    # Link text and url are different
+    # fmt: off
+    pattern = (
+        r"<"                            # begins with opening bracket
+        r"(?P<link>(https?://)?[^>]+)"  # link, with optional protocol
+        r">"                            # followed by closing bracket
+        r"(?P<dot>\.?)"                 # with optional dot
+    )
+    # fmt: on
+    text = re.sub(pattern, r"\g<link> \g<dot>", text)
+
+    # Link text and url are different:
     # Replace markdown-style links `[text](url)` with `text <url>`
-    text = re.sub(r"\[([^\]]+)\]\(((http|https)?://[^\)]+)\)", r"\1 <\2>", text)
+    # fmt: off
+    pattern = (
+        r"\["                            # begins with "["
+        r"(?P<text>[^\]]+)"              # any text that is not "]"
+        r"\]"                            # followed by "]"
+        r"\("                            # followed by "("
+        r"(?P<link>(https?://)?[^\)]+)"  # any link, with optional protocol
+        r"\)"                            # followed by ")"
+    )
+    # fmt: on
+
+    text = re.sub(pattern, r"\g<text> <\g<link>>", text)
 
     # Remove any spaces between newline and the last newline, which is added by html2text
     return text.replace(" \n", "\n").removesuffix("\n")
