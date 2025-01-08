@@ -109,6 +109,9 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES.value
     reservation_kind = ReservationKind.DIRECT_AND_SEASON.value
 
+    # Lists
+    search_terms = LazyAttribute(lambda i: [])
+
     # Forward many-to-one related
     unit = ForeignKeyFactory("tests.factories.UnitFactory", required=True)
     origin_hauki_resource = ForeignKeyFactory("tests.factories.OriginHaukiResourceFactory")
