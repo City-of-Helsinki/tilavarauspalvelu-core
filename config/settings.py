@@ -381,6 +381,11 @@ class Common(Environment):
     UPDATE_PRODUCT_MAPPING = values.BooleanValue(default=False)
     UPDATE_ACCOUNTING = values.BooleanValue(default=False)
 
+    # --- Pindora settings -------------------------------------------------------------------------------------------
+
+    PINDORA_API_URL = values.StringValue()
+    PINDORA_API_KEY = values.StringValue()
+
     # --- Graphene settings ------------------------------------------------------------------------------------------
 
     GRAPHENE = {
@@ -547,6 +552,9 @@ class EmptyDefaults:
     VERKKOKAUPPA_MERCHANT_API_URL = ""
     VERKKOKAUPPA_NAMESPACE = ""
     VERKKOKAUPPA_API_KEY = ""
+
+    PINDORA_API_URL = ""
+    PINDORA_API_KEY = ""
 
     TUNNISTAMO_BASE_URL = ""
 
@@ -800,6 +808,11 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     HAUKI_ORGANISATION_ID = "test-org:965b1630-6e5a-41f9-ab19-217d90e9729b"
     HAUKI_SECRET = "HAUKI_SECRET"  # noqa: S105 # nosec # NOSONAR
     HAUKI_API_KEY = "HAUKI_API_KEY"
+
+    # --- Pindora settings -------------------------------------------------------------------------------------------
+
+    PINDORA_API_URL = "https://fake.test.pindora.api.com"
+    PINDORA_API_KEY = "PINDORA_API_KEY"
 
     # --- Verkkokauppa settings --------------------------------------------------------------------------------------
 

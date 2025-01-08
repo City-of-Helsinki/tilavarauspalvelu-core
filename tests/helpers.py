@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from functools import wraps
 from typing import TYPE_CHECKING, Any, NamedTuple, ParamSpec, Self, TypeVar
 from unittest import mock
@@ -26,6 +27,7 @@ __all__ = [
     "GraphQLClient",
     "ResponseMock",
     "TranslationsFromPOFiles",
+    "exact",
 ]
 
 
@@ -46,9 +48,10 @@ class GraphQLClient(BaseGraphQLClient):
 
 
 class ResponseMock:
-    def __init__(self, json_data: dict[str, Any], status_code: int = 200) -> None:
-        self.json_data = json_data
+    def __init__(self, json_data: dict[str, Any] | None = None, text: str = "", status_code: int = 200) -> None:
+        self.json_data = json_data or {}
         self.status_code = status_code
+        self.text = text
 
     def json(self) -> dict[str, Any]:
         return self.json_data
@@ -216,3 +219,8 @@ class TranslationsFromPOFiles:
 
         msg = f"Language '{lang_code}' is not supported"
         raise LookupError(msg)
+
+
+def exact(msg: str) -> str:
+    """Use in `with pytest.raises(..., match=exact(msg))` to match the 'msg' string exactly."""
+    return f"^{re.escape(msg)}$"

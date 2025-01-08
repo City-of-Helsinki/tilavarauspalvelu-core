@@ -79,7 +79,7 @@ class BaseExternalServiceClient:
     ################
 
     @classmethod
-    def generic(cls, method: Literal["get", "post", "put"], url: str, **kwargs: Any) -> Response:
+    def generic(cls, method: Literal["get", "post", "put", "delete"], url: str, **kwargs: Any) -> Response:
         return request(method, url, **kwargs, timeout=cls.REQUEST_TIMEOUT_SECONDS)
 
     @classmethod
@@ -103,6 +103,15 @@ class BaseExternalServiceClient:
     @classmethod
     def put(cls, *, url: str, json: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
         response = cls.generic("put", url=url, json=json, headers=cls._get_mutate_headers(headers))
+
+        if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
+            cls.handle_500_error(response)
+
+        return response
+
+    @classmethod
+    def delete(cls, *, url: str, headers: dict[str, Any] | None = None) -> Response:
+        response = cls.generic("delete", url=url, headers=cls._get_mutate_headers(headers))
 
         if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
             cls.handle_500_error(response)
