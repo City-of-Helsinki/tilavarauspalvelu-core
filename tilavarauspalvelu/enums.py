@@ -32,6 +32,7 @@ __all__ = [
     "EventProperty",
     "HaukiResourceState",
     "Language",
+    "MethodOfEntry",
     "OrderStatus",
     "OrderStatusWithFree",
     "OrganizationTypeChoice",
@@ -1099,3 +1100,11 @@ class LoginMethod(enum.Enum):
     PROFILE = "PROFILE"
     AD = "AD"
     OTHER = "OTHER"
+
+
+class MethodOfEntry(models.TextChoices):
+    """How is the reservee able to enter the space in their reservation unit?"""
+
+    OPEN_ACCESS = "OPEN_ACCESS", pgettext_lazy("MethodOfEntry", "Open access")
+    WITH_KEY = "WITH_KEY", pgettext_lazy("MethodOfEntry", "With key")
+    KEYLESS = "KEYLESS", pgettext_lazy("MethodOfEntry", "Keyless")

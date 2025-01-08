@@ -15,6 +15,7 @@ from lookup_property import L, lookup_property
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import (
     AuthenticationType,
+    MethodOfEntry,
     ReservationKind,
     ReservationStartInterval,
     ReservationUnitPublishingState,
@@ -88,6 +89,8 @@ class ReservationUnit(models.Model):
     max_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
+    keyless_entry_start_date: datetime.date | None = models.DateField(null=True, blank=True)
+    keyless_entry_end_date: datetime.date | None = models.DateField(null=True, blank=True)
 
     # Booleans
 
@@ -117,6 +120,11 @@ class ReservationUnit(models.Model):
         choices=ReservationKind.choices,
         default=ReservationKind.DIRECT_AND_SEASON.value,
         db_index=True,
+    )
+    method_of_entry: str = models.CharField(
+        max_length=20,
+        choices=MethodOfEntry.choices,
+        default=MethodOfEntry.OPEN_ACCESS.value,
     )
 
     # List fields

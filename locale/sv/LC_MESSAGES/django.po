@@ -3010,6 +3010,21 @@ msgctxt "BannerNotificationState"
 msgid "Active"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgctxt "MethodOfEntry"
+msgid "Open access"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "MethodOfEntry"
+msgid "With key"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "MethodOfEntry"
+msgid "Keyless"
+msgstr ""
+
 #: tilavarauspalvelu/integrations/email/template_context/application.py
 msgctxt "Email"
 msgid "'My applications' page"
