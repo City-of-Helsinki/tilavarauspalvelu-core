@@ -7,11 +7,15 @@ from django.utils.translation import gettext_lazy as _
 from subforms.fields import DynamicArrayField
 from tinymce.widgets import TinyMCE
 
-from tilavarauspalvelu.enums import TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import MethodOfEntry, TermsOfUseTypeChoices
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationUnit, TermsOfUse
+from utils.external_service.errors import ExternalServiceError
 
 
 class ReservationUnitAdminForm(forms.ModelForm):
+    instance: ReservationUnit
+
     search_terms = DynamicArrayField(
         required=False,
         default=list,
@@ -30,6 +34,19 @@ class ReservationUnitAdminForm(forms.ModelForm):
         self.base_fields["cancellation_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.CANCELLATION)
         self.base_fields["service_specific_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.SERVICE)
         super().__init__(*args, **kwargs)
+
+    def clean(self) -> None:
+        cleaned_data = super().clean()
+        if not cleaned_data:
+            return
+
+        # Check if reservation unit has been configured in Pindora.
+        method_of_entry: str | None = cleaned_data.get("method_of_entry")
+        if method_of_entry == MethodOfEntry.KEYLESS:
+            try:
+                PindoraClient.get_reservation_unit(self.instance)
+            except ExternalServiceError as error:
+                self.add_error("method_of_entry", str(error))
 
     class Meta:
         model = ReservationUnit
