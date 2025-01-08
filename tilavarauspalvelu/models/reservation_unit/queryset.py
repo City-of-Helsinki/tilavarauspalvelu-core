@@ -160,6 +160,10 @@ class ReservationUnitQuerySet(models.QuerySet):
                             " ".join(term for term in reservation_unit.search_terms),
                             output_field=models.CharField(),
                         ),
+                        models.Value(
+                            " ".join(term for term in reservation_unit.unit.search_terms),
+                            output_field=models.CharField(),
+                        ),
                         #
                         # Joins are not allowed in search vectors, so we compute them as values beforehand.
                         models.Value(

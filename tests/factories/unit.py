@@ -44,6 +44,8 @@ class UnitFactory(GenericDjangoModelFactory[Unit]):
     short_description_en = FakerEN("text")
     short_description_sv = FakerSV("text")
 
+    search_terms = LazyAttribute(lambda i: [])
+
     web_page = ""
     email = ""
     phone = ""

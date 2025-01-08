@@ -29,6 +29,7 @@ class SearchableData:
     unit__name: str = "-"
     unit__name_en: str = "-"
     unit__name_sv: str = "-"
+    unit__search_terms: list[str] = dataclasses.field(default_factory=list)
     reservation_unit_type__name: str = "-"
     reservation_unit_type__name_en: str = "-"
     reservation_unit_type__name_sv: str = "-"
@@ -217,6 +218,20 @@ class Params(NamedTuple):
             text_search="tenniskenttä kannelmäki",
             reservation_unit_data=SearchableData(description="Tämä on uusi tenniskenttä"),
             has_results=False,
+        ),
+        "match unit search terms fi": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(unit__search_terms=["foo"]),
+        ),
+        "match unit search terms en": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(unit__search_terms=["foo"]),
+            language="en",
+        ),
+        "match unit search terms sv": Params(
+            text_search="foo",
+            reservation_unit_data=SearchableData(unit__search_terms=["foo"]),
+            language="sv",
         ),
     })
 )
