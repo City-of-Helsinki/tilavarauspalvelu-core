@@ -1623,6 +1623,7 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/unit/admin.py
 msgid "Search terms"
 msgstr ""
 
@@ -2098,6 +2099,14 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/sql_log/admin.py
 msgid "Search by SQL, request log path, body or request ID"
+msgstr ""
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid ""
+"Additional search terms that will bring up this unit's reservation units "
+"when making text searches in the customer UI. These terms should be added to "
+"make sure search results using text search in links from external sources "
+"work regardless of the UI language."
 msgstr ""
 
 #: tilavarauspalvelu/admin/unit/admin.py
@@ -3894,10 +3903,10 @@ msgstr ""
 msgid "Seasonal Booking"
 msgstr ""
 
-#: tilavarauspalvelu/utils/validators.py
+#: tilavarauspalvelu/validators.py
 msgid "This field is required."
 msgstr ""
 
-#: tilavarauspalvelu/utils/validators.py
+#: tilavarauspalvelu/validators.py
 msgid "Enter a valid time."
 msgstr ""

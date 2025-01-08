@@ -919,7 +919,8 @@ msgstr "Milloin virheilmoitusta muokattiin viimeksi?"
 
 #: tilavarauspalvelu/admin/bug_report/admin.py
 msgid "Search by name, description, Jira ticket URL or GitHub PR URL"
-msgstr "Hae nimen, kuvauksen, jiratiketin osoitteen tai GitHub PR:n osoitteen avulla"
+msgstr ""
+"Hae nimen, kuvauksen, jiratiketin osoitteen tai GitHub PR:n osoitteen avulla"
 
 #: tilavarauspalvelu/admin/city/admin.py
 msgid "Municipality"
@@ -1666,6 +1667,7 @@ msgstr "Ohjeet"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+#: tilavarauspalvelu/admin/unit/admin.py
 msgid "Search terms"
 msgstr "Hakusanat"
 
@@ -2161,6 +2163,19 @@ msgstr "Stack trace siellä missä SQL-kysely suoritettiin."
 #: tilavarauspalvelu/admin/sql_log/admin.py
 msgid "Search by SQL, request log path, body or request ID"
 msgstr "Etsi SQL:llä, rajapintakutsun polulla, sisällöllä tai ID:llä"
+
+#: tilavarauspalvelu/admin/unit/admin.py
+msgid ""
+"Additional search terms that will bring up this unit's reservation units "
+"when making text searches in the customer UI. These terms should be added to "
+"make sure search results using text search in links from external sources "
+"work regardless of the UI language."
+msgstr ""
+"Ylimääräiset hakusanat, joilla tämän toimipisteen varausyksikköjä on mahdollista hakea "
+"tekstihaun kautta asiakaskäyttöliittymässä. Hakusanoja tulee lisätä tähän "
+"listaan silloin kun halutaan taata, että järjestelmän ulkopuolelta tulevissa "
+"linkeissä käytettävät hakusanat tuottavat oikeat hakutulokset "
+"käyttöliittymän kielestä rippumatta."
 
 #: tilavarauspalvelu/admin/unit/admin.py
 msgid "Search by name or TPREK ID"
@@ -3967,10 +3982,10 @@ msgstr "käyttäjät"
 msgid "Seasonal Booking"
 msgstr "Kausivaraus"
 
-#: tilavarauspalvelu/utils/validators.py
+#: tilavarauspalvelu/validators.py
 msgid "This field is required."
 msgstr "Tämä kenttä on pakollinen."
 
-#: tilavarauspalvelu/utils/validators.py
+#: tilavarauspalvelu/validators.py
 msgid "Enter a valid time."
 msgstr "Syötä oikea aika."
