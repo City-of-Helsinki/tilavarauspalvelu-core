@@ -339,6 +339,25 @@ def test_reservation_unit__filter__by_min_persons_lte(graphql):
     assert response.node(2) == {"pk": reservation_unit_3.pk}
 
 
+def test_reservation_unit__filter__by_persons_allowed(graphql):
+    reservation_unit_1 = ReservationUnitFactory.create(min_persons=None, max_persons=None)
+    reservation_unit_2 = ReservationUnitFactory.create(min_persons=None, max_persons=201)
+    reservation_unit_3 = ReservationUnitFactory.create(min_persons=200, max_persons=None)
+    reservation_unit_4 = ReservationUnitFactory.create(min_persons=199, max_persons=200)
+    ReservationUnitFactory.create(min_persons=198, max_persons=199)  # Filtered out by max_persons
+    ReservationUnitFactory.create(min_persons=201, max_persons=None)  # Filtered out by min_persons
+
+    query = reservation_units_query(personsAllowed=200)
+    response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+    assert len(response.edges) == 4
+    assert response.node(0) == {"pk": reservation_unit_1.pk}
+    assert response.node(1) == {"pk": reservation_unit_2.pk}
+    assert response.node(2) == {"pk": reservation_unit_3.pk}
+    assert response.node(3) == {"pk": reservation_unit_4.pk}
+
+
 def test_reservation_unit__filter__by_name_fi(graphql):
     reservation_unit = ReservationUnitFactory.create(name_fi="foo")
     ReservationUnitFactory.create(name_fi="bar")
