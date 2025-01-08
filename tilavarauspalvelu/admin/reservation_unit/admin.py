@@ -172,6 +172,16 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
             },
         ],
         [
+            _("Method of entry"),
+            {
+                "fields": [
+                    "method_of_entry",
+                    "keyless_entry_start_date",
+                    "keyless_entry_end_date",
+                ],
+            },
+        ],
+        [
             _("Search terms"),
             {
                 "fields": [

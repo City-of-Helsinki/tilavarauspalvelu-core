@@ -1625,6 +1625,11 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Method of entry"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 #: tilavarauspalvelu/admin/unit/form.py
 msgid "Search terms"
 msgstr ""
@@ -1892,6 +1897,14 @@ msgid "Payment product"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Keyless entry start date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Keyless entry end date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment terms for the reservation unit."
 msgstr ""
 
@@ -2059,6 +2072,22 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Product used for payments"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "How is the reservee able to enter the space in their reservation unit?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"If the reservation unit is going to start using keyless entry in the future, "
+"this is the date when the switch happens"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"If the reservation unit is going to remove keyless entry in the future, this "
+"is the date when the switch happens"
 msgstr ""
 
 #: tilavarauspalvelu/admin/space/admin.py

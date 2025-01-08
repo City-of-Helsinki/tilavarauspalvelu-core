@@ -1669,6 +1669,11 @@ msgstr "Ohjeet"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Method of entry"
+msgstr "Kulkutapa"
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 #: tilavarauspalvelu/admin/unit/form.py
 msgid "Search terms"
 msgstr "Hakusanat"
@@ -1941,6 +1946,14 @@ msgid "Payment product"
 msgstr "Maksutuote"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Keyless entry start date"
+msgstr "Avaimettoman kulun alkamispäivä"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Keyless entry end date"
+msgstr "Avaimettoman kulun päättymispäivä"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment terms for the reservation unit."
 msgstr "Varausyksikön maksuehdot."
 
@@ -2123,6 +2136,26 @@ msgstr "Maksujen kirjanpidon tiliöintitiedot"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Product used for payments"
 msgstr "Tuote, jota käytetään maksuihin"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "How is the reservee able to enter the space in their reservation unit?"
+msgstr "Millä tavalla varaaja varaaja pääsee sisään varausyksikön tilaan?"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"If the reservation unit is going to start using keyless entry in the future, "
+"this is the date when the switch happens"
+msgstr ""
+"Jos varausyksikkö vaihtaa käyttämään avaimettomaan kulkua tulevaisuudessa, "
+"vaihto tapahtuu tänä päivänä"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid ""
+"If the reservation unit is going to remove keyless entry in the future, this "
+"is the date when the switch happens"
+msgstr ""
+"Jos varausyksikkö lopettaa avaimettoman kulun käytön tulevaisuudessa, vaihto "
+"tapahtuu tänä päivänä"
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"

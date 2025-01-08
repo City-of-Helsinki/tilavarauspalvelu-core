@@ -111,6 +111,9 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "uuid": _("UUID"),
             "payment_product": _("Payment product"),
             "search_terms": _("Search terms"),
+            "method_of_entry": _("Method of entry"),
+            "keyless_entry_start_date": _("Keyless entry start date"),
+            "keyless_entry_end_date": _("Keyless entry end date"),
         }
         help_texts = {
             "sku": _("SKU"),
@@ -201,5 +204,14 @@ class ReservationUnitAdminForm(forms.ModelForm):
                 "Additional search terms that will bring up this reservation unit when making text searches "
                 "in the customer UI. These terms should be added to make sure search results using text search in "
                 "links from external sources work regardless of the UI language."
+            ),
+            "method_of_entry": _("How is the reservee able to enter the space in their reservation unit?"),
+            "keyless_entry_start_date": _(
+                "If the reservation unit is going to start using keyless entry in the future, "
+                "this is the date when the switch happens"
+            ),
+            "keyless_entry_end_date": _(
+                "If the reservation unit is going to remove keyless entry in the future, "
+                "this is the date when the switch happens"
             ),
         }
