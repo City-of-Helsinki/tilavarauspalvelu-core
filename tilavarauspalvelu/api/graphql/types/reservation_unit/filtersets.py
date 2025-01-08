@@ -63,6 +63,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     min_persons_lte = django_filters.NumberFilter(field_name="min_persons", method="get_min_persons_lte")
     max_persons_gte = django_filters.NumberFilter(field_name="max_persons", method="get_max_persons_gte")
     max_persons_lte = django_filters.NumberFilter(field_name="max_persons", method="get_max_persons_lte")
+    persons_allowed = django_filters.NumberFilter(method="get_persons_allowed")
 
     text_search = django_filters.CharFilter(method="get_text_search")
 
@@ -170,6 +171,13 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     @staticmethod
     def get_min_persons_lte(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:
         return qs.filter(Q(min_persons__lte=value) | Q(min_persons__isnull=True))
+
+    @staticmethod
+    def get_persons_allowed(qs: ReservationUnitQuerySet, name: str, value: int) -> QuerySet:
+        return qs.filter(
+            Q(Q(min_persons__lte=value) | Q(min_persons__isnull=True))
+            & Q(Q(max_persons__gte=value) | Q(max_persons__isnull=True))
+        )
 
     @staticmethod
     def get_is_visible(qs: ReservationUnitQuerySet, name: str, value: bool) -> QuerySet:
