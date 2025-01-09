@@ -314,12 +314,6 @@ export function Review({
         $direction="row-reverse"
         $alignItems="center"
       >
-        {isEndingAllowed || isHandled ? (
-          <EndAllocation
-            applicationRound={applicationRound}
-            refetch={refetch}
-          />
-        ) : null}
         {!hideAllocation && (
           <>
             {isAllocationEnabled ? (
@@ -333,6 +327,12 @@ export function Review({
             )}
           </>
         )}
+        {isEndingAllowed || isHandled ? (
+          <EndAllocation
+            applicationRound={applicationRound}
+            refetch={refetch}
+          />
+        ) : null}
       </Flex>
       <TabWrapper>
         <Tabs initiallyActiveTab={activeTabIndex}>
