@@ -12,7 +12,7 @@ import {
   isPossibleToDeny,
   isPossibleToEdit,
   isPossibleToReturn,
-} from "./reservationModificationRules";
+} from "@/modules/reservationModificationRules";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type Props = {

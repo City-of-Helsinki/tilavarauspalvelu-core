@@ -12,7 +12,7 @@ import { useModal } from "@/context/ModalContext";
 import eventStyleGetter, { legend } from "./eventStyleGetter";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import { EditTimeModal } from "@/component/EditTimeModal";
-import { isPossibleToEdit } from "./reservationModificationRules";
+import { isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
 import { filterNonNullable } from "common/src/helpers";
 import VisibleIfPermission from "@/component/VisibleIfPermission";

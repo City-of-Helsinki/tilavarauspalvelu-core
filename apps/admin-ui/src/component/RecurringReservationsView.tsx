@@ -21,6 +21,10 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import { LoadingSpinner } from "hds-react";
 import { errorToast } from "common/src/common/toast";
 import { useCheckPermission } from "@/hooks";
+import {
+  isPossibleToDeny,
+  isPossibleToEdit,
+} from "@/modules/reservationModificationRules";
 
 type RecurringReservationType = NonNullable<
   RecurringReservationQuery["recurringReservation"]
@@ -126,40 +130,37 @@ export function RecurringReservationsView({
     const buttons = [];
     const startDate = new Date(x.begin);
     const endDate = new Date(x.end);
-    const now = new Date();
 
-    if (x.state !== ReservationStateChoice.Denied) {
-      if (hasPermission && startDate > now && onChange) {
-        buttons.push(
-          <ReservationListButton
-            key="change"
-            callback={() => handleChange(x)}
-            type="change"
-            t={t}
-          />
-        );
-      }
+    if (hasPermission && onChange && isPossibleToDeny(x.state, endDate)) {
+      buttons.push(
+        <ReservationListButton
+          key="change"
+          callback={() => handleChange(x)}
+          type="change"
+          t={t}
+        />
+      );
+    }
 
-      if (onSelect) {
-        buttons.push(
-          <ReservationListButton
-            key="show"
-            callback={() => onSelect(x)}
-            type="show"
-            t={t}
-          />
-        );
-      }
-      if (hasPermission && endDate > now) {
-        buttons.push(
-          <ReservationListButton
-            key="deny"
-            callback={() => handleRemove(x)}
-            type="deny"
-            t={t}
-          />
-        );
-      }
+    if (onSelect && x.state === ReservationStateChoice.Confirmed) {
+      buttons.push(
+        <ReservationListButton
+          key="show"
+          callback={() => onSelect(x)}
+          type="show"
+          t={t}
+        />
+      );
+    }
+    if (hasPermission && isPossibleToEdit(x.state, endDate)) {
+      buttons.push(
+        <ReservationListButton
+          key="deny"
+          callback={() => handleRemove(x)}
+          type="deny"
+          t={t}
+        />
+      );
     }
 
     return {

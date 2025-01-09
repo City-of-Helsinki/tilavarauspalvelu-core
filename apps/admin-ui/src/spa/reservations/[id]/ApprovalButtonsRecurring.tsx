@@ -1,11 +1,12 @@
 import React from "react";
-import { ReservationStateChoice, type ReservationQuery } from "@gql/gql-types";
+import { type ReservationQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { Button } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { DenyDialogSeries } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { useRecurringReservations } from "@/hooks";
+import { isPossibleToDeny } from "@/modules/reservationModificationRules";
 
 // TODO use a fragment
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
@@ -40,15 +41,14 @@ export function ApprovalButtonsRecurring({
     handleAccept();
   };
 
-  const now = new Date();
   // TODO don't need to do this anymore we can just pass the first reservation here
   // need to do get all data here otherwise totalCount is incorrect (filter here instead of in the query)
-  const reservationsPossibleToDelete = reservations
-    .filter((x) => new Date(x.begin) > now)
-    .filter((x) => x.state === ReservationStateChoice.Confirmed);
+  const reservationsPossibleToDeny = reservations.filter((x) =>
+    isPossibleToDeny(x.state, new Date(x.begin))
+  );
 
   const handleDenyClick = () => {
-    const reservation = reservationsPossibleToDelete.find(() => true);
+    const reservation = reservationsPossibleToDeny.find(() => true);
     if (reservation == null) {
       return;
     }
@@ -74,7 +74,7 @@ export function ApprovalButtonsRecurring({
     disabled: false,
   } as const;
 
-  if (reservationsPossibleToDelete.length === 0) {
+  if (reservationsPossibleToDeny.length === 0) {
     return null;
   }
 
