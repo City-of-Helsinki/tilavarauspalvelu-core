@@ -223,7 +223,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
         time_start: datetime.time | None = value["reservable_time_start"]
         time_end: datetime.time | None = value["reservable_time_end"]
         minimum_duration_minutes: Decimal | None = value["reservable_minimum_duration_minutes"]
-        show_only_reservable = bool(value.get("show_only_reservable", False))
+        show_only_reservable = bool(value.get("show_only_reservable"))
 
         # Annotate all ReservationUnits with `first_reservable_datetime` since we need the info in the GraphQL object.
         # If the GQL field is not selected for the query, then this is unnecessary, but if we do not annotate the info

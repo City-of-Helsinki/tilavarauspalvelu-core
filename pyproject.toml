@@ -162,6 +162,7 @@ select = [
 # Preview rules
 extend-select = [
     "B901",     # return-in-generator
+    "B903",     # class-as-data-structure
     "B909",     # loop-iterator-mutation
     "C420",     # unnecessary-dict-comprehension-for-iterable
     "FURB110",  # if-exp-instead-of-or-operator
@@ -176,6 +177,7 @@ extend-select = [
     "FURB188",  # slice-to-remove-prefix-or-suffix
     "FURB189",  # subclass-builtin
     "FURB192",  # sorted-min-max
+    "PLC1802",  # len-test
     "PLC1901",  # compare-to-empty-string
     "PLC2701",  # import-private-name
     "PLC2801",  # unnecessary-dunder-call
@@ -197,7 +199,16 @@ extend-select = [
     "RUF031",   # incorrectly-parenthesized-tuple-in-subscript
     "RUF035",   # unsafe-markup-use
     "RUF036",   # none-not-at-end-of-union
+    "RUF040",   # invalid-assert-message-literal-argument
+    "RUF041",   # unnecessary-nested-literal
+    "RUF046",   # unnecessary-cast-to-int
+    "RUF055",   # unnecessary-regular-expression
+    "RUF056",   # falsy-dict-get-fallback
+    "RUF057",   # unnecessary-round
+    "TC008",    # quoted-type-alias
     "UP042",    # replace-str-enum
+    "UP044",    # non-pep646-unpack
+    "UP045",    # non-pep604-annotation-optional
 ]
 ignore = [
     # Conflicting with ruff-format
@@ -225,12 +236,10 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$|^options$|^info$|^na
 task-tags = ["TODO", "FIXME", "XXX", "type"]
 
 [tool.ruff.lint.extend-per-file-ignores]
+"manage.py" = ["I002"]  # missing-required-import
 "local_settings*.py" = [
     "ERA001",   # Commented code is fine here.
-]
-"tilavarauspalvelu/migrations/*.py" = [
-    "ANN",      # No need to annotate migrations
-    "ARG",      # Allow unused arguments allowed in migrations
+    "I002"      # missing-required-import
 ]
 "config/settings.py" = [
     "ANN",      # No need to annotate settings
@@ -240,6 +249,13 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 "utils/date_utils.py" = [
     "PLR0917",  # Can have as many positional arguments as needed.
     "TID251"    # Can use banned imports here (e.g. datetime.datetime.now)
+]
+"tilavarauspalvelu/migrations/*.py" = [
+    "ANN",      # No need to annotate migrations
+    "ARG",      # Allow unused arguments allowed in migrations
+]
+"tilavarauspalvelu/models/*/actions.py" = [
+    "B903",     # Don't complain about converting ModelActions to a dataclass
 ]
 "tilavarauspalvelu/management/commands/data_creation/*.py" = [
     "PLR0913",  # Can take as many arguments as needed.
@@ -257,6 +273,9 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 ]
 "tilavarauspalvelu/api/graphql/types/*/filtersets.py" = [
     "FBT001",   # Filtersets filter_* methods require three positional arguments, last one being boolean.
+]
+"tilavarauspalvelu/api/graphql/types/application_round_time_slot/types.py" = [
+    "I002"      # Importing `TYPE_CHECKING` to this file causes ImportError for `tilavarauspalvelu.api.graphql.schema.schema` due to `TypedDictListField` inspecting TimeSlot type annotations when converting to a GraphQL field
 ]
 "tests/*.py" = [
     "ANN",      # No need to annotate tests
@@ -278,10 +297,7 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
     "SLF",      # Allow accessing private members in tests
     "TID251"    # Can use banned imports here (e.g. datetime.datetime.now)
 ]
-"tilavarauspalvelu/api/graphql/types/application_round_time_slot/types.py" = ["I002"]  # FIXME Somehow importing `TYPE_CHECKING` to this file causes ImportError for `tilavarauspalvelu.api.graphql.schema.schema`
-"local_settings.py"         = ["I002"]  # missing-required-import
-"local_settings_example.py" = ["I002"]  # missing-required-import
-"manage.py"                 = ["I002"]  # missing-required-import
+
 
 [tool.ruff.lint.isort]
 combine-as-imports = false
