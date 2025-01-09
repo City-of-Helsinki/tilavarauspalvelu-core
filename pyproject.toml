@@ -1,4 +1,4 @@
-[tool.poetry]
+[project]
 name = "Tilavarauspalvelu"
 version = "0"
 description = "Backend for the new space and resource reservation platform for the City of Helsinki."
@@ -7,9 +7,14 @@ classifiers = [
     # This prevents accidentally running 'poetry publish'
     "Private :: Do Not Upload",
 ]
+requires-python = ">=3.13,<3.14"
+dynamic = ["dependencies"]  # Use tool.poetry for dependency management
+
+[tool.poetry]
+requires-poetry = ">=2.0"
+package-mode = false  # Use Poetry only for dependency management but not for packaging
 
 [tool.poetry.dependencies]
-python = ">=3.13,<3.14"
 Django = "5.1.4"
 django-auditlog = "3.0.0"
 django-cors-headers = "4.6.0"
@@ -79,7 +84,7 @@ pre-commit = "4.0.1"
 ruff = "0.8.6"
 ruff-lsp = "0.0.59"
 
-[tool.poetry.plugins.pytest11]
+[project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
 
 [tool.ruff]
