@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from django.test import override_settings
 
-from tilavarauspalvelu.integrations.email.dataclasses import EmailData
 from tilavarauspalvelu.integrations.email.sending import (
     send_emails_in_batches_task,
     send_multiple_emails_in_batches_task,
 )
+from tilavarauspalvelu.integrations.email.typing import EmailData
 from tilavarauspalvelu.typing import EmailAttachment
 
 

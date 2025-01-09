@@ -11,7 +11,6 @@ from tilavarauspalvelu.models import Application, User
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from .attachements import get_reservation_ical_attachment
-from .dataclasses import EmailData
 from .find_language import get_application_email_language, get_reservation_email_language
 from .find_recipients import (
     get_application_email_recipients,
@@ -45,6 +44,7 @@ from .template_context import (
     get_context_for_user_anonymization,
 )
 from .template_context.application import get_context_for_staff_notification_application_section_cancelled
+from .typing import EmailData
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
