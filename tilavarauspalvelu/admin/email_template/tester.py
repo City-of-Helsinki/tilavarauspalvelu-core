@@ -11,8 +11,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import EmailType, Language
-from tilavarauspalvelu.integrations.email.dataclasses import EmailData
 from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
+from tilavarauspalvelu.integrations.email.typing import EmailData
 from tilavarauspalvelu.models import ReservationUnit
 from utils.utils import safe_getattr
 

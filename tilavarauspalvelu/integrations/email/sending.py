@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
 from config.celery import app
-from tilavarauspalvelu.integrations.email.dataclasses import EmailData
+from tilavarauspalvelu.integrations.email.typing import EmailData
 
 if TYPE_CHECKING:
     from collections.abc import Iterable

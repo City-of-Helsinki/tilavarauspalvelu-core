@@ -81,8 +81,8 @@ pytest-xdist = "3.6.1"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.0.1"
-ruff = "0.8.6"
-ruff-lsp = "0.0.59"
+ruff = "0.9.0"
+ruff-lsp = "0.0.60"
 
 [project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
@@ -161,13 +161,11 @@ select = [
 ]
 # Preview rules
 extend-select = [
-    "A006",     # builtin-lambda-argument-shadowing
     "B901",     # return-in-generator
     "B909",     # loop-iterator-mutation
     "C420",     # unnecessary-dict-comprehension-for-iterable
     "FURB110",  # if-exp-instead-of-or-operator
     "FURB113",  # repeated-append
-    "FURB118",  # reimplemented-operator
     "FURB131",  # delete-full-slice
     "FURB132",  # check-and-remove-from-set
     "FURB142",  # for-loop-set-mutations
@@ -197,9 +195,6 @@ extend-select = [
     "RUF027",   # missing-f-string-syntax
     "RUF028",   # invalid-formatter-suppression-comment
     "RUF031",   # incorrectly-parenthesized-tuple-in-subscript
-    "RUF032",   # decimal-from-float-literal
-    "RUF033",   # post-init-default
-    "RUF034",   # useless-if-else
     "RUF035",   # unsafe-markup-use
     "RUF036",   # none-not-at-end-of-union
     "UP042",    # replace-str-enum
@@ -325,6 +320,9 @@ exempt-modules = [
     "graphene_django_extensions",
     "tilavarauspalvelu.api.graphql",
 ]
+
+[tool.ruff.lint.flake8-builtins]
+builtins-allowed-modules = ["types", "typing", "logging", "resource"]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "django.core.handlers.wsgi.WSGIRequest".msg = "Use `tilavarauspalvelu.typing.WSGIRequest` instead."
