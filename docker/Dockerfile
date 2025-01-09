@@ -74,7 +74,7 @@ ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 ENV POETRY_INSTALLER_PARALLEL=false
 
 # Install poetry.
-RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.8.4 python -
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.0.0 python -
 
 # Copy poetry files.
 COPY poetry.lock pyproject.toml /
