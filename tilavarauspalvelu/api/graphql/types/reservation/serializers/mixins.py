@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import math
+from dataclasses import dataclass
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
@@ -21,28 +22,13 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation, ReservationUnit
 
 
+@dataclass
 class PriceCalculationResult:
-    instance: Reservation
-
     reservation_price: Decimal = Decimal(0)
     unit_price: Decimal = Decimal(0)
     tax_percentage_value: Decimal = Decimal(0)
     non_subsidised_price: Decimal = Decimal(0)
     subsidised_price: Decimal = Decimal(0)
-
-    def __init__(
-        self,
-        reservation_price: Decimal,
-        unit_price: Decimal,
-        tax_percentage_value: Decimal,
-        non_subsidised_price: Decimal,
-        subsidised_price: Decimal,
-    ) -> None:
-        self.reservation_price = reservation_price
-        self.unit_price = unit_price
-        self.tax_percentage_value = tax_percentage_value
-        self.non_subsidised_price = non_subsidised_price
-        self.subsidised_price = subsidised_price
 
 
 class ReservationPriceMixin:

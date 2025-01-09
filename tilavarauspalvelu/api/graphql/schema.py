@@ -275,7 +275,7 @@ class Query(graphene.ObjectType):
         user: AnyUser = info.context.user
         if user.permissions.can_manage_notifications():
             return BannerNotification.objects.all()
-        if kwargs.get("is_visible", False):
+        if kwargs.get("is_visible"):
             return BannerNotification.objects.visible(info.context.user)
         return BannerNotification.objects.none()
 
