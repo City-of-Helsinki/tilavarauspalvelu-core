@@ -12,7 +12,6 @@ dynamic = ["dependencies"]  # Use tool.poetry for dependency management
 
 [tool.poetry]
 requires-poetry = ">=2.0"
-package-mode = false  # Use Poetry only for dependency management but not for packaging
 
 [tool.poetry.dependencies]
 Django = "5.1.4"
