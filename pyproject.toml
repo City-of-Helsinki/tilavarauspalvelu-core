@@ -301,7 +301,9 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 [tool.ruff.lint.isort]
 combine-as-imports = false
 split-on-trailing-comma = false
-required-imports = ["from __future__ import annotations"]
+required-imports = [
+    "from __future__ import annotations",
+]
 known-third-party = [
     "django",
 ]
@@ -318,7 +320,9 @@ section-order = [
     "testing",
     "local-folder",
 ]
-sections.testing = ["tests"]
+sections.testing = [
+    "tests",
+]
 
 [tool.ruff.lint.flake8-annotations]
 suppress-dummy-args = true
@@ -337,7 +341,13 @@ exempt-modules = [
 ]
 
 [tool.ruff.lint.flake8-builtins]
-builtins-allowed-modules = ["types", "typing", "logging", "resource"]
+builtins-allowed-modules = [
+    "types",
+    "typing",
+    "logging",
+    "resource",
+    "dataclasses",
+]
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "django.core.handlers.wsgi.WSGIRequest".msg = "Use `tilavarauspalvelu.typing.WSGIRequest` instead."
@@ -379,20 +389,33 @@ banned-from = [
 ]
 
 [tool.ruff.lint.flake8-self]
-extend-ignore-names = ["_base_manager", "_default_manager",  "_meta", "_mptt_meta", "_defaults", "_errors"]
+extend-ignore-names = [
+    "_base_manager",
+    "_default_manager",
+    "_meta",
+    "_mptt_meta",
+    "_defaults",
+    "_errors",
+]
 
 [tool.ruff.lint.flake8-unused-arguments]
 ignore-variadic-names = true
 
 [tool.ruff.lint.flake8-gettext]
-extend-function-names = ["pgettext", "pgettext_lazy", "gettext_lazy"]
+extend-function-names = [
+    "pgettext",
+    "pgettext_lazy",
+    "gettext_lazy",
+]
 
 [tool.ruff.lint.pep8-naming]
 classmethod-decorators = [
     "classproperty",
     "permission",
 ]
-extend-ignore-names = ["root"]   # Allow using `root` as the first argument name.
+extend-ignore-names = [
+    "root",  # Allow using `root` as the first argument name.
+]
 
 [tool.ruff.lint.pylint]
 max-returns = 8
