@@ -9,7 +9,7 @@ import factory
 from factory import LazyAttribute
 from factory.fuzzy import FuzzyInteger
 
-from tilavarauspalvelu.enums import AuthenticationType, ReservationKind, ReservationStartInterval
+from tilavarauspalvelu.enums import AuthenticationType, MethodOfEntry, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import local_start_of_day
 from utils.utils import as_p_tags
@@ -93,6 +93,8 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     min_reservation_duration = None
     buffer_time_before = factory.LazyFunction(datetime.timedelta)
     buffer_time_after = factory.LazyFunction(datetime.timedelta)
+    method_of_entry_start_date = None
+    method_of_entry_end_date = None
 
     # Booleans
     is_draft = False
@@ -108,6 +110,7 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
     authentication = AuthenticationType.WEAK.value
     reservation_start_interval = ReservationStartInterval.INTERVAL_15_MINUTES.value
     reservation_kind = ReservationKind.DIRECT_AND_SEASON.value
+    method_of_entry = MethodOfEntry.OPEN_ACCESS.value
 
     # Lists
     search_terms = LazyAttribute(lambda i: [])
