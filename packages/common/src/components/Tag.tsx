@@ -11,14 +11,12 @@ type TagPropsType = {
   ariaLabel: string;
   type?: StatusLabelType;
   onClick?: () => void;
-  id?: string;
-  children: React.ReactNode;
+  children: string;
 };
 
 const ColoredTag = styled(StyledTag)<{ $type: StatusLabelType }>`
-  && {
-    --tag-background: ${(props) =>
-      getStatusBackgroundColor(props.$type)} !important;
+  & {
+    --background-color: ${(props) => getStatusBackgroundColor(props.$type)};
     --tag-color: var(--color-black);
     border-width: 1px;
     border-style: solid;
@@ -30,12 +28,11 @@ const ColoredTag = styled(StyledTag)<{ $type: StatusLabelType }>`
 function Tag({
   ariaLabel,
   type = "neutral",
-  id,
   children,
   onClick,
 }: TagPropsType): JSX.Element {
   return (
-    <ColoredTag $type={type} id={id} aria-label={ariaLabel} onClick={onClick}>
+    <ColoredTag $type={type} aria-label={ariaLabel} onClick={onClick}>
       {children}
     </ColoredTag>
   );

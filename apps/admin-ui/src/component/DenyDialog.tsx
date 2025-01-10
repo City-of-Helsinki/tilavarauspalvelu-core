@@ -3,8 +3,10 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import {
   Button,
+  ButtonVariant,
   Dialog,
   RadioButton,
+  Select,
   SelectionGroup,
   TextArea,
 } from "hds-react";
@@ -19,14 +21,13 @@ import {
   OrderStatus,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { Select } from "@/component/Select";
 import { CenterSpinner, Flex } from "common/styles/util";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "@/hooks";
 import { successToast, errorToast } from "common/src/common/toast";
 import { gql } from "@apollo/client";
 import { getValidationErrors } from "common/src/apolloUtils";
-import { toNumber } from "common/src/helpers";
+import { convertOptionToHDS, toNumber } from "common/src/helpers";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
@@ -180,14 +181,20 @@ function DialogContent({ reservation, onClose, onReject }: Props): JSX.Element {
       <Dialog.Content>
         <Flex>
           <Select
-            required
             id="denyReason"
-            options={options}
-            placeholder={t("common.select")}
-            label={t("RequestedReservation.DenyDialog.denyReason")}
-            onChange={(v) => setDenyReason(Number(v))}
-            value={denyReasonPk}
-            helper={t("RequestedReservation.DenyDialog.denyReasonHelper")}
+            required
+            clearable={false}
+            texts={{
+              placeholder: t("common.select"),
+              label: t("RequestedReservation.DenyDialog.denyReason"),
+              assistive: t("RequestedReservation.DenyDialog.denyReasonHelper"),
+            }}
+            options={options.map(convertOptionToHDS)}
+            value={denyReasonPk ? denyReasonPk.toString() : undefined}
+            onChange={(selected) => {
+              const v = selected.find(() => true)?.value;
+              setDenyReason(toNumber(v));
+            }}
           />
           <TextArea
             value={handlingDetails}
@@ -207,9 +214,8 @@ function DialogContent({ reservation, onClose, onReject }: Props): JSX.Element {
       </Dialog.Content>
       <ActionButtons>
         <Button
-          variant="secondary"
+          variant={ButtonVariant.Secondary}
           onClick={onClose}
-          theme="black"
           data-testid="deny-dialog__cancel-button"
         >
           {t("common.prev")}

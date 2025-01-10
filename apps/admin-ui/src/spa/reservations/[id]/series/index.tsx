@@ -25,7 +25,7 @@ import { H1 } from "common";
 import { LinkPrev } from "@/component/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Notification } from "hds-react";
+import { Button, ButtonSize, Notification } from "hds-react";
 import { useEffect, useState } from "react";
 import {
   fromApiDate,
@@ -404,7 +404,11 @@ function SeriesPageInner({ pk }: { pk: number }) {
               }}
             >
               <ButtonLikeLink to="..">{t("common:cancel")}</ButtonLikeLink>
-              <Button size="small" type="submit" disabled={isDisabled}>
+              <Button
+                size={ButtonSize.Small}
+                type="submit"
+                disabled={isDisabled}
+              >
                 {t("ReservationEditSeries.submit")}
               </Button>
             </ButtonContainer>

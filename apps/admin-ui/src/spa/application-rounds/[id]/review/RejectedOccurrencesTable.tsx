@@ -3,7 +3,7 @@ import { CustomTable } from "@/component/Table";
 import { getApplicationUrl, getReservationUrl } from "@/common/urls";
 import type { RejectedOccurrencesQuery } from "@gql/gql-types";
 import { truncate } from "common/src/helpers";
-import { IconLinkExternal } from "hds-react";
+import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize } from "lodash";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
@@ -97,7 +97,7 @@ const COLS = [
     }: RejectedOccurrencesView) => (
       <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
         {truncate(applicantName ?? "-", applicantTruncateLen)}
-        <IconLinkExternal size="xs" aria-hidden />
+        <IconLinkExternal size={IconSize.ExtraSmall} aria-hidden="true" />
       </ExternalTableLink>
     ),
   },

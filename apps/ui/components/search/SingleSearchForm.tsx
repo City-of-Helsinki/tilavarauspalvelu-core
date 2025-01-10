@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { Checkbox, IconSearch, TextInput } from "hds-react";
+import { Checkbox, IconSearch, LoadingSpinner, TextInput } from "hds-react";
 import { type SubmitHandler, useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { addYears, startOfDay } from "date-fns";
@@ -12,7 +12,6 @@ import { DateRangePicker } from "@/components/form";
 import { FilterTagList } from "./FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
-import { ControlledMultiSelect } from "./ControlledMultiSelect";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import {
   mapQueryParamToNumber,
@@ -90,13 +89,13 @@ const filterOrder = [
   "unit",
   "purposes",
   "equipments",
-];
+] as const;
 const multiSelectFilters = [
   "unit",
   "reservationUnitTypes",
   "purposes",
   "equipments",
-];
+] as const;
 // we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
 const hideTagList = ["showOnlyReservable", "order", "sort", "ref"];
 
@@ -166,19 +165,22 @@ export function SingleSearchForm({
   return (
     <form noValidate onSubmit={handleSubmit(onSearch)}>
       <Filters>
-        <ControlledMultiSelect
+        <ControlledSelect
+          multiselect
           name="purposes"
           control={control}
           options={purposeOptions}
           label={t("searchForm:purposesFilter")}
         />
-        <ControlledMultiSelect
+        <ControlledSelect
+          multiselect
           name="unit"
           control={control}
           options={unitOptions}
           label={t("searchForm:unitFilter")}
         />
-        <ControlledMultiSelect
+        <ControlledSelect
+          multiselect
           name="equipments"
           control={control}
           options={equipmentsOptions}
@@ -261,8 +263,9 @@ export function SingleSearchForm({
               className="inputSm inputGroupEnd"
             />
           </SingleLabelInputGroup>
-          <ControlledMultiSelect
+          <ControlledSelect
             name="reservationUnitTypes"
+            multiselect
             control={control}
             options={unitTypeOptions}
             label={t("searchForm:typeLabel")}
@@ -303,8 +306,14 @@ export function SingleSearchForm({
         <StyledSubmitButton
           id="searchButton"
           type="submit"
-          iconLeft={<IconSearch />}
-          isLoading={isLoading}
+          iconStart={
+            isLoading ? (
+              <LoadingSpinner small />
+            ) : (
+              <IconSearch aria-hidden="true" />
+            )
+          }
+          disabled={isLoading}
         >
           {t("searchForm:searchButton")}
         </StyledSubmitButton>

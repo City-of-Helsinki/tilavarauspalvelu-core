@@ -50,7 +50,11 @@ type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
 const Accordion = styled(AccordionBase).attrs({
   closeButton: false,
-})``;
+})`
+  > div > div {
+    width: 100%;
+  }
+`;
 
 function DataWrapper({
   label,

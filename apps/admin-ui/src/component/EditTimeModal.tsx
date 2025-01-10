@@ -1,7 +1,14 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { Button, Dialog, Notification } from "hds-react";
+import {
+  Button,
+  ButtonSize,
+  ButtonVariant,
+  Dialog,
+  Notification,
+  NotificationSize,
+} from "hds-react";
 import { z } from "zod";
 import { type TFunction } from "i18next";
 import {
@@ -60,13 +67,6 @@ const StyledDialog = styled(Dialog)`
   }
   max-width: 944px;
 `;
-
-const btnCommon = {
-  theme: "black",
-  size: "small",
-  variant: "secondary",
-  disabled: false,
-} as const;
 
 function recurringReservationInfoText({
   weekdays,
@@ -280,7 +280,7 @@ function DialogContent({
         </TimeInfoBox>
         {hasCollisions && (
           <Notification
-            size="small"
+            size={NotificationSize.Small}
             label={t(`${commonTrKey}.error.reservationCollides`)}
             type="error"
             style={{ marginTop: "var(--spacing-s)", gridColumn: "1 / -1" }}
@@ -289,7 +289,11 @@ function DialogContent({
           </Notification>
         )}
         <ActionButtons>
-          <Button {...btnCommon} onClick={onClose}>
+          <Button
+            size={ButtonSize.Small}
+            variant={ButtonVariant.Secondary}
+            onClick={onClose}
+          >
             {t("common.cancel")}
           </Button>
           <Button disabled={isDisabled} type="submit">

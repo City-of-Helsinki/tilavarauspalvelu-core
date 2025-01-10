@@ -63,13 +63,21 @@ export function ReservationUnitCard({
   const tags = [];
   if (reservationUnit.isDraft) {
     tags.push(
-      <StatusLabel type="draft" icon={<IconPen ariaHidden />} key="draft">
+      <StatusLabel
+        type="draft"
+        icon={<IconPen aria-hidden="true" />}
+        key="draft"
+      >
         {t("ReservationUnitCard.stateDraft")}
       </StatusLabel>
     );
   } else {
     tags.push(
-      <StatusLabel type="success" icon={<IconCheck ariaHidden />} key="success">
+      <StatusLabel
+        type="success"
+        icon={<IconCheck aria-hidden="true" />}
+        key="success"
+      >
         {t("ReservationUnitCard.statePublished")}
       </StatusLabel>
     );
@@ -78,7 +86,7 @@ export function ReservationUnitCard({
   const buttons = [
     <ButtonLikeLink to={link} key="seeMore">
       {t("common.view")}
-      <IconArrowRight ariaHidden />
+      <IconArrowRight aria-hidden="true" />
     </ButtonLikeLink>,
   ];
 

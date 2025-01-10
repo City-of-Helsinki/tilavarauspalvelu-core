@@ -16,7 +16,7 @@ const InputContainer = styled.div`
     height: 0;
     overflow: hidden;
   }
-  > :not(:last-child) > div {
+  > [class*="Select-module_root"]:first-of-type > div {
     border-right: none;
   }
 `;

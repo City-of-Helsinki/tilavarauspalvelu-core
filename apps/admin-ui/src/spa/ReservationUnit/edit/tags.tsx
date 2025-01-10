@@ -15,6 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
+import { NoWrap } from "common/styles/util";
 
 type StatusPropsType = {
   type: StatusLabelType;
@@ -35,22 +36,22 @@ export function ReservationStateTag({
       case ReservationUnitReservationState.ScheduledClosing:
         return {
           type: "info",
-          icon: <IconClock ariaHidden />,
+          icon: <IconClock aria-hidden="true" />,
         };
       case ReservationUnitReservationState.ReservationClosed:
         return {
           type: "neutral",
-          icon: <IconLock ariaHidden />,
+          icon: <IconLock aria-hidden="true" />,
         };
       case ReservationUnitReservationState.Reservable:
         return {
           type: "success",
-          icon: <IconEye ariaHidden />,
+          icon: <IconEye aria-hidden="true" />,
         };
       default:
         return {
           type: "neutral",
-          icon: <IconQuestionCircle ariaHidden />,
+          icon: <IconQuestionCircle aria-hidden="true" />,
         };
     }
   })(state);
@@ -116,9 +117,7 @@ export function ReservationUnitStateTag({
   }
   return (
     <StatusLabel type={statusProps(state).type} icon={statusProps(state).icon}>
-      <span style={{ whiteSpace: "nowrap" }}>
-        {t(`ReservationUnits.state.${state}`)}
-      </span>
+      <NoWrap>{t(`ReservationUnits.state.${state}`)}</NoWrap>
     </StatusLabel>
   );
 }

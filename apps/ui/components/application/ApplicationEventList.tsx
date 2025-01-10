@@ -137,7 +137,7 @@ function SingleApplicationSection({
           <StatusLabel
             type={statusProps.type}
             icon={statusProps.icon}
-            testId="application-section__status"
+            data-testid="application-section__status"
           >
             {t(`application:applicationEventStatus.${applicationEvent.status}`)}
           </StatusLabel>

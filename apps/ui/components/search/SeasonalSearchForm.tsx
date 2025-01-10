@@ -1,12 +1,16 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { TextInput, IconSearch } from "hds-react";
+import {
+  TextInput,
+  IconSearch,
+  LoadingSpinner,
+  ButtonVariant,
+} from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { participantCountOptions } from "@/modules/const";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { FilterTagList } from "./FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { ControlledMultiSelect } from "./ControlledMultiSelect";
 import { BottomContainer, Filters, StyledSubmitButton } from "./styled";
 import {
   mapQueryParamToNumber,
@@ -131,19 +135,22 @@ export function SeasonalSearchForm({
             className="inputSm inputGroupEnd"
           />
         </SingleLabelInputGroup>
-        <ControlledMultiSelect
+        <ControlledSelect
+          multiselect
           name="reservationUnitTypes"
           control={control}
           options={reservationUnitTypeOptions}
           label={t("searchForm:typeLabel")}
         />
-        <ControlledMultiSelect
+        <ControlledSelect
+          multiselect
           name="unit"
           control={control}
           options={unitOptions}
           label={t("searchForm:unitFilter")}
         />
-        <ControlledMultiSelect
+        <ControlledSelect
+          multiselect
           name="purposes"
           control={control}
           options={purposeOptions}
@@ -159,8 +166,15 @@ export function SeasonalSearchForm({
         />
         <StyledSubmitButton
           type="submit"
-          isLoading={isLoading}
-          iconLeft={<IconSearch />}
+          variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
+          iconStart={
+            isLoading ? (
+              <LoadingSpinner small />
+            ) : (
+              <IconSearch aria-hidden="true" />
+            )
+          }
+          disabled={isLoading}
         >
           {t("searchForm:searchButton")}
         </StyledSubmitButton>

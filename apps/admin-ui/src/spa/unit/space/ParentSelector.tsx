@@ -3,7 +3,12 @@ import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { Select } from "hds-react";
 import { UnitSpacesQuery, useUnitSpacesQuery } from "@gql/gql-types";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  convertOptionToHDS,
+  filterNonNullable,
+  toNumber,
+} from "common/src/helpers";
 
 function spacesAsHierarchy(unit: UnitSpacesQuery["unit"], paddingChar: string) {
   const allSpaces = filterNonNullable(unit?.spaces);
@@ -53,7 +58,7 @@ type Props = {
 function parentLessOption(t: TFunction) {
   return {
     label: t("SpaceEditor.noParent"),
-    value: null,
+    value: 0,
   };
 }
 
@@ -88,25 +93,32 @@ export function ParentSelector({
     .map((space) => ({
       label:
         space.nameFi != null && space.nameFi.length > 0 ? space.nameFi : "-",
-      value: space.pk ?? null,
+      value: space.pk ?? 0,
     }));
 
   const options = noParentless ? opts : [...opts, parentLessOption(t)];
 
+  const hdsOptions = options.map(convertOptionToHDS);
   return (
     <Select
       id="parentSelector"
-      label={label}
-      placeholder={placeholder}
+      texts={{
+        label,
+        placeholder,
+        error: errorText,
+        assistive: helperText,
+      }}
       required
-      helper={helperText}
-      options={options}
       disabled={options.length === 0}
-      value={options.find((po) => po.value === value) ?? null}
-      onChange={(selected: (typeof opts)[0]) =>
-        onChange(selected.value, selected.label)
-      }
-      error={errorText}
+      clearable={false}
+      options={hdsOptions}
+      value={hdsOptions.find((po) => toNumber(po.value) === value)?.value}
+      onChange={(selection) => {
+        const selected = selection.find(() => true);
+        if (selected) {
+          onChange(toNumber(selected.value), selected.label);
+        }
+      }}
       invalid={!!errorText}
     />
   );

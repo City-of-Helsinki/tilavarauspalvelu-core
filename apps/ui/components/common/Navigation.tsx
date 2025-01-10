@@ -6,6 +6,7 @@ import {
   IconSignout,
   IconUser,
   type LanguageOption,
+  LogoSize,
   TitleStyleType,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
@@ -194,7 +195,7 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: HeaderProps) {
       titleStyle={TitleStyleType.Bold}
       titleHref={env.NEXT_PUBLIC_BASE_URL ?? "/"}
       openFrontPageLinksAriaLabel={t("common:applicationName")}
-      logo={<Logo size="large" />}
+      logo={<Logo size={LogoSize.Large} />}
       logoAriaLabel={`${t("common:applicationName")} logo`}
       logoHref={env.NEXT_PUBLIC_BASE_URL}
       menuButtonLabel="Menu"

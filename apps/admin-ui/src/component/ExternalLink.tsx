@@ -1,5 +1,5 @@
 import React from "react";
-import { IconLinkExternal } from "hds-react";
+import { IconLinkExternal, IconSize } from "hds-react";
 import styled from "styled-components";
 import { fontMedium } from "common/src/common/typography";
 import { Link } from "react-router-dom";
@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 type Props = {
   to: string;
   children: string;
-  size?: "xs" | "s" | "m" | "l" | "xl";
+  size?: IconSize;
   isBold?: boolean;
 };
 

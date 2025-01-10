@@ -96,13 +96,15 @@ const SlotGroup = styled.ul`
   }
 `;
 
-const Slot = styled.li<{ $active: boolean }>`
+const Slot = styled(Flex).attrs({
+  $gap: "none",
+  $justifyContent: "center",
+  $alignItems: "center",
+  as: "li",
+})<{ $active: boolean }>`
   box-sizing: border-box;
   background-color: var(--color-white);
   font-size: var(--fontsize-body-s);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 32px;
   border-width: 2px;
   border-style: solid;
@@ -118,17 +120,9 @@ const SlotButton = styled.button`
   user-select: none;
 `;
 
-const StyledSelect = styled(ControlledSelect)`
-  li[role="option"] {
-    white-space: nowrap;
-  }
-`;
-
-const NoTimes = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--spacing-m);
+const NoTimes = styled(Flex).attrs({
+  $justifyContent: "space-between",
+})`
   margin: var(--spacing-s) 0 calc(var(--spacing-s) * -1) 0;
 `;
 
@@ -189,7 +183,7 @@ export function QuickReservation({
           maxDate={lastPossibleDate ?? undefined}
           disableConfirmation={false}
         />
-        <StyledSelect
+        <ControlledSelect
           name="duration"
           // react-hook-form has issues with typing generic Select
           control={control as unknown as Control<FieldValues>}

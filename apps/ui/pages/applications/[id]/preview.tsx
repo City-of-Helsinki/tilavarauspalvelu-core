@@ -21,7 +21,7 @@ import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ButtonContainer, Flex } from "common/styles/util";
-import { Button } from "hds-react";
+import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -107,8 +107,11 @@ function Preview(props: PropsNarrowed): JSX.Element {
           <Button
             id="submit"
             type="submit"
-            disabled={!acceptTermsOfUse}
-            isLoading={isMutationLoading}
+            variant={
+              isMutationLoading ? ButtonVariant.Clear : ButtonVariant.Primary
+            }
+            iconStart={isMutationLoading ? <LoadingSpinner /> : undefined}
+            disabled={!acceptTermsOfUse || isMutationLoading}
           >
             {t("common:submit")}
           </Button>

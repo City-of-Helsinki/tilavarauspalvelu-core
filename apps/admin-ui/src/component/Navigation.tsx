@@ -6,6 +6,7 @@ import {
   IconSignout,
   IconStar,
   IconUser,
+  LogoSize,
   TitleStyleType,
 } from "hds-react";
 import React from "react";
@@ -281,7 +282,7 @@ const Navigation = ({ apiBaseUrl }: Props) => {
         titleStyle={TitleStyleType.Bold}
         titleHref={env.NEXT_PUBLIC_BASE_URL ?? "/"}
         openFrontPageLinksAriaLabel={t("common:applicationName")}
-        logo={<Logo size="large" style={{ filter: "invert(1)" }} />}
+        logo={<Logo size={LogoSize.Large} style={{ filter: "invert(1)" }} />}
         logoAriaLabel={`${t("common:applicationName")} logo`}
         logoHref={env.NEXT_PUBLIC_BASE_URL}
       >

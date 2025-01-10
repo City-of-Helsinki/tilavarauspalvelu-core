@@ -4,6 +4,9 @@ import {
   IconPlus,
   IconLinkExternal,
   Button,
+  IconSize,
+  ButtonSize,
+  ButtonVariant,
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
@@ -68,7 +71,7 @@ export function ReservationUnitCard({
           aria-label={t("reservationUnitCard:maxPersons", {
             maxPersons: reservationUnit.maxPersons,
           })}
-          size="s"
+          size={IconSize.Small}
         />
       ),
       value: t("reservationUnitCard:maxPersons", {
@@ -81,9 +84,9 @@ export function ReservationUnitCard({
   if (containsReservationUnit(reservationUnit)) {
     buttons.push(
       <Button
-        size="small"
-        variant="primary"
-        iconRight={<IconCheck aria-hidden />}
+        size={ButtonSize.Small}
+        variant={ButtonVariant.Primary}
+        iconEnd={<IconCheck aria-hidden="true" />}
         onClick={() => removeReservationUnit(reservationUnit)}
         data-testid="reservation-unit-card__button--select"
         key={t("common:removeReservationUnit")}
@@ -94,9 +97,9 @@ export function ReservationUnitCard({
   } else {
     buttons.push(
       <Button
-        size="small"
-        variant="secondary"
-        iconRight={<IconPlus aria-hidden />}
+        size={ButtonSize.Small}
+        variant={ButtonVariant.Secondary}
+        iconEnd={<IconPlus aria-hidden="true" />}
         onClick={() => selectReservationUnit(reservationUnit)}
         data-testid="reservation-unit-card__button--select"
         key={t("common:selectReservationUnit")}
@@ -113,7 +116,7 @@ export function ReservationUnitCard({
       data-testid="reservation-unit-card__button--link"
       key="show"
     >
-      <IconLinkExternal aria-hidden />
+      <IconLinkExternal aria-hidden="true" />
       {t("common:show")}
     </ButtonLikeLink>
   );

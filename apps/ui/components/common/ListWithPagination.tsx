@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Button } from "hds-react";
+import { Button, ButtonVariant } from "hds-react";
 import type { PageInfo, SearchReservationUnitsQuery } from "@gql/gql-types";
 import type { ApolloQueryResult } from "@apollo/client";
 import ClientOnly from "common/src/ClientOnly";
@@ -52,7 +52,7 @@ function Content({
             {showMore && (
               <Button
                 onClick={fetchMore}
-                variant="secondary"
+                variant={ButtonVariant.Secondary}
                 data-testid="list-with-pagination__button--paginate"
               >
                 {t("common:showMore")}

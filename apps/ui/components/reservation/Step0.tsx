@@ -3,7 +3,14 @@
  *  This component needs to be wrapped inside a Form context
  */
 import type { OptionType } from "common/types/common";
-import { Notification, IconArrowLeft, IconArrowRight, Button } from "hds-react";
+import {
+  Notification,
+  IconArrowLeft,
+  IconArrowRight,
+  Button,
+  ButtonVariant,
+  LoadingSpinner,
+} from "hds-react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import React, { useState } from "react";
 import { Trans, useTranslation } from "next-i18next";
@@ -112,20 +119,25 @@ export function Step0({
       />
       <ActionContainer>
         <Button
-          variant="primary"
           type="submit"
-          disabled={submitDisabled}
-          iconRight={<IconArrowRight aria-hidden />}
+          variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
+          iconEnd={
+            isSubmitting ? (
+              <LoadingSpinner small />
+            ) : (
+              <IconArrowRight aria-hidden="true" />
+            )
+          }
+          disabled={submitDisabled || isSubmitting}
           data-testid="reservation__button--continue"
-          isLoading={isSubmitting}
-          loadingText={t("reservationCalendar:nextStepLoading")}
         >
           {t("reservationCalendar:nextStep")}
         </Button>
         <Button
-          variant="secondary"
           type="button"
-          iconLeft={<IconArrowLeft aria-hidden />}
+          variant={ButtonVariant.Secondary}
+          iconStart={<IconArrowLeft aria-hidden="true" />}
+          disabled={isSubmitting}
           onClick={cancelReservation}
           data-testid="reservation__button--cancel"
         >

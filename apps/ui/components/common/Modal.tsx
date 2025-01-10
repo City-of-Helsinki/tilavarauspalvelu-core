@@ -3,7 +3,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { isBrowser } from "common/src/helpers";
-import { Button, IconCross } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
 import { Flex } from "common/styles/util";
 import { breakpoints } from "common";
 
@@ -38,11 +38,6 @@ const ModalElement = styled(Flex)<{ $maxWidth?: string; $height?: string }>`
   }
   padding: var(--modal-padding);
 `;
-
-const CloseButton = styled(Button).attrs({
-  size: "small",
-  variant: "secondary",
-})``;
 
 const CloseButtonWrapper = styled.div`
   position: absolute;
@@ -90,14 +85,19 @@ function Modal({
           $height={fullHeight ? "100%" : undefined}
         >
           {!hideCloseButton && (
+            /* eslint-disable -- don't remove empty string */
             <CloseButtonWrapper>
-              <CloseButton
+              <Button
+                size={ButtonSize.Small}
+                variant={ButtonVariant.Secondary}
                 onClick={handleClose}
                 aria-label={t(closeButtonKey) ?? t("common:close")}
+                iconStart={<IconCross aria-hidden="true" />}
               >
-                <IconCross />
-              </CloseButton>
+                {""}
+              </Button>
             </CloseButtonWrapper>
+            /* eslint-enable */
           )}
           <section>{children}</section>
           {actions}

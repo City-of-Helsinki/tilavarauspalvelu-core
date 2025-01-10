@@ -15,5 +15,5 @@ export type ApplicationEventSchedulePriority = number;
 // @deprecated used by MetaFields
 export type OptionType = {
   label: string;
-  value?: number | string;
+  value: number | string;
 };

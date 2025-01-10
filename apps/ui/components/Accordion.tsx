@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
+import { IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import styled from "styled-components";
 import { H4 } from "common/src/common/typography";
 
@@ -26,18 +26,16 @@ const AccordionElement = styled.div<{ $noBottomMargin?: boolean }>`
   --accordion-border-color: var(--color-black-50);
 `;
 
-const HeadingButton = styled(Button).attrs({
-  style: {
-    "--color": "var(--color-black-90)",
-    "--background-color-hover": "transparent",
-    "--background-color-hover-focus": "transparent",
-  } as React.CSSProperties,
-})<{ theme: Theme }>`
-  &&& {
+const HeadingButton = styled.button<{ theme: Theme }>`
+  --color: var(--color-black-90);
+  & {
     width: 100%;
-    padding-left: 0;
-    border-left: 0;
-    border-bottom: 1px solid var(--accordion-border-color) !important;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid var(--accordion-border-color);
+    display: flex;
+    gap: var(--spacing-s);
+    align-items: center;
 
     span {
       ${({ theme }) => {
@@ -58,7 +56,7 @@ const HeadingButton = styled(Button).attrs({
         }
       }};
 
-      color: var(--color-black-90);
+      color: var(--color);
       padding: 0;
       margin: 0;
       margin-right: auto;
@@ -73,7 +71,7 @@ const HeadingButton = styled(Button).attrs({
     }
 
     :not(:disabled):hover {
-      border-bottom-color: var(--color-coat-of-arms) !important;
+      border-bottom-color: var(--color-coat-of-arms);
     }
   }
 `;
@@ -108,19 +106,15 @@ export function Accordion({
   }, [closeAccordion, isOpen, open, openAccordion]);
 
   const icon = isOpen ? (
-    <IconAngleUp aria-hidden />
+    <IconAngleUp aria-hidden="true" />
   ) : (
-    <IconAngleDown aria-hidden />
+    <IconAngleDown aria-hidden="true" />
   );
 
   return (
     <AccordionElement id={id} {...rest} $noBottomMargin={disableBottomMargin}>
-      <HeadingButton
-        variant="supplementary"
-        iconRight={icon}
-        onClick={onToggle}
-        theme={theme}
-      >
+      <HeadingButton onClick={onToggle} theme={theme}>
+        {icon}
         <H4 as={`h${headingLevel}`}>{heading}</H4>
       </HeadingButton>
       <Content $open={isOpen}>{children}</Content>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, TextArea } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, TextArea } from "hds-react";
 import { type FetchResult } from "@apollo/client";
 import {
   useUpdateApplicationWorkingMemoMutation,
@@ -88,14 +88,13 @@ function WorkingMemo({
       />
       <ButtonContainer>
         <Button
-          size="small"
-          variant="secondary"
-          theme="black"
+          size={ButtonSize.Small}
+          variant={ButtonVariant.Secondary}
           onClick={() => setWorkingMemo(initialValue || "")}
         >
           {t("common.cancel")}
         </Button>
-        <Button size="small" onClick={handleSave}>
+        <Button size={ButtonSize.Small} onClick={handleSave}>
           {t("RequestedReservation.save")}
         </Button>
       </ButtonContainer>

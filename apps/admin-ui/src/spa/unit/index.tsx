@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "hds-react";
+import { Link, LinkSize } from "hds-react";
 import { H1 } from "common/src/common/typography";
 import { useTranslation } from "next-i18next";
 import { Filters } from "./Filters";
@@ -16,7 +16,7 @@ function Units(): JSX.Element {
         <p>
           {t("Units.description")}
           <Link
-            size="M"
+            size={LinkSize.Medium}
             href={t("Units.descriptionLinkHref")}
             openInNewTab
             external

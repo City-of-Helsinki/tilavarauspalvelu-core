@@ -1,15 +1,15 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { IconAlertCircleFill, Select } from "hds-react";
+import { IconAlertCircleFill } from "hds-react";
 import {
   type FieldValues,
   Path,
   useController,
   UseControllerProps,
 } from "react-hook-form";
-import { truncatedText } from "../../../styles/cssFragments";
-import { removeRefParam } from "../../reservation-form/util";
+import { ControlledSelect } from "./ControlledSelect";
+import { timeToMinutes } from "../../helpers";
 
 interface TimeRangePickerProps<T extends FieldValues>
   extends Omit<UseControllerProps<T>, "name" | "disabled"> {
@@ -29,27 +29,45 @@ interface PopulateTimesProps {
   intervalMinutes?: number;
 }
 
-type OptionType = {
-  label: string;
-  value: number;
-};
-const StyledSelect = styled(Select<OptionType>)`
-  button {
-    display: grid;
-    text-align: left;
-  }
-
-  span {
-    ${truncatedText}
-  }
-`;
-
 const StartBeforeEndError = styled.div`
   grid-column: span 2;
   color: var(--color-error);
   margin-top: var(--spacing-2-xs);
   display: flex;
 `;
+
+type Option = {
+  label: string;
+  value: string;
+};
+function populateTimes(populateTimesProps?: PopulateTimesProps): Option[] {
+  const beginHour = populateTimesProps?.beginHour ?? 0;
+  const endHour = populateTimesProps?.endHour ?? 23.98;
+  const interval = populateTimesProps?.intervalMinutes ?? 30;
+  const times: Option[] = [];
+  let hour = beginHour ?? 0;
+  let minute = beginHour % 1 ? (beginHour % 1) * 60 : 0;
+
+  while (hour < endHour) {
+    const label = `${hour.toString().padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")}`;
+    times.push({
+      label: `${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}`,
+      value: label,
+    });
+    minute += interval;
+    // Reset the minute counter, and increment the hour counter if necessary
+    if (minute >= 60) {
+      minute = 0;
+      hour += 1;
+    }
+  }
+  // we need to add the minute times to the beginning of the duration options
+  return times;
+}
 
 /*
  *  @brief A component for selecting a time range, checks for whether the end time is before the begin time
@@ -71,99 +89,50 @@ export function TimeRangePicker<T extends FieldValues>({
   labels,
   placeholders,
   clearable,
-}: TimeRangePickerProps<T>): JSX.Element {
-  const { field: beginField, fieldState: beginFieldState } = useController({
+}: TimeRangePickerProps<T>): JSX.Element | null {
+  const { field: beginField } = useController({
     control,
     name: names?.begin,
     rules: { required: required?.begin },
   });
-  const { field: endField, fieldState: endFieldState } = useController({
+  const { field: endField } = useController({
     control,
     name: names?.end,
     rules: { required: required?.end },
   });
   const { t } = useTranslation();
 
-  // Return the option with the given value as label
-  const getSelectedOption = (
-    optionValue: string | null,
-    optionList: OptionType[]
-  ): OptionType | null => {
-    return optionList.find((o) => o.label === optionValue) ?? null;
-  };
-  const populateTimes = (
-    populateTimesProps?: PopulateTimesProps
-  ): OptionType[] => {
-    const beginHour = populateTimesProps?.beginHour ?? 0;
-    const endHour = populateTimesProps?.endHour ?? 23.98;
-    const interval = populateTimesProps?.intervalMinutes ?? 30;
-    const times: OptionType[] = [];
-    let hour = beginHour ?? 0;
-    let minute = beginHour % 1 ? (beginHour % 1) * 60 : 0;
-
-    while (hour < endHour) {
-      times.push({
-        label: `${hour.toString().padStart(2, "0")}:${minute
-          .toString()
-          .padStart(2, "0")}`,
-        value: hour + minute / 60,
-      });
-      minute += interval;
-      // Reset the minute counter, and increment the hour counter if necessary
-      if (minute >= 60) {
-        minute = 0;
-        hour += 1;
-      }
-    }
-    // we need to add the minute times to the beginning of the duration options
-    return times;
-  };
-
   const populatedTimeOptions = populateTimes();
-  const beginValue = getSelectedOption(
-    beginField.value,
-    populatedTimeOptions
-  )?.value;
-  const endValue = getSelectedOption(
-    endField.value,
-    populatedTimeOptions
-  )?.value;
   const endTimeIsBeforeStartTime =
-    !Number.isNaN(Number(beginValue)) &&
-    !Number.isNaN(Number(endValue)) &&
-    Number(beginValue) >= Number(endValue);
+    beginField.value &&
+    endField.value &&
+    timeToMinutes(beginField.value) >= timeToMinutes(endField.value);
+
+  if (control == null) {
+    return null;
+  }
 
   return (
     <>
-      <StyledSelect
-        {...removeRefParam(beginField)}
+      <ControlledSelect
+        name={names.begin}
+        control={control}
         label={labels?.begin ?? t("common:beginLabel")}
-        options={populatedTimeOptions}
         placeholder={placeholders?.begin}
-        required={required?.begin}
-        error={beginFieldState.error && beginFieldState.error.message}
-        clearable={clearable?.begin}
-        invalid={endTimeIsBeforeStartTime || beginFieldState.invalid}
-        value={getSelectedOption(beginField.value, populatedTimeOptions)}
-        onChange={(e: OptionType) => {
-          beginField.onChange(e != null ? e.label : null);
-        }}
-      />
-      <StyledSelect
-        {...removeRefParam(endField)}
-        label={labels?.end ?? t("common:endLabel")}
         options={populatedTimeOptions}
-        placeholder={placeholders?.end}
-        required={required?.end}
-        error={endFieldState.error && endFieldState.error.message}
-        clearable={clearable?.end}
-        invalid={endTimeIsBeforeStartTime || endFieldState.invalid}
-        value={getSelectedOption(endField.value, populatedTimeOptions)}
-        onChange={(e: OptionType) => {
-          endField.onChange(e != null ? e.label : null);
-        }}
+        required={required?.begin}
+        clearable={clearable?.begin}
       />
-      {!!endTimeIsBeforeStartTime && (
+      <ControlledSelect
+        name={names.end}
+        control={control}
+        label={labels?.end ?? t("common:endLabel")}
+        placeholder={placeholders?.end}
+        options={populatedTimeOptions}
+        required={required?.end}
+        clearable={clearable?.end}
+      />
+      {endTimeIsBeforeStartTime && (
         <StartBeforeEndError>
           <IconAlertCircleFill />
           <span>{t("searchForm:beginTimeIsBeforeEndTime")}</span>

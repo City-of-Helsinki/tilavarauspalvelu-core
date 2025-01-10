@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Button } from "hds-react";
+import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "react-i18next";
 import type { ApolloQueryResult } from "@apollo/client";
 import type { PageInfo, Query } from "@gql/gql-types";
@@ -45,8 +45,9 @@ export function More({
             })}
           </Counts>
           <Button
-            isLoading={isFetching}
-            variant="secondary"
+            variant={isFetching ? ButtonVariant.Clear : ButtonVariant.Secondary}
+            iconStart={isFetching ? <LoadingSpinner small /> : undefined}
+            disabled={isFetching}
             onClick={handleClick}
           >
             {t("common.showMore")}

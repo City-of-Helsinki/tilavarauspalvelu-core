@@ -32,13 +32,16 @@ const getStatusLabelProps = (
 ): { type: StatusLabelType; icon: JSX.Element } => {
   switch (state) {
     case BannerNotificationState.Draft:
-      return { type: "draft", icon: <IconPen ariaHidden /> };
+      return { type: "draft", icon: <IconPen aria-hidden="true" /> };
     case BannerNotificationState.Scheduled:
-      return { type: "info", icon: <IconClock ariaHidden /> };
+      return { type: "info", icon: <IconClock aria-hidden="true" /> };
     case BannerNotificationState.Active:
-      return { type: "success", icon: <IconCheck ariaHidden /> };
+      return { type: "success", icon: <IconCheck aria-hidden="true" /> };
     default:
-      return { type: "info", icon: <IconQuestionCircleFill ariaHidden /> };
+      return {
+        type: "info",
+        icon: <IconQuestionCircleFill aria-hidden="true" />,
+      };
   }
 };
 

@@ -1,7 +1,14 @@
 import React, { useMemo } from "react";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
-import { Button, IconAngleDown, IconAngleUp, IconCross } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  IconAngleDown,
+  IconAngleUp,
+  IconCross,
+  IconSize,
+} from "hds-react";
 import { maxBy } from "lodash";
 import { fromUIDate } from "common/src/common/util";
 import { Transition } from "react-transition-group";
@@ -105,16 +112,6 @@ const Price = styled.div`
   ${fontRegular};
   font-size: var(--fontsize-body-l);
   line-height: var(--lineheight-l);
-`;
-
-const ResetButton = styled(Button).attrs({
-  variant: "secondary",
-  iconLeft: <IconCross aria-hidden />,
-})<{ $isLast?: boolean }>`
-  && {
-    --border-color: var(--color-black-50);
-    --font-family: var(--font-regular);
-  }
 `;
 
 function TogglerLabelContent({
@@ -247,12 +244,14 @@ export function ReservationCalendarControls({
                 </>
               )}
             </PriceWrapper>
-            <ResetButton
+            <Button
               onClick={() => reservationForm.reset()}
               disabled={!focusSlot}
+              variant={ButtonVariant.Secondary}
+              iconStart={<IconCross aria-hidden="true" />}
             >
               {t("searchForm:resetForm")}
-            </ResetButton>
+            </Button>
             {mode === "create" && submitButton ? (
               <Flex
                 style={{
@@ -329,9 +328,15 @@ function ControlledToggler({
         type="button"
       >
         {value ? (
-          <IconAngleDown aria-label={t("common:showLess")} size="m" />
+          <IconAngleDown
+            aria-label={t("common:showLess")}
+            size={IconSize.Medium}
+          />
         ) : (
-          <IconAngleUp aria-label={t("common:showMore")} size="m" />
+          <IconAngleUp
+            aria-label={t("common:showMore")}
+            size={IconSize.Medium}
+          />
         )}
       </ToggleButton>
     </Flex>

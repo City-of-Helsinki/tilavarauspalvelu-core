@@ -173,7 +173,7 @@ function ToastNotification({
       type={type}
       label={label}
       notificationAriaLabel={ariaLabel ?? label ?? text}
-      dataTestId={dataTestId}
+      data-testid={dataTestId}
     >
       {
         // toastify doesn't show the progress-bar if the toast doesn't have an autoClose duration defined

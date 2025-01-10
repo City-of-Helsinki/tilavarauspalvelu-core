@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { IconClock } from "hds-react";
+import { IconClock, IconSize } from "hds-react";
 import { isPast, isFuture, isToday } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { formatDate } from "@/common/util";
@@ -54,7 +54,8 @@ function TimeframeStatus({
 
   return (
     <Wrapper data-testid="timeframe-status--wrapper">
-      <IconClock aria-hidden size="xs" /> {message}
+      <IconClock size={IconSize.ExtraSmall} aria-hidden="true" />
+      {message}
     </Wrapper>
   );
 }

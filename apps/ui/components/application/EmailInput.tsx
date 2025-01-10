@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
-import { Notification, TextInput } from "hds-react";
+import { Notification, NotificationSize, TextInput } from "hds-react";
 import { applicationErrorText } from "@/modules/util";
 import type { ApplicationFormPage3Values } from "./Form";
 import { SpanTwoColumns } from "./styled";
@@ -18,7 +18,7 @@ const EmailInput = () => {
     <>
       <SpanTwoColumns>
         <Notification
-          size="small"
+          size={NotificationSize.Small}
           label={t("application:Page3.emailNotification")}
         >
           {t("application:Page3.emailNotification")}

@@ -7,7 +7,7 @@ import {
   ReservationQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { Button } from "hds-react";
+import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { useCheckPermission } from "@/hooks";
 import { NewReservationModal } from "@/component/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
@@ -184,9 +184,8 @@ function AddNewReservationButton({
 
   return (
     <Button
-      theme="black"
-      variant="secondary"
-      size="small"
+      size={ButtonSize.Small}
+      variant={ButtonVariant.Secondary}
       disabled={!hasPermission}
       onClick={handleClick}
     >

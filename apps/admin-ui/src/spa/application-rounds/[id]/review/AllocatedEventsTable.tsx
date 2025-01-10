@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { memoize } from "lodash";
-import { IconLinkExternal } from "hds-react";
+import { IconLinkExternal, IconSize } from "hds-react";
 import type { AllocatedTimeSlotsQuery } from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { getApplicantName, truncate } from "@/helpers";
@@ -90,7 +90,7 @@ const COLS = [
     }: ApplicationScheduleView) => (
       <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
         {truncate(applicantName ?? "-", applicantTruncateLen)}
-        <IconLinkExternal size="xs" aria-hidden />
+        <IconLinkExternal size={IconSize.ExtraSmall} aria-hidden="true" />
       </ExternalTableLink>
     ),
   },

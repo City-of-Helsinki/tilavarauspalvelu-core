@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ReservationQuery } from "@gql/gql-types";
-import { Button, TextInput } from "hds-react";
+import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
@@ -192,14 +192,18 @@ function EditReservation({
         <HR />
         <ButtonContainer>
           <Button
-            variant="secondary"
+            variant={ButtonVariant.Secondary}
             onClick={onCancel}
-            theme="black"
             disabled={isSubmitting}
           >
             {t("common.cancel")}
           </Button>
-          <Button type="submit" disabled={!isDirty} isLoading={isSubmitting}>
+          <Button
+            type="submit"
+            disabled={!isDirty || isSubmitting}
+            variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
+            iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
+          >
             {t("Reservation.EditPage.save")}
           </Button>
         </ButtonContainer>

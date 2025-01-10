@@ -1,4 +1,4 @@
-import { Button, IconPlusCircleFill } from "hds-react";
+import { Button, ButtonVariant, IconPlusCircleFill } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { useParams } from "react-router-dom";
@@ -96,8 +96,8 @@ function SpacesResources(): JSX.Element {
         <H2 $noMargin>{t("Unit.spaces")}</H2>
         <ActionButton
           ref={newSpacesButtonRef}
-          iconLeft={<IconPlusCircleFill />}
-          variant="supplementary"
+          variant={ButtonVariant.Supplementary}
+          iconStart={<IconPlusCircleFill aria-hidden="true" />}
           onClick={() => openNewSpaceModal()}
         >
           {t("Unit.addSpace")}
@@ -111,9 +111,9 @@ function SpacesResources(): JSX.Element {
       >
         <H2 $noMargin>{t("Unit.resources")}</H2>
         <ActionButton
+          variant={ButtonVariant.Supplementary}
+          iconStart={<IconPlusCircleFill aria-hidden="true" />}
           disabled={unit.spaces.length === 0}
-          iconLeft={<IconPlusCircleFill />}
-          variant="supplementary"
           onClick={() => {
             openWithContent(
               <NewResourceModal

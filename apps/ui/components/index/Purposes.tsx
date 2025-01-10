@@ -1,4 +1,4 @@
-import { IconArrowRight } from "hds-react";
+import { IconArrowRight, IconSize } from "hds-react";
 import Link from "next/link";
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
@@ -111,7 +111,7 @@ export function Purposes({ purposes }: Props): JSX.Element {
               <Image src={getImg(item)} alt="" aria-hidden="true" />
               <Flex $direction="row" $gap="xs" $alignItems="center">
                 <span>{getName(item)} </span>
-                <IconArrowRight size="s" aria-hidden="true" />
+                <IconArrowRight size={IconSize.Small} aria-hidden="true" />
               </Flex>
             </PurposeItem>
           </PurposeLink>

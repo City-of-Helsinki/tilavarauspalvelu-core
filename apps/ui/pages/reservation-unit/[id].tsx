@@ -99,7 +99,7 @@ import {
   getReservationInProgressPath,
   getSingleSearchPath,
 } from "@/modules/urls";
-import { Notification } from "hds-react";
+import { ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { Flex } from "common/styles/util";
 import { SubmitButton } from "@/styles/util";
@@ -291,6 +291,8 @@ function SubmitFragment(
     buttonText: string;
   }>
 ) {
+  const { isSubmitting } = props.reservationForm.formState;
+  const { isReservable } = props.focusSlot;
   return (
     <LoginFragment
       isActionDisabled={!props.focusSlot?.isReservable}
@@ -298,13 +300,13 @@ function SubmitFragment(
       actionCallback={props.actionCallback}
       componentIfAuthenticated={
         <SubmitButton
-          disabled={!props.focusSlot?.isReservable}
           type="submit"
-          isLoading={props.reservationForm.formState.isSubmitting}
-          loadingText={props.loadingText}
+          variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
+          iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
+          disabled={!isReservable || isSubmitting}
           data-testid="quick-reservation__button--submit"
         >
-          {props.buttonText}
+          {isSubmitting ? props.loadingText : props.buttonText}
         </SubmitButton>
       }
       returnUrl={getPostLoginUrl()}

@@ -2,6 +2,7 @@ import {
   IconAngleDown,
   IconAngleUp,
   IconLinkExternal,
+  IconSize,
   RadioButton,
 } from "hds-react";
 import React, { useState } from "react";
@@ -221,7 +222,7 @@ export function ApplicationSectionCard({
           <b>
             {applicationSection.application.pk}-{applicationSection.pk}
           </b>
-          <IconLinkExternal size="xs" aria-hidden />
+          <IconLinkExternal size={IconSize.ExtraSmall} aria-hidden="true" />
         </StyledLink>
         <div>
           {t("Allocation.ageGroup")}:{" "}

@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { IconArrowRight, IconCalendar } from "hds-react";
+import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
 import { type ApplicationRoundsQuery } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
@@ -50,7 +50,7 @@ function ReservationPeriod({
 }): JSX.Element {
   return (
     <Flex $gap="xs" $direction="row" $alignItems="center">
-      <IconCalendar size="xs" />
+      <IconCalendar size={IconSize.ExtraSmall} />
       {formatDate(reservationPeriodBegin)}-{formatDate(reservationPeriodEnd)}
     </Flex>
   );
@@ -79,7 +79,7 @@ export function ApplicationRoundCard({
       key="view"
     >
       <span>{t("common.view")}</span>
-      <IconArrowRight size="m" />
+      <IconArrowRight size={IconSize.Medium} />
     </ButtonLikeLink>,
   ];
 

@@ -1,4 +1,9 @@
-import { Button, IconPlusCircle, Notification } from "hds-react";
+import {
+  Button,
+  IconPlusCircle,
+  Notification,
+  NotificationSize,
+} from "hds-react";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
@@ -19,10 +24,9 @@ type Node = NonNullable<ApplicationQuery["application"]>;
 type AppRoundNode = NonNullable<Node["applicationRound"]>;
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
 
-type OptionType =
-  | { value: string; label: string }
-  | { value: number; label: string };
-type OptionTypes = {
+export type OptionType = { value: number; label: string };
+export type OptionTypes = {
+  ageGroupOptions?: OptionType[];
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
   participantCountOptions: OptionType[];
@@ -136,13 +140,13 @@ export function ReservationUnitList({
         <Notification
           type="error"
           label={t("application:error.noReservationUnits")}
-          size="small"
+          size={NotificationSize.Small}
         >
           {t("application:error.noReservationUnits")}
         </Notification>
       )}
       <Notification
-        size="small"
+        size={NotificationSize.Small}
         label={t("reservationUnitList:infoReservationUnits")}
       >
         {t("reservationUnitList:infoReservationUnits")}

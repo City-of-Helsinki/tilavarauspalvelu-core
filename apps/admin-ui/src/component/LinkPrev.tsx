@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { IconAngleLeft } from "hds-react";
+import { IconAngleLeft, IconSize } from "hds-react";
 import { Link } from "react-router-dom";
 
 const StyledLink = styled(Link)`
@@ -32,7 +32,7 @@ function LinkPrevInner({ route, style, className }: Props): JSX.Element {
       className={className}
       data-testid="link__previous"
     >
-      <IconAngleLeft size="s" aria-hidden />
+      <IconAngleLeft size={IconSize.Small} aria-hidden="true" />
       {t("common.prev")}
     </StyledLink>
   );

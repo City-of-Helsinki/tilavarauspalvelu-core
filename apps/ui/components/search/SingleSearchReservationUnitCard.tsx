@@ -1,4 +1,4 @@
-import { IconArrowRight, IconEuroSign, IconGroup } from "hds-react";
+import { IconArrowRight, IconEuroSign, IconGroup, IconSize } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import NextImage from "next/image";
@@ -30,19 +30,17 @@ interface PropsT {
   reservationUnit: Node;
 }
 
-const StatusTag = ({
+function StatusTag({
   data,
-  id,
 }: {
   data: { closed: boolean; availableAt: string };
-  id: string;
-}): JSX.Element => {
+}): JSX.Element {
   const { t } = useTranslation();
   const { closed, availableAt } = data;
 
   if (closed) {
     return (
-      <Tag ariaLabel={t("reservationUnitCard:closed")} type="error" id={id}>
+      <Tag ariaLabel={t("reservationUnitCard:closed")} type="error">
         {t("reservationUnitCard:closed")}
       </Tag>
     );
@@ -50,7 +48,7 @@ const StatusTag = ({
 
   if (!availableAt) {
     return (
-      <Tag ariaLabel={t("reservationUnitCard:noTimes")} type="neutral" id={id}>
+      <Tag ariaLabel={t("reservationUnitCard:noTimes")} type="neutral">
         {t("reservationUnitCard:noTimes")}
       </Tag>
     );
@@ -65,11 +63,11 @@ const StatusTag = ({
   const timeText = format(new Date(availableAt), "HH:mm");
   const ariaLabel = t("reservationUnitCard:firstAvailableTime");
   return (
-    <Tag ariaLabel={ariaLabel} type="success" id={id}>
+    <Tag ariaLabel={ariaLabel} type="success">
       {`${dayText} ${timeText}`}
     </Tag>
   );
-};
+}
 
 // TODO SSR version (and remove the use hook)
 function useConstructLink(
@@ -123,7 +121,6 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
         closed: reservationUnit.isClosed ?? false,
         availableAt: reservationUnit.firstReservableDatetime ?? "",
       }}
-      id={`status-tag-${reservationUnit.pk}`}
       key={`status-tag-${reservationUnit.pk}`}
     />,
   ];
@@ -156,7 +153,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
           aria-label={t("reservationUnitCard:maxPersons", {
             maxPersons: reservationUnit.maxPersons,
           })}
-          size="s"
+          size={IconSize.Small}
         />
       ),
       value: t("reservationUnitCard:maxPersons", {

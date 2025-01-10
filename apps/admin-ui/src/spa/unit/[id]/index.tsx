@@ -1,4 +1,10 @@
-import { Button, IconPlusCircleFill, Notification } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  IconPlusCircleFill,
+  Notification,
+  NotificationSize,
+} from "hds-react";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -107,7 +113,7 @@ function Unit(): JSX.Element {
         <Notification
           type="alert"
           label={t("Unit.noSpacesResourcesTitle")}
-          size="large"
+          size={NotificationSize.Large}
         >
           {t("Unit.noSpacesResources")}{" "}
           <Link to={getSpacesResourcesUrl(unitPk)}>
@@ -131,8 +137,8 @@ function Unit(): JSX.Element {
         )}
         <StyledBoldButton
           disabled={!hasSpacesResources}
-          variant="supplementary"
-          iconLeft={<IconPlusCircleFill />}
+          variant={ButtonVariant.Supplementary}
+          iconStart={<IconPlusCircleFill aria-hidden="true" />}
           onClick={() => {
             history(getReservationUnitUrl(undefined, unitPk));
           }}

@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { Footer as HDSFooter, IconLinkExternal } from "hds-react";
+import { Footer as HDSFooter, IconLinkExternal, IconSize } from "hds-react";
 import Logo from "common/src/components/Logo";
 import styled from "styled-components";
 
@@ -18,10 +18,7 @@ const Wrapper = styled(HDSFooter)`
   }
 `;
 
-const constructFeedbackUrl = (
-  feedbackUrl: string,
-  i18n: { language: string }
-) => {
+function constructFeedbackUrl(feedbackUrl: string, i18n: { language: string }) {
   try {
     const url = new URL(feedbackUrl);
     url.searchParams.set("lang", i18n.language);
@@ -29,9 +26,9 @@ const constructFeedbackUrl = (
   } catch (e) {
     return null;
   }
-};
+}
 
-const Footer = ({ feedbackUrl }: { feedbackUrl: string }) => {
+function Footer({ feedbackUrl }: { feedbackUrl: string }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === "fi" ? "" : `/${i18n.language}`;
   const languageUrl = constructFeedbackUrl(feedbackUrl, i18n);
@@ -42,14 +39,14 @@ const Footer = ({ feedbackUrl }: { feedbackUrl: string }) => {
           href={`${locale}/terms/service`}
           label={t(`footer:Navigation.serviceTermsLabel`)}
           target="_blank"
-          icon={<IconLinkExternal size="s" aria-hidden />}
+          icon={<ExternalLinkIcon />}
           rel="noopener noreferrer"
         />
         <HDSFooter.Link
           href={languageUrl ?? ""}
           label={t(`footer:Navigation.feedbackLabel`)}
           target="_blank"
-          icon={<IconLinkExternal size="s" aria-hidden />}
+          icon={<ExternalLinkIcon />}
           rel="noopener noreferrer"
         />
       </HDSFooter.Navigation>
@@ -64,19 +61,24 @@ const Footer = ({ feedbackUrl }: { feedbackUrl: string }) => {
           href={`${locale}/terms/privacy`}
           label={t(`footer:Base.Item.privacyStatement`)}
           target="_blank"
-          icon={<IconLinkExternal size="xs" aria-hidden />}
+          icon={<ExternalLinkIcon size="xs" />}
           rel="noopener noreferrer"
         />
         <HDSFooter.Link
           href={`${locale}/terms/accessibility`}
           label={t(`footer:Base.Item.accessibilityStatement`)}
           target="_blank"
-          icon={<IconLinkExternal size="xs" aria-hidden />}
+          icon={<ExternalLinkIcon size="xs" />}
           rel="noopener noreferrer"
         />
       </HDSFooter.Base>
     </Wrapper>
   );
-};
+}
+
+function ExternalLinkIcon({ size = "s" }: { size?: "s" | "xs" }): JSX.Element {
+  const s = size === "xs" ? IconSize.ExtraSmall : IconSize.Small;
+  return <IconLinkExternal size={s} aria-hidden="true" />;
+}
 
 export default Footer;

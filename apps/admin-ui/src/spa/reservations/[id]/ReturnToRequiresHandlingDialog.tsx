@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Button, Dialog, IconInfoCircle } from "hds-react";
+import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
 import {
   type ReservationQuery,
   useRequireHandlingMutation,
@@ -60,7 +60,7 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
         <p id="modal-description" className="text-body" />
       </Dialog.Content>
       <Dialog.ActionButtons>
-        <Button variant="secondary" onClick={onClose} theme="black">
+        <Button variant={ButtonVariant.Secondary} onClick={onClose}>
           {t("common.prev")}
         </Button>
         <Button onClick={handleClick}>
@@ -91,7 +91,7 @@ const ReturnToRequiredHandlingDialog = ({
       <Dialog.Header
         id="modal-header"
         title={t("RequestedReservation.ReturnToRequiresHandlingDialog.title")}
-        iconLeft={<IconInfoCircle aria-hidden="true" />}
+        iconStart={<IconInfoCircle aria-hidden="true" />}
       />
       <DialogContent
         reservation={reservation}

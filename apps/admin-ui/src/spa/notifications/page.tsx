@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import {
   Button,
+  ButtonVariant,
   IconCheck,
   IconClock,
   IconPen,
@@ -134,17 +135,17 @@ function BannerNotificationStatusLabel({
       case BannerNotificationState.Draft:
         return {
           type: "draft",
-          icon: <IconPen ariaHidden />,
+          icon: <IconPen aria-hidden="true" />,
         };
       case BannerNotificationState.Active:
         return {
           type: "success",
-          icon: <IconCheck ariaHidden />,
+          icon: <IconCheck aria-hidden="true" />,
         };
       case BannerNotificationState.Scheduled:
         return {
           type: "info",
-          icon: <IconClock ariaHidden />,
+          icon: <IconClock aria-hidden="true" />,
         };
     }
   })(state);
@@ -566,7 +567,7 @@ const NotificationForm = ({
       <ButtonContainer>
         <InnerButtons>
           <ButtonLikeLink
-            variant="secondary"
+            variant={ButtonVariant.Secondary}
             size="large"
             to=".."
             data-testid="Notification__Page--cancel-button"
@@ -574,8 +575,7 @@ const NotificationForm = ({
             {t("form.cancel")}
           </ButtonLikeLink>
           <Button
-            variant="secondary"
-            theme="black"
+            variant={ButtonVariant.Secondary}
             type="button"
             onClick={() => {
               setValue("isDraft", true);
@@ -692,8 +692,7 @@ function LoadedContent({
         >
           <Button
             onClick={removeNotification}
-            variant="secondary"
-            theme="black"
+            variant={ButtonVariant.Secondary}
           >
             {t("Notifications.deleteButton")}
           </Button>

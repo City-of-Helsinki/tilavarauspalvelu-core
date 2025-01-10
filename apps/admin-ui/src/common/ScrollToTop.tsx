@@ -4,12 +4,9 @@ import { useScrollPosition } from "@n8tb1t/use-scroll-position";
 import { Button, IconAngleUp } from "hds-react";
 import { useDebounce, useWindowSize } from "react-use";
 import { breakpoints } from "common/src/common/style";
+import { useTranslation } from "next-i18next";
 
-const Btn = styled(Button).attrs({
-  style: {
-    "--color-bus": "var(--color-black)",
-  } as React.CSSProperties,
-})`
+const Btn = styled(Button)`
   width: 40px;
   height: 40px;
   background-color: var(--color-black);
@@ -25,6 +22,7 @@ const Btn = styled(Button).attrs({
 const breakpoint = breakpoints.m;
 
 function ScrollToTop(): JSX.Element | null {
+  const { t } = useTranslation();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
@@ -54,11 +52,24 @@ function ScrollToTop(): JSX.Element | null {
     300
   );
 
-  return isEnabled && isVisible ? (
-    <Btn onClick={() => window.scroll({ top: 0, left: 0, behavior: "smooth" })}>
-      <IconAngleUp />
+  const handleClick = () => {
+    window.scroll({ top: 0, left: 0, behavior: "smooth" });
+  };
+
+  if (!isEnabled || !isVisible) {
+    return null;
+  }
+  return (
+    /* eslint-disable -- don't remove empty string */
+    <Btn
+      aria-label={t("common:scrollToTop")}
+      onClick={handleClick}
+      iconStart={<IconAngleUp aria-hidden="true" />}
+    >
+      {""}
     </Btn>
-  ) : null;
+    /* eslint-enable */
+  );
 }
 
 export default ScrollToTop;

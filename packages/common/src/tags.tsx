@@ -35,11 +35,8 @@ export const StyledTag = styled(Tag)`
   }
 `;
 
-export const ResetButton = styled(StyledTag).attrs({
-  theme: {
-    "--tag-background": "transparent",
-  },
-})`
+export const ResetButton = styled(StyledTag)`
+  --background-color: transparent;
   border: 1px var(--color-black-80) solid;
   &:hover {
     background: var(--color-black-10);

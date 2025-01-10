@@ -1,7 +1,14 @@
 import React, { useEffect } from "react";
 import { gql } from "@apollo/client";
 import { useForm, FormProvider, UseFormReturn } from "react-hook-form";
-import { Button, Dialog, Notification } from "hds-react";
+import {
+  Button,
+  ButtonSize,
+  ButtonVariant,
+  Dialog,
+  Notification,
+  NotificationSize,
+} from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   type ReservationStaffCreateMutationInput,
@@ -147,10 +154,10 @@ function CollisionWarning({
   }
   return (
     <StyledNotification
-      size="small"
+      size={NotificationSize.Small}
       label={t("errors.descriptive.collision")}
       type="error"
-      dataTestId="CreateReservationModal__collision-warning"
+      data-testid="CreateReservationModal__collision-warning"
     >
       {t("errors.descriptive.collision")}
     </StyledNotification>
@@ -182,17 +189,16 @@ function ActionContainer({
     <ActionButtons>
       <CollisionWarning form={form} reservationUnit={reservationUnit} />
       <Button
-        size="small"
-        variant="secondary"
+        size={ButtonSize.Small}
+        variant={ButtonVariant.Secondary}
         onClick={onCancel}
-        theme="black"
         data-testid="CreateReservationModal__cancel-reservation"
       >
         {t("common.cancel")}
       </Button>
       <Button
         type="button"
-        size="small"
+        size={ButtonSize.Small}
         disabled={isDisabled}
         onClick={() => {
           handleSubmit(onSubmit)();

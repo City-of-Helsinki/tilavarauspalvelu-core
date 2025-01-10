@@ -20,7 +20,6 @@ export const BlackButton = styled(Button)`
 
 /// Used for making a reservation, scales the button to max container width
 export const SubmitButton = styled(Button)`
-  white-space: nowrap;
   && {
     width: 100%;
   }

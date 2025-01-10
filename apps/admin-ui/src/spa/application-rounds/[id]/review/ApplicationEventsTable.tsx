@@ -9,6 +9,7 @@ import {
   IconCross,
   IconLinkExternal,
   IconQuestionCircle,
+  IconSize,
 } from "hds-react";
 import {
   ApplicationSectionsQuery,
@@ -132,7 +133,7 @@ const getColConfig = (t: TFunction) =>
       }: ApplicationEventView) => (
         <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
           {truncate(applicantName ?? "-", applicantTruncateLen)}
-          <IconLinkExternal size="xs" aria-hidden />
+          <IconLinkExternal size={IconSize.ExtraSmall} aria-hidden="true" />
         </ExternalTableLink>
       ),
     },

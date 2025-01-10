@@ -1,10 +1,15 @@
-import { Button, IconArrowRight, IconCross } from "hds-react";
+import {
+  Button,
+  ButtonSize,
+  ButtonVariant,
+  IconArrowRight,
+  IconCross,
+} from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import ClientOnly from "common/src/ClientOnly";
-import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import { useRouter } from "next/router";
 import {
   ApplicationCreateMutationInput,
@@ -14,6 +19,7 @@ import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import { Flex, NoWrap } from "common/styles/util";
 import { truncatedText } from "common/styles/cssFragments";
+import { useMedia } from "react-use";
 
 type Props = {
   count: number;
@@ -55,8 +61,8 @@ const InnerContainer = styled(Flex).attrs({
 `;
 
 const DeleteButton = styled(Button).attrs({
-  variant: "primary",
-  iconLeft: <IconCross />,
+  variant: ButtonVariant.Primary,
+  iconStart: <IconCross aria-hidden="true" />,
 })`
   ${truncatedText}
 `;
@@ -67,6 +73,7 @@ function StartApplicationBar({
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
   const router = useRouter();
+  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
   const [create, { loading: isSaving }] = useCreateApplicationMutation();
 
@@ -105,38 +112,32 @@ function StartApplicationBar({
     return null;
   }
 
-  // TODO remove use of JustForDesktop and JustForMobile
   return (
     <BackgroundContainer>
       <InnerContainer>
         <div>
           <NoWrap id="reservationUnitCount">
-            <JustForDesktop>
-              {t("shoppingCart:count", { count })}
-            </JustForDesktop>
-            <JustForMobile>
-              {t("shoppingCart:countShort", { count })}
-            </JustForMobile>
+            {isMobile
+              ? t("shoppingCart:countShort", { count })
+              : t("shoppingCart:count", { count })}
           </NoWrap>
         </div>
         <DeleteButton
           onClick={clearSelections}
-          size="small"
+          size={ButtonSize.Small}
           data-testid="start-application-bar__button--clear-selections"
         >
-          <JustForDesktop>{t("shoppingCart:deleteSelections")}</JustForDesktop>
-          <JustForMobile>
-            {t("shoppingCart:deleteSelectionsShort")}
-          </JustForMobile>
+          {isMobile
+            ? t("shoppingCart:deleteSelectionsShort")
+            : t("shoppingCart:deleteSelections")}
         </DeleteButton>
         <Button
           id="startApplicationButton"
           onClick={onNext}
           disabled={isSaving}
-          iconRight={<IconArrowRight />}
+          iconEnd={<IconArrowRight aria-hidden="true" />}
         >
-          <JustForDesktop>{t("shoppingCart:next")}</JustForDesktop>
-          <JustForMobile>{t("shoppingCart:nextShort")}</JustForMobile>
+          {isMobile ? t("shoppingCart:nextShort") : t("shoppingCart:next")}
         </Button>
       </InnerContainer>
     </BackgroundContainer>

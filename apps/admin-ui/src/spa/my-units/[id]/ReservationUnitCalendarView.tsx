@@ -4,7 +4,8 @@ import { AutoGrid, Flex } from "common/styles/util";
 import { ReservationUnitCalendar } from "./ReservationUnitCalendar";
 import WeekNavigation from "./WeekNavigation";
 import { useTranslation } from "next-i18next";
-import { Select } from "hds-react";
+import { Option, Select } from "hds-react";
+import { convertOptionToHDS, toNumber } from "common/src/helpers";
 
 export function ReservationUnitCalendarView({
   reservationUnitOptions,
@@ -30,24 +31,31 @@ export function ReservationUnitCalendarView({
     }
   }, [reservationUnitOptions]);
 
-  const onChange = (reservationUnits: { label: string; value: number }) => {
-    setReservationUnitPk(reservationUnits.value);
+  const onChange = (selecte: Option[]) => {
+    const value = selecte.find(() => true)?.value;
+    const v = toNumber(value);
+    if (v != null) {
+      setReservationUnitPk(v);
+    }
   };
 
   return (
     <>
       <AutoGrid>
         <Select
+          id="reservation-unit"
+          disabled={reservationUnitOptions.length === 0}
           style={{
             zIndex: "var(--tilavaraus-admin-stack-select-over-calendar)",
           }}
-          disabled={reservationUnitOptions.length === 0}
-          label={t("ReservationUnitsFilter.label")}
-          placeholder={t("common.select")}
-          options={reservationUnitOptions}
-          value={valueOption}
+          texts={{
+            label: t("ReservationUnitsFilter.label"),
+            placeholder: t("common.select"),
+          }}
+          clearable={false}
+          options={reservationUnitOptions.map(convertOptionToHDS)}
+          value={valueOption?.value.toString()}
           onChange={onChange}
-          id="reservation-unit"
         />
       </AutoGrid>
       <Flex $justifyContent="center" $direction="row">

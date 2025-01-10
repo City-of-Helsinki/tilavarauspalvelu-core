@@ -30,9 +30,21 @@ strong {
 /****************************************************
  * Helsinki Design System overrides
  ****************************************************/
+/* Remove bottom margin from Select component,
+ * we use gaps margin breaks grid aligment with other inputs */
+[class*="Select-module_root__"] {
+  & > div {
+    margin-bottom: 0;
+  }
+}
+
+/* Default to nowrap for all HDS buttons */
+[class*="Button-module_button__"] {
+  white-space: nowrap;
+}
 
 /* HDS secndary button to use black theming */
-[class*="button_hds-button--secondary"]:not(:disabled) {
+[class*="Button-module_secondary"]:not(:disabled) {
   --font-family: var(--font-medium);
   --color: var(--color-black);
   --color-hover: var(--color-black);
@@ -46,10 +58,11 @@ strong {
   --border-color-hover: var(--border-color);
   --border-color-focus: var(--border-color);
   --border-color-hover-focus: var(--border-color);
+}
 
-  font-family: var(--font-family);
-  color: var(--color);
-  border-color: var(--color-black);
+/* Calendar buttons to use black theming */
+[class*="DatePicker-module_hds-datepicker__"] [class*="Button-module_supplementary__"] {
+  --color: var(--color-black);
 }
 
 /****************************************************

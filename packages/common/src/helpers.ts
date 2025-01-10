@@ -5,6 +5,7 @@ import {
   type Maybe,
 } from "../gql/gql-types";
 import { pixel } from "./common/style";
+import { OptionInProps } from "hds-react";
 
 export function filterNonNullable<T>(
   arr: Maybe<Maybe<T>[]> | undefined
@@ -256,4 +257,14 @@ export function constructUrl(basePath: string, page: string): string {
 
 export function ignoreMaybeArray<T>(value: T | T[]): T {
   return Array.isArray(value) ? value[0] : value;
+}
+
+export function convertOptionToHDS(option: {
+  label: string;
+  value: string | number;
+}): OptionInProps {
+  return {
+    label: option.label,
+    value: option.value.toString(),
+  };
 }

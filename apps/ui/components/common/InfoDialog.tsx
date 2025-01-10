@@ -1,7 +1,6 @@
-import { Dialog, IconInfoCircleFill } from "hds-react";
+import { Button, ButtonVariant, Dialog, IconInfoCircleFill } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { BlackButton } from "../../styles/util";
 import { Sanitize } from "common/src/components/Sanitize";
 
 type Props = {
@@ -12,13 +11,13 @@ type Props = {
   onClose: () => void;
 };
 
-const InfoDialog = ({
+function InfoDialog({
   id,
   heading,
   text,
   isOpen,
   onClose,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   return (
@@ -32,9 +31,9 @@ const InfoDialog = ({
       <Dialog.Header
         id={`dialog__${id}--header`}
         title={heading}
-        iconLeft={
+        iconStart={
           <IconInfoCircleFill
-            aria-hidden
+            aria-hidden="true"
             style={{ color: "var(--color-bus)" }}
           />
         }
@@ -43,12 +42,12 @@ const InfoDialog = ({
         <Sanitize html={text} />
       </Dialog.Content>
       <Dialog.ActionButtons>
-        <BlackButton variant="secondary" onClick={() => onClose()}>
+        <Button variant={ButtonVariant.Secondary} onClick={() => onClose()}>
           {t("common:close")}
-        </BlackButton>
+        </Button>
       </Dialog.ActionButtons>
     </Dialog>
   );
-};
+}
 
 export default InfoDialog;

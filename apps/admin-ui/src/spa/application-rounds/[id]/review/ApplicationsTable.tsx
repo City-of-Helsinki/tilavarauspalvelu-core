@@ -10,6 +10,7 @@ import {
   IconEnvelope,
   IconLinkExternal,
   IconQuestionCircle,
+  IconSize,
 } from "hds-react";
 import { ApplicationsQuery, ApplicationStatusChoice } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
@@ -89,7 +90,7 @@ const getColConfig = (t: TFunction) =>
       transform: ({ applicantName, pk }: ApplicationView) => (
         <ExternalTableLink to={getApplicationUrl(pk)}>
           {truncate(applicantName ?? "-", applicantTruncateLen)}
-          <IconLinkExternal size="xs" aria-hidden />
+          <IconLinkExternal size={IconSize.ExtraSmall} aria-hidden="true" />
         </ExternalTableLink>
       ),
     },

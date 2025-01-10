@@ -70,7 +70,7 @@ export function ReservationStatus({ state, testId }: Props): JSX.Element {
     <StatusLabel
       type={statusProps.type}
       icon={statusProps.icon}
-      testId={testId}
+      data-testid={testId}
     >
       {statusText}
     </StatusLabel>

@@ -1,6 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Button, Dialog, IconArrowLeft, IconCheck } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  Dialog,
+  IconArrowLeft,
+  IconCheck,
+  LoadingSpinner,
+} from "hds-react";
 import type { UnitQuery } from "@gql/gql-types";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import {
@@ -33,7 +40,7 @@ export function Page2({
 }: Props): JSX.Element {
   const { t } = useTranslation();
   const { watch, formState } = form;
-  const { errors, isDirty } = formState;
+  const { errors, isDirty, isSubmitting } = formState;
 
   const parentPk = watch("parent") ?? null;
   const parentName = unit?.spaces.find(
@@ -48,7 +55,7 @@ export function Page2({
             ? "SpaceModal.page2.subSpaceModalTitle"
             : "SpaceModal.page2.modalTitle"
         )}
-        extras={<StyledTag>{t("SpaceModal.phase")} 2/2</StyledTag>}
+        extras={<StyledTag>{`${t("SpaceModal.phase")} 2/2`}</StyledTag>}
         close={closeModal}
       />
       <Dialog.Content>
@@ -77,15 +84,17 @@ export function Page2({
       <DialogActionsButtons>
         <Button
           onClick={onPrevPage}
-          variant="supplementary"
-          iconLeft={<IconArrowLeft />}
+          variant={ButtonVariant.Supplementary}
+          iconStart={<IconArrowLeft aria-hidden="true" />}
+          disabled={isSubmitting}
         >
           {t("SpaceModal.page2.prevButton")}
         </Button>
         <Button
-          disabled={!isDirty}
           type="submit"
-          loadingText={t("SpaceModal.page2.saving")}
+          variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
+          iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
+          disabled={!isDirty || isSubmitting}
         >
           {t("SpaceModal.page2.createButton")}
         </Button>

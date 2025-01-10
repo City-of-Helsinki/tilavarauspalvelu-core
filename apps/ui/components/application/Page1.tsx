@@ -1,4 +1,10 @@
-import { Button, IconArrowRight, IconPlusCircle } from "hds-react";
+import {
+  Button,
+  ButtonSize,
+  ButtonVariant,
+  IconArrowRight,
+  IconPlusCircle,
+} from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { uniq } from "lodash";
@@ -139,10 +145,10 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
       )}
       <Button
         id="addApplicationEvent"
-        variant="supplementary"
-        iconLeft={<IconPlusCircle />}
+        size={ButtonSize.Small}
+        variant={ButtonVariant.Supplementary}
+        iconStart={<IconPlusCircle aria-hidden="true" />}
         onClick={handleAddNewApplicationEvent}
-        size="small"
       >
         {t("application:Page1.createNew")}
       </Button>
@@ -150,7 +156,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
         <div />
         <Button
           id="button__application--next"
-          iconRight={<IconArrowRight />}
+          iconEnd={<IconArrowRight aria-hidden="true" />}
           disabled={submitDisabled}
           type="submit"
         >

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
-import { Notification } from "hds-react";
+import { Notification, NotificationSize } from "hds-react";
 import { useMedia } from "react-use";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { breakpoints } from "common/src/common/style";
@@ -92,7 +92,7 @@ function SearchSingle({
       <Breadcrumb routes={routes} />
       <H1 $noMargin>{t("search:single.heading")}</H1>
       {error ? (
-        <Notification size="small" type="alert">
+        <Notification size={NotificationSize.Small} type="alert">
           {t("searchResultList:error")}
         </Notification>
       ) : null}

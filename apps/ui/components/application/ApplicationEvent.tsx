@@ -1,12 +1,20 @@
 import React, { useState } from "react";
-import { Button, Checkbox, DateInput, NumberInput, TextInput } from "hds-react";
+import {
+  Button,
+  ButtonSize,
+  ButtonVariant,
+  Checkbox,
+  DateInput,
+  NumberInput,
+  TextInput,
+} from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import type { ApplicationQuery } from "@gql/gql-types";
 import { H5 } from "common/src/common/typography";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
 import { getLocalizationLang } from "common/src/helpers";
-import { ReservationUnitList } from "./ReservationUnitList";
+import { OptionTypes, ReservationUnitList } from "./ReservationUnitList";
 import {
   apiDateToUIDate,
   formatApiDate,
@@ -26,17 +34,6 @@ import {
 
 type Node = NonNullable<ApplicationQuery["application"]>;
 type AppRoundNode = NonNullable<Node["applicationRound"]>;
-
-type OptionType =
-  | { label: string; value: string }
-  | { label: string; value: number };
-type OptionTypes = {
-  ageGroupOptions: OptionType[];
-  purposeOptions: OptionType[];
-  reservationUnitTypeOptions: OptionType[];
-  participantCountOptions: OptionType[];
-  unitOptions: OptionType[];
-};
 
 type Props = {
   index: number;
@@ -151,7 +148,7 @@ function ApplicationEventInner({
           required
           name={`applicationSections.${index}.ageGroup`}
           label={t("application:Page1.ageGroup")}
-          options={ageGroupOptions}
+          options={ageGroupOptions ?? []}
           error={getTranslatedError("ageGroup")}
         />
         <ControlledSelect
@@ -286,8 +283,8 @@ function ApplicationEventInner({
         name={watch(`applicationSections.${index}.name`) ?? ""}
       />
       <Button
-        variant="secondary"
-        size="small"
+        variant={ButtonVariant.Secondary}
+        size={ButtonSize.Small}
         id={`applicationSections[${index}].delete`}
         onClick={() => setIsWaitingForDelete(true)}
       >

@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Select } from "hds-react";
 import { useTranslation } from "next-i18next";
+import { convertOptionToHDS } from "common/src/helpers";
 
 type SelectFilterProps = {
   name: string;
@@ -30,10 +31,10 @@ export function SelectFilter({
     return opts;
   }, [options, sort]);
 
-  const onChange = (value: (typeof options)[0]) => {
+  const onChange = (value: string | undefined) => {
     const params = new URLSearchParams(searchParams);
     if (value != null) {
-      params.set(name, value.value.toString());
+      params.set(name, value);
     } else {
       params.delete(name);
     }
@@ -48,13 +49,17 @@ export function SelectFilter({
   const placeholder = t("common.select");
   return (
     <Select
-      label={label}
-      id="isRecurring"
-      options={sortedOptions}
-      onChange={onChange}
-      value={options.find((x) => x.value === convertedValue) ?? null}
-      clearable={clearable}
-      placeholder={placeholder}
+      texts={{
+        label,
+        placeholder,
+      }}
+      options={sortedOptions.map(convertOptionToHDS)}
+      onChange={(selected) => {
+        const val = selected.find(() => true);
+        onChange(val?.value);
+      }}
+      value={options.find((x) => x.value === convertedValue)?.value?.toString()}
+      clearable={clearable ?? false}
     />
   );
 }

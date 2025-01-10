@@ -75,9 +75,7 @@ test("Render recurring reservation form with all but unit field disabled", async
   await user.click(btn);
   expect(btn).not.toBeRequired();
 
-  const listbox = await view.findByLabelText(/reservationUnit/, {
-    selector: "ul",
-  });
+  const listbox = view.getByRole("listbox");
 
   const units = createReservationUnits();
   expect(units[0].nameFi).toBeDefined();
@@ -88,9 +86,9 @@ test("Render recurring reservation form with all but unit field disabled", async
 
   const selectorFields = ["repeatPattern"];
   for (const f of selectorFields) {
-    const labelElem = view.getByRole("button", { name: RegExp(f) });
-    expect(labelElem).toBeInTheDocument();
-    expect(labelElem).toBeDisabled();
+    const el = view.getByRole("combobox", { name: RegExp(f) });
+    expect(el).toBeInTheDocument();
+    expect(el).toHaveAttribute("aria-disabled", "true");
   }
   const dateFields = ["startingDate", "endingDate"];
   for (const f of dateFields) {
@@ -113,9 +111,9 @@ test("Render recurring reservation form with all but unit field disabled", async
 });
 
 async function selectUnit() {
-  const container = screen.getByText(/filters.label.reservationUnit/);
-  const btn = within(container.parentElement!).getByRole("button");
   const user = userEvent.setup();
+  const container = screen.getByText(/filters.label.reservationUnit/);
+  const btn = within(container.parentElement!).getByRole("combobox");
   expect(btn).toBeInTheDocument();
   expect(btn).toBeVisible();
   expect(btn).not.toBeDisabled();
@@ -123,16 +121,13 @@ async function selectUnit() {
   expect(btn).toHaveTextContent("common.select");
   await user.click(btn);
 
-  const listbox = screen.getByLabelText(/reservationUnit/, {
-    selector: "ul",
-  });
+  const listbox = screen.getByRole("listbox");
   const units = createReservationUnits();
   expect(units[0].nameFi).toBeDefined();
   const unitName = units[0].nameFi!;
 
-  // Select works for HDS listbox but
-  // to check the selected value we have to read the button text not check options
-  await userEvent.selectOptions(listbox, unitName);
+  const option = within(listbox).getByText("Unit");
+  await user.click(option);
   expect(btn).toHaveTextContent(unitName);
 }
 
@@ -142,24 +137,18 @@ test("SMOKE: selecting unit field allows input to other mandatory fields", async
   const view = customRender();
   await selectUnit();
 
-  // TODO select some values from them
-  // TODO test start and end time text inputs
-  // const = ["startingTime", "endingTime"];
   const selectorFields = ["repeatPattern"];
-  selectorFields.forEach((f) => {
-    const labelElem = view.getByRole("button", { name: RegExp(f) });
+  for (const f of selectorFields) {
+    const labelElem = view.getByRole("combobox", { name: RegExp(f) });
     expect(labelElem).toBeInTheDocument();
     expect(labelElem).not.toBeDisabled();
-  });
+  }
   const dateFields = ["startingDate", "endingDate"];
-  dateFields.forEach((f) => {
+  for (const f of dateFields) {
     const labelElem = view.getByRole("textbox", { name: RegExp(f) });
     expect(labelElem).toBeInTheDocument();
     expect(labelElem).not.toBeDisabled();
-  });
-
-  // TODO need to fill the form
-  // and then submit it and check we get both CREATE_RECURRING and CREATE_STAFF mutations
+  }
 });
 
 test("Submit is disabled if all mandatory fields are not set", async () => {
@@ -177,6 +166,10 @@ test("Form has meta when reservation unit is selected.", async () => {
 
   await selectUnit();
 
+  // visible after unit is selected
+  const seriesNameInput = view.getByLabelText(/RecurringReservationForm.name/);
+  expect(seriesNameInput).toBeInTheDocument();
+
   // TODO check that the radio buttons are not selected by default
   // this is because it's better for usability even if it causes acccessiblity issues
   const typeStaff = view.getByLabelText(/STAFF/);
@@ -188,14 +181,11 @@ test("Form has meta when reservation unit is selected.", async () => {
 
   await user.click(typeBehalf);
 
-  const seriesNameInput = view.getByLabelText(/RecurringReservationForm.name/);
-  expect(seriesNameInput).toBeInTheDocument();
-
   // we only really need to know that one of the meta fields is there to test this forms logic
   // all meta fields should have separate tests
   const metaView = view.getByTestId("reservation__form--reservee-info");
   expect(metaView).toBeInTheDocument();
-  const emailInput = within(metaView).getByLabelText(/reserveeEmail/);
+  const emailInput = await within(metaView).findByLabelText(/reserveeEmail/);
   expect(emailInput).toBeInTheDocument();
 });
 
@@ -224,7 +214,10 @@ async function fillForm({
 }) {
   // Duplicated code from selectUnit because user type is questionable to recreate / pass
   const container = screen.getByText(/filters.label.reservationUnit/);
-  const btn = within(container.parentElement!).getByRole("button");
+  if (container.parentElement == null) {
+    throw new Error("No parent element found for reservation unit button");
+  }
+  const btn = within(container.parentElement).getByRole("combobox");
   const user = userEvent.setup();
   expect(btn).toBeInTheDocument();
   expect(btn).toBeVisible();
@@ -233,22 +226,26 @@ async function fillForm({
   expect(btn).toHaveTextContent("common.select");
   await user.click(btn);
 
-  // TODO replace the select code with the utility function: selectUnit
-  const listbox = screen.getByLabelText(/reservationUnit/, {
-    selector: "ul",
-  });
+  const listbox = screen.getByRole("listbox");
 
   // Select works for HDS listbox but
   // to check the selected value we have to read the button text not check options
-  await user.selectOptions(listbox, "Unit");
+  const option = within(listbox).getByText("Unit");
+  await user.click(option);
+  // make sure that the form is active and can be filled before continuing
+  await waitFor(async () => {
+    const startDateLabel = screen.getByRole("textbox", {
+      name: /ReservationDialog.startingDate/,
+    });
 
-  await user.tab();
-  await user.keyboard(begin);
+    return expect(startDateLabel).not.toBeDisabled();
+  });
+
   const startDateLabel = screen.getByRole("textbox", {
     name: /ReservationDialog.startingDate/,
   });
-  // make sure that the form is active and can be filled before continuing
-  expect(startDateLabel).not.toBeDisabled();
+  await user.click(startDateLabel);
+  await user.keyboard(begin);
   expect(startDateLabel).toHaveValue(begin);
 
   await user.tab();
@@ -312,7 +309,7 @@ test("Form can't be submitted without reservation type selection", async () => {
   expect(submit).not.toBeDisabled();
   fireEvent.submit(submit);
   await view.findByText(/required/i);
-}, 15_000);
+});
 
 test("Form submission without any blocking reservations", async () => {
   const view = customRender();

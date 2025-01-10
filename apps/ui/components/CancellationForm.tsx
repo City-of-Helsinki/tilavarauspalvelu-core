@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
-import { Button, IconCross } from "hds-react";
+import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { fontMedium } from "common/src/common/typography";
 import { type CancelReasonFieldsFragment } from "@gql/gql-types";
@@ -103,11 +103,11 @@ export function CancellationForm(props: {
               {t("reservations:cancelButton")}
             </ButtonLikeLink>
             <Button
-              variant="primary"
               type="submit"
-              disabled={isDisabled || !watch("reason")}
+              variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
+              iconStart={isLoading ? <LoadingSpinner small /> : undefined}
+              disabled={isDisabled || isLoading || !watch("reason")}
               data-testid="reservation-cancel__button--cancel"
-              isLoading={isLoading}
             >
               {t("reservations:cancel.reservation")}
             </Button>

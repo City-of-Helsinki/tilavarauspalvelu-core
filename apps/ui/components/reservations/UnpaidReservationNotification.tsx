@@ -19,7 +19,7 @@ import { ApolloError } from "@apollo/client";
 import { toApiDate } from "common/src/common/util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
-import { Button } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 
 type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
 type EdgeT = NonNullable<QueryT["edges"][number]>;
@@ -133,22 +133,19 @@ function ReservationNotification({
         <BodyText>{text}</BodyText>
         <NotificationButtons>
           <Button
-            variant="secondary"
-            size="small"
+            variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Secondary}
+            size={ButtonSize.Small}
             onClick={onDelete}
-            disabled={disabled}
-            isLoading={isLoading}
-            loadingText={t(
-              "notification:waitingForPayment.cancelingReservation"
-            )}
+            disabled={disabled || isLoading}
+            iconStart={isLoading ? <LoadingSpinner small /> : undefined}
             data-testid="reservation-notification__button--delete"
           >
             {t("notification:waitingForPayment.cancelReservation")}
           </Button>
           <Button
-            variant="secondary"
-            size="small"
-            disabled={disabled}
+            variant={ButtonVariant.Secondary}
+            size={ButtonSize.Small}
+            disabled={disabled || isLoading}
             onClick={onNext}
             data-testid="reservation-notification__button--checkout"
           >

@@ -6,7 +6,13 @@ import type {
   ReservationUnitPageQuery,
 } from "@gql/gql-types";
 import { differenceInMinutes } from "date-fns";
-import { Button, IconArrowRight, IconCross } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  IconArrowRight,
+  IconCross,
+  LoadingSpinner,
+} from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -38,6 +44,7 @@ import { Sanitize } from "common/src/components/Sanitize";
 import { type RoundPeriod } from "@/modules/reservable";
 import { PinkBox as PinkBoxBase } from "./styles";
 import { H4 } from "common";
+import { getReservationPath } from "@/modules/urls";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -256,20 +263,24 @@ export function EditStep0({
       <Form noValidate onSubmit={handleSubmit(submitReservation)}>
         <Actions>
           <ButtonLikeLink
-            href={`/reservations/${reservation.pk}`}
+            href={getReservationPath(reservation.pk)}
             data-testid="reservation-edit__button--cancel"
           >
-            <IconCross aria-hidden />
+            <IconCross aria-hidden="true" />
             {t("reservations:cancelButton")}
           </ButtonLikeLink>
           <Button
-            variant="primary"
-            iconRight={<IconArrowRight aria-hidden />}
-            disabled={!focusSlot.isReservable || !isDirty}
             type="submit"
+            variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
+            iconEnd={
+              isLoading ? (
+                <LoadingSpinner small />
+              ) : (
+                <IconArrowRight aria-hidden="true" />
+              )
+            }
+            disabled={!focusSlot.isReservable || !isDirty || isLoading}
             data-testid="reservation__button--continue"
-            isLoading={isLoading}
-            loadingText={t("reservationCalendar:nextStepLoading")}
           >
             {t("reservationCalendar:nextStep")}
           </Button>

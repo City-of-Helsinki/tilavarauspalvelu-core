@@ -104,7 +104,8 @@ export function FilterTagList({
                 value: translateTag(key, val),
               })}
             >
-              {translateTag(key, val)}
+              {/* TODO when can this return undefined? should we filter or remove the possibility? */}
+              {translateTag(key, val) ?? ""}
             </StyledTag>
           ));
         }

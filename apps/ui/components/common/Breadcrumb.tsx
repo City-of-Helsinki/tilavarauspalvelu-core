@@ -1,6 +1,6 @@
 import React from "react";
 import styled, { css } from "styled-components";
-import { IconAngleLeft, IconAngleRight } from "hds-react";
+import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import { breakpoints, fontMedium } from "common";
 import { useMedia } from "react-use";
 import Link from "next/link";
@@ -92,7 +92,7 @@ function BreadcrumbImpl({
   if (isMobile) {
     return (
       <Item>
-        <IconAngleLeft size="s" aria-hidden="true" />
+        <IconAngleLeft size={IconSize.Small} aria-hidden="true" />
         <Anchor href={lastRouteWithSlug?.slug ?? ""} $isMobile>
           {lastRouteWithSlug.title}
         </Anchor>
@@ -104,7 +104,9 @@ function BreadcrumbImpl({
     <>
       {routes.map((item, index) => (
         <Item key={`${item.title}${item.slug}`}>
-          {index > 0 && <IconAngleRight size="s" aria-hidden="true" />}
+          {index > 0 && (
+            <IconAngleRight size={IconSize.Small} aria-hidden="true" />
+          )}
           {item.slug ? (
             <Anchor href={item.slug} $current={index === routes.length - 1}>
               {item.title}

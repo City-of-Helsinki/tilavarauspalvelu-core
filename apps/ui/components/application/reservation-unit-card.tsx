@@ -4,6 +4,10 @@ import {
   IconGroup,
   IconCross,
   Notification,
+  IconSize,
+  ButtonSize,
+  ButtonVariant,
+  Button,
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
@@ -12,7 +16,6 @@ import { fontBold, H6 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
 import { getMainImage, getTranslation } from "@/modules/util";
-import { MediumButton } from "@/styles/util";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource } from "common/src/helpers";
 
@@ -95,8 +98,6 @@ const Name = styled.div`
   margin-bottom: var(--spacing-3-xs);
 `;
 
-const UnitName = styled.div``;
-
 const MaxPersonsContainer = styled.div`
   display: flex;
   align-items: center;
@@ -106,8 +107,7 @@ const MaxPersonsContainer = styled.div`
   padding-bottom: var(--spacing-2-xs);
 `;
 
-const DeleteButton = styled(MediumButton)`
-  white-space: nowrap;
+const DeleteButton = styled(Button)`
   margin: var(--spacing-s) var(--spacing-s) var(--spacing-s) 0;
   place-self: flex-start;
   @media (min-width: ${breakpoints.m}) {
@@ -201,11 +201,11 @@ export function ReservationUnitCard({
           <ImageCell $src={imgSrc} />
           <ExtraPaddedCell>
             <Name>{getReservationUnitName(reservationUnit)}</Name>
-            <UnitName>{unitName}</UnitName>
+            <div>{unitName}</div>
             <MaxPersonsContainer>
               {reservationUnit.maxPersons && (
                 <>
-                  <IconGroup aria-hidden size="s" />
+                  <IconGroup aria-hidden="true" size={IconSize.Small} />
                   {t("reservationUnitCard:maxPersons", {
                     count: reservationUnit.maxPersons,
                   })}
@@ -214,9 +214,9 @@ export function ReservationUnitCard({
             </MaxPersonsContainer>
           </ExtraPaddedCell>
           <DeleteButton
-            variant="supplementary"
-            iconLeft={<IconCross aria-hidden />}
-            size="small"
+            variant={ButtonVariant.Supplementary}
+            iconStart={<IconCross aria-hidden="true" />}
+            size={ButtonSize.Small}
             onClick={() => {
               onDelete(reservationUnit);
             }}
@@ -233,7 +233,7 @@ export function ReservationUnitCard({
               aria-label={t("reservationUnitList:buttonUp")}
               onClick={() => onMoveUp(reservationUnit)}
             >
-              <IconArrowUp aria-hidden size="m" />
+              <IconArrowUp aria-hidden="true" size={IconSize.Small} />
             </button>
           </Circle>
           <Circle passive={last}>
@@ -244,7 +244,7 @@ export function ReservationUnitCard({
               disabled={last}
               onClick={() => onMoveDown(reservationUnit)}
             >
-              <IconArrowDown aria-hidden size="m" />
+              <IconArrowDown aria-hidden="true" size={IconSize.Small} />
             </button>
           </Circle>
         </ArrowContainer>

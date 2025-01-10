@@ -20,7 +20,12 @@ import {
   reservationsPath,
   reservationsPrefix,
 } from "@/modules/urls";
-import { Button, IconCalendar, IconLinkExternal } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  IconCalendar,
+  IconLinkExternal,
+} from "hds-react";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";
 import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
@@ -144,8 +149,8 @@ function Actions({
           onClick={() =>
             window.open(`${order.receiptUrl}&lang=${i18n.language}`, "_blank")
           }
-          variant="secondary"
-          iconRight={<IconLinkExternal aria-hidden />}
+          variant={ButtonVariant.Secondary}
+          iconEnd={<IconLinkExternal aria-hidden="true" />}
         >
           {t("reservations:downloadReceipt")}
         </Button>

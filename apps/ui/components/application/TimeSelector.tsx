@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { Button, IconCross, Select } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  IconCross,
+  OptionInProps,
+  Select,
+} from "hds-react";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
 import { fontBold, fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { fromMondayFirstUnsafe } from "common/src/helpers";
+import {
+  convertOptionToHDS,
+  fromMondayFirstUnsafe,
+  toNumber,
+} from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import { arrowDown, arrowUp, MediumButton } from "@/styles/util";
 import { TimePreview } from "./TimePreview";
@@ -199,7 +209,7 @@ const OptionWrapper = styled.div`
   }
 `;
 
-const StyledSelect = styled(Select<{ label: string; value: number }>)`
+const StyledSelect = styled(Select)`
   label {
     ${fontBold};
   }
@@ -329,7 +339,6 @@ const ResetButton = styled(Button)`
     display: flex;
     gap: var(--spacing-2-xs);
     padding-left: 0;
-    white-space: nowrap;
     align-items: center;
   }
   &:hover {
@@ -386,10 +395,12 @@ export function TimeSelector({
       label: t("application:Page2.legend.selected-2"),
     },
   ];
-  const priorityOptions = [300, 200].map((n) => ({
-    label: t(`application:Page2.priorityLabels.${n}`),
-    value: n,
-  }));
+  const priorityOptions: OptionInProps[] = [300, 200]
+    .map((n) => ({
+      label: t(`application:Page2.priorityLabels.${n}`),
+      value: n,
+    }))
+    .map(convertOptionToHDS);
 
   if (!cells) {
     return null;
@@ -411,31 +422,51 @@ export function TimeSelector({
     );
   };
 
+  const resUOpts = reservationUnitOptions.map(convertOptionToHDS);
   return (
     <>
       <OptionWrapper>
         <StyledSelect
           id={`time-selector__select--priority-${index}`}
-          label={t("application:Page2.prioritySelectLabel")}
+          texts={{
+            label: t("application:Page2.prioritySelectLabel"),
+          }}
           options={priorityOptions}
-          value={priorityOptions.find((n) => n.value === priority) ?? null}
-          defaultValue={priorityOptions[0]}
-          onChange={(val: (typeof priorityOptions)[0]) =>
-            setPriority(val.value)
+          value={
+            priorityOptions.find((n) => toNumber(n.value) === priority)?.value
           }
+          defaultValue={priorityOptions[0].value}
+          onChange={(val) => {
+            const e = val.find(() => true);
+            const value = toNumber(e?.value);
+            if (value != null) {
+              setPriority(value);
+            }
+            return {
+              invalid: false,
+            };
+          }}
         />
         <StyledSelect
           id={`time-selector__select--reservation-unit-${index}`}
-          label={t("application:Page2.reservationUnitSelectLabel")}
-          options={reservationUnitOptions}
+          texts={{
+            label: t("application:Page2.reservationUnitSelectLabel"),
+          }}
+          options={resUOpts}
           value={
-            reservationUnitOptions.find((n) => n.value === reservationUnitPk) ??
-            null
+            resUOpts.find((n) => toNumber(n.value) === reservationUnitPk)?.value
           }
-          defaultValue={reservationUnitOptions[0]}
-          onChange={(val: (typeof reservationUnitOptions)[0]) =>
-            setReservationUnitPk(val.value)
-          }
+          defaultValue={reservationUnitOptions[0].value}
+          onChange={(selection) => {
+            const val = selection.find(() => true);
+            const pk = toNumber(val?.value);
+            if (pk != null) {
+              setReservationUnitPk(pk);
+            }
+            return {
+              invalid: false,
+            };
+          }}
         />
       </OptionWrapper>
       <CalendarContainer
@@ -470,9 +501,9 @@ export function TimeSelector({
         ))}
         <ResetButton
           id={`time-selector__button--reset-${index}`}
-          variant="supplementary"
+          variant={ButtonVariant.Supplementary}
           onClick={() => resetCells()}
-          iconLeft={<IconCross />}
+          iconStart={<IconCross />}
           disabled={!cells.some((day) => day.some((cell) => cell.state > 100))}
         >
           {t("application:Page2.resetTimes")}
@@ -485,7 +516,7 @@ export function TimeSelector({
         <ButtonContainer>
           <MediumButton
             id={`time-selector__button--copy-cells-${index}`}
-            variant="secondary"
+            variant={ButtonVariant.Secondary}
             onClick={() => copyCells(index)}
           >
             {t("application:Page2.copyTimes")}

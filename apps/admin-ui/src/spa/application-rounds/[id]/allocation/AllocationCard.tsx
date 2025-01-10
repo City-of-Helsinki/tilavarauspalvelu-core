@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H5, Strong, fontMedium } from "common/src/common/typography";
@@ -188,16 +188,15 @@ export function AllocatedCard({
       ) : null}
       <Flex $gap="s" $justifyContent="space-between">
         <Button
-          size="small"
-          variant="secondary"
-          theme="black"
+          size={ButtonSize.Small}
           onClick={handleRemoveAllocation}
-          isLoading={isLoading}
+          variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Secondary}
+          iconStart={isLoading ? <LoadingSpinner small /> : undefined}
           disabled={isLoading}
         >
           {t("Allocation.removeAllocation")}
         </Button>
-        <Button size="small" disabled onClick={handleChangeSlot}>
+        <Button size={ButtonSize.Small} disabled onClick={handleChangeSlot}>
           {t("Allocation.changeSlot")}
         </Button>
       </Flex>
@@ -314,10 +313,10 @@ export function SuitableTimeCard({
       ) : null}
       <Flex $gap="s" $justifyContent="space-between">
         <Button
-          variant="primary"
-          size="small"
+          size={ButtonSize.Small}
+          variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Secondary}
+          iconStart={isLoading ? <LoadingSpinner small /> : undefined}
           disabled={isDisabled || isLoading}
-          isLoading={isLoading}
           onClick={handleAcceptSlot}
         >
           {t("Allocation.acceptSlot", { duration: selectionDurationString })}

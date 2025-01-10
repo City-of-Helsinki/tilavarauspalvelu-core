@@ -2,7 +2,13 @@ import {
   type ReservationEditPageQuery,
   type ReservationUnitPageQuery,
 } from "@gql/gql-types";
-import { Button, IconArrowLeft, IconCross } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  IconArrowLeft,
+  IconCross,
+  LoadingSpinner,
+} from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
@@ -166,8 +172,8 @@ export function EditStep1({
         />
         <Actions>
           <Button
-            variant="secondary"
-            iconLeft={<IconArrowLeft aria-hidden />}
+            variant={ButtonVariant.Secondary}
+            iconStart={<IconArrowLeft aria-hidden="true" />}
             onClick={onBack}
             data-testid="reservation-edit__button--back"
           >
@@ -178,16 +184,15 @@ export function EditStep1({
             size="large"
             data-testid="reservation-edit__button--cancel"
           >
-            <IconCross aria-hidden />
+            <IconCross aria-hidden="true" />
             {t("reservations:cancelButton")}
           </ButtonLikeLink>
           <Button
-            variant="primary"
             type="submit"
+            variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
+            iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
             disabled={isSubmitting || !termsAccepted}
             data-testid="reservation__button--continue"
-            isLoading={isSubmitting}
-            loadingText={t("reservations:saveNewTimeLoading")}
           >
             {t("reservations:saveNewTime")}
           </Button>

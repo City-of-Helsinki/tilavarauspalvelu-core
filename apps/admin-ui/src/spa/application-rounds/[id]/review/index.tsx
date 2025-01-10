@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, Notification, Tabs } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  LoadingSpinner,
+  Notification,
+  Tabs,
+} from "hds-react";
 import { uniqBy } from "lodash";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -193,10 +199,12 @@ function EndAllocation({
   return (
     <StyledNotification type={hasFailed ? "error" : "info"} label={infoBody}>
       <Button
-        isLoading={isInProgress}
-        loadingText={t("ApplicationRound.info.loadingText")}
+        variant={isInProgress ? ButtonVariant.Clear : ButtonVariant.Primary}
+        iconStart={isInProgress ? <LoadingSpinner small /> : undefined}
         onClick={() => setWaitingForHandle(true)}
-        disabled={hasFailed || isResultsSent || !canEndAllocation}
+        disabled={
+          hasFailed || isResultsSent || !canEndAllocation || isInProgress
+        }
       >
         {infoButton}
       </Button>
@@ -321,9 +329,7 @@ export function Review({
                 {t("ApplicationRound.allocate")}
               </ButtonLikeLink>
             ) : (
-              <Button variant="primary" disabled>
-                {t("ApplicationRound.allocate")}
-              </Button>
+              <Button disabled>{t("ApplicationRound.allocate")}</Button>
             )}
           </>
         )}

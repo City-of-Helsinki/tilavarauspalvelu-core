@@ -25,6 +25,9 @@ import { CenterSpinner, Flex } from "common/styles/util";
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,
 })`
+  & > div > div {
+    width: 100%;
+  }
   & [class*="Accordion-module_accordionHeader__"] {
     padding-top: 0;
     margin-top: 0;
@@ -37,6 +40,7 @@ const StyledAccordion = styled(AccordionWithoutTopPadding).attrs({
 })`
   & > div > div {
     display: grid;
+    width: 100%;
   }
   {/* This is to give more space to the name-column in the previous rounds table */}
   &.previous-rounds td:first-child {

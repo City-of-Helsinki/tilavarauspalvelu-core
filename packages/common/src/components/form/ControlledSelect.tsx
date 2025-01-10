@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "hds-react";
+import { Option, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import {
   type Control,
@@ -8,6 +8,8 @@ import {
   useController,
   type UseControllerProps,
 } from "react-hook-form";
+import { convertOptionToHDS, filterNonNullable, toNumber } from "../../helpers";
+import { convertLanguageCode } from "../../common/util";
 
 interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
@@ -42,91 +44,84 @@ export function ControlledSelect<T extends FieldValues>({
   style,
   className,
   clearable,
-  tooltip,
-  helper,
+  // ignore till HDS provides an upstream fix
+  tooltip: _,
+  helper: assistive,
   multiselect,
   disabled,
   afterChange,
 }: SelectProps<T>): JSX.Element {
-  const { t } = useTranslation(["common"]);
+  const { t, i18n } = useTranslation(["common"]);
+  const language = convertLanguageCode(i18n.language);
+
   const {
     field: { value, onChange },
   } = useController({ name, control, rules: { required, validate } });
 
-  const currentValue = multiselect
-    ? options.filter((x) => value.includes(x.value))
-    : (options.find((x) => x.value === value) ?? null);
-
-  type OptionT = (typeof options)[0];
-  const handleChange = (selection?: OptionT | OptionT[]) => {
-    if (!clearable && selection == null) {
+  const handleChange = (selection: Option[]) => {
+    if (!clearable && selection.length === 0) {
       return;
     }
     if (multiselect && Array.isArray(selection)) {
-      const v = selection.map((x) => x.value);
+      const v = filterNonNullable(
+        selection
+          .map((x) => x.value)
+          .map((x) => {
+            if (typeof options[0].value === "number") {
+              return toNumber(x);
+            }
+            return x;
+          })
+      );
       onChange(v);
       afterChange?.(v);
     } else if (Array.isArray(selection)) {
-      onChange(selection[0]?.value);
-      afterChange?.(selection[0]?.value);
+      const val = selection.find(() => true)?.value;
+      const v = typeof options[0].value === "number" ? toNumber(val) : val;
+      onChange(v);
+      afterChange?.(v ?? undefined);
     } else {
-      onChange(selection?.value);
-      afterChange?.(selection?.value);
+      throw new Error("Invalid selection");
     }
   };
 
-  // Type check mess because we can switch between multislect and single select
-  // might be better to split them into separate components
-  if (multiselect) {
-    if (!Array.isArray(currentValue)) {
-      throw new Error("Multiselect requires an array value");
+  function toHDSValue(
+    opts: Array<{ label: string; value: string | number }>,
+    val: string | number | Array<string | number> | undefined
+  ): Partial<Option>[] {
+    if (val == null) {
+      return [];
     }
-    return (
-      <Select<OptionT>
-        id={name}
-        style={style}
-        className={className}
-        clearable={clearable}
-        value={currentValue ?? []}
-        options={options}
-        label={label}
-        required={required}
-        onChange={handleChange}
-        clearButtonAriaLabel={t("common:clear")}
-        selectedItemRemoveButtonAriaLabel={t("common:remove")}
-        placeholder={placeholder ?? t("common:select")}
-        invalid={Boolean(error)}
-        error={error}
-        tooltipText={tooltip}
-        helper={helper}
-        multiselect
-        disabled={disabled ?? options.length === 0}
-      />
-    );
-  }
-
-  if (Array.isArray(currentValue)) {
-    throw new Error("Single select requires a single value");
+    if (Array.isArray(val)) {
+      const keyVals = filterNonNullable(
+        val.map((v) => opts.find((o) => o.value === v))
+      );
+      return keyVals.map(convertOptionToHDS);
+    }
+    return opts.filter((o) => o.value === val).map(convertOptionToHDS);
   }
 
   return (
-    <Select<OptionT>
-      id={name}
+    <Select
       style={style}
       className={className}
-      clearable={clearable}
-      value={currentValue}
-      options={options}
-      label={label}
+      clearable={clearable ?? false}
       required={required}
+      multiSelect={multiselect}
+      noTags
+      texts={{
+        label,
+        placeholder: placeholder ?? t("common:select"),
+        error,
+        assistive,
+        language,
+        // FIXME tooltip is missing is an upstream issue
+        // tooltipText: tooltip,
+      }}
+      value={toHDSValue(options, value)}
+      options={options.map(convertOptionToHDS)}
       onChange={handleChange}
-      clearButtonAriaLabel={t("common:clear")}
-      selectedItemRemoveButtonAriaLabel={t("common:remove")}
-      placeholder={placeholder ?? t("common:select")}
       invalid={Boolean(error)}
-      error={error}
-      tooltipText={tooltip}
-      helper={helper}
       disabled={disabled ?? options.length === 0}
     />
   );

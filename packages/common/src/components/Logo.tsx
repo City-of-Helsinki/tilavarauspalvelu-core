@@ -1,6 +1,12 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { Logo as HDSLogo, logoFi, LogoProps, logoSv } from "hds-react";
+import {
+  Logo as HDSLogo,
+  logoFi,
+  LogoProps,
+  LogoSize,
+  logoSv,
+} from "hds-react";
 
 function logoSrcFromLanguage(language: string) {
   if (language === "sv") {
@@ -10,7 +16,7 @@ function logoSrcFromLanguage(language: string) {
 }
 
 export default function Logo({
-  size = "medium",
+  size = LogoSize.Medium,
   style,
 }: Pick<LogoProps, "size"> & { style?: React.CSSProperties }): JSX.Element {
   const { t, i18n } = useTranslation();

@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import type { GetServerSidePropsContext } from "next";
-import { Notification } from "hds-react";
+import { Notification, NotificationSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1 } from "common/src/common/typography";
 import {
@@ -125,7 +125,7 @@ function SeasonalSearch({
         <p>{t("search:recurring.text")}</p>
       </div>
       {error ? (
-        <Notification size="small" type="alert">
+        <Notification size={NotificationSize.Small} type="alert">
           {t("searchResultList:error")}
         </Notification>
       ) : null}

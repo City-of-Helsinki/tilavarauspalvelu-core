@@ -3,12 +3,15 @@ import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import {
   Button,
+  ButtonSize,
+  ButtonVariant,
   IconArrowRight,
   IconCheck,
   IconCogwheel,
   IconCross,
   IconPen,
   IconQuestionCircle,
+  LoadingSpinner,
 } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import {
@@ -27,12 +30,7 @@ import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
 import { getApplicationPath } from "@/modules/urls";
 
-const StyledButton = styled(Button).attrs({
-  variant: "secondary",
-  size: "small",
-})`
-  white-space: nowrap;
-
+const StyledButton = styled(Button)`
   @media (max-width: ${breakpoints.s}) {
     width: 100%;
   }
@@ -157,11 +155,13 @@ export function ApplicationCard({
 
   const buttons = [
     <StyledButton
-      aria-label={t("applicationCard:cancel")}
       onClick={() => setIsWaitingForDelete(true)}
-      isLoading={isLoading}
-      disabled={!editable}
-      iconRight={<IconCross aria-hidden="true" />}
+      size={ButtonSize.Small}
+      variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Secondary}
+      iconEnd={
+        isLoading ? <LoadingSpinner small /> : <IconCross aria-hidden="true" />
+      }
+      disabled={!editable || isLoading}
       key="cancel"
     >
       {t("applicationCard:cancel")}

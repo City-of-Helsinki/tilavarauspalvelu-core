@@ -16,7 +16,12 @@ import {
   useAllApplicationEventsQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  convertOptionToHDS,
+  filterNonNullable,
+  toNumber,
+} from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import { useOptions } from "@/hooks";
 import { autoGridCss, CenterSpinner, TabWrapper } from "common/styles/util";
@@ -27,7 +32,7 @@ import {
 } from "@/common/const";
 import { truncate } from "@/helpers";
 import { AllocationPageContent } from "./ApplicationEvents";
-import { ComboboxFilter, SearchFilter } from "@/component/QueryParamFilters";
+import { MultiSelectFilter, SearchFilter } from "@/component/QueryParamFilters";
 import { convertPriorityFilter } from "./modules/applicationRoundAllocation";
 import { LinkPrev } from "@/component/LinkPrev";
 import { useSession } from "@/hooks/auth";
@@ -153,24 +158,33 @@ function Filters({
     <>
       {/* NOTE can't easily be refactored into reusable component because it has a side effect onChange */}
       <Select
-        label={t("filters.label.unit")}
-        options={unitOptions}
+        texts={{
+          label: t("filters.label.unit"),
+          placeholder: t("common.selectPlaceholder"),
+          clearButtonAriaLabel_multiple: t("common.clearAllSelections"),
+          clearButtonAriaLabel_one: t("common.removeValue"),
+        }}
+        clearable={false}
+        options={unitOptions.map(convertOptionToHDS)}
         disabled={unitOptions.length === 0}
-        value={unitOptions.find((v) => v.value === Number(unitFilter)) ?? null}
-        onChange={(val: { label: string; value: number }) =>
-          setUnitFilter(val.value ?? null)
-        }
-        placeholder={t("common.selectPlaceholder")}
-        clearButtonAriaLabel={t("common.clearAllSelections")}
-        selectedItemRemoveButtonAriaLabel={t("common.removeValue")}
+        value={unitOptions
+          .find((v) => v.value === toNumber(unitFilter))
+          ?.value?.toString()}
+        onChange={(selection) => {
+          const val = selection.find(() => true)?.value;
+          const v = toNumber(val);
+          if (v != null) {
+            setUnitFilter(v);
+          }
+        }}
       />
-      <ComboboxFilter name="priority" options={priorityOptions} />
-      <ComboboxFilter name="order" options={orderOptions} />
+      <MultiSelectFilter name="priority" options={priorityOptions} />
+      <MultiSelectFilter name="order" options={orderOptions} />
       <SearchFilter name="search" />
-      <ComboboxFilter name="homeCity" options={cityOptions} />
-      <ComboboxFilter name="applicantType" options={customerFilterOptions} />
-      <ComboboxFilter name="ageGroup" options={ageGroupOptions} />
-      <ComboboxFilter name="purpose" options={purposeOptions} />
+      <MultiSelectFilter name="homeCity" options={cityOptions} />
+      <MultiSelectFilter name="applicantType" options={customerFilterOptions} />
+      <MultiSelectFilter name="ageGroup" options={ageGroupOptions} />
+      <MultiSelectFilter name="purpose" options={purposeOptions} />
     </>
   );
 }

@@ -1,5 +1,11 @@
 import React from "react";
-import { Button, Checkbox, IconMinus, IconPlus } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  Checkbox,
+  IconMinus,
+  IconPlus,
+} from "hds-react";
 import styled, { css } from "styled-components";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { TimeInput } from "common/src/components/form/TimeInput";
@@ -329,7 +335,7 @@ export function SeasonalSection({
           <SeasonRow key={day.weekday} form={form} index={index} />
         ))}
         <div>
-          <Button variant="secondary" theme="black" onClick={handleClear}>
+          <Button variant={ButtonVariant.Secondary} onClick={handleClear}>
             {t("ReservationUnitEditor.clearSeasonalTimes")}
           </Button>
         </div>

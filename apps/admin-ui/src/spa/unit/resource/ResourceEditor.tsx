@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button } from "hds-react";
+import { Button, ButtonVariant } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -131,8 +131,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
           <ButtonContainer>
             <Button
               onClick={() => history(-1)}
-              variant="secondary"
-              theme="black"
+              variant={ButtonVariant.Secondary}
             >
               {t("ResourceModal.cancel")}
             </Button>

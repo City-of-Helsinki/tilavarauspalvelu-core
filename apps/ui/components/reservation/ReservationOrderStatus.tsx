@@ -36,7 +36,7 @@ export function ReservationOrderStatus({
   const statusText = t(`reservations:orderStatus.${camelCase(orderStatus)}`);
 
   return (
-    <StatusLabel type={labelType} icon={<IconEuroSign />} testId={testId}>
+    <StatusLabel type={labelType} icon={<IconEuroSign />} data-testid={testId}>
       {statusText}
     </StatusLabel>
   );

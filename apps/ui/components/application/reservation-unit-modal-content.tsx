@@ -7,12 +7,14 @@ import {
   Select,
   IconLinkExternal,
   Button,
+  ButtonVariant,
+  ButtonSize,
+  LoadingSpinner,
 } from "hds-react";
 import React, { ChangeEvent, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import type { OptionType } from "common/types/common";
 import { fontBold, H2, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import {
@@ -21,13 +23,18 @@ import {
   type ReservationUnitCardFieldsFragment,
   type ApplicationQuery,
 } from "@gql/gql-types";
-import { filterNonNullable, getImageSource } from "common/src/helpers";
+import {
+  filterNonNullable,
+  getImageSource,
+  toNumber,
+} from "common/src/helpers";
 import { AutoGrid, Flex } from "common/styles/util";
 import { getAddressAlt, getMainImage, getTranslation } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { IconWithText } from "../common/IconWithText";
 import { getReservationUnitPath } from "@/modules/urls";
+import { convertLanguageCode } from "common/src/common/util";
 
 const Container = styled.div`
   width: 100%;
@@ -150,10 +157,10 @@ function ReservationUnitCard({
         )}
       </IconContainer>
       <Button
-        iconRight={<IconArrowRight />}
+        iconEnd={<IconArrowRight aria-hidden="true" />}
         onClick={handle}
-        size="small"
-        variant={isSelected ? "danger" : "secondary"}
+        size={ButtonSize.Small}
+        variant={isSelected ? ButtonVariant.Danger : ButtonVariant.Secondary}
       >
         {buttonText}
       </Button>
@@ -164,6 +171,10 @@ function ReservationUnitCard({
 type Node = NonNullable<ApplicationQuery["application"]>;
 type AppRoundNode = NonNullable<Node["applicationRound"]>;
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
+type OptionType = {
+  label: string;
+  value: number;
+};
 type OptionsType = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
@@ -190,12 +201,10 @@ export function ReservationUnitModalContent({
 }): JSX.Element {
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
   const [reservationUnitType, setReservationUnitType] = useState<
-    OptionType | undefined
+    number | undefined
   >(undefined);
-  const [unit, setUnit] = useState<OptionType | undefined>(undefined);
-  const [maxPersons, setMaxPersons] = useState<OptionType | undefined>(
-    undefined
-  );
+  const [unit, setUnit] = useState<number | undefined>(undefined);
+  const [maxPersons, setMaxPersons] = useState<number | undefined>(undefined);
 
   const reservationUnitTypeOptions = [emptyOption].concat(
     options.reservationUnitTypeOptions
@@ -207,19 +216,18 @@ export function ReservationUnitModalContent({
 
   const unitOptions = [emptyOption].concat(options.unitOptions);
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const language = convertLanguageCode(i18n.language);
 
   const { data, refetch, loading } = useSearchReservationUnitsQuery({
     skip: !applicationRound.pk,
     variables: {
       applicationRound: [applicationRound.pk ?? 0],
       textSearch: searchTerm,
-      maxPersons: maxPersons?.value?.toString(),
+      maxPersons: maxPersons?.toString(),
       reservationUnitType:
-        reservationUnitType?.value != null
-          ? [Number(reservationUnitType?.value)]
-          : [],
-      unit: unit?.value != null ? [Number(unit?.value)] : [],
+        reservationUnitType != null ? [reservationUnitType] : [],
+      unit: unit != null ? [unit] : [],
       orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
       isDraft: false,
       isVisible: true,
@@ -245,38 +253,51 @@ export function ReservationUnitModalContent({
           }}
         />
         <Select
-          id="reservationUnitSearch.reservationUnitType"
-          placeholder={t("common:select")}
           options={reservationUnitTypeOptions}
-          label={t("reservationUnitModal:searchReservationUnitTypeLabel")}
-          onChange={(selection: OptionType): void => {
-            setReservationUnitType(selection);
+          texts={{
+            label: t("reservationUnitModal:searchReservationUnitTypeLabel"),
+            placeholder: t("common:select"),
+            language,
           }}
-          defaultValue={emptyOption}
+          clearable
+          onChange={(selection): void => {
+            const val = selection.find((x) => x.selected)?.value;
+            setReservationUnitType(toNumber(val) ?? undefined);
+          }}
         />
         <Select
-          id="participantCountFilter"
-          placeholder={t("common:select")}
+          clearable
+          texts={{
+            label: t("searchForm:participantCountLabel"),
+            placeholder: t("common:select"),
+            language,
+          }}
           options={participantCountOptions}
-          label={t("searchForm:participantCountLabel")}
-          onChange={(selection: OptionType): void => {
-            setMaxPersons(selection);
+          onChange={(selection): void => {
+            const val = selection.find((x) => x.selected)?.value;
+            setMaxPersons(toNumber(val) ?? undefined);
           }}
-          defaultValue={emptyOption}
         />
         <Select
-          id="reservationUnitSearch.unit"
-          placeholder={t("common:select")}
-          options={unitOptions}
-          label={t("reservationUnitModal:searchUnitLabel")}
-          onChange={(selection: OptionType): void => {
-            setUnit(selection);
+          clearable
+          texts={{
+            placeholder: t("common:select"),
+            label: t("reservationUnitModal:searchUnitLabel"),
           }}
-          defaultValue={emptyOption}
+          options={unitOptions}
+          onChange={(selection): void => {
+            const val = selection.find((x) => x.selected)?.value;
+            setUnit(toNumber(val) ?? undefined);
+          }}
         />
       </AutoGrid>
       <Flex $alignItems="flex-end">
-        <Button isLoading={loading} onClick={(_) => refetch()}>
+        <Button
+          variant={loading ? ButtonVariant.Clear : ButtonVariant.Primary}
+          iconStart={loading ? <LoadingSpinner small /> : undefined}
+          disabled={loading}
+          onClick={(_) => refetch()}
+        >
           {t("common:search")}
         </Button>
       </Flex>

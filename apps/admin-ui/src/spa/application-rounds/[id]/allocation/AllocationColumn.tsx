@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { IconCross, Select } from "hds-react";
+import { IconCross, Option, Select } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { type TFunction } from "i18next";
 import { fontMedium } from "common/src/common/typography";
@@ -26,6 +26,7 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
+import { convertOptionToHDS } from "common/src/helpers";
 
 type Props = {
   applicationSections: SectionNodeT[] | null;
@@ -146,66 +147,94 @@ function TimeSelection(): JSX.Element {
     setSelection(timeSlots);
   };
 
+  const onStartTimeChange = (sel: Option[]): void => {
+    const val = sel.find(() => true);
+    if (!val) {
+      return;
+    }
+    const [startHours, startMinutes] = val.label.split(":").map(Number);
+    const startTime = new Date().setHours(startHours, startMinutes);
+    const endOption = timeSlotEndOptions.find(
+      (n) => n.value === selection?.[selection.length - 1]
+    );
+    if (!endOption) {
+      return;
+    }
+    // TODO this is unsafe
+    const [endHours, endMinutes] = endOption.label.split(":").map(Number);
+    const endTime = new Date().setHours(endHours, endMinutes);
+
+    const startIndex = timeSlotStartOptions.indexOf(val);
+    const endValue =
+      startTime >= endTime
+        ? timeSlotEndOptions[startIndex + 1].value
+        : timeSlotEndOptions.find(
+            (n) => n.value === selection?.[selection.length - 1]
+          )?.value;
+    if (endValue != null && val.value != null) {
+      setSelectedTime(val.value, endValue);
+    }
+  };
+
+  const onEndTimeChange = (sel: Option[]): void => {
+    const val = sel.find(() => true);
+    if (!val) {
+      return;
+    }
+    setSelectedTime(undefined, val.value);
+  };
+
+  const isOptionDisabled = (option: Partial<Option>) => {
+    const firstOption = timeSlotStartOptions.find(
+      (n) => n.value === selection?.[0]
+    );
+    if (!firstOption) {
+      return false;
+    }
+    if (!option.label) {
+      return false;
+    }
+    const [startHours, startMinutes] = firstOption.label.split(":").map(Number);
+    const startTime = new Date().setHours(startHours, startMinutes);
+    const [endHours, endMinutes] = option.label.split(":").map(Number);
+    const endTime = new Date().setHours(endHours, endMinutes);
+
+    return endTime <= startTime && endHours !== 0;
+  };
+
+  const startTimeOptions = timeSlotStartOptions.map(convertOptionToHDS);
+  const endTimeOptions = timeSlotEndOptions
+    .map(convertOptionToHDS)
+    .map((n) => ({
+      ...n,
+      disabled: isOptionDisabled(n),
+    }));
+
   return (
     <TimeSelectWrapper>
       <Select
-        label={t("Allocation.startingTime")}
-        options={timeSlotStartOptions}
-        value={
-          timeSlotStartOptions.find((n) => n.value === selection?.[0]) ?? null
-        }
-        onChange={(val: (typeof timeSlotStartOptions)[0]) => {
-          const [startHours, startMinutes] = val.label.split(":").map(Number);
-          const startTime = new Date().setHours(startHours, startMinutes);
-          const endOption = timeSlotEndOptions.find(
-            (n) => n.value === selection?.[selection.length - 1]
-          );
-          if (!endOption) {
-            return;
-          }
-          // TODO this is unsafe
-          const [endHours, endMinutes] = endOption.label.split(":").map(Number);
-          const endTime = new Date().setHours(endHours, endMinutes);
-
-          const startIndex = timeSlotStartOptions.indexOf(val);
-          const endValue =
-            startTime >= endTime
-              ? timeSlotEndOptions[startIndex + 1].value
-              : timeSlotEndOptions.find(
-                  (n) => n.value === selection?.[selection.length - 1]
-                )?.value;
-          if (endValue != null && val.value != null) {
-            setSelectedTime(val.value, endValue);
-          }
+        texts={{
+          label: t("Allocation.startingTime"),
         }}
+        clearable={false}
+        options={startTimeOptions}
+        value={
+          timeSlotStartOptions.find((n) => n.value === selection?.[0])?.value
+        }
+        onChange={onStartTimeChange}
       />
       <Select
-        label={t("Allocation.endingTime")}
-        options={timeSlotEndOptions}
+        texts={{
+          label: t("Allocation.endingTime"),
+        }}
+        clearable={false}
+        options={endTimeOptions}
         value={
           timeSlotEndOptions.find(
             (n) => n.value === selection?.[selection.length - 1]
-          ) ?? null
+          )?.value
         }
-        onChange={(val: (typeof timeSlotEndOptions)[0]) =>
-          setSelectedTime(undefined, val.value)
-        }
-        isOptionDisabled={(option) => {
-          const firstOption = timeSlotStartOptions.find(
-            (n) => n.value === selection?.[0]
-          );
-          if (!firstOption) {
-            return false;
-          }
-          const [startHours, startMinutes] = firstOption.label
-            .split(":")
-            .map(Number);
-          const startTime = new Date().setHours(startHours, startMinutes);
-          const [endHours, endMinutes] = option.label.split(":").map(Number);
-          const endTime = new Date().setHours(endHours, endMinutes);
-
-          return endTime <= startTime && endHours !== 0;
-        }}
+        onChange={onEndTimeChange}
       />
     </TimeSelectWrapper>
   );

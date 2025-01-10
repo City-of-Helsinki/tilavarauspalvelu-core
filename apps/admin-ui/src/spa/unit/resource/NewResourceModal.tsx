@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Dialog, IconCheck } from "hds-react";
+import { Button, ButtonVariant, Dialog, IconCheck } from "hds-react";
 import styled from "styled-components";
 import { type ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "react-i18next";
@@ -111,8 +111,7 @@ export function NewResourceModal({
       <DialogActionsButtons>
         <Button
           onClick={closeModal}
-          variant="secondary"
-          theme="black"
+          variant={ButtonVariant.Secondary}
           disabled={isMutationLoading}
         >
           {t("ResourceModal.cancel")}

@@ -8,7 +8,13 @@ import {
 } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { Button, TextInput, Notification } from "hds-react";
+import {
+  Button,
+  TextInput,
+  Notification,
+  ButtonVariant,
+  LoadingSpinner,
+} from "hds-react";
 import styled from "styled-components";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { fromUIDate } from "common/src/common/util";
@@ -376,7 +382,7 @@ function RecurringReservationForm({
           {reservationUnit != null && (
             <ReservationTypeForm reservationUnit={reservationUnit}>
               <InnerTextInput
-                id="name"
+                id="seriesName"
                 disabled={reservationUnit == null}
                 label={t(`${TRANS_PREFIX}.name`)}
                 required
@@ -402,11 +408,13 @@ function RecurringReservationForm({
               {t("common.cancel")}
             </ButtonLikeLink>
             <Button
-              variant="primary"
               type="submit"
               data-testid="recurring-reservation-form__submit-button"
-              isLoading={isSubmitting}
-              disabled={isDisabled}
+              variant={
+                isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary
+              }
+              iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
+              disabled={isDisabled || isSubmitting}
             >
               {t("common.reserve")}
             </Button>

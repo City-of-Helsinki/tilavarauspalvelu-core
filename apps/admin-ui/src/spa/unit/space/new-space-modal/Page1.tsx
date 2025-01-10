@@ -1,5 +1,11 @@
 import React from "react";
-import { Button, Dialog, IconArrowRight, IconCheck } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  Dialog,
+  IconArrowRight,
+  IconCheck,
+} from "hds-react";
 import { useTranslation } from "react-i18next";
 import { type UnitQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
@@ -37,10 +43,11 @@ export function Page1({
   const parentName = unit?.spaces.find(
     (space) => space.pk === parentPk
   )?.nameFi;
+
   return (
     <>
       <CustomDialogHeader
-        extras={<StyledTag>{t("SpaceModal.phase")} 1/2</StyledTag>}
+        extras={<StyledTag>{`${t("SpaceModal.phase")} 1/2`}</StyledTag>}
         title={t(
           hasFixedParent
             ? "SpaceModal.page1.subSpaceModalTitle"
@@ -79,12 +86,12 @@ export function Page1({
         ) : null}
       </Dialog.Content>
       <DialogActionsButtons>
-        <Button onClick={closeModal} variant="secondary" theme="black">
+        <Button onClick={closeModal} variant={ButtonVariant.Secondary}>
           {t("SpaceModal.page1.buttonCancel")}
         </Button>
         <Button
-          iconRight={<IconArrowRight />}
-          variant="supplementary"
+          variant={ButtonVariant.Supplementary}
+          iconEnd={<IconArrowRight />}
           onClick={onNextPage}
         >
           {t("SpaceModal.page1.buttonNext")}

@@ -38,8 +38,10 @@ i18n.addResourceBundle("fi", "common", {
   select: "Valitse",
   clear: "Tyhjennä",
   close: "Sulje",
+  show: "Näytä",
   cancel: "Peruuta",
   remove: "Poista",
+  scrollToTop: "Siirry ylös",
 });
 i18n.addResourceBundle("en", "common", {
   day: "Day",

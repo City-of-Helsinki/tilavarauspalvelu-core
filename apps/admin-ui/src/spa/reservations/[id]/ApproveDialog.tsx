@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
   Button,
+  ButtonVariant,
   Checkbox,
   Dialog,
   Notification,
@@ -170,7 +171,7 @@ const DialogContent = ({
       </Dialog.Content>
       <ActionButtons>
         <Button
-          variant="secondary"
+          variant={ButtonVariant.Secondary}
           onClick={onClose}
           data-testid="approval-dialog__cancel-button"
         >

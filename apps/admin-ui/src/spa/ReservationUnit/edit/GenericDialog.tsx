@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Button, Dialog } from "hds-react";
+import { Button, ButtonVariant, Dialog } from "hds-react";
 import { useModal } from "@/context/ModalContext";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
@@ -29,16 +29,10 @@ function DialogContent({
         </p>
       </Dialog.Content>
       <ActionButtons>
-        <Button variant="secondary" onClick={onClose}>
+        <Button variant={ButtonVariant.Secondary} onClick={onClose}>
           {t("common.cancel")}
         </Button>
-        <Button
-          onClick={() => {
-            onAccept();
-          }}
-        >
-          {acceptLabel}
-        </Button>
+        <Button onClick={onAccept}>{acceptLabel}</Button>
       </ActionButtons>
     </>
   );

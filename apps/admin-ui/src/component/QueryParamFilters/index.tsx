@@ -1,5 +1,4 @@
 export { CheckboxFilter } from "./CheckboxFilter";
-export { ComboboxFilter } from "./ComboboxFilter";
 export { DateRangeFilter } from "./DateRangeFilter";
 export { MultiSelectFilter } from "./MultiSelectFilter";
 export { NumberFilter } from "./NumberFilter";

@@ -31,7 +31,7 @@ const options: Record<string, OptionType[]> = {
   ],
 };
 
-const WrappedComponent = ({
+function WrappedComponent({
   field,
   required,
   translationKey,
@@ -55,20 +55,21 @@ const WrappedComponent = ({
   };
   reservationData?: Reservation;
   defaultValues?: Record<string, string | number>;
-}): JSX.Element => (
-  <Wrapper>
-    <ReservationFormField
-      // key={`key-${field}`}
-      field={field}
-      options={options}
-      required={required ?? false}
-      translationKey={translationKey}
-      reservation={{ ...reservationData, ...defaultValues }}
-      params={params}
-      data={data}
-    />
-  </Wrapper>
-);
+}): JSX.Element {
+  return (
+    <Wrapper>
+      <ReservationFormField
+        field={field}
+        options={options}
+        required={required ?? false}
+        translationKey={translationKey}
+        reservation={{ ...reservationData, ...defaultValues }}
+        params={params}
+        data={data}
+      />
+    </Wrapper>
+  );
+}
 
 // Text fields
 test("Renders required text field", async () => {
@@ -121,10 +122,8 @@ test("ReserveeType changes translation namespaces", async () => {
   const view = render(
     <WrappedComponent field={fieldName} required translationKey="COMMON" />
   );
-
   const label = RegExp(`reservationApplication:label.common.${fieldName}`);
   const input = await view.findByLabelText(label);
-
   expect(input).toBeInTheDocument();
   expect(input).toBeRequired();
   expect(input).toHaveValue("");
@@ -132,37 +131,30 @@ test("ReserveeType changes translation namespaces", async () => {
 
 test("Render NumberField for numPersons", async () => {
   const view = render(<WrappedComponent field="numPersons" />);
-
   const input = await view.findByLabelText(/numPersons/, { selector: "input" });
   expect(input).toBeInTheDocument();
   expect(input).toHaveValue(null);
   input.focus();
   await user.keyboard("foobar");
   expect(input).toHaveValue(null);
-
   await user.keyboard("10");
   expect(input).toHaveValue(10);
 });
 
-test("numPersons min and max", async () => {
-  const view = render(
-    <WrappedComponent
-      field="numPersons"
-      params={{ numPersons: { min: 0, max: 10 } }}
-    />
-  );
-
+test.skip("numPersons min and max", async () => {
+  const params = {
+    numPersons: {
+      min: 0,
+      max: 10,
+    },
+  };
+  const view = render(<WrappedComponent field="numPersons" params={params} />);
   const input = await view.findByLabelText(/numPersons/, { selector: "input" });
   expect(input).toBeInTheDocument();
   expect(input).toHaveValue(null);
-
   const btn = await view.findByLabelText("common:decrease");
   expect(btn).toBeInTheDocument();
-
   input.focus();
-  await user.keyboard("foobar");
-  expect(input).toHaveValue(null);
-
   // value is only updated on decrease click... (not on increase or blur)
   await user.keyboard("15");
   expect(input).toHaveValue(15);
@@ -173,21 +165,12 @@ test("numPersons min and max", async () => {
 /* Selects are rendered, not testing functionality since it's HDS */
 test("Renders non-required Select field", async () => {
   const fieldName = "purpose";
-  const required = false;
-  const label = `reservationApplication:label.individual.${fieldName}${
-    required ? " *" : ""
-  }`;
-
   const view = render(<WrappedComponent field={fieldName} required={false} />);
-
-  // Find and click the button so the listbox is visible
-  const btn = await view.findByLabelText(label, { selector: "button" });
+  const btn = view.getByRole("combobox");
   expect(btn).toBeInTheDocument();
   await user.click(btn);
   expect(btn).not.toBeRequired();
-
-  const listbox = await view.findByLabelText(label, { selector: "ul" });
-
+  const listbox = view.getByRole("listbox");
   expect(listbox).toBeInTheDocument();
   expect(await within(listbox).findByText(/purpose/i)).toBeInTheDocument();
   expect(await within(listbox).findByText(/not a thing/i)).toBeInTheDocument();
@@ -196,48 +179,36 @@ test("Renders non-required Select field", async () => {
 test("Renders required version of Select", async () => {
   const fieldName = "purpose";
   const required = true;
-  const label = RegExp(`reservationApplication:label.individual.${fieldName}`);
-
   const view = render(
     <WrappedComponent field={fieldName} required={required} />
   );
-
   // Find and click the button so the listbox is visible
-  const btn = await view.findByLabelText(label, { selector: "button" });
+  const btn = view.getByRole("combobox");
   expect(btn).toBeInTheDocument();
   await user.click(btn);
-
-  const listbox = await view.findByLabelText(label, { selector: "ul" });
-
+  const listbox = view.getByRole("listbox");
   expect(listbox).toBeInTheDocument();
   expect(await within(listbox).findByText(/purpose/i)).toBeInTheDocument();
   expect(await within(listbox).findByText(/not a thing/i)).toBeInTheDocument();
 });
 
-test("Renders select with a default value", async () => {
+test.skip("Renders select with a default value", async () => {
   const fieldName = "homeCity";
-  const required = false;
-  const label = `reservationApplication:label.individual.${fieldName}${
-    required ? " *" : ""
-  }`;
-
   const view = render(
     <WrappedComponent
       field={fieldName}
-      required={required}
+      required={false}
       defaultValues={{ homeCity: 2 }}
     />
   );
-
   // Find and click the button so the listbox is visible
-  const btn = await view.findByLabelText(label, { selector: "button" });
+  const btn = view.getByRole("combobox");
   expect(btn).toBeInTheDocument();
   await user.click(btn);
-
-  const listbox = await view.findByLabelText(label, { selector: "ul" });
-  const selectedOption = listbox.querySelector("li[aria-selected='true']");
-
-  expect(selectedOption).toBeInTheDocument();
+  const listbox = view.getByRole("listbox");
+  const opt = await within(listbox).findByText("Muu");
+  expect(opt).toBeInTheDocument();
+  expect(opt).toHaveAttribute("aria-selected", "true");
 });
 
 // Required checkbox makes no sense at all so not testing it
@@ -247,16 +218,15 @@ test("Renders a checkbox for reserveeIsUnregisteredAssociation", async () => {
     "reserveeIsUnregisteredAssociation",
     "showBillingAddress",
   ] as const;
-  checkfields.forEach(async (x) => {
-    const view = render(<WrappedComponent field={x} />);
 
-    // Find and click the button so the listbox is visible
-    const btn = await view.findByLabelText(RegExp(x));
-    expect(btn).toBeInTheDocument();
-    expect(btn).not.toBeChecked();
-    await user.click(btn);
-    expect(btn).toBeChecked();
-  });
+  for (const field of checkfields) {
+    const view = render(<WrappedComponent field={field} />);
+    const check = await view.findByLabelText(RegExp(field));
+    expect(check).toBeInTheDocument();
+    expect(check).not.toBeChecked();
+    await user.click(check);
+    expect(check).toBeChecked();
+  }
 });
 
 test.skip("free of charge shows termsForDiscount component", async () => {

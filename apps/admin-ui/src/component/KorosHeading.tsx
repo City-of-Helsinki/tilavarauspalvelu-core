@@ -1,5 +1,5 @@
 import React, { type CSSProperties, type ReactNode } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { Koros } from "hds-react";
 import { H1 } from "common/src/common/typography";
 import { Flex } from "common/styles/util";
@@ -11,10 +11,18 @@ interface IProps {
   style?: CSSProperties;
 }
 
+const overdrawCss = css`
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+`;
+
 const Wrapper = styled.div<{ $image?: string }>`
   --fill-color: var(--color-bus-dark);
   --background-color: var(--color-white);
 
+  ${overdrawCss}
   display: flex;
   flex-direction: column;
 

@@ -1,3 +1,4 @@
+import { convertOptionToHDS } from "common/src/helpers";
 import { Select } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
@@ -7,14 +8,14 @@ import { useSearchParams } from "react-router-dom";
 // Discriminated Union can't be broken, but are unwieldy to use in this case
 // We want any type compatible with string | number be accepted
 // but never accept a combination of any of those types ex. [{label: "foo", value: 1}, {label: "bar", value: "baz"}]
-export function MultiSelectFilter<T extends string | number>({
+export function MultiSelectFilter({
   name,
   options,
   style,
   className,
 }: {
   name: string;
-  options: { label: string; value: T }[];
+  options: { label: string; value: string | number }[];
   style?: React.CSSProperties;
   className?: string;
 }): JSX.Element {
@@ -24,7 +25,7 @@ export function MultiSelectFilter<T extends string | number>({
   const filter = params.getAll(name);
 
   // TODO copy paste from allocation/index.tsx
-  const setFilter = (value: string[] | null) => {
+  const setFilter = (value: string[]) => {
     const vals = new URLSearchParams(params);
     if (value == null || value.length === 0) {
       vals.delete(name);
@@ -45,16 +46,22 @@ export function MultiSelectFilter<T extends string | number>({
     <Select
       style={style}
       className={className}
-      label={label}
-      multiselect
-      placeholder={placeholder}
-      // @ts-expect-error -- multiselect problems
-      options={options}
+      clearable
+      multiSelect
+      texts={{
+        label,
+        placeholder,
+      }}
+      noTags
+      options={options.map(convertOptionToHDS)}
       disabled={options.length === 0}
-      value={options.filter((v) => filter.includes(v.value.toString())) ?? null}
-      onChange={(val?: typeof options) =>
-        setFilter(val?.map((x) => x.value.toString()) ?? null)
-      }
+      value={options
+        .filter((v) => filter.includes(v.value.toString()))
+        .map(convertOptionToHDS)}
+      onChange={(selected) => {
+        const vals = selected.map((x) => x.value);
+        setFilter(vals);
+      }}
     />
   );
 }

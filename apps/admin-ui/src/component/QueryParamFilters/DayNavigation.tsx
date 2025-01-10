@@ -2,7 +2,14 @@ import React from "react";
 import styled from "styled-components";
 import { addDays, subDays } from "date-fns";
 import { useTranslation } from "next-i18next";
-import { Button, IconAngleLeft, IconAngleRight, DateInput } from "hds-react";
+import {
+  Button,
+  IconAngleLeft,
+  IconAngleRight,
+  DateInput,
+  ButtonSize,
+  ButtonVariant,
+} from "hds-react";
 import { fromUIDate, toUIDate } from "common/src/common/util";
 import { breakpoints } from "common";
 import { toMondayFirstUnsafe } from "common/src/helpers";
@@ -36,6 +43,11 @@ const BorderlessDatePicker = styled(DateInput)`
   & input {
     text-align: center;
   }
+`;
+
+const Btn = styled(Button)`
+  color: var(--color-black);
+  padding: 0;
 `;
 
 type Props = {
@@ -78,16 +90,15 @@ export function DayNavigation({ name }: Props): JSX.Element {
 
   return (
     <Wrapper>
-      <Button
+      <Btn
         aria-label={t("common.prev")}
-        size="small"
-        variant="supplementary"
-        theme="black"
+        size={ButtonSize.Small}
+        variant={ButtonVariant.Supplementary}
         onClick={onPreviousDay}
-        iconLeft={<IconAngleLeft />}
+        iconStart={<IconAngleLeft aria-hidden="true" />}
       >
         {" "}
-      </Button>
+      </Btn>
       <WeekDay>{`${t(`dayShort.${day}`)} `}</WeekDay>
       <BorderlessDatePicker
         disableConfirmation
@@ -98,16 +109,15 @@ export function DayNavigation({ name }: Props): JSX.Element {
         onChange={(value) => handleChange(value)}
         value={uiDate}
       />
-      <Button
+      <Btn
         aria-label={t("common.next")}
-        size="small"
-        variant="supplementary"
-        theme="black"
+        size={ButtonSize.Small}
+        variant={ButtonVariant.Supplementary}
         onClick={onNextDay}
-        iconLeft={<IconAngleRight />}
+        iconStart={<IconAngleRight aria-hidden="true" />}
       >
         {" "}
-      </Button>
+      </Btn>
     </Wrapper>
   );
 }

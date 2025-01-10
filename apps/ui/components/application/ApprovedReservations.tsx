@@ -27,6 +27,8 @@ import {
 } from "common/src/helpers";
 import {
   Button,
+  ButtonSize,
+  ButtonVariant,
   Dialog,
   IconCalendarRecurring,
   IconClock,
@@ -445,7 +447,7 @@ function ReservationUnitTable({
         <Dialog.Header
           id="reservation-unit-modal-help-header"
           title={getTranslation(modal, "name")}
-          iconLeft={<IconInfoCircle aria-hidden="true" />}
+          iconStart={<IconInfoCircle aria-hidden="true" />}
         />
         <Dialog.Content id="dialog-content">
           <Sanitize
@@ -513,15 +515,6 @@ function createReservationUnitLink({
     />
   );
 }
-
-const CancelButton = styled(Button).attrs({
-  theme: "black",
-  variant: "supplementary",
-  size: "small",
-  iconLeft: <IconCross aria-hidden="true" />,
-})`
-  white-space: nowrap;
-`;
 
 const StyledStatusLabel = styled(StatusLabel)`
   @media (max-width: ${BREAKPOINT}) {
@@ -654,7 +647,10 @@ function ReservationsTable({
       headerName: "",
       isSortable: false,
       transform: ({ pk, isCancellableReason }: ReservationsTableElem) => (
-        <CancelButton
+        <Button
+          variant={ButtonVariant.Supplementary}
+          size={ButtonSize.Small}
+          iconStart={<IconCross aria-hidden="true" />}
           onClick={() => handleCancel(pk)}
           disabled={isCancellableReason !== ""}
           title={
@@ -666,7 +662,7 @@ function ReservationsTable({
           className="hide-on-mobile"
         >
           {t("common:cancel")}
-        </CancelButton>
+        </Button>
       ),
     },
   ];

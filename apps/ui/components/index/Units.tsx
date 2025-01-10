@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { IconArrowRight } from "hds-react";
+import { IconArrowRight, IconSize } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import Link from "next/link";
 import { H3 } from "common/src/common/typography";
@@ -73,7 +73,7 @@ export function Units({ units }: Props): JSX.Element | null {
               data-testid="front-page__units--unit"
             >
               {getTranslation(unit, "name") || unit.nameFi}
-              <IconArrowRight size="l" aria-hidden />
+              <IconArrowRight size={IconSize.Large} aria-hidden="true" />
             </UnitItemLink>
           ))}
         </UnitContainer>
@@ -83,7 +83,7 @@ export function Units({ units }: Props): JSX.Element | null {
           <IconButton
             href={singleSearchPrefix}
             label={t("common:showAll")}
-            icon={<IconArrowRight aria-hidden />}
+            icon={<IconArrowRight aria-hidden="true" />}
             data-testid="front-page__units--more-link"
           />
         </Flex>

@@ -1,10 +1,13 @@
 import React, { useEffect } from "react";
 import {
   Button,
+  ButtonSize,
+  ButtonVariant,
   Checkbox,
   IconAlertCircleFill,
   IconArrowLeft,
   IconLinkExternal,
+  LoadingSpinner,
   Notification,
   RadioButton,
   SelectionGroup,
@@ -194,7 +197,7 @@ const ButtonsStripe = styled.div`
 // Point of this is to have lighter colour buttons on dark background (inverted colours)
 const WhiteButton = styled(Button)<{
   disabled?: boolean;
-  variant: "secondary" | "primary" | "supplementary";
+  variant: ButtonVariant;
 }>`
   /* stylelint-disable csstools/value-no-unknown-custom-properties */
   --bg: var(--color-white);
@@ -1879,9 +1882,8 @@ function ReservationUnitEditor({
         <div>
           <Button
             onClick={handleArchiveButtonClick}
-            variant="secondary"
+            variant={ButtonVariant.Secondary}
             disabled={isSaving || !archiveEnabled}
-            theme="black"
           >
             {t("ReservationUnitEditor.archive")}
           </Button>
@@ -1889,10 +1891,10 @@ function ReservationUnitEditor({
       </StyledContainerMedium>
       <ButtonsStripe>
         <WhiteButton
-          size="small"
+          size={ButtonSize.Small}
+          variant={ButtonVariant.Supplementary}
+          iconStart={<IconArrowLeft aria-hidden="true" />}
           disabled={isSaving}
-          variant="supplementary"
-          iconLeft={<IconArrowLeft />}
           onClick={handleBack}
         >
           {t("common.prev")}
@@ -1912,21 +1914,19 @@ function ReservationUnitEditor({
           <span>{t("ReservationUnitEditor.preview")}</span>
         </Preview>
         <WhiteButton
-          size="small"
-          variant="secondary"
+          size={ButtonSize.Small}
+          variant={isSaving ? ButtonVariant.Clear : ButtonVariant.Secondary}
+          iconStart={isSaving ? <LoadingSpinner small /> : undefined}
           disabled={isSaving || !draftEnabled}
-          isLoading={isSaving && watch("isDraft")}
           type="button"
-          loadingText={t("ReservationUnitEditor.saving")}
           onClick={handleSaveAsDraft}
         >
           {t("ReservationUnitEditor.saveAsDraft")}
         </WhiteButton>
         <WhiteButton
-          variant="primary"
+          variant={isSaving ? ButtonVariant.Clear : ButtonVariant.Primary}
+          iconStart={isSaving ? <LoadingSpinner small /> : undefined}
           disabled={isSaving || !publishEnabled}
-          isLoading={isSaving && !watch("isDraft")}
-          loadingText={t("ReservationUnitEditor.saving")}
           type="button"
           onClick={handlePublish}
         >

@@ -8,7 +8,7 @@ import { UnitCalendar } from "./UnitCalendar";
 import { useUnitResources } from "./hooks";
 import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
 import { startOfDay } from "date-fns";
-import { Button } from "hds-react";
+import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { AutoGrid, Flex } from "common/styles/util";
 import { useReservationUnitTypes } from "@/hooks";
@@ -130,9 +130,8 @@ export function UnitReservations(): JSX.Element {
         $alignItems="center"
       >
         <Button
-          variant="secondary"
-          theme="black"
-          size="small"
+          size={ButtonSize.Small}
+          variant={ButtonVariant.Secondary}
           onClick={() => {
             const p = new URLSearchParams(searchParams);
             p.set("date", toUIDate(new Date()));

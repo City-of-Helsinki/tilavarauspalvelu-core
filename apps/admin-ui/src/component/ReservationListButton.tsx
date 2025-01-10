@@ -1,6 +1,8 @@
 import React from "react";
 import {
   Button,
+  ButtonSize,
+  ButtonVariant,
   IconArrowUndo,
   IconClock,
   IconCross,
@@ -22,18 +24,16 @@ export function ReservationListButton({
   t: TFunction;
 }) {
   const btnCommon = {
-    variant: "supplementary",
+    variant: ButtonVariant.Supplementary,
     onClick: callback,
-    size: "small",
-    theme: "black",
-    key: type,
+    size: ButtonSize.Small,
   } as const;
 
   switch (type) {
     case "show":
       return (
         <a href="#reservation-calendar" style={{ textDecoration: "none" }}>
-          <Button {...btnCommon} iconLeft={<IconClock />}>
+          <Button key={type} {...btnCommon} iconStart={<IconClock />}>
             {t("ReservationsListButton.showInCalendar")}
           </Button>
         </a>
@@ -41,19 +41,19 @@ export function ReservationListButton({
     case "deny":
     case "remove":
       return (
-        <Button {...btnCommon} iconLeft={<IconCross />}>
+        <Button key={type} {...btnCommon} iconStart={<IconCross />}>
           {type === "deny" ? t("common.deny") : t("common.remove")}
         </Button>
       );
     case "restore":
       return (
-        <Button {...btnCommon} iconLeft={<IconArrowUndo />}>
+        <Button key={type} {...btnCommon} iconStart={<IconArrowUndo />}>
           {t("common.restore")}
         </Button>
       );
     case "change":
       return (
-        <Button {...btnCommon} iconLeft={<IconPen />}>
+        <Button key={type} {...btnCommon} iconStart={<IconPen />}>
           {t("ReservationsListButton.changeTime")}
         </Button>
       );

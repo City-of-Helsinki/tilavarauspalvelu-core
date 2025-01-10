@@ -6,6 +6,7 @@ import {
   IconEuroSign,
   IconPen,
   IconQuestionCircle,
+  IconSize,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { H1 } from "common/src/common/typography";
@@ -128,7 +129,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
             {order?.status != null && (
               <StatusLabel
                 type={paymentStatusLabelType}
-                testId="reservation_title_section__order_status"
+                data-testid="reservation_title_section__order_status"
                 icon={<IconEuroSign aria-hidden="true" />}
               >
                 {t(`Payment.status.${order?.status}`)}
@@ -138,7 +139,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
               <StatusLabel
                 type={reservationState.type}
                 icon={reservationState.icon}
-                testId="reservation_title_section__reservation_state"
+                data-testid="reservation_title_section__reservation_state"
               >
                 {t(`RequestedReservation.state.${reservation.state}`)}
               </StatusLabel>
@@ -150,7 +151,7 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
           {t("RequestedReservation.createdAt")}{" "}
           {formatDateTime(reservation.createdAt ?? "")}
           {applicationLink !== "" && (
-            <ExternalLink to={applicationLink} size="s" isBold>
+            <ExternalLink to={applicationLink} size={IconSize.Small} isBold>
               {`${t("RequestedReservation.applicationLink")}: ${applicationPk}-${sectionPk}`}
             </ExternalLink>
           )}

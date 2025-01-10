@@ -10,6 +10,9 @@ import {
   IconArrowRedo,
   Tag,
   IconCogwheel,
+  ButtonSize,
+  ButtonVariant,
+  LoadingSpinner,
 } from "hds-react";
 import { isEqual, trim } from "lodash";
 import { type ApolloQueryResult } from "@apollo/client";
@@ -374,14 +377,21 @@ function RejectOptionButton({
     return null;
   }
   return (
+    // @ts-expect-error -- HDS incorrect typing for ButtonVariant.Supplementary
     <Button
-      variant="supplementary"
-      iconLeft={isRejected ? <IconArrowRedo /> : <IconCross />}
-      theme="black"
-      size="small"
+      size={ButtonSize.Small}
+      variant={loading ? ButtonVariant.Clear : ButtonVariant.Supplementary}
+      iconStart={
+        loading ? (
+          <LoadingSpinner small />
+        ) : isRejected ? (
+          <IconArrowRedo />
+        ) : (
+          <IconCross />
+        )
+      }
       onClick={isRejected ? handleRevert : handleReject}
-      isLoading={loading}
-      disabled={isDisabled}
+      disabled={isDisabled || loading}
       data-testid={`reject-btn-${option.pk}`}
     >
       {isRejected
@@ -487,11 +497,11 @@ function RejectAllOptionsButton({
   }
   return (
     <Button
-      disabled={isDisabled}
-      size="small"
-      variant="secondary"
+      size={ButtonSize.Small}
+      variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Secondary}
+      iconStart={isLoading ? <LoadingSpinner small /> : undefined}
+      disabled={isDisabled || isLoading}
       onClick={() => (isRejected ? handleRestoreAll() : handleRejectAll())}
-      isLoading={isLoading}
     >
       {isRejected
         ? t("Application.section.btnRestoreAll")
@@ -571,8 +581,7 @@ function ApplicationSectionDetails({
       transform: (reservationUnitOption: ReservationUnitOptionType) => {
         if (reservationUnitOption.rejected) {
           return (
-            <DeclinedTag>
-              <IconCross />
+            <DeclinedTag iconStart={<IconCross aria-hidden="true" />}>
               {t("Application.rejected")}
             </DeclinedTag>
           );
@@ -794,9 +803,8 @@ function RejectApplicationButton({
 
   return (
     <Button
-      size="small"
-      variant="secondary"
-      theme="black"
+      variant={ButtonVariant.Secondary}
+      size={ButtonSize.Small}
       onClick={() => (isRejected ? handleRestoreAll() : handleRejectAll())}
       disabled={isDisabled}
     >

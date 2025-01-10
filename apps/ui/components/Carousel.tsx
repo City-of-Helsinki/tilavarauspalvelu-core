@@ -124,31 +124,33 @@ function Carousel({
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const ButtonComponent = SmallArrowButton;
-
   return (
     <StyledCarousel
       renderCenterLeftControls={({ previousSlide, previousDisabled }) => (
-        <ButtonComponent
+        /* eslint-disable -- don't remove empty string */
+        <SmallArrowButton
           disabled={previousDisabled}
           type="button"
           onClick={previousSlide}
           aria-label={t("common:prev")}
           data-testid="slot-carousel-button"
+          iconStart={<IconAngleLeft aria-hidden="true" />}
         >
-          <IconAngleLeft />
-        </ButtonComponent>
+        {""}
+        </SmallArrowButton>
       )}
       renderCenterRightControls={({ nextSlide, nextDisabled }) => (
-        <ButtonComponent
+        <SmallArrowButton
           disabled={nextDisabled}
           type="button"
           onClick={nextSlide}
           aria-label={t("common:next")}
           data-testid="slot-carousel-button"
+          iconStart={<IconAngleRight aria-hidden="true" />}
         >
-          <IconAngleRight />
-        </ButtonComponent>
+        {""}
+        </SmallArrowButton>
+        /* eslint-enable */
       )}
       renderBottomCenterControls={({ slideCount, currentSlide, goToSlide }) => (
         <CustomBottomControls>

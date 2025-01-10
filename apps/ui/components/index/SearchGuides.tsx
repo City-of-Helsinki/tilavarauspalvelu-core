@@ -96,7 +96,7 @@ export function SearchGuides(): JSX.Element {
           <Button
             id="browseRecurringReservationUnits"
             onClick={() => router.push("/recurring")}
-            iconRight={<IconArrowRight />}
+            iconEnd={<IconArrowRight />}
           >
             {t("browseRecurringReservationsButton")}
           </Button>

@@ -1,4 +1,4 @@
-import { Checkbox, NumberInput, Select, TextArea, TextInput } from "hds-react";
+import { Checkbox, NumberInput, TextArea, TextInput } from "hds-react";
 import get from "lodash/get";
 import React, { useMemo } from "react";
 import {
@@ -14,7 +14,7 @@ import { CustomerTypeChoice } from "../../gql/gql-types";
 import { Inputs, Reservation } from "./types";
 import { CheckboxWrapper } from "./components";
 import { OptionType } from "../../types/common";
-import { removeRefParam } from "./util";
+import { ControlledSelect } from "../components/form";
 
 type Props = {
   field: keyof Inputs;
@@ -48,7 +48,7 @@ const Subheading = styled(Strongish)`
   margin-bottom: var(--spacing-s);
 `;
 
-const StyledSelect = styled(Select)<{ $isWide?: boolean }>`
+const StyledControlledSelect = styled(ControlledSelect)<{ $isWide?: boolean }>`
   ${({ $isWide }) => $isWide && "grid-column: 1 / -1"};
 `;
 
@@ -276,33 +276,23 @@ const ReservationFormField = ({
     message: "email",
   };
 
-  if (isSelectField)
+  if (isSelectField) {
     return (
-      <Controller
+      <StyledControlledSelect
         name={field}
+        label={label}
         control={control}
+        required={required}
+        options={options[field]}
+        error={errorText}
+        placeholder={t("common:select")}
+        afterChange={() => trigger(field)}
+        $isWide={isWideRow}
         key={field}
-        rules={{ required }}
-        render={({ field: formField }) => (
-          <StyledSelect
-            label={label}
-            id={field}
-            options={options[field]}
-            {...removeRefParam(formField)}
-            value={
-              typeof formField.value === "object"
-                ? formField.value
-                : options[field].find((n) => n.value === defaultValue) || null
-            }
-            error={errorText}
-            required={required}
-            invalid={!!error}
-            $isWide={isWideRow}
-          />
-        )}
       />
     );
-  if (isNumField)
+  }
+  if (isNumField) {
     return (
       <NumberInput
         label={label}
@@ -318,8 +308,8 @@ const ReservationFormField = ({
         invalid={!!error}
         required={required}
         step={1}
-        minusStepButtonAriaLabel={t("common:decrease") || "Decrease"}
-        plusStepButtonAriaLabel={t("common:increase") || "Increase"}
+        minusStepButtonAriaLabel={t("common:decrease")}
+        plusStepButtonAriaLabel={t("common:increase")}
         min={minValue}
         max={maxValue}
         onChange={(e) => {
@@ -328,7 +318,8 @@ const ReservationFormField = ({
         }}
       />
     );
-  if (isTextArea)
+  }
+  if (isTextArea) {
     return (
       <StyledTextArea
         label={label}
@@ -353,6 +344,7 @@ const ReservationFormField = ({
         $height="119px"
       />
     );
+  }
 
   switch (field) {
     case "applyingForFreeOfCharge":

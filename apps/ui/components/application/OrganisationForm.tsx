@@ -1,9 +1,8 @@
 import React, { useEffect } from "react";
-import { TextInput, Checkbox, Select } from "hds-react";
+import { TextInput, Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { Controller, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import styled from "styled-components";
-import type { OptionType } from "common/types/common";
 import { breakpoints } from "common/src/common/style";
 import { CheckboxWrapper } from "common/src/reservation-form/components";
 import { ApplicantTypeChoice } from "@gql/gql-types";
@@ -13,6 +12,7 @@ import { BillingAddress } from "./BillingAddress";
 import type { ApplicationFormPage3Values } from "./Form";
 import { AutoGrid } from "common/styles/util";
 import { FormSubHeading } from "./styled";
+import { ControlledSelect } from "common/src/components/form";
 
 const Placeholder = styled.span`
   @media (max-width: ${breakpoints.m}) {
@@ -20,6 +20,10 @@ const Placeholder = styled.span`
   }
 `;
 
+type OptionType = {
+  label: string;
+  value: number;
+};
 type Props = {
   homeCityOptions: OptionType[];
 };
@@ -82,21 +86,13 @@ export const OrganisationForm = ({
           }
         )}
       />
-      <Controller
+      <ControlledSelect
         control={control}
-        rules={{ required: true }}
+        required
         name="homeCity"
-        render={({ field }) => (
-          <Select<OptionType>
-            label={t("application:Page3.homeCity")}
-            value={homeCityOptions.find((v) => v.value === field.value) ?? null}
-            onChange={(v: OptionType) => field.onChange(v.value)}
-            required
-            options={homeCityOptions}
-            error={applicationErrorText(t, errors.homeCity?.type)}
-            invalid={!!errors.homeCity?.type}
-          />
-        )}
+        label={t("application:Page3.homeCity")}
+        options={homeCityOptions}
+        error={applicationErrorText(t, errors.homeCity?.type)}
       />
       <Placeholder />
       <CheckboxWrapper style={{ margin: "var(--spacing-xs) 0" }}>

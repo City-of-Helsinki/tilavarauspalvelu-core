@@ -8,36 +8,19 @@ import { breakpoints } from "common/src/common/style";
 import { HERO_IMAGE_URL } from "@/common/const";
 import { KorosHeading, Heading } from "./KorosHeading";
 
-const LoginBtn = styled(Button).attrs({
-  iconLeft: <IconGroup className="icon-group" />,
-  iconRight: <IconArrowRight className="icon-arrow" />,
-  style: {
-    "--color-bus": "var(--color-white)",
-    "--color": "var(--color-black)",
-    "--background-color-focus": "var(--color-bus)",
-    "--color-focus": "var(--color-black)",
-  } as React.CSSProperties,
-})`
+const LoginBtn = styled(Button)`
+  --background-color: var(--color-white);
+  --background-color-focus: var(--color-bus-dark);
+  --background-color-hover: var(--color-bus-dark);
+  --color: var(--color-black);
+  --color-hover: var(--color-white);
+  --color-focus: var(--color-white);
+
   ${fontBold}
-  font-size: var(--fontsize-heading-l);
-  margin-top: var(--spacing-m);
-  padding: var(--spacing-xs) var(--spacing-m) var(--spacing-xs) var(--spacing-l);
-  transform: scale(0.5);
 
-  svg {
-    display: flex;
-  }
-
-  span {
-    margin: 0 0 0 var(--spacing-s);
-  }
-
-  .icon-group {
+  transform: scale(1.2);
+  @media (min-width: ${breakpoints.s}) {
     transform: scale(1.5);
-  }
-
-  @media (min-width: ${breakpoints.m}) {
-    transform: scale(1);
   }
 `;
 
@@ -54,7 +37,7 @@ const Content = styled.div`
   }
 `;
 
-const Ingress = styled(H2).attrs({ $legacy: true })`
+const Ingress = styled(H2)`
   line-height: 1.8125rem;
 `;
 
@@ -65,12 +48,16 @@ export function MainLander({ apiBaseUrl }: { apiBaseUrl: string }) {
     <>
       <KorosHeading heroImage={HERO_IMAGE_URL}>
         <Heading>{t("common.applicationName")}</Heading>
-        <LoginBtn onClick={() => signIn(apiBaseUrl)}>
+        <LoginBtn
+          iconStart={<IconGroup />}
+          iconEnd={<IconArrowRight />}
+          onClick={() => signIn(apiBaseUrl)}
+        >
           {t("Navigation.login")}
         </LoginBtn>
       </KorosHeading>
       <Content>
-        <Ingress>{t("MainLander.ingress")}</Ingress>
+        <Ingress as="p">{t("MainLander.ingress")}</Ingress>
       </Content>
     </>
   );

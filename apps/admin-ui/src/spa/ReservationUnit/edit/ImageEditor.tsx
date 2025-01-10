@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Button, FileInput } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, FileInput } from "hds-react";
 import { ImageType } from "@gql/gql-types";
 import { AutoGrid, Flex } from "common/styles/util";
 import { type ImageFormType } from "./form";
@@ -62,9 +62,8 @@ const FileInputContainer = styled.div`
 `;
 
 const SmallButton = styled(Button).attrs({
-  variant: "secondary",
-  theme: "black",
-  size: "small",
+  variant: ButtonVariant.Secondary,
+  size: ButtonSize.Small,
 })`
   ${fontRegular}
   border: 0;

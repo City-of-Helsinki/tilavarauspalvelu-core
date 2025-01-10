@@ -1,7 +1,7 @@
 import React from "react";
 import { type ReservationQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { Button } from "hds-react";
+import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { DenyDialogSeries } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
@@ -63,25 +63,15 @@ export function ApprovalButtonsRecurring({
     );
   };
 
-  if (loading) {
-    return null;
-  }
-
-  const btnCommon = {
-    theme: "black",
-    size: "small",
-    variant: "secondary",
-    disabled: false,
-  } as const;
-
-  if (reservationsPossibleToDeny.length === 0) {
+  if (loading || reservationsPossibleToDeny.length === 0) {
     return null;
   }
 
   return (
     <>
       <Button
-        {...btnCommon}
+        size={ButtonSize.Small}
+        variant={ButtonVariant.Secondary}
         onClick={handleDenyClick}
         data-testid="approval-buttons-recurring__reject-button"
       >

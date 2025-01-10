@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button, Notification } from "hds-react";
+import { Button, ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -167,8 +167,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
         </section>
         <ButtonContainer>
           <Button
-            variant="secondary"
-            theme="black"
+            variant={ButtonVariant.Secondary}
             type="button"
             onClick={() => history(-1)}
             disabled={isMutationLoading}
@@ -176,10 +175,12 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
             {t("SpaceEditor.cancel")}
           </Button>
           <Button
-            disabled={!isDirty}
-            variant="primary"
+            variant={
+              isMutationLoading ? ButtonVariant.Clear : ButtonVariant.Primary
+            }
+            iconStart={isMutationLoading ? <LoadingSpinner small /> : undefined}
+            disabled={!isDirty || isMutationLoading}
             type="submit"
-            isLoading={isMutationLoading}
           >
             {t("SpaceEditor.save")}
           </Button>
