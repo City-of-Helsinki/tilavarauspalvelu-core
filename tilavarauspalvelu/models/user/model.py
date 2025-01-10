@@ -13,9 +13,9 @@ from helusers.models import AbstractUser
 
 from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
-from tilavarauspalvelu.integrations.helauth.utils import get_jwt_payload
 from tilavarauspalvelu.services.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE
+from utils.utils import get_jwt_payload
 
 from .queryset import ProfileUserManager, UserManager
 
@@ -25,8 +25,8 @@ if TYPE_CHECKING:
     from social_django.models import UserSocialAuth
 
     from tilavarauspalvelu.enums import UserPermissionChoice
-    from tilavarauspalvelu.integrations.helauth.typing import ExtraData
     from tilavarauspalvelu.models import UnitRole
+    from tilavarauspalvelu.typing import ExtraData
 
     from .actions import UserActions
 

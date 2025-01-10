@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import base64
 import datetime
 import hashlib
 import hmac
+import json
 import operator
 import re
 import urllib.parse
@@ -222,3 +224,10 @@ def convert_html_to_text(html_text: str) -> str:
 
     # Remove any spaces between newline and the last newline, which is added by html2text
     return text.replace(" \n", "\n").removesuffix("\n")
+
+
+def get_jwt_payload(json_web_token: str) -> dict[str, Any]:
+    payload_part: str = json_web_token.split(".")[1]  # Get the payload part of the id token
+    payload_part += "=" * divmod(len(payload_part), 4)[1]  # Add padding to the payload if needed
+    payload: str = base64.urlsafe_b64decode(payload_part).decode()  # Decode the payload
+    return json.loads(payload)  # Return the payload as a dict

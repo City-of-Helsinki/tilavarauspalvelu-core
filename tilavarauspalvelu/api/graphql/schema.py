@@ -12,7 +12,7 @@ from query_optimizer import DjangoListField, optimize_single
 from query_optimizer.compiler import optimize
 
 from tilavarauspalvelu.enums import UserPermissionChoice
-from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.models import AllocatedTimeSlot, PaymentOrder, Reservation, User
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 
@@ -124,7 +124,7 @@ if TYPE_CHECKING:
 
     from django.db import models
 
-    from tilavarauspalvelu.integrations.helauth.typing import UserProfileInfo
+    from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileInfo
     from tilavarauspalvelu.typing import AnyUser, GQLInfo
 
 

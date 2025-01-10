@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 
 from tilavarauspalvelu.enums import ADLoginAMR, LoginMethod, ProfileLoginAMR
-from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 from tests.factories import ApplicationFactory, ReservationFactory, UserFactory

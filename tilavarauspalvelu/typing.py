@@ -102,3 +102,18 @@ class UserAnonymizationInfo:
 
     def __bool__(self) -> bool:
         return not (self.has_open_reservations or self.has_open_applications or self.has_open_payments)
+
+
+class ExtraData(TypedDict):
+    id: str
+    """User's uuid: uuid"""
+    id_token: str
+    """IDToken as a JWT: str"""
+    auth_time: int
+    """When the user authenticated: unix epoch timestamp"""
+    token_type: str
+    """Token type: bearer"""
+    access_token: str
+    """Access token: str"""
+    refresh_token: str
+    """Refresh token: str"""

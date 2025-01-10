@@ -1,16 +1,15 @@
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING, Any, Unpack
 
 from django.db import models
 from django.db.models.functions import Concat
 
 from tilavarauspalvelu.dataclasses import IDToken
+from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, GeneralRole, RecurringReservation, Reservation, UnitRole, User
-
-from .clients import HelsinkiProfileClient
-from .utils import use_request_user
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
@@ -36,6 +35,20 @@ def fetch_additional_info_for_user_from_helsinki_profile(**kwargs: Unpack[Pipeli
         update_user_from_profile(request, user=user)
 
     return {"user": user}
+
+
+@contextlib.contextmanager
+def use_request_user(request: WSGIRequest, user: User) -> None:
+    """
+    Use the provided user as the request user for the duration of the context.
+    This is needed during login, since the request user is still anonymous.
+    """
+    original_user = request.user
+    try:
+        request.user = user
+        yield
+    finally:
+        request.user = original_user
 
 
 @SentryLogger.log_if_raises("Login: Failed to update user from profile")

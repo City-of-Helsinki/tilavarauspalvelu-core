@@ -8,17 +8,14 @@ from django.conf import settings
 from graphene_django_extensions.utils import get_nested
 
 from tilavarauspalvelu.enums import LoginMethod
-from tilavarauspalvelu.integrations.helauth.typing import (
-    BirthdayInfo,
-    ProfileForeignAddress,
-    ProfileLocalAddress,
-    ReservationPrefillInfo,
-    UserProfileInfo,
-)
 from tilavarauspalvelu.models import City
 
+from .typing import BirthdayInfo, ProfileForeignAddress, ProfileLocalAddress, ReservationPrefillInfo, UserProfileInfo
+
 if TYPE_CHECKING:
-    from tilavarauspalvelu.integrations.helauth.typing import (
+    from tilavarauspalvelu.models import User
+
+    from .typing import (
         PermanentAddress,
         PermanentForeignAddress,
         ProfileAddress,
@@ -28,7 +25,6 @@ if TYPE_CHECKING:
         ProfilePhone,
         VerifiedPersonalInfo,
     )
-    from tilavarauspalvelu.models import User
 
 __all__ = [
     "ProfileDataParser",

@@ -9,8 +9,8 @@ from query_optimizer.selections import get_field_selections
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import LoginMethod
-from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
-from tilavarauspalvelu.integrations.helauth.typing import UserProfileInfo
+from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helsinki_profile.typing import UserProfileInfo
 from tilavarauspalvelu.models import Application, Reservation
 from tilavarauspalvelu.tasks import save_personal_info_view_log
 

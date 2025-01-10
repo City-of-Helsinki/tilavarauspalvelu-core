@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from tilavarauspalvelu.integrations.helauth.utils import get_jwt_payload
+from utils.utils import get_jwt_payload
 
 
 def test_get_jwt_payload():

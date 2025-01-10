@@ -8,7 +8,7 @@ import pytest
 from django.conf import settings
 from graphene_django_extensions.testing import parametrize_helper
 
-from tilavarauspalvelu.integrations.helauth.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.external_service.errors import (
     ExternalServiceError,
