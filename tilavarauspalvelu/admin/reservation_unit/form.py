@@ -129,8 +129,8 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "payment_product": _("Payment product"),
             "search_terms": _("Search terms"),
             "method_of_entry": _("Method of entry"),
-            "keyless_entry_start_date": _("Keyless entry start date"),
-            "keyless_entry_end_date": _("Keyless entry end date"),
+            "method_of_entry_start_date": _("Method of entry start date"),
+            "method_of_entry_end_date": _("Method of entry end date"),
         }
         help_texts = {
             "sku": _("SKU"),
@@ -223,12 +223,12 @@ class ReservationUnitAdminForm(forms.ModelForm):
                 "links from external sources work regardless of the UI language."
             ),
             "method_of_entry": _("How is the reservee able to enter the space in their reservation unit?"),
-            "keyless_entry_start_date": _(
-                "If the reservation unit is going to start using keyless entry in the future, "
-                "this is the date when the switch happens"
+            "method_of_entry_start_date": _(
+                "If set, this is the date from which the method of entry is used. If current date is "
+                "before this date, the method of entry is 'open access'."
             ),
-            "keyless_entry_end_date": _(
-                "If the reservation unit is going to remove keyless entry in the future, "
-                "this is the date when the switch happens"
+            "method_of_entry_end_date": _(
+                "If set, this is the date before which the method of entry is used. If current date is "
+                "after this date, the method of entry is 'open access'."
             ),
         }

@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
+from django.db.models.functions import Coalesce, TruncDate
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
@@ -89,8 +90,8 @@ class ReservationUnit(models.Model):
     max_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
-    keyless_entry_start_date: datetime.date | None = models.DateField(null=True, blank=True)
-    keyless_entry_end_date: datetime.date | None = models.DateField(null=True, blank=True)
+    method_of_entry_start_date: datetime.date | None = models.DateField(null=True, blank=True)
+    method_of_entry_end_date: datetime.date | None = models.DateField(null=True, blank=True)
 
     # Booleans
 
@@ -285,6 +286,17 @@ class ReservationUnit(models.Model):
         verbose_name = _("reservation unit")
         verbose_name_plural = _("reservation units")
         ordering = ["rank", "id"]
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    models.Q(method_of_entry_start_date__isnull=True)
+                    | models.Q(method_of_entry_end_date__isnull=True)
+                    | models.Q(method_of_entry_start_date__lte=models.F("method_of_entry_end_date"))
+                ),
+                name="method_of_entry_starts_before_ends",
+                violation_error_message=_("Method of entry start date must be the same or before its end date"),
+            )
+        ]
 
     def __str__(self) -> str:
         return f"{self.name}, {getattr(self.unit, 'name', '')}"
@@ -504,6 +516,42 @@ class ReservationUnit(models.Model):
 
         return case  # type: ignore[return-value]  # noqa: RET504
 
+    @lookup_property
+    def current_method_of_entry() -> MethodOfEntry:
+        """The method of entry that is currently active for the reservation unit."""
+        case = models.Case(
+            models.When(
+                (
+                    L(perceived_method_of_entry_start_date__lte=TruncDate(NowTT()))
+                    & L(perceived_method_of_entry_end_date__gte=TruncDate(NowTT()))
+                ),
+                then=models.F("method_of_entry"),
+            ),
+            default=models.Value(MethodOfEntry.OPEN_ACCESS.value),
+            output_field=models.CharField(),
+        )
+        return case  # type: ignore[return-value]  # noqa: RET504
+
+    @lookup_property
+    def perceived_method_of_entry_start_date() -> datetime.date:
+        """Helper lookup property for `current_method_of_entry`"""
+        expr = Coalesce(
+            models.F("method_of_entry_start_date"),
+            models.Value(datetime.date.min),
+            output_field=models.DateField(),
+        )
+        return expr  # type: ignore[return-value]  # noqa: RET504
+
+    @lookup_property
+    def perceived_method_of_entry_end_date() -> datetime.date:
+        """Helper lookup property for `current_method_of_entry`"""
+        expr = Coalesce(
+            models.F("method_of_entry_end_date"),
+            models.Value(datetime.date.max),
+            output_field=models.DateField(),
+        )
+        return expr  # type: ignore[return-value]  # noqa: RET504
+
 
 AuditLogger.register(
     ReservationUnit,
@@ -512,5 +560,8 @@ AuditLogger.register(
         "_publishing_state",
         "_reservation_state",
         "_active_pricing_price",
+        "_current_method_of_entry",
+        "_perceived_method_of_entry_start_date",
+        "_perceived_method_of_entry_end_date",
     ],
 )

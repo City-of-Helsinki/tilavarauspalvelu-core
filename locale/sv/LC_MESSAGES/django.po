@@ -1897,11 +1897,11 @@ msgid "Payment product"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Keyless entry start date"
+msgid "Method of entry start date"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Keyless entry end date"
+msgid "Method of entry end date"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -2080,14 +2080,14 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
-"If the reservation unit is going to start using keyless entry in the future, "
-"this is the date when the switch happens"
+"If set, this is the date from which the method of entry is used. If current "
+"date is before this date, the method of entry is 'open access'."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
-"If the reservation unit is going to remove keyless entry in the future, this "
-"is the date when the switch happens"
+"If set, this is the date before which the method of entry is used. If "
+"current date is after this date, the method of entry is 'open access'."
 msgstr ""
 
 #: tilavarauspalvelu/admin/space/admin.py
@@ -3861,6 +3861,10 @@ msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit/model.py
 msgid "reservation units"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation_unit/model.py
+msgid "Method of entry start date must be the same or before its end date"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit_cancellation_rule/model.py

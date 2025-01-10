@@ -176,8 +176,8 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
             {
                 "fields": [
                     "method_of_entry",
-                    "keyless_entry_start_date",
-                    "keyless_entry_end_date",
+                    "method_of_entry_start_date",
+                    "method_of_entry_end_date",
                 ],
             },
         ],
