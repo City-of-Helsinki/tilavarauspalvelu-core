@@ -734,6 +734,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
       end
       calendarUrl
       state
+      price
       paymentOrder {
         id
         status

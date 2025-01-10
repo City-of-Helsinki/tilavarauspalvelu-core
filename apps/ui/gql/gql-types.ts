@@ -8180,6 +8180,7 @@ export type ReservationPageQuery = {
     end: string;
     calendarUrl?: string | null;
     state?: ReservationStateChoice | null;
+    price?: string | null;
     reserveeFirstName?: string | null;
     reserveeLastName?: string | null;
     reserveeEmail?: string | null;
@@ -12178,6 +12179,7 @@ export const ReservationPageDocument = gql`
       end
       calendarUrl
       state
+      price
       paymentOrder {
         id
         status
