@@ -169,6 +169,9 @@ def test_reservation_unit__update__archiving_removes_contact_information_and_aud
             "_publishing_state",
             "_reservation_state",
             "_active_pricing_price",
+            "_current_method_of_entry",
+            "_perceived_method_of_entry_end_date",
+            "_perceived_method_of_entry_start_date",
         ],
     )
 
