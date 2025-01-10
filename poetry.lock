@@ -1615,7 +1615,7 @@ version = "2024.2.26"
 description = "Turn HTML into equivalent Markdown-structured text."
 optional = false
 python-versions = ">=3.8"
-groups = ["test"]
+groups = ["main"]
 files = [
     {file = "html2text-2024.2.26.tar.gz", hash = "sha256:05f8e367d15aaabc96415376776cdd11afd5127a77fce6e36afc60c563ca2c32"},
 ]
@@ -3430,4 +3430,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1)", "tox"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "4bdf9f90585c3689c5c25e6a2921f49f59dfbc9c491dee518c3eb4c82dc3d491"
+content-hash = "f5b30ceea95cb3a6fe806299e58a0d59f60659e7dda6e55196bd83c65ea6fb4c"
