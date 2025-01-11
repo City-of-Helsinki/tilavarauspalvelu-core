@@ -34,7 +34,6 @@ import { AccordionWithState as Accordion } from "@/components/Accordion";
 import {
   getCheckoutUrl,
   getNormalizedReservationOrderStatus,
-  getReservationValue,
   getWhyReservationCantBeChanged,
   isReservationCancellable,
 } from "@/modules/reservation";
@@ -51,7 +50,11 @@ import {
   getCommonServerSideProps,
   getGenericTerms,
 } from "@/modules/serverUtils";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  filterNonNullable,
+  LocalizationLanguages,
+} from "common/src/helpers";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
 import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
 import {
@@ -280,45 +283,6 @@ function ReserveeInfo({
           supportedFields={supportedFields}
         />
       )}
-    </div>
-  );
-}
-
-function ReservationInfo({
-  reservation,
-  supportedFields,
-}: {
-  reservation: ReservationInfoFragment;
-  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-}) {
-  const { t } = useTranslation();
-  const POSSIBLE_FIELDS = [
-    "purpose",
-    "numPersons",
-    "ageGroup",
-    "description",
-  ] as const;
-  const fields = POSSIBLE_FIELDS.filter((field) =>
-    containsField(supportedFields, field)
-  );
-
-  if (fields.length === 0) {
-    return null;
-  }
-
-  return (
-    <div>
-      <H4 as="h2">{t("reservationApplication:applicationInfo")}</H4>
-      {fields
-        .map((field) => ({
-          key: field,
-          label: t(`reservationApplication:label.common.${field}`),
-          value: getReservationValue(reservation, field) ?? "-",
-          testId: `reservation__${field}`,
-        }))
-        .map(({ key, ...rest }) => (
-          <LabelValuePair key={key} {...rest} />
-        ))}
     </div>
   );
 }
@@ -719,38 +683,119 @@ export const GET_APPLICATION_RECURRING_RESERVATION_QUERY = gql`
     }
   }
 `;
-
 export const GET_RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     reservation(id: $id) {
       id
       pk
-      name
       ...ReserveeNameFields
       ...ReserveeBillingFields
       ...ReservationInfo
+      ...ReservationInfoCard
+      ...Instructions
       applyingForFreeOfCharge
-      begin
-      end
       calendarUrl
-      state
-      price
       paymentOrder {
-        id
-        status
-        receiptUrl
-        checkoutUrl
+        ...OrderFields
       }
       recurringReservation {
         id
       }
       reservationUnits {
         id
+        unit {
+          id
+          tprekId
+          ...UnitNameFieldsI18N
+        }
         canApplyFreeOfCharge
-        ...ReservationUnitFields
         ...CancellationRuleFields
+        ...MetadataSets
+        ...TermsOfUse
       }
     }
+  }
+`;
+
+function getReservationValue(
+  reservation: ReservationInfoFragment,
+  key: "purpose" | "numPersons" | "ageGroup" | "description",
+  lang: LocalizationLanguages
+): string | number | null {
+  if (key === "ageGroup") {
+    const { minimum, maximum } = reservation.ageGroup || {};
+    return minimum && maximum ? `${minimum} - ${maximum}` : null;
+  } else if (key === "purpose") {
+    if (reservation.purpose != null) {
+      return getTranslationSafe(reservation.purpose, "name", lang);
+    }
+    return null;
+  } else if (key in reservation) {
+    const val = reservation[key as keyof ReservationInfoFragment];
+    if (typeof val === "string" || typeof val === "number") {
+      return val;
+    }
+  }
+  return null;
+}
+
+function ReservationInfo({
+  reservation,
+  supportedFields,
+}: {
+  reservation: ReservationInfoFragment;
+  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
+}) {
+  const { t, i18n } = useTranslation();
+  const POSSIBLE_FIELDS = [
+    "purpose",
+    "numPersons",
+    "ageGroup",
+    "description",
+  ] as const;
+  const fields = POSSIBLE_FIELDS.filter((field) =>
+    containsField(supportedFields, field)
+  );
+
+  if (fields.length === 0) {
+    return null;
+  }
+  const lang = convertLanguageCode(i18n.language);
+
+  return (
+    <div>
+      <H4 as="h2">{t("reservationApplication:applicationInfo")}</H4>
+      {fields
+        .map((field) => ({
+          key: field,
+          label: t(`reservationApplication:label.common.${field}`),
+          value: getReservationValue(reservation, field, lang) ?? "-",
+          testId: `reservation__${field}`,
+        }))
+        .map(({ key, ...rest }) => (
+          <LabelValuePair key={key} {...rest} />
+        ))}
+    </div>
+  );
+}
+
+export const RESERVATION_INFO_FRAGMENT = gql`
+  fragment ReservationInfo on ReservationNode {
+    description
+    purpose {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    ageGroup {
+      id
+      pk
+      minimum
+      maximum
+    }
+    numPersons
   }
 `;
 

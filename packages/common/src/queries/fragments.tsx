@@ -30,6 +30,37 @@ export const RESERVEE_BILLING_FRAGMENT = gql`
   }
 `;
 
+export const METAFIELDS_FRAGMENT = gql`
+  fragment MetaFields on ReservationNode {
+    ...ReserveeNameFields
+    ...ReserveeBillingFields
+    applyingForFreeOfCharge
+    freeOfChargeReason
+    description
+    numPersons
+    ageGroup {
+      id
+      pk
+      maximum
+      minimum
+    }
+    purpose {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    homeCity {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+    }
+  }
+`;
+
 export const TERMS_OF_USE_NAME_FRAGMENT = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
     nameFi

@@ -1,8 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  RESERVATION_UNIT_FRAGMENT,
-  UNIT_NAME_FRAGMENT_I18N,
-} from "./fragments";
+import { UNIT_NAME_FRAGMENT_I18N } from "./fragments";
 import { IMAGE_FRAGMENT, PRICING_FRAGMENT } from "common/src/queries/fragments";
 
 export { TERMS_OF_USE_QUERY as TERMS_OF_USE } from "common/src/queries/queries";
@@ -27,7 +24,7 @@ const RESERVATION_UNIT_NAME_FRAGMENT = gql`
   }
 `;
 
-const EQUIPMENT_FRAGMENT = gql`
+export const EQUIPMENT_FRAGMENT = gql`
   fragment EquipmentFields on EquipmentNode {
     id
     pk
@@ -43,18 +40,26 @@ const EQUIPMENT_FRAGMENT = gql`
   }
 `;
 
-// TODO remove extra fields that are in the IS_RESERVABLE_FRAGMENT
-const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
-  ${IMAGE_FRAGMENT}
-  ${RESERVATION_UNIT_FRAGMENT}
-  ${RESERVATION_UNIT_TYPE_FRAGMENT}
-  ${EQUIPMENT_FRAGMENT}
+export const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
   fragment ReservationUnitPageFields on ReservationUnitNode {
-    ...ReservationUnitFields
-    isDraft
+    unit {
+      ...AddressFields
+    }
+    id
+    pk
+    uuid
+    nameFi
+    nameEn
+    nameSv
+    ...TermsOfUse
+    pricings {
+      ...PricingFields
+    }
     images {
       ...Image
     }
+    ...MetadataSets
+    isDraft
     applicationRoundTimeSlots {
       id
       closed
@@ -92,7 +97,7 @@ const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
   }
 `;
 
-const BLOCKING_RESERVATION_FRAGMENT = gql`
+export const BLOCKING_RESERVATION_FRAGMENT = gql`
   fragment BlockingReservationFields on ReservationNode {
     pk
     id
@@ -108,17 +113,7 @@ const BLOCKING_RESERVATION_FRAGMENT = gql`
   }
 `;
 
-export const RESERVATION_UNIT_PARAMS_PAGE_QUERY = gql`
-  ${RESERVATION_UNIT_PAGE_FRAGMENT}
-  query ReservationUnit($id: ID!) {
-    reservationUnit(id: $id) {
-      ...ReservationUnitPageFields
-    }
-  }
-`;
-
-const IS_RESERVABLE_FRAGMENT = gql`
-  ${BLOCKING_RESERVATION_FRAGMENT}
+export const IS_RESERVABLE_FRAGMENT = gql`
   fragment IsReservableFields on ReservationUnitNode {
     bufferTimeBefore
     bufferTimeAfter
@@ -138,9 +133,6 @@ const IS_RESERVABLE_FRAGMENT = gql`
 
 // Combined version for the reservation-unit/[id] page so we can show the Calendar and check for collisions
 export const RESERVATION_UNIT_PAGE_QUERY = gql`
-  ${RESERVATION_UNIT_PAGE_FRAGMENT}
-  ${BLOCKING_RESERVATION_FRAGMENT}
-  ${IS_RESERVABLE_FRAGMENT}
   query ReservationUnitPage(
     $id: ID!
     $pk: Int!

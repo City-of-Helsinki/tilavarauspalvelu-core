@@ -22,11 +22,10 @@ import {
   type CancellationRuleFieldsFragment,
   type BlockingReservationFieldsFragment,
   type CanUserCancelReservationFragment,
-  type ReservationInfoFragment,
 } from "@gql/gql-types";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { getIntervalMinutes } from "common/src/conversion";
-import { fromUIDate, getTranslation } from "./util";
+import { fromUIDate } from "./util";
 import { type TFunction } from "i18next";
 import { type PendingReservation } from "@/modules/types";
 import {
@@ -360,27 +359,6 @@ export function canReservationTimeBeChanged({
   });
 }
 
-export function getReservationValue(
-  reservation: ReservationInfoFragment,
-  key: "purpose" | "numPersons" | "ageGroup" | "description"
-): string | number | null {
-  if (key === "ageGroup") {
-    const { minimum, maximum } = reservation.ageGroup || {};
-    return minimum && maximum ? `${minimum} - ${maximum}` : null;
-  } else if (key === "purpose") {
-    if (reservation.purpose != null) {
-      return getTranslation(reservation.purpose, "name");
-    }
-    return null;
-  } else if (key in reservation) {
-    const val = reservation[key as keyof ReservationInfoFragment];
-    if (typeof val === "string" || typeof val === "number") {
-      return val;
-    }
-  }
-  return null;
-}
-
 export function getCheckoutUrl(
   order?: Maybe<{ checkoutUrl?: Maybe<string> }>,
   lang = "fi"
@@ -582,7 +560,7 @@ export function convertReservationFormToApi(
 }
 
 export function transformReservation(
-  reservation?: ReservationNodeT
+  reservation?: Pick<ReservationNodeT, "begin" | "end">
 ): PendingReservationFormType {
   const originalBegin = new Date(reservation?.begin ?? "");
   const originalEnd = new Date(reservation?.end ?? "");

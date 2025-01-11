@@ -5311,6 +5311,42 @@ export enum Weekday {
   Wednesday = "WEDNESDAY",
 }
 
+export type InstructionsFragment = {
+  id: string;
+  state?: ReservationStateChoice | null;
+  reservationUnits: Array<{
+    id: string;
+    reservationPendingInstructionsFi?: string | null;
+    reservationPendingInstructionsEn?: string | null;
+    reservationPendingInstructionsSv?: string | null;
+    reservationConfirmedInstructionsFi?: string | null;
+    reservationConfirmedInstructionsEn?: string | null;
+    reservationConfirmedInstructionsSv?: string | null;
+    reservationCancelledInstructionsFi?: string | null;
+    reservationCancelledInstructionsEn?: string | null;
+    reservationCancelledInstructionsSv?: string | null;
+  }>;
+};
+
+export type AddressFieldsFragment = {
+  id: string;
+  tprekId?: string | null;
+  pk?: number | null;
+  nameFi?: string | null;
+  nameEn?: string | null;
+  nameSv?: string | null;
+  location?: {
+    addressStreetEn?: string | null;
+    addressStreetSv?: string | null;
+    addressCityEn?: string | null;
+    addressCitySv?: string | null;
+    id: string;
+    addressStreetFi?: string | null;
+    addressZip: string;
+    addressCityFi?: string | null;
+  } | null;
+};
+
 export type ReservationInfoContainerFragment = {
   reservationBegins?: string | null;
   reservationEnds?: string | null;
@@ -6152,68 +6188,10 @@ export type UnitNameFieldsI18NFragment = {
   } | null;
 };
 
-export type UnitFieldsFragment = {
-  id: string;
-  tprekId?: string | null;
-  pk?: number | null;
-  nameFi?: string | null;
-  nameEn?: string | null;
-  nameSv?: string | null;
-  location?: {
-    id: string;
-    latitude?: string | null;
-    longitude?: string | null;
-    addressStreetEn?: string | null;
-    addressStreetSv?: string | null;
-    addressCityEn?: string | null;
-    addressCitySv?: string | null;
-    addressStreetFi?: string | null;
-    addressZip: string;
-    addressCityFi?: string | null;
-  } | null;
-};
-
-export type ReservationUnitFieldsFragment = {
-  id: string;
-  pk?: number | null;
-  uuid: string;
-  nameFi?: string | null;
-  nameEn?: string | null;
-  nameSv?: string | null;
-  reservationPendingInstructionsFi?: string | null;
-  reservationPendingInstructionsEn?: string | null;
-  reservationPendingInstructionsSv?: string | null;
-  reservationConfirmedInstructionsFi?: string | null;
-  reservationConfirmedInstructionsEn?: string | null;
-  reservationConfirmedInstructionsSv?: string | null;
-  reservationCancelledInstructionsFi?: string | null;
-  reservationCancelledInstructionsEn?: string | null;
-  reservationCancelledInstructionsSv?: string | null;
+export type TermsOfUseFragment = {
   termsOfUseFi?: string | null;
   termsOfUseEn?: string | null;
   termsOfUseSv?: string | null;
-  minPersons?: number | null;
-  maxPersons?: number | null;
-  unit?: {
-    id: string;
-    tprekId?: string | null;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameEn?: string | null;
-    nameSv?: string | null;
-    location?: {
-      id: string;
-      latitude?: string | null;
-      longitude?: string | null;
-      addressStreetEn?: string | null;
-      addressStreetSv?: string | null;
-      addressCityEn?: string | null;
-      addressCitySv?: string | null;
-      addressStreetFi?: string | null;
-      addressZip: string;
-      addressCityFi?: string | null;
-    } | null;
-  } | null;
   serviceSpecificTerms?: {
     id: string;
     textFi?: string | null;
@@ -6240,27 +6218,6 @@ export type ReservationUnitFieldsFragment = {
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
-  } | null;
-  pricings: Array<{
-    id: string;
-    begins: string;
-    priceUnit: PriceUnit;
-    lowestPrice: string;
-    highestPrice: string;
-    taxPercentage: { id: string; pk?: number | null; value: string };
-  }>;
-  images: Array<{
-    id: string;
-    imageUrl?: string | null;
-    largeUrl?: string | null;
-    mediumUrl?: string | null;
-    smallUrl?: string | null;
-    imageType: ImageType;
-  }>;
-  metadataSet?: {
-    id: string;
-    requiredFields: Array<{ id: string; fieldName: string }>;
-    supportedFields: Array<{ id: string; fieldName: string }>;
   } | null;
 };
 
@@ -6459,25 +6416,6 @@ export type ListReservationsQuery = {
   } | null;
 };
 
-export type ReservationInfoFragment = {
-  description?: string | null;
-  numPersons?: number | null;
-  purpose?: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameEn?: string | null;
-    nameSv?: string | null;
-  } | null;
-  ageGroup?: {
-    id: string;
-    pk?: number | null;
-    minimum: number;
-    maximum?: number | null;
-  } | null;
-  homeCity?: { id: string; pk?: number | null; name: string } | null;
-};
-
 export type OrderFieldsFragment = {
   id: string;
   reservationPk?: string | null;
@@ -6509,168 +6447,6 @@ export type ReservationStateQuery = {
     id: string;
     pk?: number | null;
     state?: ReservationStateChoice | null;
-  } | null;
-};
-
-export type ReservationQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type ReservationQuery = {
-  reservation?: {
-    id: string;
-    pk?: number | null;
-    name?: string | null;
-    applyingForFreeOfCharge?: boolean | null;
-    freeOfChargeReason?: string | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    begin: string;
-    end: string;
-    calendarUrl?: string | null;
-    state?: ReservationStateChoice | null;
-    price?: string | null;
-    priceNet?: string | null;
-    taxPercentageValue?: string | null;
-    isHandled?: boolean | null;
-    reserveeFirstName?: string | null;
-    reserveeLastName?: string | null;
-    reserveeEmail?: string | null;
-    reserveePhone?: string | null;
-    reserveeType?: CustomerTypeChoice | null;
-    reserveeOrganisationName?: string | null;
-    reserveeId?: string | null;
-    reserveeIsUnregisteredAssociation?: boolean | null;
-    reserveeAddressStreet?: string | null;
-    reserveeAddressCity?: string | null;
-    reserveeAddressZip?: string | null;
-    billingFirstName?: string | null;
-    billingLastName?: string | null;
-    billingPhone?: string | null;
-    billingEmail?: string | null;
-    billingAddressStreet?: string | null;
-    billingAddressCity?: string | null;
-    billingAddressZip?: string | null;
-    description?: string | null;
-    numPersons?: number | null;
-    user?: { id: string; email: string; pk?: number | null } | null;
-    paymentOrder: Array<{
-      id: string;
-      reservationPk?: string | null;
-      status?: OrderStatus | null;
-      paymentType: PaymentType;
-      receiptUrl?: string | null;
-      checkoutUrl?: string | null;
-    }>;
-    reservationUnits: Array<{
-      id: string;
-      canApplyFreeOfCharge: boolean;
-      pk?: number | null;
-      uuid: string;
-      nameFi?: string | null;
-      nameEn?: string | null;
-      nameSv?: string | null;
-      reservationPendingInstructionsFi?: string | null;
-      reservationPendingInstructionsEn?: string | null;
-      reservationPendingInstructionsSv?: string | null;
-      reservationConfirmedInstructionsFi?: string | null;
-      reservationConfirmedInstructionsEn?: string | null;
-      reservationConfirmedInstructionsSv?: string | null;
-      reservationCancelledInstructionsFi?: string | null;
-      reservationCancelledInstructionsEn?: string | null;
-      reservationCancelledInstructionsSv?: string | null;
-      termsOfUseFi?: string | null;
-      termsOfUseEn?: string | null;
-      termsOfUseSv?: string | null;
-      minPersons?: number | null;
-      maxPersons?: number | null;
-      unit?: {
-        id: string;
-        tprekId?: string | null;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-        location?: {
-          id: string;
-          latitude?: string | null;
-          longitude?: string | null;
-          addressStreetEn?: string | null;
-          addressStreetSv?: string | null;
-          addressCityEn?: string | null;
-          addressCitySv?: string | null;
-          addressStreetFi?: string | null;
-          addressZip: string;
-          addressCityFi?: string | null;
-        } | null;
-      } | null;
-      serviceSpecificTerms?: {
-        id: string;
-        textFi?: string | null;
-        textEn?: string | null;
-        textSv?: string | null;
-      } | null;
-      cancellationTerms?: {
-        id: string;
-        textFi?: string | null;
-        textEn?: string | null;
-        textSv?: string | null;
-      } | null;
-      paymentTerms?: {
-        id: string;
-        textFi?: string | null;
-        textEn?: string | null;
-        textSv?: string | null;
-      } | null;
-      pricingTerms?: {
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-        id: string;
-        textFi?: string | null;
-        textEn?: string | null;
-        textSv?: string | null;
-      } | null;
-      pricings: Array<{
-        id: string;
-        begins: string;
-        priceUnit: PriceUnit;
-        lowestPrice: string;
-        highestPrice: string;
-        taxPercentage: { id: string; pk?: number | null; value: string };
-      }>;
-      images: Array<{
-        id: string;
-        imageUrl?: string | null;
-        largeUrl?: string | null;
-        mediumUrl?: string | null;
-        smallUrl?: string | null;
-        imageType: ImageType;
-      }>;
-      cancellationRule?: {
-        id: string;
-        canBeCancelledTimeBefore?: number | null;
-      } | null;
-      metadataSet?: {
-        id: string;
-        requiredFields: Array<{ id: string; fieldName: string }>;
-        supportedFields: Array<{ id: string; fieldName: string }>;
-      } | null;
-    }>;
-    purpose?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameEn?: string | null;
-      nameSv?: string | null;
-    } | null;
-    ageGroup?: {
-      id: string;
-      pk?: number | null;
-      minimum: number;
-      maximum?: number | null;
-    } | null;
-    homeCity?: { id: string; pk?: number | null; name: string } | null;
   } | null;
 };
 
@@ -6741,6 +6517,12 @@ export type EquipmentFieldsFragment = {
 };
 
 export type ReservationUnitPageFieldsFragment = {
+  id: string;
+  pk?: number | null;
+  uuid: string;
+  nameFi?: string | null;
+  nameEn?: string | null;
+  nameSv?: string | null;
   isDraft: boolean;
   descriptionFi?: string | null;
   descriptionEn?: string | null;
@@ -6754,24 +6536,11 @@ export type ReservationUnitPageFieldsFragment = {
   reservationState?: ReservationUnitReservationState | null;
   numActiveUserReservations?: number | null;
   requireReservationHandling: boolean;
-  id: string;
-  pk?: number | null;
-  uuid: string;
-  nameFi?: string | null;
-  nameEn?: string | null;
-  nameSv?: string | null;
-  reservationPendingInstructionsFi?: string | null;
-  reservationPendingInstructionsEn?: string | null;
-  reservationPendingInstructionsSv?: string | null;
-  reservationConfirmedInstructionsFi?: string | null;
-  reservationConfirmedInstructionsEn?: string | null;
-  reservationConfirmedInstructionsSv?: string | null;
-  reservationCancelledInstructionsFi?: string | null;
-  reservationCancelledInstructionsEn?: string | null;
-  reservationCancelledInstructionsSv?: string | null;
   termsOfUseFi?: string | null;
   termsOfUseEn?: string | null;
   termsOfUseSv?: string | null;
+  minPersons?: number | null;
+  maxPersons?: number | null;
   reservationBegins?: string | null;
   reservationEnds?: string | null;
   reservationsMaxDaysBefore?: number | null;
@@ -6779,8 +6548,32 @@ export type ReservationUnitPageFieldsFragment = {
   minReservationDuration?: number | null;
   maxReservationDuration?: number | null;
   maxReservationsPerUser?: number | null;
-  minPersons?: number | null;
-  maxPersons?: number | null;
+  unit?: {
+    id: string;
+    tprekId?: string | null;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+    location?: {
+      addressStreetEn?: string | null;
+      addressStreetSv?: string | null;
+      addressCityEn?: string | null;
+      addressCitySv?: string | null;
+      id: string;
+      addressStreetFi?: string | null;
+      addressZip: string;
+      addressCityFi?: string | null;
+    } | null;
+  } | null;
+  pricings: Array<{
+    id: string;
+    begins: string;
+    priceUnit: PriceUnit;
+    lowestPrice: string;
+    highestPrice: string;
+    taxPercentage: { id: string; pk?: number | null; value: string };
+  }>;
   images: Array<{
     id: string;
     imageUrl?: string | null;
@@ -6820,26 +6613,6 @@ export type ReservationUnitPageFieldsFragment = {
       nameSv?: string | null;
     };
   }>;
-  unit?: {
-    id: string;
-    tprekId?: string | null;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameEn?: string | null;
-    nameSv?: string | null;
-    location?: {
-      id: string;
-      latitude?: string | null;
-      longitude?: string | null;
-      addressStreetEn?: string | null;
-      addressStreetSv?: string | null;
-      addressCityEn?: string | null;
-      addressCitySv?: string | null;
-      addressStreetFi?: string | null;
-      addressZip: string;
-      addressCityFi?: string | null;
-    } | null;
-  } | null;
   serviceSpecificTerms?: {
     id: string;
     textFi?: string | null;
@@ -6867,14 +6640,6 @@ export type ReservationUnitPageFieldsFragment = {
     textEn?: string | null;
     textSv?: string | null;
   } | null;
-  pricings: Array<{
-    id: string;
-    begins: string;
-    priceUnit: PriceUnit;
-    lowestPrice: string;
-    highestPrice: string;
-    taxPercentage: { id: string; pk?: number | null; value: string };
-  }>;
   metadataSet?: {
     id: string;
     requiredFields: Array<{ id: string; fieldName: string }>;
@@ -6894,154 +6659,6 @@ export type BlockingReservationFieldsFragment = {
   bufferTimeBefore: number;
   bufferTimeAfter: number;
   affectedReservationUnits?: Array<number | null> | null;
-};
-
-export type ReservationUnitQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type ReservationUnitQuery = {
-  reservationUnit?: {
-    isDraft: boolean;
-    descriptionFi?: string | null;
-    descriptionEn?: string | null;
-    descriptionSv?: string | null;
-    reservationKind: ReservationKind;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    reservationStartInterval: ReservationStartInterval;
-    canApplyFreeOfCharge: boolean;
-    publishingState?: ReservationUnitPublishingState | null;
-    reservationState?: ReservationUnitReservationState | null;
-    numActiveUserReservations?: number | null;
-    requireReservationHandling: boolean;
-    id: string;
-    pk?: number | null;
-    uuid: string;
-    nameFi?: string | null;
-    nameEn?: string | null;
-    nameSv?: string | null;
-    reservationPendingInstructionsFi?: string | null;
-    reservationPendingInstructionsEn?: string | null;
-    reservationPendingInstructionsSv?: string | null;
-    reservationConfirmedInstructionsFi?: string | null;
-    reservationConfirmedInstructionsEn?: string | null;
-    reservationConfirmedInstructionsSv?: string | null;
-    reservationCancelledInstructionsFi?: string | null;
-    reservationCancelledInstructionsEn?: string | null;
-    reservationCancelledInstructionsSv?: string | null;
-    termsOfUseFi?: string | null;
-    termsOfUseEn?: string | null;
-    termsOfUseSv?: string | null;
-    reservationBegins?: string | null;
-    reservationEnds?: string | null;
-    reservationsMaxDaysBefore?: number | null;
-    reservationsMinDaysBefore?: number | null;
-    minReservationDuration?: number | null;
-    maxReservationDuration?: number | null;
-    maxReservationsPerUser?: number | null;
-    minPersons?: number | null;
-    maxPersons?: number | null;
-    images: Array<{
-      id: string;
-      imageUrl?: string | null;
-      largeUrl?: string | null;
-      mediumUrl?: string | null;
-      smallUrl?: string | null;
-      imageType: ImageType;
-    }>;
-    applicationRoundTimeSlots: Array<{
-      id: string;
-      closed: boolean;
-      weekday: number;
-      reservableTimes?: Array<{ begin: string; end: string } | null> | null;
-    }>;
-    applicationRounds: Array<{
-      id: string;
-      reservationPeriodBegin: string;
-      reservationPeriodEnd: string;
-    }>;
-    reservationUnitType?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameEn?: string | null;
-      nameSv?: string | null;
-    } | null;
-    equipments: Array<{
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameEn?: string | null;
-      nameSv?: string | null;
-      category: {
-        id: string;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-      };
-    }>;
-    unit?: {
-      id: string;
-      tprekId?: string | null;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameEn?: string | null;
-      nameSv?: string | null;
-      location?: {
-        id: string;
-        latitude?: string | null;
-        longitude?: string | null;
-        addressStreetEn?: string | null;
-        addressStreetSv?: string | null;
-        addressCityEn?: string | null;
-        addressCitySv?: string | null;
-        addressStreetFi?: string | null;
-        addressZip: string;
-        addressCityFi?: string | null;
-      } | null;
-    } | null;
-    serviceSpecificTerms?: {
-      id: string;
-      textFi?: string | null;
-      textEn?: string | null;
-      textSv?: string | null;
-    } | null;
-    cancellationTerms?: {
-      id: string;
-      textFi?: string | null;
-      textEn?: string | null;
-      textSv?: string | null;
-    } | null;
-    paymentTerms?: {
-      id: string;
-      textFi?: string | null;
-      textEn?: string | null;
-      textSv?: string | null;
-    } | null;
-    pricingTerms?: {
-      nameFi?: string | null;
-      nameEn?: string | null;
-      nameSv?: string | null;
-      id: string;
-      textFi?: string | null;
-      textEn?: string | null;
-      textSv?: string | null;
-    } | null;
-    pricings: Array<{
-      id: string;
-      begins: string;
-      priceUnit: PriceUnit;
-      lowestPrice: string;
-      highestPrice: string;
-      taxPercentage: { id: string; pk?: number | null; value: string };
-    }>;
-    metadataSet?: {
-      id: string;
-      requiredFields: Array<{ id: string; fieldName: string }>;
-      supportedFields: Array<{ id: string; fieldName: string }>;
-    } | null;
-  } | null;
 };
 
 export type IsReservableFieldsFragment = {
@@ -7073,6 +6690,12 @@ export type ReservationUnitPageQueryVariables = Exact<{
 
 export type ReservationUnitPageQuery = {
   reservationUnit?: {
+    id: string;
+    pk?: number | null;
+    uuid: string;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
     isDraft: boolean;
     descriptionFi?: string | null;
     descriptionEn?: string | null;
@@ -7092,27 +6715,38 @@ export type ReservationUnitPageQuery = {
     reservationsMinDaysBefore?: number | null;
     reservationBegins?: string | null;
     reservationEnds?: string | null;
-    id: string;
-    pk?: number | null;
-    uuid: string;
-    nameFi?: string | null;
-    nameEn?: string | null;
-    nameSv?: string | null;
-    reservationPendingInstructionsFi?: string | null;
-    reservationPendingInstructionsEn?: string | null;
-    reservationPendingInstructionsSv?: string | null;
-    reservationConfirmedInstructionsFi?: string | null;
-    reservationConfirmedInstructionsEn?: string | null;
-    reservationConfirmedInstructionsSv?: string | null;
-    reservationCancelledInstructionsFi?: string | null;
-    reservationCancelledInstructionsEn?: string | null;
-    reservationCancelledInstructionsSv?: string | null;
     termsOfUseFi?: string | null;
     termsOfUseEn?: string | null;
     termsOfUseSv?: string | null;
-    maxReservationsPerUser?: number | null;
     minPersons?: number | null;
     maxPersons?: number | null;
+    maxReservationsPerUser?: number | null;
+    unit?: {
+      id: string;
+      tprekId?: string | null;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+      location?: {
+        addressStreetEn?: string | null;
+        addressStreetSv?: string | null;
+        addressCityEn?: string | null;
+        addressCitySv?: string | null;
+        id: string;
+        addressStreetFi?: string | null;
+        addressZip: string;
+        addressCityFi?: string | null;
+      } | null;
+    } | null;
+    pricings: Array<{
+      id: string;
+      begins: string;
+      priceUnit: PriceUnit;
+      lowestPrice: string;
+      highestPrice: string;
+      taxPercentage: { id: string; pk?: number | null; value: string };
+    }>;
     images: Array<{
       id: string;
       imageUrl?: string | null;
@@ -7156,26 +6790,6 @@ export type ReservationUnitPageQuery = {
       startDatetime?: string | null;
       endDatetime?: string | null;
     } | null> | null;
-    unit?: {
-      id: string;
-      tprekId?: string | null;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameEn?: string | null;
-      nameSv?: string | null;
-      location?: {
-        id: string;
-        latitude?: string | null;
-        longitude?: string | null;
-        addressStreetEn?: string | null;
-        addressStreetSv?: string | null;
-        addressCityEn?: string | null;
-        addressCitySv?: string | null;
-        addressStreetFi?: string | null;
-        addressZip: string;
-        addressCityFi?: string | null;
-      } | null;
-    } | null;
     serviceSpecificTerms?: {
       id: string;
       textFi?: string | null;
@@ -7203,14 +6817,6 @@ export type ReservationUnitPageQuery = {
       textEn?: string | null;
       textSv?: string | null;
     } | null;
-    pricings: Array<{
-      id: string;
-      begins: string;
-      priceUnit: PriceUnit;
-      lowestPrice: string;
-      highestPrice: string;
-      taxPercentage: { id: string; pk?: number | null; value: string };
-    }>;
     metadataSet?: {
       id: string;
       requiredFields: Array<{ id: string; fieldName: string }>;
@@ -7679,6 +7285,51 @@ export type ReserveeBillingFieldsFragment = {
   billingAddressZip?: string | null;
 };
 
+export type MetaFieldsFragment = {
+  applyingForFreeOfCharge?: boolean | null;
+  freeOfChargeReason?: string | null;
+  description?: string | null;
+  numPersons?: number | null;
+  reserveeFirstName?: string | null;
+  reserveeLastName?: string | null;
+  reserveeEmail?: string | null;
+  reserveePhone?: string | null;
+  reserveeType?: CustomerTypeChoice | null;
+  reserveeOrganisationName?: string | null;
+  reserveeId?: string | null;
+  reserveeIsUnregisteredAssociation?: boolean | null;
+  reserveeAddressStreet?: string | null;
+  reserveeAddressCity?: string | null;
+  reserveeAddressZip?: string | null;
+  billingFirstName?: string | null;
+  billingLastName?: string | null;
+  billingPhone?: string | null;
+  billingEmail?: string | null;
+  billingAddressStreet?: string | null;
+  billingAddressCity?: string | null;
+  billingAddressZip?: string | null;
+  ageGroup?: {
+    id: string;
+    pk?: number | null;
+    maximum?: number | null;
+    minimum: number;
+  } | null;
+  purpose?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+  } | null;
+  homeCity?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameSv?: string | null;
+    nameEn?: string | null;
+  } | null;
+};
+
 export type TermsOfUseNameFieldsFragment = {
   nameFi?: string | null;
   nameEn?: string | null;
@@ -8097,6 +7748,150 @@ export type ApplicationViewQuery = {
   } | null;
 };
 
+export type ReservationQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationQuery = {
+  reservation?: {
+    id: string;
+    pk?: number | null;
+    name?: string | null;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
+    calendarUrl?: string | null;
+    applyingForFreeOfCharge?: boolean | null;
+    freeOfChargeReason?: string | null;
+    description?: string | null;
+    numPersons?: number | null;
+    taxPercentageValue?: string | null;
+    begin: string;
+    end: string;
+    state?: ReservationStateChoice | null;
+    price?: string | null;
+    reserveeFirstName?: string | null;
+    reserveeLastName?: string | null;
+    reserveeEmail?: string | null;
+    reserveePhone?: string | null;
+    reserveeType?: CustomerTypeChoice | null;
+    reserveeOrganisationName?: string | null;
+    reserveeId?: string | null;
+    reserveeIsUnregisteredAssociation?: boolean | null;
+    reserveeAddressStreet?: string | null;
+    reserveeAddressCity?: string | null;
+    reserveeAddressZip?: string | null;
+    billingFirstName?: string | null;
+    billingLastName?: string | null;
+    billingPhone?: string | null;
+    billingEmail?: string | null;
+    billingAddressStreet?: string | null;
+    billingAddressCity?: string | null;
+    billingAddressZip?: string | null;
+    paymentOrder: Array<{
+      id: string;
+      reservationPk?: string | null;
+      status?: OrderStatus | null;
+      paymentType: PaymentType;
+      receiptUrl?: string | null;
+      checkoutUrl?: string | null;
+    }>;
+    reservationUnits: Array<{
+      id: string;
+      canApplyFreeOfCharge: boolean;
+      requireReservationHandling: boolean;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+      minPersons?: number | null;
+      maxPersons?: number | null;
+      termsOfUseFi?: string | null;
+      termsOfUseEn?: string | null;
+      termsOfUseSv?: string | null;
+      reservationBegins?: string | null;
+      reservationEnds?: string | null;
+      images: Array<{
+        id: string;
+        imageUrl?: string | null;
+        largeUrl?: string | null;
+        mediumUrl?: string | null;
+        smallUrl?: string | null;
+        imageType: ImageType;
+      }>;
+      unit?: {
+        id: string;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+      } | null;
+      cancellationRule?: {
+        id: string;
+        canBeCancelledTimeBefore?: number | null;
+      } | null;
+      metadataSet?: {
+        id: string;
+        requiredFields: Array<{ id: string; fieldName: string }>;
+        supportedFields: Array<{ id: string; fieldName: string }>;
+      } | null;
+      serviceSpecificTerms?: {
+        id: string;
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      cancellationTerms?: {
+        id: string;
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      paymentTerms?: {
+        id: string;
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      pricingTerms?: {
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        id: string;
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      pricings: Array<{
+        id: string;
+        begins: string;
+        priceUnit: PriceUnit;
+        lowestPrice: string;
+        highestPrice: string;
+        taxPercentage: { id: string; pk?: number | null; value: string };
+      }>;
+    }>;
+    ageGroup?: {
+      id: string;
+      pk?: number | null;
+      maximum?: number | null;
+      minimum: number;
+    } | null;
+    purpose?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+    } | null;
+    homeCity?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+    } | null;
+  } | null;
+};
+
 export type ReservationCancelPageQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8104,12 +7899,12 @@ export type ReservationCancelPageQueryVariables = Exact<{
 export type ReservationCancelPageQuery = {
   reservation?: {
     id: string;
-    pk?: number | null;
     name?: string | null;
+    pk?: number | null;
+    taxPercentageValue?: string | null;
     begin: string;
     end: string;
     state?: ReservationStateChoice | null;
-    taxPercentageValue?: string | null;
     price?: string | null;
     reservationUnits: Array<{
       id: string;
@@ -8193,6 +7988,212 @@ export type ReservationCancelPageQuery = {
   } | null;
 };
 
+export type ReservationConfirmationPageQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationConfirmationPageQuery = {
+  reservation?: {
+    id: string;
+    pk?: number | null;
+    name?: string | null;
+    calendarUrl?: string | null;
+    reserveeFirstName?: string | null;
+    reserveeLastName?: string | null;
+    reserveeEmail?: string | null;
+    reserveePhone?: string | null;
+    reserveeType?: CustomerTypeChoice | null;
+    reserveeOrganisationName?: string | null;
+    reserveeId?: string | null;
+    reserveeIsUnregisteredAssociation?: boolean | null;
+    reserveeAddressStreet?: string | null;
+    reserveeAddressCity?: string | null;
+    reserveeAddressZip?: string | null;
+    billingFirstName?: string | null;
+    billingLastName?: string | null;
+    billingPhone?: string | null;
+    billingEmail?: string | null;
+    billingAddressStreet?: string | null;
+    billingAddressCity?: string | null;
+    billingAddressZip?: string | null;
+    description?: string | null;
+    numPersons?: number | null;
+    taxPercentageValue?: string | null;
+    begin: string;
+    end: string;
+    state?: ReservationStateChoice | null;
+    price?: string | null;
+    paymentOrder: Array<{
+      id: string;
+      reservationPk?: string | null;
+      status?: OrderStatus | null;
+      paymentType: PaymentType;
+      receiptUrl?: string | null;
+      checkoutUrl?: string | null;
+    }>;
+    reservationUnits: Array<{
+      id: string;
+      canApplyFreeOfCharge: boolean;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+      reservationPendingInstructionsFi?: string | null;
+      reservationPendingInstructionsEn?: string | null;
+      reservationPendingInstructionsSv?: string | null;
+      reservationConfirmedInstructionsFi?: string | null;
+      reservationConfirmedInstructionsEn?: string | null;
+      reservationConfirmedInstructionsSv?: string | null;
+      reservationCancelledInstructionsFi?: string | null;
+      reservationCancelledInstructionsEn?: string | null;
+      reservationCancelledInstructionsSv?: string | null;
+      reservationBegins?: string | null;
+      reservationEnds?: string | null;
+      images: Array<{
+        id: string;
+        imageUrl?: string | null;
+        largeUrl?: string | null;
+        mediumUrl?: string | null;
+        smallUrl?: string | null;
+        imageType: ImageType;
+      }>;
+      unit?: {
+        id: string;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+      } | null;
+      cancellationRule?: {
+        id: string;
+        canBeCancelledTimeBefore?: number | null;
+      } | null;
+      pricings: Array<{
+        id: string;
+        begins: string;
+        priceUnit: PriceUnit;
+        lowestPrice: string;
+        highestPrice: string;
+        taxPercentage: { id: string; pk?: number | null; value: string };
+      }>;
+    }>;
+    purpose?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+    } | null;
+    ageGroup?: {
+      id: string;
+      pk?: number | null;
+      minimum: number;
+      maximum?: number | null;
+    } | null;
+  } | null;
+};
+
+export type ReservationEditPageQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationEditPageQuery = {
+  reservation?: {
+    id: string;
+    pk?: number | null;
+    name?: string | null;
+    isHandled?: boolean | null;
+    applyingForFreeOfCharge?: boolean | null;
+    freeOfChargeReason?: string | null;
+    description?: string | null;
+    numPersons?: number | null;
+    taxPercentageValue?: string | null;
+    begin: string;
+    end: string;
+    state?: ReservationStateChoice | null;
+    price?: string | null;
+    reserveeFirstName?: string | null;
+    reserveeLastName?: string | null;
+    reserveeEmail?: string | null;
+    reserveePhone?: string | null;
+    reserveeType?: CustomerTypeChoice | null;
+    reserveeOrganisationName?: string | null;
+    reserveeId?: string | null;
+    reserveeIsUnregisteredAssociation?: boolean | null;
+    reserveeAddressStreet?: string | null;
+    reserveeAddressCity?: string | null;
+    reserveeAddressZip?: string | null;
+    billingFirstName?: string | null;
+    billingLastName?: string | null;
+    billingPhone?: string | null;
+    billingEmail?: string | null;
+    billingAddressStreet?: string | null;
+    billingAddressCity?: string | null;
+    billingAddressZip?: string | null;
+    reservationUnits: Array<{
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+      minPersons?: number | null;
+      maxPersons?: number | null;
+      reservationBegins?: string | null;
+      reservationEnds?: string | null;
+      images: Array<{
+        id: string;
+        imageUrl?: string | null;
+        largeUrl?: string | null;
+        mediumUrl?: string | null;
+        smallUrl?: string | null;
+        imageType: ImageType;
+      }>;
+      unit?: {
+        id: string;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+      } | null;
+      cancellationRule?: {
+        id: string;
+        canBeCancelledTimeBefore?: number | null;
+      } | null;
+      metadataSet?: {
+        id: string;
+        requiredFields: Array<{ id: string; fieldName: string }>;
+        supportedFields: Array<{ id: string; fieldName: string }>;
+      } | null;
+      pricings: Array<{
+        id: string;
+        begins: string;
+        priceUnit: PriceUnit;
+        lowestPrice: string;
+        highestPrice: string;
+        taxPercentage: { id: string; pk?: number | null; value: string };
+      }>;
+    }>;
+    ageGroup?: {
+      id: string;
+      pk?: number | null;
+      maximum?: number | null;
+      minimum: number;
+    } | null;
+    purpose?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+    } | null;
+    homeCity?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+    } | null;
+  } | null;
+};
+
 export type ApplicationRecurringReservationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8221,13 +8222,8 @@ export type ReservationPageQuery = {
   reservation?: {
     id: string;
     pk?: number | null;
-    name?: string | null;
     applyingForFreeOfCharge?: boolean | null;
-    begin: string;
-    end: string;
     calendarUrl?: string | null;
-    state?: ReservationStateChoice | null;
-    price?: string | null;
     reserveeFirstName?: string | null;
     reserveeLastName?: string | null;
     reserveeEmail?: string | null;
@@ -8248,9 +8244,16 @@ export type ReservationPageQuery = {
     billingAddressZip?: string | null;
     description?: string | null;
     numPersons?: number | null;
+    taxPercentageValue?: string | null;
+    begin: string;
+    end: string;
+    state?: ReservationStateChoice | null;
+    price?: string | null;
     paymentOrder: Array<{
       id: string;
+      reservationPk?: string | null;
       status?: OrderStatus | null;
+      paymentType: PaymentType;
       receiptUrl?: string | null;
       checkoutUrl?: string | null;
     }>;
@@ -8259,7 +8262,6 @@ export type ReservationPageQuery = {
       id: string;
       canApplyFreeOfCharge: boolean;
       pk?: number | null;
-      uuid: string;
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
@@ -8272,30 +8274,47 @@ export type ReservationPageQuery = {
       reservationCancelledInstructionsFi?: string | null;
       reservationCancelledInstructionsEn?: string | null;
       reservationCancelledInstructionsSv?: string | null;
+      minPersons?: number | null;
+      maxPersons?: number | null;
       termsOfUseFi?: string | null;
       termsOfUseEn?: string | null;
       termsOfUseSv?: string | null;
-      minPersons?: number | null;
-      maxPersons?: number | null;
+      reservationBegins?: string | null;
+      reservationEnds?: string | null;
       unit?: {
         id: string;
         tprekId?: string | null;
-        pk?: number | null;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
+        pk?: number | null;
         location?: {
-          id: string;
-          latitude?: string | null;
-          longitude?: string | null;
           addressStreetEn?: string | null;
           addressStreetSv?: string | null;
           addressCityEn?: string | null;
           addressCitySv?: string | null;
+          id: string;
           addressStreetFi?: string | null;
           addressZip: string;
           addressCityFi?: string | null;
         } | null;
+      } | null;
+      images: Array<{
+        id: string;
+        imageUrl?: string | null;
+        largeUrl?: string | null;
+        mediumUrl?: string | null;
+        smallUrl?: string | null;
+        imageType: ImageType;
+      }>;
+      cancellationRule?: {
+        id: string;
+        canBeCancelledTimeBefore?: number | null;
+      } | null;
+      metadataSet?: {
+        id: string;
+        requiredFields: Array<{ id: string; fieldName: string }>;
+        supportedFields: Array<{ id: string; fieldName: string }>;
       } | null;
       serviceSpecificTerms?: {
         id: string;
@@ -8332,23 +8351,6 @@ export type ReservationPageQuery = {
         highestPrice: string;
         taxPercentage: { id: string; pk?: number | null; value: string };
       }>;
-      images: Array<{
-        id: string;
-        imageUrl?: string | null;
-        largeUrl?: string | null;
-        mediumUrl?: string | null;
-        smallUrl?: string | null;
-        imageType: ImageType;
-      }>;
-      cancellationRule?: {
-        id: string;
-        canBeCancelledTimeBefore?: number | null;
-      } | null;
-      metadataSet?: {
-        id: string;
-        requiredFields: Array<{ id: string; fieldName: string }>;
-        supportedFields: Array<{ id: string; fieldName: string }>;
-      } | null;
     }>;
     purpose?: {
       id: string;
@@ -8363,10 +8365,45 @@ export type ReservationPageQuery = {
       minimum: number;
       maximum?: number | null;
     } | null;
-    homeCity?: { id: string; pk?: number | null; name: string } | null;
   } | null;
 };
 
+export type ReservationInfoFragment = {
+  description?: string | null;
+  numPersons?: number | null;
+  purpose?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+  } | null;
+  ageGroup?: {
+    id: string;
+    pk?: number | null;
+    minimum: number;
+    maximum?: number | null;
+  } | null;
+};
+
+export const InstructionsFragmentDoc = gql`
+  fragment Instructions on ReservationNode {
+    id
+    state
+    reservationUnits {
+      id
+      reservationPendingInstructionsFi
+      reservationPendingInstructionsEn
+      reservationPendingInstructionsSv
+      reservationConfirmedInstructionsFi
+      reservationConfirmedInstructionsEn
+      reservationConfirmedInstructionsSv
+      reservationCancelledInstructionsFi
+      reservationCancelledInstructionsEn
+      reservationCancelledInstructionsSv
+    }
+  }
+`;
 export const PricingFieldsFragmentDoc = gql`
   fragment PricingFields on ReservationUnitPricingNode {
     id
@@ -8760,30 +8797,6 @@ export const ReservationOrderStatusFragmentDoc = gql`
     }
   }
 `;
-export const ReservationInfoFragmentDoc = gql`
-  fragment ReservationInfo on ReservationNode {
-    description
-    purpose {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-    ageGroup {
-      id
-      pk
-      minimum
-      maximum
-    }
-    homeCity {
-      id
-      pk
-      name
-    }
-    numPersons
-  }
-`;
 export const OrderFieldsFragmentDoc = gql`
   fragment OrderFields on PaymentOrderNode {
     id
@@ -8825,18 +8838,35 @@ export const UnitNameFieldsI18NFragmentDoc = gql`
   }
   ${LocationFieldsI18nFragmentDoc}
 `;
-export const UnitFieldsFragmentDoc = gql`
-  fragment UnitFields on UnitNode {
+export const AddressFieldsFragmentDoc = gql`
+  fragment AddressFields on UnitNode {
     ...UnitNameFieldsI18N
     id
     tprekId
-    location {
-      id
-      latitude
-      longitude
-    }
   }
   ${UnitNameFieldsI18NFragmentDoc}
+`;
+export const TermsOfUseFragmentDoc = gql`
+  fragment TermsOfUse on ReservationUnitNode {
+    termsOfUseFi
+    termsOfUseEn
+    termsOfUseSv
+    serviceSpecificTerms {
+      ...TermsOfUseTextFields
+    }
+    cancellationTerms {
+      ...TermsOfUseTextFields
+    }
+    paymentTerms {
+      ...TermsOfUseTextFields
+    }
+    pricingTerms {
+      ...TermsOfUseNameFields
+      ...TermsOfUseTextFields
+    }
+  }
+  ${TermsOfUseTextFieldsFragmentDoc}
+  ${TermsOfUseNameFieldsFragmentDoc}
 `;
 export const MetadataSetsFragmentDoc = gql`
   fragment MetadataSets on ReservationUnitNode {
@@ -8855,57 +8885,6 @@ export const MetadataSetsFragmentDoc = gql`
       }
     }
   }
-`;
-export const ReservationUnitFieldsFragmentDoc = gql`
-  fragment ReservationUnitFields on ReservationUnitNode {
-    unit {
-      ...UnitFields
-    }
-    id
-    pk
-    uuid
-    nameFi
-    nameEn
-    nameSv
-    reservationPendingInstructionsFi
-    reservationPendingInstructionsEn
-    reservationPendingInstructionsSv
-    reservationConfirmedInstructionsFi
-    reservationConfirmedInstructionsEn
-    reservationConfirmedInstructionsSv
-    reservationCancelledInstructionsFi
-    reservationCancelledInstructionsEn
-    reservationCancelledInstructionsSv
-    termsOfUseFi
-    termsOfUseEn
-    termsOfUseSv
-    serviceSpecificTerms {
-      ...TermsOfUseTextFields
-    }
-    cancellationTerms {
-      ...TermsOfUseTextFields
-    }
-    paymentTerms {
-      ...TermsOfUseTextFields
-    }
-    pricingTerms {
-      ...TermsOfUseNameFields
-      ...TermsOfUseTextFields
-    }
-    pricings {
-      ...PricingFields
-    }
-    images {
-      ...Image
-    }
-    ...MetadataSets
-  }
-  ${UnitFieldsFragmentDoc}
-  ${TermsOfUseTextFieldsFragmentDoc}
-  ${TermsOfUseNameFieldsFragmentDoc}
-  ${PricingFieldsFragmentDoc}
-  ${ImageFragmentDoc}
-  ${MetadataSetsFragmentDoc}
 `;
 export const ReservationUnitTypeFieldsFragmentDoc = gql`
   fragment ReservationUnitTypeFields on ReservationUnitTypeNode {
@@ -8944,11 +8923,24 @@ export const EquipmentFieldsFragmentDoc = gql`
 `;
 export const ReservationUnitPageFieldsFragmentDoc = gql`
   fragment ReservationUnitPageFields on ReservationUnitNode {
-    ...ReservationUnitFields
-    isDraft
+    unit {
+      ...AddressFields
+    }
+    id
+    pk
+    uuid
+    nameFi
+    nameEn
+    nameSv
+    ...TermsOfUse
+    pricings {
+      ...PricingFields
+    }
     images {
       ...Image
     }
+    ...MetadataSets
+    isDraft
     applicationRoundTimeSlots {
       id
       closed
@@ -8984,8 +8976,11 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
       ...EquipmentFields
     }
   }
-  ${ReservationUnitFieldsFragmentDoc}
+  ${AddressFieldsFragmentDoc}
+  ${TermsOfUseFragmentDoc}
+  ${PricingFieldsFragmentDoc}
   ${ImageFragmentDoc}
+  ${MetadataSetsFragmentDoc}
   ${ReservationUnitTypeFieldsFragmentDoc}
   ${ReservationInfoContainerFragmentDoc}
   ${EquipmentFieldsFragmentDoc}
@@ -9092,6 +9087,38 @@ export const ReserveeBillingFieldsFragmentDoc = gql`
     billingAddressZip
   }
 `;
+export const MetaFieldsFragmentDoc = gql`
+  fragment MetaFields on ReservationNode {
+    ...ReserveeNameFields
+    ...ReserveeBillingFields
+    applyingForFreeOfCharge
+    freeOfChargeReason
+    description
+    numPersons
+    ageGroup {
+      id
+      pk
+      maximum
+      minimum
+    }
+    purpose {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    homeCity {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+    }
+  }
+  ${ReserveeNameFieldsFragmentDoc}
+  ${ReserveeBillingFieldsFragmentDoc}
+`;
 export const BannerNotificationCommonFragmentDoc = gql`
   fragment BannerNotificationCommon on BannerNotificationNode {
     id
@@ -9101,6 +9128,25 @@ export const BannerNotificationCommonFragmentDoc = gql`
     messageEn
     messageFi
     messageSv
+  }
+`;
+export const ReservationInfoFragmentDoc = gql`
+  fragment ReservationInfo on ReservationNode {
+    description
+    purpose {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    ageGroup {
+      id
+      pk
+      minimum
+      maximum
+    }
+    numPersons
   }
 `;
 export const OptionsDocument = gql`
@@ -10602,123 +10648,6 @@ export type ReservationStateQueryResult = Apollo.QueryResult<
   ReservationStateQuery,
   ReservationStateQueryVariables
 >;
-export const ReservationDocument = gql`
-  query Reservation($id: ID!) {
-    reservation(id: $id) {
-      id
-      pk
-      name
-      ...ReserveeNameFields
-      ...ReserveeBillingFields
-      ...ReservationInfo
-      applyingForFreeOfCharge
-      freeOfChargeReason
-      bufferTimeBefore
-      bufferTimeAfter
-      begin
-      end
-      calendarUrl
-      user {
-        id
-        email
-        pk
-      }
-      state
-      price
-      priceNet
-      taxPercentageValue
-      paymentOrder {
-        ...OrderFields
-      }
-      reservationUnits {
-        id
-        canApplyFreeOfCharge
-        ...ReservationUnitFields
-        ...CancellationRuleFields
-      }
-      isHandled
-    }
-  }
-  ${ReserveeNameFieldsFragmentDoc}
-  ${ReserveeBillingFieldsFragmentDoc}
-  ${ReservationInfoFragmentDoc}
-  ${OrderFieldsFragmentDoc}
-  ${ReservationUnitFieldsFragmentDoc}
-  ${CancellationRuleFieldsFragmentDoc}
-`;
-
-/**
- * __useReservationQuery__
- *
- * To run a query within a React component, call `useReservationQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useReservationQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationQuery,
-    ReservationQueryVariables
-  > &
-    (
-      | { variables: ReservationQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options
-  );
-}
-export function useReservationLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationQuery,
-    ReservationQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options
-  );
-}
-export function useReservationSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationQuery,
-        ReservationQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options
-  );
-}
-export type ReservationQueryHookResult = ReturnType<typeof useReservationQuery>;
-export type ReservationLazyQueryHookResult = ReturnType<
-  typeof useReservationLazyQuery
->;
-export type ReservationSuspenseQueryHookResult = ReturnType<
-  typeof useReservationSuspenseQuery
->;
-export type ReservationQueryResult = Apollo.QueryResult<
-  ReservationQuery,
-  ReservationQueryVariables
->;
 export const AdjustReservationTimeDocument = gql`
   mutation AdjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
     adjustReservationTime(input: $input) {
@@ -10889,89 +10818,6 @@ export type RefreshOrderMutationResult =
 export type RefreshOrderMutationOptions = Apollo.BaseMutationOptions<
   RefreshOrderMutation,
   RefreshOrderMutationVariables
->;
-export const ReservationUnitDocument = gql`
-  query ReservationUnit($id: ID!) {
-    reservationUnit(id: $id) {
-      ...ReservationUnitPageFields
-    }
-  }
-  ${ReservationUnitPageFieldsFragmentDoc}
-`;
-
-/**
- * __useReservationUnitQuery__
- *
- * To run a query within a React component, call `useReservationUnitQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationUnitQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationUnitQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useReservationUnitQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationUnitQuery,
-    ReservationUnitQueryVariables
-  > &
-    (
-      | { variables: ReservationUnitQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ReservationUnitQuery, ReservationUnitQueryVariables>(
-    ReservationUnitDocument,
-    options
-  );
-}
-export function useReservationUnitLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationUnitQuery,
-    ReservationUnitQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationUnitQuery,
-    ReservationUnitQueryVariables
-  >(ReservationUnitDocument, options);
-}
-export function useReservationUnitSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationUnitQuery,
-        ReservationUnitQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationUnitQuery,
-    ReservationUnitQueryVariables
-  >(ReservationUnitDocument, options);
-}
-export type ReservationUnitQueryHookResult = ReturnType<
-  typeof useReservationUnitQuery
->;
-export type ReservationUnitLazyQueryHookResult = ReturnType<
-  typeof useReservationUnitLazyQuery
->;
-export type ReservationUnitSuspenseQueryHookResult = ReturnType<
-  typeof useReservationUnitSuspenseQuery
->;
-export type ReservationUnitQueryResult = Apollo.QueryResult<
-  ReservationUnitQuery,
-  ReservationUnitQueryVariables
 >;
 export const ReservationUnitPageDocument = gql`
   query ReservationUnitPage(
@@ -11994,16 +11840,116 @@ export type ApplicationViewQueryResult = Apollo.QueryResult<
   ApplicationViewQuery,
   ApplicationViewQueryVariables
 >;
+export const ReservationDocument = gql`
+  query Reservation($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      name
+      ...MetaFields
+      ...ReservationInfoCard
+      bufferTimeBefore
+      bufferTimeAfter
+      calendarUrl
+      paymentOrder {
+        ...OrderFields
+      }
+      reservationUnits {
+        id
+        canApplyFreeOfCharge
+        ...CancellationRuleFields
+        ...MetadataSets
+        ...TermsOfUse
+        requireReservationHandling
+      }
+    }
+  }
+  ${MetaFieldsFragmentDoc}
+  ${ReservationInfoCardFragmentDoc}
+  ${OrderFieldsFragmentDoc}
+  ${CancellationRuleFieldsFragmentDoc}
+  ${MetadataSetsFragmentDoc}
+  ${TermsOfUseFragmentDoc}
+`;
+
+/**
+ * __useReservationQuery__
+ *
+ * To run a query within a React component, call `useReservationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationQuery,
+    ReservationQueryVariables
+  > &
+    (
+      | { variables: ReservationQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ReservationQuery, ReservationQueryVariables>(
+    ReservationDocument,
+    options
+  );
+}
+export function useReservationLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationQuery,
+    ReservationQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ReservationQuery, ReservationQueryVariables>(
+    ReservationDocument,
+    options
+  );
+}
+export function useReservationSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationQuery,
+        ReservationQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<ReservationQuery, ReservationQueryVariables>(
+    ReservationDocument,
+    options
+  );
+}
+export type ReservationQueryHookResult = ReturnType<typeof useReservationQuery>;
+export type ReservationLazyQueryHookResult = ReturnType<
+  typeof useReservationLazyQuery
+>;
+export type ReservationSuspenseQueryHookResult = ReturnType<
+  typeof useReservationSuspenseQuery
+>;
+export type ReservationQueryResult = Apollo.QueryResult<
+  ReservationQuery,
+  ReservationQueryVariables
+>;
 export const ReservationCancelPageDocument = gql`
   query ReservationCancelPage($id: ID!) {
     reservation(id: $id) {
       id
       ...ReservationInfoCard
-      pk
       name
-      begin
-      end
-      state
       reservationUnits {
         id
         ...CancellationRuleFields
@@ -12124,6 +12070,207 @@ export type ReservationCancelPageQueryResult = Apollo.QueryResult<
   ReservationCancelPageQuery,
   ReservationCancelPageQueryVariables
 >;
+export const ReservationConfirmationPageDocument = gql`
+  query ReservationConfirmationPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      name
+      ...ReserveeNameFields
+      ...ReserveeBillingFields
+      ...ReservationInfo
+      ...ReservationInfoCard
+      ...Instructions
+      calendarUrl
+      paymentOrder {
+        ...OrderFields
+      }
+      reservationUnits {
+        id
+        canApplyFreeOfCharge
+        ...CancellationRuleFields
+      }
+    }
+  }
+  ${ReserveeNameFieldsFragmentDoc}
+  ${ReserveeBillingFieldsFragmentDoc}
+  ${ReservationInfoFragmentDoc}
+  ${ReservationInfoCardFragmentDoc}
+  ${InstructionsFragmentDoc}
+  ${OrderFieldsFragmentDoc}
+  ${CancellationRuleFieldsFragmentDoc}
+`;
+
+/**
+ * __useReservationConfirmationPageQuery__
+ *
+ * To run a query within a React component, call `useReservationConfirmationPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationConfirmationPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationConfirmationPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationConfirmationPageQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationConfirmationPageQuery,
+    ReservationConfirmationPageQueryVariables
+  > &
+    (
+      | { variables: ReservationConfirmationPageQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationConfirmationPageQuery,
+    ReservationConfirmationPageQueryVariables
+  >(ReservationConfirmationPageDocument, options);
+}
+export function useReservationConfirmationPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationConfirmationPageQuery,
+    ReservationConfirmationPageQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationConfirmationPageQuery,
+    ReservationConfirmationPageQueryVariables
+  >(ReservationConfirmationPageDocument, options);
+}
+export function useReservationConfirmationPageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationConfirmationPageQuery,
+        ReservationConfirmationPageQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationConfirmationPageQuery,
+    ReservationConfirmationPageQueryVariables
+  >(ReservationConfirmationPageDocument, options);
+}
+export type ReservationConfirmationPageQueryHookResult = ReturnType<
+  typeof useReservationConfirmationPageQuery
+>;
+export type ReservationConfirmationPageLazyQueryHookResult = ReturnType<
+  typeof useReservationConfirmationPageLazyQuery
+>;
+export type ReservationConfirmationPageSuspenseQueryHookResult = ReturnType<
+  typeof useReservationConfirmationPageSuspenseQuery
+>;
+export type ReservationConfirmationPageQueryResult = Apollo.QueryResult<
+  ReservationConfirmationPageQuery,
+  ReservationConfirmationPageQueryVariables
+>;
+export const ReservationEditPageDocument = gql`
+  query ReservationEditPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      name
+      isHandled
+      ...MetaFields
+      ...ReservationInfoCard
+      reservationUnits {
+        id
+        ...CancellationRuleFields
+        ...MetadataSets
+      }
+    }
+  }
+  ${MetaFieldsFragmentDoc}
+  ${ReservationInfoCardFragmentDoc}
+  ${CancellationRuleFieldsFragmentDoc}
+  ${MetadataSetsFragmentDoc}
+`;
+
+/**
+ * __useReservationEditPageQuery__
+ *
+ * To run a query within a React component, call `useReservationEditPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationEditPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationEditPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationEditPageQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationEditPageQuery,
+    ReservationEditPageQueryVariables
+  > &
+    (
+      | { variables: ReservationEditPageQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationEditPageQuery,
+    ReservationEditPageQueryVariables
+  >(ReservationEditPageDocument, options);
+}
+export function useReservationEditPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationEditPageQuery,
+    ReservationEditPageQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationEditPageQuery,
+    ReservationEditPageQueryVariables
+  >(ReservationEditPageDocument, options);
+}
+export function useReservationEditPageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationEditPageQuery,
+        ReservationEditPageQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationEditPageQuery,
+    ReservationEditPageQueryVariables
+  >(ReservationEditPageDocument, options);
+}
+export type ReservationEditPageQueryHookResult = ReturnType<
+  typeof useReservationEditPageQuery
+>;
+export type ReservationEditPageLazyQueryHookResult = ReturnType<
+  typeof useReservationEditPageLazyQuery
+>;
+export type ReservationEditPageSuspenseQueryHookResult = ReturnType<
+  typeof useReservationEditPageSuspenseQuery
+>;
+export type ReservationEditPageQueryResult = Apollo.QueryResult<
+  ReservationEditPageQuery,
+  ReservationEditPageQueryVariables
+>;
 export const ApplicationRecurringReservationDocument = gql`
   query ApplicationRecurringReservation($id: ID!) {
     recurringReservation(id: $id) {
@@ -12227,38 +12374,43 @@ export const ReservationPageDocument = gql`
     reservation(id: $id) {
       id
       pk
-      name
       ...ReserveeNameFields
       ...ReserveeBillingFields
       ...ReservationInfo
+      ...ReservationInfoCard
+      ...Instructions
       applyingForFreeOfCharge
-      begin
-      end
       calendarUrl
-      state
-      price
       paymentOrder {
-        id
-        status
-        receiptUrl
-        checkoutUrl
+        ...OrderFields
       }
       recurringReservation {
         id
       }
       reservationUnits {
         id
+        unit {
+          id
+          tprekId
+          ...UnitNameFieldsI18N
+        }
         canApplyFreeOfCharge
-        ...ReservationUnitFields
         ...CancellationRuleFields
+        ...MetadataSets
+        ...TermsOfUse
       }
     }
   }
   ${ReserveeNameFieldsFragmentDoc}
   ${ReserveeBillingFieldsFragmentDoc}
   ${ReservationInfoFragmentDoc}
-  ${ReservationUnitFieldsFragmentDoc}
+  ${ReservationInfoCardFragmentDoc}
+  ${InstructionsFragmentDoc}
+  ${OrderFieldsFragmentDoc}
+  ${UnitNameFieldsI18NFragmentDoc}
   ${CancellationRuleFieldsFragmentDoc}
+  ${MetadataSetsFragmentDoc}
+  ${TermsOfUseFragmentDoc}
 `;
 
 /**

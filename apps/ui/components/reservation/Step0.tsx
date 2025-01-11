@@ -11,11 +11,7 @@ import styled from "styled-components";
 import MetaFields from "common/src/reservation-form/MetaFields";
 import { ActionContainer } from "./styles";
 import InfoDialog from "../common/InfoDialog";
-import {
-  CustomerTypeChoice,
-  type ReservationQuery,
-  type ReservationUnitPageFieldsFragment,
-} from "@gql/gql-types";
+import { CustomerTypeChoice, type ReservationQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { containsField, FieldName } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
@@ -28,19 +24,18 @@ import {
 
 type ReservationT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservationUnit: ReservationUnitPageFieldsFragment;
   cancelReservation: () => void;
   reservation: ReservationT;
   options: Record<string, OptionType[]>;
 };
 
 export function Step0({
-  reservationUnit,
   reservation,
   cancelReservation,
   options,
 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
+  const reservationUnit = reservation?.reservationUnits?.find(() => true);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -51,7 +46,7 @@ export function Step0({
   } = form;
 
   const supportedFields = filterNonNullable(
-    reservationUnit.metadataSet?.supportedFields
+    reservationUnit?.metadataSet?.supportedFields
   );
   const reserveeType = watch("reserveeType");
   const homeCity = watch("homeCity");
@@ -70,10 +65,15 @@ export function Step0({
   const submitDisabled = !isValid || !isReserveeTypeValid || !isHomeCityValid;
 
   const lang = convertLanguageCode(i18n.language);
-  const pricingTerms = reservationUnit.pricingTerms
+  const pricingTerms = reservationUnit?.pricingTerms
     ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
     : "";
 
+  if (reservationUnit == null) {
+    return (
+      <Notification type="error">{t("common:errors.dataError")}</Notification>
+    );
+  }
   return (
     <>
       <MetaFields

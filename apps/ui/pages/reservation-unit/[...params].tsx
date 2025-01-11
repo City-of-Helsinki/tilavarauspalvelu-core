@@ -15,9 +15,6 @@ import {
   useUpdateReservationMutation,
   useDeleteReservationMutation,
   type ReservationQuery,
-  ReservationUnitDocument,
-  type ReservationUnitQuery,
-  type ReservationUnitQueryVariables,
   ReservationDocument,
   type ReservationQueryVariables,
   useReservationLazyQuery,
@@ -43,7 +40,7 @@ import { Step1 } from "@/components/reservation/Step1";
 import { ReservationStep } from "@/modules/types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { base64encode, filterNonNullable, toNumber } from "common/src/helpers";
 import { containsField } from "common/src/metaFieldsHelpers";
 import { errorToast } from "common/src/common/toast";
 import { getGeneralFields } from "@/components/reservation/SummaryFields";
@@ -52,7 +49,7 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
-import { ApolloError } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
 import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Flex } from "common/styles/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
@@ -118,7 +115,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
-  const { reservationUnit, options } = props;
+  const { options } = props;
 
   const [refetch, { data: resData }] = useReservationLazyQuery({
     variables: { id: props.reservation.id },
@@ -126,6 +123,8 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   });
 
   const reservation = resData?.reservation ?? props.reservation;
+  const reservationUnit = reservation?.reservationUnits?.find(() => true);
+
   // it should be Created only here (SSR should have redirected)
   if (reservation.state !== ReservationStateChoice.Created) {
     // eslint-disable-next-line no-console
@@ -167,6 +166,9 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     reservation?.applyingForFreeOfCharge;
 
   const steps: ReservationStep[] = useMemo(() => {
+    if (reservationUnit == null) {
+      return [];
+    }
     const isUnitFreeOfCharge = isReservationUnitFreeOfCharge(
       reservationUnit.pricings,
       new Date(reservation.begin)
@@ -358,12 +360,10 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   }, [step, generalFields, reservation, reservationUnit]);
 
   const lang = convertLanguageCode(i18n.language);
-  const termsOfUse = getTranslationSafe(reservationUnit, "termsOfUse", lang);
-
-  const infoReservation = {
-    ...reservation,
-    reservationUnit: reservationUnit != null ? [reservationUnit] : [],
-  };
+  const termsOfUse =
+    reservationUnit != null
+      ? getTranslationSafe(reservationUnit, "termsOfUse", lang)
+      : "";
 
   // TODO rework so we submit the form values here
   const onSubmit = (values: unknown) => {
@@ -379,7 +379,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     <FormProvider {...form}>
       <ReservationPageWrapper>
         <StyledReservationInfoCard
-          reservation={infoReservation}
+          reservation={reservation}
           type="pending"
           shouldDisplayReservationUnitPrice={shouldDisplayReservationUnitPrice}
         />
@@ -419,7 +419,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         <StyledForm onSubmit={handleSubmit(onSubmit)} noValidate>
           {step === 0 && (
             <Step0
-              reservationUnit={reservationUnit}
               reservation={reservation}
               cancelReservation={cancelReservation}
               options={options}
@@ -428,7 +427,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
           {step === 1 && (
             <Step1
               reservation={reservation}
-              reservationUnit={reservationUnit}
               supportedFields={supportedFields}
               options={options}
               // TODO this is correct but confusing.
@@ -445,8 +443,12 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
 function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const { reservation, reservationUnit } = props;
   const lang = convertLanguageCode(i18n.language);
+  const { reservation } = props;
+  const reservationUnit = reservation?.reservationUnits?.find(() => true);
+  const reservationUnitName = reservationUnit
+    ? getTranslationSafe(reservationUnit, "name", lang)
+    : "";
   const routes = [
     {
       slug: getSingleSearchPath(),
@@ -454,7 +456,7 @@ function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
     },
     {
       slug: getReservationUnitPath(reservationUnit?.pk),
-      title: getTranslationSafe(reservationUnit, "name", lang) ?? "-",
+      title: reservationUnitName,
     },
     {
       title: t("reservations:reservationName", { id: reservation.pk }),
@@ -476,24 +478,12 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
-  const [reservationUnitPk, path, reservationPk] = params?.params ?? [];
+  const [_, path, reservationPk] = params?.params ?? [];
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const resUnitPk = Number(reservationUnitPk);
-  const resPk = Number(reservationPk);
-  if (resUnitPk > 0 && resPk > 0 && path === "reservation") {
-    const id = base64encode(`ReservationUnitNode:${resUnitPk}`);
-    const { data } = await apolloClient.query<
-      ReservationUnitQuery,
-      ReservationUnitQueryVariables
-    >({
-      query: ReservationUnitDocument,
-      variables: { id },
-      fetchPolicy: "no-cache",
-    });
-    const { reservationUnit } = data || {};
-
+  const resPk = toNumber(reservationPk);
+  if (resPk != null && resPk > 0 && path === "reservation") {
     const options = await queryOptions(apolloClient, locale ?? "");
 
     const { data: resData } = await apolloClient.query<
@@ -523,12 +513,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       };
     }
 
-    if (reservation != null && reservationUnit != null) {
+    if (reservation != null) {
       return {
         props: {
           ...commonProps,
           reservation,
-          reservationUnit,
           options,
           ...(await serverSideTranslations(locale ?? "fi")),
         },
@@ -546,3 +535,29 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     notFound: true,
   };
 }
+
+export const GET_RESERVATION = gql`
+  query Reservation($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      name
+      ...MetaFields
+      ...ReservationInfoCard
+      bufferTimeBefore
+      bufferTimeAfter
+      calendarUrl
+      paymentOrder {
+        ...OrderFields
+      }
+      reservationUnits {
+        id
+        canApplyFreeOfCharge
+        ...CancellationRuleFields
+        ...MetadataSets
+        ...TermsOfUse
+        requireReservationHandling
+      }
+    }
+  }
+`;

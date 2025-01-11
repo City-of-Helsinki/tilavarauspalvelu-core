@@ -5,7 +5,7 @@ import { fontMedium, H4 } from "common/src/common/typography";
 import type {
   Maybe,
   LocationFieldsI18nFragment,
-  UnitFieldsFragment,
+  AddressFieldsFragment,
 } from "@gql/gql-types";
 import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
@@ -16,6 +16,7 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 import { type LocalizationLanguages } from "common/src/helpers";
+import { gql } from "@apollo/client";
 
 const AddressSpan = styled.span`
   font-size: var(--fontsize-body-l);
@@ -39,7 +40,7 @@ type UrlReturn = string;
 
 function createHslUrl(
   locale: LocalizationLanguages,
-  location?: Maybe<LocationFieldsI18nFragment>
+  location: Maybe<LocationFieldsI18nFragment> | undefined
 ): UrlReturn {
   if (!location) {
     return "";
@@ -61,18 +62,14 @@ function createHslUrl(
 
 function createGoogleUrl(
   locale: LocalizationLanguages,
-  location?: Maybe<LocationFieldsI18nFragment>
+  location: Maybe<LocationFieldsI18nFragment> | undefined
 ): UrlReturn {
   if (!location) {
     return "";
   }
 
-  const addressStreet =
-    getTranslationSafe(location, "addressStreet", locale) ||
-    location.addressStreetFi;
-  const addressCity =
-    getTranslationSafe(location, "addressCity", locale) ||
-    location.addressCityFi;
+  const addressStreet = getTranslationSafe(location, "addressStreet", locale);
+  const addressCity = getTranslationSafe(location, "addressCity", locale);
 
   const destination = addressStreet
     ? encodeURI(`${addressStreet},${addressCity}`)
@@ -83,7 +80,7 @@ function createGoogleUrl(
 
 function createMapUrl(
   locale: LocalizationLanguages,
-  unit?: Maybe<Pick<UnitFieldsFragment, "tprekId">>
+  unit: Maybe<Pick<AddressFieldsFragment, "tprekId">> | undefined
 ): string {
   if (!unit?.tprekId) {
     return "";
@@ -94,7 +91,7 @@ function createMapUrl(
 
 function createAccessibilityUrl(
   locale: LocalizationLanguages,
-  unit?: Maybe<Pick<UnitFieldsFragment, "tprekId">>
+  unit: Maybe<Pick<AddressFieldsFragment, "tprekId">> | undefined
 ): UrlReturn {
   if (!unit?.tprekId) {
     return "";
@@ -105,7 +102,7 @@ function createAccessibilityUrl(
 
 type Props = {
   title: string;
-  unit?: Maybe<UnitFieldsFragment> | undefined;
+  unit: Maybe<AddressFieldsFragment> | undefined;
 };
 
 export function AddressSection({ title, unit }: Props): JSX.Element {
@@ -114,12 +111,12 @@ export function AddressSection({ title, unit }: Props): JSX.Element {
   const { location } = unit ?? {};
   const lang = convertLanguageCode(i18n.language);
 
-  const addressStreet =
-    (location && getTranslationSafe(location, "addressStreet", lang)) ||
-    location?.addressStreetFi;
-  const addressCity =
-    (location && getTranslationSafe(location, "addressCity", lang)) ||
-    location?.addressCityFi;
+  const addressStreet = location
+    ? getTranslationSafe(location, "addressStreet", lang)
+    : undefined;
+  const addressCity = location
+    ? getTranslationSafe(location, "addressCity", lang)
+    : undefined;
 
   const unitMapUrl = createMapUrl(lang, unit);
   const googleUrl = createGoogleUrl(lang, location);
@@ -137,24 +134,32 @@ export function AddressSection({ title, unit }: Props): JSX.Element {
         <IconButton
           href={unitMapUrl}
           label={t("reservationUnit:linkMap")}
-          icon={<IconLinkExternal aria-hidden />}
+          icon={<IconLinkExternal aria-hidden="true" />}
         />
         <IconButton
           href={googleUrl}
           label={t("reservationUnit:linkGoogle")}
-          icon={<IconLinkExternal aria-hidden />}
+          icon={<IconLinkExternal aria-hidden="true" />}
         />
         <IconButton
           href={hslUrl}
           label={t("reservationUnit:linkHSL")}
-          icon={<IconLinkExternal aria-hidden />}
+          icon={<IconLinkExternal aria-hidden="true" />}
         />
         <IconButton
           href={accessibilityUrl}
           label={t("reservationUnit:linkAccessibility")}
-          icon={<IconLinkExternal aria-hidden />}
+          icon={<IconLinkExternal aria-hidden="true" />}
         />
       </Links>
     </div>
   );
 }
+
+export const ADDRESS_FIELDS = gql`
+  fragment AddressFields on UnitNode {
+    ...UnitNameFieldsI18N
+    id
+    tprekId
+  }
+`;

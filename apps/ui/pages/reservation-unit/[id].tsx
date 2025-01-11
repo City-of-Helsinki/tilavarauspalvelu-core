@@ -238,7 +238,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-const StyledApplicationRoundScheduleDay = styled.div`
+const StyledApplicationRoundScheduleDay = styled.p`
   span:first-child {
     display: inline-block;
     font-weight: bold;

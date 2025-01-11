@@ -2,14 +2,11 @@ import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { capitalize } from "@/modules/util";
-import {
-  CustomerTypeChoice,
-  type ReservationNode,
-  type ReservationQuery,
-} from "@/gql/gql-types";
+import { CustomerTypeChoice, type ReservationNode } from "@/gql/gql-types";
 import { type FieldName, containsField } from "common/src/metaFieldsHelpers";
 import { AutoGrid } from "common/styles/util";
 import { H4 } from "common";
+import { type MetaFieldsFragment } from "common/gql/gql-types";
 
 type OptionType = {
   label: string;
@@ -20,7 +17,7 @@ export type OptionsRecord = Record<
   "purpose" | "ageGroup" | "homeCity",
   OptionType[]
 >;
-type NodeT = NonNullable<ReservationQuery["reservation"]>;
+type NodeT = MetaFieldsFragment;
 
 const ParagraphAlt = styled.div<{ $isWide?: boolean }>`
   ${({ $isWide }) => $isWide && "grid-column: 1 / -1;"}

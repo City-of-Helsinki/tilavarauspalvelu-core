@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
-import { Button, IconArrowLeft, IconArrowRight } from "hds-react";
-import {
-  type ReservationQuery,
-  type ReservationUnitPageFieldsFragment,
-} from "@gql/gql-types";
+import { Button, IconArrowLeft, IconArrowRight, Notification } from "hds-react";
+import { type ReservationQuery } from "@gql/gql-types";
 import { ActionContainer } from "./styles";
 import { useFormContext } from "react-hook-form";
 import {
@@ -18,7 +15,6 @@ import { AcceptTerms } from "./AcceptTerms";
 type NodeT = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: NodeT;
-  reservationUnit: ReservationUnitPageFieldsFragment;
   supportedFields: FieldName[];
   options: OptionsRecord;
   requiresHandling: boolean;
@@ -27,7 +23,6 @@ type Props = {
 
 export function Step1({
   reservation,
-  reservationUnit,
   supportedFields,
   options,
   requiresHandling,
@@ -50,6 +45,8 @@ export function Step1({
     setIsTermsAccepted({ ...isTermsAccepted, [key]: val });
   };
 
+  const reservationUnit = reservation?.reservationUnits?.find(() => true);
+
   const areTermsAccepted = isTermsAccepted.space && isTermsAccepted.service;
   const loadingText = t(
     `reservationCalendar:${requiresHandling ? "nextStep" : "makeReservation"}Loading`
@@ -58,6 +55,11 @@ export function Step1({
     `reservationCalendar:${requiresHandling ? "nextStep" : "makeReservation"}`
   );
 
+  if (!reservationUnit) {
+    return (
+      <Notification type="error">{t("common:errors.dataError")}</Notification>
+    );
+  }
   return (
     <>
       <GeneralFields
@@ -80,7 +82,7 @@ export function Step1({
           variant="primary"
           type="submit"
           iconRight={
-            requiresHandling ? <IconArrowRight aria-hidden /> : undefined
+            requiresHandling ? <IconArrowRight aria-hidden="true" /> : undefined
           }
           data-testid="reservation__button--continue"
           isLoading={isSubmitting}
@@ -91,7 +93,7 @@ export function Step1({
         </Button>
         <Button
           variant="secondary"
-          iconLeft={<IconArrowLeft aria-hidden />}
+          iconLeft={<IconArrowLeft aria-hidden="true" />}
           onClick={() => setStep(0)}
           data-testid="reservation__button--cancel"
         >

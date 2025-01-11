@@ -1,14 +1,6 @@
 import { gql } from "@apollo/client";
-import {
-  RESERVEE_NAME_FRAGMENT,
-  IMAGE_FRAGMENT,
-  PRICING_FRAGMENT,
-  RESERVEE_BILLING_FRAGMENT,
-} from "common/src/queries/fragments";
-import {
-  RESERVATION_UNIT_FRAGMENT,
-  UNIT_NAME_FRAGMENT_I18N,
-} from "./fragments";
+import { IMAGE_FRAGMENT, PRICING_FRAGMENT } from "common/src/queries/fragments";
+import { UNIT_NAME_FRAGMENT_I18N } from "./fragments";
 
 export const CREATE_RESERVATION = gql`
   mutation CreateReservation($input: ReservationCreateMutationInput!) {
@@ -128,32 +120,6 @@ export const LIST_RESERVATIONS = gql`
   }
 `;
 
-// NOTE this is used to display some general info about the reservation (on /reservation/:id page)
-const RESERVATION_INFO_FRAGMENT = gql`
-  fragment ReservationInfo on ReservationNode {
-    description
-    purpose {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-    ageGroup {
-      id
-      pk
-      minimum
-      maximum
-    }
-    homeCity {
-      id
-      pk
-      name
-    }
-    numPersons
-  }
-`;
-
 export const ORDER_FRAGMENT = gql`
   fragment OrderFields on PaymentOrderNode {
     id
@@ -183,54 +149,6 @@ export const GET_RESERVATION_STATE = gql`
       id
       pk
       state
-    }
-  }
-`;
-
-// TODO do we need all the fields from ReservationUnitNode? ex. pricing (since we should be using the Reservations own pricing anyway)
-// TODO can we split this into smaller queries? per case?
-// making a reservation, showing a reservation, editing a reservation, cancelling a reservation
-// TODO why pricing fields? instead of asking the reservation price info? lets say the unit is normally paid only but you made the reservation free
-export const GET_RESERVATION = gql`
-  ${RESERVEE_NAME_FRAGMENT}
-  ${RESERVEE_BILLING_FRAGMENT}
-  ${RESERVATION_UNIT_FRAGMENT}
-  ${CANCELLATION_RULE_FRAGMENT}
-  ${RESERVATION_INFO_FRAGMENT}
-  query Reservation($id: ID!) {
-    reservation(id: $id) {
-      id
-      pk
-      name
-      ...ReserveeNameFields
-      ...ReserveeBillingFields
-      ...ReservationInfo
-      applyingForFreeOfCharge
-      freeOfChargeReason
-      bufferTimeBefore
-      bufferTimeAfter
-      begin
-      end
-      calendarUrl
-      user {
-        id
-        email
-        pk
-      }
-      state
-      price
-      priceNet
-      taxPercentageValue
-      paymentOrder {
-        ...OrderFields
-      }
-      reservationUnits {
-        id
-        canApplyFreeOfCharge
-        ...ReservationUnitFields
-        ...CancellationRuleFields
-      }
-      isHandled
     }
   }
 `;

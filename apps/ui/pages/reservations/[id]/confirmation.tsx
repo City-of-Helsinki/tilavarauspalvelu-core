@@ -1,16 +1,16 @@
 import React from "react";
 import {
-  ReservationDocument,
+  ReservationConfirmationPageDocument,
+  type ReservationConfirmationPageQuery,
+  type ReservationConfirmationPageQueryVariables,
   ReservationStateChoice,
-  type ReservationQuery,
-  type ReservationQueryVariables,
 } from "@gql/gql-types";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { base64encode } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ReservationPageWrapper } from "@/components/reservations/styles";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
@@ -29,6 +29,7 @@ import { breakpoints } from "common";
 import { InlineStyledLink } from "@/styles/util";
 import { BackLinkList } from "@/components/reservation/CancelledLinkSet";
 import { Instructions } from "@/components/Instructions";
+import { gql } from "@apollo/client";
 
 function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
   const { t } = useTranslation();
@@ -155,20 +156,19 @@ function Actions({
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
-  const pk = params?.id;
+  const pk = toNumber(ignoreMaybeArray(params?.id));
 
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  if (Number.isFinite(Number(pk))) {
+  if (pk != null) {
     const typename = "ReservationNode";
     const id = base64encode(`${typename}:${pk}`);
-
     const { data: reservationData } = await client.query<
-      ReservationQuery,
-      ReservationQueryVariables
+      ReservationConfirmationPageQuery,
+      ReservationConfirmationPageQueryVariables
     >({
-      query: ReservationDocument,
+      query: ReservationConfirmationPageDocument,
       fetchPolicy: "no-cache",
       variables: { id },
     });
@@ -197,5 +197,29 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
+
+export const CONFIRMATION_QUERY = gql`
+  query ReservationConfirmationPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      name
+      ...ReserveeNameFields
+      ...ReserveeBillingFields
+      ...ReservationInfo
+      ...ReservationInfoCard
+      ...Instructions
+      calendarUrl
+      paymentOrder {
+        ...OrderFields
+      }
+      reservationUnits {
+        id
+        canApplyFreeOfCharge
+        ...CancellationRuleFields
+      }
+    }
+  }
+`;
 
 export default Confirmation;

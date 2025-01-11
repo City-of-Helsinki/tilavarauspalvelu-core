@@ -138,11 +138,7 @@ export const RESERVATION_CANCEL_PAGE_QUERY = gql`
     reservation(id: $id) {
       id
       ...ReservationInfoCard
-      pk
       name
-      begin
-      end
-      state
       reservationUnits {
         id
         ...CancellationRuleFields

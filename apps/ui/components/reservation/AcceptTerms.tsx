@@ -3,19 +3,16 @@ import TermsBox from "common/src/termsbox/TermsBox";
 import { useTranslation } from "next-i18next";
 import { getTranslation } from "@/modules/util";
 import { Sanitize } from "common/src/components/Sanitize";
-import { type ReservationUnitPageQuery } from "@/gql/gql-types";
+import { type TermsOfUseFragment } from "@/gql/gql-types";
 import { Flex } from "common/styles/util";
 
-type ReservationUnitNodeT = NonNullable<
-  ReservationUnitPageQuery["reservationUnit"]
->;
 export function AcceptTerms({
   reservationUnit,
   isTermsAccepted,
   setIsTermsAccepted,
 }: {
   reservationUnit: Pick<
-    ReservationUnitNodeT,
+    TermsOfUseFragment,
     "cancellationTerms" | "paymentTerms" | "serviceSpecificTerms"
   >;
   isTermsAccepted: { space: boolean; service: boolean };

@@ -5520,6 +5520,51 @@ export type ReserveeBillingFieldsFragment = {
   billingAddressZip?: string | null;
 };
 
+export type MetaFieldsFragment = {
+  applyingForFreeOfCharge?: boolean | null;
+  freeOfChargeReason?: string | null;
+  description?: string | null;
+  numPersons?: number | null;
+  reserveeFirstName?: string | null;
+  reserveeLastName?: string | null;
+  reserveeEmail?: string | null;
+  reserveePhone?: string | null;
+  reserveeType?: CustomerTypeChoice | null;
+  reserveeOrganisationName?: string | null;
+  reserveeId?: string | null;
+  reserveeIsUnregisteredAssociation?: boolean | null;
+  reserveeAddressStreet?: string | null;
+  reserveeAddressCity?: string | null;
+  reserveeAddressZip?: string | null;
+  billingFirstName?: string | null;
+  billingLastName?: string | null;
+  billingPhone?: string | null;
+  billingEmail?: string | null;
+  billingAddressStreet?: string | null;
+  billingAddressCity?: string | null;
+  billingAddressZip?: string | null;
+  ageGroup?: {
+    id: string;
+    pk?: number | null;
+    maximum?: number | null;
+    minimum: number;
+  } | null;
+  purpose?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+  } | null;
+  homeCity?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameSv?: string | null;
+    nameEn?: string | null;
+  } | null;
+};
+
 export type TermsOfUseNameFieldsFragment = {
   nameFi?: string | null;
   nameEn?: string | null;
@@ -5788,6 +5833,38 @@ export const ReserveeBillingFieldsFragmentDoc = gql`
     billingAddressCity
     billingAddressZip
   }
+`;
+export const MetaFieldsFragmentDoc = gql`
+  fragment MetaFields on ReservationNode {
+    ...ReserveeNameFields
+    ...ReserveeBillingFields
+    applyingForFreeOfCharge
+    freeOfChargeReason
+    description
+    numPersons
+    ageGroup {
+      id
+      pk
+      maximum
+      minimum
+    }
+    purpose {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    homeCity {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+    }
+  }
+  ${ReserveeNameFieldsFragmentDoc}
+  ${ReserveeBillingFieldsFragmentDoc}
 `;
 export const TermsOfUseNameFieldsFragmentDoc = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {

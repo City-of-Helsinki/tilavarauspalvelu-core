@@ -1,5 +1,5 @@
 import {
-  type ReservationQuery,
+  type ReservationEditPageQuery,
   type ReservationUnitPageQuery,
 } from "@gql/gql-types";
 import { Button, IconArrowLeft, IconCross } from "hds-react";
@@ -25,7 +25,7 @@ import { getReservationPath } from "@/modules/urls";
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
 >;
-type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
+type ReservationNodeT = NonNullable<ReservationEditPageQuery["reservation"]>;
 type Props = {
   reservation: ReservationNodeT;
   reservationUnit: ReservationUnitNodeT;

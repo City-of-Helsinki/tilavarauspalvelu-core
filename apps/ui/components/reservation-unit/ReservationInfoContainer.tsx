@@ -58,13 +58,17 @@ function getStatus(
 export function ReservationInfoContainer({
   reservationUnit,
   reservationUnitIsReservable,
-}: Props): JSX.Element {
+}: Props): JSX.Element | null {
   const { t } = useTranslation();
 
   const isReservable =
     reservationUnitIsReservable &&
     (reservationUnit.reservationsMaxDaysBefore != null ||
       reservationUnit.reservationsMinDaysBefore != null);
+
+  if (!reservationUnitIsReservable) {
+    return null;
+  }
 
   // TODO this should be a list
   return (

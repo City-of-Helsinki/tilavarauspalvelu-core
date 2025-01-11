@@ -43,8 +43,6 @@ export const UNIT_QUERY = gql`
       }
       location {
         ...LocationFields
-        longitude
-        latitude
       }
     }
   }

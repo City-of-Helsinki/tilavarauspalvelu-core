@@ -9,18 +9,23 @@ import {
   ReservationUnitPageDocument,
   type ReservationUnitPageQuery,
   type ReservationUnitPageQueryVariables,
-  ReservationDocument,
-  type ReservationQuery,
-  type ReservationQueryVariables,
   type Mutation,
   type MutationAdjustReservationTimeArgs,
   useAdjustReservationTimeMutation,
+  type ReservationEditPageQuery,
+  type ReservationEditPageQueryVariables,
+  ReservationEditPageDocument,
 } from "@gql/gql-types";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  filterNonNullable,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { type FetchResult } from "@apollo/client";
+import { gql, type FetchResult } from "@apollo/client";
 import { useRouter } from "next/router";
 import { StepState, Stepper } from "hds-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -160,7 +165,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     return (
       <>
         <HeadingSection>
-          <H1>{t(title)}</H1>
+          <H1 $marginTop="none">{t(title)}</H1>
         </HeadingSection>
         <NotModifiableReason reservation={reservation} />
       </>
@@ -194,7 +199,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
   return (
     <ReservationPageWrapper $nRows={5}>
       <StepperWrapper>
-        <H1>{t(title)}</H1>
+        <H1 $marginTop="none">{t(title)}</H1>
         <Stepper
           language={i18n.language}
           selectedStep={step}
@@ -258,7 +263,7 @@ export default ReservationEditPageWrapper;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
-  const pk = params?.id;
+  const pk = toNumber(ignoreMaybeArray(params?.id));
 
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
@@ -272,14 +277,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 
-  if (Number.isFinite(Number(pk))) {
+  if (pk != null) {
     // TODO why are we doing two separate queries? the linked reservationUnit should be part of the reservation query
     const resId = base64encode(`ReservationNode:${pk}`);
     const { data } = await client.query<
-      ReservationQuery,
-      ReservationQueryVariables
+      ReservationEditPageQuery,
+      ReservationEditPageQueryVariables
     >({
-      query: ReservationDocument,
+      query: ReservationEditPageDocument,
       fetchPolicy: "no-cache",
       variables: { id: resId },
     });
@@ -336,3 +341,21 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return notFoundValue;
 }
+
+export const EDIT_PAGE_QUERY = gql`
+  query ReservationEditPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      name
+      isHandled
+      ...MetaFields
+      ...ReservationInfoCard
+      reservationUnits {
+        id
+        ...CancellationRuleFields
+        ...MetadataSets
+      }
+    }
+  }
+`;

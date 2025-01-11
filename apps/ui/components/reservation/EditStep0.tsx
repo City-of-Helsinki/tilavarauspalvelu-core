@@ -2,7 +2,7 @@ import { breakpoints } from "common/src/common/style";
 import type { PendingReservation } from "@/modules/types";
 import type {
   BlockingReservationFieldsFragment,
-  ReservationQuery,
+  ReservationEditPageQuery,
   ReservationUnitPageQuery,
 } from "@gql/gql-types";
 import { differenceInMinutes } from "date-fns";
@@ -42,7 +42,7 @@ import { H4 } from "common";
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
 >;
-type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
+type ReservationNodeT = NonNullable<ReservationEditPageQuery["reservation"]>;
 type Props = {
   reservation: ReservationNodeT;
   reservationUnit: ReservationUnitNodeT;

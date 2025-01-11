@@ -1,8 +1,9 @@
 import {
+  type InstructionsFragment,
   type Maybe,
-  type ReservationQuery,
   ReservationStateChoice,
 } from "@/gql/gql-types";
+import { gql } from "@apollo/client";
 import { H4 } from "common";
 import {
   convertLanguageCode,
@@ -11,12 +12,28 @@ import {
 import { Sanitize } from "common/src/components/Sanitize";
 import { useTranslation } from "next-i18next";
 
-// TODO replace with a fragment
-type NodeT = NonNullable<ReservationQuery["reservation"]>;
-type Props = {
-  reservation: Pick<NodeT, "reservationUnits" | "state">;
-};
+export const INSTRUCTIOSN_FRAGMENT = gql`
+  fragment Instructions on ReservationNode {
+    id
+    state
+    reservationUnits {
+      id
+      reservationPendingInstructionsFi
+      reservationPendingInstructionsEn
+      reservationPendingInstructionsSv
+      reservationConfirmedInstructionsFi
+      reservationConfirmedInstructionsEn
+      reservationConfirmedInstructionsSv
+      reservationCancelledInstructionsFi
+      reservationCancelledInstructionsEn
+      reservationCancelledInstructionsSv
+    }
+  }
+`;
 
+type Props = {
+  reservation: InstructionsFragment;
+};
 export function Instructions({ reservation }: Props): JSX.Element | null {
   const { t, i18n } = useTranslation();
 

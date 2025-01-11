@@ -109,7 +109,6 @@ export function ReservationInfoCard({
 
   const { begin, end } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation
-  const taxPercentageValue = reservation.taxPercentageValue;
 
   const timeString = capitalize(
     formatDateTimeRange(t, new Date(begin), new Date(end))
@@ -133,7 +132,7 @@ export function ReservationInfoCard({
     shouldDisplayReservationUnitPrice
   );
   const shouldDisplayTaxPercentage: boolean =
-    reservation.state === ReservationStateChoice.RequiresHandling && begin
+    reservation.state === ReservationStateChoice.RequiresHandling
       ? isReservationUnitPaid(reservationUnit.pricings, new Date(begin))
       : Number(reservation?.price) > 0;
 
@@ -146,6 +145,7 @@ export function ReservationInfoCard({
       ? getTranslationSafe(reservationUnit.unit, "name", lang)
       : "-";
 
+  const { taxPercentageValue } = reservation;
   // TODO why does this not use the Card component?
   return (
     <Wrapper $type={type} className={className} style={style}>
