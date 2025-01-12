@@ -51,12 +51,12 @@ function ReservationUnitCard({
   handleAdd,
   handleRemove,
   isSelected,
-}: {
+}: Readonly<{
   reservationUnit: ReservationUnitType;
   isSelected: boolean;
   handleAdd: (ru: ReservationUnitType) => void;
   handleRemove: (ru: ReservationUnitType) => void;
-}) {
+}>) {
   const { t } = useTranslation();
 
   const handle = () =>
@@ -252,7 +252,13 @@ export function ReservationUnitModalContent({
       <Flex $alignItems="flex-end">
         <Button
           variant={loading ? ButtonVariant.Clear : ButtonVariant.Primary}
-          iconStart={loading ? <LoadingSpinner small /> : <IconSearch aria-hidden="true" />}
+          iconStart={
+            loading ? (
+              <LoadingSpinner small />
+            ) : (
+              <IconSearch aria-hidden="true" />
+            )
+          }
           disabled={loading}
           onClick={(_) => refetch()}
         >

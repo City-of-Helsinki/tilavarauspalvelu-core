@@ -17,9 +17,9 @@ import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
 import Modal from "../common/Modal";
 import type { ApplicationFormValues } from "./Form";
-import { ReservationUnitCard } from "./reservation-unit-card";
+import { OrderedReservationUnitCard } from "./OrderedReservationUnitCard";
 import { Flex } from "common/styles/util";
-import { ReservationUnitModalContent } from "./reservation-unit-modal-content";
+import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
 import { breakpoints } from "common";
 
 type Node = NonNullable<ApplicationQuery["application"]>;
@@ -156,7 +156,7 @@ export function ReservationUnitList({
       </Notification>
       <Flex $gap="m" $direction="column">
         {currentReservationUnits.map((ru, i, all) => (
-          <ReservationUnitCard
+          <OrderedReservationUnitCard
             key={ru.pk}
             invalid={
               minSize != null &&
