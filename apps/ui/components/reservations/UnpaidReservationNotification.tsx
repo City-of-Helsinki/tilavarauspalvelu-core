@@ -209,7 +209,7 @@ export function InProgressReservationNotification() {
     deleteReservation,
     { data: deleteData, error: deleteError, loading: isDeleteLoading },
   ] = useDeleteReservationMutation();
-  const deleted = deleteData?.deleteReservation?.deleted;
+  const deleted = deleteData?.deleteTentativeReservation?.deleted;
 
   const order = unpaidReservation?.paymentOrder[0];
   const checkoutUrl = getCheckoutUrl(order, i18n.language);

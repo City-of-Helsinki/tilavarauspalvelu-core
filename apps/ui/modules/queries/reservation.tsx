@@ -21,8 +21,8 @@ export const UPDATE_RESERVATION = gql`
 `;
 
 export const DELETE_RESERVATION = gql`
-  mutation DeleteReservation($input: ReservationDeleteMutationInput!) {
-    deleteReservation(input: $input) {
+  mutation DeleteReservation($input: ReservationDeleteTentativeMutationInput!) {
+    deleteTentativeReservation(input: $input) {
       deleted
     }
   }

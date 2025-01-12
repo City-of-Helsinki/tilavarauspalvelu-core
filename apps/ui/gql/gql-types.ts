@@ -6291,11 +6291,11 @@ export type UpdateReservationMutation = {
 };
 
 export type DeleteReservationMutationVariables = Exact<{
-  input: ReservationDeleteMutationInput;
+  input: ReservationDeleteTentativeMutationInput;
 }>;
 
 export type DeleteReservationMutation = {
-  deleteReservation?: { deleted?: boolean | null } | null;
+  deleteTentativeReservation?: { deleted?: boolean | null } | null;
 };
 
 export type CancelReservationMutationVariables = Exact<{
@@ -10285,8 +10285,8 @@ export type UpdateReservationMutationOptions = Apollo.BaseMutationOptions<
   UpdateReservationMutationVariables
 >;
 export const DeleteReservationDocument = gql`
-  mutation DeleteReservation($input: ReservationDeleteMutationInput!) {
-    deleteReservation(input: $input) {
+  mutation DeleteReservation($input: ReservationDeleteTentativeMutationInput!) {
+    deleteTentativeReservation(input: $input) {
       deleted
     }
   }
