@@ -108,7 +108,7 @@ AUTOMATIC_REPLY_CONTEXT_SV = {
 RESERVATION_BASIC_INFO_CONTEXT_EN = {
     "reservation_unit_name": "Test reservation unit",
     "unit_name": "Test unit",
-    "unit_location": "Test location",
+    "unit_location": "Test Street, City",
     "begins_label": "From",
     "begin_date": "1.1.2024",
     "begin_time": "12:00",
@@ -120,7 +120,7 @@ RESERVATION_BASIC_INFO_CONTEXT_EN = {
 RESERVATION_BASIC_INFO_CONTEXT_FI = {
     "reservation_unit_name": "Test reservation unit",
     "unit_name": "Test unit",
-    "unit_location": "Test location",
+    "unit_location": "Test Street, City",
     "begins_label": "Alkamisaika",
     "begin_date": "1.1.2024",
     "begin_time": "12:00",
@@ -132,7 +132,7 @@ RESERVATION_BASIC_INFO_CONTEXT_FI = {
 RESERVATION_BASIC_INFO_CONTEXT_SV = {
     "reservation_unit_name": "Test reservation unit",
     "unit_name": "Test unit",
-    "unit_location": "Test location",
+    "unit_location": "Test Street, City",
     "begins_label": "Börjar",
     "begin_date": "1.1.2024",
     "begin_time": "12:00",
