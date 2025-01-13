@@ -199,8 +199,9 @@ def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
 
 
 def params_for_reservation_series_info(*, reservation_series: RecurringReservation) -> dict[str, Any]:
+    weekdays = ", ".join(str(Weekday.from_week_day(int(val)).label) for val in reservation_series.weekdays.split(","))
     return {
-        "weekday_value": Weekday.from_week_day(int(reservation_series.weekdays)).label,
+        "weekday_value": weekdays,
         "time_value": f"{reservation_series.begin_time}-{reservation_series.end_time}",
     }
 
