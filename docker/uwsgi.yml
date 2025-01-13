@@ -1,28 +1,27 @@
 uwsgi:
+  # Basic settings
+  strict: true
   need-app: true
+  module: config.wsgi:application
   single-interpreter: true
   die-on-term: true
-  # Needed plugins if running against Debian uwsgi-package
-  # python docker image cannot use that due to linker mishaps
-  # plugins: python3,http
-  module: config.wsgi:application
-  # wsgi-file: config/wsgi.p
-  #uid: tvp
   umask: 022
   http: :8000
   buffer-size: 14000
   log-x-forwarded-for: true
 
-  # Reload workers regularly to keep memory fresh
-  # and ease potential memory leaks
+  # Reload workers regularly to keep memory fresh and ease potential memory leaks.
   max-requests: 1000                  # Restart workers after this many requests
   max-worker-lifetime: 3600           # Restart workers after this many seconds
   reload-on-rss: 300                  # Restart workers after this much resident memory
   worker-reload-mercy: 60             # How long to wait before forcefully killing workers
 
+  # Required for Sentry to operate correctly.
+  enable-threads: true
+  py-call-uwsgi-fork-hooks: true
+
   # Workload settings
-  # Automatically scales up worker count when application is
-  # under load.
+  # Automatically scales up worker count when application is under load.
   master: true
   threads: 1
   cheaper-algo: busyness
@@ -45,3 +44,8 @@ uwsgi:
   ignore-sigpipe: true
   ignore-write-errors: true
   disable-write-exception: true
+
+  # Configure logging to be less verbose
+  disable-logging: true
+  log-4xx: true
+  log-5xx: true
