@@ -4,8 +4,13 @@ import datetime
 
 import pytest
 
-from tilavarauspalvelu.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
-from utils.date_utils import local_datetime
+from tilavarauspalvelu.enums import (
+    MethodOfEntry,
+    ReservationKind,
+    ReservationUnitPublishingState,
+    ReservationUnitReservationState,
+)
+from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
     ApplicationRoundFactory,
@@ -786,3 +791,129 @@ def test_reservation_unit__filter__by_reservation_unit_state__multiple(graphql):
     assert len(response.edges) == 2
     assert response.node(0) == {"pk": reservation_units.draft.pk}
     assert response.node(1) == {"pk": reservation_units.scheduled_publishing.pk}
+
+
+def test_reservation_unit__filter__by_method_of_entry(graphql):
+    graphql.login_with_superuser()
+
+    today = local_date()
+
+    # Always active method of entry
+    reservation_unit_1 = ReservationUnitFactory.create(
+        name="Always with key",
+        method_of_entry=MethodOfEntry.WITH_KEY,
+    )
+
+    # Method of entry before filter period.
+    ReservationUnitFactory.create(
+        name="with key ends before filter period",
+        method_of_entry=MethodOfEntry.WITH_KEY,
+        method_of_entry_end_date=today - datetime.timedelta(days=1),
+    )
+
+    # Method of entry starts during the filter period.
+    reservation_unit_2 = ReservationUnitFactory.create(
+        name="with key starts during filter period",
+        method_of_entry=MethodOfEntry.WITH_KEY,
+        method_of_entry_start_date=today + datetime.timedelta(days=1),
+    )
+
+    # Method of entry starts after the filter period.
+    ReservationUnitFactory.create(
+        name="with key starts after filter period",
+        method_of_entry=MethodOfEntry.WITH_KEY,
+        method_of_entry_start_date=today + datetime.timedelta(days=10),
+    )
+
+    # Method of entry ending during the filter period.
+    reservation_unit_3 = ReservationUnitFactory.create(
+        name="with key ends during filter period",
+        method_of_entry=MethodOfEntry.WITH_KEY,
+        method_of_entry_end_date=today,
+    )
+
+    # Method of entry something other
+    ReservationUnitFactory.create(name="open access", method_of_entry=MethodOfEntry.OPEN_ACCESS)
+    ReservationUnitFactory.create(name="keyless", method_of_entry=MethodOfEntry.KEYLESS)
+
+    query = reservation_units_query(
+        fields="name",
+        method_of_entry=MethodOfEntry.WITH_KEY,
+        method_of_entry_start=today.isoformat(),
+        method_of_entry_end=(today + datetime.timedelta(days=1)).isoformat(),
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 3
+    assert response.node(0) == {"name": reservation_unit_1.name}
+    assert response.node(1) == {"name": reservation_unit_2.name}
+    assert response.node(2) == {"name": reservation_unit_3.name}
+
+
+def test_reservation_unit__filter__by_method_of_entry__open_access(graphql):
+    graphql.login_with_superuser()
+
+    today = local_date()
+
+    # Method of entry open access
+    reservation_unit_1 = ReservationUnitFactory.create(
+        name="Always open access",
+        method_of_entry=MethodOfEntry.OPEN_ACCESS,
+    )
+
+    # Other method of entry ends during the filter period
+    # => Has "open access" during rest of period.
+    reservation_unit_2 = ReservationUnitFactory.create(
+        name="ending during filter period",
+        method_of_entry=MethodOfEntry.WITH_KEY,
+        method_of_entry_end_date=today,
+    )
+
+    # Other method of entry starts during the filter period
+    # => Has "open access" during beginning of period.
+    reservation_unit_3 = ReservationUnitFactory.create(
+        name="starting during filter period",
+        method_of_entry=MethodOfEntry.WITH_KEY,
+        method_of_entry_start_date=today + datetime.timedelta(days=1),
+    )
+
+    # Method of entry something other.
+    ReservationUnitFactory.create(name="with key", method_of_entry=MethodOfEntry.WITH_KEY)
+    ReservationUnitFactory.create(name="keyless", method_of_entry=MethodOfEntry.KEYLESS)
+
+    query = reservation_units_query(
+        fields="name",
+        method_of_entry=MethodOfEntry.OPEN_ACCESS,
+        method_of_entry_start=today.isoformat(),
+        method_of_entry_end=(today + datetime.timedelta(days=1)).isoformat(),
+    )
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 3
+    assert response.node(0) == {"name": reservation_unit_1.name}
+    assert response.node(1) == {"name": reservation_unit_2.name}
+    assert response.node(2) == {"name": reservation_unit_3.name}
+
+
+def test_reservation_unit__filter__by_method_of_entry__no_period(graphql):
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(name="with key", method_of_entry=MethodOfEntry.WITH_KEY)
+    ReservationUnitFactory.create(name="open access", method_of_entry=MethodOfEntry.OPEN_ACCESS)
+    ReservationUnitFactory.create(name="keyless", method_of_entry=MethodOfEntry.KEYLESS)
+
+    # Target method of entry was in the past, default filter only looks to the future.
+    ReservationUnitFactory.create(
+        name="with key",
+        method_of_entry=MethodOfEntry.WITH_KEY,
+        method_of_entry_end_date=local_date() - datetime.timedelta(days=1),
+    )
+
+    query = reservation_units_query(fields="name", method_of_entry=MethodOfEntry.WITH_KEY)
+    response = graphql(query)
+
+    assert response.has_errors is False
+    assert len(response.edges) == 1
+    assert response.node(0) == {"name": reservation_unit.name}

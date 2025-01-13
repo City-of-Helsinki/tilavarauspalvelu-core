@@ -10,7 +10,12 @@ from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
 
-from tilavarauspalvelu.enums import ReservationKind, ReservationUnitPublishingState, ReservationUnitReservationState
+from tilavarauspalvelu.enums import (
+    MethodOfEntry,
+    ReservationKind,
+    ReservationUnitPublishingState,
+    ReservationUnitReservationState,
+)
 from tilavarauspalvelu.models import ReservationUnit
 from utils.db import build_search
 from utils.utils import get_text_search_language
@@ -100,6 +105,10 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
         enum=ReservationUnitReservationState,
     )
 
+    method_of_entry = EnumMultipleChoiceFilter(method="filter_by_method_of_entry", enum=MethodOfEntry)
+    method_of_entry_start = django_filters.DateFilter(method="filter_by_method_of_entry")
+    method_of_entry_end = django_filters.DateFilter(method="filter_by_method_of_entry")
+
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
 
     reservable_date_start = django_filters.DateFilter(method="get_filter_reservable")
@@ -121,6 +130,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
             "description_en": ["exact", "icontains"],
         }
         combination_methods = [
+            "filter_by_method_of_entry",
             "get_filter_reservable",
         ]
         order_by = [
@@ -196,6 +206,18 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     @staticmethod
     def filter_by_reservation_state(qs: ReservationUnitQuerySet, name: str, value: list[str]) -> models.QuerySet:
         return qs.with_reservation_state_in(value)
+
+    @staticmethod
+    def filter_by_method_of_entry(qs: ReservationUnitQuerySet, name: str, value: dict[str, Any]) -> models.QuerySet:
+        allowed_methods: list[str] = value.get("method_of_entry")
+        if not allowed_methods:
+            return qs
+
+        return qs.with_method_of_entry_at(
+            allowed_methods_of_entry=[MethodOfEntry(method) for method in allowed_methods],
+            begin_date=value.get("method_of_entry_start"),
+            end_date=value.get("method_of_entry_end"),
+        )
 
     def get_filter_reservable(self, qs: ReservationUnitQuerySet, name: str, value: dict[str, Any]) -> QuerySet:
         """
