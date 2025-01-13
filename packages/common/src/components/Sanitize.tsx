@@ -11,11 +11,6 @@ const StyledContent = styled.div`
   p:empty {
     display: none;
   }
-
-  /* old data has extra line-breaks instead of just using <p> */
-  p br {
-    display: none;
-  }
   a {
     text-decoration: underline;
     color: var(--tilavaraus-link-color);
