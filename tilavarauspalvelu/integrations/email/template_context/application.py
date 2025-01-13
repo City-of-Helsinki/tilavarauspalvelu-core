@@ -184,7 +184,7 @@ def get_context_for_staff_notification_application_section_cancelled(
             {
                 **params_for_reservation_series_info(reservation_series=series),
                 "reservation_url": get_staff_reservations_ext_link(
-                    reservation_id=series.reservations.values_list("pk").last()
+                    reservation_id=series.reservations.values_list("pk", flat=True).last()
                 ),
             }
             for series in application_section.actions.get_reservation_series()
