@@ -183,6 +183,9 @@ export function dayMax(days: Array<Date | undefined>): Date | undefined {
   }, undefined);
 }
 
+/// @description Convert time string "HH:MM" to minutes
+/// safe for invalid time strings but not for invalid time values
+/// @return 0 if time is invalid otherwise the time in minutes
 export function timeToMinutes(time: string) {
   const [hours, minutes] = time.split(":").map(Number).filter(Number.isFinite);
   if (hours != null && minutes != null) {

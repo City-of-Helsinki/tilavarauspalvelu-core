@@ -26,7 +26,8 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
-import { convertOptionToHDS } from "common/src/helpers";
+import { convertOptionToHDS, timeToMinutes } from "common/src/helpers";
+import { addMinutes, startOfDay } from "date-fns";
 
 type Props = {
   applicationSections: SectionNodeT[] | null;
@@ -108,6 +109,21 @@ const getTimeLabel = (selection: string[], t: TFunction): string => {
   }:${endMinute === "30" ? "00" : "30"}`;
 };
 
+function deserializeSlot(
+  slot: string
+): { day: Day; hour: number; mins: number } | null {
+  const res = slot.split("-").map(Number).filter(Number.isFinite);
+  if (res.length !== 3) {
+    return null;
+  }
+  // safe coercion
+  if (res[0] < 0 || res[0] > 6) {
+    return null;
+  }
+
+  return { day: res[0] as Day, hour: res[1], mins: res[2] };
+}
+
 function TimeSelection(): JSX.Element {
   const { t } = useTranslation();
   const [selection, setSelection] = useSlotSelection();
@@ -118,7 +134,14 @@ function TimeSelection(): JSX.Element {
       const day = selection[0].split("-")[0];
       const start = ALLOCATION_CALENDAR_TIMES[0];
       const end = ALLOCATION_CALENDAR_TIMES[1];
-      return getTimeSlotOptions(day, start, 0, end, type === "end");
+      // TODO unsafe
+      return getTimeSlotOptions(
+        Number(day) as Day,
+        start,
+        0,
+        end,
+        type === "end"
+      );
     },
     [selection]
   );
@@ -130,20 +153,27 @@ function TimeSelection(): JSX.Element {
     if (!selection) {
       return undefined;
     }
-    const start = startValue || selection[0];
-    const end = endValue || selection[selection.length - 1];
-    const [, startHours, startMinutes] = start
-      ? start.toString().split("-")
-      : [];
-    const [, endHours, endMinutes] = end ? end.toString().split("-") : [];
+    const startSelection = startValue || selection[0];
+    const endSelection = endValue || selection[selection.length - 1];
+    const start = deserializeSlot(startSelection);
+    const end = deserializeSlot(endSelection);
+    if (start == null || end == null) {
+      return;
+    }
+
+    const { day, hour: startHours, mins: startMinutes } = start;
+    const { day: dayEnd, hour: endHours, mins: endMinutes } = end;
+    if (day !== dayEnd) {
+      return;
+    }
     const timeSlots = getTimeSlotOptions(
-      selection[0].split("-")[0],
-      Number(startHours),
-      Number(startMinutes),
-      Number(endHours)
+      day,
+      startHours,
+      startMinutes,
+      endHours
     ).map((n) => n.value);
 
-    if (endValue && endMinutes === "00") timeSlots.pop();
+    if (endValue && endMinutes === 0) timeSlots.pop();
     setSelection(timeSlots);
   };
 
@@ -152,19 +182,24 @@ function TimeSelection(): JSX.Element {
     if (!val) {
       return;
     }
-    const [startHours, startMinutes] = val.label.split(":").map(Number);
-    const startTime = new Date().setHours(startHours, startMinutes);
+    const minsStart = timeToMinutes(val.label);
+    const startTime = addMinutes(startOfDay(new Date()), minsStart);
     const endOption = timeSlotEndOptions.find(
       (n) => n.value === selection?.[selection.length - 1]
     );
     if (!endOption) {
       return;
     }
-    // TODO this is unsafe
-    const [endHours, endMinutes] = endOption.label.split(":").map(Number);
-    const endTime = new Date().setHours(endHours, endMinutes);
 
+    const minsEnd = timeToMinutes(endOption.label);
+    const endTime = addMinutes(startOfDay(new Date()), minsEnd);
     const startIndex = timeSlotStartOptions.indexOf(val);
+    // The select component completely breaks if the end time is before the start time
+    // TODO more robust solution that shows errors to the users without breaking the UI
+    if (minsEnd <= minsStart && minsEnd !== 0) {
+      return;
+    }
+
     const endValue =
       startTime >= endTime
         ? timeSlotEndOptions[startIndex + 1].value
@@ -181,6 +216,19 @@ function TimeSelection(): JSX.Element {
     if (!val) {
       return;
     }
+    const minsEnd = timeToMinutes(val.label);
+    // Disabling options shows them disabled but does NOT prevent them from being selected
+    // the select component breaks if the end time is before the start time
+    const startOption = timeSlotStartOptions.find(
+      (n) => n.value === selection?.[0]
+    );
+    if (!startOption) {
+      return;
+    }
+    const minsStart = timeToMinutes(startOption?.label ?? "");
+    if (minsEnd <= minsStart && minsEnd !== 0) {
+      return;
+    }
     setSelectedTime(undefined, val.value);
   };
 
@@ -194,12 +242,12 @@ function TimeSelection(): JSX.Element {
     if (!option.label) {
       return false;
     }
-    const [startHours, startMinutes] = firstOption.label.split(":").map(Number);
-    const startTime = new Date().setHours(startHours, startMinutes);
-    const [endHours, endMinutes] = option.label.split(":").map(Number);
-    const endTime = new Date().setHours(endHours, endMinutes);
+    const minsStart = timeToMinutes(firstOption.label);
+    const startTime = addMinutes(startOfDay(new Date()), minsStart);
+    const minsEnd = timeToMinutes(option.label);
+    const endTime = addMinutes(startOfDay(new Date()), minsEnd);
 
-    return endTime <= startTime && endHours !== 0;
+    return endTime <= startTime && minsEnd !== 0;
   };
 
   const startTimeOptions = timeSlotStartOptions.map(convertOptionToHDS);

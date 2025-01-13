@@ -76,7 +76,7 @@ export const timeSlotKeyToTime = (slot: string): number => {
 };
 
 export function getTimeSlotOptions(
-  day: string,
+  day: Day,
   startHours: number,
   startMinutes: number,
   endHours: number,
