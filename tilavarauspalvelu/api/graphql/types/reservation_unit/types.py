@@ -13,7 +13,7 @@ from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.api.graphql.types.location.types import LocationNode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
-from tilavarauspalvelu.enums import ReservationUnitPublishingState, ReservationUnitReservationState
+from tilavarauspalvelu.enums import MethodOfEntry, ReservationUnitPublishingState, ReservationUnitReservationState
 from tilavarauspalvelu.integrations.opening_hours.hauki_link_generator import generate_hauki_link
 from tilavarauspalvelu.models import (
     Location,
@@ -80,6 +80,11 @@ class ReservationUnitNode(DjangoNode):
 
     calculated_surface_area = AnnotatedField(graphene.Int, expression=Sum("surface_area"))
 
+    current_method_of_entry = AnnotatedField(
+        graphene.Enum.from_enum(MethodOfEntry),
+        expression=L("current_method_of_entry"),
+    )
+
     class Meta:
         model = ReservationUnit
         fields = [
@@ -116,6 +121,8 @@ class ReservationUnitNode(DjangoNode):
             "max_reservation_duration",
             "buffer_time_before",
             "buffer_time_after",
+            "method_of_entry_start_date",
+            "method_of_entry_end_date",
             #
             # Booleans
             "is_draft",
@@ -132,6 +139,8 @@ class ReservationUnitNode(DjangoNode):
             "reservation_kind",
             "publishing_state",
             "reservation_state",
+            "method_of_entry",
+            "current_method_of_entry",
             #
             # List fields
             "search_terms",
