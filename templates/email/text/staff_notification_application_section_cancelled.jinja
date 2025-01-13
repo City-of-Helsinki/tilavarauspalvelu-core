@@ -8,7 +8,7 @@
 
 {{ view_booking_at_label | safe }}:
 
-{% for series in cancelled_reservation_series %}{{ series.weekday | safe }} {{ series.time | safe }}
+{% for series in cancelled_reservation_series %}{{ series.weekday_value | safe }} {{ series.time_value | safe }}
 {{ series.url | safe }}
 {% endfor %}
 {% include "email/text/partials/closing_staff.jinja" %}
