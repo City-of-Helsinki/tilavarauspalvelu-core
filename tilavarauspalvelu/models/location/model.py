@@ -81,7 +81,7 @@ class Location(models.Model):
 
     @property
     def address(self) -> str:
-        return f"{self.address_street}, {self.address_zip} {self.address_city}"
+        return ", ".join([self.address_street, f"{self.address_zip} {self.address_city}".strip()])
 
     @property
     def lat(self) -> float | None:
