@@ -6,6 +6,8 @@ from typing import Any
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 
+from tilavarauspalvelu.exceptions import PDFRenderingError
+
 
 def render_to_pdf(template: str, **context: Any) -> bytes:
     """Render given template to a pdf"""
@@ -14,5 +16,5 @@ def render_to_pdf(template: str, **context: Any) -> bytes:
     pdf = pisa.pisaDocument(src=BytesIO(template.encode("UTF-8")), dest=result)
     if pdf.err:
         msg = f"Error while rendering PDF: {pdf.err}"
-        raise ValueError(msg)
+        raise PDFRenderingError(msg)
     return result.getvalue()

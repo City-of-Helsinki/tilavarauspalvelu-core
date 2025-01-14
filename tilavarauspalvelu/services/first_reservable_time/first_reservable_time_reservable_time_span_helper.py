@@ -5,6 +5,7 @@ import math
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import ReservationStartInterval
+from tilavarauspalvelu.exceptions import FirstReservableTimeError
 from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import (
     override_reservable_with_closed_time_spans,
 )
@@ -123,7 +124,7 @@ class ReservableTimeSpanFirstReservableTimeHelper:
                 # Reservation (with buffers) can not overlap with the reservable time span (without buffers).
                 if reservable_time_span.overlaps_with(reservation):
                     msg = "Reservable Time Span overlaps with Reservation buffer. This should never happen."
-                    raise ValueError(msg)
+                    raise FirstReservableTimeError(msg)
 
                 # Only continue forward if a buffered time span overlaps with a reservation (without buffers)
                 if not reservation.overlaps_with(reservable_time_span):

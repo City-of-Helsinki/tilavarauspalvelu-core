@@ -15,6 +15,7 @@ from tilavarauspalvelu.enums import (
     TimezoneProperty,
     TimezoneRuleProperty,
 )
+from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
 from tilavarauspalvelu.models import Space
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
@@ -215,12 +216,12 @@ class ReservationActions:
         reservation_unit: ReservationUnit | None = self.reservation.reservation_units.first()
         if reservation_unit is None:
             msg = "Reservation has no reservation unit"
-            raise ValueError(msg)
+            raise ReservationPriceCalculationError(msg)
 
         pricing = reservation_unit.actions.get_active_pricing(by_date=begin_datetime.date())
         if pricing is None:
             msg = "Reservation unit has no pricing information"
-            raise ValueError(msg)
+            raise ReservationPriceCalculationError(msg)
 
         duration = end_datetime - begin_datetime
         return pricing.actions.calculate_reservation_price(duration, subsidised=subsidised)

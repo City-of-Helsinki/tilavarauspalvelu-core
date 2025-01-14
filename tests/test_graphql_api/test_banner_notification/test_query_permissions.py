@@ -25,18 +25,17 @@ _PRIVATE_FIELDS = ("draft", "name", "target", "state")
 
 
 def login_based_on_type(graphql, user_type: UserType) -> User | None:
-    if user_type == UserType.ANONYMOUS:
-        return None
-    if user_type == UserType.REGULAR:
-        return graphql.login_with_regular_user()
-    if user_type == UserType.SUPERUSER:
-        return graphql.login_with_superuser()
-    if user_type == UserType.STAFF:
-        return graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
-    if user_type == UserType.NOTIFICATION_MANAGER:
-        return graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
-    msg = f"Unknown user type: {user_type}"
-    raise ValueError(msg)
+    match user_type:
+        case UserType.ANONYMOUS:
+            return None
+        case UserType.REGULAR:
+            return graphql.login_with_regular_user()
+        case UserType.SUPERUSER:
+            return graphql.login_with_superuser()
+        case UserType.STAFF:
+            return graphql.login_user_with_role(role=UserRoleChoice.RESERVER)
+        case UserType.NOTIFICATION_MANAGER:
+            return graphql.login_user_with_role(role=UserRoleChoice.NOTIFICATION_MANAGER)
 
 
 @pytest.mark.parametrize(

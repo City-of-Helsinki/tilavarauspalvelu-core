@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import HaukiResourceState
+from tilavarauspalvelu.exceptions import TimeSpanElementError
 from utils.date_utils import DEFAULT_TIMEZONE, combine, datetime_range_as_string, local_start_of_day
 
 if TYPE_CHECKING:
@@ -263,10 +264,10 @@ class TimeSpanElement:
 
         if filter_time_start and filter_time_start.tzinfo is not None:
             msg = "`filter_time_start` must be timezone naive."
-            raise ValueError(msg)
+            raise TimeSpanElementError(msg)
         if filter_time_end and filter_time_end.tzinfo is not None:
             msg = "`filter_time_end` must be timezone naive."
-            raise ValueError(msg)
+            raise TimeSpanElementError(msg)
 
         # Loop through every day between the start and end date of this time span
         for day in self.get_dates_range():

@@ -46,7 +46,7 @@ def _set_user_roles() -> None:
 
         else:
             msg = f"Unknown role kind: {kind}"
-            raise ValueError(msg)
+            raise RuntimeError(msg)
 
 
 @with_logs

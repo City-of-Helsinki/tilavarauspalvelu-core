@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from django.db import models
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
+from tilavarauspalvelu.exceptions import ApplicationRoundResetError
 from tilavarauspalvelu.models import RecurringReservation, Reservation
 
 if TYPE_CHECKING:
@@ -75,4 +76,4 @@ class ApplicationRoundActions:
 
             case _:
                 msg = f"Application round in status {self.application_round.status.value!r} cannot be reset"
-                raise ValueError(msg)
+                raise ApplicationRoundResetError(msg)
