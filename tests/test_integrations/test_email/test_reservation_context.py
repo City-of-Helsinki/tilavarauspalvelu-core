@@ -4,8 +4,10 @@ from __future__ import annotations
 import datetime
 from decimal import Decimal
 
+import pytest
 from freezegun import freeze_time
 
+from tilavarauspalvelu.enums import ReservationStateChoice, WeekdayChoice
 from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
@@ -57,32 +59,38 @@ from tests.test_integrations.test_email.helpers import (
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
 )
 
+# Applied to all tests
+pytestmark = [
+    pytest.mark.django_db,
+]
+
+
 # type: EmailType.RESERVATION_APPROVED #################################################################################
 
 
 @freeze_time("2024-01-01")
-def test_get_context__reservation_approved__en():
+def test_get_context__reservation_approved__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
-            email_recipient_name="John Doe",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_unit_name="Test reservation unit",
             unit_name="Test unit",
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            non_subsidised_price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            price=Decimal(0),
+            non_subsidised_price=Decimal(0),
+            tax_percentage=Decimal(0),
+            reservation_id=email_reservation.id,
+            confirmed_instructions="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="en",
         )
 
     assert context == {
-        "email_recipient_name": "John Doe",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "text_reservation_approved": "Your booking is now confirmed",
         "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
+        "instructions": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "title": "Your booking is confirmed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -90,7 +98,16 @@ def test_get_context__reservation_approved__en():
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
         **CLOSING_POLITE_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "reservation_id": f"{email_reservation.id}",
+        "price": Decimal(0),
+        "tax_percentage": Decimal(0),
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_reservation_approved(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -262,29 +279,29 @@ def test_get_context__reservation_approved__discount__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context__reservation_cancelled__en():
+def test_get_context__reservation_cancelled__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_cancelled(
-            email_recipient_name="John Doe",
-            cancel_reason="This is a reason",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            cancel_reason="[PERUUTUKSEN SYY]",
             reservation_unit_name="Test reservation unit",
             unit_name="Test unit",
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            reservation_id=12,
-            cancelled_instructions="This are the instructions",
+            price=Decimal(0),
+            tax_percentage=Decimal(0),
+            reservation_id=email_reservation.id,
+            cancelled_instructions="[PERUUTETUN VARAUKSEN OHJEET]",
             language="en",
         )
 
     assert context == {
-        "cancel_reason": "This is a reason",
+        "cancel_reason": "[PERUUTUKSEN SYY]",
         "cancel_reason_label": "Your reason for cancellation",
-        "instructions": "This are the instructions",
+        "instructions": "[PERUUTETUN VARAUKSEN OHJEET]",
         "instructions_label": "Additional information about cancellation",
-        "email_recipient_name": "John Doe",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Your booking has been cancelled",
         "text_reservation_cancelled": "Your booking has been cancelled",
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -292,7 +309,16 @@ def test_get_context__reservation_cancelled__en():
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "reservation_id": f"{email_reservation.id}",
+        "price": Decimal(0),
+        "tax_percentage": Decimal(0),
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_reservation_cancelled(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -367,25 +393,25 @@ def test_get_context__reservation_cancelled__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context__reservation_confirmed__en():
+def test_get_context__reservation_confirmed__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_confirmed(
-            email_recipient_name="John Doe",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_unit_name="Test reservation unit",
             unit_name="Test unit",
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            price=Decimal(0),
+            tax_percentage=Decimal(0),
+            reservation_id=email_reservation.id,
+            confirmed_instructions="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="en",
         )
 
     assert context == {
-        "email_recipient_name": "John Doe",
-        "instructions": "These are the instructions",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "instructions": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "instructions_label": "Additional information about your booking",
         "text_reservation_confirmed": "You have made a new booking",
         "title": "Thank you for your booking at Varaamo",
@@ -395,7 +421,16 @@ def test_get_context__reservation_confirmed__en():
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
         **CLOSING_POLITE_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "reservation_id": f"{email_reservation.id}",
+        "price": Decimal(0),
+        "tax_percentage": Decimal(0),
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_reservation_confirmed(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -466,27 +501,27 @@ def test_get_context__reservation_confirmed__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context__reservation_modified__en():
+def test_get_context__reservation_modified__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_modified(
-            email_recipient_name="John Doe",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_unit_name="Test reservation unit",
             unit_name="Test unit",
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            price=Decimal(0),
+            tax_percentage=Decimal(0),
+            reservation_id=email_reservation.id,
+            confirmed_instructions="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="en",
         )
 
     assert context == {
-        "email_recipient_name": "John Doe",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "text_reservation_modified": "Your booking has been updated",
         "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
+        "instructions": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "title": "Your booking has been updated",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -494,7 +529,16 @@ def test_get_context__reservation_modified__en():
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
         **CLOSING_POLITE_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "reservation_id": f"{email_reservation.id}",
+        "price": Decimal(0),
+        "tax_percentage": Decimal(0),
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_reservation_modified(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -565,36 +609,42 @@ def test_get_context__reservation_modified__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context__reservation_rejected__en():
+def test_get_context__reservation_rejected__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_rejected(
-            email_recipient_name="John Doe",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_unit_name="Test reservation unit",
             unit_name="Test unit",
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            rejection_reason="This is the rejection reason",
-            reservation_id=12,
-            cancelled_instructions="These are the instructions",
+            rejection_reason="[HYLKÄYKSEN SYY]",
+            reservation_id=email_reservation.id,
+            cancelled_instructions="[PERUUTETUN VARAUKSEN OHJEET]",
             language="en",
         )
 
     assert context == {
-        "email_recipient_name": "John Doe",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "booking_number_label": "Booking number",
-        "reservation_id": "12",
+        "reservation_id": f"{email_reservation.id}",
         "rejection_reason_label": "Reason",
-        "rejection_reason": "This is the rejection reason",
+        "rejection_reason": "[HYLKÄYKSEN SYY]",
         "text_reservation_rejected": "Unfortunately your booking cannot be confirmed",
         "instructions_label": "Additional information",
-        "instructions": "These are the instructions",
+        "instructions": "[PERUUTETUN VARAUKSEN OHJEET]",
         "title": "Unfortunately your booking cannot be confirmed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_reservation_rejected(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -667,33 +717,33 @@ def test_get_context__reservation_rejected__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context__reservation_requires_handling__en():
+def test_get_context__reservation_requires_handling__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_handling(
-            email_recipient_name="John Doe",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_unit_name="Test reservation unit",
             unit_name="Test unit",
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            subsidised_price=Decimal("12.30"),
+            price=Decimal(0),
+            subsidised_price=Decimal(0),
             applying_for_free_of_charge=True,
-            tax_percentage=Decimal("25.5"),
-            reservation_id=12,
-            pending_instructions="These are the instructions",
+            tax_percentage=Decimal(0),
+            reservation_id=email_reservation.id,
+            pending_instructions="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
             language="en",
         )
 
     assert context == {
-        "email_recipient_name": "John Doe",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "text_pending_notification": (
             "You will receive a confirmation email once your booking has been processed. "
             "We will contact you if further information is needed regarding your booking request."
         ),
         "text_reservation_requires_handling": "You have made a new booking request",
         "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
+        "instructions": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
         "title": "Your booking is waiting for processing",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -701,7 +751,17 @@ def test_get_context__reservation_requires_handling__en():
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
         **CLOSING_POLITE_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "price": Decimal(0),
+        "subsidised_price": Decimal(0),
+        "tax_percentage": Decimal(0),
+        "reservation_id": f"{email_reservation.id}",
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_reservation_requires_handling(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -824,32 +884,32 @@ def test_get_context__reservation_requires_handling__subsidised():
 
 
 @freeze_time("2024-01-01")
-def test_get_context__reservation_requires_payment__en():
+def test_get_context__reservation_requires_payment__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_payment(
-            email_recipient_name="John Doe",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_unit_name="Test reservation unit",
             unit_name="Test unit",
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            payment_due_date=datetime.date(2024, 2, 1),
-            reservation_id=12,
-            confirmed_instructions="These are the instructions",
+            price=Decimal(0),
+            tax_percentage=Decimal(0),
+            payment_due_date=datetime.date(2024, 1, 1),
+            reservation_id=email_reservation.id,
+            confirmed_instructions="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="en",
         )
 
     assert context == {
-        "email_recipient_name": "John Doe",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "payment_due_date_label": "Due date",
-        "payment_due_date": "1.2.2024",
+        "payment_due_date": "1.1.2024",
         "text_reservation_requires_payment": "Your booking has been confirmed, and can be paid",
         "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/en/reservations">Pay the booking</a>',
         "pay_reservation_link": "Pay the booking: https://fake.varaamo.hel.fi/en/reservations",
         "instructions_label": "Additional information about your booking",
-        "instructions": "These are the instructions",
+        "instructions": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "title": "Your booking has been confirmed, and can be paid",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -857,7 +917,16 @@ def test_get_context__reservation_requires_payment__en():
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
         **CLOSING_POLITE_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "reservation_id": f"{email_reservation.id}",
+        "price": 0,
+        "tax_percentage": 0,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_reservation_requires_payment(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -938,7 +1007,7 @@ def test_get_context__reservation_requires_payment__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context_for_seasonal_reservation_cancelled_single__en():
+def test_get_context_for_seasonal_reservation_cancelled_single__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_cancelled_single(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -957,14 +1026,18 @@ def test_get_context_for_seasonal_reservation_cancelled_single__en():
         "text_reservation_cancelled": "The space reservation included in your seasonal booking has been cancelled",
         "cancel_reason_label": "Reason",
         "cancel_reason": "[PERUUTUKSEN SYY]",
-        "check_booking_details_text": "You can check your booking details at",
-        "check_booking_details_url": "https://fake.varaamo.hel.fi/en/applications",
-        "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/en/applications">https://fake.varaamo.hel.fi/en/applications</a>',
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_seasonal_reservation_cancelled_single(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -1031,12 +1104,12 @@ def test_get_context_for_seasonal_reservation_cancelled_single__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context_for_seasonal_reservation_modified_series__en():
+def test_get_context_for_seasonal_reservation_modified_series__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_modified_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            weekday_value="[VIIKONPÄIVÄ]",
-            time_value="[KELLONAIKA]",
+            weekday_value=WeekdayChoice.MONDAY.label,
+            time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             language="en",
@@ -1050,14 +1123,20 @@ def test_get_context_for_seasonal_reservation_modified_series__en():
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
         "weekday_label": "Day",
-        "weekday_value": "[VIIKONPÄIVÄ]",
+        "weekday_value": "Monday",
         "time_label": "Time",
-        "time_value": "[KELLONAIKA]",
+        "time_value": "12:00:00-14:00:00",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
         **BASE_TEMPLATE_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_seasonal_reservation_modified_series(
+            reservation_series=email_reservation.recurring_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -1066,7 +1145,7 @@ def test_get_context_for_seasonal_reservation_modified_series__fi():
         context = get_context_for_seasonal_reservation_modified_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             weekday_value="[VIIKONPÄIVÄ]",
-            time_value="[KELLONAIKA]",
+            time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             language="fi",
@@ -1082,7 +1161,7 @@ def test_get_context_for_seasonal_reservation_modified_series__fi():
         "weekday_label": "Päivä",
         "weekday_value": "[VIIKONPÄIVÄ]",
         "time_label": "Kellonaika",
-        "time_value": "[KELLONAIKA]",
+        "time_value": "12:00:00-14:00:00",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
         **BASE_TEMPLATE_CONTEXT_FI,
         **CLOSING_CONTEXT_FI,
@@ -1096,7 +1175,7 @@ def test_get_context_for_seasonal_reservation_modified_series__sv():
         context = get_context_for_seasonal_reservation_modified_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             weekday_value="[VIIKONPÄIVÄ]",
-            time_value="[KELLONAIKA]",
+            time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             language="sv",
@@ -1112,7 +1191,7 @@ def test_get_context_for_seasonal_reservation_modified_series__sv():
         "weekday_label": "Dag",
         "weekday_value": "[VIIKONPÄIVÄ]",
         "time_label": "Tid",
-        "time_value": "[KELLONAIKA]",
+        "time_value": "12:00:00-14:00:00",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
         **BASE_TEMPLATE_CONTEXT_SV,
         **CLOSING_CONTEXT_SV,
@@ -1124,7 +1203,7 @@ def test_get_context_for_seasonal_reservation_modified_series__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context_for_seasonal_reservation_modified_single__en():
+def test_get_context_for_seasonal_reservation_modified_single__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_modified_single(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -1146,6 +1225,12 @@ def test_get_context_for_seasonal_reservation_modified_single__en():
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_seasonal_reservation_modified_single(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -1202,12 +1287,12 @@ def test_get_context_for_seasonal_reservation_modified_single__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context_for_seasonal_reservation_rejected_series__en():
+def test_get_context_for_seasonal_reservation_rejected_series__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_rejected_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            weekday_value="[VIIKONPÄIVÄ]",
-            time_value="[KELLONAIKA]",
+            weekday_value=WeekdayChoice.MONDAY.label,
+            time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             language="en",
@@ -1222,9 +1307,9 @@ def test_get_context_for_seasonal_reservation_rejected_series__en():
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
         "weekday_label": "Day",
-        "weekday_value": "[VIIKONPÄIVÄ]",
+        "weekday_value": "Monday",
         "time_label": "Time",
-        "time_value": "[KELLONAIKA]",
+        "time_value": "12:00:00-14:00:00",
         "rejection_reason_label": "Reason",
         "rejection_reason": "[HYLKÄYKSEN SYY]",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
@@ -1233,6 +1318,14 @@ def test_get_context_for_seasonal_reservation_rejected_series__en():
         **AUTOMATIC_REPLY_CONTEXT_EN,
     }
 
+    email_reservation.state = ReservationStateChoice.DENIED
+    email_reservation.save()
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_seasonal_reservation_rejected_series(
+            reservation_series=email_reservation.recurring_reservation,
+            language="en",
+        )
+
 
 @freeze_time("2024-01-01")
 def test_get_context_for_seasonal_reservation_rejected_series__fi():
@@ -1240,7 +1333,7 @@ def test_get_context_for_seasonal_reservation_rejected_series__fi():
         context = get_context_for_seasonal_reservation_rejected_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             weekday_value="[VIIKONPÄIVÄ]",
-            time_value="[KELLONAIKA]",
+            time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             rejection_reason="[HYLKÄYKSEN SYY]",
@@ -1257,7 +1350,7 @@ def test_get_context_for_seasonal_reservation_rejected_series__fi():
         "weekday_label": "Päivä",
         "weekday_value": "[VIIKONPÄIVÄ]",
         "time_label": "Kellonaika",
-        "time_value": "[KELLONAIKA]",
+        "time_value": "12:00:00-14:00:00",
         "rejection_reason_label": "Syy",
         "rejection_reason": "[HYLKÄYKSEN SYY]",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
@@ -1273,7 +1366,7 @@ def test_get_context_for__seasonal_reservation_rejected_series_sv():
         context = get_context_for_seasonal_reservation_rejected_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             weekday_value="[VIIKONPÄIVÄ]",
-            time_value="[KELLONAIKA]",
+            time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             rejection_reason="[HYLKÄYKSEN SYY]",
@@ -1290,7 +1383,7 @@ def test_get_context_for__seasonal_reservation_rejected_series_sv():
         "weekday_label": "Dag",
         "weekday_value": "[VIIKONPÄIVÄ]",
         "time_label": "Tid",
-        "time_value": "[KELLONAIKA]",
+        "time_value": "12:00:00-14:00:00",
         "rejection_reason_label": "Orsak",
         "rejection_reason": "[HYLKÄYKSEN SYY]",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
@@ -1304,7 +1397,7 @@ def test_get_context_for__seasonal_reservation_rejected_series_sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context_for_seasonal_reservation_rejected_single__en():
+def test_get_context_for_seasonal_reservation_rejected_single__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_rejected_single(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -1329,6 +1422,12 @@ def test_get_context_for_seasonal_reservation_rejected_single__en():
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_seasonal_reservation_rejected_single(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -1391,17 +1490,17 @@ def test_get_context_for_seasonal_reservation_rejected_single__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context__staff_notification_reservation_made__en():
+def test_get_context__staff_notification_reservation_made__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_reservation_made(
-            reservee_name="John Doe",
+            reservee_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_name="Test reservation",
             reservation_unit_name="Test reservation unit",
             unit_name="Test unit",
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            reservation_id=12,
+            reservation_id=email_reservation.id,
             language="en",
         )
 
@@ -1409,21 +1508,27 @@ def test_get_context__staff_notification_reservation_made__en():
         "email_recipient_name": None,
         "reservation_name": "Test reservation",
         "booking_number_label": "Booking number",
-        "reservation_id": "12",
+        "reservation_id": f"{email_reservation.id}",
         "reservee_name_label": "Reservee name",
-        "reservee_name": "John Doe",
-        "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
+        "reservee_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "staff_reservations_ext_link": f"https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}",
         "staff_reservations_ext_link_html": (
-            '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/12">'
-            "https://fake.varaamo.hel.fi/kasittely/reservations/12</a>"
+            f'<a href="https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}">'
+            f"https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}</a>"
         ),
         "text_check_details": "You can view the booking at",
         "text_staff_reservation_made": "A new booking has been confirmed for Test reservation unit",
-        "title": "New booking 12 has been made for Test unit",
+        "title": f"New booking {email_reservation.id} has been made for Test unit",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **CLOSING_STAFF_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_staff_notification_reservation_made(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -1502,17 +1607,17 @@ def test_get_context__staff_notification_reservation_made__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context__staff_notification_reservation_requires_handling__en():
+def test_get_context__staff_notification_reservation_requires_handling__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_reservation_requires_handling(
-            reservee_name="John Doe",
+            reservee_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_name="Test reservation",
             reservation_unit_name="Test reservation unit",
             unit_name="Test unit",
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
-            reservation_id=12,
+            reservation_id=email_reservation.id,
             language="en",
         )
 
@@ -1520,23 +1625,29 @@ def test_get_context__staff_notification_reservation_requires_handling__en():
         "email_recipient_name": None,
         "reservation_name": "Test reservation",
         "booking_number_label": "Booking number",
-        "reservation_id": "12",
+        "reservation_id": f"{email_reservation.id}",
         "reservee_name_label": "Reservee name",
-        "reservee_name": "John Doe",
-        "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
+        "reservee_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "staff_reservations_ext_link": f"https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}",
         "staff_reservations_ext_link_html": (
-            '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/12">'
-            "https://fake.varaamo.hel.fi/kasittely/reservations/12</a>"
+            f'<a href="https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}">'
+            f"https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}</a>"
         ),
         "text_check_details": "You can view and handle the booking at",
         "text_staff_reservation_requires_handling": (
             "A booking request for Test reservation unit is waiting for processing"
         ),
-        "title": "New booking 12 requires handling at unit Test unit",
+        "title": f"New booking {email_reservation.id} requires handling at unit Test unit",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **CLOSING_STAFF_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_staff_notification_reservation_requires_handling(
+            reservation=email_reservation,
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
