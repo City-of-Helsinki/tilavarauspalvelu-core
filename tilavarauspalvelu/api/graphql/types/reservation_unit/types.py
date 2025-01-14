@@ -6,11 +6,12 @@ import graphene
 from django.db import models
 from django.db.models import Sum
 from graphene_django_extensions import DjangoNode
-from graphql import GraphQLError
+from graphene_django_extensions.errors import GQLCodeError
 from lookup_property import L
 from query_optimizer import AnnotatedField, DjangoListField, ManuallyOptimizedField
 from query_optimizer.optimizer import QueryOptimizer
 
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.location.types import LocationNode
 from tilavarauspalvelu.api.graphql.types.reservation.types import ReservationNode
 from tilavarauspalvelu.enums import AccessType, ReservationUnitPublishingState, ReservationUnitReservationState
@@ -207,7 +208,7 @@ class ReservationUnitNode(DjangoNode):
             "Unexpected error: 'isClosed' should have been calculated but wasn't. "
             "Did you forget to set `calculateFirstReservableTime:true`?"
         )
-        raise GraphQLError(msg)
+        raise GQLCodeError(msg, code=error_codes.RESERVATION_UNIT_FIRST_RESERVABLE_DATETIME_NOT_CALCULATED)
 
     def resolve_first_reservable_datetime(root: ReservationUnit, info: GQLInfo) -> datetime.datetime | None:
         # 'first_reservable_datetime' is annotated by ReservationUnitFilterSet
@@ -218,7 +219,7 @@ class ReservationUnitNode(DjangoNode):
             "Unexpected error: 'firstReservableDatetime' should have been calculated but wasn't. "
             "Did you forget to set `calculateFirstReservableTime:true`?"
         )
-        raise GraphQLError(msg)
+        raise GQLCodeError(msg, code=error_codes.RESERVATION_UNIT_FIRST_RESERVABLE_DATETIME_NOT_CALCULATED)
 
     @staticmethod
     def optimize_location(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
