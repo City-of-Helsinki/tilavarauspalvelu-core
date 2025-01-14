@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from factory import FactoryError
+
 from tilavarauspalvelu.models import ReservationMetadataSet
 
 from ._base import FakerFI, GenericDjangoModelFactory, ManyToManyFactory, ReverseForeignKeyFactory
@@ -40,15 +42,15 @@ class ReservationMetadataSetFactory(GenericDjangoModelFactory[ReservationMetadat
 
         if extra_fields := set(supported_fields) - POSSIBLE_FIELDS:
             msg = f"Unknowns fields in `supported_fields`: {extra_fields}"
-            raise ValueError(msg)
+            raise FactoryError(msg)
 
         if extra_fields := set(required_fields) - POSSIBLE_FIELDS:
             msg = f"Unknowns fields in `required_fields`: {extra_fields}"
-            raise ValueError(msg)
+            raise FactoryError(msg)
 
         if extra_fields := set(required_fields) - set(supported_fields):
             msg = f"Received `required_fields` that are not in `supported_fields`: {extra_fields}"
-            raise ValueError(msg)
+            raise FactoryError(msg)
 
         defaults: list[str] = [
             "reservee_first_name",

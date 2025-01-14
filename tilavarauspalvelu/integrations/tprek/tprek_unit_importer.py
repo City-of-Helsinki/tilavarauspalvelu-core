@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from django.db.transaction import atomic
 
+from tilavarauspalvelu.exceptions import TPRekImportError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekAPIClient
@@ -40,7 +41,7 @@ class TprekUnitImporter:
         for unit in units:
             if unit.tprek_id is None:
                 msg = f"Unit TPREK ID is None: {unit.pk}"
-                raise ValueError(msg)
+                raise TPRekImportError(msg)
 
             tprek_unit_data, tprek_location_data = TprekAPIClient.get_unit(unit_tprek_id=unit.tprek_id)
 
