@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db.transaction import atomic
 from graphene.utils.str_converters import to_camel_case
 from graphene_django_extensions import NestingModelSerializer
-from graphql import GraphQLError
+from graphene_django_extensions.errors import GQLCodeError
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
@@ -307,7 +307,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 instance.actions.send_reservation_unit_to_hauki()
             except ExternalServiceError as err:
                 msg = "Sending reservation unit as resource to HAUKI failed."
-                raise GraphQLError(msg) from err
+                raise GQLCodeError(msg, code=error_codes.HAUKI_EXPORTS_ERROR) from err
 
     @staticmethod
     def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:

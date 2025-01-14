@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import graphene
-from graphene_django_extensions.errors import GQLNodePermissionDeniedError
-from graphql import GraphQLError
+from graphene_django_extensions.errors import GQLCodeError, GQLNodePermissionDeniedError
 from query_optimizer.selections import get_field_selections
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
@@ -55,7 +54,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
             user = cls.get_user_from_application(application_id, info=info)
         else:
             msg = "Either 'reservation_id' or 'application_id' required."
-            raise GraphQLError(msg)
+            raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_INVALID_PARAMS)
 
         id_token = user.id_token
 
@@ -80,8 +79,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
 
         if not bool(user.profile_id):
             msg = "User does not have a profile id. Cannot fetch profile data."
-            extensions = {"code": error_codes.HELSINKI_PROFILE_USER_MISSING_PROFILE_ID}
-            raise GraphQLError(msg, extensions=extensions)
+            raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_USER_MISSING_PROFILE_ID)
 
         # Modify profile request based on the requested fields in the graphql query
         fields: list[str] = get_field_selections(info)
@@ -94,13 +92,11 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         )
         if info.context.session.get("keycloak_refresh_token_expired", False):
             msg = "Keycloak refresh token is expired. Please log out and back in again."
-            extensions = {"code": error_codes.HELSINKI_PROFILE_KEYCLOAK_REFRESH_TOKEN_EXPIRED}
-            raise GraphQLError(msg, extensions=extensions)
+            raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_KEYCLOAK_REFRESH_TOKEN_EXPIRED)
 
         if data is None:
             msg = "Helsinki profile token is not valid and could not be refreshed."
-            extensions = {"code": error_codes.HELSINKI_PROFILE_TOKEN_INVALID}
-            raise GraphQLError(msg, extensions=extensions)
+            raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_TOKEN_INVALID)
 
         return data
 
@@ -114,8 +110,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         )
         if application is None:
             msg = f"Application with id {application_id} not found."
-            extensions = {"code": error_codes.HELSINKI_PROFILE_APPLICATION_USER_NOT_FOUND}
-            raise GraphQLError(msg, extensions=extensions)
+            raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_APPLICATION_USER_NOT_FOUND)
 
         user: AnyUser = info.context.user
         if not user.permissions.can_view_application(application):
@@ -124,8 +119,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         user: User | None = application.user
         if user is None:
             msg = f"Application with id {application_id} does not have a user."
-            extensions = {"code": error_codes.HELSINKI_PROFILE_APPLICATION_USER_MISSING}
-            raise GraphQLError(msg, extensions=extensions)
+            raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_APPLICATION_USER_MISSING)
 
         return user
 
@@ -139,8 +133,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         )
         if reservation is None:
             msg = f"Reservation with id {reservation_id} not found."
-            extensions = {"code": error_codes.HELSINKI_PROFILE_RESERVATION_USER_NOT_FOUND}
-            raise GraphQLError(msg, extensions=extensions)
+            raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_RESERVATION_USER_NOT_FOUND)
 
         user: AnyUser = info.context.user
         if not user.permissions.can_view_reservation(reservation):
@@ -149,8 +142,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
         user: User | None = reservation.user
         if user is None:
             msg = f"Reservation with id {reservation_id} does not have a user."
-            extensions = {"code": error_codes.HELSINKI_PROFILE_RESERVATION_USER_MISSING}
-            raise GraphQLError(msg, extensions=extensions)
+            raise GQLCodeError(msg, code=error_codes.HELSINKI_PROFILE_RESERVATION_USER_MISSING)
 
         return user
 
