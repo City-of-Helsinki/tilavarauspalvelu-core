@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from subforms.fields import DynamicArrayField
 from tinymce.widgets import TinyMCE
 
-from tilavarauspalvelu.enums import MethodOfEntry, TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import AccessType, TermsOfUseTypeChoices
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationUnit, TermsOfUse
 from utils.external_service.errors import ExternalServiceError
@@ -41,12 +41,12 @@ class ReservationUnitAdminForm(forms.ModelForm):
             return
 
         # Check if reservation unit has been configured in Pindora.
-        method_of_entry: str | None = cleaned_data.get("method_of_entry")
-        if method_of_entry == MethodOfEntry.KEYLESS:
+        access_type: str | None = cleaned_data.get("access_type")
+        if access_type == AccessType.ACCESS_CODE:
             try:
                 PindoraClient.get_reservation_unit(self.instance)
             except ExternalServiceError as error:
-                self.add_error("method_of_entry", str(error))
+                self.add_error("access_type", str(error))
 
     class Meta:
         model = ReservationUnit
@@ -128,9 +128,9 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "uuid": _("UUID"),
             "payment_product": _("Payment product"),
             "search_terms": _("Search terms"),
-            "method_of_entry": _("Method of entry"),
-            "method_of_entry_start_date": _("Method of entry start date"),
-            "method_of_entry_end_date": _("Method of entry end date"),
+            "access_type": _("Access type"),
+            "access_type_start_date": _("Access type start date"),
+            "access_type_end_date": _("Access type end date"),
         }
         help_texts = {
             "sku": _("SKU"),
@@ -222,13 +222,13 @@ class ReservationUnitAdminForm(forms.ModelForm):
                 "in the customer UI. These terms should be added to make sure search results using text search in "
                 "links from external sources work regardless of the UI language."
             ),
-            "method_of_entry": _("How is the reservee able to enter the space in their reservation unit?"),
-            "method_of_entry_start_date": _(
-                "If set, this is the date from which the method of entry is used. If current date is "
-                "before this date, the method of entry is 'open access'."
+            "access_type": _("How is the reservee able to enter the space in their reservation unit?"),
+            "access_type_start_date": _(
+                "If set, this is the date from which the access type is used. If current date is "
+                "before this date, the access type is 'unrestricted'."
             ),
-            "method_of_entry_end_date": _(
-                "If set, this is the date before which the method of entry is used. If current date is "
-                "after this date, the method of entry is 'open access'."
+            "access_type_end_date": _(
+                "If set, this is the date before which the access type is used. If current date is "
+                "after this date, the access type is 'unrestricted'."
             ),
         }

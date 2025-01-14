@@ -5,7 +5,7 @@ import datetime
 import pytest
 
 from tilavarauspalvelu.enums import (
-    MethodOfEntry,
+    AccessType,
     ReservationKind,
     ReservationUnitPublishingState,
     ReservationUnitReservationState,
@@ -793,54 +793,58 @@ def test_reservation_unit__filter__by_reservation_unit_state__multiple(graphql):
     assert response.node(1) == {"pk": reservation_units.scheduled_publishing.pk}
 
 
-def test_reservation_unit__filter__by_method_of_entry(graphql):
+# Access type
+
+
+def test_reservation_unit__filter__by_access_type(graphql):
     graphql.login_with_superuser()
 
     today = local_date()
 
-    # Always active method of entry
+    # Always active access type
     reservation_unit_1 = ReservationUnitFactory.create(
-        name="Always with key",
-        method_of_entry=MethodOfEntry.WITH_KEY,
+        name="Always physical key",
+        access_type=AccessType.PHYSICAL_KEY,
     )
 
-    # Method of entry before filter period.
+    # Access type before filter period.
     ReservationUnitFactory.create(
-        name="with key ends before filter period",
-        method_of_entry=MethodOfEntry.WITH_KEY,
-        method_of_entry_end_date=today - datetime.timedelta(days=1),
+        name="physical key ends before filter period",
+        access_type=AccessType.PHYSICAL_KEY,
+        access_type_end_date=today - datetime.timedelta(days=1),
     )
 
-    # Method of entry starts during the filter period.
+    # Access type starts during the filter period.
     reservation_unit_2 = ReservationUnitFactory.create(
-        name="with key starts during filter period",
-        method_of_entry=MethodOfEntry.WITH_KEY,
-        method_of_entry_start_date=today + datetime.timedelta(days=1),
+        name="physical key starts during filter period",
+        access_type=AccessType.PHYSICAL_KEY,
+        access_type_start_date=today + datetime.timedelta(days=1),
     )
 
-    # Method of entry starts after the filter period.
+    # Access type starts after the filter period.
     ReservationUnitFactory.create(
-        name="with key starts after filter period",
-        method_of_entry=MethodOfEntry.WITH_KEY,
-        method_of_entry_start_date=today + datetime.timedelta(days=10),
+        name="physical key starts after filter period",
+        access_type=AccessType.PHYSICAL_KEY,
+        access_type_start_date=today + datetime.timedelta(days=10),
     )
 
-    # Method of entry ending during the filter period.
+    # Access type ending during the filter period.
     reservation_unit_3 = ReservationUnitFactory.create(
-        name="with key ends during filter period",
-        method_of_entry=MethodOfEntry.WITH_KEY,
-        method_of_entry_end_date=today,
+        name="physical key ends during filter period",
+        access_type=AccessType.PHYSICAL_KEY,
+        access_type_end_date=today,
     )
 
-    # Method of entry something other
-    ReservationUnitFactory.create(name="open access", method_of_entry=MethodOfEntry.OPEN_ACCESS)
-    ReservationUnitFactory.create(name="keyless", method_of_entry=MethodOfEntry.KEYLESS)
+    # Access type something other
+    ReservationUnitFactory.create(name="unrestricted", access_type=AccessType.UNRESTRICTED)
+    ReservationUnitFactory.create(name="access code", access_type=AccessType.ACCESS_CODE)
+    ReservationUnitFactory.create(name="opened by staff", access_type=AccessType.OPENED_BY_STAFF)
 
     query = reservation_units_query(
         fields="name",
-        method_of_entry=MethodOfEntry.WITH_KEY,
-        method_of_entry_start=today.isoformat(),
-        method_of_entry_end=(today + datetime.timedelta(days=1)).isoformat(),
+        access_type=AccessType.PHYSICAL_KEY,
+        access_type_start_date=today.isoformat(),
+        access_type_end_date=(today + datetime.timedelta(days=1)).isoformat(),
     )
     response = graphql(query)
 
@@ -851,42 +855,43 @@ def test_reservation_unit__filter__by_method_of_entry(graphql):
     assert response.node(2) == {"name": reservation_unit_3.name}
 
 
-def test_reservation_unit__filter__by_method_of_entry__open_access(graphql):
+def test_reservation_unit__filter__by_access_type__open_access(graphql):
     graphql.login_with_superuser()
 
     today = local_date()
 
-    # Method of entry open access
+    # Access type open access
     reservation_unit_1 = ReservationUnitFactory.create(
         name="Always open access",
-        method_of_entry=MethodOfEntry.OPEN_ACCESS,
+        access_type=AccessType.UNRESTRICTED,
     )
 
-    # Other method of entry ends during the filter period
+    # Other access type ends during the filter period
     # => Has "open access" during rest of period.
     reservation_unit_2 = ReservationUnitFactory.create(
         name="ending during filter period",
-        method_of_entry=MethodOfEntry.WITH_KEY,
-        method_of_entry_end_date=today,
+        access_type=AccessType.PHYSICAL_KEY,
+        access_type_end_date=today,
     )
 
-    # Other method of entry starts during the filter period
+    # Other access type starts during the filter period
     # => Has "open access" during beginning of period.
     reservation_unit_3 = ReservationUnitFactory.create(
         name="starting during filter period",
-        method_of_entry=MethodOfEntry.WITH_KEY,
-        method_of_entry_start_date=today + datetime.timedelta(days=1),
+        access_type=AccessType.PHYSICAL_KEY,
+        access_type_start_date=today + datetime.timedelta(days=1),
     )
 
-    # Method of entry something other.
-    ReservationUnitFactory.create(name="with key", method_of_entry=MethodOfEntry.WITH_KEY)
-    ReservationUnitFactory.create(name="keyless", method_of_entry=MethodOfEntry.KEYLESS)
+    # Access type something other.
+    ReservationUnitFactory.create(name="with key", access_type=AccessType.PHYSICAL_KEY)
+    ReservationUnitFactory.create(name="keyless", access_type=AccessType.ACCESS_CODE)
+    ReservationUnitFactory.create(name="opened by staff", access_type=AccessType.OPENED_BY_STAFF)
 
     query = reservation_units_query(
         fields="name",
-        method_of_entry=MethodOfEntry.OPEN_ACCESS,
-        method_of_entry_start=today.isoformat(),
-        method_of_entry_end=(today + datetime.timedelta(days=1)).isoformat(),
+        access_type=AccessType.UNRESTRICTED,
+        access_type_start_date=today.isoformat(),
+        access_type_end_date=(today + datetime.timedelta(days=1)).isoformat(),
     )
     response = graphql(query)
 
@@ -897,21 +902,22 @@ def test_reservation_unit__filter__by_method_of_entry__open_access(graphql):
     assert response.node(2) == {"name": reservation_unit_3.name}
 
 
-def test_reservation_unit__filter__by_method_of_entry__no_period(graphql):
+def test_reservation_unit__filter__by_access_type__no_period(graphql):
     graphql.login_with_superuser()
 
-    reservation_unit = ReservationUnitFactory.create(name="with key", method_of_entry=MethodOfEntry.WITH_KEY)
-    ReservationUnitFactory.create(name="open access", method_of_entry=MethodOfEntry.OPEN_ACCESS)
-    ReservationUnitFactory.create(name="keyless", method_of_entry=MethodOfEntry.KEYLESS)
+    reservation_unit = ReservationUnitFactory.create(name="with key", access_type=AccessType.PHYSICAL_KEY)
+    ReservationUnitFactory.create(name="open access", access_type=AccessType.UNRESTRICTED)
+    ReservationUnitFactory.create(name="keyless", access_type=AccessType.ACCESS_CODE)
+    ReservationUnitFactory.create(name="opened by staff", access_type=AccessType.OPENED_BY_STAFF)
 
-    # Target method of entry was in the past, default filter only looks to the future.
+    # Target access type was in the past, default filter only looks to the future.
     ReservationUnitFactory.create(
         name="with key",
-        method_of_entry=MethodOfEntry.WITH_KEY,
-        method_of_entry_end_date=local_date() - datetime.timedelta(days=1),
+        access_type=AccessType.PHYSICAL_KEY,
+        access_type_end_date=local_date() - datetime.timedelta(days=1),
     )
 
-    query = reservation_units_query(fields="name", method_of_entry=MethodOfEntry.WITH_KEY)
+    query = reservation_units_query(fields="name", access_type=AccessType.PHYSICAL_KEY)
     response = graphql(query)
 
     assert response.has_errors is False

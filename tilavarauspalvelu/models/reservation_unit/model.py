@@ -15,8 +15,8 @@ from lookup_property import L, lookup_property
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import (
+    AccessType,
     AuthenticationType,
-    MethodOfEntry,
     ReservationKind,
     ReservationStartInterval,
     ReservationUnitPublishingState,
@@ -90,8 +90,8 @@ class ReservationUnit(models.Model):
     max_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
-    method_of_entry_start_date: datetime.date | None = models.DateField(null=True, blank=True)
-    method_of_entry_end_date: datetime.date | None = models.DateField(null=True, blank=True)
+    access_type_start_date: datetime.date | None = models.DateField(null=True, blank=True)
+    access_type_end_date: datetime.date | None = models.DateField(null=True, blank=True)
 
     # Booleans
 
@@ -122,10 +122,10 @@ class ReservationUnit(models.Model):
         default=ReservationKind.DIRECT_AND_SEASON.value,
         db_index=True,
     )
-    method_of_entry: str = models.CharField(
+    access_type: str = models.CharField(
         max_length=20,
-        choices=MethodOfEntry.choices,
-        default=MethodOfEntry.OPEN_ACCESS.value,
+        choices=AccessType.choices,
+        default=AccessType.UNRESTRICTED.value,
     )
 
     # List fields
@@ -289,12 +289,12 @@ class ReservationUnit(models.Model):
         constraints = [
             models.CheckConstraint(
                 check=(
-                    models.Q(method_of_entry_start_date__isnull=True)
-                    | models.Q(method_of_entry_end_date__isnull=True)
-                    | models.Q(method_of_entry_start_date__lte=models.F("method_of_entry_end_date"))
+                    models.Q(access_type_start_date__isnull=True)
+                    | models.Q(access_type_end_date__isnull=True)
+                    | models.Q(access_type_start_date__lte=models.F("access_type_end_date"))
                 ),
-                name="method_of_entry_starts_before_ends",
-                violation_error_message=_("Method of entry start date must be the same or before its end date"),
+                name="access_type_starts_before_ends",
+                violation_error_message=_("Access type start date must be the same or before its end date"),
             )
         ]
 
@@ -517,36 +517,36 @@ class ReservationUnit(models.Model):
         return case  # type: ignore[return-value]  # noqa: RET504
 
     @lookup_property
-    def current_method_of_entry() -> MethodOfEntry:
-        """The method of entry that is currently active for the reservation unit."""
+    def current_access_type() -> AccessType:
+        """The access type that is currently active for the reservation unit."""
         case = models.Case(
             models.When(
                 (
-                    L(perceived_method_of_entry_start_date__lte=TruncDate(NowTT()))
-                    & L(perceived_method_of_entry_end_date__gte=TruncDate(NowTT()))
+                    L(perceived_access_type_start_date__lte=TruncDate(NowTT()))
+                    & L(perceived_access_type_end_date__gte=TruncDate(NowTT()))
                 ),
-                then=models.F("method_of_entry"),
+                then=models.F("access_type"),
             ),
-            default=models.Value(MethodOfEntry.OPEN_ACCESS.value),
+            default=models.Value(AccessType.UNRESTRICTED.value),
             output_field=models.CharField(),
         )
         return case  # type: ignore[return-value]  # noqa: RET504
 
     @lookup_property
-    def perceived_method_of_entry_start_date() -> datetime.date:
-        """Helper lookup property for `current_method_of_entry`"""
+    def perceived_access_type_start_date() -> datetime.date:
+        """Helper lookup property for `current_access_type`"""
         expr = Coalesce(
-            models.F("method_of_entry_start_date"),
+            models.F("access_type_start_date"),
             models.Value(datetime.date.min),
             output_field=models.DateField(),
         )
         return expr  # type: ignore[return-value]  # noqa: RET504
 
     @lookup_property
-    def perceived_method_of_entry_end_date() -> datetime.date:
-        """Helper lookup property for `current_method_of_entry`"""
+    def perceived_access_type_end_date() -> datetime.date:
+        """Helper lookup property for `current_access_type`"""
         expr = Coalesce(
-            models.F("method_of_entry_end_date"),
+            models.F("access_type_end_date"),
             models.Value(datetime.date.max),
             output_field=models.DateField(),
         )
@@ -560,8 +560,8 @@ AuditLogger.register(
         "_publishing_state",
         "_reservation_state",
         "_active_pricing_price",
-        "_current_method_of_entry",
-        "_perceived_method_of_entry_start_date",
-        "_perceived_method_of_entry_end_date",
+        "_current_access_type",
+        "_perceived_access_type_start_date",
+        "_perceived_access_type_end_date",
     ],
 )

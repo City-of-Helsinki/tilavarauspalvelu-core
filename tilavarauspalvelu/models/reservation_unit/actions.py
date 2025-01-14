@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from tilavarauspalvelu.enums import MethodOfEntry, ReservationStartInterval
+from tilavarauspalvelu.enums import AccessType, ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
@@ -382,11 +382,11 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             return self.reservation_unit.unit.payment_accounting
         return None
 
-    def get_method_of_entry_at(self, moment: datetime.datetime) -> MethodOfEntry:
-        begin = self.reservation_unit.perceived_method_of_entry_start_date
-        end = self.reservation_unit.perceived_method_of_entry_end_date
+    def get_access_type_at(self, moment: datetime.datetime) -> AccessType:
+        begin = self.reservation_unit.perceived_access_type_start_date
+        end = self.reservation_unit.perceived_access_type_end_date
 
         if begin <= moment.date() <= end:
-            return MethodOfEntry(self.reservation_unit.method_of_entry)
+            return AccessType(self.reservation_unit.access_type)
 
-        return MethodOfEntry.OPEN_ACCESS
+        return AccessType.UNRESTRICTED

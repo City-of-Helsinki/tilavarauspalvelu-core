@@ -134,8 +134,8 @@ def test_reservation_unit__query__all_fields(graphql):
         maxReservationDuration
         bufferTimeBefore
         bufferTimeAfter
-        methodOfEntryStartDate
-        methodOfEntryEndDate
+        accessTypeStartDate
+        accessTypeEndDate
 
         isDraft
         isArchived
@@ -150,8 +150,8 @@ def test_reservation_unit__query__all_fields(graphql):
         reservationKind
         publishingState
         reservationState
-        methodOfEntry
-        currentMethodOfEntry
+        accessType
+        currentAccessType
     """
 
     reservation_unit = ReservationUnitFactory.create(
@@ -215,8 +215,8 @@ def test_reservation_unit__query__all_fields(graphql):
         "maxReservationDuration": int(reservation_unit.max_reservation_duration.total_seconds()),
         "bufferTimeBefore": int(reservation_unit.buffer_time_before.total_seconds()),
         "bufferTimeAfter": int(reservation_unit.buffer_time_after.total_seconds()),
-        "methodOfEntryStartDate": None,
-        "methodOfEntryEndDate": None,
+        "accessTypeStartDate": None,
+        "accessTypeEndDate": None,
         #
         "isDraft": reservation_unit.is_draft,
         "isArchived": reservation_unit.is_archived,
@@ -231,8 +231,8 @@ def test_reservation_unit__query__all_fields(graphql):
         "reservationKind": reservation_unit.reservation_kind.upper(),
         "publishingState": reservation_unit.publishing_state,
         "reservationState": reservation_unit.reservation_state,
-        "methodOfEntry": reservation_unit.method_of_entry,
-        "currentMethodOfEntry": reservation_unit.current_method_of_entry,
+        "accessType": reservation_unit.access_type,
+        "currentAccessType": reservation_unit.current_access_type,
     }
 
 

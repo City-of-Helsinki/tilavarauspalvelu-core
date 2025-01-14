@@ -9,7 +9,7 @@ from django.db import connections, models
 from django.db.models import Q, prefetch_related_objects
 from lookup_property import L
 
-from tilavarauspalvelu.enums import MethodOfEntry
+from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from utils.date_utils import local_date
 from utils.db import ArrayUnnest, NowTT
@@ -112,33 +112,33 @@ class ReservationUnitQuerySet(models.QuerySet):
     def with_reservation_state_in(self, states: list[str]) -> Self:
         return self.filter(L(reservation_state__in=states))
 
-    def with_method_of_entry_at(
+    def with_access_type_at(
         self,
-        allowed_methods_of_entry: list[MethodOfEntry],
+        allowed_access_types: list[AccessType],
         begin_date: datetime.date | None = None,
         end_date: datetime.date | None = None,
     ) -> Self:
-        """Filter to reservation units that have any of the allowed methods of entry on the given date range."""
+        """Filter to reservation units that have any of the allowed access types on the given date range."""
         period_start = models.Value(begin_date or local_date())
         period_end = models.Value(end_date or datetime.date.max)
 
-        # If "open access" is allowed, the reservation unit is included if:
-        if MethodOfEntry.OPEN_ACCESS in allowed_methods_of_entry:
+        # If unrestricted access is allowed, the reservation unit is included if:
+        if AccessType.UNRESTRICTED in allowed_access_types:
             return self.filter(
-                # 1) It's method of access is "open access", OR
-                models.Q(method_of_entry=MethodOfEntry.OPEN_ACCESS)
-                # 2) The given period extends outside the method of access' period (since default is "open access")
-                | L(perceived_method_of_entry_start_date__gt=period_start)
-                | L(perceived_method_of_entry_end_date__lt=period_end),
+                # 1) It's access type is "unrestricted", OR
+                models.Q(access_type=AccessType.UNRESTRICTED)
+                # 2) The given period extends outside the access type's period (since default is "unrestricted")
+                | L(perceived_access_type_start_date__gt=period_start)
+                | L(perceived_access_type_end_date__lt=period_end),
             )
 
         # Otherwise, the reservation unit is included if:
         return self.filter(
-            # 1) It has one of the allowed methods of entry, AND
-            models.Q(method_of_entry__in=allowed_methods_of_entry)
-            # 2) The given period overlaps with the method of entry's period
-            & L(perceived_method_of_entry_start_date__lte=period_end)
-            & L(perceived_method_of_entry_end_date__gte=period_start)
+            # 1) It has one of the allowed access types, AND
+            models.Q(access_type__in=allowed_access_types)
+            # 2) The given period overlaps with the access type's period
+            & L(perceived_access_type_start_date__lte=period_end)
+            & L(perceived_access_type_end_date__gte=period_start)
         )
 
     def published(self) -> Self:

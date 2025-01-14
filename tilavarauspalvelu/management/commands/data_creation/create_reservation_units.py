@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 
 from tilavarauspalvelu.enums import (
+    AccessType,
     AuthenticationType,
-    MethodOfEntry,
     PaymentType,
     PriceUnit,
     ReservationKind,
@@ -321,7 +321,7 @@ def _create_free_reservation_units(
                 max_reservations_per_user=None,
                 reservation_unit_type=reservation_unit_type,
                 reservation_kind=reservation_kind,
-                method_of_entry=MethodOfEntry.OPEN_ACCESS,
+                access_type=AccessType.UNRESTRICTED,
                 cancellation_rule=random.choice(data.cancellation_rule_info.value),
                 require_reservation_handling=data.handling_info.handling_required,
                 metadata_set=metadata_sets[set_name],
@@ -543,7 +543,7 @@ def _create_paid_reservation_units(
                 max_reservations_per_user=None,
                 reservation_unit_type=reservation_unit_type,
                 reservation_kind=reservation_kind,
-                method_of_entry=MethodOfEntry.WITH_KEY,
+                access_type=AccessType.PHYSICAL_KEY,
                 cancellation_rule=random.choice(data.cancellation_rule_info.value),
                 require_reservation_handling=data.handling_info.handling_required,
                 metadata_set=metadata_sets[set_name],

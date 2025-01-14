@@ -172,12 +172,12 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
             },
         ],
         [
-            _("Method of entry"),
+            _("Access type"),
             {
                 "fields": [
-                    "method_of_entry",
-                    "method_of_entry_start_date",
-                    "method_of_entry_end_date",
+                    "access_type",
+                    "access_type_start_date",
+                    "access_type_end_date",
                 ],
             },
         ],

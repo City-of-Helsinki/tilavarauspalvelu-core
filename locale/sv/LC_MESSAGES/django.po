@@ -1625,7 +1625,7 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Method of entry"
+msgid "Access type"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
@@ -1897,11 +1897,11 @@ msgid "Payment product"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Method of entry start date"
+msgid "Access type start date"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Method of entry end date"
+msgid "Access type end date"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -2080,14 +2080,14 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
-"If set, this is the date from which the method of entry is used. If current "
-"date is before this date, the method of entry is 'open access'."
+"If set, this is the date from which the access type is used. If current date "
+"is before this date, the access type is 'unrestricted'."
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
-"If set, this is the date before which the method of entry is used. If "
-"current date is after this date, the method of entry is 'open access'."
+"If set, this is the date before which the access type is used. If current "
+"date is after this date, the access type is 'unrestricted'."
 msgstr ""
 
 #: tilavarauspalvelu/admin/space/admin.py
@@ -3040,18 +3040,23 @@ msgid "Active"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgctxt "MethodOfEntry"
-msgid "Open access"
+msgctxt "AccessType"
+msgid "access code"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgctxt "MethodOfEntry"
-msgid "With key"
+msgctxt "AccessType"
+msgid "opened by staff"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgctxt "MethodOfEntry"
-msgid "Keyless"
+msgctxt "AccessType"
+msgid "physical key"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "AccessType"
+msgid "unrestricted"
 msgstr ""
 
 #: tilavarauspalvelu/integrations/email/template_context/application.py
@@ -3864,7 +3869,7 @@ msgid "reservation units"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit/model.py
-msgid "Method of entry start date must be the same or before its end date"
+msgid "Access type start date must be the same or before its end date"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit_cancellation_rule/model.py

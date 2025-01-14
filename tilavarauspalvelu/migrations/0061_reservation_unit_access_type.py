@@ -12,34 +12,39 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="reservationunit",
-            name="method_of_entry",
+            name="access_type",
             field=models.CharField(
-                choices=[("OPEN_ACCESS", "Open access"), ("WITH_KEY", "With key"), ("KEYLESS", "Keyless")],
-                default="OPEN_ACCESS",
+                choices=[
+                    ("ACCESS_CODE", "access code"),
+                    ("OPENED_BY_STAFF", "opened by staff"),
+                    ("PHYSICAL_KEY", "physical key"),
+                    ("UNRESTRICTED", "unrestricted"),
+                ],
+                default="UNRESTRICTED",
                 max_length=20,
             ),
         ),
         migrations.AddField(
             model_name="reservationunit",
-            name="method_of_entry_end_date",
+            name="access_type_end_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AddField(
             model_name="reservationunit",
-            name="method_of_entry_start_date",
+            name="access_type_start_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AddConstraint(
             model_name="reservationunit",
             constraint=models.CheckConstraint(
                 check=models.Q(
-                    ("method_of_entry_start_date__isnull", True),
-                    ("method_of_entry_end_date__isnull", True),
-                    ("method_of_entry_start_date__lte", models.F("method_of_entry_end_date")),
+                    ("access_type_start_date__isnull", True),
+                    ("access_type_end_date__isnull", True),
+                    ("access_type_start_date__lte", models.F("access_type_end_date")),
                     _connector="OR",
                 ),
-                name="method_of_entry_starts_before_ends",
-                violation_error_message="Method of entry start date must be the same or before its end date",
+                name="access_type_starts_before_ends",
+                violation_error_message="Access type start date must be the same or before its end date",
             ),
         ),
     ]
