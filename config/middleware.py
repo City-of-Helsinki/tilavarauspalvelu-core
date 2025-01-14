@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
+from django.core.signals import got_request_exception
 from django.db import connection
 from graphql import GraphQLFieldResolver
 
@@ -73,7 +74,8 @@ class GraphQLSentryMiddleware:
         try:
             return next_(root, info, **kwargs)
         except Exception as err:  # noqa: BLE001
-            SentryLogger.log_exception(err, "Error in GraphQL query")
+            # Send the exception to `tilavarauspalvelu.signals.sentry_log_exception`
+            got_request_exception.send(sender=None, request=info.context)
             return err
 
 
