@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import datetime
-import re
 
 import pytest
 from django.utils.timezone import get_default_timezone
 
+from tilavarauspalvelu.exceptions import TPRekImportError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekAPIClient
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitHaukiResourceIdImporter, TprekUnitImporter
@@ -28,8 +28,7 @@ def test_TprekUnitImporter__unit_tprek_id_missing():
     unit = UnitFactory.create(tprek_id=None)
 
     importer = TprekUnitImporter()
-    msg = f"Unit TPREK ID is None: {unit.pk}"
-    with pytest.raises(ValueError, match=re.escape(msg)):
+    with pytest.raises(TPRekImportError):
         importer.update_unit_from_tprek([unit])
 
     assert importer.updated_units_count == 0
