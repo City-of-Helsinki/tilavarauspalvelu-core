@@ -65,8 +65,8 @@ class KeyCloakClient(BaseExternalServiceClient):
 
         social_auth = user.current_social_auth
         if social_auth is None:
-            msg = f"Unable to get `social_auth` for user {int(user.pk)}."
-            SentryLogger.log_message(msg)
+            msg = "Unable to get `social_auth` for user."
+            SentryLogger.log_message(msg, details={"user": user.pk}, level="error")
             return None
 
         extra_data: ExtraData = social_auth.extra_data
@@ -86,8 +86,9 @@ class KeyCloakClient(BaseExternalServiceClient):
                     session["keycloak_refresh_token_expired"] = True
 
             except Exception:  # noqa: BLE001
-                msg = f"Unable to refresh keycloak token for user {int(user.pk)}: {error.response.text}"
-                SentryLogger.log_exception(error, details=msg)
+                details = {"user": user.pk, "error": error.response.text}
+                msg = "Unable to refresh keycloak token"
+                SentryLogger.log_message(msg, details=details, level="error")
 
             return None
 
