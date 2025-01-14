@@ -17,14 +17,12 @@ import { filterNonNullable } from "../helpers";
 type BannerNotificationListProps = {
   target: BannerNotificationTarget;
   displayAmount?: number;
-  centered?: boolean;
 };
 
-type BannerNotificationItemProps = {
+type NotificationsListItemProps = {
   notification: BannerNotificationCommonFragment;
   closeFn: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   closedArray: string[];
-  centered?: boolean;
 };
 
 const PositionWrapper = styled.div`
@@ -63,8 +61,7 @@ function NotificationsListItem({
   notification,
   closeFn,
   closedArray,
-  centered,
-}: BannerNotificationItemProps) {
+}: NotificationsListItemProps) {
   let notificationType: NotificationType;
   switch (notification.level) {
     case "EXCEPTION":
@@ -80,7 +77,6 @@ function NotificationsListItem({
     <BannerNotificationBackground>
       <NotificationWrapper
         type={notificationType}
-        centered={centered}
         dismissible
         closeButtonLabelText={t("common:close")}
         data-testid="BannerNotificationList__Notitification"
@@ -115,7 +111,6 @@ function NotificationsListItem({
 const BannerNotificationsList = ({
   target,
   displayAmount = 2,
-  centered,
 }: BannerNotificationListProps) => {
   // no-cache is required because admin is caching bannerNotifications query and
   // there is no key setup for this so this query returns garbage from the admin cache.
@@ -174,7 +169,6 @@ const BannerNotificationsList = ({
             notification={notification}
             closedArray={closedNotificationsList ?? []}
             closeFn={setClosedNotificationsList}
-            centered={centered}
           />
         ))}
     </PositionWrapper>

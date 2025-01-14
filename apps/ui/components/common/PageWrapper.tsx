@@ -35,10 +35,7 @@ function PageWrapper({
         <meta name="version" content={version} />
       </Head>
       <Navigation apiBaseUrl={apiBaseUrl} profileLink={profileLink} />
-      <BannerNotificationsList
-        centered
-        target={BannerNotificationTarget.User}
-      />
+      <BannerNotificationsList target={BannerNotificationTarget.User} />
       <InProgressReservationNotification />
       <Main id="main">{children}</Main>
       <Footer feedbackUrl={feedbackUrl} />
