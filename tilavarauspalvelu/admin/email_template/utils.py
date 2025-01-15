@@ -72,13 +72,13 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
         "cancelled_reservation_series",
         [
             {
-                "weekday": str(WeekdayChoice.MONDAY.label),
-                "time": "13:00-15:00",
+                "weekday_value": str(WeekdayChoice.MONDAY.label),
+                "time_value": "13:00-15:00",
                 "url": get_staff_reservations_ext_link(reservation_id=1234),
             },
             {
-                "weekday": str(WeekdayChoice.TUESDAY.label),
-                "time": "21:00-22:00",
+                "weekday_value": str(WeekdayChoice.TUESDAY.label),
+                "time_value": "21:00-22:00",
                 "url": get_staff_reservations_ext_link(reservation_id=5678),
             },
         ],

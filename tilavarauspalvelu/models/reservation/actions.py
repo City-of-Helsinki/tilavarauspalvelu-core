@@ -15,7 +15,7 @@ from tilavarauspalvelu.enums import (
     TimezoneProperty,
     TimezoneRuleProperty,
 )
-from tilavarauspalvelu.models import Space
+from tilavarauspalvelu.models import ApplicationSection, Space
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
@@ -229,3 +229,8 @@ class ReservationActions:
 
         duration = end_datetime - begin_datetime
         return pricing.actions.calculate_reservation_price(duration, subsidised=subsidised)
+
+    def get_application_section(self) -> ApplicationSection | None:
+        return ApplicationSection.objects.filter(
+            reservation_unit_options__allocated_time_slots__recurring_reservation__reservations=self.reservation
+        ).first()

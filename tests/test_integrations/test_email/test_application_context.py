@@ -1,6 +1,7 @@
 # ruff: noqa: RUF001
 from __future__ import annotations
 
+import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import WeekdayChoice
@@ -14,6 +15,7 @@ from tilavarauspalvelu.integrations.email.template_context.application import (
     get_context_for_staff_notification_application_section_cancelled,
 )
 from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
+from tilavarauspalvelu.models import Reservation
 
 from tests.helpers import TranslationsFromPOFiles
 from tests.test_integrations.test_email.helpers import (
@@ -36,6 +38,11 @@ from tests.test_integrations.test_email.helpers import (
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
 )
+
+# Applied to all tests
+pytestmark = [
+    pytest.mark.django_db,
+]
 
 # type: EmailType.APPLICATION_HANDLED ##################################################################################
 
@@ -272,7 +279,7 @@ def test_get_context__application_received__sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context_for_application_section_cancelled__en():
+def test_get_context_for_application_section_cancelled__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_application_section_cancelled(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -298,6 +305,19 @@ def test_get_context_for_application_section_cancelled__en():
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
+        assert context == get_context_for_application_section_cancelled(
+            application_section=email_reservation.actions.get_application_section(),
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -362,25 +382,28 @@ def test_get_context_for_application_section_cancelled_sv():
 
 
 @freeze_time("2024-01-01")
-def test_get_context_for_staff_notification_application_section_cancelled__en():
+def test_get_context_for_staff_notification_application_section_cancelled__en(email_reservation):
+    reservation_id_1 = email_reservation.id
+    reservation_id_2 = Reservation.objects.exclude(id=reservation_id_1).first().id
+
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_application_section_cancelled(
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
-            language="en",
             cancelled_reservation_series=[
                 {
-                    "weekday": WeekdayChoice.MONDAY.label,
-                    "time": "13:00-15:00",
-                    "url": get_staff_reservations_ext_link(reservation_id=1234),
+                    "weekday_value": "Monday",
+                    "time_value": "12:00:00-14:00:00",
+                    "reservation_url": get_staff_reservations_ext_link(reservation_id=reservation_id_1),
                 },
                 {
-                    "weekday": WeekdayChoice.TUESDAY.label,
-                    "time": "21:00-22:00",
-                    "url": get_staff_reservations_ext_link(reservation_id=5678),
+                    "weekday_value": "Tuesday",
+                    "time_value": "21:00:00-22:00:00",
+                    "reservation_url": get_staff_reservations_ext_link(reservation_id=reservation_id_2),
                 },
             ],
+            language="en",
         )
 
     assert context == {
@@ -397,20 +420,26 @@ def test_get_context_for_staff_notification_application_section_cancelled__en():
         "view_booking_at_label": "You can view the booking at",
         "cancelled_reservation_series": [
             {
-                "weekday": "Monday",
-                "time": "13:00-15:00",
-                "url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "weekday_value": "Monday",
+                "time_value": "12:00:00-14:00:00",
+                "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}",
             },
             {
-                "weekday": "Tuesday",
-                "time": "21:00-22:00",
-                "url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "weekday_value": "Tuesday",
+                "time_value": "21:00:00-22:00:00",
+                "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_2}",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **CLOSING_STAFF_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_staff_notification_application_section_cancelled(
+            application_section=email_reservation.actions.get_application_section(),
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -423,14 +452,14 @@ def test_get_context_for_staff_notification_application_section_cancelled__fi():
             language="fi",
             cancelled_reservation_series=[
                 {
-                    "weekday": WeekdayChoice.MONDAY.label,
-                    "time": "13:00-15:00",
-                    "url": get_staff_reservations_ext_link(reservation_id=1234),
+                    "weekday_value": WeekdayChoice.MONDAY.label,
+                    "time_value": "12:00:00-14:00:00",
+                    "reservation_url": get_staff_reservations_ext_link(reservation_id=1234),
                 },
                 {
-                    "weekday": WeekdayChoice.TUESDAY.label,
-                    "time": "21:00-22:00",
-                    "url": get_staff_reservations_ext_link(reservation_id=5678),
+                    "weekday_value": WeekdayChoice.TUESDAY.label,
+                    "time_value": "21:00:00-22:00:00",
+                    "reservation_url": get_staff_reservations_ext_link(reservation_id=5678),
                 },
             ],
         )
@@ -447,14 +476,14 @@ def test_get_context_for_staff_notification_application_section_cancelled__fi():
         "view_booking_at_label": "Voit tarkistaa varauksen tiedot osoitteessa",
         "cancelled_reservation_series": [
             {
-                "weekday": "Monday",
-                "time": "13:00-15:00",
-                "url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "weekday_value": "Monday",
+                "time_value": "12:00:00-14:00:00",
+                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
             },
             {
-                "weekday": "Tuesday",
-                "time": "21:00-22:00",
-                "url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "weekday_value": "Tuesday",
+                "time_value": "21:00:00-22:00:00",
+                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -473,14 +502,14 @@ def test_get_context_for_staff_notification_application_section_cancelled_sv():
             language="sv",
             cancelled_reservation_series=[
                 {
-                    "weekday": WeekdayChoice.MONDAY.label,
-                    "time": "13:00-15:00",
-                    "url": get_staff_reservations_ext_link(reservation_id=1234),
+                    "weekday_value": WeekdayChoice.MONDAY.label,
+                    "time_value": "12:00:00-14:00:00",
+                    "reservation_url": get_staff_reservations_ext_link(reservation_id=1234),
                 },
                 {
-                    "weekday": WeekdayChoice.TUESDAY.label,
-                    "time": "21:00-22:00",
-                    "url": get_staff_reservations_ext_link(reservation_id=5678),
+                    "weekday_value": WeekdayChoice.TUESDAY.label,
+                    "time_value": "21:00:00-22:00:00",
+                    "reservation_url": get_staff_reservations_ext_link(reservation_id=5678),
                 },
             ],
         )
@@ -497,14 +526,14 @@ def test_get_context_for_staff_notification_application_section_cancelled_sv():
         "view_booking_at_label": "Du kan se bokningen på",
         "cancelled_reservation_series": [
             {
-                "weekday": "Monday",
-                "time": "13:00-15:00",
-                "url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "weekday_value": "Monday",
+                "time_value": "12:00:00-14:00:00",
+                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
             },
             {
-                "weekday": "Tuesday",
-                "time": "21:00-22:00",
-                "url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "weekday_value": "Tuesday",
+                "time_value": "21:00:00-22:00:00",
+                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_SV,
