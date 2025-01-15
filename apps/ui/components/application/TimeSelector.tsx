@@ -1,31 +1,29 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import {
-  Button,
-  ButtonVariant,
-  IconCross,
-  OptionInProps,
-  Select,
-} from "hds-react";
+import { Button, ButtonVariant, IconCross } from "hds-react";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
-import { fontBold, fontRegular } from "common/src/common/typography";
+import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import {
-  convertOptionToHDS,
-  fromMondayFirstUnsafe,
-  toNumber,
-} from "common/src/helpers";
+import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import { arrowDown, arrowUp, MediumButton } from "@/styles/util";
 import { TimePreview } from "./TimePreview";
 import { type ApplicationEventScheduleFormType } from "./Form";
+import { UseFormReturn } from "react-hook-form";
+import { ControlledSelect } from "common/src/components/form";
+import { Flex } from "common/styles/util";
 
 type Cell = {
   hour: number;
   label: string;
   state: ApplicationEventSchedulePriority;
   key: string;
+};
+
+export type TimeSelectorFormValues = {
+  reservationUnitPk: number;
+  priority: ApplicationEventSchedulePriority;
 };
 
 type Props = {
@@ -39,8 +37,7 @@ type Props = {
     ApplicationEventScheduleFormType[],
   ];
   reservationUnitOptions: { label: string; value: number }[];
-  reservationUnitPk: number;
-  setReservationUnitPk: (pk: number) => void;
+  form: UseFormReturn<TimeSelectorFormValues>;
 };
 
 const CalendarHead = styled.div`
@@ -199,27 +196,6 @@ const Day = ({
   );
 };
 
-const OptionWrapper = styled.div`
-  margin-top: var(--spacing-m);
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-s);
-  @media (min-width: ${breakpoints.s}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`;
-
-const StyledSelect = styled(Select)`
-  label {
-    ${fontBold};
-  }
-  [class*="buttonLabel"] {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-`;
-
 const CalendarContainer = styled.div`
   margin-top: var(--spacing-layout-s);
   display: grid;
@@ -324,9 +300,10 @@ const TimePreviewContainer = styled.div`
   margin: var(--spacing-xl) 0;
 `;
 
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: row;
+const ButtonContainer = styled(Flex).attrs({
+  $direction: "row",
+  $gap: "none",
+})`
   margin-top: var(--spacing-layout-l);
   margin-bottom: var(--spacing-layout-s);
 `;
@@ -366,12 +343,9 @@ export function TimeSelector({
   index,
   summaryData,
   reservationUnitOptions,
-  reservationUnitPk,
-  setReservationUnitPk,
+  form,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
-  const [priority, setPriority] =
-    useState<ApplicationEventSchedulePriority>(300);
   const [paintState, setPaintState] = useState<
     ApplicationEventSchedulePriority | false
   >(false); // toggle value true = set, false = clear: ;
@@ -395,12 +369,9 @@ export function TimeSelector({
       label: t("application:Page2.legend.selected-2"),
     },
   ];
-  const priorityOptions: OptionInProps[] = [300, 200]
-    .map((n) => ({
-      label: t(`application:Page2.priorityLabels.${n}`),
-      value: n,
-    }))
-    .map(convertOptionToHDS);
+
+  const { watch } = form;
+  const priority = watch("priority");
 
   if (!cells) {
     return null;
@@ -422,57 +393,14 @@ export function TimeSelector({
     );
   };
 
-  const resUOpts = reservationUnitOptions.map(convertOptionToHDS);
   return (
     <>
-      <OptionWrapper>
-        <StyledSelect
-          id={`time-selector__select--priority-${index}`}
-          texts={{
-            label: t("application:Page2.prioritySelectLabel"),
-          }}
-          options={priorityOptions}
-          value={
-            priorityOptions.find((n) => toNumber(n.value) === priority)?.value
-          }
-          defaultValue={priorityOptions[0].value}
-          onChange={(val) => {
-            const e = val.find(() => true);
-            const value = toNumber(e?.value);
-            if (value != null) {
-              setPriority(value);
-            }
-            return {
-              invalid: false,
-            };
-          }}
-        />
-        <StyledSelect
-          id={`time-selector__select--reservation-unit-${index}`}
-          texts={{
-            label: t("application:Page2.reservationUnitSelectLabel"),
-          }}
-          options={resUOpts}
-          value={
-            resUOpts.find((n) => toNumber(n.value) === reservationUnitPk)?.value
-          }
-          defaultValue={reservationUnitOptions[0].value}
-          onChange={(selection) => {
-            const val = selection.find(() => true);
-            const pk = toNumber(val?.value);
-            if (pk != null) {
-              setReservationUnitPk(pk);
-            }
-            return {
-              invalid: false,
-            };
-          }}
-        />
-      </OptionWrapper>
+      <OptionSelector
+        reservationUnitOptions={reservationUnitOptions}
+        form={form}
+      />
       <CalendarContainer
-        onMouseLeave={() => {
-          setPainting(false);
-        }}
+        onMouseLeave={() => setPainting(false)}
         aria-multiselectable
         aria-labelledby={`timeSelector-${index}`}
         role="listbox"
@@ -524,5 +452,45 @@ export function TimeSelector({
         </ButtonContainer>
       )}
     </>
+  );
+}
+
+const OptionWrapper = styled.div`
+  margin-top: var(--spacing-m);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-s);
+  @media (min-width: ${breakpoints.s}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`;
+
+function OptionSelector({
+  reservationUnitOptions,
+  form,
+}: Pick<Props, "reservationUnitOptions" | "form">) {
+  const { t } = useTranslation();
+  const { control } = form;
+
+  const priorityOptions = [300, 200].map((n) => ({
+    label: t(`application:Page2.priorityLabels.${n}`),
+    value: n,
+  }));
+
+  return (
+    <OptionWrapper>
+      <ControlledSelect
+        name="priority"
+        label={t("application:Page2.prioritySelectLabel")}
+        control={control}
+        options={priorityOptions}
+      />
+      <ControlledSelect
+        name="reservationUnitPk"
+        label={t("application:Page2.reservationUnitSelectLabel")}
+        control={control}
+        options={reservationUnitOptions}
+      />
+    </OptionWrapper>
   );
 }

@@ -9,7 +9,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { useFormContext } from "react-hook-form";
+import { useForm, useFormContext } from "react-hook-form";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
 import {
   Priority,
@@ -35,7 +35,7 @@ import {
 } from "common/src/conversion";
 import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
-import { TimeSelector } from "./TimeSelector";
+import { TimeSelector, TimeSelectorFormValues } from "./TimeSelector";
 import { errorToast, successToast } from "common/src/common/toast";
 import { ButtonContainer } from "common/styles/util";
 
@@ -251,10 +251,17 @@ const getApplicationEventsWhichMinDurationsIsNotFulfilled = (
 
 function Page2({ application, onNext }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
-  const [reservationUnitPk, setReservationUnitPk] = useState<number>(
+  const initialReservationUnitPk =
     application?.applicationSections?.[0]?.reservationUnitOptions?.[0]
-      ?.reservationUnit?.pk ?? 0
-  );
+      ?.reservationUnit?.pk ?? 0;
+
+  const timeSelectorForm = useForm<TimeSelectorFormValues>({
+    defaultValues: {
+      reservationUnitPk: initialReservationUnitPk,
+      priority: 300,
+    },
+  });
+  const reservationUnitPk = timeSelectorForm.watch("reservationUnitPk");
 
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
@@ -456,8 +463,7 @@ function Page2({ application, onNext }: Props): JSX.Element {
               resetCells={() => resetCells(index)}
               summaryData={[summaryDataPrimary, summaryDataSecondary]}
               reservationUnitOptions={reservationUnitOptions}
-              reservationUnitPk={reservationUnitPk}
-              setReservationUnitPk={setReservationUnitPk}
+              form={timeSelectorForm}
             />
           </Accordion>
         );
