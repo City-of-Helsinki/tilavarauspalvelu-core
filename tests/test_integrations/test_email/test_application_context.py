@@ -303,6 +303,13 @@ def test_get_context_for_application_section_cancelled__en(email_reservation):
     }
 
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_application_section_cancelled(
             application_section=email_reservation.actions.get_application_section(),
             language="en",
@@ -381,7 +388,6 @@ def test_get_context_for_staff_notification_application_section_cancelled__en(em
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
-            language="en",
             cancelled_reservation_series=[
                 {
                     "weekday_value": "Monday",
@@ -394,6 +400,7 @@ def test_get_context_for_staff_notification_application_section_cancelled__en(em
                     "reservation_url": get_staff_reservations_ext_link(reservation_id=reservation_id_2),
                 },
             ],
+            language="en",
         )
 
     assert context == {

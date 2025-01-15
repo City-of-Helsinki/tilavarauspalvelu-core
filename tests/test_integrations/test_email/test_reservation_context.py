@@ -1065,6 +1065,13 @@ def test_get_context_for_seasonal_reservation_cancelled_single__en(email_reserva
     }
 
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_seasonal_reservation_cancelled_single(
             reservation=email_reservation,
             language="en",
@@ -1165,6 +1172,13 @@ def test_get_context_for_seasonal_reservation_modified_series__en(email_reservat
     }
 
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_seasonal_reservation_modified_series(
             reservation_series=email_reservation.recurring_reservation,
             language="en",
@@ -1260,6 +1274,13 @@ def test_get_context_for_seasonal_reservation_modified_single__en(email_reservat
     }
 
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_seasonal_reservation_modified_single(
             reservation=email_reservation,
             language="en",
@@ -1355,6 +1376,13 @@ def test_get_context_for_seasonal_reservation_rejected_series__en(email_reservat
     email_reservation.state = ReservationStateChoice.DENIED
     email_reservation.save()
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_seasonal_reservation_rejected_series(
             reservation_series=email_reservation.recurring_reservation,
             language="en",
@@ -1459,6 +1487,13 @@ def test_get_context_for_seasonal_reservation_rejected_single__en(email_reservat
     }
 
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_seasonal_reservation_rejected_single(
             reservation=email_reservation,
             language="en",

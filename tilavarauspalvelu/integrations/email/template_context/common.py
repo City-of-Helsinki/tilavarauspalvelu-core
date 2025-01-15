@@ -149,8 +149,12 @@ def get_contex_for_reservation_price_range(
     }
 
 
-def get_contex_for_seasonal_reservation_check_details_url(*, language: Lang) -> EmailContext:
-    link = get_my_applications_ext_link(language=language)
+def get_contex_for_seasonal_reservation_check_details_url(
+    *,
+    language: Lang,
+    application_section: ApplicationSection | None = None,
+) -> EmailContext:
+    link = get_my_applications_ext_link(language=language, application_section=application_section)
 
     return {
         "check_booking_details_text": pgettext("Email", "You can check your booking details at"),
@@ -198,7 +202,7 @@ def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
     }
 
 
-def params_for_reservation_series_info(*, reservation_series: RecurringReservation) -> dict[str, Any]:
+def params_for_reservation_series_info(*, reservation_series: RecurringReservation) -> dict[str, str]:
     weekdays = ", ".join(str(Weekday.from_week_day(int(val)).label) for val in reservation_series.weekdays.split(","))
     return {
         "weekday_value": weekdays,
@@ -206,7 +210,7 @@ def params_for_reservation_series_info(*, reservation_series: RecurringReservati
     }
 
 
-def params_for_application_section_info(*, application_section: ApplicationSection, language: Lang) -> dict[str, Any]:
+def params_for_application_section_info(*, application_section: ApplicationSection, language: Lang) -> dict[str, str]:
     return {
         "application_section_name": application_section.name,
         "application_round_name": get_attr_by_language(
@@ -225,11 +229,28 @@ def get_varaamo_ext_link(*, language: Lang) -> str:
     return url_base
 
 
-def get_my_applications_ext_link(*, language: Lang) -> str:
-    url_base = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
+def get_my_applications_ext_link(
+    *,
+    language: Lang,
+    application_section: ApplicationSection | None = None,
+) -> str:
+    """
+    Return the link to the 'My applications' page:
+    e.g. https://varaamo.hel.fi/applications/{application_id}/view?tab=reservations&section={application_section_id}
+    """
+    url = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
+
     if language != "fi":
-        return f"{url_base}/{language}/applications"
-    return f"{url_base}/applications"
+        url = f"{url}/{language}"
+    url = f"{url}/applications"
+
+    if application_section:
+        application_id = getattr(application_section, "application_id", None)
+        application_section_id = getattr(application_section, "id", None)
+
+        url = f"{url}/{application_id}/view?tab=reservations&section={application_section_id}"
+
+    return url
 
 
 def get_my_reservations_ext_link(*, language: Lang) -> str:
