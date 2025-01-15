@@ -579,11 +579,19 @@ def get_context_for_seasonal_reservation_cancelled_single(
     **data: Any,
 ) -> EmailContext:
     if reservation is not None:
+        application_section = reservation.actions.get_application_section()
+
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
             "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language=language),
             **params_for_base_info(reservation=reservation, language=language),
+            **get_contex_for_seasonal_reservation_check_details_url(
+                language=language,
+                application_section=application_section,
+            ),
         }
+    else:
+        data.update(get_contex_for_seasonal_reservation_check_details_url(language=language))
 
     title = pgettext("Email", "The space reservation included in your seasonal booking has been cancelled")
     return {
@@ -599,8 +607,10 @@ def get_context_for_seasonal_reservation_cancelled_single(
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
         ),
-        **get_contex_for_seasonal_reservation_check_details_url(language=language),
         **get_contex_for_closing(language=language),
+        "check_booking_details_text": data["check_booking_details_text"],
+        "check_booking_details_url_html": data["check_booking_details_url_html"],
+        "check_booking_details_url": data["check_booking_details_url"],
     }
 
 
@@ -633,13 +643,19 @@ def get_context_for_seasonal_reservation_modified_series(
     **data: Any,
 ) -> EmailContext:
     if reservation_series is not None:
-        section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
+        application_section = reservation_series.actions.get_application_section()
 
         data: dict[str, Any] = {
-            "email_recipient_name": section.application.applicant,
+            "email_recipient_name": application_section.application.applicant,
             **params_for_reservation_series_info(reservation_series=reservation_series),
-            **params_for_application_section_info(application_section=section, language=language),
+            **params_for_application_section_info(application_section=application_section, language=language),
+            **get_contex_for_seasonal_reservation_check_details_url(
+                language=language,
+                application_section=application_section,
+            ),
         }
+    else:
+        data.update(get_contex_for_seasonal_reservation_check_details_url(language=language))
 
     title = pgettext("Email", "The time of the space reservation included in your seasonal booking has changed")
     return {
@@ -653,8 +669,10 @@ def get_context_for_seasonal_reservation_modified_series(
         "time_label": pgettext("Email", "Time"),
         "time_value": data["time_value"],
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
-        **get_contex_for_seasonal_reservation_check_details_url(language=language),
         **get_contex_for_closing(language=language),
+        "check_booking_details_text": data["check_booking_details_text"],
+        "check_booking_details_url_html": data["check_booking_details_url_html"],
+        "check_booking_details_url": data["check_booking_details_url"],
     }
 
 
@@ -688,10 +706,18 @@ def get_context_for_seasonal_reservation_modified_single(
     **data: Any,
 ) -> EmailContext:
     if reservation is not None:
+        application_section = reservation.actions.get_application_section()
+
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
             **params_for_base_info(reservation=reservation, language=language),
+            **get_contex_for_seasonal_reservation_check_details_url(
+                language=language,
+                application_section=application_section,
+            ),
         }
+    else:
+        data.update(get_contex_for_seasonal_reservation_check_details_url(language=language))
 
     title = pgettext("Email", "The time of the space reservation included in your seasonal booking has changed")
     return {
@@ -705,8 +731,10 @@ def get_context_for_seasonal_reservation_modified_single(
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
         ),
-        **get_contex_for_seasonal_reservation_check_details_url(language=language),
         **get_contex_for_closing(language=language),
+        "check_booking_details_text": data["check_booking_details_text"],
+        "check_booking_details_url_html": data["check_booking_details_url_html"],
+        "check_booking_details_url": data["check_booking_details_url"],
     }
 
 
@@ -740,15 +768,21 @@ def get_context_for_seasonal_reservation_rejected_series(
     **data: Any,
 ) -> EmailContext:
     if reservation_series is not None:
-        section = reservation_series.allocated_time_slot.reservation_unit_option.application_section
-        reservation = reservation_series.reservations.filter(state=ReservationStateChoice.DENIED).last()
+        application_section = reservation_series.actions.get_application_section()
+        latest_denied_reservation = reservation_series.reservations.filter(state=ReservationStateChoice.DENIED).last()
 
         data: dict[str, Any] = {
-            "email_recipient_name": section.application.applicant,
-            "rejection_reason": get_attr_by_language(reservation.deny_reason, "reason", language),
+            "email_recipient_name": application_section.application.applicant,
+            "rejection_reason": get_attr_by_language(latest_denied_reservation.deny_reason, "reason", language),
             **params_for_reservation_series_info(reservation_series=reservation_series),
-            **params_for_application_section_info(application_section=section, language=language),
+            **params_for_application_section_info(application_section=application_section, language=language),
+            **get_contex_for_seasonal_reservation_check_details_url(
+                language=language,
+                application_section=application_section,
+            ),
         }
+    else:
+        data.update(get_contex_for_seasonal_reservation_check_details_url(language=language))
 
     return {
         "title": pgettext("Email", "Your seasonal booking has been cancelled"),
@@ -765,8 +799,10 @@ def get_context_for_seasonal_reservation_rejected_series(
         "time_label": pgettext("Email", "Time"),
         "time_value": data["time_value"],
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
-        **get_contex_for_seasonal_reservation_check_details_url(language=language),
         **get_contex_for_closing(language=language),
+        "check_booking_details_text": data["check_booking_details_text"],
+        "check_booking_details_url_html": data["check_booking_details_url_html"],
+        "check_booking_details_url": data["check_booking_details_url"],
     }
 
 
@@ -801,11 +837,19 @@ def get_context_for_seasonal_reservation_rejected_single(
     **data: Any,
 ) -> EmailContext:
     if reservation is not None:
+        application_section = reservation.actions.get_application_section()
+
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
             "rejection_reason": get_attr_by_language(reservation.deny_reason, "reason", language),
             **params_for_base_info(reservation=reservation, language=language),
+            **get_contex_for_seasonal_reservation_check_details_url(
+                language=language,
+                application_section=application_section,
+            ),
         }
+    else:
+        data.update(get_contex_for_seasonal_reservation_check_details_url(language=language))
 
     title = pgettext("Email", "The space reservation included in your seasonal booking has been cancelled")
     return {
@@ -821,8 +865,10 @@ def get_context_for_seasonal_reservation_rejected_single(
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
         ),
-        **get_contex_for_seasonal_reservation_check_details_url(language=language),
         **get_contex_for_closing(language=language),
+        "check_booking_details_text": data["check_booking_details_text"],
+        "check_booking_details_url_html": data["check_booking_details_url_html"],
+        "check_booking_details_url": data["check_booking_details_url"],
     }
 
 

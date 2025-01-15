@@ -134,7 +134,13 @@ def get_context_for_application_section_cancelled(
             "email_recipient_name": application_section.application.applicant,
             "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language),
             **params_for_application_section_info(application_section=application_section, language=language),
+            **get_contex_for_seasonal_reservation_check_details_url(
+                language=language,
+                application_section=application_section,
+            ),
         }
+    else:
+        data.update(get_contex_for_seasonal_reservation_check_details_url(language=language))
 
     return {
         "title": pgettext("Email", "Your seasonal booking has been cancelled"),
@@ -147,8 +153,10 @@ def get_context_for_application_section_cancelled(
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
         **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
-        **get_contex_for_seasonal_reservation_check_details_url(language=language),
         **get_contex_for_closing(language=language),
+        "check_booking_details_text": data["check_booking_details_text"],
+        "check_booking_details_url_html": data["check_booking_details_url_html"],
+        "check_booking_details_url": data["check_booking_details_url"],
     }
 
 

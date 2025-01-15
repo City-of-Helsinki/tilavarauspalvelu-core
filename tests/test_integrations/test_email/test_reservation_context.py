@@ -7,7 +7,7 @@ from decimal import Decimal
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import ReservationStateChoice, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_approved,
     get_context_for_reservation_cancelled,
@@ -1034,6 +1034,13 @@ def test_get_context_for_seasonal_reservation_cancelled_single__en(email_reserva
     }
 
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_seasonal_reservation_cancelled_single(
             reservation=email_reservation,
             language="en",
@@ -1108,7 +1115,7 @@ def test_get_context_for_seasonal_reservation_modified_series__en(email_reservat
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_modified_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            weekday_value=WeekdayChoice.MONDAY.label,
+            weekday_value="Monday",
             time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
@@ -1133,6 +1140,13 @@ def test_get_context_for_seasonal_reservation_modified_series__en(email_reservat
     }
 
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_seasonal_reservation_modified_series(
             reservation_series=email_reservation.recurring_reservation,
             language="en",
@@ -1227,6 +1241,13 @@ def test_get_context_for_seasonal_reservation_modified_single__en(email_reservat
     }
 
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_seasonal_reservation_modified_single(
             reservation=email_reservation,
             language="en",
@@ -1291,7 +1312,7 @@ def test_get_context_for_seasonal_reservation_rejected_series__en(email_reservat
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_rejected_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            weekday_value=WeekdayChoice.MONDAY.label,
+            weekday_value="Monday",
             time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
@@ -1321,6 +1342,13 @@ def test_get_context_for_seasonal_reservation_rejected_series__en(email_reservat
     email_reservation.state = ReservationStateChoice.DENIED
     email_reservation.save()
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_seasonal_reservation_rejected_series(
             reservation_series=email_reservation.recurring_reservation,
             language="en",
@@ -1424,6 +1452,13 @@ def test_get_context_for_seasonal_reservation_rejected_single__en(email_reservat
     }
 
     with TranslationsFromPOFiles():
+        # Add application and section ID to the url, which are always taken from actual instances to the context
+        section = email_reservation.actions.get_application_section()
+        old_url = context["check_booking_details_url"]
+        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
+        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
+        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
+
         assert context == get_context_for_seasonal_reservation_rejected_single(
             reservation=email_reservation,
             language="en",
