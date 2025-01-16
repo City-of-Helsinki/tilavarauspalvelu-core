@@ -809,7 +809,7 @@ def _create_reservations_for_series(
                     buffer_time_before=buffer_time_before,
                     buffer_time_after=buffer_time_after,
                     #
-                    type=ReservationTypeChoice.NORMAL,
+                    type=ReservationTypeChoice.BEHALF,
                     state=ReservationStateChoice.CONFIRMED,
                     #
                     handled_at=None,
