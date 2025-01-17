@@ -65,24 +65,28 @@ const ShowTOS = ({ reservationUnit }: { reservationUnit: Node }) => {
         <TOSElement
           title={t("tos.paymentTermsTitle")}
           text={payTerms?.textFi ?? ""}
+          isHtml
         />
       )}
       {priceTerms?.textFi && (
         <TOSElement
           title={t("tos.priceTermsTitle")}
           text={priceTerms?.textFi ?? ""}
+          isHtml
         />
       )}
       {cancelTerms?.textFi && (
         <TOSElement
           title={t("tos.cancelTermsTitle")}
           text={cancelTerms?.textFi ?? ""}
+          isHtml
         />
       )}
       {serviceTerms?.textFi && (
         <TOSElement
           title={t("tos.serviceTermsTitle")}
           text={serviceTerms?.textFi ?? ""}
+          isHtml
         />
       )}
       <TOSElement

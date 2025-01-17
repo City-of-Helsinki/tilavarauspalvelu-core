@@ -8,6 +8,7 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { Sanitize } from "common/src/components/Sanitize";
 import { useTranslation } from "next-i18next";
 
 // TODO replace with a fragment
@@ -39,7 +40,7 @@ export function Instructions({ reservation }: Props): JSX.Element | null {
   return (
     <div>
       <H4 as="h2">{t("reservations:reservationInfo")}</H4>
-      <p>{instructionsText}</p>
+      <Sanitize html={instructionsText} />
     </div>
   );
 }

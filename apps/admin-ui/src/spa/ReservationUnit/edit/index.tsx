@@ -8,7 +8,6 @@ import {
   Notification,
   RadioButton,
   SelectionGroup,
-  TextArea,
   TextInput,
   Tooltip,
 } from "hds-react";
@@ -1282,12 +1281,11 @@ function CommunicationSection({
             control={control}
             name={fieldName}
             render={({ field }) => (
-              <TextArea
+              <RichTextInput
                 {...field}
                 id={fieldName}
                 label={t(`ReservationUnitEditor.label.${fieldName}`)}
                 errorText={getTranslatedError(t, errors[fieldName]?.message)}
-                invalid={errors[fieldName]?.message != null}
                 tooltipText={getTranslatedTooltipTex(t, fieldName)}
               />
             )}
@@ -1306,12 +1304,11 @@ function CommunicationSection({
             name={fieldName}
             key={fieldName}
             render={({ field }) => (
-              <TextArea
+              <RichTextInput
                 {...field}
                 id={fieldName}
                 label={t(`ReservationUnitEditor.label.${fieldName}`)}
                 errorText={getTranslatedError(t, errors[fieldName]?.message)}
-                invalid={errors[fieldName]?.message != null}
                 tooltipText={getTranslatedTooltipTex(t, fieldName)}
               />
             )}
@@ -1335,12 +1332,11 @@ function CommunicationSection({
               name={fieldName}
               key={fieldName}
               render={({ field }) => (
-                <TextArea
+                <RichTextInput
                   {...field}
                   id={fieldName}
                   label={t(`ReservationUnitEditor.label.${fieldName}`)}
                   errorText={getTranslatedError(t, errors[fieldName]?.message)}
-                  invalid={errors[fieldName]?.message != null}
                   tooltipText={getTranslatedTooltipTex(t, fieldName)}
                 />
               )}
