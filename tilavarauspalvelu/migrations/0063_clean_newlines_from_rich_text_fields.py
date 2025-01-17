@@ -8,7 +8,7 @@ def clean_newlines(text: str | None) -> str:
     if not text:
         return text
 
-    return text.replace("<p><br></p>", "").replace("\r\n<p>&nbsp;</p>\r\n", "")
+    return text.replace("<p><br></p>", "").replace("\r\n<p>&nbsp;</p>\r\n", "").replace("<p>&nbsp;</p>", "")
 
 
 def clean_reservation_unit_fields(apps, schema_editor):
