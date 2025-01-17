@@ -11,6 +11,7 @@ import {
   type ReservationMetadataFieldNode,
   OrderStatus,
   PaymentType,
+  AccessType,
 } from "@gql/gql-types";
 import {
   canReservationTimeBeChanged,
@@ -47,6 +48,7 @@ function createMockReservationUnit({
     name: "Cancellation rule",
   };
   return {
+    accessType: AccessType.Unrestricted,
     authentication: Authentication.Weak,
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,

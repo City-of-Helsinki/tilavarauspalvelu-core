@@ -47,6 +47,14 @@ export type AbilityGroupNode = Node & {
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
+/** How is the reservee able to enter the space in their reservation unit? */
+export enum AccessType {
+  AccessCode = "ACCESS_CODE",
+  OpenedByStaff = "OPENED_BY_STAFF",
+  PhysicalKey = "PHYSICAL_KEY",
+  Unrestricted = "UNRESTRICTED",
+}
+
 export type AddressNode = Node & {
   city: Scalars["String"]["output"];
   cityEn?: Maybe<Scalars["String"]["output"]>;
@@ -378,6 +386,9 @@ export type ApplicationRoundNodePurposesArgs = {
 };
 
 export type ApplicationRoundNodeReservationUnitsArgs = {
+  accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
+  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -404,6 +415,7 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
+  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
@@ -1794,7 +1806,7 @@ export type Query = {
   equipmentsAll?: Maybe<Array<EquipmentAllNode>>;
   metadataSets?: Maybe<ReservationMetadataSetNodeConnection>;
   order?: Maybe<PaymentOrderNode>;
-  /** Get information about the user, using Helsinki profile if necessary. */
+  /** Get information about a user from Helsinki profile. If user is not a profile user, still return data stored in our database, e.g. first and last name. Use only one of 'reservation_id' or 'application_id' to select the user. This determines the required permissions to view the user's data. */
   profileData?: Maybe<HelsinkiProfileDataNode>;
   purposes?: Maybe<PurposeNodeConnection>;
   qualifiers?: Maybe<QualifierNodeConnection>;
@@ -2200,6 +2212,9 @@ export type QueryReservationUnitTypesArgs = {
 };
 
 export type QueryReservationUnitsArgs = {
+  accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
+  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   before?: InputMaybe<Scalars["String"]["input"]>;
@@ -2231,6 +2246,7 @@ export type QueryReservationUnitsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
+  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
@@ -3008,6 +3024,9 @@ export type ReservationNode = Node & {
 };
 
 export type ReservationNodeReservationUnitsArgs = {
+  accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
+  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -3034,6 +3053,7 @@ export type ReservationNodeReservationUnitsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
+  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
@@ -3784,6 +3804,9 @@ export type ReservationUnitImageUpdateMutationPayload = {
 };
 
 export type ReservationUnitNode = Node & {
+  accessType: AccessType;
+  accessTypeEndDate?: Maybe<Scalars["Date"]["output"]>;
+  accessTypeStartDate?: Maybe<Scalars["Date"]["output"]>;
   allowReservationsWithoutOpeningHours: Scalars["Boolean"]["output"];
   applicationRoundTimeSlots: Array<ApplicationRoundTimeSlotNode>;
   applicationRounds: Array<ApplicationRoundNode>;
@@ -3795,6 +3818,7 @@ export type ReservationUnitNode = Node & {
   cancellationRule?: Maybe<ReservationUnitCancellationRuleNode>;
   cancellationTerms?: Maybe<TermsOfUseNode>;
   contactInformation: Scalars["String"]["output"];
+  currentAccessType?: Maybe<AccessType>;
   description: Scalars["String"]["output"];
   descriptionEn?: Maybe<Scalars["String"]["output"]>;
   descriptionFi?: Maybe<Scalars["String"]["output"]>;
@@ -4903,6 +4927,9 @@ export type UnitNode = Node & {
 };
 
 export type UnitNodeReservationUnitsArgs = {
+  accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
+  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -4929,6 +4956,7 @@ export type UnitNodeReservationUnitsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
+  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>

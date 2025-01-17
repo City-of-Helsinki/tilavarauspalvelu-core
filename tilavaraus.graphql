@@ -15,6 +15,16 @@ type AbilityGroupNode implements Node {
   pk: Int
 }
 
+"""
+How is the reservee able to enter the space in their reservation unit?
+"""
+enum AccessType {
+  ACCESS_CODE
+  OPENED_BY_STAFF
+  PHYSICAL_KEY
+  UNRESTRICTED
+}
+
 type AddressNode implements Node {
   city: String!
   cityEn: String
@@ -391,6 +401,9 @@ type ApplicationRoundNode implements Node {
   reservationPeriodEnd: Date!
   reservationUnitCount: Int
   reservationUnits(
+    accessType: [AccessType]
+    accessTypeEndDate: Date
+    accessTypeStartDate: Date
     applicationRound: [Int]
     calculateFirstReservableTime: Boolean
     descriptionEn: String
@@ -420,6 +433,7 @@ type ApplicationRoundNode implements Node {
     Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
+    personsAllowed: Decimal
     pk: [Int]
     publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
@@ -2165,9 +2179,18 @@ type Query {
   ): ReservationMetadataSetNodeConnection
   order(orderUuid: String!): PaymentOrderNode
   """
-  Get information about the user, using Helsinki profile if necessary.
+  Get information about a user from Helsinki profile. If user is not a profile user, still return data stored in our database, e.g. first and last name. Use only one of 'reservation_id' or 'application_id' to select the user. This determines the required permissions to view the user's data.
   """
-  profileData(applicationId: Int, reservationId: Int): HelsinkiProfileDataNode
+  profileData(
+    """
+    View profile data for this application's user.
+    """
+    applicationId: Int
+    """
+    View profile data for this reservation's user.
+    """
+    reservationId: Int
+  ): HelsinkiProfileDataNode
   purposes(
     after: String
     before: String
@@ -2338,6 +2361,9 @@ type Query {
     pk: [Int]
   ): ReservationUnitTypeNodeConnection
   reservationUnits(
+    accessType: [AccessType]
+    accessTypeEndDate: Date
+    accessTypeStartDate: Date
     after: String
     applicationRound: [Int]
     before: String
@@ -2372,6 +2398,7 @@ type Query {
     Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
+    personsAllowed: Decimal
     pk: [Int]
     publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
@@ -3240,6 +3267,9 @@ type ReservationNode implements Node {
   purpose: ReservationPurposeNode
   recurringReservation: RecurringReservationNode
   reservationUnits(
+    accessType: [AccessType]
+    accessTypeEndDate: Date
+    accessTypeStartDate: Date
     applicationRound: [Int]
     calculateFirstReservableTime: Boolean
     descriptionEn: String
@@ -3269,6 +3299,7 @@ type ReservationNode implements Node {
     Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
+    personsAllowed: Decimal
     pk: [Int]
     publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
@@ -4131,6 +4162,9 @@ type ReservationUnitImageUpdateMutationPayload {
 }
 
 type ReservationUnitNode implements Node {
+  accessType: AccessType!
+  accessTypeEndDate: Date
+  accessTypeStartDate: Date
   allowReservationsWithoutOpeningHours: Boolean!
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode!]!
   applicationRounds(
@@ -4152,6 +4186,7 @@ type ReservationUnitNode implements Node {
   cancellationRule: ReservationUnitCancellationRuleNode
   cancellationTerms: TermsOfUseNode
   contactInformation: String!
+  currentAccessType: AccessType
   description: String!
   descriptionEn: String
   descriptionFi: String
@@ -5417,6 +5452,9 @@ type UnitNode implements Node {
   phone: String!
   pk: Int
   reservationUnits(
+    accessType: [AccessType]
+    accessTypeEndDate: Date
+    accessTypeStartDate: Date
     applicationRound: [Int]
     calculateFirstReservableTime: Boolean
     descriptionEn: String
@@ -5446,6 +5484,7 @@ type UnitNode implements Node {
     Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
+    personsAllowed: Decimal
     pk: [Int]
     publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
