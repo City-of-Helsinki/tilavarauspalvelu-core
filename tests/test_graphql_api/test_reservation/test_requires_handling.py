@@ -67,9 +67,7 @@ def test_reservation__requires_handling__disallowed_states(graphql, state):
     response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Only reservations with states 'CONFIRMED' or 'DENIED' can be returned to handling.",
-    ]
+    assert response.field_error_messages() == ["Reservation cannot be handled based on its state"]
 
     reservation.refresh_from_db()
     assert reservation.state == state

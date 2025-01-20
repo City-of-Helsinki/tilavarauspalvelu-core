@@ -1,24 +1,32 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, NotRequired, TypedDict
 
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
-from rest_framework.exceptions import ValidationError
+from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
-from utils.utils import comma_sep_str
 
 __all__ = [
     "ReservationRequiresHandlingSerializer",
 ]
 
 
+class ReservationHandlingData(TypedDict):
+    pk: int
+
+    state: NotRequired[ReservationStateChoice]
+
+
 class ReservationRequiresHandlingSerializer(NestingModelSerializer):
+    """Return a reservation to handling."""
+
     instance: Reservation
+
+    pk = IntegerField(required=True)
 
     state = EnumFriendlyChoiceField(
         choices=ReservationStateChoice.choices,
@@ -33,16 +41,12 @@ class ReservationRequiresHandlingSerializer(NestingModelSerializer):
             "state",
         ]
 
-    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        if self.instance.state not in ReservationStateChoice.states_that_can_change_to_handling:
-            states = comma_sep_str(ReservationStateChoice.states_that_can_change_to_handling, last_sep="or", quote=True)
-            msg = f"Only reservations with states {states} can be returned to handling."
-            raise ValidationError(msg, code=error_codes.RESERVATION_STATE_CHANGE_NOT_ALLOWED)
-
+    def validate(self, data: ReservationHandlingData) -> ReservationHandlingData:
+        self.instance.validator.validate_reservation_state_allows_handling()
+        data["state"] = ReservationStateChoice.REQUIRES_HANDLING
         return data
 
-    def save(self, **kwargs: Any) -> Reservation:
-        kwargs["state"] = ReservationStateChoice.REQUIRES_HANDLING.value
-        instance = super().save(**kwargs)
+    def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:
+        instance = super().update(instance=instance, validated_data=validated_data)
         EmailService.send_reservation_requires_handling_email(reservation=instance)
         return instance
