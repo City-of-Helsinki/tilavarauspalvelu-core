@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, NamedTuple
 
 from graphene_django_extensions.bases import DjangoMutation
+from rest_framework.exceptions import ValidationError
 
-from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
@@ -38,7 +39,7 @@ class RefreshOrderMutation(DjangoMutation):
         payment_order: PaymentOrder | None = PaymentOrder.objects.filter(remote_id=remote_id).first()
         if not payment_order:
             msg = "Order not found"
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.NOT_FOUND)
+            raise ValidationError(msg, code=error_codes.NOT_FOUND)
 
         if payment_order.status not in OrderStatus.needs_update_statuses:
             return RefreshOrderMutationOutput(
@@ -56,10 +57,11 @@ class RefreshOrderMutation(DjangoMutation):
                     level="warning",
                 )
                 msg = "Unable to check order payment"
-                raise ValidationErrorWithCode(msg, ValidationErrorCodes.NOT_FOUND)
+                raise ValidationError(msg, code=error_codes.NOT_FOUND)
+
         except GetPaymentError as error:
             msg = "Unable to check order payment: problem with external service"
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.EXTERNAL_SERVICE_ERROR) from error
+            raise ValidationError(msg, code=error_codes.EXTERNAL_SERVICE_ERROR) from error
 
         new_status: OrderStatus = payment_order.actions.get_order_status_from_webshop_response(webshop_payment)
         if new_status in {OrderStatus.CANCELLED, OrderStatus.PAID}:
