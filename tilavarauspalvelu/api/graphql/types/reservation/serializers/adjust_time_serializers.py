@@ -1,28 +1,27 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
+from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
+from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeyUpdateSerializer
-from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import (
-    ReservationPriceMixin,
-    ReservationSchedulingMixin,
-)
-from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE
 
 if TYPE_CHECKING:
-    import datetime
-
     from tilavarauspalvelu.models import ReservationUnit
+    from tilavarauspalvelu.typing import ReservationAdjustTimeData
 
 
-class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, ReservationPriceMixin, ReservationSchedulingMixin):
+class ReservationAdjustTimeSerializer(NestingModelSerializer):
+    """Adjust the time of a reservation."""
+
     instance: Reservation
+
+    pk = IntegerField(required=True)
 
     state = EnumFriendlyChoiceField(
         choices=ReservationStateChoice.choices,
@@ -38,91 +37,55 @@ class ReservationAdjustTimeSerializer(OldPrimaryKeyUpdateSerializer, Reservation
             "end",
             "state",
         ]
+        extra_kwargs = {
+            "begin": {"required": True},
+            "end": {"required": True},
+        }
 
-    def save(self) -> Reservation:
-        kwargs: dict[str, Any] = {}
-        for res_unit in self.instance.reservation_units.all():
-            kwargs["buffer_time_before"] = res_unit.actions.get_actual_before_buffer(self.validated_data["begin"])
-            kwargs["buffer_time_after"] = res_unit.actions.get_actual_after_buffer(self.validated_data["end"])
-            break
+    def validate(self, data: ReservationAdjustTimeData) -> ReservationAdjustTimeData:
+        self.instance.validator.validate_reservation_state_allows_rescheduling()
+        self.instance.validator.validate_reservation_type_allows_rescheduling()
+        self.instance.validator.validate_reservation_not_handled()
+        self.instance.validator.validate_reservation_not_paid()
+        self.instance.validator.validate_reservation_not_past_or_ongoing()
+        self.instance.validator.validate_single_reservation_unit()
 
-        instance = super().save(**kwargs)
-        EmailService.send_reservation_modified_email(reservation=instance)
-        if instance.state == ReservationStateChoice.REQUIRES_HANDLING:
-            EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
-        return instance
+        begin = data["begin"].astimezone(DEFAULT_TIMEZONE)
+        end = data["end"].astimezone(DEFAULT_TIMEZONE)
 
-    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        data = super().validate(data)
+        current_begin = self.instance.begin.astimezone(DEFAULT_TIMEZONE)
 
-        if self.instance.state != ReservationStateChoice.CONFIRMED.value:
-            msg = "Only reservations in 'CONFIRMED' state can be rescheduled."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
+        reservation_unit: ReservationUnit = self.instance.reservation_units.first()
 
-        if self.instance.type not in ReservationTypeChoice.allowed_for_user_time_adjust:
-            msg = "Only reservations of type 'NORMAL' or 'BEHALF' can be rescheduled."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
-
-        if self.instance.handled_at:
-            msg = "Reservation has gone through handling and cannot be changed anymore."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
-
-        begin: datetime.datetime = data["begin"].astimezone(DEFAULT_TIMEZONE)
-        end: datetime.datetime = data["end"].astimezone(DEFAULT_TIMEZONE)
-        self.check_begin(begin, end)
-
-        for reservation_unit in self.instance.reservation_units.all():
-            self.check_cancellation_rules(reservation_unit)
-            self.check_reservation_time(reservation_unit)
-            self.check_reservation_overlap(reservation_unit, begin, end)
-            self.check_reservation_duration(reservation_unit, begin, end)
-            self.check_buffer_times(reservation_unit, begin, end)
-            self.check_reservation_days_before(begin, reservation_unit)
-            self.check_opening_hours(reservation_unit, begin, end)
-            self.check_open_application_round(reservation_unit, begin, end)
-            self.check_reservation_start_time(reservation_unit, begin)
-
-        self.check_and_handle_pricing(data)
+        reservation_unit.validator.validate_reservation_unit_is_direct_bookable()
+        reservation_unit.validator.validate_reservation_unit_is_published()
+        reservation_unit.validator.validate_reservation_unit_is_reservable_at(begin=begin)
+        reservation_unit.validator.validate_begin_before_end(begin=begin, end=end)
+        reservation_unit.validator.validate_duration_is_allowed(duration=end - begin)
+        reservation_unit.validator.validate_reservation_days_before(begin=begin)
+        reservation_unit.validator.validate_reservation_unit_is_open(begin=begin, end=end)
+        reservation_unit.validator.validate_not_paid_at(begin=begin)
+        reservation_unit.validator.validate_cancellation_rule(begin=current_begin)
+        reservation_unit.validator.validate_not_in_open_application_round(begin=begin.date(), end=end.date())
+        reservation_unit.validator.validate_reservation_begin_time(begin=begin)
+        reservation_unit.validator.validate_no_overlapping_reservations(
+            begin=begin, end=end, ignore_ids=[self.instance.pk]
+        )
 
         if self.instance.requires_handling:
-            data["state"] = ReservationStateChoice.REQUIRES_HANDLING.value
+            data["state"] = ReservationStateChoice.REQUIRES_HANDLING
+
+        data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
+        data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
 
         return data
 
-    def check_begin(self, begin: datetime.datetime, end: datetime.datetime) -> None:
-        if begin > end:
-            msg = "End cannot be before begin"
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
+    def update(self, instance: Reservation, validated_data: ReservationAdjustTimeData) -> Reservation:
+        instance = super().update(instance=instance, validated_data=validated_data)
 
-        now = local_datetime()
+        EmailService.send_reservation_modified_email(reservation=instance)
 
-        if begin < now:
-            msg = "Reservation new begin cannot be in the past"
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST)
+        if instance.state == ReservationStateChoice.REQUIRES_HANDLING:
+            EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
 
-        if self.instance.begin < now:
-            msg = "Reservation time cannot be changed when current begin time is in past."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_CURRENT_BEGIN_IN_PAST)
-
-    def check_cancellation_rules(self, reservation_unit: ReservationUnit) -> None:
-        now = local_datetime()
-
-        cancel_rule = reservation_unit.cancellation_rule
-        if not cancel_rule:
-            msg = "Reservation time cannot be changed thus no cancellation rule."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_NOT_ALLOWED)
-        must_be_cancelled_before = self.instance.begin - cancel_rule.can_be_cancelled_time_before
-        if must_be_cancelled_before < now:
-            msg = "Reservation time cannot be changed because the cancellation period has expired."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_TIME_PAST)
-
-    def check_and_handle_pricing(self, data: dict[str, Any]) -> None:
-        if self.instance.price > 0:
-            msg = "Reservation time cannot be changed due to its price"
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.CANCELLATION_NOT_ALLOWED)
-        if self.requires_price_calculation(data):
-            pricing = self.calculate_price(data["begin"], data["end"], self.instance.reservation_units.all())
-
-            if pricing.reservation_price > 0:
-                msg = "Reservation begin time change causes price change that not allowed."
-                raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_MODIFICATION_NOT_ALLOWED)
+        return instance
