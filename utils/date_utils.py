@@ -206,10 +206,12 @@ def local_start_of_day(_date: datetime.date | datetime.datetime | None = None, /
     return datetime.datetime.combine(_date, datetime.time.min, tzinfo=DEFAULT_TIMEZONE)
 
 
-def local_end_of_day(_date: datetime.date | datetime.datetime, /) -> datetime.datetime:
+def local_end_of_day(_date: datetime.date | datetime.datetime | None = None, /) -> datetime.datetime:
     """Get the end of day (23:59:59) as datetime for the given date in local timezone."""
     if isinstance(_date, datetime.datetime):
         _date = _date.astimezone(DEFAULT_TIMEZONE).date()
+    if _date is None:
+        _date = local_date()
     return datetime.datetime.combine(_date, datetime.time.max, tzinfo=DEFAULT_TIMEZONE)
 
 

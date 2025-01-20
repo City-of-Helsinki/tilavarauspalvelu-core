@@ -464,11 +464,49 @@ class ReservationStateChoice(models.TextChoices):
         ]
 
     @classproperty
+    def states_that_can_be_edited_by_staff(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.CONFIRMED.value,
+        ]
+
+    @classproperty
+    def states_that_can_be_rescheduled(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.CONFIRMED.value,
+        ]
+
+    @classproperty
+    def states_that_can_be_approved(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.REQUIRES_HANDLING.value,
+        ]
+
+    @classproperty
+    def states_that_can_be_cancelled(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.CONFIRMED.value,
+        ]
+
+    @classproperty
+    def states_that_can_be_refunded(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.CANCELLED.value,
+            ReservationStateChoice.DENIED.value,
+        ]
+
+    @classproperty
     def doesnt_block_anonymization(cls) -> list[str]:
         return [  # type: ignore[return-type]
             ReservationStateChoice.CANCELLED.value,
             ReservationStateChoice.DENIED.value,
         ]
+
+    @enum.property
+    def should_create_payment_order(self) -> bool:
+        return self in {
+            ReservationStateChoice.CONFIRMED.value,
+            ReservationStateChoice.WAITING_FOR_PAYMENT.value,
+        }
 
 
 class ReservationTypeChoice(models.TextChoices):
@@ -479,7 +517,7 @@ class ReservationTypeChoice(models.TextChoices):
     SEASONAL = "SEASONAL", pgettext_lazy("ReservationType", "Seasonal")
 
     @classproperty
-    def allowed_for_user_time_adjust(cls) -> list[str]:
+    def types_that_can_be_rescheduled(cls) -> list[str]:
         return [  # type: ignore[return-type]
             ReservationTypeChoice.NORMAL.value,
             ReservationTypeChoice.BEHALF.value,
@@ -496,6 +534,15 @@ class ReservationTypeChoice(models.TextChoices):
     def types_that_can_be_cancelled(cls) -> list[str]:
         return [  # type: ignore[return-type]
             ReservationTypeChoice.NORMAL.value,
+            ReservationTypeChoice.SEASONAL.value,
+        ]
+
+    @classproperty
+    def types_that_staff_can_create(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationTypeChoice.BLOCKED.value,
+            ReservationTypeChoice.STAFF.value,
+            ReservationTypeChoice.BEHALF.value,
             ReservationTypeChoice.SEASONAL.value,
         ]
 
@@ -642,6 +689,13 @@ class ReservationUnitPublishingState(models.TextChoices):
     PUBLISHED = "PUBLISHED", _("Published")
     ARCHIVED = "ARCHIVED", _("Archived")
 
+    @classproperty
+    def states_that_are_visible(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            cls.PUBLISHED.value,
+            cls.SCHEDULED_HIDING.value,
+        ]
+
 
 class ReservationUnitReservationState(models.TextChoices):
     SCHEDULED_RESERVATION = "SCHEDULED_RESERVATION", _("Scheduled reservation")
@@ -675,11 +729,17 @@ class ReservationKind(models.TextChoices):
 
     @classproperty
     def allows_direct(cls) -> list[str]:
-        return [cls.DIRECT.value, cls.DIRECT_AND_SEASON.value]
+        return [  # type: ignore[return-type]
+            cls.DIRECT.value,
+            cls.DIRECT_AND_SEASON.value,
+        ]
 
     @classproperty
     def allows_season(cls) -> list[str]:
-        return [cls.SEASON.value, cls.DIRECT_AND_SEASON.value]
+        return [  # type: ignore[return-type]
+            cls.SEASON.value,
+            cls.DIRECT_AND_SEASON.value,
+        ]
 
 
 class PricingType(models.TextChoices):
@@ -702,14 +762,14 @@ class PriceUnit(models.TextChoices):
     PRICE_UNIT_PER_WEEK = "per_week", pgettext_lazy("PriceUnit", "per week")
     PRICE_UNIT_FIXED = "fixed", pgettext_lazy("PriceUnit", "fixed")
 
-    @classproperty
-    def fixed_price_units(cls) -> list[str]:
-        return [  # type: ignore[return-value]
-            PriceUnit.PRICE_UNIT_FIXED.value,
-            PriceUnit.PRICE_UNIT_PER_HALF_DAY.value,
-            PriceUnit.PRICE_UNIT_PER_DAY.value,
-            PriceUnit.PRICE_UNIT_PER_WEEK.value,
-        ]
+    @enum.property
+    def is_fixed(self) -> bool:
+        return self in {
+            PriceUnit.PRICE_UNIT_FIXED,
+            PriceUnit.PRICE_UNIT_PER_HALF_DAY,
+            PriceUnit.PRICE_UNIT_PER_DAY,
+            PriceUnit.PRICE_UNIT_PER_WEEK,
+        }
 
     @enum.property
     def in_minutes(self) -> int:
