@@ -161,6 +161,9 @@ class ReservationUnitFactory(GenericDjangoModelFactory[ReservationUnit]):
         kwargs.setdefault("origin_hauki_resource__id", "987")
         kwargs.setdefault("spaces", [space])
         kwargs.setdefault("unit", space.unit)
+        kwargs.setdefault("pricings__lowest_price", 0)
+        kwargs.setdefault("pricings__highest_price", 0)
+        kwargs.setdefault("pricings__tax_percentage__value", 0)
         reservation_unit = cls.create(**kwargs)
 
         ReservableTimeSpanFactory.create(
