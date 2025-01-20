@@ -94,7 +94,7 @@ def get_staff_create_data(
         "type": ReservationTypeChoice.STAFF,
         "begin": begin.isoformat(),
         "end": end.isoformat(),
-        "reservationUnitPks": [reservation_unit.pk],
+        "reservationUnit": reservation_unit.pk,
         **overrides,
     }
 
