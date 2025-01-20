@@ -1,16 +1,18 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
-from rest_framework.exceptions import ValidationError
+from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import ReservationApproveData
 
 __all__ = [
     "ReservationApproveSerializer",
@@ -18,7 +20,11 @@ __all__ = [
 
 
 class ReservationApproveSerializer(NestingModelSerializer):
+    """Approve a reservation during handling."""
+
     instance: Reservation
+
+    pk = IntegerField(required=True)
 
     state = EnumFriendlyChoiceField(
         choices=ReservationStateChoice.choices,
@@ -32,26 +38,23 @@ class ReservationApproveSerializer(NestingModelSerializer):
             "pk",
             "price",
             "handling_details",
-            "state",
             "handled_at",
+            "state",
         ]
         extra_kwargs = {
-            "handled_at": {"read_only": True},
-            "handling_details": {"required": True},
             "price": {"required": True},
+            "handling_details": {"required": True},
+            "handled_at": {"read_only": True},
         }
 
-    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        if self.instance.state != ReservationStateChoice.REQUIRES_HANDLING:
-            msg = "Only reservations with state 'REQUIRES_HANDLING' can be approved."
-            raise ValidationError(msg, code=error_codes.RESERVATION_APPROVING_NOT_ALLOWED)
-
+    def validate(self, data: ReservationApproveData) -> ReservationApproveData:
+        self.instance.validator.validate_reservation_state_allows_approving()
+        data["state"] = ReservationStateChoice.CONFIRMED
+        data["handled_at"] = local_datetime()
         return data
 
-    def save(self, **kwargs: Any) -> Reservation:
-        kwargs["state"] = ReservationStateChoice.CONFIRMED.value
-        kwargs["handled_at"] = local_datetime()
-        instance = super().save(**kwargs)
+    def update(self, instance: Reservation, validated_data: ReservationApproveData) -> Reservation:
+        instance = super().update(instance=instance, validated_data=validated_data)
         EmailService.send_reservation_approved_email(reservation=instance)
         EmailService.send_staff_notification_reservation_made_email(reservation=instance)
         return instance

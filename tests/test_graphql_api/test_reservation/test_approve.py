@@ -25,9 +25,7 @@ def test_reservation__approve__cant_approve_if_status_not_requires_handling(grap
     response = graphql(APPROVE_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Only reservations with state 'REQUIRES_HANDLING' can be approved.",
-    ]
+    assert response.field_error_messages() == ["Reservation cannot be approved based on its state"]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
