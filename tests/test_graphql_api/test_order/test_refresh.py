@@ -44,7 +44,8 @@ def test_refresh_order__payment_not_found(graphql):
 
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
 
-    assert response.error_message() == "Unable to check order payment"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Unable to check order payment"]
 
     order.refresh_from_db()
     assert order.status == status
@@ -208,7 +209,9 @@ def test_refresh_order__payment_endpoint_error(graphql):
     response = graphql(REFRESH_MUTATION, input_data=data)
 
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
-    assert response.error_message() == "Unable to check order payment: problem with external service"
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Unable to check order payment: problem with external service"]
 
     order.refresh_from_db()
     assert order.status == order_status
