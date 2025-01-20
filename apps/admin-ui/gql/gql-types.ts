@@ -8451,6 +8451,20 @@ export type ReservationsQuery = {
   } | null;
 };
 
+export type ReservationPermissionsQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationPermissionsQuery = {
+  reservation?: {
+    id: string;
+    reservationUnits: Array<{
+      id: string;
+      unit?: { id: string; pk?: number | null } | null;
+    }>;
+  } | null;
+};
+
 export type DeleteResourceMutationVariables = Exact<{
   input: ResourceDeleteMutationInput;
 }>;
@@ -15574,6 +15588,95 @@ export type ReservationsSuspenseQueryHookResult = ReturnType<
 export type ReservationsQueryResult = Apollo.QueryResult<
   ReservationsQuery,
   ReservationsQueryVariables
+>;
+export const ReservationPermissionsDocument = gql`
+  query ReservationPermissions($id: ID!) {
+    reservation(id: $id) {
+      id
+      reservationUnits {
+        id
+        unit {
+          id
+          pk
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useReservationPermissionsQuery__
+ *
+ * To run a query within a React component, call `useReservationPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationPermissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationPermissionsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationPermissionsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationPermissionsQuery,
+    ReservationPermissionsQueryVariables
+  > &
+    (
+      | { variables: ReservationPermissionsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationPermissionsQuery,
+    ReservationPermissionsQueryVariables
+  >(ReservationPermissionsDocument, options);
+}
+export function useReservationPermissionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationPermissionsQuery,
+    ReservationPermissionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationPermissionsQuery,
+    ReservationPermissionsQueryVariables
+  >(ReservationPermissionsDocument, options);
+}
+export function useReservationPermissionsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationPermissionsQuery,
+        ReservationPermissionsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationPermissionsQuery,
+    ReservationPermissionsQueryVariables
+  >(ReservationPermissionsDocument, options);
+}
+export type ReservationPermissionsQueryHookResult = ReturnType<
+  typeof useReservationPermissionsQuery
+>;
+export type ReservationPermissionsLazyQueryHookResult = ReturnType<
+  typeof useReservationPermissionsLazyQuery
+>;
+export type ReservationPermissionsSuspenseQueryHookResult = ReturnType<
+  typeof useReservationPermissionsSuspenseQuery
+>;
+export type ReservationPermissionsQueryResult = Apollo.QueryResult<
+  ReservationPermissionsQuery,
+  ReservationPermissionsQueryVariables
 >;
 export const DeleteResourceDocument = gql`
   mutation DeleteResource($input: ResourceDeleteMutationInput!) {

@@ -127,7 +127,10 @@ function ClientApp({
           <Route
             path="/reservations/*"
             element={withAuthorization(
-              <ReservationsRouter />,
+              <ReservationsRouter
+                apiBaseUrl={apiBaseUrl}
+                feedbackUrl={feedbackUrl}
+              />,
               apiBaseUrl,
               feedbackUrl
             )}
