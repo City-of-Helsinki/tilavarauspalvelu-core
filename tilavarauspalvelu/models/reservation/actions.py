@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import uuid
 from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
@@ -12,18 +13,22 @@ from tilavarauspalvelu.enums import (
     CalendarProperty,
     CustomerTypeChoice,
     EventProperty,
+    OrderStatus,
+    PaymentType,
+    ReservationStateChoice,
     TimezoneProperty,
     TimezoneRuleProperty,
 )
 from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
-from tilavarauspalvelu.models import ApplicationSection, Space
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.models import ApplicationSection, ReservationMetadataField, Space
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
 
-    from tilavarauspalvelu.models import Location, Reservation, ReservationUnit, Unit
+    from tilavarauspalvelu.models import Location, PaymentOrder, Reservation, ReservationUnit, Unit
     from tilavarauspalvelu.typing import Lang
 
 
@@ -230,3 +235,61 @@ class ReservationActions:
         return ApplicationSection.objects.filter(
             reservation_unit_options__allocated_time_slots__recurring_reservation__reservations=self.reservation
         ).first()
+
+    def get_state_on_reservation_confirmed(self, payment_type: PaymentType | None) -> ReservationStateChoice:
+        if self.reservation.requires_handling:
+            return ReservationStateChoice.REQUIRES_HANDLING
+
+        if self.reservation.price_net > 0 and payment_type != PaymentType.ON_SITE:
+            return ReservationStateChoice.WAITING_FOR_PAYMENT
+
+        return ReservationStateChoice.CONFIRMED
+
+    def get_required_fields(
+        self,
+        *,
+        reservee_type: CustomerTypeChoice | None = None,
+        reservee_is_unregistered_association: bool | None = None,
+    ) -> list[str]:
+        if reservee_type is None:
+            reservee_type = self.reservation.reservee_type
+        if reservee_is_unregistered_association is None:
+            reservee_is_unregistered_association = self.reservation.reservee_is_unregistered_association
+
+        qs = ReservationMetadataField.objects.filter(
+            metadata_sets_required__reservation_units__reservations=self.reservation,
+        )
+
+        # Some fields are never mandatory for an individual reserver even if marked so in the metadata.
+        if reservee_type == CustomerTypeChoice.INDIVIDUAL:
+            qs = qs.exclude(field_name__in=["home_city", "reservee_id", "reservee_organisation_name"])
+
+        # `reservee_id` is not mandatory for unregistered associations.
+        if reservee_is_unregistered_association:
+            qs = qs.exclude(field_name__in=["reservee_id"])
+
+        return list(qs.distinct().order_by("field_name").values_list("field_name", flat=True))
+
+    @property
+    def is_refundable(self) -> bool:
+        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
+        return (
+            payment_order is not None  # There is a payment order
+            and payment_order.status == OrderStatus.PAID  # This is a paid reservation
+            and payment_order.refund_id is None  # Not refunded already
+        )
+
+    def refund_paid_reservation(self) -> None:
+        payment_order: PaymentOrder | None = self.reservation.payment_order.first()
+        if not payment_order:
+            return
+
+        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
+            payment_order.refund_id = uuid.uuid4()
+
+        else:
+            refund = VerkkokauppaAPIClient.refund_order(order_uuid=payment_order.remote_id)
+            payment_order.refund_id = refund.refund_id
+
+        payment_order.status = OrderStatus.REFUNDED
+        payment_order.save(update_fields=["refund_id", "status"])

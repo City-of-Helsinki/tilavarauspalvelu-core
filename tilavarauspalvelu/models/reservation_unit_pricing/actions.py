@@ -25,11 +25,12 @@ class ReservationUnitPricingActions:
 
         # Time-based calculation is needed only if price unit is not fixed.
         # Otherwise, we can just use the price defined in the reservation unit
-        if price_unit in PriceUnit.fixed_price_units:
+        if price_unit.is_fixed:
             return price
 
         # Price calculations use duration rounded to the next 15 minutes
         duration_seconds = int(duration.total_seconds())
         duration_minutes = int(math.ceil(duration_seconds / 60 / 15) * 15)
 
-        return (price / price_unit.in_minutes) * duration_minutes
+        price_per_minute = price / price_unit.in_minutes
+        return price_per_minute * duration_minutes

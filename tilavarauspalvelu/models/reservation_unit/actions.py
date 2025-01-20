@@ -3,16 +3,26 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
-from tilavarauspalvelu.enums import AccessType, ReservationStartInterval
+from lookup_property import L
+
+from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice, PaymentType, ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
 from tilavarauspalvelu.models import OriginHaukiResource
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, time_as_timedelta
+from utils.date_utils import (
+    DEFAULT_TIMEZONE,
+    local_date,
+    local_datetime_max,
+    local_datetime_min,
+    local_end_of_day,
+    local_start_of_day,
+    time_as_timedelta,
+)
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Collection
 
     from django.db import models
 
@@ -21,11 +31,11 @@ if TYPE_CHECKING:
         Location,
         PaymentAccounting,
         PaymentMerchant,
-        ReservableTimeSpan,
         Reservation,
         ReservationUnit,
         ReservationUnitPricing,
     )
+    from tilavarauspalvelu.typing import TimeSpan
 
 
 class ReservationUnitHaukiExporter:
@@ -193,24 +203,27 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         # Sum of max persons for all spaces because group can be divided to different spaces
         return sum(space.max_persons or 0 for space in self.reservation_unit.spaces.all()) or None
 
-    def check_reservation_overlap(
+    def has_overlapping_reservations(
         self,
         start_datetime: datetime.datetime,
         end_datetime: datetime.datetime,
-        reservation: Reservation | None = None,
+        *,
+        buffer_time_before: datetime.timedelta | None = None,
+        buffer_time_after: datetime.timedelta | None = None,
+        ignore_ids: Collection[int] = (),
     ) -> bool:
-        from tilavarauspalvelu.enums import ReservationStateChoice
         from tilavarauspalvelu.models import Reservation
 
-        qs = Reservation.objects.filter(
-            reservation_units__in=self.reservation_units_with_common_hierarchy,
-            end__gt=start_datetime,
-            begin__lt=end_datetime,
-        ).exclude(state__in=[ReservationStateChoice.CANCELLED, ReservationStateChoice.DENIED])
+        qs = Reservation.objects.overlapping_reservations(
+            reservation_unit=self.reservation_unit,
+            begin=start_datetime,
+            end=end_datetime,
+            buffer_time_before=buffer_time_before,
+            buffer_time_after=buffer_time_after,
+        )
 
-        # If updating an existing reservation, allow "overlapping" it's old time
-        if reservation:
-            qs = qs.exclude(pk=reservation.pk)
+        if ignore_ids:
+            qs = qs.exclude(pk__in=ignore_ids)
 
         return qs.exists()
 
@@ -279,68 +292,87 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
         return ReservationUnit.objects.filter(pk=self.reservation_unit.pk).reservation_units_with_common_hierarchy()
 
-    def get_possible_start_times(self, from_date: datetime.date, interval_minutes: int) -> set[datetime.datetime]:
+    def get_possible_start_times(self, on_date: datetime.date) -> set[datetime.time]:
         if self.reservation_unit.origin_hauki_resource is None:
             return set()
 
-        reservable_time_spans: Iterable[ReservableTimeSpan] = (
+        time_spans: list[TimeSpan] = list(
             self.reservation_unit.origin_hauki_resource.reservable_time_spans.filter(
-                start_datetime__date__lte=from_date,
-                end_datetime__date__gte=from_date,
+                start_datetime__date__lte=on_date,
+                end_datetime__date__gte=on_date,
             )
+            .order_by("start_datetime")
+            .values("start_datetime", "end_datetime")
         )
 
-        possible_start_times: set[datetime.datetime] = set()
+        interval_minutes = self.reservation_unit.actions.start_interval_minutes
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
 
-        for time_span in reservable_time_spans:
-            start_datetime = time_span.start_datetime.astimezone(DEFAULT_TIMEZONE)
-            end_datetime = time_span.end_datetime.astimezone(DEFAULT_TIMEZONE)
+        possible_start_times: set[datetime.time] = set()
+
+        for time_span in time_spans:
+            start_datetime = time_span["start_datetime"].astimezone(DEFAULT_TIMEZONE)
+            end_datetime = time_span["end_datetime"].astimezone(DEFAULT_TIMEZONE)
+
+            if end_datetime.date() < on_date or on_date < start_datetime.date():
+                continue
+
+            if start_datetime.date() < on_date:
+                start_datetime = local_start_of_day(on_date)
+
+            if end_datetime.date() > on_date:
+                end_datetime = local_end_of_day(on_date)
 
             while start_datetime < end_datetime:
-                # If "start date" is before "from date", set "start date" to the start of "from date"
-                if start_datetime.date() < from_date:
-                    start_datetime = start_datetime.replace(
-                        year=from_date.year,
-                        month=from_date.month,
-                        day=from_date.day,
-                        hour=0,
-                        minute=0,
-                        second=0,
-                        microsecond=0,
-                    )
-                    continue
+                # Don't include times at the end timespans that are too small
+                if end_datetime - start_datetime >= interval_timedelta:  # TODO: Should be `min_duration`?
+                    possible_start_times.add(start_datetime.time())
 
-                # If the remaining time is less than the interval, don't include it
-                if end_datetime - start_datetime < interval_timedelta:
-                    break
-
-                possible_start_times.add(start_datetime)
                 start_datetime += interval_timedelta
 
         return possible_start_times
 
+    def get_possible_start_times_staff(self, on_date: datetime.date) -> set[datetime.time]:
+        # Staff reservations ignore start intervals longer than 30 minutes
+        interval_minutes = min(self.reservation_unit.actions.start_interval_minutes, 30)
+        interval_timedelta = datetime.timedelta(minutes=interval_minutes)
+
+        start_datetime = local_start_of_day(on_date)
+        end_datetime = local_end_of_day(on_date)
+
+        possible_start_times: set[datetime.time] = set()
+        while start_datetime < end_datetime:
+            possible_start_times.add(start_datetime.time())  # TODO: Validate `min_duration`?
+            start_datetime += interval_timedelta
+
+        return possible_start_times
+
     def is_open(self, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> bool:
+        if self.reservation_unit.allow_reservations_without_opening_hours:
+            return True
+
         origin_hauki_resource = self.reservation_unit.origin_hauki_resource
         if not origin_hauki_resource:
             return False
-        return origin_hauki_resource.is_reservable(start_datetime, end_datetime)
+        return origin_hauki_resource.actions.is_reservable(start_datetime, end_datetime)
 
     def is_in_open_application_round(self, start_date: datetime.date, end_date: datetime.date) -> bool:
         from tilavarauspalvelu.models import ApplicationRound
 
-        for app_round in ApplicationRound.objects.filter(
-            reservation_units=self.reservation_unit,
-            reservation_period_end__gte=start_date,
-            reservation_period_begin__lte=end_date,
-        ):
-            if app_round.status.is_ongoing:
-                return True
-
-        return False
+        return (
+            ApplicationRound.objects.filter(
+                reservation_units=self.reservation_unit,
+                reservation_period_end__gte=start_date,
+                reservation_period_begin__lte=end_date,
+            )
+            .exclude(
+                L(status=ApplicationRoundStatusChoice.RESULTS_SENT),
+            )
+            .exists()
+        )
 
     def is_valid_staff_start_interval(self, begin_time: datetime.time) -> bool:
-        interval_minutes = ReservationStartInterval(self.reservation_unit.reservation_start_interval).as_number
+        interval_minutes = self.reservation_unit.actions.start_interval_minutes
 
         # Staff reservations ignore start intervals longer than 30 minutes
         interval_minutes = min(interval_minutes, 30)
@@ -383,6 +415,8 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         return None
 
     def get_access_type_at(self, moment: datetime.datetime) -> AccessType:
+        moment = moment.astimezone(DEFAULT_TIMEZONE)
+
         begin = self.reservation_unit.perceived_access_type_start_date
         end = self.reservation_unit.perceived_access_type_end_date
 
@@ -390,3 +424,40 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             return AccessType(self.reservation_unit.access_type)
 
         return AccessType.UNRESTRICTED
+
+    @property
+    def start_interval_minutes(self) -> int:
+        return ReservationStartInterval(self.reservation_unit.reservation_start_interval).as_number
+
+    def get_default_payment_type(self) -> PaymentType | None:
+        payment_types: set[str] = set(self.reservation_unit.payment_types.values_list("code", flat=True))
+        if not payment_types:
+            return None
+
+        # If only one payment type is defined, use that
+        if len(payment_types) == 1:
+            return PaymentType(payment_types.pop())
+
+        # If only 'INVOICE' and 'ON_SITE' are defined, use 'INVOICE'
+        if payment_types == {PaymentType.INVOICE, PaymentType.ON_SITE}:
+            return PaymentType.INVOICE
+
+        # Otherwise, use 'ONLINE'
+        return PaymentType.ONLINE
+
+    def is_reservable_at(self, moment: datetime.datetime) -> bool:
+        moment = moment.astimezone(DEFAULT_TIMEZONE)
+
+        reservation_begins = self.reservation_unit.reservation_begins or local_datetime_min()
+        reservation_begins = reservation_begins.astimezone(DEFAULT_TIMEZONE)
+
+        reservation_ends = self.reservation_unit.reservation_ends or local_datetime_max()
+        reservation_ends = reservation_ends.astimezone(DEFAULT_TIMEZONE)
+
+        if reservation_begins == reservation_ends:
+            return False
+
+        if reservation_begins < reservation_ends:
+            return reservation_begins <= moment < reservation_ends
+
+        return moment < reservation_ends or reservation_begins <= moment
