@@ -1,70 +1,29 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
+from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
-from rest_framework import serializers
+from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions.fields import OldChoiceCharField
-from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
-from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from tilavarauspalvelu.api.graphql.types.reservation.serializers.mixins import ReservationSchedulingMixin
-from tilavarauspalvelu.enums import (
-    RESERVEE_LANGUAGE_CHOICES,
-    CustomerTypeChoice,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-)
-from tilavarauspalvelu.models import (
-    AgeGroup,
-    City,
-    RecurringReservation,
-    Reservation,
-    ReservationPurpose,
-    ReservationUnit,
-)
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.typing import AnyUser
+    from tilavarauspalvelu.models import User
+    from tilavarauspalvelu.typing import StaffCreateReservationData
 
 
-class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSchedulingMixin):
-    recurring_reservation_pk = IntegerPrimaryKeyField(
-        queryset=RecurringReservation.objects.all(),
-        source="recurring_reservation",
-        allow_null=True,
-        required=False,
-    )
-    reservation_unit_pks = serializers.ListField(
-        child=IntegerPrimaryKeyField(queryset=ReservationUnit.objects.all()),
-        source="reservation_units",
-        required=True,
-    )
-    purpose_pk = IntegerPrimaryKeyField(
-        queryset=ReservationPurpose.objects.all(),
-        source="purpose",
-        allow_null=True,
-        required=False,
-    )
-    home_city_pk = IntegerPrimaryKeyField(
-        queryset=City.objects.all(),
-        source="home_city",
-        allow_null=True,
-        required=False,
-    )
-    age_group_pk = IntegerPrimaryKeyField(
-        queryset=AgeGroup.objects.all(),
-        source="age_group",
-        allow_null=True,
-        required=False,
-    )
-    state = EnumFriendlyChoiceField(
-        choices=ReservationStateChoice.choices,
-        enum=ReservationStateChoice,
-        read_only=True,
-    )
+class ReservationStaffCreateSerializer(NestingModelSerializer):
+    """Create a reservation as a staff user."""
+
+    instance: None
+
+    pk = IntegerField(read_only=True)
+    reservation_unit = IntegerPrimaryKeyField(queryset=ReservationUnit.objects, required=True, write_only=True)
+
     reservee_type = EnumFriendlyChoiceField(
         choices=CustomerTypeChoice.choices,
         enum=CustomerTypeChoice,
@@ -75,171 +34,122 @@ class ReservationStaffCreateSerializer(OldPrimaryKeySerializer, ReservationSched
         enum=ReservationTypeChoice,
         required=True,
     )
-    reservee_language = OldChoiceCharField(
-        choices=RESERVEE_LANGUAGE_CHOICES,
-        default="",
-        required=False,
+
+    purpose = IntegerPrimaryKeyField(queryset=ReservationPurpose.objects, allow_null=True, required=False)
+    home_city = IntegerPrimaryKeyField(queryset=City.objects, allow_null=True, required=False)
+    age_group = IntegerPrimaryKeyField(queryset=AgeGroup.objects, allow_null=True, required=False)
+
+    state = EnumFriendlyChoiceField(
+        choices=ReservationStateChoice.choices,
+        enum=ReservationStateChoice,
+        read_only=True,
     )
 
     class Meta:
         model = Reservation
         fields = [
             "pk",
+            #
+            # Basic information
+            "name",
+            "description",
+            "num_persons",
+            "working_memo",
+            "type",
+            #
+            # Time information
+            "begin",
+            "end",
+            "buffer_time_before",
+            "buffer_time_after",
+            #
+            # Free of charge information
+            "applying_for_free_of_charge",
+            "free_of_charge_reason",
+            #
+            # Reservee information
+            "reservee_id",
             "reservee_first_name",
             "reservee_last_name",
+            "reservee_email",
             "reservee_phone",
             "reservee_organisation_name",
             "reservee_address_street",
             "reservee_address_city",
             "reservee_address_zip",
-            "reservee_email",
-            "reservee_type",
-            "reservee_id",
             "reservee_is_unregistered_association",
-            "reservee_language",
+            "reservee_type",
+            #
+            # Billing information
             "billing_first_name",
             "billing_last_name",
+            "billing_phone",
+            "billing_email",
             "billing_address_street",
             "billing_address_city",
             "billing_address_zip",
-            "billing_phone",
-            "billing_email",
-            "home_city_pk",
-            "applying_for_free_of_charge",
-            "free_of_charge_reason",
-            "age_group_pk",
-            "num_persons",
-            "name",
-            "description",
+            #
+            # Relations
+            "reservation_unit",
+            "age_group",
+            "home_city",
+            "purpose",
+            #
+            # Read only
             "state",
-            "begin",
-            "end",
-            "buffer_time_before",
-            "buffer_time_after",
-            "reservation_unit_pks",
-            "purpose_pk",
             "confirmed_at",
             "handled_at",
-            "unit_price",
-            "type",
-            "working_memo",
-            "recurring_reservation_pk",
         ]
         extra_kwargs = {
-            "applying_for_free_of_charge": {"required": False},
-            "begin": {"required": True},
-            "billing_address_city": {"required": False},
-            "billing_address_street": {"required": False},
-            "billing_address_zip": {"required": False},
-            "billing_email": {"required": False},
-            "billing_first_name": {"required": False},
-            "billing_last_name": {"required": False},
-            "billing_phone": {"required": False},
-            "buffer_time_before": {
-                "required": False,
-                "help_text": (
-                    "Can be a number of seconds or timespan in format HH:MM:SS. "
-                    "Null/undefined value means buffer from reservation unit is used."
-                ),
-            },
-            "buffer_time_after": {
-                "required": False,
-                "help_text": (
-                    "Can be a number of seconds or timespan in format HH:MM:SS. "
-                    "Null/undefined value means buffer from reservation unit is used."
-                ),
-            },
             "confirmed_at": {"read_only": True},
-            "description": {"required": False},
-            "end": {"required": True},
-            "free_of_charge_reason": {"required": False},
             "handled_at": {"read_only": True},
-            "name": {"required": False},
-            "num_persons": {"required": False},
-            "reservee_address_city": {"required": False},
-            "reservee_address_street": {"required": False},
-            "reservee_address_zip": {"required": False},
-            "reservee_email": {"required": False},
-            "reservee_first_name": {"required": False},
-            "reservee_id": {"required": False},
-            "reservee_is_unregistered_association": {"required": False},
-            "reservee_last_name": {"required": False},
-            "reservee_organisation_name": {"required": False},
-            "reservee_phone": {"required": False},
         }
 
-    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        data = super().validate(data)
-
+    def validate(self, data: StaffCreateReservationData) -> StaffCreateReservationData:
         begin = data.get("begin").astimezone(DEFAULT_TIMEZONE)
         end = data.get("end").astimezone(DEFAULT_TIMEZONE)
 
-        reservation_units: list[ReservationUnit] = data.get("reservation_units")
+        # Endpoint requires user to be logged in
+        user: User = self.context["request"].user
+        reservation_unit: ReservationUnit = data["reservation_unit"]
 
-        self.check_begin(begin, end)
+        if reservation_unit.reservation_block_whole_day:
+            data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
+            data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
 
-        buffer_before: datetime.timedelta | None = data.get("buffer_time_before", None)
-        buffer_after: datetime.timedelta | None = data.get("buffer_time_after", None)
+        reservation_type = data.get("type")
+        reservation_unit.validator.validate_can_create_reservation_type(reservation_type=reservation_type)
 
-        for reservation_unit in reservation_units:
-            if reservation_unit.reservation_block_whole_day:
-                data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
-                data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
+        # For blocking reservations, buffer times can overlap existing reservations.
+        if reservation_type == ReservationTypeChoice.BLOCKED:
+            buffer_time_before = datetime.timedelta()
+            buffer_time_after = datetime.timedelta()
+        else:
+            buffer_time_before = data.get("buffer_time_before")
+            buffer_time_after = data.get("buffer_time_after")
 
-            reservation_type = data.get("type", getattr(self.instance, "type", None))
-            self.check_reservation_overlap(reservation_unit, begin, end)
-            self.check_buffer_times(
-                reservation_unit,
-                begin,
-                end,
-                reservation_type=reservation_type,
-                new_buffer_before=buffer_before,
-                new_buffer_after=buffer_after,
-            )
-            self.check_reservation_intervals_for_staff_reservation(reservation_unit, begin)
+        reservation_unit.validator.validate_begin_before_end(begin=begin, end=end)
+        reservation_unit.validator.validate_reservation_begin_time_staff(begin=begin)
+        reservation_unit.validator.validate_no_overlapping_reservations(
+            begin=begin,
+            end=end,
+            new_buffer_time_before=buffer_time_before,
+            new_buffer_time_after=buffer_time_after,
+        )
 
         now = local_datetime()
+        id_token = user.id_token
+
         data["handled_at"] = now
         data["confirmed_at"] = now
-        data["state"] = ReservationStateChoice.CONFIRMED.value
-
-        request_user: AnyUser = self.context["request"].user
-        data["user"] = request_user
-        data["reservee_used_ad_login"] = (
-            False if request_user.is_anonymous else getattr(request_user.id_token, "is_ad_login", False)
-        )
+        data["state"] = ReservationStateChoice.CONFIRMED
+        data["user"] = user
+        data["reservee_used_ad_login"] = False if id_token is None else id_token.is_ad_login
 
         return data
 
-    def validate_type(self, reservation_type: str) -> str:
-        allowed_types = [
-            ReservationTypeChoice.BLOCKED.value,
-            ReservationTypeChoice.STAFF.value,
-            ReservationTypeChoice.BEHALF.value,
-            ReservationTypeChoice.SEASONAL.value,
-        ]
-
-        if reservation_type not in allowed_types:
-            msg = (
-                f"Reservation type {reservation_type} is not allowed in this mutation. "
-                f"Allowed choices are {', '.join(allowed_types)}."
-            )
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_TYPE_NOT_ALLOWED)
-
-        return reservation_type
-
-    def check_begin(self, begin: datetime.datetime, end: datetime.datetime) -> None:
-        if begin > end:
-            msg = "End cannot be before begin"
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_BEGIN_AFTER_END)
-
-        now = local_datetime()
-        min_allowed_date = now.date()
-
-        # For the first hour of the day, we allow reservations to be created for the previous day
-        if now.hour == 0:
-            min_allowed_date -= datetime.timedelta(days=1)
-
-        if begin.astimezone(DEFAULT_TIMEZONE).date() < min_allowed_date:
-            msg = "Reservation begin date cannot be in the past."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.RESERVATION_BEGIN_IN_PAST)
+    def create(self, validated_data: StaffCreateReservationData) -> Reservation:
+        reservation_unit: ReservationUnit = validated_data.pop("reservation_unit")
+        reservation = super().create(validated_data)
+        reservation.reservation_units.set([reservation_unit])
+        return reservation
