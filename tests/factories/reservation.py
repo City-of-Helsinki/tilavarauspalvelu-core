@@ -136,6 +136,8 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
         sub_kwargs.setdefault("cancellation_rule__can_be_cancelled_time_before", datetime.timedelta(0))
         sub_kwargs.setdefault("spaces", [space])
         sub_kwargs.setdefault("unit", unit)
+        sub_kwargs.setdefault("pricings__lowest_price", 0)
+        sub_kwargs.setdefault("pricings__highest_price", 0)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
         day_start = local_start_of_day()
