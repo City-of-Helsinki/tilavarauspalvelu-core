@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import uuid
 from decimal import Decimal
 from typing import TYPE_CHECKING, NamedTuple
 
@@ -11,7 +12,7 @@ from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
     ADLoginAMR,
-    CustomerTypeChoice,
+    PaymentType,
     PriceUnit,
     ReservationKind,
     ReservationStateChoice,
@@ -20,24 +21,13 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
-from utils.date_utils import (
-    DEFAULT_TIMEZONE,
-    local_date,
-    local_datetime,
-    local_end_of_day,
-    local_start_of_day,
-    next_hour,
-)
-from utils.decimal_utils import round_decimal
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, next_hour
 
 from tests.factories import (
-    AgeGroupFactory,
     ApplicationRoundFactory,
     CityFactory,
     OriginHaukiResourceFactory,
-    ReservableTimeSpanFactory,
     ReservationFactory,
-    ReservationPurposeFactory,
     ReservationUnitFactory,
     ReservationUnitPricingFactory,
     SpaceFactory,
@@ -66,99 +56,6 @@ def test_reservation__create__success(graphql):
     assert response.has_errors is False, response.errors
 
     assert Reservation.objects.count() == 1
-
-
-def test_reservation__create__with_additional_data(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now()
-
-    age_group = AgeGroupFactory.create(minimum=18, maximum=30)
-    city = CityFactory.create(name="Helsinki")
-    purpose = ReservationPurposeFactory.create(name="Test purpose")
-
-    additional_data = {
-        "name": "Test reservation",
-        "description": "Test description",
-        "numPersons": 1,
-        "applyingForFreeOfCharge": True,
-        "freeOfChargeReason": "Free of charge reason",
-        "reserveeId": "2882333-2",
-        "reserveeFirstName": "John",
-        "reserveeLastName": "Doe",
-        "reserveeEmail": "john.doe@example.com",
-        "reserveePhone": "+358123456789",
-        "reserveeAddressStreet": "Mannerheimintie 2",
-        "reserveeAddressCity": "Helsinki",
-        "reserveeAddressZip": "00100",
-        "reserveeIsUnregisteredAssociation": False,
-        "reserveeOrganisationName": "Test Organisation ry",
-        "reserveeType": CustomerTypeChoice.INDIVIDUAL.value,
-        "billingFirstName": "Jane",
-        "billingLastName": "Doe",
-        "billingEmail": "jane.doe@example.com",
-        "billingPhone": "+358234567890",
-        "billingAddressStreet": "Auratie 12B",
-        "billingAddressCity": "Turku",
-        "billingAddressZip": "20100",
-        "ageGroupPk": age_group.pk,
-        "homeCityPk": city.pk,
-        "purposePk": purpose.pk,
-    }
-
-    graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, **additional_data)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    assert Reservation.objects.count() == 1
-
-
-def test_reservation__create__with_reservation_language_succeed(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now()
-
-    graphql.login_with_superuser()
-    data = get_create_data(reservation_unit, reserveeLanguage="fi")
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.reservee_language == "fi"
-
-
-def test_reservation__create__use_longest_buffer_times_if_reserving_multiple_reservation_units(graphql):
-    #
-    # Currently (March 2024) reserving multiple reservation units is not supported
-    # in the UI, but it is planned to be implemented in the future (at some point).
-    #
-    reservation_unit_1 = ReservationUnitFactory.create_reservable_now(
-        sku="foo",
-        buffer_time_before=datetime.timedelta(),
-        buffer_time_after=datetime.timedelta(),
-    )
-    reservation_unit_2 = ReservationUnitFactory.create_reservable_now(
-        sku="foo",
-        buffer_time_before=datetime.timedelta(minutes=90),
-        buffer_time_after=datetime.timedelta(),
-    )
-    reservation_unit_3 = ReservationUnitFactory.create_reservable_now(
-        sku="foo",
-        buffer_time_before=datetime.timedelta(),
-        buffer_time_after=datetime.timedelta(minutes=15),
-    )
-
-    data = get_create_data(
-        reservation_unit_1,
-        reservationUnitPks=[reservation_unit_1.pk, reservation_unit_2.pk, reservation_unit_3.pk],
-    )
-    graphql.login_with_superuser()
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.buffer_time_before == reservation_unit_2.buffer_time_before
-    assert reservation.buffer_time_after == reservation_unit_3.buffer_time_after
 
 
 def test_reservation__create__cannot_set_reservation_price(graphql):
@@ -199,16 +96,13 @@ def test_reservation__create__overlapping_reservation(graphql):
 
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Overlapping reservations are not allowed."
+    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
 
 class BufferParams(NamedTuple):
     reservation_delta_time: datetime.timedelta
-    error_message: str
-    reservation_buffer_before: datetime.timedelta = datetime.timedelta()
-    reservation_buffer_after: datetime.timedelta = datetime.timedelta()
-    reservation_unit_buffer_before: datetime.timedelta = datetime.timedelta()
-    reservation_unit_buffer_after: datetime.timedelta = datetime.timedelta()
+    buffer_before: datetime.timedelta = datetime.timedelta()
+    buffer_after: datetime.timedelta = datetime.timedelta()
 
 
 @pytest.mark.parametrize("reservation_type", [ReservationTypeChoice.BLOCKED, ReservationTypeChoice.NORMAL])
@@ -216,39 +110,32 @@ class BufferParams(NamedTuple):
     **parametrize_helper({
         "Reservation Buffer Before": BufferParams(
             reservation_delta_time=-datetime.timedelta(hours=1),
-            reservation_unit_buffer_before=datetime.timedelta(minutes=1),
-            error_message="Reservation overlaps with reservation before due to buffer time.",
+            buffer_before=datetime.timedelta(minutes=1),
         ),
         "Reservation Buffer After": BufferParams(
             reservation_delta_time=datetime.timedelta(hours=1),
-            reservation_unit_buffer_after=datetime.timedelta(minutes=1),
-            error_message="Reservation overlaps with reservation after due to buffer time.",
+            buffer_after=datetime.timedelta(minutes=1),
         ),
         "Reservation Unit Buffer Before": BufferParams(
             reservation_delta_time=-datetime.timedelta(hours=1),
-            reservation_unit_buffer_before=datetime.timedelta(minutes=1),
-            error_message="Reservation overlaps with reservation before due to buffer time.",
+            buffer_before=datetime.timedelta(minutes=1),
         ),
         "Reservation Unit Buffer After": BufferParams(
             reservation_delta_time=datetime.timedelta(hours=1),
-            reservation_unit_buffer_after=datetime.timedelta(minutes=1),
-            error_message="Reservation overlaps with reservation after due to buffer time.",
+            buffer_after=datetime.timedelta(minutes=1),
         ),
     })
 )
 def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
     graphql,
     reservation_type,
-    error_message,
     reservation_delta_time,
-    reservation_buffer_before,
-    reservation_buffer_after,
-    reservation_unit_buffer_before,
-    reservation_unit_buffer_after,
+    buffer_before,
+    buffer_after,
 ):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        buffer_time_before=reservation_unit_buffer_before,
-        buffer_time_after=reservation_unit_buffer_after,
+        buffer_time_before=buffer_before,
+        buffer_time_after=buffer_after,
     )
 
     begin = next_hour(plus_hours=1)
@@ -259,8 +146,8 @@ def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
         end=end + reservation_delta_time,
         state=ReservationStateChoice.CONFIRMED,
         reservation_units=[reservation_unit],
-        buffer_time_before=reservation_buffer_before,
-        buffer_time_after=reservation_buffer_after,
+        buffer_time_before=datetime.timedelta(),
+        buffer_time_after=datetime.timedelta(),
         type=reservation_type,
     )
 
@@ -274,7 +161,7 @@ def test_reservation__create__overlaps_with_reservation_buffer_before_or_after(
     if reservation_type == ReservationTypeChoice.BLOCKED:
         assert response.has_errors is False, response.errors
     else:
-        assert response.error_message() == error_message
+        assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
 
 def test_reservation__create__reservation_unit_closed(graphql):
@@ -284,11 +171,15 @@ def test_reservation__create__reservation_unit_closed(graphql):
     data = get_create_data(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation unit is not open within desired reservation time."
+    assert response.field_error_messages() == ["Reservation unit is not open within desired reservation time."]
 
 
 def test_reservation__create__reservation_unit_closed__allow_reservations_without_opening_hours(graphql):
-    reservation_unit = ReservationUnitFactory.create(allow_reservations_without_opening_hours=True)
+    reservation_unit = ReservationUnitFactory.create(
+        allow_reservations_without_opening_hours=True,
+        pricings__lowest_price=0,
+        pricings__highest_price=0,
+    )
 
     graphql.login_with_superuser()
     data = get_create_data(reservation_unit)
@@ -308,7 +199,7 @@ def test_reservation__create__reservation_unit_in_open_application_round(graphql
     data = get_create_data(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "One or more reservation units are in open application round."
+    assert response.field_error_messages() == ["Reservation unit is in an open application round."]
 
 
 def test_reservation__create__reservation_unit_max_reservation_duration_exceeded(graphql):
@@ -320,7 +211,9 @@ def test_reservation__create__reservation_unit_max_reservation_duration_exceeded
     data = get_create_data(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation duration exceeds one or more reservation unit's maximum duration."
+    assert response.field_error_messages() == [
+        "Reservation duration exceeds reservation unit's maximum allowed duration."
+    ]
 
 
 def test_reservation__create__reservation_unit_min_reservation_duration_subceeded(graphql):
@@ -332,7 +225,9 @@ def test_reservation__create__reservation_unit_min_reservation_duration_subceede
     data = get_create_data(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation duration less than one or more reservation unit's minimum duration."
+    assert response.field_error_messages() == [
+        "Reservation duration is less than the reservation unit's minimum allowed duration."
+    ]
 
 
 @pytest.mark.parametrize("allow_reservations_without_opening_hours", [True, False])
@@ -357,7 +252,9 @@ def test_reservation__create__start_time_does_not_match_reservation_start_interv
         reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
         assert reservation.state == ReservationStateChoice.CREATED
     else:
-        assert response.error_message() == "Reservation start time does not match the allowed interval of 15 minutes."
+        assert response.field_error_messages() == [
+            "Reservation start time does not match the reservation unit's allowed start interval."
+        ]
 
 
 def test_reservation__create__reservation_unit_is_archived(graphql):
@@ -367,7 +264,7 @@ def test_reservation__create__reservation_unit_is_archived(graphql):
     data = get_create_data(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation unit is not reservable due to its status: 'ARCHIVED'."
+    assert response.field_error_messages() == ["Reservation unit is not currently published."]
 
 
 def test_reservation__create__reservation_unit_is_draft(graphql):
@@ -377,14 +274,12 @@ def test_reservation__create__reservation_unit_is_draft(graphql):
     data = get_create_data(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation unit is not reservable due to its status: 'DRAFT'."
+    assert response.field_error_messages() == ["Reservation unit is not currently published."]
 
 
 class ReservationTimeParams(NamedTuple):
     reservation_begins_delta: int = 0
     reservation_ends_delta: int = 0
-    publish_begins_delta: int = 0
-    publish_ends_delta: int = 0
     is_error: bool = False
 
 
@@ -394,18 +289,12 @@ class ReservationTimeParams(NamedTuple):
         "Reservation begins in the future": ReservationTimeParams(reservation_begins_delta=10, is_error=True),
         "Reservation ended in the past": ReservationTimeParams(reservation_ends_delta=-10, is_error=True),
         "Reservation ends in the future": ReservationTimeParams(reservation_ends_delta=10),
-        "Publish began in the past": ReservationTimeParams(publish_begins_delta=-10),
-        "Publish begins in the future": ReservationTimeParams(publish_begins_delta=10, is_error=True),
-        "Publish ended in the past": ReservationTimeParams(publish_ends_delta=-10, is_error=True),
-        "Publish ends in the future": ReservationTimeParams(publish_ends_delta=10),
     })
 )
-def test_reservation__create__reservation_unit_reservation_and_publish_in_the_past_or_future(
+def test_reservation__create__reservation_unit_reservation_in_the_past_or_future(
     graphql,
     reservation_begins_delta,
     reservation_ends_delta,
-    publish_begins_delta,
-    publish_ends_delta,
     is_error,
 ):
     begin = next_hour(plus_hours=1)
@@ -414,6 +303,46 @@ def test_reservation__create__reservation_unit_reservation_and_publish_in_the_pa
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         reservation_begins=next_hour(plus_days=reservation_begins_delta) if reservation_begins_delta else None,
         reservation_ends=next_hour(plus_days=reservation_ends_delta) if reservation_ends_delta else None,
+    )
+
+    graphql.login_with_superuser()
+    data = get_create_data(reservation_unit, begin=begin, end=end)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    if is_error:
+        assert response.field_error_messages() == [
+            "Reservation unit is not reservable at the time of the reservation.",
+        ]
+    else:
+        assert response.has_errors is False, response.errors
+        reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+        assert reservation.state == ReservationStateChoice.CREATED
+
+
+class PublishTimeParams(NamedTuple):
+    publish_begins_delta: int = 0
+    publish_ends_delta: int = 0
+    is_error: bool = False
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper({
+        "Publish began in the past": PublishTimeParams(publish_begins_delta=-10),
+        "Publish begins in the future": PublishTimeParams(publish_begins_delta=10, is_error=True),
+        "Publish ended in the past": PublishTimeParams(publish_ends_delta=-10, is_error=True),
+        "Publish ends in the future": PublishTimeParams(publish_ends_delta=10),
+    })
+)
+def test_reservation__create__reservation_unit_publish_in_the_past_or_future(
+    graphql,
+    publish_begins_delta,
+    publish_ends_delta,
+    is_error,
+):
+    begin = next_hour(plus_hours=1)
+    end = begin + datetime.timedelta(hours=1)
+
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
         publish_begins=next_hour(plus_days=publish_begins_delta) if publish_begins_delta else None,
         publish_ends=next_hour(plus_days=publish_ends_delta) if publish_ends_delta else None,
     )
@@ -423,7 +352,9 @@ def test_reservation__create__reservation_unit_reservation_and_publish_in_the_pa
     response = graphql(CREATE_MUTATION, input_data=data)
 
     if is_error:
-        assert response.error_message() == "Reservation unit is not reservable at current time."
+        assert response.field_error_messages() == [
+            "Reservation unit is not currently published.",
+        ]
     else:
         assert response.has_errors is False, response.errors
         reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
@@ -473,7 +404,9 @@ def test_reservation__create__max_reservations_per_user__over(graphql):
     )
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Maximum number of active reservations for this reservation unit exceeded."
+    assert response.field_error_messages() == [
+        "Maximum number of active reservations for this reservation unit exceeded."
+    ]
 
 
 def test_reservation__create__max_reservations_per_user__non_normal_reservation(graphql):
@@ -612,17 +545,6 @@ def test_reservation__create__copy_sku_to_reservation(graphql):
     assert reservation.sku == "foo"
 
 
-def test_reservation__create__sku_is_ambiguous(graphql):
-    reservation_unit_1 = ReservationUnitFactory.create_reservable_now(sku="foo")
-    reservation_unit_2 = ReservationUnitFactory.create(sku="bar")
-
-    graphql.login_with_superuser()
-    data = get_create_data(reservation_unit_1, reservationUnitPks=[reservation_unit_1.pk, reservation_unit_2.pk])
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.error_message() == "An ambiguous SKU cannot be assigned for this reservation."
-
-
 class ReservationsMinMaxDaysParams(NamedTuple):
     reservation_days_delta: int
     reservations_max_days_before: int | None = None
@@ -675,7 +597,7 @@ def test_reservation__create__reservation_unit_reservations_min_and_max_days_bef
 
     if error_message:
         assert response.has_errors is True, response
-        assert response.error_message() == error_message
+        assert response.field_error_messages() == [error_message]
     else:
         assert response.has_errors is False, response.errors
         reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
@@ -689,7 +611,7 @@ def test_reservation__create__reservation_unit_reservation_kind_is_season(graphq
     data = get_create_data(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation unit is only available or seasonal booking."
+    assert response.field_error_messages() == ["Reservation unit is not direct bookable."]
 
 
 def test_reservation__create__price_calculation__free_reservation_unit(graphql):
@@ -703,108 +625,78 @@ def test_reservation__create__price_calculation__free_reservation_unit(graphql):
 
     assert reservation.price == 0  # Free units should always be 0 €
     assert reservation.non_subsidised_price == reservation.price  # Non subsidised price be the same as price
-    assert reservation.price_net == 0
     assert reservation.unit_price == 0
     assert reservation.tax_percentage_value == 0
 
 
 def test_reservation__create__price_calculation__fixed_price_reservation_unit(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now()
-    pricing = ReservationUnitPricingFactory.create(
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        reservation_unit=reservation_unit,
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        allow_reservations_without_opening_hours=True,
+        pricings__lowest_price=Decimal(10),
+        pricings__highest_price=Decimal(20),
+        pricings__price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        pricings__tax_percentage__value=Decimal(10),
+        payment_types__code=PaymentType.ONLINE,
+        payment_product__id=uuid.uuid4(),
     )
 
     graphql.login_with_superuser()
     data = get_create_data(reservation_unit)
-    response = graphql(CREATE_MUTATION, input_data=data)
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-
-    price = pricing.highest_price
-    price_net = round_decimal(price / pricing.tax_percentage.multiplier, 2)
-
-    assert reservation.price == price  # With fixed price unit, time is ignored
-    assert reservation.non_subsidised_price == price
-    assert reservation.unit_price == price
-    assert reservation.price_net == price_net
-    assert reservation.tax_percentage_value == pricing.tax_percentage.value
-
-
-def test_reservation__create__price_calculation__time_based_price(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now()
-    pricing = ReservationUnitPricingFactory.create(
-        price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
-        reservation_unit=reservation_unit,
-    )
-
-    graphql.login_with_superuser()
-    data = get_create_data(reservation_unit)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-
-    price = pricing.highest_price * 4  # 1h reservation, i.e. 4 x 15 min
-    price_net = round_decimal(price / pricing.tax_percentage.multiplier, 2)
-
-    assert reservation is not None
-    assert reservation.price == price
-    assert reservation.non_subsidised_price == price
-    assert reservation.price_net == price_net
-    assert reservation.unit_price == pricing.highest_price
-    assert reservation.tax_percentage_value == pricing.tax_percentage.value
-
-
-def test_reservation__create__price_calculation__multiple_reservation_units(graphql):
-    reservation_unit_1 = ReservationUnitFactory.create_reservable_now(sku="foo")
-    pricing_1 = ReservationUnitPricingFactory.create(
-        price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
-        reservation_unit=reservation_unit_1,
-        highest_price=Decimal("6.00"),
-    )
-
-    reservation_unit_2 = ReservationUnitFactory.create_reservable_now(sku="foo")
-    pricing_2 = ReservationUnitPricingFactory.create(
-        price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
-        reservation_unit=reservation_unit_2,
-        highest_price=Decimal("10.00"),
-    )
-
-    graphql.login_with_superuser()
-    data = get_create_data(reservation_unit_1, reservationUnitPks=[reservation_unit_1.pk, reservation_unit_2.pk])
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    price = pricing_1.highest_price * 4 + pricing_2.highest_price * 4  # 1h reservation = 4 x 15 min from both units
-    price_net = round_decimal(price / pricing_1.tax_percentage.multiplier, 2)
+    assert reservation.price == Decimal(20)
+    assert reservation.non_subsidised_price == Decimal(20)
+    assert reservation.unit_price == Decimal(20)
+    assert reservation.tax_percentage_value == Decimal(10)
 
-    assert reservation.price == price
-    assert reservation.non_subsidised_price == price
-    assert reservation.price_net == price_net
-    assert reservation.unit_price == pricing_1.highest_price  # always from the first unit
-    assert reservation.tax_percentage_value == pricing_1.tax_percentage.value  # always from the first unit
+
+def test_reservation__create__price_calculation__time_based_price(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        allow_reservations_without_opening_hours=True,
+        pricings__lowest_price=Decimal(10),
+        pricings__highest_price=Decimal(20),
+        pricings__price_unit=PriceUnit.PRICE_UNIT_PER_15_MINS,
+        pricings__tax_percentage__value=Decimal(10),
+        payment_types__code=PaymentType.ONLINE,
+        payment_product__id=uuid.uuid4(),
+    )
+
+    graphql.login_with_superuser()
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+
+    assert reservation.price == Decimal(80)
+    assert reservation.non_subsidised_price == Decimal(80)
+    assert reservation.unit_price == Decimal(20)
+    assert reservation.tax_percentage_value == Decimal(10)
 
 
 def test_reservation__create__price_calculation__future_pricing(graphql):
-    reservation_unit = ReservationUnitFactory.create(allow_reservations_without_opening_hours=True)
-
     now = local_datetime()
 
-    # Current pricing
-    ReservationUnitPricingFactory.create(
-        begins=now,
-        price_unit=PriceUnit.PRICE_UNIT_FIXED,
-        highest_price=Decimal(6),
-        tax_percentage__value=Decimal(24),
-        reservation_unit=reservation_unit,
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        allow_reservations_without_opening_hours=True,
+        payment_types__code=PaymentType.ONLINE,
+        payment_product__id=uuid.uuid4(),
+        # Current pricing
+        pricings__begins=now,
+        pricings__price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        pricings__lowest_price=Decimal(5),
+        pricings__highest_price=Decimal(6),
+        pricings__tax_percentage__value=Decimal(24),
     )
-
-    future_pricing = ReservationUnitPricingFactory(
+    # Future pricing
+    ReservationUnitPricingFactory.create(
         begins=now + datetime.timedelta(days=1),
         price_unit=PriceUnit.PRICE_UNIT_FIXED,
+        lowest_price=Decimal(5),
         highest_price=Decimal(10),
         tax_percentage__value=Decimal(24),
         reservation_unit=reservation_unit,
@@ -816,16 +708,12 @@ def test_reservation__create__price_calculation__future_pricing(graphql):
 
     assert response.has_errors is False, response.errors
 
-    reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
-    price = future_pricing.highest_price
-    price_net = round_decimal(price / future_pricing.tax_percentage.multiplier, 2)
-
-    assert reservation.price == price
-    assert reservation.non_subsidised_price == price
-    assert reservation.price_net == price_net
-    assert reservation.unit_price == future_pricing.highest_price
-    assert reservation.tax_percentage_value == future_pricing.tax_percentage.value
+    assert reservation.price == Decimal(10)
+    assert reservation.non_subsidised_price == Decimal(10)
+    assert reservation.unit_price == Decimal(10)
+    assert reservation.tax_percentage_value == Decimal(24)
 
 
 def test_reservation__create__duration_is_not_multiple_of_interval(graphql):
@@ -839,7 +727,9 @@ def test_reservation__create__duration_is_not_multiple_of_interval(graphql):
 
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
-    assert response.error_message() == "Reservation duration is not a multiple of the allowed interval of 15 minutes."
+    assert response.field_error_messages() == [
+        "Reservation duration is not a multiple of the start interval of 15 minutes."
+    ]
 
 
 @pytest.mark.parametrize("arm", ["suomi_fi", "heltunnistussuomifi"])
@@ -1002,31 +892,30 @@ def test_reservation__create__prefilled_with_profile_data__ad_login(graphql, set
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_filled_by_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
+        allow_reservations_without_opening_hours=True,
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
-    )
-    ReservableTimeSpanFactory.create(
-        resource=reservation_unit.origin_hauki_resource,
-        start_datetime=datetime.datetime(2023, 1, 1, 6, tzinfo=DEFAULT_TIMEZONE),
-        end_datetime=datetime.datetime(2023, 1, 1, 22, tzinfo=DEFAULT_TIMEZONE),
+        pricings__lowest_price=Decimal(5),
+        pricings__highest_price=Decimal(6),
+        pricings__tax_percentage__value=Decimal(24),
+        payment_types__code=PaymentType.ONLINE,
+        payment_product__id=uuid.uuid4(),
     )
 
     graphql.login_with_regular_user()
 
     input_data = {
-        "name": "foo",
-        "description": "bar",
         "begin": datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         "end": datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "reservationUnitPks": [reservation_unit.pk],
+        "reservationUnit": reservation_unit.pk,
     }
 
     response = graphql(CREATE_MUTATION, input_data=input_data)
     assert response.has_errors is False, response.errors
 
-    reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
-    assert reservation is not None
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+
     assert reservation.begin == datetime.datetime(2023, 1, 1, hour=12, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.end == datetime.datetime(2023, 1, 1, hour=13, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.buffer_time_before == datetime.timedelta(hours=12)
@@ -1036,31 +925,30 @@ def test_reservation__create__reservation_block_whole_day__non_reserved_time_is_
 @freezegun.freeze_time("2021-01-01")
 def test_reservation__create__reservation_block_whole_day__start_and_end_at_midnight_has_no_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
+        allow_reservations_without_opening_hours=True,
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
-    )
-    ReservableTimeSpanFactory.create(
-        resource=reservation_unit.origin_hauki_resource,
-        start_datetime=datetime.datetime(2022, 12, 31, 0, tzinfo=DEFAULT_TIMEZONE),
-        end_datetime=datetime.datetime(2023, 1, 3, 0, tzinfo=DEFAULT_TIMEZONE),
+        pricings__lowest_price=Decimal(5),
+        pricings__highest_price=Decimal(6),
+        pricings__tax_percentage__value=Decimal(24),
+        payment_types__code=PaymentType.ONLINE,
+        payment_product__id=uuid.uuid4(),
     )
 
     graphql.login_with_regular_user()
 
     input_data = {
-        "name": "foo",
-        "description": "bar",
         "begin": datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         "end": datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE).isoformat(),
-        "reservationUnitPks": [reservation_unit.pk],
+        "reservationUnit": reservation_unit.pk,
     }
 
     response = graphql(CREATE_MUTATION, input_data=input_data)
     assert response.has_errors is False, response.errors
 
-    reservation: Reservation | None = Reservation.objects.filter(name="foo").first()
-    assert reservation is not None
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+
     assert reservation.begin == datetime.datetime(2023, 1, 1, hour=0, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.end == datetime.datetime(2023, 1, 2, hour=0, tzinfo=DEFAULT_TIMEZONE)
     assert reservation.buffer_time_before == datetime.timedelta(hours=0)
@@ -1071,8 +959,8 @@ def test_reservation__create__reservation_block_whole_day__start_and_end_at_midn
 @pytest.mark.parametrize(
     ("new_reservation_begin_delta", "error_message"),
     [
-        (datetime.timedelta(hours=-3), "Reservation overlaps with reservation after due to buffer time."),
-        (datetime.timedelta(hours=3), "Reservation overlaps with reservation before due to buffer time."),
+        (datetime.timedelta(hours=-3), "Reservation overlaps with existing reservations."),
+        (datetime.timedelta(hours=3), "Reservation overlaps with existing reservations."),
     ],
 )
 def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_new_reservation(
@@ -1081,36 +969,34 @@ def test_reservation__create__reservation_block_whole_day__blocks_reserving_for_
     error_message,
 ):
     reservation_unit = ReservationUnitFactory.create(
+        allow_reservations_without_opening_hours=True,
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
+        pricings__lowest_price=Decimal(5),
+        pricings__highest_price=Decimal(6),
+        pricings__tax_percentage__value=Decimal(24),
+        payment_types__code=PaymentType.ONLINE,
+        payment_product__id=uuid.uuid4(),
     )
 
-    begin = next_hour(plus_hours=1)
+    begin = next_hour(plus_hours=5)
     end = begin + datetime.timedelta(hours=1)
-
-    ReservableTimeSpanFactory.create(
-        resource=reservation_unit.origin_hauki_resource,
-        start_datetime=local_start_of_day(begin),
-        end_datetime=local_end_of_day(begin),
-    )
 
     ReservationFactory.create_for_reservation_unit(reservation_unit=reservation_unit, begin=begin, end=end)
 
     graphql.login_with_regular_user()
 
     input_data = {
-        "name": "foo",
-        "description": "bar",
         "begin": (begin + new_reservation_begin_delta).isoformat(),
         "end": (end + new_reservation_begin_delta).isoformat(),
-        "reservationUnitPks": [reservation_unit.pk],
+        "reservationUnit": reservation_unit.pk,
     }
 
     ReservationUnitHierarchy.refresh()
 
     response = graphql(CREATE_MUTATION, input_data=input_data)
-    assert response.error_message() == error_message
+    assert response.field_error_messages() == [error_message]
 
 
 @pytest.mark.parametrize(
@@ -1163,7 +1049,7 @@ def test_reservation__create__require_adult_reservee__is_under_age(graphql):
     data = get_create_data(reservation_unit)
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation unit can only be booked by an adult reservee"
+    assert response.field_error_messages() == ["Reservation unit can only be booked by an adult reservee"]
 
 
 @freeze_time(local_datetime(2024, 1, 1))
