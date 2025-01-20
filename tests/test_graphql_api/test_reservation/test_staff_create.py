@@ -7,13 +7,12 @@ import pytest
 
 from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour, timedelta_to_json
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
 
 from tests.factories import (
     AgeGroupFactory,
     CityFactory,
     OriginHaukiResourceFactory,
-    RecurringReservationFactory,
     ReservableTimeSpanFactory,
     ReservationFactory,
     ReservationPurposeFactory,
@@ -52,7 +51,7 @@ def test_reservation__staff_create__reservation_block_whole_day(graphql):
         "type": ReservationTypeChoice.STAFF.value,
         "begin": datetime.datetime(2023, 1, 1, hour=12).isoformat(),
         "end": datetime.datetime(2023, 1, 1, hour=13).isoformat(),
-        "reservationUnitPks": [reservation_unit.pk],
+        "reservationUnit": reservation_unit.pk,
     }
 
     response = graphql(CREATE_STAFF_MUTATION, input_data=input_data)
@@ -88,9 +87,9 @@ def test_reservation__staff_create__reservation_block_whole_day__ignore_given_bu
         "type": ReservationTypeChoice.STAFF.value,
         "begin": datetime.datetime(2023, 1, 1, hour=12).isoformat(),
         "end": datetime.datetime(2023, 1, 1, hour=13).isoformat(),
-        "reservationUnitPks": [reservation_unit.pk],
-        "bufferTimeBefore": timedelta_to_json(datetime.timedelta(hours=1)),
-        "bufferTimeAfter": timedelta_to_json(datetime.timedelta(hours=1)),
+        "reservationUnit": reservation_unit.pk,
+        "bufferTimeBefore": int(datetime.timedelta(hours=1).total_seconds()),
+        "bufferTimeAfter": int(datetime.timedelta(hours=1).total_seconds()),
     }
 
     response = graphql(CREATE_STAFF_MUTATION, input_data=input_data)
@@ -166,7 +165,8 @@ def test_reservation__staff_create__end_before_begin(graphql):
     data["begin"], data["end"] = data["end"], data["begin"]
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "End cannot be before begin"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot end before it begins"]
 
 
 def test_reservation__staff_create__begin_date_in_the_past(graphql):
@@ -182,7 +182,8 @@ def test_reservation__staff_create__begin_date_in_the_past(graphql):
     data = get_staff_create_data(reservation_unit, begin=begin, end=end)
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation begin date cannot be in the past."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot begin this much in the past."]
 
 
 @freezegun.freeze_time(datetime.datetime(2021, 1, 5, hour=12, minute=15, tzinfo=DEFAULT_TIMEZONE))
@@ -238,36 +239,35 @@ def test_reservation__staff_create__optional_fields(graphql):
 
     data = get_staff_create_data(
         reservation_unit,
-        type=ReservationTypeChoice.BLOCKED,
-        reserveeType=CustomerTypeChoice.INDIVIDUAL,
-        reserveeFirstName="John",
-        reserveeLastName="Doe",
-        reserveeOrganisationName="Test Organisation ry",
-        reserveePhone="+358123456789",
-        reserveeEmail="john.doe@example.com",
-        reserveeId="2882333-2",
-        reserveeIsUnregisteredAssociation=False,
-        reserveeAddressStreet="Mannerheimintie 2",
-        reserveeAddressCity="Helsinki",
-        reserveeAddressZip="00100",
+        ageGroup=AgeGroupFactory.create(minimum=18, maximum=30).pk,
+        applyingForFreeOfCharge=True,
+        billingAddressCity="Turku",
+        billingAddressStreet="Auratie 12B",
+        billingAddressZip="20100",
+        billingEmail="jane.doe@example.com",
         billingFirstName="Jane",
         billingLastName="Doe",
         billingPhone="+358234567890",
-        billingEmail="jane.doe@example.com",
-        billingAddressStreet="Auratie 12B",
-        billingAddressCity="Turku",
-        billingAddressZip="20100",
-        homeCityPk=CityFactory.create(name="Helsinki").pk,
-        ageGroupPk=AgeGroupFactory.create(minimum=18, maximum=30).pk,
-        applyingForFreeOfCharge=True,
-        freeOfChargeReason="Some reason here.",
-        name="Test reservation",
+        bufferTimeAfter=int(datetime.timedelta(minutes=30).total_seconds()),
+        bufferTimeBefore=int(datetime.timedelta(minutes=30).total_seconds()),
         description="Test description",
+        freeOfChargeReason="Some reason here.",
+        homeCity=CityFactory.create(name="Helsinki").pk,
+        name="Test reservation",
         numPersons=1,
-        purposePk=ReservationPurposeFactory.create(name="purpose").pk,
-        bufferTimeBefore="00:30:00",
-        bufferTimeAfter="00:30:00",
-        recurringReservationPk=RecurringReservationFactory(reservation_unit=reservation_unit).pk,
+        purpose=ReservationPurposeFactory.create(name="purpose").pk,
+        reserveeAddressCity="Helsinki",
+        reserveeAddressStreet="Mannerheimintie 2",
+        reserveeAddressZip="00100",
+        reserveeEmail="john.doe@example.com",
+        reserveeFirstName="John",
+        reserveeId="2882333-2",
+        reserveeIsUnregisteredAssociation=False,
+        reserveeLastName="Doe",
+        reserveeOrganisationName="Test Organisation ry",
+        reserveePhone="+358123456789",
+        reserveeType=CustomerTypeChoice.INDIVIDUAL,
+        type=ReservationTypeChoice.BLOCKED,
     )
 
     graphql.login_with_superuser()
@@ -276,37 +276,37 @@ def test_reservation__staff_create__optional_fields(graphql):
     assert response.has_errors is False, response.errors
 
     reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-    assert reservation.type == ReservationTypeChoice.BLOCKED
-    assert reservation.reservee_type == "INDIVIDUAL"
-    assert reservation.reservee_first_name == "John"
-    assert reservation.reservee_last_name == "Doe"
-    assert reservation.reservee_organisation_name == "Test Organisation ry"
-    assert reservation.reservee_phone == "+358123456789"
-    assert reservation.reservee_email == "john.doe@example.com"
-    assert reservation.reservee_id == "2882333-2"
-    assert reservation.reservee_is_unregistered_association is False
-    assert reservation.reservee_address_street == "Mannerheimintie 2"
-    assert reservation.reservee_address_city == "Helsinki"
-    assert reservation.reservee_address_zip == "00100"
+
+    assert reservation.age_group.maximum == 30
+    assert reservation.age_group.minimum == 18
+    assert reservation.applying_for_free_of_charge is True
+    assert reservation.billing_address_city == "Turku"
+    assert reservation.billing_address_street == "Auratie 12B"
+    assert reservation.billing_address_zip == "20100"
+    assert reservation.billing_email == "jane.doe@example.com"
     assert reservation.billing_first_name == "Jane"
     assert reservation.billing_last_name == "Doe"
     assert reservation.billing_phone == "+358234567890"
-    assert reservation.billing_email == "jane.doe@example.com"
-    assert reservation.billing_address_street == "Auratie 12B"
-    assert reservation.billing_address_city == "Turku"
-    assert reservation.billing_address_zip == "20100"
-    assert reservation.home_city.name == "Helsinki"
-    assert reservation.age_group.minimum == 18
-    assert reservation.age_group.maximum == 30
-    assert reservation.applying_for_free_of_charge is True
-    assert reservation.free_of_charge_reason == "Some reason here."
-    assert reservation.name == "Test reservation"
+    assert reservation.buffer_time_after == datetime.timedelta(minutes=30)
+    assert reservation.buffer_time_before == datetime.timedelta(minutes=30)
     assert reservation.description == "Test description"
+    assert reservation.free_of_charge_reason == "Some reason here."
+    assert reservation.home_city.name == "Helsinki"
+    assert reservation.name == "Test reservation"
     assert reservation.num_persons == 1
     assert reservation.purpose.name == "purpose"
-    assert reservation.buffer_time_before == datetime.timedelta(minutes=30)
-    assert reservation.buffer_time_after == datetime.timedelta(minutes=30)
-    assert reservation.recurring_reservation.pk == data["recurringReservationPk"]
+    assert reservation.reservee_address_city == "Helsinki"
+    assert reservation.reservee_address_street == "Mannerheimintie 2"
+    assert reservation.reservee_address_zip == "00100"
+    assert reservation.reservee_email == "john.doe@example.com"
+    assert reservation.reservee_first_name == "John"
+    assert reservation.reservee_id == "2882333-2"
+    assert reservation.reservee_is_unregistered_association is False
+    assert reservation.reservee_last_name == "Doe"
+    assert reservation.reservee_organisation_name == "Test Organisation ry"
+    assert reservation.reservee_phone == "+358123456789"
+    assert reservation.reservee_type == "INDIVIDUAL"
+    assert reservation.type == ReservationTypeChoice.BLOCKED
 
 
 def test_reservation__staff_create__reservation_overlapping_fails(graphql):
@@ -330,7 +330,8 @@ def test_reservation__staff_create__reservation_overlapping_fails(graphql):
 
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Overlapping reservations are not allowed."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
 
 def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
@@ -355,7 +356,8 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails(graphql):
 
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
 
 def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer_time_before(graphql):
@@ -377,14 +379,15 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
         reservation_unit,
         begin=begin + datetime.timedelta(hours=1),
         end=end + datetime.timedelta(hours=1),
-        bufferTimeBefore="00:01:00",
+        bufferTimeBefore=int(datetime.timedelta(minutes=1).total_seconds()),
     )
 
     ReservationUnitHierarchy.refresh()
 
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation overlaps with reservation before due to buffer time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
 
 def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer_time_after(graphql):
@@ -406,14 +409,15 @@ def test_reservation__staff_create__buffer_times_cause_overlap_fails_with_buffer
         reservation_unit,
         begin=begin,
         end=end,
-        bufferTimeAfter="00:01:00",
+        bufferTimeAfter=int(datetime.timedelta(minutes=1).total_seconds()),
     )
 
     ReservationUnitHierarchy.refresh()
 
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
 
 def test_reservation__staff_create__interval_not_respected_fails(graphql):
@@ -426,7 +430,10 @@ def test_reservation__staff_create__interval_not_respected_fails(graphql):
     data = get_staff_create_data(reservation_unit, begin=begin, end=end)
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation start time does not match the allowed interval of 15 minutes."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation start time does not match the reservation unit's allowed start interval.",
+    ]
 
 
 def test_reservation__staff_create__reservation_type_normal_not_accepted(graphql):
@@ -436,9 +443,8 @@ def test_reservation__staff_create__reservation_type_normal_not_accepted(graphql
     data = get_staff_create_data(reservation_unit, type=ReservationTypeChoice.NORMAL)
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == (
-        "Reservation type NORMAL is not allowed in this mutation. Allowed choices are BLOCKED, STAFF, BEHALF, SEASONAL."
-    )
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Staff users are not allowed to create reservations of this type."]
 
 
 def test_reservation__staff_create__reservation_type_behalf_accepted(graphql):

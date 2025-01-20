@@ -91,15 +91,14 @@ class ReservationStaffCreatePermission(BasePermission):
 
     @classmethod
     def _get_reservation_unit(cls, input_data: dict[str, Any]) -> ReservationUnit:
-        ids = input_data.get("reservation_unit_pks")
-        if ids is None:
-            msg = "Reservation Units are required for creating Staff Reservations."
+        pk: int | None = input_data.get("reservation_unit")
+        if pk is None:
+            msg = "Reservation Unit is required for creating Staff Reservations."
             raise GQLCodeError(msg, code=error_codes.REQUIRED_FIELD_MISSING)
 
-        # Simplified since currently we only ever add one reservation unit to a reservation.
-        reservation_unit = ReservationUnit.objects.select_related("unit").filter(id=ids[0]).first()
+        reservation_unit: ReservationUnit | None = ReservationUnit.objects.select_related("unit").filter(pk=pk).first()
         if reservation_unit is None:
-            msg = f"Reservation Unit with pk {ids[0]} does not exist."
+            msg = f"Reservation Unit with pk {pk} does not exist."
             raise GQLCodeError(msg, code=error_codes.ENTITY_NOT_FOUND)
 
         return reservation_unit
