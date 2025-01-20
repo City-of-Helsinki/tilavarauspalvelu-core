@@ -57,7 +57,8 @@ def test_reservation__adjust_time__wrong_state(graphql):
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Only reservations in 'CONFIRMED' state can be rescheduled."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot be rescheduled based on its state"]
 
 
 def test_reservation__adjust_time__new_reservation_begin_in_past(graphql):
@@ -73,7 +74,8 @@ def test_reservation__adjust_time__new_reservation_begin_in_past(graphql):
     )
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation new begin cannot be in the past"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot begin in the past."]
 
 
 def test_reservation__adjust_time__reservation__adjust_time__reservation_begin_in_past(graphql):
@@ -87,7 +89,8 @@ def test_reservation__adjust_time__reservation__adjust_time__reservation_begin_i
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation time cannot be changed when current begin time is in past."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Past or ongoing reservations cannot be modified"]
 
 
 def test_reservation__adjust_time__reservation_unit_missing_cancellation_rule(graphql):
@@ -97,7 +100,8 @@ def test_reservation__adjust_time__reservation_unit_missing_cancellation_rule(gr
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation time cannot be changed thus no cancellation rule."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot be changed because it has no cancellation rule."]
 
 
 def test_reservation__adjust_time__cancellation_rule_time_limit_exceed(graphql):
@@ -109,7 +113,10 @@ def test_reservation__adjust_time__cancellation_rule_time_limit_exceed(graphql):
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation time cannot be changed because the cancellation period has expired."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation time cannot be changed because the cancellation period has expired."
+    ]
 
 
 def test_reservation__adjust_time__reservation_is_already_handled(graphql):
@@ -119,7 +126,8 @@ def test_reservation__adjust_time__reservation_is_already_handled(graphql):
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation has gone through handling and cannot be changed anymore."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot be modified since it has been handled"]
 
 
 def test_reservation__adjust_time__reservation_has_price_to_be_paid(graphql):
@@ -129,7 +137,8 @@ def test_reservation__adjust_time__reservation_has_price_to_be_paid(graphql):
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation time cannot be changed due to its price"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Paid reservations cannot be modified"]
 
 
 def test_reservation__adjust_time__change_would_make_unit_reservation_unit_paid(graphql):
@@ -144,19 +153,23 @@ def test_reservation__adjust_time__change_would_make_unit_reservation_unit_paid(
     graphql.login_with_superuser()
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation begin time change causes price change that not allowed."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation cannot be rescheduled to a point where it would become paid.",
+    ]
 
 
 def test_reservation__adjust_time__reservation_unit_not_reservable_in_new_time(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
-        reservation_units__reservation_begins=local_datetime() + datetime.timedelta(hours=3),
+        reservation_units__reservation_begins=local_datetime() + datetime.timedelta(days=1),
     )
 
     graphql.login_with_superuser()
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation unit is not reservable at current time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation unit is not reservable at the time of the reservation."]
 
 
 def test_reservation__adjust_time__new_time_overlaps_another_reservation(graphql):
@@ -180,7 +193,8 @@ def test_reservation__adjust_time__new_time_overlaps_another_reservation(graphql
 
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Overlapping reservations are not allowed."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
 
 def test_reservation__adjust_time__new_time_duration_under_min_duration(graphql):
@@ -192,7 +206,10 @@ def test_reservation__adjust_time__new_time_duration_under_min_duration(graphql)
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation duration less than one or more reservation unit's minimum duration."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation duration is less than the reservation unit's minimum allowed duration."
+    ]
 
 
 def test_reservation__adjust_time__new_time_duration_over_max_duration(graphql):
@@ -204,7 +221,10 @@ def test_reservation__adjust_time__new_time_duration_over_max_duration(graphql):
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation duration exceeds one or more reservation unit's maximum duration."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation duration exceeds reservation unit's maximum allowed duration."
+    ]
 
 
 def test_reservation__adjust_time__overlaps_with_buffer_time(graphql):
@@ -225,7 +245,8 @@ def test_reservation__adjust_time__overlaps_with_buffer_time(graphql):
 
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation overlaps with reservation after due to buffer time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
 
 
 def test_reservation__adjust_time__max_days_before_exceeded(graphql):
@@ -242,7 +263,8 @@ def test_reservation__adjust_time__max_days_before_exceeded(graphql):
     graphql.login_with_superuser()
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation start time is earlier than 1 days before."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation start time is earlier than 1 days before."]
 
 
 def test_reservation__adjust_time__min_days_before_subceeded(graphql):
@@ -258,7 +280,8 @@ def test_reservation__adjust_time__min_days_before_subceeded(graphql):
     )
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation start time is later than 7 days before."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation start time is later than 7 days before."]
 
 
 def test_reservation__adjust_time__reservation_unit_not_open_in_new_time(graphql):
@@ -272,7 +295,8 @@ def test_reservation__adjust_time__reservation_unit_not_open_in_new_time(graphql
     )
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation unit is not open within desired reservation time."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation unit is not open within desired reservation time."]
 
 
 def test_reservation__adjust_time__reservation_unit_in_open_application_round(graphql):
@@ -288,7 +312,8 @@ def test_reservation__adjust_time__reservation_unit_in_open_application_round(gr
     data = get_adjust_data(reservation)
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "One or more reservation units are in open application round."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation unit is in an open application round."]
 
 
 def test_reservation__adjust_time__reservation_start_time_not_within_the_interval(graphql):
@@ -304,7 +329,10 @@ def test_reservation__adjust_time__reservation_start_time_not_within_the_interva
     graphql.login_with_superuser()
     response = graphql(ADJUST_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation duration is not a multiple of the allowed interval of 15 minutes."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation duration is not a multiple of the start interval of 15 minutes."
+    ]
 
 
 def test_reservation__adjust_time__reservee_can_adjust(graphql):
@@ -381,9 +409,11 @@ def test_reservation__adjust_time__needs_handling_after_time_change(graphql, out
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_reservation__update__reservation_block_whole_day__ignore_given_buffers(graphql):
+def test_reservation__adjust_time__reservation_block_whole_day__ignore_given_buffers(graphql):
     reservation_unit = ReservationUnitFactory.create(
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
+        pricings__lowest_price=0,
+        pricings__highest_price=0,
         reservation_block_whole_day=True,
         spaces=[SpaceFactory.create()],
         cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(hours=0),
@@ -423,8 +453,10 @@ def test_reservation__update__reservation_block_whole_day__ignore_given_buffers(
 
 
 @freezegun.freeze_time("2021-01-01")
-def test_reservation__update__update_reservation_buffer_on_adjust(graphql):
+def test_reservation__adjust_time__update_reservation_buffer_on_adjust(graphql):
     reservation_unit = ReservationUnitFactory.create(
+        pricings__lowest_price=0,
+        pricings__highest_price=0,
         buffer_time_before=datetime.timedelta(hours=1),
         buffer_time_after=datetime.timedelta(hours=1),
         origin_hauki_resource=OriginHaukiResourceFactory.create(id=999),
