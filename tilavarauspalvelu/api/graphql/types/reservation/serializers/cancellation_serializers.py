@@ -1,20 +1,20 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
-from graphene_django_extensions.fields import EnumFriendlyChoiceField
-from rest_framework.exceptions import ValidationError
+from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
+from rest_framework.fields import CharField, IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.models import Reservation, ReservationCancelReason
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
-from utils.date_utils import local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import PaymentOrder
+    from tilavarauspalvelu.models import ReservationUnit
+    from tilavarauspalvelu.typing import ReservationCancellationData
 
 __all__ = [
     "ReservationCancellationSerializer",
@@ -22,7 +22,14 @@ __all__ = [
 
 
 class ReservationCancellationSerializer(NestingModelSerializer):
+    """Cancel a reservation."""
+
     instance: Reservation
+
+    pk = IntegerField(required=True)
+
+    cancel_reason = IntegerPrimaryKeyField(queryset=ReservationCancelReason.objects, required=True)
+    cancel_details = CharField(required=False, allow_blank=True)
 
     state = EnumFriendlyChoiceField(
         choices=ReservationStateChoice.choices,
@@ -38,55 +45,29 @@ class ReservationCancellationSerializer(NestingModelSerializer):
             "cancel_details",
             "state",
         ]
-        extra_kwargs = {
-            "cancel_reason": {"required": True},
-        }
 
-    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        data = super().validate(data)
-        if self.instance.state != ReservationStateChoice.CONFIRMED.value:
-            msg = "Only reservations with state 'CONFIRMED' can be cancelled."
-            raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
+    def validate(self, data: ReservationCancellationData) -> ReservationCancellationData:
+        self.instance.validator.validate_reservation_state_allows_cancelling()
+        self.instance.validator.validate_reservation_type_allows_cancelling()
+        self.instance.validator.validate_reservation_not_past_or_ongoing()
+        self.instance.validator.validate_single_reservation_unit()
 
-        if self.instance.type not in ReservationTypeChoice.types_that_can_be_cancelled:
-            msg = f"Only reservations with type {ReservationTypeChoice.types_that_can_be_cancelled} can be cancelled."
-            raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
+        reservation_unit: ReservationUnit = self.instance.reservation_units.first()
 
-        if self.instance.type == ReservationTypeChoice.SEASONAL.value and self.instance.price > 0:
-            msg = "Paid seasonal reservations cannot be cancelled."
-            raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
+        begin = self.instance.begin.astimezone(DEFAULT_TIMEZONE)
 
-        now = local_datetime()
-        if self.instance.begin < now:
-            msg = "Reservation cannot be cancelled after it has begun."
-            raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
+        reservation_unit.validator.validate_cancellation_rule(begin=begin)
 
-        for reservation_unit in self.instance.reservation_units.all():
-            cancel_rule = reservation_unit.cancellation_rule
-            if cancel_rule is None:
-                msg = "Reservation cannot be cancelled because its reservation unit has no cancellation rule."
-                raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
-
-            must_be_cancelled_before = self.instance.begin - cancel_rule.can_be_cancelled_time_before
-            if must_be_cancelled_before < now:
-                msg = "Reservation cannot be cancelled because the cancellation period is over."
-                raise ValidationError(msg, code=error_codes.RESERVATION_CANCELLATION_NOT_ALLOWED)
+        data["state"] = ReservationStateChoice.CANCELLED
 
         return data
 
-    def save(self, **kwargs: Any) -> Reservation:
-        kwargs["state"] = ReservationStateChoice.CANCELLED.value
-        instance: Reservation = super().save(**kwargs)
+    def update(self, instance: Reservation, validated_data: ReservationCancellationData) -> Reservation:
+        instance = super().update(instance=instance, validated_data=validated_data)
 
-        payment_order: PaymentOrder | None = instance.payment_order.first()
-        payment_is_refundable = (
-            payment_order is not None  # There is a payment order
-            and payment_order.status == OrderStatus.PAID  # This is a paid reservation
-            and payment_order.refund_id is None  # Not refunded already
-        )
-
-        if payment_is_refundable and instance.price_net > 0:
+        if instance.actions.is_refundable and instance.price_net > 0:
             refund_paid_reservation_task.delay(instance.pk)
 
         EmailService.send_reservation_cancelled_email(reservation=instance)
+
         return instance
