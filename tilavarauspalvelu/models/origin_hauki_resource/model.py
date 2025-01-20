@@ -46,6 +46,3 @@ class OriginHaukiResource(models.Model):
         from .actions import OriginHaukiResourceActions
 
         return OriginHaukiResourceActions(self)
-
-    def is_reservable(self, start_datetime: datetime.datetime, end_datetime: datetime.datetime) -> bool:
-        return self.reservable_time_spans.fully_fill_period(start=start_datetime, end=end_datetime).exists()
