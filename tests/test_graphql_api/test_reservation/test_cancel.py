@@ -74,7 +74,7 @@ def test_reservation__cancel__fails_type_wrong(graphql, reservation_type):
     response = graphql(CANCEL_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Only reservations with type ['NORMAL', 'SEASONAL'] can be cancelled."]
+    assert response.field_error_messages() == ["Reservation cannot be cancelled based on its type"]
 
 
 def test_reservation__cancel__fails_when_type_is_seasonal_and_reservation_is_paid(graphql):
@@ -96,9 +96,7 @@ def test_reservation__cancel__fails_if_state_is_not_confirmed(graphql):
     response = graphql(CANCEL_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Only reservations with state 'CONFIRMED' can be cancelled.",
-    ]
+    assert response.field_error_messages() == ["Reservation cannot be cancelled based on its state"]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -155,7 +153,7 @@ def test_reservation__cancel__fails_when_cancellation_time_is_over(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
-        "Reservation cannot be cancelled because the cancellation period is over.",
+        "Reservation time cannot be changed because the cancellation period has expired.",
     ]
 
     reservation.refresh_from_db()
@@ -174,9 +172,7 @@ def test_reservation__cancel__fails_when_reservation_in_the_past(graphql):
     response = graphql(CANCEL_MUTATION, input_data=data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == [
-        "Reservation cannot be cancelled after it has begun.",
-    ]
+    assert response.field_error_messages() == ["Past or ongoing reservations cannot be modified"]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
@@ -191,7 +187,7 @@ def test_reservation__cancel__fails_if_no_cancellation_rule(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
-        "Reservation cannot be cancelled because its reservation unit has no cancellation rule.",
+        "Reservation cannot be changed because it has no cancellation rule.",
     ]
 
     reservation.refresh_from_db()
