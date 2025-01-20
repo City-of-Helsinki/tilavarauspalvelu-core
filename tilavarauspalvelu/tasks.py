@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 import json
 import logging
-import uuid
 from contextlib import suppress
 from decimal import Decimal
 from typing import TYPE_CHECKING, Literal
@@ -188,21 +187,9 @@ def prune_recurring_reservations_task() -> None:
     retry_backoff=True,
 )
 def refund_paid_reservation_task(reservation_pk: int) -> None:
-    reservation = Reservation.objects.filter(pk=reservation_pk).first()
-    if not reservation:
-        return
-
-    payment_order: PaymentOrder | None = PaymentOrder.objects.filter(reservation=reservation).first()
-    if not payment_order:
-        return
-
-    if not settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-        refund = VerkkokauppaAPIClient.refund_order(order_uuid=payment_order.remote_id)
-        payment_order.refund_id = refund.refund_id
-    else:
-        payment_order.refund_id = uuid.uuid4()
-    payment_order.status = OrderStatus.REFUNDED
-    payment_order.save(update_fields=["refund_id", "status"])
+    reservation: Reservation | None = Reservation.objects.filter(pk=reservation_pk).first()
+    if reservation is not None:
+        reservation.actions.refund_paid_reservation()
 
 
 @app.task(name="update_reservation_unit_hierarchy")
