@@ -38,6 +38,7 @@ if TYPE_CHECKING:
     )
 
     from .actions import ReservationActions
+    from .validators import ReservationValidator
 
 
 __all__ = [
@@ -86,7 +87,7 @@ class Reservation(SerializableMixin, models.Model):
 
     # Free of charge information
     applying_for_free_of_charge: bool = models.BooleanField(default=False, blank=True)
-    free_of_charge_reason: bool | None = models.TextField(null=True, blank=True)
+    free_of_charge_reason: str | None = models.TextField(null=True, blank=True)
 
     # Reservee information
     reservee_id: str = models.CharField(max_length=255, blank=True, default="")
@@ -227,6 +228,18 @@ class Reservation(SerializableMixin, models.Model):
         from .actions import ReservationActions
 
         return ReservationActions(self)
+
+    @cached_property
+    def validator(self) -> ReservationValidator:
+        """
+        Validation logic that requires access to a Reservation instance,
+        e.g. for update, delete, or validation of another model.
+        """
+        # Import actions inline to defer loading them.
+        # This allows us to avoid circular imports.
+        from .validators import ReservationValidator
+
+        return ReservationValidator(self)
 
     @property
     def price_net(self) -> Decimal:
