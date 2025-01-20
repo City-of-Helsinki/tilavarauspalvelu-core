@@ -1,19 +1,22 @@
 from __future__ import annotations
 
-from decimal import Decimal
 from typing import Any
 
-from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
-from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorCodes, ValidationErrorWithCode
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
-from tilavarauspalvelu.models import PaymentOrder, Reservation
+from graphene_django_extensions import NestingModelSerializer
+from rest_framework.fields import IntegerField
+
+from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
-from utils.date_utils import local_datetime
-from utils.utils import comma_sep_str
+
+__all__ = [
+    "ReservationRefundSerializer",
+]
 
 
-class ReservationRefundSerializer(OldPrimaryKeySerializer):
+class ReservationRefundSerializer(NestingModelSerializer):
     instance: Reservation
+
+    pk = IntegerField(required=True)
 
     class Meta:
         model = Reservation
@@ -22,30 +25,12 @@ class ReservationRefundSerializer(OldPrimaryKeySerializer):
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        now = local_datetime()
-        if self.instance.price_net <= Decimal("0.0"):
-            msg = "Only reservations with price greater than 0 can be refunded."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.REFUND_NOT_ALLOWED)
+        self.instance.validator.validate_reservation_is_paid()
+        self.instance.validator.validate_reservation_state_allows_refunding()
+        self.instance.validator.validate_reservation_has_been_paid()
+        return data
 
-        valid_states = [ReservationStateChoice.CANCELLED.value, ReservationStateChoice.DENIED.value]
-
-        if self.instance.state not in valid_states and self.instance.end >= now:
-            values = comma_sep_str(valid_states, last_sep="or", quote=True)
-            msg = f"Only reservations in the past or in state {values} can be refunded."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.REFUND_NOT_ALLOWED)
-
-        payment_order = PaymentOrder.objects.filter(
-            reservation=self.instance,
-            status=OrderStatus.PAID,
-            refund_id__isnull=True,
-        ).first()
-        if not payment_order:
-            msg = "Only reservations with paid order can be refunded."
-            raise ValidationErrorWithCode(msg, ValidationErrorCodes.REFUND_NOT_ALLOWED)
-
-        return super().validate(data)
-
-    def save(self, **kwargs: Any) -> Reservation:
-        instance = super().save(**kwargs)
+    def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:
+        instance = super().update(instance=instance, validated_data=validated_data)
         refund_paid_reservation_task.delay(instance.pk)
         return instance
