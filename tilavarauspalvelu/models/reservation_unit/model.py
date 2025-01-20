@@ -42,6 +42,7 @@ if TYPE_CHECKING:
     )
 
     from .actions import ReservationUnitActions
+    from .validators import ReservationUnitValidator
 
 
 __all__ = [
@@ -303,11 +304,24 @@ class ReservationUnit(models.Model):
 
     @cached_property
     def actions(self) -> ReservationUnitActions:
+        """Actions that can be executed on a ReservationUnit."""
         # Import actions inline to defer loading them.
         # This allows us to avoid circular imports.
         from .actions import ReservationUnitActions
 
         return ReservationUnitActions(self)
+
+    @cached_property
+    def validator(self) -> ReservationUnitValidator:
+        """
+        Validation logic that requires access to a ReservationUnit instance,
+        e.g. for update, delete, or validation of another model.
+        """
+        # Import actions inline to defer loading them.
+        # This allows us to avoid circular imports.
+        from .validators import ReservationUnitValidator
+
+        return ReservationUnitValidator(self)
 
     @lookup_property(skip_codegen=True)
     def active_pricing_price() -> Decimal | None:
@@ -328,7 +342,7 @@ class ReservationUnit(models.Model):
         return self.pricings.active().values_list("highest_price", flat=True).first()
 
     @lookup_property
-    def publishing_state() -> str:
+    def publishing_state() -> ReservationUnitPublishingState:
         """State indicating the publishing status of the reservation unit."""
         case = models.Case(
             # Reservation Unit has been archived.

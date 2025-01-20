@@ -73,6 +73,53 @@ class ReservationQuerySet(models.QuerySet):
             end__date__gte=period_start,
         )
 
+    def overlapping_reservations(
+        self,
+        reservation_unit: ReservationUnit,
+        begin: datetime.datetime,
+        end: datetime.datetime,
+        *,
+        buffer_time_before: datetime.timedelta | None = None,
+        buffer_time_after: datetime.timedelta | None = None,
+    ) -> Self:
+        """
+        All reservations that are going to occur in the given reservation unit
+        that overlap with a period, even partially.
+        """
+        begin = begin.astimezone(datetime.UTC)
+        end = end.astimezone(datetime.UTC)
+
+        if buffer_time_before is None:
+            buffer_time_before = reservation_unit.actions.get_actual_before_buffer(begin)
+        if buffer_time_after is None:
+            buffer_time_after = reservation_unit.actions.get_actual_after_buffer(end)
+
+        qs = (
+            self.with_buffered_begin_and_end()
+            .going_to_occur()
+            .filter(
+                # In any reservation unit related through the reservation unit hierarchy
+                models.Q(reservation_units__in=reservation_unit.actions.reservation_units_with_common_hierarchy),
+            )
+        )
+
+        return qs.filter(
+            models.Case(
+                # Don't account for buffers on blocked reservations
+                models.When(
+                    type=ReservationTypeChoice.BLOCKED,
+                    then=models.Q(end__gt=begin, begin__lt=end),
+                ),
+                default=(
+                    # Existing reservations (with buffers) overlap the given period (without buffers)
+                    (models.Q(buffered_end__gt=begin) & models.Q(buffered_begin__lt=end))
+                    # The given period (with buffers) overlap the existing reservations (without buffers)
+                    | (models.Q(end__gt=begin - buffer_time_before) & models.Q(begin__lt=end + buffer_time_after))
+                ),
+                output_field=models.BooleanField(),
+            ),
+        )
+
     def going_to_occur(self) -> Self:
         return self.filter(state__in=ReservationStateChoice.states_going_to_occur)
 
