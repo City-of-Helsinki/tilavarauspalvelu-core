@@ -4,7 +4,6 @@ import datetime
 import math
 from typing import TYPE_CHECKING
 
-from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.exceptions import FirstReservableTimeError
 from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import (
     override_reservable_with_closed_time_spans,
@@ -199,7 +198,7 @@ class ReservableTimeSpanFirstReservableTimeHelper:
           - A new reservation must start at 11:15, 12:45, 14:15, 15:45 etc.
         """
         reservation_unit = self.parent.reservation_unit
-        interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
+        interval_minutes = reservation_unit.actions.start_interval_minutes
 
         time_span.round_start_time_to_next_minute()
 
