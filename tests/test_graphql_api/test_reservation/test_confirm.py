@@ -118,7 +118,8 @@ def test_reservation__confirm__fails_if_state_is_not_created(graphql):
     data = get_confirm_data(reservation)
     response = graphql(CONFIRM_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation cannot be changed anymore."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot be changed anymore."]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.DENIED
@@ -195,7 +196,8 @@ def test_reservation__confirm__fails_if_any_required_field_are_missing(graphql):
     data = get_confirm_data(reservation)
     response = graphql(CONFIRM_MUTATION, input_data=data)
 
-    assert response.error_message() == "Value for required field reserveeEmail is missing."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Value for required field 'reservee_email' is missing."]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
@@ -291,64 +293,12 @@ def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
     data = get_confirm_data(reservation)
     response = graphql(CONFIRM_MUTATION, input_data=data)
 
-    assert response.error_message() == "Upstream service call failed. Unable to confirm the reservation."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Upstream service call failed. Unable to confirm the reservation."]
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CREATED
     assert PaymentOrder.objects.count() == 0
-
-
-def test_reservation__confirm__use_non_default_payment_type(graphql):
-    payment_type_1 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.ON_SITE.value)
-    payment_type_2 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.INVOICE.value)
-
-    reservation = ReservationFactory.create_for_confirmation(reservation_units__payment_types=None)
-
-    reservation_unit = reservation.reservation_units.first()
-    reservation_unit.payment_types.add(payment_type_1, payment_type_2)
-
-    graphql.login_with_superuser()
-    data = get_confirm_data(reservation, paymentType=PaymentType.ON_SITE.value)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation.refresh_from_db()
-    assert reservation.state == ReservationStateChoice.CONFIRMED
-
-
-def test_reservation__confirm__does_not_allow_unsupported_payment_type(graphql):
-    reservation = ReservationFactory.create_for_confirmation()
-
-    graphql.login_with_superuser()
-    data = get_confirm_data(reservation, paymentType=PaymentType.ONLINE.value)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
-
-    assert response.error_message() == "Reservation unit does not support ONLINE payment type. Allowed values: ON_SITE"
-
-    reservation.refresh_from_db()
-    assert reservation.state == ReservationStateChoice.CREATED
-
-
-@patch_method(VerkkokauppaAPIClient.create_order)
-def test_reservation__confirm__allows_unsupported_payment_type_with_zero_price(graphql):
-    reservation = ReservationFactory.create_for_confirmation(
-        reservation_units__payment_types__code=PaymentType.INVOICE,
-        reservation_units__pricings__lowest_price=0,
-        reservation_units__pricings__highest_price=0,
-        price=Decimal(0),
-    )
-
-    graphql.login_with_superuser()
-    data = get_confirm_data(reservation, paymentType=PaymentType.ONLINE.value)
-    response = graphql(CONFIRM_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation.refresh_from_db()
-    assert reservation.state == ReservationStateChoice.CONFIRMED
-
-    assert VerkkokauppaAPIClient.create_order.called is False
 
 
 def test_reservation__confirm__default_payment_type__on_site(graphql):
@@ -426,7 +376,10 @@ def test_reservation__confirm__cannot_confirm_if_order_exists(graphql):
     data = get_confirm_data(reservation)
     response = graphql(CONFIRM_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation cannot be changed anymore because it is attached to a payment order"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "Reservation cannot be changed anymore because it is attached to a payment order"
+    ]
 
 
 def test_reservation__confirm__order_not_created_when_price_is_zero(graphql):
@@ -478,7 +431,8 @@ def test_reservation__confirm__with_price_requires_payment_product(graphql):
     data = get_confirm_data(reservation)
     response = graphql(CONFIRM_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation unit is missing payment product"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation unit is missing payment product"]
 
 
 def test_reservation__confirm__without_price_and_with_free_pricing_does_not_require_payment_product(graphql):
