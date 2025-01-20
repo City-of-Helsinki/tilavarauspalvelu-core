@@ -44,7 +44,7 @@ def test_reservation_unit__check_reservation_overlap__no_reservations_no_overlap
     begin = local_datetime()
     end = begin + datetime.timedelta(minutes=120)
 
-    assert not res_unit_parent.actions.check_reservation_overlap(begin, end)
+    assert not res_unit_parent.actions.has_overlapping_reservations(begin, end)
 
 
 def test_reservation_unit__check_reservation_overlap__same_space__same_time__overlaps(res_unit_parent):
@@ -60,7 +60,7 @@ def test_reservation_unit__check_reservation_overlap__same_space__same_time__ove
 
     ReservationUnitHierarchy.refresh()
 
-    assert res_unit_parent.actions.check_reservation_overlap(begin, end)
+    assert res_unit_parent.actions.has_overlapping_reservations(begin, end)
 
 
 def test_reservation_unit__check_reservation_overlap__child__same_time__overlaps(
@@ -79,7 +79,7 @@ def test_reservation_unit__check_reservation_overlap__child__same_time__overlaps
 
     ReservationUnitHierarchy.refresh()
 
-    assert res_unit_parent.actions.check_reservation_overlap(begin, end)
+    assert res_unit_parent.actions.has_overlapping_reservations(begin, end)
 
 
 def test_reservation_unit__check_reservation_overlap__sibling__same_time__does_not_overlap(
@@ -95,7 +95,7 @@ def test_reservation_unit__check_reservation_overlap__sibling__same_time__does_n
         end=end,
         state=ReservationStateChoice.CREATED,
     )
-    assert not res_unit_child_2.actions.check_reservation_overlap(begin, end)
+    assert not res_unit_child_2.actions.has_overlapping_reservations(begin, end)
 
 
 def test_reservation_unit__check_reservation_overlap__same_space__partly_same_time__overlaps(
@@ -114,7 +114,7 @@ def test_reservation_unit__check_reservation_overlap__same_space__partly_same_ti
 
     ReservationUnitHierarchy.refresh()
 
-    assert res_unit_parent.actions.check_reservation_overlap(begin, end)
+    assert res_unit_parent.actions.has_overlapping_reservations(begin, end)
 
 
 def test_reservation_unit__check_reservation_overlap__child__partly_same_time__overlaps(
@@ -133,7 +133,7 @@ def test_reservation_unit__check_reservation_overlap__child__partly_same_time__o
 
     ReservationUnitHierarchy.refresh()
 
-    assert res_unit_parent.actions.check_reservation_overlap(begin, end)
+    assert res_unit_parent.actions.has_overlapping_reservations(begin, end)
 
 
 def test_reservation_unit__check_reservation_overlap__child_of_child__same_time__overlaps(
@@ -152,7 +152,7 @@ def test_reservation_unit__check_reservation_overlap__child_of_child__same_time_
 
     ReservationUnitHierarchy.refresh()
 
-    assert res_unit_parent.actions.check_reservation_overlap(begin, end)
+    assert res_unit_parent.actions.has_overlapping_reservations(begin, end)
 
 
 def test_reservation_unit__check_reservation_overlap__child_of_sibling__same_time__does_not_overlap(
@@ -168,7 +168,7 @@ def test_reservation_unit__check_reservation_overlap__child_of_sibling__same_tim
         end=end,
         state=ReservationStateChoice.CREATED,
     )
-    assert not res_unit_child_1.actions.check_reservation_overlap(begin, end)
+    assert not res_unit_child_1.actions.has_overlapping_reservations(begin, end)
 
 
 def test_reservation_unit__check_reservation_overlap__child_parent__same_time__overlaps(
@@ -187,4 +187,4 @@ def test_reservation_unit__check_reservation_overlap__child_parent__same_time__o
 
     ReservationUnitHierarchy.refresh()
 
-    assert res_unit_child_2_child.actions.check_reservation_overlap(begin, end)
+    assert res_unit_child_2_child.actions.has_overlapping_reservations(begin, end)
