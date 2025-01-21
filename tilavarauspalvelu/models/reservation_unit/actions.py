@@ -305,6 +305,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             .values("start_datetime", "end_datetime")
         )
 
+        min_duration = self.reservation_unit.min_reservation_duration or datetime.timedelta()
         interval_minutes = self.reservation_unit.actions.start_interval_minutes
         interval_timedelta = datetime.timedelta(minutes=interval_minutes)
 
@@ -325,7 +326,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
             while start_datetime < end_datetime:
                 # Don't include times at the end timespans that are too small
-                if end_datetime - start_datetime >= interval_timedelta:  # TODO: Should be `min_duration`?
+                if end_datetime - start_datetime >= min_duration:
                     possible_start_times.add(start_datetime.time())
 
                 start_datetime += interval_timedelta
@@ -342,7 +343,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
         possible_start_times: set[datetime.time] = set()
         while start_datetime < end_datetime:
-            possible_start_times.add(start_datetime.time())  # TODO: Validate `min_duration`?
+            possible_start_times.add(start_datetime.time())
             start_datetime += interval_timedelta
 
         return possible_start_times
