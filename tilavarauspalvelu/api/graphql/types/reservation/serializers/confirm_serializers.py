@@ -9,7 +9,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
@@ -99,7 +99,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
             return PaymentOrder.objects.create(
                 payment_type=payment_type,
                 status=OrderStatus.PAID_MANUALLY,
-                language=self.instance.reservee_language or Language.FI,
+                language=self.instance.user.get_preferred_language(),
                 price_net=self.instance.price_net,
                 price_vat=self.instance.price_vat_amount,
                 price_total=self.instance.price,
@@ -111,7 +111,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         return PaymentOrder.objects.create(
             payment_type=payment_type,
             status=OrderStatus.DRAFT,
-            language=self.instance.reservee_language or Language.FI,
+            language=self.instance.user.get_preferred_language(),
             price_net=self.instance.price_net,
             price_vat=self.instance.price_vat_amount,
             price_total=self.instance.price,
