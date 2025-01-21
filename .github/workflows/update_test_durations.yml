@@ -1,0 +1,74 @@
+name: "Create a new PR to update test durations"
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run on the first day of every month
+    - cron: "0 0 1 * *"
+
+env:
+  POETRY_VERSION: 2.0.1
+  PYTHON_VERSION: 3.13
+
+jobs:
+  update-test-durations:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:13-3.3-alpine
+        env:
+          POSTGRES_USER: tvp
+          POSTGRES_PASSWORD: tvp
+          POSTGRES_DB: tvp
+          DEBUG: true
+          SECRET_KEY: build_secret
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Set up python"
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: "Install Poetry and project dependencies"
+        uses: ./.github/actions/poetry
+        with:
+          poetry-version: ${{ env.POETRY_VERSION }}
+          python-version: ${{ steps.setup-python.outputs.python-version }}
+
+      - name: "Run pytest with coverage"
+        run: poetry run pytest --disable-warnings --store-durations
+        env:
+          DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
+
+      - name: "Create Pull Request"
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "[github-actions] Update test durations"
+          commit-message: "Update test durations"
+          branch: update-test-durations
+          delete-branch: true
+          labels: github_actions
