@@ -137,6 +137,7 @@ export function SeasonalSearchForm({
         </SingleLabelInputGroup>
         <ControlledSelect
           multiselect
+          enableSearch
           name="reservationUnitTypes"
           control={control}
           options={reservationUnitTypeOptions}
@@ -144,6 +145,7 @@ export function SeasonalSearchForm({
         />
         <ControlledSelect
           multiselect
+          enableSearch
           name="unit"
           control={control}
           options={unitOptions}
@@ -151,6 +153,7 @@ export function SeasonalSearchForm({
         />
         <ControlledSelect
           multiselect
+          enableSearch
           name="purposes"
           control={control}
           options={purposeOptions}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Option, Select } from "hds-react";
+import { Option, SearchResult, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import {
   type Control,
@@ -27,6 +27,7 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   helper?: string;
   multiselect?: boolean;
   disabled?: boolean;
+  enableSearch?: boolean;
   afterChange?: (
     value: string | number | Array<string | number> | undefined
   ) => void;
@@ -50,6 +51,7 @@ export function ControlledSelect<T extends FieldValues>({
   multiselect,
   disabled,
   afterChange,
+  enableSearch,
 }: SelectProps<T>): JSX.Element {
   const { t, i18n } = useTranslation(["common"]);
   const language = convertLanguageCode(i18n.language);
@@ -101,6 +103,17 @@ export function ControlledSelect<T extends FieldValues>({
     return opts.filter((o) => o.value === val).map(convertOptionToHDS);
   }
 
+  const handleSearch = (val: string) => {
+    const opts = options.filter((o) =>
+      o.label.toLowerCase().includes(val.toLowerCase())
+    );
+    const res: SearchResult = {
+      options: opts.map(convertOptionToHDS),
+      groups: undefined,
+    };
+    return Promise.resolve(res);
+  };
+
   return (
     <Select
       style={style}
@@ -109,6 +122,7 @@ export function ControlledSelect<T extends FieldValues>({
       required={required}
       multiSelect={multiselect}
       noTags
+      onSearch={enableSearch ? handleSearch : undefined}
       texts={{
         label,
         placeholder: placeholder ?? t("common:select"),

@@ -167,6 +167,8 @@ export function SingleSearchForm({
       <Filters>
         <ControlledSelect
           multiselect
+          clearable
+          enableSearch
           name="purposes"
           control={control}
           options={purposeOptions}
@@ -174,6 +176,8 @@ export function SingleSearchForm({
         />
         <ControlledSelect
           multiselect
+          clearable
+          enableSearch
           name="unit"
           control={control}
           options={unitOptions}
@@ -181,6 +185,8 @@ export function SingleSearchForm({
         />
         <ControlledSelect
           multiselect
+          clearable
+          enableSearch
           name="equipments"
           control={control}
           options={equipmentsOptions}
@@ -268,6 +274,7 @@ export function SingleSearchForm({
             multiselect
             control={control}
             options={unitTypeOptions}
+            enableSearch
             label={t("searchForm:typeLabel")}
           />
           <TextInput
