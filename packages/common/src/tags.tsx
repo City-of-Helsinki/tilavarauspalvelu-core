@@ -8,9 +8,7 @@ export const FilterTags = styled(Flex).attrs({
   $direction: "row",
   $wrap: "wrap",
   $alignItems: "center",
-})`
-  flex-grow: 1;
-`;
+})``;
 
 export const StyledTag = styled(Tag)`
   --tag-font-size: var(--fontsize-body-s);

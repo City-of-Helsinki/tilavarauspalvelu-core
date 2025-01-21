@@ -18,6 +18,7 @@ export const HR = styled.hr`
 // Required for overflow to work
 const Wrapper = styled.div`
   display: grid;
+  flex-grow: 1;
 `;
 
 const StyledTable = styled(Table)<TableWrapperProps>`
