@@ -1039,6 +1039,8 @@ def test_get_context__reservation_requires_payment__sv():
 @pytest.mark.django_db
 @freeze_time("2024-01-01")
 def test_get_context_for_seasonal_reservation_cancelled_single__en(email_reservation):
+    section = email_reservation.actions.get_application_section()
+
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_cancelled_single(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -1048,9 +1050,12 @@ def test_get_context_for_seasonal_reservation_cancelled_single__en(email_reserva
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             cancel_reason="[PERUUTUKSEN SYY]",
+            application_id=section.application_id,
+            application_section_id=section.id,
             language="en",
         )
 
+    details_url = f"https://fake.varaamo.hel.fi/en/applications/{section.application_id}/view?tab=reservations&section={section.id}"
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "The space reservation included in your seasonal booking has been cancelled",
@@ -1062,16 +1067,11 @@ def test_get_context_for_seasonal_reservation_cancelled_single__en(email_reserva
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "check_booking_details_url": f"{details_url}",
+        "check_booking_details_url_html": f'<a href="{details_url}">{details_url}</a>',
     }
 
     with TranslationsFromPOFiles():
-        # Add application and section ID to the url, which are always taken from actual instances to the context
-        section = email_reservation.actions.get_application_section()
-        old_url = context["check_booking_details_url"]
-        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
-        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
-        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
-
         assert context == get_context_for_seasonal_reservation_cancelled_single(
             reservation=email_reservation,
             language="en",
@@ -1089,6 +1089,8 @@ def test_get_context_for_seasonal_reservation_cancelled_single__fi():
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             cancel_reason="[PERUUTUKSEN SYY]",
+            application_id=None,
+            application_section_id=None,
             language="fi",
         )
 
@@ -1119,6 +1121,8 @@ def test_get_context_for_seasonal_reservation_cancelled_single__sv():
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             cancel_reason="[PERUUTUKSEN SYY]",
+            application_id=None,
+            application_section_id=None,
             language="sv",
         )
 
@@ -1144,6 +1148,8 @@ def test_get_context_for_seasonal_reservation_cancelled_single__sv():
 @pytest.mark.django_db
 @freeze_time("2024-01-01")
 def test_get_context_for_seasonal_reservation_modified_series__en(email_reservation):
+    section = email_reservation.actions.get_application_section()
+
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_modified_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -1151,9 +1157,12 @@ def test_get_context_for_seasonal_reservation_modified_series__en(email_reservat
             time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
+            application_id=section.application_id,
+            application_section_id=section.id,
             language="en",
         )
 
+        details_url = f"https://fake.varaamo.hel.fi/en/applications/{section.application_id}/view?tab=reservations&section={section.id}"
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "The time of the space reservation included in your seasonal booking has changed",
@@ -1169,16 +1178,11 @@ def test_get_context_for_seasonal_reservation_modified_series__en(email_reservat
         **BASE_TEMPLATE_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "check_booking_details_url": f"{details_url}",
+        "check_booking_details_url_html": f'<a href="{details_url}">{details_url}</a>',
     }
 
     with TranslationsFromPOFiles():
-        # Add application and section ID to the url, which are always taken from actual instances to the context
-        section = email_reservation.actions.get_application_section()
-        old_url = context["check_booking_details_url"]
-        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
-        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
-        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
-
         assert context == get_context_for_seasonal_reservation_modified_series(
             reservation_series=email_reservation.recurring_reservation,
             language="en",
@@ -1194,6 +1198,8 @@ def test_get_context_for_seasonal_reservation_modified_series__fi():
             time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
+            application_id=None,
+            application_section_id=None,
             language="fi",
         )
 
@@ -1224,6 +1230,8 @@ def test_get_context_for_seasonal_reservation_modified_series__sv():
             time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
+            application_id=None,
+            application_section_id=None,
             language="sv",
         )
 
@@ -1251,6 +1259,8 @@ def test_get_context_for_seasonal_reservation_modified_series__sv():
 @pytest.mark.django_db
 @freeze_time("2024-01-01")
 def test_get_context_for_seasonal_reservation_modified_single__en(email_reservation):
+    section = email_reservation.actions.get_application_section()
+
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_modified_single(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -1259,9 +1269,12 @@ def test_get_context_for_seasonal_reservation_modified_single__en(email_reservat
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
+            application_id=section.application_id,
+            application_section_id=section.id,
             language="en",
         )
 
+    details_url = f"https://fake.varaamo.hel.fi/en/applications/{section.application_id}/view?tab=reservations&section={section.id}"
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "The time of the space reservation included in your seasonal booking has changed",
@@ -1271,16 +1284,11 @@ def test_get_context_for_seasonal_reservation_modified_single__en(email_reservat
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "check_booking_details_url": f"{details_url}",
+        "check_booking_details_url_html": f'<a href="{details_url}">{details_url}</a>',
     }
 
     with TranslationsFromPOFiles():
-        # Add application and section ID to the url, which are always taken from actual instances to the context
-        section = email_reservation.actions.get_application_section()
-        old_url = context["check_booking_details_url"]
-        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
-        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
-        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
-
         assert context == get_context_for_seasonal_reservation_modified_single(
             reservation=email_reservation,
             language="en",
@@ -1297,6 +1305,8 @@ def test_get_context_for_seasonal_reservation_modified_single__fi():
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
+            application_id=None,
+            application_section_id=None,
             language="fi",
         )
 
@@ -1322,6 +1332,8 @@ def test_get_context_for_seasonal_reservation_modified_single__sv():
             unit_location="Test Street, City",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
+            application_id=None,
+            application_section_id=None,
             language="sv",
         )
 
@@ -1343,6 +1355,8 @@ def test_get_context_for_seasonal_reservation_modified_single__sv():
 @pytest.mark.django_db
 @freeze_time("2024-01-01")
 def test_get_context_for_seasonal_reservation_rejected_series__en(email_reservation):
+    section = email_reservation.actions.get_application_section()
+
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_rejected_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -1350,10 +1364,13 @@ def test_get_context_for_seasonal_reservation_rejected_series__en(email_reservat
             time_value="12:00:00-14:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
-            language="en",
             rejection_reason="[HYLKÄYKSEN SYY]",
+            application_id=section.application_id,
+            application_section_id=section.id,
+            language="en",
         )
 
+    details_url = f"https://fake.varaamo.hel.fi/en/applications/{section.application_id}/view?tab=reservations&section={section.id}"
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Your seasonal booking has been cancelled",
@@ -1371,18 +1388,13 @@ def test_get_context_for_seasonal_reservation_rejected_series__en(email_reservat
         **BASE_TEMPLATE_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "check_booking_details_url": f"{details_url}",
+        "check_booking_details_url_html": f'<a href="{details_url}">{details_url}</a>',
     }
 
     email_reservation.state = ReservationStateChoice.DENIED
     email_reservation.save()
     with TranslationsFromPOFiles():
-        # Add application and section ID to the url, which are always taken from actual instances to the context
-        section = email_reservation.actions.get_application_section()
-        old_url = context["check_booking_details_url"]
-        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
-        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
-        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
-
         assert context == get_context_for_seasonal_reservation_rejected_series(
             reservation_series=email_reservation.recurring_reservation,
             language="en",
@@ -1399,6 +1411,8 @@ def test_get_context_for_seasonal_reservation_rejected_series__fi():
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             rejection_reason="[HYLKÄYKSEN SYY]",
+            application_id=None,
+            application_section_id=None,
             language="fi",
         )
 
@@ -1432,6 +1446,8 @@ def test_get_context_for__seasonal_reservation_rejected_series_sv():
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             rejection_reason="[HYLKÄYKSEN SYY]",
+            application_id=None,
+            application_section_id=None,
             language="sv",
         )
 
@@ -1461,6 +1477,8 @@ def test_get_context_for__seasonal_reservation_rejected_series_sv():
 @pytest.mark.django_db
 @freeze_time("2024-01-01")
 def test_get_context_for_seasonal_reservation_rejected_single__en(email_reservation):
+    section = email_reservation.actions.get_application_section()
+
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_rejected_single(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -1470,9 +1488,12 @@ def test_get_context_for_seasonal_reservation_rejected_single__en(email_reservat
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="[HYLKÄYKSEN SYY]",
+            application_id=section.application_id,
+            application_section_id=section.id,
             language="en",
         )
 
+    details_url = f"https://fake.varaamo.hel.fi/en/applications/{section.application_id}/view?tab=reservations&section={section.id}"
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "The space reservation included in your seasonal booking has been cancelled",
@@ -1484,16 +1505,11 @@ def test_get_context_for_seasonal_reservation_rejected_single__en(email_reservat
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "check_booking_details_url": f"{details_url}",
+        "check_booking_details_url_html": f'<a href="{details_url}">{details_url}</a>',
     }
 
     with TranslationsFromPOFiles():
-        # Add application and section ID to the url, which are always taken from actual instances to the context
-        section = email_reservation.actions.get_application_section()
-        old_url = context["check_booking_details_url"]
-        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
-        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
-        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
-
         assert context == get_context_for_seasonal_reservation_rejected_single(
             reservation=email_reservation,
             language="en",
@@ -1511,6 +1527,8 @@ def test_get_context_for_seasonal_reservation_rejected_single__fi():
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="[HYLKÄYKSEN SYY]",
+            application_id=None,
+            application_section_id=None,
             language="fi",
         )
 
@@ -1539,6 +1557,8 @@ def test_get_context_for_seasonal_reservation_rejected_single__sv():
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="[HYLKÄYKSEN SYY]",
+            application_id=None,
+            application_section_id=None,
             language="sv",
         )
 

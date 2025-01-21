@@ -22,6 +22,7 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_reservation_requires_payment,
     get_context_for_seasonal_reservation_cancelled_single,
     get_context_for_seasonal_reservation_modified_series,
+    get_context_for_seasonal_reservation_modified_single,
     get_context_for_seasonal_reservation_rejected_series,
     get_context_for_seasonal_reservation_rejected_single,
     get_context_for_staff_notification_reservation_made,
@@ -230,6 +231,8 @@ class ApplicationReceivedEmailTemplateTesterForm(BaseEmailTemplateForm):
 class ApplicationSectionCancelledTemplateTesterForm(EmailRecipientFormMixin, BaseEmailTemplateForm):
     weekday_value = forms.CharField(initial="Maanantai")
     time_value = forms.CharField(initial="13:00-15:00")
+    application_id = forms.IntegerField(initial=0, widget=number_widget)
+    application_section_id = forms.IntegerField(initial=0, widget=number_widget)
     application_section_name = forms.CharField(initial="[HAKEMUKSEN OSAN NIMI]")
     application_round_name = forms.CharField(initial="[KAUSIVARAUSKIERROKSEN NIMI]")
     cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
@@ -240,6 +243,8 @@ class ApplicationSectionCancelledTemplateTesterForm(EmailRecipientFormMixin, Bas
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             weekday_value=self.cleaned_data["weekday_value"],
             time_value=self.cleaned_data["time_value"],
+            application_id=self.cleaned_data["application_id"],
+            application_section_id=self.cleaned_data["application_section_id"],
             application_section_name=self.cleaned_data["application_section_name"],
             application_round_name=self.cleaned_data["application_round_name"],
             cancel_reason=self.cleaned_data["cancel_reason"],
@@ -440,6 +445,8 @@ class ReservationRequiresPaymentEmailTemplateTesterForm(
 
 class SeasonalReservationCancelledSingleTemplateTesterForm(ReservationBaseForm):
     reservation_id = forms.IntegerField(initial=0, widget=number_widget)
+    application_id = forms.IntegerField(initial=0, widget=number_widget)
+    application_section_id = forms.IntegerField(initial=0, widget=number_widget)
     cancel_reason = forms.CharField(initial="[PERUUTUKSEN SYY]", widget=text_widget)
 
     @classmethod
@@ -452,6 +459,8 @@ class SeasonalReservationCancelledSingleTemplateTesterForm(ReservationBaseForm):
         return get_context_for_seasonal_reservation_cancelled_single(
             **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
+            application_id=self.cleaned_data["application_id"],
+            application_section_id=self.cleaned_data["application_section_id"],
             cancel_reason=self.cleaned_data["cancel_reason"],
         )
 
@@ -459,6 +468,8 @@ class SeasonalReservationCancelledSingleTemplateTesterForm(ReservationBaseForm):
 class SeasonalReservationModifiedSeriesTemplateTesterForm(EmailRecipientFormMixin, BaseEmailTemplateForm):
     weekday_value = forms.CharField(initial="Maanantai")
     time_value = forms.CharField(initial="13:00-15:00")
+    application_id = forms.IntegerField(initial=0, widget=number_widget)
+    application_section_id = forms.IntegerField(initial=0, widget=number_widget)
     application_section_name = forms.CharField(initial="[HAKEMUKSEN OSAN NIMI]")
     application_round_name = forms.CharField(initial="[KAUSIVARAUSKIERROKSEN NIMI]")
 
@@ -468,6 +479,8 @@ class SeasonalReservationModifiedSeriesTemplateTesterForm(EmailRecipientFormMixi
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             weekday_value=self.cleaned_data["weekday_value"],
             time_value=self.cleaned_data["time_value"],
+            application_id=self.cleaned_data["application_id"],
+            application_section_id=self.cleaned_data["application_section_id"],
             application_section_name=self.cleaned_data["application_section_name"],
             application_round_name=self.cleaned_data["application_round_name"],
         )
@@ -475,6 +488,8 @@ class SeasonalReservationModifiedSeriesTemplateTesterForm(EmailRecipientFormMixi
 
 class SeasonalReservationModifiedSingleTemplateTesterForm(ReservationBaseForm):
     reservation_id = forms.IntegerField(initial=0, widget=number_widget)
+    application_id = forms.IntegerField(initial=0, widget=number_widget)
+    application_section_id = forms.IntegerField(initial=0, widget=number_widget)
 
     @classmethod
     def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
@@ -483,15 +498,19 @@ class SeasonalReservationModifiedSingleTemplateTesterForm(ReservationBaseForm):
         }
 
     def to_context(self) -> EmailContext:
-        return get_context_for_seasonal_reservation_cancelled_single(
+        return get_context_for_seasonal_reservation_modified_single(
             **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
+            application_id=self.cleaned_data["application_id"],
+            application_section_id=self.cleaned_data["application_section_id"],
         )
 
 
 class SeasonalReservationRejectedSeriesTemplateTesterForm(EmailRecipientFormMixin, BaseEmailTemplateForm):
     weekday_value = forms.CharField(initial="Maanantai")
     time_value = forms.CharField(initial="13:00-15:00")
+    application_id = forms.IntegerField(initial=0, widget=number_widget)
+    application_section_id = forms.IntegerField(initial=0, widget=number_widget)
     application_section_name = forms.CharField(initial="[HAKEMUKSEN OSAN NIMI]")
     application_round_name = forms.CharField(initial="[KAUSIVARAUSKIERROKSEN NIMI]")
     rejection_reason = forms.CharField(initial="[HYLKÄYKSEN SYY]", widget=text_widget)
@@ -502,6 +521,8 @@ class SeasonalReservationRejectedSeriesTemplateTesterForm(EmailRecipientFormMixi
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             weekday_value=self.cleaned_data["weekday_value"],
             time_value=self.cleaned_data["time_value"],
+            application_id=self.cleaned_data["application_id"],
+            application_section_id=self.cleaned_data["application_section_id"],
             application_section_name=self.cleaned_data["application_section_name"],
             application_round_name=self.cleaned_data["application_round_name"],
             rejection_reason=self.cleaned_data["rejection_reason"],
@@ -510,6 +531,8 @@ class SeasonalReservationRejectedSeriesTemplateTesterForm(EmailRecipientFormMixi
 
 class SeasonalReservationRejectedSingleTemplateTesterForm(ReservationBaseForm):
     reservation_id = forms.IntegerField(initial=0, widget=number_widget)
+    application_id = forms.IntegerField(initial=0, widget=number_widget)
+    application_section_id = forms.IntegerField(initial=0, widget=number_widget)
     rejection_reason = forms.CharField(initial="[HYLKÄYKSEN SYY]", widget=text_widget)
 
     @classmethod
@@ -522,6 +545,8 @@ class SeasonalReservationRejectedSingleTemplateTesterForm(ReservationBaseForm):
         return get_context_for_seasonal_reservation_rejected_single(
             **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
+            application_id=self.cleaned_data["application_id"],
+            application_section_id=self.cleaned_data["application_section_id"],
             rejection_reason=self.cleaned_data["rejection_reason"],
         )
 

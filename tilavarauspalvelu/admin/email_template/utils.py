@@ -102,6 +102,8 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 application_section_name=application_section_name,
                 application_round_name=application_round_name,
                 cancel_reason=cancel_reason,
+                application_id=1234,
+                application_section_id=5678,
                 language=language,
             )
 
@@ -226,6 +228,8 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 begin_datetime=begin,
                 end_datetime=end,
                 cancel_reason=cancel_reason,
+                application_id=1234,
+                application_section_id=5678,
                 language=language,
             )
         case EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES:
@@ -235,6 +239,8 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 time_value=time_value,
                 application_section_name=application_section_name,
                 application_round_name=application_round_name,
+                application_id=1234,
+                application_section_id=5678,
                 language=language,
             )
         case EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE:
@@ -245,6 +251,8 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 unit_location=unit_location,
                 begin_datetime=begin,
                 end_datetime=end,
+                application_id=1234,
+                application_section_id=5678,
                 language=language,
             )
         case EmailType.SEASONAL_RESERVATION_REJECTED_SERIES:
@@ -255,6 +263,8 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 application_section_name=application_section_name,
                 application_round_name=application_round_name,
                 rejection_reason=rejection_reason,
+                application_id=1234,
+                application_section_id=5678,
                 language=language,
             )
         case EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE:
@@ -266,6 +276,8 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 begin_datetime=begin,
                 end_datetime=end,
                 rejection_reason=rejection_reason,
+                application_id=1234,
+                application_section_id=5678,
                 language=language,
             )
 
