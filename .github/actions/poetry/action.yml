@@ -4,6 +4,7 @@ description: "Install Poetry and project dependencies"
 inputs:
   poetry-version:
     description: "Poetry version to use."
+    default: "2.0.1"
   python-version:
     description: "Python version to use."
 
