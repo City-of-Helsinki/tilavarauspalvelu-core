@@ -262,21 +262,19 @@ function ApplicationRoundScheduleDay(
       : "";
   return (
     <StyledApplicationRoundScheduleDay>
-      {/* eslint-disable react/no-unknown-property */}
-      <span test-dataid="application-round-time-slot__weekday">
+      <span data-testid="application-round-time-slot__weekday">
         {t(`common:weekDayLong.${fromMondayFirstUnsafe(weekday)}`)}
       </span>{" "}
       {closed ? (
-        <span test-dataid="application-round-time-slot__value">-</span>
+        <span data-testid="application-round-time-slot__value">-</span>
       ) : (
         reservableTimes && (
-          <span test-dataid="application-round-time-slot__value">
+          <span data-testid="application-round-time-slot__value">
             {reservableTimes[0] && timeSlotString(0)}
             {reservableTimes[1] && ` ${t("common:and")} ${timeSlotString(1)}`}
           </span>
         )
       )}
-      {/* eslint-enable react/no-unknown-property */}
     </StyledApplicationRoundScheduleDay>
   );
 }

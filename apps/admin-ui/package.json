@@ -46,7 +46,6 @@
     "lodash": "^4.17.21",
     "next": "15.1.5",
     "next-i18next": "^15.3.1",
-    "query-string": "9.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^4.0.13",
