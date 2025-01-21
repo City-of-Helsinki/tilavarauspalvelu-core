@@ -12,13 +12,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  POETRY_VERSION: 2.0.1
+  PYTHON_VERSION: 3.13
+
 jobs:
 
-  test:
-    name: "Run tests and SonarCloud scan"
+  checks:
+    name: "Check migrations and translations"
     runs-on: ubuntu-latest
-    env:
-      POETRY_VERSION: 2.0.0
 
     services:
       postgres:
@@ -52,48 +54,18 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
-        with:
-          # Disable shallow cloning to improve relevancy of reporting in SonarCloud
-          fetch-depth: 0
 
       - name: "Set up python"
         id: setup-python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: "Load cached poetry installation"
-        uses: actions/cache@v4
-        id: poetry-cache
+      - name: "Install Poetry and project dependencies"
+        uses: ./.github/actions/poetry
         with:
-          path: |
-            /home/runner/.local/share/pypoetry
-            /home/runner/.local/bin
-          key: cache-poetry-${{ env.POETRY_VERSION }}-python${{ steps.setup-python.outputs.python-version }}-v1
-
-      - name: "Install poetry"
-        if: steps.poetry-cache.outputs.cache-hit != 'true'
-        run: curl -sSL https://install.python-poetry.org | POETRY_VERSION=${{ env.POETRY_VERSION }} python - -y
-
-      - name: "Add poetry to PATH"
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: "Configure poetry"
-        run: poetry config virtualenvs.in-project true
-
-      - name: "Install additional libraries"
-        run: |
-          sudo apt-get update
-          sudo apt install -y --no-install-recommends gdal-bin gettext
-
-      - name: "Load cached poetry environment"
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: cache-venv-python${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-v1
-
-      - name: "Install dependencies"
-        run: poetry install
+          poetry-version: ${{ env.POETRY_VERSION }}
+          python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Test for migration issues"
         run: poetry run python manage.py makemigrations --check --no-color --no-input --dry-run
@@ -107,10 +79,107 @@ jobs:
           DJANGO_SETTINGS_ENVIRONMENT: CI
           DATABASE_URL: postgis://tvp:tvp@localhost:5432/tvp
 
+  test:
+    name: "Run tests"
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:13-3.3-alpine
+        env:
+          POSTGRES_USER: tvp
+          POSTGRES_PASSWORD: tvp
+          POSTGRES_DB: tvp
+          DEBUG: true
+          SECRET_KEY: build_secret
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 6379:6379
+
+    strategy:
+      matrix:
+        # Length must match "--splits" in test run.
+        group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Set up python"
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: "Install Poetry and project dependencies"
+        uses: ./.github/actions/poetry
+        with:
+          poetry-version: ${{ env.POETRY_VERSION }}
+          python-version: ${{ steps.setup-python.outputs.python-version }}
+
       - name: "Run pytest with coverage"
-        run: poetry run pytest --cov=. --cov-report=xml --cov-branch --disable-warnings
+        run: poetry run coverage run --branch -m pytest --disable-warnings --splits 12 --group ${{ matrix.group }}
         env:
           DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
+          COVERAGE_FILE: .coverage.${{ matrix.group }}
+
+      - name: "Upload coverage artefact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: cov-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ matrix.group }}
+          path: .coverage.${{ matrix.group }}
+          if-no-files-found: error
+          retention-days: 1
+          include-hidden-files: true
+          overwrite: true
+
+  sonarcloud:
+    needs: test
+    name: "SonarCloud scan"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+        with:
+          # Disable shallow cloning to improve relevancy of reporting in SonarCloud
+          fetch-depth: 0
+
+      - name: "Download coverage artefacts"
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cov-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-*
+          merge-multiple: true
+
+      - name: "Set up python"
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: "Install coverage"
+        run: pip install coverage
+
+      - name: "Combine coverage reports and generate XML report"
+        run: |
+          coverage combine
+          coverage xml
 
       # Without this workaround, SonarCloud reports a warning about an incorrect source path
       - name: "Override coverage report source path for SonarCloud"

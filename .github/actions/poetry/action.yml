@@ -1,0 +1,51 @@
+name: "Install Poetry and project dependencies"
+description: "Install Poetry and project dependencies"
+
+inputs:
+  poetry-version:
+    description: "Poetry version to use."
+  python-version:
+    description: "Python version to use."
+
+runs:
+  using: composite
+
+  steps:
+
+    - name: "Install additional libraries"
+      run: |
+        sudo apt-get update
+        sudo apt install -y --no-install-recommends gdal-bin gettext
+      shell: bash
+
+    - name: "Load cached poetry installation"
+      uses: actions/cache@v4
+      id: poetry-cache
+      with:
+        path: |
+          /home/runner/.local/share/pypoetry
+          /home/runner/.local/bin
+        key: cache-poetry-${{ inputs.poetry-version }}-python${{ inputs.python-version }}-v1
+
+    - name: "Install poetry"
+      if: steps.poetry-cache.outputs.cache-hit != 'true'
+      run: curl -sSL https://install.python-poetry.org | POETRY_VERSION=${{ inputs.poetry-version }} python - -y
+      shell: bash
+
+    - name: "Add poetry to PATH"
+      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+      shell: bash
+
+    - name: "Configure poetry"
+      run: poetry config virtualenvs.in-project true
+      shell: bash
+
+    - name: "Load cached poetry environment"
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: cache-venv-python${{ inputs.poetry-version }}-${{ hashFiles('**/poetry.lock') }}-v1
+
+    - name: "Install dependencies"
+      run: poetry install
+      shell: bash
