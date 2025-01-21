@@ -58,7 +58,7 @@ jobs:
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Run pytest with coverage"
-        run: poetry run pytest --disable-warnings --store-durations --splitting-algorithm least_duration
+        run: poetry run pytest --disable-warnings --store-durations
         env:
           DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
 
@@ -66,6 +66,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           title: "[github-actions] Update test durations"
+          body: "Update test durations file"
           commit-message: "Update test durations"
           branch: update-test-durations
           delete-branch: true

@@ -78,7 +78,7 @@ jobs:
           DATABASE_URL: postgis://tvp:tvp@localhost:5432/tvp
 
   test:
-    name: "Run tests"
+    name: "Run tests (${{ matrix.group }}/12)"
     runs-on: ubuntu-latest
 
     services:
@@ -178,14 +178,13 @@ jobs:
           coverage combine
           coverage xml
 
-      # Without this workaround, SonarCloud reports a warning about an incorrect source path
-      - name: "Override coverage report source path for SonarCloud"
-        run: sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
+#      # Without this workaround, SonarCloud reports a warning about an incorrect source path
+#      - name: "Override coverage report source path for SonarCloud"
+#        run: sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
 
       - name: "SonarCloud Scan"
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@v4
         # Skip analysis for all bots
         if: ${{ ! contains(fromJSON(vars.BOTS), github.event.pull_request.user.login) }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
