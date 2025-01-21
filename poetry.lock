@@ -2572,6 +2572,21 @@ docs = ["sphinx", "sphinx-rtd-theme"]
 testing = ["Django", "django-configurations (>=2.0)"]
 
 [[package]]
+name = "pytest-split"
+version = "0.10.0"
+description = "Pytest plugin which splits the test suite to equally sized sub suites based on test execution time."
+optional = false
+python-versions = "<4.0,>=3.8.1"
+groups = ["test"]
+files = [
+    {file = "pytest_split-0.10.0-py3-none-any.whl", hash = "sha256:466096b086a7147bcd423c6e6c2e57fc62af1c5ea2e256b4ed50fc030fc3dddc"},
+    {file = "pytest_split-0.10.0.tar.gz", hash = "sha256:adf80ba9fef7be89500d571e705b4f963dfa05038edf35e4925817e6b34ea66f"},
+]
+
+[package.dependencies]
+pytest = ">=5,<9"
+
+[[package]]
 name = "pytest-xdist"
 version = "3.6.1"
 description = "pytest xdist plugin for distributed testing, most importantly across multiple CPUs"
@@ -3430,4 +3445,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1)", "tox"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "f5b30ceea95cb3a6fe806299e58a0d59f60659e7dda6e55196bd83c65ea6fb4c"
+content-hash = "53d66cc79109fedb1c11888939a15d697d8c6e3dab8d6fbe87cefc0279705f57"

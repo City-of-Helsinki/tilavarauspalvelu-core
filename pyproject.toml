@@ -75,6 +75,7 @@ pypdf2 = "3.0.1"
 pytest = "8.3.4"
 pytest-cov = "6.0.0"
 pytest-django = "4.9.0"
+pytest-split = "0.10.0"
 pytest-xdist = "3.6.1"
 
 [tool.poetry.group.lint.dependencies]
@@ -461,21 +462,10 @@ filterwarnings = [
 ]
 
 [tool.coverage.run]
+branch = true
 source = [
-    "allocation/",
-    "applications/",
-    "email_notification/",
-    "merchants/",
-    "opening_hours/",
-    "permissions/",
-    "reservation_units/",
-    "reservations/",
-    "resources/",
-    "services/",
-    "spaces/",
-    "terms_of_use/",
+    "tilavarauspalvelu/",
     "config/",
-    "users/",
     "utils/",
 ]
 
@@ -486,6 +476,7 @@ omit = [
 ]
 exclude_also = [
     "if TYPE_CHECKING:",
+    "except ImportError:",
     "def __repr__",
     "def __str__",
 ]
