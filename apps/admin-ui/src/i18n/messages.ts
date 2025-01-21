@@ -1486,10 +1486,8 @@ const translations: ITranslations = {
         `Voit määrittää, kuinka monta  voimassaolevaa varausta käyttäjällä voi samanaikaisesti olla tähän varausyksikköön.
       Älä rajoita määrää tarpeettomasti. Väärinkäytösten ehkäisemiseksi suositus max 30/varausyksikkö. `,
       ],
-      introductionSettings: [
-        `Toiminnallisuus ei ole vielä käytössä.
-      Suositus:
-      jätä tyhjäksi`,
+      requireAdultReservee: [
+        "Valinta estää alle 18-vuotiasta tekemästä varausta tai hakemusta. Täysi-ikäisyys vaaditaan varauksen ja hakemuksen tekohetkellä.",
       ],
       handlingSettings: [
         `Voit valita kaikki varaukset käsiteltäviksi ennen hyväksymistä.
@@ -1597,6 +1595,7 @@ const translations: ITranslations = {
     requireReservationHandling: [
       "Haluan käsitellä kaikki varaukset. Varaukset tulee aina käsitellä - hyväksyä tai hylätä -luvatussa ajassa, usein kolmen arkipäivän kuluessa.",
     ],
+    requireAdultReserveeLabel: ["Varaajan on oltava täysi-ikäinen"],
     requireIntroductionLabel: ["Varausyksikkö vaatii pakollisen perehdytyksen"],
     surfaceAreaHelperText: ["Tilojen yhteenlaskettua alaa ei voi pienentää"],
     maxPersonsHelperText: [
@@ -1671,7 +1670,7 @@ const translations: ITranslations = {
     ],
     reservationSettings: ["Varauskalenterin ajastus"],
     handlingSettings: ["Käsittely"],
-    introductionSettings: ["Perehdytys"],
+    requireAdultReserveeSettings: ["Iän tarkistus"],
     bufferSettings: ["Varauksen tauko"],
     cancellationSettings: ["Varauksen peruutus"],
     reservationBegins: ["Avaa varauskalenteri alkaen"],

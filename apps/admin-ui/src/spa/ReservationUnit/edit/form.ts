@@ -377,7 +377,7 @@ export const ReservationUnitEditSchema = z
     reservationBeginsTime: z.string(),
     reservationEndsDate: z.string(),
     reservationEndsTime: z.string(),
-    requireIntroduction: z.boolean(),
+    requireAdultReservee: z.boolean(),
     requireReservationHandling: z.boolean(),
     reservationStartInterval: z.nativeEnum(ReservationStartInterval),
     canApplyFreeOfCharge: z.boolean(),
@@ -826,7 +826,7 @@ export function convertReservationUnit(
     reservationEndsTime: data?.reservationEnds
       ? format(new Date(data.reservationEnds), "H:mm")
       : "",
-    requireIntroduction: data?.requireIntroduction ?? false,
+    requireAdultReservee: data?.requireAdultReservee ?? false,
     requireReservationHandling: data?.requireReservationHandling ?? false,
     reservationStartInterval:
       data?.reservationStartInterval ??

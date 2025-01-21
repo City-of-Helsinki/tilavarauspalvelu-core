@@ -60,7 +60,7 @@ function createMockReservationUnit({
     images: [],
     isArchived: false,
     isDraft: false,
-    requireIntroduction: false,
+    requireAdultReservee: false,
     reservationKind: ReservationKind.Direct,
     reservationStartInterval: ReservationStartInterval.Interval_15Mins,
     reservationBegins: addDays(new Date(), -1).toISOString(),

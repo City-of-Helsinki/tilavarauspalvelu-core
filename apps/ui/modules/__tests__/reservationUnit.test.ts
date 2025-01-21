@@ -998,7 +998,7 @@ describe("isReservationUnitReservable", () => {
       pricings: [],
       purposes: [],
       qualifiers: [],
-      requireIntroduction: false,
+      requireAdultReservee: false,
       requireReservationHandling: false,
       reservationBlockWholeDay: false,
       reservationCancelledInstructions: "",

@@ -3587,7 +3587,7 @@ export type ReservationUnitCreateMutationInput = {
   publishEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  requireIntroduction?: InputMaybe<Scalars["Boolean"]["input"]>;
+  requireAdultReservee?: InputMaybe<Scalars["Boolean"]["input"]>;
   requireReservationHandling?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
   reservationBlockWholeDay?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -3662,7 +3662,7 @@ export type ReservationUnitCreateMutationPayload = {
   publishingState?: Maybe<Scalars["String"]["output"]>;
   purposes?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   qualifiers?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  requireIntroduction?: Maybe<Scalars["Boolean"]["output"]>;
+  requireAdultReservee?: Maybe<Scalars["Boolean"]["output"]>;
   requireReservationHandling?: Maybe<Scalars["Boolean"]["output"]>;
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
   reservationBlockWholeDay?: Maybe<Scalars["Boolean"]["output"]>;
@@ -3801,7 +3801,7 @@ export type ReservationUnitNode = Node & {
   purposes: Array<PurposeNode>;
   qualifiers: Array<QualifierNode>;
   rank: Scalars["Int"]["output"];
-  requireIntroduction: Scalars["Boolean"]["output"];
+  requireAdultReservee: Scalars["Boolean"]["output"];
   requireReservationHandling: Scalars["Boolean"]["output"];
   reservableTimeSpans?: Maybe<Array<Maybe<ReservableTimeSpanType>>>;
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
@@ -4183,7 +4183,7 @@ export type ReservationUnitUpdateMutationInput = {
   publishEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  requireIntroduction?: InputMaybe<Scalars["Boolean"]["input"]>;
+  requireAdultReservee?: InputMaybe<Scalars["Boolean"]["input"]>;
   requireReservationHandling?: InputMaybe<Scalars["Boolean"]["input"]>;
   reservationBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
   reservationBlockWholeDay?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -4258,7 +4258,7 @@ export type ReservationUnitUpdateMutationPayload = {
   publishingState?: Maybe<Scalars["String"]["output"]>;
   purposes?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   qualifiers?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  requireIntroduction?: Maybe<Scalars["Boolean"]["output"]>;
+  requireAdultReservee?: Maybe<Scalars["Boolean"]["output"]>;
   requireReservationHandling?: Maybe<Scalars["Boolean"]["output"]>;
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
   reservationBlockWholeDay?: Maybe<Scalars["Boolean"]["output"]>;
@@ -6338,7 +6338,7 @@ export type ReservationUnitEditQuery = {
     isDraft: boolean;
     authentication: Authentication;
     uuid: string;
-    requireIntroduction: boolean;
+    requireAdultReservee: boolean;
     termsOfUseFi?: string | null;
     termsOfUseSv?: string | null;
     termsOfUseEn?: string | null;
@@ -11107,7 +11107,7 @@ export const ReservationUnitEditDocument = gql`
         nameFi
       }
       uuid
-      requireIntroduction
+      requireAdultReservee
       termsOfUseFi
       termsOfUseSv
       termsOfUseEn
