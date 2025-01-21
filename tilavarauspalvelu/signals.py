@@ -23,7 +23,6 @@ from rest_framework.exceptions import ValidationError
 from sentry_sdk.integrations.django import _got_request_exception  # noqa: PLC2701
 from social_core.exceptions import AuthCanceled, AuthFailed, AuthStateForbidden, AuthStateMissing, AuthTokenError
 
-from tilavarauspalvelu.api.graphql.extensions.validation_errors import ValidationErrorWithCode
 from tilavarauspalvelu.integrations.image_cache import purge_previous_image_cache
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Purpose, Reservation, ReservationUnit, ReservationUnitImage, Space
@@ -230,7 +229,7 @@ if sentry_disconnected:
 
         # Validation errors
 
-        if isinstance(exception, ValidationError | ValidationErrorWithCode | GQLValidationError):
+        if isinstance(exception, ValidationError | GQLValidationError):
             # No need to log these as they are handled errors
             return
 
