@@ -276,6 +276,8 @@ def test_get_context__application_received__sv():
 @pytest.mark.django_db
 @freeze_time("2024-01-01")
 def test_get_context_for_application_section_cancelled__en(email_reservation):
+    section = email_reservation.actions.get_application_section()
+
     with TranslationsFromPOFiles():
         context = get_context_for_application_section_cancelled(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -283,10 +285,13 @@ def test_get_context_for_application_section_cancelled__en(email_reservation):
             time_value="[KELLONAIKA]",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
-            language="en",
             cancel_reason="[PERUUTUKSEN SYY]",
+            application_id=section.application_id,
+            application_section_id=section.id,
+            language="en",
         )
 
+    details_url = f"https://fake.varaamo.hel.fi/en/applications/{section.application_id}/view?tab=reservations&section={section.id}"
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Your seasonal booking has been cancelled",
@@ -300,16 +305,11 @@ def test_get_context_for_application_section_cancelled__en(email_reservation):
         **BASE_TEMPLATE_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
+        "check_booking_details_url": f"{details_url}",
+        "check_booking_details_url_html": f'<a href="{details_url}">{details_url}</a>',
     }
 
     with TranslationsFromPOFiles():
-        # Add application and section ID to the url, which are always taken from actual instances to the context
-        section = email_reservation.actions.get_application_section()
-        old_url = context["check_booking_details_url"]
-        new_url = f"{old_url}/{section.application_id}/view?tab=reservations&section={section.id}"
-        context["check_booking_details_url"] = context["check_booking_details_url"].replace(old_url, new_url)
-        context["check_booking_details_url_html"] = context["check_booking_details_url_html"].replace(old_url, new_url)
-
         assert context == get_context_for_application_section_cancelled(
             application_section=email_reservation.actions.get_application_section(),
             language="en",
@@ -326,6 +326,8 @@ def test_get_context_for_application_section_cancelled__fi():
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
+            application_id=None,
+            application_section_id=None,
             language="fi",
         )
 
@@ -355,6 +357,8 @@ def test_get_context_for_application_section_cancelled_sv():
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
+            application_id=None,
+            application_section_id=None,
             language="sv",
         )
 

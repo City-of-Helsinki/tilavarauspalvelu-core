@@ -111,7 +111,7 @@ def test_render_application_section_cancelled_email_text():
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
 
-        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications
+        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678
 
         Kind regards
         Varaamo
@@ -599,7 +599,7 @@ def test_render_seasonal_reservation_cancelled_single_text():
         From: 1.1.2024 at 12:00
         To: 2.1.2024 at 15:00
 
-        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications
+        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678
 
         Kind regards
         Varaamo
@@ -627,7 +627,7 @@ def test_render_seasonal_reservation_modified_series__text():
         Day: Monday
         Time: 13:00-15:00
 
-        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications
+        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678
 
         Kind regards
         Varaamo
@@ -657,7 +657,7 @@ def test_render_seasonal_reservation_modified_single__text():
         From: 1.1.2024 at 12:00
         To: 2.1.2024 at 15:00
 
-        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications
+        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678
 
         Kind regards
         Varaamo
@@ -686,7 +686,7 @@ def test_render_seasonal_reservation_rejected_series__text():
         Day: Monday
         Time: 13:00-15:00
 
-        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications
+        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678
 
         Kind regards
         Varaamo
@@ -717,7 +717,7 @@ def test_render_seasonal_reservation_rejected_single__text():
         From: 1.1.2024 at 12:00
         To: 2.1.2024 at 15:00
 
-        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications
+        You can check your booking details at: https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678
 
         Kind regards
         Varaamo

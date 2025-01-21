@@ -152,9 +152,14 @@ def get_contex_for_reservation_price_range(
 def get_contex_for_seasonal_reservation_check_details_url(
     *,
     language: Lang,
-    application_section: ApplicationSection | None = None,
+    application_id: int | None = None,
+    application_section_id: int | None = None,
 ) -> EmailContext:
-    link = get_my_applications_ext_link(language=language, application_section=application_section)
+    link = get_my_applications_ext_link(
+        language=language,
+        application_id=application_id,
+        application_section_id=application_section_id,
+    )
 
     return {
         "check_booking_details_text": pgettext("Email", "You can check your booking details at"),
@@ -232,7 +237,8 @@ def get_varaamo_ext_link(*, language: Lang) -> str:
 def get_my_applications_ext_link(
     *,
     language: Lang,
-    application_section: ApplicationSection | None = None,
+    application_id: int | None = None,
+    application_section_id: int | None = None,
 ) -> str:
     """
     Return the link to the 'My applications' page:
@@ -244,11 +250,10 @@ def get_my_applications_ext_link(
         url = f"{url}/{language}"
     url = f"{url}/applications"
 
-    if application_section:
-        application_id = getattr(application_section, "application_id", None)
-        application_section_id = getattr(application_section, "id", None)
-
-        url = f"{url}/{application_id}/view?tab=reservations&section={application_section_id}"
+    if application_id:
+        url = f"{url}/{application_id}/view"
+        if application_section_id:
+            url = f"{url}?tab=reservations&section={application_section_id}"
 
     return url
 
