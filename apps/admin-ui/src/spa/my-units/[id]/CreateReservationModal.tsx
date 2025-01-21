@@ -315,12 +315,12 @@ function DialogContent({
           ? (reservationUnit.bufferTimeAfter ?? 0)
           : 0;
       const input: ReservationStaffCreateMutationInput = {
-        reservationUnitPks: [reservationUnit.pk],
+        reservationUnit: reservationUnit.pk,
         type: values.type,
         begin: dateTime(values.date, values.startTime),
         end: dateTime(values.date, values.endTime),
-        bufferTimeBefore: bufferBefore.toString(),
-        bufferTimeAfter: bufferAfter.toString(),
+        bufferTimeBefore: bufferBefore,
+        bufferTimeAfter: bufferAfter,
         workingMemo: values.comments,
         ...flatMetaValues,
         reserveeType: values.reserveeType,

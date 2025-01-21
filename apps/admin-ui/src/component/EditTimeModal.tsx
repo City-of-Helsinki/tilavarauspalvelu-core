@@ -17,7 +17,7 @@ import {
   useCreateStaffReservationMutation,
   useStaffAdjustReservationTimeMutation,
   type ReservationQuery,
-  ReservationStaffCreateMutationInput,
+  type ReservationStaffCreateMutationInput,
 } from "@gql/gql-types";
 import { FormProvider, UseFormReturn, useForm } from "react-hook-form";
 import { differenceInMinutes, format } from "date-fns";
@@ -318,8 +318,7 @@ export function NewReservationModal({
   const { t } = useTranslation();
   const { isOpen } = useModal();
 
-  const { recurringReservation, type } = reservationToCopy ?? {};
-  const { pk: recurringReservationPk } = recurringReservation ?? {};
+  const { type } = reservationToCopy ?? {};
   const reservationUnit = reservationToCopy?.reservationUnits?.[0];
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected
@@ -379,9 +378,9 @@ export function NewReservationModal({
       "reserveeOrganisationName",
       "reserveePhone",
     ] as const;
-    const homeCityPk = reservationToCopy.homeCity?.pk;
-    const purposePk = reservationToCopy.purpose?.pk;
-    const ageGroupPk = reservationToCopy.ageGroup?.pk;
+    const homeCity = reservationToCopy.homeCity?.pk;
+    const purpose = reservationToCopy.purpose?.pk;
+    const ageGroup = reservationToCopy.ageGroup?.pk;
     const metadata = pick(reservationToCopy, keys);
     if (!reservationUnit?.pk) {
       throw new Error("reservation unit pk missing");
@@ -391,15 +390,14 @@ export function NewReservationModal({
     }
     return {
       ...metadata,
-      homeCityPk,
-      purposePk,
-      ageGroupPk,
       ...convertToApiFormat(begin, end),
-      bufferTimeAfter: String(buffers.after),
-      bufferTimeBefore: String(buffers.before),
-      reservationUnitPks: [reservationUnit?.pk],
+      homeCity,
+      purpose,
+      ageGroup,
+      bufferTimeAfter: buffers.after,
+      bufferTimeBefore: buffers.before,
+      reservationUnit: reservationUnit.pk,
       type,
-      recurringReservationPk,
     };
   }
 
@@ -502,10 +500,8 @@ export function EditTimeModal({
         input: {
           ...convertToApiFormat(begin, end),
           pk,
-          bufferTimeAfter:
-            buffers.after != null ? String(buffers.after) : undefined,
-          bufferTimeBefore:
-            buffers.before != null ? String(buffers.before) : undefined,
+          bufferTimeAfter: buffers.after ?? undefined,
+          bufferTimeBefore: buffers.before ?? undefined,
         },
       },
     });

@@ -7,17 +7,17 @@ import {
   ReserveeType,
   CustomerTypeChoice,
   type Maybe,
-  type ReservationStaffModifyMutationInput,
+  type UpdateStaffReservationMutationVariables,
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
 
-export type MutationInputParams = Omit<
-  ReservationStaffModifyMutationInput,
-  "pk"
-> & {
-  seriesName?: string;
-  workingMemo?: string;
-};
+type InputT = UpdateStaffReservationMutationVariables["input"];
+type MemoT = UpdateStaffReservationMutationVariables["workingMemo"];
+type ExtraParamsT = { seriesName?: string };
+
+export type MutationInputParams = Omit<InputT, "pk"> &
+  Omit<MemoT, "pk"> &
+  ExtraParamsT;
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
 /// Combines regular and recurring reservation change mutation
@@ -50,13 +50,10 @@ export function useStaffReservationMutation({
 
     try {
       if (reservation.recurringReservation?.pk != null) {
-        const { purposePk, ageGroupPk, homeCityPk, type, ...details } = rest;
+        const { type, ...details } = rest;
         const reserveeType = convertReserveeType(rest.reserveeType);
         const reservationDetails = {
           ...details,
-          purpose: purposePk,
-          ageGroup: ageGroupPk,
-          homeCity: homeCityPk,
           reserveeType,
         };
 
@@ -64,7 +61,7 @@ export function useStaffReservationMutation({
           name: seriesName,
           pk: reservation.recurringReservation.pk,
           description: workingMemo,
-          ageGroup: rest.ageGroupPk,
+          ageGroup: rest.ageGroup,
           reservationDetails,
         };
         const res = await recurringMutation({

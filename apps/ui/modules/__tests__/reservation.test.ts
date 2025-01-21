@@ -7,8 +7,6 @@ import {
   Authentication,
   ReservationKind,
   type ReservationUnitNode,
-  CustomerTypeChoice,
-  type ReservationMetadataFieldNode,
   OrderStatus,
   PaymentType,
   AccessType,
@@ -19,7 +17,6 @@ import {
   getCheckoutUrl,
   getDurationOptions,
   getNormalizedReservationOrderStatus,
-  getReservationApplicationMutationValues,
   isReservationEditable,
   isReservationStartInFuture,
 } from "../reservation";
@@ -340,53 +337,6 @@ describe("isReservationCancellable", () => {
       canBeCancelledTimeBefore: 30 * 60,
     });
     expect(isReservationCancellable(input)).toBe(false);
-  });
-});
-
-describe("getReservationApplcationMutationValues", () => {
-  test("with empty input", () => {
-    expect(
-      getReservationApplicationMutationValues(
-        {},
-        [],
-        CustomerTypeChoice.Individual
-      )
-    ).toEqual({
-      reserveeType: CustomerTypeChoice.Individual,
-    });
-  });
-
-  test("with sane input", () => {
-    const payload = {
-      name: "Nimi",
-      reserveeId: "123456-7",
-      reserveeFirstName: "Etunimi",
-    };
-    const supportedFields: ReservationMetadataFieldNode[] = [
-      {
-        id: "123456-7",
-        fieldName: "name",
-      },
-      {
-        id: "123456-7",
-        fieldName: "reservee_id",
-      },
-      {
-        id: "123456-7",
-        fieldName: "reservee_first_name",
-      },
-    ];
-    expect(
-      getReservationApplicationMutationValues(
-        payload,
-        supportedFields,
-        CustomerTypeChoice.Individual
-      )
-    ).toEqual({
-      name: "Nimi",
-      reserveeFirstName: "Etunimi",
-      reserveeType: CustomerTypeChoice.Individual,
-    });
   });
 });
 

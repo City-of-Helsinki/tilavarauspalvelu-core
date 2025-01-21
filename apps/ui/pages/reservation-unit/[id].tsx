@@ -406,7 +406,7 @@ function ReservationUnit({
     const input: ReservationCreateMutationInput = {
       begin: begin.toISOString(),
       end: end.toISOString(),
-      reservationUnitPks: [reservationUnit.pk],
+      reservationUnit: reservationUnit.pk,
     };
     await createReservation(input);
   };
@@ -532,7 +532,7 @@ function ReservationUnit({
       const input: ReservationCreateMutationInput = {
         begin,
         end,
-        reservationUnitPks: [reservationUnit.pk],
+        reservationUnit: reservationUnit.pk,
       };
       createReservation(input);
     }

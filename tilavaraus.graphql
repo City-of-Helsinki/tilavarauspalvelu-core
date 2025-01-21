@@ -2865,8 +2865,8 @@ type ReservableTimeSpanType {
 }
 
 input ReservationAdjustTimeMutationInput {
-  begin: DateTime
-  end: DateTime
+  begin: DateTime!
+  end: DateTime!
   pk: Int!
 }
 
@@ -2951,131 +2951,24 @@ type ReservationCancellationMutationPayload {
 }
 
 input ReservationConfirmMutationInput {
-  paymentType: PaymentType
   pk: Int!
 }
 
 type ReservationConfirmMutationPayload {
-  ageGroupPk: Int
-  applyingForFreeOfCharge: Boolean
-  begin: DateTime
-  billingAddressCity: String
-  billingAddressStreet: String
-  billingAddressZip: String
-  billingEmail: String
-  billingFirstName: String
-  billingLastName: String
-  billingPhone: String
-  bufferTimeAfter: Int
-  bufferTimeBefore: Int
-  confirmedAt: DateTime
-  description: String
-  end: DateTime
-  freeOfChargeReason: String
-  homeCityPk: Int
-  name: String
-  nonSubsidisedPrice: Decimal
-  nonSubsidisedPriceNet: String
-  numPersons: Int
   order: PaymentOrderNode
   pk: Int
-  price: Decimal
-  priceNet: String
-  purposePk: Int
-  reserveeAddressCity: String
-  reserveeAddressStreet: String
-  reserveeAddressZip: String
-  reserveeEmail: String
-  reserveeFirstName: String
-  reserveeId: String
-  reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: String
-  reserveeLastName: String
-  reserveeOrganisationName: String
-  reserveePhone: String
-  reserveeType: CustomerTypeChoice
   state: ReservationStateChoice
-  taxPercentageValue: Decimal
-  unitPrice: Decimal
 }
 
 input ReservationCreateMutationInput {
-  ageGroupPk: Int
-  applyingForFreeOfCharge: Boolean
   begin: DateTime!
-  billingAddressCity: String
-  billingAddressStreet: String
-  billingAddressZip: String
-  billingEmail: String
-  billingFirstName: String
-  billingLastName: String
-  billingPhone: String
-  bufferTimeAfter: Int
-  bufferTimeBefore: Int
-  description: String
   end: DateTime!
-  freeOfChargeReason: String
-  homeCityPk: Int
-  name: String
-  numPersons: Int
   pk: Int
-  purposePk: Int
-  reservationUnitPks: [Int]!
-  reserveeAddressCity: String
-  reserveeAddressStreet: String
-  reserveeAddressZip: String
-  reserveeEmail: String
-  reserveeFirstName: String
-  reserveeId: String
-  reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: String
-  reserveeLastName: String
-  reserveeOrganisationName: String
-  reserveePhone: String
-  reserveeType: CustomerTypeChoice
+  reservationUnit: Int!
 }
 
 type ReservationCreateMutationPayload {
-  ageGroupPk: Int
-  applyingForFreeOfCharge: Boolean
-  begin: DateTime
-  billingAddressCity: String
-  billingAddressStreet: String
-  billingAddressZip: String
-  billingEmail: String
-  billingFirstName: String
-  billingLastName: String
-  billingPhone: String
-  bufferTimeAfter: Int
-  bufferTimeBefore: Int
-  confirmedAt: DateTime
-  description: String
-  end: DateTime
-  freeOfChargeReason: String
-  homeCityPk: Int
-  name: String
-  nonSubsidisedPrice: Decimal
-  nonSubsidisedPriceNet: String
-  numPersons: Int
   pk: Int
-  price: Decimal
-  priceNet: String
-  purposePk: Int
-  reserveeAddressCity: String
-  reserveeAddressStreet: String
-  reserveeAddressZip: String
-  reserveeEmail: String
-  reserveeFirstName: String
-  reserveeId: String
-  reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: String
-  reserveeLastName: String
-  reserveeOrganisationName: String
-  reserveePhone: String
-  reserveeType: CustomerTypeChoice
-  state: ReservationStateChoice
-  taxPercentageValue: Decimal
-  unitPrice: Decimal
 }
 
 input ReservationDeleteMutationInput {
@@ -3479,7 +3372,7 @@ enum ReservationPurposeOrderingChoices {
 }
 
 input ReservationRefundMutationInput {
-  pk: Int
+  pk: Int!
 }
 
 type ReservationRefundMutationPayload {
@@ -3616,35 +3509,23 @@ type ReservationSeriesUpdateMutationPayload {
 
 input ReservationStaffAdjustTimeMutationInput {
   begin: DateTime
-  """
-  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined value means buffer from reservation unit is used.
-  """
-  bufferTimeAfter: String
-  """
-  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined value means buffer from reservation unit is used.
-  """
-  bufferTimeBefore: String
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
   end: DateTime
   pk: Int!
 }
 
 type ReservationStaffAdjustTimeMutationPayload {
   begin: DateTime
-  """
-  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined value means buffer from reservation unit is used.
-  """
-  bufferTimeAfter: String
-  """
-  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined value means buffer from reservation unit is used.
-  """
-  bufferTimeBefore: String
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
   end: DateTime
   pk: Int
   state: ReservationStateChoice
 }
 
 input ReservationStaffCreateMutationInput {
-  ageGroupPk: Int
+  ageGroup: Int
   applyingForFreeOfCharge: Boolean
   begin: DateTime!
   billingAddressCity: String
@@ -3654,24 +3535,17 @@ input ReservationStaffCreateMutationInput {
   billingFirstName: String
   billingLastName: String
   billingPhone: String
-  """
-  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined value means buffer from reservation unit is used.
-  """
-  bufferTimeAfter: String
-  """
-  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined value means buffer from reservation unit is used.
-  """
-  bufferTimeBefore: String
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
   description: String
   end: DateTime!
   freeOfChargeReason: String
-  homeCityPk: Int
+  homeCity: Int
   name: String
   numPersons: Int
   pk: Int
-  purposePk: Int
-  recurringReservationPk: Int
-  reservationUnitPks: [Int]!
+  purpose: Int
+  reservationUnit: Int!
   reserveeAddressCity: String
   reserveeAddressStreet: String
   reserveeAddressZip: String
@@ -3679,18 +3553,16 @@ input ReservationStaffCreateMutationInput {
   reserveeFirstName: String
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: String
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
   type: ReservationTypeChoice!
-  unitPrice: Decimal
   workingMemo: String
 }
 
 type ReservationStaffCreateMutationPayload {
-  ageGroupPk: Int
+  ageGroup: Int
   applyingForFreeOfCharge: Boolean
   begin: DateTime
   billingAddressCity: String
@@ -3700,26 +3572,18 @@ type ReservationStaffCreateMutationPayload {
   billingFirstName: String
   billingLastName: String
   billingPhone: String
-  """
-  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined value means buffer from reservation unit is used.
-  """
-  bufferTimeAfter: String
-  """
-  Can be a number of seconds or timespan in format HH:MM:SS. Null/undefined value means buffer from reservation unit is used.
-  """
-  bufferTimeBefore: String
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
   confirmedAt: DateTime
   description: String
   end: DateTime
   freeOfChargeReason: String
   handledAt: DateTime
-  homeCityPk: Int
+  homeCity: Int
   name: String
   numPersons: Int
   pk: Int
-  purposePk: Int
-  recurringReservationPk: Int
-  reservationUnitPks: [Int]
+  purpose: Int
   reserveeAddressCity: String
   reserveeAddressStreet: String
   reserveeAddressZip: String
@@ -3727,19 +3591,17 @@ type ReservationStaffCreateMutationPayload {
   reserveeFirstName: String
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: String
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
   state: ReservationStateChoice
   type: ReservationTypeChoice
-  unitPrice: Decimal
   workingMemo: String
 }
 
 input ReservationStaffModifyMutationInput {
-  ageGroupPk: Int
+  ageGroup: Int
   applyingForFreeOfCharge: Boolean
   billingAddressCity: String
   billingAddressStreet: String
@@ -3750,12 +3612,11 @@ input ReservationStaffModifyMutationInput {
   billingPhone: String
   description: String
   freeOfChargeReason: String
-  homeCityPk: Int
+  homeCity: Int
   name: String
   numPersons: Int
   pk: Int!
-  purposePk: Int
-  reservationUnitPks: [Int]
+  purpose: Int
   reserveeAddressCity: String
   reserveeAddressStreet: String
   reserveeAddressZip: String
@@ -3768,12 +3629,11 @@ input ReservationStaffModifyMutationInput {
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
-  state: ReservationStateChoice
   type: ReservationTypeChoice
 }
 
 type ReservationStaffModifyMutationPayload {
-  ageGroupPk: Int
+  ageGroup: Int
   applyingForFreeOfCharge: Boolean
   begin: DateTime
   billingAddressCity: String
@@ -3783,13 +3643,13 @@ type ReservationStaffModifyMutationPayload {
   billingFirstName: String
   billingLastName: String
   billingPhone: String
-  bufferTimeAfter: Int
-  bufferTimeBefore: Int
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
   confirmedAt: DateTime
   description: String
   end: DateTime
   freeOfChargeReason: String
-  homeCityPk: Int
+  homeCity: Int
   name: String
   nonSubsidisedPrice: Decimal
   nonSubsidisedPriceNet: String
@@ -3797,7 +3657,7 @@ type ReservationStaffModifyMutationPayload {
   pk: Int
   price: Decimal
   priceNet: String
-  purposePk: Int
+  purpose: Int
   reserveeAddressCity: String
   reserveeAddressStreet: String
   reserveeAddressZip: String
@@ -4736,9 +4596,8 @@ type ReservationUnitUpdateMutationPayload {
 }
 
 input ReservationUpdateMutationInput {
-  ageGroupPk: Int
+  ageGroup: Int
   applyingForFreeOfCharge: Boolean
-  begin: DateTime
   billingAddressCity: String
   billingAddressStreet: String
   billingAddressZip: String
@@ -4746,17 +4605,13 @@ input ReservationUpdateMutationInput {
   billingFirstName: String
   billingLastName: String
   billingPhone: String
-  bufferTimeAfter: Int
-  bufferTimeBefore: Int
   description: String
-  end: DateTime
   freeOfChargeReason: String
-  homeCityPk: Int
+  homeCity: Int
   name: String
   numPersons: Int
   pk: Int!
-  purposePk: Int
-  reservationUnitPks: [Int]
+  purpose: Int
   reserveeAddressCity: String
   reserveeAddressStreet: String
   reserveeAddressZip: String
@@ -4764,18 +4619,15 @@ input ReservationUpdateMutationInput {
   reserveeFirstName: String
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: String
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
-  state: ReservationStateChoice
 }
 
 type ReservationUpdateMutationPayload {
-  ageGroupPk: Int
+  ageGroup: Int
   applyingForFreeOfCharge: Boolean
-  begin: DateTime
   billingAddressCity: String
   billingAddressStreet: String
   billingAddressZip: String
@@ -4783,21 +4635,13 @@ type ReservationUpdateMutationPayload {
   billingFirstName: String
   billingLastName: String
   billingPhone: String
-  bufferTimeAfter: Int
-  bufferTimeBefore: Int
-  confirmedAt: DateTime
   description: String
-  end: DateTime
   freeOfChargeReason: String
-  homeCityPk: Int
+  homeCity: Int
   name: String
-  nonSubsidisedPrice: Decimal
-  nonSubsidisedPriceNet: String
   numPersons: Int
   pk: Int
-  price: Decimal
-  priceNet: String
-  purposePk: Int
+  purpose: Int
   reserveeAddressCity: String
   reserveeAddressStreet: String
   reserveeAddressZip: String
@@ -4805,28 +4649,19 @@ type ReservationUpdateMutationPayload {
   reserveeFirstName: String
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: String
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
   state: ReservationStateChoice
-  taxPercentageValue: Decimal
-  unitPrice: Decimal
 }
 
 input ReservationWorkingMemoMutationInput {
-  """
-  Primary key of the reservation
-  """
-  pk: Int
-  workingMemo: String
+  pk: Int!
+  workingMemo: String!
 }
 
 type ReservationWorkingMemoMutationPayload {
-  """
-  Primary key of the reservation
-  """
   pk: Int
   workingMemo: String
 }

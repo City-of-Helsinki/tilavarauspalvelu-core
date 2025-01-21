@@ -10,7 +10,6 @@ import { useTranslation } from "next-i18next";
 import { breakpoints } from "common/src/common/style";
 import { H1, H4 } from "common/src/common/typography";
 import {
-  CustomerTypeChoice,
   useConfirmReservationMutation,
   useUpdateReservationMutation,
   useDeleteReservationMutation,
@@ -29,10 +28,7 @@ import {
 } from "@/modules/urls";
 import { Sanitize } from "common/src/components/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
-import {
-  getCheckoutUrl,
-  getReservationApplicationMutationValues,
-} from "@/modules/reservation";
+import { getCheckoutUrl } from "@/modules/reservation";
 import { ReservationProps } from "@/context/DataContext";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { Step0 } from "@/components/reservation/Step0";
@@ -243,8 +239,9 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       throw new Error("Reservee type is required");
     }
 
+    // TODO what is the purpose of this?
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: type the form
-    const normalizedPayload = Object.keys(payload).reduce<any>((acc, key) => {
+    const input = Object.keys(payload).reduce<any>((acc, key) => {
       if (key === "showBillingAddress") {
         return acc;
       }
@@ -254,20 +251,12 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       return acc;
     }, {});
 
-    const type = reserveeType ?? CustomerTypeChoice.Individual;
-    const input = getReservationApplicationMutationValues(
-      normalizedPayload,
-      supportedFields,
-      hasReserveeTypeField ? type : CustomerTypeChoice.Individual
-    );
-
     try {
       const { data } = await updateReservation({
         variables: {
           input: {
             pk: reservationPk ?? 0,
             ...input,
-            reserveeLanguage: i18n.language,
           },
         },
       });
@@ -279,12 +268,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
         window.scrollTo(0, 0);
       }
     } catch (e) {
-      if (e instanceof ApolloError) {
-        if (e.graphQLErrors[0].extensions?.code === "NOT_FOUND") {
-          errorToast({ text: t("errors:update_reservation_not_found") });
-          return;
-        }
-      }
       errorToast({ text: t("errors:general_error") });
     }
   };

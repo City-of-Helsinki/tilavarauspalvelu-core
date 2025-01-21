@@ -10,8 +10,6 @@ import {
 import {
   type ReservationNode,
   ReservationStartInterval,
-  CustomerTypeChoice,
-  type ReservationMetadataFieldNode,
   type Maybe,
   type ListReservationsQuery,
   type IsReservableFieldsFragment,
@@ -23,7 +21,6 @@ import {
   type BlockingReservationFieldsFragment,
   type CanUserCancelReservationFragment,
 } from "@gql/gql-types";
-import { getReservationApplicationFields } from "common/src/reservation-form/util";
 import { getIntervalMinutes } from "common/src/conversion";
 import { fromUIDate } from "./util";
 import { type TFunction } from "i18next";
@@ -175,42 +172,6 @@ export function isReservationCancellableReason(
   }
 
   return "";
-}
-
-// TODO why is this named like this??? what does application have to do with this?
-export function getReservationApplicationMutationValues(
-  // TODO don't use Records to avoid proper typing
-  payload: Record<string, string | number | boolean>,
-  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[],
-  reserveeType: CustomerTypeChoice
-): Record<string, string | number | boolean> {
-  const result: typeof payload = { reserveeType };
-  const intValues = ["numPersons"];
-  const changes = [
-    { field: "homeCity", mutationField: "homeCityPk" },
-    { field: "ageGroup", mutationField: "ageGroupPk" },
-    { field: "purpose", mutationField: "purposePk" },
-  ];
-  const fields = getReservationApplicationFields({
-    supportedFields,
-    reserveeType,
-  });
-
-  const commonFields = getReservationApplicationFields({
-    supportedFields,
-    reserveeType: "common",
-  });
-
-  [...fields, ...commonFields].forEach((field: string) => {
-    const key = changes.find((c) => c.field === field)?.mutationField || field;
-    result[key] = intValues.includes(field)
-      ? Number(payload[field])
-      : payload[field];
-  });
-
-  result.reserveeType = reserveeType;
-
-  return result;
 }
 
 function shouldShowOrderStatus(

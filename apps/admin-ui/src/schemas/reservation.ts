@@ -149,7 +149,7 @@ export const ReservationChangeFormSchema = z
   .object({
     type: ReservationTypeSchema,
     seriesName: z.string().optional(),
-    comments: z.string().optional(),
+    comments: z.string(),
     showBillingAddress: z.boolean().optional(),
   })
   // passthrough since this is combined to the metafields

@@ -85,7 +85,7 @@ function EditReservation({
     mode: "onChange",
     defaultValues: {
       seriesName: reservation.recurringReservation?.name ?? "",
-      comments: reservation.workingMemo ?? undefined,
+      comments: reservation.workingMemo ?? "",
       type: ReservationTypeSchema.optional().parse(
         reservation.type?.toUpperCase()
       ),

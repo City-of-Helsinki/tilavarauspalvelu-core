@@ -6,7 +6,6 @@ export const CREATE_RESERVATION = gql`
   mutation CreateReservation($input: ReservationCreateMutationInput!) {
     createReservation(input: $input) {
       pk
-      price
     }
   }
 `;
