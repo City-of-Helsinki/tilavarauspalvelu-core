@@ -122,6 +122,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         profile_refresh_token: str | None = session.get("profile_refresh_token")
         profile_refresh_token_expires_at: datetime.datetime | None = session.get("profile_refresh_token_expires_at")
 
+        # If it seems like profile token is expired, go straight to keycloak.
         if (
             profile_refresh_token is None
             or profile_refresh_token_expires_at is None
@@ -138,16 +139,22 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
                 response: RefreshResponse = cls.oidc_backend.refresh_token(token=profile_refresh_token)
                 access_token = response["access_token"]
             except HTTPError as error:
-                msg = f"Unable to refresh Helsinki profile token for user {int(user.pk)}: {error.response.text}"
-                SentryLogger.log_exception(error, details=msg)
-                return None
+                #
+                # Last resort, try keycloak refresh
+                access_token = KeyCloakClient.refresh_token(user=user, session=session)
+                if access_token is None:
+                    msg = "Unable to refresh Helsinki profile token"
+                    details = {"user": user.pk, "error": error.response.text}
+                    SentryLogger.log_message(msg, details=details, level="warning")
+                    return None
 
         try:
             # Fetch new profile tokens.
             response: TokenResponse = cls.oidc_backend.get_token_for_profile(access_token=access_token)
         except HTTPError as error:
-            msg = f"Unable to get Helsinki profile token for user {int(user.pk)}: {error.response.text}"
-            SentryLogger.log_exception(error, details=msg)
+            msg = "Unable to get Helsinki profile token"
+            details = {"user": user.pk, "error": error.response.text}
+            SentryLogger.log_message(msg, details=details, level="warning")
             return None
 
         now = local_datetime()
@@ -189,7 +196,7 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         errors: dict[str, Any] | None = response_data.get("errors")
         if errors is not None:
             msg = f"{cls.SERVICE_NAME.capitalize()}: Response contains errors."
-            SentryLogger.log_message(message=msg, details=errors, level="error")
+            SentryLogger.log_message(message=msg, details=errors, level="warning")
             raise ExternalServiceError(msg, details=errors)
 
         return response_data

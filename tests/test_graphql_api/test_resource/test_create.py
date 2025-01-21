@@ -72,7 +72,8 @@ def test_resource__create__no_space_fixed_location(graphql):
     }
     response = graphql(CREATE_MUTATION, input_data=data)
 
-    assert response.error_message() == "Location type 'fixed' needs a space to be defined."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Location type 'fixed' needs a space to be defined."]
 
 
 def test_resource__create__no_space_movable_location(graphql):

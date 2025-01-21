@@ -1,22 +1,18 @@
 from __future__ import annotations
 
-from typing import Any
-
 from utils.external_service.errors import ExternalServiceError
 
 
-class SendEmailNotificationError(Exception):
-    pass
+class ApplicationRoundExporterError(Exception):
+    """Error when exporting application round data"""
 
 
-class EmailBuilderConfigurationError(Exception):
-    pass
+class ApplicationRoundResetError(Exception):
+    """Error when resetting application round"""
 
 
-class EmailTemplateValidationError(Exception):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        if len(args) > 0:
-            self.message = args[0]
+class FirstReservableTimeError(Exception):
+    """Error when calculating first reservable time"""
 
 
 class HaukiAPIError(ExternalServiceError):
@@ -27,13 +23,29 @@ class HaukiConfigurationError(ExternalServiceError):
     """Hauki API settings are not configured correctly"""
 
 
+class PDFRenderingError(Exception):
+    """Error when rendering PDF"""
+
+
 class ReservableTimeSpanClientError(Exception):
-    pass
+    """Error in reservable time span client"""
 
 
 class ReservableTimeSpanClientValueError(ReservableTimeSpanClientError):
-    pass
+    """Error in reservable time span client when given values are invalid"""
 
 
 class ReservableTimeSpanClientNothingToDoError(ReservableTimeSpanClientError):
-    pass
+    """Error in reservable time span client when there is nothing to do"""
+
+
+class ReservationPriceCalculationError(Exception):
+    """Error when calculating reservation price"""
+
+
+class TimeSpanElementError(Exception):
+    """Error when dealing with time span elements"""
+
+
+class TPRekImportError(Exception):
+    """Error when importing TPRek data"""

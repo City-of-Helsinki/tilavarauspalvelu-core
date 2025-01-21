@@ -8,6 +8,7 @@ from django.db.models.functions import Coalesce
 from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicationStatusChoice
+from tilavarauspalvelu.exceptions import ApplicationRoundExporterError
 from tilavarauspalvelu.models import ApplicationSection, ReservationUnitOption, SuitableTimeRange
 from utils.date_utils import local_date, local_date_string, local_time_string, local_timedelta_string
 from utils.db import SubqueryCount
@@ -70,7 +71,7 @@ class ApplicationExportRow(BaseExportRow):
         new_value = f"{local_time_string(time_range.begin_time)}-{local_time_string(time_range.end_time)}"
         if current_value is None:
             msg = f"Key {key} not found in {self.__class__.__name__}"
-            raise ValueError(msg)
+            raise ApplicationRoundExporterError(msg)
         # If the value is already set, append the new time range to the end of the string.
         # Time ranges should be in chronological order.
         if current_value:
