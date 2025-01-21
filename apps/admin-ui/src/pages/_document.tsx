@@ -10,6 +10,7 @@ import { ServerStyleSheet } from "styled-components";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: this works in ui/pages/_document.js for some reason
 import { getCriticalHdsRules, hdsStyles } from "hds-react";
+import { env } from "@/env.mjs";
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
@@ -41,6 +42,7 @@ export default class MyDocument extends Document {
   }
 
   render() {
+    const basePath = env.NEXT_PUBLIC_BASE_URL;
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore: this works in ui/pages/_document.js for some reason
     const { locale, hdsCriticalRules } = this.props;
@@ -53,10 +55,17 @@ export default class MyDocument extends Document {
           />
           <meta name="color-scheme" content="light only" />
           <meta name="theme-color" content="#0000bf" />
-          <link rel="icon" href="/favicon-32x32.ico" sizes="any" />
-          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-          <link rel="manifest" href="/manifest.webmanifest" />
+          <link rel="icon" href={`${basePath}/favicon-32x32.ico`} sizes="any" />
+          <link
+            rel="icon"
+            href={`${basePath}/favicon.svg`}
+            type="image/svg+xml"
+          />
+          <link
+            rel="apple-touch-icon"
+            href={`${basePath}/apple-touch-icon.png`}
+          />
+          <link rel="manifest" href={`${basePath}/manifest.webmanifest`} />
         </Head>
         <body>
           <Main />
