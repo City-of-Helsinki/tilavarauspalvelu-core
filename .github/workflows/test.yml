@@ -131,7 +131,7 @@ jobs:
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Run pytest with coverage"
-        run: poetry run coverage run --branch -m pytest --disable-warnings --splits 12 --group ${{ matrix.group }}
+        run: poetry run coverage run --branch -m pytest --disable-warnings --splits 12 --splitting-algorithm least_duration --group ${{ matrix.group }}
         env:
           DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
           COVERAGE_FILE: .coverage.${{ matrix.group }}
