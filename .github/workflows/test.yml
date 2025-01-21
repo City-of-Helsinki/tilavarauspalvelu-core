@@ -13,7 +13,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  POETRY_VERSION: 2.0.1
   PYTHON_VERSION: 3.13
 
 jobs:
@@ -64,7 +63,6 @@ jobs:
       - name: "Install Poetry and project dependencies"
         uses: ./.github/actions/poetry
         with:
-          poetry-version: ${{ env.POETRY_VERSION }}
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Test for migration issues"
@@ -130,7 +128,6 @@ jobs:
       - name: "Install Poetry and project dependencies"
         uses: ./.github/actions/poetry
         with:
-          poetry-version: ${{ env.POETRY_VERSION }}
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Run pytest with coverage"
