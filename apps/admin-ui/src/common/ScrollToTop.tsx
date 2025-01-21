@@ -1,22 +1,37 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
-import { Button, IconAngleUp } from "hds-react";
+import { IconAngleUp } from "hds-react";
 import { useDebounce, useWindowSize } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import { useTranslation } from "next-i18next";
+import { focusStyles } from "common/styles/cssFragments";
 
-const Btn = styled(Button)`
-  width: 40px;
-  height: 40px;
+const Btn = styled.button`
+  --min-size: 44px;
+  & {
+    --background-color-focus: var(--color-black);
+    --color-focus: var(--color-white);
+  }
+
+  border: none;
   background-color: var(--color-black);
   color: var(--color-white);
+
   position: fixed;
   right: var(--spacing-l);
   bottom: var(--spacing-l);
+  min-height: var(--min-size);
+  min-width: var(--min-size);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  &:hover {
+    background-color: var(--color-black-80);
+  }
+  ${focusStyles}
 `;
 
 const breakpoint = breakpoints.m;
@@ -60,15 +75,9 @@ function ScrollToTop(): JSX.Element | null {
     return null;
   }
   return (
-    /* eslint-disable -- don't remove empty string */
-    <Btn
-      aria-label={t("common:scrollToTop")}
-      onClick={handleClick}
-      iconStart={<IconAngleUp aria-hidden="true" />}
-    >
-      {""}
+    <Btn aria-label={t("common:scrollToTop")} onClick={handleClick}>
+      <IconAngleUp aria-hidden="true" />
     </Btn>
-    /* eslint-enable */
   );
 }
 

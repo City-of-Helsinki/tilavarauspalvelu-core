@@ -3,9 +3,10 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { isBrowser } from "common/src/helpers";
-import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
+import { IconCross } from "hds-react";
 import { Flex } from "common/styles/util";
 import { breakpoints } from "common";
+import { focusStyles } from "common/styles/cssFragments";
 
 const Overlay = styled(Flex).attrs({
   $justifyContent: "center",
@@ -39,10 +40,30 @@ const ModalElement = styled(Flex)<{ $maxWidth?: string; $height?: string }>`
   padding: var(--modal-padding);
 `;
 
-const CloseButtonWrapper = styled.div`
+const CloseButton = styled.button`
+  --min-size: 44px;
+  --border-width: 1px;
+  & {
+    --background-color-focus: white;
+  }
+
   position: absolute;
   top: var(--spacing-layout-xs);
   right: var(--spacing-layout-xs);
+  min-height: var(--min-size);
+  min-width: var(--min-size);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-white);
+  border: var(--border-width) solid var(--color-black);
+
+  :hover {
+    cursor: pointer;
+    background: var(--color-black-10);
+  }
+  ${focusStyles}
 `;
 
 type Props = {
@@ -85,19 +106,13 @@ function Modal({
           $height={fullHeight ? "100%" : undefined}
         >
           {!hideCloseButton && (
-            /* eslint-disable -- don't remove empty string */
-            <CloseButtonWrapper>
-              <Button
-                size={ButtonSize.Small}
-                variant={ButtonVariant.Secondary}
-                onClick={handleClose}
-                aria-label={t(closeButtonKey) ?? t("common:close")}
-                iconStart={<IconCross aria-hidden="true" />}
-              >
-                {""}
-              </Button>
-            </CloseButtonWrapper>
-            /* eslint-enable */
+            <CloseButton
+              aria-label={t(closeButtonKey) ?? t("common:close")}
+              onClick={handleClose}
+              type="button"
+            >
+              <IconCross aria-hidden="true" />
+            </CloseButton>
           )}
           <section>{children}</section>
           {actions}

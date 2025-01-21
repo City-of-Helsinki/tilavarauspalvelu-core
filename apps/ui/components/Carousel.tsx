@@ -1,9 +1,9 @@
 import React from "react";
 import NukaCarousel from "nuka-carousel";
-import { IconAngleLeft, IconAngleRight } from "hds-react";
+import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { MediumButton } from "@/styles/util";
+import { focusStyles } from "common/styles/cssFragments";
 
 type Props = {
   children: React.ReactNode[];
@@ -16,53 +16,20 @@ type Props = {
   slideIndex?: number;
 };
 
-const Button = styled(MediumButton).attrs({
-  style: {
-    "--color-bus": "rgba(0,0,0,0.4)",
-    "--color-bus-dark": "rgba(0,0,0,0.4)",
-    "--border-color": "rgba(0,0,0,0.4)",
-    "--border-width": "1px",
-    "--min-size": "40px",
-    "--outline-gutter": "-2px",
-    "--outline-width": "2px",
-  } as React.CSSProperties,
-})`
-  && {
-    & > span {
-      padding: 0;
-    }
+const SmallArrowButton = styled.button`
+  background-color: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
 
-    padding: 0;
-    border-color: transparent !important;
+  &:hover {
+    opacity: 0.5;
   }
-
-  button {
-    padding: 0;
+  &:disabled {
+    opacity: 0.1;
   }
-`;
-
-const SmallArrowButton = styled(Button)`
-  &&& {
-    --color-bus: transparent;
-    --color-bus-dark: transparent;
-    --min-size: 0;
-
-    background-color: transparent;
-    margin: 0;
-    padding: 0;
-
-    &:hover {
-      opacity: 0.7;
-    }
-    :disabled {
-      opacity: 0.1;
-    }
-
-    svg {
-      color: black;
-      transform: scale(1.5);
-    }
-  }
+  ${focusStyles}
 `;
 
 const StyledCarousel = styled(NukaCarousel)<{
@@ -127,16 +94,14 @@ function Carousel({
   return (
     <StyledCarousel
       renderCenterLeftControls={({ previousSlide, previousDisabled }) => (
-        /* eslint-disable -- don't remove empty string */
         <SmallArrowButton
           disabled={previousDisabled}
           type="button"
           onClick={previousSlide}
           aria-label={t("common:prev")}
           data-testid="slot-carousel-button"
-          iconStart={<IconAngleLeft aria-hidden="true" />}
         >
-        {""}
+          <IconAngleLeft size={IconSize.Medium} aria-hidden="true" />
         </SmallArrowButton>
       )}
       renderCenterRightControls={({ nextSlide, nextDisabled }) => (
@@ -146,11 +111,9 @@ function Carousel({
           onClick={nextSlide}
           aria-label={t("common:next")}
           data-testid="slot-carousel-button"
-          iconStart={<IconAngleRight aria-hidden="true" />}
         >
-        {""}
+          <IconAngleRight size={IconSize.Medium} aria-hidden="true" />
         </SmallArrowButton>
-        /* eslint-enable */
       )}
       renderBottomCenterControls={({ slideCount, currentSlide, goToSlide }) => (
         <CustomBottomControls>
