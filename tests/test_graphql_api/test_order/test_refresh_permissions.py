@@ -46,7 +46,9 @@ def test_refresh_order__order_owner(graphql):
     response = graphql(REFRESH_MUTATION, input_data=data)
 
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
-    assert response.error_message() == "Unable to check order payment"
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Unable to check order payment"]
 
     assert SentryLogger.log_message.call_count == 1
 
@@ -63,6 +65,8 @@ def test_refresh_order__general_admin__can_manage_reservations(graphql):
     response = graphql(REFRESH_MUTATION, input_data=data)
 
     assert VerkkokauppaAPIClient.get_payment.call_count == 1
-    assert response.error_message() == "Unable to check order payment"
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Unable to check order payment"]
 
     assert SentryLogger.log_message.call_count == 1

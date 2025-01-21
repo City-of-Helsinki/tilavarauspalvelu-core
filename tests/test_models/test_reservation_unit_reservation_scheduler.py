@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
@@ -74,21 +74,21 @@ def test__reservation_unit_reservation_scheduler__get_reservation_unit_possible_
         end_datetime=_get_dt(month=7, day=1, hour=22),
     )
 
-    possible_start_times = reservation_unit.actions.get_possible_start_times(
-        from_date=_get_date(month=1, day=1),
-        interval_minutes=90,
-    )
+    reservation_unit.reservation_start_interval = ReservationStartInterval.INTERVAL_90_MINUTES
+    reservation_unit.save()
+
+    possible_start_times = reservation_unit.actions.get_possible_start_times(on_date=_get_date(month=1, day=1))
 
     expected = {
-        _get_dt(month=1, day=1, hour=10, minute=0),
-        _get_dt(month=1, day=1, hour=11, minute=30),
-        _get_dt(month=1, day=1, hour=13, minute=0),
-        _get_dt(month=1, day=1, hour=14, minute=30),
-        _get_dt(month=1, day=1, hour=16, minute=0),
-        _get_dt(month=1, day=1, hour=17, minute=30),
-        _get_dt(month=1, day=1, hour=19, minute=0),
-        _get_dt(month=1, day=1, hour=20, minute=30),
-        _get_dt(month=1, day=1, hour=20, minute=30),
+        _get_dt(month=1, day=1, hour=10, minute=0).time(),
+        _get_dt(month=1, day=1, hour=11, minute=30).time(),
+        _get_dt(month=1, day=1, hour=13, minute=0).time(),
+        _get_dt(month=1, day=1, hour=14, minute=30).time(),
+        _get_dt(month=1, day=1, hour=16, minute=0).time(),
+        _get_dt(month=1, day=1, hour=17, minute=30).time(),
+        _get_dt(month=1, day=1, hour=19, minute=0).time(),
+        _get_dt(month=1, day=1, hour=20, minute=30).time(),
+        _get_dt(month=1, day=1, hour=20, minute=30).time(),
     }
 
     # All possible start times are in the expected set

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Literal, Protocol, TypedDict
+from typing import TYPE_CHECKING, Any, Literal, NotRequired, Protocol, TypedDict
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.handlers import wsgi
@@ -13,8 +13,16 @@ if TYPE_CHECKING:
 
     from django.contrib.sessions.backends.cache import SessionStore
 
-    from tilavarauspalvelu.models import User
-
+    from tilavarauspalvelu.enums import CustomerTypeChoice, PaymentType, ReservationStateChoice, ReservationTypeChoice
+    from tilavarauspalvelu.models import (
+        AgeGroup,
+        City,
+        ReservationCancelReason,
+        ReservationDenyReason,
+        ReservationPurpose,
+        ReservationUnit,
+        User,
+    )
 
 __all__ = [
     "AffectedTimeSpan",
@@ -27,6 +35,7 @@ __all__ = [
     "SessionMapping",
     "TimeSlot",
     "TimeSlotDB",
+    "TimeSpan",
     "UserAnonymizationInfo",
     "WSGIRequest",
     "permission",
@@ -49,6 +58,11 @@ class AffectedTimeSpan(TypedDict):
     buffer_time_before: str
     buffer_time_after: str
     is_blocking: bool
+
+
+class TimeSpan(TypedDict):
+    start_datetime: datetime.datetime
+    end_datetime: datetime.datetime
 
 
 class TimeSlot(TypedDict):
@@ -117,3 +131,166 @@ class ExtraData(TypedDict):
     """Access token: str"""
     refresh_token: str
     """Refresh token: str"""
+
+
+class ReservationCreateData(TypedDict):
+    reservation_unit: NotRequired[ReservationUnit]  # Required but removed before mutation
+
+    begin: datetime.datetime
+    end: datetime.datetime
+
+    # Added automatically
+    sku: NotRequired[str]
+    buffer_time_before: NotRequired[datetime.timedelta]
+    buffer_time_after: NotRequired[datetime.timedelta]
+    user: NotRequired[User]
+    reservee_used_ad_login: NotRequired[bool]
+    price: NotRequired[Decimal]
+    unit_price: NotRequired[Decimal]
+    tax_percentage_value: NotRequired[Decimal]
+    non_subsidised_price: NotRequired[Decimal]
+
+    # From prefill
+    reservee_first_name: NotRequired[str | None]
+    reservee_last_name: NotRequired[str | None]
+    reservee_email: NotRequired[str | None]
+    reservee_phone: NotRequired[str | None]
+    reservee_address_street: NotRequired[str | None]
+    reservee_address_zip: NotRequired[str | None]
+    reservee_address_city: NotRequired[str | None]
+    home_city: NotRequired[City | None]
+
+
+class ReservationUpdateData(TypedDict):
+    pk: int
+
+    name: NotRequired[str]
+    num_persons: NotRequired[int]
+    description: NotRequired[str]
+
+    applying_for_free_of_charge: NotRequired[bool]
+    free_of_charge_reason: NotRequired[str | None]
+
+    reservee_id: NotRequired[str]
+    reservee_first_name: NotRequired[str]
+    reservee_last_name: NotRequired[str]
+    reservee_email: NotRequired[str | None]
+    reservee_phone: NotRequired[str]
+    reservee_organisation_name: NotRequired[str]
+    reservee_address_street: NotRequired[str]
+    reservee_address_city: NotRequired[str]
+    reservee_address_zip: NotRequired[str]
+    reservee_is_unregistered_association: NotRequired[bool]
+    reservee_type: NotRequired[CustomerTypeChoice]
+
+    billing_first_name: NotRequired[str]
+    billing_last_name: NotRequired[str]
+    billing_email: NotRequired[str | None]
+    billing_phone: NotRequired[str]
+    billing_address_street: NotRequired[str]
+    billing_address_city: NotRequired[str]
+    billing_address_zip: NotRequired[str]
+
+    purpose: NotRequired[ReservationPurpose | None]
+    home_city: NotRequired[City | None]
+    age_group: NotRequired[AgeGroup | None]
+
+    state: NotRequired[ReservationStateChoice]
+
+
+class ReservationConfirmData(TypedDict):
+    pk: int
+
+    confirmed_at: NotRequired[datetime.datetime]
+    payment_type: NotRequired[PaymentType | None]
+    state: NotRequired[ReservationStateChoice]
+
+
+class ReservationAdjustTimeData(TypedDict):
+    pk: int
+    begin: datetime.datetime
+    end: datetime.datetime
+
+    state: NotRequired[ReservationStateChoice]
+    buffer_time_before: NotRequired[datetime.timedelta]
+    buffer_time_after: NotRequired[datetime.timedelta]
+
+
+class ReservationApproveData(TypedDict):
+    pk: int
+    price: Decimal
+    handling_details: str
+
+    state: NotRequired[ReservationStateChoice]
+    handled_at: NotRequired[datetime.datetime]
+
+
+class ReservationCancellationData(TypedDict):
+    pk: int
+
+    cancel_details: str
+    cancel_reason: ReservationCancelReason
+
+    state: NotRequired[ReservationStateChoice]
+
+
+class ReservationDenyData(TypedDict):
+    pk: int
+
+    deny_reason: ReservationDenyReason
+    handling_details: str
+
+    state: NotRequired[ReservationStateChoice]
+    handled_at: NotRequired[datetime.datetime]
+
+
+class StaffCreateReservationData(TypedDict):
+    reservation_unit: NotRequired[ReservationUnit]  # Required but removed before mutation
+
+    name: NotRequired[str]
+    description: NotRequired[str]
+    num_persons: NotRequired[int]
+    working_memo: NotRequired[str]
+    type: NotRequired[ReservationTypeChoice]
+
+    begin: NotRequired[datetime.datetime]
+    end: NotRequired[datetime.datetime]
+    buffer_time_before: NotRequired[datetime.timedelta]
+    buffer_time_after: NotRequired[datetime.timedelta]
+
+    applying_for_free_of_charge: NotRequired[bool]
+    free_of_charge_reason: NotRequired[str | None]
+
+    reservee_id: NotRequired[str]
+    reservee_first_name: NotRequired[str]
+    reservee_last_name: NotRequired[str]
+    reservee_email: NotRequired[str | None]
+    reservee_phone: NotRequired[str]
+    reservee_organisation_name: NotRequired[str]
+    reservee_address_street: NotRequired[str]
+    reservee_address_city: NotRequired[str]
+    reservee_address_zip: NotRequired[str]
+    reservee_is_unregistered_association: NotRequired[bool]
+    reservee_type: NotRequired[CustomerTypeChoice]
+
+    billing_first_name: NotRequired[str]
+    billing_last_name: NotRequired[str]
+    billing_email: NotRequired[str | None]
+    billing_phone: NotRequired[str]
+    billing_address_street: NotRequired[str]
+    billing_address_city: NotRequired[str]
+    billing_address_zip: NotRequired[str]
+
+    age_group: NotRequired[ReservationPurpose | None]
+    home_city: NotRequired[City | None]
+    purpose: NotRequired[AgeGroup | None]
+
+    state: NotRequired[ReservationStateChoice]
+    confirmed_at: NotRequired[datetime.datetime]
+    handled_at: NotRequired[datetime.datetime]
+    user: User
+    reservee_used_ad_login: bool
+
+
+class StaffReservationData(StaffCreateReservationData):
+    pk: int

@@ -2321,19 +2321,6 @@ msgstr "Käyttäjällä on käsittelemätön hakemus."
 msgid "User has open payments."
 msgstr "Käyttäjällä on avoimia maksuja."
 
-#: tilavarauspalvelu/api/graphql/extensions/fields.py
-msgid "A valid integer is required."
-msgstr "Syötä oikea kokonaisluku."
-
-#: tilavarauspalvelu/api/graphql/extensions/fields.py
-#, python-format
-msgid ""
-"Choice \"%(choice)s\" is not allowed. Allowed choices are: "
-"%(allowed_choices)s."
-msgstr ""
-"Valinta \"%(choice)s\" ei ole sallittu. Mahdolliset valinnat ovat: "
-"%(allowed_choices)s."
-
 #: tilavarauspalvelu/api/helauth/views.py
 msgid "You have been successfully logged out."
 msgstr "Sinut on nyt kirjattu ulos."

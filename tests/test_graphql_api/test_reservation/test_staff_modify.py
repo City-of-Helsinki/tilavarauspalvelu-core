@@ -36,7 +36,8 @@ def test_reservation__staff_modify__normal_reservation_to_staff(graphql):
     data = get_staff_modify_data(reservation, type=ReservationTypeChoice.STAFF)
     response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation type cannot be changed from NORMAL to STAFF."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["A normal type reservation cannot be changed to any other type."]
 
 
 def test_reservation__staff_modify__normal_reservation_to_behalf(graphql):
@@ -46,7 +47,8 @@ def test_reservation__staff_modify__normal_reservation_to_behalf(graphql):
     data = get_staff_modify_data(reservation, type=ReservationTypeChoice.BEHALF)
     response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation type cannot be changed from NORMAL to BEHALF."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["A normal type reservation cannot be changed to any other type."]
 
 
 def test_reservation__staff_modify__normal_reservation_to_blocked(graphql):
@@ -56,7 +58,8 @@ def test_reservation__staff_modify__normal_reservation_to_blocked(graphql):
     data = get_staff_modify_data(reservation, type=ReservationTypeChoice.BLOCKED)
     response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation type cannot be changed from NORMAL to BLOCKED."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["A normal type reservation cannot be changed to any other type."]
 
 
 def test_reservation__staff_modify__staff_reservation_to_normal(graphql):
@@ -66,7 +69,10 @@ def test_reservation__staff_modify__staff_reservation_to_normal(graphql):
     data = get_staff_modify_data(reservation, type=ReservationTypeChoice.NORMAL)
     response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation type cannot be changed to NORMAl from state STAFF."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "A reservation cannot be changed to a normal reservation from any other type.",
+    ]
 
 
 def test_reservation__staff_modify__behalf_reservation_to_normal(graphql):
@@ -76,7 +82,10 @@ def test_reservation__staff_modify__behalf_reservation_to_normal(graphql):
     data = get_staff_modify_data(reservation, type=ReservationTypeChoice.NORMAL)
     response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation type cannot be changed to NORMAl from state BEHALF."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "A reservation cannot be changed to a normal reservation from any other type.",
+    ]
 
 
 def test_reservation__staff_modify__blocked_reservation_to_normal(graphql):
@@ -86,7 +95,10 @@ def test_reservation__staff_modify__blocked_reservation_to_normal(graphql):
     data = get_staff_modify_data(reservation, type=ReservationTypeChoice.NORMAL)
     response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation type cannot be changed to NORMAl from state BLOCKED."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == [
+        "A reservation cannot be changed to a normal reservation from any other type.",
+    ]
 
 
 def test_reservation__staff_modify__wrong_state(graphql):
@@ -96,7 +108,8 @@ def test_reservation__staff_modify__wrong_state(graphql):
     data = get_staff_modify_data(reservation)
     response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation must be in confirmed state."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot be edited by staff members based on its state"]
 
 
 def test_reservation__staff_modify__end_date_passed(graphql):
@@ -109,4 +122,5 @@ def test_reservation__staff_modify__end_date_passed(graphql):
     data = get_staff_modify_data(reservation)
     response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Reservation cannot be changed anymore."
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation cannot be changed anymore."]

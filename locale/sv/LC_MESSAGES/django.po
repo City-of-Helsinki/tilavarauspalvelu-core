@@ -2245,17 +2245,6 @@ msgstr ""
 msgid "User has open payments."
 msgstr ""
 
-#: tilavarauspalvelu/api/graphql/extensions/fields.py
-msgid "A valid integer is required."
-msgstr ""
-
-#: tilavarauspalvelu/api/graphql/extensions/fields.py
-#, python-format
-msgid ""
-"Choice \"%(choice)s\" is not allowed. Allowed choices are: "
-"%(allowed_choices)s."
-msgstr ""
-
 #: tilavarauspalvelu/api/helauth/views.py
 msgid "You have been successfully logged out."
 msgstr ""

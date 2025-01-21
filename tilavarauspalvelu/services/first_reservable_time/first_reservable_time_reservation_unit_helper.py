@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
-from tilavarauspalvelu.enums import ReservationStartInterval
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_reservable_time_span_helper import (
@@ -73,7 +72,7 @@ class ReservationUnitFirstReservableTimeHelper:
             self.blocking_reservation_closed_time_spans,
         )
 
-        start_interval_minutes = ReservationStartInterval(reservation_unit.reservation_start_interval).as_number
+        start_interval_minutes = reservation_unit.actions.start_interval_minutes
 
         self.minimum_duration_minutes = max(
             parent.filter_minimum_duration_minutes,

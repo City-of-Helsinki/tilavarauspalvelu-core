@@ -94,7 +94,7 @@ def get_staff_create_data(
         "type": ReservationTypeChoice.STAFF,
         "begin": begin.isoformat(),
         "end": end.isoformat(),
-        "reservationUnitPks": [reservation_unit.pk],
+        "reservationUnit": reservation_unit.pk,
         **overrides,
     }
 
@@ -111,9 +111,9 @@ def get_create_data(
         end = begin + datetime.timedelta(hours=1)
 
     return {
+        "reservationUnit": reservation_unit.pk,
         "begin": begin.isoformat(),
         "end": end.isoformat(),
-        "reservationUnitPks": [reservation_unit.pk],
         **overrides,
     }
 

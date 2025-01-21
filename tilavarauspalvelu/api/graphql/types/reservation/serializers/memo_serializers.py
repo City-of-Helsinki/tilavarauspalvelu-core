@@ -1,16 +1,20 @@
 from __future__ import annotations
 
-from typing import Any
+from graphene_django_extensions import NestingModelSerializer
+from rest_framework.fields import CharField, IntegerField
 
-from tilavarauspalvelu.api.graphql.extensions.serializers import OldPrimaryKeySerializer
 from tilavarauspalvelu.models import Reservation
 
 
-class ReservationWorkingMemoSerializer(OldPrimaryKeySerializer):
+class ReservationWorkingMemoSerializer(NestingModelSerializer):
+    """Update the working memo of a reservation."""
+
+    pk = IntegerField(required=True)
+    working_memo = CharField(required=True, allow_blank=False)
+
     class Meta:
         model = Reservation
-        fields = ["pk", "working_memo"]
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        self.fields["pk"].help_text = "Primary key of the reservation"
+        fields = [
+            "pk",
+            "working_memo",
+        ]
