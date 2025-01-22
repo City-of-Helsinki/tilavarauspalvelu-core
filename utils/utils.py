@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import get_language_from_path, get_language_from_request
-from html2text import html2text
+from html2text import HTML2Text  # noqa: TID251
 
 from tilavarauspalvelu.enums import Language
 from utils.date_utils import local_datetime
@@ -206,8 +206,23 @@ def as_p_tags(texts: Iterable[str]) -> str:
     return "".join(f"<p>{p}</p>" for p in texts)
 
 
+class VaraamoHTML2Text(HTML2Text):
+    def handle(self, data: str) -> str:
+        # Replace &section with $section and then back to prevent html2text from converting it to a section symbol (§)
+        data = data.replace("&section", "$section")
+        output = super().handle(data)
+        return output.replace("$section", "&section")
+
+
+def html_2_text(html_text: str) -> str:
+    """Used as a replacement for html2text.html2text"""
+    h = VaraamoHTML2Text(baseurl="", bodywidth=0)
+    return h.handle(html_text)
+
+
 def convert_html_to_text(html_text: str) -> str:
-    text = html2text(html_text, bodywidth=0)
+    """Convert HTML text to plain text, with our formatting rules for links."""
+    text = html_2_text(html_text)
 
     # Link text and url are the same:
     # Remove angle-brackets from links `<url>` -> `url`

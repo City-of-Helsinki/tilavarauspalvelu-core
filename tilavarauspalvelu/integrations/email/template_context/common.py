@@ -160,10 +160,11 @@ def get_contex_for_seasonal_reservation_check_details_url(
         application_id=application_id,
         application_section_id=application_section_id,
     )
+    text = "varaamo.hel.fi"
 
     return {
         "check_booking_details_text": pgettext("Email", "You can check your booking details at"),
-        "check_booking_details_url_html": create_anchor_tag(link=link, text=link),
+        "check_booking_details_url_html": create_anchor_tag(link=link, text=text),
         "check_booking_details_url": link,
     }
 

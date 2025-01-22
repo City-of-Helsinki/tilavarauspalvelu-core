@@ -306,7 +306,7 @@ def test_get_context_for_application_section_cancelled__en(email_reservation):
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
         "check_booking_details_url": f"{details_url}",
-        "check_booking_details_url_html": f'<a href="{details_url}">{details_url}</a>',
+        "check_booking_details_url_html": f'<a href="{details_url}">varaamo.hel.fi</a>',
     }
 
     with TranslationsFromPOFiles():

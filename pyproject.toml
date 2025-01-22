@@ -362,6 +362,8 @@ builtins-allowed-modules = [
 
 "django.contrib.auth.get_user_model".msg = "Use `tilavarauspalvelu.models.User` instead."
 
+"html2text".msg = "Use `utils.utils.html_2_text` instead."
+
 [tool.ruff.lint.flake8-import-conventions]
 banned-from = [
     # Python standard libraries
