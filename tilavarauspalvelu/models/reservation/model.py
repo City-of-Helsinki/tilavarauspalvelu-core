@@ -16,6 +16,7 @@ from lookup_property import lookup_property
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import (
     RESERVEE_LANGUAGE_CHOICES,
+    AccessType,
     CustomerTypeChoice,
     ReservationStateChoice,
     ReservationTypeChoice,
@@ -78,6 +79,15 @@ class Reservation(SerializableMixin, models.Model):
     handled_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     created_at: datetime.datetime | None = models.DateTimeField(null=True, default=timezone.now)  # noqa: TID251
+
+    # Access type information
+    access_type: str = models.CharField(
+        max_length=20,
+        choices=AccessType.choices,
+        default=AccessType.UNRESTRICTED.value,
+    )
+    access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+    access_code_is_active: bool = models.BooleanField(default=False)
 
     # Pricing details
     price: Decimal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -343,11 +353,32 @@ class Reservation(SerializableMixin, models.Model):
         # Should not be used by anything else!
         self._units_for_permissions = value
 
+    @lookup_property
+    def access_code_should_be_active() -> bool:
+        """
+        Whether the reservation's access code _should_ be active or not. This is used by background tasks
+        to update access code state in Pindora in case an API call to Pindora fails in the endpoint.
+        """
+        case = models.Case(
+            models.When(
+                (
+                    models.Q(access_type=AccessType.ACCESS_CODE.value)
+                    & models.Q(state=ReservationStateChoice.CONFIRMED.value)
+                    & ~models.Q(type=ReservationTypeChoice.BLOCKED.value)
+                ),
+                then=models.Value(True),  # noqa: FBT003
+            ),
+            default=models.Value(False),  # noqa: FBT003
+            output_field=models.BooleanField(),
+        )
+        return case  # noqa: RET504 type: ignore[return-value]
+
 
 AuditLogger.register(
     Reservation,
     # Exclude lookup properties, since they are calculated values.
     exclude_fields=[
         "_reservee_name",
+        "_access_code_should_be_active",
     ],
 )

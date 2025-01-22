@@ -50,6 +50,10 @@ class ReservationStatistic(models.Model):
     reservee_language: str = models.CharField(max_length=255, blank=True, default="")
     reservee_type: str | None = models.CharField(max_length=255, null=True, blank=True)
 
+    # Access type information
+    access_type: str = models.CharField(max_length=255)
+    access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
+
     # Relations and static copies of their values
 
     primary_reservation_unit = models.ForeignKey(
@@ -178,6 +182,8 @@ class ReservationStatistic(models.Model):
         )
 
         statistic.ability_group = ability_group
+        statistic.access_code_generated_at = reservation.access_code_generated_at
+        statistic.access_type = reservation.access_type
         statistic.age_group = reservation.age_group
         statistic.age_group_name = str(reservation.age_group)
         statistic.applying_for_free_of_charge = reservation.applying_for_free_of_charge
@@ -206,12 +212,12 @@ class ReservationStatistic(models.Model):
         statistic.recurrence_begin_date = getattr(recurring_reservation, "begin_date", None)
         statistic.recurrence_end_date = getattr(recurring_reservation, "end_date", None)
         statistic.recurrence_uuid = str(getattr(recurring_reservation, "ext_uuid", ""))
-        statistic.reservation_uuid = str(reservation.ext_uuid)
         statistic.reservation = reservation
         statistic.reservation_confirmed_at = reservation.confirmed_at
         statistic.reservation_created_at = reservation.created_at
         statistic.reservation_handled_at = reservation.handled_at
         statistic.reservation_type = reservation.type
+        statistic.reservation_uuid = str(reservation.ext_uuid)
         statistic.reservee_address_zip = reservation.reservee_address_zip if by_profile_user else ""
         statistic.reservee_id = reservation.reservee_id if requires_org_id else ""
         statistic.reservee_is_unregistered_association = reservation.reservee_is_unregistered_association
