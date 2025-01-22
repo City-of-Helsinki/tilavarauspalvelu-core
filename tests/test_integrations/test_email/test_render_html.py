@@ -5,16 +5,16 @@ from decimal import Decimal
 from inspect import cleandoc
 
 from freezegun import freeze_time
-from html2text import html2text
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.integrations.email.rendering import render_html
+from utils.utils import html_2_text
 
 
 def html_email_to_text(html_content: str) -> str:
-    """Convert a rendered email to plain text for testing purposes."""
-    converted_text = html2text(html_content, bodywidth=0)
+    """Convert a rendered email to plain text, used only for testing purposes."""
+    converted_text = html_2_text(html_content)
 
     # Cleanup the text a little bit.
     text: str = ""
@@ -167,7 +167,7 @@ def test_render_application_section_cancelled_email__html():
 
         Reason: [PERUUTUKSEN SYY]
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
-        You can check your booking details at: <https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678>
+        You can check your booking details at: [varaamo.hel.fi](https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678)
 
         Kind regards
         Varaamo
@@ -752,7 +752,7 @@ def test_render_seasonal_reservation_cancelled_single__html():
         [TOIMIPISTEEN OSOITE]
         From: **1.1.2024** at **12:00**
         To: **2.1.2024** at **15:00**
-        You can check your booking details at: <https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678>
+        You can check your booking details at: [varaamo.hel.fi](https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678)
 
         Kind regards
         Varaamo
@@ -788,7 +788,7 @@ def test_render_seasonal_reservation_modified_series__html():
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         Day: Monday
         Time: 13:00-15:00
-        You can check your booking details at: <https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678>
+        You can check your booking details at: [varaamo.hel.fi](https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678)
 
         Kind regards
         Varaamo
@@ -826,7 +826,7 @@ def test_render_seasonal_reservation_modified_single__html():
         [TOIMIPISTEEN OSOITE]
         From: **1.1.2024** at **12:00**
         To: **2.1.2024** at **15:00**
-        You can check your booking details at: <https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678>
+        You can check your booking details at: [varaamo.hel.fi](https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678)
 
         Kind regards
         Varaamo
@@ -863,7 +863,7 @@ def test_render_seasonal_reservation_rejected_series__html():
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         Day: Monday
         Time: 13:00-15:00
-        You can check your booking details at: <https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678>
+        You can check your booking details at: [varaamo.hel.fi](https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678)
 
         Kind regards
         Varaamo
@@ -902,7 +902,7 @@ def test_render_seasonal_reservation_rejected_single__html():
         [TOIMIPISTEEN OSOITE]
         From: **1.1.2024** at **12:00**
         To: **2.1.2024** at **15:00**
-        You can check your booking details at: <https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678>
+        You can check your booking details at: [varaamo.hel.fi](https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678)
 
         Kind regards
         Varaamo

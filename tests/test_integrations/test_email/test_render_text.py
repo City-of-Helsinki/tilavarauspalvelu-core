@@ -101,6 +101,7 @@ def test_render_application_received_email__text():
 def test_render_application_section_cancelled_email_text():
     context = get_mock_data(email_type=EmailType.APPLICATION_SECTION_CANCELLED, language="en")
     text_content = render_text(email_type=EmailType.APPLICATION_SECTION_CANCELLED, context=context)
+    text_content = text_content.replace("&amp;", "&")
 
     assert text_content == cleandoc(
         """
@@ -584,6 +585,7 @@ def test_render_reservation_requires_payment__text():
 def test_render_seasonal_reservation_cancelled_single_text():
     context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_RESERVATION_CANCELLED_SINGLE, context=context)
+    text_content = text_content.replace("&amp;", "&")
 
     assert text_content == cleandoc(
         """
@@ -615,6 +617,7 @@ def test_render_seasonal_reservation_cancelled_single_text():
 def test_render_seasonal_reservation_modified_series__text():
     context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES, context=context)
+    text_content = text_content.replace("&amp;", "&")
 
     assert text_content == cleandoc(
         """
@@ -643,6 +646,7 @@ def test_render_seasonal_reservation_modified_series__text():
 def test_render_seasonal_reservation_modified_single__text():
     context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE, context=context)
+    text_content = text_content.replace("&amp;", "&")
 
     assert text_content == cleandoc(
         """
@@ -673,6 +677,7 @@ def test_render_seasonal_reservation_modified_single__text():
 def test_render_seasonal_reservation_rejected_series__text():
     context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SERIES, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SERIES, context=context)
+    text_content = text_content.replace("&amp;", "&")
 
     assert text_content == cleandoc(
         """
@@ -702,6 +707,7 @@ def test_render_seasonal_reservation_rejected_series__text():
 def test_render_seasonal_reservation_rejected_single__text():
     context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE, language="en")
     text_content = render_text(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE, context=context)
+    text_content = text_content.replace("&amp;", "&")
 
     assert text_content == cleandoc(
         """
