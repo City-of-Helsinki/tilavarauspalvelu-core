@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -197,7 +198,9 @@ class HelsinkiProfileClient(BaseExternalServiceClient):
         if errors is not None:
             msg = f"{cls.SERVICE_NAME.capitalize()}: Response contains errors."
             SentryLogger.log_message(message=msg, details=errors, level="warning")
-            raise ExternalServiceError(msg, details=errors)
+
+            error_msg = f"{msg} {json.dumps(errors)}"
+            raise ExternalServiceError(error_msg)
 
         return response_data
 

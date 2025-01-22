@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import json
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
@@ -11,16 +10,6 @@ if TYPE_CHECKING:
 
 class ExternalServiceError(Exception):
     """Base class for exceptions related to external services."""
-
-    def __init__(self, msg: str, /, *, details: dict[str, Any] | None = None) -> None:
-        self.details = details
-        super().__init__(msg)
-
-    def __str__(self) -> str:
-        base = super().__str__()
-        if self.details is not None:
-            return f"{base} {json.dumps(self.details)}"
-        return base
 
 
 class ExternalServiceRequestError(ExternalServiceError):
