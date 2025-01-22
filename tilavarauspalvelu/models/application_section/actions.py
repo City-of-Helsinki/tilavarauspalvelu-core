@@ -15,9 +15,13 @@ class ApplicationSectionActions:
         self.application_section = application_section
 
     def get_reservation_series(self) -> QuerySet[RecurringReservation]:
-        return RecurringReservation.objects.filter(
-            allocated_time_slot__reservation_unit_option__application_section=self.application_section
-        ).prefetch_related("reservations")
+        return (
+            RecurringReservation.objects.filter(
+                allocated_time_slot__reservation_unit_option__application_section=self.application_section
+            )
+            .prefetch_related("reservations")
+            .order_by("begin_date")
+        )
 
     def get_last_reservation(self) -> Reservation | None:
         return Reservation.objects.filter(

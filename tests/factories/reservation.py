@@ -62,10 +62,10 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     created_at = None
 
     # Pricing details
-    price = 0
-    non_subsidised_price = 0
-    unit_price = 0
-    tax_percentage_value = 0
+    price = Decimal(0)
+    non_subsidised_price = Decimal(0)
+    unit_price = Decimal(0)
+    tax_percentage_value = Decimal(0)
 
     # Free of charge information
     applying_for_free_of_charge = False
