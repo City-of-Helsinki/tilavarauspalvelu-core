@@ -1,6 +1,7 @@
 # ruff: noqa: RUF001
 from __future__ import annotations
 
+import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import WeekdayChoice
@@ -14,6 +15,7 @@ from tilavarauspalvelu.integrations.email.template_context.application import (
     get_context_for_staff_notification_application_section_cancelled,
 )
 from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
+from tilavarauspalvelu.models import Reservation
 
 from tests.helpers import TranslationsFromPOFiles
 from tests.test_integrations.test_email.helpers import (
@@ -271,8 +273,9 @@ def test_get_context__application_received__sv():
 # type: EmailType.APPLICATION_SECTION_CANCELLED #################################################################################
 
 
+@pytest.mark.django_db
 @freeze_time("2024-01-01")
-def test_get_context_for_application_section_cancelled__en():
+def test_get_context_for_application_section_cancelled__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_application_section_cancelled(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -298,6 +301,12 @@ def test_get_context_for_application_section_cancelled__en():
         **CLOSING_CONTEXT_EN,
         **AUTOMATIC_REPLY_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_application_section_cancelled(
+            application_section=email_reservation.actions.get_application_section(),
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
@@ -361,8 +370,12 @@ def test_get_context_for_application_section_cancelled_sv():
 # type: EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED #####################################################
 
 
+@pytest.mark.django_db
 @freeze_time("2024-01-01")
-def test_get_context_for_staff_notification_application_section_cancelled__en():
+def test_get_context_for_staff_notification_application_section_cancelled__en(email_reservation):
+    reservation_id_1 = email_reservation.id
+    reservation_id_2 = Reservation.objects.exclude(id=reservation_id_1).first().id
+
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_application_section_cancelled(
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
@@ -371,14 +384,14 @@ def test_get_context_for_staff_notification_application_section_cancelled__en():
             language="en",
             cancelled_reservation_series=[
                 {
-                    "weekday_value": WeekdayChoice.MONDAY.label,
+                    "weekday_value": "Monday",
                     "time_value": "12:00:00-14:00:00",
-                    "reservation_url": get_staff_reservations_ext_link(reservation_id=1234),
+                    "reservation_url": get_staff_reservations_ext_link(reservation_id=reservation_id_1),
                 },
                 {
-                    "weekday_value": WeekdayChoice.TUESDAY.label,
+                    "weekday_value": "Tuesday",
                     "time_value": "21:00:00-22:00:00",
-                    "reservation_url": get_staff_reservations_ext_link(reservation_id=5678),
+                    "reservation_url": get_staff_reservations_ext_link(reservation_id=reservation_id_2),
                 },
             ],
         )
@@ -399,18 +412,24 @@ def test_get_context_for_staff_notification_application_section_cancelled__en():
             {
                 "weekday_value": "Monday",
                 "time_value": "12:00:00-14:00:00",
-                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+                "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}",
             },
             {
                 "weekday_value": "Tuesday",
                 "time_value": "21:00:00-22:00:00",
-                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+                "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_2}",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_EN,
         **CLOSING_CONTEXT_EN,
         **CLOSING_STAFF_CONTEXT_EN,
     }
+
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_staff_notification_application_section_cancelled(
+            application_section=email_reservation.actions.get_application_section(),
+            language="en",
+        )
 
 
 @freeze_time("2024-01-01")
