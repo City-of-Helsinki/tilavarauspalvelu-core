@@ -12,9 +12,10 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.translation import get_language_from_request
+from django.utils.translation import get_language_from_path, get_language_from_request
 from html2text import html2text
 
+from tilavarauspalvelu.enums import Language
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
@@ -22,7 +23,7 @@ if TYPE_CHECKING:
 
     from django.http import HttpRequest
 
-    from tilavarauspalvelu.typing import AnyUser, TextSearchLang
+    from tilavarauspalvelu.typing import AnyUser, Lang, TextSearchLang
 
 __all__ = [
     "comma_sep_str",
@@ -125,11 +126,26 @@ def get_text_search_language(request: HttpRequest) -> TextSearchLang:
     Get appropriate text search language for the given request.
     Use preferred language if user is authenticated, otherwise use the language from the request.
     """
-    user: AnyUser = request.user
-    lang_code = (
-        user.preferred_language if user.is_authenticated else get_language_from_request(request, check_path=True)
-    )
+    lang_code = get_request_language(request)
     return "swedish" if lang_code == "sv" else "english" if lang_code == "en" else "finnish"
+
+
+def get_request_language(request: HttpRequest) -> Lang:
+    referer = request.META.get("HTTP_REFERER")
+    user: AnyUser = request.user
+
+    if user.is_authenticated:
+        return user.get_preferred_language()
+
+    if referer:
+        path = urllib.parse.urlparse(referer).path
+        lang_code = get_language_from_path(path)
+    else:
+        lang_code = get_language_from_request(request, check_path=True)
+
+    if lang_code in Language.values:
+        return lang_code  # type: ignore[return-value]
+    return Language.FI.value  # type: ignore[return-value]
 
 
 def safe_getattr(obj: object, dotted_path: str, default: Any = None) -> Any:
