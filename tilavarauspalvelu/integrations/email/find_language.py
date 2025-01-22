@@ -26,6 +26,4 @@ def get_reservation_email_language(reservation: Reservation) -> Lang:
     """Get email notification language for the given application."""
     if getattr(reservation.user, "preferred_language", None) in Language.values:
         return reservation.user.preferred_language  # type: ignore[return-value]
-    if reservation.reservee_language in Language.values:
-        return reservation.reservee_language  # type: ignore[return-value]
     return settings.LANGUAGE_CODE

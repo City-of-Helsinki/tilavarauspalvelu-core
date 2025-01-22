@@ -159,7 +159,6 @@ class ReservationAdmin(admin.ModelAdmin):
                     "reservee_address_city",
                     "reservee_address_zip",
                     "reservee_is_unregistered_association",
-                    "reservee_language",
                     "reservee_type",
                 ],
             },

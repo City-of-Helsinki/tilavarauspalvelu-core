@@ -1385,10 +1385,6 @@ msgid "Reservee is an unregistered association"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Preferred language of reservee"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Type of reservee"
 msgstr ""
 
@@ -1564,10 +1560,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's zip code"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee's preferred language"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py

@@ -99,7 +99,6 @@ class ReservationDetails(TypedDict, total=False):
     reservee_address_city: str
     reservee_address_zip: str
     reservee_is_unregistered_association: bool
-    reservee_language: str
     reservee_type: CustomerTypeChoice
 
     billing_first_name: str

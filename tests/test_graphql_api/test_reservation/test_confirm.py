@@ -227,7 +227,7 @@ def test_reservation__confirm__does_not_create_order_when_handling_is_required(g
 def test_reservation__confirm__creates_local_order_when_payment_type_is_on_site(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_units__payment_types__code=PaymentType.ON_SITE,
-        reservee_language="fi",
+        user__preferred_language="fi",
     )
 
     graphql.login_with_superuser()
@@ -243,7 +243,7 @@ def test_reservation__confirm__creates_local_order_when_payment_type_is_on_site(
     assert len(orders) == 1
     assert orders[0].payment_type == PaymentType.ON_SITE
     assert orders[0].status == OrderStatus.PAID_MANUALLY
-    assert orders[0].language == reservation.reservee_language
+    assert orders[0].language == reservation.user.preferred_language
     assert orders[0].reservation == reservation
 
     assert VerkkokauppaAPIClient.create_order.called is False
@@ -253,7 +253,7 @@ def test_reservation__confirm__creates_local_order_when_payment_type_is_on_site(
 def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_on_site(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_units__payment_types__code=PaymentType.INVOICE,
-        reservee_language="fi",
+        user__preferred_language="fi",
     )
 
     order = OrderFactory.create()
@@ -272,7 +272,7 @@ def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_o
     assert len(orders) == 1
     assert orders[0].payment_type == PaymentType.INVOICE
     assert orders[0].status == OrderStatus.DRAFT
-    assert orders[0].language == reservation.reservee_language
+    assert orders[0].language == reservation.user.preferred_language
     assert orders[0].reservation == reservation
     assert orders[0].remote_id == order.order_id
     assert orders[0].checkout_url == order.checkout_url
@@ -286,7 +286,7 @@ def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_o
 def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         reservation_units__payment_types__code=PaymentType.INVOICE,
-        reservee_language="fi",
+        user__preferred_language="fi",
     )
 
     graphql.login_with_superuser()

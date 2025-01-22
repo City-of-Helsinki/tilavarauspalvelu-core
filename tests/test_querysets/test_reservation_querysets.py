@@ -5,7 +5,7 @@ from collections import defaultdict
 
 import pytest
 
-from tilavarauspalvelu.enums import Language, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import AffectingTimeSpan, Reservation, ReservationUnit, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
@@ -40,7 +40,6 @@ def _create_test_reservations_for_all_reservation_units() -> None:
             end=_datetime(minute=0),
             reservation_units=[reservation_unit],
             user=None,
-            reservee_language=Language.FI.value,
             state=ReservationStateChoice.CREATED,
             type=ReservationTypeChoice.NORMAL,
         )

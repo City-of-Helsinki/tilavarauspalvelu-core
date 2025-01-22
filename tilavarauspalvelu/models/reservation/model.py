@@ -14,12 +14,7 @@ from helsinki_gdpr.models import SerializableMixin
 from lookup_property import lookup_property
 
 from config.utils.auditlog_util import AuditLogger
-from tilavarauspalvelu.enums import (
-    RESERVEE_LANGUAGE_CHOICES,
-    CustomerTypeChoice,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-)
+from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from utils.date_utils import datetime_range_as_string
 from utils.decimal_utils import round_decimal
 
@@ -101,12 +96,6 @@ class Reservation(SerializableMixin, models.Model):
     reservee_address_zip: str = models.CharField(max_length=255, blank=True, default="")
     reservee_is_unregistered_association: bool = models.BooleanField(default=False, blank=True)
     reservee_used_ad_login: bool = models.BooleanField(default=False, blank=True)
-    reservee_language: str = models.CharField(
-        max_length=255,
-        blank=True,
-        default="",
-        choices=RESERVEE_LANGUAGE_CHOICES,
-    )
     reservee_type: str | None = models.CharField(
         max_length=50,
         choices=CustomerTypeChoice.choices,

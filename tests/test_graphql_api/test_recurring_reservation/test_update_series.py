@@ -66,7 +66,6 @@ def test_recurring_reservations__update_series(graphql):
             "reserveeAddressCity": "city",
             "reserveeAddressZip": "cip",
             "reserveeIsUnregisteredAssociation": False,
-            "reserveeLanguage": "FI",
             "reserveeType": CustomerTypeChoice.BUSINESS.upper(),
             "billingFirstName": "Bill",
             "billingLastName": "Admin",
@@ -108,7 +107,6 @@ def test_recurring_reservations__update_series(graphql):
     assert reservation.reservee_address_city == "city"
     assert reservation.reservee_address_zip == "cip"
     assert reservation.reservee_is_unregistered_association is False
-    assert reservation.reservee_language == "fi"
     assert reservation.reservee_type == CustomerTypeChoice.BUSINESS
     assert reservation.billing_first_name == "Bill"
     assert reservation.billing_last_name == "Admin"

@@ -1429,10 +1429,6 @@ msgid "Reservee is an unregistered association"
 msgstr "Varaaja on rekisteröimätön yhdistys"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-msgid "Preferred language of reservee"
-msgstr "Varaajan kieli"
-
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Type of reservee"
 msgstr "Varaajan tyyppi"
 
@@ -1609,10 +1605,6 @@ msgstr "Varaajan kaupunki"
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's zip code"
 msgstr "Varaajan postinumero"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "Reservee's preferred language"
-msgstr "Varaajan suosima kieli"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "User who made the reservation"

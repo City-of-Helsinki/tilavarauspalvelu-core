@@ -68,7 +68,6 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             "reservee_type",
             "reservee_id",
             "reservee_is_unregistered_association",
-            "reservee_language",
             #
             # Billing information
             "billing_address_city",

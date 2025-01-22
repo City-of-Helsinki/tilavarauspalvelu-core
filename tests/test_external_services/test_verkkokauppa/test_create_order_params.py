@@ -28,6 +28,7 @@ def test_get_verkkokauppa_order_params__to_json():
         email="test@localhost",
         first_name="First",
         last_name="Last",
+        preferred_language="fi",
     )
     reservation = ReservationFactory.create(
         reservation_units=[reservation_unit],
@@ -39,7 +40,6 @@ def test_get_verkkokauppa_order_params__to_json():
         reservee_last_name="Lastname",
         reservee_email="test@example.com",
         reservee_phone="+358 50 123 4567",
-        reservee_language="fi",
     )
 
     order_params = get_verkkokauppa_order_params(reservation)
@@ -47,7 +47,7 @@ def test_get_verkkokauppa_order_params__to_json():
 
     assert json["namespace"] == settings.VERKKOKAUPPA_NAMESPACE
     assert json["user"] == str(reservation.user.uuid)
-    assert json["language"] == reservation.reservee_language or "fi"
+    assert json["language"] == reservation.user.get_preferred_language()
     assert json["priceNet"] == "10.12"
     assert json["priceVat"] == "2.43"
     assert json["priceTotal"] == "12.55"
@@ -93,6 +93,7 @@ def test_get_verkkokauppa_order_params__to_json__meta_label_language_support():
         email="test@localhost",
         first_name="First",
         last_name="Name",
+        preferred_language="en",
     )
     reservation = ReservationFactory.create(
         reservation_units=[reservation_unit],
@@ -104,7 +105,6 @@ def test_get_verkkokauppa_order_params__to_json__meta_label_language_support():
         reservee_last_name="Lastname",
         reservee_email="test@example.com",
         reservee_phone="+358 50 123 4567",
-        reservee_language="en",
     )
 
     order_params = get_verkkokauppa_order_params(reservation)

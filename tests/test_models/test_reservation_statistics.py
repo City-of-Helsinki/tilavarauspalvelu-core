@@ -55,6 +55,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
         tax_percentage_value=24,
         unit_price=10,
         working_memo="its like that",
+        user__preferred_language="fi",
     )
 
     reservation_unit = reservation.reservation_units.first()
@@ -107,7 +108,7 @@ def test_statistics__create__reservation_creation_creates_statistics(settings):
     assert stat.reservee_address_zip == ""
     assert stat.reservee_id == ""
     assert stat.reservee_is_unregistered_association == reservation.reservee_is_unregistered_association
-    assert stat.reservee_language == reservation.reservee_language
+    assert stat.reservee_language == reservation.user.preferred_language
     assert stat.reservee_organisation_name == ""
     assert stat.reservee_type == reservation.reservee_type
     assert stat.reservee_uuid == str(reservation.user.tvp_uuid)

@@ -83,7 +83,6 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     reservee_address_zip = FakerFI("postcode")
     reservee_is_unregistered_association = False
     reservee_used_ad_login = False
-    reservee_language = LazyAttribute(lambda i: i.user.get_preferred_language())
     reservee_type = CustomerTypeChoice.INDIVIDUAL
 
     # Billing information
@@ -309,7 +308,6 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         self.kwargs["reservee_first_name"] = user.first_name
         self.kwargs["reservee_last_name"] = user.last_name
         self.kwargs["reservee_email"] = user.email
-        self.kwargs["reservee_language"] = user.get_preferred_language()
         return self
 
     def for_reservation_unit(self, reservation_unit: ReservationUnit) -> Self:

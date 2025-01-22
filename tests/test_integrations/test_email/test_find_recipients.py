@@ -68,7 +68,6 @@ def test_get_reservation_email_recipients__no_user():
     reservation = ReservationFactory.create(
         user=None,
         reservee_email="reservee@example.com",
-        reservee_language=Language.EN.value,
     )
 
     result = get_reservation_email_recipients(reservation)
@@ -79,7 +78,6 @@ def test_get_reservation_email_recipients__no_reservee_email_or_user():
     reservation = ReservationFactory.create(
         user=None,
         reservee_email="",
-        reservee_language=Language.EN.value,
     )
 
     result = get_reservation_email_recipients(reservation)

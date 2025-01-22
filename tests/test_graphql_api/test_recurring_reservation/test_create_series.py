@@ -110,7 +110,6 @@ def test_recurring_reservations__create_series__reservation_details(graphql):
     data["reservationDetails"]["reserveeAddressCity"] = "city"
     data["reservationDetails"]["reserveeAddressZip"] = "cip"
     data["reservationDetails"]["reserveeIsUnregisteredAssociation"] = False
-    data["reservationDetails"]["reserveeLanguage"] = "FI"
     data["reservationDetails"]["reserveeType"] = CustomerTypeChoice.BUSINESS.upper()
     data["reservationDetails"]["billingFirstName"] = "Bill"
     data["reservationDetails"]["billingLastName"] = "Admin"
@@ -157,7 +156,6 @@ def test_recurring_reservations__create_series__reservation_details(graphql):
     assert reservations[0].reservee_address_city == "city"
     assert reservations[0].reservee_address_zip == "cip"
     assert reservations[0].reservee_is_unregistered_association is False
-    assert reservations[0].reservee_language == "fi"
     assert reservations[0].reservee_type == CustomerTypeChoice.BUSINESS
     assert reservations[0].billing_first_name == "Bill"
     assert reservations[0].billing_last_name == "Admin"

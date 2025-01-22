@@ -78,7 +78,6 @@ class ReservationSeriesReservationCreateSerializer(NestingModelSerializer):
             "reservee_address_city",
             "reservee_address_zip",
             "reservee_is_unregistered_association",
-            "reservee_language",
             "reservee_type",
             #
             "billing_first_name",
@@ -277,7 +276,6 @@ class ReservationSeriesReservationUpdateSerializer(NestingModelSerializer):
             "reservee_address_city",
             "reservee_address_zip",
             "reservee_is_unregistered_association",
-            "reservee_language",
             "reservee_type",
             #
             "billing_first_name",
@@ -567,7 +565,6 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             reservee_address_city=next_reservation.reservee_address_city,
             reservee_address_zip=next_reservation.reservee_address_zip,
             reservee_is_unregistered_association=next_reservation.reservee_is_unregistered_association,
-            reservee_language=next_reservation.reservee_language,
             reservee_type=next_reservation.reservee_type,
             #
             billing_first_name=next_reservation.billing_first_name,

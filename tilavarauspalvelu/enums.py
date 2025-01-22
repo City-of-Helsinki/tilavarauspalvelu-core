@@ -7,7 +7,6 @@ from inspect import cleandoc
 from types import DynamicClassAttribute
 from typing import Literal
 
-from django.conf import settings
 from django.db import models
 from django.utils.functional import classproperty
 from django.utils.translation import gettext_lazy as _
@@ -16,7 +15,6 @@ from django.utils.translation import pgettext_lazy
 from tilavarauspalvelu.typing import permission
 
 __all__ = [
-    "RESERVEE_LANGUAGE_CHOICES",
     "AccessType",
     "ApplicantTypeChoice",
     "ApplicationRoundReservationCreationStatusChoice",
@@ -552,9 +550,6 @@ class ReservationTypeStaffChoice(models.TextChoices):
     BLOCKED = "BLOCKED", pgettext_lazy("ReservationTypeStaffChoice", "Blocked")
     STAFF = "STAFF", pgettext_lazy("ReservationTypeStaffChoice", "Staff")
     BEHALF = "BEHALF", pgettext_lazy("ReservationTypeStaffChoice", "Behalf")
-
-
-RESERVEE_LANGUAGE_CHOICES = (*settings.LANGUAGES, ("", ""))
 
 
 class RejectionReadinessChoice(models.TextChoices):

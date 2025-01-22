@@ -8,7 +8,6 @@ from django.db import models
 
 from tilavarauspalvelu.enums import (
     CustomerTypeChoice,
-    Language,
     OrderStatus,
     PaymentType,
     ReservationKind,
@@ -269,7 +268,7 @@ def _create_normal_reservations(
 
 def _build_payment_order(reservation: Reservation, payment_types_choices: list[PaymentType]) -> PaymentOrder:
     payment_order_builder = PaymentOrderBuilder().set(
-        language=reservation.reservee_language or Language.FI,
+        language=reservation.user.get_preferred_language(),
         price_net=reservation.price_net,
         price_vat=reservation.price_vat_amount,
         price_total=reservation.price,

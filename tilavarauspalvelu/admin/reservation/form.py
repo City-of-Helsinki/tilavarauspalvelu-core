@@ -51,7 +51,6 @@ class ReservationAdminForm(forms.ModelForm):
             "reservee_address_city": _("Reservee address city"),
             "reservee_address_zip": _("Reservee address zip code"),
             "reservee_is_unregistered_association": _("Reservee is an unregistered association"),
-            "reservee_language": _("Preferred language of reservee"),
             "reservee_type": _("Type of reservee"),
             #
             "billing_first_name": _("Billing first name"),
@@ -111,7 +110,6 @@ class ReservationAdminForm(forms.ModelForm):
             "reservee_address_city": _("Reservee's city"),
             "reservee_address_zip": _("Reservee's zip code"),
             "reservee_is_unregistered_association": _("Reservee is an unregistered association"),
-            "reservee_language": _("Reservee's preferred language"),
             "reservee_type": _("Type of reservee"),
             #
             "billing_first_name": _("Billing first name"),

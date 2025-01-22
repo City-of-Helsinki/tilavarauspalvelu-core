@@ -215,7 +215,7 @@ class ReservationStatistic(models.Model):
         statistic.reservee_address_zip = reservation.reservee_address_zip if by_profile_user else ""
         statistic.reservee_id = reservation.reservee_id if requires_org_id else ""
         statistic.reservee_is_unregistered_association = reservation.reservee_is_unregistered_association
-        statistic.reservee_language = reservation.reservee_language
+        statistic.reservee_language = reservation.user.get_preferred_language()
         statistic.reservee_organisation_name = reservation.reservee_organisation_name if requires_org_name else ""
         statistic.reservee_type = reservation.reservee_type
         statistic.reservee_used_ad_login = reservation.reservee_used_ad_login

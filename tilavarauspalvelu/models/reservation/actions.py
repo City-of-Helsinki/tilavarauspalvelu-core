@@ -58,11 +58,7 @@ class ReservationActions:
         return buffer_time_after
 
     def to_ical(self) -> bytes:
-        language: Lang = (  # type: ignore[assignment]
-            self.reservation.reservee_language
-            or (self.reservation.user is not None and self.reservation.user.get_preferred_language())
-            or settings.LANGUAGE_CODE
-        )
+        language = self.reservation.user.get_preferred_language()
 
         cal = Calendar()
         cal.add(CalendarProperty.VERSION, "2.0")

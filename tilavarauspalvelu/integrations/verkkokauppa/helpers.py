@@ -39,7 +39,7 @@ def get_formatted_reservation_time(reservation: Reservation) -> str:
     begin = reservation.begin.astimezone(DEFAULT_TIMEZONE)
     end = reservation.end.astimezone(DEFAULT_TIMEZONE)
 
-    preferred_language = reservation.reservee_language or "fi"
+    preferred_language = reservation.user.get_preferred_language()
     weekday = localized_short_weekday(begin.weekday(), preferred_language)
     date = f"{begin.day}.{begin.month}.{begin.year}"
     start_time = begin.strftime("%H:%M")
@@ -65,13 +65,13 @@ def get_meta_label(key: str, reservation: Reservation) -> str:
         msg = f"Invalid meta label key '{key}'"
         raise UnsupportedMetaKeyError(msg)
 
-    preferred_language = reservation.reservee_language or "fi"
+    preferred_language = reservation.user.get_preferred_language()
     return labels[key][preferred_language]
 
 
 def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams:
     reservation_unit = reservation.reservation_units.first()
-    preferred_language = getattr(reservation, "reservee_language", "fi")
+    preferred_language = reservation.user.get_preferred_language()
     items = [
         OrderItemParams(
             product_id=reservation_unit.payment_product.id,
@@ -113,7 +113,7 @@ def get_verkkokauppa_order_params(reservation: Reservation) -> CreateOrderParams
     return CreateOrderParams(
         namespace=settings.VERKKOKAUPPA_NAMESPACE,
         user=reservation.user.uuid,
-        language=reservation.reservee_language or "fi",
+        language=reservation.user.get_preferred_language(),
         items=items,
         price_net=Decimal(sum(item.row_price_net for item in items)),
         price_vat=Decimal(sum(item.row_price_vat for item in items)),
