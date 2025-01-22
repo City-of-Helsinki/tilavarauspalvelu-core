@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from django.db.models import QuerySet
 
     from tilavarauspalvelu.models import ApplicationSection
+    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
 
 class ApplicationSectionActions:
@@ -23,10 +24,13 @@ class ApplicationSectionActions:
             .order_by("begin_date")
         )
 
-    def get_last_reservation(self) -> Reservation | None:
+    def get_reservations(self) -> ReservationQuerySet:
         return Reservation.objects.filter(
             user=self.application_section.application.user,
             recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
                 self.application_section
             ),
-        ).last()
+        )
+
+    def get_last_reservation(self) -> Reservation | None:
+        return self.get_reservations().last()
