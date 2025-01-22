@@ -2154,8 +2154,8 @@ msgid ""
 "If set, this is the date before which the access type is used. If current "
 "date is after this date, the access type is 'unrestricted'."
 msgstr ""
-"Jos asetettu, kulkuoikeutta käytetään tästä päivästä eteenpäin. Jos nykyinen "
-"päivä on tämän päivän jälkeen, kulkuoikeus on 'rajoittamaton'."
+"Jos asetettu, kulkuoikeutta käytetään tähän päivään asti. Jos nykyinen päivä "
+"on tämän päivän jälkeen, kulkuoikeus on 'rajoittamaton'."
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
