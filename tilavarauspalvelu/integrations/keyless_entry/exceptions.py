@@ -6,15 +6,17 @@ from typing import Any
 from utils.external_service.errors import ExternalServiceError
 
 __all__ = [
-    "PindoraAPIConfigurationError",
     "PindoraAPIError",
+    "PindoraClientConfigurationError",
+    "PindoraClientError",
+    "PindoraUnexpectedResponseError",
 ]
 
 
-class PindoraAPIError(ExternalServiceError):
-    """Error in Pindora API"""
+class PindoraClientError(ExternalServiceError):
+    """Error in Pindora client, not related to the API"""
 
-    msg: str = "Pindora API error"
+    msg: str = "Pindora client error"
     error_formatter: Formatter = Formatter()
 
     def __init__(self, msg: str = "", /, **kwargs: Any) -> None:
@@ -22,10 +24,14 @@ class PindoraAPIError(ExternalServiceError):
         super().__init__(msg)
 
 
-class PindoraAPIConfigurationError(PindoraAPIError):
+class PindoraClientConfigurationError(PindoraClientError):
     """Pindora API settings are not configured correctly"""
 
     msg = "'{config}' setting must to be configured for Pindora client to work."
+
+
+class PindoraAPIError(PindoraClientError):
+    """Error in Pindora API"""
 
 
 class PindoraUnexpectedResponseError(PindoraAPIError):
