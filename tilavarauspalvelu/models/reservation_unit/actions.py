@@ -439,12 +439,12 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         if len(payment_types) == 1:
             return PaymentType(payment_types.pop())
 
-        # If only 'INVOICE' and 'ON_SITE' are defined, use 'INVOICE'
-        if payment_types == {PaymentType.INVOICE, PaymentType.ON_SITE}:
-            return PaymentType.INVOICE
+        # If 'ONLINE' is accepted, use that
+        if PaymentType.ONLINE in payment_types:
+            return PaymentType.ONLINE
 
-        # Otherwise, use 'ONLINE'
-        return PaymentType.ONLINE
+        # Otherwise only combination left is {'INVOICE', 'ON_SITE'}, so use 'INVOICE'
+        return PaymentType.INVOICE
 
     def is_reservable_at(self, moment: datetime.datetime) -> bool:
         moment = moment.astimezone(DEFAULT_TIMEZONE)

@@ -64,7 +64,7 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         reservation_unit.validator.validate_duration_is_allowed(duration=end - begin)
         reservation_unit.validator.validate_reservation_days_before(begin=begin)
         reservation_unit.validator.validate_reservation_unit_is_open(begin=begin, end=end)
-        reservation_unit.validator.validate_not_paid_at(begin=begin)
+        reservation_unit.validator.validate_not_rescheduled_to_paid_date(begin=begin)
         reservation_unit.validator.validate_cancellation_rule(begin=current_begin)
         reservation_unit.validator.validate_not_in_open_application_round(begin=begin.date(), end=end.date())
         reservation_unit.validator.validate_reservation_begin_time(begin=begin)
