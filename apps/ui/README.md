@@ -47,7 +47,6 @@ See `.env.local.example` and Azure DevOps library for values.
 | SENTRY_ENVIRONMENT             | Sentry environment, for example 'test', 'prod'                  |
 | SENTRY_AUTH_TOKEN              | auth token for sentry cli                                       |
 | MATOMO_ENABLED                 | 'true' enables matomo tracking                                  |
-| COOKIEHUB_ENABLED              | 'true' enables cookiehub consent module                         |
 | HOTJAR_ENABLED                 | 'true' enables hotjar tracking                                  |
 | ENABLE_FETCH_HACK              | 'true' to fix localhost dns problem                             |
 | SKIP_ENV_VALIDATION            | 'true' to allow empty env values (especially for build / test)  |

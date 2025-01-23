@@ -1,6 +1,6 @@
-import React, { useEffect, type FC } from "react";
+import React, { useEffect, useState, type FC } from "react";
 import { ApolloProvider } from "@apollo/client";
-import { appWithTranslation } from "next-i18next";
+import { appWithTranslation, useTranslation } from "next-i18next";
 import type { AppProps } from "next/app";
 import { ThemeProvider } from "styled-components";
 import { theme } from "common";
@@ -13,12 +13,20 @@ import "common/styles/global.scss";
 import "../styles/global.scss";
 import { updateSentryConfig } from "@/sentry.client.config";
 import { ToastContainer } from "common/src/common/toast";
+import {
+  CookieBanner,
+  CookieConsentChangeEvent,
+  CookieConsentContextProvider,
+  useGroupConsent,
+} from "hds-react";
+import sitesettings from "./sitesettings.json";
+import { convertLanguageCode } from "common/src/common/util";
+import { ANALYTICS_COOKIE_GROUP_NAME } from "@/modules/const";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const {
     hotjarEnabled,
     matomoEnabled,
-    cookiehubEnabled,
     apiBaseUrl,
     sentryDsn,
     sentryEnvironment,
@@ -29,29 +37,56 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }, [sentryDsn, sentryEnvironment]);
 
+  const { i18n } = useTranslation();
+
+  const statsEnabled = useGroupConsent(ANALYTICS_COOKIE_GROUP_NAME);
+  const [isStatisticsAccepted, setIsStatisticsAccepted] =
+    useState(statsEnabled);
+
+  const cookieSelectionChange = (evt: CookieConsentChangeEvent) => {
+    const statsAccepted = evt.acceptedGroups.find(
+      (group) => group === ANALYTICS_COOKIE_GROUP_NAME
+    );
+    if (statsAccepted) {
+      setIsStatisticsAccepted(true);
+    } else {
+      setIsStatisticsAccepted(false);
+    }
+  };
+
   const client = createApolloClient(apiBaseUrl ?? "", undefined);
+  const language = convertLanguageCode(i18n.language);
+
+  const enableMatomo = matomoEnabled && isStatisticsAccepted;
+  const enableHotjar = hotjarEnabled && isStatisticsAccepted;
 
   return (
-    <>
-      <DataContextProvider>
-        <TrackingWrapper matomoEnabled={matomoEnabled}>
+    <DataContextProvider>
+      <CookieConsentContextProvider
+        siteSettings={sitesettings}
+        options={{
+          language,
+        }}
+        onChange={cookieSelectionChange}
+      >
+        <TrackingWrapper matomoEnabled={enableMatomo}>
           {/* TODO is this ever called on the server? then the ctx is not undefined */}
           <ApolloProvider client={client}>
             <ThemeProvider theme={theme}>
               <PageWrapper {...pageProps}>
                 <Component {...pageProps} />
+                <CookieBanner />
               </PageWrapper>
               <ToastContainer />
             </ThemeProvider>
           </ApolloProvider>
         </TrackingWrapper>
-      </DataContextProvider>
-      <ExternalScripts
-        cookiehubEnabled={cookiehubEnabled}
-        matomoEnabled={matomoEnabled}
-        hotjarEnabled={hotjarEnabled}
-      />
-    </>
+        <ExternalScripts
+          enableMatomo={enableMatomo}
+          enableHotjar={enableHotjar}
+        />
+      </CookieConsentContextProvider>
+    </DataContextProvider>
   );
 }
 

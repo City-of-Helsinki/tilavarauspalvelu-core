@@ -5,6 +5,8 @@ export { genericTermsVariant } from "common/src/const";
 
 export const mapUrlPrefix = "https://palvelukartta.hel.fi/";
 
+export const ANALYTICS_COOKIE_GROUP_NAME = "statistics";
+
 export const SEARCH_PAGING_LIMIT = 36;
 
 export const participantCountOptions = [
