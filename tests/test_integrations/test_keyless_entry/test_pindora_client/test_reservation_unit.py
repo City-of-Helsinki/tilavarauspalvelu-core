@@ -4,7 +4,7 @@ import pytest
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND, HTTP_418_IM_A_TEAPOT
 
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIConfigurationError, PindoraAPIError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraClientConfigurationError
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
 from tests.factories import ReservationUnitFactory
@@ -34,7 +34,7 @@ def test_pindora_client__get_reservation_unit__missing_api_key(settings):
     reservation_unit = ReservationUnitFactory.build()
 
     msg = "'PINDORA_API_KEY' setting must to be configured for Pindora client to work."
-    with pytest.raises(PindoraAPIConfigurationError, match=exact(msg)):
+    with pytest.raises(PindoraClientConfigurationError, match=exact(msg)):
         PindoraClient.get_reservation_unit(reservation_unit)
 
 
@@ -44,7 +44,7 @@ def test_pindora_client__get_reservation_unit__missing_api_url(settings):
     reservation_unit = ReservationUnitFactory.build()
 
     msg = "'PINDORA_API_URL' setting must to be configured for Pindora client to work."
-    with pytest.raises(PindoraAPIConfigurationError, match=exact(msg)):
+    with pytest.raises(PindoraClientConfigurationError, match=exact(msg)):
         PindoraClient.get_reservation_unit(reservation_unit)
 
 

@@ -11,8 +11,9 @@ from rest_framework.status import (
     HTTP_418_IM_A_TEAPOT,
 )
 
+from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraClientError
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
@@ -121,6 +122,7 @@ def test_pindora_client__create_seasonal_booking(is_active: bool):
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     data = default_seasonal_booking_response(reservation, access_code_is_active=is_active)
@@ -165,6 +167,7 @@ def test_pindora_client__create_seasonal_booking__403():
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     msg = "Pindora API key is invalid."
@@ -187,6 +190,7 @@ def test_pindora_client__create_seasonal_booking__400():
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     msg = "Invalid Pindora API request: bad request."
@@ -209,6 +213,7 @@ def test_pindora_client__create_seasonal_booking__404():
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     msg = f"Seasonal booking '{application_section.ext_uuid}' not found from Pindora."
@@ -231,6 +236,7 @@ def test_pindora_client__create_seasonal_booking__409():
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     msg = f"Seasonal booking '{application_section.ext_uuid}' already exists in Pindora."
@@ -253,6 +259,7 @@ def test_pindora_client__create_seasonal_booking__not_200():
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     msg = (
@@ -271,8 +278,31 @@ def test_pindora_client__create_seasonal_booking__not_200():
 def test_pindora_client__create_seasonal_booking__no_reservations():
     application_section = ApplicationSectionFactory.create()
 
-    msg = f"No reservations in for seasonal booking '{application_section.ext_uuid}'."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
+    with pytest.raises(PindoraClientError, match=exact(msg)):
+        PindoraClient.create_seasonal_booking(application_section)
+
+
+@patch_method(
+    BaseExternalServiceClient.generic,
+    return_value=ResponseMock(status_code=HTTP_200_OK),
+)
+@pytest.mark.django_db
+def test_pindora_client__create_seasonal_booking__no_confirmed_reservations():
+    application_section = ApplicationSectionFactory.create()
+    reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
+    allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
+    recurring_reservation = RecurringReservationFactory.create(allocated_time_slot=allocation)
+
+    ReservationFactory.create(
+        recurring_reservation=recurring_reservation,
+        created_at=local_datetime(),
+        user=application_section.application.user,
+        state=ReservationStateChoice.DENIED,
+    )
+
+    msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
+    with pytest.raises(PindoraClientError, match=exact(msg)):
         PindoraClient.create_seasonal_booking(application_section)
 
 
@@ -292,6 +322,7 @@ def test_pindora_client__update_seasonal_booking(is_active: bool):
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     PindoraClient.update_seasonal_reservation(application_section, is_active=is_active)
@@ -314,6 +345,7 @@ def test_pindora_client__update_seasonal_booking__403():
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     msg = "Pindora API key is invalid."
@@ -336,6 +368,7 @@ def test_pindora_client__update_seasonal_booking__400():
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     msg = "Invalid Pindora API request: bad request."
@@ -358,6 +391,7 @@ def test_pindora_client__update_seasonal_booking__404():
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     msg = f"Seasonal booking '{application_section.ext_uuid}' not found from Pindora."
@@ -380,6 +414,7 @@ def test_pindora_client__update_seasonal_booking__409():
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     msg = f"Seasonal booking '{application_section.ext_uuid}' already exists in Pindora."
@@ -402,6 +437,7 @@ def test_pindora_client__update_seasonal_booking__not_204():
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     msg = (
@@ -420,8 +456,31 @@ def test_pindora_client__update_seasonal_booking__not_204():
 def test_pindora_client__update_seasonal_booking__no_reservations():
     application_section = ApplicationSectionFactory.create()
 
-    msg = f"No reservations in for seasonal booking '{application_section.ext_uuid}'."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
+    with pytest.raises(PindoraClientError, match=exact(msg)):
+        PindoraClient.update_seasonal_reservation(application_section)
+
+
+@patch_method(
+    BaseExternalServiceClient.generic,
+    return_value=ResponseMock(status_code=HTTP_200_OK),
+)
+@pytest.mark.django_db
+def test_pindora_client__update_seasonal_booking__no_confirmed_reservations():
+    application_section = ApplicationSectionFactory.create()
+    reservation_unit_option = ReservationUnitOptionFactory.create(application_section=application_section)
+    allocation = AllocatedTimeSlotFactory.create(reservation_unit_option=reservation_unit_option)
+    recurring_reservation = RecurringReservationFactory.create(allocated_time_slot=allocation)
+
+    ReservationFactory.create(
+        recurring_reservation=recurring_reservation,
+        created_at=local_datetime(),
+        user=application_section.application.user,
+        state=ReservationStateChoice.DENIED,
+    )
+
+    msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
+    with pytest.raises(PindoraClientError, match=exact(msg)):
         PindoraClient.update_seasonal_reservation(application_section)
 
 

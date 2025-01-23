@@ -14,10 +14,16 @@ from rest_framework.status import (
     HTTP_409_CONFLICT,
 )
 
-from utils.date_utils import DEFAULT_TIMEZONE
+from tilavarauspalvelu.enums import ReservationStateChoice
+from utils.date_utils import local_iso_format
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
-from .exceptions import PindoraAPIConfigurationError, PindoraAPIError, PindoraUnexpectedResponseError
+from .exceptions import (
+    PindoraAPIError,
+    PindoraClientConfigurationError,
+    PindoraClientError,
+    PindoraUnexpectedResponseError,
+)
 from .typing import (
     PindoraReservationCreateData,
     PindoraReservationResponse,
@@ -99,8 +105,8 @@ class PindoraClient(BaseExternalServiceClient):
         data = PindoraReservationCreateData(
             reservation_id=str(reservation.ext_uuid),
             reservation_unit_id=str(reservation_unit.uuid),
-            begin=reservation.begin.astimezone(DEFAULT_TIMEZONE).isoformat(),
-            end=reservation.end.astimezone(DEFAULT_TIMEZONE).isoformat(),
+            begin=local_iso_format(reservation.begin),
+            end=local_iso_format(reservation.end),
             is_active=is_active,
         )
 
@@ -120,8 +126,8 @@ class PindoraClient(BaseExternalServiceClient):
         url = cls._build_url(f"reservation/{reservation.ext_uuid}")
 
         data = PindoraUpdateReservationData(
-            begin=reservation.begin.astimezone(DEFAULT_TIMEZONE).isoformat(),
-            end=reservation.end.astimezone(DEFAULT_TIMEZONE).isoformat(),
+            begin=local_iso_format(reservation.begin),
+            end=local_iso_format(reservation.end),
             is_active=is_active,
         )
 
@@ -191,20 +197,22 @@ class PindoraClient(BaseExternalServiceClient):
         url = cls._build_url("seasonal-bookings")
 
         reservations: list[Reservation] = list(
-            application_section.actions.get_reservations().select_related("recurring_reservation__reservation_unit")
+            application_section.actions.get_reservations()
+            .filter(state=ReservationStateChoice.CONFIRMED)
+            .select_related("recurring_reservation__reservation_unit")
         )
 
         if not reservations:
-            msg = f"No reservations in for seasonal booking '{application_section.ext_uuid}'."
-            raise PindoraAPIError(msg)
+            msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
+            raise PindoraClientError(msg)
 
         data = PindoraSeasonalBookingCreateData(
             seasonal_booking_id=str(application_section.ext_uuid),
             series=[
                 PindoraSeasonalBookingReservationData(
                     reservation_unit_id=str(reservation.recurring_reservation.reservation_unit.uuid),
-                    begin=reservation.begin.astimezone(DEFAULT_TIMEZONE).isoformat(),
-                    end=reservation.end.astimezone(DEFAULT_TIMEZONE).isoformat(),
+                    begin=local_iso_format(reservation.begin),
+                    end=local_iso_format(reservation.end),
                 )
                 for reservation in reservations
             ],
@@ -232,19 +240,21 @@ class PindoraClient(BaseExternalServiceClient):
         url = cls._build_url(f"seasonal-booking/{application_section.ext_uuid}")
 
         reservations: list[Reservation] = list(
-            application_section.actions.get_reservations().select_related("recurring_reservation__reservation_unit")
+            application_section.actions.get_reservations()
+            .filter(state=ReservationStateChoice.CONFIRMED)
+            .select_related("recurring_reservation__reservation_unit")
         )
 
         if not reservations:
-            msg = f"No reservations in for seasonal booking '{application_section.ext_uuid}'."
-            raise PindoraAPIError(msg)
+            msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
+            raise PindoraClientError(msg)
 
         data = PindoraSeasonalBookingUpdateData(
             series=[
                 PindoraSeasonalBookingReservationData(
                     reservation_unit_id=str(reservation.recurring_reservation.reservation_unit.uuid),
-                    begin=reservation.begin.astimezone(DEFAULT_TIMEZONE).isoformat(),
-                    end=reservation.end.astimezone(DEFAULT_TIMEZONE).isoformat(),
+                    begin=local_iso_format(reservation.begin),
+                    end=local_iso_format(reservation.end),
                 )
                 for reservation in reservations
             ],
@@ -322,19 +332,19 @@ class PindoraClient(BaseExternalServiceClient):
         """Create a new reservation series in Pindora."""
         url = cls._build_url("reservation-series")
 
-        reservations: list[Reservation] = list(series.reservations.all())
+        reservations: list[Reservation] = list(series.reservations.filter(state=ReservationStateChoice.CONFIRMED))
 
         if not reservations:
-            msg = f"No reservations in for reservation series '{series.ext_uuid}'."
-            raise PindoraAPIError(msg)
+            msg = f"No confirmed reservations in reservation series '{series.ext_uuid}'."
+            raise PindoraClientError(msg)
 
         data = PindoraReservationSeriesCreateData(
             reservation_serie_id=str(series.ext_uuid),
             reservation_unit_id=str(series.reservation_unit.uuid),
             series=[
                 PindoraReservationSeriesReservationData(
-                    begin=reservation.begin.astimezone(DEFAULT_TIMEZONE).isoformat(),
-                    end=reservation.end.astimezone(DEFAULT_TIMEZONE).isoformat(),
+                    begin=local_iso_format(reservation.begin),
+                    end=local_iso_format(reservation.end),
                 )
                 for reservation in reservations
             ],
@@ -361,17 +371,17 @@ class PindoraClient(BaseExternalServiceClient):
         """Create a new reservation series in Pindora."""
         url = cls._build_url(f"reservation-serie/{series.ext_uuid}")
 
-        reservations: list[Reservation] = list(series.reservations.all())
+        reservations: list[Reservation] = list(series.reservations.filter(state=ReservationStateChoice.CONFIRMED))
 
         if not reservations:
-            msg = f"No reservations in for reservation series '{series.ext_uuid}'."
-            raise PindoraAPIError(msg)
+            msg = f"No confirmed reservations in reservation series '{series.ext_uuid}'."
+            raise PindoraClientError(msg)
 
         data = PindoraReservationSeriesUpdateData(
             series=[
                 PindoraReservationSeriesReservationData(
-                    begin=reservation.begin.astimezone(DEFAULT_TIMEZONE).isoformat(),
-                    end=reservation.end.astimezone(DEFAULT_TIMEZONE).isoformat(),
+                    begin=local_iso_format(reservation.begin),
+                    end=local_iso_format(reservation.end),
                 )
                 for reservation in reservations
             ],
@@ -532,7 +542,7 @@ class PindoraClient(BaseExternalServiceClient):
     @classmethod
     def _build_url(cls, endpoint: str) -> str:
         if not settings.PINDORA_API_URL:
-            raise PindoraAPIConfigurationError(config="PINDORA_API_URL")
+            raise PindoraClientConfigurationError(config="PINDORA_API_URL")
 
         base_url = settings.PINDORA_API_URL.removesuffix("/")
         return f"{base_url}/{endpoint}"
@@ -540,7 +550,7 @@ class PindoraClient(BaseExternalServiceClient):
     @classmethod
     def _get_headers(cls, headers: dict[str, Any] | None) -> dict[str, str]:
         if not settings.PINDORA_API_KEY:
-            raise PindoraAPIConfigurationError(config="PINDORA_API_KEY")
+            raise PindoraClientConfigurationError(config="PINDORA_API_KEY")
 
         return {
             "Pindora-Api-Key": str(settings.PINDORA_API_KEY),
