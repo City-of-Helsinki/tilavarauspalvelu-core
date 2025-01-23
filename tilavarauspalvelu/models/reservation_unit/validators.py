@@ -49,13 +49,11 @@ class ReservationUnitValidator:
             msg = "Reservation unit can only be booked by an adult reservee"
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED)
 
-    def validate_user_has_not_exceeded_max_reservations(self, user: User, *, ignore_ids: Collection[int] = ()) -> None:
+    def validate_user_has_not_exceeded_max_reservations(self, user: User) -> None:
         if self.reservation_unit.max_reservations_per_user is None:
             return
 
         qs = Reservation.objects.filter_for_user_num_active_reservations(self.reservation_unit, user)
-        if ignore_ids:
-            qs = qs.exclude(pk__in=ignore_ids)
 
         num_active_user_reservations = qs.count()
         if num_active_user_reservations >= self.reservation_unit.max_reservations_per_user:
@@ -177,7 +175,7 @@ class ReservationUnitValidator:
             msg = "Reservation might require payment, but reservation unit has no payment type defined"
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_PAYMENT_TYPE)
 
-    def validate_supports_payment_type(self, payment_type: PaymentType) -> None:
+    def validate_supports_payment_type(self, payment_type: PaymentType) -> None:  # TODO: Used?
         supported = set(self.reservation_unit.payment_types.values_list("code", flat=True))
         if payment_type not in supported:
             msg = f"Reservation unit does not support the '{payment_type}' payment type."
@@ -205,7 +203,7 @@ class ReservationUnitValidator:
             msg = "Reservation time cannot be changed because the cancellation period has expired."
             raise ValidationError(msg, code=error_codes.CANCELLATION_TIME_PAST)
 
-    def validate_not_paid_at(self, begin: datetime.datetime) -> None:
+    def validate_not_rescheduled_to_paid_date(self, begin: datetime.datetime) -> None:
         pricing = self.reservation_unit.actions.get_active_pricing(by_date=begin.date())
 
         if pricing is None:

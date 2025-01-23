@@ -33,6 +33,11 @@ class ReservationValidator:
             raise ValidationError(msg, code=error_codes.CHANGES_NOT_ALLOWED)
 
     def validate_can_change_reservation(self) -> None:
+        """
+        Should be used to validate that customers shouldn't be able to change reservations
+        details after they have confirmed it during checkout. Customer may still reschedule
+        reservation using different validation logic.
+        """
         if self.reservation.state != ReservationStateChoice.CREATED:
             msg = "Reservation cannot be changed anymore."
             raise ValidationError(msg, code=error_codes.CHANGES_NOT_ALLOWED)
