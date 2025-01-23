@@ -11,8 +11,9 @@ from rest_framework.status import (
     HTTP_418_IM_A_TEAPOT,
 )
 
+from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraClientError
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
@@ -141,6 +142,7 @@ def test_pindora_client__create_reservation_series(is_active: bool):
     reservation = ReservationFactory.create(
         recurring_reservation=recurring_reservation,
         created_at=local_datetime(),
+        state=ReservationStateChoice.CONFIRMED,
     )
 
     data = default_reservation_series_response(reservation, access_code_is_active=is_active)
@@ -177,7 +179,7 @@ def test_pindora_client__create_reservation_series(is_active: bool):
 @pytest.mark.django_db
 def test_pindora_client__create_reservation_series__403():
     recurring_reservation = RecurringReservationFactory.create()
-    ReservationFactory.create(recurring_reservation=recurring_reservation)
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = "Pindora API key is invalid."
     with pytest.raises(PindoraAPIError, match=exact(msg)):
@@ -191,7 +193,7 @@ def test_pindora_client__create_reservation_series__403():
 @pytest.mark.django_db
 def test_pindora_client__create_reservation_series__400():
     recurring_reservation = RecurringReservationFactory.create()
-    ReservationFactory.create(recurring_reservation=recurring_reservation)
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = "Invalid Pindora API request: bad request."
     with pytest.raises(PindoraAPIError, match=exact(msg)):
@@ -205,7 +207,7 @@ def test_pindora_client__create_reservation_series__400():
 @pytest.mark.django_db
 def test_pindora_client__create_reservation_series__409():
     recurring_reservation = RecurringReservationFactory.create()
-    ReservationFactory.create(recurring_reservation=recurring_reservation)
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = f"Reservation series '{recurring_reservation.ext_uuid}' already exists in Pindora."
     with pytest.raises(PindoraAPIError, match=exact(msg)):
@@ -219,7 +221,7 @@ def test_pindora_client__create_reservation_series__409():
 @pytest.mark.django_db
 def test_pindora_client__create_reservation_series__not_200():
     recurring_reservation = RecurringReservationFactory.create()
-    ReservationFactory.create(recurring_reservation=recurring_reservation)
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = (
         f"Unexpected response from Pindora when creating reservation series '{recurring_reservation.ext_uuid}': "
@@ -237,8 +239,22 @@ def test_pindora_client__create_reservation_series__not_200():
 def test_pindora_client__create_reservation_series__no_reservations():
     recurring_reservation = RecurringReservationFactory.create()
 
-    msg = f"No reservations in for reservation series '{recurring_reservation.ext_uuid}'."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    msg = f"No confirmed reservations in reservation series '{recurring_reservation.ext_uuid}'."
+    with pytest.raises(PindoraClientError, match=exact(msg)):
+        PindoraClient.create_reservation_series(recurring_reservation)
+
+
+@patch_method(
+    BaseExternalServiceClient.generic,
+    return_value=ResponseMock(status_code=HTTP_200_OK),
+)
+@pytest.mark.django_db
+def test_pindora_client__create_reservation_series__no_confirmed_reservations():
+    recurring_reservation = RecurringReservationFactory.create()
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.DENIED)
+
+    msg = f"No confirmed reservations in reservation series '{recurring_reservation.ext_uuid}'."
+    with pytest.raises(PindoraClientError, match=exact(msg)):
         PindoraClient.create_reservation_series(recurring_reservation)
 
 
@@ -250,7 +266,7 @@ def test_pindora_client__create_reservation_series__no_reservations():
 @pytest.mark.parametrize("is_active", [True, False])
 def test_pindora_client__update_reservation_series(is_active: bool):
     recurring_reservation = RecurringReservationFactory.create()
-    ReservationFactory.create(recurring_reservation=recurring_reservation)
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     PindoraClient.update_reservation_series(recurring_reservation, is_active=is_active)
 
@@ -264,7 +280,7 @@ def test_pindora_client__update_reservation_series(is_active: bool):
 @pytest.mark.django_db
 def test_pindora_client__update_reservation_series__403():
     recurring_reservation = RecurringReservationFactory.create()
-    ReservationFactory.create(recurring_reservation=recurring_reservation)
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = "Pindora API key is invalid."
     with pytest.raises(PindoraAPIError, match=exact(msg)):
@@ -278,7 +294,7 @@ def test_pindora_client__update_reservation_series__403():
 @pytest.mark.django_db
 def test_pindora_client__update_reservation_series__400():
     recurring_reservation = RecurringReservationFactory.create()
-    ReservationFactory.create(recurring_reservation=recurring_reservation)
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = "Invalid Pindora API request: bad request."
     with pytest.raises(PindoraAPIError, match=exact(msg)):
@@ -292,7 +308,7 @@ def test_pindora_client__update_reservation_series__400():
 @pytest.mark.django_db
 def test_pindora_client__update_reservation_series__404():
     recurring_reservation = RecurringReservationFactory.create()
-    ReservationFactory.create(recurring_reservation=recurring_reservation)
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = f"Reservation series '{recurring_reservation.ext_uuid}' not found from Pindora."
     with pytest.raises(PindoraAPIError, match=exact(msg)):
@@ -306,7 +322,7 @@ def test_pindora_client__update_reservation_series__404():
 @pytest.mark.django_db
 def test_pindora_client__update_reservation_series__409():
     recurring_reservation = RecurringReservationFactory.create()
-    ReservationFactory.create(recurring_reservation=recurring_reservation)
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = f"Reservation series '{recurring_reservation.ext_uuid}' already exists in Pindora."
     with pytest.raises(PindoraAPIError, match=exact(msg)):
@@ -320,7 +336,7 @@ def test_pindora_client__update_reservation_series__409():
 @pytest.mark.django_db
 def test_pindora_client__update_reservation_series__not_204():
     recurring_reservation = RecurringReservationFactory.create()
-    ReservationFactory.create(recurring_reservation=recurring_reservation)
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = (
         f"Unexpected response from Pindora when updating reservation series '{recurring_reservation.ext_uuid}': "
@@ -338,8 +354,22 @@ def test_pindora_client__update_reservation_series__not_204():
 def test_pindora_client__update_reservation_series__no_reservations():
     recurring_reservation = RecurringReservationFactory.create()
 
-    msg = f"No reservations in for reservation series '{recurring_reservation.ext_uuid}'."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    msg = f"No confirmed reservations in reservation series '{recurring_reservation.ext_uuid}'."
+    with pytest.raises(PindoraClientError, match=exact(msg)):
+        PindoraClient.update_reservation_series(recurring_reservation)
+
+
+@patch_method(
+    BaseExternalServiceClient.generic,
+    return_value=ResponseMock(status_code=HTTP_200_OK),
+)
+@pytest.mark.django_db
+def test_pindora_client__update_reservation_series__no_confirmed_reservations():
+    recurring_reservation = RecurringReservationFactory.create()
+    ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.DENIED)
+
+    msg = f"No confirmed reservations in reservation series '{recurring_reservation.ext_uuid}'."
+    with pytest.raises(PindoraClientError, match=exact(msg)):
         PindoraClient.update_reservation_series(recurring_reservation)
 
 
