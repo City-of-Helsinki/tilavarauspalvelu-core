@@ -19,9 +19,14 @@ from utils.date_utils import local_iso_format
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
 from .exceptions import (
-    PindoraAPIError,
+    PindoraBadRequestError,
     PindoraClientConfigurationError,
     PindoraClientError,
+    PindoraConflictError,
+    PindoraInvalidValueError,
+    PindoraMissingKeyError,
+    PindoraNotFoundError,
+    PindoraPermissionError,
     PindoraUnexpectedResponseError,
 )
 from .typing import (
@@ -444,12 +449,10 @@ class PindoraClient(BaseExternalServiceClient):
             )
 
         except KeyError as error:
-            msg = f"Missing key in reservation unit response from Pindora: {error}"
-            raise PindoraAPIError(msg) from error
+            raise PindoraMissingKeyError(entity="reservation unit", key=error) from error
 
         except (ValueError, TypeError) as error:
-            msg = f"Invalid value in reservation unit response from Pindora: {error}"
-            raise PindoraAPIError(msg) from error
+            raise PindoraInvalidValueError(entity="reservation unit", error=error) from error
 
     @classmethod
     def _parse_reservation_response(cls, data: dict[str, Any]) -> PindoraReservationResponse:
@@ -470,12 +473,10 @@ class PindoraClient(BaseExternalServiceClient):
             )
 
         except KeyError as error:
-            msg = f"Missing key in reservation response from Pindora: {error}"
-            raise PindoraAPIError(msg) from error
+            raise PindoraMissingKeyError(entity="reservation", key=error) from error
 
         except (ValueError, TypeError) as error:
-            msg = f"Invalid value in reservation response from Pindora: {error}"
-            raise PindoraAPIError(msg) from error
+            raise PindoraInvalidValueError(entity="reservation", error=error) from error
 
     @classmethod
     def _parse_seasonal_booking_response(cls, data: dict[str, Any]) -> PindoraSeasonalBookingResponse:
@@ -501,12 +502,10 @@ class PindoraClient(BaseExternalServiceClient):
             )
 
         except KeyError as error:
-            msg = f"Missing key in seasonal booking response from Pindora: {error}"
-            raise PindoraAPIError(msg) from error
+            raise PindoraMissingKeyError(entity="seasonal booking", key=error) from error
 
         except (ValueError, TypeError) as error:
-            msg = f"Invalid value in seasonal booking response from Pindora: {error}"
-            raise PindoraAPIError(msg) from error
+            raise PindoraInvalidValueError(entity="seasonal booking", error=error) from error
 
     @classmethod
     def _parse_reservation_series_response(cls, data: dict[str, Any]) -> PindoraReservationSeriesResponse:
@@ -532,12 +531,10 @@ class PindoraClient(BaseExternalServiceClient):
             )
 
         except KeyError as error:
-            msg = f"Missing key in reservation series response from Pindora: {error}"
-            raise PindoraAPIError(msg) from error
+            raise PindoraMissingKeyError(entity="reservation series", key=error) from error
 
         except (ValueError, TypeError) as error:
-            msg = f"Invalid value in reservation series response from Pindora: {error}"
-            raise PindoraAPIError(msg) from error
+            raise PindoraInvalidValueError(entity="reservation series", error=error) from error
 
     @classmethod
     def _build_url(cls, endpoint: str) -> str:
@@ -571,8 +568,7 @@ class PindoraClient(BaseExternalServiceClient):
         cls._validate_response(response)
 
         if response.status_code == HTTP_404_NOT_FOUND:
-            msg = f"Reservation unit '{reservation_unit.uuid}' not found from Pindora."
-            raise PindoraAPIError(msg)
+            raise PindoraNotFoundError(entity="Reservation unit", uuid=reservation_unit.uuid)
 
         if response.status_code != expected_status_code:
             raise PindoraUnexpectedResponseError(
@@ -595,12 +591,10 @@ class PindoraClient(BaseExternalServiceClient):
         cls._validate_response(response)
 
         if response.status_code == HTTP_404_NOT_FOUND:
-            msg = f"Reservation '{reservation.ext_uuid}' not found from Pindora."
-            raise PindoraAPIError(msg)
+            raise PindoraNotFoundError(entity="Reservation", uuid=reservation.ext_uuid)
 
         if response.status_code == HTTP_409_CONFLICT:
-            msg = f"Reservation '{reservation.ext_uuid}' already exists in Pindora."
-            raise PindoraAPIError(msg)
+            raise PindoraConflictError(entity="Reservation", uuid=reservation.ext_uuid)
 
         if response.status_code != expected_status_code:
             raise PindoraUnexpectedResponseError(
@@ -623,12 +617,10 @@ class PindoraClient(BaseExternalServiceClient):
         cls._validate_response(response)
 
         if response.status_code == HTTP_404_NOT_FOUND:
-            msg = f"Seasonal booking '{application_section.ext_uuid}' not found from Pindora."
-            raise PindoraAPIError(msg)
+            raise PindoraNotFoundError(entity="Seasonal booking", uuid=application_section.ext_uuid)
 
         if response.status_code == HTTP_409_CONFLICT:
-            msg = f"Seasonal booking '{application_section.ext_uuid}' already exists in Pindora."
-            raise PindoraAPIError(msg)
+            raise PindoraConflictError(entity="Seasonal booking", uuid=application_section.ext_uuid)
 
         if response.status_code != expected_status_code:
             raise PindoraUnexpectedResponseError(
@@ -651,12 +643,10 @@ class PindoraClient(BaseExternalServiceClient):
         cls._validate_response(response)
 
         if response.status_code == HTTP_404_NOT_FOUND:
-            msg = f"Reservation series '{series.ext_uuid}' not found from Pindora."
-            raise PindoraAPIError(msg)
+            raise PindoraNotFoundError(entity="Reservation series", uuid=series.ext_uuid)
 
         if response.status_code == HTTP_409_CONFLICT:
-            msg = f"Reservation series '{series.ext_uuid}' already exists in Pindora."
-            raise PindoraAPIError(msg)
+            raise PindoraConflictError(entity="Reservation series", uuid=series.ext_uuid)
 
         if response.status_code != expected_status_code:
             raise PindoraUnexpectedResponseError(
@@ -670,9 +660,7 @@ class PindoraClient(BaseExternalServiceClient):
     def _validate_response(cls, response: Response) -> None:
         """Handle common errors in Pindora API responses."""
         if response.status_code == HTTP_403_FORBIDDEN:
-            msg = "Pindora API key is invalid."
-            raise PindoraAPIError(msg)
+            raise PindoraPermissionError
 
         if response.status_code == HTTP_400_BAD_REQUEST:
-            msg = f"Invalid Pindora API request: {response.text}."
-            raise PindoraAPIError(msg)
+            raise PindoraBadRequestError(text=response.text)

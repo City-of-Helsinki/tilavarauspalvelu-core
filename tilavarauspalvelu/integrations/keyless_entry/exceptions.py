@@ -7,8 +7,14 @@ from utils.external_service.errors import ExternalServiceError
 
 __all__ = [
     "PindoraAPIError",
+    "PindoraBadRequestError",
     "PindoraClientConfigurationError",
     "PindoraClientError",
+    "PindoraConflictError",
+    "PindoraInvalidValueError",
+    "PindoraMissingKeyError",
+    "PindoraNotFoundError",
+    "PindoraPermissionError",
     "PindoraUnexpectedResponseError",
 ]
 
@@ -34,7 +40,43 @@ class PindoraAPIError(PindoraClientError):
     """Error in Pindora API"""
 
 
+class PindoraBadRequestError(PindoraAPIError):
+    """Bad request to Pindora API"""
+
+    msg = "Invalid Pindora API request: {text}."
+
+
+class PindoraPermissionError(PindoraAPIError):
+    """Permission error in Pindora API"""
+
+    msg = "Pindora API key is invalid."
+
+
+class PindoraNotFoundError(PindoraAPIError):
+    """Entity was not found in Pindora"""
+
+    msg = "{entity} '{uuid}' not found from Pindora."
+
+
+class PindoraConflictError(PindoraAPIError):
+    """Conflict when mutating entity in Pindora"""
+
+    msg = "{entity} '{uuid}' already exists in Pindora."
+
+
 class PindoraUnexpectedResponseError(PindoraAPIError):
-    """Error when an unexpected response was received from Pindora"""
+    """An unexpected response was received from Pindora"""
 
     msg = "Unexpected response from Pindora when {action} '{uuid}': [{status_code}] {text}"
+
+
+class PindoraMissingKeyError(PindoraAPIError):
+    """Missing key in response JSON"""
+
+    msg = "Missing key in {entity} response from Pindora: {key}"
+
+
+class PindoraInvalidValueError(PindoraAPIError):
+    """Invalid value in response JSON"""
+
+    msg = "Invalid value in {entity} response from Pindora: {error}"
