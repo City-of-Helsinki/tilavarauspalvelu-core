@@ -300,6 +300,7 @@ class StaffCreateReservationData(TypedDict):
     user: User
     reservee_used_ad_login: bool
     access_type: NotRequired[AccessType]
+    access_code_is_active: NotRequired[bool]
 
 
 class StaffReservationData(StaffCreateReservationData):

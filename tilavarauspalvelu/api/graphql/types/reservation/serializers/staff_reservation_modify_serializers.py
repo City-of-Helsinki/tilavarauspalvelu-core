@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose
 
 if TYPE_CHECKING:
@@ -125,3 +128,22 @@ class StaffReservationModifySerializer(NestingModelSerializer):
             self.instance.validator.validate_reservation_type_allows_staff_edit(new_type=reservation_type)
 
         return data
+
+    def update(self, instance: Reservation, validated_data: StaffReservationData) -> Reservation:
+        type_before = instance.type
+        type_after = validated_data.get("type", type_before)
+
+        # If reservation was changed to or from blocked, change access code active state in Pindora.
+        changed_with_blocked = type_before != type_after and ReservationTypeChoice.BLOCKED in {type_before, type_after}
+
+        if self.instance.access_type == AccessType.ACCESS_CODE and changed_with_blocked:
+            # Allow reservation modification to succeed if reservation doesn't exist in Pindora.
+            with suppress(PindoraNotFoundError):
+                if type_after == ReservationTypeChoice.BLOCKED:
+                    PindoraClient.deactivate_reservation_access_code(reservation=instance)
+                    validated_data["access_code_is_active"] = False
+                else:
+                    PindoraClient.activate_reservation_access_code(reservation=instance)
+                    validated_data["access_code_is_active"] = True
+
+        return super().update(instance=instance, validated_data=validated_data)
