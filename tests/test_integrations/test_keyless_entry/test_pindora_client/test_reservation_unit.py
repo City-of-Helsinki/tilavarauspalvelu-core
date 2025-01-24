@@ -4,7 +4,13 @@ import pytest
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND, HTTP_418_IM_A_TEAPOT
 
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraClientConfigurationError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
+    PindoraAPIError,
+    PindoraBadRequestError,
+    PindoraClientConfigurationError,
+    PindoraPermissionError,
+    PindoraUnexpectedResponseError,
+)
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
 from tests.factories import ReservationUnitFactory
@@ -56,7 +62,7 @@ def test_pindora_client__get_reservation_unit__403():
     reservation_unit = ReservationUnitFactory.build()
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.get_reservation_unit(reservation_unit)
 
 
@@ -68,7 +74,7 @@ def test_pindora_client__get_reservation_unit__400():
     reservation_unit = ReservationUnitFactory.build()
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.get_reservation_unit(reservation_unit)
 
 
@@ -94,7 +100,7 @@ def test_pindora_client__get_reservation_unit__not_200():
     msg = (
         f"Unexpected response from Pindora when fetching reservation unit '{reservation_unit.uuid}': [418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.get_reservation_unit(reservation_unit)
 
 
