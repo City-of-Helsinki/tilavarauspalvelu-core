@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, Self
 from factory import LazyAttribute, fuzzy
 
 from tilavarauspalvelu.enums import (
+    AccessType,
     CustomerTypeChoice,
     OrderStatus,
     PaymentType,
@@ -61,6 +62,10 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     handled_at = None
     confirmed_at = None
     created_at = None
+
+    # Access information
+    access_type = AccessType.UNRESTRICTED.value
+    access_code_generated_at = None
 
     # Pricing details
     price = Decimal(0)

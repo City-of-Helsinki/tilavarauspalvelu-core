@@ -13,7 +13,13 @@ if TYPE_CHECKING:
 
     from django.contrib.sessions.backends.cache import SessionStore
 
-    from tilavarauspalvelu.enums import CustomerTypeChoice, PaymentType, ReservationStateChoice, ReservationTypeChoice
+    from tilavarauspalvelu.enums import (
+        AccessType,
+        CustomerTypeChoice,
+        PaymentType,
+        ReservationStateChoice,
+        ReservationTypeChoice,
+    )
     from tilavarauspalvelu.models import (
         AgeGroup,
         City,
@@ -151,6 +157,7 @@ class ReservationCreateData(TypedDict):
     unit_price: NotRequired[Decimal]
     tax_percentage_value: NotRequired[Decimal]
     non_subsidised_price: NotRequired[Decimal]
+    access_type: NotRequired[AccessType]
 
     # From prefill
     reservee_first_name: NotRequired[str | None]
@@ -292,6 +299,7 @@ class StaffCreateReservationData(TypedDict):
     handled_at: NotRequired[datetime.datetime]
     user: User
     reservee_used_ad_login: bool
+    access_type: NotRequired[AccessType]
 
 
 class StaffReservationData(StaffCreateReservationData):
