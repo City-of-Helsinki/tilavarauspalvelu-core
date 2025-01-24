@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+from unittest import mock
+
 import pytest
+import requests
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
@@ -16,7 +19,7 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
 from tests.factories import ReservationFactory
-from tests.helpers import ResponseMock, exact, patch_method
+from tests.helpers import ResponseMock, exact, patch_method, use_retires
 from tests.test_integrations.test_keyless_entry.helpers import default_reservation_response
 
 
@@ -124,17 +127,51 @@ def test_pindora_client__get_reservation__invalid_data():
         PindoraClient.get_reservation(reservation)
 
 
+@use_retires(attempts=3)
+def test_pindora_client__get_reservation__retry__fails_all_retries():
+    reservation = ReservationFactory.build(created_at=local_datetime())
+
+    patch = mock.patch(
+        "utils.external_service.base_external_service_client.request",
+        side_effect=requests.ConnectionError("timeout"),
+    )
+
+    with patch as magic_mock, pytest.raises(requests.ConnectionError):
+        PindoraClient.get_reservation(reservation)
+
+    assert magic_mock.call_count == 3
+
+
+@use_retires(attempts=3)
+def test_pindora_client__get_reservation__retry__succeeds_after_retry():
+    reservation = ReservationFactory.build(created_at=local_datetime())
+
+    data = default_reservation_response(reservation)
+
+    patch = mock.patch(
+        "utils.external_service.base_external_service_client.request",
+        side_effect=[requests.ConnectionError("timeout"), ResponseMock(json_data=data)],
+    )
+
+    with patch as magic_mock:
+        PindoraClient.get_reservation(reservation)
+
+    assert magic_mock.call_count == 2
+
+
 @pytest.mark.django_db
-def test_pindora_client__create_reservation():  # TODO: `is_active=True` version
+@pytest.mark.parametrize("is_active", [True, False])
+def test_pindora_client__create_reservation(is_active):
     reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
 
     data = default_reservation_response(reservation)
+    data["access_code_is_active"] = is_active
 
     with patch_method(
         BaseExternalServiceClient.generic,
         return_value=ResponseMock(json_data=data),
     ):
-        response = PindoraClient.create_reservation(reservation)
+        response = PindoraClient.create_reservation(reservation, is_active=is_active)
 
     assert response["reservation_unit_id"] == reservation.ext_uuid
     assert response["access_code"] == "13245#"
@@ -145,7 +182,7 @@ def test_pindora_client__create_reservation():  # TODO: `is_active=True` version
     assert response["access_code_valid_minutes_before"] == 0
     assert response["access_code_valid_minutes_after"] == 0
     assert response["access_code_generated_at"] == reservation.created_at.astimezone(DEFAULT_TIMEZONE)
-    assert response["access_code_is_active"] is True
+    assert response["access_code_is_active"] is is_active
     assert response["begin"] == reservation.begin.astimezone(DEFAULT_TIMEZONE)
     assert response["end"] == reservation.end.astimezone(DEFAULT_TIMEZONE)
 
@@ -206,10 +243,11 @@ def test_pindora_client__create_reservation__not_200():
     BaseExternalServiceClient.generic,
     return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
 )
-def test_pindora_client__update_reservation():  # TODO: `is_active=True` version
+@pytest.mark.parametrize("is_active", [True, False])
+def test_pindora_client__update_reservation(is_active):
     reservation = ReservationFactory.build()
 
-    PindoraClient.update_reservation(reservation)
+    PindoraClient.update_reservation(reservation, is_active=is_active)
 
     assert BaseExternalServiceClient.generic.call_count == 1
 

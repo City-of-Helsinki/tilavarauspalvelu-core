@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Any, Literal
 
+import stamina
 from requests import request
 from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -79,6 +80,7 @@ class BaseExternalServiceClient:
     ################
 
     @classmethod
+    @stamina.retry(on=Exception, attempts=3)  # Likely retry should happen no matter the exception
     def generic(cls, method: Literal["get", "post", "put", "delete"], url: str, **kwargs: Any) -> Response:
         return request(method, url, **kwargs, timeout=cls.REQUEST_TIMEOUT_SECONDS)
 
