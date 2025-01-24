@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import datetime
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from django.conf import settings
 
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
@@ -109,11 +111,22 @@ class PaymentOrderActions:
             and self.payment_order.reservation is not None
             and self.payment_order.reservation.state == ReservationStateChoice.WAITING_FOR_PAYMENT
         ):
-            self.payment_order.reservation.state = ReservationStateChoice.CONFIRMED
-            self.payment_order.reservation.save(update_fields=["state"])
+            reservation = self.payment_order.reservation
 
-            EmailService.send_reservation_confirmed_email(reservation=self.payment_order.reservation)
-            EmailService.send_staff_notification_reservation_made_email(reservation=self.payment_order.reservation)
+            update_fields: list[str] = ["state"]
+            reservation.state = ReservationStateChoice.CONFIRMED
+
+            if reservation.access_type == AccessType.ACCESS_CODE:
+                # Allow activation in Pindora to fail, will be handled by a background task.
+                with suppress(Exception):
+                    PindoraClient.activate_reservation_access_code(reservation=reservation)
+                    reservation.access_code_is_active = True
+                    update_fields.append("access_code_is_active")
+
+            reservation.save(update_fields=update_fields)
+
+            EmailService.send_reservation_confirmed_email(reservation=reservation)
+            EmailService.send_staff_notification_reservation_made_email(reservation=reservation)
 
     def refresh_order_status_from_webshop(self) -> None:
         """Fetches the payment status from the webshop and updates the PaymentOrder status accordingly."""
