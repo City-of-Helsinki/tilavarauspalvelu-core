@@ -1023,12 +1023,13 @@ def test_application_section__filter__by_text_search__section_id(graphql):
     # - There is an application with two application sections
     # - A superuser is using the system
     application = ApplicationFactory.create_in_status_draft_no_sections(
+        id=1,
         organisation=None,
         contact_person=None,
         user=None,
     )
-    section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application, name="foo")
-    ApplicationSectionFactory.create_in_status_unallocated(application=application, name="bar")
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated(id=2, application=application, name="foo")
+    ApplicationSectionFactory.create_in_status_unallocated(id=3, application=application, name="bar")
     graphql.login_with_superuser()
 
     # when:
@@ -1049,17 +1050,19 @@ def test_application_section__filter__by_text_search__application_id(graphql):
     # - There are two applications with one application sections each
     # - A superuser is using the system
     application_1 = ApplicationFactory.create_in_status_draft_no_sections(
+        id=1,
         organisation=None,
         contact_person=None,
         user=None,
     )
     application_2 = ApplicationFactory.create_in_status_draft_no_sections(
+        id=2,
         organisation=None,
         contact_person=None,
         user=None,
     )
-    section_1 = ApplicationSectionFactory.create_in_status_unallocated(application=application_1, name="foo")
-    ApplicationSectionFactory.create_in_status_unallocated(application=application_2, name="bar")
+    section_1 = ApplicationSectionFactory.create_in_status_unallocated(id=3, application=application_1, name="foo")
+    ApplicationSectionFactory.create_in_status_unallocated(id=4, application=application_2, name="bar")
     graphql.login_with_superuser()
 
     # when:
