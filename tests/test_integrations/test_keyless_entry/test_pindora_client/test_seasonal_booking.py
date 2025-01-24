@@ -13,7 +13,14 @@ from rest_framework.status import (
 
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraClientError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
+    PindoraAPIError,
+    PindoraBadRequestError,
+    PindoraClientError,
+    PindoraConflictError,
+    PindoraPermissionError,
+    PindoraUnexpectedResponseError,
+)
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
@@ -67,7 +74,7 @@ def test_pindora_client__get_seasonal_booking__403():
     application_section = ApplicationSectionFactory.build()
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.get_seasonal_booking(application_section)
 
 
@@ -79,7 +86,7 @@ def test_pindora_client__get_seasonal_booking__400():
     application_section = ApplicationSectionFactory.build()
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.get_seasonal_booking(application_section)
 
 
@@ -106,7 +113,7 @@ def test_pindora_client__get_seasonal_booking__not_200():
         f"Unexpected response from Pindora when fetching seasonal booking "
         f"'{application_section.ext_uuid}': [418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.get_seasonal_booking(application_section)
 
 
@@ -171,7 +178,7 @@ def test_pindora_client__create_seasonal_booking__403():
     )
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.create_seasonal_booking(application_section)
 
 
@@ -194,7 +201,7 @@ def test_pindora_client__create_seasonal_booking__400():
     )
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.create_seasonal_booking(application_section)
 
 
@@ -240,7 +247,7 @@ def test_pindora_client__create_seasonal_booking__409():
     )
 
     msg = f"Seasonal booking '{application_section.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraConflictError, match=exact(msg)):
         PindoraClient.create_seasonal_booking(application_section)
 
 
@@ -266,7 +273,7 @@ def test_pindora_client__create_seasonal_booking__not_200():
         f"Unexpected response from Pindora when creating seasonal booking '{application_section.ext_uuid}': "
         f"[418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.create_seasonal_booking(application_section)
 
 
@@ -349,7 +356,7 @@ def test_pindora_client__update_seasonal_booking__403():
     )
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.update_seasonal_reservation(application_section)
 
 
@@ -372,7 +379,7 @@ def test_pindora_client__update_seasonal_booking__400():
     )
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.update_seasonal_reservation(application_section)
 
 
@@ -418,7 +425,7 @@ def test_pindora_client__update_seasonal_booking__409():
     )
 
     msg = f"Seasonal booking '{application_section.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraConflictError, match=exact(msg)):
         PindoraClient.update_seasonal_reservation(application_section)
 
 
@@ -444,7 +451,7 @@ def test_pindora_client__update_seasonal_booking__not_204():
         f"Unexpected response from Pindora when updating seasonal booking '{application_section.ext_uuid}': "
         f"[418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.update_seasonal_reservation(application_section)
 
 
@@ -504,7 +511,7 @@ def test_pindora_client__delete_seasonal_booking__403():
     application_section = ApplicationSectionFactory.build()
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.delete_seasonal_booking(application_section)
 
 
@@ -516,7 +523,7 @@ def test_pindora_client__delete_seasonal_booking__400():
     application_section = ApplicationSectionFactory.build()
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.delete_seasonal_booking(application_section)
 
 
@@ -540,7 +547,7 @@ def test_pindora_client__delete_seasonal_booking__409():
     application_section = ApplicationSectionFactory.build()
 
     msg = f"Seasonal booking '{application_section.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraConflictError, match=exact(msg)):
         PindoraClient.delete_seasonal_booking(application_section)
 
 
@@ -555,7 +562,7 @@ def test_pindora_client__delete_seasonal_booking__non_204():
         f"Unexpected response from Pindora when deleting seasonal booking '{application_section.ext_uuid}': "
         f"[418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.delete_seasonal_booking(application_section)
 
 
@@ -598,7 +605,7 @@ def test_pindora_client__change_seasonal_booking_access_code__403():
     application_section = ApplicationSectionFactory.build()
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.change_seasonal_booking_access_code(application_section)
 
 
@@ -610,7 +617,7 @@ def test_pindora_client__change_seasonal_booking_access_code__400():
     application_section = ApplicationSectionFactory.build()
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.change_seasonal_booking_access_code(application_section)
 
 
@@ -637,5 +644,5 @@ def test_pindora_client__change_seasonal_booking_access_code__non_200():
         f"Unexpected response from Pindora when changing access code for seasonal booking "
         f"'{application_section.ext_uuid}': [418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.change_seasonal_booking_access_code(application_section)

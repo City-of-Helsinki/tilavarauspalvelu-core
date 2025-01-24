@@ -14,7 +14,13 @@ from rest_framework.status import (
 )
 
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
+    PindoraAPIError,
+    PindoraBadRequestError,
+    PindoraConflictError,
+    PindoraPermissionError,
+    PindoraUnexpectedResponseError,
+)
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
@@ -56,7 +62,7 @@ def test_pindora_client__get_reservation__403():
     reservation = ReservationFactory.build()
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.get_reservation(reservation)
 
 
@@ -68,7 +74,7 @@ def test_pindora_client__get_reservation__400():
     reservation = ReservationFactory.build()
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.get_reservation(reservation)
 
 
@@ -91,7 +97,7 @@ def test_pindora_client__get_reservation__404():
 def test_pindora_client__get_reservation__not_200():
     reservation = ReservationFactory.build()
     msg = f"Unexpected response from Pindora when fetching reservation '{reservation.ext_uuid}': [418] I'm a teapot"
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.get_reservation(reservation)
 
 
@@ -196,7 +202,7 @@ def test_pindora_client__create_reservation__403():
     reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.create_reservation(reservation)
 
 
@@ -209,7 +215,7 @@ def test_pindora_client__create_reservation__400():
     reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.create_reservation(reservation)
 
 
@@ -222,7 +228,7 @@ def test_pindora_client__create_reservation__409():
     reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
 
     msg = f"Reservation '{reservation.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraConflictError, match=exact(msg)):
         PindoraClient.create_reservation(reservation)
 
 
@@ -235,7 +241,7 @@ def test_pindora_client__create_reservation__not_200():
     reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
 
     msg = f"Unexpected response from Pindora when creating reservation '{reservation.ext_uuid}': [418] I'm a teapot"
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.create_reservation(reservation)
 
 
@@ -260,7 +266,7 @@ def test_pindora_client__update_reservation__403():
     reservation = ReservationFactory.build()
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.update_reservation(reservation)
 
 
@@ -272,7 +278,7 @@ def test_pindora_client__update_reservation__400():
     reservation = ReservationFactory.build()
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.update_reservation(reservation)
 
 
@@ -296,7 +302,7 @@ def test_pindora_client__update_reservation__409():
     reservation = ReservationFactory.build()
 
     msg = f"Reservation '{reservation.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraConflictError, match=exact(msg)):
         PindoraClient.update_reservation(reservation)
 
 
@@ -308,7 +314,7 @@ def test_pindora_client__update_reservation__not_204():
     reservation = ReservationFactory.build()
 
     msg = f"Unexpected response from Pindora when updating reservation '{reservation.ext_uuid}': [418] I'm a teapot"
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.update_reservation(reservation)
 
 
@@ -332,7 +338,7 @@ def test_pindora_client__delete_reservation__403():
     reservation = ReservationFactory.build()
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.delete_reservation(reservation)
 
 
@@ -344,7 +350,7 @@ def test_pindora_client__delete_reservation__400():
     reservation = ReservationFactory.build()
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.delete_reservation(reservation)
 
 
@@ -368,7 +374,7 @@ def test_pindora_client__delete_reservation__409():
     reservation = ReservationFactory.build()
 
     msg = f"Reservation '{reservation.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraConflictError, match=exact(msg)):
         PindoraClient.delete_reservation(reservation)
 
 
@@ -380,7 +386,7 @@ def test_pindora_client__delete_reservation__non_204():
     reservation = ReservationFactory.build()
 
     msg = f"Unexpected response from Pindora when deleting reservation '{reservation.ext_uuid}': [418] I'm a teapot"
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.delete_reservation(reservation)
 
 
@@ -417,7 +423,7 @@ def test_pindora_client__change_reservation_access_code__403():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.change_reservation_access_code(reservation)
 
 
@@ -429,7 +435,7 @@ def test_pindora_client__change_reservation_access_code__400():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.change_reservation_access_code(reservation)
 
 
@@ -456,5 +462,5 @@ def test_pindora_client__change_reservation_access_code__not_200():
         f"Unexpected response from Pindora when changing access code for reservation '{reservation.ext_uuid}': "
         f"[418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.change_reservation_access_code(reservation)

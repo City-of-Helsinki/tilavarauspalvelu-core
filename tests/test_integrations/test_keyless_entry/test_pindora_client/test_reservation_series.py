@@ -13,7 +13,14 @@ from rest_framework.status import (
 
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraClientError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
+    PindoraAPIError,
+    PindoraBadRequestError,
+    PindoraClientError,
+    PindoraConflictError,
+    PindoraPermissionError,
+    PindoraUnexpectedResponseError,
+)
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
@@ -61,7 +68,7 @@ def test_pindora_client__get_reservation_series__403():
     series = RecurringReservationFactory.build()
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.get_reservation_series(series)
 
 
@@ -73,7 +80,7 @@ def test_pindora_client__get_reservation_series__400():
     series = RecurringReservationFactory.build()
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.get_reservation_series(series)
 
 
@@ -97,7 +104,7 @@ def test_pindora_client__get_reservation__not_200():
     series = RecurringReservationFactory.build()
 
     msg = f"Unexpected response from Pindora when fetching reservation series '{series.ext_uuid}': [418] I'm a teapot"
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.get_reservation_series(series)
 
 
@@ -182,7 +189,7 @@ def test_pindora_client__create_reservation_series__403():
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.create_reservation_series(recurring_reservation)
 
 
@@ -196,7 +203,7 @@ def test_pindora_client__create_reservation_series__400():
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.create_reservation_series(recurring_reservation)
 
 
@@ -210,7 +217,7 @@ def test_pindora_client__create_reservation_series__409():
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = f"Reservation series '{recurring_reservation.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraConflictError, match=exact(msg)):
         PindoraClient.create_reservation_series(recurring_reservation)
 
 
@@ -227,7 +234,7 @@ def test_pindora_client__create_reservation_series__not_200():
         f"Unexpected response from Pindora when creating reservation series '{recurring_reservation.ext_uuid}': "
         f"[418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.create_reservation_series(recurring_reservation)
 
 
@@ -283,7 +290,7 @@ def test_pindora_client__update_reservation_series__403():
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.update_reservation_series(recurring_reservation)
 
 
@@ -297,7 +304,7 @@ def test_pindora_client__update_reservation_series__400():
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.update_reservation_series(recurring_reservation)
 
 
@@ -325,7 +332,7 @@ def test_pindora_client__update_reservation_series__409():
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
     msg = f"Reservation series '{recurring_reservation.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraConflictError, match=exact(msg)):
         PindoraClient.update_reservation_series(recurring_reservation)
 
 
@@ -342,7 +349,7 @@ def test_pindora_client__update_reservation_series__not_204():
         f"Unexpected response from Pindora when updating reservation series '{recurring_reservation.ext_uuid}': "
         f"[418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.update_reservation_series(recurring_reservation)
 
 
@@ -393,7 +400,7 @@ def test_pindora_client__delete_reservation_series__403():
     recurring_reservation = RecurringReservationFactory.build()
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.delete_reservation_series(recurring_reservation)
 
 
@@ -405,7 +412,7 @@ def test_pindora_client__delete_reservation_series__400():
     recurring_reservation = RecurringReservationFactory.build()
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.delete_reservation_series(recurring_reservation)
 
 
@@ -429,7 +436,7 @@ def test_pindora_client__delete_reservation_series__409():
     recurring_reservation = RecurringReservationFactory.build()
 
     msg = f"Reservation series '{recurring_reservation.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraConflictError, match=exact(msg)):
         PindoraClient.delete_reservation_series(recurring_reservation)
 
 
@@ -444,7 +451,7 @@ def test_pindora_client__delete_reservation_series__non_204():
         f"Unexpected response from Pindora when deleting reservation series '{recurring_reservation.ext_uuid}': "
         f"[418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.delete_reservation_series(recurring_reservation)
 
 
@@ -488,7 +495,7 @@ def test_pindora_client__change_reservation_series_access_code__403():
     recurring_reservation = RecurringReservationFactory.build()
 
     msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraPermissionError, match=exact(msg)):
         PindoraClient.change_reservation_series_access_code(recurring_reservation)
 
 
@@ -500,7 +507,7 @@ def test_pindora_client__change_reservation_series_access_code__400():
     recurring_reservation = RecurringReservationFactory.build()
 
     msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
         PindoraClient.change_reservation_series_access_code(recurring_reservation)
 
 
@@ -527,5 +534,5 @@ def test_pindora_client__change_reservation_series_access_code__not_200():
         f"Unexpected response from Pindora when changing access code for reservation series "
         f"'{recurring_reservation.ext_uuid}': [418] I'm a teapot"
     )
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
+    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
         PindoraClient.change_reservation_series_access_code(recurring_reservation)
