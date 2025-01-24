@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
+import stamina
 from rest_framework.test import APIClient
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -22,6 +23,12 @@ def graphql() -> GraphQLClient:
 @pytest.fixture
 def api_client() -> APIClient:
     return APIClient()
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _deactivate_retries():
+    """Deactivate all retry logic during testing."""
+    stamina.set_active(False)
 
 
 @pytest.fixture(autouse=False)
