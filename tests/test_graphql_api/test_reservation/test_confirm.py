@@ -6,7 +6,15 @@ import pytest
 from django.test import override_settings
 from graphene_django_extensions.testing import build_mutation
 
-from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationNotification, ReservationStateChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    OrderStatus,
+    PaymentType,
+    ReservationNotification,
+    ReservationStateChoice,
+)
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
@@ -30,6 +38,7 @@ pytestmark = [
 
 
 @override_settings(SEND_EMAILS=True)
+@patch_method(PindoraClient.activate_reservation_access_code)
 def test_reservation__confirm__changes_state__confirmed(graphql, outbox):
     reservation = ReservationFactory.create_for_confirmation()
 
@@ -53,6 +62,8 @@ def test_reservation__confirm__changes_state__confirmed(graphql, outbox):
     assert outbox[0].subject == "Thank you for your booking at Varaamo"
     unit_name = reservation.reservation_units.first().unit.name
     assert outbox[1].subject == f"New booking {reservation.id} has been made for {unit_name}"
+
+    assert PindoraClient.activate_reservation_access_code.call_count == 0
 
 
 @override_settings(SEND_EMAILS=True)
@@ -453,3 +464,44 @@ def test_reservation__confirm__without_price_and_with_free_pricing_does_not_requ
     assert reservation.state == ReservationStateChoice.CONFIRMED
 
     assert PaymentOrder.objects.count() == 0
+
+
+@patch_method(PindoraClient.activate_reservation_access_code)
+def test_reservation__confirm__pindora_api__call_succeeds(graphql):
+    reservation = ReservationFactory.create_for_confirmation(
+        access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=False,
+    )
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.access_code_is_active is True
+
+    assert PindoraClient.activate_reservation_access_code.call_count == 1
+
+
+@patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraAPIError("Error"))
+def test_reservation__confirm__pindora_api__call_fails(graphql):
+    reservation = ReservationFactory.create_for_confirmation(
+        access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=False,
+    )
+
+    graphql.login_with_superuser()
+    data = get_confirm_data(reservation)
+    response = graphql(CONFIRM_MUTATION, input_data=data)
+
+    # Request is still successful, even if Pindora API call fails
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+    assert reservation.access_code_is_active is False
+
+    assert PindoraClient.activate_reservation_access_code.call_count == 1
