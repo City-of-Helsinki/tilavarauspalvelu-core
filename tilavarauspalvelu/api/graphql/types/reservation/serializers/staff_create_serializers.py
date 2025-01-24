@@ -3,11 +3,13 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
+from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
@@ -145,11 +147,24 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
         data["state"] = ReservationStateChoice.CONFIRMED
         data["user"] = user
         data["reservee_used_ad_login"] = False if id_token is None else id_token.is_ad_login
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begin)
 
         return data
 
     def create(self, validated_data: StaffCreateReservationData) -> Reservation:
-        reservation_unit: ReservationUnit = validated_data.pop("reservation_unit")
-        reservation = super().create(validated_data)
-        reservation.reservation_units.set([reservation_unit])
+        # Must be able to link reservation unit to the reservation
+        with transaction.atomic():
+            reservation_unit: ReservationUnit = validated_data.pop("reservation_unit")
+            reservation: Reservation = super().create(validated_data)
+            reservation.reservation_units.set([reservation_unit])
+
+        # Don't fail reservation creation if Pindora request fails, but return an error in the response.
+        if reservation.access_type == AccessType.ACCESS_CODE:
+            is_active = reservation.type != ReservationTypeChoice.BLOCKED
+            response = PindoraClient.create_reservation(reservation=reservation, is_active=is_active)
+
+            reservation.access_code_generated_at = response["access_code_generated_at"]
+            reservation.access_code_is_active = response["access_code_is_active"]
+            reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+
         return reservation
