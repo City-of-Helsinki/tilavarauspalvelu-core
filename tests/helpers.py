@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from contextlib import contextmanager
 from functools import wraps
 from typing import TYPE_CHECKING, Any, NamedTuple, ParamSpec, Self, TypeVar
 from unittest import mock
@@ -8,6 +9,7 @@ from unittest.mock import patch
 
 import polib
 import pytest
+import stamina
 from django.conf import settings
 from django.utils import translation
 from django.utils.functional import lazy
@@ -224,3 +226,17 @@ class TranslationsFromPOFiles:
 def exact(msg: str) -> str:
     """Use in `with pytest.raises(..., match=exact(msg))` to match the 'msg' string exactly."""
     return f"^{re.escape(msg)}$"
+
+
+@contextmanager
+def use_retires(attempts: int = 1):
+    """Enable given amount of retries for the duration of a test bu using the this manager."""
+    is_active = stamina.is_active()
+    is_testing = stamina.is_testing()
+    try:
+        stamina.set_active(True)
+        stamina.set_testing(True, attempts=attempts)
+        yield
+    finally:
+        stamina.set_active(is_active)
+        stamina.set_testing(is_testing)
