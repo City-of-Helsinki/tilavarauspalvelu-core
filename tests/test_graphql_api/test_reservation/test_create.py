@@ -11,6 +11,7 @@ from freezegun import freeze_time
 from graphene_django_extensions.testing import parametrize_helper
 
 from tilavarauspalvelu.enums import (
+    AccessType,
     ADLoginAMR,
     PaymentType,
     PriceUnit,
@@ -19,6 +20,8 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, next_hour
@@ -1104,3 +1107,88 @@ def test_reservation__create__require_adult_reservee__no_id_token(graphql):
 
     reservation = Reservation.objects.filter(pk=response.first_query_object["pk"]).first()
     assert reservation is not None
+
+
+@patch_method(
+    PindoraClient.create_reservation,
+    return_value={"access_code_generated_at": datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)},
+)
+def test_reservation__create__access_type__access_code(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(access_type=AccessType.ACCESS_CODE)
+
+    graphql.login_with_regular_user()
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+
+    assert reservation.access_type == AccessType.ACCESS_CODE
+    assert reservation.access_code_generated_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)
+
+    PindoraClient.create_reservation.assert_called_with(reservation=reservation)
+
+
+@patch_method(PindoraClient.create_reservation)
+def test_reservation__create__access_type__changes_to_access_code_in_the_future(graphql):
+    today = local_date()
+
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        access_type=AccessType.ACCESS_CODE,
+        access_type_start_date=today + datetime.timedelta(days=1),
+    )
+
+    graphql.login_with_regular_user()
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+
+    assert reservation.access_type == AccessType.UNRESTRICTED
+    assert reservation.access_code_generated_at is None
+
+    assert PindoraClient.create_reservation.call_count == 0
+
+
+@patch_method(PindoraClient.create_reservation)
+def test_reservation__create__access_type__access_code_has_ended(graphql):
+    today = local_date()
+
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        access_type=AccessType.ACCESS_CODE,
+        access_type_end_date=today - datetime.timedelta(days=1),
+    )
+
+    graphql.login_with_regular_user()
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
+
+    assert reservation.access_type == AccessType.UNRESTRICTED
+    assert reservation.access_code_generated_at is None
+
+    assert PindoraClient.create_reservation.call_count == 0
+
+
+@patch_method(PindoraClient.create_reservation, side_effect=PindoraAPIError())
+def test_reservation__create__access_type__access_code__no_reservation_on_pindora_failure(graphql):
+    reservation_unit = ReservationUnitFactory.create_reservable_now(access_type=AccessType.ACCESS_CODE)
+
+    graphql.login_with_regular_user()
+
+    data = get_create_data(reservation_unit)
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.has_errors is True
+    assert response.error_message() == "Pindora client error"
+
+    assert Reservation.objects.exists() is False

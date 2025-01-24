@@ -3,13 +3,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import DateTimeField, IntegerField
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE
@@ -86,6 +89,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
         data["unit_price"] = pricing.highest_price
         data["tax_percentage_value"] = pricing.tax_percentage.value
         data["non_subsidised_price"] = data["price"]
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begin)
 
         if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA:
             self.prefill_reservation_from_profile(data)
@@ -114,8 +118,17 @@ class ReservationCreateSerializer(NestingModelSerializer):
         if prefill_info is not None:
             data.update({key: value for key, value in prefill_info.items() if value is not None})
 
+    @transaction.atomic()
     def create(self, validated_data: ReservationCreateData) -> Reservation:
+        # Must be able to link reservation unit to the reservation
         reservation_unit: ReservationUnit = validated_data.pop("reservation_unit")
         reservation = super().create(validated_data)
         reservation.reservation_units.set([reservation_unit])
+
+        # Pindora request must succeed, or the reservation is not created.
+        if reservation.access_type == AccessType.ACCESS_CODE:
+            response = PindoraClient.create_reservation(reservation=reservation)
+            reservation.access_code_generated_at = response["access_code_generated_at"]
+            reservation.save()
+
         return reservation

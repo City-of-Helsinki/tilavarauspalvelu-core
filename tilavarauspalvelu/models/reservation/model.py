@@ -80,7 +80,7 @@ class Reservation(SerializableMixin, models.Model):
     confirmed_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
     created_at: datetime.datetime | None = models.DateTimeField(null=True, default=timezone.now)  # noqa: TID251
 
-    # Access type information
+    # Access information
     access_type: str = models.CharField(
         max_length=20,
         choices=AccessType.choices,
