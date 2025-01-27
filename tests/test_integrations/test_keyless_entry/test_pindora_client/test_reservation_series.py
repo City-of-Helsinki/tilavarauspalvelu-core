@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from unittest import mock
-
 import pytest
 import requests
 from graphene_django_extensions.testing import parametrize_helper
@@ -28,7 +26,6 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraUnexpectedResponseError,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
@@ -43,10 +40,7 @@ def test_pindora_client__get_reservation_series():
 
     data = default_reservation_series_response(reservation)
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(json_data=data),
-    ):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         response = PindoraClient.get_reservation_series(series)
 
     assert response["reservation_unit_id"] == reservation.ext_uuid
@@ -91,10 +85,7 @@ def test_pindora_client__get_reservation_series():
 def test_pindora_client__get_reservation_series__errors(status_code, exception, error_msg):
     series = RecurringReservationFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.get_reservation_series(series)
@@ -107,10 +98,7 @@ def test_pindora_client__get_reservation_series__missing_key():
     data = default_reservation_series_response(reservation)
     data.pop("reservation_unit_id")
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(json_data=data),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
 
     msg = "Missing key in reservation series response from Pindora: 'reservation_unit_id'"
     with patch, pytest.raises(PindoraAPIError, match=exact(msg)):
@@ -124,10 +112,7 @@ def test_pindora_client__get_reservation_series__invalid_data():
     data = default_reservation_series_response(reservation)
     data["reservation_unit_id"] = str(reservation.id)
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(json_data=data),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
 
     msg = "Invalid value in reservation series response from Pindora: badly formed hexadecimal UUID string"
     with patch, pytest.raises(PindoraAPIError, match=exact(msg)):
@@ -138,10 +123,7 @@ def test_pindora_client__get_reservation_series__invalid_data():
 def test_pindora_client__get_reservation_series__fails_all_retries():
     series = RecurringReservationFactory.build()
 
-    patch = mock.patch(
-        "utils.external_service.base_external_service_client.request",
-        side_effect=requests.ConnectionError("timeout"),
-    )
+    patch = patch_method(PindoraClient.request, side_effect=requests.ConnectionError("timeout"))
 
     with patch as magic_mock, pytest.raises(requests.ConnectionError):
         PindoraClient.get_reservation_series(series)
@@ -153,10 +135,7 @@ def test_pindora_client__get_reservation_series__fails_all_retries():
 def test_pindora_client__get_reservation_series__retry_on_500():
     series = RecurringReservationFactory.build()
 
-    patch = mock.patch(
-        "utils.external_service.base_external_service_client.request",
-        return_value=ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR))
 
     with patch as magic_mock, pytest.raises(ExternalServiceRequestError):
         PindoraClient.get_reservation_series(series)
@@ -171,8 +150,8 @@ def test_pindora_client__get_reservation_series__succeeds_after_retry():
 
     data = default_reservation_series_response(reservation)
 
-    patch = mock.patch(
-        "utils.external_service.base_external_service_client.request",
+    patch = patch_method(
+        PindoraClient.request,
         side_effect=[
             requests.ConnectionError("timeout"),
             ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR),
@@ -198,10 +177,7 @@ def test_pindora_client__create_reservation_series(is_active: bool):
 
     data = default_reservation_series_response(reservation, access_code_is_active=is_active)
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(json_data=data),
-    ):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         response = PindoraClient.create_reservation_series(recurring_reservation, is_active=is_active)
 
     assert response["reservation_unit_id"] == reservation.ext_uuid
@@ -252,10 +228,7 @@ def test_pindora_client__create_reservation_series__errors(status_code, exceptio
     recurring_reservation = RecurringReservationFactory.create()
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.create_reservation_series(recurring_reservation)
@@ -265,10 +238,7 @@ def test_pindora_client__create_reservation_series__errors(status_code, exceptio
 def test_pindora_client__create_reservation_series__no_reservations():
     recurring_reservation = RecurringReservationFactory.create()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_200_OK),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
 
     msg = f"No confirmed reservations in reservation series '{recurring_reservation.ext_uuid}'."
     with patch, pytest.raises(PindoraClientError, match=exact(msg)):
@@ -280,10 +250,7 @@ def test_pindora_client__create_reservation_series__no_confirmed_reservations():
     recurring_reservation = RecurringReservationFactory.create()
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.DENIED)
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_200_OK),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
 
     msg = f"No confirmed reservations in reservation series '{recurring_reservation.ext_uuid}'."
     with patch, pytest.raises(PindoraClientError, match=exact(msg)):
@@ -295,10 +262,7 @@ def test_pindora_client__reschedule_reservation_series():
     recurring_reservation = RecurringReservationFactory.create()
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-    ) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.reschedule_reservation_series(recurring_reservation)
 
     assert patch.call_count == 1
@@ -329,10 +293,7 @@ def test_pindora_client__reschedule_reservation_series__errors(status_code, exce
     recurring_reservation = RecurringReservationFactory.create()
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.CONFIRMED)
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.reschedule_reservation_series(recurring_reservation)
@@ -342,10 +303,7 @@ def test_pindora_client__reschedule_reservation_series__errors(status_code, exce
 def test_pindora_client__reschedule_reservation_series__no_reservations():
     recurring_reservation = RecurringReservationFactory.create()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_200_OK),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
 
     msg = f"No confirmed reservations in reservation series '{recurring_reservation.ext_uuid}'."
     with patch, pytest.raises(PindoraClientError, match=exact(msg)):
@@ -357,10 +315,7 @@ def test_pindora_client__reschedule_reservation_series__no_confirmed_reservation
     recurring_reservation = RecurringReservationFactory.create()
     ReservationFactory.create(recurring_reservation=recurring_reservation, state=ReservationStateChoice.DENIED)
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_200_OK),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
 
     msg = f"No confirmed reservations in reservation series '{recurring_reservation.ext_uuid}'."
     with patch, pytest.raises(PindoraClientError, match=exact(msg)):
@@ -370,10 +325,7 @@ def test_pindora_client__reschedule_reservation_series__no_confirmed_reservation
 def test_pindora_client__delete_reservation_series():
     recurring_reservation = RecurringReservationFactory.build()
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-    ) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.delete_reservation_series(recurring_reservation)
 
     assert patch.call_count == 1
@@ -402,10 +354,7 @@ def test_pindora_client__delete_reservation_series():
 def test_pindora_client__delete_reservation_series__errors(status_code, exception, error_msg):
     recurring_reservation = RecurringReservationFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.delete_reservation_series(recurring_reservation)
@@ -414,10 +363,7 @@ def test_pindora_client__delete_reservation_series__errors(status_code, exceptio
 def test_pindora_client__change_reservation_series_access_code():
     recurring_reservation = RecurringReservationFactory.build()
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-    ) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.change_reservation_series_access_code(recurring_reservation)
 
     assert patch.call_count == 1
@@ -446,10 +392,7 @@ def test_pindora_client__change_reservation_series_access_code():
 def test_pindora_client__change_reservation_series_access_code__errors(status_code, exception, error_msg):
     recurring_reservation = RecurringReservationFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.change_reservation_series_access_code(recurring_reservation)
@@ -458,10 +401,7 @@ def test_pindora_client__change_reservation_series_access_code__errors(status_co
 def test_pindora_client__activate_reservation_series_access_code():
     recurring_reservation = RecurringReservationFactory.build()
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-    ) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.activate_reservation_series_access_code(recurring_reservation)
 
     assert patch.call_count == 1
@@ -490,10 +430,7 @@ def test_pindora_client__activate_reservation_series_access_code():
 def test_pindora_client__activate_reservation_series_access_code__errors(status_code, exception, error_msg):
     recurring_reservation = RecurringReservationFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.activate_reservation_series_access_code(recurring_reservation)
@@ -502,10 +439,7 @@ def test_pindora_client__activate_reservation_series_access_code__errors(status_
 def test_pindora_client__deactivate_reservation_series_access_code():
     recurring_reservation = RecurringReservationFactory.build()
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-    ) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.deactivate_reservation_series_access_code(recurring_reservation)
 
     assert patch.call_count == 1
@@ -534,10 +468,7 @@ def test_pindora_client__deactivate_reservation_series_access_code():
 def test_pindora_client__deactivate_reservation_series_access_code__errors(status_code, exception, error_msg):
     recurring_reservation = RecurringReservationFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.deactivate_reservation_series_access_code(recurring_reservation)

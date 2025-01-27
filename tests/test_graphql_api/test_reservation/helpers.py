@@ -41,7 +41,7 @@ UPDATE_WORKING_MEMO_MUTATION = build_mutation("updateReservationWorkingMemo", "R
 def mock_profile_reader(**kwargs: Any):
     profile_data = MyProfileDataFactory.create_basic(**kwargs)
     response = ResponseMock(json_data={"data": {"myProfile": profile_data}})
-    patch_http = patch_method(HelsinkiProfileClient.generic, return_value=response)
+    patch_http = patch_method(HelsinkiProfileClient.request, return_value=response)
     patch_token = patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 
     with patch_http, patch_token:

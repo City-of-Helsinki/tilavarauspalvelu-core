@@ -21,8 +21,7 @@ from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from utils.date_utils import local_datetime
 
 from tests import factories
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tests.helpers import ResponseMock, patch_method
 from tests.test_external_services.test_verkkokauppa.test_merchant_requests import get_merchant_response
 
 if TYPE_CHECKING:
@@ -69,7 +68,10 @@ def create_all_models():
 # Override languages, since TinyMCE can't handle lazy language name translations in tests ¯\_(ツ)_/¯
 @override_settings(LANGUAGES=[("fi", "Finnish"), ("en", "English"), ("sv", "Swedish")])
 @pytest.mark.slow
-@patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=200, json=get_merchant_response))
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=200, json_data=get_merchant_response),
+)
 def test_django_admin_site__pages_load__model_admins(create_all_models):
     """Test that all Django admin pages load without errors."""
     user = factories.UserFactory.create_superuser()
