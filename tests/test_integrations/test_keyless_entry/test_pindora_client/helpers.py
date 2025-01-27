@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 from utils.date_utils import DEFAULT_TIMEZONE
 
@@ -81,3 +81,9 @@ def default_reservation_series_response(reservation: Reservation, **overrides: A
         ],
         **overrides,
     }
+
+
+class ErrorParams(NamedTuple):
+    status_code: int
+    exception: type[Exception]
+    error_msg: str = ""
