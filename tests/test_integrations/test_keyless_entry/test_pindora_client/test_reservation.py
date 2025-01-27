@@ -26,7 +26,7 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationFactory
-from tests.helpers import ResponseMock, exact, patch_method, use_retires
+from tests.helpers import ResponseMock, exact, patch_method, use_retries
 
 from .helpers import ErrorParams, default_reservation_response
 
@@ -108,7 +108,7 @@ def test_pindora_client__get_reservation__invalid_data():
         PindoraClient.get_reservation(reservation)
 
 
-@use_retires(attempts=3)
+@use_retries(attempts=3)
 def test_pindora_client__get_reservation__retry__fails_all_retries():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
@@ -120,7 +120,7 @@ def test_pindora_client__get_reservation__retry__fails_all_retries():
     assert magic_mock.call_count == 3
 
 
-@use_retires(attempts=3)
+@use_retries(attempts=3)
 def test_pindora_client__get_reservation__retry__retry_on_500():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
@@ -132,7 +132,7 @@ def test_pindora_client__get_reservation__retry__retry_on_500():
     assert magic_mock.call_count == 3
 
 
-@use_retires(attempts=3)
+@use_retries(attempts=3)
 def test_pindora_client__get_reservation__retry__succeeds_after_retry():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
