@@ -247,7 +247,7 @@ def exact(msg: str) -> str:
 
 
 @contextmanager
-def use_retires(attempts: int = 1):
+def use_retries(attempts: int = 1):
     """Enable given amount of retries for the duration of a test bu using the this manager."""
     is_active = stamina.is_active()
     is_testing = stamina.is_testing()
