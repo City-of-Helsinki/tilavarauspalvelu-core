@@ -73,7 +73,7 @@ import {
   getMaxReservationDuration,
   getMinReservationDuration,
 } from "@/modules/reservable";
-import SubventionSuffix from "@/components/reservation/SubventionSuffix";
+import { SubventionSuffix } from "@/components/reservation/SubventionSuffix";
 import InfoDialog from "@/components/common/InfoDialog";
 import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
 import { ReservationInfoContainer } from "@/components/reservation-unit/ReservationInfoContainer";

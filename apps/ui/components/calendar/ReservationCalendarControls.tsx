@@ -16,6 +16,7 @@ import {
   fontBold,
   fontMedium,
   fontRegular,
+  SemiBold,
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import type { ReservationUnitPageQuery } from "@gql/gql-types";
@@ -216,8 +217,9 @@ export function ReservationCalendarControls({
                   : new Date()
               }
             />
-            <div data-testid="reservation__input--duration">
+            <div data-testid="calendar-controls__duration">
               <ControlledSelect
+                id="calendar-controls__duration"
                 name="duration"
                 // react-hook-form has issues with typing generic Select
                 control={control as unknown as Control<FieldValues>}
@@ -226,6 +228,7 @@ export function ReservationCalendarControls({
               />
             </div>
             <ControlledSelect
+              id="calendar-controls__time"
               name="time"
               label={t("reservationCalendar:startTime")}
               // react-hook-form has issues with typing generic Select
@@ -234,14 +237,12 @@ export function ReservationCalendarControls({
               placeholder={t("common:select")}
             />
             <PriceWrapper>
-              {focusSlot.isReservable && (
-                <>
-                  {/* TODO for doesn't work with div either change it to disabled input or remove it */}
-                  <label htmlFor="price">{t("common:price")}</label>
-                  <Price id="price" data-testid="reservation__price--value">
-                    {price}
-                  </Price>
-                </>
+              {focusSlot.isReservable && price != null && (
+                <Price data-testid="calendar-controls__price">
+                  {t("common:price")}
+                  {": "}
+                  <SemiBold>{price}</SemiBold>
+                </Price>
               )}
             </PriceWrapper>
             <Button
@@ -324,7 +325,7 @@ function ControlledToggler({
       </TogglerLabel>
       <ToggleButton
         onClick={() => onChange(!value)}
-        data-testid="reservation-unit__reservation-controls--toggle-button"
+        data-testid="calendar-controls__toggle-button"
         type="button"
       >
         {value ? (

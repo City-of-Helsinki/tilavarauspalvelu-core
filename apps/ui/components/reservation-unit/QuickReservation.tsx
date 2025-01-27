@@ -3,7 +3,7 @@ import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { chunkArray, fromUIDate, toUIDate } from "common/src/common/util";
-import { fontBold, H4 } from "common/src/common/typography";
+import { fontMedium, H4 } from "common/src/common/typography";
 import type { ReservationUnitPageQuery } from "@gql/gql-types";
 import { breakpoints } from "common";
 import {
@@ -22,7 +22,7 @@ import { ControlledDateInput } from "common/src/components/form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { type FocusTimeSlot } from "@/modules/reservation";
-import { Flex } from "common/styles/util";
+import { Flex, NoWrap } from "common/styles/util";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type Props = {
@@ -54,9 +54,8 @@ const Form = styled.form`
 `;
 
 const Price = styled.div`
-  & > * {
-    display: inline-block;
-  }
+  /* no-wrap for price and subvention suffix */
+  display: inline-grid;
   padding-bottom: var(--spacing-m);
   height: var(--spacing-m);
   &:empty {
@@ -74,8 +73,8 @@ const Selects = styled.div`
   }
 `;
 
-const PriceValue = styled.div`
-  ${fontBold}
+const PriceValue = styled.span`
+  ${fontMedium}
 `;
 
 const Subheading = styled.div`
@@ -174,7 +173,7 @@ export function QuickReservation({
       </H4>
       <Selects>
         <ControlledDateInput
-          id="quick-reservation-date"
+          id="quick-reservation__date"
           name="date"
           control={control}
           label={t("reservationCalendar:startDate")}
@@ -184,6 +183,7 @@ export function QuickReservation({
           disableConfirmation={false}
         />
         <ControlledSelect
+          id="quick-reservation__duration"
           name="duration"
           // react-hook-form has issues with typing generic Select
           control={control as unknown as Control<FieldValues>}
@@ -206,11 +206,13 @@ export function QuickReservation({
         />
       </div>
       <Flex $direction="row" $justifyContent="space-between">
-        <Price data-testid="quick-reservation-price">
+        <Price data-testid="quick-reservation__price">
           {focusSlot?.isReservable && (
             <>
-              {t("common:price")}: <PriceValue>{price}</PriceValue>
-              {!isFreeOfCharge && subventionSuffix}
+              <NoWrap>
+                {t("common:price")}: <PriceValue>{price}</PriceValue>
+              </NoWrap>
+              <NoWrap>{!isFreeOfCharge && subventionSuffix}</NoWrap>
             </>
           )}
         </Price>
@@ -266,7 +268,7 @@ function TimeChunkSection({
         </span>
         {nextAvailableTime != null && (
           <Button
-            data-testid="quick-reservation-next-available-time"
+            data-testid="quick-reservation__next-available-time"
             type="button"
             onClick={(e) => {
               e.preventDefault();
@@ -289,7 +291,7 @@ function TimeChunkSection({
           {chunk.map((value: string) => (
             <Slot $active={watch("time") === value} key={value}>
               <SlotButton
-                data-testid="quick-reservation-slot"
+                data-testid="quick-reservation__slot"
                 onClick={() => setValue("time", value, { shouldDirty: true })}
                 type="button"
               >

@@ -31,6 +31,7 @@ interface SelectProps<T extends FieldValues> extends UseControllerProps<T> {
   afterChange?: (
     value: string | number | Array<string | number> | undefined
   ) => void;
+  id?: string;
 }
 
 export function ControlledSelect<T extends FieldValues>({
@@ -52,6 +53,7 @@ export function ControlledSelect<T extends FieldValues>({
   disabled,
   afterChange,
   enableSearch,
+  ...rest
 }: SelectProps<T>): JSX.Element {
   const { t, i18n } = useTranslation(["common"]);
   const language = convertLanguageCode(i18n.language);
@@ -116,6 +118,7 @@ export function ControlledSelect<T extends FieldValues>({
 
   return (
     <Select
+      {...rest}
       style={style}
       className={className}
       clearable={clearable ?? false}

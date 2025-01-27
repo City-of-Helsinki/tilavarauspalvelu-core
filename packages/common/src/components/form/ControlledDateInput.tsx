@@ -33,6 +33,7 @@ export function ControlledDateInput<T extends FieldValues>({
   minDate,
   initialMonth,
   disableConfirmation,
+  ...rest
 }: ControllerProps<T>) {
   const {
     field: { value, onChange },
@@ -41,7 +42,8 @@ export function ControlledDateInput<T extends FieldValues>({
 
   return (
     <DateInput
-      id={id ?? `reservationDialog.${name}`}
+      {...rest}
+      id={id ?? `controlled-date-input__${name}`}
       label={label ?? t(`ReservationDialog.${name}`)}
       minDate={minDate ?? new Date()}
       maxDate={maxDate ?? addYears(new Date(), 2)}

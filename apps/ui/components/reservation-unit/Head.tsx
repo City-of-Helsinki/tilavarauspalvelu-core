@@ -188,6 +188,7 @@ function IconList({
           text: (
             <>
               {unitPrice}
+              {hasSubventionSuffix ? ": " : null}
               {hasSubventionSuffix ? subventionSuffix : null}
             </>
           ),

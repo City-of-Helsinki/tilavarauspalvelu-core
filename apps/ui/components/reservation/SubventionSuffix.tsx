@@ -8,34 +8,32 @@ type Props = {
   ref?: RefObject<HTMLAnchorElement>;
 };
 
-const Anchor = styled.a`
+const Btn = styled.button`
+  display: inline;
+  background-color: unset;
+  border: unset;
+  padding: unset;
+
   text-decoration: underline;
   color: var(--color-black);
   word-break: keep-all;
 `;
 
-const SubventionSuffix = ({
+export function SubventionSuffix({
   placement,
   setIsDialogOpen,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { t } = useTranslation();
 
   return (
-    <>
-      {", "}
-      <Anchor
-        href="#"
-        style={{}}
-        onClick={(e) => {
-          e.preventDefault();
-          setIsDialogOpen(true);
-        }}
-        data-testid={`link__pricing-terms--${placement}`}
-      >
-        {t("reservationCalendar:subventionAvailable")}
-      </Anchor>
-    </>
+    <Btn
+      onClick={(e) => {
+        e.preventDefault();
+        setIsDialogOpen(true);
+      }}
+      data-testid={`link__pricing-terms--${placement}`}
+    >
+      {t("reservationCalendar:subventionAvailable")}
+    </Btn>
   );
-};
-
-export default SubventionSuffix;
+}
