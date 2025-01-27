@@ -14,8 +14,7 @@ from tilavarauspalvelu.models import ReservableTimeSpan
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tests.helpers import ResponseMock, patch_method
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import OriginHaukiResource
@@ -68,8 +67,8 @@ def test__HaukiResourceHashUpdater__fetch_hauki_resources__single_page(reservati
 @patch_method(
     HaukiAPIClient.get,
     side_effect=[
-        MockResponse(status_code=200, json={"results": ["foo"], "next": "page2"}),
-        MockResponse(status_code=200, json={"results": ["bar"], "next": None}),
+        ResponseMock(status_code=200, json_data={"results": ["foo"], "next": "page2"}),
+        ResponseMock(status_code=200, json_data={"results": ["bar"], "next": None}),
     ],
 )
 def test__HaukiResourceHashUpdater__fetch_hauki_resources__multiple_pages(reservation_unit):

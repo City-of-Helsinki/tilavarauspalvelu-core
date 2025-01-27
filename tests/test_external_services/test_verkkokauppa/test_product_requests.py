@@ -19,8 +19,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tests.helpers import ResponseMock, patch_method
 
 create_product_params = CreateProductParams(
     namespace="test-namespace",
@@ -62,14 +61,14 @@ create_or_update_accounting_response = {
 }
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 def test__create_product__makes_valid_request():
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=201, json=create_product_response)
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=201, json_data=create_product_response)
 
     response = VerkkokauppaAPIClient.create_product(params=create_product_params)
 
-    VerkkokauppaAPIClient.generic.assert_called_with(
-        "post",
+    VerkkokauppaAPIClient.request.assert_called_with(
+        method="post",
         url=settings.VERKKOKAUPPA_PRODUCT_API_URL + "/",
         json=create_product_params.to_json(),
         headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
@@ -78,31 +77,31 @@ def test__create_product__makes_valid_request():
     assert response == Product.from_json(create_product_response)
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 def test__create_product__raises_exception_if_product_id_is_missing():
     response = create_product_response.copy()
     response.pop("productId")
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=201, json=response)
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=201, json_data=response)
 
     with pytest.raises(CreateProductError):
         VerkkokauppaAPIClient.create_product(params=create_product_params)
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 def test__create_product__raises_exception_if_product_id_is_invalid():
     response = create_product_response.copy()
     response["productId"] = "invalid-id"
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=201, json=response)
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=201, json_data=response)
 
     with pytest.raises(CreateProductError):
         VerkkokauppaAPIClient.create_product(params=create_product_params)
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_message)
 def test__create_product__raises_exception_if_status_code_is_not_201():
     response = {"errors": [{"code": "mock-error", "message": "Error Message"}]}
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=500, json=response)
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=500, json_data=response)
 
     with pytest.raises(CreateProductError):
         VerkkokauppaAPIClient.create_product(params=create_product_params)
@@ -110,16 +109,16 @@ def test__create_product__raises_exception_if_status_code_is_not_201():
     assert SentryLogger.log_message.call_count == 1
 
 
-@patch_method(VerkkokauppaAPIClient.generic, side_effect=Timeout())
+@patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout())
 def test__create_product__raises_exception_on_timeout():
     with pytest.raises(CreateProductError):
         VerkkokauppaAPIClient.create_product(params=create_product_params)
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 def test__create_or_update__account_makes_valid_request():
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(
-        status_code=201, json=create_or_update_accounting_response
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(
+        status_code=201, json_data=create_or_update_accounting_response
     )
 
     response = VerkkokauppaAPIClient.create_or_update_accounting(
@@ -127,8 +126,8 @@ def test__create_or_update__account_makes_valid_request():
         params=create_or_update_account_params,
     )
 
-    VerkkokauppaAPIClient.generic.assert_called_with(
-        "post",
+    VerkkokauppaAPIClient.request.assert_called_with(
+        method="post",
         url=settings.VERKKOKAUPPA_PRODUCT_API_URL + "/0bd382a0-d79f-44c8-b3c6-8617bf72ebd5/accounting",
         json=create_or_update_account_params.to_json(),
         headers={
@@ -140,11 +139,12 @@ def test__create_or_update__account_makes_valid_request():
     assert response == Accounting.from_json(create_or_update_accounting_response)
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_message)
 def test__create_or_update_accounting__raises_exception_if_status_code_is_not_201():
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(
-        status_code=500, json={"errors": [{"code": "mock-error", "message": "Error Message"}]}
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(
+        status_code=500,
+        json_data={"errors": [{"code": "mock-error", "message": "Error Message"}]},
     )
 
     with pytest.raises(CreateOrUpdateAccountingError):
@@ -156,7 +156,7 @@ def test__create_or_update_accounting__raises_exception_if_status_code_is_not_20
     assert SentryLogger.log_message.call_count == 1
 
 
-@patch_method(VerkkokauppaAPIClient.generic, side_effect=Timeout())
+@patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout())
 def test__create_or_update_accounting__raises_exception_on_timeout():
     with pytest.raises(CreateOrUpdateAccountingError):
         VerkkokauppaAPIClient.create_or_update_accounting(

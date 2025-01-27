@@ -817,7 +817,7 @@ def test_reservation__create__prefill_profile_data__null_values(graphql, setting
     assert reservation.home_city is None
 
 
-@patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(status_code=500, json_data={}))
+@patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(status_code=500, json_data={}))
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 @patch_method(SentryLogger.log_exception)
 def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphql, settings):
@@ -852,7 +852,8 @@ def test_reservation__create__prefilled_with_profile_data__api_call_fails(graphq
     assert reservation.reservee_address_zip == ""
     assert reservation.home_city is None
 
-    assert SentryLogger.log_exception.call_count == 1
+    # External service call raises known exception, so no Sentry logging is done.
+    assert SentryLogger.log_exception.call_count == 0
 
 
 @pytest.mark.parametrize("arm", ADLoginAMR)

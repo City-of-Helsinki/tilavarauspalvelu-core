@@ -80,9 +80,13 @@ class BaseExternalServiceClient:
     ################
 
     @classmethod
+    def request(cls, method: Literal["get", "post", "put", "delete"], url: str, **kwargs: Any) -> Response:
+        return request(method, url, **kwargs, timeout=cls.REQUEST_TIMEOUT_SECONDS)
+
+    @classmethod
     @stamina.retry(on=Exception, attempts=3)  # Likely retry should happen no matter the exception
     def generic(cls, method: Literal["get", "post", "put", "delete"], url: str, **kwargs: Any) -> Response:
-        response = request(method, url, **kwargs, timeout=cls.REQUEST_TIMEOUT_SECONDS)
+        response = cls.request(method=method, url=url, **kwargs)
         if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
             cls.handle_500_error(response)
         return response

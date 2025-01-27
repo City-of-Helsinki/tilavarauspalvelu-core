@@ -24,7 +24,7 @@ pytestmark = [
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__all_fields(graphql):
     user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
     application = ApplicationFactory.create(user=user)
@@ -32,7 +32,7 @@ def test_helsinki_profile_data__query__all_fields(graphql):
     profile_data = MyProfileDataFactory.create_basic(
         verifiedPersonalInformation__nationalIdentificationNumber="181106A830T",
     )
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     fields = """
@@ -54,7 +54,7 @@ def test_helsinki_profile_data__query__all_fields(graphql):
     query = profile_query(fields=fields, application_id=application.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 1
+    assert HelsinkiProfileClient.request.call_count == 1
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
@@ -76,19 +76,19 @@ def test_helsinki_profile_data__query__all_fields(graphql):
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__application_user(graphql):
     user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     query = profile_query(application_id=application.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 1
+    assert HelsinkiProfileClient.request.call_count == 1
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
@@ -98,19 +98,19 @@ def test_helsinki_profile_data__query__application_user(graphql):
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__reservation_user(graphql):
     user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
     reservation = ReservationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     query = profile_query(reservation_id=reservation.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 1
+    assert HelsinkiProfileClient.request.call_count == 1
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
@@ -120,13 +120,13 @@ def test_helsinki_profile_data__query__reservation_user(graphql):
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__ad_user(graphql):
     user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ADLoginAMR.HELSINKIAD.value)
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     fields = """
@@ -148,7 +148,7 @@ def test_helsinki_profile_data__query__ad_user(graphql):
     query = profile_query(fields=fields, application_id=application.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 0
+    assert HelsinkiProfileClient.request.call_count == 0
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
@@ -170,13 +170,13 @@ def test_helsinki_profile_data__query__ad_user(graphql):
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__non_helauth_user(graphql):
     user = UserFactory.create(profile_id="foo")
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     fields = """
@@ -198,7 +198,7 @@ def test_helsinki_profile_data__query__non_helauth_user(graphql):
     query = profile_query(fields=fields, application_id=application.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 0
+    assert HelsinkiProfileClient.request.call_count == 0
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
@@ -220,83 +220,83 @@ def test_helsinki_profile_data__query__non_helauth_user(graphql):
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__no_profile_id(graphql):
     user = UserFactory.create(profile_id="", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     query = profile_query(application_id=application.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 0
+    assert HelsinkiProfileClient.request.call_count == 0
     assert response.error_message() == "User does not have a profile id. Cannot fetch profile data."
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__no_token(graphql):
     user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_superuser()
     query = profile_query(application_id=application.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 0
+    assert HelsinkiProfileClient.request.call_count == 0
     assert response.error_message() == "Helsinki profile token is not valid and could not be refreshed."
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 @patch_method(SentryLogger.log_message)
 def test_helsinki_profile_data__query__profile_request_has_errors(graphql):
     user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
     application = ApplicationFactory.create(user=user)
 
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"errors": [{"message": "foo"}]})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"errors": [{"message": "foo"}]})
 
     graphql.login_with_superuser()
     query = profile_query(application_id=application.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 1
+    assert HelsinkiProfileClient.request.call_count == 1
     assert response.error_message() == 'Helsinki profile: Response contains errors. [{"message": "foo"}]'
 
     assert SentryLogger.log_message.call_count == 1
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__no_permission(graphql):
     user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     graphql.login_with_regular_user()
     query = profile_query(application_id=application.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 0
+    assert HelsinkiProfileClient.request.call_count == 0
     assert response.error_message() == "No permission to access node."
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__general_admin(graphql):
     user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
     application = ApplicationFactory.create(user=user)
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     admin = UserFactory.create_with_general_role()
     graphql.force_login(admin)
@@ -304,7 +304,7 @@ def test_helsinki_profile_data__query__general_admin(graphql):
     query = profile_query(application_id=application.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 1
+    assert HelsinkiProfileClient.request.call_count == 1
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {
@@ -314,7 +314,7 @@ def test_helsinki_profile_data__query__general_admin(graphql):
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic)
+@patch_method(HelsinkiProfileClient.request)
 def test_helsinki_profile_data__query__unit_admin(graphql):
     user = UserFactory.create(profile_id="foo", social_auth__extra_data__amr=ProfileLoginAMR.SUOMI_FI.value)
     application = ApplicationFactory.create(
@@ -324,7 +324,7 @@ def test_helsinki_profile_data__query__unit_admin(graphql):
     unit = application.units_for_permissions[0]
 
     profile_data = MyProfileDataFactory.create_basic()
-    HelsinkiProfileClient.generic.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
+    HelsinkiProfileClient.request.return_value = ResponseMock(json_data={"data": {"profile": profile_data}})
 
     admin = UserFactory.create_with_unit_role(units=[unit])
     graphql.force_login(admin)
@@ -332,7 +332,7 @@ def test_helsinki_profile_data__query__unit_admin(graphql):
     query = profile_query(application_id=application.id)
     response = graphql(query)
 
-    assert HelsinkiProfileClient.generic.call_count == 1
+    assert HelsinkiProfileClient.request.call_count == 1
     assert response.has_errors is False, response.errors
 
     assert response.first_query_object == {

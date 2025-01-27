@@ -21,8 +21,7 @@ from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeS
 from tilavarauspalvelu.models import ReservableTimeSpan
 from utils.date_utils import DEFAULT_TIMEZONE, local_date
 
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tests.helpers import ResponseMock, patch_method
 
 # Applied to all tests
 pytestmark = [
@@ -249,7 +248,7 @@ def test__ReservableTimeSpanClient__init__latest_fetched_date_is_defined__raise(
 
 @patch_method(
     HaukiAPIClient.get,
-    return_value=MockResponse(status_code=200, json={"count": 1, "results": [_get_resource_opening_hours()]}),
+    return_value=ResponseMock(status_code=200, json_data={"count": 1, "results": [_get_resource_opening_hours()]}),
 )
 def test__ReservableTimeSpanClient__get_opening_hours_from_hauki_api(reservation_unit):
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
