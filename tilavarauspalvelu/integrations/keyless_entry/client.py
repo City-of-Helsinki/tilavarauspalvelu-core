@@ -31,19 +31,19 @@ from .exceptions import (
 )
 from .typing import (
     PindoraReservationCreateData,
+    PindoraReservationRescheduleData,
     PindoraReservationResponse,
     PindoraReservationSeriesAccessCodeValidity,
     PindoraReservationSeriesCreateData,
+    PindoraReservationSeriesRescheduleData,
     PindoraReservationSeriesReservationData,
     PindoraReservationSeriesResponse,
-    PindoraReservationSeriesUpdateData,
     PindoraReservationUnitResponse,
     PindoraSeasonalBookingAccessCodeValidity,
     PindoraSeasonalBookingCreateData,
+    PindoraSeasonalBookingRescheduleData,
     PindoraSeasonalBookingReservationData,
     PindoraSeasonalBookingResponse,
-    PindoraSeasonalBookingUpdateData,
-    PindoraUpdateReservationData,
 )
 
 if TYPE_CHECKING:
@@ -88,7 +88,7 @@ class PindoraClient(BaseExternalServiceClient):
     @classmethod
     def get_reservation(cls, reservation: Reservation) -> PindoraReservationResponse:
         """Fetch a reservation from Pindora."""
-        url = cls._build_url(f"reservation-unit/{reservation.ext_uuid}")
+        url = cls._build_url(f"reservation/{reservation.ext_uuid}")
 
         response = cls.get(url=url)
         cls._validate_reservation_response(
@@ -103,7 +103,7 @@ class PindoraClient(BaseExternalServiceClient):
     @classmethod
     def create_reservation(cls, reservation: Reservation, *, is_active: bool = False) -> PindoraReservationResponse:
         """Create a new reservation in Pindora."""
-        url = cls._build_url("reservations")
+        url = cls._build_url("reservation")
 
         reservation_unit: ReservationUnit = reservation.reservation_units.first()
 
@@ -126,21 +126,59 @@ class PindoraClient(BaseExternalServiceClient):
         return cls._parse_reservation_response(data)
 
     @classmethod
-    def update_reservation(cls, reservation: Reservation, *, is_active: bool = False) -> None:
-        """Update a reservation in Pindora."""
-        url = cls._build_url(f"reservation/{reservation.ext_uuid}")
+    def reschedule_reservation(cls, reservation: Reservation) -> None:
+        """Reschedule a reservation in Pindora."""
+        url = cls._build_url(f"reservation/reschedule/{reservation.ext_uuid}")
 
-        data = PindoraUpdateReservationData(
+        data = PindoraReservationRescheduleData(
             begin=local_iso_format(reservation.begin),
             end=local_iso_format(reservation.end),
-            is_active=is_active,
         )
 
         response = cls.put(url=url, json=data)
         cls._validate_reservation_response(
             response,
             reservation,
-            action="updating reservation",
+            action="rescheduling reservation",
+            expected_status_code=HTTP_204_NO_CONTENT,
+        )
+
+    @classmethod
+    def change_reservation_access_code(cls, reservation: Reservation) -> None:
+        """Change a reservation's access code in Pindora."""
+        url = cls._build_url(f"reservation/change-access-code/{reservation.ext_uuid}")
+
+        response = cls.put(url=url)
+        cls._validate_reservation_response(
+            response,
+            reservation,
+            action="changing access code for reservation",
+            expected_status_code=HTTP_204_NO_CONTENT,
+        )
+
+    @classmethod
+    def activate_reservation_access_code(cls, reservation: Reservation) -> None:
+        """Activate a reservation's access code in Pindora."""
+        url = cls._build_url(f"reservation/activate/{reservation.ext_uuid}")
+
+        response = cls.put(url=url)
+        cls._validate_reservation_response(
+            response,
+            reservation,
+            action="activating access code for reservation",
+            expected_status_code=HTTP_204_NO_CONTENT,
+        )
+
+    @classmethod
+    def deactivate_reservation_access_code(cls, reservation: Reservation) -> None:
+        """Deactivate a reservation's access code in Pindora."""
+        url = cls._build_url(f"reservation/deactivate/{reservation.ext_uuid}")
+
+        response = cls.put(url=url)
+        cls._validate_reservation_response(
+            response,
+            reservation,
+            action="deactivating access code for reservation",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
@@ -156,21 +194,6 @@ class PindoraClient(BaseExternalServiceClient):
             action="deleting reservation",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
-
-    @classmethod
-    def change_reservation_access_code(cls, reservation: Reservation) -> PindoraReservationResponse:
-        """Change a reservation's access code in Pindora."""
-        url = cls._build_url(f"change-access-code/reservation/{reservation.ext_uuid}")
-
-        response = cls.put(url=url)
-        cls._validate_reservation_response(
-            response,
-            reservation,
-            action="changing access code for reservation",
-        )
-
-        data = cls.response_json(response)
-        return cls._parse_reservation_response(data)
 
     ####################
     # Seasonal booking #
@@ -199,7 +222,7 @@ class PindoraClient(BaseExternalServiceClient):
         is_active: bool = False,
     ) -> PindoraSeasonalBookingResponse:
         """Create a new seasonal booking in Pindora."""
-        url = cls._build_url("seasonal-bookings")
+        url = cls._build_url("seasonal-booking")
 
         reservations: list[Reservation] = list(
             application_section.actions.get_reservations()
@@ -235,14 +258,9 @@ class PindoraClient(BaseExternalServiceClient):
         return cls._parse_seasonal_booking_response(data)
 
     @classmethod
-    def update_seasonal_reservation(
-        cls,
-        application_section: ApplicationSection,
-        *,
-        is_active: bool = False,
-    ) -> None:
-        """Update a seasonal booking in Pindora."""
-        url = cls._build_url(f"seasonal-booking/{application_section.ext_uuid}")
+    def reschedule_seasonal_booking(cls, application_section: ApplicationSection) -> None:
+        """Reschedule a seasonal booking in Pindora."""
+        url = cls._build_url(f"seasonal-booking/reschedule/{application_section.ext_uuid}")
 
         reservations: list[Reservation] = list(
             application_section.actions.get_reservations()
@@ -254,7 +272,7 @@ class PindoraClient(BaseExternalServiceClient):
             msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
             raise PindoraClientError(msg)
 
-        data = PindoraSeasonalBookingUpdateData(
+        data = PindoraSeasonalBookingRescheduleData(
             series=[
                 PindoraSeasonalBookingReservationData(
                     reservation_unit_id=str(reservation.recurring_reservation.reservation_unit.uuid),
@@ -263,22 +281,57 @@ class PindoraClient(BaseExternalServiceClient):
                 )
                 for reservation in reservations
             ],
-            is_active=is_active,
         )
 
         response = cls.put(url=url, json=data)
         cls._validate_seasonal_booking_response(
             response,
             application_section,
-            action="updating seasonal booking",
+            action="rescheduling seasonal booking",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def delete_seasonal_booking(
-        cls,
-        application_section: ApplicationSection,
-    ) -> None:
+    def change_seasonal_booking_access_code(cls, application_section: ApplicationSection) -> None:
+        """Change a seasonal booking's access code in Pindora."""
+        url = cls._build_url(f"seasonal-booking/change-access-code/{application_section.ext_uuid}")
+
+        response = cls.put(url=url)
+        cls._validate_seasonal_booking_response(
+            response,
+            application_section,
+            action="changing access code for seasonal booking",
+            expected_status_code=HTTP_204_NO_CONTENT,
+        )
+
+    @classmethod
+    def activate_seasonal_booking_access_code(cls, application_section: ApplicationSection) -> None:
+        """Activate a seasonal booking's access code in Pindora."""
+        url = cls._build_url(f"seasonal-booking/activate/{application_section.ext_uuid}")
+
+        response = cls.put(url=url)
+        cls._validate_seasonal_booking_response(
+            response,
+            application_section,
+            action="activating access code for seasonal booking",
+            expected_status_code=HTTP_204_NO_CONTENT,
+        )
+
+    @classmethod
+    def deactivate_seasonal_booking_access_code(cls, application_section: ApplicationSection) -> None:
+        """Deactivate a seasonal booking's access code in Pindora."""
+        url = cls._build_url(f"seasonal-booking/deactivate/{application_section.ext_uuid}")
+
+        response = cls.put(url=url)
+        cls._validate_seasonal_booking_response(
+            response,
+            application_section,
+            action="deactivating access code for seasonal booking",
+            expected_status_code=HTTP_204_NO_CONTENT,
+        )
+
+    @classmethod
+    def delete_seasonal_booking(cls, application_section: ApplicationSection) -> None:
         """Delete a seasonal booking from Pindora."""
         url = cls._build_url(f"seasonal-booking/{application_section.ext_uuid}")
 
@@ -290,24 +343,6 @@ class PindoraClient(BaseExternalServiceClient):
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
-    @classmethod
-    def change_seasonal_booking_access_code(
-        cls,
-        application_section: ApplicationSection,
-    ) -> PindoraSeasonalBookingResponse:
-        """Change a seasonal booking's access code in Pindora."""
-        url = cls._build_url(f"change-access-code/seasonal-booking/{application_section.ext_uuid}")
-
-        response = cls.put(url=url)
-        cls._validate_seasonal_booking_response(
-            response,
-            application_section,
-            action="changing access code for seasonal booking",
-        )
-
-        data = cls.response_json(response)
-        return cls._parse_seasonal_booking_response(data)
-
     ######################
     # Reservation series #
     ######################
@@ -315,7 +350,7 @@ class PindoraClient(BaseExternalServiceClient):
     @classmethod
     def get_reservation_series(cls, series: RecurringReservation) -> PindoraReservationSeriesResponse:
         """Fetch a reservation series from Pindora."""
-        url = cls._build_url(f"reservation-serie/{series.ext_uuid}")
+        url = cls._build_url(f"reservation-series/{series.ext_uuid}")
 
         response = cls.get(url=url)
         cls._validate_reservation_series_response(
@@ -344,7 +379,7 @@ class PindoraClient(BaseExternalServiceClient):
             raise PindoraClientError(msg)
 
         data = PindoraReservationSeriesCreateData(
-            reservation_serie_id=str(series.ext_uuid),
+            reservation_series_id=str(series.ext_uuid),
             reservation_unit_id=str(series.reservation_unit.uuid),
             series=[
                 PindoraReservationSeriesReservationData(
@@ -367,14 +402,9 @@ class PindoraClient(BaseExternalServiceClient):
         return cls._parse_reservation_series_response(data)
 
     @classmethod
-    def update_reservation_series(
-        cls,
-        series: RecurringReservation,
-        *,
-        is_active: bool = False,
-    ) -> None:
-        """Create a new reservation series in Pindora."""
-        url = cls._build_url(f"reservation-serie/{series.ext_uuid}")
+    def reschedule_reservation_series(cls, series: RecurringReservation) -> None:
+        """Reschedule a reservation series in Pindora."""
+        url = cls._build_url(f"reservation-series/reschedule/{series.ext_uuid}")
 
         reservations: list[Reservation] = list(series.reservations.filter(state=ReservationStateChoice.CONFIRMED))
 
@@ -382,7 +412,7 @@ class PindoraClient(BaseExternalServiceClient):
             msg = f"No confirmed reservations in reservation series '{series.ext_uuid}'."
             raise PindoraClientError(msg)
 
-        data = PindoraReservationSeriesUpdateData(
+        data = PindoraReservationSeriesRescheduleData(
             series=[
                 PindoraReservationSeriesReservationData(
                     begin=local_iso_format(reservation.begin),
@@ -390,24 +420,59 @@ class PindoraClient(BaseExternalServiceClient):
                 )
                 for reservation in reservations
             ],
-            is_active=is_active,
         )
 
         response = cls.put(url=url, json=data)
         cls._validate_reservation_series_response(
             response,
             series,
-            action="updating reservation series",
+            action="rescheduling reservation series",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def delete_reservation_series(
-        cls,
-        series: RecurringReservation,
-    ) -> None:
+    def change_reservation_series_access_code(cls, series: RecurringReservation) -> None:
+        """Change a reservation series' access code in Pindora."""
+        url = cls._build_url(f"reservation-series/change-access-code/{series.ext_uuid}")
+
+        response = cls.put(url=url)
+        cls._validate_reservation_series_response(
+            response,
+            series,
+            action="changing access code for reservation series",
+            expected_status_code=HTTP_204_NO_CONTENT,
+        )
+
+    @classmethod
+    def activate_reservation_series_access_code(cls, series: RecurringReservation) -> None:
+        """Activate a reservation series' access code in Pindora."""
+        url = cls._build_url(f"reservation-series/activate/{series.ext_uuid}")
+
+        response = cls.put(url=url)
+        cls._validate_reservation_series_response(
+            response,
+            series,
+            action="activating access code for reservation series",
+            expected_status_code=HTTP_204_NO_CONTENT,
+        )
+
+    @classmethod
+    def deactivate_reservation_series_access_code(cls, series: RecurringReservation) -> None:
+        """Deactivate a reservation series' access code in Pindora."""
+        url = cls._build_url(f"reservation-series/deactivate/{series.ext_uuid}")
+
+        response = cls.put(url=url)
+        cls._validate_reservation_series_response(
+            response,
+            series,
+            action="deactivating access code for reservation series",
+            expected_status_code=HTTP_204_NO_CONTENT,
+        )
+
+    @classmethod
+    def delete_reservation_series(cls, series: RecurringReservation) -> None:
         """Delete a reservation series from Pindora."""
-        url = cls._build_url(f"reservation-serie/{series.ext_uuid}")
+        url = cls._build_url(f"reservation-series/{series.ext_uuid}")
 
         response = cls.delete(url=url)
         cls._validate_reservation_series_response(
@@ -416,24 +481,6 @@ class PindoraClient(BaseExternalServiceClient):
             action="deleting reservation series",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
-
-    @classmethod
-    def change_reservation_series_access_code(
-        cls,
-        series: RecurringReservation,
-    ) -> PindoraReservationSeriesResponse:
-        """Change a reservation series' access code in Pindora."""
-        url = cls._build_url(f"change-access-code/reservation-serie/{series.ext_uuid}")
-
-        response = cls.put(url=url)
-        cls._validate_reservation_series_response(
-            response,
-            series,
-            action="changing access code for reservation series",
-        )
-
-        data = cls.response_json(response)
-        return cls._parse_reservation_series_response(data)
 
     ##################
     # Helper methods #
