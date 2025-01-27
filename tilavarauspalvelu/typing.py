@@ -223,6 +223,7 @@ class ReservationAdjustTimeData(TypedDict):
     state: NotRequired[ReservationStateChoice]
     buffer_time_before: NotRequired[datetime.timedelta]
     buffer_time_after: NotRequired[datetime.timedelta]
+    access_type: NotRequired[AccessType]
 
 
 class ReservationApproveData(TypedDict):
