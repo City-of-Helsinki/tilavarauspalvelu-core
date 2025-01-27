@@ -23,7 +23,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationUnitFactory
-from tests.helpers import ResponseMock, exact, patch_method, use_retires
+from tests.helpers import ResponseMock, exact, patch_method, use_retries
 
 from .helpers import ErrorParams, default_reservation_unit_response
 
@@ -61,7 +61,7 @@ def test_pindora_client__get_reservation_unit__missing_api_url(settings):
         PindoraClient.get_reservation_unit(reservation_unit)
 
 
-@use_retires(attempts=3)
+@use_retries(attempts=3)
 def test_pindora_client__get_reservation_unit__fails_all_retries():
     reservation_unit = ReservationUnitFactory.build()
 
@@ -73,7 +73,7 @@ def test_pindora_client__get_reservation_unit__fails_all_retries():
     assert magic_mock.call_count == 3
 
 
-@use_retires(attempts=3)
+@use_retries(attempts=3)
 def test_pindora_client__get_reservation_unit__retry_on_500():
     reservation_unit = ReservationUnitFactory.build()
 
@@ -85,7 +85,7 @@ def test_pindora_client__get_reservation_unit__retry_on_500():
     assert magic_mock.call_count == 3
 
 
-@use_retires(attempts=3)
+@use_retries(attempts=3)
 def test_pindora_client__get_reservation_unit__succeeds_after_retry():
     reservation_unit = ReservationUnitFactory.build()
 

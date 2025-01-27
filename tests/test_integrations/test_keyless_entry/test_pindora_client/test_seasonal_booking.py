@@ -34,7 +34,7 @@ from tests.factories import (
     ReservationFactory,
     ReservationUnitOptionFactory,
 )
-from tests.helpers import ResponseMock, exact, patch_method, use_retires
+from tests.helpers import ResponseMock, exact, patch_method, use_retries
 
 from .helpers import ErrorParams, default_seasonal_booking_response
 
@@ -96,7 +96,7 @@ def test_pindora_client__get_seasonal_booking__errors(status_code, exception, er
         PindoraClient.get_seasonal_booking(application_section)
 
 
-@use_retires(attempts=3)
+@use_retries(attempts=3)
 def test_pindora_client__get_seasonal_booking__fails_all_retries():
     application_section = ApplicationSectionFactory.build()
 
@@ -108,7 +108,7 @@ def test_pindora_client__get_seasonal_booking__fails_all_retries():
     assert magic_mock.call_count == 3
 
 
-@use_retires(attempts=3)
+@use_retries(attempts=3)
 def test_pindora_client__get_seasonal_booking__retry_on_500():
     application_section = ApplicationSectionFactory.build()
 
@@ -120,7 +120,7 @@ def test_pindora_client__get_seasonal_booking__retry_on_500():
     assert magic_mock.call_count == 3
 
 
-@use_retires(attempts=3)
+@use_retries(attempts=3)
 def test_pindora_client__get_seasonal_booking__succeeds_after_retry():
     application_section = ApplicationSectionFactory.build()
     reservation = ReservationFactory.build(created_at=local_datetime())
