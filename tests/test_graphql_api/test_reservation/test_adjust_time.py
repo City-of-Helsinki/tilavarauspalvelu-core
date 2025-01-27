@@ -7,8 +7,9 @@ import freezegun
 import pytest
 from django.test import override_settings
 
-from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
@@ -501,3 +502,127 @@ def test_reservation__adjust_time__update_reservation_buffer_on_adjust(graphql):
     # New reservation unit buffers are applied automatically on adjust.
     assert reservation.buffer_time_before == datetime.timedelta(hours=2)
     assert reservation.buffer_time_after == datetime.timedelta(hours=2)
+
+
+@patch_method(PindoraClient.reschedule_reservation)
+@patch_method(PindoraClient.deactivate_reservation_access_code)
+def test_reservation__adjust_time__same_access_type(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment(
+        access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=True,
+    )
+
+    graphql.login_with_superuser()
+    data = get_adjust_data(reservation)
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PindoraClient.reschedule_reservation.called is True
+    assert PindoraClient.deactivate_reservation_access_code.called is False
+
+    reservation.refresh_from_db()
+    assert reservation.access_code_is_active is True
+
+
+@patch_method(PindoraClient.reschedule_reservation)
+@patch_method(PindoraClient.deactivate_reservation_access_code)
+def test_reservation__adjust_time__same_access_type__requires_handling(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment(
+        access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__require_reservation_handling=True,
+        access_code_is_active=True,
+    )
+
+    graphql.login_with_superuser()
+    data = get_adjust_data(reservation)
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PindoraClient.reschedule_reservation.called is True
+    assert PindoraClient.deactivate_reservation_access_code.called is True
+
+    reservation.refresh_from_db()
+    assert reservation.access_code_is_active is False
+
+
+@patch_method(
+    PindoraClient.create_reservation,
+    return_value={
+        "access_code_generated_at": datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        "access_code_is_active": True,
+    },
+)
+def test_reservation__adjust_time__change_to_access_code(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment(
+        access_type=AccessType.UNRESTRICTED,
+        reservation_units__access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=False,
+    )
+
+    graphql.login_with_superuser()
+    data = get_adjust_data(reservation)
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PindoraClient.create_reservation.called is True
+    assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is True
+
+    reservation.refresh_from_db()
+    assert reservation.access_code_generated_at == datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.access_code_is_active is True
+
+
+@patch_method(
+    PindoraClient.create_reservation,
+    return_value={
+        "access_code_generated_at": datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        "access_code_is_active": False,
+    },
+)
+def test_reservation__adjust_time__change_to_access_code__requires_handling(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment(
+        access_type=AccessType.UNRESTRICTED,
+        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__require_reservation_handling=True,
+        access_code_is_active=False,
+    )
+
+    graphql.login_with_superuser()
+    data = get_adjust_data(reservation)
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PindoraClient.create_reservation.called is True
+    assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is False
+
+    reservation.refresh_from_db()
+    assert reservation.access_code_generated_at == datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE)
+    assert reservation.access_code_is_active is False
+
+
+@patch_method(PindoraClient.delete_reservation)
+def test_reservation__adjust_time__change_from_access_code(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment(
+        access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_type=AccessType.UNRESTRICTED,
+        access_code_generated_at=datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        access_code_is_active=True,
+    )
+
+    graphql.login_with_superuser()
+    data = get_adjust_data(reservation)
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PindoraClient.delete_reservation.called is True
+
+    reservation.refresh_from_db()
+    assert reservation.access_code_generated_at is None
+    assert reservation.access_code_is_active is False

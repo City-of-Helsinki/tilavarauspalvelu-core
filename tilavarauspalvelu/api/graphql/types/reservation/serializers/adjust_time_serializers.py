@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.fields import IntegerField
@@ -77,11 +78,17 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
 
         data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
         data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begin)
 
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationAdjustTimeData) -> Reservation:
-        instance = super().update(instance=instance, validated_data=validated_data)
+        access_type_before = instance.access_type
+
+        with transaction.atomic():
+            instance = super().update(instance=instance, validated_data=validated_data)
+
+            instance.actions.create_or_update_access_code_if_required(from_access_type=access_type_before)
 
         EmailService.send_reservation_modified_email(reservation=instance)
 
