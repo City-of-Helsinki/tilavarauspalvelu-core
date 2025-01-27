@@ -8,16 +8,19 @@ if TYPE_CHECKING:
 
 __all__ = [
     "PindoraReservationCreateData",
+    "PindoraReservationRescheduleData",
     "PindoraReservationResponse",
     "PindoraReservationSeriesAccessCodeValidity",
+    "PindoraReservationSeriesCreateData",
+    "PindoraReservationSeriesRescheduleData",
+    "PindoraReservationSeriesReservationData",
     "PindoraReservationSeriesResponse",
     "PindoraReservationUnitResponse",
     "PindoraSeasonalBookingAccessCodeValidity",
     "PindoraSeasonalBookingCreateData",
+    "PindoraSeasonalBookingRescheduleData",
     "PindoraSeasonalBookingReservationData",
     "PindoraSeasonalBookingResponse",
-    "PindoraSeasonalBookingUpdateData",
-    "PindoraUpdateReservationData",
 ]
 
 
@@ -55,13 +58,6 @@ class PindoraSeasonalBookingAccessCodeValidity(TypedDict):
     end: datetime.datetime
 
 
-class PindoraReservationSeriesAccessCodeValidity(TypedDict):
-    access_code_valid_minutes_before: int
-    access_code_valid_minutes_after: int
-    begin: datetime.datetime
-    end: datetime.datetime
-
-
 class PindoraSeasonalBookingResponse(TypedDict):
     access_code: str
     access_code_keypad_url: str  # url
@@ -71,6 +67,13 @@ class PindoraSeasonalBookingResponse(TypedDict):
     access_code_generated_at: datetime.datetime
     access_code_is_active: bool
     reservation_unit_code_validity: list[PindoraSeasonalBookingAccessCodeValidity]
+
+
+class PindoraReservationSeriesAccessCodeValidity(TypedDict):
+    access_code_valid_minutes_before: int
+    access_code_valid_minutes_after: int
+    begin: datetime.datetime
+    end: datetime.datetime
 
 
 class PindoraReservationSeriesResponse(TypedDict):
@@ -95,13 +98,12 @@ class PindoraReservationCreateData(TypedDict):
     reservation_unit_id: str  # uuid
     begin: str  # datetime
     end: str  # datetime
-    is_active: NotRequired[bool]  # default: false
+    is_active: NotRequired[bool]  # default: false (access code will not become active when reservation starts)
 
 
-class PindoraUpdateReservationData(TypedDict):
+class PindoraReservationRescheduleData(TypedDict):
     begin: str  # datetime
     end: str  # datetime
-    is_active: NotRequired[bool]  # default: false
 
 
 class PindoraSeasonalBookingReservationData(TypedDict):
@@ -113,12 +115,11 @@ class PindoraSeasonalBookingReservationData(TypedDict):
 class PindoraSeasonalBookingCreateData(TypedDict):
     seasonal_booking_id: str  # uuid
     series: list[PindoraSeasonalBookingReservationData]
-    is_active: NotRequired[bool]  # default: false
+    is_active: NotRequired[bool]  # default: false (access code will not become active when reservation starts)
 
 
-class PindoraSeasonalBookingUpdateData(TypedDict):
+class PindoraSeasonalBookingRescheduleData(TypedDict):
     series: list[PindoraSeasonalBookingReservationData]
-    is_active: NotRequired[bool]  # default: false
 
 
 class PindoraReservationSeriesReservationData(TypedDict):
@@ -127,12 +128,11 @@ class PindoraReservationSeriesReservationData(TypedDict):
 
 
 class PindoraReservationSeriesCreateData(TypedDict):
-    reservation_serie_id: str  # uuid
+    reservation_series_id: str  # uuid
     reservation_unit_id: str  # uuid
     series: list[PindoraReservationSeriesReservationData]
-    is_active: NotRequired[bool]  # default: false
+    is_active: NotRequired[bool]  # default: false (access code will not become active when reservation starts)
 
 
-class PindoraReservationSeriesUpdateData(TypedDict):
+class PindoraReservationSeriesRescheduleData(TypedDict):
     series: list[PindoraReservationSeriesReservationData]
-    is_active: NotRequired[bool]  # default: false

@@ -4,6 +4,7 @@ from unittest import mock
 
 import pytest
 import requests
+from graphene_django_extensions.testing import parametrize_helper
 from rest_framework.status import (
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
@@ -11,6 +12,7 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
     HTTP_409_CONFLICT,
     HTTP_418_IM_A_TEAPOT,
+    HTTP_500_INTERNAL_SERVER_ERROR,
 )
 
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
@@ -18,15 +20,18 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraAPIError,
     PindoraBadRequestError,
     PindoraConflictError,
+    PindoraNotFoundError,
     PindoraPermissionError,
     PindoraUnexpectedResponseError,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
+from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationFactory
 from tests.helpers import ResponseMock, exact, patch_method, use_retires
-from tests.test_integrations.test_keyless_entry.helpers import default_reservation_response
+
+from .helpers import ErrorParams, default_reservation_response
 
 
 def test_pindora_client__get_reservation():
@@ -54,50 +59,35 @@ def test_pindora_client__get_reservation():
     assert response["end"] == reservation.end.astimezone(DEFAULT_TIMEZONE)
 
 
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_403_FORBIDDEN),
+@pytest.mark.parametrize(
+    **parametrize_helper({
+        "400": ErrorParams(
+            status_code=HTTP_400_BAD_REQUEST,
+            exception=PindoraBadRequestError,
+        ),
+        "403": ErrorParams(
+            status_code=HTTP_403_FORBIDDEN,
+            exception=PindoraPermissionError,
+        ),
+        "404": ErrorParams(
+            status_code=HTTP_404_NOT_FOUND,
+            exception=PindoraNotFoundError,
+        ),
+        "non 200": ErrorParams(
+            status_code=HTTP_418_IM_A_TEAPOT,
+            exception=PindoraUnexpectedResponseError,
+        ),
+    })
 )
-def test_pindora_client__get_reservation__403():
+def test_pindora_client__get_reservation__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.build()
 
-    msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraPermissionError, match=exact(msg)):
-        PindoraClient.get_reservation(reservation)
+    patch = patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=status_code),
+    )
 
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_400_BAD_REQUEST, text="bad request"),
-)
-def test_pindora_client__get_reservation__400():
-    reservation = ReservationFactory.build()
-
-    msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
-        PindoraClient.get_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_404_NOT_FOUND),
-)
-def test_pindora_client__get_reservation__404():
-    reservation = ReservationFactory.build()
-
-    msg = f"Reservation '{reservation.ext_uuid}' not found from Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
-        PindoraClient.get_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_418_IM_A_TEAPOT, text="I'm a teapot"),
-)
-def test_pindora_client__get_reservation__not_200():
-    reservation = ReservationFactory.build()
-    msg = f"Unexpected response from Pindora when fetching reservation '{reservation.ext_uuid}': [418] I'm a teapot"
-    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
+    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.get_reservation(reservation)
 
 
@@ -149,6 +139,21 @@ def test_pindora_client__get_reservation__retry__fails_all_retries():
 
 
 @use_retires(attempts=3)
+def test_pindora_client__get_reservation__retry__retry_on_500():
+    reservation = ReservationFactory.build(created_at=local_datetime())
+
+    patch = mock.patch(
+        "utils.external_service.base_external_service_client.request",
+        return_value=ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR),
+    )
+
+    with patch as magic_mock, pytest.raises(ExternalServiceRequestError):
+        PindoraClient.get_reservation(reservation)
+
+    assert magic_mock.call_count == 3
+
+
+@use_retires(attempts=3)
 def test_pindora_client__get_reservation__retry__succeeds_after_retry():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
@@ -156,13 +161,17 @@ def test_pindora_client__get_reservation__retry__succeeds_after_retry():
 
     patch = mock.patch(
         "utils.external_service.base_external_service_client.request",
-        side_effect=[requests.ConnectionError("timeout"), ResponseMock(json_data=data)],
+        side_effect=[
+            requests.ConnectionError("timeout"),
+            ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR),
+            ResponseMock(json_data=data),
+        ],
     )
 
     with patch as magic_mock:
         PindoraClient.get_reservation(reservation)
 
-    assert magic_mock.call_count == 2
+    assert magic_mock.call_count == 3
 
 
 @pytest.mark.django_db
@@ -193,274 +202,258 @@ def test_pindora_client__create_reservation(is_active):
     assert response["end"] == reservation.end.astimezone(DEFAULT_TIMEZONE)
 
 
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_403_FORBIDDEN),
+@pytest.mark.parametrize(
+    **parametrize_helper({
+        "400": ErrorParams(
+            status_code=HTTP_400_BAD_REQUEST,
+            exception=PindoraBadRequestError,
+        ),
+        "403": ErrorParams(
+            status_code=HTTP_403_FORBIDDEN,
+            exception=PindoraPermissionError,
+        ),
+        "404": ErrorParams(
+            status_code=HTTP_404_NOT_FOUND,
+            exception=PindoraNotFoundError,
+        ),
+        "409": ErrorParams(
+            status_code=HTTP_409_CONFLICT,
+            exception=PindoraConflictError,
+        ),
+        "non 200": ErrorParams(
+            status_code=HTTP_418_IM_A_TEAPOT,
+            exception=PindoraUnexpectedResponseError,
+        ),
+    })
 )
 @pytest.mark.django_db
-def test_pindora_client__create_reservation__403():
+def test_pindora_client__create_reservation__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
 
-    msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraPermissionError, match=exact(msg)):
+    patch = patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=status_code),
+    )
+
+    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.create_reservation(reservation)
 
 
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_400_BAD_REQUEST, text="bad request"),
-)
-@pytest.mark.django_db
-def test_pindora_client__create_reservation__400():
-    reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
-
-    msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
-        PindoraClient.create_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_409_CONFLICT),
-)
-@pytest.mark.django_db
-def test_pindora_client__create_reservation__409():
-    reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
-
-    msg = f"Reservation '{reservation.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraConflictError, match=exact(msg)):
-        PindoraClient.create_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_418_IM_A_TEAPOT, text="I'm a teapot"),
-)
-@pytest.mark.django_db
-def test_pindora_client__create_reservation__not_200():
-    reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
-
-    msg = f"Unexpected response from Pindora when creating reservation '{reservation.ext_uuid}': [418] I'm a teapot"
-    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
-        PindoraClient.create_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-)
-@pytest.mark.parametrize("is_active", [True, False])
-def test_pindora_client__update_reservation(is_active):
+def test_pindora_client__reschedule_reservation():
     reservation = ReservationFactory.build()
 
-    PindoraClient.update_reservation(reservation, is_active=is_active)
+    with patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
+    ) as patch:
+        PindoraClient.reschedule_reservation(reservation)
 
-    assert BaseExternalServiceClient.generic.call_count == 1
+    assert patch.call_count == 1
 
 
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_403_FORBIDDEN),
+@pytest.mark.parametrize(
+    **parametrize_helper({
+        "400": ErrorParams(
+            status_code=HTTP_400_BAD_REQUEST,
+            exception=PindoraBadRequestError,
+        ),
+        "403": ErrorParams(
+            status_code=HTTP_403_FORBIDDEN,
+            exception=PindoraPermissionError,
+        ),
+        "404": ErrorParams(
+            status_code=HTTP_404_NOT_FOUND,
+            exception=PindoraNotFoundError,
+        ),
+        "non 204": ErrorParams(
+            status_code=HTTP_418_IM_A_TEAPOT,
+            exception=PindoraUnexpectedResponseError,
+        ),
+    })
 )
-def test_pindora_client__update_reservation__403():
+def test_pindora_client__reschedule_reservation__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.build()
 
-    msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraPermissionError, match=exact(msg)):
-        PindoraClient.update_reservation(reservation)
+    patch = patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=status_code),
+    )
+
+    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+        PindoraClient.reschedule_reservation(reservation)
 
 
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_400_BAD_REQUEST, text="bad request"),
-)
-def test_pindora_client__update_reservation__400():
-    reservation = ReservationFactory.build()
-
-    msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
-        PindoraClient.update_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_404_NOT_FOUND),
-)
-def test_pindora_client__update_reservation__404():
-    reservation = ReservationFactory.build()
-
-    msg = f"Reservation '{reservation.ext_uuid}' not found from Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
-        PindoraClient.update_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_409_CONFLICT),
-)
-def test_pindora_client__update_reservation__409():
-    reservation = ReservationFactory.build()
-
-    msg = f"Reservation '{reservation.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraConflictError, match=exact(msg)):
-        PindoraClient.update_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_418_IM_A_TEAPOT, text="I'm a teapot"),
-)
-def test_pindora_client__update_reservation__not_204():
-    reservation = ReservationFactory.build()
-
-    msg = f"Unexpected response from Pindora when updating reservation '{reservation.ext_uuid}': [418] I'm a teapot"
-    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
-        PindoraClient.update_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-)
 def test_pindora_client__delete_reservation():
     reservation = ReservationFactory.build()
 
-    PindoraClient.delete_reservation(reservation)
-
-    assert BaseExternalServiceClient.generic.call_count == 1
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_403_FORBIDDEN),
-)
-def test_pindora_client__delete_reservation__403():
-    reservation = ReservationFactory.build()
-
-    msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraPermissionError, match=exact(msg)):
+    with patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
+    ) as patch:
         PindoraClient.delete_reservation(reservation)
 
+    assert patch.call_count == 1
 
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_400_BAD_REQUEST, text="bad request"),
+
+@pytest.mark.parametrize(
+    **parametrize_helper({
+        "400": ErrorParams(
+            status_code=HTTP_400_BAD_REQUEST,
+            exception=PindoraBadRequestError,
+        ),
+        "403": ErrorParams(
+            status_code=HTTP_403_FORBIDDEN,
+            exception=PindoraPermissionError,
+        ),
+        "404": ErrorParams(
+            status_code=HTTP_404_NOT_FOUND,
+            exception=PindoraNotFoundError,
+        ),
+        "non 204": ErrorParams(
+            status_code=HTTP_418_IM_A_TEAPOT,
+            exception=PindoraUnexpectedResponseError,
+        ),
+    })
 )
-def test_pindora_client__delete_reservation__400():
+def test_pindora_client__delete_reservation__errors(status_code, exception, error_msg):
     reservation = ReservationFactory.build()
 
-    msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
-        PindoraClient.delete_reservation(reservation)
+    patch = patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=status_code),
+    )
 
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_404_NOT_FOUND),
-)
-def test_pindora_client__delete_reservation__404():
-    reservation = ReservationFactory.build()
-
-    msg = f"Reservation '{reservation.ext_uuid}' not found from Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
-        PindoraClient.delete_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_409_CONFLICT),
-)
-def test_pindora_client__delete_reservation__409():
-    reservation = ReservationFactory.build()
-
-    msg = f"Reservation '{reservation.ext_uuid}' already exists in Pindora."
-    with pytest.raises(PindoraConflictError, match=exact(msg)):
-        PindoraClient.delete_reservation(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_418_IM_A_TEAPOT, text="I'm a teapot"),
-)
-def test_pindora_client__delete_reservation__non_204():
-    reservation = ReservationFactory.build()
-
-    msg = f"Unexpected response from Pindora when deleting reservation '{reservation.ext_uuid}': [418] I'm a teapot"
-    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
+    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.delete_reservation(reservation)
 
 
 def test_pindora_client__change_reservation_access_code():
-    reservation = ReservationFactory.build(created_at=local_datetime())
-
-    data = default_reservation_response(reservation)
+    reservation = ReservationFactory.build()
 
     with patch_method(
         BaseExternalServiceClient.generic,
-        return_value=ResponseMock(json_data=data),
-    ):
-        response = PindoraClient.change_reservation_access_code(reservation)
-
-    assert response["reservation_unit_id"] == reservation.ext_uuid
-    assert response["access_code"] == "13245#"
-    assert response["access_code_keypad_url"] == "https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto"
-    assert response["access_code_phone_number"] == "+358407089833"
-    assert response["access_code_sms_number"] == "+358407089834"
-    assert response["access_code_sms_message"] == "a13245"
-    assert response["access_code_valid_minutes_before"] == 0
-    assert response["access_code_valid_minutes_after"] == 0
-    assert response["access_code_generated_at"] == reservation.created_at.astimezone(DEFAULT_TIMEZONE)
-    assert response["access_code_is_active"] is True
-    assert response["begin"] == reservation.begin.astimezone(DEFAULT_TIMEZONE)
-    assert response["end"] == reservation.end.astimezone(DEFAULT_TIMEZONE)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_403_FORBIDDEN),
-)
-def test_pindora_client__change_reservation_access_code__403():
-    reservation = ReservationFactory.build(created_at=local_datetime())
-
-    msg = "Pindora API key is invalid."
-    with pytest.raises(PindoraPermissionError, match=exact(msg)):
+        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
+    ) as patch:
         PindoraClient.change_reservation_access_code(reservation)
 
+    assert patch.call_count == 1
 
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_400_BAD_REQUEST, text="bad request"),
+
+@pytest.mark.parametrize(
+    **parametrize_helper({
+        "400": ErrorParams(
+            status_code=HTTP_400_BAD_REQUEST,
+            exception=PindoraBadRequestError,
+        ),
+        "403": ErrorParams(
+            status_code=HTTP_403_FORBIDDEN,
+            exception=PindoraPermissionError,
+        ),
+        "404": ErrorParams(
+            status_code=HTTP_404_NOT_FOUND,
+            exception=PindoraNotFoundError,
+        ),
+        "non 204": ErrorParams(
+            status_code=HTTP_418_IM_A_TEAPOT,
+            exception=PindoraUnexpectedResponseError,
+        ),
+    })
 )
-def test_pindora_client__change_reservation_access_code__400():
-    reservation = ReservationFactory.build(created_at=local_datetime())
+def test_pindora_client__change_reservation_access_code__errors(status_code, exception, error_msg):
+    reservation = ReservationFactory.build()
 
-    msg = "Invalid Pindora API request: bad request."
-    with pytest.raises(PindoraBadRequestError, match=exact(msg)):
-        PindoraClient.change_reservation_access_code(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_404_NOT_FOUND),
-)
-def test_pindora_client__change_reservation_access_code__404():
-    reservation = ReservationFactory.build(created_at=local_datetime())
-
-    msg = f"Reservation '{reservation.ext_uuid}' not found from Pindora."
-    with pytest.raises(PindoraAPIError, match=exact(msg)):
-        PindoraClient.change_reservation_access_code(reservation)
-
-
-@patch_method(
-    BaseExternalServiceClient.generic,
-    return_value=ResponseMock(status_code=HTTP_418_IM_A_TEAPOT, text="I'm a teapot"),
-)
-def test_pindora_client__change_reservation_access_code__not_200():
-    reservation = ReservationFactory.build(created_at=local_datetime())
-
-    msg = (
-        f"Unexpected response from Pindora when changing access code for reservation '{reservation.ext_uuid}': "
-        f"[418] I'm a teapot"
+    patch = patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=status_code),
     )
-    with pytest.raises(PindoraUnexpectedResponseError, match=exact(msg)):
+
+    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.change_reservation_access_code(reservation)
+
+
+def test_pindora_client__activate_reservation_access_code():
+    reservation = ReservationFactory.build()
+
+    with patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
+    ) as patch:
+        PindoraClient.activate_reservation_access_code(reservation)
+
+    assert patch.call_count == 1
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper({
+        "400": ErrorParams(
+            status_code=HTTP_400_BAD_REQUEST,
+            exception=PindoraBadRequestError,
+        ),
+        "403": ErrorParams(
+            status_code=HTTP_403_FORBIDDEN,
+            exception=PindoraPermissionError,
+        ),
+        "404": ErrorParams(
+            status_code=HTTP_404_NOT_FOUND,
+            exception=PindoraNotFoundError,
+        ),
+        "non 204": ErrorParams(
+            status_code=HTTP_418_IM_A_TEAPOT,
+            exception=PindoraUnexpectedResponseError,
+        ),
+    })
+)
+def test_pindora_client__activate_reservation_access_code__errors(status_code, exception, error_msg):
+    reservation = ReservationFactory.build()
+
+    patch = patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=status_code),
+    )
+
+    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+        PindoraClient.activate_reservation_access_code(reservation)
+
+
+def test_pindora_client__deactivate_reservation_access_code():
+    reservation = ReservationFactory.build()
+
+    with patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
+    ) as patch:
+        PindoraClient.deactivate_reservation_access_code(reservation)
+
+    assert patch.call_count == 1
+
+
+@pytest.mark.parametrize(
+    **parametrize_helper({
+        "400": ErrorParams(
+            status_code=HTTP_400_BAD_REQUEST,
+            exception=PindoraBadRequestError,
+        ),
+        "403": ErrorParams(
+            status_code=HTTP_403_FORBIDDEN,
+            exception=PindoraPermissionError,
+        ),
+        "404": ErrorParams(
+            status_code=HTTP_404_NOT_FOUND,
+            exception=PindoraNotFoundError,
+        ),
+        "non 204": ErrorParams(
+            status_code=HTTP_418_IM_A_TEAPOT,
+            exception=PindoraUnexpectedResponseError,
+        ),
+    })
+)
+def test_pindora_client__deactivate_reservation_access_code__errors(status_code, exception, error_msg):
+    reservation = ReservationFactory.build()
+
+    patch = patch_method(
+        BaseExternalServiceClient.generic,
+        return_value=ResponseMock(status_code=status_code),
+    )
+
+    with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
+        PindoraClient.deactivate_reservation_access_code(reservation)

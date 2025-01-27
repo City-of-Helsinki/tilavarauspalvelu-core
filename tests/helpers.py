@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from contextlib import contextmanager
 from functools import wraps
+from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any, NamedTuple, ParamSpec, Self, TypeVar
 from unittest import mock
 from unittest.mock import patch
@@ -18,12 +19,14 @@ from graphene_django_extensions.testing import GraphQLClient as BaseGraphQLClien
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from types import TracebackType
+    from unittest.mock import NonCallableMock
 
     from django.http import HttpRequest
 
     from tilavarauspalvelu.enums import UserRoleChoice
     from tilavarauspalvelu.models import User
-    from tilavarauspalvelu.typing import Lang
+    from tilavarauspalvelu.typing import HTTPMethod, Lang
 
 __all__ = [
     "GraphQLClient",
@@ -50,10 +53,20 @@ class GraphQLClient(BaseGraphQLClient):
 
 
 class ResponseMock:
-    def __init__(self, json_data: dict[str, Any] | None = None, text: str = "", status_code: int = 200) -> None:
+    def __init__(
+        self,
+        *,
+        json_data: dict[str, Any] | None = None,
+        text: str = "",
+        status_code: int = 200,
+        method: HTTPMethod = "GET",
+        url: str = "",
+    ) -> None:
         self.json_data = json_data or {}
         self.status_code = status_code
         self.text = text
+        self.request = SimpleNamespace(method=method)
+        self.url = url
 
     def json(self) -> dict[str, Any]:
         return self.json_data
@@ -98,11 +111,16 @@ class patch_method:
 
         return wrapper
 
-    def __enter__(self) -> Any:
+    def __enter__(self) -> NonCallableMock:
         return self.patch.__enter__()
 
-    def __exit__(self, *exc_info: object) -> Any:
-        return self.patch.__exit__(*exc_info)
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> bool | None:
+        return self.patch.__exit__(exc_type, exc_val, exc_tb)
 
 
 class TranslationsFromPOFiles:
