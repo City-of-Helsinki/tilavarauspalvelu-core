@@ -82,40 +82,23 @@ class BaseExternalServiceClient:
     @classmethod
     @stamina.retry(on=Exception, attempts=3)  # Likely retry should happen no matter the exception
     def generic(cls, method: Literal["get", "post", "put", "delete"], url: str, **kwargs: Any) -> Response:
-        return request(method, url, **kwargs, timeout=cls.REQUEST_TIMEOUT_SECONDS)
+        response = request(method, url, **kwargs, timeout=cls.REQUEST_TIMEOUT_SECONDS)
+        if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
+            cls.handle_500_error(response)
+        return response
 
     @classmethod
     def get(cls, *, url: str, params: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
-        response = cls.generic("get", url=url, params=params, headers=cls._get_headers(headers))
-
-        if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
-            cls.handle_500_error(response)
-
-        return response
+        return cls.generic("get", url=url, params=params, headers=cls._get_headers(headers))
 
     @classmethod
     def post(cls, *, url: str, json: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
-        response = cls.generic("post", url=url, json=json, headers=cls._get_mutate_headers(headers))
-
-        if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
-            cls.handle_500_error(response)
-
-        return response
+        return cls.generic("post", url=url, json=json, headers=cls._get_mutate_headers(headers))
 
     @classmethod
     def put(cls, *, url: str, json: dict[str, Any] | None = None, headers: dict[str, Any] | None = None) -> Response:
-        response = cls.generic("put", url=url, json=json, headers=cls._get_mutate_headers(headers))
-
-        if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
-            cls.handle_500_error(response)
-
-        return response
+        return cls.generic("put", url=url, json=json, headers=cls._get_mutate_headers(headers))
 
     @classmethod
     def delete(cls, *, url: str, headers: dict[str, Any] | None = None) -> Response:
-        response = cls.generic("delete", url=url, headers=cls._get_mutate_headers(headers))
-
-        if response.status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
-            cls.handle_500_error(response)
-
-        return response
+        return cls.generic("delete", url=url, headers=cls._get_mutate_headers(headers))
