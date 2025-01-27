@@ -3,16 +3,15 @@ from __future__ import annotations
 from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekAPIClient
 from utils.date_utils import local_datetime
 
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tests.helpers import ResponseMock, patch_method
 from tests.test_external_services.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
 
 
 @patch_method(
     TprekAPIClient.get,
-    return_value=MockResponse(
+    return_value=ResponseMock(
         status_code=200,
-        json=SINGLE_TPREK_UNIT_JSON,
+        json_data=SINGLE_TPREK_UNIT_JSON,
     ),
 )
 def test_TprekAPIClient__get_unit():

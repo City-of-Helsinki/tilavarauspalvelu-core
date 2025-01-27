@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from unittest import mock
-
 import pytest
 import requests
 from graphene_django_extensions.testing import parametrize_helper
@@ -27,7 +25,6 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraUnexpectedResponseError,
 )
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
-from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import (
@@ -48,10 +45,7 @@ def test_pindora_client__get_seasonal_booking():
 
     data = default_seasonal_booking_response(reservation)
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(json_data=data),
-    ):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         response = PindoraClient.get_seasonal_booking(application_section)
 
     assert response["access_code"] == "13245#"
@@ -96,10 +90,7 @@ def test_pindora_client__get_seasonal_booking():
 def test_pindora_client__get_seasonal_booking__errors(status_code, exception, error_msg):
     application_section = ApplicationSectionFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.get_seasonal_booking(application_section)
@@ -109,10 +100,7 @@ def test_pindora_client__get_seasonal_booking__errors(status_code, exception, er
 def test_pindora_client__get_seasonal_booking__fails_all_retries():
     application_section = ApplicationSectionFactory.build()
 
-    patch = mock.patch(
-        "utils.external_service.base_external_service_client.request",
-        side_effect=requests.ConnectionError("timeout"),
-    )
+    patch = patch_method(PindoraClient.request, side_effect=requests.ConnectionError("timeout"))
 
     with patch as magic_mock, pytest.raises(requests.ConnectionError):
         PindoraClient.get_seasonal_booking(application_section)
@@ -124,10 +112,7 @@ def test_pindora_client__get_seasonal_booking__fails_all_retries():
 def test_pindora_client__get_seasonal_booking__retry_on_500():
     application_section = ApplicationSectionFactory.build()
 
-    patch = mock.patch(
-        "utils.external_service.base_external_service_client.request",
-        return_value=ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR))
 
     with patch as magic_mock, pytest.raises(ExternalServiceRequestError):
         PindoraClient.get_seasonal_booking(application_section)
@@ -142,8 +127,8 @@ def test_pindora_client__get_seasonal_booking__succeeds_after_retry():
 
     data = default_seasonal_booking_response(reservation)
 
-    patch = mock.patch(
-        "utils.external_service.base_external_service_client.request",
+    patch = patch_method(
+        PindoraClient.request,
         side_effect=[
             requests.ConnectionError("timeout"),
             ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR),
@@ -174,10 +159,7 @@ def test_pindora_client__create_seasonal_booking(is_active: bool):
 
     data = default_seasonal_booking_response(reservation, access_code_is_active=is_active)
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(json_data=data),
-    ):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         response = PindoraClient.create_seasonal_booking(application_section, is_active=is_active)
 
     assert response["access_code"] == "13245#"
@@ -237,10 +219,7 @@ def test_pindora_client__create_seasonal_booking__errors(status_code, exception,
         state=ReservationStateChoice.CONFIRMED,
     )
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.create_seasonal_booking(application_section)
@@ -250,10 +229,7 @@ def test_pindora_client__create_seasonal_booking__errors(status_code, exception,
 def test_pindora_client__create_seasonal_booking__no_reservations():
     application_section = ApplicationSectionFactory.create()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_200_OK),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
 
     msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
     with patch, pytest.raises(PindoraClientError, match=exact(msg)):
@@ -274,10 +250,7 @@ def test_pindora_client__create_seasonal_booking__no_confirmed_reservations():
         state=ReservationStateChoice.DENIED,
     )
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_200_OK),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
 
     msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
     with patch, pytest.raises(PindoraClientError, match=exact(msg)):
@@ -298,10 +271,7 @@ def test_pindora_client__reschedule_seasonal_booking():
         state=ReservationStateChoice.CONFIRMED,
     )
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-    ) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.reschedule_seasonal_booking(application_section)
 
     assert patch.call_count == 1
@@ -341,10 +311,7 @@ def test_pindora_client__reschedule_seasonal_booking__errors(status_code, except
         state=ReservationStateChoice.CONFIRMED,
     )
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.reschedule_seasonal_booking(application_section)
@@ -354,10 +321,7 @@ def test_pindora_client__reschedule_seasonal_booking__errors(status_code, except
 def test_pindora_client__reschedule_seasonal_booking__no_reservations():
     application_section = ApplicationSectionFactory.create()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_200_OK),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
 
     msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
     with patch, pytest.raises(PindoraClientError, match=exact(msg)):
@@ -378,10 +342,7 @@ def test_pindora_client__reschedule_seasonal_booking__no_confirmed_reservations(
         state=ReservationStateChoice.DENIED,
     )
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_200_OK),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
 
     msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
     with patch, pytest.raises(PindoraClientError, match=exact(msg)):
@@ -391,10 +352,7 @@ def test_pindora_client__reschedule_seasonal_booking__no_confirmed_reservations(
 def test_pindora_client__delete_seasonal_booking():
     application_section = ApplicationSectionFactory.build()
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-    ) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.delete_seasonal_booking(application_section)
 
     assert patch.call_count == 1
@@ -423,10 +381,7 @@ def test_pindora_client__delete_seasonal_booking():
 def test_pindora_client__delete_seasonal_booking__errors(status_code, exception, error_msg):
     application_section = ApplicationSectionFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.delete_seasonal_booking(application_section)
@@ -435,10 +390,7 @@ def test_pindora_client__delete_seasonal_booking__errors(status_code, exception,
 def test_pindora_client__change_seasonal_booking_access_code():
     application_section = ApplicationSectionFactory.build()
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-    ) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.change_seasonal_booking_access_code(application_section)
 
     assert patch.call_count == 1
@@ -467,10 +419,7 @@ def test_pindora_client__change_seasonal_booking_access_code():
 def test_pindora_client__change_seasonal_booking_access_code__errors(status_code, exception, error_msg):
     application_section = ApplicationSectionFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.change_seasonal_booking_access_code(application_section)
@@ -479,10 +428,7 @@ def test_pindora_client__change_seasonal_booking_access_code__errors(status_code
 def test_pindora_client__activate_seasonal_booking_access_code():
     application_section = ApplicationSectionFactory.build()
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-    ) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.activate_seasonal_booking_access_code(application_section)
 
     assert patch.call_count == 1
@@ -511,10 +457,7 @@ def test_pindora_client__activate_seasonal_booking_access_code():
 def test_pindora_client__activate_seasonal_booking_access_code__errors(status_code, exception, error_msg):
     application_section = ApplicationSectionFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.activate_seasonal_booking_access_code(application_section)
@@ -523,10 +466,7 @@ def test_pindora_client__activate_seasonal_booking_access_code__errors(status_co
 def test_pindora_client__deactivate_seasonal_booking_access_code():
     application_section = ApplicationSectionFactory.build()
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT),
-    ) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
         PindoraClient.deactivate_seasonal_booking_access_code(application_section)
 
     assert patch.call_count == 1
@@ -555,10 +495,7 @@ def test_pindora_client__deactivate_seasonal_booking_access_code():
 def test_pindora_client__deactivate_seasonal_booking_access_code__errors(status_code, exception, error_msg):
     application_section = ApplicationSectionFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.deactivate_seasonal_booking_access_code(application_section)

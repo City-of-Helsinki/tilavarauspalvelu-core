@@ -13,8 +13,7 @@ from tilavarauspalvelu.models import Location
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import UnitFactory
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tests.helpers import ResponseMock, patch_method
 from tests.test_external_services.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
 
 # Applied to all tests
@@ -46,7 +45,7 @@ def test_TprekUnitImporter__unit_not_found_in_tprek():
     assert SentryLogger.log_message.call_count == 1
 
 
-@patch_method(TprekAPIClient.get, return_value=MockResponse(status_code=200, json=SINGLE_TPREK_UNIT_JSON))
+@patch_method(TprekAPIClient.get, return_value=ResponseMock(status_code=200, json_data=SINGLE_TPREK_UNIT_JSON))
 @patch_method(TprekUnitHaukiResourceIdImporter.import_hauki_resources_for_units)
 def test_TprekUnitImporter__update_unit_data_from_tprek__no_last_modified_set__update():
     unit = UnitFactory.create(name="Original name", name_sv=None, tprek_id="999", tprek_last_modified=None)
@@ -85,7 +84,7 @@ def test_TprekUnitImporter__update_unit_data_from_tprek__no_last_modified_set__u
     assert location.coordinates.y == 78.123456
 
 
-@patch_method(TprekAPIClient.get, return_value=MockResponse(status_code=200, json=SINGLE_TPREK_UNIT_JSON))
+@patch_method(TprekAPIClient.get, return_value=ResponseMock(status_code=200, json_data=SINGLE_TPREK_UNIT_JSON))
 @patch_method(TprekUnitHaukiResourceIdImporter.import_hauki_resources_for_units)
 def test_TprekUnitImporter__update_unit_data_from_tprek__saved_last_modified_is_older__update():
     modified = datetime.datetime.fromisoformat(SINGLE_TPREK_UNIT_JSON["modified_time"]).replace(tzinfo=DEFAULT_TIMEZONE)
@@ -101,7 +100,7 @@ def test_TprekUnitImporter__update_unit_data_from_tprek__saved_last_modified_is_
     assert unit.name == "Test Unit"
 
 
-@patch_method(TprekAPIClient.get, return_value=MockResponse(status_code=200, json=SINGLE_TPREK_UNIT_JSON))
+@patch_method(TprekAPIClient.get, return_value=ResponseMock(status_code=200, json_data=SINGLE_TPREK_UNIT_JSON))
 def test_TprekUnitImporter__update_unit_data_from_tprek__saved_last_modified_is_the_same__no_update():
     modified = datetime.datetime.fromisoformat(SINGLE_TPREK_UNIT_JSON["modified_time"]).replace(tzinfo=DEFAULT_TIMEZONE)
     unit = UnitFactory.create(name="Original name", tprek_id="999", tprek_last_modified=modified)
@@ -115,7 +114,7 @@ def test_TprekUnitImporter__update_unit_data_from_tprek__saved_last_modified_is_
     assert unit.name == "Original name"
 
 
-@patch_method(TprekAPIClient.get, return_value=MockResponse(status_code=200, json=SINGLE_TPREK_UNIT_JSON))
+@patch_method(TprekAPIClient.get, return_value=ResponseMock(status_code=200, json_data=SINGLE_TPREK_UNIT_JSON))
 @patch_method(TprekUnitHaukiResourceIdImporter.import_hauki_resources_for_units)
 def test_TprekUnitImporter__update_unit_data_from_tprek__saved_last_modified_is_the_same__force_update():
     modified = datetime.datetime.fromisoformat(SINGLE_TPREK_UNIT_JSON["modified_time"]).replace(tzinfo=DEFAULT_TIMEZONE)

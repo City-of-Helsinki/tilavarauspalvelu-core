@@ -42,7 +42,7 @@ class ErrorParams(NamedTuple):
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="foo")
 @patch_method(
-    HelsinkiProfileClient.generic,
+    HelsinkiProfileClient.request,
     return_value=ResponseMock(
         json_data={
             "data": {
@@ -73,7 +73,7 @@ def test_update_user_from_profile():
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value=None)
-@patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(json_data={}))
+@patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(json_data={}))
 @patch_method(SentryLogger.log_message)
 def test_update_user_from_profile_logs_to_sentry_if_unsuccessful():
     # given:
@@ -90,7 +90,7 @@ def test_update_user_from_profile_logs_to_sentry_if_unsuccessful():
 
 
 @patch_method(HelsinkiProfileClient.get_token, return_value="token")
-@patch_method(HelsinkiProfileClient.generic, return_value=ResponseMock(json_data={"errors": [{"message": "foo"}]}))
+@patch_method(HelsinkiProfileClient.request, return_value=ResponseMock(json_data={"errors": [{"message": "foo"}]}))
 @patch_method(SentryLogger.log_exception)
 @patch_method(SentryLogger.log_message)
 def test_update_user_from_profile_logs_to_sentry_if_raises():

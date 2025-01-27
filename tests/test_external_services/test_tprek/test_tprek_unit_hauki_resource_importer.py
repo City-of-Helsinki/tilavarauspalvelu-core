@@ -6,8 +6,7 @@ from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiA
 from tilavarauspalvelu.integrations.tprek.tprek_unit_importer import TprekUnitHaukiResourceIdImporter
 
 from tests.factories import OriginHaukiResourceFactory, UnitFactory
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tests.helpers import ResponseMock, patch_method
 
 pytestmark = [
     pytest.mark.django_db,
@@ -40,8 +39,8 @@ SECOND_RET_VAL = {
 @patch_method(
     HaukiAPIClient.get,
     side_effect=[
-        MockResponse(status_code=200, json=FIRST_RET_VAL),
-        MockResponse(status_code=200, json=SECOND_RET_VAL),
+        ResponseMock(status_code=200, json_data=FIRST_RET_VAL),
+        ResponseMock(status_code=200, json_data=SECOND_RET_VAL),
     ],
 )
 def test__tprek_unit_hauki_resource_importer__multiple_pages():
@@ -58,7 +57,7 @@ def test__tprek_unit_hauki_resource_importer__multiple_pages():
     assert HaukiAPIClient.get.call_count == 2
 
 
-@patch_method(HaukiAPIClient.get, side_effect=[MockResponse(status_code=200, json=SECOND_RET_VAL)])
+@patch_method(HaukiAPIClient.get, side_effect=[ResponseMock(status_code=200, json_data=SECOND_RET_VAL)])
 def test__tprek_unit_hauki_resource_importer__all_resources_not_found():
     unit_1 = UnitFactory.create(tprek_id=1)
     unit_2 = UnitFactory.create(tprek_id=2)

@@ -24,8 +24,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.types import (
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
-from tests.helpers import patch_method
-from tests.mocks import MockResponse
+from tests.helpers import ResponseMock, patch_method
 
 create_order_params: CreateOrderParams = CreateOrderParams(
     namespace="test-namespace",
@@ -269,12 +268,15 @@ cancel_order_response: dict[str, Any] = {
 }
 
 
-@patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=201, json=create_order_response))
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=201, json_data=create_order_response),
+)
 def test_verkkokauppa__create_order__makes_valid_request(settings):
     returned_value = VerkkokauppaAPIClient.create_order(order_params=create_order_params)
 
-    VerkkokauppaAPIClient.generic.assert_called_with(
-        "post",
+    VerkkokauppaAPIClient.request.assert_called_with(
+        method="post",
         url=settings.VERKKOKAUPPA_ORDER_API_URL + "/",
         json=create_order_params.to_json(),
         headers={"api-key": settings.VERKKOKAUPPA_API_KEY},
@@ -283,13 +285,13 @@ def test_verkkokauppa__create_order__makes_valid_request(settings):
     assert returned_value == Order.from_json(create_order_response)
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__create_order__raises_exception_if_order_id_is_missing():
     return_value = create_order_response.copy()
     return_value.pop("orderId")
 
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=201, json=return_value)
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=201, json_data=return_value)
 
     with pytest.raises(CreateOrderError):
         VerkkokauppaAPIClient.create_order(order_params=create_order_params)
@@ -297,13 +299,13 @@ def test_verkkokauppa__create_order__raises_exception_if_order_id_is_missing():
     assert SentryLogger.log_exception.call_count == 2
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__create_order__raises_exception_if_order_id_is_invalid():
     return_value = create_order_response.copy()
     return_value["orderId"] = "invalid-id"
 
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=201, json=return_value)
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=201, json_data=return_value)
 
     with pytest.raises(CreateOrderError):
         VerkkokauppaAPIClient.create_order(order_params=create_order_params)
@@ -311,13 +313,13 @@ def test_verkkokauppa__create_order__raises_exception_if_order_id_is_invalid():
     assert SentryLogger.log_exception.call_count == 2
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__create_order__raises_exception_if_logger_in_checkout_url_is_missing():
     return_value = create_order_response.copy()
     return_value.pop("loggedInCheckoutUrl")
 
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=201, json=return_value)
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=201, json_data=return_value)
 
     with pytest.raises(CreateOrderError):
         VerkkokauppaAPIClient.create_order(order_params=create_order_params)
@@ -325,7 +327,7 @@ def test_verkkokauppa__create_order__raises_exception_if_logger_in_checkout_url_
     assert SentryLogger.log_exception.call_count == 2
 
 
-@patch_method(VerkkokauppaAPIClient.generic, side_effect=Timeout())
+@patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout())
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__create_order__raises_exception_on_timeout():
     with pytest.raises(CreateOrderError):
@@ -334,7 +336,10 @@ def test_verkkokauppa__create_order__raises_exception_on_timeout():
     assert SentryLogger.log_exception.call_count == 1
 
 
-@patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=500, json=create_order_response))
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=500, json_data=create_order_response),
+)
 @patch_method(SentryLogger.log_message)
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__create_order__raises_exception_if_status_is_500():
@@ -345,19 +350,25 @@ def test_verkkokauppa__create_order__raises_exception_if_status_is_500():
     assert SentryLogger.log_exception.call_count == 1
 
 
-@patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=400, json=create_order_response))
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=400, json_data=create_order_response),
+)
 def test_verkkokauppa__create_order__raises_exception_if_status_code_is_not_201():
     with pytest.raises(CreateOrderError):
         VerkkokauppaAPIClient.create_order(order_params=create_order_params)
 
 
-@patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=200, json=get_order_response))
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=200, json_data=get_order_response),
+)
 def test_verkkokauppa__get_order__makes_valid_request(settings):
     order_uuid = uuid.UUID(get_order_response["orderId"])
     returned_value = VerkkokauppaAPIClient.get_order(order_uuid=order_uuid)
 
-    VerkkokauppaAPIClient.generic.assert_called_with(
-        "get",
+    VerkkokauppaAPIClient.request.assert_called_with(
+        method="get",
         url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, f"admin/{order_uuid}"),
         params=None,
         headers={
@@ -368,13 +379,13 @@ def test_verkkokauppa__get_order__makes_valid_request(settings):
     assert returned_value == Order.from_json(get_order_response)
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__get_order__raises_exception_if_order_id_is_missing():
     return_value = get_order_response.copy()
     order_uuid = uuid.UUID(return_value.pop("orderId"))
 
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=200, json=return_value)
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=return_value)
 
     with pytest.raises(GetOrderError):
         VerkkokauppaAPIClient.get_order(order_uuid=order_uuid)
@@ -382,13 +393,13 @@ def test_verkkokauppa__get_order__raises_exception_if_order_id_is_missing():
     assert SentryLogger.log_exception.call_count == 2
 
 
-@patch_method(VerkkokauppaAPIClient.generic)
+@patch_method(VerkkokauppaAPIClient.request)
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__get_order_raises_exception_if_logger_in_checkout_url_is_missing():
     return_value = get_order_response.copy()
     return_value.pop("loggedInCheckoutUrl")
 
-    VerkkokauppaAPIClient.generic.return_value = MockResponse(status_code=200, json=return_value)
+    VerkkokauppaAPIClient.request.return_value = ResponseMock(status_code=200, json_data=return_value)
 
     with pytest.raises(GetOrderError):
         VerkkokauppaAPIClient.get_order(order_uuid=return_value["orderId"])
@@ -396,7 +407,7 @@ def test_verkkokauppa__get_order_raises_exception_if_logger_in_checkout_url_is_m
     assert SentryLogger.log_exception.call_count == 2
 
 
-@patch_method(VerkkokauppaAPIClient.generic, side_effect=Timeout())
+@patch_method(VerkkokauppaAPIClient.request, side_effect=Timeout())
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__get_order__raises_exception_on_timeout():
     with pytest.raises(GetOrderError):
@@ -405,22 +416,28 @@ def test_verkkokauppa__get_order__raises_exception_on_timeout():
     assert SentryLogger.log_exception.call_count == 1
 
 
-@patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=404, json=get_order_404_response))
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=404, json_data=get_order_404_response),
+)
 def test_verkkokauppa__get_order__raises_exception_on_404():
     with pytest.raises(GetOrderError) as err:
         VerkkokauppaAPIClient.get_order(order_uuid=uuid.UUID(get_order_response["orderId"]))
     assert str(err.value) == "Order not found: [{'code': 'order-not-found', 'message': 'Order not found'}]"
 
 
-@patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=200, json=cancel_order_response))
+@patch_method(
+    VerkkokauppaAPIClient.request,
+    return_value=ResponseMock(status_code=200, json_data=cancel_order_response),
+)
 def test_verkkokauppa__cancel_order__makes_valid_request(settings):
     order_uuid = uuid.UUID(cancel_order_response["order"]["orderId"])
     user_uuid = cancel_order_response["order"]["user"]
 
     returned_value = VerkkokauppaAPIClient.cancel_order(order_uuid=order_uuid, user_uuid=user_uuid)
 
-    VerkkokauppaAPIClient.generic.assert_called_with(
-        "post",
+    VerkkokauppaAPIClient.request.assert_called_with(
+        method="post",
         url=urljoin(settings.VERKKOKAUPPA_ORDER_API_URL, f"{order_uuid}/cancel"),
         json=None,
         headers={
@@ -432,7 +449,7 @@ def test_verkkokauppa__cancel_order__makes_valid_request(settings):
     assert returned_value == Order.from_json(cancel_order_response["order"])
 
 
-@patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=404, json={}))
+@patch_method(VerkkokauppaAPIClient.request, return_value=ResponseMock(status_code=404, json_data={}))
 def test_verkkokauppa__cancel_order__returns_none_if_order_is_not_found():
     order_uuid = uuid.UUID(cancel_order_response["order"]["orderId"])
     user_uuid = cancel_order_response["order"]["user"]
@@ -441,7 +458,7 @@ def test_verkkokauppa__cancel_order__returns_none_if_order_is_not_found():
     assert order is None
 
 
-@patch_method(VerkkokauppaAPIClient.generic, return_value=MockResponse(status_code=500, json={}, method="post"))
+@patch_method(VerkkokauppaAPIClient.request, return_value=ResponseMock(status_code=500, json_data={}, method="post"))
 @patch_method(SentryLogger.log_message)
 @patch_method(SentryLogger.log_exception)
 def test_verkkokauppa__cancel_order__raises_exception_on_500_status():

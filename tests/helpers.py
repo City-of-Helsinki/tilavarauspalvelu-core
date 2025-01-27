@@ -60,7 +60,7 @@ class ResponseMock:
         text: str = "",
         status_code: int = 200,
         method: HTTPMethod = "GET",
-        url: str = "",
+        url: str = "http://example.com",
     ) -> None:
         self.json_data = json_data or {}
         self.status_code = status_code

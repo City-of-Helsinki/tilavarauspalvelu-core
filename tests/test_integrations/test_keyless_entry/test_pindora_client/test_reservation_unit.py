@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from unittest import mock
-
 import pytest
 import requests
 from graphene_django_extensions.testing import parametrize_helper
@@ -22,7 +20,6 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraPermissionError,
     PindoraUnexpectedResponseError,
 )
-from utils.external_service.base_external_service_client import BaseExternalServiceClient
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationUnitFactory
@@ -36,10 +33,7 @@ def test_pindora_client__get_reservation_unit():
 
     data = default_reservation_unit_response(reservation_unit)
 
-    with patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(json_data=data),
-    ):
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         response = PindoraClient.get_reservation_unit(reservation_unit)
 
     assert response["reservation_unit_id"] == reservation_unit.uuid
@@ -71,10 +65,7 @@ def test_pindora_client__get_reservation_unit__missing_api_url(settings):
 def test_pindora_client__get_reservation_unit__fails_all_retries():
     reservation_unit = ReservationUnitFactory.build()
 
-    patch = mock.patch(
-        "utils.external_service.base_external_service_client.request",
-        side_effect=requests.ConnectionError("timeout"),
-    )
+    patch = patch_method(PindoraClient.request, side_effect=requests.ConnectionError("timeout"))
 
     with patch as magic_mock, pytest.raises(requests.ConnectionError):
         PindoraClient.get_reservation_unit(reservation_unit)
@@ -86,10 +77,7 @@ def test_pindora_client__get_reservation_unit__fails_all_retries():
 def test_pindora_client__get_reservation_unit__retry_on_500():
     reservation_unit = ReservationUnitFactory.build()
 
-    patch = mock.patch(
-        "utils.external_service.base_external_service_client.request",
-        return_value=ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR))
 
     with patch as magic_mock, pytest.raises(ExternalServiceRequestError):
         PindoraClient.get_reservation_unit(reservation_unit)
@@ -103,8 +91,8 @@ def test_pindora_client__get_reservation_unit__succeeds_after_retry():
 
     data = default_reservation_unit_response(reservation_unit)
 
-    patch = mock.patch(
-        "utils.external_service.base_external_service_client.request",
+    patch = patch_method(
+        PindoraClient.request,
         side_effect=[
             requests.ConnectionError("timeout"),
             ResponseMock(status_code=HTTP_500_INTERNAL_SERVER_ERROR),
@@ -141,10 +129,7 @@ def test_pindora_client__get_reservation_unit__succeeds_after_retry():
 def test_pindora_client__get_reservation_unit__errors(status_code, exception, error_msg):
     reservation_unit = ReservationUnitFactory.build()
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(status_code=status_code),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
 
     with patch, pytest.raises(exception, match=exact(error_msg) if error_msg else None):
         PindoraClient.get_reservation_unit(reservation_unit)
@@ -156,10 +141,7 @@ def test_pindora_client__get_reservation_unit__missing_key():
     data = default_reservation_unit_response(reservation_unit)
     data.pop("reservation_unit_id")
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(json_data=data),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
 
     msg = "Missing key in reservation unit response from Pindora: 'reservation_unit_id'"
     with patch, pytest.raises(PindoraAPIError, match=exact(msg)):
@@ -172,10 +154,7 @@ def test_pindora_client__get_reservation_unit__invalid_data():
     data = default_reservation_unit_response(reservation_unit)
     data["reservation_unit_id"] = str(reservation_unit.id)
 
-    patch = patch_method(
-        BaseExternalServiceClient.generic,
-        return_value=ResponseMock(json_data=data),
-    )
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
 
     msg = "Invalid value in reservation unit response from Pindora: badly formed hexadecimal UUID string"
     with patch, pytest.raises(PindoraAPIError, match=exact(msg)):
