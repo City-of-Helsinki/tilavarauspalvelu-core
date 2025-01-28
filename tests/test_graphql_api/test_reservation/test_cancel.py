@@ -8,8 +8,10 @@ from unittest import mock
 import pytest
 from django.test import override_settings
 
-from tilavarauspalvelu.enums import OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, OrderStatus, PaymentType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import ReservationCancelReason
 from utils.date_utils import local_datetime
@@ -243,3 +245,52 @@ def test_reservation__cancel__starts_refund_process_for_paid_reservation(graphql
 
     payment_order.refresh_from_db()
     assert payment_order.refund_id == refund_id
+
+
+@patch_method(PindoraClient.delete_reservation)
+def test_reservation__cancel__delete_from_pindora__call_success(graphql):
+    reservation = ReservationFactory.create_for_cancellation(access_type=AccessType.ACCESS_CODE)
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CANCELLED
+
+    assert PindoraClient.delete_reservation.called is True
+
+
+@patch_method(PindoraClient.delete_reservation, side_effect=PindoraAPIError("Pindora API error"))
+def test_reservation__cancel__delete_from_pindora__call_fails(graphql):
+    reservation = ReservationFactory.create_for_cancellation(access_type=AccessType.ACCESS_CODE)
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    assert response.error_message() == "Pindora API error"
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CONFIRMED
+
+    assert PindoraClient.delete_reservation.called is True
+
+
+@patch_method(PindoraClient.delete_reservation, side_effect=PindoraNotFoundError("Error"))
+def test_reservation__cancel__delete_from_pindora__call_fails__404(graphql):
+    reservation = ReservationFactory.create_for_cancellation(access_type=AccessType.ACCESS_CODE)
+
+    graphql.login_with_superuser()
+    data = get_cancel_data(reservation)
+    response = graphql(CANCEL_MUTATION, input_data=data)
+
+    # Request is still successful if Pindora fails with 404
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.CANCELLED
+
+    assert PindoraClient.delete_reservation.called is True

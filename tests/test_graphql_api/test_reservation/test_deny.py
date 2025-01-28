@@ -5,8 +5,10 @@ import datetime
 import pytest
 from django.test import override_settings
 
-from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory
@@ -203,3 +205,52 @@ def test_reservation__deny__dont_send_notification_if_reservation_already_ended(
     assert reservation.state == ReservationStateChoice.DENIED
 
     assert len(outbox) == 0
+
+
+@patch_method(PindoraClient.delete_reservation)
+def test_reservation__deny__delete_from_pindora__call_success(graphql):
+    reservation = ReservationFactory.create_for_deny(access_type=AccessType.ACCESS_CODE)
+
+    graphql.login_with_superuser()
+    input_data = get_deny_data(reservation)
+    response = graphql(DENY_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.DENIED
+
+    assert PindoraClient.delete_reservation.called is True
+
+
+@patch_method(PindoraClient.delete_reservation, side_effect=PindoraAPIError("Pindora API error"))
+def test_reservation__deny__delete_from_pindora__call_fails(graphql):
+    reservation = ReservationFactory.create_for_deny(access_type=AccessType.ACCESS_CODE)
+
+    graphql.login_with_superuser()
+    input_data = get_deny_data(reservation)
+    response = graphql(DENY_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Pindora API error"
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+
+    assert PindoraClient.delete_reservation.called is True
+
+
+@patch_method(PindoraClient.delete_reservation, side_effect=PindoraNotFoundError("Error"))
+def test_reservation__deny__delete_from_pindora__call_fails__404(graphql):
+    reservation = ReservationFactory.create_for_deny(access_type=AccessType.ACCESS_CODE)
+
+    graphql.login_with_superuser()
+    input_data = get_deny_data(reservation)
+    response = graphql(DENY_MUTATION, input_data=input_data)
+
+    # Request is still successful if Pindora fails with 404
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.DENIED
+
+    assert PindoraClient.delete_reservation.called is True

@@ -3,9 +3,10 @@ from __future__ import annotations
 import datetime
 import json
 import logging
+import uuid
 from contextlib import suppress
 from decimal import Decimal
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import transaction
@@ -27,17 +28,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     Weekday,
 )
-from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
-from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
-from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
-from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
-from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
-    CreateOrUpdateAccountingParams,
-    CreateProductParams,
-)
-from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
     AllocatedTimeSlot,
@@ -46,6 +37,7 @@ from tilavarauspalvelu.models import (
     PaymentProduct,
     PersonalInfoViewLog,
     RecurringReservation,
+    RequestLog,
     Reservation,
     ReservationStatistic,
     ReservationStatisticsReservationUnit,
@@ -54,30 +46,22 @@ from tilavarauspalvelu.models import (
     ReservationUnitImage,
     ReservationUnitPricing,
     Space,
+    SQLLog,
     TaxPercentage,
     Unit,
     User,
 )
-from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
-from tilavarauspalvelu.models.request_log.model import RequestLog
-from tilavarauspalvelu.models.sql_log.model import SQLLog
-from tilavarauspalvelu.services.permission_service import deactivate_old_permissions
-from tilavarauspalvelu.services.pruning import (
-    prune_inactive_reservations,
-    prune_recurring_reservations,
-    prune_reservation_statistics,
-    prune_reservation_with_inactive_payments,
-)
-from tilavarauspalvelu.translation import translate_for_user
 from utils.date_utils import local_date, local_datetime, local_end_of_day, local_start_of_day
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterable
 
+    from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
     from tilavarauspalvelu.models import Address, Organisation, Person
+    from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
     from tilavarauspalvelu.typing import QueryInfo
 
-type Action = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
 
 logger = logging.getLogger(__name__)
 
@@ -133,6 +117,8 @@ def update_origin_hauki_resource_reservable_time_spans() -> None:
 
 @app.task(name="prune_reservations")
 def prune_reservations_task() -> None:
+    from tilavarauspalvelu.services.pruning import prune_inactive_reservations, prune_reservation_with_inactive_payments
+
     prune_inactive_reservations()
     prune_reservation_with_inactive_payments()
 
@@ -153,6 +139,9 @@ def send_application_handled_email_task() -> None:
 
 @app.task(name="update_expired_orders")
 def update_expired_orders_task() -> None:
+    from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
+    from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
+
     older_than_minutes = settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
     expired_datetime = local_datetime() - datetime.timedelta(minutes=older_than_minutes)
     expired_orders: Iterable[PaymentOrder] = PaymentOrder.objects.filter(
@@ -172,11 +161,15 @@ def update_expired_orders_task() -> None:
 
 @app.task(name="prune_reservation_statistics")
 def prune_reservation_statistics_task() -> None:
+    from tilavarauspalvelu.services.pruning import prune_reservation_statistics
+
     prune_reservation_statistics()
 
 
 @app.task(name="prune_recurring_reservations")
 def prune_recurring_reservations_task() -> None:
+    from tilavarauspalvelu.services.pruning import prune_recurring_reservations
+
     prune_recurring_reservations()
 
 
@@ -341,6 +334,9 @@ def update_reservation_unit_pricings_tax_percentage(
     retry_backoff=True,
 )
 def refresh_reservation_unit_product_mapping(reservation_unit_pk: int) -> None:
+    from tilavarauspalvelu.integrations.verkkokauppa.product.types import CreateProductParams
+    from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+
     reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
@@ -380,6 +376,10 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk: int) -> None:
     retry_backoff=True,
 )
 def refresh_reservation_unit_accounting(reservation_unit_pk: int) -> None:
+    from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
+    from tilavarauspalvelu.integrations.verkkokauppa.product.types import CreateOrUpdateAccountingParams
+    from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+
     reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
@@ -450,6 +450,9 @@ def _get_series_override_closed_time_spans(allocations: list[AllocatedTimeSlot])
     outside opening hours (as this system defines them), but should not be on explicitly
     closed hours, like holidays.
     """
+    from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
+    from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
+
     closed_time_spans: dict[int, list[TimeSpanElement]] = {}
     for allocation in allocations:
         resource = allocation.reservation_unit_option.reservation_unit.origin_hauki_resource
@@ -481,6 +484,8 @@ def _get_series_override_closed_time_spans(allocations: list[AllocatedTimeSlot])
 
 
 def _get_recurring_reservation_details(recurring_reservation: RecurringReservation) -> ReservationDetails:
+    from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
+
     application_section = recurring_reservation.allocated_time_slot.reservation_unit_option.application_section
     application = application_section.application
 
@@ -534,6 +539,8 @@ def _get_recurring_reservation_details(recurring_reservation: RecurringReservati
 @app.task(name="generate_reservation_series_from_allocations")
 @SentryLogger.log_if_raises("Failed to generate reservation series from allocations")
 def generate_reservation_series_from_allocations(application_round_id: int) -> None:
+    from tilavarauspalvelu.translation import translate_for_user
+
     allocations = AllocatedTimeSlot.objects.filter(
         reservation_unit_option__application_section__application__application_round=application_round_id,
     ).select_related(
@@ -673,6 +680,8 @@ def update_reservation_unit_search_vectors_task(reservation_unit_pk: int | None 
 
 @app.task(name="deactivate_old_permissions")
 def deactivate_old_permissions_task() -> None:
+    from tilavarauspalvelu.services.permission_service import deactivate_old_permissions
+
     deactivate_old_permissions()
 
 
@@ -693,3 +702,15 @@ def send_user_anonymization_email_task() -> None:
 @app.task(name="anonymize_old_users")
 def anonymize_old_users_task() -> None:
     User.objects.anonymize_inactive_users()
+
+
+@app.task(
+    name="delete_pindora_reservation",
+    autoretry_for=(ExternalServiceError,),
+    max_retries=5,
+    retry_backoff=True,
+)
+def delete_pindora_reservation(reservation_uuid: str) -> None:
+    from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+
+    PindoraClient.delete_reservation(reservation=uuid.UUID(reservation_uuid))
