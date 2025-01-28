@@ -12,14 +12,15 @@ import { breakpoints } from "common/src/common/style";
 import ClientOnly from "common/src/ClientOnly";
 import { useRouter } from "next/router";
 import {
-  ApplicationCreateMutationInput,
+  type ApplicationCreateMutationInput,
   useCreateApplicationMutation,
 } from "@/gql/gql-types";
-import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import { Flex, NoWrap } from "common/styles/util";
 import { truncatedText } from "common/styles/cssFragments";
 import { useMedia } from "react-use";
+import { ignoreMaybeArray, toNumber } from "common/src/helpers";
+import { useDisplayError } from "@/hooks/useDisplayError";
 
 type Props = {
   count: number;
@@ -77,9 +78,10 @@ function StartApplicationBar({
 
   const [create, { loading: isSaving }] = useCreateApplicationMutation();
 
-  const createNewApplication = async (applicationRoundId: number) => {
+  const displayError = useDisplayError();
+  const createNewApplication = async (applicationRoundPk: number) => {
     const input: ApplicationCreateMutationInput = {
-      applicationRound: applicationRoundId,
+      applicationRound: applicationRoundPk,
     };
     try {
       const { data } = await create({
@@ -93,14 +95,14 @@ function StartApplicationBar({
         throw new Error("create application mutation failed");
       }
     } catch (e) {
-      errorToast({ text: t("application:Intro.createFailedContent") });
+      displayError(e);
     }
   };
 
   const onNext = () => {
-    const applicationRoundId = router.query.id;
-    if (typeof applicationRoundId === "string" && applicationRoundId !== "") {
-      createNewApplication(Number(applicationRoundId));
+    const applicationRoundPk = toNumber(ignoreMaybeArray(router.query.id));
+    if (applicationRoundPk) {
+      createNewApplication(applicationRoundPk);
     } else {
       throw new Error("Application round id is missing");
     }

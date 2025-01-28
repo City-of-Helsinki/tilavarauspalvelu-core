@@ -20,17 +20,25 @@
     "Unknown error": "Unknown error occurred."
   },
   "general_error": "Undefined error.",
-  "update_reservation_not_found": "Booking expired.",
-  "CHANGES_NOT_ALLOWED": "You cannot make changes to the booking.",
-  "RESERVATION_UNIT_NOT_RESERVABLE": "The item cannot be booked.",
-  "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
-  "RESERVATION_UNIT_IS_NOT_OPEN": "The item is closed at the moment.",
-  "RESERVATION_UNIT_IN_OPEN_ROUND": "You can make a seasonal booking application for this item.",
-  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Please shorten the booking time.",
-  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Please extend the booking time.",
-  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "You have exceeded the maximum number of bookings.",
-  "RESERVATION_OVERLAP": "There are duplicate bookings.",
-  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Please check the booking time.",
-  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Please check the booking time.",
-  "RESERVATION_UNIT_TYPE_IS_SEASON": "You can only make a seasonal booking application for this item."
+  "api": {
+    "NOT_FOUND": "Booking expired.",
+    "CHANGES_NOT_ALLOWED": "You cannot make changes to the booking.",
+    "RESERVATION_UNIT_NOT_RESERVABLE": "The item cannot be booked.",
+    "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
+    "RESERVATION_UNIT_IS_NOT_OPEN": "The item is closed at the moment.",
+    "RESERVATION_UNIT_IN_OPEN_ROUND": "You can make a seasonal booking application for this item.",
+    "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Please shorten the booking time.",
+    "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Please extend the booking time.",
+    "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "You have exceeded the maximum number of bookings.",
+    "RESERVATION_OVERLAP": "There are duplicate bookings.",
+    "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Please check the booking time.",
+    "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Please check the booking time.",
+    "RESERVATION_UNIT_TYPE_IS_SEASON": "You can only make a seasonal booking application for this item.",
+    "CREATE_PERMISSION_DENIED": "No permission to create.",
+    "validation": {
+      "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "The person making the reservation must be 18 years old",
+      "APPLICATION_ADULT_RESERVEE_REQUIRED": "The applicant must be 18 years old.",
+      "generic_validation_error": "An error occurred."
+    }
+  }
 }

@@ -20,17 +20,25 @@
     "Unknown error": "Okänt fel"
   },
   "general_error": "Odefinierat fel.",
-  "update_reservation_not_found": "Bokningen hittades inte.",
-  "CHANGES_NOT_ALLOWED": "Du kan inte göra ändringar.",
-  "RESERVATION_UNIT_NOT_RESERVABLE": "Objektet går inte att boka.",
-  "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
-  "RESERVATION_UNIT_IS_NOT_OPEN": "Objektet är för närvarande stängt.",
-  "RESERVATION_UNIT_IN_OPEN_ROUND": "Du kan ansöka om en säsongsbokning för detta objekt.",
-  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Förkorta bokningstiden.",
-  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Förläng bokningstiden.",
-  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Det maximala antalet bokningar har överskridits.",
-  "RESERVATION_OVERLAP": "Överlappande bokningar.",
-  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Kontrollera bokningstiden.",
-  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Kontrollera bokningstiden.",
-  "RESERVATION_UNIT_TYPE_IS_SEASON": "Du kan bara göra en ansökan om säsongsbokning för detta objekt."
+  "api": {
+    "NOT_FOUND": "Bokningen hittades inte.",
+    "CHANGES_NOT_ALLOWED": "Du kan inte göra ändringar.",
+    "RESERVATION_UNIT_NOT_RESERVABLE": "Objektet går inte att boka.",
+    "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
+    "RESERVATION_UNIT_IS_NOT_OPEN": "Objektet är för närvarande stängt.",
+    "RESERVATION_UNIT_IN_OPEN_ROUND": "Du kan ansöka om en säsongsbokning för detta objekt.",
+    "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Förkorta bokningstiden.",
+    "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Förläng bokningstiden.",
+    "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Det maximala antalet bokningar har överskridits.",
+    "RESERVATION_OVERLAP": "Överlappande bokningar.",
+    "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Kontrollera bokningstiden.",
+    "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Kontrollera bokningstiden.",
+    "RESERVATION_UNIT_TYPE_IS_SEASON": "Du kan bara göra en ansökan om säsongsbokning för detta objekt.",
+    "CREATE_PERMISSION_DENIED": "Ingen behörighet att skapa.",
+    "validation": {
+      "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Personen som gör bokningen måste vara myndig.",
+      "APPLICATION_ADULT_RESERVEE_REQUIRED": "Sökanden måste vara myndig.",
+      "generic_validation_error": "Ett fel uppstod."
+    }
+  }
 }

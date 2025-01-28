@@ -39,8 +39,7 @@
   "Intro": {
     "startNewApplication": "Fyll i ansökan",
     "heading": "Säsongbokningsansökan",
-    "createFailedHeading": "Kunde inte skapa en ansökan",
-    "createFailedContent": "Försök igen senare"
+    "createFailedHeading": "Kunde inte skapa en ansökan"
   },
   "applicationEventSaved": "Säsongsbokning sparad på ansökningen",
   "Page1": {
