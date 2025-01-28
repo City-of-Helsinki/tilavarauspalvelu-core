@@ -1,5 +1,5 @@
 import React from "react";
-import { Option, SearchResult, Select } from "hds-react";
+import { defaultFilter, Option, Select } from "hds-react";
 import { useTranslation } from "next-i18next";
 import {
   type Control,
@@ -105,17 +105,6 @@ export function ControlledSelect<T extends FieldValues>({
     return opts.filter((o) => o.value === val).map(convertOptionToHDS);
   }
 
-  const handleSearch = (val: string) => {
-    const opts = options.filter((o) =>
-      o.label.toLowerCase().includes(val.toLowerCase())
-    );
-    const res: SearchResult = {
-      options: opts.map(convertOptionToHDS),
-      groups: undefined,
-    };
-    return Promise.resolve(res);
-  };
-
   return (
     <Select
       {...rest}
@@ -125,7 +114,7 @@ export function ControlledSelect<T extends FieldValues>({
       required={required}
       multiSelect={multiselect}
       noTags
-      onSearch={enableSearch ? handleSearch : undefined}
+      filter={enableSearch ? defaultFilter : undefined}
       texts={{
         label,
         placeholder: placeholder ?? t("common:select"),
