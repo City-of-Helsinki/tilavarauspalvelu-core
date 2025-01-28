@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 import datetime
+import uuid
 from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
 from graphql_relay import to_global_id
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservationResponse
 from tilavarauspalvelu.models import PersonalInfoViewLog
+from utils.date_utils import local_datetime
 
 from tests.factories import (
     PaymentOrderFactory,
@@ -18,6 +23,7 @@ from tests.factories import (
     UnitGroupFactory,
     UserFactory,
 )
+from tests.helpers import patch_method
 
 from .helpers import reservation_query, reservations_query
 
@@ -409,3 +415,261 @@ def test_reservation__query__reservation_unit_is_archived_but_data_is_still_retu
     response = graphql(query)
     assert response.has_errors is False, response.errors
     assert response.node(0) == expected_response
+
+
+# Pindora responses
+
+
+def pindora_response() -> PindoraReservationResponse:
+    return PindoraReservationResponse(
+        reservation_unit_id=uuid.uuid4(),
+        access_code="12345",
+        access_code_keypad_url="https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
+        access_code_phone_number="+358407089833",
+        access_code_sms_number="+358407089834",
+        access_code_sms_message="a12345",
+        access_code_valid_minutes_before=10,
+        access_code_valid_minutes_after=5,
+        access_code_generated_at=local_datetime(2022, 1, 1),
+        access_code_is_active=True,
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
+    )
+
+
+def test_reservation__query__pindora_info(graphql):
+    reservation = ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    fields = """
+        pindoraInfo {
+            accessCode
+            accessCodeGeneratedAt
+            accessCodeIsActive
+            accessCodeKeypadUrl
+            accessCodePhoneNumber
+            accessCodeSmsNumber
+            accessCodeSmsMessage
+            accessCodeBeginsAt
+            accessCodeEndsAt
+        }
+    """
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(fields=fields, id=global_id)
+
+    graphql.force_login(reservation.user)
+
+    with patch_method(PindoraClient.get_reservation, return_value=pindora_response()):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    assert response.first_query_object["pindoraInfo"] == {
+        "accessCode": "12345",
+        "accessCodeIsActive": True,
+        "accessCodeGeneratedAt": "2022-01-01T00:00:00+02:00",
+        "accessCodeKeypadUrl": "https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
+        "accessCodePhoneNumber": "+358407089833",
+        "accessCodeSmsMessage": "a12345",
+        "accessCodeSmsNumber": "+358407089834",
+        "accessCodeBeginsAt": "2022-01-01T11:50:00+02:00",
+        "accessCodeEndsAt": "2022-01-01T13:05:00+02:00",
+    }
+
+
+@pytest.mark.parametrize("as_reservee", [True, False])
+def test_reservation__query__pindora_info__access_code_not_active(graphql, as_reservee):
+    reservation = ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    fields = """
+        pindoraInfo {
+            accessCode
+            accessCodeGeneratedAt
+            accessCodeIsActive
+            accessCodeKeypadUrl
+            accessCodePhoneNumber
+            accessCodeSmsNumber
+            accessCodeSmsMessage
+            accessCodeBeginsAt
+            accessCodeEndsAt
+        }
+    """
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(fields=fields, id=global_id)
+
+    if as_reservee:
+        graphql.force_login(reservation.user)
+    else:
+        graphql.login_with_superuser()
+
+    response = pindora_response()
+    response["access_code_is_active"] = False
+
+    with patch_method(PindoraClient.get_reservation, return_value=response):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    if as_reservee:
+        assert response.first_query_object["pindoraInfo"] is None
+    else:
+        assert response.first_query_object["pindoraInfo"] is not None
+
+
+@pytest.mark.parametrize("as_reservee", [True, False])
+def test_reservation__query__pindora_info__not_confirmed(graphql, as_reservee):
+    reservation = ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.WAITING_FOR_PAYMENT,
+    )
+
+    fields = """
+        pindoraInfo {
+            accessCode
+            accessCodeGeneratedAt
+            accessCodeIsActive
+            accessCodeKeypadUrl
+            accessCodePhoneNumber
+            accessCodeSmsNumber
+            accessCodeSmsMessage
+            accessCodeBeginsAt
+            accessCodeEndsAt
+        }
+    """
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(fields=fields, id=global_id)
+
+    if as_reservee:
+        graphql.force_login(reservation.user)
+    else:
+        graphql.login_with_superuser()
+
+    with patch_method(PindoraClient.get_reservation, return_value=pindora_response()):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    if as_reservee:
+        assert response.first_query_object["pindoraInfo"] is None
+    else:
+        assert response.first_query_object["pindoraInfo"] is not None
+
+
+def test_reservation__query__pindora_info__access_type_not_access_code(graphql):
+    reservation = ReservationFactory.create(
+        access_type=AccessType.UNRESTRICTED,
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    fields = """
+        pindoraInfo {
+            accessCode
+            accessCodeGeneratedAt
+            accessCodeIsActive
+            accessCodeKeypadUrl
+            accessCodePhoneNumber
+            accessCodeSmsNumber
+            accessCodeSmsMessage
+            accessCodeBeginsAt
+            accessCodeEndsAt
+        }
+    """
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(fields=fields, id=global_id)
+
+    graphql.force_login(reservation.user)
+
+    with patch_method(PindoraClient.get_reservation, return_value=pindora_response()):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    assert response.first_query_object["pindoraInfo"] is None
+
+
+def test_reservation__query__pindora_info__pindora_call_fails(graphql):
+    reservation = ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    fields = """
+        pindoraInfo {
+            accessCode
+            accessCodeGeneratedAt
+            accessCodeIsActive
+            accessCodeKeypadUrl
+            accessCodePhoneNumber
+            accessCodeSmsNumber
+            accessCodeSmsMessage
+            accessCodeBeginsAt
+            accessCodeEndsAt
+        }
+    """
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(fields=fields, id=global_id)
+
+    graphql.force_login(reservation.user)
+
+    with patch_method(PindoraClient.get_reservation, side_effect=PindoraAPIError("Error")):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    assert response.first_query_object["pindoraInfo"] is None
+
+
+def test_reservation__query__pindora_info__pindora_data_cached(graphql):
+    reservation = ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+    )
+
+    fields = """
+        pindoraInfo {
+            accessCode
+            accessCodeGeneratedAt
+            accessCodeIsActive
+            accessCodeKeypadUrl
+            accessCodePhoneNumber
+            accessCodeSmsNumber
+            accessCodeSmsMessage
+            accessCodeBeginsAt
+            accessCodeEndsAt
+        }
+    """
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(fields=fields, id=global_id)
+
+    graphql.force_login(reservation.user)
+
+    data = pindora_response()
+    PindoraClient.cache_reservation_response(data=data, ext_uuid=reservation.ext_uuid)
+
+    with patch_method(PindoraClient.get_reservation, return_value=data) as pindora_api:
+        response = graphql(query)
+
+    # cache was used, no API call was made
+    assert pindora_api.called is False
+
+    assert response.has_errors is False, response
+
+    assert response.first_query_object["pindoraInfo"] == {
+        "accessCode": "12345",
+        "accessCodeIsActive": True,
+        "accessCodeGeneratedAt": "2022-01-01T00:00:00+02:00",
+        "accessCodeKeypadUrl": "https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
+        "accessCodePhoneNumber": "+358407089833",
+        "accessCodeSmsMessage": "a12345",
+        "accessCodeSmsNumber": "+358407089834",
+        "accessCodeBeginsAt": "2022-01-01T11:50:00+02:00",
+        "accessCodeEndsAt": "2022-01-01T13:05:00+02:00",
+    }
+
+
+#
