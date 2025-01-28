@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import CharField, IntegerField
 
-from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import Reservation, ReservationCancelReason
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
 from utils.date_utils import DEFAULT_TIMEZONE
@@ -63,6 +66,12 @@ class ReservationCancellationSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationCancellationData) -> Reservation:
+        if instance.access_type == AccessType.ACCESS_CODE:
+            with suppress(PindoraNotFoundError):
+                PindoraClient.delete_reservation(reservation=instance)
+                validated_data["access_code_generated_at"] = None
+                validated_data["access_code_is_active"] = False
+
         instance = super().update(instance=instance, validated_data=validated_data)
 
         if instance.actions.is_refundable and instance.price_net > 0:

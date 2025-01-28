@@ -141,11 +141,12 @@ class ReservationQuerySet(models.QuerySet):
     def unconfirmed(self) -> Self:
         return self.exclude(state=ReservationStateChoice.CONFIRMED)
 
-    def inactive(self, older_than_minutes: int) -> Self:
+    def inactive(self) -> Self:
         """Filter 'draft' reservations, which are older than X minutes old, and can be assumed to be inactive."""
+        expiration_time = local_datetime() - datetime.timedelta(minutes=settings.PRUNE_RESERVATIONS_OLDER_THAN_MINUTES)
         return self.filter(
             state=ReservationStateChoice.CREATED,
-            created_at__lte=local_datetime() - datetime.timedelta(minutes=older_than_minutes),
+            created_at__lte=expiration_time,
         )
 
     def with_inactive_payments(self) -> Self:

@@ -2,16 +2,20 @@ from __future__ import annotations
 
 import datetime
 import uuid
+from unittest import mock
 
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.services.pruning import prune_reservation_with_inactive_payments
 from utils.date_utils import local_datetime
 
 from tests.factories import PaymentOrderFactory, ReservationFactory
+from tests.helpers import patch_method
 
 # Applied to all tests
 pytestmark = [
@@ -83,3 +87,43 @@ def test_prune_reservation_with_inactive_payments__does_not_delete_reservations_
     prune_reservation_with_inactive_payments()
 
     assert Reservation.objects.exists() is True
+
+
+@patch_method(PindoraClient.delete_reservation)
+def test_prune_reservation_with_inactive_payments__delete_from_pindora():
+    with freeze_time(local_datetime() - datetime.timedelta(minutes=5)):
+        PaymentOrderFactory.create(
+            reservation__state=ReservationStateChoice.WAITING_FOR_PAYMENT,
+            reservation__access_type=AccessType.ACCESS_CODE,
+            reservation__access_code_generated_at=local_datetime(),
+            remote_id=uuid.uuid4(),
+            status=OrderStatus.CANCELLED,
+        )
+
+    prune_reservation_with_inactive_payments()
+
+    assert Reservation.objects.exists() is False
+
+    assert PindoraClient.delete_reservation.called is True
+
+
+@patch_method(PindoraClient.delete_reservation, side_effect=PindoraAPIError())
+def test_prune_reservation_with_inactive_payments__delete_from_pindora__call_fails_runs_task():
+    with freeze_time(local_datetime() - datetime.timedelta(minutes=5)):
+        PaymentOrderFactory.create(
+            reservation__state=ReservationStateChoice.WAITING_FOR_PAYMENT,
+            reservation__access_type=AccessType.ACCESS_CODE,
+            reservation__access_code_generated_at=local_datetime(),
+            remote_id=uuid.uuid4(),
+            status=OrderStatus.CANCELLED,
+        )
+
+    path = "tilavarauspalvelu.services.pruning.delete_pindora_reservation.delay"
+
+    with mock.patch(path) as task:
+        prune_reservation_with_inactive_payments()
+
+    assert Reservation.objects.exists() is False
+
+    assert PindoraClient.delete_reservation.called is True
+    assert task.called is True

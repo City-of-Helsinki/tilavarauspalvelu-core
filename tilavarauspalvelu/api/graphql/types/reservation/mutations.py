@@ -9,8 +9,10 @@ from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMut
 
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.tasks import delete_pindora_reservation
 
 from .permissions import (
     ReservationCommentPermission,
@@ -152,33 +154,47 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
             )
             raise ValidationError(msg)
 
-        payment_order: PaymentOrder = reservation.payment_order.first()
+        payment_order: PaymentOrder | None = reservation.payment_order.first()
+        if payment_order is not None:
+            cls.validate_payment_order(payment_order)
 
+        # Try Pindora delete, but if it fails, retry in background
+        try:
+            PindoraClient.delete_reservation(reservation=reservation)
+        except Exception:  # noqa: BLE001
+            delete_pindora_reservation.delay(str(reservation.ext_uuid))
+
+    @classmethod
+    def validate_payment_order(cls, payment_order: PaymentOrder) -> None:
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-            if payment_order and payment_order.status in OrderStatus.can_be_cancelled_statuses:
+            if payment_order.status in OrderStatus.can_be_cancelled_statuses:
                 payment_order.actions.set_order_as_cancelled()
             return
 
+        if not payment_order.remote_id:
+            return
+
         # Verify PaymentOrder status from the webshop
-        if payment_order and payment_order.remote_id:
-            payment_order.actions.refresh_order_status_from_webshop()
+        payment_order.actions.refresh_order_status_from_webshop()
 
-            # If the PaymentOrder is marked as paid, prevent the deletion.
-            if payment_order.status == OrderStatus.PAID:
-                msg = "Reservation which is paid cannot be deleted."
-                raise ValidationError(msg)
+        # If the PaymentOrder is marked as paid, prevent the deletion.
+        if payment_order.status == OrderStatus.PAID:
+            msg = "Reservation which is paid cannot be deleted."
+            raise ValidationError(msg)
 
-            if payment_order.status in OrderStatus.can_be_cancelled_statuses:
-                # Status should be updated if the webshop call errors or the order is successfully cancelled
-                # When the webshop returns any other status than "cancelled", the payment_order status is not updated
-                try:
-                    webshop_order = payment_order.actions.cancel_order_in_webshop()
-                    if not webshop_order or webshop_order.status != "cancelled":
-                        return
-                except CancelOrderError:
-                    pass
+        if payment_order.status not in OrderStatus.can_be_cancelled_statuses:
+            return
 
-                payment_order.actions.set_order_as_cancelled()
+        # Status should be updated if the webshop call errors or the order is successfully cancelled
+        # When the webshop returns any other status than "cancelled", the payment_order status is not updated
+        try:
+            webshop_order = payment_order.actions.cancel_order_in_webshop()
+            if not webshop_order or webshop_order.status != "cancelled":
+                return
+        except CancelOrderError:
+            pass
+
+        payment_order.actions.set_order_as_cancelled()
 
 
 class ReservationDeleteMutation(ReservationDeleteTentativeMutation):
