@@ -262,23 +262,16 @@ const ReservationFormField = ({
 
   const defaultValue = get(reservation, field);
 
-  const checkParams = {
-    field,
-    control,
-    defaultValue: typeof defaultValue === "boolean" ? defaultValue : undefined,
-    label,
-    required,
-    errorText,
-  };
-
   const emailPattern = {
     value: /^[A-ZÖÄÅ0-9._%+-]+@[A-ZÖÄÅ0-9.-]+\.[A-ZÖÄÅ]{2,}$/i,
     message: "email",
   };
 
+  const id = `reservation-form-field__${field}`;
   if (isSelectField) {
     return (
       <StyledControlledSelect
+        id={id}
         name={field}
         label={label}
         control={control}
@@ -296,7 +289,7 @@ const ReservationFormField = ({
     return (
       <NumberInput
         label={label}
-        id={field}
+        id={id}
         {...register(field, {
           valueAsNumber: true,
           required,
@@ -323,7 +316,7 @@ const ReservationFormField = ({
     return (
       <StyledTextArea
         label={label}
-        id={field}
+        id={id}
         {...register(field, {
           required,
           ...(isEmailField && {
@@ -345,6 +338,16 @@ const ReservationFormField = ({
       />
     );
   }
+
+  const checkParams = {
+    id,
+    field,
+    control,
+    defaultValue: typeof defaultValue === "boolean" ? defaultValue : undefined,
+    label,
+    required,
+    errorText,
+  };
 
   switch (field) {
     case "applyingForFreeOfCharge":
@@ -382,7 +385,7 @@ const ReservationFormField = ({
       return (
         <StyledTextArea
           label={label}
-          id={field}
+          id={id}
           key={field}
           {...register(field, { required: isFreeOfChargeReasonRequired })}
           defaultValue={defaultValue?.toString() ?? ""}
@@ -399,7 +402,7 @@ const ReservationFormField = ({
       return (
         <StyledTextInput
           label={label}
-          id={field}
+          id={id}
           {...register(field, {
             required: isReserveeIdRequired,
             minLength: 3,
@@ -424,7 +427,7 @@ const ReservationFormField = ({
       return (
         <StyledTextInput
           label={label}
-          id={field}
+          id={id}
           {...register(field, {
             required,
             ...(isEmailField && {

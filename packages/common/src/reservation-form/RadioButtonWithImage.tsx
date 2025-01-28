@@ -1,21 +1,22 @@
-import { capitalize } from "lodash";
 import React, { ReactElement } from "react";
 import styled from "styled-components";
 import { Flex } from "../../styles/util";
+import { focusStyles } from "../../styles/cssFragments";
 
 type Props = {
-  id: string;
+  id?: string;
   icon: ReactElement;
   label: string;
   checked: boolean;
   onClick: () => void;
 };
 
-const height = "100px";
+const BUTTON_HEIGHT = "100px";
 
 const Button = styled.button<{ $checked: boolean }>`
   --color-border: var(--color-black-30);
   --color-checked: var(--color-bus);
+  --button-height: ${BUTTON_HEIGHT};
 
   box-sizing: border-box;
   border: ${({ $checked }) =>
@@ -25,11 +26,16 @@ const Button = styled.button<{ $checked: boolean }>`
   border-radius: 2px;
   max-width: 163px;
   min-width: 163px;
-  height: ${height};
+  height: var(--button-height);
   cursor: pointer;
   user-select: none;
   background-color: var(--color-white);
   padding: 0;
+
+  ${focusStyles}
+  &:hover {
+    border-color: var(--color-checked);
+  }
 `;
 
 const InnerWrapper = styled(Flex).attrs({
@@ -50,7 +56,7 @@ const InnerWrapper = styled(Flex).attrs({
   `};
 `;
 
-const Label = styled.label`
+const Label = styled.span`
   margin-top: var(--spacing-2-xs);
   cursor: pointer;
   align-self: center;
@@ -58,13 +64,7 @@ const Label = styled.label`
   text-align: center;
 `;
 
-const HiddenInput = styled.input`
-  visibility: hidden;
-  width: 0;
-  height: 0;
-`;
-
-function RadioButtonWithImage({
+export function RadioButtonWithImage({
   id,
   icon,
   label,
@@ -83,6 +83,8 @@ function RadioButtonWithImage({
   };
   return (
     <Button
+      id={id}
+      type="button"
       onClick={clickHandler}
       tabIndex={0}
       onKeyDown={keyDownHandler}
@@ -90,18 +92,8 @@ function RadioButtonWithImage({
     >
       <InnerWrapper $checked={checked}>
         {icon}
-        <Label htmlFor={id}>{capitalize(label)}</Label>
-        <HiddenInput
-          id={id}
-          name={id}
-          type="radio"
-          checked={checked}
-          value={id}
-          onChange={() => {}}
-        />
+        <Label>{label}</Label>
       </InnerWrapper>
     </Button>
   );
 }
-
-export default RadioButtonWithImage;

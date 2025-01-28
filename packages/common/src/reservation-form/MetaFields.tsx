@@ -13,11 +13,11 @@ import React, { Fragment } from "react";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { camelCase } from "lodash";
+import { camelCase, capitalize } from "lodash";
 import { CustomerTypeChoice, MetadataSetsFragment } from "../../gql/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
-import RadioButtonWithImage from "./RadioButtonWithImage";
+import { RadioButtonWithImage } from "./RadioButtonWithImage";
 import { fontMedium, fontRegular, H4, H5 } from "../common/typography";
 import type { OptionType } from "../../types/common";
 import IconPremises from "../icons/IconPremises";
@@ -269,18 +269,25 @@ function CustomerTypeChoiceSelector() {
         name="reserveeType"
         render={({ field: { value, onChange } }) => (
           <>
-            {reserveeOptions.map(({ id, icon }) => (
-              <RadioButtonWithImage
-                key={id}
-                id={id}
-                label={t(
-                  `reservationApplication:reserveeTypes.labels.${id.toLocaleLowerCase()}`
-                )}
-                onClick={() => onChange(id)}
-                icon={icon}
-                checked={value === id}
-              />
-            ))}
+            {reserveeOptions
+              .map(({ id, icon }) => ({
+                choice: id,
+                icon,
+                name: id.toLocaleLowerCase(),
+              }))
+              .map(({ choice, icon, name }) => (
+                <RadioButtonWithImage
+                  key={choice}
+                  id={`reserveeType__${name}`}
+                  // TODO use the enum translation key
+                  label={capitalize(
+                    t(`reservationApplication:reserveeTypes.labels.${name}`)
+                  )}
+                  onClick={() => onChange(choice)}
+                  icon={icon}
+                  checked={value === choice}
+                />
+              ))}
           </>
         )}
       />

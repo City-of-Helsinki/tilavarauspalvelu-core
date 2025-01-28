@@ -209,7 +209,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     return {
       props: {
-        key: `${pk}-${locale}`,
         ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit,
@@ -228,7 +227,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   return {
     props: {
-      key: `${pk}-${locale}`,
       ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
       notFound: true, // required for type narrowing
