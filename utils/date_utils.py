@@ -23,6 +23,7 @@ __all__ = [
     "local_datetime_max",
     "local_datetime_min",
     "local_end_of_day",
+    "local_from_iso_format",
     "local_iso_format",
     "local_start_of_day",
     "local_time",
@@ -218,6 +219,11 @@ def local_end_of_day(_date: datetime.date | datetime.datetime | None = None, /) 
 def local_iso_format(_datetime: datetime.datetime, /) -> str:
     """Get the datetime in the local timezone in ISO format."""
     return _datetime.astimezone(DEFAULT_TIMEZONE).isoformat(timespec="seconds")
+
+
+def local_from_iso_format(_string: str, /) -> datetime.datetime:
+    """Get the datetime from ISO string in the local timezone."""
+    return datetime.datetime.fromisoformat(_string).astimezone(DEFAULT_TIMEZONE)
 
 
 def local_datetime_string(_datetime: datetime.datetime, /, *, seconds: bool = False) -> str:
