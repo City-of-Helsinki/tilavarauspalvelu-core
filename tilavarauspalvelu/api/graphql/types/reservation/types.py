@@ -1,18 +1,21 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import datetime
+from contextlib import suppress
+from typing import TYPE_CHECKING, NamedTuple
 
 import graphene
 from django.db import models
 from django.db.models import OuterRef
 from graphene_django_extensions import DjangoNode
 from lookup_property import L
-from query_optimizer import AnnotatedField
+from query_optimizer import AnnotatedField, MultiField
 from query_optimizer.optimizer import QueryOptimizer
 from rest_framework.reverse import reverse
 
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import Reservation, ReservationUnit, User
 from utils.db import SubqueryArray
 from utils.utils import ical_hmac_signature
@@ -28,6 +31,34 @@ if TYPE_CHECKING:
 __all__ = [
     "ReservationNode",
 ]
+
+
+class PindoraInfoData(NamedTuple):
+    access_code: str
+    access_code_generated_at: datetime.datetime
+    access_code_is_active: bool
+
+    access_code_keypad_url: str
+    access_code_phone_number: str
+    access_code_sms_number: str
+    access_code_sms_message: str
+
+    access_code_begins_at: datetime.datetime
+    access_code_ends_at: datetime.datetime
+
+
+class PindoraInfoType(graphene.ObjectType):
+    access_code = graphene.String(required=True)
+    access_code_generated_at = graphene.DateTime(required=True)
+    access_code_is_active = graphene.Boolean(required=True)
+
+    access_code_keypad_url = graphene.String(required=True)
+    access_code_phone_number = graphene.String(required=True)
+    access_code_sms_number = graphene.String(required=True)
+    access_code_sms_message = graphene.String(required=True)
+
+    access_code_begins_at = graphene.DateTime(required=True)
+    access_code_ends_at = graphene.DateTime(required=True)
 
 
 def private_field_check(user: AnyUser, reservation: Reservation) -> bool | None:
@@ -65,6 +96,15 @@ class ReservationNode(DjangoNode):
                 agg_field="ids",
                 distinct=True,
             )
+        ),
+    )
+
+    pindora_info = MultiField(
+        PindoraInfoType,
+        fields=["access_type", "ext_uuid", "state"],
+        description=(
+            "Info fetched from Pindora API. Cached per reservation for 30s. "
+            "Please don't use this when filtering multiple reservations, queries to Pindora are not optimized."
         ),
     )
 
@@ -137,6 +177,10 @@ class ReservationNode(DjangoNode):
             "price_net",
             "unit_price",
             "tax_percentage_value",
+            #
+            "access_type",
+            "access_code_generated_at",
+            "pindora_info",
             #
             "applying_for_free_of_charge",
             "free_of_charge_reason",
@@ -239,3 +283,47 @@ class ReservationNode(DjangoNode):
         calendar_url = reverse("reservation_calendar", kwargs={"pk": root.pk})
         signature = ical_hmac_signature(f"reservation-{root.pk}")
         return f"{scheme}://{host}{calendar_url}?hash={signature}"
+
+    def resolve_pindora_info(root: Reservation, info: GQLInfo) -> PindoraInfoData | None:
+        # No Pindora info if access type is not 'ACCESS_CODE'
+        if root.access_type != AccessType.ACCESS_CODE:
+            return None
+
+        has_view_permissions = info.context.user.permissions.can_view_reservation(root, reserver_needs_role=True)
+
+        # Don't allow reserver to view Pindora info without view permissions if the reservation is not confirmed
+        if not has_view_permissions and root.state != ReservationStateChoice.CONFIRMED:
+            return None
+
+        response = PindoraClient.get_cached_reservation_response(ext_uuid=root.ext_uuid)
+        if response is None:
+            with suppress(Exception):
+                response = PindoraClient.get_reservation(reservation=root.ext_uuid)
+                PindoraClient.cache_reservation_response(data=response, ext_uuid=root.ext_uuid)
+
+        if response is None:
+            return None
+
+        # Don't allow reserver to view Pindora info without view permissions if the access code is not active
+        access_code_is_active = response["access_code_is_active"]
+        if not has_view_permissions and not access_code_is_active:
+            return None
+
+        begin = response["begin"]
+        end = response["end"]
+        access_code_valid_minutes_before = response["access_code_valid_minutes_before"]
+        access_code_valid_minutes_after = response["access_code_valid_minutes_after"]
+        access_code_begins_at = begin - datetime.timedelta(minutes=access_code_valid_minutes_before)
+        access_code_ends_at = end + datetime.timedelta(minutes=access_code_valid_minutes_after)
+
+        return PindoraInfoData(
+            access_code=response["access_code"],
+            access_code_generated_at=response["access_code_generated_at"],
+            access_code_is_active=access_code_is_active,
+            access_code_keypad_url=response["access_code_keypad_url"],
+            access_code_phone_number=response["access_code_phone_number"],
+            access_code_sms_number=response["access_code_sms_number"],
+            access_code_sms_message=response["access_code_sms_message"],
+            access_code_begins_at=access_code_begins_at,
+            access_code_ends_at=access_code_ends_at,
+        )
