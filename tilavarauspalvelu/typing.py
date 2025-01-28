@@ -58,6 +58,7 @@ type TextSearchLang = Literal["finnish", "english", "swedish"]
 type HTTPMethod = Literal["GET", "POST", "PUT", "PATCH", "DELETE"]
 type M2MAction = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
 type EmailContext = dict[str, str | int | Decimal | None]
+type Action = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
 
 
 class AffectedTimeSpan(TypedDict):
@@ -242,6 +243,8 @@ class ReservationCancellationData(TypedDict):
     cancel_reason: ReservationCancelReason
 
     state: NotRequired[ReservationStateChoice]
+    access_code_generated_at: NotRequired[datetime.datetime | None]
+    access_code_is_active: NotRequired[bool]
 
 
 class ReservationDenyData(TypedDict):
@@ -252,6 +255,8 @@ class ReservationDenyData(TypedDict):
 
     state: NotRequired[ReservationStateChoice]
     handled_at: NotRequired[datetime.datetime]
+    access_code_generated_at: NotRequired[datetime.datetime | None]
+    access_code_is_active: NotRequired[bool]
 
 
 class StaffCreateReservationData(TypedDict):
