@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import datetime
+import json
 import uuid
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
+from django.core.cache import cache
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_204_NO_CONTENT,
@@ -513,6 +515,73 @@ class PindoraClient(BaseExternalServiceClient):
             action="deleting reservation series",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
+
+    ###########
+    # Caching #
+    ###########
+
+    @classmethod
+    def cache_reservation_unit_response(cls, data: PindoraReservationUnitResponse, *, ext_uuid: uuid.UUID) -> str:
+        return cls._cache_response(data, ext_uuid=ext_uuid, prefix="reservation-unit")
+
+    @classmethod
+    def get_cached_reservation_unit_response(cls, *, ext_uuid: uuid.UUID) -> PindoraReservationUnitResponse | None:
+        data = cls._get_cached_response(ext_uuid=ext_uuid, prefix="reservation-unit")
+        if data is None:
+            return None
+        return cls._parse_reservation_unit_response(data)
+
+    @classmethod
+    def cache_reservation_response(cls, data: PindoraReservationResponse, *, ext_uuid: uuid.UUID) -> str:
+        return cls._cache_response(data, ext_uuid=ext_uuid, prefix="reservation")
+
+    @classmethod
+    def get_cached_reservation_response(cls, *, ext_uuid: uuid.UUID) -> PindoraReservationResponse | None:
+        data = cls._get_cached_response(ext_uuid=ext_uuid, prefix="reservation")
+        if data is None:
+            return None
+        return cls._parse_reservation_response(data)
+
+    @classmethod
+    def cache_seasonal_booking_response(cls, data: PindoraSeasonalBookingResponse, *, ext_uuid: uuid.UUID) -> str:
+        return cls._cache_response(data, ext_uuid=ext_uuid, prefix="seasonal-booking")
+
+    @classmethod
+    def get_cached_seasonal_booking_response(cls, *, ext_uuid: uuid.UUID) -> PindoraSeasonalBookingResponse | None:
+        data = cls._get_cached_response(ext_uuid=ext_uuid, prefix="seasonal-booking")
+        if data is None:
+            return None
+        return cls._parse_seasonal_booking_response(data)
+
+    @classmethod
+    def cache_reservation_series_response(cls, data: PindoraReservationSeriesResponse, *, ext_uuid: uuid.UUID) -> str:
+        return cls._cache_response(data, ext_uuid=ext_uuid, prefix="reservation-series")
+
+    @classmethod
+    def get_cached_reservation_series_response(cls, *, ext_uuid: uuid.UUID) -> PindoraReservationSeriesResponse | None:
+        data = cls._get_cached_response(ext_uuid=ext_uuid, prefix="reservation-series")
+        if data is None:
+            return None
+        return cls._parse_reservation_series_response(data)
+
+    @classmethod
+    def _cache_response(cls, data: dict[str, Any], *, ext_uuid: uuid.UUID, prefix: str) -> str:
+        cache_key = cls._cache_key(ext_uuid=ext_uuid, prefix=prefix)
+        cache_data = json.dumps(data, default=str)
+        cache.set(cache_key, cache_data, timeout=30)
+        return cache_data
+
+    @classmethod
+    def _get_cached_response(cls, *, ext_uuid: uuid.UUID, prefix: str) -> dict[str, Any] | None:
+        cache_key = cls._cache_key(ext_uuid=ext_uuid, prefix=prefix)
+        cached_data = cache.get(cache_key)
+        if cached_data is None:
+            return None
+        return json.loads(cached_data)
+
+    @classmethod
+    def _cache_key(cls, *, ext_uuid: uuid.UUID, prefix: str) -> str:
+        return f"pindora:{prefix}:{ext_uuid}"
 
     ##################
     # Helper methods #
