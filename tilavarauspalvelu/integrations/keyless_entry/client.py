@@ -67,14 +67,16 @@ class PindoraClient(BaseExternalServiceClient):
     ####################
 
     @classmethod
-    def get_reservation_unit(cls, reservation_unit: ReservationUnit) -> PindoraReservationUnitResponse:
+    def get_reservation_unit(cls, reservation_unit: ReservationUnit | uuid.UUID) -> PindoraReservationUnitResponse:
         """Get a reservation unit from Pindora."""
-        url = cls._build_url(f"reservation-unit/{reservation_unit.uuid}")
+        reservation_unit_uuid = reservation_unit if isinstance(reservation_unit, uuid.UUID) else reservation_unit.uuid
+
+        url = cls._build_url(f"reservation-unit/{reservation_unit_uuid}")
 
         response = cls.get(url=url)
         cls._validate_reservation_unit_response(
             response,
-            reservation_unit,
+            reservation_unit_uuid=reservation_unit_uuid,
             action="fetching reservation unit",
         )
 
@@ -86,14 +88,16 @@ class PindoraClient(BaseExternalServiceClient):
     ######################
 
     @classmethod
-    def get_reservation(cls, reservation: Reservation) -> PindoraReservationResponse:
+    def get_reservation(cls, reservation: Reservation | uuid.UUID) -> PindoraReservationResponse:
         """Fetch a reservation from Pindora."""
-        url = cls._build_url(f"reservation/{reservation.ext_uuid}")
+        reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
+
+        url = cls._build_url(f"reservation/{reservation_uuid}")
 
         response = cls.get(url=url)
         cls._validate_reservation_response(
             response,
-            reservation,
+            reservation_uuid=reservation_uuid,
             action="fetching reservation",
         )
 
@@ -118,7 +122,7 @@ class PindoraClient(BaseExternalServiceClient):
         response = cls.post(url=url, json=data)
         cls._validate_reservation_response(
             response,
-            reservation,
+            reservation_uuid=reservation.ext_uuid,
             action="creating reservation",
         )
 
@@ -138,59 +142,67 @@ class PindoraClient(BaseExternalServiceClient):
         response = cls.put(url=url, json=data)
         cls._validate_reservation_response(
             response,
-            reservation,
+            reservation_uuid=reservation.ext_uuid,
             action="rescheduling reservation",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def change_reservation_access_code(cls, reservation: Reservation) -> None:
+    def change_reservation_access_code(cls, reservation: Reservation | uuid.UUID) -> None:
         """Change a reservation's access code in Pindora."""
-        url = cls._build_url(f"reservation/change-access-code/{reservation.ext_uuid}")
+        reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
+
+        url = cls._build_url(f"reservation/change-access-code/{reservation_uuid}")
 
         response = cls.put(url=url)
         cls._validate_reservation_response(
             response,
-            reservation,
+            reservation_uuid=reservation_uuid,
             action="changing access code for reservation",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def activate_reservation_access_code(cls, reservation: Reservation) -> None:
+    def activate_reservation_access_code(cls, reservation: Reservation | uuid.UUID) -> None:
         """Activate a reservation's access code in Pindora."""
-        url = cls._build_url(f"reservation/activate/{reservation.ext_uuid}")
+        reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
+
+        url = cls._build_url(f"reservation/activate/{reservation_uuid}")
 
         response = cls.put(url=url)
         cls._validate_reservation_response(
             response,
-            reservation,
+            reservation_uuid=reservation_uuid,
             action="activating access code for reservation",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def deactivate_reservation_access_code(cls, reservation: Reservation) -> None:
+    def deactivate_reservation_access_code(cls, reservation: Reservation | uuid.UUID) -> None:
         """Deactivate a reservation's access code in Pindora."""
-        url = cls._build_url(f"reservation/deactivate/{reservation.ext_uuid}")
+        reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
+
+        url = cls._build_url(f"reservation/deactivate/{reservation_uuid}")
 
         response = cls.put(url=url)
         cls._validate_reservation_response(
             response,
-            reservation,
+            reservation_uuid=reservation_uuid,
             action="deactivating access code for reservation",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def delete_reservation(cls, reservation: Reservation) -> None:
+    def delete_reservation(cls, reservation: Reservation | uuid.UUID) -> None:
         """Delete a reservation from Pindora."""
-        url = cls._build_url(f"reservation/{reservation.ext_uuid}")
+        reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
+
+        url = cls._build_url(f"reservation/{reservation_uuid}")
 
         response = cls.delete(url=url)
         cls._validate_reservation_response(
             response,
-            reservation,
+            reservation_uuid=reservation_uuid,
             action="deleting reservation",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
@@ -200,14 +212,16 @@ class PindoraClient(BaseExternalServiceClient):
     ####################
 
     @classmethod
-    def get_seasonal_booking(cls, application_section: ApplicationSection) -> PindoraSeasonalBookingResponse:
+    def get_seasonal_booking(cls, section: ApplicationSection | uuid.UUID) -> PindoraSeasonalBookingResponse:
         """Fetch a seasonal booking from Pindora."""
-        url = cls._build_url(f"seasonal-booking/{application_section.ext_uuid}")
+        section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
+
+        url = cls._build_url(f"seasonal-booking/{section_uuid}")
 
         response = cls.get(url=url)
         cls._validate_seasonal_booking_response(
             response,
-            application_section,
+            application_section_uuid=section_uuid,
             action="fetching seasonal booking",
         )
 
@@ -217,7 +231,7 @@ class PindoraClient(BaseExternalServiceClient):
     @classmethod
     def create_seasonal_booking(
         cls,
-        application_section: ApplicationSection,
+        section: ApplicationSection,
         *,
         is_active: bool = False,
     ) -> PindoraSeasonalBookingResponse:
@@ -225,17 +239,17 @@ class PindoraClient(BaseExternalServiceClient):
         url = cls._build_url("seasonal-booking")
 
         reservations: list[Reservation] = list(
-            application_section.actions.get_reservations()
+            section.actions.get_reservations()
             .filter(state=ReservationStateChoice.CONFIRMED)
             .select_related("recurring_reservation__reservation_unit")
         )
 
         if not reservations:
-            msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
+            msg = f"No confirmed reservations in seasonal booking '{section.ext_uuid}'."
             raise PindoraClientError(msg)
 
         data = PindoraSeasonalBookingCreateData(
-            seasonal_booking_id=str(application_section.ext_uuid),
+            seasonal_booking_id=str(section.ext_uuid),
             series=[
                 PindoraSeasonalBookingReservationData(
                     reservation_unit_id=str(reservation.recurring_reservation.reservation_unit.uuid),
@@ -250,7 +264,7 @@ class PindoraClient(BaseExternalServiceClient):
         response = cls.post(url=url, json=data)
         cls._validate_seasonal_booking_response(
             response,
-            application_section,
+            application_section_uuid=section.ext_uuid,
             action="creating seasonal booking",
         )
 
@@ -258,18 +272,18 @@ class PindoraClient(BaseExternalServiceClient):
         return cls._parse_seasonal_booking_response(data)
 
     @classmethod
-    def reschedule_seasonal_booking(cls, application_section: ApplicationSection) -> None:
+    def reschedule_seasonal_booking(cls, section: ApplicationSection) -> None:
         """Reschedule a seasonal booking in Pindora."""
-        url = cls._build_url(f"seasonal-booking/reschedule/{application_section.ext_uuid}")
+        url = cls._build_url(f"seasonal-booking/reschedule/{section.ext_uuid}")
 
         reservations: list[Reservation] = list(
-            application_section.actions.get_reservations()
+            section.actions.get_reservations()
             .filter(state=ReservationStateChoice.CONFIRMED)
             .select_related("recurring_reservation__reservation_unit")
         )
 
         if not reservations:
-            msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
+            msg = f"No confirmed reservations in seasonal booking '{section.ext_uuid}'."
             raise PindoraClientError(msg)
 
         data = PindoraSeasonalBookingRescheduleData(
@@ -286,59 +300,67 @@ class PindoraClient(BaseExternalServiceClient):
         response = cls.put(url=url, json=data)
         cls._validate_seasonal_booking_response(
             response,
-            application_section,
+            application_section_uuid=section.ext_uuid,
             action="rescheduling seasonal booking",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def change_seasonal_booking_access_code(cls, application_section: ApplicationSection) -> None:
+    def change_seasonal_booking_access_code(cls, section: ApplicationSection | uuid.UUID) -> None:
         """Change a seasonal booking's access code in Pindora."""
-        url = cls._build_url(f"seasonal-booking/change-access-code/{application_section.ext_uuid}")
+        section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
+
+        url = cls._build_url(f"seasonal-booking/change-access-code/{section_uuid}")
 
         response = cls.put(url=url)
         cls._validate_seasonal_booking_response(
             response,
-            application_section,
+            application_section_uuid=section_uuid,
             action="changing access code for seasonal booking",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def activate_seasonal_booking_access_code(cls, application_section: ApplicationSection) -> None:
+    def activate_seasonal_booking_access_code(cls, section: ApplicationSection | uuid.UUID) -> None:
         """Activate a seasonal booking's access code in Pindora."""
-        url = cls._build_url(f"seasonal-booking/activate/{application_section.ext_uuid}")
+        section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
+
+        url = cls._build_url(f"seasonal-booking/activate/{section_uuid}")
 
         response = cls.put(url=url)
         cls._validate_seasonal_booking_response(
             response,
-            application_section,
+            application_section_uuid=section_uuid,
             action="activating access code for seasonal booking",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def deactivate_seasonal_booking_access_code(cls, application_section: ApplicationSection) -> None:
+    def deactivate_seasonal_booking_access_code(cls, section: ApplicationSection | uuid.UUID) -> None:
         """Deactivate a seasonal booking's access code in Pindora."""
-        url = cls._build_url(f"seasonal-booking/deactivate/{application_section.ext_uuid}")
+        section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
+
+        url = cls._build_url(f"seasonal-booking/deactivate/{section_uuid}")
 
         response = cls.put(url=url)
         cls._validate_seasonal_booking_response(
             response,
-            application_section,
+            application_section_uuid=section_uuid,
             action="deactivating access code for seasonal booking",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def delete_seasonal_booking(cls, application_section: ApplicationSection) -> None:
+    def delete_seasonal_booking(cls, section: ApplicationSection | uuid.UUID) -> None:
         """Delete a seasonal booking from Pindora."""
-        url = cls._build_url(f"seasonal-booking/{application_section.ext_uuid}")
+        section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
+
+        url = cls._build_url(f"seasonal-booking/{section_uuid}")
 
         response = cls.delete(url=url)
         cls._validate_seasonal_booking_response(
             response,
-            application_section,
+            application_section_uuid=section_uuid,
             action="deleting seasonal booking",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
@@ -348,14 +370,16 @@ class PindoraClient(BaseExternalServiceClient):
     ######################
 
     @classmethod
-    def get_reservation_series(cls, series: RecurringReservation) -> PindoraReservationSeriesResponse:
+    def get_reservation_series(cls, series: RecurringReservation | uuid.UUID) -> PindoraReservationSeriesResponse:
         """Fetch a reservation series from Pindora."""
-        url = cls._build_url(f"reservation-series/{series.ext_uuid}")
+        series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
+
+        url = cls._build_url(f"reservation-series/{series_uuid}")
 
         response = cls.get(url=url)
         cls._validate_reservation_series_response(
             response,
-            series,
+            series_uuid=series_uuid,
             action="fetching reservation series",
         )
 
@@ -394,7 +418,7 @@ class PindoraClient(BaseExternalServiceClient):
         response = cls.post(url=url, json=data)
         cls._validate_reservation_series_response(
             response,
-            series,
+            series_uuid=series.ext_uuid,
             action="creating reservation series",
         )
 
@@ -425,59 +449,67 @@ class PindoraClient(BaseExternalServiceClient):
         response = cls.put(url=url, json=data)
         cls._validate_reservation_series_response(
             response,
-            series,
+            series_uuid=series.ext_uuid,
             action="rescheduling reservation series",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def change_reservation_series_access_code(cls, series: RecurringReservation) -> None:
+    def change_reservation_series_access_code(cls, series: RecurringReservation | uuid.UUID) -> None:
         """Change a reservation series' access code in Pindora."""
-        url = cls._build_url(f"reservation-series/change-access-code/{series.ext_uuid}")
+        series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
+
+        url = cls._build_url(f"reservation-series/change-access-code/{series_uuid}")
 
         response = cls.put(url=url)
         cls._validate_reservation_series_response(
             response,
-            series,
+            series_uuid=series_uuid,
             action="changing access code for reservation series",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def activate_reservation_series_access_code(cls, series: RecurringReservation) -> None:
+    def activate_reservation_series_access_code(cls, series: RecurringReservation | uuid.UUID) -> None:
         """Activate a reservation series' access code in Pindora."""
-        url = cls._build_url(f"reservation-series/activate/{series.ext_uuid}")
+        series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
+
+        url = cls._build_url(f"reservation-series/activate/{series_uuid}")
 
         response = cls.put(url=url)
         cls._validate_reservation_series_response(
             response,
-            series,
+            series_uuid=series_uuid,
             action="activating access code for reservation series",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def deactivate_reservation_series_access_code(cls, series: RecurringReservation) -> None:
+    def deactivate_reservation_series_access_code(cls, series: RecurringReservation | uuid.UUID) -> None:
         """Deactivate a reservation series' access code in Pindora."""
-        url = cls._build_url(f"reservation-series/deactivate/{series.ext_uuid}")
+        series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
+
+        url = cls._build_url(f"reservation-series/deactivate/{series_uuid}")
 
         response = cls.put(url=url)
         cls._validate_reservation_series_response(
             response,
-            series,
+            series_uuid=series_uuid,
             action="deactivating access code for reservation series",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
 
     @classmethod
-    def delete_reservation_series(cls, series: RecurringReservation) -> None:
+    def delete_reservation_series(cls, series: RecurringReservation | uuid.UUID) -> None:
         """Delete a reservation series from Pindora."""
-        url = cls._build_url(f"reservation-series/{series.ext_uuid}")
+        series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
+
+        url = cls._build_url(f"reservation-series/{series_uuid}")
 
         response = cls.delete(url=url)
         cls._validate_reservation_series_response(
             response,
-            series,
+            series_uuid=series_uuid,
             action="deleting reservation series",
             expected_status_code=HTTP_204_NO_CONTENT,
         )
@@ -606,7 +638,7 @@ class PindoraClient(BaseExternalServiceClient):
     def _validate_reservation_unit_response(
         cls,
         response: Response,
-        reservation_unit: ReservationUnit,
+        reservation_unit_uuid: uuid.UUID,
         *,
         action: str,
         expected_status_code: int = HTTP_200_OK,
@@ -615,12 +647,12 @@ class PindoraClient(BaseExternalServiceClient):
         cls._validate_response(response)
 
         if response.status_code == HTTP_404_NOT_FOUND:
-            raise PindoraNotFoundError(entity="Reservation unit", uuid=reservation_unit.uuid)
+            raise PindoraNotFoundError(entity="Reservation unit", uuid=reservation_unit_uuid)
 
         if response.status_code != expected_status_code:
             raise PindoraUnexpectedResponseError(
                 action=action,
-                uuid=reservation_unit.uuid,
+                uuid=reservation_unit_uuid,
                 status_code=response.status_code,
                 text=response.text,
             )
@@ -629,7 +661,7 @@ class PindoraClient(BaseExternalServiceClient):
     def _validate_reservation_response(
         cls,
         response: Response,
-        reservation: Reservation,
+        reservation_uuid: uuid.UUID,
         *,
         action: str,
         expected_status_code: int = HTTP_200_OK,
@@ -638,15 +670,15 @@ class PindoraClient(BaseExternalServiceClient):
         cls._validate_response(response)
 
         if response.status_code == HTTP_404_NOT_FOUND:
-            raise PindoraNotFoundError(entity="Reservation", uuid=reservation.ext_uuid)
+            raise PindoraNotFoundError(entity="Reservation", uuid=reservation_uuid)
 
         if response.status_code == HTTP_409_CONFLICT:
-            raise PindoraConflictError(entity="Reservation", uuid=reservation.ext_uuid)
+            raise PindoraConflictError(entity="Reservation", uuid=reservation_uuid)
 
         if response.status_code != expected_status_code:
             raise PindoraUnexpectedResponseError(
                 action=action,
-                uuid=reservation.ext_uuid,
+                uuid=reservation_uuid,
                 status_code=response.status_code,
                 text=response.text,
             )
@@ -655,7 +687,7 @@ class PindoraClient(BaseExternalServiceClient):
     def _validate_seasonal_booking_response(
         cls,
         response: Response,
-        application_section: ApplicationSection,
+        application_section_uuid: uuid.UUID,
         *,
         action: str,
         expected_status_code: int = HTTP_200_OK,
@@ -664,15 +696,15 @@ class PindoraClient(BaseExternalServiceClient):
         cls._validate_response(response)
 
         if response.status_code == HTTP_404_NOT_FOUND:
-            raise PindoraNotFoundError(entity="Seasonal booking", uuid=application_section.ext_uuid)
+            raise PindoraNotFoundError(entity="Seasonal booking", uuid=application_section_uuid)
 
         if response.status_code == HTTP_409_CONFLICT:
-            raise PindoraConflictError(entity="Seasonal booking", uuid=application_section.ext_uuid)
+            raise PindoraConflictError(entity="Seasonal booking", uuid=application_section_uuid)
 
         if response.status_code != expected_status_code:
             raise PindoraUnexpectedResponseError(
                 action=action,
-                uuid=application_section.ext_uuid,
+                uuid=application_section_uuid,
                 status_code=response.status_code,
                 text=response.text,
             )
@@ -681,7 +713,7 @@ class PindoraClient(BaseExternalServiceClient):
     def _validate_reservation_series_response(
         cls,
         response: Response,
-        series: RecurringReservation,
+        series_uuid: uuid.UUID,
         *,
         action: str,
         expected_status_code: int = HTTP_200_OK,
@@ -690,15 +722,15 @@ class PindoraClient(BaseExternalServiceClient):
         cls._validate_response(response)
 
         if response.status_code == HTTP_404_NOT_FOUND:
-            raise PindoraNotFoundError(entity="Reservation series", uuid=series.ext_uuid)
+            raise PindoraNotFoundError(entity="Reservation series", uuid=series_uuid)
 
         if response.status_code == HTTP_409_CONFLICT:
-            raise PindoraConflictError(entity="Reservation series", uuid=series.ext_uuid)
+            raise PindoraConflictError(entity="Reservation series", uuid=series_uuid)
 
         if response.status_code != expected_status_code:
             raise PindoraUnexpectedResponseError(
                 action=action,
-                uuid=series.ext_uuid,
+                uuid=series_uuid,
                 status_code=response.status_code,
                 text=response.text,
             )
