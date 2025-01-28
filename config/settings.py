@@ -512,10 +512,10 @@ class Common(Environment):
     PERMISSION_NOTIFICATION_BEFORE_DAYS = values.IntegerValue(default=14)
     RAISE_ERROR_ON_REFRESH_FAILURE = False
 
+    ICAL_HASH_SECRET = values.StringValue()
+
     # Allows faking membership to certain AD groups for testing automatic role assignment
     FAKE_SUPERUSER_AD_GROUPS = values.ListValue(default=[])
-
-    ICAL_HASH_SECRET = values.StringValue()
 
 
 class EmptyDefaults:
@@ -573,6 +573,8 @@ class EmptyDefaults:
 
     EMAIL_VARAAMO_EXT_LINK = ""
     EMAIL_FEEDBACK_EXT_LINK = ""
+
+    FRONTEND_TESTING_API_ENABLED = True
 
 
 class Local(Common, overrides_from=LocalMixin):
@@ -902,6 +904,10 @@ class Platta(Common, use_environ=True):
     REDIS_PASSWORD: str = values.StringValue()
 
     DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
+
+    # --- Misc settings ----------------------------------------------------------------------------------------------
+
+    FRONTEND_TESTING_API_ENABLED = False
 
     @classproperty
     def CACHES(cls):

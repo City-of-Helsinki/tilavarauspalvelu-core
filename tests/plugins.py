@@ -62,7 +62,9 @@ def setup_now_tt():
             return super().stop()
 
     # Just apply the patch for the whole duration of the test run.
-    patch("freezegun.api._freeze_time", MockFreezeTime).start()
+    mocked_freeze_factory = patch("freezegun.api._freeze_time", MockFreezeTime)
+    mocked_freeze_factory.start()
+    return mocked_freeze_factory
 
 
 @pytest.hookimpl()

@@ -65,6 +65,14 @@ if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
         ),
     )
 
+if settings.FRONTEND_TESTING_API_ENABLED:
+    urlpatterns.append(
+        path(
+            "testing/",
+            include("tilavarauspalvelu.api.frontend_testing_api.urls", namespace="frontend_testing_api"),
+        ),
+    )
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
