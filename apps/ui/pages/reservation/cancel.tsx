@@ -33,7 +33,7 @@ function Cancel({ apiBaseUrl }: NarrowedProps): JSX.Element {
       title: t("breadcrumb:reservations"),
     },
     {
-      title: t("reservations:cancelReservation"),
+      title: t("reservations:cancel.reservation"),
     },
   ] as const;
 

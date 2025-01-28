@@ -86,6 +86,7 @@ export function CancellationForm(props: {
       <Form onSubmit={handleSubmit(onNext)}>
         <AutoGrid>
           <ControlledSelect
+            id="reservation-cancel__reason"
             name="reason"
             control={control}
             label={t("reservations:cancel.reason")}

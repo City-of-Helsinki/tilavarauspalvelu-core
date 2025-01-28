@@ -41,8 +41,6 @@ function getBreadcrumbs(
         title: t("breadcrumb:application", { id: applicationPk }),
       },
       {
-        // NOTE Don't set slug. It hides the mobile breadcrumb
-        slug: "",
         title: t("reservations:cancel.reservation"),
       },
     ];
@@ -57,7 +55,7 @@ function getBreadcrumbs(
       title: t("reservations:reservationName", { id: reservation.pk }),
     },
     {
-      title: t("reservations:cancelReservation"),
+      title: t("reservations:cancel.reservation"),
     },
   ] as const;
 }
