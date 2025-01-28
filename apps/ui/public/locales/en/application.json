@@ -39,8 +39,7 @@
   "Intro": {
     "startNewApplication": "Apply",
     "heading": "Seasonal booking application",
-    "createFailedHeading": "Application creation failed",
-    "createFailedContent": "Application creation failed"
+    "createFailedHeading": "Application creation failed"
   },
   "applicationEventSaved": "Booking saved",
   "Page1": {

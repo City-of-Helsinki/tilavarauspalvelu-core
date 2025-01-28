@@ -20,17 +20,25 @@
     "Unknown error": "Tuntematon virhe"
   },
   "general_error": "Tapahtui määrittämätön virhe.",
-  "update_reservation_not_found": "Varaus on vanhentunut.",
-  "CHANGES_NOT_ALLOWED": "Muutoksia ei sallita.",
-  "RESERVATION_UNIT_NOT_RESERVABLE": "Kohde ei ole varattavissa.",
-  "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
-  "RESERVATION_UNIT_IS_NOT_OPEN": "Kohde on tällä hetkellä suljettu.",
-  "RESERVATION_UNIT_IN_OPEN_ROUND": "Voit tehdä kausivaraushakemuksen tähän kohteeseen.",
-  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Lyhennä varausaikaa.",
-  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Pidennä varausaikaa.",
-  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Varausten enimmäismäärä on ylittynyt.",
-  "RESERVATION_OVERLAP": "Päällekkäisiä varauksia.",
-  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Tarkista varausaika.",
-  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Tarkista varausaika.",
-  "RESERVATION_UNIT_TYPE_IS_SEASON": "Tähän kohteeseen voit tehdä vain kausivaraushakemuksen."
+  "api": {
+    "NOT_FOUND": "Varaus on vanhentunut.",
+    "CHANGES_NOT_ALLOWED": "Muutoksia ei sallita.",
+    "RESERVATION_UNIT_NOT_RESERVABLE": "Kohde ei ole varattavissa.",
+    "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
+    "RESERVATION_UNIT_IS_NOT_OPEN": "Kohde on tällä hetkellä suljettu.",
+    "RESERVATION_UNIT_IN_OPEN_ROUND": "Voit tehdä kausivaraushakemuksen tähän kohteeseen.",
+    "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Lyhennä varausaikaa.",
+    "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Pidennä varausaikaa.",
+    "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Varausten enimmäismäärä on ylittynyt.",
+    "RESERVATION_OVERLAP": "Päällekkäisiä varauksia.",
+    "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Tarkista varausaika.",
+    "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Tarkista varausaika.",
+    "RESERVATION_UNIT_TYPE_IS_SEASON": "Tähän kohteeseen voit tehdä vain kausivaraushakemuksen.",
+    "CREATE_PERMISSION_DENIED": "Ei lupaa luoda.",
+    "validation": {
+      "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED":  "Varaajan on oltava täysi-ikäinen.",
+      "APPLICATION_ADULT_RESERVEE_REQUIRED": "Hakijan on oltava täysi-ikäinen.",
+      "generic_validation_error": "Tapahtui virhe."
+    }
+  }
 }
