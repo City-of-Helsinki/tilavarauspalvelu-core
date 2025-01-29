@@ -113,7 +113,7 @@ export function Accordion({
 
   return (
     <AccordionElement id={id} {...rest} $noBottomMargin={disableBottomMargin}>
-      <HeadingButton onClick={onToggle} theme={theme}>
+      <HeadingButton onClick={onToggle} theme={theme} type="button">
         {icon}
         <H4 as={`h${headingLevel}`}>{heading}</H4>
       </HeadingButton>
