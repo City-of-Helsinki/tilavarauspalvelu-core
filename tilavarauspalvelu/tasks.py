@@ -18,6 +18,7 @@ from lookup_property import L
 
 from config.celery import app
 from tilavarauspalvelu.enums import (
+    AccessType,
     ApplicantTypeChoice,
     ApplicationRoundStatusChoice,
     ApplicationStatusChoice,
@@ -711,6 +712,95 @@ def anonymize_old_users_task() -> None:
     retry_backoff=True,
 )
 def delete_pindora_reservation(reservation_uuid: str) -> None:
+    """
+    Task that can be used to retry a Pindora reservation deletion if it fails
+    in the endpoint. This should only be called if the access code is know to
+    be inactive, since this task may also fail to delete the reservation if
+    Pindora is down for an extended period of time.
+    """
     from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 
     PindoraClient.delete_reservation(reservation=uuid.UUID(reservation_uuid))
+
+
+@app.task(name="create_missing_pindora_reservations")
+def create_missing_pindora_reservations() -> None:
+    """If a reservation failed to be created in Pindora, e.g. in the staff create endpoint, retry it here."""
+    from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+    from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraConflictError
+
+    reservations: list[Reservation] = list(
+        Reservation.objects.filter(
+            state=ReservationStateChoice.CONFIRMED,
+            access_type=AccessType.ACCESS_CODE,
+            access_code_generated_at=None,
+            end__gt=local_datetime(),
+        )
+    )
+
+    if not reservations:
+        return
+
+    for reservation in reservations:
+        is_active = reservation.access_code_should_be_active
+
+        with suppress(Exception):
+            try:
+                response = PindoraClient.create_reservation(reservation=reservation, is_active=is_active)
+
+            # If reservation already exists, fetch it instead.
+            except PindoraConflictError:
+                response = PindoraClient.get_reservation(reservation=reservation)
+
+            reservation.access_code_generated_at = response["access_code_generated_at"]
+            reservation.access_code_is_active = response["access_code_is_active"]
+
+            # Update reservations in loop so that in case of a timeout we have done some work.
+            reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+
+
+@app.task(name="update_pindora_access_code_is_active")
+def update_pindora_access_code_is_active() -> None:
+    """If a reservation's access code active state failed to update in Pindora, retry the change here."""
+    from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+    from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+
+    reservations: list[Reservation] = list(
+        Reservation.objects.filter(
+            (
+                (Q(access_code_is_active=True) & L(access_code_should_be_active=False))
+                | (Q(access_code_is_active=False) & L(access_code_should_be_active=True))
+            ),
+            access_code_generated_at__isnull=False,
+            end__gt=local_datetime(),
+        )
+    )
+
+    if not reservations:
+        return
+
+    for reservation in reservations:
+        with suppress(Exception):
+            if reservation.access_code_should_be_active:
+                try:
+                    PindoraClient.activate_reservation_access_code(reservation=reservation)
+
+                # If we think an access code has been generated, but it's not found in Pindora,
+                # set `access_code_generated_at`. `create_missing_pindora_reservations` will
+                # then create the access code if needed.
+                except PindoraNotFoundError:
+                    reservation.access_code_generated_at = None
+
+                else:
+                    reservation.access_code_is_active = True
+            else:
+                try:
+                    PindoraClient.deactivate_reservation_access_code(reservation=reservation)
+
+                except PindoraNotFoundError:
+                    reservation.access_code_generated_at = None
+
+                reservation.access_code_is_active = False
+
+            # Update reservations in loop so that in case of a timeout we have done some work.
+            reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
