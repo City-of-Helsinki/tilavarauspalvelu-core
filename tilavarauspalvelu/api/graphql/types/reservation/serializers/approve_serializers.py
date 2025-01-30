@@ -56,14 +56,21 @@ class ReservationApproveSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationApproveData) -> Reservation:
-        instance = super().update(instance=instance, validated_data=validated_data)
-
         if self.instance.access_type == AccessType.ACCESS_CODE:
             # Allow activation in Pindora to fail, will be handled by a background task.
             with suppress(Exception):
-                PindoraClient.activate_reservation_access_code(reservation=instance)
-                instance.access_code_is_active = True
-                instance.save(update_fields=["access_code_is_active"])
+                # If access code has not been generated (e.g. returned to handling after a deny and then approved),
+                # create a new active access code in Pindora.
+                if instance.access_code_generated_at is None:
+                    response = PindoraClient.create_reservation(reservation=instance, is_active=True)
+                    validated_data["access_code_generated_at"] = response["access_code_generated_at"]
+                    validated_data["access_code_is_active"] = response["access_code_is_active"]
+
+                else:
+                    PindoraClient.activate_reservation_access_code(reservation=instance)
+                    validated_data["access_code_is_active"] = True
+
+        instance = super().update(instance=instance, validated_data=validated_data)
 
         EmailService.send_reservation_approved_email(reservation=instance)
         EmailService.send_staff_notification_reservation_made_email(reservation=instance)
