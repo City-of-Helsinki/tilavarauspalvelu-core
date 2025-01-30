@@ -1,7 +1,7 @@
 {% extends "email/html/partials/base.jinja" %}
 
 {% block content_main %}
-    <mj-text>{{ text_reservation_cancelled | sentence | safe }}</mj-text>
+    <mj-text>{{ text_seasonal_cancelled_by_customer | sentence | safe }}</mj-text>
     <mj-text>{{ reason_label | safe }}: {{ cancel_reason | safe }}</mj-text>
     {% include "email/html/partials/application_section_name.jinja" %}
 

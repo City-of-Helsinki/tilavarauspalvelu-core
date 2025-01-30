@@ -51,14 +51,12 @@ def test_get_context__staff_notification_reservation_made__en(email_reservation)
         "reservation_name": "Test reservation",
         "booking_number_label": "Booking number",
         "reservation_id": f"{email_reservation.id}",
-        "reservee_name_label": "Reservee name",
         "reservee_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "staff_reservations_ext_link": f"https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}",
         "staff_reservations_ext_link_html": (
             f'<a href="https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}">'
             f"https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}</a>"
         ),
-        "text_check_details": "You can view the booking at",
         "text_staff_reservation_made": "A new booking has been confirmed for Test reservation unit",
         "title": f"New booking {email_reservation.id} has been made for Test unit",
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -92,14 +90,12 @@ def test_get_context__staff_notification_reservation_made__fi():
         "reservation_name": "Test reservation",
         "booking_number_label": "Varausnumero",
         "reservation_id": "12",
-        "reservee_name_label": "Varaajan nimi",
         "reservee_name": "Mikko Mallikas",
         "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
         "staff_reservations_ext_link_html": (
             '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/12">'
             "https://fake.varaamo.hel.fi/kasittely/reservations/12</a>"
         ),
-        "text_check_details": "Voit tarkistaa varauksen tiedot osoitteessa",
         "text_staff_reservation_made": "Varausyksikköön Test reservation unit on tehty uusi hyväksytty varaus",
         "title": "Toimipisteeseen Test unit on tehty uusi tilavaraus 12",
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -127,14 +123,12 @@ def test_get_context__staff_notification_reservation_made__sv():
         "reservation_name": "Test reservation",
         "booking_number_label": "Bokningsnummer",
         "reservation_id": "12",
-        "reservee_name_label": "Bokare",
         "reservee_name": "Magnus Persson",
         "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
         "staff_reservations_ext_link_html": (
             '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/12">'
             "https://fake.varaamo.hel.fi/kasittely/reservations/12</a>"
         ),
-        "text_check_details": "Du kan se bokningen på",
         "text_staff_reservation_made": "En ny bokningsförfrågan för Test reservation unit har bekräftats",
         "title": "Ny bokning 12 har gjorts för Test unit",
         **BASE_TEMPLATE_CONTEXT_SV,

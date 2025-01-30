@@ -175,8 +175,6 @@ def get_context_for_reservation_cancelled(
 
     return {
         "title": pgettext("Email", "Your booking has been cancelled"),
-        "text_reservation_cancelled": pgettext("Email", "Your booking has been cancelled"),
-        "cancel_reason_label": pgettext("Email", "Your reason for cancellation"),
         "cancel_reason": data["cancel_reason"],
         "instructions_html": data["instructions"],
         "instructions_text": convert_html_to_text(data["instructions"]),
@@ -373,7 +371,6 @@ def get_context_for_reservation_rejected(
         "title": pgettext("Email", "Unfortunately your booking cannot be confirmed"),
         "text_reservation_rejected": pgettext("Email", "Unfortunately your booking cannot be confirmed"),
         "rejection_reason": data["rejection_reason"],
-        "booking_number_label": pgettext("Email", "Booking number"),
         "reservation_id": str(data["reservation_id"]),
         "instructions_html": data["instructions"],
         "instructions_text": convert_html_to_text(data["instructions"]),
@@ -510,10 +507,10 @@ def get_context_for_reservation_requires_payment(
 
     link = get_my_reservations_ext_link(language=language)
     text = pgettext("Email", "Pay the booking")
-
+    title = pgettext("Email", "Your booking has been confirmed, and can be paid")
     return {
-        "title": pgettext("Email", "Your booking has been confirmed, and can be paid"),
-        "text_reservation_requires_payment": pgettext("Email", "Your booking has been confirmed, and can be paid"),
+        "title": title,
+        "text_reservation_requires_payment": title,
         "payment_due_date_label": pgettext("Email", "Due date"),
         "payment_due_date": data["payment_due_date"].strftime("%-d.%-m.%Y"),
         "pay_reservation_link_html": create_anchor_tag(link=link, text=text),
@@ -580,11 +577,8 @@ def get_context_for_seasonal_reservation_cancelled_single(
             **params_for_base_info(reservation=reservation, language=language),
         }
 
-    title = pgettext("Email", "The space reservation included in your seasonal booking has been cancelled")
     return {
-        "title": title,
-        "text_reservation_cancelled": title,
-        "cancel_reason_label": pgettext("Email", "Reason"),
+        "title": pgettext("Email", "The space reservation included in your seasonal booking has been cancelled"),
         "cancel_reason": data["cancel_reason"],
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
@@ -647,12 +641,9 @@ def get_context_for_seasonal_reservation_modified_series(
     return {
         "title": title,
         "text_reservation_modified": title,
-        "seasonal_booking_label": pgettext("Email", "Seasonal Booking"),
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
-        "weekday_label": pgettext("Email", "Day"),
         "weekday_value": data["weekday_value"],
-        "time_label": pgettext("Email", "Time"),
         "time_value": data["time_value"],
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_seasonal_reservation_check_details_url(
@@ -774,12 +765,9 @@ def get_context_for_seasonal_reservation_rejected_series(
             "Email", "The space reservation included in your seasonal booking has been cancelled"
         ),
         "rejection_reason": data["rejection_reason"],
-        "seasonal_booking_label": pgettext("Email", "Seasonal Booking"),
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
-        "weekday_label": pgettext("Email", "Day"),
         "weekday_value": data["weekday_value"],
-        "time_label": pgettext("Email", "Time"),
         "time_value": data["time_value"],
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_seasonal_reservation_check_details_url(
@@ -912,11 +900,8 @@ def get_context_for_staff_notification_reservation_made(
             }
         ),
         "reservation_name": data["reservation_name"],
-        "reservee_name_label": pgettext("Email", "Reservee name"),
         "reservee_name": data["reservee_name"],
-        "booking_number_label": pgettext("Email", "Booking number"),
         "reservation_id": str(data["reservation_id"]),
-        "text_check_details": pgettext("Email", "You can view the booking at"),
         "staff_reservations_ext_link_html": create_anchor_tag(link=link),
         "staff_reservations_ext_link": link,
         **get_context_for_translations(language=language, email_recipient_name=None),
@@ -988,11 +973,8 @@ def get_context_for_staff_notification_reservation_requires_handling(
             }
         ),
         "reservation_name": data["reservation_name"],
-        "reservee_name_label": pgettext("Email", "Reservee name"),
         "reservee_name": data["reservee_name"],
-        "booking_number_label": pgettext("Email", "Booking number"),
         "reservation_id": str(data["reservation_id"]),
-        "text_check_details": pgettext("Email", "You can view and handle the booking at"),
         "staff_reservations_ext_link_html": create_anchor_tag(link=link),
         "staff_reservations_ext_link": link,
         **get_context_for_translations(language=language, email_recipient_name=None),

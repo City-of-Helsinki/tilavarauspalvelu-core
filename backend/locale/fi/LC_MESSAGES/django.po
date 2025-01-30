@@ -3316,39 +3316,8 @@ msgstr "Kausivarauksesi on peruttu"
 
 #: tilavarauspalvelu/integrations/email/template_context/application.py
 msgctxt "Email"
-msgid ""
-"All space reservations included in your seasonal booking have been cancelled"
-msgstr "Kaikki kausivaraukseesi kuuluvat tilavaraukset on peruttu"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Reason"
-msgstr "Syy"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Seasonal Booking"
-msgstr "Kausivaraus"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
 msgid "The customer has canceled the seasonal booking"
 msgstr "Asiakas on perunut kausivarauksen"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
-msgid ""
-"The customer has canceled all space reservations included in the seasonal "
-"booking"
-msgstr "Asiakas on perunut kaikki kausivaraukseen kuuluvat tilavaraukset"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "You can view the booking at"
-msgstr "Voit tarkistaa varauksen tiedot osoitteessa"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3377,8 +3346,13 @@ msgstr "Kiitos, kun käytit Varaamoa!"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
-msgid "This is an automated message, please do not reply"
-msgstr "Tämä on automaattinen viesti, johon ei voi vastata"
+msgid "Reason"
+msgstr "Syy"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Your reason for cancellation"
+msgstr "Peruutuksen syy"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3391,6 +3365,87 @@ msgctxt "Email"
 msgid "Book the city's premises and equipment for your use at %(link)s"
 msgstr ""
 "Varaa kaupungin tiloja ja laitteita käyttöösi helposti osoitteessa %(link)s"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "This is an automated message, please do not reply"
+msgstr "Tämä on automaattinen viesti, johon ei voi vastata"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Booking number"
+msgstr "Varausnumero"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Reservee name"
+msgstr "Varaajan nimi"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Additional information about your booking"
+msgstr "Lisätietoa varauksestasi"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Additional information about cancellation"
+msgstr "Lisätietoa peruutuksesta"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Additional information"
+msgstr "Lisätietoa"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Day"
+msgstr "Päivä"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Time"
+msgstr "Kellonaika"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "You can view the booking at"
+msgstr "Voit tarkistaa varauksen tiedot osoitteessa"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "You can view and handle the booking at"
+msgstr "Voit tarkistaa ja käsitellä varauksen osoitteessa"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking has been cancelled"
+msgstr "Varauksesi on peruttu"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid ""
+"The space reservation included in your seasonal booking has been cancelled"
+msgstr "Kausivaraukseesi kuuluva tilavaraus on peruttu"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Seasonal Booking"
+msgstr "Kausivaraus"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid ""
+"All space reservations included in your seasonal booking have been cancelled"
+msgstr "Kaikki kausivaraukseesi kuuluvat tilavaraukset on peruttu"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid ""
+"The customer has canceled all space reservations included in the seasonal "
+"booking"
+msgstr "Asiakas on perunut kaikki kausivaraukseen kuuluvat tilavaraukset"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3431,12 +3486,6 @@ msgstr "Hinta"
 msgctxt "Email"
 msgid "incl. VAT"
 msgstr "sis. alv"
-
-#: tilavarauspalvelu/integrations/email/template_context/common.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Booking number"
-msgstr "Varausnumero"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3503,26 +3552,6 @@ msgstr "Varauksesi on vahvistettu"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Additional information about your booking"
-msgstr "Lisätietoa varauksestasi"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Your booking has been cancelled"
-msgstr "Varauksesi on peruttu"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Your reason for cancellation"
-msgstr "Peruutuksen syy"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Additional information about cancellation"
-msgstr "Lisätietoa peruutuksesta"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
 msgid "Thank you for your booking at Varaamo"
 msgstr "Kiitos varauksestasi Varaamossa"
 
@@ -3540,11 +3569,6 @@ msgstr "Varaustasi on muutettu"
 msgctxt "Email"
 msgid "Unfortunately your booking cannot be confirmed"
 msgstr "Valitettavasti varaustasi ei voida vahvistaa"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Additional information"
-msgstr "Lisätietoa"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
@@ -3584,25 +3608,9 @@ msgstr "Eräpäivä"
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
 msgid ""
-"The space reservation included in your seasonal booking has been cancelled"
-msgstr "Kausivaraukseesi kuuluva tilavaraus on peruttu"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid ""
 "The time of the space reservation included in your seasonal booking has "
 "changed"
 msgstr "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Day"
-msgstr "Päivä"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Time"
-msgstr "Kellonaika"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
@@ -3617,11 +3625,6 @@ msgctxt "Email"
 msgid "A new booking has been confirmed for %(reservation_unit_name)s"
 msgstr ""
 "Varausyksikköön %(reservation_unit_name)s on tehty uusi hyväksytty varaus"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Reservee name"
-msgstr "Varaajan nimi"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
@@ -3639,11 +3642,6 @@ msgid ""
 msgstr ""
 "Varausyksikköön %(reservation_unit_name)s on tehty uusi käsittelyä vaativa "
 "varauspyyntö"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "You can view and handle the booking at"
-msgstr "Voit tarkistaa ja käsitellä varauksen osoitteessa"
 
 #: tilavarauspalvelu/models/ability_group/model.py
 msgid "ability group"
