@@ -70,36 +70,64 @@ AUTOMATIC_REPLY_CONTEXT_SV = {
     ),
 }
 
-BASE_TEMPLATE_CONTEXT_EN = {
-    "current_year": "2024",
-    "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
-    "helsinki_city": "City of Helsinki",
-    "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
-    "salutation": "Hi",
-    "service_name": "Varaamo",
-    "with_regards": "Kind regards",
-    "thank_you_for_using": "Thank you for choosing Varaamo!",
-} | AUTOMATIC_REPLY_CONTEXT_EN
-BASE_TEMPLATE_CONTEXT_FI = {
-    "current_year": "2024",
-    "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
-    "helsinki_city": "Helsingin kaupunki",
-    "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
-    "salutation": "Hei",
-    "service_name": "Varaamo",
-    "with_regards": "Ystävällisin terveisin",
-    "thank_you_for_using": "Kiitos, kun käytit Varaamoa!",
-} | AUTOMATIC_REPLY_CONTEXT_FI
-BASE_TEMPLATE_CONTEXT_SV = {
-    "current_year": "2024",
-    "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
-    "helsinki_city": "Helsingfors stad",
-    "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
-    "salutation": "Hej",
-    "service_name": "Varaamo",
-    "with_regards": "Med vänliga hälsningar",
-    "thank_you_for_using": "Tack för att du använder Varaamo!",
-} | AUTOMATIC_REPLY_CONTEXT_SV
+RESERVATION_TRANSLATIONS_CONTEXT_EN = {
+    "instructions_booking_label": "Additional information about your booking",
+    "instructions_cancelled_label": "Additional information about cancellation",
+    "instructions_rejected_label": "Additional information",
+}
+RESERVATION_TRANSLATIONS_CONTEXT_FI = {
+    "instructions_booking_label": "Lisätietoa varauksestasi",
+    "instructions_cancelled_label": "Lisätietoa peruutuksesta",
+    "instructions_rejected_label": "Lisätietoa",
+}
+RESERVATION_TRANSLATIONS_CONTEXT_SV = {
+    "instructions_booking_label": "Mer information om din bokning",
+    "instructions_cancelled_label": "Mer information om avbokning",
+    "instructions_rejected_label": "Mer information",
+}
+
+BASE_TEMPLATE_CONTEXT_EN = (
+    {
+        "current_year": "2024",
+        "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
+        "helsinki_city": "City of Helsinki",
+        "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
+        "salutation": "Hi",
+        "service_name": "Varaamo",
+        "with_regards": "Kind regards",
+        "thank_you_for_using": "Thank you for choosing Varaamo!",
+    }
+    | AUTOMATIC_REPLY_CONTEXT_EN
+    | RESERVATION_TRANSLATIONS_CONTEXT_EN
+)
+BASE_TEMPLATE_CONTEXT_FI = (
+    {
+        "current_year": "2024",
+        "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
+        "helsinki_city": "Helsingin kaupunki",
+        "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
+        "salutation": "Hei",
+        "service_name": "Varaamo",
+        "with_regards": "Ystävällisin terveisin",
+        "thank_you_for_using": "Kiitos, kun käytit Varaamoa!",
+    }
+    | AUTOMATIC_REPLY_CONTEXT_FI
+    | RESERVATION_TRANSLATIONS_CONTEXT_FI
+)
+BASE_TEMPLATE_CONTEXT_SV = (
+    {
+        "current_year": "2024",
+        "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
+        "helsinki_city": "Helsingfors stad",
+        "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
+        "salutation": "Hej",
+        "service_name": "Varaamo",
+        "with_regards": "Med vänliga hälsningar",
+        "thank_you_for_using": "Tack för att du använder Varaamo!",
+    }
+    | AUTOMATIC_REPLY_CONTEXT_SV
+    | RESERVATION_TRANSLATIONS_CONTEXT_SV
+)
 
 
 RESERVATION_BASIC_INFO_CONTEXT_EN = {

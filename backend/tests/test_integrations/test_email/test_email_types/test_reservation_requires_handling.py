@@ -65,7 +65,6 @@ def test_get_context__reservation_requires_handling__en(email_reservation):
             "We will contact you if further information is needed regarding your booking request."
         ),
         "text_reservation_requires_handling": "You have made a new booking request",
-        "instructions_label": "Additional information about your booking",
         "instructions_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
         "instructions_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
         "title": "Your booking is waiting for processing",
@@ -112,7 +111,6 @@ def test_get_context__reservation_requires_handling__fi():
             "Otamme sinuun yhteyttä, jos tarvitsemme lisätietoja varauspyyntöösi liittyen."
         ),
         "text_reservation_requires_handling": "Olet tehnyt alustavan varauksen",
-        "instructions_label": "Lisätietoa varauksestasi",
         "instructions_html": "Tässä ovat ohjeet",
         "instructions_text": "Tässä ovat ohjeet",
         "title": "Varauksesi odottaa käsittelyä",
@@ -149,7 +147,6 @@ def test_get_context__reservation_requires_handling__sv():
             "Vi kommer att kontakta dig om ytterligare information behövs angående din bokningsförfrågan."
         ),
         "text_reservation_requires_handling": "Du har gjort en ny bokningsförfrågan",
-        "instructions_label": "Mer information om din bokning",
         "instructions_html": "Här är instruktionerna",
         "instructions_text": "Här är instruktionerna",
         "title": "Din bokning väntar på att behandlas",
@@ -186,7 +183,6 @@ def test_get_context__reservation_requires_handling__subsidised():
             "We will contact you if further information is needed regarding your booking request."
         ),
         "text_reservation_requires_handling": "You have made a new booking request",
-        "instructions_label": "Additional information about your booking",
         "instructions_html": "These are the instructions",
         "instructions_text": "These are the instructions",
         "title": "Your booking is waiting for processing",

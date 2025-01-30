@@ -109,7 +109,6 @@ def get_context_for_reservation_approved(
     return {
         "title": pgettext("Email", "Your booking is confirmed"),
         "text_reservation_approved": text_reservation_approved,
-        "instructions_label": pgettext("Email", "Additional information about your booking"),
         "instructions_html": data["instructions"],
         "instructions_text": convert_html_to_text(data["instructions"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
@@ -179,7 +178,6 @@ def get_context_for_reservation_cancelled(
         "text_reservation_cancelled": pgettext("Email", "Your booking has been cancelled"),
         "cancel_reason_label": pgettext("Email", "Your reason for cancellation"),
         "cancel_reason": data["cancel_reason"],
-        "instructions_label": pgettext("Email", "Additional information about cancellation"),
         "instructions_html": data["instructions"],
         "instructions_text": convert_html_to_text(data["instructions"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
@@ -244,7 +242,6 @@ def get_context_for_reservation_confirmed(
     return {
         "title": pgettext("Email", "Thank you for your booking at Varaamo"),
         "text_reservation_confirmed": pgettext("Email", "You have made a new booking"),
-        "instructions_label": pgettext("Email", "Additional information about your booking"),
         "instructions_html": data["instructions"],
         "instructions_text": convert_html_to_text(data["instructions"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
@@ -310,7 +307,6 @@ def get_context_for_reservation_modified(
     return {
         "title": pgettext("Email", "Your booking has been updated"),
         "text_reservation_modified": pgettext("Email", "Your booking has been updated"),
-        "instructions_label": pgettext("Email", "Additional information about your booking"),
         "instructions_html": data["instructions"],
         "instructions_text": convert_html_to_text(data["instructions"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
@@ -380,7 +376,6 @@ def get_context_for_reservation_rejected(
         "rejection_reason": data["rejection_reason"],
         "booking_number_label": pgettext("Email", "Booking number"),
         "reservation_id": str(data["reservation_id"]),
-        "instructions_label": pgettext("Email", "Additional information"),
         "instructions_html": data["instructions"],
         "instructions_text": convert_html_to_text(data["instructions"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
@@ -448,7 +443,6 @@ def get_context_for_reservation_requires_handling(
             "You will receive a confirmation email once your booking has been processed. "
             "We will contact you if further information is needed regarding your booking request.",
         ),
-        "instructions_label": pgettext("Email", "Additional information about your booking"),
         "instructions_html": data["instructions"],
         "instructions_text": convert_html_to_text(data["instructions"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
@@ -525,7 +519,6 @@ def get_context_for_reservation_requires_payment(
         "payment_due_date": data["payment_due_date"].strftime("%-d.%-m.%Y"),
         "pay_reservation_link_html": create_anchor_tag(link=link, text=text),
         "pay_reservation_link": f"{text}: {link}",
-        "instructions_label": pgettext("Email", "Additional information about your booking"),
         "instructions_html": data["instructions"],
         "instructions_text": convert_html_to_text(data["instructions"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),

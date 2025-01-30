@@ -64,7 +64,6 @@ def test_get_context__reservation_approved__en(email_reservation):
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "text_reservation_approved": "Your booking is now confirmed",
-        "instructions_label": "Additional information about your booking",
         "instructions_html": '<p>[HYVÄKSYTYN VARAUKSEN OHJEET] <a href="https://foo.bar">LINK</a></p>',
         "instructions_text": "[HYVÄKSYTYN VARAUKSEN OHJEET] LINK <https://foo.bar>",
         "title": "Your booking is confirmed",
@@ -106,7 +105,6 @@ def test_get_context__reservation_approved__discount__en():
     assert context == {
         "email_recipient_name": "John Doe",
         "text_reservation_approved": "Your booking has been confirmed with the following discount:",
-        "instructions_label": "Additional information about your booking",
         "instructions_html": "These are the instructions",
         "instructions_text": "These are the instructions",
         "title": "Your booking is confirmed",
@@ -138,7 +136,6 @@ def test_get_context__reservation_approved__fi():
     assert context == {
         "email_recipient_name": "Mikko Mallikas",
         "text_reservation_approved": "Varauksesi on nyt vahvistettu",
-        "instructions_label": "Lisätietoa varauksestasi",
         "instructions_html": "Tässä ovat ohjeet",
         "instructions_text": "Tässä ovat ohjeet",
         "title": "Varauksesi on vahvistettu",
@@ -170,7 +167,6 @@ def test_get_context__reservation_approved__discount__fi():
     assert context == {
         "email_recipient_name": "Mikko Mallikas",
         "text_reservation_approved": "Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus:",
-        "instructions_label": "Lisätietoa varauksestasi",
         "instructions_html": "Tässä ovat ohjeet",
         "instructions_text": "Tässä ovat ohjeet",
         "title": "Varauksesi on vahvistettu",
@@ -202,7 +198,6 @@ def test_get_context__reservation_approved__sv():
     assert context == {
         "email_recipient_name": "Magnus Persson",
         "text_reservation_approved": "Din bokning har bekräftats",
-        "instructions_label": "Mer information om din bokning",
         "instructions_html": "Här är instruktionerna",
         "instructions_text": "Här är instruktionerna",
         "title": "Din bokning är bekräftad",
@@ -234,7 +229,6 @@ def test_get_context__reservation_approved__discount__sv():
     assert context == {
         "email_recipient_name": "Magnus Persson",
         "text_reservation_approved": "Din bokning har bekräftats med följande rabatt:",
-        "instructions_label": "Mer information om din bokning",
         "instructions_html": "Här är instruktionerna",
         "instructions_text": "Här är instruktionerna",
         "title": "Din bokning är bekräftad",

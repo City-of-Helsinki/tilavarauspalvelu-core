@@ -33,6 +33,7 @@ def get_context_for_translations(*, language: Lang, email_recipient_name: str | 
         "with_regards": pgettext("Email", "Kind regards"),
         "thank_you_for_using": pgettext("Email", "Thank you for choosing Varaamo!"),
         **get_contex_for_automatic_message(language=language),
+        **get_context_for_reservation_translations(),
     }
 
 
@@ -56,6 +57,14 @@ def get_contex_for_automatic_message(*, language: Lang) -> EmailContext:
         "contact_us": f"{text_feedback}: {link_feedback}",
         "reserve_city_resources_at_html": reserve_city_resources_at % {"link": varaamo_page_link},
         "reserve_city_resources_at": reserve_city_resources_at % {"link": link_varaamo},
+    }
+
+
+def get_context_for_reservation_translations() -> EmailContext:
+    return {
+        "instructions_booking_label": pgettext("Email", "Additional information about your booking"),
+        "instructions_cancelled_label": pgettext("Email", "Additional information about cancellation"),
+        "instructions_rejected_label": pgettext("Email", "Additional information"),
     }
 
 
