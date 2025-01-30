@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
-import { Button, ButtonVariant, IconCross } from "hds-react";
+import { Button, ButtonVariant, IconCross, Select } from "hds-react";
 import type { ApplicationEventSchedulePriority } from "common/types/common";
 import { fontRegular } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import { fromMondayFirstUnsafe } from "common/src/helpers";
+import {
+  convertOptionToHDS,
+  fromMondayFirstUnsafe,
+  toNumber,
+} from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import { arrowDown, arrowUp, MediumButton } from "@/styles/util";
 import { TimePreview } from "./TimePreview";
 import { type ApplicationEventScheduleFormType } from "./Form";
-import { UseFormReturn } from "react-hook-form";
+import { useController, UseFormReturn } from "react-hook-form";
 import { ControlledSelect } from "common/src/components/form";
 import { Flex } from "common/styles/util";
+import { convertLanguageCode } from "common/src/common/util";
 
 type Cell = {
   hour: number;
@@ -398,6 +403,7 @@ export function TimeSelector({
       <OptionSelector
         reservationUnitOptions={reservationUnitOptions}
         form={form}
+        index={index}
       />
       <CalendarContainer
         onMouseLeave={() => setPainting(false)}
@@ -468,8 +474,9 @@ const OptionWrapper = styled.div`
 function OptionSelector({
   reservationUnitOptions,
   form,
-}: Pick<Props, "reservationUnitOptions" | "form">) {
-  const { t } = useTranslation();
+  index,
+}: Pick<Props, "reservationUnitOptions" | "form" | "index">) {
+  const { t, i18n } = useTranslation();
   const { control } = form;
 
   const priorityOptions = [300, 200].map((n) => ({
@@ -477,6 +484,14 @@ function OptionSelector({
     value: n,
   }));
 
+  const language = convertLanguageCode(i18n.language);
+
+  const {
+    field: { value, onChange },
+  } = useController({ name: "reservationUnitPks", control });
+  const hdsValue = reservationUnitOptions
+    .filter((o) => o.value === value[index])
+    .map(convertOptionToHDS);
   return (
     <OptionWrapper>
       <ControlledSelect
@@ -485,11 +500,24 @@ function OptionSelector({
         control={control}
         options={priorityOptions}
       />
-      <ControlledSelect
-        name="reservationUnitPks"
-        label={t("application:Page2.reservationUnitSelectLabel")}
-        control={control}
-        options={reservationUnitOptions}
+      <Select
+        options={reservationUnitOptions.map(convertOptionToHDS)}
+        clearable={false}
+        noTags
+        texts={{
+          label: t("application:Page2.reservationUnitSelectLabel"),
+          placeholder: t("common:select"),
+          language,
+        }}
+        value={hdsValue}
+        onChange={(v) => {
+          const val = toNumber(v[0].value);
+          if (val != null) {
+            const arr = [...value];
+            arr[index] = val;
+            onChange(arr);
+          }
+        }}
       />
     </OptionWrapper>
   );

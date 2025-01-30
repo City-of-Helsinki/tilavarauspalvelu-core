@@ -255,7 +255,6 @@ function Page2({ application, onNext }: Props): JSX.Element {
       priority: 300,
     },
   });
-  const reservationUnitPks = timeSelectorForm.watch("reservationUnitPks");
 
   const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
@@ -270,6 +269,9 @@ function Page2({ application, onNext }: Props): JSX.Element {
       openingHours: ruo.reservationUnit.applicationRoundTimeSlots,
     }))
   );
+
+  const { watch: timeSelectorWatch } = timeSelectorForm;
+  const reservationUnitPks = timeSelectorWatch("reservationUnitPks");
   const reservationUnitOpeningHours = filterNonNullable(
     application?.applicationSections
   ).map(
@@ -313,7 +315,8 @@ function Page2({ application, onNext }: Props): JSX.Element {
     // this seems to work except
     // TODO: day is incorrect (empty days at the start are missing, and 200 / 300 priority on the same day gets split into two days)
     // TODO refactor the Cell -> ApplicationEventSchedule conversion to use FormTypes
-    selectedAppEvents.forEach((appEventSchedule, i) => {
+    for (const i of selectedAppEvents.keys()) {
+      const appEventSchedule = selectedAppEvents[i];
       const val: SuitableTimeRangeFormValues[] = appEventSchedule.map(
         (appEvent) => {
           const { day } = appEvent;
@@ -333,7 +336,7 @@ function Page2({ application, onNext }: Props): JSX.Element {
         }
       );
       setValue(`applicationSections.${i}.suitableTimeRanges`, val);
-    });
+    }
   };
 
   const updateCells = (index: number, newCells: Cell[][]) => {
@@ -402,7 +405,7 @@ function Page2({ application, onNext }: Props): JSX.Element {
 
   const shouldShowMinDurationMessage =
     minDurationMsg &&
-    applicationEventsForWhichMinDurationIsNotFulfilled.some((d) => d != null);
+    applicationEventsForWhichMinDurationIsNotFulfilled.length > 0;
 
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -416,7 +419,7 @@ function Page2({ application, onNext }: Props): JSX.Element {
           .map((a) => ({
             begin: a.beginTime,
             end: a.endTime,
-            priority: 300,
+            priority: 300 as const,
             day: convertWeekday(a.dayOfTheWeek),
           }));
         const summaryDataSecondary = schedules
@@ -424,7 +427,7 @@ function Page2({ application, onNext }: Props): JSX.Element {
           .map((a) => ({
             begin: a.beginTime,
             end: a.endTime,
-            priority: 200,
+            priority: 200 as const,
             day: convertWeekday(a.dayOfTheWeek),
           }));
         const reservationUnitOptions = filterNonNullable(
