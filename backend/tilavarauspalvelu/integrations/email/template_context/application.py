@@ -139,7 +139,6 @@ def get_context_for_application_section_cancelled(
         "text_reservation_cancelled": pgettext(
             "Email", "All space reservations included in your seasonal booking have been cancelled"
         ),
-        "cancel_reason_label": pgettext("Email", "Reason"),
         "cancel_reason": data["cancel_reason"],
         "seasonal_booking_label": pgettext("Email", "Seasonal Booking"),
         "application_section_name": data["application_section_name"],
@@ -203,7 +202,6 @@ def get_context_for_staff_notification_application_section_cancelled(
         "text_reservation_cancelled": pgettext(
             "Email", "The customer has canceled all space reservations included in the seasonal booking"
         ),
-        "cancel_reason_label": pgettext("Email", "Reason"),
         "cancel_reason": data["cancel_reason"],
         "seasonal_booking_label": pgettext("Email", "Seasonal Booking"),
         "view_booking_at_label": pgettext("Email", "You can view the booking at"),

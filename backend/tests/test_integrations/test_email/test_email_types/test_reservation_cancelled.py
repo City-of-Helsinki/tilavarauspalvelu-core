@@ -56,7 +56,6 @@ def test_get_context__reservation_cancelled__en(email_reservation):
 
     assert context == {
         "cancel_reason": "[PERUUTUKSEN SYY]",
-        "cancel_reason_label": "Your reason for cancellation",
         "instructions_html": "[PERUUTETUN VARAUKSEN OHJEET]",
         "instructions_text": "[PERUUTETUN VARAUKSEN OHJEET]",
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
@@ -98,7 +97,6 @@ def test_get_context__reservation_cancelled__fi():
 
     assert context == {
         "cancel_reason": "Tässä on syyni",
-        "cancel_reason_label": "Peruutuksen syy",
         "instructions_html": "Tässä ovat ohjeet",
         "instructions_text": "Tässä ovat ohjeet",
         "email_recipient_name": "Mikko Mallikas",
@@ -130,7 +128,6 @@ def test_get_context__reservation_cancelled__sv():
 
     assert context == {
         "cancel_reason": "Här är anledningen",
-        "cancel_reason_label": "Din anledning till avbokning",
         "instructions_html": "Här är instruktionerna",
         "instructions_text": "Här är instruktionerna",
         "email_recipient_name": "Magnus Persson",
