@@ -167,6 +167,15 @@ const TableWrapper = styled.div`
   }
 `;
 
+const MarginHeader = styled(H3)`
+  margin-top: var(--spacing-m);
+  margin-bottom: var(--spacing-2-xs);
+  @media (min-width: ${breakpoints.m}) {
+    margin-top: var(--spacing-l);
+    margin-bottom: var(--spacing-s);
+  }
+`;
+
 function getAesReservationUnits(aes: ApplicationSectionT) {
   return filterNonNullable(
     aes.reservationUnitOptions
@@ -238,7 +247,7 @@ function formatReservationTimes(
   return times.map((x) => x.label).join(" / ") || "-";
 }
 
-export function ApprovedReservations({ application }: Props) {
+export function ApprovedReservations({ application }: Readonly<Props>) {
   const { t, i18n } = useTranslation();
   const searchParams = useSearchParams();
   const { data, loading } = useApplicationReservationsQuery({
@@ -355,9 +364,9 @@ const StyledLinkLikeButton = styled(LinkLikeButton)`
 
 function ReservationUnitTable({
   reservationUnits,
-}: {
+}: Readonly<{
   reservationUnits: ReservationUnitTableElem[];
-}) {
+}>) {
   const { t, i18n } = useTranslation();
   type ModalT = ReservationUnitTableElem["reservationUnit"];
   const [modal, setModal] = useState<ModalT | null>(null);
@@ -527,10 +536,10 @@ const StyledStatusLabel = styled(StatusLabel)`
 function ReservationsTable({
   reservations,
   application,
-}: {
+}: Readonly<{
   reservations: ReservationsTableElem[];
   application: Pick<ApplicationT, "pk">;
-}) {
+}>) {
   const { i18n } = useTranslation();
   const { t } = useTranslation();
 
@@ -789,10 +798,10 @@ function sectionToReservationUnits(
 export function AllReservations({
   applicationSection,
   application,
-}: {
+}: Readonly<{
   applicationSection: ApplicationSectionT;
   application: Pick<ApplicationT, "pk">;
-}) {
+}>) {
   const { t } = useTranslation();
   const reservations = sectionToreservations(t, applicationSection);
   return (
@@ -811,10 +820,10 @@ export function AllReservations({
 export function ApplicationSection({
   applicationSection,
   application,
-}: {
+}: Readonly<{
   applicationSection: ApplicationSectionT;
   application: Pick<ApplicationT, "pk">;
-}) {
+}>) {
   const { t } = useTranslation();
 
   const reservationUnits: ReservationUnitTableElem[] =
@@ -825,10 +834,14 @@ export function ApplicationSection({
     .slice(0, N_RESERVATIONS_TO_SHOW);
 
   return (
-    <Flex>
-      <H3>{t("application:view.reservationsTab.reservationUnitsTitle")}</H3>
+    <Flex $gap="none">
+      <MarginHeader>
+        {t("application:view.reservationsTab.reservationUnitsTitle")}
+      </MarginHeader>
       <ReservationUnitTable reservationUnits={reservationUnits} />
-      <H3>{t("application:view.reservationsTab.reservationsTitle")}</H3>
+      <MarginHeader>
+        {t("application:view.reservationsTab.reservationsTitle")}
+      </MarginHeader>
       <ReservationsTable
         reservations={reservations}
         application={application}
