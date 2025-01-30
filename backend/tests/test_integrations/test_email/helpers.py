@@ -31,70 +31,6 @@ def html_email_to_text(html_content: str) -> str:
     return text.strip()
 
 
-BASE_TEMPLATE_CONTEXT_EN = {
-    "current_year": "2024",
-    "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
-    "helsinki_city": "City of Helsinki",
-    "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
-    "salutation": "Hi",
-    "service_name": "Varaamo",
-}
-BASE_TEMPLATE_CONTEXT_FI = {
-    "current_year": "2024",
-    "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
-    "helsinki_city": "Helsingin kaupunki",
-    "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
-    "salutation": "Hei",
-    "service_name": "Varaamo",
-}
-BASE_TEMPLATE_CONTEXT_SV = {
-    "current_year": "2024",
-    "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
-    "helsinki_city": "Helsingfors stad",
-    "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
-    "salutation": "Hej",
-    "service_name": "Varaamo",
-}
-
-CLOSING_CONTEXT_EN = {
-    "service_name": "Varaamo",
-    "with_regards": "Kind regards",
-}
-CLOSING_CONTEXT_FI = {
-    "service_name": "Varaamo",
-    "with_regards": "Ystävällisin terveisin",
-}
-CLOSING_CONTEXT_SV = {
-    "service_name": "Varaamo",
-    "with_regards": "Med vänliga hälsningar",
-}
-
-CLOSING_POLITE_CONTEXT_FI = CLOSING_CONTEXT_FI | {
-    "thank_you_for_using": "Kiitos, kun käytit Varaamoa!",
-}
-CLOSING_POLITE_CONTEXT_EN = CLOSING_CONTEXT_EN | {
-    "thank_you_for_using": "Thank you for choosing Varaamo!",
-}
-CLOSING_POLITE_CONTEXT_SV = CLOSING_CONTEXT_SV | {
-    "thank_you_for_using": "Tack för att du använder Varaamo!",
-}
-
-CLOSING_STAFF_CONTEXT_EN = {
-    "automatic_message_do_not_reply": "This is an automated message, please do not reply",
-    "service_name": "Varaamo",
-    "with_regards": "Kind regards",
-}
-CLOSING_STAFF_CONTEXT_FI = {
-    "automatic_message_do_not_reply": "Tämä on automaattinen viesti, johon ei voi vastata",
-    "service_name": "Varaamo",
-    "with_regards": "Ystävällisin terveisin",
-}
-CLOSING_STAFF_CONTEXT_SV = {
-    "automatic_message_do_not_reply": "Detta är ett automatiskt meddelande som inte kan besvaras",
-    "service_name": "Varaamo",
-    "with_regards": "Med vänliga hälsningar",
-}
-
 AUTOMATIC_REPLY_CONTEXT_EN = {
     "automatic_message_do_not_reply": "This is an automated message, please do not reply",
     "contact_us": "Contact us: https://fake.varaamo.hel.fi/feedback?lang=en",
@@ -133,6 +69,38 @@ AUTOMATIC_REPLY_CONTEXT_SV = {
         '<a href="https://fake.varaamo.hel.fi/sv">varaamo.hel.fi</a>'
     ),
 }
+
+BASE_TEMPLATE_CONTEXT_EN = {
+    "current_year": "2024",
+    "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
+    "helsinki_city": "City of Helsinki",
+    "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
+    "salutation": "Hi",
+    "service_name": "Varaamo",
+    "with_regards": "Kind regards",
+    "thank_you_for_using": "Thank you for choosing Varaamo!",
+} | AUTOMATIC_REPLY_CONTEXT_EN
+BASE_TEMPLATE_CONTEXT_FI = {
+    "current_year": "2024",
+    "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
+    "helsinki_city": "Helsingin kaupunki",
+    "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
+    "salutation": "Hei",
+    "service_name": "Varaamo",
+    "with_regards": "Ystävällisin terveisin",
+    "thank_you_for_using": "Kiitos, kun käytit Varaamoa!",
+} | AUTOMATIC_REPLY_CONTEXT_FI
+BASE_TEMPLATE_CONTEXT_SV = {
+    "current_year": "2024",
+    "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
+    "helsinki_city": "Helsingfors stad",
+    "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
+    "salutation": "Hej",
+    "service_name": "Varaamo",
+    "with_regards": "Med vänliga hälsningar",
+    "thank_you_for_using": "Tack för att du använder Varaamo!",
+} | AUTOMATIC_REPLY_CONTEXT_SV
+
 
 RESERVATION_BASIC_INFO_CONTEXT_EN = {
     "reservation_unit_name": "Test reservation unit",

@@ -18,15 +18,9 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tests.factories import ApplicationFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_integrations.test_email.helpers import (
-    AUTOMATIC_REPLY_CONTEXT_EN,
-    AUTOMATIC_REPLY_CONTEXT_FI,
-    AUTOMATIC_REPLY_CONTEXT_SV,
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
-    CLOSING_POLITE_CONTEXT_EN,
-    CLOSING_POLITE_CONTEXT_FI,
-    CLOSING_POLITE_CONTEXT_SV,
     html_email_to_text,
 )
 
@@ -52,8 +46,6 @@ def test_get_context__application_received__en():
         ),
         "title": "Your application has been received",
         **BASE_TEMPLATE_CONTEXT_EN,
-        **CLOSING_POLITE_CONTEXT_EN,
-        **AUTOMATIC_REPLY_CONTEXT_EN,
     }
 
 
@@ -76,8 +68,6 @@ def test_get_context__application_received__fi():
         ),
         "title": "Hakemuksesi on vastaanotettu",
         **BASE_TEMPLATE_CONTEXT_FI,
-        **CLOSING_POLITE_CONTEXT_FI,
-        **AUTOMATIC_REPLY_CONTEXT_FI,
     }
 
 
@@ -100,8 +90,6 @@ def test_get_context__application_received__sv():
         ),
         "title": "Din ansökan har mottagits",
         **BASE_TEMPLATE_CONTEXT_SV,
-        **CLOSING_POLITE_CONTEXT_SV,
-        **AUTOMATIC_REPLY_CONTEXT_SV,
     }
 
 
