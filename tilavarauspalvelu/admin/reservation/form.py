@@ -1,12 +1,19 @@
 from __future__ import annotations
 
+import json
+from typing import Any
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from tilavarauspalvelu.enums import AccessType
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import Reservation
 
 
 class ReservationAdminForm(forms.ModelForm):
+    pindora_response = forms.CharField(widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}))
+
     class Meta:
         model = Reservation
         fields = []  # Use fields from ModelAdmin
@@ -60,6 +67,8 @@ class ReservationAdminForm(forms.ModelForm):
             "billing_address_street": _("Billing address street"),
             "billing_address_city": _("Billing address city"),
             "billing_address_zip": _("Billing address zip code"),
+            #
+            "pindora_response": _("Pindora API response"),
             #
             "user": _("User"),
             "recurring_reservation": _("Recurring reservation"),
@@ -120,6 +129,8 @@ class ReservationAdminForm(forms.ModelForm):
             "billing_address_city": _("Billing address city"),
             "billing_address_zip": _("Billing address zip code"),
             #
+            "pindora_response": _("Response from Pindora API"),
+            #
             "user": _("User who made the reservation"),
             "recurring_reservation": _("Recurring reservation"),
             "deny_reason": _("Reason for denying the reservation"),
@@ -128,3 +139,25 @@ class ReservationAdminForm(forms.ModelForm):
             "home_city": _("Reservee's home city"),
             "age_group": _("Age group of the group or association"),
         }
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.access_type == AccessType.ACCESS_CODE:
+            pindora_field = self.fields["pindora_response"]
+            pindora_field.initial = self.get_pindora_response(self.instance)
+            pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})
+
+    def get_pindora_response(self, obj: Reservation) -> str | None:
+        if obj.access_type != AccessType.ACCESS_CODE:
+            return None
+
+        response = PindoraClient.get_cached_reservation_response(ext_uuid=obj.ext_uuid)
+        if response is None:
+            response = PindoraClient.get_reservation(reservation=obj)
+            PindoraClient.cache_reservation_response(response, ext_uuid=obj.ext_uuid)
+
+        if response is None:
+            return None
+
+        return json.dumps(response, default=str, indent=2)

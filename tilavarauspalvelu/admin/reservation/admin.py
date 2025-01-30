@@ -178,6 +178,14 @@ class ReservationAdmin(admin.ModelAdmin):
             },
         ],
         [
+            _("Pindora information"),
+            {
+                "fields": [
+                    "pindora_response",
+                ],
+            },
+        ],
+        [
             _("Additional information"),
             {
                 "fields": [
