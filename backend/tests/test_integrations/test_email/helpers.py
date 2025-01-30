@@ -96,6 +96,8 @@ BASE_TEMPLATE_CONTEXT_EN = (
         "service_name": "Varaamo",
         "with_regards": "Kind regards",
         "thank_you_for_using": "Thank you for choosing Varaamo!",
+        "reason_label": "Reason",
+        "reason_cancel_label": "Your reason for cancellation",
     }
     | AUTOMATIC_REPLY_CONTEXT_EN
     | RESERVATION_TRANSLATIONS_CONTEXT_EN
@@ -110,6 +112,8 @@ BASE_TEMPLATE_CONTEXT_FI = (
         "service_name": "Varaamo",
         "with_regards": "Ystävällisin terveisin",
         "thank_you_for_using": "Kiitos, kun käytit Varaamoa!",
+        "reason_label": "Syy",
+        "reason_cancel_label": "Peruutuksen syy",
     }
     | AUTOMATIC_REPLY_CONTEXT_FI
     | RESERVATION_TRANSLATIONS_CONTEXT_FI
@@ -124,6 +128,8 @@ BASE_TEMPLATE_CONTEXT_SV = (
         "service_name": "Varaamo",
         "with_regards": "Med vänliga hälsningar",
         "thank_you_for_using": "Tack för att du använder Varaamo!",
+        "reason_label": "Orsak",
+        "reason_cancel_label": "Din anledning till avbokning",
     }
     | AUTOMATIC_REPLY_CONTEXT_SV
     | RESERVATION_TRANSLATIONS_CONTEXT_SV

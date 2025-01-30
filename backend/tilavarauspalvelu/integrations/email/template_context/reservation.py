@@ -372,7 +372,6 @@ def get_context_for_reservation_rejected(
     return {
         "title": pgettext("Email", "Unfortunately your booking cannot be confirmed"),
         "text_reservation_rejected": pgettext("Email", "Unfortunately your booking cannot be confirmed"),
-        "rejection_reason_label": pgettext("Email", "Reason"),
         "rejection_reason": data["rejection_reason"],
         "booking_number_label": pgettext("Email", "Booking number"),
         "reservation_id": str(data["reservation_id"]),
@@ -774,7 +773,6 @@ def get_context_for_seasonal_reservation_rejected_series(
         "text_reservation_rejected": pgettext(
             "Email", "The space reservation included in your seasonal booking has been cancelled"
         ),
-        "rejection_reason_label": pgettext("Email", "Reason"),
         "rejection_reason": data["rejection_reason"],
         "seasonal_booking_label": pgettext("Email", "Seasonal Booking"),
         "application_section_name": data["application_section_name"],
@@ -839,7 +837,6 @@ def get_context_for_seasonal_reservation_rejected_single(
     return {
         "title": title,
         "text_reservation_rejected": title,
-        "rejection_reason_label": pgettext("Email", "Reason"),
         "rejection_reason": data["rejection_reason"],
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(

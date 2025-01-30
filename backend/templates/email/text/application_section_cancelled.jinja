@@ -1,7 +1,7 @@
 {{ salutation | safe }} {{ email_recipient_name | safe }},
 
 {{ text_reservation_cancelled | sentence | safe }}
-{{ cancel_reason_label | safe }}: {{ cancel_reason }}
+{{ reason_label | safe }}: {{ cancel_reason }}
 
 {% include "email/text/partials/application_section_name.jinja" %}
 

@@ -66,7 +66,6 @@ def test_get_context_for_staff_notification_application_section_cancelled__en(em
         "seasonal_booking_label": "Seasonal Booking",
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-        "cancel_reason_label": "Reason",
         "cancel_reason": "[PERUUTUKSEN SYY]",
         "view_booking_at_label": "You can view the booking at",
         "cancelled_reservation_series": [
@@ -120,7 +119,6 @@ def test_get_context_for_staff_notification_application_section_cancelled__fi():
         "seasonal_booking_label": "Kausivaraus",
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-        "cancel_reason_label": "Syy",
         "cancel_reason": "[PERUUTUKSEN SYY]",
         "view_booking_at_label": "Voit tarkistaa varauksen tiedot osoitteessa",
         "cancelled_reservation_series": [
@@ -168,7 +166,6 @@ def test_get_context_for_staff_notification_application_section_cancelled_sv():
         "seasonal_booking_label": "Säsongsbokning",
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-        "cancel_reason_label": "Orsak",
         "cancel_reason": "[PERUUTUKSEN SYY]",
         "view_booking_at_label": "Du kan se bokningen på",
         "cancelled_reservation_series": [

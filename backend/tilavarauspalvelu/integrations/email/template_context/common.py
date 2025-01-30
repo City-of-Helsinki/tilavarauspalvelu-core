@@ -32,6 +32,8 @@ def get_context_for_translations(*, language: Lang, email_recipient_name: str | 
         "salutation": pgettext("Email", "Hi"),
         "with_regards": pgettext("Email", "Kind regards"),
         "thank_you_for_using": pgettext("Email", "Thank you for choosing Varaamo!"),
+        "reason_label": pgettext("Email", "Reason"),
+        "reason_cancel_label": pgettext("Email", "Your reason for cancellation"),
         **get_contex_for_automatic_message(language=language),
         **get_context_for_reservation_translations(),
     }
