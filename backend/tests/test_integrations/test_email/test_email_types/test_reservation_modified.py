@@ -59,7 +59,6 @@ def test_get_context__reservation_modified__en(email_reservation):
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "text_reservation_modified": "Your booking has been updated",
-        "instructions_label": "Additional information about your booking",
         "instructions_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "instructions_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "title": "Your booking has been updated",
@@ -100,7 +99,6 @@ def test_get_context__reservation_modified__fi():
     assert context == {
         "email_recipient_name": "Mikko Mallikas",
         "text_reservation_modified": "Varaustasi on muutettu",
-        "instructions_label": "Lisätietoa varauksestasi",
         "instructions_html": "Tässä ovat ohjeet",
         "instructions_text": "Tässä ovat ohjeet",
         "title": "Varaustasi on muutettu",
@@ -131,7 +129,6 @@ def test_get_context__reservation_modified__sv():
     assert context == {
         "email_recipient_name": "Magnus Persson",
         "text_reservation_modified": "Din bokning har uppdaterats",
-        "instructions_label": "Mer information om din bokning",
         "instructions_html": "Här är instruktionerna",
         "instructions_text": "Här är instruktionerna",
         "title": "Din bokning har uppdaterats",
