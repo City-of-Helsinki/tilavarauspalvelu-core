@@ -73,8 +73,9 @@ def test_get_context__reservation_requires_payment__en(email_reservation):
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
         "reservation_id": f"{email_reservation.id}",
-        "price": 0,
-        "tax_percentage": 0,
+        "price": Decimal(0),
+        "subsidised_price": Decimal(0),
+        "tax_percentage": Decimal(0),
     }
 
     with TranslationsFromPOFiles():

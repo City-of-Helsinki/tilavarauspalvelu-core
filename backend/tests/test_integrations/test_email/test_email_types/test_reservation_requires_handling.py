@@ -29,9 +29,9 @@ from tests.test_integrations.test_email.helpers import (
     RESERVATION_MANAGE_LINK_CONTEXT_EN,
     RESERVATION_MANAGE_LINK_CONTEXT_FI,
     RESERVATION_MANAGE_LINK_CONTEXT_SV,
-    RESERVATION_PRICE_RANGE_INFO_CONTEXT_EN,
-    RESERVATION_PRICE_RANGE_INFO_CONTEXT_FI,
-    RESERVATION_PRICE_RANGE_INFO_CONTEXT_SV,
+    RESERVATION_PRICE_INFO_CONTEXT_EN,
+    RESERVATION_PRICE_INFO_CONTEXT_FI,
+    RESERVATION_PRICE_INFO_CONTEXT_SV,
     html_email_to_text,
 )
 
@@ -71,7 +71,7 @@ def test_get_context__reservation_requires_handling__en(email_reservation):
         "title": "Your booking is waiting for processing",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **RESERVATION_PRICE_RANGE_INFO_CONTEXT_EN,
+        **RESERVATION_PRICE_INFO_CONTEXT_EN,
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
         "price": Decimal(0),
         "subsidised_price": Decimal(0),
@@ -118,7 +118,7 @@ def test_get_context__reservation_requires_handling__fi():
         "title": "Varauksesi odottaa käsittelyä",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
-        **RESERVATION_PRICE_RANGE_INFO_CONTEXT_FI,
+        **RESERVATION_PRICE_INFO_CONTEXT_FI,
         **RESERVATION_MANAGE_LINK_CONTEXT_FI,
     }
 
@@ -155,7 +155,7 @@ def test_get_context__reservation_requires_handling__sv():
         "title": "Din bokning väntar på att behandlas",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
-        **RESERVATION_PRICE_RANGE_INFO_CONTEXT_SV,
+        **RESERVATION_PRICE_INFO_CONTEXT_SV,
         **RESERVATION_MANAGE_LINK_CONTEXT_SV,
     }
 
@@ -192,7 +192,7 @@ def test_get_context__reservation_requires_handling__subsidised():
         "title": "Your booking is waiting for processing",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **RESERVATION_PRICE_RANGE_INFO_CONTEXT_EN,
+        **RESERVATION_PRICE_INFO_CONTEXT_EN,
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
         "subsidised_price": Decimal("10.30"),
         "price_can_be_subsidised": True,
