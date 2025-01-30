@@ -14,7 +14,6 @@ from .common import (
     get_contex_for_reservation_basic_info,
     get_contex_for_reservation_manage_link,
     get_contex_for_reservation_price,
-    get_contex_for_reservation_price_range,
     get_contex_for_seasonal_reservation_check_details_url,
     get_context_for_translations,
     get_my_reservations_ext_link,
@@ -460,7 +459,7 @@ def get_context_for_reservation_requires_handling(
             begin_datetime=data["begin_datetime"],
             end_datetime=data["end_datetime"],
         ),
-        **get_contex_for_reservation_price_range(
+        **get_contex_for_reservation_price(
             price=data["price"],
             subsidised_price=data["subsidised_price"],
             tax_percentage=data["tax_percentage"],
