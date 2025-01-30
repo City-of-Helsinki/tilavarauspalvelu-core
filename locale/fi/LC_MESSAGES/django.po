@@ -712,6 +712,7 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "External UUID"
 msgstr "Ulkoinen UUID"
 
@@ -734,6 +735,7 @@ msgstr "Käyttötarkoitus"
 
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "ID for external systems to use"
 msgstr "Tunniste ulkoisten järjestelmien käyttöön"
 
@@ -1930,10 +1932,6 @@ msgid "Payment accounting"
 msgstr "Kirjanpidon tiliöintitieto"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "UUID"
-msgstr "UUID"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment product"
 msgstr "Maksutuote"
 
@@ -1944,6 +1942,10 @@ msgstr "Kulkuoikeuden alkamispäivä"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Access type end date"
 msgstr "Kulkuoikeuden päättymispäivä"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Pindora API response"
+msgstr "Pindora rajapinnan vastaus"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment terms for the reservation unit."
@@ -2148,6 +2150,10 @@ msgid ""
 msgstr ""
 "Jos asetettu, kulkuoikeutta käytetään tähän päivään asti. Jos nykyinen päivä "
 "on tämän päivän jälkeen, kulkuoikeus on 'rajoittamaton'."
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Response from Pindora API"
+msgstr "Vastaus Pindora rajapinnasta"
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"

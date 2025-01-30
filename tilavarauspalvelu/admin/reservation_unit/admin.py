@@ -80,6 +80,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
             {
                 "fields": [
                     "id",
+                    "uuid",
                     "name",
                     "description",
                     "unit",
@@ -178,6 +179,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                     "access_type",
                     "access_type_start_date",
                     "access_type_end_date",
+                    "pindora_response",
                 ],
             },
         ],

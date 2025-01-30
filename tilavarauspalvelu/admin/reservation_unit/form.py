@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from django import forms
@@ -16,6 +17,8 @@ from utils.external_service.errors import ExternalServiceError
 class ReservationUnitAdminForm(forms.ModelForm):
     instance: ReservationUnit
 
+    pindora_response = forms.CharField(widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}))
+
     search_terms = DynamicArrayField(
         required=False,
         default=list,
@@ -26,27 +29,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "links from external sources work regardless of the UI language."
         ),
     )
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        qs = TermsOfUse.objects.all()
-        self.base_fields["pricing_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PRICING)
-        self.base_fields["payment_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PAYMENT)
-        self.base_fields["cancellation_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.CANCELLATION)
-        self.base_fields["service_specific_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.SERVICE)
-        super().__init__(*args, **kwargs)
-
-    def clean(self) -> None:
-        cleaned_data = super().clean()
-        if not cleaned_data:
-            return
-
-        # Check if reservation unit has been configured in Pindora.
-        access_type: str | None = cleaned_data.get("access_type")
-        if access_type == AccessType.ACCESS_CODE:
-            try:
-                PindoraClient.get_reservation_unit(self.instance)
-            except ExternalServiceError as error:
-                self.add_error("access_type", str(error))
 
     class Meta:
         model = ReservationUnit
@@ -59,6 +41,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "reservation_cancelled_instructions": TinyMCE(),
         }
         labels = {
+            "uuid": _("External UUID"),
             "sku": _("SKU"),
             "name": _("Name"),
             "name_fi": _("Name (Finnish)"),
@@ -128,14 +111,15 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "rank": _("Order number"),
             "payment_merchant": _("Payment merchant"),
             "payment_accounting": _("Payment accounting"),
-            "uuid": _("UUID"),
             "payment_product": _("Payment product"),
             "search_terms": _("Search terms"),
             "access_type": _("Access type"),
             "access_type_start_date": _("Access type start date"),
             "access_type_end_date": _("Access type end date"),
+            "pindora_response": _("Pindora API response"),
         }
         help_texts = {
+            "uuid": _("ID for external systems to use"),
             "sku": _("SKU"),
             "name": _("Name"),
             "name_fi": _("Name (Finnish)"),
@@ -218,7 +202,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "rank": _("Order number to be use in api sorting."),
             "payment_merchant": _("Merchant used for payments"),
             "payment_accounting": _("Payment accounting information"),
-            "uuid": _("UUID"),
             "payment_product": _("Product used for payments"),
             "search_terms": _(
                 "Additional search terms that will bring up this reservation unit when making text searches "
@@ -234,4 +217,46 @@ class ReservationUnitAdminForm(forms.ModelForm):
                 "If set, this is the date before which the access type is used. If current date is "
                 "after this date, the access type is 'unrestricted'."
             ),
+            "pindora_response": _("Response from Pindora API"),
         }
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        qs = TermsOfUse.objects.all()
+        self.base_fields["pricing_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PRICING)
+        self.base_fields["payment_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.PAYMENT)
+        self.base_fields["cancellation_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.CANCELLATION)
+        self.base_fields["service_specific_terms"].queryset = qs.filter(terms_type=TermsOfUseTypeChoices.SERVICE)
+
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.access_type == AccessType.ACCESS_CODE:
+            pindora_field = self.fields["pindora_response"]
+            pindora_field.initial = self.get_pindora_response(self.instance)
+            pindora_field.widget.attrs.update({"cols": "100", "rows": "10"})
+
+    def get_pindora_response(self, obj: ReservationUnit) -> str | None:
+        if obj.access_type != AccessType.ACCESS_CODE:
+            return None
+
+        response = PindoraClient.get_cached_reservation_unit_response(ext_uuid=obj.uuid)
+        if response is None:
+            response = PindoraClient.get_reservation_unit(reservation_unit=obj)
+            PindoraClient.cache_reservation_unit_response(response, ext_uuid=obj.uuid)
+
+        if response is None:
+            return None
+
+        return json.dumps(response, default=str, indent=2)
+
+    def clean(self) -> None:
+        cleaned_data = super().clean()
+        if not cleaned_data:
+            return
+
+        # Check if reservation unit has been configured in Pindora.
+        access_type: str | None = cleaned_data.get("access_type")
+        if access_type == AccessType.ACCESS_CODE:
+            try:
+                PindoraClient.get_reservation_unit(self.instance)
+            except ExternalServiceError as error:
+                self.add_error("access_type", str(error))
