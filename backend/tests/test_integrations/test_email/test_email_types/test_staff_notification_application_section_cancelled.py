@@ -60,14 +60,9 @@ def test_get_context_for_staff_notification_application_section_cancelled__en(em
     assert context == {
         "email_recipient_name": None,
         "title": "The customer has canceled the seasonal booking",
-        "text_reservation_cancelled": (
-            "The customer has canceled all space reservations included in the seasonal booking"
-        ),
-        "seasonal_booking_label": "Seasonal Booking",
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
         "cancel_reason": "[PERUUTUKSEN SYY]",
-        "view_booking_at_label": "You can view the booking at",
         "cancelled_reservation_series": [
             {
                 "weekday_value": "Monday",
@@ -115,12 +110,9 @@ def test_get_context_for_staff_notification_application_section_cancelled__fi():
     assert context == {
         "email_recipient_name": None,
         "title": "Asiakas on perunut kausivarauksen",
-        "text_reservation_cancelled": "Asiakas on perunut kaikki kausivaraukseen kuuluvat tilavaraukset",
-        "seasonal_booking_label": "Kausivaraus",
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
         "cancel_reason": "[PERUUTUKSEN SYY]",
-        "view_booking_at_label": "Voit tarkistaa varauksen tiedot osoitteessa",
         "cancelled_reservation_series": [
             {
                 "weekday_value": "Monday",
@@ -162,12 +154,9 @@ def test_get_context_for_staff_notification_application_section_cancelled_sv():
     assert context == {
         "email_recipient_name": None,
         "title": "Kunden har avbokat säsongsbokningen",
-        "text_reservation_cancelled": "Kunden har avbokat alla lokalbokningar som ingår i säsongsbokningen",
-        "seasonal_booking_label": "Säsongsbokning",
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
         "cancel_reason": "[PERUUTUKSEN SYY]",
-        "view_booking_at_label": "Du kan se bokningen på",
         "cancelled_reservation_series": [
             {
                 "weekday_value": "Monday",
