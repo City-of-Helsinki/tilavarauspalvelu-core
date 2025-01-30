@@ -98,29 +98,21 @@ def get_contex_for_reservation_manage_link(*, language: Lang) -> EmailContext:
     }
 
 
-def get_contex_for_reservation_price(*, price: Decimal, tax_percentage: Decimal, reservation_id: int) -> EmailContext:
-    return {
-        "price_label": pgettext("Email", "Price"),
-        "price": price,
-        "vat_included_label": pgettext("Email", "incl. VAT"),
-        "tax_percentage": tax_percentage,
-        "booking_number_label": pgettext("Email", "Booking number"),
-        "reservation_id": str(reservation_id),
-    }
-
-
-def get_contex_for_reservation_price_range(
+def get_contex_for_reservation_price(
     *,
     price: Decimal,
-    subsidised_price: Decimal,
     tax_percentage: Decimal,
     reservation_id: int,
-    applying_for_free_of_charge: bool,
+    subsidised_price: Decimal | None = None,
+    applying_for_free_of_charge: bool = False,
 ) -> EmailContext:
+    if subsidised_price is None:
+        subsidised_price = price
+
     return {
         "price_label": pgettext("Email", "Price"),
         "price": price,
-        "subsidised_price": subsidised_price,
+        "subsidised_price": subsidised_price or price,
         "price_can_be_subsidised": applying_for_free_of_charge and subsidised_price < price,
         "vat_included_label": pgettext("Email", "incl. VAT"),
         "tax_percentage": tax_percentage,
