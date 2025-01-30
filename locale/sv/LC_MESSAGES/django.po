@@ -686,6 +686,7 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "External UUID"
 msgstr ""
 
@@ -708,6 +709,7 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "ID for external systems to use"
 msgstr ""
 
@@ -1881,10 +1883,6 @@ msgid "Payment accounting"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "UUID"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment product"
 msgstr ""
 
@@ -1894,6 +1892,10 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Access type end date"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Pindora API response"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
@@ -2080,6 +2082,10 @@ msgstr ""
 msgid ""
 "If set, this is the date before which the access type is used. If current "
 "date is after this date, the access type is 'unrestricted'."
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Response from Pindora API"
 msgstr ""
 
 #: tilavarauspalvelu/admin/space/admin.py
