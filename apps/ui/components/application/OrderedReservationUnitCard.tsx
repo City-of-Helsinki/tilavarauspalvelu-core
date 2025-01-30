@@ -5,6 +5,7 @@ import {
   ButtonSize,
   ButtonVariant,
   Button,
+  ButtonPresetTheme,
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
@@ -60,7 +61,7 @@ const PreCardLabel = styled(H6).attrs({ as: "h3" })`
   }
 `;
 
-const OverlayContainer = styled(Flex)`
+const OverlayContainer = styled(Flex).attrs({ $gap: "none" })`
   position: relative;
   @media (min-width: ${breakpoints.m}) {
     flex-direction: row;
@@ -70,7 +71,7 @@ const OverlayContainer = styled(Flex)`
 
 const orderButtonsWidth = "230px";
 
-const CardContainer = styled(Flex)`
+const CardContainer = styled(Flex).attrs({ $gap: "none" })`
   @media (min-width: ${breakpoints.m}) {
     width: calc(100% - ${orderButtonsWidth});
     overflow: hidden;
@@ -92,13 +93,10 @@ const CardContainer = styled(Flex)`
 
 const OrderButtonContainer = styled.div`
   display: flex;
-  margin-top: calc(var(--spacing-m) * -1);
+  flex-wrap: wrap;
   background: var(--color-black-5);
-  padding: 0 var(--spacing-m) var(--spacing-m);
+  padding: 0 var(--spacing-s) var(--spacing-s);
   @media (min-width: ${breakpoints.m}) {
-    position: absolute;
-    top: 0;
-    right: 0;
     display: grid;
     grid-template-columns: 100px 1fr;
     grid-template-rows: 1fr 1fr;
@@ -122,10 +120,11 @@ const DeleteContainer = styled(Flex).attrs({ $justifyContent: "center" })`
 `;
 
 const DeleteButton = styled(Button)`
-  margin: var(--spacing-s) var(--spacing-s) var(--spacing-s) 0;
   color: var(--color-black-90) !important;
   && {
     ${fontBold}
+    --padding-horizontal: var(--spacing-s);
+    --padding-vertical: var(--spacing-xs);
   }
   @media (min-width: ${breakpoints.m}) {
     grid-column: 1;
@@ -139,6 +138,8 @@ const DeleteButton = styled(Button)`
 
 const OrderButton = styled(Button)`
   &&& {
+    --padding-horizontal: var(--spacing-s);
+    --padding-vertical: var(--spacing-xs);
     position: relative;
     z-index: 2;
     background-color: var(--color-white);
@@ -173,9 +174,6 @@ const OrderButton = styled(Button)`
         --border-color-disabled: transparent;
         ${fontRegular}
       }
-    }
-    svg {
-      scale: 1.5;
     }
   }
 `;
@@ -228,53 +226,60 @@ export function OrderedReservationUnitCard({
   const imgSrc = getImageSource(img, "medium");
 
   return (
-    <NameCardContainer>
-      <PreCardLabel>
-        <span>{t("reservationUnitList:option")} </span>
-        {order + 1}.
-      </PreCardLabel>
+    <>
       {invalid ? (
         <ErrorNotification
           label={t("application:validation.reservationUnitTooSmall")}
         />
       ) : null}
-      <OverlayContainer>
-        <CardContainer>
-          <Card
-            heading={getReservationUnitName(reservationUnit) ?? ""}
-            text={unitName}
-            imageSrc={imgSrc}
-          />
-        </CardContainer>
-        <OrderButtonContainer>
-          <DeleteContainer>
-            <DeleteButton
+      <NameCardContainer>
+        <PreCardLabel>
+          <span>{t("reservationUnitList:option")} </span>
+          {order + 1}.
+        </PreCardLabel>
+        <OverlayContainer>
+          <CardContainer>
+            <Card
+              heading={getReservationUnitName(reservationUnit) ?? ""}
+              text={unitName}
+              imageSrc={imgSrc}
+            />
+          </CardContainer>
+          <OrderButtonContainer>
+            <DeleteContainer>
+              <DeleteButton
+                variant={ButtonVariant.Supplementary}
+                theme={ButtonPresetTheme.Black}
+                size={ButtonSize.Small}
+                iconEnd={undefined}
+                onClick={() => onDelete(reservationUnit)}
+              >
+                {t("reservationUnitList:buttonRemove")}
+              </DeleteButton>
+            </DeleteContainer>
+            <UpButton
+              iconStart={<IconArrowUp aria-hidden="true" />}
               variant={ButtonVariant.Supplementary}
+              theme={ButtonPresetTheme.Black}
               size={ButtonSize.Small}
-              iconEnd={undefined}
-              onClick={() => onDelete(reservationUnit)}
+              onClick={() => onMoveUp(reservationUnit)}
+              disabled={first}
             >
-              {t("reservationUnitList:buttonRemove")}
-            </DeleteButton>
-          </DeleteContainer>
-          <UpButton
-            iconStart={<IconArrowUp aria-hidden="true" />}
-            variant={ButtonVariant.Supplementary}
-            onClick={() => onMoveUp(reservationUnit)}
-            disabled={first}
-          >
-            {t("reservationUnitList:buttonUp")}
-          </UpButton>
-          <DownButton
-            iconStart={<IconArrowDown aria-hidden="true" />}
-            variant={ButtonVariant.Supplementary}
-            onClick={() => onMoveDown(reservationUnit)}
-            disabled={last}
-          >
-            {t("reservationUnitList:buttonDown")}
-          </DownButton>
-        </OrderButtonContainer>
-      </OverlayContainer>
-    </NameCardContainer>
+              {t("reservationUnitList:buttonUp")}
+            </UpButton>
+            <DownButton
+              iconStart={<IconArrowDown aria-hidden="true" />}
+              variant={ButtonVariant.Supplementary}
+              theme={ButtonPresetTheme.Black}
+              size={ButtonSize.Small}
+              onClick={() => onMoveDown(reservationUnit)}
+              disabled={last}
+            >
+              {t("reservationUnitList:buttonDown")}
+            </DownButton>
+          </OrderButtonContainer>
+        </OverlayContainer>
+      </NameCardContainer>
+    </>
   );
 }
