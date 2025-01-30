@@ -21,38 +21,18 @@ if TYPE_CHECKING:
 # --- Partials -----------------------------------------------------------------------------------------------------
 
 
-def get_contex_for_base_template(*, email_recipient_name: str | None = None) -> EmailContext:
+def get_context_for_translations(*, language: Lang, email_recipient_name: str | None) -> EmailContext:
     return {
-        "service_name": pgettext("Email", "Varaamo"),
+        "email_recipient_name": email_recipient_name,
         "current_year": str(local_datetime().year),
+        "service_name": pgettext("Email", "Varaamo"),
         "helsinki_city": pgettext("Email", "City of Helsinki"),
         "helsinki_logo_url": "https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png",
         "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
         "salutation": pgettext("Email", "Hi"),
-        "email_recipient_name": email_recipient_name,
-    }
-
-
-def get_contex_for_closing(*, language: Lang) -> EmailContext:
-    return {
         "with_regards": pgettext("Email", "Kind regards"),
-        "service_name": pgettext("Email", "Varaamo"),
-        **get_contex_for_automatic_message(language=language),
-    }
-
-
-def get_contex_for_closing_polite(*, language: Lang) -> EmailContext:
-    return {
         "thank_you_for_using": pgettext("Email", "Thank you for choosing Varaamo!"),
-        **get_contex_for_closing(language=language),
-    }
-
-
-def get_contex_for_closing_staff() -> EmailContext:
-    return {
-        "with_regards": pgettext("Email", "Kind regards"),
-        "service_name": pgettext("Email", "Varaamo"),
-        "automatic_message_do_not_reply": pgettext("Email", "This is an automated message, please do not reply"),
+        **get_contex_for_automatic_message(language=language),
     }
 
 

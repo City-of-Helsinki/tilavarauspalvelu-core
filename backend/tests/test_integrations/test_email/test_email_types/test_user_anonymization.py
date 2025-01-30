@@ -20,15 +20,9 @@ from utils.date_utils import local_datetime
 from tests.factories import UserFactory
 from tests.helpers import TranslationsFromPOFiles
 from tests.test_integrations.test_email.helpers import (
-    AUTOMATIC_REPLY_CONTEXT_EN,
-    AUTOMATIC_REPLY_CONTEXT_FI,
-    AUTOMATIC_REPLY_CONTEXT_SV,
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
-    CLOSING_CONTEXT_EN,
-    CLOSING_CONTEXT_FI,
-    CLOSING_CONTEXT_SV,
     html_email_to_text,
 )
 
@@ -51,8 +45,6 @@ def test_get_context__user_anonymization__en():
         "login_url": "https://fake.varaamo.hel.fi/en",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/en">https://fake.varaamo.hel.fi/en</a>',
         **BASE_TEMPLATE_CONTEXT_EN,
-        **CLOSING_CONTEXT_EN,
-        **AUTOMATIC_REPLY_CONTEXT_EN,
     }
 
 
@@ -72,8 +64,6 @@ def test_get_context__user_anonymization__fi():
         "login_url": "https://fake.varaamo.hel.fi",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi">https://fake.varaamo.hel.fi</a>',
         **BASE_TEMPLATE_CONTEXT_FI,
-        **CLOSING_CONTEXT_FI,
-        **AUTOMATIC_REPLY_CONTEXT_FI,
     }
 
 
@@ -95,8 +85,6 @@ def test_get_context__user_anonymization__sv():
         "login_url": "https://fake.varaamo.hel.fi/sv",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/sv">https://fake.varaamo.hel.fi/sv</a>',
         **BASE_TEMPLATE_CONTEXT_SV,
-        **CLOSING_CONTEXT_SV,
-        **AUTOMATIC_REPLY_CONTEXT_SV,
     }
 
 

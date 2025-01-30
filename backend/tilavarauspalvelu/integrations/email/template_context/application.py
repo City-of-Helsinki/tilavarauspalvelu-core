@@ -8,11 +8,8 @@ from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 
 from .common import (
     create_anchor_tag,
-    get_contex_for_base_template,
-    get_contex_for_closing,
-    get_contex_for_closing_polite,
-    get_contex_for_closing_staff,
     get_contex_for_seasonal_reservation_check_details_url,
+    get_context_for_translations,
     get_my_applications_ext_link,
     get_staff_reservations_ext_link,
     params_for_application_section_info,
@@ -46,8 +43,7 @@ def get_context_for_application_handled(*, language: Lang) -> EmailContext:
         "text_application_handled": pgettext("Email", "Your application has been processed"),
         "text_view_application_html": text_view_application % {"page": create_anchor_tag(link=link, text=text)},
         "text_view_application": text_view_application % {"page": f"{text}: {link}"},
-        **get_contex_for_base_template(),
-        **get_contex_for_closing_polite(language=language),
+        **get_context_for_translations(language=language, email_recipient_name=None),
     }
 
 
@@ -71,8 +67,7 @@ def get_context_for_application_in_allocation(*, language: Lang) -> EmailContext
         ),
         "text_view_application_html": text_view_application % {"page": create_anchor_tag(link=link, text=text)},
         "text_view_application": text_view_application % {"page": f"{text}: {link}"},
-        **get_contex_for_base_template(),
-        **get_contex_for_closing_polite(language=language),
+        **get_context_for_translations(language=language, email_recipient_name=None),
     }
 
 
@@ -94,8 +89,7 @@ def get_context_for_application_received(*, language: Lang) -> EmailContext:
         "text_application_received": pgettext("Email", "Thank you for your application"),
         "text_view_application_html": text_view_application % {"page": create_anchor_tag(link=link, text=text)},
         "text_view_application": text_view_application % {"page": text} + f": {link}",
-        **get_contex_for_base_template(),
-        **get_contex_for_closing_polite(language=language),
+        **get_context_for_translations(language=language, email_recipient_name=None),
     }
 
 
@@ -150,8 +144,7 @@ def get_context_for_application_section_cancelled(
         "seasonal_booking_label": pgettext("Email", "Seasonal Booking"),
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
-        **get_contex_for_base_template(email_recipient_name=data["email_recipient_name"]),
-        **get_contex_for_closing(language=language),
+        **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_seasonal_reservation_check_details_url(
             language=language,
             application_id=data["application_id"],
@@ -217,6 +210,5 @@ def get_context_for_staff_notification_application_section_cancelled(
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
         "cancelled_reservation_series": data["cancelled_reservation_series"],
-        **get_contex_for_base_template(),
-        **get_contex_for_closing_staff(),
+        **get_context_for_translations(language=language, email_recipient_name=None),
     }

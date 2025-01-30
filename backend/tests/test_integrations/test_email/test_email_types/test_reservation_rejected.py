@@ -19,15 +19,9 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tests.factories import ReservationFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_integrations.test_email.helpers import (
-    AUTOMATIC_REPLY_CONTEXT_EN,
-    AUTOMATIC_REPLY_CONTEXT_FI,
-    AUTOMATIC_REPLY_CONTEXT_SV,
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
-    CLOSING_CONTEXT_EN,
-    CLOSING_CONTEXT_FI,
-    CLOSING_CONTEXT_SV,
     RESERVATION_BASIC_INFO_CONTEXT_EN,
     RESERVATION_BASIC_INFO_CONTEXT_FI,
     RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -67,8 +61,6 @@ def test_get_context__reservation_rejected__en(email_reservation):
         "title": "Unfortunately your booking cannot be confirmed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **CLOSING_CONTEXT_EN,
-        **AUTOMATIC_REPLY_CONTEXT_EN,
     }
 
     with TranslationsFromPOFiles():
@@ -107,8 +99,6 @@ def test_get_context__reservation_rejected__fi():
         "title": "Valitettavasti varaustasi ei voida vahvistaa",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
-        **CLOSING_CONTEXT_FI,
-        **AUTOMATIC_REPLY_CONTEXT_FI,
     }
 
 
@@ -141,8 +131,6 @@ def test_get_context__reservation_rejected__sv():
         "title": "Tyvärr kan vi inte bekräfta din bokning",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
-        **CLOSING_CONTEXT_SV,
-        **AUTOMATIC_REPLY_CONTEXT_SV,
     }
 
 

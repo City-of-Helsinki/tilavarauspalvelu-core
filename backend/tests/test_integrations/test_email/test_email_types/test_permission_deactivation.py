@@ -19,15 +19,9 @@ from utils.date_utils import local_datetime
 from tests.factories import UnitFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles
 from tests.test_integrations.test_email.helpers import (
-    AUTOMATIC_REPLY_CONTEXT_EN,
-    AUTOMATIC_REPLY_CONTEXT_FI,
-    AUTOMATIC_REPLY_CONTEXT_SV,
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
-    CLOSING_CONTEXT_EN,
-    CLOSING_CONTEXT_FI,
-    CLOSING_CONTEXT_SV,
     html_email_to_text,
 )
 
@@ -49,8 +43,6 @@ def test_get_context__permission_deactivation__en():
         "login_url": "https://fake.varaamo.hel.fi/kasittely",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/kasittely">https://fake.varaamo.hel.fi/kasittely</a>',
         **BASE_TEMPLATE_CONTEXT_EN,
-        **CLOSING_CONTEXT_EN,
-        **AUTOMATIC_REPLY_CONTEXT_EN,
     }
 
 
@@ -69,8 +61,6 @@ def test_get_context__permission_deactivation__fi():
         "login_url": "https://fake.varaamo.hel.fi/kasittely",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/kasittely">https://fake.varaamo.hel.fi/kasittely</a>',
         **BASE_TEMPLATE_CONTEXT_FI,
-        **CLOSING_CONTEXT_FI,
-        **AUTOMATIC_REPLY_CONTEXT_FI,
     }
 
 
@@ -89,8 +79,6 @@ def test_get_context__permission_deactivation__sv():
         "login_url": "https://fake.varaamo.hel.fi/kasittely",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/kasittely">https://fake.varaamo.hel.fi/kasittely</a>',
         **BASE_TEMPLATE_CONTEXT_SV,
-        **CLOSING_CONTEXT_SV,
-        **AUTOMATIC_REPLY_CONTEXT_SV,
     }
 
 

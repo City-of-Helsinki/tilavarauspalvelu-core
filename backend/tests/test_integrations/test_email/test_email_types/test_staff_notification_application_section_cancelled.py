@@ -25,12 +25,6 @@ from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
-    CLOSING_CONTEXT_EN,
-    CLOSING_CONTEXT_FI,
-    CLOSING_CONTEXT_SV,
-    CLOSING_STAFF_CONTEXT_EN,
-    CLOSING_STAFF_CONTEXT_FI,
-    CLOSING_STAFF_CONTEXT_SV,
     html_email_to_text,
 )
 
@@ -88,8 +82,6 @@ def test_get_context_for_staff_notification_application_section_cancelled__en(em
             },
         ],
         **BASE_TEMPLATE_CONTEXT_EN,
-        **CLOSING_CONTEXT_EN,
-        **CLOSING_STAFF_CONTEXT_EN,
     }
 
     with TranslationsFromPOFiles():
@@ -144,8 +136,6 @@ def test_get_context_for_staff_notification_application_section_cancelled__fi():
             },
         ],
         **BASE_TEMPLATE_CONTEXT_FI,
-        **CLOSING_CONTEXT_FI,
-        **CLOSING_STAFF_CONTEXT_FI,
     }
 
 
@@ -194,8 +184,6 @@ def test_get_context_for_staff_notification_application_section_cancelled_sv():
             },
         ],
         **BASE_TEMPLATE_CONTEXT_SV,
-        **CLOSING_CONTEXT_SV,
-        **CLOSING_STAFF_CONTEXT_SV,
     }
 
 
