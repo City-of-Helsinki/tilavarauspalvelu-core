@@ -319,7 +319,10 @@ function TimeBlock({
   return (
     <>
       {reservation.recurringReservation?.pk && (
-        <Accordion heading={t("RequestedReservation.recurring")}>
+        <Accordion
+          id="reservation__recurring"
+          heading={t("RequestedReservation.recurring")}
+        >
           <RecurringReservationsView
             recurringPk={reservation.recurringReservation.pk}
             // TODO check how this works and fix types
@@ -334,7 +337,7 @@ function TimeBlock({
       <Accordion
         heading={t("RequestedReservation.calendar")}
         initiallyOpen={reservation.recurringReservation != null}
-        id="reservation-calendar"
+        id="reservation__calendar"
       >
         <Calendar
           reservation={reservation}
@@ -413,6 +416,7 @@ function RequestedReservation({
           reservation={reservation}
         >
           <Accordion
+            id="reservation__working-memo"
             heading={t("RequestedReservation.workingMemo")}
             initiallyOpen={
               reservation.workingMemo?.length != null &&
@@ -427,7 +431,10 @@ function RequestedReservation({
           </Accordion>
         </VisibleIfPermission>
         <TimeBlock reservation={reservation} onReservationUpdated={refetch} />
-        <Accordion heading={t("RequestedReservation.reservationDetails")}>
+        <Accordion
+          id="reservation__reservation-details"
+          heading={t("RequestedReservation.reservationDetails")}
+        >
           <ApplicationDatas>
             <DataWrapper label={t("RequestedReservation.id")}>
               {reservation.pk}
@@ -448,7 +455,10 @@ function RequestedReservation({
             </DataWrapper>
           </ApplicationDatas>
         </Accordion>
-        <Accordion heading={t("RequestedReservation.reservationUser")}>
+        <Accordion
+          id="reservation__reservation-user"
+          heading={t("RequestedReservation.reservationUser")}
+        >
           <ApplicationDatas>
             <DataWrapper label={t("RequestedReservation.reserveeType")}>
               {translateType(reservation, t)}
@@ -483,7 +493,10 @@ function RequestedReservation({
           </ApplicationDatas>
         </Accordion>
         {isNonFree && (
-          <Accordion heading={t("RequestedReservation.pricingDetails")}>
+          <Accordion
+            id="reservation__pricing-details"
+            heading={t("RequestedReservation.pricingDetails")}
+          >
             <ApplicationDatas>
               <DataWrapper label={t("RequestedReservation.price")}>
                 {reservation.price && reservationPrice(reservation, t)}
@@ -508,7 +521,10 @@ function RequestedReservation({
             </ApplicationDatas>
           </Accordion>
         )}
-        <Accordion heading={t("RequestedReservation.reserveeDetails")}>
+        <Accordion
+          id="reservation__reservee-details"
+          heading={t("RequestedReservation.reserveeDetails")}
+        >
           <ApplicationDatas>
             <DataWrapper label={t("RequestedReservation.user")}>
               {trim(
