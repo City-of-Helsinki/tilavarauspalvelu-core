@@ -1235,6 +1235,10 @@ msgid "Billing information"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Pindora information"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/admin.py
 msgid "None of the selected reservations can be denied."
 msgstr ""
 
@@ -1419,6 +1423,11 @@ msgid "Billing address zip code"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Pindora API response"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "User"
 msgstr ""
 
@@ -1562,6 +1571,11 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's zip code"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Response from Pindora API"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1895,10 +1909,6 @@ msgid "Access type end date"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Pindora API response"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment terms for the reservation unit."
 msgstr ""
 
@@ -2082,10 +2092,6 @@ msgstr ""
 msgid ""
 "If set, this is the date before which the access type is used. If current "
 "date is after this date, the access type is 'unrestricted'."
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Response from Pindora API"
 msgstr ""
 
 #: tilavarauspalvelu/admin/space/admin.py

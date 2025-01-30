@@ -1279,6 +1279,10 @@ msgid "Billing information"
 msgstr "Laskutustiedot"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Pindora information"
+msgstr "Pindora tiedot"
+
+#: tilavarauspalvelu/admin/reservation/admin.py
 msgid "None of the selected reservations can be denied."
 msgstr "Yhtään valittua varausta ei voida hylätä."
 
@@ -1463,6 +1467,11 @@ msgid "Billing address zip code"
 msgstr "Varauksen maksajan postinumero"
 
 #: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Pindora API response"
+msgstr "Pindora rajapinnan vastaus"
+
+#: tilavarauspalvelu/admin/reservation/form.py
 msgid "User"
 msgstr "Käyttäjä"
 
@@ -1607,6 +1616,11 @@ msgstr "Varaajan kaupunki"
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's zip code"
 msgstr "Varaajan postinumero"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Response from Pindora API"
+msgstr "Vastaus Pindora rajapinnasta"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "User who made the reservation"
@@ -1944,10 +1958,6 @@ msgid "Access type end date"
 msgstr "Kulkuoikeuden päättymispäivä"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Pindora API response"
-msgstr "Pindora rajapinnan vastaus"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment terms for the reservation unit."
 msgstr "Varausyksikön maksuehdot."
 
@@ -2150,10 +2160,6 @@ msgid ""
 msgstr ""
 "Jos asetettu, kulkuoikeutta käytetään tähän päivään asti. Jos nykyinen päivä "
 "on tämän päivän jälkeen, kulkuoikeus on 'rajoittamaton'."
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Response from Pindora API"
-msgstr "Vastaus Pindora rajapinnasta"
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
