@@ -71,19 +71,64 @@ AUTOMATIC_REPLY_CONTEXT_SV = {
 }
 
 RESERVATION_TRANSLATIONS_CONTEXT_EN = {
+    "booking_number_label": "Booking number",
+    "reservee_name_label": "Reservee name",
     "instructions_booking_label": "Additional information about your booking",
     "instructions_cancelled_label": "Additional information about cancellation",
     "instructions_rejected_label": "Additional information",
+    "weekday_label": "Day",
+    "time_label": "Time",
+    "text_view_booking_at": "You can view the booking at",
+    "text_view_and_handle_at": "You can view and handle the booking at",
+    "text_reservation_cancelled": "Your booking has been cancelled",
+    "text_seasonal_reservation_cancelled": "The space reservation included in your seasonal booking has been cancelled",
 }
 RESERVATION_TRANSLATIONS_CONTEXT_FI = {
+    "booking_number_label": "Varausnumero",
+    "reservee_name_label": "Varaajan nimi",
     "instructions_booking_label": "Lisätietoa varauksestasi",
     "instructions_cancelled_label": "Lisätietoa peruutuksesta",
     "instructions_rejected_label": "Lisätietoa",
+    "weekday_label": "Päivä",
+    "time_label": "Kellonaika",
+    "text_view_booking_at": "Voit tarkistaa varauksen tiedot osoitteessa",
+    "text_view_and_handle_at": "Voit tarkistaa ja käsitellä varauksen osoitteessa",
+    "text_reservation_cancelled": "Varauksesi on peruttu",
+    "text_seasonal_reservation_cancelled": "Kausivaraukseesi kuuluva tilavaraus on peruttu",
 }
 RESERVATION_TRANSLATIONS_CONTEXT_SV = {
+    "booking_number_label": "Bokningsnummer",
+    "reservee_name_label": "Bokare",
     "instructions_booking_label": "Mer information om din bokning",
     "instructions_cancelled_label": "Mer information om avbokning",
     "instructions_rejected_label": "Mer information",
+    "weekday_label": "Dag",
+    "time_label": "Tid",
+    "text_view_booking_at": "Du kan se bokningen på",
+    "text_view_and_handle_at": "Du kan se bokningen på",
+    "text_reservation_cancelled": "Din bokning har avbokats",
+    "text_seasonal_reservation_cancelled": "Lokalbokningen som ingår i din säsongsbokning har avbokats",
+}
+
+APPLICATION_TRANSLATIONS_CONTEXT_EN = {
+    "seasonal_booking_label": "Seasonal Booking",
+    "view_booking_at_label": "You can view the booking at",
+    "text_seasonal_cancelled_by_staff": "All space reservations included in your seasonal booking have been cancelled",
+    "text_seasonal_cancelled_by_customer": (
+        "The customer has canceled all space reservations included in the seasonal booking"
+    ),
+}
+APPLICATION_TRANSLATIONS_CONTEXT_FI = {
+    "seasonal_booking_label": "Kausivaraus",
+    "view_booking_at_label": "Voit tarkistaa varauksen tiedot osoitteessa",
+    "text_seasonal_cancelled_by_staff": "Kaikki kausivaraukseesi kuuluvat tilavaraukset on peruttu",
+    "text_seasonal_cancelled_by_customer": "Asiakas on perunut kaikki kausivaraukseen kuuluvat tilavaraukset",
+}
+APPLICATION_TRANSLATIONS_CONTEXT_SV = {
+    "seasonal_booking_label": "Säsongsbokning",
+    "view_booking_at_label": "Du kan se bokningen på",
+    "text_seasonal_cancelled_by_staff": "Alla lokalbokningar som ingår i din säsongsbokning har avbokats",
+    "text_seasonal_cancelled_by_customer": "Kunden har avbokat alla lokalbokningar som ingår i säsongsbokningen",
 }
 
 BASE_TEMPLATE_CONTEXT_EN = (
@@ -101,6 +146,7 @@ BASE_TEMPLATE_CONTEXT_EN = (
     }
     | AUTOMATIC_REPLY_CONTEXT_EN
     | RESERVATION_TRANSLATIONS_CONTEXT_EN
+    | APPLICATION_TRANSLATIONS_CONTEXT_EN
 )
 BASE_TEMPLATE_CONTEXT_FI = (
     {
@@ -117,6 +163,7 @@ BASE_TEMPLATE_CONTEXT_FI = (
     }
     | AUTOMATIC_REPLY_CONTEXT_FI
     | RESERVATION_TRANSLATIONS_CONTEXT_FI
+    | APPLICATION_TRANSLATIONS_CONTEXT_FI
 )
 BASE_TEMPLATE_CONTEXT_SV = (
     {
@@ -133,6 +180,7 @@ BASE_TEMPLATE_CONTEXT_SV = (
     }
     | AUTOMATIC_REPLY_CONTEXT_SV
     | RESERVATION_TRANSLATIONS_CONTEXT_SV
+    | APPLICATION_TRANSLATIONS_CONTEXT_SV
 )
 
 
@@ -173,35 +221,25 @@ RESERVATION_BASIC_INFO_CONTEXT_SV = {
     "o_clock_label": "kl.",
 }
 
-RESERVATION_PRICE_INFO_CONTEXT_EN = {
+
+_RESERVATION_PRICE_INFO_CONTEXT_COMMON = {
+    "price": Decimal("12.30"),
+    "subsidised_price": Decimal("12.30"),
+    "price_can_be_subsidised": False,
+    "tax_percentage": Decimal("25.5"),
+    "reservation_id": "12",
+}
+RESERVATION_PRICE_INFO_CONTEXT_EN = _RESERVATION_PRICE_INFO_CONTEXT_COMMON | {
     "price_label": "Price",
-    "price": Decimal("12.30"),
-    "subsidised_price": Decimal("12.30"),
-    "price_can_be_subsidised": False,
     "vat_included_label": "incl. VAT",
-    "tax_percentage": Decimal("25.5"),
-    "booking_number_label": "Booking number",
-    "reservation_id": "12",
 }
-RESERVATION_PRICE_INFO_CONTEXT_FI = {
+RESERVATION_PRICE_INFO_CONTEXT_FI = _RESERVATION_PRICE_INFO_CONTEXT_COMMON | {
     "price_label": "Hinta",
-    "price": Decimal("12.30"),
-    "subsidised_price": Decimal("12.30"),
-    "price_can_be_subsidised": False,
     "vat_included_label": "sis. alv",
-    "tax_percentage": Decimal("25.5"),
-    "booking_number_label": "Varausnumero",
-    "reservation_id": "12",
 }
-RESERVATION_PRICE_INFO_CONTEXT_SV = {
+RESERVATION_PRICE_INFO_CONTEXT_SV = _RESERVATION_PRICE_INFO_CONTEXT_COMMON | {
     "price_label": "Pris",
-    "price": Decimal("12.30"),
-    "subsidised_price": Decimal("12.30"),
-    "price_can_be_subsidised": False,
     "vat_included_label": "inkl. moms",
-    "tax_percentage": Decimal("25.5"),
-    "booking_number_label": "Bokningsnummer",
-    "reservation_id": "12",
 }
 
 

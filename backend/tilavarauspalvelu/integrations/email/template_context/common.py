@@ -36,6 +36,7 @@ def get_context_for_translations(*, language: Lang, email_recipient_name: str | 
         "reason_cancel_label": pgettext("Email", "Your reason for cancellation"),
         **get_contex_for_automatic_message(language=language),
         **get_context_for_reservation_translations(),
+        **get_context_for_application_translations(),
     }
 
 
@@ -64,9 +65,32 @@ def get_contex_for_automatic_message(*, language: Lang) -> EmailContext:
 
 def get_context_for_reservation_translations() -> EmailContext:
     return {
+        "booking_number_label": pgettext("Email", "Booking number"),
+        "reservee_name_label": pgettext("Email", "Reservee name"),
         "instructions_booking_label": pgettext("Email", "Additional information about your booking"),
         "instructions_cancelled_label": pgettext("Email", "Additional information about cancellation"),
         "instructions_rejected_label": pgettext("Email", "Additional information"),
+        "weekday_label": pgettext("Email", "Day"),
+        "time_label": pgettext("Email", "Time"),
+        "text_view_booking_at": pgettext("Email", "You can view the booking at"),
+        "text_view_and_handle_at": pgettext("Email", "You can view and handle the booking at"),
+        "text_reservation_cancelled": pgettext("Email", "Your booking has been cancelled"),
+        "text_seasonal_reservation_cancelled": pgettext(
+            "Email", "The space reservation included in your seasonal booking has been cancelled"
+        ),
+    }
+
+
+def get_context_for_application_translations() -> EmailContext:
+    return {
+        "seasonal_booking_label": pgettext("Email", "Seasonal Booking"),
+        "view_booking_at_label": pgettext("Email", "You can view the booking at"),
+        "text_seasonal_cancelled_by_staff": pgettext(
+            "Email", "All space reservations included in your seasonal booking have been cancelled"
+        ),
+        "text_seasonal_cancelled_by_customer": pgettext(
+            "Email", "The customer has canceled all space reservations included in the seasonal booking"
+        ),
     }
 
 
@@ -127,7 +151,6 @@ def get_contex_for_reservation_price(
         "price_can_be_subsidised": applying_for_free_of_charge and subsidised_price < price,
         "vat_included_label": pgettext("Email", "incl. VAT"),
         "tax_percentage": tax_percentage,
-        "booking_number_label": pgettext("Email", "Booking number"),
         "reservation_id": str(reservation_id),
     }
 

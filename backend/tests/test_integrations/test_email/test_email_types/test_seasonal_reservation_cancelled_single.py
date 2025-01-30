@@ -25,6 +25,8 @@ from tests.test_integrations.test_email.helpers import (
     RESERVATION_BASIC_INFO_CONTEXT_FI,
     RESERVATION_BASIC_INFO_CONTEXT_SV,
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
+    SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
+    SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
     html_email_to_text,
 )
 
@@ -54,7 +56,6 @@ def test_get_context_for_seasonal_reservation_cancelled_single__en(email_reserva
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "The space reservation included in your seasonal booking has been cancelled",
-        "text_reservation_cancelled": "The space reservation included in your seasonal booking has been cancelled",
         "cancel_reason": "[PERUUTUKSEN SYY]",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -89,13 +90,10 @@ def test_get_context_for_seasonal_reservation_cancelled_single__fi():
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Kausivaraukseesi kuuluva tilavaraus on peruttu",
-        "text_reservation_cancelled": "Kausivaraukseesi kuuluva tilavaraus on peruttu",
         "cancel_reason": "[PERUUTUKSEN SYY]",
-        "check_booking_details_text": "Voit käydä tarkistamassa varauksesi tiedot osoitteessa",
-        "check_booking_details_url": "https://fake.varaamo.hel.fi/applications",
-        "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/applications">varaamo.hel.fi</a>',
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
     }
 
 
@@ -118,13 +116,10 @@ def test_get_context_for_seasonal_reservation_cancelled_single__sv():
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Lokalbokningen som ingår i din säsongsbokning har avbokats",
-        "text_reservation_cancelled": "Lokalbokningen som ingår i din säsongsbokning har avbokats",
         "cancel_reason": "[PERUUTUKSEN SYY]",
-        "check_booking_details_text": "Du kan kontrollera dina bokningsuppgifter på",
-        "check_booking_details_url": "https://fake.varaamo.hel.fi/sv/applications",
-        "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/sv/applications">varaamo.hel.fi</a>',
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
     }
 
 

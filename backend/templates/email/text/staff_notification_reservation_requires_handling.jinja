@@ -7,7 +7,7 @@
 
 {% include "email/text/partials/reservation_basic_info.jinja" %}
 
-{{ text_check_details | safe }}:
+{{ text_view_and_handle_at | safe }}:
 {{ staff_reservations_ext_link }}
 
 {% include "email/text/partials/closing_staff.jinja" %}

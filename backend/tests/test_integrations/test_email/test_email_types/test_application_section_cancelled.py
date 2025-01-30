@@ -52,7 +52,6 @@ def test_get_context_for_application_section_cancelled__en(email_reservation):
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Your seasonal booking has been cancelled",
-        "text_reservation_cancelled": "All space reservations included in your seasonal booking have been cancelled",
         "seasonal_booking_label": "Seasonal Booking",
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
@@ -88,7 +87,6 @@ def test_get_context_for_application_section_cancelled__fi():
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Kausivarauksesi on peruttu",
-        "text_reservation_cancelled": "Kaikki kausivaraukseesi kuuluvat tilavaraukset on peruttu",
         "seasonal_booking_label": "Kausivaraus",
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
@@ -116,7 +114,6 @@ def test_get_context_for_application_section_cancelled_sv():
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Din säsongsbokning har avbokats",
-        "text_reservation_cancelled": "Alla lokalbokningar som ingår i din säsongsbokning har avbokats",
         "seasonal_booking_label": "Säsongsbokning",
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
