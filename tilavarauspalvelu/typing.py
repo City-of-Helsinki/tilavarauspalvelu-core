@@ -234,6 +234,8 @@ class ReservationApproveData(TypedDict):
 
     state: NotRequired[ReservationStateChoice]
     handled_at: NotRequired[datetime.datetime]
+    access_code_generated_at: NotRequired[datetime.datetime | None]
+    access_code_is_active: NotRequired[bool]
 
 
 class ReservationCancellationData(TypedDict):

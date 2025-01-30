@@ -6,6 +6,7 @@ from django.test import override_settings
 from tilavarauspalvelu.enums import AccessType, ReservationNotification, ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
+from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory, UserFactory
 from tests.helpers import patch_method
@@ -85,6 +86,7 @@ def test_reservation__requires_handling__pindora_api__call_succeeds(graphql):
         state=ReservationStateChoice.CONFIRMED,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     graphql.login_with_superuser()
@@ -106,6 +108,7 @@ def test_reservation__requires_handling__pindora_api__call_fails(graphql):
         state=ReservationStateChoice.CONFIRMED,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     graphql.login_with_superuser()
@@ -123,6 +126,7 @@ def test_reservation__requires_handling__pindora_api__call_fails__404(graphql):
         state=ReservationStateChoice.CONFIRMED,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     graphql.login_with_superuser()
@@ -137,3 +141,25 @@ def test_reservation__requires_handling__pindora_api__call_fails__404(graphql):
     assert reservation.access_code_is_active is True
 
     assert PindoraClient.deactivate_reservation_access_code.call_count == 1
+
+
+@patch_method(PindoraClient.deactivate_reservation_access_code)
+def test_reservation__requires_handling__pindora_api__not_called_if_not_generated(graphql):
+    reservation = ReservationFactory.create_for_requires_handling(
+        state=ReservationStateChoice.DENIED,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=False,
+        access_code_generated_at=None,
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_require_handling_data(reservation)
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.REQUIRES_HANDLING
+    assert reservation.access_code_is_active is False
+
+    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
