@@ -9,7 +9,8 @@
 {% endblock %}
 
 {% block content_secondary %}
-    {% include "email/html/partials/instructions.jinja" %}
+    <mj-text><h2>{{ instructions_rejected_label | safe }}</h2></mj-text>
+    <mj-text font-size="16px">{{ instructions_html | safe }}</mj-text>
 {% endblock %}
 
 {% block content_closing %}
