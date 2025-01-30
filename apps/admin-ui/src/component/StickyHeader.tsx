@@ -18,16 +18,15 @@ const StickyContent = styled.div`
   padding: var(--spacing-s);
   && button,
   && a {
+    --background-color: transparent;
+    --color: var(--color-white);
     border-color: var(--color-white);
-    color: var(--color-white);
+    cursor: pointer;
+
     &:hover,
     &:focus-within {
-      background-color: unset;
-      color: var(--color-black-10);
+      --color: var(--color-black-10);
       border-color: var(--color-black-10);
-    }
-    &:hover {
-      filter: brightness(0.8);
     }
   }
 

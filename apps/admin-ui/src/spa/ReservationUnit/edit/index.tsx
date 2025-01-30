@@ -204,7 +204,9 @@ const WhiteButton = styled(Button)<{
   --fg: var(--color-black);
   --hbg: var(--fg);
   --hfg: var(--bg);
-  --border-color: var(--color-white);
+  && {
+    --border-color: var(--color-white);
+  }
 
   ${({ variant }) => {
     switch (variant) {
@@ -1925,6 +1927,7 @@ function ReservationUnitEditor({
         </WhiteButton>
         <WhiteButton
           variant={isSaving ? ButtonVariant.Clear : ButtonVariant.Primary}
+          size={ButtonSize.Small}
           iconStart={isSaving ? <LoadingSpinner small /> : undefined}
           disabled={isSaving || !publishEnabled}
           type="button"
