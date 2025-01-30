@@ -22,9 +22,6 @@ from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
-    CLOSING_STAFF_CONTEXT_EN,
-    CLOSING_STAFF_CONTEXT_FI,
-    CLOSING_STAFF_CONTEXT_SV,
     RESERVATION_BASIC_INFO_CONTEXT_EN,
     RESERVATION_BASIC_INFO_CONTEXT_FI,
     RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -66,7 +63,6 @@ def test_get_context__staff_notification_reservation_made__en(email_reservation)
         "title": f"New booking {email_reservation.id} has been made for Test unit",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **CLOSING_STAFF_CONTEXT_EN,
     }
 
     with TranslationsFromPOFiles():
@@ -108,7 +104,6 @@ def test_get_context__staff_notification_reservation_made__fi():
         "title": "Toimipisteeseen Test unit on tehty uusi tilavaraus 12",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
-        **CLOSING_STAFF_CONTEXT_FI,
     }
 
 
@@ -144,7 +139,6 @@ def test_get_context__staff_notification_reservation_made__sv():
         "title": "Ny bokning 12 har gjorts för Test unit",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
-        **CLOSING_STAFF_CONTEXT_SV,
     }
 
 

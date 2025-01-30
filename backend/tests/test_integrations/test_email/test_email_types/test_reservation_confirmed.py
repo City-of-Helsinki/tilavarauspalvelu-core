@@ -20,15 +20,9 @@ from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tests.factories import ReservationFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_integrations.test_email.helpers import (
-    AUTOMATIC_REPLY_CONTEXT_EN,
-    AUTOMATIC_REPLY_CONTEXT_FI,
-    AUTOMATIC_REPLY_CONTEXT_SV,
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
-    CLOSING_POLITE_CONTEXT_EN,
-    CLOSING_POLITE_CONTEXT_FI,
-    CLOSING_POLITE_CONTEXT_SV,
     RESERVATION_BASIC_INFO_CONTEXT_EN,
     RESERVATION_BASIC_INFO_CONTEXT_FI,
     RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -73,8 +67,6 @@ def test_get_context__reservation_confirmed__en(email_reservation):
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
-        **CLOSING_POLITE_CONTEXT_EN,
-        **AUTOMATIC_REPLY_CONTEXT_EN,
         "reservation_id": f"{email_reservation.id}",
         "price": Decimal(0),
         "tax_percentage": Decimal(0),
@@ -115,8 +107,6 @@ def test_get_context__reservation_confirmed__fi():
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
         **RESERVATION_MANAGE_LINK_CONTEXT_FI,
-        **CLOSING_POLITE_CONTEXT_FI,
-        **AUTOMATIC_REPLY_CONTEXT_FI,
     }
 
 
@@ -148,8 +138,6 @@ def test_get_context__reservation_confirmed__sv():
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
         **RESERVATION_MANAGE_LINK_CONTEXT_SV,
-        **CLOSING_POLITE_CONTEXT_SV,
-        **AUTOMATIC_REPLY_CONTEXT_SV,
     }
 
 

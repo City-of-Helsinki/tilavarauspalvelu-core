@@ -17,15 +17,9 @@ from tilavarauspalvelu.integrations.email.template_context import get_context_fo
 from tests.helpers import TranslationsFromPOFiles
 from tests.test_graphql_api.test_recurring_reservation.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
-    AUTOMATIC_REPLY_CONTEXT_EN,
-    AUTOMATIC_REPLY_CONTEXT_FI,
-    AUTOMATIC_REPLY_CONTEXT_SV,
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
-    CLOSING_CONTEXT_EN,
-    CLOSING_CONTEXT_FI,
-    CLOSING_CONTEXT_SV,
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
@@ -69,8 +63,6 @@ def test_get_context_for_seasonal_reservation_rejected_series__en(email_reservat
         "rejection_reason": "[HYLKÄYKSEN SYY]",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
         **BASE_TEMPLATE_CONTEXT_EN,
-        **CLOSING_CONTEXT_EN,
-        **AUTOMATIC_REPLY_CONTEXT_EN,
         "check_booking_details_url": f"{details_url}",
         "check_booking_details_url_html": f'<a href="{details_url}">varaamo.hel.fi</a>',
     }
@@ -114,8 +106,6 @@ def test_get_context_for_seasonal_reservation_rejected_series__fi():
         "rejection_reason": "[HYLKÄYKSEN SYY]",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
         **BASE_TEMPLATE_CONTEXT_FI,
-        **CLOSING_CONTEXT_FI,
-        **AUTOMATIC_REPLY_CONTEXT_FI,
     }
 
 
@@ -149,8 +139,6 @@ def test_get_context_for__seasonal_reservation_rejected_series_sv():
         "rejection_reason": "[HYLKÄYKSEN SYY]",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
         **BASE_TEMPLATE_CONTEXT_SV,
-        **CLOSING_CONTEXT_SV,
-        **AUTOMATIC_REPLY_CONTEXT_SV,
     }
 
 
