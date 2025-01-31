@@ -17,6 +17,7 @@ from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import Reservation, ReservationUnit, User
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.db import SubqueryArray
 from utils.utils import ical_hmac_signature
 
@@ -294,6 +295,12 @@ class ReservationNode(DjangoNode):
     def resolve_pindora_info(root: Reservation, info: GQLInfo) -> PindoraInfoData | None:
         # No Pindora info if access type is not 'ACCESS_CODE'
         if root.access_type != AccessType.ACCESS_CODE:
+            return None
+
+        # No need to show Pindora info after 24 hours have passed since it ended
+        now = local_datetime()
+        cutoff = root.end.astimezone(DEFAULT_TIMEZONE) + datetime.timedelta(hours=24)
+        if now > cutoff:
             return None
 
         has_view_permissions = info.context.user.permissions.can_view_reservation(root, reserver_needs_role=True)
