@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django import forms
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from subforms.fields import DynamicArrayField
 from tinymce.widgets import TinyMCE
@@ -12,6 +13,9 @@ from tilavarauspalvelu.enums import AccessType, TermsOfUseTypeChoices
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationUnit, TermsOfUse
 from utils.external_service.errors import ExternalServiceError
+
+if TYPE_CHECKING:
+    import datetime
 
 
 class ReservationUnitAdminForm(forms.ModelForm):
@@ -256,10 +260,27 @@ class ReservationUnitAdminForm(forms.ModelForm):
         if not cleaned_data:
             return
 
-        # Check if reservation unit has been configured in Pindora.
         access_type: str | None = cleaned_data.get("access_type")
-        if access_type == AccessType.ACCESS_CODE:
+
+        # Check if reservation unit has been configured in Pindora.
+        # No need to check if access type is already 'ACCESS_CODE'.
+        if access_type == AccessType.ACCESS_CODE and self.instance.access_type != AccessType.ACCESS_CODE:
             try:
                 PindoraClient.get_reservation_unit(self.instance)
             except ExternalServiceError as error:
                 self.add_error("access_type", str(error))
+                return
+
+    @transaction.atomic
+    def save(self, commit: bool = True) -> ReservationUnit:  # noqa: FBT001, FBT002
+        access_type: str = self.cleaned_data.get("access_type")
+        access_type_start_date: datetime.date | None = self.cleaned_data.get("access_type_start_date")
+        access_type_end_date: datetime.date | None = self.cleaned_data.get("access_type_end_date")
+
+        reservation_unit: ReservationUnit = super().save(commit=commit)
+        reservation_unit.actions.update_access_type_for_reservations(
+            access_type=AccessType(access_type),
+            access_type_start_date=access_type_start_date,
+            access_type_end_date=access_type_end_date,
+        )
+        return reservation_unit

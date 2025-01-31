@@ -3,16 +3,18 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING, Any
 
+from django.db import models
 from lookup_property import L
 
 from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice, PaymentType, ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
-from tilavarauspalvelu.models import OriginHaukiResource
+from tilavarauspalvelu.models import OriginHaukiResource, Reservation
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
     local_date,
+    local_datetime,
     local_datetime_max,
     local_datetime_min,
     local_end_of_day,
@@ -24,14 +26,11 @@ from utils.external_service.errors import ExternalServiceError
 if TYPE_CHECKING:
     from collections.abc import Collection
 
-    from django.db import models
-
     from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource
     from tilavarauspalvelu.models import (
         Location,
         PaymentAccounting,
         PaymentMerchant,
-        Reservation,
         ReservationUnit,
         ReservationUnitPricing,
     )
@@ -462,3 +461,42 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             return reservation_begins <= moment < reservation_ends
 
         return moment < reservation_ends or reservation_begins <= moment
+
+    def update_access_type_for_reservations(
+        self,
+        access_type: AccessType,
+        access_type_start_date: datetime.date | None,
+        access_type_end_date: datetime.date | None,
+    ) -> None:
+        """
+        Update access type for reservations in the reservation unit based on
+        how the given values differ from the reservation unit's current values.
+
+        In case access type changes to or from 'ACCESS_CODE', background tasks
+        will take care of removing or adding access codes to Pindora.
+        """
+        # No changes
+        if (
+            access_type == self.reservation_unit.access_type
+            and access_type_start_date == self.reservation_unit.access_type_start_date
+            and access_type_end_date == self.reservation_unit.access_type_end_date
+        ):
+            return
+
+        now = local_datetime()
+        begin_date = access_type_start_date or datetime.date.min
+        end_date = access_type_end_date or datetime.date.max
+
+        # Update all future or ongoing reservations in the reservation unit
+        Reservation.objects.filter(reservation_units=self.reservation_unit, end__gt=now).update(
+            access_type=models.Case(
+                # All reservations that begin during the period should belong to the access type
+                models.When(
+                    models.Q(begin__date__gte=begin_date, begin__date__lte=end_date),
+                    then=models.Value(access_type),
+                ),
+                # Others should have UNRESTRICTED access type by default
+                default=models.Value(AccessType.UNRESTRICTED),
+                output_field=models.CharField(),
+            )
+        )

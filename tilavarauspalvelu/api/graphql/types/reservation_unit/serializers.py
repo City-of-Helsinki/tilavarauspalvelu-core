@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+import datetime
+from typing import Any
 
 from auditlog.models import LogEntry
 from django.conf import settings
+from django.db import transaction
 from django.db.transaction import atomic
 from graphene.utils.str_converters import to_camel_case
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.errors import GQLCodeError
+from graphene_django_extensions.serializers import NotProvided
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
@@ -16,14 +19,11 @@ from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers
 )
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from tilavarauspalvelu.enums import ReservationStartInterval, ReservationUnitPublishingState, WeekdayChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationUnitPublishingState, WeekdayChoice
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
-
-if TYPE_CHECKING:
-    import datetime
 
 __all__ = [
     "ReservationUnitSerializer",
@@ -71,6 +71,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "max_reservation_duration",
             "buffer_time_before",
             "buffer_time_after",
+            "access_type_start_date",
+            "access_type_end_date",
             #
             # Booleans
             "is_draft",
@@ -85,6 +87,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "authentication",
             "reservation_start_interval",
             "reservation_kind",
+            "access_type",
             "publishing_state",
             #
             # List fields
@@ -119,6 +122,8 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
         self._validate_reservation_duration_fields(data)
         self._validate_pricings(data)
+
+        self._validate_access_type(data)
 
         if not is_draft:
             self._validate_for_publish(data)
@@ -245,6 +250,14 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 msg = "Highest price cannot be less than lowest price."
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES)
 
+    def _validate_access_type(self, data: dict[str, Any]) -> None:
+        access_type_start_date = self.get_or_default("access_type_start_date", data) or datetime.date.min
+        access_type_end_date = self.get_or_default("access_type_end_date", data) or datetime.date.max
+
+        if access_type_end_date < access_type_start_date:
+            msg = "Access type start date must be before access type end date."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_ACCESS_TYPE_START_DATE_INVALID)
+
     @staticmethod
     def validate_application_round_time_slots(timeslots: list[dict[str, Any]]) -> list[dict[str, Any]]:
         errors: list[str] = []
@@ -328,6 +341,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 else:  # Create new pricings
                     ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
+    @transaction.atomic
     def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
         # The ReservationUnit can't be archived if it has active reservations in the future
         if instance.publishing_state != ReservationUnitPublishingState.ARCHIVED and validated_data.get("is_archived"):
@@ -335,6 +349,22 @@ class ReservationUnitSerializer(NestingModelSerializer):
             if future_reservations.exists():
                 msg = "Reservation unit can't be archived if it has any reservations in the future"
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)
+
+        access_type = validated_data.get("access_type", NotProvided)
+        access_type_start_date = validated_data.get("access_type_start_date", NotProvided)
+        access_type_end_date = validated_data.get("access_type_end_date", NotProvided)
+
+        # If at least one value was provided, we might need to update access type for reservations
+        if {access_type, access_type_start_date, access_type_end_date} != {NotProvided}:
+            access_type = AccessType(validated_data.get("access_type", self.instance.access_type))
+            access_type_start_date = validated_data.get("access_type_start_date", self.instance.access_type_start_date)
+            access_type_end_date = validated_data.get("access_type_end_date", self.instance.access_type_end_date)
+
+            self.instance.actions.update_access_type_for_reservations(
+                access_type=access_type,
+                access_type_start_date=access_type_start_date,
+                access_type_end_date=access_type_end_date,
+            )
 
         pricings = validated_data.pop("pricings", [])
         reservation_unit = super().update(instance, validated_data)
