@@ -5370,6 +5370,7 @@ export type ApplicationSectionUiFragment = {
 };
 
 export type ApplicantFragment = {
+  pk?: number | null;
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
   contactPerson?: {
@@ -5682,6 +5683,7 @@ export const ApplicationSectionUiFragmentDoc = gql`
 `;
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {
+    pk
     applicantType
     contactPerson {
       id

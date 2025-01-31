@@ -5,7 +5,11 @@ import styled from "styled-components";
 import { H1 } from "common";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import type { GetServerSidePropsContext } from "next";
-import { applicationsPath, applicationsPrefix } from "@/modules/urls";
+import {
+  applicationsPath,
+  applicationsPrefix,
+  getApplicationPath,
+} from "@/modules/urls";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
@@ -15,13 +19,17 @@ const Paragraph = styled.p`
   max-width: var(--prose-width);
 `;
 
-function Sent(): JSX.Element {
+function Sent({ pk }: PropsNarrowed): JSX.Element {
   const { t } = useTranslation();
 
   const routes = [
     {
       slug: applicationsPrefix,
       title: t("breadcrumb:applications"),
+    },
+    {
+      slug: getApplicationPath(pk, "view"),
+      title: t("breadcrumb:application"),
     },
     {
       title: t("application:sent.heading"),
@@ -46,6 +54,9 @@ function Sent(): JSX.Element {
   );
 }
 
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
+
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
   const { id } = query;
@@ -55,6 +66,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     notFound: pk == null,
     props: {
+      pk,
       ...getCommonServerSideProps(),
       ...(await serverSideTranslations(locale ?? "fi")),
     },

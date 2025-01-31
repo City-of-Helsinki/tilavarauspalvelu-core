@@ -1,5 +1,4 @@
 import React from "react";
-import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import {
   type ApplicationCommonFragment,
@@ -70,19 +69,11 @@ export function ViewApplication({
           <TermsBox
             id="preview.acceptServiceSpecificTerms"
             body={<Sanitize html={getTranslationSafe(tos2, "text", lang)} />}
-            /* TODO TermsBox has accepted and checkbox we could use but for now leaving the single
-             * page specific checkbox to accept all terms */
+            acceptLabel={t("application:preview.userAcceptsTerms")}
+            accepted={acceptTermsOfUse}
+            setAccepted={setAcceptTermsOfUse}
           />
         </Accordion>
-      )}
-      {acceptTermsOfUse != null && setAcceptTermsOfUse != null && (
-        <Checkbox
-          id="preview.acceptTermsOfUse"
-          checked={acceptTermsOfUse}
-          onChange={(e) => setAcceptTermsOfUse(e.target.checked)}
-          label={t("application:preview.userAcceptsTerms")}
-          // NOTE I'm assuming we can just hide the whole checkbox in View
-        />
       )}
       {shouldShowNotification && (
         <div>

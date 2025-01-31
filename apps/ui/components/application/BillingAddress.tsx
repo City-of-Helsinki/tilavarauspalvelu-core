@@ -2,11 +2,10 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { TextInput } from "hds-react";
 import { useFormContext } from "react-hook-form";
-import { applicationErrorText } from "@/modules/util";
 import { FormSubHeading } from "./styled";
-import type { ApplicationFormPage3Values } from "./Form";
+import type { ApplicationFormPage3Values } from "./form";
 
-export const BillingAddress = () => {
+export function BillingAddress() {
   const { t } = useTranslation();
 
   const {
@@ -14,53 +13,40 @@ export const BillingAddress = () => {
     formState: { errors },
   } = useFormContext<ApplicationFormPage3Values>();
 
+  const translateError = (errorMsg?: string) =>
+    errorMsg ? t(`application:validation.${errorMsg}`) : "";
+
   return (
     <>
       <FormSubHeading as="h2">
         {t("application:Page3.subHeading.billingAddress")}
       </FormSubHeading>
       <TextInput
-        {...register("billingAddress.streetAddress", {
-          required: true,
-          maxLength: 80,
-        })}
+        {...register("billingAddress.streetAddress")}
         label={t("application:Page3.billingAddress.streetAddress")}
         id="billingAddress.streetAddress"
         required
-        invalid={!!errors.billingAddress?.streetAddress?.type}
-        errorText={applicationErrorText(
-          t,
-          errors.billingAddress?.streetAddress?.type,
-          {
-            count: 80,
-          }
+        invalid={!!errors.billingAddress?.streetAddress?.message}
+        errorText={translateError(
+          errors.billingAddress?.streetAddress?.message
         )}
       />
       <TextInput
-        {...register("billingAddress.postCode", {
-          required: true,
-          maxLength: 32,
-        })}
+        {...register("billingAddress.postCode")}
         label={t("application:Page3.billingAddress.postCode")}
         id="billingAddress.postCode"
         required
-        invalid={!!errors.billingAddress?.postCode?.type}
-        errorText={applicationErrorText(
-          t,
-          errors.billingAddress?.postCode?.type,
-          { count: 32 }
-        )}
+        invalid={!!errors.billingAddress?.postCode?.message}
+        errorText={translateError(errors.billingAddress?.postCode?.message)}
       />
       <TextInput
-        {...register("billingAddress.city", { required: true, maxLength: 80 })}
+        {...register("billingAddress.city")}
         label={t("application:Page3.billingAddress.city")}
         id="billingAddress.city"
         required
-        invalid={!!errors.billingAddress?.city?.type}
-        errorText={applicationErrorText(t, errors.billingAddress?.city?.type, {
-          count: 80,
-        })}
+        invalid={!!errors.billingAddress?.city?.message}
+        errorText={translateError(errors.billingAddress?.city?.message)}
       />
     </>
   );
-};
+}

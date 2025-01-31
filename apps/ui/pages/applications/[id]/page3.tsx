@@ -1,31 +1,22 @@
 import React, { useEffect } from "react";
-import {
-  ApplicantTypeChoice,
-  type ApplicationQuery,
-  useApplicationQuery,
-  type ApplicationUpdateMutationInput,
-} from "@gql/gql-types";
+import { ApplicantTypeChoice, useApplicationQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
-import { Maybe } from "graphql/jsutils/Maybe";
-import Error from "next/error";
+import NextError from "next/error";
 import { CompanyForm } from "@/components/application/CompanyForm";
 import { IndividualForm } from "@/components/application/IndividualForm";
 import { OrganisationForm } from "@/components/application/OrganisationForm";
 import { ApplicantTypeSelector } from "@/components/application/ApplicantTypeSelector";
 import { useOptions } from "@/hooks/useOptions";
 import {
-  convertAddress,
-  convertOrganisation,
-  convertPerson,
   type ApplicationFormPage3Values,
-  type PersonFormValues,
-  type AddressFormValues,
-  type OrganisationFormValues,
-} from "@/components/application/Form";
+  ApplicationFormPage3Schema,
+  convertApplicationPage3,
+  transformPage3Application,
+} from "@/components/application/form";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { CenterSpinner } from "@/components/common/common";
@@ -39,138 +30,17 @@ import {
   IconArrowLeft,
   IconArrowRight,
 } from "hds-react";
-import { ButtonContainer } from "common/styles/util";
+import { AutoGrid, ButtonContainer } from "common/styles/util";
 import styled from "styled-components";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { EmailInput } from "@/components/application/EmailInput";
+import { FormSubHeading } from "@/components/application/styled";
 
-function Buttons({
-  applicationPk,
-  submitDisabled,
-}: {
-  applicationPk: number;
-  submitDisabled?: boolean;
-}): JSX.Element {
-  const { t } = useTranslation();
-  const router = useRouter();
-
-  const onPrev = () => router.push(getApplicationPath(applicationPk, "page2"));
-
-  return (
-    <ButtonContainer>
-      <Button
-        iconStart={<IconArrowLeft aria-hidden="true" />}
-        variant={ButtonVariant.Secondary}
-        onClick={onPrev}
-      >
-        {t("common:prev")}
-      </Button>
-      <Button
-        id="button__application--next"
-        iconEnd={<IconArrowRight aria-hidden="true" />}
-        type="submit"
-        disabled={submitDisabled}
-      >
-        {t("common:next")}
-      </Button>
-    </ButtonContainer>
-  );
-}
-
-// Filter out any empty strings from the object (otherwise the mutation fails)
-function transformPerson(person?: PersonFormValues) {
-  return {
-    firstName: person?.firstName || undefined,
-    lastName: person?.lastName || undefined,
-    email: person?.email || undefined,
-    phoneNumber: person?.phoneNumber || undefined,
-  };
-}
-
-type Node = NonNullable<ApplicationQuery["application"]>;
-function isAddressValid(address?: AddressFormValues) {
-  const { streetAddress, postCode, city } = address || {};
-  return (
-    streetAddress != null &&
-    streetAddress !== "" &&
-    postCode != null &&
-    postCode !== "" &&
-    city != null &&
-    city !== ""
-  );
-}
-
-function transformAddress(address?: AddressFormValues) {
-  return {
-    pk: address?.pk || undefined,
-    streetAddress: address?.streetAddress || undefined,
-    postCode: address?.postCode || undefined,
-    city: address?.city || undefined,
-  };
-}
-
-// Filter out any empty strings from the object (otherwise the mutation fails)
-// remove the identifier if it's empty (otherwise the mutation fails)
-function transformOrganisation(org: OrganisationFormValues) {
-  return {
-    name: org?.name || undefined,
-    identifier: org?.identifier || undefined,
-    address: isAddressValid(org?.address)
-      ? transformAddress(org?.address)
-      : undefined,
-    coreBusiness: org?.coreBusiness || undefined,
-  };
-}
-
-function convertApplicationToForm(
-  app?: Maybe<Node>
-): ApplicationFormPage3Values {
-  return {
-    pk: app?.pk ?? 0,
-    applicantType: app?.applicantType ?? undefined,
-    organisation: convertOrganisation(app?.organisation),
-    contactPerson: convertPerson(app?.contactPerson),
-    billingAddress: convertAddress(app?.billingAddress),
-    hasBillingAddress:
-      app?.applicantType !== ApplicantTypeChoice.Individual &&
-      app?.billingAddress?.streetAddressFi != null,
-    additionalInformation: app?.additionalInformation ?? "",
-    homeCity: app?.homeCity?.pk ?? undefined,
-  };
-}
-
-function transformApplication(
-  values: ApplicationFormPage3Values
-): ApplicationUpdateMutationInput {
-  const shouldSaveBillingAddress =
-    values.applicantType === ApplicantTypeChoice.Individual ||
-    values.hasBillingAddress;
-  return {
-    pk: values.pk,
-    applicantType: values.applicantType,
-    ...(values.billingAddress != null && shouldSaveBillingAddress
-      ? { billingAddress: transformAddress(values.billingAddress) }
-      : {}),
-    ...(values.contactPerson != null
-      ? { contactPerson: transformPerson(values.contactPerson) }
-      : {}),
-    ...(values.organisation != null &&
-    values.applicantType !== ApplicantTypeChoice.Individual
-      ? { organisation: transformOrganisation(values.organisation) }
-      : {}),
-    ...(values.additionalInformation != null
-      ? { additionalInformation: values.additionalInformation }
-      : {}),
-    ...(values.homeCity != null && values.homeCity !== 0
-      ? { homeCity: values.homeCity }
-      : {}),
-  };
-}
-
-function Page3(): JSX.Element | null {
+function Page3Form(): JSX.Element | null {
   const { options } = useOptions();
   const { cityOptions } = options;
 
   const { watch } = useFormContext<ApplicationFormPage3Values>();
-
   const type = watch("applicantType");
 
   switch (type) {
@@ -182,6 +52,7 @@ function Page3(): JSX.Element | null {
     case ApplicantTypeChoice.Company:
       return <CompanyForm />;
     default:
+      // TODO should we return disabled form here?
       return null;
   }
 }
@@ -209,10 +80,9 @@ function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
 
   const form = useForm<ApplicationFormPage3Values>({
     mode: "onChange",
-    defaultValues: convertApplicationToForm(application),
-    // No resolver because different types require different mandatory values.
-    // Would need to write more complex validation logic that branches based on the type.
-    // resolver: zodResolver(ApplicationFormPage3Schema),
+    defaultValues: convertApplicationPage3(application),
+    resolver: zodResolver(ApplicationFormPage3Schema),
+    reValidateMode: "onChange",
   });
 
   const {
@@ -224,7 +94,7 @@ function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
 
   useEffect(() => {
     if (application != null) {
-      reset(convertApplicationToForm(application));
+      reset(convertApplicationPage3(application));
     }
   }, [application, reset]);
 
@@ -236,33 +106,22 @@ function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
     // but because of loading we might not have it when the page is rendered
     // TODO: refactor so we don't need to check it like this
     if (values.pk === 0) {
-      // eslint-disable-next-line no-console
-      console.error("application pk is 0");
-      return 0;
+      throw new Error("Invalid application");
     }
-    return update(transformApplication(values));
+    return update(transformPage3Application(values));
   };
 
   const onSubmit = async (values: ApplicationFormPage3Values) => {
     try {
       const pk = await handleSave(values);
-      if (pk === 0) {
-        return;
-      }
       router.push(getApplicationPath(pk, "preview"));
     } catch (e) {
       errorToast({ text: t("common:error.dataError") });
     }
   };
 
-  if (id == null) {
-    return <Error statusCode={404} />;
-  }
-
   if (queryError != null) {
-    // eslint-disable-next-line no-console
-    console.error(queryError);
-    return <Error statusCode={500} />;
+    return <NextError statusCode={500} />;
   }
 
   if (isLoading && application == null && applicationRound == null) {
@@ -272,8 +131,10 @@ function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
   // TODO these are 404
   // This should never happen but Apollo TS doesn't enforce it
   if (application?.pk == null || applicationRound == null) {
-    return <Error statusCode={404} />;
+    return <NextError statusCode={404} />;
   }
+
+  const onPrev = () => router.push(getApplicationPath(application.pk, "page2"));
 
   const isValid = watch("applicantType") != null;
 
@@ -287,8 +148,30 @@ function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
       >
         <Form noValidate onSubmit={handleSubmit(onSubmit)}>
           <ApplicantTypeSelector />
-          <Page3 />
-          <Buttons applicationPk={application.pk} submitDisabled={!isValid} />
+          <AutoGrid $alignCenter>
+            <FormSubHeading as="h2">
+              {t("application:Page3.subHeading.basicInfo")}
+            </FormSubHeading>
+            <Page3Form />
+            <EmailInput />
+          </AutoGrid>
+          <ButtonContainer>
+            <Button
+              variant={ButtonVariant.Secondary}
+              iconStart={<IconArrowLeft />}
+              onClick={onPrev}
+            >
+              {t("common:prev")}
+            </Button>
+            <Button
+              id="button__application--next"
+              iconEnd={<IconArrowRight />}
+              type="submit"
+              disabled={!isValid}
+            >
+              {t("common:next")}
+            </Button>
+          </ButtonContainer>
         </Form>
       </ApplicationPageWrapper>
     </FormProvider>
