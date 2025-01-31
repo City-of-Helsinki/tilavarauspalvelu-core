@@ -14,15 +14,14 @@ import { Breadcrumb } from "../common/Breadcrumb";
 import { fontBold, H1 } from "common";
 import { Stepper as HDSStepper, StepState } from "hds-react";
 
-const InnerContainer = styled.div<{ $hideStepper: boolean }>`
+const InnerContainer = styled.div`
   display: grid;
   gap: 1em;
   grid-template-rows: repeat(3, auto);
 
   grid-template-columns: 1fr;
   @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: ${({ $hideStepper }) =>
-      $hideStepper ? `1fr;` : `21em 1fr;`};
+    grid-template-columns: 21em 1fr;
   }
 `;
 
@@ -184,7 +183,7 @@ export function ApplicationPageWrapper({
           onStepClick={(_e, i) => handleStepClick(i)}
         />
       )}
-      <InnerContainer $hideStepper={hideStepper}>
+      <InnerContainer>
         <>
           {/* TODO preview / view should not maybe display these notes */}
           <StyledNotesWhenApplying

@@ -16,7 +16,7 @@ import type {
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
 import Modal from "../common/Modal";
-import type { ApplicationFormValues } from "./Form";
+import type { ApplicationFormValues } from "./form";
 import { OrderedReservationUnitCard } from "./OrderedReservationUnitCard";
 import { Flex } from "common/styles/util";
 import { ReservationUnitModalContent } from "./ReservationUnitModalContent";

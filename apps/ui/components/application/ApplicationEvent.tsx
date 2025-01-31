@@ -23,7 +23,7 @@ import { ApplicationEventSummary } from "./ApplicationEventSummary";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import { ApplicationFormValues } from "./Form";
+import { type ApplicationFormValues } from "./form";
 import { AutoGrid, Flex } from "common/styles/util";
 import {
   ControlledNumberInput,
@@ -104,12 +104,12 @@ function ApplicationEventInner({
     | "name"
     | "appliedReservationsPerWeek"
     | "reservationUnits";
-  const getTranslatedError = (field: FieldName): string => {
+  const getTranslatedError = (field: FieldName): string | undefined => {
     const error = errors.applicationSections?.[index]?.[field];
     if (error?.message != null) {
       return t(`application:validation.${error.message}`);
     }
-    return "";
+    return undefined;
   };
 
   // convert from minutes to seconds (search page uses minutes, this uses seconds)

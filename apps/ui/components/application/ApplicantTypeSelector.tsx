@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { fontRegular } from "common/src/common/typography";
 import { ApplicantTypeChoice } from "@gql/gql-types";
 import { useController, useFormContext } from "react-hook-form";
-import type { ApplicationFormPage3Values } from "./Form";
+import type { ApplicationFormPage3Values } from "./form";
 
 const Container = styled.div`
   margin-top: var(--spacing-m);

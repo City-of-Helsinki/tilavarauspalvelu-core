@@ -139,7 +139,7 @@
     "company": {
       "name": "Företagets officiella namn",
       "coreBusiness": "Företagets kärnverksamhet",
-      "registrationNumber": "FO-nummer"
+      "identifier": "FO-nummer"
     },
     "organisation": {
       "name": "Officiella namnet",

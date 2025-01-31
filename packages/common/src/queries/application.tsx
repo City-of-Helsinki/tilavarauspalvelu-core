@@ -100,6 +100,7 @@ export const APPLICATION_SECTION_UI_FRAGMENT = gql`
 
 export const APPLICANT_FRAGMENT = gql`
   fragment Applicant on ApplicationNode {
+    pk
     applicantType
     contactPerson {
       id

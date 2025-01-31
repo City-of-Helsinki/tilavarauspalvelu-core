@@ -139,7 +139,7 @@
     "company": {
       "name": "Company’s official name",
       "coreBusiness": "Company’s core business",
-      "registrationNumber": "Business ID"
+      "identifier": "Business ID"
     },
     "organisation": {
       "name": "Official name",

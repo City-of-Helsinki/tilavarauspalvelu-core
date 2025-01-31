@@ -5,10 +5,10 @@ import { breakpoints } from "common/src/common/style";
 import { fontBold, H4 } from "common/src/common/typography";
 import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
-import {
+import type {
   ApplicationEventScheduleFormType,
   ApplicationFormValues,
-} from "./Form";
+} from "./form";
 import { getDayTimes } from "@/modules/util";
 import { useFormContext } from "react-hook-form";
 import { Priority } from "@/gql/gql-types";
