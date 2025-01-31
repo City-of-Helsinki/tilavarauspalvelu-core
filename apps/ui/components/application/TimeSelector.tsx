@@ -3,39 +3,33 @@ import styled from "styled-components";
 import { TFunction, useTranslation } from "next-i18next";
 import { Button, ButtonVariant, IconCross } from "hds-react";
 import { breakpoints } from "common/src/common/style";
-import { fromMondayFirstUnsafe } from "common/src/helpers";
+import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import { arrowDown, arrowUp } from "@/styles/util";
 import { TimePreview } from "./TimePreview";
-import {
-  type ApplicationFormValues,
-  type ApplicationEventScheduleFormType,
-} from "./Form";
+import { type ApplicationFormValues } from "./Form";
 import { useFormContext } from "react-hook-form";
 import { ControlledSelect } from "common/src/components/form";
 import { Flex, NoWrap } from "common/styles/util";
 import { isTouchDevice } from "@/modules/util";
+import {
+  aesToCells,
+  ApplicationEventSchedulePriority,
+  Cell,
+  convertToSchedule,
+  covertCellsToTimeRange,
+} from "./module";
+import { successToast } from "common/src/common/toast";
+import { ApplicationQuery } from "@/gql/gql-types";
 
-export type ApplicationEventSchedulePriority = 50 | 100 | 200 | 300;
-
-type Cell = {
-  hour: number;
-  label: string;
-  state: ApplicationEventSchedulePriority;
-  key: string;
-};
+type ApplicationT = NonNullable<ApplicationQuery["application"]>;
+type SectionT = NonNullable<ApplicationT["applicationSections"]>[0];
 
 type Props = {
   index: number;
   cells: Cell[][];
-  updateCells: (cells: Cell[][]) => void;
-  copyCells?: () => void;
-  resetCells: () => void;
-  summaryData: [
-    ApplicationEventScheduleFormType[],
-    ApplicationEventScheduleFormType[],
-  ];
   reservationUnitOptions: { label: string; value: number }[];
+  reservationUnitOpeningHours: SectionT["reservationUnitOptions"][0]["reservationUnit"]["applicationRoundTimeSlots"];
 };
 
 const CalendarHead = styled.div`
@@ -331,21 +325,11 @@ const CELL_TYPES = [
   },
 ] as const;
 
-/// TODO what is the responsibility of this component?
-/// Why does it take a bucket full of props?
-/// Why is it used in only two different places?
-/// TODO why does it require some Cell functions in the props? what are these?
-/// TODO why is the summaryData type so weird?
-/// TODO why is the summaryData coupled with the Selector? instead of passing JSX child element or a JSX component?
-/// TODO why does summaryData include priority but is split by priority also? one of these is redundant
 export function TimeSelector({
   cells,
-  updateCells,
-  copyCells,
-  resetCells,
   index,
-  summaryData,
   reservationUnitOptions,
+  reservationUnitOpeningHours,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
   const [paintState, setPaintState] = useState<
@@ -358,17 +342,59 @@ export function TimeSelector({
     label: t(cell.label),
   }));
 
-  const { watch } = useFormContext<ApplicationFormValues>();
+  const { setValue, watch } = useFormContext<ApplicationFormValues>();
   const priority = watch(`applicationSections.${index}.priority`);
 
-  /*
-  const { setValue, getValues, watch } = useFormContext<ApplicationFormValues>();
+  const setSelectorData = (selected: Cell[][][]) => {
+    const formVals = covertCellsToTimeRange(selected);
+    for (const i of formVals.keys()) {
+      setValue(`applicationSections.${i}.suitableTimeRanges`, formVals[i]);
+    }
+  };
 
+  const getSelectorData = (): Cell[][][] => {
     const applicationSections = filterNonNullable(watch("applicationSections"));
     const selectorData = applicationSections.map((ae) =>
       aesToCells(convertToSchedule(ae), reservationUnitOpeningHours)
     );
-  */
+    return selectorData;
+  };
+
+  const updateCells = (newCells: Cell[][]) => {
+    const updated = [...getSelectorData()];
+    updated[index] = newCells;
+    setSelectorData(updated);
+  };
+
+  // TODO should remove the cell not set a priority
+  const resetCells = () => {
+    const selectorData = [...getSelectorData()];
+    const updated = [...selectorData];
+    updated[index] = selectorData[index].map((n) =>
+      n.map((nn) => ({ ...nn, state: 100 }))
+    );
+    setSelectorData(updated);
+  };
+
+  const copyCells = () => {
+    const updated = [...getSelectorData()];
+    const srcCells = updated[index];
+    srcCells.forEach((day, i) => {
+      day.forEach((cell, j) => {
+        const { state } = cell;
+        for (let k = 0; k < updated.length; k += 1) {
+          if (k !== index) {
+            updated[k][i][j].state = state;
+          }
+        }
+      });
+    });
+    setSelectorData(updated);
+    successToast({
+      text: t("application:Page2.notification.copyCells"),
+      dataTestId: "application__page2--notification-success",
+    });
+  };
   const setCellValue = (
     selection: Cell,
     value: ApplicationEventSchedulePriority | false
@@ -380,9 +406,11 @@ export function TimeSelector({
           : h
       ),
     ]);
-
     updateCells(newVal);
   };
+
+  const enableCopyCells =
+    filterNonNullable(watch("applicationSections")).length > 1;
 
   return (
     <>
@@ -429,9 +457,9 @@ export function TimeSelector({
         </ResetButton>
       </LegendContainer>
       <TimePreviewContainer data-testid={`time-selector__preview-${index}`}>
-        <TimePreview primary={summaryData[0]} secondary={summaryData[1]} />
+        <TimePreview index={index} />
       </TimePreviewContainer>
-      {copyCells && (
+      {enableCopyCells && (
         <ButtonContainer>
           <Button
             id={`time-selector__button--copy-cells-${index}`}
