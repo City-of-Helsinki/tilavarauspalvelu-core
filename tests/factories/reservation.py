@@ -16,7 +16,8 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.models import Reservation
-from utils.date_utils import local_start_of_day, next_hour, utc_datetime
+from utils.date_utils import local_datetime, local_start_of_day, next_hour, utc_datetime
+from utils.decimal_utils import round_decimal
 
 from ._base import (
     FakerFI,
@@ -304,18 +305,29 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
     factory = ReservationFactory
 
     def for_user(self, user: User) -> Self:
-        self.kwargs["user"] = user
-        self.kwargs["reservee_first_name"] = user.first_name
-        self.kwargs["reservee_last_name"] = user.last_name
-        self.kwargs["reservee_email"] = user.email
+        self.set(
+            user=user,
+            reservee_first_name=user.first_name,
+            reservee_last_name=user.last_name,
+            reservee_email=user.email,
+        )
         return self
 
     def for_reservation_unit(self, reservation_unit: ReservationUnit) -> Self:
         min_persons = reservation_unit.min_persons or 0
         max_persons = reservation_unit.max_persons or (min_persons + 10)
-        self.kwargs["num_persons"] = random.randint(min_persons, max_persons)
-        self.kwargs["buffer_time_before"] = reservation_unit.buffer_time_before
-        self.kwargs["buffer_time_after"] = reservation_unit.buffer_time_after
+        self.set(
+            num_persons=random.randint(min_persons, max_persons),
+            buffer_time_before=reservation_unit.buffer_time_before,
+            buffer_time_after=reservation_unit.buffer_time_after,
+        )
+
+        if self.kwargs.get("begin") and self.kwargs.get("end"):
+            self.set(
+                buffer_time_before=reservation_unit.actions.get_actual_before_buffer(self.kwargs["begin"]),
+                buffer_time_after=reservation_unit.actions.get_actual_after_buffer(self.kwargs["end"]),
+            )
+
         return self
 
     def for_customer_type(self, customer_type: CustomerTypeChoice) -> Self:
@@ -327,25 +339,53 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
             case CustomerTypeChoice.INDIVIDUAL:
                 return self.for_individual()
 
+    def for_state(self, state: ReservationStateChoice) -> Self:
+        self.set(state=state)
+        match state:
+            case ReservationStateChoice.CONFIRMED:
+                return self.set(
+                    handled_at=local_datetime(),
+                    confirmed_at=local_datetime(),
+                )
+            case ReservationStateChoice.CANCELLED:
+                return self.set(
+                    confirmed_at=local_datetime(),
+                    cancel_details="[CANCEL DETAILS]",
+                    cancel_reason__reason="[CANCEL REASON]",
+                )
+            case ReservationStateChoice.DENIED:
+                return self.set(
+                    handled_at=local_datetime(),
+                    confirmed_at=local_datetime(),
+                    deny_reason__reason="[DENY REASON]",
+                )
+        return self
+
     def for_business(self) -> Self:
-        self.kwargs["reservee_type"] = CustomerTypeChoice.BUSINESS
-        self.kwargs["reservee_organisation_name"] = self.factory.reservee_organisation_name.generate()
-        self.kwargs["reservee_id"] = self.factory.reservee_id.generate()
-        self.kwargs["reservee_is_unregistered_association"] = False
+        self.set(
+            reservee_type=CustomerTypeChoice.BUSINESS,
+            reservee_organisation_name=self.factory.reservee_organisation_name.generate(),
+            reservee_id=self.factory.reservee_id.generate(),
+            reservee_is_unregistered_association=False,
+        )
         return self
 
     def for_nonprofit(self, *, unregistered: bool = False) -> Self:
-        self.kwargs["reservee_type"] = CustomerTypeChoice.NONPROFIT
-        self.kwargs["reservee_organisation_name"] = ""
-        self.kwargs["reservee_id"] = "" if unregistered else self.factory.reservee_id.generate()
-        self.kwargs["reservee_is_unregistered_association"] = False
+        self.set(
+            reservee_type=CustomerTypeChoice.NONPROFIT,
+            reservee_organisation_name="",
+            reservee_id="" if unregistered else self.factory.reservee_id.generate(),
+            reservee_is_unregistered_association=False,
+        )
         return self
 
     def for_individual(self) -> Self:
-        self.kwargs["reservee_type"] = CustomerTypeChoice.INDIVIDUAL
-        self.kwargs["reservee_organisation_name"] = ""
-        self.kwargs["reservee_id"] = ""
-        self.kwargs["reservee_is_unregistered_association"] = False
+        self.set(
+            reservee_type=CustomerTypeChoice.INDIVIDUAL,
+            reservee_organisation_name="",
+            reservee_id="",
+            reservee_is_unregistered_association=False,
+        )
         return self
 
     def starting_at(
@@ -372,15 +412,44 @@ class ReservationBuilder(ModelFactoryBuilder[Reservation]):
         duration = random.choice(range(min_hours, max_hours + 1))  # '+ 1' is for inclusive range maximum
         end = begin + datetime.timedelta(hours=duration)
 
-        self.kwargs["begin"] = begin
-        self.kwargs["end"] = end
-        self.kwargs["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(self.kwargs["begin"])
-        self.kwargs["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(self.kwargs["end"])
+        self.set(
+            begin=begin,
+            end=end,
+            buffer_time_before=reservation_unit.actions.get_actual_before_buffer(begin),
+            buffer_time_after=reservation_unit.actions.get_actual_after_buffer(end),
+        )
 
         if pricing is not None:
-            self.kwargs["price"] = pricing.actions.calculate_reservation_price(duration=end - begin)
-            self.kwargs["non_subsidised_price"] = pricing.highest_price
-            self.kwargs["unit_price"] = pricing.lowest_price if subsidised else pricing.highest_price
-            self.kwargs["tax_percentage_value"] = pricing.tax_percentage.value
+            self.set(
+                price=round_decimal(pricing.actions.calculate_reservation_price(duration=end - begin), 2),
+                non_subsidised_price=pricing.highest_price,
+                unit_price=pricing.lowest_price if subsidised else pricing.highest_price,
+                tax_percentage_value=pricing.tax_percentage.value,
+            )
 
+        return self
+
+    def use_reservation_unit_price(self) -> Self:
+        begin = self.kwargs.get("begin")
+        end = self.kwargs.get("end")
+        if not all([begin, end]):
+            msg = "begin and end times must be set before using reservation unit pricing"
+            raise ValueError(msg)
+
+        reservation_units = self.kwargs.get("reservation_units")
+        if not reservation_units:
+            msg = "reservation unit must be set before using reservation unit pricing"
+            raise ValueError(msg)
+
+        pricing = reservation_units[0].actions.get_active_pricing(by_date=begin)
+        if pricing is None:
+            msg = "reservation unit must have active pricing for the given date"
+            raise ValueError(msg)
+
+        self.set(
+            price=round_decimal(pricing.actions.calculate_reservation_price(duration=end - begin), 2),
+            non_subsidised_price=pricing.highest_price,
+            unit_price=pricing.lowest_price,
+            tax_percentage_value=pricing.tax_percentage.value,
+        )
         return self

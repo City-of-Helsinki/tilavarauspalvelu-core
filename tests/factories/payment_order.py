@@ -8,7 +8,7 @@ import factory
 from django.conf import settings
 from django.urls import reverse
 
-from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType
+from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.models import PaymentOrder
 
 from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder
@@ -47,6 +47,21 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
 
 class PaymentOrderBuilder(ModelFactoryBuilder[PaymentOrder]):
     factory = PaymentOrderFactory
+
+    def for_reservation(self, reservation: Reservation) -> Self:
+        if reservation.state == ReservationStateChoice.CONFIRMED:
+            self.set(status=OrderStatus.PAID)
+        elif reservation.state == ReservationStateChoice.CANCELLED:
+            self.set(status=OrderStatus.CANCELLED)
+        elif reservation.state == ReservationStateChoice.DENIED:
+            self.set(status=OrderStatus.REFUNDED, refund_id=uuid.uuid4())
+
+        return self.set(
+            reservation=reservation,
+            price_net=reservation.price_net,
+            price_vat=reservation.price_vat_amount,
+            price_total=reservation.price,
+        )
 
     def for_mock_order(self, reservation: Reservation) -> Self:
         order_uuid = uuid.uuid4()
