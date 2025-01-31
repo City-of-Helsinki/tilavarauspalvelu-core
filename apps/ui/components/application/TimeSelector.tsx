@@ -7,8 +7,11 @@ import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import { arrowDown, arrowUp } from "@/styles/util";
 import { TimePreview } from "./TimePreview";
-import { type ApplicationEventScheduleFormType } from "./Form";
-import { UseFormReturn } from "react-hook-form";
+import {
+  type ApplicationFormValues,
+  type ApplicationEventScheduleFormType,
+} from "./Form";
+import { useFormContext } from "react-hook-form";
 import { ControlledSelect } from "common/src/components/form";
 import { Flex, NoWrap } from "common/styles/util";
 import { isTouchDevice } from "@/modules/util";
@@ -22,11 +25,6 @@ type Cell = {
   key: string;
 };
 
-export type TimeSelectorFormValues = {
-  reservationUnitPk: number;
-  priority: ApplicationEventSchedulePriority;
-};
-
 type Props = {
   index: number;
   cells: Cell[][];
@@ -38,7 +36,6 @@ type Props = {
     ApplicationEventScheduleFormType[],
   ];
   reservationUnitOptions: { label: string; value: number }[];
-  form: UseFormReturn<TimeSelectorFormValues>;
 };
 
 const CalendarHead = styled.div`
@@ -349,7 +346,6 @@ export function TimeSelector({
   index,
   summaryData,
   reservationUnitOptions,
-  form,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
   const [paintState, setPaintState] = useState<
@@ -362,8 +358,8 @@ export function TimeSelector({
     label: t(cell.label),
   }));
 
-  const { watch: timeWatcher } = form;
-  const priority = timeWatcher("priority");
+  const { watch } = useFormContext<ApplicationFormValues>();
+  const priority = watch(`applicationSections.${index}.priority`);
 
   /*
   const { setValue, getValues, watch } = useFormContext<ApplicationFormValues>();
@@ -392,7 +388,7 @@ export function TimeSelector({
     <>
       <OptionSelector
         reservationUnitOptions={reservationUnitOptions}
-        form={form}
+        index={index}
       />
       <CalendarContainer
         onMouseLeave={() => setPainting(false)}
@@ -462,10 +458,10 @@ const OptionWrapper = styled.div`
 
 function OptionSelector({
   reservationUnitOptions,
-  form,
-}: Pick<Props, "reservationUnitOptions" | "form">) {
+  index,
+}: Pick<Props, "reservationUnitOptions" | "index">) {
   const { t } = useTranslation();
-  const { control } = form;
+  const { control } = useFormContext<ApplicationFormValues>();
 
   const priorityOptions = [300, 200].map((n) => ({
     label: t(`application:Page2.priorityLabels.${n}`),
@@ -475,13 +471,13 @@ function OptionSelector({
   return (
     <OptionWrapper>
       <ControlledSelect
-        name="priority"
+        name={`applicationSections.${index}.priority`}
         label={t("application:Page2.prioritySelectLabel")}
         control={control}
         options={priorityOptions}
       />
       <ControlledSelect
-        name="reservationUnitPk"
+        name={`applicationSections.${index}.reservationUnitPk`}
         label={t("application:Page2.reservationUnitSelectLabel")}
         control={control}
         options={reservationUnitOptions}
