@@ -3,10 +3,17 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
+from freezegun import freeze_time
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import PaymentType, ReservationStartInterval, ReservationStateChoice, TermsOfUseTypeChoices
-from utils.date_utils import next_hour
+from tilavarauspalvelu.enums import (
+    AccessType,
+    PaymentType,
+    ReservationStartInterval,
+    ReservationStateChoice,
+    TermsOfUseTypeChoices,
+)
+from utils.date_utils import local_datetime, next_hour
 
 from tests.factories import (
     ReservationFactory,
@@ -351,3 +358,85 @@ def test_reservation_unit__update__archiving_not_blocked_if_reservation_unit_has
     reservation_unit.refresh_from_db()
     assert reservation_unit.is_archived is True
     assert reservation_unit.is_draft is True
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation_unit__update__access_type__change_future_reservations(graphql):
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(is_draft=False, access_type=AccessType.UNRESTRICTED)
+
+    past_reservation = ReservationFactory.create(
+        reservation_units=[reservation_unit],
+        access_type=AccessType.UNRESTRICTED,
+        begin=local_datetime(2023, 12, 1, 12),
+        end=local_datetime(2023, 12, 1, 13),
+    )
+    future_reservation = ReservationFactory.create(
+        reservation_units=[reservation_unit],
+        access_type=AccessType.UNRESTRICTED,
+        begin=local_datetime(2024, 1, 1, 12),
+        end=local_datetime(2024, 1, 1, 13),
+    )
+
+    data = get_non_draft_update_input_data(reservation_unit, accessType=AccessType.ACCESS_CODE)
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+    assert response.has_errors is False, response
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.access_type == AccessType.ACCESS_CODE
+
+    past_reservation.refresh_from_db()
+    assert past_reservation.access_type == AccessType.UNRESTRICTED
+
+    future_reservation.refresh_from_db()
+    assert future_reservation.access_type == AccessType.ACCESS_CODE
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation_unit__update__access_type__valid_for_period(graphql):
+    graphql.login_with_superuser()
+
+    reservation_unit = ReservationUnitFactory.create(is_draft=False, access_type=AccessType.UNRESTRICTED)
+
+    before_period_reservation = ReservationFactory.create(
+        reservation_units=[reservation_unit],
+        access_type=AccessType.OPENED_BY_STAFF,
+        begin=local_datetime(2024, 1, 1, 12),
+        end=local_datetime(2024, 1, 1, 13),
+    )
+    on_period_reservation = ReservationFactory.create(
+        reservation_units=[reservation_unit],
+        access_type=AccessType.UNRESTRICTED,
+        begin=local_datetime(2024, 1, 2, 12),
+        end=local_datetime(2024, 1, 2, 13),
+    )
+    after_period_reservation = ReservationFactory.create(
+        reservation_units=[reservation_unit],
+        access_type=AccessType.PHYSICAL_KEY,
+        begin=local_datetime(2024, 1, 3, 12),
+        end=local_datetime(2024, 1, 3, 13),
+    )
+
+    data = get_non_draft_update_input_data(
+        reservation_unit,
+        accessType=AccessType.ACCESS_CODE,
+        accessTypeStartDate="2024-01-02",
+        accessTypeEndDate="2024-01-02",
+    )
+
+    response = graphql(UPDATE_MUTATION, input_data=data)
+    assert response.has_errors is False, response
+
+    reservation_unit.refresh_from_db()
+    assert reservation_unit.access_type == AccessType.ACCESS_CODE
+
+    before_period_reservation.refresh_from_db()
+    assert before_period_reservation.access_type == AccessType.UNRESTRICTED
+
+    on_period_reservation.refresh_from_db()
+    assert on_period_reservation.access_type == AccessType.ACCESS_CODE
+
+    after_period_reservation.refresh_from_db()
+    assert after_period_reservation.access_type == AccessType.UNRESTRICTED
