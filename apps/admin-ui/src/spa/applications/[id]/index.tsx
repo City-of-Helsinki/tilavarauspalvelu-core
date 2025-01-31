@@ -133,7 +133,7 @@ function ApplicationStatusBlock({
   const { icon, type } = getApplicationStatusIcon(status);
   return (
     <StatusLabel type={type} icon={icon}>
-      {t(`ApplicationRound.statuses.${status}`)}
+      {t(`Application.statuses.${status}`)}
     </StatusLabel>
   );
 }
