@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
+from freezegun import freeze_time
 from graphql_relay import to_global_id
 
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
@@ -445,10 +446,13 @@ def pindora_response() -> PindoraReservationResponse:
     )
 
 
+@freeze_time(local_datetime(2022, 1, 1))
 def test_reservation__query__pindora_info(graphql):
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
     )
 
     fields = """
@@ -487,11 +491,14 @@ def test_reservation__query__pindora_info(graphql):
     }
 
 
+@freeze_time(local_datetime(2022, 1, 1))
 @pytest.mark.parametrize("as_reservee", [True, False])
 def test_reservation__query__pindora_info__access_code_not_active(graphql, as_reservee):
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
     )
 
     fields = """
@@ -529,11 +536,14 @@ def test_reservation__query__pindora_info__access_code_not_active(graphql, as_re
         assert response.first_query_object["pindoraInfo"] is not None
 
 
+@freeze_time(local_datetime(2022, 1, 1))
 @pytest.mark.parametrize("as_reservee", [True, False])
 def test_reservation__query__pindora_info__not_confirmed(graphql, as_reservee):
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.WAITING_FOR_PAYMENT,
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
     )
 
     fields = """
@@ -568,10 +578,13 @@ def test_reservation__query__pindora_info__not_confirmed(graphql, as_reservee):
         assert response.first_query_object["pindoraInfo"] is not None
 
 
+@freeze_time(local_datetime(2022, 1, 1))
 def test_reservation__query__pindora_info__access_type_not_access_code(graphql):
     reservation = ReservationFactory.create(
         access_type=AccessType.UNRESTRICTED,
         state=ReservationStateChoice.CONFIRMED,
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
     )
 
     fields = """
@@ -600,10 +613,13 @@ def test_reservation__query__pindora_info__access_type_not_access_code(graphql):
     assert response.first_query_object["pindoraInfo"] is None
 
 
+@freeze_time(local_datetime(2022, 1, 1))
 def test_reservation__query__pindora_info__pindora_call_fails(graphql):
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
     )
 
     fields = """
@@ -632,10 +648,13 @@ def test_reservation__query__pindora_info__pindora_call_fails(graphql):
     assert response.first_query_object["pindoraInfo"] is None
 
 
+@freeze_time(local_datetime(2022, 1, 1))
 def test_reservation__query__pindora_info__pindora_data_cached(graphql):
     reservation = ReservationFactory.create(
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
     )
 
     fields = """
@@ -680,4 +699,36 @@ def test_reservation__query__pindora_info__pindora_data_cached(graphql):
     }
 
 
-#
+@freeze_time(local_datetime(2022, 1, 3))
+def test_reservation__query__pindora_info__reservation_past(graphql):
+    reservation = ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
+    )
+
+    fields = """
+        pindoraInfo {
+            accessCode
+            accessCodeGeneratedAt
+            accessCodeIsActive
+            accessCodeKeypadUrl
+            accessCodePhoneNumber
+            accessCodeSmsNumber
+            accessCodeSmsMessage
+            accessCodeBeginsAt
+            accessCodeEndsAt
+        }
+    """
+    global_id = to_global_id("ReservationNode", reservation.pk)
+    query = reservation_query(fields=fields, id=global_id)
+
+    graphql.force_login(reservation.user)
+
+    with patch_method(PindoraClient.get_reservation, return_value=pindora_response()):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    assert response.first_query_object["pindoraInfo"] is None
