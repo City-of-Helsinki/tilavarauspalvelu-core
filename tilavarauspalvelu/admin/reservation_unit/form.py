@@ -17,7 +17,10 @@ from utils.external_service.errors import ExternalServiceError
 class ReservationUnitAdminForm(forms.ModelForm):
     instance: ReservationUnit
 
-    pindora_response = forms.CharField(widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}))
+    pindora_response = forms.CharField(
+        widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}),
+        required=False,
+    )
 
     search_terms = DynamicArrayField(
         required=False,

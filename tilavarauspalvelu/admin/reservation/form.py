@@ -12,7 +12,12 @@ from tilavarauspalvelu.models import Reservation
 
 
 class ReservationAdminForm(forms.ModelForm):
-    pindora_response = forms.CharField(widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}))
+    instance: Reservation
+
+    pindora_response = forms.CharField(
+        widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}),
+        required=False,
+    )
 
     class Meta:
         model = Reservation
