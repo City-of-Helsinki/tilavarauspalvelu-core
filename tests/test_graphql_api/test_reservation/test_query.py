@@ -46,6 +46,10 @@ def test_reservation__query__all_fields(graphql):
     # when:
     # - User queries for reservations with all fields
     fields = """
+        accessCodeGeneratedAt
+        accessCodeIsActive
+        accessCodeShouldBeActive
+        accessType
         ageGroup { minimum maximum }
         applyingForFreeOfCharge
         begin
@@ -107,6 +111,10 @@ def test_reservation__query__all_fields(graphql):
     assert response.has_errors is False, response
     assert len(response.edges) == 1
     assert response.node(0) == {
+        "accessCodeGeneratedAt": None,
+        "accessCodeIsActive": False,
+        "accessCodeShouldBeActive": False,
+        "accessType": AccessType.UNRESTRICTED.value,
         "ageGroup": None,
         "applyingForFreeOfCharge": reservation.applying_for_free_of_charge,
         "begin": reservation.begin.isoformat(),

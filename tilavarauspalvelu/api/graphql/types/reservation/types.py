@@ -85,6 +85,8 @@ class ReservationNode(DjangoNode):
         deprecation_reason="Please use to 'type' instead.",
     )
 
+    access_code_should_be_active = AnnotatedField(graphene.Boolean, expression=L("access_code_should_be_active"))
+
     calendar_url = graphene.String()
 
     affected_reservation_units = AnnotatedField(
@@ -101,7 +103,7 @@ class ReservationNode(DjangoNode):
 
     pindora_info = MultiField(
         PindoraInfoType,
-        fields=["access_type", "ext_uuid", "state"],
+        fields=["access_type", "ext_uuid", "state", "end"],
         description=(
             "Info fetched from Pindora API. Cached per reservation for 30s. "
             "Please don't use this when filtering multiple reservations, queries to Pindora are not optimized."
@@ -181,6 +183,7 @@ class ReservationNode(DjangoNode):
             "access_type",
             "access_code_generated_at",
             "access_code_is_active",
+            "access_code_should_be_active",
             "pindora_info",
             #
             "applying_for_free_of_charge",
@@ -234,6 +237,9 @@ class ReservationNode(DjangoNode):
                     "working_memo",
                     "handled_at",
                     "staff_event",
+                    "access_code_generated_at",
+                    "access_code_is_active",
+                    "access_code_should_be_active",
                 }
                 # FIELDS ARE PRIVATE BY DEFAULT
                 else private_field_check
