@@ -3,12 +3,11 @@
 // CreateReservationModal / RecurringReservation / EditReservation
 import { CustomerTypeChoice } from "@gql/gql-types";
 import { z } from "zod";
-import { OptionSchema } from "common/src/schemas/schemaCommon";
 
 const ReservationFormMetaSchema = z.object({
   name: z.string().optional(),
   description: z.string().optional(),
-  ageGroup: OptionSchema.optional(),
+  ageGroup: z.number().optional(),
   applyingForFreeOfCharge: z.boolean().optional(),
   billingAddressCity: z.string().optional(),
   billingAddressStreet: z.string().optional(),
@@ -18,9 +17,9 @@ const ReservationFormMetaSchema = z.object({
   billingLastName: z.string().optional(),
   billingPhone: z.string().optional(),
   freeOfChargeReason: z.string().optional(),
-  homeCity: OptionSchema.optional(),
+  homeCity: z.number().optional(),
   numPersons: z.number().optional(),
-  purpose: OptionSchema.optional(),
+  purpose: z.number().optional(),
   reserveeAddressCity: z.string().optional(),
   reserveeAddressStreet: z.string().optional(),
   reserveeAddressZip: z.string().optional(),

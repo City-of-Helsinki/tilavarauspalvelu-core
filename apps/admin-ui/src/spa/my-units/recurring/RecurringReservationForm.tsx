@@ -20,6 +20,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { fromUIDate } from "common/src/common/util";
 import {
   RecurringReservationFormSchema,
+  type ReservationFormMeta,
   type RecurringReservationForm as RecurringReservationFormT,
 } from "@/schemas";
 import { type NewReservationListItem } from "@/component/ReservationsList";
@@ -34,7 +35,7 @@ import ReservationTypeForm, {
 } from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import { Element } from "@/styles/util";
 import { Label } from "@/styles/layout";
 import { AutoGrid, Flex } from "common/styles/util";
@@ -120,6 +121,7 @@ type QueryT = NonNullable<NonNullable<ReservationUnitQuery>["reservationUnit"]>;
 type ReservationUnitType = TypeFormReservationUnit &
   Pick<QueryT, "pk" | "reservationStartInterval">;
 
+type FormValues = RecurringReservationFormT & ReservationFormMeta;
 function RecurringReservationForm({
   reservationUnit,
 }: {
@@ -131,7 +133,7 @@ function RecurringReservationForm({
     reservationUnit?.reservationStartInterval
   );
 
-  const form = useForm<RecurringReservationFormT>({
+  const form = useForm<FormValues>({
     // TODO onBlur doesn't work properly we have to submit the form to get validation errors
     mode: "onBlur",
     defaultValues: {
@@ -200,7 +202,7 @@ function RecurringReservationForm({
 
   const navigate = useNavigate();
 
-  const onSubmit = async (data: RecurringReservationFormT) => {
+  const onSubmit = async (data: FormValues) => {
     setLocalError(null);
 
     const skipDates = removedReservations
@@ -217,9 +219,6 @@ function RecurringReservationForm({
       return;
     }
 
-    const metaFields = filterNonNullable(
-      reservationUnit?.metadataSet?.supportedFields
-    );
     const buffers = {
       before: data.bufferTimeBefore
         ? getBufferTime(reservationUnit.bufferTimeBefore, data.type)
@@ -234,7 +233,6 @@ function RecurringReservationForm({
         data,
         skipDates,
         reservationUnitPk: reservationUnit.pk,
-        metaFields,
         buffers,
       });
 

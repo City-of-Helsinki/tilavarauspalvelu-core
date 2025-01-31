@@ -4,16 +4,16 @@ import {
   ReservationStateChoice,
   ReservationTypeChoice,
   ReservationTypeStaffChoice,
-  type ReservationMetadataFieldNode,
   type ReservationSeriesCreateMutationInput,
   useCreateReservationSeriesMutation,
+  type ReservationSeriesReservationCreateSerializerInput,
 } from "@gql/gql-types";
-import type { RecurringReservationForm } from "@/schemas";
+import type { RecurringReservationForm, ReservationFormMeta } from "@/schemas";
 import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
-import { flattenMetadata } from "@/common/util";
 import { gql } from "@apollo/client";
 import { errorToast } from "common/src/common/toast";
 import { useSession } from "@/hooks/auth";
+import { transformReserveeType } from "common/src/conversion";
 
 // Not all choices are valid for recurring reservations (the ui should not allow these)
 function transformReservationTypeStaffChoice(
@@ -60,17 +60,28 @@ export function useCreateRecurringReservation() {
 
   // NOTE unsafe
   const mutate = async (props: {
-    data: RecurringReservationForm;
+    // FIXME this type is incorrect, it should include the reservation meta fields
+    data: RecurringReservationForm & ReservationFormMeta;
     skipDates: Date[];
     reservationUnitPk: number;
-    metaFields: ReservationMetadataFieldNode[];
+    // metaFields: ReservationMetadataFieldNode[];
     buffers: { before?: number; after?: number };
   }): Promise<number | undefined> => {
-    const { data, reservationUnitPk, metaFields, buffers } = props;
-    const flattenedMetadataSetValues = flattenMetadata(data, metaFields, false);
-    // unlike reservation creation age group are passed to the main mutation and others to details
-    const ageGroup = flattenedMetadataSetValues.ageGroup;
-    delete flattenedMetadataSetValues.ageGroup;
+    const { data, reservationUnitPk, buffers } = props;
+    const {
+      ageGroup,
+      type,
+      seriesName,
+      comments,
+      startingDate,
+      startTime,
+      endingDate,
+      endTime,
+      repeatOnDays,
+      repeatPattern,
+      reserveeType,
+      ...rest
+    } = data;
 
     const name = data.type === "BLOCKED" ? "BLOCKED" : (data.seriesName ?? "");
 
@@ -78,16 +89,18 @@ export function useCreateRecurringReservation() {
       throw new Error("Current user pk missing");
     }
 
-    const reservationDetails = {
-      ...flattenedMetadataSetValues,
-      type: transformReservationTypeStaffChoice(data.type),
-      bufferTimeBefore: buffers.before,
-      bufferTimeAfter: buffers.after,
-      workingMemo: data.comments,
-      state: ReservationStateChoice.Confirmed,
-      // TODO why is this needed in the mutation?
-      user: user.pk,
-    };
+    const reservationDetails: ReservationSeriesReservationCreateSerializerInput =
+      {
+        ...rest,
+        type: transformReservationTypeStaffChoice(type),
+        reserveeType: transformReserveeType(reserveeType),
+        bufferTimeBefore: buffers.before,
+        bufferTimeAfter: buffers.after,
+        workingMemo: comments,
+        state: ReservationStateChoice.Confirmed,
+        // TODO why is this needed in the mutation?
+        user: user.pk,
+      };
 
     const skipDates: string[] = props.skipDates.map((d) => toApiDateUnsafe(d));
     const input: ReservationSeriesCreateMutationInput = {
@@ -97,13 +110,13 @@ export function useCreateRecurringReservation() {
       ageGroup: !Number.isNaN(Number(ageGroup)) ? Number(ageGroup) : undefined,
       reservationUnit: reservationUnitPk,
       beginDate: toApiDateUnsafe(fromUIDateUnsafe(data.startingDate)),
-      beginTime: data.startTime,
+      beginTime: startTime,
       endDate: toApiDateUnsafe(fromUIDateUnsafe(data.endingDate)),
-      endTime: data.endTime,
-      weekdays: data.repeatOnDays,
-      recurrenceInDays: data.repeatPattern === "weekly" ? 7 : 14,
+      endTime,
+      weekdays: repeatOnDays,
+      recurrenceInDays: repeatPattern === "weekly" ? 7 : 14,
       name,
-      description: data.comments,
+      description: comments,
     };
 
     const { data: createResponse } = await createReservationSeries(input);

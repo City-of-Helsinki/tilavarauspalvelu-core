@@ -15,11 +15,8 @@ import {
 } from "@/schemas";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { HR } from "@/component/Table";
-import { useOptions } from "@/hooks";
 import { useReservationEditData } from "./hooks";
 import { useStaffReservationMutation } from "../hooks";
-import { filterNonNullable } from "common/src/helpers";
-import { flattenMetadata } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 import { ButtonContainer, CenterSpinner } from "common/styles/util";
 import { createTagString } from "./util";
@@ -29,12 +26,6 @@ import { LinkPrev } from "@/component/LinkPrev";
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
-
-type PossibleOptions = {
-  ageGroup: Array<{ label: string; value: number }>;
-  purpose: Array<{ label: string; value: number }>;
-  homeCity: Array<{ label: string; value: number }>;
-};
 
 const noSeparateBillingDefined = (reservation: ReservationType): boolean =>
   !reservation.billingAddressCity &&
@@ -60,13 +51,11 @@ function EditReservation({
   onCancel,
   reservation,
   reservationUnit,
-  options,
   onSuccess,
 }: {
   onCancel: () => void;
   reservation: ReservationType;
   reservationUnit: ReservationUnitType;
-  options: PossibleOptions;
   onSuccess: () => void;
 }) {
   const { t } = useTranslation();
@@ -91,9 +80,7 @@ function EditReservation({
       ),
       name: reservation.name ?? "",
       description: reservation.description ?? "",
-      ageGroup: options.ageGroup.find(
-        (x) => x.value === reservation.ageGroup?.pk
-      ),
+      ageGroup: reservation.ageGroup?.pk ?? undefined,
       applyingForFreeOfCharge: reservation.applyingForFreeOfCharge ?? undefined,
       showBillingAddress: !noSeparateBillingDefined(reservation),
       billingAddressCity: reservation.billingAddressCity ?? "",
@@ -104,11 +91,9 @@ function EditReservation({
       billingLastName: reservation.billingLastName ?? "",
       billingPhone: reservation.billingPhone ?? "",
       freeOfChargeReason: reservation.freeOfChargeReason ?? undefined,
-      homeCity: options.homeCity.find(
-        (x) => x.value === reservation.homeCity?.pk
-      ),
+      homeCity: reservation.homeCity?.pk ?? undefined,
       numPersons: reservation.numPersons ?? undefined,
-      purpose: options.purpose.find((x) => x.value === reservation.purpose?.pk),
+      purpose: reservation.purpose?.pk ?? undefined,
       reserveeAddressCity: reservation.reserveeAddressCity ?? "",
       reserveeAddressStreet: reservation.reserveeAddressStreet ?? "",
       reserveeAddressZip: reservation.reserveeAddressZip ?? "",
@@ -139,21 +124,12 @@ function EditReservation({
       return;
     }
 
-    const metadataSetFields = filterNonNullable(
-      reservationUnit.metadataSet?.supportedFields
-    );
-
-    // TODO this removes all type information
-    const flattenedMetadataSetValues = flattenMetadata(
-      values,
-      metadataSetFields
-    );
+    const { seriesName, comments, showBillingAddress: _, ...rest } = values;
 
     const toSubmit = {
-      seriesName: values.seriesName !== "" ? values.seriesName : undefined,
-      workingMemo: values.comments,
-      type: values.type,
-      ...flattenedMetadataSetValues,
+      ...rest,
+      seriesName: seriesName !== "" ? seriesName : undefined,
+      workingMemo: comments,
     };
 
     return changeStaffReservation(toSubmit);
@@ -233,8 +209,6 @@ export function EditPage() {
     navigate(-1);
   };
 
-  const options = useOptions();
-
   return (
     <EditPageWrapper reservation={reservation} title={t("title")}>
       {loading ? (
@@ -249,7 +223,6 @@ export function EditPage() {
             reservation={reservation}
             reservationUnit={reservationUnit}
             onCancel={handleCancel}
-            options={options}
             onSuccess={handleSuccess}
           />
         </ErrorBoundary>

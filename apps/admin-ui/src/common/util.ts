@@ -1,20 +1,14 @@
 import { format, getDay, isSameDay, parseISO } from "date-fns";
-import { trim, camelCase, get, pick, zipObject } from "lodash";
+import { trim } from "lodash";
 import {
   type Maybe,
   type ReservationNode,
   ReservationTypeChoice,
   type LocationFieldsFragment,
   type ReservationCommonFragment,
-  type ReservationMetadataFieldNode,
 } from "@gql/gql-types";
 import type { TFunction } from "next-i18next";
 import { toMondayFirstUnsafe, truncate } from "common/src/helpers";
-import {
-  type ReservationFormType,
-  type RecurringReservationForm,
-  type ReservationChangeFormType,
-} from "@/schemas";
 
 export { formatDuration } from "common/src/common/util";
 
@@ -129,33 +123,6 @@ export function getTranslatedError(
   }
   // TODO use a common translation key for these
   return t(`Notifications.form.errors.${error}`);
-}
-
-// TODO this should be typed
-// some mutations expect purpose others purposePk
-// but because this isn't typed we have to check runtime errors for each mutation
-export function flattenMetadata(
-  values:
-    | ReservationFormType
-    | RecurringReservationForm
-    | ReservationChangeFormType,
-  metadataSetFields: Pick<ReservationMetadataFieldNode, "fieldName">[],
-  shouldRenamePkFields = true
-) {
-  const fieldNames = metadataSetFields.map((f) => f.fieldName).map(camelCase);
-  // TODO don't use pick
-  const metadataSetValues = pick(values, fieldNames);
-
-  const renamePkFields = shouldRenamePkFields
-    ? ["ageGroup", "homeCity", "purpose"]
-    : [];
-
-  return zipObject(
-    Object.keys(metadataSetValues).map((k) =>
-      renamePkFields.includes(k) ? `${k}Pk` : k
-    ),
-    Object.values(metadataSetValues).map((v) => get(v, "value") || v)
-  );
 }
 
 export function getReserveeName(

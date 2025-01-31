@@ -1,6 +1,8 @@
 import {
+  type Maybe,
   ReservationStartInterval,
   ReservationTypeChoice,
+  ReserveeType,
   Weekday,
 } from "../gql/gql-types";
 
@@ -68,6 +70,21 @@ export function convertReservationType(type: string): ReservationTypeChoice {
     throw new Error(`Unknown reservation type: ${type}`);
   }
   return t;
+}
+
+export function transformReserveeType(
+  reserveeType: Maybe<string> | undefined
+): ReserveeType | undefined {
+  switch (reserveeType) {
+    case ReserveeType.Business:
+      return ReserveeType.Business;
+    case ReserveeType.Nonprofit:
+      return ReserveeType.Nonprofit;
+    case ReserveeType.Individual:
+      return ReserveeType.Individual;
+    default:
+      return undefined;
+  }
 }
 
 export function getIntervalMinutes(

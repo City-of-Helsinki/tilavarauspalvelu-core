@@ -34,8 +34,7 @@ import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
-import { flattenMetadata } from "@/common/util";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { base64encode } from "common/src/helpers";
 import { errorToast, successToast } from "common/src/common/toast";
 import { CenterSpinner } from "common/styles/util";
 
@@ -258,22 +257,22 @@ function DialogContent({
   }, [start, trigger]);
 
   // force form vaildation on date change but not on first render
-  const date = watch("date");
+  const formDate = watch("date");
   useEffect(() => {
     // Is touched is always false with controller
     if (getFieldState("date").isDirty) {
       trigger();
     }
-  }, [date, trigger, getFieldState]);
+  }, [formDate, trigger, getFieldState]);
 
   // force revalidation of end time on start time change
-  const startTime = watch("startTime");
+  const formStartTime = watch("startTime");
   useEffect(() => {
     // Is touched is always false with controller
     if (getFieldState("endTime").isDirty) {
       trigger("endTime");
     }
-  }, [startTime, trigger, getFieldState]);
+  }, [formStartTime, trigger, getFieldState]);
 
   const [create] = useCreateStaffReservationMutation();
 
@@ -297,33 +296,34 @@ function DialogContent({
         throw new Error("Missing reservation unit");
       }
 
-      const fields = filterNonNullable(
-        reservationUnit.metadataSet?.supportedFields
-      );
+      const {
+        comments,
+        date,
+        startTime,
+        endTime,
+        type,
+        bufferTimeBefore,
+        bufferTimeAfter,
+        ...rest
+      } = values;
 
-      const flatMetaValues = flattenMetadata(values, fields);
-
-      if (values.type == null) {
-        throw new Error("Invalid reservation type");
-      }
       const bufferBefore =
-        values.type !== ReservationTypeChoice.Blocked && values.bufferTimeBefore
-          ? (reservationUnit.bufferTimeBefore ?? 0)
+        type !== ReservationTypeChoice.Blocked && bufferTimeBefore
+          ? reservationUnit.bufferTimeBefore
           : 0;
       const bufferAfter =
-        values.type !== ReservationTypeChoice.Blocked && values.bufferTimeAfter
-          ? (reservationUnit.bufferTimeAfter ?? 0)
+        type !== ReservationTypeChoice.Blocked && bufferTimeAfter
+          ? reservationUnit.bufferTimeAfter
           : 0;
       const input: ReservationStaffCreateMutationInput = {
+        ...rest,
         reservationUnit: reservationUnit.pk,
-        type: values.type,
-        begin: dateTime(values.date, values.startTime),
-        end: dateTime(values.date, values.endTime),
+        type,
+        begin: dateTime(date, startTime),
+        end: dateTime(date, endTime),
         bufferTimeBefore: bufferBefore,
         bufferTimeAfter: bufferAfter,
-        workingMemo: values.comments,
-        ...flatMetaValues,
-        reserveeType: values.reserveeType,
+        workingMemo: comments,
       };
 
       await createStaffReservation(input);

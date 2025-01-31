@@ -5,14 +5,6 @@ import { fromUIDate } from "../common/util";
 const THREE_YEARS_MS = 3 * 365 * 24 * 60 * 60 * 1000;
 const TIME_PATTERN = /^[0-2][0-9]:[0-5][0-9]$/;
 
-// Common select prop type
-// normally a backend provided list that is transformed into
-// { value, label } pair for input the value maps to a backend id (pk).
-export const OptionSchema = z.object({
-  value: z.number(),
-  label: z.string(),
-});
-
 export function checkDateNotInPast(
   date: Date | null,
   ctx: z.RefinementCtx,
