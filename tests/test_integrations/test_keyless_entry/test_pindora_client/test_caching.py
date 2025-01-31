@@ -25,8 +25,13 @@ def test_pindora_client__caching__reservation_unit_response():
     PindoraClient.cache_reservation_unit_response(data=data, ext_uuid=reservation_unit_id)
 
     response = PindoraClient.get_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
-
     assert response == data
+
+    succeeded = PindoraClient.clear_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
+    assert succeeded is True
+
+    response = PindoraClient.get_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
+    assert response is None
 
 
 def test_pindora_client__caching__reservation_response():
@@ -50,8 +55,13 @@ def test_pindora_client__caching__reservation_response():
     PindoraClient.cache_reservation_response(data=data, ext_uuid=reservation_id)
 
     response = PindoraClient.get_cached_reservation_response(ext_uuid=reservation_id)
-
     assert response == data
+
+    succeeded = PindoraClient.clear_cached_reservation_response(ext_uuid=reservation_id)
+    assert succeeded is True
+
+    response = PindoraClient.get_cached_reservation_response(ext_uuid=reservation_id)
+    assert response is None
 
 
 def test_pindora_client__caching__seasonal_booking_response():
@@ -79,8 +89,13 @@ def test_pindora_client__caching__seasonal_booking_response():
     PindoraClient.cache_seasonal_booking_response(data=data, ext_uuid=section_id)
 
     response = PindoraClient.get_cached_seasonal_booking_response(ext_uuid=section_id)
-
     assert response == data
+
+    succeeded = PindoraClient.clear_cached_seasonal_booking_response(ext_uuid=section_id)
+    assert succeeded is True
+
+    response = PindoraClient.get_cached_seasonal_booking_response(ext_uuid=section_id)
+    assert response is None
 
 
 def test_pindora_client__caching__reservation_series_response():
@@ -108,5 +123,10 @@ def test_pindora_client__caching__reservation_series_response():
     PindoraClient.cache_reservation_series_response(data=data, ext_uuid=series_id)
 
     response = PindoraClient.get_cached_reservation_series_response(ext_uuid=series_id)
-
     assert response == data
+
+    succeeded = PindoraClient.clear_cached_reservation_series_response(ext_uuid=series_id)
+    assert succeeded is True
+
+    response = PindoraClient.get_cached_reservation_series_response(ext_uuid=series_id)
+    assert response is None
