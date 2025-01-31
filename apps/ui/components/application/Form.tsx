@@ -74,10 +74,13 @@ const ApplicationSectionFormValueSchema = z
     suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema).optional(),
     // TODO do we want to keep the pk of the options? so we can update them when the order changes and not recreate the whole list on save?
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
-    // extra page prop, not saved to backend
+    // frontend only props
     accordionOpen: z.boolean(),
     // form specific: new events don't have pks and we need a unique identifier
     formKey: z.string(),
+    // selected reservation unit to show for this section
+    reservationUnitPk: z.number(),
+    priority: z.literal(200).or(z.literal(300)),
   })
   .refine((s) => s.maxDuration >= s.minDuration, {
     path: ["maxDuration"],
@@ -102,6 +105,9 @@ type SectionType = NonNullable<Node["applicationSections"]>[0];
 function transformApplicationSectionToForm(
   section: SectionType
 ): ApplicationSectionFormValue {
+  const initialReservationUnitPk =
+    section.reservationUnitOptions[0].reservationUnit.pk ?? 0;
+
   return {
     pk: section.pk ?? undefined,
     formKey: section.pk ? `event-${section.pk}` : "event-NEW",
@@ -133,6 +139,8 @@ function transformApplicationSectionToForm(
     begin: convertDate(section.reservationsBeginDate),
     end: convertDate(section.reservationsEndDate),
     accordionOpen: false,
+    reservationUnitPk: initialReservationUnitPk,
+    priority: 300,
   };
 }
 
@@ -224,6 +232,8 @@ const ApplicationFormSchema = z.object({
     .array(ApplicationSectionFormValueSchema.optional())
     .optional(),
 });
+
+export type ApplicationFormValues = z.infer<typeof ApplicationFormSchema>;
 
 function checkDateRange(props: {
   date: Date;
@@ -330,8 +340,6 @@ export type ApplicationFormPage3Values = z.infer<
   typeof ApplicationFormPage3Schema
 >;
 
-export type ApplicationFormValues = z.infer<typeof ApplicationFormSchema>;
-
 /// form -> API transformers, enforce return types so API changes cause type errors
 
 function transformDateString(date?: string | null): string | null {
@@ -430,6 +438,8 @@ export function convertApplication(
     suitableTimeRanges: [],
     reservationUnits: filterNonNullable(reservationUnits.map((ru) => ru.pk)),
     accordionOpen: true,
+    reservationUnitPk: 0,
+    priority: 300,
   };
   return {
     pk: app?.pk ?? 0,
