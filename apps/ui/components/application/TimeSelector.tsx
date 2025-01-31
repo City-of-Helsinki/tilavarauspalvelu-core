@@ -1,23 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { useTranslation } from "next-i18next";
-import { Button, ButtonVariant, IconCross, Select } from "hds-react";
-import type { ApplicationEventSchedulePriority } from "common/types/common";
-import { fontRegular } from "common/src/common/typography";
+import { TFunction, useTranslation } from "next-i18next";
+import { Button, ButtonVariant, IconCross } from "hds-react";
 import { breakpoints } from "common/src/common/style";
-import {
-  convertOptionToHDS,
-  fromMondayFirstUnsafe,
-  toNumber,
-} from "common/src/helpers";
+import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
-import { arrowDown, arrowUp, MediumButton } from "@/styles/util";
+import { arrowDown, arrowUp } from "@/styles/util";
 import { TimePreview } from "./TimePreview";
 import { type ApplicationEventScheduleFormType } from "./Form";
-import { useController, UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { ControlledSelect } from "common/src/components/form";
-import { Flex } from "common/styles/util";
-import { convertLanguageCode } from "common/src/common/util";
+import { Flex, NoWrap } from "common/styles/util";
+import { isTouchDevice } from "@/modules/util";
+
+export type ApplicationEventSchedulePriority = 50 | 100 | 200 | 300;
 
 type Cell = {
   hour: number;
@@ -27,15 +23,15 @@ type Cell = {
 };
 
 export type TimeSelectorFormValues = {
-  reservationUnitPks: number[];
+  reservationUnitPk: number;
   priority: ApplicationEventSchedulePriority;
 };
 
 type Props = {
   index: number;
   cells: Cell[][];
-  updateCells: (i: number, cells: Cell[][]) => void;
-  copyCells: ((i: number) => void) | null;
+  updateCells: (cells: Cell[][]) => void;
+  copyCells?: () => void;
   resetCells: () => void;
   summaryData: [
     ApplicationEventScheduleFormType[],
@@ -53,22 +49,25 @@ const CalendarHead = styled.div`
 `;
 
 const TimeSelectionButton = styled.button<{
-  state: ApplicationEventSchedulePriority | boolean;
-  firstRow: boolean;
+  $state: ApplicationEventSchedulePriority | boolean;
+  $firstRow: boolean;
 }>`
   --border-color: var(--color-black-50);
 
   display: block;
   width: 100%;
   font-size: var(--fontsize-heading-m);
-  color: ${(props) =>
-    props.state ? "var(--color-white)" : "var(--color-black)"};
+  white-space: nowrap;
+  position: relative;
+  cursor: pointer;
+  color: ${({ $state }) =>
+    $state ? "var(--color-white)" : "var(--color-black)"};
   padding: 0.24em 0.5em;
   border: 1px solid var(--border-color);
-  border-top: ${(props) =>
-    props.firstRow ? "1px solid var(--border-color)" : "none"};
-  ${(props) =>
-    props.state === 300
+  border-top: ${({ $firstRow }) =>
+    $firstRow ? "1px solid var(--border-color)" : "none"};
+  ${({ $state }) =>
+    $state === 300
       ? `
     &:after {
       ${arrowUp}
@@ -80,7 +79,7 @@ const TimeSelectionButton = styled.button<{
     color: var(--color-white);
     border-bottom-color: var(--color-black-60);
   `
-      : props.state === 200
+      : $state === 200
         ? `
     &:after {
       ${arrowDown}
@@ -93,17 +92,38 @@ const TimeSelectionButton = styled.button<{
   `
         : `
     background: ${
-      props.state === 100 ? "var(--color-white)" : "var(--color-black-10)"
+      $state === 100 ? "var(--color-white)" : "var(--color-black-10)"
     };
-    font-weight: ${props.state === 100 ? "bold" : "normal"};
+    font-weight: ${$state === 100 ? "bold" : "normal"};
     color: var(--color-black);
   `};
-  white-space: nowrap;
-  position: relative;
-  cursor: pointer;
 `;
 
-const Day = ({
+function getAriaLabel(t: TFunction, cell: Cell): string {
+  switch (cell.state) {
+    case 300:
+      return t("application:Page2.legend.selected-1");
+    case 200:
+      return t("application:Page2.legend.selected-2");
+    case 100:
+      return t("application:Page2.legend.within-opening-hours");
+    case 50:
+      return t("application:Page2.legend.outside-opening-hours");
+    default:
+      return "";
+  }
+}
+
+function constructAriaLabel(
+  t: TFunction,
+  cell: Cell,
+  labelHead: string
+): string {
+  const base = getAriaLabel(t, cell);
+  return `${base ? `${base}: ` : ""}${labelHead} ${cell.label}`;
+}
+
+function Day({
   head,
   labelHead,
   cells,
@@ -126,70 +146,44 @@ const Day = ({
   painting: boolean;
   setPainting: (state: boolean) => void;
   priority: ApplicationEventSchedulePriority;
-}): JSX.Element => {
+}): JSX.Element {
   const { t } = useTranslation();
 
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const handleMouseDown = (cell: Cell, _evt: React.MouseEvent) => {
+    const state = priority === cell.state ? false : priority;
 
-  useEffect(() => {
-    if ("ontouchstart" in window) setIsTouchDevice(true);
-  }, []);
+    if (isTouchDevice()) {
+      setCellValue(cell, state);
+      return;
+    }
+
+    setPaintState(state);
+    setCellValue(cell, state);
+    setPainting(true);
+  };
 
   return (
     <div>
       <CalendarHead>{head}</CalendarHead>
       {cells.map((cell, cellIndex) => {
-        let ariaLabel = "";
-        switch (cell.state) {
-          case 300:
-            ariaLabel = t("application:Page2.legend.selected-1");
-            break;
-          case 200:
-            ariaLabel = t("application:Page2.legend.selected-2");
-            break;
-          case 100:
-            ariaLabel = t("application:Page2.legend.within-opening-hours");
-            break;
-          case 50:
-            ariaLabel = t("application:Page2.legend.outside-opening-hours");
-            break;
-          default:
-        }
-
         return (
           <TimeSelectionButton
             key={cell.key}
-            state={cell.state}
-            firstRow={cellIndex === 0}
+            $state={cell.state}
+            $firstRow={cellIndex === 0}
             type="button"
-            onMouseDown={() => {
-              const state = priority === cell.state ? false : priority;
-
-              if (isTouchDevice) {
-                setCellValue(cell, state);
-                return;
-              }
-
-              setPaintState(state);
-              setCellValue(cell, state);
-              setPainting(true);
-            }}
-            onMouseUp={() => {
-              setPainting(false);
-            }}
-            onKeyPress={() => {
-              const state = priority === cell.state ? false : priority;
-              setCellValue(cell, state);
-            }}
+            onMouseDown={(evt) => handleMouseDown(cell, evt)}
+            onMouseUp={() => setPainting(false)}
+            onKeyDown={() =>
+              setCellValue(cell, priority === cell.state ? false : priority)
+            }
             onMouseEnter={() => {
               if (painting) {
                 setCellValue(cell, paintState);
               }
             }}
             role="option"
-            aria-label={`${ariaLabel ? `${ariaLabel}: ` : ""}${labelHead} ${
-              cell.label
-            }`}
+            aria-label={constructAriaLabel(t, cell, labelHead)}
             aria-selected={cell.state > 100}
             data-testid={`time-selector__button--${cell.key}`}
           >
@@ -199,7 +193,7 @@ const Day = ({
       })}
     </div>
   );
-};
+}
 
 const CalendarContainer = styled.div`
   margin-top: var(--spacing-layout-s);
@@ -297,10 +291,6 @@ const LegendBox = styled.div<{ type: string }>`
   }
 `;
 
-const LegendLabel = styled.div`
-  white-space: nowrap;
-`;
-
 const TimePreviewContainer = styled.div`
   margin: var(--spacing-xl) 0;
 `;
@@ -314,24 +304,35 @@ const ButtonContainer = styled(Flex).attrs({
 `;
 
 const ResetButton = styled(Button)`
-  --color-bus: var(--color-black);
-  grid-row: 1;
-  grid-column: 3;
-  & > span {
-    display: flex;
-    gap: var(--spacing-2-xs);
-    padding-left: 0;
-    align-items: center;
-  }
-  &:hover {
+  && {
+    --color: var(--color-black);
     --background-color-hover-focus: var(--color-black-15);
     --background-color-hover: var(--color-black-5);
     --color-hover: var(--color-black-90);
     --color-hover-focus: var(--color-hover);
   }
-
-  ${fontRegular};
+  grid-row: 1;
+  grid-column: 3;
 `;
+
+const CELL_TYPES = [
+  {
+    type: "within-opening-hours",
+    label: "application:Page2.legend.within-opening-hours",
+  },
+  {
+    type: "outside-opening-hours",
+    label: "application:Page2.legend.outside-opening-hours",
+  },
+  {
+    type: "selected-1",
+    label: "application:Page2.legend.selected-1",
+  },
+  {
+    type: "selected-2",
+    label: "application:Page2.legend.selected-2",
+  },
+] as const;
 
 /// TODO what is the responsibility of this component?
 /// Why does it take a bucket full of props?
@@ -356,46 +357,35 @@ export function TimeSelector({
   >(false); // toggle value true = set, false = clear: ;
   const [painting, setPainting] = useState(false); // is painting 'on'
 
-  const cellTypes = [
-    {
-      type: "within-opening-hours",
-      label: t("application:Page2.legend.within-opening-hours"),
-    },
-    {
-      type: "outside-opening-hours",
-      label: t("application:Page2.legend.outside-opening-hours"),
-    },
-    {
-      type: "selected-1",
-      label: t("application:Page2.legend.selected-1"),
-    },
-    {
-      type: "selected-2",
-      label: t("application:Page2.legend.selected-2"),
-    },
-  ];
+  const cellTypes = CELL_TYPES.map((cell) => ({
+    ...cell,
+    label: t(cell.label),
+  }));
 
-  const { watch } = form;
-  const priority = watch("priority");
+  const { watch: timeWatcher } = form;
+  const priority = timeWatcher("priority");
 
-  if (!cells) {
-    return null;
-  }
+  /*
+  const { setValue, getValues, watch } = useFormContext<ApplicationFormValues>();
 
+    const applicationSections = filterNonNullable(watch("applicationSections"));
+    const selectorData = applicationSections.map((ae) =>
+      aesToCells(convertToSchedule(ae), reservationUnitOpeningHours)
+    );
+  */
   const setCellValue = (
     selection: Cell,
     value: ApplicationEventSchedulePriority | false
   ): void => {
-    updateCells(
-      index,
-      cells.map((day) => [
-        ...day.map((h) =>
-          h.key === selection.key
-            ? { ...h, state: value === false ? 100 : value }
-            : h
-        ),
-      ])
-    );
+    const newVal = cells.map((day) => [
+      ...day.map((h) =>
+        h.key === selection.key
+          ? { ...h, state: value === false ? 100 : value }
+          : h
+      ),
+    ]);
+
+    updateCells(newVal);
   };
 
   return (
@@ -403,7 +393,6 @@ export function TimeSelector({
       <OptionSelector
         reservationUnitOptions={reservationUnitOptions}
         form={form}
-        index={index}
       />
       <CalendarContainer
         onMouseLeave={() => setPainting(false)}
@@ -430,7 +419,7 @@ export function TimeSelector({
         {cellTypes.map((cell, idx) => (
           <Legend key={cell.label} $idx={idx}>
             <LegendBox type={cell.type} />
-            <LegendLabel>{cell.label}</LegendLabel>
+            <NoWrap>{cell.label}</NoWrap>
           </Legend>
         ))}
         <ResetButton
@@ -448,13 +437,13 @@ export function TimeSelector({
       </TimePreviewContainer>
       {copyCells && (
         <ButtonContainer>
-          <MediumButton
+          <Button
             id={`time-selector__button--copy-cells-${index}`}
             variant={ButtonVariant.Secondary}
-            onClick={() => copyCells(index)}
+            onClick={copyCells}
           >
             {t("application:Page2.copyTimes")}
-          </MediumButton>
+          </Button>
         </ButtonContainer>
       )}
     </>
@@ -474,9 +463,8 @@ const OptionWrapper = styled.div`
 function OptionSelector({
   reservationUnitOptions,
   form,
-  index,
-}: Pick<Props, "reservationUnitOptions" | "form" | "index">) {
-  const { t, i18n } = useTranslation();
+}: Pick<Props, "reservationUnitOptions" | "form">) {
+  const { t } = useTranslation();
   const { control } = form;
 
   const priorityOptions = [300, 200].map((n) => ({
@@ -484,14 +472,6 @@ function OptionSelector({
     value: n,
   }));
 
-  const language = convertLanguageCode(i18n.language);
-
-  const {
-    field: { value, onChange },
-  } = useController({ name: "reservationUnitPks", control });
-  const hdsValue = reservationUnitOptions
-    .filter((o) => o.value === value[index])
-    .map(convertOptionToHDS);
   return (
     <OptionWrapper>
       <ControlledSelect
@@ -500,24 +480,11 @@ function OptionSelector({
         control={control}
         options={priorityOptions}
       />
-      <Select
-        options={reservationUnitOptions.map(convertOptionToHDS)}
-        clearable={false}
-        noTags
-        texts={{
-          label: t("application:Page2.reservationUnitSelectLabel"),
-          placeholder: t("common:select"),
-          language,
-        }}
-        value={hdsValue}
-        onChange={(v) => {
-          const val = toNumber(v[0].value);
-          if (val != null) {
-            const arr = [...value];
-            arr[index] = val;
-            onChange(arr);
-          }
-        }}
+      <ControlledSelect
+        name="reservationUnitPk"
+        label={t("application:Page2.reservationUnitSelectLabel")}
+        control={control}
+        options={reservationUnitOptions}
       />
     </OptionWrapper>
   );
