@@ -1,8 +1,8 @@
 import {
   type ApplicationFormValues,
   type ApplicationEventScheduleFormType,
-  SuitableTimeRangeFormValues,
-} from "./Form";
+  type SuitableTimeRangeFormValues,
+} from "./form";
 import { ApplicationRoundTimeSlotNode, Priority } from "@/gql/gql-types";
 import { convertWeekday, Day, transformWeekday } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";

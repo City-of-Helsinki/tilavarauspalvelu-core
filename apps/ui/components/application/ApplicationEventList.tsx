@@ -20,7 +20,7 @@ import {
   InfoItem,
   ScheduleDay,
 } from "./styled";
-import { ApplicationEventScheduleFormType } from "@/components/application/Form";
+import { ApplicationEventScheduleFormType } from "./form";
 import { WEEKDAYS } from "common/src/const";
 import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
 import StatusLabel from "common/src/components/StatusLabel";

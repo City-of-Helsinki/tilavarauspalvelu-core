@@ -7,14 +7,14 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { Page1 } from "@/components/application/Page1";
-import Page2 from "@/components/application/Page2";
+import { Page2 } from "@/components/application/Page2";
 import { getTranslation } from "@/modules/util";
 import {
   type ApplicationFormValues,
   transformApplication,
   convertApplication,
   ApplicationFormSchemaRefined,
-} from "@/components/application/Form";
+} from "@/components/application/form";
 import { useReservationUnitList } from "@/hooks";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { getCommonServerSideProps } from "@/modules/serverUtils";

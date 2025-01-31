@@ -167,7 +167,7 @@ export const TermsAccordion = styled(AccordionWithState)`
   }
 `;
 
-export const SpanTwoColumns = styled(FullRow).attrs({ as: "span" })``;
+export const SpanFullRow = styled(FullRow).attrs({ as: "span" })``;
 
 export const FormSubHeading = styled(H5).attrs({ as: "h2" })`
   margin: 0;

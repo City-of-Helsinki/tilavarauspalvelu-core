@@ -145,14 +145,6 @@ export const getAddressAlt = (ru: {
   return trim(`${street}, ${city}`, ", ");
 };
 
-export function applicationErrorText(
-  t: TFunction,
-  key: string | undefined,
-  attrs: { [key: string]: string | number } = {}
-): string {
-  return key ? t(`application:error.${key}`, attrs) : "";
-}
-
 export const getReadableList = (list: string[]): string => {
   if (list.length === 0) {
     return "";

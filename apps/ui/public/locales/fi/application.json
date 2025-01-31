@@ -140,7 +140,7 @@
     "company": {
       "name": "Yrityksen virallinen nimi",
       "coreBusiness": "Yrityksen ydintoiminta",
-      "registrationNumber": "Y-tunnus"
+      "identifier": "Y-tunnus"
     },
     "organisation": {
       "name": "Virallinen nimi",

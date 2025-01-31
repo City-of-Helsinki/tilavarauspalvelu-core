@@ -17,7 +17,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { getTranslation } from "@/modules/util";
 import { useOptions } from "@/hooks/useOptions";
 import { ApplicationEvent } from "./ApplicationEvent";
-import { type ApplicationFormValues } from "./Form";
+import { type ApplicationFormValues } from "./form";
 import { useReservationUnitList } from "@/hooks";
 import { ButtonContainer } from "common/styles/util";
 

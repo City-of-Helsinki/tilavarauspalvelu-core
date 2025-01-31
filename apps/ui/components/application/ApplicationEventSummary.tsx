@@ -5,7 +5,7 @@ import { Trans, useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
 import { H4 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
-import { ApplicationSectionFormValue } from "./Form";
+import { type ApplicationSectionFormValue } from "./form";
 import { Flex } from "common/styles/util";
 import { IconWithText } from "../common/IconWithText";
 
