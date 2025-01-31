@@ -11,34 +11,26 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
-import {
-  Priority,
-  type ApplicationQuery,
-  type ApplicationRoundTimeSlotNode,
-} from "@gql/gql-types";
+import { type ApplicationQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import type {
   ApplicationSectionFormValue,
-  ApplicationEventScheduleFormType,
   ApplicationFormValues,
-  SuitableTimeRangeFormValues,
 } from "./Form";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
-import {
-  convertWeekday,
-  transformWeekday,
-  type Day,
-} from "common/src/conversion";
 import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
+import { TimeSelector } from "./TimeSelector";
 import {
-  type ApplicationEventSchedulePriority,
-  TimeSelector,
-} from "./TimeSelector";
-import { errorToast, successToast } from "common/src/common/toast";
+  aesToCells,
+  Cell,
+  cellsToApplicationEventSchedules,
+  convertToSchedule,
+} from "./module";
+import { errorToast } from "common/src/common/toast";
 import { ButtonContainer } from "common/styles/util";
 import { getApplicationPath } from "@/modules/urls";
 
@@ -48,23 +40,9 @@ type Props = {
   onNext: (appToSave: ApplicationFormValues) => void;
 };
 
-type OpeningHourPeriod = {
-  begin: string;
-  end: string;
-} | null;
-
-type DailyOpeningHours = Pick<
-  ApplicationRoundTimeSlotNode,
-  "weekday" | "closed" | "reservableTimes"
->[];
-
 const StyledNotification = styled(Notification)`
   margin-top: var(--spacing-m);
 `;
-
-function cellLabel(row: number): string {
-  return `${row} - ${row + 1}`;
-}
 
 function getListOfApplicationEventTitles(
   applicationSections: ApplicationSectionFormValue[],
@@ -72,164 +50,6 @@ function getListOfApplicationEventTitles(
 ): string {
   return getReadableList(ids.map((id) => `"${applicationSections[id].name}"`));
 }
-
-function getOpeningHours(
-  day: number,
-  openingHours?: DailyOpeningHours
-): OpeningHourPeriod[] | null {
-  if (!openingHours) {
-    return null;
-  }
-  const dayOpeningHours = openingHours.find((oh) => oh.weekday === day);
-  if (!dayOpeningHours) {
-    return null;
-  }
-  if (dayOpeningHours.closed) {
-    return null;
-  }
-  return dayOpeningHours.reservableTimes ?? null;
-}
-
-function aesToCells(
-  schedule: ApplicationEventScheduleFormType[],
-  openingHours?: DailyOpeningHours
-): Cell[][] {
-  const firstSlotStart = 7;
-  const lastSlotStart = 23;
-
-  const cells: Cell[][] = [];
-
-  for (let j = 0; j < 7; j += 1) {
-    const day: Cell[] = [];
-    const openingHoursForADay = getOpeningHours(j, openingHours);
-    const dayOpeningHours = filterNonNullable(openingHoursForADay).map((t) => ({
-      begin: t && +t.begin.split(":")[0],
-      end: t && +t.end.split(":")[0] === 0 ? 24 : t && +t.end.split(":")[0],
-    }));
-    // state is 50 if the cell is outside the opening hours, 100 if it's inside
-    for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
-      const isAvailable = dayOpeningHours.some(
-        (t) => t.begin != null && t.end != null && t?.begin <= i && t?.end > i
-      );
-      day.push({
-        key: `${i}-${j}`,
-        hour: i,
-        label: cellLabel(i),
-        state: isAvailable ? 100 : 50,
-      });
-    }
-    cells.push(day);
-  }
-
-  for (const aes of schedule) {
-    const { day, priority } = aes;
-    const hourBegin = Number(aes.begin.substring(0, 2)) - firstSlotStart;
-    const hourEnd = (Number(aes.end.substring(0, 2)) || 24) - firstSlotStart;
-    for (let h = hourBegin; h < hourEnd; h += 1) {
-      const cell = cells[day][h];
-      if (cell) {
-        cell.state = convertPriorityToState(priority);
-      }
-    }
-  }
-
-  return cells;
-}
-
-function convertPriorityToState(
-  priority: number
-): ApplicationEventSchedulePriority {
-  switch (priority) {
-    case 300:
-      return 300;
-    case 200:
-      return 200;
-    default:
-      return 100;
-  }
-}
-
-/// unsafe
-function formatNumber(n: number): string {
-  if (n < 0) {
-    throw new Error("Negative number");
-  }
-  if (n > 23) {
-    return "00";
-  }
-  if (n < 10) {
-    return `0${n}`;
-  }
-  return `${n}`;
-}
-
-type Timespan = {
-  begin: number;
-  end: number;
-  priority: ApplicationEventSchedulePriority;
-};
-
-type Cell = {
-  hour: number;
-  label: string;
-  state: ApplicationEventSchedulePriority;
-  key: string;
-};
-
-type ApplicationEventScheduleType = {
-  day: Day;
-  begin: string;
-  end: string;
-  priority: number;
-};
-
-function cellsToApplicationEventSchedules(
-  cells: Cell[][]
-): ApplicationEventScheduleType[] {
-  const daySchedules: ApplicationEventScheduleType[] = [];
-  if (cells.length > 7) {
-    throw new Error("Too many days");
-  }
-  const range = [0, 1, 2, 3, 4, 5, 6] as const;
-  for (const day of range) {
-    const dayCells = cells[day];
-    const transformedDayCells = dayCells
-      .filter((cell) => cell.state)
-      .map((cell) => ({
-        begin: cell.hour,
-        end: cell.hour + 1,
-        priority: cell.state,
-      }))
-      .reduce<Timespan[]>((prev, current) => {
-        if (!prev.length) {
-          return [current];
-        }
-        if (
-          prev[prev.length - 1].end === current.begin &&
-          prev[prev.length - 1].priority === current.priority
-        ) {
-          return [
-            ...prev.slice(0, prev.length - 1),
-            {
-              begin: prev[prev.length - 1].begin,
-              end: prev[prev.length - 1].end + 1,
-              priority: prev[prev.length - 1].priority,
-            },
-          ];
-        }
-        return [...prev, current];
-      }, [])
-      .map((cell) => ({
-        day,
-        begin: `${formatNumber(cell.begin)}:00`,
-        end: `${formatNumber(cell.end)}:00`,
-        priority: cell.priority,
-      }));
-    daySchedules.push(...transformedDayCells);
-  }
-  return daySchedules;
-}
-
 function getLongestChunks(selectorData: Cell[][][]): number[] {
   return selectorData.map((n) => {
     const primarySchedules = cellsToApplicationEventSchedules(
@@ -261,57 +81,6 @@ function getApplicationEventsWhichMinDurationsIsNotFulfilled(
       return selectedHours[index] < minDuration / 3600 ? index : null;
     })
   );
-}
-
-function convertToSchedule(
-  b: NonNullable<NonNullable<ApplicationFormValues["applicationSections"]>[0]>
-): ApplicationEventScheduleFormType[] {
-  return (
-    b.suitableTimeRanges?.map((range) => {
-      return {
-        day: range ? convertWeekday(range.dayOfTheWeek) : 0,
-        begin: range?.beginTime ?? "",
-        end: range?.endTime ?? "",
-        priority: range?.priority === Priority.Primary ? 300 : 200,
-      };
-    }) ?? []
-  );
-}
-
-function covertCellsToTimeRange(
-  cells: Cell[][][]
-): SuitableTimeRangeFormValues[][] {
-  // So this returns them as:
-  // applicationSections (N)
-  // - ApplicationEventSchedule[][]: Array(7) (i is the day)
-  // - ApplicationEventSchedule[]: Array(M) (j is the continuous block)
-  // priority: 200 | 300 (200 is secondary, 300 is primary)
-  // priority: 100 (? assuming it's not selected)
-  const selectedAppEvents = cells
-    .map((cell) => cellsToApplicationEventSchedules(cell))
-    .map((aes) =>
-      aes.filter((ae) => ae.priority === 300 || ae.priority === 200)
-    );
-  // this seems to work except
-  // TODO: day is incorrect (empty days at the start are missing, and 200 / 300 priority on the same day gets split into two days)
-  // TODO refactor the Cell -> ApplicationEventSchedule conversion to use FormTypes
-  return selectedAppEvents.map((appEventSchedule) => {
-    const val: SuitableTimeRangeFormValues[] = appEventSchedule.map(
-      (appEvent) => {
-        const { day } = appEvent;
-        return {
-          beginTime: appEvent.begin,
-          endTime: appEvent.end,
-          // The default will never happen (it's already filtered)
-          // TODO type this better
-          priority:
-            appEvent.priority === 300 ? Priority.Primary : Priority.Secondary,
-          dayOfTheWeek: transformWeekday(day),
-        };
-      }
-    );
-    return val;
-  });
 }
 
 function Page2({ application, onNext }: Props): JSX.Element {
@@ -360,7 +129,6 @@ function Page2({ application, onNext }: Props): JSX.Element {
             key={section.formKey}
             index={index}
             section={application?.applicationSections[index]}
-            enableCopyCells={applicationSections.length > 1}
           />
         ) : null
       )}
@@ -410,14 +178,11 @@ function Page2({ application, onNext }: Props): JSX.Element {
 function ApplicationSectionTimePicker({
   index: sectionIndex,
   section,
-  enableCopyCells = true,
 }: {
   index: number;
   section: NonNullable<Node["applicationSections"]>[0];
-  enableCopyCells?: boolean;
 }): JSX.Element {
-  const { setValue, getValues, watch } =
-    useFormContext<ApplicationFormValues>();
+  const { watch } = useFormContext<ApplicationFormValues>();
 
   const { t, i18n } = useTranslation();
   const language = convertLanguageCode(i18n.language);
@@ -433,83 +198,6 @@ function ApplicationSectionTimePicker({
   const reservationUnitOpeningHours =
     allOpeningHours.find((n) => n.pk === selectedReservationUnitPk)
       ?.openingHours ?? [];
-
-  const setSelectorData = (selected: Cell[][][]) => {
-    const formVals = covertCellsToTimeRange(selected);
-    for (const i of formVals.keys()) {
-      setValue(`applicationSections.${i}.suitableTimeRanges`, formVals[i]);
-    }
-  };
-
-  const updateCells = (index: number, newCells: Cell[][]) => {
-    const applicationSections = filterNonNullable(watch("applicationSections"));
-    const selectorData = applicationSections.map((ae) =>
-      aesToCells(convertToSchedule(ae), reservationUnitOpeningHours)
-    );
-    const updated = [...selectorData];
-    updated[index] = newCells;
-    setSelectorData(updated);
-  };
-
-  // TODO should remove the cell not set a priority
-  const resetCells = (index: number) => {
-    const applicationSections = filterNonNullable(watch("applicationSections"));
-    const selectorData = applicationSections.map((ae) =>
-      aesToCells(convertToSchedule(ae), reservationUnitOpeningHours)
-    );
-
-    const updated = [...selectorData];
-    updated[index] = selectorData[index].map((n) =>
-      n.map((nn) => ({ ...nn, state: 100 }))
-    );
-    setSelectorData(updated);
-  };
-
-  const copyCells = (index: number) => {
-    const applicationSections = filterNonNullable(watch("applicationSections"));
-    const selectorData = applicationSections.map((ae) =>
-      aesToCells(convertToSchedule(ae), reservationUnitOpeningHours)
-    );
-
-    const updated = [...selectorData];
-    const srcCells = updated[index];
-    srcCells.forEach((day, i) => {
-      day.forEach((cell, j) => {
-        const { state } = cell;
-        for (let k = 0; k < updated.length; k += 1) {
-          if (k !== index) {
-            updated[k][i][j].state = state;
-          }
-        }
-      });
-    });
-    setSelectorData(updated);
-    successToast({
-      text: t("application:Page2.notification.copyCells"),
-      dataTestId: "application__page2--notification-success",
-    });
-  };
-
-  // NOTE there is something funny with this one on the first render
-  // (it's undefined and not Array as expected).
-  const schedules =
-    getValues(`applicationSections.${sectionIndex}.suitableTimeRanges`) ?? [];
-  const summaryDataPrimary = schedules
-    .filter((n) => n.priority === Priority.Primary)
-    .map((a) => ({
-      begin: a.beginTime,
-      end: a.endTime,
-      priority: 300 as const,
-      day: convertWeekday(a.dayOfTheWeek),
-    }));
-  const summaryDataSecondary = schedules
-    .filter((n) => n.priority === Priority.Secondary)
-    .map((a) => ({
-      begin: a.beginTime,
-      end: a.endTime,
-      priority: 200 as const,
-      day: convertWeekday(a.dayOfTheWeek),
-    }));
 
   const reservationUnitOptions = filterNonNullable(
     section.reservationUnitOptions
@@ -543,11 +231,8 @@ function ApplicationSectionTimePicker({
       <TimeSelector
         index={sectionIndex}
         cells={selectorData[sectionIndex]}
-        updateCells={(cells) => updateCells(sectionIndex, cells)}
-        copyCells={enableCopyCells ? () => copyCells(sectionIndex) : undefined}
-        resetCells={() => resetCells(sectionIndex)}
-        summaryData={[summaryDataPrimary, summaryDataSecondary]}
         reservationUnitOptions={reservationUnitOptions}
+        reservationUnitOpeningHours={reservationUnitOpeningHours}
       />
     </Accordion>
   );

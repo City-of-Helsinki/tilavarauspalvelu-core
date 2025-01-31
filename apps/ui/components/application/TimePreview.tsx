@@ -5,12 +5,17 @@ import { breakpoints } from "common/src/common/style";
 import { fontBold, H4 } from "common/src/common/typography";
 import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
-import { ApplicationEventScheduleFormType } from "./Form";
+import {
+  ApplicationEventScheduleFormType,
+  ApplicationFormValues,
+} from "./Form";
 import { getDayTimes } from "@/modules/util";
+import { useFormContext } from "react-hook-form";
+import { Priority } from "@/gql/gql-types";
+import { convertWeekday } from "common/src/conversion";
 
 type Props = {
-  primary: ApplicationEventScheduleFormType[];
-  secondary: ApplicationEventScheduleFormType[];
+  index: number;
 };
 
 const WeekWrapper = styled.div`
@@ -68,8 +73,29 @@ const Heading = styled(H4).attrs({
   margin-top: 0;
 `;
 
-const TimePreview = ({ primary, secondary }: Props): JSX.Element => {
+export function TimePreview({ index }: Props): JSX.Element {
   const { t } = useTranslation();
+
+  const { watch } = useFormContext<ApplicationFormValues>();
+
+  const schedules =
+    watch(`applicationSections.${index}.suitableTimeRanges`) ?? [];
+  const primary = schedules
+    .filter((n) => n.priority === Priority.Primary)
+    .map((a) => ({
+      begin: a.beginTime,
+      end: a.endTime,
+      priority: 300 as const,
+      day: convertWeekday(a.dayOfTheWeek),
+    }));
+  const secondary = schedules
+    .filter((n) => n.priority === Priority.Secondary)
+    .map((a) => ({
+      begin: a.beginTime,
+      end: a.endTime,
+      priority: 200 as const,
+      day: convertWeekday(a.dayOfTheWeek),
+    }));
 
   return (
     <Wrapper>
@@ -83,6 +109,4 @@ const TimePreview = ({ primary, secondary }: Props): JSX.Element => {
       </div>
     </Wrapper>
   );
-};
-
-export { TimePreview };
+}
