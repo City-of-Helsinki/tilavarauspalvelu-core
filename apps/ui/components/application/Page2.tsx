@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
-import { useForm, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import {
   Priority,
   type ApplicationQuery,
@@ -37,7 +37,6 @@ import { AccordionWithState as Accordion } from "@/components/Accordion";
 import {
   type ApplicationEventSchedulePriority,
   TimeSelector,
-  TimeSelectorFormValues,
 } from "./TimeSelector";
 import { errorToast, successToast } from "common/src/common/toast";
 import { ButtonContainer } from "common/styles/util";
@@ -358,8 +357,7 @@ function Page2({ application, onNext }: Props): JSX.Element {
       {applicationSections.map((section, index) =>
         application?.applicationSections?.[index] != null ? (
           <ApplicationSectionTimePicker
-            // TODO if we gonna use this as a key we need to create negative pks for new sections
-            key={section.pk ?? 0}
+            key={section.formKey}
             index={index}
             section={application?.applicationSections[index]}
             enableCopyCells={applicationSections.length > 1}
@@ -421,27 +419,19 @@ function ApplicationSectionTimePicker({
   const { setValue, getValues, watch } =
     useFormContext<ApplicationFormValues>();
 
-  const initialReservationUnitPk =
-    section.reservationUnitOptions[0].reservationUnit.pk ?? 0;
-
-  const timeSelectorForm = useForm<TimeSelectorFormValues>({
-    defaultValues: {
-      reservationUnitPk: initialReservationUnitPk,
-      priority: 300,
-    },
-  });
-
   const { t, i18n } = useTranslation();
   const language = convertLanguageCode(i18n.language);
 
-  const { watch: timeSelectorWatch } = timeSelectorForm;
   const allOpeningHours = section.reservationUnitOptions.map((ruo) => ({
     pk: ruo.reservationUnit.pk ?? 0,
     openingHours: ruo.reservationUnit.applicationRoundTimeSlots,
   }));
 
+  const selectedReservationUnitPk = watch(
+    `applicationSections.${sectionIndex}.reservationUnitPk`
+  );
   const reservationUnitOpeningHours =
-    allOpeningHours.find((n) => n.pk === timeSelectorWatch("reservationUnitPk"))
+    allOpeningHours.find((n) => n.pk === selectedReservationUnitPk)
       ?.openingHours ?? [];
 
   const setSelectorData = (selected: Cell[][][]) => {
@@ -500,7 +490,7 @@ function ApplicationSectionTimePicker({
     });
   };
 
-  // TODO there is something funny with this one on the first render
+  // NOTE there is something funny with this one on the first render
   // (it's undefined and not Array as expected).
   const schedules =
     getValues(`applicationSections.${sectionIndex}.suitableTimeRanges`) ?? [];
@@ -558,7 +548,6 @@ function ApplicationSectionTimePicker({
         resetCells={() => resetCells(sectionIndex)}
         summaryData={[summaryDataPrimary, summaryDataSecondary]}
         reservationUnitOptions={reservationUnitOptions}
-        form={timeSelectorForm}
       />
     </Accordion>
   );
