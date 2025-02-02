@@ -2,8 +2,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
-  ReservationStateChoice,
   type ReservationQuery,
+  ReservationStateChoice,
   useRecurringReservationQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
@@ -41,7 +41,7 @@ export function RecurringReservationsView({
   onChange,
   onReservationUpdated,
   reservationToCopy,
-}: Props) {
+}: Readonly<Props>) {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
@@ -166,7 +166,8 @@ export function RecurringReservationsView({
       date: startDate,
       startTime: format(startDate, "H:mm"),
       endTime: format(endDate, "H:mm"),
-      isRemoved: x.state === "DENIED",
+      isRemoved: x.state === ReservationStateChoice.Denied,
+      isCancelled: x.state === ReservationStateChoice.Cancelled,
       buttons,
     };
   });

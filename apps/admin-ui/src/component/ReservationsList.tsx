@@ -7,11 +7,12 @@ import {
   ReservationQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { Button, ButtonSize, ButtonVariant } from "hds-react";
+import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
 import { useCheckPermission } from "@/hooks";
 import { NewReservationModal } from "@/component/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { H6 } from "common";
+import StatusLabel from "common/src/components/StatusLabel";
 
 export type NewReservationListItem = {
   date: Date;
@@ -22,6 +23,7 @@ export type NewReservationListItem = {
   reservationPk?: number;
   buttons?: React.ReactNode;
   isRemoved?: boolean;
+  isCancelled?: boolean;
   isOverlapping?: boolean;
   buffers?: {
     before?: number;
@@ -68,13 +70,8 @@ const DateElement = styled.div<{ $isRemoved: boolean }>`
   ${({ $isRemoved }) => ($isRemoved ? "color: var(--color-black-50)" : "")};
 `;
 
-const ErrorLabel = styled.div<{ $isError: boolean }>`
-  & > span {
-    color: var(--color-black);
-    background: ${({ $isError }) =>
-      $isError ? "var(--color-metro-medium-light)" : "var(--color-black-10)"};
-    padding: 0.5rem;
-  }
+const ErrorLabel = styled(StatusLabel)`
+  margin-inline: -8px;
 `;
 
 const stripTimeZeros = (time: string) =>
@@ -88,18 +85,28 @@ function getStatus(x: NewReservationListItem) {
     return {
       isError: true,
       msg: "overlapping",
+      icon: <IconCross />,
     };
   }
   if (x.reason) {
     return {
       isError: true,
       msg: `RejectionReadinessChoice.${x.reason}`,
+      icon: <IconCross />,
     };
   }
   if (x.isRemoved) {
     return {
-      isError: false,
+      isError: true,
       msg: "removed",
+      icon: <IconCross />,
+    };
+  }
+  if (x.isCancelled) {
+    return {
+      isError: false,
+      msg: "cancelled",
+      icon: <IconCross />,
     };
   }
   if (x.error) {
@@ -122,6 +129,7 @@ function getStatus(x: NewReservationListItem) {
     return {
       isError: true,
       msg: `failureMessages.${errorCode}`,
+      icon: <IconCross />,
     };
   }
   return undefined;
@@ -137,11 +145,11 @@ function StatusElement({ item }: { item: NewReservationListItem }) {
     return null;
   }
 
-  const { isError, msg } = status;
+  const { isError, msg, icon } = status;
 
   return (
-    <ErrorLabel $isError={isError}>
-      <span>{t(msg)}</span>
+    <ErrorLabel icon={icon} type={isError ? "error" : "neutral"} slim>
+      {t(msg)}
     </ErrorLabel>
   );
 }
@@ -248,7 +256,10 @@ export function ReservationList(props: Props | ExtendedProps) {
           >
             <TextWrapper $failed={!!item.error}>
               <DateElement
-                $isRemoved={(item.isRemoved || item.isOverlapping) ?? false}
+                $isRemoved={
+                  (item.isRemoved || item.isOverlapping || item.isCancelled) ??
+                  false
+                }
               >
                 {`${toUIDate(item.date, "cccccc d.M.yyyy")}, ${stripTimeZeros(
                   item.startTime

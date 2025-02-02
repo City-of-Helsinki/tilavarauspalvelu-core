@@ -219,6 +219,7 @@
       "reservationUnit": "Utrymme",
       "rejected": "Avslagen",
       "modified": "Ändrad",
+      "cancelled": "Avbokad",
       "showAllReservations": "Visa alla bokningar",
       "cancelApplication": "Avboka alla bokningar",
       "reservationUnitsTitle": "Verksamhetsställe",

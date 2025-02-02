@@ -221,6 +221,7 @@
       "reservationUnit": "Tila",
       "rejected": "Hylätty",
       "modified": "Muokattu",
+      "cancelled": "Peruttu",
       "showAllReservations": "Näytä kaikki varaukset",
       "cancelApplication": "Peru kaikki varaukset",
       "reservationUnitsTitle": "Toimipiste",

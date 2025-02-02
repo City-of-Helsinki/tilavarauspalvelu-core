@@ -406,8 +406,9 @@ const translations: ITranslations = {
       pageTitle: ["Tee toistuva varaus"],
       addNewReservation: ["Lisää uusi varaus"],
       Confirmation: {
-        removed: ["Poistettu"],
+        removed: ["Hylätty"],
         overlapping: ["Ei saatavilla"],
+        cancelled: ["Peruttu"],
         title: ["Toistuva varaus tehty"],
         allFailedTitle: ["Toistuvaa varausta ei voitu tehdä"],
         failedSubtitle: ["Epäonnistuneet varaukset"],
