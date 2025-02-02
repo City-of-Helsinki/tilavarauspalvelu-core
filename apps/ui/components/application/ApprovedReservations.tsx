@@ -59,6 +59,7 @@ import {
 import { formatDateTimeStrings } from "@/modules/util";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { useSearchParams } from "next/navigation";
+import type { StatusLabelType } from "common/src/tags";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
@@ -139,7 +140,7 @@ const TableWrapper = styled.div`
       /* card padding has to be implemented with tds because we can't style tr */
       & td:first-of-type {
         padding-top: var(--spacing-s);
-        font-size: var(--fontsize-heading-2-xs);
+        font-size: var(--fontsize-heading-xs);
         ${fontMedium}
       }
 
@@ -282,15 +283,15 @@ export function ApprovedReservations({ application }: Readonly<Props>) {
           headingLevel={2}
           icons={[
             {
-              icon: <IconCalendarRecurring aria-hidden="true" />,
+              icon: <IconCalendarRecurring />,
               text: formatNumberOfReservations(t, aes),
             },
             {
-              icon: <IconClock aria-hidden="true" />,
+              icon: <IconClock />,
               text: formatReservationTimes(t, aes),
             },
             {
-              icon: <IconLocation aria-hidden="true" />,
+              icon: <IconLocation />,
               text: formatAesName(aes, lang),
               textPostfix:
                 getAesReservationUnitCount(aes) > 1
@@ -402,7 +403,7 @@ function ReservationUnitTable({
       isSortable: false,
       transform: ({ dateOfWeek, time }: ReservationUnitTableElem) => (
         <IconTextWrapper aria-label={t("common:timeLabel")}>
-          <IconClock aria-hidden="true" />
+          <IconClock />
           <OnlyForMobile>{dateOfWeek}</OnlyForMobile>
           {time}
         </IconTextWrapper>
@@ -413,7 +414,7 @@ function ReservationUnitTable({
       headerName: t("application:view.helpModal.title"),
       transform: ({ reservationUnit }: ReservationUnitTableElem) => (
         <StyledLinkLikeButton onClick={() => setModal(reservationUnit)}>
-          <IconInfoCircle aria-hidden="true" />
+          <IconInfoCircle />
           {isMobile
             ? t("application:view.helpLinkLong")
             : t("application:view.helpLink")}
@@ -456,7 +457,7 @@ function ReservationUnitTable({
         <Dialog.Header
           id="reservation-unit-modal-help-header"
           title={getTranslation(modal, "name")}
-          iconStart={<IconInfoCircle aria-hidden="true" />}
+          iconStart={<IconInfoCircle />}
         />
         <Dialog.Content id="dialog-content">
           <Sanitize
@@ -479,7 +480,7 @@ type ReservationsTableElem = {
     ReservationUnitNode,
     "nameSv" | "nameFi" | "nameEn" | "id" | "pk"
   >;
-  status: "" | "rejected" | "modified";
+  status: "" | "rejected" | "modified" | "cancelled";
   isCancellableReason: ReservationCancellableReason;
   pk: number;
 };
@@ -490,8 +491,8 @@ const ReservationUnitLink = styled(IconButton)`
     display: inline-flex;
     flex-wrap: wrap;
 
-    ${fontRegular}
     text-decoration: underline;
+    ${fontRegular}
   }
 
   /* table hides icons by default, override this behaviour */
@@ -520,7 +521,7 @@ function createReservationUnitLink({
       href={getReservationUnitPath(pk)}
       label={name}
       openInNewTab
-      icon={<IconLinkExternal aria-hidden="true" />}
+      icon={<IconLinkExternal />}
     />
   );
 }
@@ -532,6 +533,30 @@ const StyledStatusLabel = styled(StatusLabel)`
     top: var(--spacing-s);
   }
 `;
+
+function getStatusLabelProps(status: string): {
+  icon: JSX.Element;
+  type: StatusLabelType;
+} {
+  switch (status) {
+    case "cancelled":
+      return {
+        icon: <IconCross />,
+        type: "neutral",
+      };
+    case "modified":
+      return {
+        icon: <IconPen />,
+        type: "neutral",
+      };
+    case "denied":
+    default:
+      return {
+        icon: <IconCross />,
+        type: "error",
+      };
+  }
+}
 
 function ReservationsTable({
   reservations,
@@ -611,7 +636,7 @@ function ReservationsTable({
       isSortable: false,
       transform: ({ dayOfWeek, time }: ReservationsTableElem) => (
         <IconTextWrapper aria-label={t("common:timeLabel")}>
-          <IconClock aria-hidden="true" />
+          <IconClock />
           <OnlyForMobile>{dayOfWeek}</OnlyForMobile>
           {time}
         </IconTextWrapper>
@@ -626,7 +651,7 @@ function ReservationsTable({
           className="last-on-mobile"
           aria-label={t("application:view.reservationsTab.reservationUnit")}
         >
-          <IconLocation aria-hidden="true" />
+          <IconLocation />
           {createReservationUnitLink({
             reservationUnit: elem.reservationUnit,
             lang,
@@ -639,13 +664,12 @@ function ReservationsTable({
       headerName: "",
       isSortable: false,
       transform: ({ status }: ReservationsTableElem) => {
-        const icon = status === "rejected" ? <IconCross /> : <IconPen />;
-        const type = status === "rejected" ? "error" : "neutral";
         if (status === "") {
           return "";
         }
+        const labelProps = getStatusLabelProps(status);
         return (
-          <StyledStatusLabel icon={icon} type={type}>
+          <StyledStatusLabel icon={labelProps.icon} type={labelProps.type}>
             {t(`application:view.reservationsTab.${status}`)}
           </StyledStatusLabel>
         );
@@ -659,7 +683,7 @@ function ReservationsTable({
         <Button
           variant={ButtonVariant.Supplementary}
           size={ButtonSize.Small}
-          iconStart={<IconCross aria-hidden="true" />}
+          iconStart={<IconCross />}
           onClick={() => handleCancel(pk)}
           disabled={isCancellableReason !== ""}
           title={
@@ -681,6 +705,20 @@ function ReservationsTable({
       <Table variant="light" indexKey="date" rows={reservations} cols={cols} />
     </TableWrapper>
   );
+}
+
+function getReservationStatusChoice(
+  state: ReservationStateChoice | null | undefined,
+  isModified?: boolean
+): "" | "rejected" | "modified" | "cancelled" {
+  switch (state) {
+    case ReservationStateChoice.Denied:
+      return "rejected";
+    case ReservationStateChoice.Cancelled:
+      return "cancelled";
+    default:
+      return isModified ? "modified" : "";
+  }
 }
 
 function sectionToreservations(
@@ -730,13 +768,8 @@ function sectionToreservations(
         r.allocatedTimeSlot
       );
 
-      const status =
-        res.state === ReservationStateChoice.Cancelled ||
-        res.state === ReservationStateChoice.Denied
-          ? "rejected"
-          : isModified
-            ? "modified"
-            : "";
+      const status = getReservationStatusChoice(res.state, isModified);
+
       return {
         ...rest,
         reservationUnit: r.reservationUnit,

@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Button,
+  ButtonPresetTheme,
   ButtonSize,
   ButtonVariant,
   IconArrowUndo,
@@ -17,16 +18,17 @@ export function ReservationListButton({
   type,
   callback,
   t,
-}: {
+}: Readonly<{
   type: "remove" | "deny" | "restore" | "change" | "show";
   callback: () => void;
   // Pass the TFunc because the amount of buttons change and hooks break
   t: TFunction;
-}) {
+}>) {
   const btnCommon = {
     variant: ButtonVariant.Supplementary,
     onClick: callback,
     size: ButtonSize.Small,
+    theme: ButtonPresetTheme.Black,
   } as const;
 
   switch (type) {

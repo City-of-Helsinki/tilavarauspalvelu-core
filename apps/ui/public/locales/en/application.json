@@ -225,6 +225,7 @@
       "reservationUnit": "Space",
       "rejected": "Rejected",
       "modified": "Modified",
+      "cancelled": "Cancelled",
       "showAllReservations": "Show all bookings",
       "cancelApplication": "Cancel all bookings",
       "reservationUnitsTitle": "Location",
