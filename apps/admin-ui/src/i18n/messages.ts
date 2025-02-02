@@ -426,7 +426,7 @@ const translations: ITranslations = {
         // TODO these should be in the common translations (enum)
         RejectionReadinessChoice: {
           INTERVAL_NOT_ALLOWED: ["Aloitusaika ei sallittu"],
-          OVERLAPPING_RESERVATIONS: ["Päivämäärä ei saatavilla"],
+          OVERLAPPING_RESERVATIONS: ["Ei saatavilla"],
           RESERVATION_UNIT_CLOSED: ["Suljettu"],
         },
         failureMessages: {
