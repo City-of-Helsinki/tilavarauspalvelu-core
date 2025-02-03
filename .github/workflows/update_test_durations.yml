@@ -1,10 +1,10 @@
-name: "Create a new PR to update test durations"
+name: "Update test durations to project artefacts"
 
 on:
   workflow_dispatch:
   schedule:
-    # Run on the first day of every month
-    - cron: "0 0 1 * *"
+    # At midnight on Sunday
+    - cron: "0 0 * * 0"
 
 env:
   PYTHON_VERSION: 3.13
@@ -62,12 +62,12 @@ jobs:
         env:
           DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
 
-      - name: "Create Pull Request"
-        uses: peter-evans/create-pull-request@v7
+      - name: "Upload test durations artefact"
+        uses: actions/upload-artifact@v4
         with:
-          title: "[github-actions] Update test durations"
-          body: "Update test durations file"
-          commit-message: "Update test durations"
-          branch: update-test-durations
-          delete-branch: true
-          labels: github_actions
+          name: test_durations
+          path: .test_durations
+          if-no-files-found: error
+          retention-days: 90
+          include-hidden-files: true
+          overwrite: true
