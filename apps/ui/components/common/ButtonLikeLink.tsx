@@ -11,10 +11,12 @@ export const ButtonLikeLink = styled(Link)<ButtonStyleProps>`
   ${ButtonCss}
   ${fontMedium}
   gap: var(--spacing-s);
+  white-space: nowrap;
 `;
 
 export const ButtonLikeExternalLink = styled.a<ButtonStyleProps>`
   ${ButtonCss}
   ${fontMedium}
   gap: var(--spacing-s);
+  white-space: nowrap;
 `;
