@@ -13,8 +13,8 @@ import {
 } from "@gql/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
-import { toApiDate } from "common/src/common/util";
-import { apiDateToUIDate, fromUIDate } from "@/modules/util";
+import { toApiDate, toUIDate } from "common/src/common/util";
+import { fromUIDate } from "@/modules/util";
 import {
   checkValidDateOnly,
   lessThanMaybeDate,
@@ -145,6 +145,7 @@ function transformApplicationSectionToForm(
     suitableTimeRanges: filterNonNullable(section.suitableTimeRanges).map(
       (timeRanges) => convertTimeRange(timeRanges)
     ),
+    // TODO why do these default to undefined instead of empty string?
     begin: convertDate(section.reservationsBeginDate),
     end: convertDate(section.reservationsEndDate),
     accordionOpen: false,
@@ -167,8 +168,10 @@ function convertTimeRange(
 }
 
 function convertDate(date: string | null | undefined): string | undefined {
-  // TODO is there a case where this could be DD.MM.YYYY? do we want to ignore invalide dates or raise a problem?
-  return date != null && date.includes("-") ? apiDateToUIDate(date) : undefined;
+  if (date == null) {
+    return undefined;
+  }
+  return toUIDate(new Date(date)) || undefined;
 }
 
 const AddressFormValueSchema = z.object({

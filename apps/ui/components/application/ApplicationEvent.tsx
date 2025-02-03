@@ -9,16 +9,11 @@ import {
 } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
-import type { ApplicationQuery } from "@gql/gql-types";
+import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { H4 } from "common/src/common/typography";
 import { getLocalizationLang } from "common/src/helpers";
-import { OptionTypes, ReservationUnitList } from "./ReservationUnitList";
-import {
-  apiDateToUIDate,
-  formatApiDate,
-  formatDate,
-  uiDateToApiDate,
-} from "@/modules/util";
+import { type OptionTypes, ReservationUnitList } from "./ReservationUnitList";
+import { formatDate } from "@/modules/util";
 import { ApplicationEventSummary } from "./ApplicationEventSummary";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
@@ -29,9 +24,9 @@ import {
   ControlledNumberInput,
   ControlledSelect,
 } from "common/src/components/form";
+import { toUIDate } from "common/src/common/util";
 
-type Node = NonNullable<ApplicationQuery["application"]>;
-type AppRoundNode = NonNullable<Node["applicationRound"]>;
+type AppRoundNode = ApplicationRoundForApplicationFragment;
 
 type Props = {
   index: number;
@@ -63,10 +58,6 @@ function ApplicationEventInner({
   } = form;
 
   const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
-  const periodStartDate = formatApiDate(
-    applicationRound.reservationPeriodBegin
-  );
-  const periodEndDate = formatApiDate(applicationRound.reservationPeriodEnd);
 
   const {
     ageGroupOptions,
@@ -76,22 +67,25 @@ function ApplicationEventInner({
     unitOptions,
   } = optionTypes;
 
-  const applicationPeriodBegin = watch(`applicationSections.${index}.begin`);
-  const applicationPeriodEnd = watch(`applicationSections.${index}.end`);
-  const numPersons = watch(`applicationSections.${index}.numPersons`);
+  const periodStartDate = new Date(applicationRound.reservationPeriodBegin);
+  const periodEndDate = new Date(applicationRound.reservationPeriodEnd);
 
   const selectDefaultPeriod = (): void => {
-    const begin = periodStartDate ? apiDateToUIDate(periodStartDate) : "";
-    const end = periodEndDate ? apiDateToUIDate(periodEndDate) : "";
+    const begin = toUIDate(periodStartDate);
+    const end = toUIDate(periodEndDate);
     setValue(`applicationSections.${index}.begin`, begin);
     setValue(`applicationSections.${index}.end`, end);
   };
 
+  const applicationPeriodBegin = watch(`applicationSections.${index}.begin`);
+  const applicationPeriodEnd = watch(`applicationSections.${index}.end`);
+  const numPersons = watch(`applicationSections.${index}.numPersons`);
+
   const selectionIsDefaultPeriod =
     applicationPeriodEnd != null &&
     applicationPeriodBegin != null &&
-    uiDateToApiDate(applicationPeriodBegin) === periodStartDate &&
-    uiDateToApiDate(applicationPeriodEnd) === periodEndDate;
+    applicationPeriodBegin === toUIDate(periodStartDate) &&
+    applicationPeriodEnd === toUIDate(periodEndDate);
 
   type FieldName =
     | "begin"
