@@ -156,6 +156,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
         <Button
           id="button__application--next"
           iconEnd={<IconArrowRight aria-hidden="true" />}
+          size={ButtonSize.Small}
           disabled={submitDisabled}
           type="submit"
         >
