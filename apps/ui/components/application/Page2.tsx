@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Button,
   ButtonSize,
@@ -14,9 +14,11 @@ import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
 import { type ApplicationQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import type {
-  ApplicationSectionFormValue,
-  ApplicationFormValues,
+import {
+  type ApplicationSectionFormValue,
+  type ApplicationPage2FormValues,
+  convertToSchedule,
+  ApplicationSectionPage2FormValue,
 } from "./form";
 import {
   convertLanguageCode,
@@ -25,12 +27,7 @@ import {
 import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { TimeSelector } from "./TimeSelector";
-import {
-  aesToCells,
-  Cell,
-  cellsToApplicationEventSchedules,
-  convertToSchedule,
-} from "./module";
+import { aesToCells, Cell, cellsToApplicationEventSchedules } from "./module";
 import { errorToast } from "common/src/common/toast";
 import { ButtonContainer } from "common/styles/util";
 import { getApplicationPath } from "@/modules/urls";
@@ -38,19 +35,13 @@ import { getApplicationPath } from "@/modules/urls";
 type Node = NonNullable<ApplicationQuery["application"]>;
 type Props = {
   application: Node;
-  onNext: (appToSave: ApplicationFormValues) => void;
+  onNext: (appToSave: ApplicationPage2FormValues) => void;
 };
 
 const StyledNotification = styled(Notification)`
   margin-top: var(--spacing-m);
 `;
 
-function getListOfApplicationEventTitles(
-  applicationSections: ApplicationSectionFormValue[],
-  ids: number[]
-): string {
-  return getReadableList(ids.map((id) => `"${applicationSections[id].name}"`));
-}
 function getLongestChunks(selectorData: Cell[][][]): number[] {
   return selectorData.map((n) => {
     const primarySchedules = cellsToApplicationEventSchedules(
@@ -69,29 +60,12 @@ function getLongestChunks(selectorData: Cell[][][]): number[] {
   });
 }
 
-function getApplicationEventsWhichMinDurationsIsNotFulfilled(
-  applicationSections: ApplicationSectionFormValue[]
-): number[] {
-  const selected = applicationSections.map((ae) =>
-    aesToCells(convertToSchedule(ae))
-  );
-  const selectedHours = getLongestChunks(selected);
-  return filterNonNullable(
-    applicationSections.map((ae, index) => {
-      const minDuration = ae.minDuration ?? 0;
-      return selectedHours[index] < minDuration / 3600 ? index : null;
-    })
-  );
-}
-
 export function Page2({ application, onNext }: Props): JSX.Element {
   const { t } = useTranslation();
-
-  const [minDurationMsg, setMinDurationMsg] = useState(true);
   const router = useRouter();
-  const { watch, handleSubmit } = useFormContext<ApplicationFormValues>();
+  const { watch, handleSubmit } = useFormContext<ApplicationPage2FormValues>();
 
-  const onSubmit = (data: ApplicationFormValues) => {
+  const onSubmit = (data: ApplicationPage2FormValues) => {
     const selectorData = filterNonNullable(data.applicationSections).map((ae) =>
       aesToCells(convertToSchedule(ae))
     );
@@ -106,7 +80,6 @@ export function Page2({ application, onNext }: Props): JSX.Element {
       .flat();
     if (selectedAppEvents.length === 0) {
       errorToast({
-        label: t("application:error.missingSchedule"),
         text: t("application:error.missingSchedule"),
         dataTestId: "application__page2--notification-error",
       });
@@ -116,44 +89,20 @@ export function Page2({ application, onNext }: Props): JSX.Element {
   };
 
   const applicationSections = filterNonNullable(watch("applicationSections"));
-  const sectionsNotFullfilled: number[] =
-    getApplicationEventsWhichMinDurationsIsNotFulfilled(applicationSections);
-
-  const shouldShowMinDurationMessage =
-    minDurationMsg && sectionsNotFullfilled.length > 0;
 
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
       {applicationSections.map((section, index) =>
         application?.applicationSections?.[index] != null ? (
           <ApplicationSectionTimePicker
-            key={section.formKey}
+            key={section.pk}
             index={index}
             section={application?.applicationSections[index]}
           />
         ) : null
       )}
-      {shouldShowMinDurationMessage && (
-        <Notification
-          type="alert"
-          label={t("application:Page2.notification.minDuration.title")}
-          dismissible
-          onClose={() => setMinDurationMsg(false)}
-          closeButtonLabelText={t("common:close")}
-          data-testid="application__page2--notification-min-duration"
-          style={{ marginBottom: "var(--spacing-m)" }}
-        >
-          {applicationSections.length === 1
-            ? t("application:Page2.notification.minDuration.bodySingle")
-            : t("application:Page2.notification.minDuration.body", {
-                title: getListOfApplicationEventTitles(
-                  applicationSections,
-                  sectionsNotFullfilled
-                ),
-                count: sectionsNotFullfilled.length,
-              })}
-        </Notification>
-      )}
+      <MinDurationMessage />
+
       <ButtonContainer>
         <Button
           variant={ButtonVariant.Secondary}
@@ -178,6 +127,61 @@ export function Page2({ application, onNext }: Props): JSX.Element {
   );
 }
 
+function getListOfApplicationEventTitles(
+  applicationSections: Pick<ApplicationSectionFormValue, "name">[],
+  ids: number[]
+): string {
+  return getReadableList(ids.map((id) => `"${applicationSections[id].name}"`));
+}
+
+function getApplicationEventsWhichMinDurationsIsNotFulfilled(
+  aes: ApplicationSectionPage2FormValue[]
+): number[] {
+  const selected = aes.map((ae) => aesToCells(convertToSchedule(ae)));
+  const selectedHours = getLongestChunks(selected);
+  return filterNonNullable(
+    aes.map((ae, index) => {
+      const minDuration = ae.minDuration ?? 0;
+      return selectedHours[index] < minDuration / 3600 ? index : null;
+    })
+  );
+}
+
+function MinDurationMessage(): JSX.Element | null {
+  const { t } = useTranslation();
+  const { watch } = useFormContext<ApplicationPage2FormValues>();
+  const applicationSections = filterNonNullable(watch("applicationSections"));
+  const sectionsNotFullfilled =
+    getApplicationEventsWhichMinDurationsIsNotFulfilled(applicationSections);
+  const shouldShowMinDurationMessage = sectionsNotFullfilled.length > 0;
+
+  if (!shouldShowMinDurationMessage) {
+    return null;
+  }
+
+  const title = getListOfApplicationEventTitles(
+    applicationSections,
+    sectionsNotFullfilled
+  );
+
+  return (
+    <Notification
+      type="alert"
+      label={t("application:Page2.notification.minDuration.title")}
+      closeButtonLabelText={t("common:close")}
+      data-testid="application__page2--notification-min-duration"
+      style={{ marginBottom: "var(--spacing-m)" }}
+    >
+      {applicationSections.length === 1
+        ? t("application:Page2.notification.minDuration.bodySingle")
+        : t("application:Page2.notification.minDuration.body", {
+            title,
+            count: sectionsNotFullfilled.length,
+          })}
+    </Notification>
+  );
+}
+
 function ApplicationSectionTimePicker({
   index: sectionIndex,
   section,
@@ -185,7 +189,7 @@ function ApplicationSectionTimePicker({
   index: number;
   section: NonNullable<Node["applicationSections"]>[0];
 }): JSX.Element {
-  const { watch } = useFormContext<ApplicationFormValues>();
+  const { watch } = useFormContext<ApplicationPage2FormValues>();
 
   const { t, i18n } = useTranslation();
   const language = convertLanguageCode(i18n.language);

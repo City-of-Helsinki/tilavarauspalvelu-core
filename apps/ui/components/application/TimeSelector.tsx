@@ -7,7 +7,7 @@ import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import { arrowDown, arrowUp } from "@/styles/util";
 import { TimePreview } from "./TimePreview";
-import { type ApplicationFormValues } from "./form";
+import { convertToSchedule, type ApplicationPage2FormValues } from "./form";
 import { useFormContext } from "react-hook-form";
 import { ControlledSelect } from "common/src/components/form";
 import { Flex, NoWrap } from "common/styles/util";
@@ -16,7 +16,6 @@ import {
   aesToCells,
   ApplicationEventSchedulePriority,
   Cell,
-  convertToSchedule,
   covertCellsToTimeRange,
 } from "./module";
 import { successToast } from "common/src/common/toast";
@@ -342,7 +341,7 @@ export function TimeSelector({
     label: t(cell.label),
   }));
 
-  const { setValue, watch } = useFormContext<ApplicationFormValues>();
+  const { setValue, watch } = useFormContext<ApplicationPage2FormValues>();
   const priority = watch(`applicationSections.${index}.priority`);
 
   const setSelectorData = (selected: Cell[][][]) => {
@@ -489,7 +488,7 @@ function OptionSelector({
   index,
 }: Pick<Props, "reservationUnitOptions" | "index">) {
   const { t } = useTranslation();
-  const { control } = useFormContext<ApplicationFormValues>();
+  const { control } = useFormContext<ApplicationPage2FormValues>();
 
   const priorityOptions = [300, 200].map((n) => ({
     label: t(`application:Page2.priorityLabels.${n}`),

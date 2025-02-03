@@ -3,7 +3,7 @@ import { useTranslation } from "next-i18next";
 import { TextInput } from "hds-react";
 import { useFormContext } from "react-hook-form";
 import { FormSubHeading } from "./styled";
-import type { ApplicationFormPage3Values } from "./form";
+import { type ApplicationPage3FormValues } from "./form";
 
 export function BillingAddress() {
   const { t } = useTranslation();
@@ -11,7 +11,7 @@ export function BillingAddress() {
   const {
     register,
     formState: { errors },
-  } = useFormContext<ApplicationFormPage3Values>();
+  } = useFormContext<ApplicationPage3FormValues>();
 
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`application:validation.${errorMsg}`) : "";

@@ -16,7 +16,7 @@ import type {
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
 import Modal from "../common/Modal";
-import type { ApplicationFormValues } from "./form";
+import { type ApplicationPage1FormValues } from "./form";
 import { OrderedReservationUnitCard } from "./OrderedReservationUnitCard";
 import { Flex } from "common/styles/util";
 import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
@@ -51,7 +51,7 @@ export function ReservationUnitList({
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
 
-  const form = useFormContext<ApplicationFormValues>();
+  const form = useFormContext<ApplicationPage1FormValues>();
   const { clearErrors, setError, watch, setValue, formState } = form;
   const { errors } = formState;
 
