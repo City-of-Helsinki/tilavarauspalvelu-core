@@ -1,4 +1,4 @@
-import { type FC, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { isBefore } from "date-fns";
 import { DateInput } from "hds-react";
 import { useTranslation } from "next-i18next";
@@ -30,7 +30,7 @@ export interface DateRangePickerProps {
   };
 }
 
-const DateRangePicker: FC<DateRangePickerProps> = ({
+export function DateRangePicker({
   endDate,
   startDate,
   onChangeEndDate,
@@ -40,7 +40,7 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
   required,
   limits,
   placeholder,
-}) => {
+}: DateRangePickerProps) {
   const [internalStartDateString, setInternalStartDateString] =
     useState<string>(() => toUIDate(startDate));
   const [internalEndDateString, setInternalEndDateString] = useState<string>(
@@ -217,6 +217,4 @@ const DateRangePicker: FC<DateRangePickerProps> = ({
       />
     </>
   );
-};
-
-export default DateRangePicker;
+}
