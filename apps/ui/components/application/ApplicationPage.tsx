@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import {
   ApplicantTypeChoice,
-  type ApplicationQuery,
+  ApplicationFormFragment,
   ApplicationStatusChoice,
 } from "@gql/gql-types";
 import { useRouter } from "next/router";
@@ -43,8 +43,8 @@ const StyledStepper = styled(HDSStepper)`
 `;
 
 // TODO this should have more complete checks (but we are thinking of splitting the form anyway)
-function calculateCompletedStep(values: Node): 0 | 1 | 2 | 3 | 4 {
-  const { status } = values;
+function calculateCompletedStep(aes: Node): 0 | 1 | 2 | 3 | 4 {
+  const { status } = aes;
   // 4 should only be returned if the application state === Received
   if (status === ApplicationStatusChoice.Received) {
     return 4;
@@ -52,36 +52,36 @@ function calculateCompletedStep(values: Node): 0 | 1 | 2 | 3 | 4 {
 
   // 3 if the user information is filled
   if (
-    (values.billingAddress?.streetAddressFi &&
-      values.applicantType === ApplicantTypeChoice.Individual) ||
-    values.contactPerson != null
+    (aes.billingAddress?.streetAddressFi &&
+      aes.applicantType === ApplicantTypeChoice.Individual) ||
+    aes.contactPerson != null
   ) {
     return 3;
   }
 
   // 2 only if application events have time schedules
   if (
-    values.applicationSections?.length &&
-    values.applicationSections?.find((x) => x?.suitableTimeRanges) != null
+    aes.applicationSections?.length &&
+    aes.applicationSections?.find((x) => x?.suitableTimeRanges) != null
   ) {
     return 2;
   }
 
   // First page is valid
   if (
-    values.applicationSections?.[0]?.reservationUnitOptions?.length &&
-    values.applicationSections?.[0]?.reservationsBeginDate &&
-    values.applicationSections?.[0]?.reservationsEndDate &&
-    values.applicationSections?.[0]?.name &&
-    values.applicationSections?.[0]?.numPersons &&
-    values.applicationSections?.[0]?.purpose
+    aes.applicationSections?.[0]?.reservationUnitOptions?.length &&
+    aes.applicationSections?.[0]?.reservationsBeginDate &&
+    aes.applicationSections?.[0]?.reservationsEndDate &&
+    aes.applicationSections?.[0]?.name &&
+    aes.applicationSections?.[0]?.numPersons &&
+    aes.applicationSections?.[0]?.purpose
   ) {
     return 1;
   }
   return 0;
 }
 
-type Node = NonNullable<ApplicationQuery["application"]>;
+type Node = ApplicationFormFragment;
 type ApplicationPageProps = {
   application: Node;
   translationKeyPrefix: string;

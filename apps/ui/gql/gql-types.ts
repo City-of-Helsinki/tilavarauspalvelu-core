@@ -5245,6 +5245,72 @@ export type InstructionsFragment = {
   }>;
 };
 
+export type ApplicationRoundForApplicationFragment = {
+  reservationPeriodBegin: string;
+  reservationPeriodEnd: string;
+  id: string;
+  pk?: number | null;
+  nameFi?: string | null;
+  nameSv?: string | null;
+  nameEn?: string | null;
+  reservationUnits: Array<{
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameSv?: string | null;
+    nameEn?: string | null;
+    minPersons?: number | null;
+    maxPersons?: number | null;
+    images: Array<{
+      id: string;
+      imageUrl?: string | null;
+      largeUrl?: string | null;
+      mediumUrl?: string | null;
+      smallUrl?: string | null;
+      imageType: ImageType;
+    }>;
+    unit?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+    } | null;
+  }>;
+};
+
+export type ApplicationReservationUnitListFragment = {
+  id: string;
+  pk?: number | null;
+  nameFi?: string | null;
+  nameSv?: string | null;
+  nameEn?: string | null;
+  reservationUnits: Array<{
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameSv?: string | null;
+    nameEn?: string | null;
+    minPersons?: number | null;
+    maxPersons?: number | null;
+    images: Array<{
+      id: string;
+      imageUrl?: string | null;
+      largeUrl?: string | null;
+      mediumUrl?: string | null;
+      smallUrl?: string | null;
+      imageType: ImageType;
+    }>;
+    unit?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+    } | null;
+  }>;
+};
+
 export type AddressFieldsFragment = {
   id: string;
   tprekId?: string | null;
@@ -5593,44 +5659,116 @@ export type ApplicationsQuery = {
   } | null;
 };
 
-export type ApplicationRoundForApplicationFragment = {
+export type ApplicationFormFragment = {
   id: string;
   pk?: number | null;
-  nameFi?: string | null;
-  nameSv?: string | null;
-  nameEn?: string | null;
-  applicationPeriodBegin: string;
-  applicationPeriodEnd: string;
-  reservationPeriodBegin: string;
-  reservationPeriodEnd: string;
-  status?: ApplicationRoundStatusChoice | null;
-  applicationsCount?: number | null;
-  reservationUnitCount?: number | null;
-  statusTimestamp?: string | null;
-  reservationUnits: Array<{
+  status?: ApplicationStatusChoice | null;
+  lastModifiedDate: string;
+  applicantType?: ApplicantTypeChoice | null;
+  additionalInformation?: string | null;
+  applicationRound: {
+    id: string;
+    notesWhenApplyingFi?: string | null;
+    notesWhenApplyingEn?: string | null;
+    notesWhenApplyingSv?: string | null;
+  };
+  applicationSections?: Array<{
+    hasReservations: boolean;
     id: string;
     pk?: number | null;
-    nameFi?: string | null;
-    nameSv?: string | null;
-    nameEn?: string | null;
-    minPersons?: number | null;
-    maxPersons?: number | null;
-    images: Array<{
+    name: string;
+    status?: ApplicationSectionStatusChoice | null;
+    reservationMaxDuration: number;
+    numPersons: number;
+    reservationsEndDate: string;
+    reservationsBeginDate: string;
+    appliedReservationsPerWeek: number;
+    reservationMinDuration: number;
+    suitableTimeRanges: Array<{
       id: string;
-      imageUrl?: string | null;
-      largeUrl?: string | null;
-      mediumUrl?: string | null;
-      smallUrl?: string | null;
-      imageType: ImageType;
+      pk?: number | null;
+      beginTime: string;
+      endTime: string;
+      dayOfTheWeek: Weekday;
+      priority: Priority;
     }>;
-    unit?: {
+    purpose?: {
       id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameSv?: string | null;
       nameEn?: string | null;
     } | null;
-  }>;
+    reservationUnitOptions: Array<{
+      id: string;
+      pk?: number | null;
+      preferredOrder: number;
+      reservationUnit: {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        unit?: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameEn?: string | null;
+          nameSv?: string | null;
+        } | null;
+        applicationRoundTimeSlots: Array<{
+          id: string;
+          weekday: number;
+          closed: boolean;
+          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+        }>;
+      };
+    }>;
+    ageGroup?: {
+      id: string;
+      pk?: number | null;
+      minimum: number;
+      maximum?: number | null;
+    } | null;
+  }> | null;
+  contactPerson?: {
+    id: string;
+    pk?: number | null;
+    firstName: string;
+    lastName: string;
+    email?: string | null;
+    phoneNumber?: string | null;
+  } | null;
+  organisation?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    identifier?: string | null;
+    organisationType: OrganizationTypeChoice;
+    coreBusinessFi?: string | null;
+    yearEstablished?: number | null;
+    address?: {
+      id: string;
+      pk?: number | null;
+      postCode: string;
+      streetAddressFi?: string | null;
+      cityFi?: string | null;
+    } | null;
+  } | null;
+  homeCity?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+  } | null;
+  billingAddress?: {
+    id: string;
+    pk?: number | null;
+    postCode: string;
+    streetAddressFi?: string | null;
+    cityFi?: string | null;
+  } | null;
 };
 
 export type ApplicationCommonFragment = {
@@ -5642,19 +5780,22 @@ export type ApplicationCommonFragment = {
   additionalInformation?: string | null;
   applicationRound: {
     sentDate?: string | null;
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameSv?: string | null;
-    nameEn?: string | null;
     applicationPeriodBegin: string;
     applicationPeriodEnd: string;
-    reservationPeriodBegin: string;
-    reservationPeriodEnd: string;
     status?: ApplicationRoundStatusChoice | null;
     applicationsCount?: number | null;
     reservationUnitCount?: number | null;
     statusTimestamp?: string | null;
+    id: string;
+    notesWhenApplyingFi?: string | null;
+    notesWhenApplyingEn?: string | null;
+    notesWhenApplyingSv?: string | null;
+    reservationPeriodBegin: string;
+    reservationPeriodEnd: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameSv?: string | null;
+    nameEn?: string | null;
     termsOfUse?: {
       id: string;
       pk?: string | null;
@@ -5803,23 +5944,23 @@ export type ApplicationQuery = {
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
-      id: string;
-      notesWhenApplyingFi?: string | null;
-      notesWhenApplyingEn?: string | null;
-      notesWhenApplyingSv?: string | null;
       sentDate?: string | null;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameSv?: string | null;
-      nameEn?: string | null;
       applicationPeriodBegin: string;
       applicationPeriodEnd: string;
-      reservationPeriodBegin: string;
-      reservationPeriodEnd: string;
       status?: ApplicationRoundStatusChoice | null;
       applicationsCount?: number | null;
       reservationUnitCount?: number | null;
       statusTimestamp?: string | null;
+      id: string;
+      notesWhenApplyingFi?: string | null;
+      notesWhenApplyingEn?: string | null;
+      notesWhenApplyingSv?: string | null;
+      reservationPeriodBegin: string;
+      reservationPeriodEnd: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
       termsOfUse?: {
         id: string;
         pk?: string | null;
@@ -7352,6 +7493,127 @@ export type TermsOfUseQuery = {
   } | null;
 };
 
+export type ApplicationPage3QueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ApplicationPage3Query = {
+  application?: {
+    id: string;
+    pk?: number | null;
+    status?: ApplicationStatusChoice | null;
+    lastModifiedDate: string;
+    applicantType?: ApplicantTypeChoice | null;
+    additionalInformation?: string | null;
+    applicationRound: {
+      id: string;
+      notesWhenApplyingFi?: string | null;
+      notesWhenApplyingEn?: string | null;
+      notesWhenApplyingSv?: string | null;
+    };
+    applicationSections?: Array<{
+      hasReservations: boolean;
+      id: string;
+      pk?: number | null;
+      name: string;
+      status?: ApplicationSectionStatusChoice | null;
+      reservationMaxDuration: number;
+      numPersons: number;
+      reservationsEndDate: string;
+      reservationsBeginDate: string;
+      appliedReservationsPerWeek: number;
+      reservationMinDuration: number;
+      suitableTimeRanges: Array<{
+        id: string;
+        pk?: number | null;
+        beginTime: string;
+        endTime: string;
+        dayOfTheWeek: Weekday;
+        priority: Priority;
+      }>;
+      purpose?: {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameSv?: string | null;
+        nameEn?: string | null;
+      } | null;
+      reservationUnitOptions: Array<{
+        id: string;
+        pk?: number | null;
+        preferredOrder: number;
+        reservationUnit: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameEn?: string | null;
+          nameSv?: string | null;
+          unit?: {
+            id: string;
+            pk?: number | null;
+            nameFi?: string | null;
+            nameEn?: string | null;
+            nameSv?: string | null;
+          } | null;
+          applicationRoundTimeSlots: Array<{
+            id: string;
+            weekday: number;
+            closed: boolean;
+            reservableTimes?: Array<{
+              begin: string;
+              end: string;
+            } | null> | null;
+          }>;
+        };
+      }>;
+      ageGroup?: {
+        id: string;
+        pk?: number | null;
+        minimum: number;
+        maximum?: number | null;
+      } | null;
+    }> | null;
+    contactPerson?: {
+      id: string;
+      pk?: number | null;
+      firstName: string;
+      lastName: string;
+      email?: string | null;
+      phoneNumber?: string | null;
+    } | null;
+    organisation?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      identifier?: string | null;
+      organisationType: OrganizationTypeChoice;
+      coreBusinessFi?: string | null;
+      yearEstablished?: number | null;
+      address?: {
+        id: string;
+        pk?: number | null;
+        postCode: string;
+        streetAddressFi?: string | null;
+        cityFi?: string | null;
+      } | null;
+    } | null;
+    homeCity?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+    } | null;
+    billingAddress?: {
+      id: string;
+      pk?: number | null;
+      postCode: string;
+      streetAddressFi?: string | null;
+      cityFi?: string | null;
+    } | null;
+  } | null;
+};
+
 export type ApplicationSectionCancelQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -7500,6 +7762,18 @@ export type ApplicationSectionViewQuery = {
   } | null;
 };
 
+export type ApplicationSentPageQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ApplicationSentPageQuery = {
+  application?: {
+    id: string;
+    pk?: number | null;
+    status?: ApplicationStatusChoice | null;
+  } | null;
+};
+
 export type ApplicationViewQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -7514,19 +7788,22 @@ export type ApplicationViewQuery = {
     additionalInformation?: string | null;
     applicationRound: {
       sentDate?: string | null;
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameSv?: string | null;
-      nameEn?: string | null;
       applicationPeriodBegin: string;
       applicationPeriodEnd: string;
-      reservationPeriodBegin: string;
-      reservationPeriodEnd: string;
       status?: ApplicationRoundStatusChoice | null;
       applicationsCount?: number | null;
       reservationUnitCount?: number | null;
       statusTimestamp?: string | null;
+      id: string;
+      notesWhenApplyingFi?: string | null;
+      notesWhenApplyingEn?: string | null;
+      notesWhenApplyingSv?: string | null;
+      reservationPeriodBegin: string;
+      reservationPeriodEnd: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
       termsOfUse?: {
         id: string;
         pk?: string | null;
@@ -8503,68 +8780,6 @@ export const ApplicantFragmentDoc = gql`
     }
   }
 `;
-export const ApplicationRoundForApplicationFragmentDoc = gql`
-  fragment ApplicationRoundForApplication on ApplicationRoundNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
-    reservationUnits {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
-      minPersons
-      maxPersons
-      images {
-        ...Image
-      }
-      unit {
-        id
-        pk
-        nameFi
-        nameSv
-        nameEn
-      }
-    }
-    applicationPeriodBegin
-    applicationPeriodEnd
-    reservationPeriodBegin
-    reservationPeriodEnd
-    status
-    applicationsCount
-    reservationUnitCount
-    statusTimestamp
-  }
-  ${ImageFragmentDoc}
-`;
-export const TermsOfUseNameFieldsFragmentDoc = gql`
-  fragment TermsOfUseNameFields on TermsOfUseNode {
-    nameFi
-    nameEn
-    nameSv
-  }
-`;
-export const TermsOfUseTextFieldsFragmentDoc = gql`
-  fragment TermsOfUseTextFields on TermsOfUseNode {
-    id
-    textFi
-    textEn
-    textSv
-  }
-`;
-export const TermsOfUseFieldsFragmentDoc = gql`
-  fragment TermsOfUseFields on TermsOfUseNode {
-    pk
-    ...TermsOfUseNameFields
-    ...TermsOfUseTextFields
-    termsType
-  }
-  ${TermsOfUseNameFieldsFragmentDoc}
-  ${TermsOfUseTextFieldsFragmentDoc}
-`;
 export const ApplicationSectionDurationFragmentDoc = gql`
   fragment ApplicationSectionDuration on ApplicationSectionNode {
     reservationsEndDate
@@ -8644,29 +8859,109 @@ export const ApplicationSectionUiFragmentDoc = gql`
   }
   ${ApplicationSectionCommonFragmentDoc}
 `;
-export const ApplicationCommonFragmentDoc = gql`
-  fragment ApplicationCommon on ApplicationNode {
+export const ApplicationFormFragmentDoc = gql`
+  fragment ApplicationForm on ApplicationNode {
     id
     pk
     status
     lastModifiedDate
     ...Applicant
     applicationRound {
-      ...ApplicationRoundForApplication
-      sentDate
-      termsOfUse {
-        id
-        ...TermsOfUseFields
-      }
+      id
+      notesWhenApplyingFi
+      notesWhenApplyingEn
+      notesWhenApplyingSv
     }
     applicationSections {
       ...ApplicationSectionUI
     }
   }
   ${ApplicantFragmentDoc}
+  ${ApplicationSectionUiFragmentDoc}
+`;
+export const ApplicationReservationUnitListFragmentDoc = gql`
+  fragment ApplicationReservationUnitList on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    nameSv
+    nameEn
+    reservationUnits {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+      minPersons
+      maxPersons
+      images {
+        ...Image
+      }
+      unit {
+        id
+        pk
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+  }
+  ${ImageFragmentDoc}
+`;
+export const ApplicationRoundForApplicationFragmentDoc = gql`
+  fragment ApplicationRoundForApplication on ApplicationRoundNode {
+    ...ApplicationReservationUnitList
+    reservationPeriodBegin
+    reservationPeriodEnd
+  }
+  ${ApplicationReservationUnitListFragmentDoc}
+`;
+export const TermsOfUseNameFieldsFragmentDoc = gql`
+  fragment TermsOfUseNameFields on TermsOfUseNode {
+    nameFi
+    nameEn
+    nameSv
+  }
+`;
+export const TermsOfUseTextFieldsFragmentDoc = gql`
+  fragment TermsOfUseTextFields on TermsOfUseNode {
+    id
+    textFi
+    textEn
+    textSv
+  }
+`;
+export const TermsOfUseFieldsFragmentDoc = gql`
+  fragment TermsOfUseFields on TermsOfUseNode {
+    pk
+    ...TermsOfUseNameFields
+    ...TermsOfUseTextFields
+    termsType
+  }
+  ${TermsOfUseNameFieldsFragmentDoc}
+  ${TermsOfUseTextFieldsFragmentDoc}
+`;
+export const ApplicationCommonFragmentDoc = gql`
+  fragment ApplicationCommon on ApplicationNode {
+    ...ApplicationForm
+    applicationRound {
+      ...ApplicationRoundForApplication
+      sentDate
+      applicationPeriodBegin
+      applicationPeriodEnd
+      status
+      applicationsCount
+      reservationUnitCount
+      statusTimestamp
+      termsOfUse {
+        id
+        ...TermsOfUseFields
+      }
+    }
+  }
+  ${ApplicationFormFragmentDoc}
   ${ApplicationRoundForApplicationFragmentDoc}
   ${TermsOfUseFieldsFragmentDoc}
-  ${ApplicationSectionUiFragmentDoc}
 `;
 export const ApplicationRoundFieldsFragmentDoc = gql`
   fragment ApplicationRoundFields on ApplicationRoundNode {
@@ -9406,12 +9701,6 @@ export const ApplicationDocument = gql`
   query Application($id: ID!) {
     application(id: $id) {
       ...ApplicationCommon
-      applicationRound {
-        id
-        notesWhenApplyingFi
-        notesWhenApplyingEn
-        notesWhenApplyingSv
-      }
     }
   }
   ${ApplicationCommonFragmentDoc}
@@ -11446,6 +11735,89 @@ export type TermsOfUseQueryResult = Apollo.QueryResult<
   TermsOfUseQuery,
   TermsOfUseQueryVariables
 >;
+export const ApplicationPage3Document = gql`
+  query ApplicationPage3($id: ID!) {
+    application(id: $id) {
+      ...ApplicationForm
+    }
+  }
+  ${ApplicationFormFragmentDoc}
+`;
+
+/**
+ * __useApplicationPage3Query__
+ *
+ * To run a query within a React component, call `useApplicationPage3Query` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationPage3Query` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationPage3Query({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useApplicationPage3Query(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationPage3Query,
+    ApplicationPage3QueryVariables
+  > &
+    (
+      | { variables: ApplicationPage3QueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ApplicationPage3Query, ApplicationPage3QueryVariables>(
+    ApplicationPage3Document,
+    options
+  );
+}
+export function useApplicationPage3LazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationPage3Query,
+    ApplicationPage3QueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationPage3Query,
+    ApplicationPage3QueryVariables
+  >(ApplicationPage3Document, options);
+}
+export function useApplicationPage3SuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationPage3Query,
+        ApplicationPage3QueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationPage3Query,
+    ApplicationPage3QueryVariables
+  >(ApplicationPage3Document, options);
+}
+export type ApplicationPage3QueryHookResult = ReturnType<
+  typeof useApplicationPage3Query
+>;
+export type ApplicationPage3LazyQueryHookResult = ReturnType<
+  typeof useApplicationPage3LazyQuery
+>;
+export type ApplicationPage3SuspenseQueryHookResult = ReturnType<
+  typeof useApplicationPage3SuspenseQuery
+>;
+export type ApplicationPage3QueryResult = Apollo.QueryResult<
+  ApplicationPage3Query,
+  ApplicationPage3QueryVariables
+>;
 export const ApplicationSectionCancelDocument = gql`
   query ApplicationSectionCancel($id: ID!) {
     applicationSection(id: $id) {
@@ -11674,6 +12046,90 @@ export type ApplicationSectionViewSuspenseQueryHookResult = ReturnType<
 export type ApplicationSectionViewQueryResult = Apollo.QueryResult<
   ApplicationSectionViewQuery,
   ApplicationSectionViewQueryVariables
+>;
+export const ApplicationSentPageDocument = gql`
+  query ApplicationSentPage($id: ID!) {
+    application(id: $id) {
+      id
+      pk
+      status
+    }
+  }
+`;
+
+/**
+ * __useApplicationSentPageQuery__
+ *
+ * To run a query within a React component, call `useApplicationSentPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationSentPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationSentPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useApplicationSentPageQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationSentPageQuery,
+    ApplicationSentPageQueryVariables
+  > &
+    (
+      | { variables: ApplicationSentPageQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationSentPageQuery,
+    ApplicationSentPageQueryVariables
+  >(ApplicationSentPageDocument, options);
+}
+export function useApplicationSentPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationSentPageQuery,
+    ApplicationSentPageQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationSentPageQuery,
+    ApplicationSentPageQueryVariables
+  >(ApplicationSentPageDocument, options);
+}
+export function useApplicationSentPageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationSentPageQuery,
+        ApplicationSentPageQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationSentPageQuery,
+    ApplicationSentPageQueryVariables
+  >(ApplicationSentPageDocument, options);
+}
+export type ApplicationSentPageQueryHookResult = ReturnType<
+  typeof useApplicationSentPageQuery
+>;
+export type ApplicationSentPageLazyQueryHookResult = ReturnType<
+  typeof useApplicationSentPageLazyQuery
+>;
+export type ApplicationSentPageSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationSentPageSuspenseQuery
+>;
+export type ApplicationSentPageQueryResult = Apollo.QueryResult<
+  ApplicationSentPageQuery,
+  ApplicationSentPageQueryVariables
 >;
 export const ApplicationViewDocument = gql`
   query ApplicationView($id: ID!) {

@@ -100,60 +100,46 @@ export const APPLICATIONS = gql`
   }
 `;
 
-export const APPLICATION_ROUND_FRAGMENT = gql`
-  fragment ApplicationRoundForApplication on ApplicationRoundNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
-    reservationUnits {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
-      minPersons
-      maxPersons
-      images {
-        ...Image
-      }
-      unit {
-        id
-        pk
-        nameFi
-        nameSv
-        nameEn
-      }
-    }
-    applicationPeriodBegin
-    applicationPeriodEnd
-    reservationPeriodBegin
-    reservationPeriodEnd
-    status
-    applicationsCount
-    reservationUnitCount
-    statusTimestamp
-  }
-`;
-
-export const APPLICATION_FRAGMENT = gql`
-  fragment ApplicationCommon on ApplicationNode {
+// includes all the form fields for an application
+// the applicant section is required for the Stepper checks
+// applicationSections?
+// notesWhenApplying -> on all application pages (except for view?)
+export const APPLICATION_MINIMAL = gql`
+  fragment ApplicationForm on ApplicationNode {
     id
     pk
     status
     lastModifiedDate
     ...Applicant
     applicationRound {
+      id
+      notesWhenApplyingFi
+      notesWhenApplyingEn
+      notesWhenApplyingSv
+    }
+    applicationSections {
+      ...ApplicationSectionUI
+    }
+  }
+`;
+
+// TODO rename (it's more uncommon)
+export const APPLICATION_FRAGMENT = gql`
+  fragment ApplicationCommon on ApplicationNode {
+    ...ApplicationForm
+    applicationRound {
       ...ApplicationRoundForApplication
       sentDate
+      applicationPeriodBegin
+      applicationPeriodEnd
+      status
+      applicationsCount
+      reservationUnitCount
+      statusTimestamp
       termsOfUse {
         id
         ...TermsOfUseFields
       }
-    }
-    applicationSections {
-      ...ApplicationSectionUI
     }
   }
 `;
@@ -163,12 +149,6 @@ export const APPLICATION_QUERY = gql`
   query Application($id: ID!) {
     application(id: $id) {
       ...ApplicationCommon
-      applicationRound {
-        id
-        notesWhenApplyingFi
-        notesWhenApplyingEn
-        notesWhenApplyingSv
-      }
     }
   }
 `;

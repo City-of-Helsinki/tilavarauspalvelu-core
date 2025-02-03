@@ -1,11 +1,14 @@
 import React, { useEffect } from "react";
-import { ApplicantTypeChoice, useApplicationQuery } from "@gql/gql-types";
+import {
+  ApplicantTypeChoice,
+  ApplicationPage3Document,
+  ApplicationPage3Query,
+} from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
-import NextError from "next/error";
 import { CompanyForm } from "@/components/application/CompanyForm";
 import { IndividualForm } from "@/components/application/IndividualForm";
 import { OrganisationForm } from "@/components/application/OrganisationForm";
@@ -19,9 +22,8 @@ import {
 } from "@/components/application/form";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
-import { CenterSpinner } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { base64encode, toNumber } from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import {
@@ -35,6 +37,8 @@ import styled from "styled-components";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EmailInput } from "@/components/application/EmailInput";
 import { FormSubHeading } from "@/components/application/styled";
+import { createApolloClient } from "@/modules/apolloClient";
+import { gql } from "@apollo/client";
 
 function Page3Form(): JSX.Element | null {
   const { options } = useOptions();
@@ -63,20 +67,8 @@ const Form = styled.form`
   gap: var(--spacing-m);
 `;
 
-function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
-  const { pk: appPk } = props;
+function Page3({ application }: PropsNarrowed): JSX.Element {
   const router = useRouter();
-
-  const id = base64encode(`ApplicationNode:${appPk}`);
-  const {
-    data,
-    error: queryError,
-    loading: isLoading,
-  } = useApplicationQuery({
-    variables: { id },
-  });
-  const { application } = data ?? {};
-  const { applicationRound } = application ?? {};
 
   const form = useForm<ApplicationFormPage3Values>({
     mode: "onChange",
@@ -120,27 +112,12 @@ function Page3Wrapped(props: PropsNarrowed): JSX.Element | null {
     }
   };
 
-  if (queryError != null) {
-    return <NextError statusCode={500} />;
-  }
-
-  if (isLoading && application == null && applicationRound == null) {
-    return <CenterSpinner />;
-  }
-
-  // TODO these are 404
-  // This should never happen but Apollo TS doesn't enforce it
-  if (application?.pk == null || applicationRound == null) {
-    return <NextError statusCode={404} />;
-  }
-
   const onPrev = () => router.push(getApplicationPath(application.pk, "page2"));
 
   const isValid = watch("applicantType") != null;
 
   return (
     <FormProvider {...form}>
-      {/* TODO general mutation error (not query) */}
       <ApplicationPageWrapper
         translationKeyPrefix="application:Page3"
         application={application}
@@ -182,30 +159,47 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const commonProps = getCommonServerSideProps();
   const { locale } = ctx;
 
-  // TODO should fetch on SSR but we need authentication for it
   const { query } = ctx;
-  const { id } = query;
-  const pkstring = Array.isArray(id) ? id[0] : id;
+  const pkstring = ignoreMaybeArray(query.id);
   const pk = toNumber(pkstring ?? "");
-  if (pk == null || !(pk > 0)) {
-    return {
+  const notFound = {
+    notFound: true,
+    props: {
       notFound: true,
-      props: {
-        notFound: true,
-        ...(await serverSideTranslations(locale ?? "fi")),
-      },
-    };
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
+  if (pk == null || !(pk > 0)) {
+    return notFound;
   }
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const { data } = await apolloClient.query<ApplicationPage3Query>({
+    query: ApplicationPage3Document,
+    variables: { id: base64encode(`ApplicationNode:${pk}`) },
+  });
+  const { application } = data ?? {};
+  if (application == null) {
+    return notFound;
+  }
+
   return {
     props: {
-      ...getCommonServerSideProps(),
-      key: locale,
-      pk,
+      application,
+      ...commonProps,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 }
 
-export default Page3Wrapped;
+export default Page3;
+
+export const APPLICATION_PAGE3_QUERY = gql`
+  query ApplicationPage3($id: ID!) {
+    application(id: $id) {
+      ...ApplicationForm
+    }
+  }
+`;
