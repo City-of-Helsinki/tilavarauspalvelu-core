@@ -10,7 +10,7 @@ import {
   type ApplicationSectionUiFragment,
   type ApplicationCommonFragment,
 } from "@gql/gql-types";
-import { getTranslation } from "common/src/common/util";
+import { getTranslation, toUIDate } from "common/src/common/util";
 import { convertWeekday } from "common/src/conversion";
 import {
   ApplicationInfoContainer,
@@ -31,7 +31,7 @@ import {
   IconQuestionCircleFill,
   Tooltip,
 } from "hds-react";
-import { apiDateToUIDate, getDayTimes } from "@/modules/util";
+import { getDayTimes } from "@/modules/util";
 
 const filterPrimary = (n: { priority: Priority }) =>
   n.priority === Priority.Primary;
@@ -104,14 +104,12 @@ const InfoListItem = ({ label, value }: { label: string; value: string }) => (
   </li>
 );
 
-type ApplicationSectionT = ApplicationSectionUiFragment;
-
 function SingleApplicationSection({
   applicationEvent,
   primaryTimes,
   secondaryTimes,
 }: {
-  applicationEvent: ApplicationSectionT;
+  applicationEvent: ApplicationSectionUiFragment;
   primaryTimes: ApplicationEventScheduleFormType[];
   secondaryTimes: ApplicationEventScheduleFormType[];
 }) {
@@ -129,6 +127,51 @@ function SingleApplicationSection({
     applicationEvent.status === ApplicationSectionStatusChoice.Rejected ||
     applicationEvent.status === ApplicationSectionStatusChoice.Handled;
   const statusProps = getLabelProps(applicationEvent.status);
+
+  const reservationsBegin = toUIDate(
+    new Date(applicationEvent.reservationsBeginDate)
+  );
+  const reservationsEnd = toUIDate(
+    new Date(applicationEvent.reservationsEndDate)
+  );
+  const duration = formatDurationRange(
+    applicationEvent.reservationMinDuration,
+    applicationEvent.reservationMaxDuration,
+    t
+  );
+  const infos = [
+    {
+      key: "numPersons",
+      label: t("application:preview.applicationEvent.numPersons"),
+      value: `${applicationEvent.numPersons} ${t("common:peopleSuffixShort")}`,
+    },
+    {
+      key: "ageGroup",
+      label: t("application:preview.applicationEvent.ageGroup"),
+      value: `${ageGroupToString(applicationEvent.ageGroup)} ${t("common:yearSuffixShort")}`,
+    },
+    {
+      key: "duration",
+      label: t("application:preview.applicationEvent.duration"),
+      value: duration,
+    },
+    {
+      key: "eventsPerWeek",
+      label: t("application:preview.applicationEvent.eventsPerWeek"),
+      value: `${applicationEvent.appliedReservationsPerWeek} ${t("common:amountSuffixShort")}`,
+    },
+    {
+      key: "period",
+      label: t("application:preview.applicationEvent.period"),
+      value: `${reservationsBegin} - ${reservationsEnd}`,
+    },
+    {
+      key: "purpose",
+      label: t("application:preview.applicationEvent.purpose"),
+      value: getTranslation(applicationEvent.purpose ?? {}, "name"),
+    },
+  ];
+
   return (
     <ApplicationSection>
       <ApplicationSectionHeader>
@@ -150,34 +193,9 @@ function SingleApplicationSection({
               {t("application:preview.applicationEvent.applicationInfo")}
             </h3>
             <ul>
-              <InfoListItem
-                label={t("application:preview.applicationEvent.numPersons")}
-                value={`${applicationEvent.numPersons} ${t("common:peopleSuffixShort")}`}
-              />
-              <InfoListItem
-                label={t("application:preview.applicationEvent.ageGroup")}
-                value={`${ageGroupToString(applicationEvent.ageGroup)} ${t("common:yearSuffixShort")}`}
-              />
-              <InfoListItem
-                label={t("application:preview.applicationEvent.duration")}
-                value={formatDurationRange(
-                  applicationEvent.reservationMinDuration ?? 0,
-                  applicationEvent.reservationMaxDuration ?? 0,
-                  t
-                )}
-              />
-              <InfoListItem
-                label={t("application:preview.applicationEvent.eventsPerWeek")}
-                value={`${applicationEvent.appliedReservationsPerWeek} ${t("common:amountSuffixShort")}`}
-              />
-              <InfoListItem
-                label={t("application:preview.applicationEvent.period")}
-                value={`${apiDateToUIDate(applicationEvent.reservationsBeginDate)} - ${apiDateToUIDate(applicationEvent.reservationsEndDate)}`}
-              />
-              <InfoListItem
-                label={t("application:preview.applicationEvent.purpose")}
-                value={getTranslation(applicationEvent.purpose ?? {}, "name")}
-              />
+              {infos.map(({ key, ...rest }) => (
+                <InfoListItem key={key} {...rest} />
+              ))}
             </ul>
           </InfoItem>
         </InfoItemContainer>
