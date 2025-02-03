@@ -247,8 +247,6 @@ def test_render_reservation_approved__text():
     context = get_mock_data(
         email_type=EmailType.RESERVATION_APPROVED,
         language="en",
-        price=Decimal("12.30"),
-        non_subsidised_price=Decimal("12.30"),
     )
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
 
@@ -291,7 +289,12 @@ def test_render_reservation_approved__text():
 
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_approved__discount__text():
-    context = get_mock_data(email_type=EmailType.RESERVATION_APPROVED, language="en")
+    context = get_mock_data(
+        email_type=EmailType.RESERVATION_APPROVED,
+        language="en",
+        price=Decimal("12.30"),
+        non_subsidised_price=Decimal("15.30"),
+    )
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
 
     manage = (
@@ -391,7 +394,12 @@ def test_render_reservation_approved__html():
 
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_approved__discount__html():
-    context = get_mock_data(email_type=EmailType.RESERVATION_APPROVED, language="en")
+    context = get_mock_data(
+        email_type=EmailType.RESERVATION_APPROVED,
+        language="en",
+        price=Decimal("12.30"),
+        non_subsidised_price=Decimal("15.30"),
+    )
     html_content = render_html(email_type=EmailType.RESERVATION_APPROVED, context=context)
     text_content = html_email_to_text(html_content)
 
