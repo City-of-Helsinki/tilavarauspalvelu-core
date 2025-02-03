@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import { Page1 } from "@/components/application/Page1";
 import { Page2 } from "@/components/application/Page2";
-import { getTranslation } from "@/modules/util";
 import {
   type ApplicationFormValues,
   transformApplication,
@@ -18,7 +17,7 @@ import {
 import { useReservationUnitList } from "@/hooks";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { base64encode } from "common/src/helpers";
+import { base64encode, toNumber } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
   ApplicationDocument,
@@ -27,6 +26,11 @@ import {
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
 import { useDisplayError } from "@/hooks/useDisplayError";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
+import { useTranslation } from "next-i18next";
 
 // TODO move this to a shared file
 // and combine all the separate error handling functions to one
@@ -40,65 +44,51 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { query } = ctx;
   const { params } = query;
   const [id, slug] = params ?? [];
-  const pk = Number.isNaN(Number(id)) ? null : Number(id);
+  const pk = toNumber(id);
 
   const commonProps = getCommonServerSideProps();
-  if (pk == null) {
-    return {
-      props: {
-        ...commonProps,
-        notFound: true,
-        slug: slug ?? "page1",
-        ...(await serverSideTranslations(locale ?? "fi")),
-      },
+  const notFound = {
+    props: {
+      ...commonProps,
       notFound: true,
-    };
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+    notFound: true,
+  };
+  if (pk == null) {
+    return notFound;
   }
 
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
-  const typename = "ApplicationNode";
   const { data } = await client.query<
     ApplicationQuery,
     ApplicationQueryVariables
   >({
     query: ApplicationDocument,
     variables: {
-      id: base64encode(`${typename}:${pk}`),
+      id: base64encode(`ApplicationNode:${pk}`),
     },
   });
-
-  // Pass the application and round as props because we don't need to hydrate
-  // and our codegen would allow undefineds if we passed data instead.
   const { application } = data;
-
-  const applicationRound = application?.applicationRound ?? undefined;
-  if (application == null || applicationRound == null) {
-    return {
-      props: {
-        ...commonProps,
-        notFound: true,
-        slug: slug ?? "page1",
-        ...(await serverSideTranslations(locale ?? "fi")),
-      },
-      notFound: true,
-    };
+  if (application == null) {
+    return notFound;
   }
 
   return {
     props: {
       ...commonProps,
-      slug: slug ?? "page1",
+      slug,
+      application,
       ...(await serverSideTranslations(locale ?? "fi")),
-      data: {
-        application,
-        applicationRound,
-      },
     },
   };
 }
 
-function ApplicationRootPage({ slug, data }: PropsNarrowed): JSX.Element {
-  const { application, applicationRound } = data;
+function ApplicationRootPage({
+  slug,
+  application,
+}: PropsNarrowed): JSX.Element {
+  const { applicationRound } = application;
   const router = useRouter();
 
   const [update] = useApplicationUpdate();
@@ -144,15 +134,13 @@ function ApplicationRootPage({ slug, data }: PropsNarrowed): JSX.Element {
     formState: { isDirty },
   } = form;
 
-  /* TODO removing form reset on page load for now
-   * the defaultValues should be enough and seems to work when loading an existing application
-   * this page is not saved + refreshed but goes to second page after save.
-   * The problem using reset is that it resets the form with development quick refresh,
-   * so not a big problem, but if there is no need to use it, it's better to avoid it.
-   */
+  const { i18n } = useTranslation();
 
+  const lang = convertLanguageCode(i18n.language);
   const applicationRoundName =
-    applicationRound != null ? getTranslation(applicationRound, "name") : "-";
+    applicationRound != null
+      ? getTranslationSafe(applicationRound, "name", lang)
+      : "-";
 
   return (
     <FormProvider {...form}>

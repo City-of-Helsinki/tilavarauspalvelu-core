@@ -13,7 +13,6 @@ import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { H4 } from "common/src/common/typography";
 import { getLocalizationLang } from "common/src/helpers";
 import { type OptionTypes, ReservationUnitList } from "./ReservationUnitList";
-import { formatDate } from "@/modules/util";
 import { ApplicationEventSummary } from "./ApplicationEventSummary";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
@@ -25,12 +24,11 @@ import {
   ControlledSelect,
 } from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
-
-type AppRoundNode = ApplicationRoundForApplicationFragment;
+import { gql } from "@apollo/client";
 
 type Props = {
   index: number;
-  applicationRound: AppRoundNode;
+  applicationRound: ApplicationRoundForApplicationFragment;
   optionTypes: OptionTypes;
   isVisible: boolean;
   onToggleAccordion: () => void;
@@ -152,7 +150,7 @@ function ApplicationEventInner({
       <ReservationUnitList
         applicationRound={applicationRound}
         index={index}
-        minSize={numPersons ?? undefined}
+        minSize={numPersons}
         options={{
           purposeOptions,
           reservationUnitTypeOptions,
@@ -164,9 +162,9 @@ function ApplicationEventInner({
       <Checkbox
         id={`applicationSections.${index}.defaultPeriod`}
         checked={selectionIsDefaultPeriod}
-        label={`${t("application:Page1.defaultPeriodPrefix")} ${formatDate(
-          applicationRound.reservationPeriodBegin
-        )} - ${formatDate(applicationRound.reservationPeriodEnd)}`}
+        label={`${t("application:Page1.defaultPeriodPrefix")} ${toUIDate(
+          periodStartDate
+        )} - ${toUIDate(periodEndDate)}`}
         onChange={() => {
           clearErrors([
             `applicationSections.${index}.begin`,
@@ -179,8 +177,8 @@ function ApplicationEventInner({
       <AutoGrid>
         <ApplicationDateRangePicker
           index={index}
-          minDate={new Date(applicationRound.reservationPeriodBegin)}
-          maxDate={new Date(applicationRound.reservationPeriodEnd)}
+          minDate={periodStartDate}
+          maxDate={periodEndDate}
         />
         <ControlledSelect
           control={control}
@@ -193,7 +191,6 @@ function ApplicationEventInner({
         <ControlledSelect
           control={control}
           name={`applicationSections.${index}.maxDuration`}
-          placeholder={t("common:select")}
           options={durationOptions}
           label={t("application:Page1.maxDuration")}
           required
@@ -339,3 +336,11 @@ export function ApplicationEvent(props: Props): JSX.Element {
     </Accordion>
   );
 }
+
+export const APPLICATION_ROUND_FRAGMENT = gql`
+  fragment ApplicationRoundForApplication on ApplicationRoundNode {
+    ...ApplicationReservationUnitList
+    reservationPeriodBegin
+    reservationPeriodEnd
+  }
+`;
