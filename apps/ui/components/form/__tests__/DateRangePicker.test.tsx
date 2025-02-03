@@ -3,7 +3,7 @@ import { get as mockGet } from "lodash";
 import React from "react";
 import mockTranslations from "@/public/locales/fi/dateSelector.json";
 import { configure, render, screen } from "@/test/testUtils";
-import DateRangePicker, { DateRangePickerProps } from "../DateRangePicker";
+import { DateRangePicker, DateRangePickerProps } from "../DateRangePicker";
 
 jest.mock("next-i18next", () => ({
   useTranslation: () => {
