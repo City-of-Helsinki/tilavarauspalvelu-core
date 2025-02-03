@@ -19,16 +19,19 @@ import {
   covertCellsToTimeRange,
 } from "./module";
 import { successToast } from "common/src/common/toast";
-import { ApplicationQuery } from "@/gql/gql-types";
+import { type ApplicationPage2Query } from "@/gql/gql-types";
 
-type ApplicationT = NonNullable<ApplicationQuery["application"]>;
+// TODO fragment
+type ApplicationT = NonNullable<ApplicationPage2Query["application"]>;
 type SectionT = NonNullable<ApplicationT["applicationSections"]>[0];
+type OpeningHoursT =
+  SectionT["reservationUnitOptions"][0]["reservationUnit"]["applicationRoundTimeSlots"];
 
 type Props = {
   index: number;
   cells: Cell[][];
   reservationUnitOptions: { label: string; value: number }[];
-  reservationUnitOpeningHours: SectionT["reservationUnitOptions"][0]["reservationUnit"]["applicationRoundTimeSlots"];
+  reservationUnitOpeningHours: OpeningHoursT;
 };
 
 const CalendarHead = styled.div`

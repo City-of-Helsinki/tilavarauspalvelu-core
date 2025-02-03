@@ -8,8 +8,9 @@ import {
   Priority,
   type UpdateApplicationSectionForApplicationSerializerInput,
   type ReservationUnitNode,
-  type ApplicationQuery,
-  ApplicantFragment,
+  type ApplicantFragment,
+  type ApplicationPage1Query,
+  ApplicationPage2Query,
 } from "@gql/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
@@ -21,9 +22,15 @@ import {
 } from "common/src/schemas/schemaCommon";
 import { convertWeekday } from "common/src/conversion";
 
-type Node = NonNullable<ApplicationQuery["application"]>;
+// TODO fragment
+type Node = NonNullable<ApplicationPage1Query["application"]>;
 type Organisation = Node["organisation"];
 type Address = NonNullable<Organisation>["address"];
+type SectionType = NonNullable<Node["applicationSections"]>[0];
+
+type NodePage2 = NonNullable<ApplicationPage2Query["application"]>;
+type SectionTypePage2 = NonNullable<NodePage2["applicationSections"]>[0];
+
 // NOTE the zod schemas have a lot of undefineds because the form is split into four pages
 // so you can't trust some of the zod validation (e.g. mandatory fields)
 // real solution is to split the forms per page so we have four schemas
@@ -119,8 +126,6 @@ export const ApplicationSectionPage2Schema = z.object({
   priority: z.literal(200).or(z.literal(300)).optional(),
 });
 
-type SectionType = NonNullable<Node["applicationSections"]>[0];
-
 function transformApplicationSectionPage2(
   values: ApplicationSectionPage2FormValue
 ): UpdateApplicationSectionForApplicationSerializerInput {
@@ -132,7 +137,7 @@ function transformApplicationSectionPage2(
   };
 }
 function convertApplicationSectionPage2(
-  section: SectionType
+  section: SectionTypePage2
 ): ApplicationSectionPage2FormValue {
   return {
     pk: section.pk ?? 0,
@@ -601,7 +606,9 @@ export function transformApplicationPage1(
   };
 }
 
-export function convertApplicationPage2(app: Node): ApplicationPage2FormValues {
+export function convertApplicationPage2(
+  app: Pick<NodePage2, "pk" | "applicationSections">
+): ApplicationPage2FormValues {
   return {
     pk: app?.pk ?? 0,
     applicationSections:

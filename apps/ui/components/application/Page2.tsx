@@ -12,7 +12,7 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import styled from "styled-components";
 import { useFormContext } from "react-hook-form";
-import { type ApplicationQuery } from "@gql/gql-types";
+import { type ApplicationPage2Query } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import {
   type ApplicationSectionFormValue,
@@ -32,9 +32,9 @@ import { errorToast } from "common/src/common/toast";
 import { ButtonContainer } from "common/styles/util";
 import { getApplicationPath } from "@/modules/urls";
 
-type Node = NonNullable<ApplicationQuery["application"]>;
+type Node = NonNullable<ApplicationPage2Query["application"]>;
 type Props = {
-  application: Node;
+  application: Pick<Node, "applicationSections" | "pk">;
   onNext: (appToSave: ApplicationPage2FormValues) => void;
 };
 
