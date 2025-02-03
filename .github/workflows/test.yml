@@ -130,6 +130,11 @@ jobs:
         with:
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
+      - name: "Download test durations artefact"
+        uses: actions/download-artifact@v4
+        with:
+          name: test_durations
+
       - name: "Run pytest with coverage"
         run: poetry run coverage run --branch -m pytest --disable-warnings --splits 12 --splitting-algorithm least_duration --group ${{ matrix.group }}
         env:
