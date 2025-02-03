@@ -7,7 +7,7 @@ import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import type {
   ApplicationEventScheduleFormType,
-  ApplicationFormValues,
+  ApplicationPage2FormValues,
 } from "./form";
 import { getDayTimes } from "@/modules/util";
 import { useFormContext } from "react-hook-form";
@@ -76,7 +76,7 @@ const Heading = styled(H4).attrs({
 export function TimePreview({ index }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const { watch } = useFormContext<ApplicationFormValues>();
+  const { watch } = useFormContext<ApplicationPage2FormValues>();
 
   const schedules =
     watch(`applicationSections.${index}.suitableTimeRanges`) ?? [];

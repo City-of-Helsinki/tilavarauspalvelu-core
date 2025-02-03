@@ -15,8 +15,8 @@ import { OrganisationForm } from "@/components/application/OrganisationForm";
 import { ApplicantTypeSelector } from "@/components/application/ApplicantTypeSelector";
 import { useOptions } from "@/hooks/useOptions";
 import {
-  type ApplicationFormPage3Values,
-  ApplicationFormPage3Schema,
+  type ApplicationPage3FormValues,
+  ApplicationPage3Schema,
   convertApplicationPage3,
   transformPage3Application,
 } from "@/components/application/form";
@@ -45,7 +45,7 @@ function Page3Form(): JSX.Element | null {
   const { options } = useOptions();
   const { cityOptions } = options;
 
-  const { watch } = useFormContext<ApplicationFormPage3Values>();
+  const { watch } = useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
 
   switch (type) {
@@ -71,10 +71,10 @@ const Form = styled.form`
 function Page3({ application }: PropsNarrowed): JSX.Element {
   const router = useRouter();
 
-  const form = useForm<ApplicationFormPage3Values>({
+  const form = useForm<ApplicationPage3FormValues>({
     mode: "onChange",
     defaultValues: convertApplicationPage3(application),
-    resolver: zodResolver(ApplicationFormPage3Schema),
+    resolver: zodResolver(ApplicationPage3Schema),
     reValidateMode: "onChange",
   });
 
@@ -94,19 +94,9 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
   const { t } = useTranslation();
   const [update] = useApplicationUpdate();
 
-  const handleSave = async (values: ApplicationFormPage3Values) => {
-    // There should not be a situation where we are saving on this page without an application
-    // but because of loading we might not have it when the page is rendered
-    // TODO: refactor so we don't need to check it like this
-    if (values.pk === 0) {
-      throw new Error("Invalid application");
-    }
-    return update(transformPage3Application(values));
-  };
-
-  const onSubmit = async (values: ApplicationFormPage3Values) => {
+  const onSubmit = async (values: ApplicationPage3FormValues) => {
     try {
-      const pk = await handleSave(values);
+      const pk = await update(transformPage3Application(values));
       router.push(getApplicationPath(pk, "preview"));
     } catch (e) {
       errorToast({ text: t("common:error.dataError") });

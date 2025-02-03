@@ -4,13 +4,13 @@ import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { FormSubHeading } from "./styled";
 import { BillingAddress } from "./BillingAddress";
-import { ApplicationFormPage3Values } from "./form";
+import { type ApplicationPage3FormValues } from "./form";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
 
 export function CompanyForm(): JSX.Element {
   const { t } = useTranslation();
 
-  const { watch, control } = useFormContext<ApplicationFormPage3Values>();
+  const { watch, control } = useFormContext<ApplicationPage3FormValues>();
 
   const hasBillingAddress = watch("hasBillingAddress");
 
@@ -72,7 +72,7 @@ export function ApplicationFormTextInput({
 }): JSX.Element {
   const { t } = useTranslation();
   const { register, getFieldState } =
-    useFormContext<ApplicationFormPage3Values>();
+    useFormContext<ApplicationPage3FormValues>();
 
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`application:validation.${errorMsg}`) : "";

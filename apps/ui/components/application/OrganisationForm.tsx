@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { ApplicantTypeChoice } from "@gql/gql-types";
 import { BillingAddress } from "./BillingAddress";
-import type { ApplicationFormPage3Values } from "./form";
+import { type ApplicationPage3FormValues } from "./form";
 import { FormSubHeading } from "./styled";
 import { ControlledSelect } from "common/src/components/form";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
@@ -28,7 +28,7 @@ export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
     formState: { errors },
     watch,
     setValue,
-  } = useFormContext<ApplicationFormPage3Values>();
+  } = useFormContext<ApplicationPage3FormValues>();
 
   const applicantType = watch("applicantType");
   const hasRegistration = applicantType === ApplicantTypeChoice.Association;

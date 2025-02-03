@@ -9,8 +9,17 @@ import { type ApplicationSectionFormValue } from "./form";
 import { Flex } from "common/styles/util";
 import { IconWithText } from "../common/IconWithText";
 
+type SectionT = Pick<
+  ApplicationSectionFormValue,
+  | "begin"
+  | "end"
+  | "appliedReservationsPerWeek"
+  | "minDuration"
+  | "maxDuration"
+  | "numPersons"
+>;
 type Props = {
-  applicationSection?: ApplicationSectionFormValue;
+  applicationSection?: SectionT;
   name: string;
 };
 
@@ -108,8 +117,8 @@ export function ApplicationEventSummary({
           minDuration === maxDuration ? "minDuration" : "durations"
         }`,
         {
-          minDuration: displayDuration(applicationSection.minDuration, t),
-          maxDuration: displayDuration(applicationSection.maxDuration, t),
+          minDuration: displayDuration(minDuration, t),
+          maxDuration: displayDuration(maxDuration, t),
         }
       ),
     },
