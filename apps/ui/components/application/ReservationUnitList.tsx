@@ -10,7 +10,7 @@ import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import type {
-  ApplicationQuery,
+  ApplicationReservationUnitListFragment,
   ReservationUnitCardFieldsFragment,
 } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
@@ -21,11 +21,9 @@ import { OrderedReservationUnitCard } from "./OrderedReservationUnitCard";
 import { Flex } from "common/styles/util";
 import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
 import { breakpoints } from "common";
+import { gql } from "@apollo/client";
 
-type Node = NonNullable<ApplicationQuery["application"]>;
-type AppRoundNode = NonNullable<Node["applicationRound"]>;
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
-
 export type OptionType = { value: number; label: string };
 export type OptionTypes = {
   ageGroupOptions?: OptionType[];
@@ -37,7 +35,7 @@ export type OptionTypes = {
 
 type Props = {
   index: number;
-  applicationRound: AppRoundNode;
+  applicationRound: ApplicationReservationUnitListFragment;
   options: OptionTypes;
   minSize?: number;
 };
@@ -57,7 +55,9 @@ export function ReservationUnitList({
   const { clearErrors, setError, watch, setValue, formState } = form;
   const { errors } = formState;
 
-  const isValid = (units: typeof applicationRound.reservationUnits) => {
+  const isValid = (
+    units: ApplicationReservationUnitListFragment["reservationUnits"]
+  ) => {
     const error = units
       .map(
         (resUnit) =>
@@ -208,3 +208,32 @@ export function ReservationUnitList({
     </Flex>
   );
 }
+
+export const APPLICATION_RESERVATION_UNIT_LIST_FRAGMENT = gql`
+  fragment ApplicationReservationUnitList on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    nameSv
+    nameEn
+    reservationUnits {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+      minPersons
+      maxPersons
+      images {
+        ...Image
+      }
+      unit {
+        id
+        pk
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+  }
+`;

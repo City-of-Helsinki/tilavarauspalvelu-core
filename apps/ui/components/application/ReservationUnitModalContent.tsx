@@ -21,7 +21,7 @@ import {
   ReservationUnitOrderingChoices,
   useSearchReservationUnitsQuery,
   type ReservationUnitCardFieldsFragment,
-  type ApplicationQuery,
+  type ApplicationReservationUnitListFragment,
 } from "@gql/gql-types";
 import { filterNonNullable, getImageSource } from "common/src/helpers";
 import { AutoGrid, CenterSpinner, Flex } from "common/styles/util";
@@ -125,8 +125,11 @@ function ReservationUnitCard({
   );
 }
 
-type Node = NonNullable<ApplicationQuery["application"]>;
-type AppRoundNode = NonNullable<Node["applicationRound"]>;
+type AppRoundNode = Omit<
+  ApplicationReservationUnitListFragment,
+  "reservationUnits"
+>;
+
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
 type OptionType = {
   label: string;
