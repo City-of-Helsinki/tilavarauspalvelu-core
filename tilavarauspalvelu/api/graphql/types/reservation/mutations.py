@@ -39,6 +39,7 @@ from .serializers import (
     StaffReservationAdjustTimeSerializer,
     StaffReservationModifySerializer,
 )
+from .serializers.staff_repair_access_code_serializers import StaffRepairReservationAccessCodeSerializer
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import PaymentOrder
@@ -59,6 +60,7 @@ __all__ = [
     "ReservationStaffChangeAccessCodeMutation",
     "ReservationStaffCreateMutation",
     "ReservationStaffModifyMutation",
+    "ReservationStaffRepairAccessCodeMutation",
     "ReservationUpdateMutation",
     "ReservationWorkingMemoMutation",
 ]
@@ -223,4 +225,10 @@ class ReservationStaffModifyMutation(UpdateMutation):
 class ReservationStaffChangeAccessCodeMutation(UpdateMutation):
     class Meta:
         serializer_class = StaffChangeReservationAccessCodeSerializer
+        permission_classes = [StaffReservationModifyPermission]
+
+
+class ReservationStaffRepairAccessCodeMutation(UpdateMutation):
+    class Meta:
+        serializer_class = StaffRepairReservationAccessCodeSerializer
         permission_classes = [StaffReservationModifyPermission]

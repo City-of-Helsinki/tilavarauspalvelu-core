@@ -23,7 +23,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraConflictError, PindoraNotFoundError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import ApplicationSection, ReservationMetadataField, Space
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
@@ -328,3 +328,36 @@ class ReservationActions:
             self.reservation.access_code_generated_at = response["access_code_generated_at"]
             self.reservation.access_code_is_active = response["access_code_is_active"]
             self.reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+
+    def repair_reservation_access_code(self) -> None:
+        """
+        Synchronizes the state of access codes for a reservation between Pindora and Varaamo
+        so that the access code is generated and activated/deactivated in Pindora according to what
+        Varaamo thinks is should be its current state.
+        """
+        should_be_active = self.reservation.access_code_should_be_active
+
+        if self.reservation.access_code_generated_at is not None:
+            try:
+                if should_be_active:
+                    PindoraClient.activate_reservation_access_code(reservation=self.reservation)
+                    self.reservation.access_code_is_active = True
+                else:
+                    PindoraClient.deactivate_reservation_access_code(reservation=self.reservation)
+                    self.reservation.access_code_is_active = False
+            except PindoraNotFoundError:
+                self.reservation.access_code_generated_at = None
+                self.reservation.access_code_is_active = False
+
+        if self.reservation.access_code_generated_at is None:
+            try:
+                response = PindoraClient.create_reservation(reservation=self.reservation, is_active=should_be_active)
+                self.reservation.access_code_generated_at = response["access_code_generated_at"]
+                self.reservation.access_code_is_active = response["access_code_is_active"]
+
+            except PindoraConflictError:
+                response = PindoraClient.get_reservation(reservation=self.reservation)
+                self.reservation.access_code_generated_at = response["access_code_generated_at"]
+                self.reservation.access_code_is_active = response["access_code_is_active"]
+
+        self.reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])

@@ -41,6 +41,11 @@ CHANGE_ACCESS_CODE_STAFF_MUTATION = build_mutation(
     "ReservationStaffChangeAccessCodeMutation",
     fields="pk accessCodeIsActive accessCodeGeneratedAt",
 )
+REPAIR_ACCESS_CODE_STAFF_MUTATION = build_mutation(
+    "staffRepairReservationAccessCode",
+    "ReservationStaffRepairAccessCodeMutation",
+    fields="pk accessCodeIsActive accessCodeGeneratedAt",
+)
 
 
 @contextmanager

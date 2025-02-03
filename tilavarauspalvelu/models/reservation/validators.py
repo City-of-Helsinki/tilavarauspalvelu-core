@@ -175,10 +175,13 @@ class ReservationValidator:
             msg = "A reservation cannot be changed to a normal reservation from any other type."
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
 
-    def validate_reservation_has_access_code(self) -> None:
+    def validate_reservation_access_type_is_access_code(self) -> None:
         if self.reservation.access_type != AccessType.ACCESS_CODE:
             msg = "Reservation access type does not use access codes."
             raise ValidationError(msg, code=error_codes.RESERVATION_WRONG_ACCESS_TYPE)
+
+    def validate_reservation_has_access_code(self) -> None:
+        self.validate_reservation_access_type_is_access_code()
 
         if self.reservation.access_code_generated_at is None:
             msg = "Reservation must have an access code to change it."
