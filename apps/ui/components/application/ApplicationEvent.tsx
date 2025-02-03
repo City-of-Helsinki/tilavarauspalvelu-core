@@ -17,7 +17,7 @@ import { ApplicationEventSummary } from "./ApplicationEventSummary";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
-import { type ApplicationFormValues } from "./form";
+import { type ApplicationPage1FormValues } from "./form";
 import { AutoGrid, Flex } from "common/styles/util";
 import {
   ControlledNumberInput,
@@ -44,7 +44,7 @@ function ApplicationEventInner({
   del: () => void;
 }): JSX.Element {
   const { t } = useTranslation();
-  const form = useFormContext<ApplicationFormValues>();
+  const form = useFormContext<ApplicationPage1FormValues>();
   const {
     control,
     register,
@@ -244,7 +244,7 @@ function ApplicationDateRangePicker({
   maxDate: Date;
 }): JSX.Element {
   const { t, i18n } = useTranslation();
-  const form = useFormContext<ApplicationFormValues>();
+  const form = useFormContext<ApplicationPage1FormValues>();
   const { register, getValues, setValue, clearErrors, trigger, getFieldState } =
     form;
 
@@ -308,7 +308,7 @@ export function ApplicationEvent(props: Props): JSX.Element {
 
   const { t } = useTranslation();
 
-  const form = useFormContext<ApplicationFormValues>();
+  const form = useFormContext<ApplicationPage1FormValues>();
   const {
     watch,
     formState: { errors },

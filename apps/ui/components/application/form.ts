@@ -19,6 +19,7 @@ import {
   checkValidDateOnly,
   lessThanMaybeDate,
 } from "common/src/schemas/schemaCommon";
+import { convertWeekday } from "common/src/conversion";
 
 type Node = NonNullable<ApplicationQuery["application"]>;
 type Organisation = Node["organisation"];
@@ -77,19 +78,12 @@ const ApplicationSectionFormValueSchema = z
       .string()
       .optional()
       .refine((s) => s, { path: [""], message: "Required" }),
-    // optional because it's not present on the first page
-    // TODO do we check this on Page2? not undefined and length > 0?)
-    suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema).optional(),
     // TODO do we want to keep the pk of the options? so we can update them when the order changes and not recreate the whole list on save?
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
     // frontend only props
     accordionOpen: z.boolean(),
     // form specific: new events don't have pks and we need a unique identifier
     formKey: z.string(),
-    // selected reservation unit to show for this section (only used by Page2)
-    // TODO split the form? so we have three schemas (common + page1 + page2)
-    reservationUnitPk: z.number().optional(),
-    priority: z.literal(200).or(z.literal(300)).optional(),
   })
   .refine((s) => s.maxDuration >= s.minDuration, {
     path: ["maxDuration"],
@@ -110,12 +104,91 @@ export type ApplicationSectionFormValue = z.infer<
   typeof ApplicationSectionFormValueSchema
 >;
 
+export type ApplicationSectionPage2FormValue = z.infer<
+  typeof ApplicationSectionPage2Schema
+>;
+
+export const ApplicationSectionPage2Schema = z.object({
+  pk: z.number(),
+  suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema).min(1),
+  minDuration: z.number().min(1),
+  name: z.string().min(1).max(100),
+  // selected reservation unit to show for this section (only used by Page2)
+  // TODO split the form? so we have three schemas (common + page1 + page2)
+  reservationUnitPk: z.number().optional(),
+  priority: z.literal(200).or(z.literal(300)).optional(),
+});
+
 type SectionType = NonNullable<Node["applicationSections"]>[0];
+
+function transformApplicationSectionPage2(
+  values: ApplicationSectionPage2FormValue
+): UpdateApplicationSectionForApplicationSerializerInput {
+  return {
+    pk: values.pk,
+    suitableTimeRanges: values.suitableTimeRanges.map(
+      transformSuitableTimeRange
+    ),
+  };
+}
+function convertApplicationSectionPage2(
+  section: SectionType
+): ApplicationSectionPage2FormValue {
+  return {
+    pk: section.pk ?? 0,
+    name: section.name,
+    suitableTimeRanges: filterNonNullable(section.suitableTimeRanges).map(
+      (timeRanges) => convertTimeRange(timeRanges)
+    ),
+    minDuration: section.reservationMinDuration ?? 0,
+    reservationUnitPk:
+      section.reservationUnitOptions[0].reservationUnit.pk ?? 0,
+    priority: 300,
+  };
+}
+const ApplicationPage2Schema = z.object({
+  pk: z.number(),
+  // applicantType: ApplicantTypeSchema.optional(),
+  applicationSections: z.array(ApplicationSectionPage2Schema),
+});
+
+export type ApplicationPage2FormValues = z.infer<typeof ApplicationPage2Schema>;
+
+export function convertToSchedule(
+  b: NonNullable<
+    NonNullable<ApplicationPage2FormValues["applicationSections"]>[0]
+  >
+): ApplicationEventScheduleFormType[] {
+  return (
+    b.suitableTimeRanges?.map((range) => {
+      return {
+        day: range ? convertWeekday(range.dayOfTheWeek) : 0,
+        begin: range?.beginTime ?? "",
+        end: range?.endTime ?? "",
+        priority: range?.priority === Priority.Primary ? 300 : 200,
+      };
+    }) ?? []
+  );
+}
+
 function transformApplicationSectionToForm(
   section: SectionType
 ): ApplicationSectionFormValue {
-  const initialReservationUnitPk =
-    section.reservationUnitOptions[0].reservationUnit.pk ?? 0;
+  const reservationUnits = filterNonNullable(
+    section.reservationUnitOptions?.map(
+      ({ reservationUnit, preferredOrder }) => ({
+        pk: reservationUnit?.pk,
+        preferredOrder,
+      })
+    )
+  )
+    .sort((a, b) =>
+      a.preferredOrder && b.preferredOrder
+        ? a.preferredOrder - b.preferredOrder
+        : 0
+    )
+    .map((eru) => eru.pk ?? 0)
+    .filter((pk) => pk > 0);
 
   return {
     pk: section.pk ?? undefined,
@@ -127,30 +200,11 @@ function transformApplicationSectionToForm(
     minDuration: section.reservationMinDuration ?? 0,
     maxDuration: section.reservationMaxDuration ?? 0,
     appliedReservationsPerWeek: section.appliedReservationsPerWeek ?? 0,
-    reservationUnits: filterNonNullable(
-      section.reservationUnitOptions?.map(
-        ({ reservationUnit, preferredOrder }) => ({
-          pk: reservationUnit?.pk,
-          preferredOrder,
-        })
-      )
-    )
-      .sort((a, b) =>
-        a.preferredOrder && b.preferredOrder
-          ? a.preferredOrder - b.preferredOrder
-          : 0
-      )
-      .map((eru) => eru.pk ?? 0)
-      .filter((pk) => pk > 0),
-    suitableTimeRanges: filterNonNullable(section.suitableTimeRanges).map(
-      (timeRanges) => convertTimeRange(timeRanges)
-    ),
+    reservationUnits,
     // TODO why do these default to undefined instead of empty string?
     begin: convertDate(section.reservationsBeginDate),
     end: convertDate(section.reservationsEndDate),
     accordionOpen: false,
-    reservationUnitPk: initialReservationUnitPk,
-    priority: 300,
   };
 }
 
@@ -237,7 +291,7 @@ const ApplicantTypeSchema = z.enum([
   ApplicantTypeChoice.Association,
   ApplicantTypeChoice.Community,
 ]);
-const ApplicationFormSchema = z.object({
+const ApplicationPage1Schema = z.object({
   pk: z.number(),
   applicantType: ApplicantTypeSchema.optional(),
   applicationSections: z
@@ -245,7 +299,7 @@ const ApplicationFormSchema = z.object({
     .optional(),
 });
 
-export type ApplicationFormValues = z.infer<typeof ApplicationFormSchema>;
+export type ApplicationPage1FormValues = z.infer<typeof ApplicationPage1Schema>;
 
 function checkDateRange(props: {
   date: Date;
@@ -315,11 +369,11 @@ function checkApplicationRoundDates(
   }
 }
 
-export function ApplicationFormSchemaRefined(round: {
+export function ApplicationPage1SchemaRefined(round: {
   begin: Date;
   end: Date;
 }) {
-  return ApplicationFormSchema.superRefine((val, ctx) => {
+  return ApplicationPage1Schema.superRefine((val, ctx) => {
     if (val.applicationSections == null) {
       return;
     }
@@ -337,7 +391,7 @@ export function ApplicationFormSchemaRefined(round: {
 // TODO refine the form (different applicant types require different fields)
 // if applicantType === Organisation | Company => organisation.identifier is required
 // if hasBillingAddress | applicantType === Individual => billingAddress is required
-export const ApplicationFormPage3Schema = z
+export const ApplicationPage3Schema = z
   .object({
     pk: z.number(),
     applicantType: ApplicantTypeSchema.optional(),
@@ -458,9 +512,7 @@ export const ApplicationFormPage3Schema = z
     }
   });
 
-export type ApplicationFormPage3Values = z.infer<
-  typeof ApplicationFormPage3Schema
->;
+export type ApplicationPage3FormValues = z.infer<typeof ApplicationPage3Schema>;
 
 /// form -> API transformers, enforce return types so API changes cause type errors
 
@@ -509,7 +561,6 @@ function transformApplicationSection(
     reservationMinDuration: ae.minDuration ?? 0, // "3600" == 1h
     reservationMaxDuration: ae.maxDuration ?? 0, // "7200" == 2h
     appliedReservationsPerWeek: ae.appliedReservationsPerWeek,
-    suitableTimeRanges: ae.suitableTimeRanges?.map(transformSuitableTimeRange),
     // TODO should validate that the units are on the application round
     reservationUnitOptions: ae.reservationUnits.map((ruo, ruoIndex) =>
       transformEventReservationUnit(ruo, ruoIndex)
@@ -525,22 +576,42 @@ function transformApplicationSection(
   return commonData;
 }
 
-// For pages 1 and 2
-export function transformApplication(
-  values: ApplicationFormValues
+export function transformApplicationPage2(
+  values: ApplicationPage2FormValues
 ): ApplicationUpdateMutationInput {
+  const { pk } = values;
+  const appEvents = values.applicationSections;
+  return {
+    pk,
+    applicationSections: appEvents.map((ae) =>
+      transformApplicationSectionPage2(ae)
+    ),
+  };
+}
+// For page 1
+export function transformApplicationPage1(
+  values: ApplicationPage1FormValues
+): ApplicationUpdateMutationInput {
+  const { pk, applicantType } = values;
   const appEvents = filterNonNullable(values.applicationSections);
   return {
-    pk: values.pk,
-    applicantType: values.applicantType,
+    pk,
+    ...(applicantType != null ? { applicantType } : {}),
     applicationSections: appEvents.map((ae) => transformApplicationSection(ae)),
   };
 }
 
-export function convertApplication(
+export function convertApplicationPage2(app: Node): ApplicationPage2FormValues {
+  return {
+    pk: app?.pk ?? 0,
+    applicationSections:
+      app.applicationSections?.map(convertApplicationSectionPage2) ?? [],
+  };
+}
+export function convertApplicationPage1(
   app: Node,
   reservationUnits: Pick<ReservationUnitNode, "pk">[]
-): ApplicationFormValues {
+): ApplicationPage1FormValues {
   const formAes = filterNonNullable(app?.applicationSections).map((ae) =>
     transformApplicationSectionToForm(ae)
   );
@@ -558,11 +629,8 @@ export function convertApplication(
     begin: undefined,
     end: undefined,
     appliedReservationsPerWeek: 1,
-    suitableTimeRanges: [],
     reservationUnits: filterNonNullable(reservationUnits.map((ru) => ru.pk)),
     accordionOpen: true,
-    reservationUnitPk: 0,
-    priority: 300,
   };
   return {
     pk: app?.pk ?? 0,
@@ -617,7 +685,7 @@ function transformOrganisation(org: OrganisationFormValues) {
 
 export function convertApplicationPage3(
   app?: Maybe<ApplicantFragment>
-): ApplicationFormPage3Values {
+): ApplicationPage3FormValues {
   return {
     pk: app?.pk ?? 0,
     applicantType: app?.applicantType ?? undefined,
@@ -633,7 +701,7 @@ export function convertApplicationPage3(
 }
 
 export function transformPage3Application(
-  values: ApplicationFormPage3Values
+  values: ApplicationPage3FormValues
 ): ApplicationUpdateMutationInput {
   const shouldSaveBillingAddress =
     values.applicantType === ApplicantTypeChoice.Individual ||

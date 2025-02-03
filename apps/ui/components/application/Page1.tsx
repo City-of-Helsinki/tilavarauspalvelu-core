@@ -17,7 +17,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { getTranslation } from "@/modules/util";
 import { useOptions } from "@/hooks/useOptions";
 import { ApplicationEvent } from "./ApplicationEvent";
-import { type ApplicationFormValues } from "./form";
+import { type ApplicationPage1FormValues } from "./form";
 import { useReservationUnitList } from "@/hooks";
 import { ButtonContainer } from "common/styles/util";
 
@@ -28,7 +28,7 @@ type Props = {
   // mostly we need periodBegin and periodEnd here (that should be Dates not strings)
   // we also need applicationRound.reservationUnits for ReservationUnitList
   applicationRound: AppRoundNode;
-  onNext: (formValues: ApplicationFormValues) => void;
+  onNext: (formValues: ApplicationPage1FormValues) => void;
 };
 
 export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
@@ -54,7 +54,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
 
   const { options } = useOptions();
 
-  const form = useFormContext<ApplicationFormValues>();
+  const form = useFormContext<ApplicationPage1FormValues>();
   const { setValue, register, unregister, watch, handleSubmit } = form;
   // get the user selected defaults for reservationUnits field
   const { reservationUnits: selectedReservationUnits } =
@@ -119,7 +119,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
   const submitDisabled =
     applicationSections == null || applicationSections.length === 0;
 
-  const onSubmit = (values: ApplicationFormValues) => {
+  const onSubmit = (values: ApplicationPage1FormValues) => {
     onNext(values);
   };
 

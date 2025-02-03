@@ -1,10 +1,9 @@
 import {
-  type ApplicationFormValues,
   type ApplicationEventScheduleFormType,
   type SuitableTimeRangeFormValues,
 } from "./form";
 import { ApplicationRoundTimeSlotNode, Priority } from "@/gql/gql-types";
-import { convertWeekday, Day, transformWeekday } from "common/src/conversion";
+import { Day, transformWeekday } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
 
 export type ApplicationEventSchedulePriority = 50 | 100 | 200 | 300;
@@ -117,21 +116,6 @@ type OpeningHourPeriod = {
 
 function cellLabel(row: number): string {
   return `${row} - ${row + 1}`;
-}
-
-export function convertToSchedule(
-  b: NonNullable<NonNullable<ApplicationFormValues["applicationSections"]>[0]>
-): ApplicationEventScheduleFormType[] {
-  return (
-    b.suitableTimeRanges?.map((range) => {
-      return {
-        day: range ? convertWeekday(range.dayOfTheWeek) : 0,
-        begin: range?.beginTime ?? "",
-        end: range?.endTime ?? "",
-        priority: range?.priority === Priority.Primary ? 300 : 200,
-      };
-    }) ?? []
-  );
 }
 
 export function covertCellsToTimeRange(

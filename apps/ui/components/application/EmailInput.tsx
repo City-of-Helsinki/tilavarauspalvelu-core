@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import { Notification, NotificationSize, TextInput } from "hds-react";
-import type { ApplicationFormPage3Values } from "./form";
+import { type ApplicationPage3FormValues } from "./form";
 import { SpanFullRow } from "./styled";
 
 export function EmailInput() {
@@ -11,7 +11,7 @@ export function EmailInput() {
   const {
     register,
     formState: { errors },
-  } = useFormContext<ApplicationFormPage3Values>();
+  } = useFormContext<ApplicationPage3FormValues>();
 
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`application:validation.${errorMsg}`) : "";
