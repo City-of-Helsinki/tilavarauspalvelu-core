@@ -3,7 +3,6 @@ import {
   IconGroup,
   IconInfoCircle,
   TextInput,
-  Select,
   IconLinkExternal,
   Button,
   ButtonVariant,
@@ -13,7 +12,7 @@ import {
   IconSearch,
   IconSize,
 } from "hds-react";
-import React, { ChangeEvent, useState } from "react";
+import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { H2, H3 } from "common/src/common/typography";
@@ -24,19 +23,16 @@ import {
   type ReservationUnitCardFieldsFragment,
   type ApplicationQuery,
 } from "@gql/gql-types";
-import {
-  filterNonNullable,
-  getImageSource,
-  toNumber,
-} from "common/src/helpers";
-import { AutoGrid, Flex } from "common/styles/util";
+import { filterNonNullable, getImageSource } from "common/src/helpers";
+import { AutoGrid, CenterSpinner, Flex } from "common/styles/util";
 import { getMainImage, getTranslation } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
-import { convertLanguageCode } from "common/src/common/util";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
+import { useForm } from "react-hook-form";
+import { ControlledSelect } from "common/src/components/form";
 
 const ImageSizeWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -59,8 +55,14 @@ function ReservationUnitCard({
 }>) {
   const { t } = useTranslation();
 
-  const handle = () =>
-    isSelected ? handleRemove(reservationUnit) : handleAdd(reservationUnit);
+  const toggleSelection = () => {
+    if (isSelected) {
+      handleRemove(reservationUnit);
+    } else {
+      handleAdd(reservationUnit);
+    }
+  };
+
   const buttonText = isSelected
     ? t("reservationUnitModal:unSelectReservationUnit")
     : t("reservationUnitModal:selectReservationUnit");
@@ -90,9 +92,6 @@ function ReservationUnitCard({
       href={getReservationUnitPath(reservationUnit.pk)}
       target="_blank"
       rel="noopener noreferrer"
-      style={{
-        whiteSpace: "nowrap",
-      }}
     >
       {t("reservationUnitModal:openLinkToNewTab")}
       <IconLinkExternal size={IconSize.ExtraSmall} />
@@ -106,7 +105,7 @@ function ReservationUnitCard({
           <IconArrowRight aria-hidden="true" />
         )
       }
-      onClick={handle}
+      onClick={toggleSelection}
       size={ButtonSize.Small}
       variant={isSelected ? ButtonVariant.Danger : ButtonVariant.Secondary}
     >
@@ -140,8 +139,11 @@ type OptionsType = {
   unitOptions: OptionType[];
 };
 
-const emptyOption = {
-  label: "",
+type SearchFormValues = {
+  searchTerm?: string;
+  reservationUnitType?: number;
+  unit?: number;
+  minPersons?: number;
 };
 
 export function ReservationUnitModalContent({
@@ -157,32 +159,20 @@ export function ReservationUnitModalContent({
   currentReservationUnits: Pick<ReservationUnitType, "pk">[];
   options: OptionsType;
 }): JSX.Element {
-  const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
-  const [reservationUnitType, setReservationUnitType] = useState<
-    number | undefined
-  >(undefined);
-  const [unit, setUnit] = useState<number | undefined>(undefined);
-  const [maxPersons, setMaxPersons] = useState<number | undefined>(undefined);
+  const { t } = useTranslation();
+  const form = useForm<SearchFormValues>();
+  const { control, watch, setValue } = form;
+  const { unitOptions, participantCountOptions, reservationUnitTypeOptions } =
+    options;
 
-  const reservationUnitTypeOptions = [emptyOption].concat(
-    options.reservationUnitTypeOptions
-  );
-
-  const participantCountOptions = [emptyOption].concat(
-    options.participantCountOptions
-  );
-
-  const unitOptions = [emptyOption].concat(options.unitOptions);
-
-  const { t, i18n } = useTranslation();
-  const language = convertLanguageCode(i18n.language);
-
+  const reservationUnitType = watch("reservationUnitType");
+  const unit = watch("unit");
   const { data, refetch, loading } = useSearchReservationUnitsQuery({
     skip: !applicationRound.pk,
     variables: {
       applicationRound: [applicationRound.pk ?? 0],
-      textSearch: searchTerm,
-      maxPersons: maxPersons?.toString(),
+      textSearch: watch("searchTerm"),
+      minPersons: watch("minPersons")?.toString(),
       reservationUnitType:
         reservationUnitType != null ? [reservationUnitType] : [],
       unit: unit != null ? [unit] : [],
@@ -191,7 +181,6 @@ export function ReservationUnitModalContent({
       isVisible: true,
     },
     notifyOnNetworkStatusChange: true,
-    fetchPolicy: "no-cache",
   });
 
   const reservationUnits = filterNonNullable(
@@ -206,47 +195,30 @@ export function ReservationUnitModalContent({
         <TextInput
           id="reservationUnitSearch.search"
           label={t("reservationUnitModal:searchTermLabel")}
-          onChange={(e: ChangeEvent<HTMLInputElement>): void => {
-            setSearchTerm(e.target.value);
+          onChange={(e) => {
+            setValue("searchTerm", e.target.value);
           }}
         />
-        <Select
+        <ControlledSelect
+          name="reservationUnitType"
+          clearable
+          control={control}
           options={reservationUnitTypeOptions}
-          texts={{
-            label: t("reservationUnitModal:searchReservationUnitTypeLabel"),
-            placeholder: t("common:select"),
-            language,
-          }}
-          clearable
-          onChange={(selection): void => {
-            const val = selection.find((x) => x.selected)?.value;
-            setReservationUnitType(toNumber(val) ?? undefined);
-          }}
+          label={t("reservationUnitModal:searchReservationUnitTypeLabel")}
         />
-        <Select
+        <ControlledSelect
+          name="minPersons"
+          control={control}
           clearable
-          texts={{
-            label: t("searchForm:participantCountLabel"),
-            placeholder: t("common:select"),
-            language,
-          }}
+          label={t("searchForm:participantCountLabel")}
           options={participantCountOptions}
-          onChange={(selection): void => {
-            const val = selection.find((x) => x.selected)?.value;
-            setMaxPersons(toNumber(val) ?? undefined);
-          }}
         />
-        <Select
+        <ControlledSelect
+          name="unit"
+          control={control}
           clearable
-          texts={{
-            placeholder: t("common:select"),
-            label: t("reservationUnitModal:searchUnitLabel"),
-          }}
+          label={t("reservationUnitModal:searchUnitLabel")}
           options={unitOptions}
-          onChange={(selection): void => {
-            const val = selection.find((x) => x.selected)?.value;
-            setUnit(toNumber(val) ?? undefined);
-          }}
         />
       </AutoGrid>
       <Flex $alignItems="flex-end">
@@ -265,18 +237,23 @@ export function ReservationUnitModalContent({
           {t("common:search")}
         </Button>
       </Flex>
-      {reservationUnits.length === 0 && <div>{t("common:noResults")}</div>}
-      {reservationUnits.map((ru) => (
-        <ReservationUnitCard
-          handleAdd={() => handleAdd(ru)}
-          handleRemove={() => handleRemove(ru)}
-          isSelected={
-            currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined
-          }
-          reservationUnit={ru}
-          key={ru.pk}
-        />
-      ))}
+      {loading ? (
+        <CenterSpinner />
+      ) : reservationUnits.length === 0 ? (
+        <div>{t("common:noResults")}</div>
+      ) : (
+        reservationUnits.map((ru) => (
+          <ReservationUnitCard
+            handleAdd={() => handleAdd(ru)}
+            handleRemove={() => handleRemove(ru)}
+            isSelected={
+              currentReservationUnits.find((i) => i.pk === ru.pk) !== undefined
+            }
+            reservationUnit={ru}
+            key={ru.pk}
+          />
+        ))
+      )}
     </Flex>
   );
 }

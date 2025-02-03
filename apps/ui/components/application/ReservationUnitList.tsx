@@ -86,7 +86,7 @@ export function ReservationUnitList({
   useEffect(() => {
     const valid = isValid(currentReservationUnits);
     if (valid) {
-      clearErrors([`applicationSections.${index}.reservationUnits`]);
+      clearErrors([fieldName]);
     } else {
       setError(fieldName, { message: "reservationUnitTooSmall" });
     }
