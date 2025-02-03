@@ -493,6 +493,12 @@ class ReservationStateChoice(models.TextChoices):
         ]
 
     @classproperty
+    def states_that_can_change_access_code(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationStateChoice.CONFIRMED.value,
+        ]
+
+    @classproperty
     def doesnt_block_anonymization(cls) -> list[str]:
         return [  # type: ignore[return-type]
             ReservationStateChoice.CANCELLED.value,
@@ -541,6 +547,15 @@ class ReservationTypeChoice(models.TextChoices):
             ReservationTypeChoice.BLOCKED.value,
             ReservationTypeChoice.STAFF.value,
             ReservationTypeChoice.BEHALF.value,
+            ReservationTypeChoice.SEASONAL.value,
+        ]
+
+    @classproperty
+    def types_that_can_change_access_code(cls) -> list[str]:
+        return [  # type: ignore[return-type]
+            ReservationTypeChoice.NORMAL.value,
+            ReservationTypeChoice.BEHALF.value,
+            ReservationTypeChoice.STAFF.value,
             ReservationTypeChoice.SEASONAL.value,
         ]
 

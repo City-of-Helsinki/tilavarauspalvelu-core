@@ -10,6 +10,7 @@ from .memo_serializers import ReservationWorkingMemoSerializer
 from .refund_serializers import ReservationRefundSerializer
 from .requires_handling_serializers import ReservationRequiresHandlingSerializer
 from .staff_adjust_time_serializers import StaffReservationAdjustTimeSerializer
+from .staff_change_access_code_serializers import StaffChangeReservationAccessCodeSerializer
 from .staff_create_serializers import ReservationStaffCreateSerializer
 from .staff_reservation_modify_serializers import StaffReservationModifySerializer
 from .update_serializers import ReservationUpdateSerializer
@@ -26,6 +27,7 @@ __all__ = (
     "ReservationStaffCreateSerializer",
     "ReservationUpdateSerializer",
     "ReservationWorkingMemoSerializer",
+    "StaffChangeReservationAccessCodeSerializer",
     "StaffReservationAdjustTimeSerializer",
     "StaffReservationModifySerializer",
 )

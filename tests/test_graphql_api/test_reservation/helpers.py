@@ -36,6 +36,12 @@ UPDATE_STAFF_MUTATION = build_mutation("staffReservationModify", "ReservationSta
 ADJUST_STAFF_MUTATION = build_mutation("staffAdjustReservationTime", "ReservationStaffAdjustTimeMutation")
 UPDATE_WORKING_MEMO_MUTATION = build_mutation("updateReservationWorkingMemo", "ReservationWorkingMemoMutation")
 
+CHANGE_ACCESS_CODE_STAFF_MUTATION = build_mutation(
+    "staffChangeReservationAccessCode",
+    "ReservationStaffChangeAccessCodeMutation",
+    fields="pk accessCodeIsActive accessCodeGeneratedAt",
+)
+
 
 @contextmanager
 def mock_profile_reader(**kwargs: Any):

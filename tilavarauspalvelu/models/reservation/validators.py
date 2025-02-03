@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice, ReservationTypeChoice
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_start_of_day
 
 if TYPE_CHECKING:
@@ -174,3 +174,35 @@ class ReservationValidator:
         if new_is_normal and not is_normal:
             msg = "A reservation cannot be changed to a normal reservation from any other type."
             raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
+
+    def validate_reservation_has_access_code(self) -> None:
+        if self.reservation.access_type != AccessType.ACCESS_CODE:
+            msg = "Reservation access type does not use access codes."
+            raise ValidationError(msg, code=error_codes.RESERVATION_WRONG_ACCESS_TYPE)
+
+        if self.reservation.access_code_generated_at is None:
+            msg = "Reservation must have an access code to change it."
+            raise ValidationError(msg, code=error_codes.RESERVATION_ACCESS_CODE_NOT_GENERATED)
+
+    def validate_not_in_reservation_series(self) -> None:
+        if self.reservation.recurring_reservation is not None:
+            msg = "Reservation cannot be in a reservation series."
+            raise ValidationError(msg, code=error_codes.RESERVATION_MODIFICATION_NOT_ALLOWED)
+
+    def validate_reservation_state_allows_access_code_change(self) -> None:
+        if self.reservation.state not in ReservationStateChoice.states_that_can_change_access_code:
+            msg = "Reservation access code cannot be changed based on its state."
+            raise ValidationError(msg, code=error_codes.RESERVATION_ACCESS_CODE_CHANGE_NOT_ALLOWED)
+
+    def validate_reservation_type_allows_access_code_change(self) -> None:
+        if self.reservation.type not in ReservationTypeChoice.types_that_can_change_access_code:
+            msg = "Reservation access code cannot be changed based on its type."
+            raise ValidationError(msg, code=error_codes.RESERVATION_ACCESS_CODE_CHANGE_NOT_ALLOWED)
+
+    def validate_reservation_has_not_ended(self) -> None:
+        now = local_datetime()
+        end = self.reservation.end.astimezone(DEFAULT_TIMEZONE)
+
+        if end <= now:
+            msg = "Reservation has already ended."
+            raise ValidationError(msg, code=error_codes.RESERVATION_HAS_ENDED)

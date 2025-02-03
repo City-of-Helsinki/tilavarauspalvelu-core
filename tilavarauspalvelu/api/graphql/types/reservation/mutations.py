@@ -35,6 +35,7 @@ from .serializers import (
     ReservationStaffCreateSerializer,
     ReservationUpdateSerializer,
     ReservationWorkingMemoSerializer,
+    StaffChangeReservationAccessCodeSerializer,
     StaffReservationAdjustTimeSerializer,
     StaffReservationModifySerializer,
 )
@@ -44,7 +45,22 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser
 
 __all__ = [
+    "ReservationAdjustTimeMutation",
+    "ReservationApproveMutation",
+    "ReservationCancellationMutation",
+    "ReservationConfirmMutation",
     "ReservationCreateMutation",
+    "ReservationDeleteMutation",
+    "ReservationDeleteTentativeMutation",
+    "ReservationDenyMutation",
+    "ReservationRefundMutation",
+    "ReservationRequiresHandlingMutation",
+    "ReservationStaffAdjustTimeMutation",
+    "ReservationStaffChangeAccessCodeMutation",
+    "ReservationStaffCreateMutation",
+    "ReservationStaffModifyMutation",
+    "ReservationUpdateMutation",
+    "ReservationWorkingMemoMutation",
 ]
 
 
@@ -116,27 +132,6 @@ class ReservationAdjustTimeMutation(UpdateMutation):
         permission_classes = [ReservationPermission]
 
 
-# Staff mutations
-
-
-class ReservationStaffCreateMutation(CreateMutation):
-    class Meta:
-        serializer_class = ReservationStaffCreateSerializer
-        permission_classes = [ReservationStaffCreatePermission]
-
-
-class ReservationStaffAdjustTimeMutation(UpdateMutation):
-    class Meta:
-        serializer_class = StaffReservationAdjustTimeSerializer
-        permission_classes = [StaffAdjustTimePermission]
-
-
-class ReservationStaffModifyMutation(UpdateMutation):
-    class Meta:
-        serializer_class = StaffReservationModifySerializer
-        permission_classes = [StaffReservationModifyPermission]
-
-
 class ReservationDeleteTentativeMutation(DeleteMutation):
     """Used only for deleting a reservation before it is confirmed."""
 
@@ -202,3 +197,30 @@ class ReservationDeleteMutation(ReservationDeleteTentativeMutation):
     class Meta:
         model = Reservation
         permission_classes = [ReservationPermission]
+
+
+# Staff mutations
+
+
+class ReservationStaffCreateMutation(CreateMutation):
+    class Meta:
+        serializer_class = ReservationStaffCreateSerializer
+        permission_classes = [ReservationStaffCreatePermission]
+
+
+class ReservationStaffAdjustTimeMutation(UpdateMutation):
+    class Meta:
+        serializer_class = StaffReservationAdjustTimeSerializer
+        permission_classes = [StaffAdjustTimePermission]
+
+
+class ReservationStaffModifyMutation(UpdateMutation):
+    class Meta:
+        serializer_class = StaffReservationModifySerializer
+        permission_classes = [StaffReservationModifyPermission]
+
+
+class ReservationStaffChangeAccessCodeMutation(UpdateMutation):
+    class Meta:
+        serializer_class = StaffChangeReservationAccessCodeSerializer
+        permission_classes = [StaffReservationModifyPermission]

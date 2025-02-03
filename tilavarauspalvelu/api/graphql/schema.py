@@ -57,6 +57,7 @@ from .mutations import (
     ReservationSeriesRescheduleMutation,
     ReservationSeriesUpdateMutation,
     ReservationStaffAdjustTimeMutation,
+    ReservationStaffChangeAccessCodeMutation,
     ReservationStaffCreateMutation,
     ReservationStaffModifyMutation,
     ReservationUnitCreateMutation,
@@ -366,6 +367,7 @@ class Mutation(graphene.ObjectType):
     reschedule_reservation_series = ReservationSeriesRescheduleMutation.Field()
     deny_reservation_series = ReservationSeriesDenyMutation.Field()
     refresh_order = RefreshOrderMutation.Field()
+    staff_change_reservation_access_code = ReservationStaffChangeAccessCodeMutation.Field()
     #
     # User
     update_current_user = CurrentUserUpdateMutation.Field()
