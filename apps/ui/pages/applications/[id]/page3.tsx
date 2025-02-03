@@ -28,6 +28,7 @@ import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import {
   Button,
+  ButtonSize,
   ButtonVariant,
   IconArrowLeft,
   IconArrowRight,
@@ -136,6 +137,7 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
             <Button
               variant={ButtonVariant.Secondary}
               iconStart={<IconArrowLeft />}
+              size={ButtonSize.Small}
               onClick={onPrev}
             >
               {t("common:prev")}
@@ -143,6 +145,7 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
             <Button
               id="button__application--next"
               iconEnd={<IconArrowRight />}
+              size={ButtonSize.Small}
               type="submit"
               disabled={!isValid}
             >
