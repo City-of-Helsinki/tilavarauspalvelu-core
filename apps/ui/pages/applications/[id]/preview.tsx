@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import {
-  ApplicationDocument,
-  type ApplicationQuery,
+  ApplicationPage1Document,
+  type ApplicationPage1Query,
+  type ApplicationPage1QueryVariables,
   useSendApplicationMutation,
 } from "@gql/gql-types";
 import type { GetServerSidePropsContext } from "next";
@@ -127,8 +128,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
-  const { data } = await apolloClient.query<ApplicationQuery>({
-    query: ApplicationDocument,
+  const { data } = await apolloClient.query<
+    ApplicationPage1Query,
+    ApplicationPage1QueryVariables
+  >({
+    // TODO replace with own page query
+    query: ApplicationPage1Document,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
   const { application } = data ?? {};

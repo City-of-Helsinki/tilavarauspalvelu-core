@@ -19,15 +19,16 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
-  ApplicationDocument,
-  type ApplicationQuery,
-  type ApplicationQueryVariables,
+  ApplicationPage1Document,
+  type ApplicationPage1Query,
+  type ApplicationPage1QueryVariables,
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { gql } from "@apollo/client";
 import { useDisplayError } from "@/hooks/useDisplayError";
 
 function Page1({ application }: PropsNarrowed): JSX.Element {
@@ -114,10 +115,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
   const { data } = await client.query<
-    ApplicationQuery,
-    ApplicationQueryVariables
+    ApplicationPage1Query,
+    ApplicationPage1QueryVariables
   >({
-    query: ApplicationDocument,
+    query: ApplicationPage1Document,
     variables: {
       id: base64encode(`ApplicationNode:${pk}`),
     },
@@ -135,5 +136,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
+
+export const APPLICATION_PAGE1_QUERY = gql`
+  query ApplicationPage1($id: ID!) {
+    application(id: $id) {
+      ...ApplicationCommon
+    }
+  }
+`;
 
 export default Page1;

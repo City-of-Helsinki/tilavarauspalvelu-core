@@ -144,15 +144,6 @@ export const APPLICATION_FRAGMENT = gql`
   }
 `;
 
-// Commmon query for all application pages (except view)
-export const APPLICATION_QUERY = gql`
-  query Application($id: ID!) {
-    application(id: $id) {
-      ...ApplicationCommon
-    }
-  }
-`;
-
 export const CREATE_APPLICATION_MUTATION = gql`
   mutation CreateApplication($input: ApplicationCreateMutationInput!) {
     createApplication(input: $input) {

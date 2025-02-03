@@ -9,7 +9,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { uniq } from "lodash";
 import {
-  type ApplicationQuery,
+  type ApplicationRoundForApplicationFragment,
   useSearchFormParamsUnitQuery,
 } from "@gql/gql-types";
 import { useFormContext } from "react-hook-form";
@@ -21,13 +21,8 @@ import { type ApplicationPage1FormValues } from "./form";
 import { useReservationUnitList } from "@/hooks";
 import { ButtonContainer } from "common/styles/util";
 
-type Node = NonNullable<ApplicationQuery["application"]>;
-type AppRoundNode = NonNullable<Node["applicationRound"]>;
 type Props = {
-  // TODO break application round down to smaller pieces (only the required props)
-  // mostly we need periodBegin and periodEnd here (that should be Dates not strings)
-  // we also need applicationRound.reservationUnits for ReservationUnitList
-  applicationRound: AppRoundNode;
+  applicationRound: ApplicationRoundForApplicationFragment;
   onNext: (formValues: ApplicationPage1FormValues) => void;
 };
 

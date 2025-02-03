@@ -17,12 +17,13 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
-  ApplicationDocument,
-  type ApplicationQuery,
-  type ApplicationQueryVariables,
+  ApplicationPage2Document,
+  type ApplicationPage2Query,
+  type ApplicationPage2QueryVariables,
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
 import { useDisplayError } from "@/hooks/useDisplayError";
+import { gql } from "@apollo/client";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -87,10 +88,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
   const { data } = await client.query<
-    ApplicationQuery,
-    ApplicationQueryVariables
+    ApplicationPage2Query,
+    ApplicationPage2QueryVariables
   >({
-    query: ApplicationDocument,
+    query: ApplicationPage2Document,
     variables: {
       id: base64encode(`ApplicationNode:${pk}`),
     },
@@ -108,5 +109,13 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
+
+export const APPLICATION_PAGE2_QUERY = gql`
+  query ApplicationPage2($id: ID!) {
+    application(id: $id) {
+      ...ApplicationForm
+    }
+  }
+`;
 
 export default Page2;
