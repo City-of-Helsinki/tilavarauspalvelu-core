@@ -56,7 +56,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
     end = kwargs.get("end", begin + datetime.timedelta(days=1, hours=3))
     price = kwargs.get("price", Decimal("12.30"))
     subsidised_price = kwargs.get("subsidised_price", Decimal("10.30"))
-    non_subsidised_price = kwargs.get("non_subsidised_price", Decimal("15.30"))
+    non_subsidised_price = kwargs.get("non_subsidised_price", Decimal("12.30"))
     applying_for_free_of_charge = kwargs.get("applying_for_free_of_charge", True)
     payment_due_date = kwargs.get("payment_due_date", end.date())
     tax_percentage = kwargs.get("tax_percentage", Decimal("25.5"))
