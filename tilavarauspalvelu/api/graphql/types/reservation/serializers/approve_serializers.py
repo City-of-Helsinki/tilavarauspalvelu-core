@@ -56,7 +56,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationApproveData) -> Reservation:
-        if self.instance.access_type == AccessType.ACCESS_CODE:
+        if self.instance.access_type == AccessType.ACCESS_CODE and instance.recurring_reservation is None:
             # Allow activation in Pindora to fail, will be handled by a background task.
             with suppress(Exception):
                 # If access code has not been generated (e.g. returned to handling after a deny and then approved),

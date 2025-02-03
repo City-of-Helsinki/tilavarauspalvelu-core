@@ -294,8 +294,12 @@ class ReservationActions:
         payment_order.status = OrderStatus.REFUNDED
         payment_order.save(update_fields=["refund_id", "status"])
 
-    def create_or_update_access_code_if_required(self, *, from_access_type: AccessType) -> None:
+    def create_or_update_reservation_access_code_if_required(self, *, from_access_type: AccessType) -> None:
         """Notify Pindora about the time of the reservation if required."""
+        # Recurring reservations should be handled with separate endpoints
+        if self.reservation.recurring_reservation is not None:
+            return
+
         current_access_type = self.reservation.access_type
 
         is_active = self.reservation.access_code_should_be_active

@@ -88,7 +88,7 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         with transaction.atomic():
             instance = super().update(instance=instance, validated_data=validated_data)
 
-            instance.actions.create_or_update_access_code_if_required(from_access_type=access_type_before)
+            instance.actions.create_or_update_reservation_access_code_if_required(from_access_type=access_type_before)
 
         EmailService.send_reservation_modified_email(reservation=instance)
 

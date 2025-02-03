@@ -148,7 +148,11 @@ class ReservationAdminForm(forms.ModelForm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        if self.instance and self.instance.access_type == AccessType.ACCESS_CODE:
+        if (
+            self.instance
+            and self.instance.recurring_reservation is None
+            and self.instance.access_type == AccessType.ACCESS_CODE
+        ):
             pindora_field = self.fields["pindora_response"]
             pindora_field.initial = self.get_pindora_response(self.instance)
             pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})

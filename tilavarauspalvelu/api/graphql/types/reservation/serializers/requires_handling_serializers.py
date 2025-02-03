@@ -51,7 +51,11 @@ class ReservationRequiresHandlingSerializer(NestingModelSerializer):
 
     def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:
         # Denied reservations shouldn't have an access code. It will be regenerated if the reservation is approved.
-        if self.instance.access_type == AccessType.ACCESS_CODE and instance.access_code_generated_at is not None:
+        if (
+            self.instance.access_type == AccessType.ACCESS_CODE
+            and instance.recurring_reservation is None
+            and instance.access_code_generated_at is not None
+        ):
             # Allow reservation modification to succeed if reservation doesn't exist in Pindora.
             with suppress(PindoraNotFoundError):
                 PindoraClient.deactivate_reservation_access_code(reservation=instance)

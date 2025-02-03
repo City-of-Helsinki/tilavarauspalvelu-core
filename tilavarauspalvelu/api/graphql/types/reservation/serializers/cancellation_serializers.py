@@ -66,7 +66,7 @@ class ReservationCancellationSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationCancellationData) -> Reservation:
-        if instance.access_type == AccessType.ACCESS_CODE:
+        if instance.access_type == AccessType.ACCESS_CODE and instance.recurring_reservation is None:
             with suppress(PindoraNotFoundError):
                 PindoraClient.delete_reservation(reservation=instance)
                 validated_data["access_code_generated_at"] = None

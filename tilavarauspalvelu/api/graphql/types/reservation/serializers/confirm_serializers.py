@@ -87,7 +87,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         instance = super().update(instance=instance, validated_data=validated_data)
 
         if instance.state == ReservationStateChoice.CONFIRMED:
-            if self.instance.access_type == AccessType.ACCESS_CODE:
+            if self.instance.access_type == AccessType.ACCESS_CODE and instance.recurring_reservation is None:
                 # Allow activation in Pindora to fail, will be handled by a background task.
                 with suppress(Exception):
                     PindoraClient.activate_reservation_access_code(reservation=instance)

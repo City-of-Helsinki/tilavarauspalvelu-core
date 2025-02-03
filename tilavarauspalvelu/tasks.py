@@ -731,6 +731,7 @@ def create_missing_pindora_reservations() -> None:
 
     reservations: list[Reservation] = list(
         Reservation.objects.filter(
+            recurring_reservation=None,
             state=ReservationStateChoice.CONFIRMED,
             access_type=AccessType.ACCESS_CODE,
             access_code_generated_at=None,
@@ -771,6 +772,7 @@ def update_pindora_access_code_is_active() -> None:
                 (Q(access_code_is_active=True) & L(access_code_should_be_active=False))
                 | (Q(access_code_is_active=False) & L(access_code_should_be_active=True))
             ),
+            recurring_reservation=None,
             access_code_generated_at__isnull=False,
             end__gt=local_datetime(),
         )
