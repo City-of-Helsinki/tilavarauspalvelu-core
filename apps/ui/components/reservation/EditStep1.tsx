@@ -83,6 +83,9 @@ const StyledReservationInfoCard = styled(ReservationInfoCard)`
 `;
 
 const StyledForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
   @media (min-width: ${breakpoints.m}) {
     grid-row: 2 / -1;
     grid-column: 1 / span 1;
@@ -185,7 +188,7 @@ export function EditStep1({
             data-testid="reservation-edit__button--cancel"
           >
             <IconCross aria-hidden="true" />
-            {t("reservations:cancelButton")}
+            {t("common:stop")}
           </ButtonLikeLink>
           <Button
             type="submit"

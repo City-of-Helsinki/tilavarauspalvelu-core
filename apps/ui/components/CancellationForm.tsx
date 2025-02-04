@@ -101,7 +101,7 @@ export function CancellationForm(props: {
               size="large"
             >
               <IconCross aria-hidden="true" />
-              {t("reservations:cancelButton")}
+              {t("common:stop")}
             </ButtonLikeLink>
             <Button
               type="submit"

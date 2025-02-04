@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   Button,
   ButtonVariant,
+  IconArrowLeft,
   IconArrowRight,
   Notification,
   NotificationSize,
@@ -497,6 +498,7 @@ function Page2({ application, onNext }: Props): JSX.Element {
         <Button
           variant={ButtonVariant.Secondary}
           onClick={() => router.push(`${application.pk}/page1`)}
+          iconStart={<IconArrowLeft />}
         >
           {t("common:prev")}
         </Button>

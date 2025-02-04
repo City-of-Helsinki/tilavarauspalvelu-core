@@ -84,6 +84,7 @@
   "loginAlt": "Sign in",
   "logout": "Sign out",
   "cancel": "Cancel",
+  "stop": "Cancel",
   "imgAltForSpace": "Image of the spaces {{name}}",
   "address": {
     "streetAddress": "Address",

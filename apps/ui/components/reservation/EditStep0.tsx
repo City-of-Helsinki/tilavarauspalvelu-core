@@ -267,7 +267,7 @@ export function EditStep0({
             data-testid="reservation-edit__button--cancel"
           >
             <IconCross aria-hidden="true" />
-            {t("reservations:cancelButton")}
+            {t("common:stop")}
           </ButtonLikeLink>
           <Button
             type="submit"
@@ -282,7 +282,7 @@ export function EditStep0({
             disabled={!focusSlot.isReservable || !isDirty || isLoading}
             data-testid="reservation__button--continue"
           >
-            {t("reservationCalendar:nextStep")}
+            {t("common:next")}
           </Button>
         </Actions>
       </Form>

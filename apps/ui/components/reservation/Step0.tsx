@@ -5,11 +5,11 @@
 import type { OptionType } from "common/types/common";
 import {
   Notification,
-  IconArrowLeft,
   IconArrowRight,
   Button,
   ButtonVariant,
   LoadingSpinner,
+  IconCross,
 } from "hds-react";
 import { useFormContext, UseFormReturn } from "react-hook-form";
 import React, { useState } from "react";
@@ -131,17 +131,17 @@ export function Step0({
           disabled={submitDisabled || isSubmitting}
           data-testid="reservation__button--continue"
         >
-          {t("reservationCalendar:nextStep")}
+          {t("common:next")}
         </Button>
         <Button
           type="button"
           variant={ButtonVariant.Secondary}
-          iconStart={<IconArrowLeft aria-hidden="true" />}
+          iconStart={<IconCross aria-hidden="true" />}
           disabled={isSubmitting}
           onClick={cancelReservation}
           data-testid="reservation__button--cancel"
         >
-          {t("common:cancel")}
+          {t("common:stop")}
         </Button>
       </ActionContainer>
     </>
