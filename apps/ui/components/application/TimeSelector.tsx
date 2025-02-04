@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { TFunction, useTranslation } from "next-i18next";
-import { Button, ButtonVariant, IconCross } from "hds-react";
+import {
+  Button,
+  ButtonSize,
+  ButtonVariant,
+  IconCross,
+  Notification,
+  NotificationSize,
+} from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
@@ -189,7 +196,6 @@ function Day({
 }
 
 const CalendarContainer = styled.div`
-  margin-top: var(--spacing-layout-s);
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   column-gap: 6px;
@@ -204,10 +210,6 @@ const CalendarContainer = styled.div`
 `;
 
 const LegendContainer = styled.div`
-  display: block;
-  margin-top: var(--spacing-m);
-  margin-bottom: var(--spacing-m);
-
   @media (min-width: ${breakpoints.m}) {
     & > div {
       display: flex;
@@ -284,16 +286,10 @@ const LegendBox = styled.div<{ type: string }>`
   }
 `;
 
-const TimePreviewContainer = styled.div`
-  margin: var(--spacing-xl) 0;
-`;
+const TimePreviewContainer = styled.div``;
 
-const ButtonContainer = styled(Flex).attrs({
-  $direction: "row",
-  $gap: "none",
-})`
-  margin-top: var(--spacing-layout-l);
-  margin-bottom: var(--spacing-layout-s);
+const StyledNotification = styled(Notification)`
+  margin-top: var(--spacing-m);
 `;
 
 const ResetButton = styled(Button)`
@@ -415,7 +411,14 @@ export function TimeSelector({
     filterNonNullable(watch("applicationSections")).length > 1;
 
   return (
-    <>
+    <Flex>
+      <StyledNotification
+        label={t("application:Page2.info")}
+        size={NotificationSize.Small}
+        type="info"
+      >
+        {t("application:Page2.info")}
+      </StyledNotification>
       <OptionSelector
         reservationUnitOptions={reservationUnitOptions}
         index={index}
@@ -462,22 +465,22 @@ export function TimeSelector({
         <TimePreview index={index} />
       </TimePreviewContainer>
       {enableCopyCells && (
-        <ButtonContainer>
+        <div>
           <Button
             id={`time-selector__button--copy-cells-${index}`}
             variant={ButtonVariant.Secondary}
             onClick={copyCells}
+            size={ButtonSize.Small}
           >
             {t("application:Page2.copyTimes")}
           </Button>
-        </ButtonContainer>
+        </div>
       )}
-    </>
+    </Flex>
   );
 }
 
 const OptionWrapper = styled.div`
-  margin-top: var(--spacing-m);
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--spacing-s);
