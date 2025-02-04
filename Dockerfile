@@ -13,10 +13,11 @@ RUN turbo prune --scope=$APP --docker
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init ca-certificates
+RUN npm install -g corepack@latest
+RUN corepack enable
 WORKDIR /app
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
-RUN corepack enable
 RUN pnpm install --frozen-lockfile
 
 # Build the project
@@ -45,6 +46,8 @@ ENV SENTRY_LOG_LEVEL=debug
 # because it's on the frontend it needs to be present during build
 ENV SKIP_ENV_VALIDATION=true
 COPY turbo.json turbo.json
+RUN npm install -g corepack@latest
+RUN corepack enable
 RUN corepack enable
 RUN --mount=type=secret,id=sentry_auth_token,env=SENTRY_AUTH_TOKEN \
   pnpm turbo run build --filter=$APP...
