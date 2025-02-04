@@ -306,6 +306,9 @@ def get_context_for_reservation_modified(
     tax_percentage: Decimal,
     reservation_id: int,
     instructions: str,
+    access_code_is_used: bool,
+    access_code: str,
+    access_code_validity_period: str,
 ) -> EmailContext: ...
 
 
@@ -322,6 +325,7 @@ def get_context_for_reservation_modified(
             "instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_info(reservation=reservation),
+            **params_for_keyless_entry(reservation=reservation),
         }
 
     return {
@@ -341,6 +345,12 @@ def get_context_for_reservation_modified(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
             reservation_id=data["reservation_id"],
+        ),
+        **get_context_for_keyless_entry(
+            language=language,
+            access_code_is_used=data["access_code_is_used"],
+            access_code=data["access_code"],
+            access_code_validity_period=data["access_code_validity_period"],
         ),
         **get_contex_for_reservation_manage_link(language=language),
     }
