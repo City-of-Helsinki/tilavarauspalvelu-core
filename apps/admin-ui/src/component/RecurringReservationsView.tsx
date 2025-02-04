@@ -17,13 +17,13 @@ import { DenyDialog } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { LoadingSpinner } from "hds-react";
 import { errorToast } from "common/src/common/toast";
 import { useCheckPermission } from "@/hooks";
 import {
   isPossibleToDeny,
   isPossibleToEdit,
 } from "@/modules/reservationModificationRules";
+import { CenterSpinner } from "common/styles/util";
 
 type Props = {
   recurringPk: number;
@@ -65,7 +65,7 @@ export function RecurringReservationsView({
   const reservations = filterNonNullable(recurringReservation?.reservations);
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <CenterSpinner />;
   }
 
   const handleChangeSuccess = () => {

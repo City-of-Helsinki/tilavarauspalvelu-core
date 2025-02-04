@@ -51,7 +51,7 @@ type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 const Accordion = styled(AccordionBase).attrs({
   closeButton: false,
 })`
-  > div > div {
+  > div > div:not([class^="LoadingSpinner-module_loadingSpinner"]) {
     width: 100%;
   }
 `;
