@@ -671,6 +671,7 @@ class Local(Common, overrides_from=LocalMixin):
     SAVE_RESERVATION_STATISTICS = values.BooleanValue(default=True)
     REBUILD_SPACE_HIERARCHY = values.BooleanValue(default=True)
     RAISE_ERROR_ON_REFRESH_FAILURE = True
+    FRONTEND_TESTING_API_ENABLED = values.BooleanValue(default=True)
 
     EMAIL_VARAAMO_EXT_LINK = "https://fake.local.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.local.varaamo.hel.fi/feedback"
@@ -722,6 +723,7 @@ class Docker(Common, overrides_from=DockerMixin):
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
     RAISE_ERROR_ON_REFRESH_FAILURE = True
+    FRONTEND_TESTING_API_ENABLED = values.BooleanValue(default=True)
 
     EMAIL_VARAAMO_EXT_LINK = "https://fake.local.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.local.varaamo.hel.fi/feedback"
