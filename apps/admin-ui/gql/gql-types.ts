@@ -6477,15 +6477,16 @@ export type UpdateImageMutation = {
 };
 
 export type ReservationUnitEditorParametersQueryVariables = Exact<{
-  [key: string]: never;
+  equipmentsOrderBy?: InputMaybe<EquipmentOrderingChoices>;
 }>;
 
 export type ReservationUnitEditorParametersQuery = {
-  equipments?: {
-    edges: Array<{
-      node?: { id: string; nameFi?: string | null; pk?: number | null } | null;
-    } | null>;
-  } | null;
+  equipmentsAll?: Array<{
+    id: string;
+    name: string;
+    nameFi?: string | null;
+    pk?: number | null;
+  }> | null;
   taxPercentages?: {
     edges: Array<{
       node?: { id: string; pk?: number | null; value: string } | null;
@@ -11534,15 +11535,14 @@ export type UpdateImageMutationOptions = Apollo.BaseMutationOptions<
   UpdateImageMutationVariables
 >;
 export const ReservationUnitEditorParametersDocument = gql`
-  query ReservationUnitEditorParameters {
-    equipments {
-      edges {
-        node {
-          id
-          nameFi
-          pk
-        }
-      }
+  query ReservationUnitEditorParameters(
+    $equipmentsOrderBy: EquipmentOrderingChoices
+  ) {
+    equipmentsAll(orderBy: [$equipmentsOrderBy]) {
+      id
+      name
+      nameFi
+      pk
     }
     taxPercentages {
       edges {
@@ -11623,6 +11623,7 @@ export const ReservationUnitEditorParametersDocument = gql`
  * @example
  * const { data, loading, error } = useReservationUnitEditorParametersQuery({
  *   variables: {
+ *      equipmentsOrderBy: // value for 'equipmentsOrderBy'
  *   },
  * });
  */
