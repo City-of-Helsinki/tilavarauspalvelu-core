@@ -66,13 +66,18 @@ function RejectedOccurrencesDataLoader({
     return <CenterSpinner />;
   }
 
-  const totalCount = dataToUse?.rejectedOccurrences?.edges.length ?? 0;
+  const totalCount = dataToUse?.rejectedOccurrences?.totalCount ?? 0;
   const rejectedOccurrences = filterNonNullable(
     dataToUse?.rejectedOccurrences?.edges.map((edge) => edge?.node)
   );
 
   return (
     <>
+      <span>
+        <b>
+          {totalCount} {t("ApplicationRound.rejectedOccurrencesCount")}
+        </b>
+      </span>
       <RejectedOccurrencesTable
         rejectedOccurrences={rejectedOccurrences}
         isLoading={loading}
@@ -159,6 +164,7 @@ export const REJECTED_OCCURRENCES_QUERY = gql`
       after: $after
       first: $first
     ) {
+      totalCount
       pageInfo {
         hasNextPage
         endCursor

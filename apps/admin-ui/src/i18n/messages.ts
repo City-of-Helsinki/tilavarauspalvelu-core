@@ -610,6 +610,7 @@ const translations: ITranslations = {
     madeReservations: ["Varatut vuorot"],
     allocatedReservations: ["Jaetut vuorot"],
     rejectedOccurrences: ["Hylätyt ajankohdat"],
+    rejectedOccurrencesCount: ["hylättyä ajankohtaa"],
     applications: ["Hakemukset"],
     roundCriteria: ["Kierroksen kriteerit"],
     // TODO this is used in Criteria page
