@@ -181,6 +181,9 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
                 instructions=confirmed_instructions,
+                access_code_is_used=access_code_is_used,
+                access_code=access_code,
+                access_code_validity_period=access_code_validity_period,
                 language=language,
             )
         case EmailType.RESERVATION_REJECTED:

@@ -11,10 +11,12 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data
-from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.enums import AccessType, EmailType
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_modified
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservationResponse
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 from tests.factories import ReservationFactory
@@ -23,6 +25,10 @@ from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
+    KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT,
+    KEYLESS_ENTRY_CONTEXT_EN,
+    KEYLESS_ENTRY_CONTEXT_FI,
+    KEYLESS_ENTRY_CONTEXT_SV,
     RESERVATION_BASIC_INFO_CONTEXT_EN,
     RESERVATION_BASIC_INFO_CONTEXT_FI,
     RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -53,6 +59,9 @@ def test_get_context__reservation_modified__en(email_reservation):
             tax_percentage=Decimal(0),
             reservation_id=email_reservation.id,
             instructions="[HYVÄKSYTYN VARAUKSEN OHJEET]",
+            access_code_is_used=False,
+            access_code="",
+            access_code_validity_period="",
             language="en",
         )
 
@@ -66,12 +75,69 @@ def test_get_context__reservation_modified__en(email_reservation):
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
+        **KEYLESS_ENTRY_CONTEXT_EN,
         "reservation_id": f"{email_reservation.id}",
         "price": Decimal(0),
         "subsidised_price": Decimal(0),
         "tax_percentage": Decimal(0),
     }
 
+    with TranslationsFromPOFiles():
+        assert context == get_context_for_reservation_modified(
+            reservation=email_reservation,
+            language="en",
+        )
+
+
+@patch_method(
+    PindoraClient.get_reservation,
+    return_value=PindoraReservationResponse(
+        access_code="123456",
+        begin=datetime.datetime(2024, 1, 1, 11),
+        end=datetime.datetime(2024, 1, 1, 15),
+    ),
+)
+@pytest.mark.django_db
+@freeze_time("2024-01-01")
+def test_get_context__reservation_modified__access_code__en(email_reservation):
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_modified(
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="Test reservation unit",
+            unit_name="Test unit",
+            unit_location="Test Street, City",
+            begin_datetime=datetime.datetime(2024, 1, 1, 12),
+            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            price=Decimal(0),
+            tax_percentage=Decimal(0),
+            reservation_id=email_reservation.id,
+            instructions="[HYVÄKSYTYN VARAUKSEN OHJEET]",
+            access_code_is_used=True,
+            access_code="123456",
+            access_code_validity_period="11:00-15:00",
+            language="en",
+        )
+
+    assert context == {
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "text_reservation_modified": "Your booking has been updated",
+        "instructions_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "title": "Your booking has been updated",
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **RESERVATION_PRICE_INFO_CONTEXT_EN,
+        **RESERVATION_MANAGE_LINK_CONTEXT_EN,
+        **KEYLESS_ENTRY_CONTEXT_EN,
+        **KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT,
+        "reservation_id": f"{email_reservation.id}",
+        "price": Decimal(0),
+        "subsidised_price": Decimal(0),
+        "tax_percentage": Decimal(0),
+    }
+
+    email_reservation.access_type = AccessType.ACCESS_CODE
+    email_reservation.save()
     with TranslationsFromPOFiles():
         assert context == get_context_for_reservation_modified(
             reservation=email_reservation,
@@ -93,6 +159,9 @@ def test_get_context__reservation_modified__fi():
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
             instructions="Tässä ovat ohjeet",
+            access_code_is_used=False,
+            access_code="",
+            access_code_validity_period="",
             language="fi",
         )
 
@@ -106,6 +175,7 @@ def test_get_context__reservation_modified__fi():
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
         **RESERVATION_MANAGE_LINK_CONTEXT_FI,
+        **KEYLESS_ENTRY_CONTEXT_FI,
     }
 
 
@@ -123,6 +193,9 @@ def test_get_context__reservation_modified__sv():
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
             instructions="Här är instruktionerna",
+            access_code_is_used=False,
+            access_code="",
+            access_code_validity_period="",
             language="sv",
         )
 
@@ -136,6 +209,7 @@ def test_get_context__reservation_modified__sv():
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
         **RESERVATION_MANAGE_LINK_CONTEXT_SV,
+        **KEYLESS_ENTRY_CONTEXT_SV,
     }
 
 
@@ -185,7 +259,55 @@ def test_render_reservation_modified__text():
     )
 
 
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_reservation_modified__access_code__text():
+    context = get_mock_data(email_type=EmailType.RESERVATION_MODIFIED, access_code_is_used=True, language="en")
+    text_content = render_text(email_type=EmailType.RESERVATION_MODIFIED, context=context)
+
+    manage = (
+        "Manage your booking at Varaamo. You can check the details of your booking and "
+        "Varaamo's terms of contract and cancellation on the 'My bookings' page: "
+        "https://fake.varaamo.hel.fi/en/reservations."
+    )
+
+    assert text_content == cleandoc(
+        f"""
+        Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
+
+        Your booking has been updated. Here are your booking details and the door code for easy access to the space.
+
+        [VARAUSYKSIKÖN NIMI]
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
+
+        From: 1.1.2024 at 12:00
+        To: 2.1.2024 at 15:00
+
+        Price: 12,30 € (incl. VAT 25.5 %)
+        Booking number: 1234
+
+        Door code: 123456
+        Validity period of the door code: 11:00-15:00
+
+        Additional information about your booking:
+        [HYVÄKSYTYN VARAUKSEN OHJEET]
+
+        {manage}
+
+        Thank you for choosing Varaamo!
+        Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
+
+        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        """
+    )
+
+
 # RENDER HTML ##########################################################################################################
+
+
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_render_reservation_modified__html():
     context = get_mock_data(email_type=EmailType.RESERVATION_MODIFIED, language="en")
@@ -214,6 +336,58 @@ def test_render_reservation_modified__html():
         To: **2.1.2024** at **15:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
         Booking number: 1234
+
+        ## Additional information about your booking
+
+        [HYVÄKSYTYN VARAUKSEN OHJEET]
+
+        {manage}
+        Thank you for choosing Varaamo!
+        Kind regards
+        Varaamo
+        This is an automated message, please do not reply.
+        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
+        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
+
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        (C) City of Helsinki 2024
+        """
+    )
+
+
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_render_reservation_modified__access_code__html():
+    context = get_mock_data(email_type=EmailType.RESERVATION_MODIFIED, access_code_is_used=True, language="en")
+    html_content = render_html(email_type=EmailType.RESERVATION_MODIFIED, context=context)
+    text_content = html_email_to_text(html_content)
+
+    manage = (
+        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
+        "terms of contract and cancellation on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations)."
+    )
+
+    assert text_content == cleandoc(
+        f"""
+        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**
+
+        **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
+
+        Your booking has been updated. Here are your booking details and the door code for easy access to the space.
+
+        **[VARAUSYKSIKÖN NIMI]**
+        [TOIMIPISTEEN NIMI]
+        [TOIMIPISTEEN OSOITE]
+        From: **1.1.2024** at **12:00**
+        To: **2.1.2024** at **15:00**
+        Price: **12,30 €** (incl. VAT 25.5 %)
+        Booking number: 1234
+        Door code: 123456
+        Validity period of the door code: 11:00-15:00
 
         ## Additional information about your booking
 

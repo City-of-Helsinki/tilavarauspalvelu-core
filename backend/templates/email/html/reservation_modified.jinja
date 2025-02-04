@@ -1,9 +1,10 @@
 {% extends "email/html/partials/base.jinja" %}
 
 {% block content_main %}
-    <mj-text>{{ text_reservation_modified | sentence | safe }}</mj-text>
+    <mj-text>{{ text_reservation_modified | sentence | safe }}{% if access_code_is_used and access_code %} {{ text_access_code_confirmed | sentence | safe }}{% endif %}</mj-text>
     {% include "email/html/partials/reservation_basic_info.jinja" %}
     {% include "email/html/partials/reservation_price.jinja" %}
+    {% include "email/html/partials/access_code.jinja" %}
 {% endblock %}
 
 {% block content_secondary %}
