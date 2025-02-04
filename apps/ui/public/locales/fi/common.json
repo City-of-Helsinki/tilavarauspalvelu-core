@@ -84,6 +84,7 @@
   "loginAlt": "Kirjaudu sisään",
   "logout": "Kirjaudu ulos",
   "cancel": "Peru",
+  "stop": "Keskeytä",
   "imgAltForSpace": "Kuva tilasta {{name}}",
   "address": {
     "streetAddress": "Katuosoite",

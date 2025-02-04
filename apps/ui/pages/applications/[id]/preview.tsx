@@ -21,7 +21,12 @@ import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ButtonContainer, Flex } from "common/styles/util";
-import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  IconArrowLeft,
+  LoadingSpinner,
+} from "hds-react";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -102,6 +107,7 @@ function Preview(props: PropsNarrowed): JSX.Element {
         />
         <ButtonContainer>
           <ButtonLikeLink size="large" href={getApplicationPath(pk, "page3")}>
+            <IconArrowLeft aria-hidden="true" />
             {t("common:prev")}
           </ButtonLikeLink>
           <Button

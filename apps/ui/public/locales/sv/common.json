@@ -84,6 +84,7 @@
   "loginAlt": "Logga in",
   "logout": "Logga ut",
   "cancel": "Avboka",
+  "stop": "Avbryt",
   "imgAltForSpace": "Bild på lokalen {{name}}",
   "address": {
     "streetAddress": "Adress",

@@ -33,7 +33,12 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
-import { Button, ButtonVariant, IconArrowRight } from "hds-react";
+import {
+  Button,
+  ButtonVariant,
+  IconArrowLeft,
+  IconArrowRight,
+} from "hds-react";
 import { ButtonContainer } from "common/styles/util";
 import styled from "styled-components";
 
@@ -51,7 +56,11 @@ function Buttons({
 
   return (
     <ButtonContainer>
-      <Button variant={ButtonVariant.Secondary} onClick={onPrev}>
+      <Button
+        iconStart={<IconArrowLeft aria-hidden="true" />}
+        variant={ButtonVariant.Secondary}
+        onClick={onPrev}
+      >
         {t("common:prev")}
       </Button>
       <Button

@@ -406,10 +406,8 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
               reservation={reservation}
               supportedFields={supportedFields}
               options={options}
-              // TODO this is correct but confusing.
-              // There used to be 5 steps for payed reservations but the stepper is hidden for them now.
-              requiresHandling={steps.length > 2}
               setStep={setStep}
+              requiresPayment={steps.length > 2}
             />
           )}
         </StyledForm>

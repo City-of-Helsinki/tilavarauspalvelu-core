@@ -5,7 +5,6 @@ import {
   Button,
   ButtonVariant,
   IconArrowLeft,
-  IconArrowRight,
   LoadingSpinner,
   Notification,
 } from "hds-react";
@@ -24,7 +23,7 @@ type Props = {
   reservation: NodeT;
   supportedFields: FieldName[];
   options: OptionsRecord;
-  requiresHandling: boolean;
+  requiresPayment: boolean;
   setStep: React.Dispatch<React.SetStateAction<number>>;
 };
 
@@ -32,7 +31,7 @@ export function Step1({
   reservation,
   supportedFields,
   options,
-  requiresHandling,
+  requiresPayment,
   setStep,
 }: Props): JSX.Element {
   const { t } = useTranslation();
@@ -55,9 +54,6 @@ export function Step1({
   const reservationUnit = reservation?.reservationUnits?.find(() => true);
 
   const areTermsAccepted = isTermsAccepted.space && isTermsAccepted.service;
-  const submitText = t(
-    `reservationCalendar:${requiresHandling ? "nextStep" : "makeReservation"}`
-  );
 
   if (!reservationUnit) {
     return (
@@ -85,23 +81,19 @@ export function Step1({
         <Button
           type="submit"
           variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
-          iconEnd={
-            isSubmitting ? (
-              <LoadingSpinner small />
-            ) : requiresHandling ? (
-              <IconArrowRight aria-hidden="true" />
-            ) : undefined
-          }
+          iconEnd={isSubmitting ? <LoadingSpinner small /> : undefined}
           data-testid="reservation__button--continue"
           disabled={!areTermsAccepted || isSubmitting}
         >
-          {submitText}
+          {requiresPayment
+            ? t("notification:waitingForPayment.continueReservation")
+            : t("reservationCalendar:makeReservation")}
         </Button>
         <Button
           variant={ButtonVariant.Secondary}
           iconStart={<IconArrowLeft aria-hidden="true" />}
           onClick={() => setStep(0)}
-          data-testid="reservation__button--cancel"
+          data-testid="reservation__button--prev"
         >
           {t("common:prev")}
         </Button>
