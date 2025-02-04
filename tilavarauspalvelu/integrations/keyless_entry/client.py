@@ -73,6 +73,10 @@ class PindoraClient(BaseExternalServiceClient):
         """Get a reservation unit from Pindora."""
         reservation_unit_uuid = reservation_unit if isinstance(reservation_unit, uuid.UUID) else reservation_unit.uuid
 
+        response = cls.get_cached_reservation_unit_response(ext_uuid=reservation_unit_uuid)
+        if response is not None:
+            return response
+
         url = cls._build_url(f"reservation-unit/{reservation_unit_uuid}")
 
         response = cls.get(url=url)
@@ -83,7 +87,9 @@ class PindoraClient(BaseExternalServiceClient):
         )
 
         data = cls.response_json(response)
-        return cls._parse_reservation_unit_response(data)
+        parsed_data = cls._parse_reservation_unit_response(data)
+        cls.cache_reservation_unit_response(data=data, ext_uuid=reservation_unit_uuid)
+        return parsed_data
 
     ######################
     # Single reservation #
@@ -93,6 +99,10 @@ class PindoraClient(BaseExternalServiceClient):
     def get_reservation(cls, reservation: Reservation | uuid.UUID) -> PindoraReservationResponse:
         """Fetch a reservation from Pindora."""
         reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
+
+        response = cls.get_cached_reservation_response(ext_uuid=reservation_uuid)
+        if response is not None:
+            return response
 
         url = cls._build_url(f"reservation/{reservation_uuid}")
 
@@ -104,7 +114,9 @@ class PindoraClient(BaseExternalServiceClient):
         )
 
         data = cls.response_json(response)
-        return cls._parse_reservation_response(data)
+        parsed_data = cls._parse_reservation_response(data)
+        cls.cache_reservation_response(parsed_data, ext_uuid=reservation.ext_uuid)
+        return parsed_data
 
     @classmethod
     def create_reservation(cls, reservation: Reservation, *, is_active: bool = False) -> PindoraReservationResponse:
@@ -129,7 +141,9 @@ class PindoraClient(BaseExternalServiceClient):
         )
 
         data = cls.response_json(response)
-        return cls._parse_reservation_response(data)
+        parsed_data = cls._parse_reservation_response(data)
+        cls.cache_reservation_response(parsed_data, ext_uuid=reservation.ext_uuid)
+        return parsed_data
 
     @classmethod
     def reschedule_reservation(cls, reservation: Reservation) -> None:
@@ -223,6 +237,10 @@ class PindoraClient(BaseExternalServiceClient):
         """Fetch a seasonal booking from Pindora."""
         section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
 
+        response = cls.get_cached_seasonal_booking_response(ext_uuid=section_uuid)
+        if response is not None:
+            return response
+
         url = cls._build_url(f"seasonal-booking/{section_uuid}")
 
         response = cls.get(url=url)
@@ -233,7 +251,9 @@ class PindoraClient(BaseExternalServiceClient):
         )
 
         data = cls.response_json(response)
-        return cls._parse_seasonal_booking_response(data)
+        parsed_data = cls._parse_seasonal_booking_response(data)
+        cls.cache_seasonal_booking_response(parsed_data, ext_uuid=section_uuid)
+        return parsed_data
 
     @classmethod
     def create_seasonal_booking(
@@ -276,7 +296,9 @@ class PindoraClient(BaseExternalServiceClient):
         )
 
         data = cls.response_json(response)
-        return cls._parse_seasonal_booking_response(data)
+        parsed_data = cls._parse_seasonal_booking_response(data)
+        cls.cache_seasonal_booking_response(parsed_data, ext_uuid=section.ext_uuid)
+        return parsed_data
 
     @classmethod
     def reschedule_seasonal_booking(cls, section: ApplicationSection) -> None:
@@ -386,6 +408,10 @@ class PindoraClient(BaseExternalServiceClient):
         """Fetch a reservation series from Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
 
+        response = cls.get_cached_reservation_series_response(ext_uuid=series_uuid)
+        if response is not None:
+            return response
+
         url = cls._build_url(f"reservation-series/{series_uuid}")
 
         response = cls.get(url=url)
@@ -396,7 +422,9 @@ class PindoraClient(BaseExternalServiceClient):
         )
 
         data = cls.response_json(response)
-        return cls._parse_reservation_series_response(data)
+        parsed_data = cls._parse_reservation_series_response(data)
+        cls.cache_reservation_series_response(parsed_data, ext_uuid=series.ext_uuid)
+        return parsed_data
 
     @classmethod
     def create_reservation_series(
@@ -435,7 +463,9 @@ class PindoraClient(BaseExternalServiceClient):
         )
 
         data = cls.response_json(response)
-        return cls._parse_reservation_series_response(data)
+        parsed_data = cls._parse_reservation_series_response(data)
+        cls.cache_reservation_series_response(parsed_data, ext_uuid=series.ext_uuid)
+        return parsed_data
 
     @classmethod
     def reschedule_reservation_series(cls, series: RecurringReservation) -> None:

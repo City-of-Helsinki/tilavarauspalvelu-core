@@ -161,12 +161,5 @@ class ReservationAdminForm(forms.ModelForm):
         if obj.access_type != AccessType.ACCESS_CODE:
             return None
 
-        response = PindoraClient.get_cached_reservation_response(ext_uuid=obj.ext_uuid)
-        if response is None:
-            response = PindoraClient.get_reservation(reservation=obj)
-            PindoraClient.cache_reservation_response(response, ext_uuid=obj.ext_uuid)
-
-        if response is None:
-            return None
-
+        response = PindoraClient.get_reservation(reservation=obj)
         return json.dumps(response, default=str, indent=2)

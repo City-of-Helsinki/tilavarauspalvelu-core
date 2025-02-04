@@ -245,10 +245,7 @@ class ReservationUnitAdminForm(forms.ModelForm):
         if obj.access_type != AccessType.ACCESS_CODE:
             return None
 
-        response = PindoraClient.get_cached_reservation_unit_response(ext_uuid=obj.uuid)
-        if response is None:
-            response = PindoraClient.get_reservation_unit(reservation_unit=obj)
-            PindoraClient.cache_reservation_unit_response(response, ext_uuid=obj.uuid)
+        response = PindoraClient.get_reservation_unit(reservation_unit=obj)
 
         if response is None:
             return None

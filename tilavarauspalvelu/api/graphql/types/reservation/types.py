@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from contextlib import suppress
 from typing import TYPE_CHECKING, NamedTuple
 
 import graphene
@@ -309,13 +308,9 @@ class ReservationNode(DjangoNode):
         if not has_view_permissions and root.state != ReservationStateChoice.CONFIRMED:
             return None
 
-        response = PindoraClient.get_cached_reservation_response(ext_uuid=root.ext_uuid)
-        if response is None:
-            with suppress(Exception):
-                response = PindoraClient.get_reservation(reservation=root.ext_uuid)
-                PindoraClient.cache_reservation_response(data=response, ext_uuid=root.ext_uuid)
-
-        if response is None:
+        try:
+            response = PindoraClient.get_reservation(reservation=root.ext_uuid)
+        except Exception:  # noqa: BLE001
             return None
 
         # Don't allow reserver to view Pindora info without view permissions if the access code is not active

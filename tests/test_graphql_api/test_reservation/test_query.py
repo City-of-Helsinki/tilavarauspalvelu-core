@@ -678,7 +678,7 @@ def test_reservation__query__pindora_info__pindora_data_cached(graphql):
     data = pindora_response()
     PindoraClient.cache_reservation_response(data=data, ext_uuid=reservation.ext_uuid)
 
-    with patch_method(PindoraClient.get_reservation, return_value=data) as pindora_api:
+    with patch_method(PindoraClient.get) as pindora_api:
         response = graphql(query)
 
     # cache was used, no API call was made
