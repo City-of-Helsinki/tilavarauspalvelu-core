@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
 import {
   ReservationOrderingChoices,
   useListReservationsQuery,
@@ -20,33 +19,14 @@ import { toApiDate } from "common/src/common/util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
+import { Flex } from "common/styles/util";
 
 type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
 type EdgeT = NonNullable<QueryT["edges"][number]>;
 type NodeT = NonNullable<EdgeT["node"]>;
 
-const NotificationContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--spacing-s);
-
-  @media (min-width: ${breakpoints.m}) {
-    flex-direction: row;
-  }
-`;
-
 const BodyText = styled.p`
   margin: 0;
-`;
-
-const NotificationButtons = styled.div`
-  display: flex;
-  gap: var(--spacing-s);
-
-  > button {
-    white-space: nowrap;
-  }
 `;
 
 function isNotFoundError(error: unknown): boolean {
@@ -129,9 +109,9 @@ function ReservationNotification({
       closeButtonLabelText={t("common:close")}
       data-testid="unpaid-reservation-notification__title"
     >
-      <NotificationContent>
+      <Flex $wrap="wrap" $direction="row">
         <BodyText>{text}</BodyText>
-        <NotificationButtons>
+        <Flex $gap="s" $direction="row">
           <Button
             variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Secondary}
             size={ButtonSize.Small}
@@ -151,8 +131,8 @@ function ReservationNotification({
           >
             {submitButtonText}
           </Button>
-        </NotificationButtons>
-      </NotificationContent>
+        </Flex>
+      </Flex>
     </NotificationWrapper>
   );
 }
