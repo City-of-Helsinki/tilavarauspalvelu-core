@@ -333,6 +333,7 @@ export async function getSearchOptions(
     query: SearchFormParamsUnitDocument,
     variables: {
       publishedReservationUnits: true,
+      orderBy: UnitOrderingChoices.NameFiAsc,
       ...(page === "direct" ? { onlyDirectBookable: true } : {}),
       ...(page === "seasonal" ? { onlySeasonalBookable: true } : {}),
     },
