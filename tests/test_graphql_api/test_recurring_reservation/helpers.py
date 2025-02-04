@@ -8,7 +8,7 @@ from graphene_django_extensions.testing import build_mutation, build_query
 
 from tilavarauspalvelu.enums import ReservationTypeChoice, WeekdayChoice
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
-from utils.date_utils import local_date, local_time
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_time
 
 from tests.factories import RecurringReservationFactory
 
@@ -19,6 +19,7 @@ recurring_reservations_query = partial(build_query, "recurringReservations", con
 
 CREATE_SERIES_MUTATION = build_mutation("createReservationSeries", "ReservationSeriesCreateMutation")
 UPDATE_SERIES_MUTATION = build_mutation("updateReservationSeries", "ReservationSeriesUpdateMutation")
+ADD_RESERVATION_TO_SERIES_MUTATION = build_mutation("addReservationToSeries", "ReservationSeriesAddMutation")
 RESCHEDULE_SERIES_MUTATION = build_mutation("rescheduleReservationSeries", "ReservationSeriesRescheduleMutation")
 DENY_SERIES_MUTATION = build_mutation(
     "denyReservationSeries",
@@ -52,6 +53,15 @@ def get_minimal_series_data(reservation_unit: ReservationUnit, user: User, **ove
 def get_minimal_reschedule_data(recurring_reservation: RecurringReservation, **overrides: Any) -> dict[str, Any]:
     return {
         "pk": recurring_reservation.pk,
+        **overrides,
+    }
+
+
+def get_minimal_add_data(recurring_reservation: RecurringReservation, **overrides: Any) -> dict[str, Any]:
+    return {
+        "pk": recurring_reservation.pk,
+        "begin": datetime.datetime(2024, 1, 2, 10, tzinfo=DEFAULT_TIMEZONE).isoformat(),
+        "end": datetime.datetime(2024, 1, 2, 12, tzinfo=DEFAULT_TIMEZONE).isoformat(),
         **overrides,
     }
 

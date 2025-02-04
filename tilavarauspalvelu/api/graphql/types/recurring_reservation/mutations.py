@@ -9,6 +9,7 @@ from utils.date_utils import local_datetime
 
 from .permissions import RecurringReservationPermission
 from .serializers import (
+    ReservationSeriesAddReservationSerializer,
     ReservationSeriesCreateSerializer,
     ReservationSeriesDenyInputSerializer,
     ReservationSeriesDenyOutputSerializer,
@@ -20,7 +21,9 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import RecurringReservation
 
 __all__ = [
+    "ReservationSeriesAddMutation",
     "ReservationSeriesCreateMutation",
+    "ReservationSeriesDenyMutation",
     "ReservationSeriesRescheduleMutation",
     "ReservationSeriesUpdateMutation",
 ]
@@ -35,6 +38,12 @@ class ReservationSeriesCreateMutation(CreateMutation):
 class ReservationSeriesUpdateMutation(UpdateMutation):
     class Meta:
         serializer_class = ReservationSeriesUpdateSerializer
+        permission_classes = [RecurringReservationPermission]
+
+
+class ReservationSeriesAddMutation(UpdateMutation):
+    class Meta:
+        serializer_class = ReservationSeriesAddReservationSerializer
         permission_classes = [RecurringReservationPermission]
 
 

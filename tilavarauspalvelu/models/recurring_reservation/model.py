@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
     from .actions import RecurringReservationActions
+    from .validators import ReservationSeriesValidator
 
 
 __all__ = [
@@ -111,3 +112,15 @@ class RecurringReservation(models.Model):
         from .actions import RecurringReservationActions
 
         return RecurringReservationActions(self)
+
+    @cached_property
+    def validator(self) -> ReservationSeriesValidator:
+        """
+        Validation logic that requires access to a RecurringReservation instance,
+        e.g. for update, delete, or validation of another model.
+        """
+        # Import actions inline to defer loading them.
+        # This allows us to avoid circular imports.
+        from .validators import ReservationSeriesValidator
+
+        return ReservationSeriesValidator(self)

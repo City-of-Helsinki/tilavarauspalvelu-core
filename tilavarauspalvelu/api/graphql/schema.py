@@ -52,6 +52,7 @@ from .mutations import (
     ReservationDenyMutation,
     ReservationRefundMutation,
     ReservationRequiresHandlingMutation,
+    ReservationSeriesAddMutation,
     ReservationSeriesCreateMutation,
     ReservationSeriesDenyMutation,
     ReservationSeriesRescheduleMutation,
@@ -365,6 +366,7 @@ class Mutation(graphene.ObjectType):
     staff_reservation_modify = ReservationStaffModifyMutation.Field()
     create_reservation_series = ReservationSeriesCreateMutation.Field()
     update_reservation_series = ReservationSeriesUpdateMutation.Field()
+    add_reservation_to_series = ReservationSeriesAddMutation.Field()
     reschedule_reservation_series = ReservationSeriesRescheduleMutation.Field()
     deny_reservation_series = ReservationSeriesDenyMutation.Field()
     refresh_order = RefreshOrderMutation.Field()
