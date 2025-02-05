@@ -7721,7 +7721,7 @@ export type BannerNotificationDeleteMutation = {
 export type SearchReservationUnitsQueryVariables = Exact<{
   after?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
   maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -14456,7 +14456,7 @@ export const SearchReservationUnitsDocument = gql`
   query SearchReservationUnits(
     $after: String
     $first: Int
-    $nameFi: String
+    $textSearch: String
     $maxPersonsGte: Decimal
     $maxPersonsLte: Decimal
     $surfaceAreaGte: Decimal
@@ -14470,7 +14470,7 @@ export const SearchReservationUnitsDocument = gql`
       first: $first
       after: $after
       orderBy: $orderBy
-      nameFi: $nameFi
+      textSearch: $textSearch
       maxPersonsGte: $maxPersonsGte
       minPersonsGte: $maxPersonsGte
       maxPersonsLte: $maxPersonsLte
@@ -14525,7 +14525,7 @@ export const SearchReservationUnitsDocument = gql`
  *   variables: {
  *      after: // value for 'after'
  *      first: // value for 'first'
- *      nameFi: // value for 'nameFi'
+ *      textSearch: // value for 'textSearch'
  *      maxPersonsGte: // value for 'maxPersonsGte'
  *      maxPersonsLte: // value for 'maxPersonsLte'
  *      surfaceAreaGte: // value for 'surfaceAreaGte'

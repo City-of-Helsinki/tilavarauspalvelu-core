@@ -124,7 +124,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
       maxPersonsGte,
       surfaceAreaLte,
       surfaceAreaGte,
-      nameFi: searchFilter,
+      textSearch: searchFilter,
       unit,
       publishingState: reservationUnitStates.map((state) =>
         convertToReservationUnitState(state)

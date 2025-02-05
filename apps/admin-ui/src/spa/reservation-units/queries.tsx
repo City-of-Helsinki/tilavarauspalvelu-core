@@ -4,7 +4,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
   query SearchReservationUnits(
     $after: String
     $first: Int
-    $nameFi: String
+    $textSearch: String
     $maxPersonsGte: Decimal
     $maxPersonsLte: Decimal
     $surfaceAreaGte: Decimal
@@ -18,7 +18,7 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
       first: $first
       after: $after
       orderBy: $orderBy
-      nameFi: $nameFi
+      textSearch: $textSearch
       maxPersonsGte: $maxPersonsGte
       minPersonsGte: $maxPersonsGte
       maxPersonsLte: $maxPersonsLte
