@@ -62,6 +62,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+      args:
+        DEPS: main,admin,celery,test,lint
     env_file:
       - .env
     environment:
