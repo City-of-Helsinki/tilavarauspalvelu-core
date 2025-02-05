@@ -137,15 +137,30 @@ jobs:
           name: test_durations
 
       - name: "Run pytest with coverage"
-        run: poetry run coverage run --branch -m pytest --disable-warnings --splits 12 --splitting-algorithm least_duration --group ${{ matrix.group }}
+        run: |
+          poetry run coverage run \
+            --branch \
+            -m pytest \
+              --disable-warnings \
+              --splits 12 \
+              --splitting-algorithm least_duration \
+              --group ${{ matrix.group }}
         env:
           DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
           COVERAGE_FILE: .coverage.${{ matrix.group }}
 
+      # Invalid characters in artifact name: " :  < > | * ? \r \n \ /
+      - name: "Create artifact name"
+        id: artifact
+        run: >-
+          echo "artifact=$(
+            echo ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }} | sed 's/[":<>|*?\\r\\n\\/]/-/g'
+          )" >> $GITHUB_OUTPUT
+
       - name: "Upload coverage artefact"
         uses: actions/upload-artifact@v4
         with:
-          name: cov-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ matrix.group }}
+          name: cov-${{ steps.artifact.outputs.artifact }}-${{ matrix.group }}
           path: .coverage.${{ matrix.group }}
           if-no-files-found: error
           retention-days: 1
@@ -183,10 +198,6 @@ jobs:
         run: |
           coverage combine
           coverage xml
-
-#      # Without this workaround, SonarCloud reports a warning about an incorrect source path
-#      - name: "Override coverage report source path for SonarCloud"
-#        run: sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.xml
 
       - name: "SonarCloud Scan"
         uses: SonarSource/sonarqube-scan-action@v4
