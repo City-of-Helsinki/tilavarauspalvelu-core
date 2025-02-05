@@ -180,7 +180,7 @@ export function RecurringReservationsView({
       header={t("RecurringReservationsView.Heading")}
       items={items}
       reservationToCopy={reservationToCopy}
-      refetch={refetch}
+      refetch={handleChangeSuccess}
     />
   );
 }
