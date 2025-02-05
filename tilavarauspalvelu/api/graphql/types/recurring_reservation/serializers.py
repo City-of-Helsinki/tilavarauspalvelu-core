@@ -421,7 +421,11 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         # This retains data from many-to-one relationships, but not for many-to-many or one-to-many relationships.
         # One-to-one relationships to or from the model would cause an error.
         reservation: Reservation = instance.reservations.last()
-        reservation.id = None  # Create a new reservation
+
+        # A little trick for making a copy of an existing instance
+        reservation._state.adding = True  # noqa: SLF001
+        reservation.id = None
+
         reservation.begin = validated_data["begin"]
         reservation.end = validated_data["end"]
         reservation.buffer_time_before = validated_data["buffer_time_before"]
