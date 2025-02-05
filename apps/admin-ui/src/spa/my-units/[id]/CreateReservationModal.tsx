@@ -112,18 +112,16 @@ function useCheckFormCollisions({
   const formDate = watch("date");
   const formEndTime = watch("endTime");
   const formStartTime = watch("startTime");
-  const bufferTimeAfter = watch("bufferTimeAfter");
-  const bufferTimeBefore = watch("bufferTimeBefore");
+  const enableBufferTimeAfter = watch("enableBufferTimeAfter");
+  const enableBufferTimeBefore = watch("enableBufferTimeBefore");
   const type = watch("type");
 
-  const bufferBeforeSeconds =
-    type !== "BLOCKED" && bufferTimeBefore && reservationUnit.bufferTimeBefore
-      ? reservationUnit.bufferTimeBefore
-      : 0;
-  const bufferAfterSeconds =
-    type !== "BLOCKED" && bufferTimeAfter && reservationUnit.bufferTimeAfter
-      ? reservationUnit.bufferTimeAfter
-      : 0;
+  const bufferBeforeSeconds = enableBufferTimeBefore
+    ? getBufferTime(reservationUnit.bufferTimeBefore, type)
+    : 0;
+  const bufferAfterSeconds = enableBufferTimeAfter
+    ? getBufferTime(reservationUnit.bufferTimeAfter, type)
+    : 0;
 
   const start = parseDateTimeSafe(formDate, formStartTime);
   const end = parseDateTimeSafe(formDate, formEndTime);
@@ -239,8 +237,8 @@ function DialogContent({
     defaultValues: {
       date: format(start, "dd.MM.yyyy"),
       startTime: format(start, "HH:mm"),
-      bufferTimeBefore: false,
-      bufferTimeAfter: false,
+      enableBufferTimeBefore: false,
+      enableBufferTimeAfter: false,
     },
   });
 
