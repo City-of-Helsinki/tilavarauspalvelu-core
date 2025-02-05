@@ -433,6 +433,7 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
 
         reservation.ext_uuid = uuid.uuid4()
         reservation.state = ReservationStateChoice.CONFIRMED
+        reservation.created_at = now
         reservation.handled_at = now
         reservation.confirmed_at = now
         reservation.handling_details = ""
