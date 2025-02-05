@@ -496,6 +496,7 @@ class Common(Environment):
     UNSAFE_SKIP_IAT_CLAIM_VALIDATION = False
     UPDATE_RESERVATION_UNIT_THUMBNAILS = True
     DOWNLOAD_IMAGES_FOR_TEST_DATA = True
+    FRONTEND_TESTING_API_ENABLED = False
 
     PRUNE_RESERVATIONS_OLDER_THAN_MINUTES = 20
     REMOVE_RESERVATION_STATS_OLDER_THAN_YEARS = 5
@@ -573,8 +574,6 @@ class EmptyDefaults:
 
     EMAIL_VARAAMO_EXT_LINK = ""
     EMAIL_FEEDBACK_EXT_LINK = ""
-
-    FRONTEND_TESTING_API_ENABLED = True
 
 
 class Local(Common, overrides_from=LocalMixin):
@@ -863,6 +862,8 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
     SAVE_RESERVATION_STATISTICS = False
     # Always re-raise silenced Sentry errors during testing for better debugging
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
+    # Enable frontend testing API for testing
+    FRONTEND_TESTING_API_ENABLED = True
 
     EMAIL_VARAAMO_EXT_LINK = "https://fake.varaamo.hel.fi"
     EMAIL_FEEDBACK_EXT_LINK = "https://fake.varaamo.hel.fi/feedback"
@@ -908,8 +909,6 @@ class Platta(Common, use_environ=True):
     DJANGO_REDIS_CONNECTION_FACTORY = "django_redis.pool.SentinelConnectionFactory"
 
     # --- Misc settings ----------------------------------------------------------------------------------------------
-
-    FRONTEND_TESTING_API_ENABLED = False
 
     @classproperty
     def CACHES(cls):
