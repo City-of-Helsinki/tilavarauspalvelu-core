@@ -154,7 +154,7 @@ jobs:
         id: artifact
         run: >-
           echo "artifact=$(
-            echo ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }} | sed 's/[":<>|*?\\r\\n\\/]/-/g'
+            echo ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }} | sed 's/[":<>|*?\r\n\\/]/-/g'
           )" >> $GITHUB_OUTPUT
 
       - name: "Upload coverage artefact"
@@ -179,10 +179,18 @@ jobs:
           # Disable shallow cloning to improve relevancy of reporting in SonarCloud
           fetch-depth: 0
 
+      # Invalid characters in artifact name: " :  < > | * ? \r \n \ /
+      - name: "Create artifact name"
+        id: artifact
+        run: >-
+          echo "artifact=$(
+            echo ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }} | sed 's/[":<>|*?\r\n\\/]/-/g'
+          )" >> $GITHUB_OUTPUT
+
       - name: "Download coverage artefacts"
         uses: actions/download-artifact@v4
         with:
-          pattern: cov-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-*
+          pattern: cov-${{ steps.artifact.outputs.artifact }}-*
           merge-multiple: true
 
       - name: "Set up python"
