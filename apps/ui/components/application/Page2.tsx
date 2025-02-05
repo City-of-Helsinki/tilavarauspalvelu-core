@@ -5,28 +5,20 @@ import {
   ButtonVariant,
   IconArrowLeft,
   IconArrowRight,
-  Notification,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useFormContext } from "react-hook-form";
 import { type ApplicationPage2Query } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import {
-  type ApplicationSectionFormValue,
-  type ApplicationPage2FormValues,
-  convertToSchedule,
-  ApplicationSectionPage2FormValue,
-} from "./form";
+import { type ApplicationPage2FormValues, convertToSchedule } from "./form";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
-import { getReadableList } from "@/modules/util";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { TimeSelector } from "./TimeSelector";
-import { aesToCells, Cell, cellsToApplicationEventSchedules } from "./module";
-import { errorToast } from "common/src/common/toast";
+import { aesToCells } from "./module";
 import { ButtonContainer } from "common/styles/util";
 import { getApplicationPath } from "@/modules/urls";
 
@@ -36,56 +28,19 @@ type Props = {
   onNext: (appToSave: ApplicationPage2FormValues) => void;
 };
 
-function getLongestChunks(selectorData: Cell[][][]): number[] {
-  return selectorData.map((n) => {
-    const primarySchedules = cellsToApplicationEventSchedules(
-      n.map((nn) => nn.filter((nnn) => nnn.state === 300))
-    );
-    const secondarySchedules = cellsToApplicationEventSchedules(
-      n.map((nn) => nn.filter((nnn) => nnn.state === 200))
-    );
-
-    return [...primarySchedules, ...secondarySchedules].reduce((acc, cur) => {
-      const start = parseInt(cur.begin, 10);
-      const end = cur.end === "00:00" ? 24 : parseInt(cur.end, 10);
-      const length = end - start;
-      return length > acc ? length : acc;
-    }, 0);
-  });
-}
-
 export function Page2({ application, onNext }: Props): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
-  const { watch, handleSubmit } = useFormContext<ApplicationPage2FormValues>();
-
-  const onSubmit = (data: ApplicationPage2FormValues) => {
-    const selectorData = filterNonNullable(data.applicationSections).map((ae) =>
-      aesToCells(convertToSchedule(ae))
-    );
-    // TODO test the checking of that there is at least one primary or secondary
-    // TODO this should be a form refinement, but we need separate refinements
-    // for pages or a Page specific checker
-    const selectedAppEvents = selectorData
-      .map((cell) => cellsToApplicationEventSchedules(cell))
-      .map((aes) =>
-        aes.filter((ae) => ae.priority === 300 || ae.priority === 200)
-      )
-      .flat();
-    if (selectedAppEvents.length === 0) {
-      errorToast({
-        text: t("application:error.missingSchedule"),
-        dataTestId: "application__page2--notification-error",
-      });
-      return;
-    }
-    onNext(data);
-  };
+  const { watch, handleSubmit, formState } =
+    useFormContext<ApplicationPage2FormValues>();
 
   const applicationSections = filterNonNullable(watch("applicationSections"));
 
+  const { isSubmitting, isValid } = formState;
+  const enableSubmit = !isSubmitting && isValid;
+
   return (
-    <form noValidate onSubmit={handleSubmit(onSubmit)}>
+    <form noValidate onSubmit={handleSubmit(onNext)}>
       {applicationSections.map((section, index) =>
         application?.applicationSections?.[index] != null ? (
           <ApplicationSectionTimePicker
@@ -95,7 +50,6 @@ export function Page2({ application, onNext }: Props): JSX.Element {
           />
         ) : null
       )}
-      <MinDurationMessage />
       <ButtonContainer>
         <Button
           variant={ButtonVariant.Secondary}
@@ -109,69 +63,15 @@ export function Page2({ application, onNext }: Props): JSX.Element {
         </Button>
         <Button
           id="button__application--next"
-          iconEnd={<IconArrowRight aria-hidden="true" />}
+          iconEnd={<IconArrowRight />}
           size={ButtonSize.Small}
+          disabled={!enableSubmit}
           type="submit"
         >
           {t("common:next")}
         </Button>
       </ButtonContainer>
     </form>
-  );
-}
-
-function getListOfApplicationEventTitles(
-  applicationSections: Pick<ApplicationSectionFormValue, "name">[],
-  ids: number[]
-): string {
-  return getReadableList(ids.map((id) => `"${applicationSections[id].name}"`));
-}
-
-function getApplicationEventsWhichMinDurationsIsNotFulfilled(
-  aes: ApplicationSectionPage2FormValue[]
-): number[] {
-  const selected = aes.map((ae) => aesToCells(convertToSchedule(ae)));
-  const selectedHours = getLongestChunks(selected);
-  return filterNonNullable(
-    aes.map((ae, index) => {
-      const minDuration = ae.minDuration ?? 0;
-      return selectedHours[index] < minDuration / 3600 ? index : null;
-    })
-  );
-}
-
-function MinDurationMessage(): JSX.Element | null {
-  const { t } = useTranslation();
-  const { watch } = useFormContext<ApplicationPage2FormValues>();
-  const applicationSections = filterNonNullable(watch("applicationSections"));
-  const sectionsNotFullfilled =
-    getApplicationEventsWhichMinDurationsIsNotFulfilled(applicationSections);
-  const shouldShowMinDurationMessage = sectionsNotFullfilled.length > 0;
-
-  if (!shouldShowMinDurationMessage) {
-    return null;
-  }
-
-  const title = getListOfApplicationEventTitles(
-    applicationSections,
-    sectionsNotFullfilled
-  );
-
-  return (
-    <Notification
-      type="alert"
-      label={t("application:Page2.notification.minDuration.title")}
-      closeButtonLabelText={t("common:close")}
-      data-testid="application__page2--notification-min-duration"
-      style={{ marginBottom: "var(--spacing-m)" }}
-    >
-      {applicationSections.length === 1
-        ? t("application:Page2.notification.minDuration.bodySingle")
-        : t("application:Page2.notification.minDuration.body", {
-            title,
-            count: sectionsNotFullfilled.length,
-          })}
-    </Notification>
   );
 }
 
@@ -212,13 +112,14 @@ function ApplicationSectionTimePicker({
   const selectorData = applicationSections.map((ae) =>
     aesToCells(convertToSchedule(ae), reservationUnitOpeningHours)
   );
+  const aes = watch(`applicationSections.${sectionIndex}`);
 
   return (
     <Accordion
       open={sectionIndex === 0}
-      key={watch(`applicationSections.${sectionIndex}.pk`) ?? "NEW"}
+      key={aes.pk}
       id={`timeSelector-${sectionIndex}`}
-      heading={watch(`applicationSections.${sectionIndex}.name`) ?? ""}
+      heading={aes.name}
       theme="thin"
     >
       <TimeSelector

@@ -10,7 +10,7 @@ import {
   type ApplicationPage2FormValues,
   transformApplicationPage2,
   convertApplicationPage2,
-  ApplicationSectionPage2Schema,
+  ApplicationPage2Schema,
 } from "@/components/application/form";
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
@@ -49,7 +49,7 @@ function Page2({ application }: PropsNarrowed): JSX.Element {
   const form = useForm<ApplicationPage2FormValues>({
     mode: "onChange",
     defaultValues: convertApplicationPage2(application),
-    resolver: zodResolver(ApplicationSectionPage2Schema),
+    resolver: zodResolver(ApplicationPage2Schema),
   });
 
   const {

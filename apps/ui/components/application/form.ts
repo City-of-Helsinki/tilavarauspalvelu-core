@@ -1,5 +1,5 @@
 import { startOfDay } from "date-fns";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, timeToMinutes } from "common/src/helpers";
 import {
   ApplicantTypeChoice,
   type PersonNode,
@@ -115,16 +115,56 @@ export type ApplicationSectionPage2FormValue = z.infer<
   typeof ApplicationSectionPage2Schema
 >;
 
-export const ApplicationSectionPage2Schema = z.object({
-  pk: z.number(),
-  suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema).min(1),
-  minDuration: z.number().min(1),
-  name: z.string().min(1).max(100),
-  // selected reservation unit to show for this section (only used by Page2)
-  // TODO split the form? so we have three schemas (common + page1 + page2)
-  reservationUnitPk: z.number().optional(),
-  priority: z.literal(200).or(z.literal(300)).optional(),
-});
+// seconds
+function lengthOfTimeRange(timeRange: SuitableTimeRangeFormValues): number {
+  const begin = timeToMinutes(timeRange.beginTime);
+  const end = timeToMinutes(timeRange.endTime);
+
+  return (end - begin) * 60;
+}
+
+const ApplicationSectionPage2Schema = z
+  .object({
+    pk: z.number(),
+    suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema).min(1),
+    minDuration: z.number().min(1),
+    name: z.string().min(1).max(100),
+    // selected reservation unit to show for this section (only used by Page2)
+    // TODO split the form? so we have three schemas (common + page1 + page2)
+    reservationUnitPk: z.number().optional(),
+    priority: z.literal(200).or(z.literal(300)).optional(),
+    // NOTE: not sent or modified here, but required for validation
+    appliedReservationsPerWeek: z.number().min(1).max(7),
+  })
+  .refine((s) => s.suitableTimeRanges.length > 0, {
+    path: ["suitableTimeRanges"],
+    message: "Required",
+  })
+  // TODO validate that we have at least as many time ranges on different days as appliedPerWeek
+  .refine(
+    (s) =>
+      s.minDuration > 0 &&
+      s.suitableTimeRanges.find((tr) => lengthOfTimeRange(tr) >= s.minDuration),
+    {
+      path: ["suitableTimeRanges"],
+      message:
+        "Suitable time range must be at least as long as the minimum duration",
+    }
+  )
+  .refine(
+    (s) =>
+      s.suitableTimeRanges.reduce<typeof s.suitableTimeRanges>((acc, tr) => {
+        if (acc.find((x) => x.dayOfTheWeek === tr.dayOfTheWeek)) {
+          return acc;
+        }
+        return [...acc, tr];
+      }, []).length >= s.appliedReservationsPerWeek,
+    {
+      path: ["suitableTimeRanges"],
+      message:
+        "At least as many suitable time ranges as applied reservations per week",
+    }
+  );
 
 function transformApplicationSectionPage2(
   values: ApplicationSectionPage2FormValue
@@ -139,21 +179,23 @@ function transformApplicationSectionPage2(
 function convertApplicationSectionPage2(
   section: SectionTypePage2
 ): ApplicationSectionPage2FormValue {
+  const reservationUnitPk =
+    section.reservationUnitOptions.find(() => true)?.reservationUnit.pk ?? 0;
+  const { name, appliedReservationsPerWeek } = section;
   return {
     pk: section.pk ?? 0,
-    name: section.name,
+    name,
     suitableTimeRanges: filterNonNullable(section.suitableTimeRanges).map(
       (timeRanges) => convertTimeRange(timeRanges)
     ),
-    minDuration: section.reservationMinDuration ?? 0,
-    reservationUnitPk:
-      section.reservationUnitOptions[0].reservationUnit.pk ?? 0,
+    minDuration: section.reservationMinDuration,
+    appliedReservationsPerWeek,
+    reservationUnitPk,
     priority: 300,
   };
 }
-const ApplicationPage2Schema = z.object({
+export const ApplicationPage2Schema = z.object({
   pk: z.number(),
-  // applicantType: ApplicantTypeSchema.optional(),
   applicationSections: z.array(ApplicationSectionPage2Schema),
 });
 

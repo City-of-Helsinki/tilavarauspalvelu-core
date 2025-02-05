@@ -27,6 +27,7 @@ import {
 } from "./module";
 import { successToast } from "common/src/common/toast";
 import { type ApplicationPage2Query } from "@/gql/gql-types";
+import { fontBold } from "common";
 
 // TODO fragment
 type ApplicationT = NonNullable<ApplicationPage2Query["application"]>;
@@ -42,7 +43,7 @@ type Props = {
 };
 
 const CalendarHead = styled.div`
-  font-family: var(--font-bold);
+  ${fontBold}
   font-size: var(--fontsize-body-l);
   text-align: center;
   padding: var(--spacing-2-xs) 0;
@@ -286,8 +287,6 @@ const LegendBox = styled.div<{ type: string }>`
   }
 `;
 
-const TimePreviewContainer = styled.div``;
-
 const StyledNotification = styled(Notification)`
   margin-top: var(--spacing-m);
 `;
@@ -346,7 +345,11 @@ export function TimeSelector({
   const setSelectorData = (selected: Cell[][][]) => {
     const formVals = covertCellsToTimeRange(selected);
     for (const i of formVals.keys()) {
-      setValue(`applicationSections.${i}.suitableTimeRanges`, formVals[i]);
+      setValue(`applicationSections.${i}.suitableTimeRanges`, formVals[i], {
+        shouldDirty: true,
+        shouldValidate: true,
+        shouldTouch: true,
+      });
     }
   };
 
@@ -411,7 +414,8 @@ export function TimeSelector({
     filterNonNullable(watch("applicationSections")).length > 1;
 
   return (
-    <Flex>
+    // NOTE flex inside a grid container breaks overflow-x
+    <Flex style={{ display: "grid" }}>
       <StyledNotification
         label={t("application:Page2.info")}
         size={NotificationSize.Small}
@@ -461,9 +465,9 @@ export function TimeSelector({
           {t("application:Page2.resetTimes")}
         </ResetButton>
       </LegendContainer>
-      <TimePreviewContainer data-testid={`time-selector__preview-${index}`}>
+      <div data-testid={`time-selector__preview-${index}`}>
         <TimePreview index={index} />
-      </TimePreviewContainer>
+      </div>
       {enableCopyCells && (
         <div>
           <Button
@@ -476,6 +480,7 @@ export function TimeSelector({
           </Button>
         </div>
       )}
+      <ErrorMessage index={index} />
     </Flex>
   );
 }
@@ -516,5 +521,31 @@ function OptionSelector({
         options={reservationUnitOptions}
       />
     </OptionWrapper>
+  );
+}
+
+function ErrorMessage({ index }: { index: number }): JSX.Element | null {
+  const { t } = useTranslation();
+  const { getFieldState } = useFormContext<ApplicationPage2FormValues>();
+  const fieldName = `applicationSections.${index}.suitableTimeRanges` as const;
+  const suitableTimeErrors = getFieldState(fieldName)?.error;
+  if (suitableTimeErrors == null) {
+    return null;
+  }
+  const errorMsg = suitableTimeErrors.message;
+  const msg = errorMsg
+    ? t(`application:Page2.errors.${errorMsg}`)
+    : t("errors:general_error");
+
+  return (
+    <Notification
+      type="alert"
+      // TODO do we need the title?
+      label={t("application:Page2.errors.title")}
+      closeButtonLabelText={t("common:close")}
+      data-testid="application__page2--notification-min-duration"
+    >
+      {msg}
+    </Notification>
   );
 }
