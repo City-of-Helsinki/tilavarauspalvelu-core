@@ -97,6 +97,7 @@ class ApplicationSendSerializer(NestingModelSerializer):
 
         self.validate_application_sections(errors)
         self.validate_applicant(errors)
+        self.validate_user(self.instance.user, errors)
 
         status = self.instance.status
         if not status.can_send:
@@ -311,6 +312,14 @@ class ApplicationSendSerializer(NestingModelSerializer):
             # and thus filled out the billing address information.
             if self.instance.billing_address is not None:
                 self.validate_billing_address(errors)
+
+    def validate_user(self, user: User, errors: defaultdict[str, list[str]]) -> None:
+        if user.actions.is_ad_user or user.actions.is_of_age:
+            return
+
+        msg = "Application can only be sent by an adult reservee"
+        errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+        return
 
     def save(self, **kwargs: Any) -> Application:
         self.instance.sent_date = local_datetime()

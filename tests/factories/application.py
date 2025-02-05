@@ -131,6 +131,7 @@ class ApplicationFactory(GenericDjangoModelFactory[Application]):
             "applicant_type": ApplicantTypeChoice.INDIVIDUAL,
             "cancelled_date": None,
             "sent_date": None,
+            "user__date_of_birth": datetime.date(1980, 1, 1),
             **kwargs,
         }
 

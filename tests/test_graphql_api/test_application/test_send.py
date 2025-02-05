@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 
 import pytest
+from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
 from tilavarauspalvelu.integrations.email.main import EmailService
@@ -737,3 +738,16 @@ def test_send_application__company_applicant__identifier_missing(graphql):
     assert response.field_error_messages() == [
         "Application organisation must have an identifier.",
     ]
+
+
+@freeze_time("2024-01-01")
+def test_send_application__user_is_not_adult(graphql):
+    application = ApplicationFactory.create_application_ready_for_sending(
+        user__date_of_birth=datetime.date(2020, 1, 1),
+    )
+
+    graphql.login_with_superuser()
+    response = graphql(SEND_MUTATION, input_data={"pk": application.pk})
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Application can only be sent by an adult reservee"]
