@@ -94,13 +94,13 @@
     "primarySchedules": "Prioriterade tidsönskemål",
     "secondarySchedules": "Alternativa tidsönskemål",
     "notification": {
-      "copyCells": "Kopieringen av tiderna till alla bokningsönskemål lyckades",
-      "minDuration": {
-        "title": "Dina tidsönskemål överensstämmer inte med bokningens varaktighet",
-        "bodySingle": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
-        "body_one": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
-        "body_other": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg."
-      }
+      "copyCells": "Kopieringen av tiderna till alla bokningsönskemål lyckades"
+    },
+    "errors": {
+      "title": "Dina tidsönskemål överensstämmer inte med bokningens varaktighet",
+      "Suitable time range must be at least as long as the minimum duration": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
+      "At least as many suitable time ranges as applied reservations per week": "Ange flera tidsönskemål i kalendern eller minska antalet bokningar per vecka i föregående steg.",
+      "Array must contain at least 1 element(s)": "Ange minst en tid för alla säsongbokningar"
     }
   },
   "Page3": {

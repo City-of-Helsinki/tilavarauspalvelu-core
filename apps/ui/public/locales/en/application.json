@@ -94,13 +94,13 @@
     "primarySchedules": "Preferred time slots",
     "secondarySchedules": "Other time slots",
     "notification": {
-      "copyCells": "Times successfully copied for all booking requests",
-      "minDuration": {
-        "title": "Your selected time slots do not correspond to the duration of your booking",
-        "bodySingle": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
-        "body_one": "Select more time slots from the calendar of {{title}} or shorten the minimum duration selected in the previous step of the application.",
-        "body_other": "Select more time slots from the calendar of {{title}} or shorten the minimum duration selected in the previous step of the application."
-      }
+      "copyCells": "Times successfully copied for all booking requests"
+    },
+    "errors": {
+      "title": "Your selected time slots do not correspond to the duration of your booking",
+      "Suitable time range must be at least as long as the minimum duration": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
+      "At least as many suitable time ranges as applied reservations per week": "Select more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
+      "Array must contain at least 1 element(s)": "Valitse kalenterista aikatoiveita"
     }
   },
   "Page3": {

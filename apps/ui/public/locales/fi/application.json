@@ -95,13 +95,13 @@
     "primarySchedules": "Ensisijaiset aikatoiveet",
     "secondarySchedules": "Muut aikatoiveet",
     "notification": {
-      "copyCells": "Ajat kopioitu onnistuneesti kaikille varaustoiveille",
-      "minDuration": {
-        "title": "Ilmoitetut aikatoiveet eivät vastaa varauksen kestoa",
-        "bodySingle": "Valitse kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
-        "body_one": "Valitse varauksen {{title}} kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
-        "body_other": "Valitse varausten {{title}} kalentereista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa."
-      }
+      "copyCells": "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
+    },
+    "errors": {
+      "title": "Ilmoitetut aikatoiveet eivät vastaa varauksen kestoa",
+      "Suitable time range must be at least as long as the minimum duration": "Valitse kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
+      "At least as many suitable time ranges as applied reservations per week": "Valitse kalenterista lisää aikatoiveita tai vähennä hakemuksen edellisessä vaiheessa valittua varausten määrää viikossa.",
+      "Array must contain at least 1 element(s)": "Valitse kalenterista aikatoiveita"
     }
   },
   "Page3": {
