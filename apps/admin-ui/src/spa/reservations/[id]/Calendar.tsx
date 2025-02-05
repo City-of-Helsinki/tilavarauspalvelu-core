@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { forwardRef, type Ref, useState } from "react";
 import CommonCalendar, { CalendarEvent } from "common/src/calendar/Calendar";
 import { Toolbar, ToolbarBtn } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
@@ -14,8 +14,9 @@ import { Legend, LegendsWrapper } from "@/component/Legend";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
 import { getEventBuffers } from "common/src/calendar/util";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, toNumber } from "common/src/helpers";
 import VisibleIfPermission from "@/component/VisibleIfPermission";
+import { useSearchParams } from "react-router-dom";
 
 // TODO fragment
 type ReservationType = Omit<
@@ -27,7 +28,6 @@ export type CalendarEventType = CalendarEvent<ReservationType>;
 type Props = {
   reservation: ReservationType;
   refetch: (focusDate?: Date) => void;
-  selected?: ReservationType;
   focusDate: Date;
   events: Array<CalendarEventType>;
 };
@@ -47,16 +47,17 @@ type WeekOptions = "day" | "week" | "month";
 /// @param selected (for recurring only) different styling
 /// @param focusDate date to show in the calendar
 // TODO combine with the one in my-unit/ReservationUnitCalendar (without the time change button)
-function Calendar({
-  reservation,
-  selected,
-  refetch,
-  focusDate,
-  events: eventsAll,
-}: Props): JSX.Element {
+export const Calendar = forwardRef(function Calendar(
+  { reservation, refetch, focusDate, events: eventsAll }: Props,
+  ref: Ref<HTMLDivElement>
+): JSX.Element {
   const { t } = useTranslation();
   const { setModalContent } = useModal();
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
+
+  const [searchParams] = useSearchParams();
+  const selected = toNumber(searchParams.get("selected"));
+  const selectedEvent = eventsAll.find((e) => e.event?.pk === selected);
 
   // Because the calendar is fixed to 6 - 24 interval anything outside it causes rendering artefacts.
   // TODO this is common problem in the UI
@@ -95,7 +96,7 @@ function Calendar({
     : [];
 
   return (
-    <Container>
+    <Container ref={ref}>
       <CommonCalendar<ReservationType>
         events={[...events, ...eventBuffers]}
         toolbarComponent={(props) => (
@@ -115,7 +116,7 @@ function Calendar({
         )}
         showToolbar
         begin={focusDate}
-        eventStyleGetter={eventStyleGetter(reservation, selected)}
+        eventStyleGetter={eventStyleGetter(reservation, selectedEvent?.event)}
         onNavigate={(d: Date) => {
           refetch(d);
         }}
@@ -133,6 +134,6 @@ function Calendar({
       </LegendsWrapper>
     </Container>
   );
-}
+});
 
 export default Calendar;

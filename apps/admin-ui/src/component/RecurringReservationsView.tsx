@@ -4,7 +4,6 @@ import { format } from "date-fns";
 import {
   ReservationStateChoice,
   type ReservationQuery,
-  type RecurringReservationQuery,
   useRecurringReservationQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
@@ -26,14 +25,9 @@ import {
   isPossibleToEdit,
 } from "@/modules/reservationModificationRules";
 
-type RecurringReservationType = NonNullable<
-  RecurringReservationQuery["recurringReservation"]
->;
-type ReservationType = NonNullable<RecurringReservationType["reservations"]>[0];
-
 type Props = {
   recurringPk: number;
-  onSelect?: (selected: ReservationType) => void;
+  onSelect?: (selected: number) => void;
   onChange?: () => Promise<ApolloQueryResult<ReservationQuery>>;
   onReservationUpdated?: () => void;
   // optional reservation to copy when creating a new reservation
@@ -142,11 +136,16 @@ export function RecurringReservationsView({
       );
     }
 
-    if (onSelect && x.state === ReservationStateChoice.Confirmed) {
+    const { pk } = x;
+    if (
+      onSelect &&
+      x.state === ReservationStateChoice.Confirmed &&
+      pk != null
+    ) {
       buttons.push(
         <ReservationListButton
           key="show"
-          callback={() => onSelect(x)}
+          callback={() => onSelect(pk)}
           type="show"
           t={t}
         />

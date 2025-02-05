@@ -32,11 +32,9 @@ export function ReservationListButton({
   switch (type) {
     case "show":
       return (
-        <a href="#reservation-calendar" style={{ textDecoration: "none" }}>
-          <Button key={type} {...btnCommon} iconStart={<IconClock />}>
-            {t("ReservationsListButton.showInCalendar")}
-          </Button>
-        </a>
+        <Button key={type} {...btnCommon} iconStart={<IconClock />}>
+          {t("ReservationsListButton.showInCalendar")}
+        </Button>
       );
     case "deny":
     case "remove":

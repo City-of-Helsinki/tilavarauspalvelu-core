@@ -2,7 +2,7 @@ import { type ApolloQueryResult } from "@apollo/client";
 import { trim } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import type { TFunction } from "i18next";
 import { add, startOfISOWeek } from "date-fns";
@@ -260,10 +260,6 @@ function TimeBlock({
   reservation: ReservationType;
   onReservationUpdated: () => Promise<ApolloQueryResult<ReservationQuery>>;
 }>): JSX.Element {
-  const [selected, setSelected] = useState<ReservationType | undefined>(
-    undefined
-  );
-
   const { t } = useTranslation();
 
   // date focus rules for Calendar
@@ -285,10 +281,27 @@ function TimeBlock({
     new Date(reservation.begin) > new Date() ? reservation : nextReservation;
 
   const [focusDate, setFocusDate] = useState<Date>(
-    maybeStringToDate(selected?.begin) ??
-      onlyFutureDates(maybeStringToDate(shownReservation?.begin)) ??
-      new Date()
+    onlyFutureDates(maybeStringToDate(shownReservation?.begin)) ?? new Date()
   );
+
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const setSelected = (pk: number) => {
+    const params = new URLSearchParams(searchParams);
+    if (pk > 0) {
+      params.set("selected", pk.toString());
+      setSearchParams(params, { replace: true });
+      const selectedReservation = reservations.find((x) => x.pk === pk);
+      if (selectedReservation) {
+        setFocusDate(new Date(selectedReservation.begin));
+        calendarRef.current?.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      params.delete("selected");
+      setSearchParams(params, { replace: true });
+    }
+  };
 
   // No month view so always query the whole week even if a single day is selected
   // to avoid spamming queries and having to deal with start of day - end of day.
@@ -325,9 +338,7 @@ function TimeBlock({
         >
           <RecurringReservationsView
             recurringPk={reservation.recurringReservation.pk}
-            // TODO check how this works and fix types
-            // e.g. find the least common denominator between the two types and fragment that
-            onSelect={(r) => setSelected(r as ReservationType)}
+            onSelect={setSelected}
             onReservationUpdated={handleChanged}
             onChange={handleChanged}
             reservationToCopy={reservation}
@@ -340,8 +351,8 @@ function TimeBlock({
         id="reservation__calendar"
       >
         <Calendar
+          ref={calendarRef}
           reservation={reservation}
-          selected={selected}
           focusDate={focusDate}
           refetch={(d) => {
             onReservationUpdated();
