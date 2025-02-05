@@ -1178,6 +1178,7 @@ export enum LoginMethod {
 }
 
 export type Mutation = {
+  addReservationToSeries?: Maybe<ReservationSeriesAddMutationPayload>;
   adjustReservationTime?: Maybe<ReservationAdjustTimeMutationPayload>;
   approveReservation?: Maybe<ReservationApproveMutationPayload>;
   cancelAllApplicationSectionReservations?: Maybe<ApplicationSectionReservationCancellationMutationPayload>;
@@ -1224,6 +1225,8 @@ export type Mutation = {
   setApplicationRoundHandled?: Maybe<SetApplicationRoundHandledMutationPayload>;
   setApplicationRoundResultsSent?: Maybe<SetApplicationRoundResultsSentMutationPayload>;
   staffAdjustReservationTime?: Maybe<ReservationStaffAdjustTimeMutationPayload>;
+  staffChangeReservationAccessCode?: Maybe<ReservationStaffChangeAccessCodeMutationPayload>;
+  staffRepairReservationAccessCode?: Maybe<ReservationStaffRepairAccessCodeMutationPayload>;
   staffReservationModify?: Maybe<ReservationStaffModifyMutationPayload>;
   updateApplication?: Maybe<ApplicationUpdateMutationPayload>;
   updateApplicationSection?: Maybe<ApplicationSectionUpdateMutationPayload>;
@@ -1242,6 +1245,10 @@ export type Mutation = {
   updateSpace?: Maybe<SpaceUpdateMutationPayload>;
   updateStaffUser?: Maybe<UserStaffUpdateMutationPayload>;
   updateUnit?: Maybe<UnitUpdateMutationPayload>;
+};
+
+export type MutationAddReservationToSeriesArgs = {
+  input: ReservationSeriesAddMutationInput;
 };
 
 export type MutationAdjustReservationTimeArgs = {
@@ -1418,6 +1425,14 @@ export type MutationSetApplicationRoundResultsSentArgs = {
 
 export type MutationStaffAdjustReservationTimeArgs = {
   input: ReservationStaffAdjustTimeMutationInput;
+};
+
+export type MutationStaffChangeReservationAccessCodeArgs = {
+  input: ReservationStaffChangeAccessCodeMutationInput;
+};
+
+export type MutationStaffRepairReservationAccessCodeArgs = {
+  input: ReservationStaffRepairAccessCodeMutationInput;
 };
 
 export type MutationStaffReservationModifyArgs = {
@@ -1640,6 +1655,18 @@ export type PersonSerializerInput = {
   lastName: Scalars["String"]["input"];
   phoneNumber?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
+export type PindoraInfoType = {
+  accessCode: Scalars["String"]["output"];
+  accessCodeBeginsAt: Scalars["DateTime"]["output"];
+  accessCodeEndsAt: Scalars["DateTime"]["output"];
+  accessCodeGeneratedAt: Scalars["DateTime"]["output"];
+  accessCodeIsActive: Scalars["Boolean"]["output"];
+  accessCodeKeypadUrl: Scalars["String"]["output"];
+  accessCodePhoneNumber: Scalars["String"]["output"];
+  accessCodeSmsMessage: Scalars["String"]["output"];
+  accessCodeSmsNumber: Scalars["String"]["output"];
 };
 
 /** An enumeration. */
@@ -2853,6 +2880,10 @@ export type ReservationMetadataSetNodeEdge = {
 };
 
 export type ReservationNode = Node & {
+  accessCodeGeneratedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  accessCodeIsActive: Scalars["Boolean"]["output"];
+  accessCodeShouldBeActive?: Maybe<Scalars["Boolean"]["output"]>;
+  accessType: AccessType;
   /** Which reservation units' reserveability is affected by this reservation? */
   affectedReservationUnits?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
   ageGroup?: Maybe<AgeGroupNode>;
@@ -2888,6 +2919,8 @@ export type ReservationNode = Node & {
   /** @deprecated Please use to 'paymentOrder' instead. */
   order?: Maybe<PaymentOrderNode>;
   paymentOrder: Array<PaymentOrderNode>;
+  /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized. */
+  pindoraInfo?: Maybe<PindoraInfoType>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
   priceNet?: Maybe<Scalars["Decimal"]["output"]>;
@@ -3092,6 +3125,18 @@ export type ReservationRequiresHandlingMutationPayload = {
   state?: Maybe<ReservationStateChoice>;
 };
 
+export type ReservationSeriesAddMutationInput = {
+  begin: Scalars["DateTime"]["input"];
+  bufferTimeAfter?: InputMaybe<Scalars["String"]["input"]>;
+  bufferTimeBefore?: InputMaybe<Scalars["String"]["input"]>;
+  end: Scalars["DateTime"]["input"];
+  pk: Scalars["Int"]["input"];
+};
+
+export type ReservationSeriesAddMutationPayload = {
+  pk?: Maybe<Scalars["Int"]["output"]>;
+};
+
 export type ReservationSeriesCreateMutationInput = {
   abilityGroup?: InputMaybe<Scalars["Int"]["input"]>;
   ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
@@ -3184,7 +3229,6 @@ export type ReservationSeriesReservationCreateSerializerInput = {
   reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeId?: InputMaybe<Scalars["String"]["input"]>;
   reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reserveeLanguage?: InputMaybe<ReserveeLanguage>;
   reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
@@ -3226,6 +3270,16 @@ export type ReservationStaffAdjustTimeMutationPayload = {
   end?: Maybe<Scalars["DateTime"]["output"]>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   state?: Maybe<ReservationStateChoice>;
+};
+
+export type ReservationStaffChangeAccessCodeMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type ReservationStaffChangeAccessCodeMutationPayload = {
+  accessCodeGeneratedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  accessCodeIsActive?: Maybe<Scalars["Boolean"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationStaffCreateMutationInput = {
@@ -3328,7 +3382,6 @@ export type ReservationStaffModifyMutationInput = {
   reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeId?: InputMaybe<Scalars["String"]["input"]>;
   reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reserveeLanguage?: InputMaybe<ReserveeLanguage>;
   reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
@@ -3369,7 +3422,6 @@ export type ReservationStaffModifyMutationPayload = {
   reserveeFirstName?: Maybe<Scalars["String"]["output"]>;
   reserveeId?: Maybe<Scalars["String"]["output"]>;
   reserveeIsUnregisteredAssociation?: Maybe<Scalars["Boolean"]["output"]>;
-  reserveeLanguage?: Maybe<ReserveeLanguage>;
   reserveeLastName?: Maybe<Scalars["String"]["output"]>;
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
@@ -3378,6 +3430,16 @@ export type ReservationStaffModifyMutationPayload = {
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
   type?: Maybe<ReservationTypeChoice>;
   unitPrice?: Maybe<Scalars["Decimal"]["output"]>;
+};
+
+export type ReservationStaffRepairAccessCodeMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type ReservationStaffRepairAccessCodeMutationPayload = {
+  accessCodeGeneratedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  accessCodeIsActive?: Maybe<Scalars["Boolean"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** An enumeration. */
@@ -3478,6 +3540,9 @@ export enum ReservationUnitCancellationRuleOrderingChoices {
 }
 
 export type ReservationUnitCreateMutationInput = {
+  accessType?: InputMaybe<AccessType>;
+  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
+  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
   allowReservationsWithoutOpeningHours?: InputMaybe<
     Scalars["Boolean"]["input"]
   >;
@@ -3557,6 +3622,9 @@ export type ReservationUnitCreateMutationInput = {
 };
 
 export type ReservationUnitCreateMutationPayload = {
+  accessType?: Maybe<AccessType>;
+  accessTypeEndDate?: Maybe<Scalars["Date"]["output"]>;
+  accessTypeStartDate?: Maybe<Scalars["Date"]["output"]>;
   allowReservationsWithoutOpeningHours?: Maybe<Scalars["Boolean"]["output"]>;
   applicationRoundTimeSlots?: Maybe<Array<Maybe<ApplicationRoundTimeSlotNode>>>;
   authentication?: Maybe<Authentication>;
@@ -4068,6 +4136,9 @@ export enum ReservationUnitTypeOrderingChoices {
 }
 
 export type ReservationUnitUpdateMutationInput = {
+  accessType?: InputMaybe<AccessType>;
+  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
+  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
   allowReservationsWithoutOpeningHours?: InputMaybe<
     Scalars["Boolean"]["input"]
   >;
@@ -4147,6 +4218,9 @@ export type ReservationUnitUpdateMutationInput = {
 };
 
 export type ReservationUnitUpdateMutationPayload = {
+  accessType?: Maybe<AccessType>;
+  accessTypeEndDate?: Maybe<Scalars["Date"]["output"]>;
+  accessTypeStartDate?: Maybe<Scalars["Date"]["output"]>;
   allowReservationsWithoutOpeningHours?: Maybe<Scalars["Boolean"]["output"]>;
   applicationRoundTimeSlots?: Maybe<Array<Maybe<ApplicationRoundTimeSlotNode>>>;
   authentication?: Maybe<Authentication>;
@@ -4289,17 +4363,6 @@ export type ReservationWorkingMemoMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
   workingMemo?: Maybe<Scalars["String"]["output"]>;
 };
-
-/** An enumeration. */
-export enum ReserveeLanguage {
-  A = "A_",
-  /** Englanti */
-  En = "EN",
-  /** Suomi */
-  Fi = "FI",
-  /** Ruotsi */
-  Sv = "SV",
-}
 
 /** An enumeration. */
 export enum ReserveeType {
@@ -5055,7 +5118,6 @@ export type UpdateReservationSeriesReservationUpdateSerializerInput = {
   reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeId?: InputMaybe<Scalars["String"]["input"]>;
   reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reserveeLanguage?: InputMaybe<ReserveeLanguage>;
   reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
   reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;

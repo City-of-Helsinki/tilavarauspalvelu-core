@@ -137,8 +137,8 @@ function RecurringReservationForm({
     // TODO onBlur doesn't work properly we have to submit the form to get validation errors
     mode: "onBlur",
     defaultValues: {
-      bufferTimeAfter: false,
-      bufferTimeBefore: false,
+      enableBufferTimeAfter: false,
+      enableBufferTimeBefore: false,
       repeatPattern: "weekly",
     },
     resolver: zodResolver(RecurringReservationFormSchema(interval)),
@@ -202,7 +202,11 @@ function RecurringReservationForm({
 
   const navigate = useNavigate();
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async ({
+    enableBufferTimeBefore,
+    enableBufferTimeAfter,
+    ...data
+  }: FormValues) => {
     setLocalError(null);
 
     const skipDates = removedReservations
@@ -220,10 +224,10 @@ function RecurringReservationForm({
     }
 
     const buffers = {
-      before: data.bufferTimeBefore
+      before: enableBufferTimeBefore
         ? getBufferTime(reservationUnit.bufferTimeBefore, data.type)
         : 0,
-      after: data.bufferTimeAfter
+      after: enableBufferTimeAfter
         ? getBufferTime(reservationUnit.bufferTimeAfter, data.type)
         : 0,
     };

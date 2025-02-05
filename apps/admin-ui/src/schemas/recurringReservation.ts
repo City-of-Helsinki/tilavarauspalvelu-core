@@ -42,8 +42,8 @@ const RecurringReservationFormSchema = z
     type: ReservationTypeSchema,
     seriesName: z.string().optional(),
     comments: z.string().max(500).optional(),
-    bufferTimeBefore: z.boolean().optional(),
-    bufferTimeAfter: z.boolean().optional(),
+    enableBufferTimeBefore: z.boolean().optional(),
+    enableBufferTimeAfter: z.boolean().optional(),
   })
   .merge(timeSelectionSchemaBase);
 

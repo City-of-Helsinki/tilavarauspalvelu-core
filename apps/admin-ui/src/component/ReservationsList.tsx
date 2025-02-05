@@ -173,6 +173,9 @@ function AddNewReservationButton({
   };
 
   const handleClick = () => {
+    if (reservationToCopy == null) {
+      return;
+    }
     setModalContent(
       <NewReservationModal
         onAccept={handleAccept}

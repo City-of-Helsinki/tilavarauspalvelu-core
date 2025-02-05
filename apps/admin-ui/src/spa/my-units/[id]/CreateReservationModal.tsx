@@ -13,7 +13,6 @@ import { useTranslation } from "react-i18next";
 import {
   type ReservationStaffCreateMutationInput,
   type ReservationUnitQuery,
-  ReservationTypeChoice,
   useCreateStaffReservationMutation,
   useReservationUnitQuery,
 } from "@gql/gql-types";
@@ -29,7 +28,12 @@ import {
 } from "@/schemas";
 import { breakpoints } from "common/src/common/style";
 import { useCheckCollisions } from "@/hooks";
-import { dateTime, getNormalizedInterval, parseDateTimeSafe } from "@/helpers";
+import {
+  dateTime,
+  getBufferTime,
+  getNormalizedInterval,
+  parseDateTimeSafe,
+} from "@/helpers";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
@@ -302,19 +306,17 @@ function DialogContent({
         startTime,
         endTime,
         type,
-        bufferTimeBefore,
-        bufferTimeAfter,
+        enableBufferTimeBefore,
+        enableBufferTimeAfter,
         ...rest
       } = values;
 
-      const bufferBefore =
-        type !== ReservationTypeChoice.Blocked && bufferTimeBefore
-          ? reservationUnit.bufferTimeBefore
-          : 0;
-      const bufferAfter =
-        type !== ReservationTypeChoice.Blocked && bufferTimeAfter
-          ? reservationUnit.bufferTimeAfter
-          : 0;
+      const bufferBefore = enableBufferTimeBefore
+        ? getBufferTime(reservationUnit.bufferTimeBefore, type)
+        : 0;
+      const bufferAfter = enableBufferTimeAfter
+        ? getBufferTime(reservationUnit.bufferTimeAfter, type)
+        : 0;
       const input: ReservationStaffCreateMutationInput = {
         ...rest,
         reservationUnit: reservationUnit.pk,

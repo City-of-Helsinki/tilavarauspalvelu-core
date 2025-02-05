@@ -1355,6 +1355,9 @@ enum LoginMethod {
 }
 
 type Mutation {
+  addReservationToSeries(
+    input: ReservationSeriesAddMutationInput!
+  ): ReservationSeriesAddMutationPayload
   adjustReservationTime(
     input: ReservationAdjustTimeMutationInput!
   ): ReservationAdjustTimeMutationPayload
@@ -1485,6 +1488,12 @@ type Mutation {
   staffAdjustReservationTime(
     input: ReservationStaffAdjustTimeMutationInput!
   ): ReservationStaffAdjustTimeMutationPayload
+  staffChangeReservationAccessCode(
+    input: ReservationStaffChangeAccessCodeMutationInput!
+  ): ReservationStaffChangeAccessCodeMutationPayload
+  staffRepairReservationAccessCode(
+    input: ReservationStaffRepairAccessCodeMutationInput!
+  ): ReservationStaffRepairAccessCodeMutationPayload
   staffReservationModify(
     input: ReservationStaffModifyMutationInput!
   ): ReservationStaffModifyMutationPayload
@@ -1729,6 +1738,18 @@ input PersonSerializerInput {
   lastName: String!
   phoneNumber: String
   pk: Int
+}
+
+type PindoraInfoType {
+  accessCode: String!
+  accessCodeBeginsAt: DateTime!
+  accessCodeEndsAt: DateTime!
+  accessCodeGeneratedAt: DateTime!
+  accessCodeIsActive: Boolean!
+  accessCodeKeypadUrl: String!
+  accessCodePhoneNumber: String!
+  accessCodeSmsMessage: String!
+  accessCodeSmsNumber: String!
 }
 
 """
@@ -3115,6 +3136,10 @@ type ReservationMetadataSetNodeEdge {
 }
 
 type ReservationNode implements Node {
+  accessCodeGeneratedAt: DateTime
+  accessCodeIsActive: Boolean!
+  accessCodeShouldBeActive: Boolean
+  accessType: AccessType!
   """
   Which reservation units' reserveability is affected by this reservation?
   """
@@ -3154,6 +3179,10 @@ type ReservationNode implements Node {
   order: PaymentOrderNode
     @deprecated(reason: "Please use to 'paymentOrder' instead.")
   paymentOrder: [PaymentOrderNode!]!
+  """
+  Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized.
+  """
+  pindoraInfo: PindoraInfoType
   pk: Int
   price: Decimal
   priceNet: Decimal
@@ -3388,6 +3417,18 @@ type ReservationRequiresHandlingMutationPayload {
   state: ReservationStateChoice
 }
 
+input ReservationSeriesAddMutationInput {
+  begin: DateTime!
+  bufferTimeAfter: String
+  bufferTimeBefore: String
+  end: DateTime!
+  pk: Int!
+}
+
+type ReservationSeriesAddMutationPayload {
+  pk: Int
+}
+
 input ReservationSeriesCreateMutationInput {
   abilityGroup: Int
   ageGroup: Int
@@ -3480,7 +3521,6 @@ input ReservationSeriesReservationCreateSerializerInput {
   reserveeFirstName: String
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: ReserveeLanguage
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
@@ -3522,6 +3562,16 @@ type ReservationStaffAdjustTimeMutationPayload {
   end: DateTime
   pk: Int
   state: ReservationStateChoice
+}
+
+input ReservationStaffChangeAccessCodeMutationInput {
+  pk: Int!
+}
+
+type ReservationStaffChangeAccessCodeMutationPayload {
+  accessCodeGeneratedAt: DateTime
+  accessCodeIsActive: Boolean
+  pk: Int
 }
 
 input ReservationStaffCreateMutationInput {
@@ -3624,7 +3674,6 @@ input ReservationStaffModifyMutationInput {
   reserveeFirstName: String
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: ReserveeLanguage
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
@@ -3665,7 +3714,6 @@ type ReservationStaffModifyMutationPayload {
   reserveeFirstName: String
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: ReserveeLanguage
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String
@@ -3674,6 +3722,16 @@ type ReservationStaffModifyMutationPayload {
   taxPercentageValue: Decimal
   type: ReservationTypeChoice
   unitPrice: Decimal
+}
+
+input ReservationStaffRepairAccessCodeMutationInput {
+  pk: Int!
+}
+
+type ReservationStaffRepairAccessCodeMutationPayload {
+  accessCodeGeneratedAt: DateTime
+  accessCodeIsActive: Boolean
+  pk: Int
 }
 
 """
@@ -3826,6 +3884,9 @@ enum ReservationUnitCancellationRuleOrderingChoices {
 }
 
 input ReservationUnitCreateMutationInput {
+  accessType: AccessType
+  accessTypeEndDate: Date
+  accessTypeStartDate: Date
   allowReservationsWithoutOpeningHours: Boolean
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
   authentication: Authentication
@@ -3897,6 +3958,9 @@ input ReservationUnitCreateMutationInput {
 }
 
 type ReservationUnitCreateMutationPayload {
+  accessType: AccessType
+  accessTypeEndDate: Date
+  accessTypeStartDate: Date
   allowReservationsWithoutOpeningHours: Boolean
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
   authentication: Authentication
@@ -4452,6 +4516,9 @@ enum ReservationUnitTypeOrderingChoices {
 }
 
 input ReservationUnitUpdateMutationInput {
+  accessType: AccessType
+  accessTypeEndDate: Date
+  accessTypeStartDate: Date
   allowReservationsWithoutOpeningHours: Boolean
   applicationRoundTimeSlots: [UpdateApplicationRoundTimeSlotSerializerInput]
   authentication: Authentication
@@ -4523,6 +4590,9 @@ input ReservationUnitUpdateMutationInput {
 }
 
 type ReservationUnitUpdateMutationPayload {
+  accessType: AccessType
+  accessTypeEndDate: Date
+  accessTypeStartDate: Date
   allowReservationsWithoutOpeningHours: Boolean
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
   authentication: Authentication
@@ -4664,25 +4734,6 @@ input ReservationWorkingMemoMutationInput {
 type ReservationWorkingMemoMutationPayload {
   pk: Int
   workingMemo: String
-}
-
-"""
-An enumeration.
-"""
-enum ReserveeLanguage {
-  A_
-  """
-  Englanti
-  """
-  EN
-  """
-  Suomi
-  """
-  FI
-  """
-  Ruotsi
-  """
-  SV
 }
 
 """
@@ -5580,7 +5631,6 @@ input UpdateReservationSeriesReservationUpdateSerializerInput {
   reserveeFirstName: String
   reserveeId: String
   reserveeIsUnregisteredAssociation: Boolean
-  reserveeLanguage: ReserveeLanguage
   reserveeLastName: String
   reserveeOrganisationName: String
   reserveePhone: String

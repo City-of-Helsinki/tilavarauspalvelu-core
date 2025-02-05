@@ -14,10 +14,10 @@ import { type TFunction } from "i18next";
 import {
   type ChangeReservationTimeFragment,
   ReservationTypeChoice,
-  useCreateStaffReservationMutation,
   useStaffAdjustReservationTimeMutation,
   type ReservationQuery,
-  type ReservationStaffCreateMutationInput,
+  type ReservationSeriesAddMutationInput,
+  useAddReservationToSeriesMutation,
 } from "@gql/gql-types";
 import { FormProvider, UseFormReturn, useForm } from "react-hook-form";
 import { differenceInMinutes, format } from "date-fns";
@@ -30,10 +30,14 @@ import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { BufferToggles } from "@/component/BufferToggles";
 import { useCheckCollisions } from "@/hooks";
-import { getNormalizedInterval, parseDateTimeSafe } from "@/helpers";
+import {
+  getBufferTime,
+  getNormalizedInterval,
+  parseDateTimeSafe,
+} from "@/helpers";
 import { formatDateTimeRange } from "@/common/util";
 import { gql } from "@apollo/client";
-import { filterNonNullable, pick } from "common/src/helpers";
+import { filterNonNullable } from "common/src/helpers";
 import { errorToast, successToast } from "common/src/common/toast";
 
 const StyledForm = styled.form`
@@ -106,6 +110,14 @@ export const CHANGE_RESERVATION_TIME = gql`
       begin
       end
       state
+    }
+  }
+`;
+
+export const ADD_RESERVATION_TO_SERIES = gql`
+  mutation AddReservationToSeries($input: ReservationSeriesAddMutationInput!) {
+    addReservationToSeries(input: $input) {
+      pk
     }
   }
 `;
@@ -196,14 +208,8 @@ function DialogContent({
     start,
     end,
     buffers: {
-      before:
-        formType !== ReservationTypeChoice.Blocked && bufferTimeBefore
-          ? bufferTimeBefore
-          : 0,
-      after:
-        formType !== ReservationTypeChoice.Blocked && bufferTimeAfter
-          ? bufferTimeAfter
-          : 0,
+      before: getBufferTime(bufferTimeBefore, formType),
+      after: getBufferTime(bufferTimeAfter, formType),
     },
     reservationType: formType,
   });
@@ -305,8 +311,12 @@ function DialogContent({
   );
 }
 
+type ReservationToCopyT = Pick<
+  NonNullable<ReservationQuery["reservation"]>,
+  "type" | "reservationUnits" | "recurringReservation"
+>;
 export type NewReservationModalProps = CommonProps & {
-  reservationToCopy: ReservationQuery["reservation"];
+  reservationToCopy: ReservationToCopyT;
   onAccept: () => void;
 };
 
@@ -318,7 +328,6 @@ export function NewReservationModal({
   const { t } = useTranslation();
   const { isOpen } = useModal();
 
-  const { type } = reservationToCopy ?? {};
   const reservationUnit = reservationToCopy?.reservationUnits?.[0];
 
   // NOTE 0 => buffer disabled for this reservation, undefined => no buffers selected
@@ -335,74 +344,29 @@ export function NewReservationModal({
     defaultValues: {
       enableBufferTimeAfter: true,
       enableBufferTimeBefore: true,
-      // FIXME this is incorrect (they are created as part of a series)
-      // so we need to use the type from other reservations in that series
-      // TODO we can remove the type completely? correct?
+      // NOTE type is required because it overrides buffer times
       type: reservationToCopy?.type ?? ReservationTypeChoice.Staff,
     },
   });
 
-  // TODO for the create mutation we need to pass in at least the recurringReservationPk (from another reservation in the same series)
-  // but do we need to pass in also the metadata? i.e. copy all the fields from another reservation?
-  const [create] = useCreateStaffReservationMutation();
+  const [create] = useAddReservationToSeriesMutation();
 
   function createInput({
     begin,
     end,
     buffers,
-  }: MutationValues): ReservationStaffCreateMutationInput {
-    if (reservationToCopy == null) {
-      throw new Error("reservationToCopy missing");
-    }
-    const keys = [
-      "name",
-      "description",
-      "applyingForFreeOfCharge",
-      "billingAddressCity",
-      "billingAddressStreet",
-      "billingAddressZip",
-      "billingEmail",
-      "billingFirstName",
-      "billingLastName",
-      "billingPhone",
-      "freeOfChargeReason",
-      "numPersons",
-      "reserveeAddressCity",
-      "reserveeAddressStreet",
-      "reserveeAddressZip",
-      "reserveeEmail",
-      "reserveeFirstName",
-      "reserveeId",
-      "reserveeIsUnregisteredAssociation",
-      "reserveeLastName",
-      "reserveeOrganisationName",
-      "reserveePhone",
-    ] as const;
-    const homeCity = reservationToCopy.homeCity?.pk;
-    const purpose = reservationToCopy.purpose?.pk;
-    const ageGroup = reservationToCopy.ageGroup?.pk;
-    const metadata = pick(reservationToCopy, keys);
-    if (!reservationUnit?.pk) {
-      throw new Error("reservation unit pk missing");
-    }
-    if (type == null) {
-      throw new Error("type missing");
+  }: MutationValues): ReservationSeriesAddMutationInput {
+    if (reservationToCopy?.recurringReservation?.pk == null) {
+      throw new Error("recurring reservation pk missing");
     }
     return {
-      ...metadata,
+      pk: reservationToCopy?.recurringReservation?.pk,
       ...convertToApiFormat(begin, end),
-      homeCity,
-      purpose,
-      ageGroup,
-      bufferTimeAfter: buffers.after,
-      bufferTimeBefore: buffers.before,
-      reservationUnit: reservationUnit.pk,
-      type,
+      bufferTimeAfter: buffers.after?.toString(),
+      bufferTimeBefore: buffers.before?.toString(),
     };
   }
 
-  // TODO pass the type as a prop? it's available in the form
-  // but it doesn't need to be?
   const mutate = async (values: MutationValues) => {
     await create({
       variables: {
