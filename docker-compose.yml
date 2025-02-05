@@ -32,7 +32,7 @@ services:
     container_name: tvp-core
     image: tvp-core
     build:
-      context: .
+      context: backend/
       dockerfile: docker/Dockerfile
       args:
         DEPS: main,admin,celery,test,lint
@@ -42,7 +42,7 @@ services:
       redis:
         condition: service_healthy
     env_file:
-      - .env
+      - backend/.env
     environment:
       DJANGO_SETTINGS_ENVIRONMENT: Docker
     ports:
@@ -60,12 +60,12 @@ services:
       redis:
         condition: service_healthy
     build:
-      context: .
+      context: backend/
       dockerfile: docker/Dockerfile
       args:
         DEPS: main,admin,celery,test,lint
     env_file:
-      - .env
+      - backend/.env
     environment:
       DJANGO_SETTINGS_ENVIRONMENT: Docker
     entrypoint: /tvp/docker/worker.sh

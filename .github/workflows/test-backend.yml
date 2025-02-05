@@ -2,6 +2,8 @@ name: "Tests"
 
 on:
   push:
+    paths:
+      - backend/**
     branches:
       - main
   pull_request:
@@ -66,12 +68,14 @@ jobs:
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Test for migration issues"
+        working-directory: backend
         run: poetry run python manage.py makemigrations --check --no-color --no-input --dry-run
         env:
           DJANGO_SETTINGS_ENVIRONMENT: CI
           DATABASE_URL: postgis://tvp:tvp@localhost:5432/tvp
 
       - name: "Test for missing translation"
+        working-directory: backend
         run: poetry run python -m config.hooks.translations_done
         env:
           DJANGO_SETTINGS_ENVIRONMENT: CI
@@ -137,6 +141,7 @@ jobs:
           name: test_durations
 
       - name: "Run pytest with coverage"
+        working-directory: backend
         run: |
           poetry run coverage run \
             --branch \
@@ -161,7 +166,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cov-${{ steps.artifact.outputs.artifact }}-${{ matrix.group }}
-          path: .coverage.${{ matrix.group }}
+          path: ./backend/.coverage.${{ matrix.group }}
           if-no-files-found: error
           retention-days: 1
           include-hidden-files: true
@@ -190,6 +195,7 @@ jobs:
       - name: "Download coverage artefacts"
         uses: actions/download-artifact@v4
         with:
+          path: ./backend
           pattern: cov-${{ steps.artifact.outputs.artifact }}-*
           merge-multiple: true
 
@@ -200,15 +206,20 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: "Install coverage"
+        working-directory: backend
         run: pip install coverage
 
       - name: "Combine coverage reports and generate XML report"
+        working-directory: backend
         run: |
           coverage combine
           coverage xml
+          sed -i 's@<source>@<source>backend/@g' coverage.xml
 
       - name: "SonarCloud Scan"
         uses: SonarSource/sonarqube-scan-action@v4
+        with:
+          projectBaseDir: ./backend
         # Skip analysis for all bots
         if: ${{ ! contains(fromJSON(vars.BOTS), github.event.pull_request.user.login) }}
         env:

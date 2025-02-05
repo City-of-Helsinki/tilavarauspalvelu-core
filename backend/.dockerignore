@@ -1,0 +1,28 @@
+# configs
+.editorconfig
+.idea
+.vscode
+pytest.ini
+sonar-project.properties
+
+# caches
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+
+# tests
+**/tests*
+!tests/factories*
+!tests/plugins.py
+
+# celery
+broker/*
+control/*
+
+# coverage
+.coverage
+
+# docker
+.dockerignore
+docker/Dockerfile
+docker/Dockerfile.final

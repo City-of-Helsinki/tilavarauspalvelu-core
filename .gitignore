@@ -1,36 +1,62 @@
+# environments
+**/node_modules
+**/.pnpm
+**/.pnp.js
+
+# yarn
+**/.yarn
+**/.yarnrc.yml
+
+# debug
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
+# local certs
+**/certificates
+
+# caches
+**/.turbo
+**/.next
+**/__pycache__
+**/.cache
+**/.pytest_cache
+**/.ruff_cache
+
+# builds
+**/dist
+**/build
+**/out
+
+# local config
+**/.env.local
+**/.local
+**/.idea
+**/.vscode
+backend/local_settings.py
+backend/.env
+backend/pytest.ini
+
+# misc
+**/.DS_Store
+**/*.pem
+**/.eslintcache
+**/*.tsbuildinfo
 *~
-__pycache__
-db.sqlite3
+
+# translations
 *.mo
-*.sqlite
-data/
-exports/
-media/
-static/
-.django_secret
-*local_settings.py
-/venv*
-/.idea
+
+# backend generated static
+backend/media/
+backend/static/
+backend/staticroot/
+
+# coverage
 .coverage
 htmlcov
-.cache
-perf*csv
-/*hack*py
-*.egg-info
-/build
-/dist
-/src
-.env
-/.vscode
-.pytest_cache
-.DS_Store
-/staticroot/
-/broker
-celerybeat-schedule
-.python-version
-.tox
 coverage.xml
-control/*
-.ruff_cache
-pytest.ini
-dump.rdb
+
+# celery
+backend/broker*
+backend/control*

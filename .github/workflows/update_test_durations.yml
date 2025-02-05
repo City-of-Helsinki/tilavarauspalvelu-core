@@ -58,6 +58,7 @@ jobs:
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
       - name: "Run pytest with coverage"
+        working-directory: backend
         run: poetry run pytest --disable-warnings --store-durations
         env:
           DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
@@ -66,7 +67,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test_durations
-          path: .test_durations
+          path: ./backend/.test_durations
           if-no-files-found: error
           retention-days: 90
           include-hidden-files: true

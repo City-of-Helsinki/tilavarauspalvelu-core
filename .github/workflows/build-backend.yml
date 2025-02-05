@@ -2,6 +2,8 @@ name: "Build"
 
 on:
   push:
+    paths:
+      - backend/**
     branches:
       - main
     tags:
@@ -70,8 +72,8 @@ jobs:
     - name: "Build backend container"
       uses: docker/build-push-action@v6
       with:
-        context: .
-        file: docker/Dockerfile
+        context: backend/
+        file: backend/docker/Dockerfile
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}

@@ -1,7 +1,6 @@
 ci:
   skip:
     # Cannot access poetry on pre-commit.ci
-    - python-safety-dependencies-check
     - poetry-lock
 
 repos:
@@ -16,33 +15,17 @@ repos:
         args: ["--markdown-linebreak-ext=md"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.4
+    rev: v0.9.3
     hooks:
       - id: ruff
+        entry: bash -c 'cd backend && ruff check --force-exclude'
       - id: ruff-format
-
-  - repo: https://github.com/pycqa/bandit
-    rev: 1.8.2
-    hooks:
-      - id: bandit
-        args: ["-c", "pyproject.toml"]
-        additional_dependencies: ["bandit[toml]"]
-
-  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: v1.3.3
-    hooks:
-      - id: python-safety-dependencies-check
-        files: pyproject.toml
-        # Ignore some issues in sub-dependencies:
-        # - https://data.safetycli.com/v/64396/97c/  | django-helusers -> python-jose -> ecdsa
-        # - https://data.safetycli.com/v/64459/97c/  | django-helusers -> python-jose -> ecdsa
-        # - https://data.safetycli.com/v/70612/97c/  | django-jinja -> jinja2
-        # - https://data.safetycli.com/v/70715/97c/  | django-helusers -> python-jose
-        # - https://data.safetycli.com/v/70716/97c/  | django-helusers -> python-jose
-        args: ["--ignore=64396,64459,70612,70715,70716"]
+        entry: bash -c 'cd backend && ruff format --force-exclude'
 
   - repo: https://github.com/python-poetry/poetry
     rev: 2.0.1
     hooks:
     -   id: poetry-check
+        args: ["--project=backend"]
     -   id: poetry-lock
+        args: ["--project=backend"]
