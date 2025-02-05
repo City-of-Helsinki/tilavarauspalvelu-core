@@ -312,13 +312,17 @@ def test_application__filter__by_text_search__section_id(graphql):
         reservation_unit_option__application_section__application__organisation=None,
         reservation_unit_option__application_section__application__contact_person=None,
         reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__id=1,
         reservation_unit_option__application_section__name="foo",
+        reservation_unit_option__application_section__id=2,
     )
     AllocatedTimeSlotFactory.create(
         reservation_unit_option__application_section__application__organisation=None,
         reservation_unit_option__application_section__application__contact_person=None,
         reservation_unit_option__application_section__application__user=None,
+        reservation_unit_option__application_section__application__id=3,
         reservation_unit_option__application_section__name="bar",
+        reservation_unit_option__application_section__id=4,
     )
     graphql.login_with_superuser()
 
