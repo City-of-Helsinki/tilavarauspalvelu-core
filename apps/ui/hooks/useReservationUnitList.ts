@@ -1,20 +1,25 @@
-import { useSessionStorage } from "react-use";
 import type { ReservationUnitNode } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
+import { useSearchParams } from "next/navigation";
+import { useSearchModify } from "./useSearchValues";
 
 type NodeList = Pick<ReservationUnitNode, "pk">[];
 type Node = NonNullable<NodeList>[0];
 type ReservationUnitList = {
-  reservationUnits: Node[];
+  getReservationUnits: () => number[];
+  // TODO refactor to use pk instead of Node
   selectReservationUnit: (ru: Node) => void;
   containsReservationUnit: (ru: Node) => boolean;
   removeReservationUnit: (ru: Node) => void;
   clearSelections: () => void;
+  PARAM_NAME: string;
 };
 
 type HookVars = {
   reservationUnits?: NodeList;
 };
+
+const PARAM_NAME = "selectedReservationUnits";
 
 /// @param round filter the reservation units by the application round
 /// Problem with this is that the current system is not based on around requiring an application round
@@ -22,43 +27,52 @@ type HookVars = {
 export function useReservationUnitList(
   round: HookVars | undefined
 ): ReservationUnitList {
-  const [list, setList] = useSessionStorage<NodeList>(
-    "reservationUnitList",
-    []
-  );
+  const searchValues = useSearchParams();
+  const { handleRouteChange } = useSearchModify();
 
   const selectReservationUnit = (ru: Node) => {
-    setList([...list, ru]);
+    if (ru.pk == null) {
+      return;
+    }
+    const vals = new URLSearchParams(searchValues);
+    vals.append(PARAM_NAME, ru.pk.toString());
+    handleRouteChange(vals);
   };
 
   const removeReservationUnit = (ru: Node) => {
-    if (!list) {
+    if (!ru.pk) {
       return;
     }
-    setList(list.filter((x) => x.pk !== ru.pk));
+    const vals = new URLSearchParams(searchValues);
+    vals.delete(PARAM_NAME, ru.pk.toString());
+    handleRouteChange(vals);
   };
 
   const clearSelections = () => {
-    setList([]);
+    const vals = new URLSearchParams(searchValues);
+    vals.delete(PARAM_NAME);
+    handleRouteChange(vals);
   };
 
   const containsReservationUnit = (ru: Node): boolean => {
-    if (!list) {
+    if (ru.pk == null) {
       return false;
     }
-    return list.some((x) => x.pk === ru.pk);
+    return searchValues.has(PARAM_NAME, ru.pk.toString());
   };
 
-  const getReservationUnits = () => {
+  const getReservationUnits = (): number[] => {
+    const pks = searchValues
+      .getAll(PARAM_NAME)
+      .map(Number)
+      .filter(Number.isInteger);
     if (round) {
       const roundRuPks = filterNonNullable(
         round.reservationUnits?.map((ru) => ru.pk)
       );
-      return list.filter(
-        (ru) => ru.pk != null && roundRuPks.find((x) => x === ru.pk) != null
-      );
+      return pks.filter((pk) => roundRuPks.includes(pk));
     }
-    return list;
+    return pks;
   };
 
   return {
@@ -66,6 +80,7 @@ export function useReservationUnitList(
     containsReservationUnit,
     clearSelections,
     removeReservationUnit,
-    reservationUnits: getReservationUnits(),
+    getReservationUnits,
+    PARAM_NAME,
   };
 }

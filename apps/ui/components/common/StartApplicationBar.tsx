@@ -13,6 +13,7 @@ import ClientOnly from "common/src/ClientOnly";
 import { useRouter } from "next/router";
 import {
   type ApplicationCreateMutationInput,
+  ReservationUnitNode,
   useCreateApplicationMutation,
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
@@ -21,11 +22,8 @@ import { truncatedText } from "common/styles/cssFragments";
 import { useMedia } from "react-use";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { useDisplayError } from "@/hooks/useDisplayError";
-
-type Props = {
-  count: number;
-  clearSelections: () => void;
-};
+import { useReservationUnitList } from "@/hooks";
+import { useSearchParams } from "next/navigation";
 
 const BackgroundContainer = styled.div`
   position: fixed;
@@ -68,13 +66,21 @@ const DeleteButton = styled(Button).attrs({
   ${truncatedText}
 `;
 
-function StartApplicationBar({
-  count,
-  clearSelections,
-}: Props): JSX.Element | null {
+type NodeList = Pick<ReservationUnitNode, "pk">[];
+type Props = {
+  applicationRound: {
+    reservationUnits: NodeList;
+  };
+};
+
+function StartApplicationBar({ applicationRound }: Props): JSX.Element | null {
   const { t } = useTranslation();
   const router = useRouter();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
+
+  const { getReservationUnits, clearSelections, PARAM_NAME } =
+    useReservationUnitList(applicationRound);
+  const searchValues = useSearchParams();
 
   const [create, { loading: isSaving }] = useCreateApplicationMutation();
 
@@ -90,7 +96,13 @@ function StartApplicationBar({
 
       if (data?.createApplication?.pk) {
         const { pk } = data.createApplication;
-        router.replace(getApplicationPath(pk, "page1"));
+        const selected = searchValues.getAll(PARAM_NAME);
+        const forwardParams = new URLSearchParams();
+        for (const s of selected) {
+          forwardParams.append(PARAM_NAME, s);
+        }
+        const url = `${getApplicationPath(pk, "page1")}?${forwardParams.toString()}`;
+        router.replace(url);
       } else {
         throw new Error("create application mutation failed");
       }
@@ -108,6 +120,7 @@ function StartApplicationBar({
     }
   };
 
+  const count = getReservationUnits().length;
   // This breaks SSR because the server knowns nothing about client side stores
   // we can't fix it with CSS since it doesn't update properly
   if (count === 0) {

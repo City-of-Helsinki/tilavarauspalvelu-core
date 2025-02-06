@@ -46,8 +46,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
   const form = useFormContext<ApplicationPage1FormValues>();
   const { setValue, register, unregister, watch, handleSubmit } = form;
   // get the user selected defaults for reservationUnits field
-  const { reservationUnits: selectedReservationUnits } =
-    useReservationUnitList(applicationRound);
+  const { getReservationUnits } = useReservationUnitList(applicationRound);
 
   const applicationSections = watch("applicationSections");
 
@@ -97,7 +96,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
     register(`applicationSections.${nextIndex}.begin`);
     register(`applicationSections.${nextIndex}.end`);
     register(`applicationSections.${nextIndex}.reservationUnits`, {
-      value: filterNonNullable(selectedReservationUnits.map((ru) => ru.pk)),
+      value: filterNonNullable(getReservationUnits()),
     });
     register(`applicationSections.${nextIndex}.accordionOpen`, { value: true });
     register(`applicationSections.${nextIndex}.formKey`);
