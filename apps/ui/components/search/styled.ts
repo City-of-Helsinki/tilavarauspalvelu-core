@@ -43,10 +43,12 @@ export const BottomContainer = styled(Flex).attrs({
   $alignItems: "center",
   $marginTop: "m",
 })`
-  /* have to use flex-flow: otherwise on desktop the button will be split to the second line */
-  flex-flow: column nowrap;
-  @media (min-width: ${breakpoints.m}) {
-    flex-flow: row nowrap;
+  && {
+    /* have to use flex-flow: otherwise on desktop the button will be split to the second line */
+    flex-flow: column nowrap;
+    @media (min-width: ${breakpoints.m}) {
+      flex-flow: row nowrap;
+    }
   }
 `;
 

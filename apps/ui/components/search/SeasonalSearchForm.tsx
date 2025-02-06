@@ -98,7 +98,13 @@ export function SeasonalSearchForm({
     "reservationUnitTypes",
     "purposes",
   ] as const;
-  const hideList = ["id", "order", "sort", "ref"] as const;
+  const hideList = [
+    "id",
+    "order",
+    "sort",
+    "ref",
+    "selectedReservationUnits",
+  ] as const;
 
   return (
     <form noValidate onSubmit={handleSubmit(search)}>
@@ -170,13 +176,7 @@ export function SeasonalSearchForm({
         <StyledSubmitButton
           type="submit"
           variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
-          iconStart={
-            isLoading ? (
-              <LoadingSpinner small />
-            ) : (
-              <IconSearch aria-hidden="true" />
-            )
-          }
+          iconStart={isLoading ? <LoadingSpinner small /> : <IconSearch />}
           disabled={isLoading}
         >
           {t("searchForm:searchButton")}
