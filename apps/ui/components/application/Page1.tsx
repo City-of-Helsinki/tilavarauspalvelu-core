@@ -29,23 +29,17 @@ type Props = {
 export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
   const { t } = useTranslation();
 
-  const resUnitsInApplicationRound = applicationRound.reservationUnits;
-  const resUnitPks = resUnitsInApplicationRound?.map(
+  const resUnitPks = applicationRound.reservationUnits?.map(
     (resUnit) => resUnit?.unit?.pk
   );
   const unitsInApplicationRound = filterNonNullable(uniq(resUnitPks));
   const { data } = useSearchFormParamsUnitQuery();
-  const units = filterNonNullable(data?.unitsAll)
+  const unitOptions = filterNonNullable(data?.unitsAll)
     .filter((u) => u.pk != null && unitsInApplicationRound.includes(u.pk))
     .map((u) => ({
-      pk: u.pk ?? 0,
-      name: getTranslation(u, "name"),
+      value: u.pk ?? 0,
+      label: getTranslation(u, "name"),
     }));
-
-  const unitOptions = units.map((u) => ({
-    value: u.pk,
-    label: u.name,
-  }));
 
   const { options } = useOptions();
 
@@ -142,7 +136,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
         <Button
           id="addApplicationEvent"
           variant={ButtonVariant.Secondary}
-          iconStart={<IconPlus aria-hidden="true" />}
+          iconStart={<IconPlus />}
           onClick={handleAddNewApplicationEvent}
           size={ButtonSize.Small}
         >
@@ -150,7 +144,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
         </Button>
         <Button
           id="button__application--next"
-          iconEnd={<IconArrowRight aria-hidden="true" />}
+          iconEnd={<IconArrowRight />}
           size={ButtonSize.Small}
           disabled={submitDisabled}
           type="submit"

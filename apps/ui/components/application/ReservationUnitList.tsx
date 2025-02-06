@@ -22,6 +22,7 @@ import { Flex } from "common/styles/util";
 import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
 import { breakpoints } from "common";
 import { gql } from "@apollo/client";
+import ClientOnly from "common/src/ClientOnly";
 
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
 export type OptionType = { value: number; label: string };
@@ -154,29 +155,31 @@ export function ReservationUnitList({
       >
         {t("reservationUnitList:infoReservationUnits")}
       </Notification>
-      <Flex $gap="m" $direction="column">
-        {currentReservationUnits.map((ru, i, all) => (
-          <OrderedReservationUnitCard
-            key={ru.pk}
-            invalid={
-              minSize != null &&
-              ru.maxPersons != null &&
-              minSize > ru.maxPersons
-            }
-            onDelete={remove}
-            reservationUnit={ru}
-            order={i}
-            first={i === 0}
-            last={i === all.length - 1}
-            onMoveDown={moveDown}
-            onMoveUp={moveUp}
-          />
-        ))}
-      </Flex>
+      <ClientOnly>
+        <Flex $gap="m" $direction="column">
+          {currentReservationUnits.map((ru, i, all) => (
+            <OrderedReservationUnitCard
+              key={ru.pk}
+              invalid={
+                minSize != null &&
+                ru.maxPersons != null &&
+                minSize > ru.maxPersons
+              }
+              onDelete={remove}
+              reservationUnit={ru}
+              order={i}
+              first={i === 0}
+              last={i === all.length - 1}
+              onMoveDown={moveDown}
+              onMoveUp={moveUp}
+            />
+          ))}
+        </Flex>
+      </ClientOnly>
       <Flex $alignItems="center">
         <IconButton
           onClick={() => setShowModal(true)}
-          icon={<IconPlus aria-hidden="true" />}
+          icon={<IconPlus />}
           label={t("reservationUnitList:add")}
         />
       </Flex>
@@ -188,7 +191,7 @@ export function ReservationUnitList({
         actions={
           <Flex $alignItems="center">
             <Button
-              iconStart={<IconArrowUndo aria-hidden="true" />}
+              iconStart={<IconArrowUndo />}
               onClick={() => setShowModal(false)}
               variant={ButtonVariant.Supplementary}
             >
