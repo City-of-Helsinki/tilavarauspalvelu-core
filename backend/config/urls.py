@@ -13,6 +13,7 @@ from tilavarauspalvelu.api.rest.views import (
     liveness_check,
     readiness_check,
     reservation_ical,
+    reservation_statistics_export,
     reservation_unit_export,
     terms_of_use_pdf,
 )
@@ -57,6 +58,7 @@ urlpatterns = [
     path("monitoring/liveness/", liveness_check, name="liveness_check"),
     path("monitoring/readiness/", readiness_check, name="readiness_check"),
     path("v1/reports/reservation-units/", reservation_unit_export, name="reservation_unit_export"),
+    path("v1/reports/reservation-statistics/", reservation_statistics_export, name="reservation_statistics_export"),
 ]
 
 if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
