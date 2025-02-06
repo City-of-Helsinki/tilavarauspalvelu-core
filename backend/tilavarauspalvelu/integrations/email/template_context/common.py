@@ -149,7 +149,7 @@ def get_contex_for_reservation_price(
     return {
         "price_label": pgettext("Email", "Price"),
         "price": price,
-        "subsidised_price": subsidised_price or price,
+        "subsidised_price": subsidised_price,
         "price_can_be_subsidised": applying_for_free_of_charge and subsidised_price < price,
         "vat_included_label": pgettext("Email", "incl. VAT"),
         "tax_percentage": tax_percentage,
@@ -287,9 +287,11 @@ def params_for_keyless_entry(*, reservation: Reservation) -> dict[str, Any]:
 
 def params_for_reservation_series_info(*, reservation_series: RecurringReservation) -> dict[str, str]:
     weekdays = ", ".join(str(Weekday.from_week_day(int(val)).label) for val in reservation_series.weekdays.split(","))
+    start_time = reservation_series.begin_time
+    end_time = reservation_series.end_time
     return {
         "weekday_value": weekdays,
-        "time_value": f"{reservation_series.begin_time}-{reservation_series.end_time}",
+        "time_value": f"{local_time_string(start_time)}-{local_time_string(end_time)}",
     }
 
 

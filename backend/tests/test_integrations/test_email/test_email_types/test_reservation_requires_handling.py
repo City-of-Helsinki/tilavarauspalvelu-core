@@ -5,17 +5,19 @@ from __future__ import annotations
 import datetime
 from decimal import Decimal
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.admin.email_template.utils import get_mock_data
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
 from tilavarauspalvelu.enums import EmailType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_requires_handling
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.models import ReservationUnitPricing
 
 from tests.factories import ReservationFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
@@ -35,164 +37,148 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
+
 # CONTEXT ##############################################################################################################
 
 
-@pytest.mark.django_db
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_requires_handling__en(email_reservation):
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_requires_handling(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal(0),
-            subsidised_price=Decimal(0),
-            applying_for_free_of_charge=True,
-            tax_percentage=Decimal(0),
-            reservation_id=email_reservation.id,
-            instructions_pending="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-            language="en",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+COMMON_CONTEXT = {
+    "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+    "instructions_pending_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
+    "instructions_pending_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
+}
+LANGUAGE_CONTEXT = {
+    "en": {
+        "title": "Your booking is waiting for processing",
+        "text_reservation_requires_handling": "You have made a new booking request",
         "text_pending_notification": (
             "You will receive a confirmation email once your booking has been processed. "
             "We will contact you if further information is needed regarding your booking request."
         ),
-        "text_reservation_requires_handling": "You have made a new booking request",
-        "instructions_pending_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        "instructions_pending_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        "title": "Your booking is waiting for processing",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
-        "price": Decimal(0),
-        "subsidised_price": Decimal(0),
-        "tax_percentage": Decimal(0),
-        "reservation_id": f"{email_reservation.id}",
-    }
-
-    with TranslationsFromPOFiles():
-        assert context == get_context_for_reservation_requires_handling(
-            reservation=email_reservation,
-            language="en",
-        )
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_requires_handling__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_requires_handling(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal("12.30"),
-            subsidised_price=Decimal("12.30"),
-            applying_for_free_of_charge=True,
-            tax_percentage=Decimal("25.5"),
-            reservation_id=1234,
-            instructions_pending="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-            language="fi",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        **COMMON_CONTEXT,
+    },
+    "fi": {
+        "title": "Varauksesi odottaa käsittelyä",
+        "text_reservation_requires_handling": "Olet tehnyt alustavan varauksen",
         "text_pending_notification": (
             "Saat varausvahvistuksen sähköpostitse, kun varauksesi on käsitelty. "
             "Otamme sinuun yhteyttä, jos tarvitsemme lisätietoja varauspyyntöösi liittyen."
         ),
-        "text_reservation_requires_handling": "Olet tehnyt alustavan varauksen",
-        "instructions_pending_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        "instructions_pending_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        "title": "Varauksesi odottaa käsittelyä",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
         **RESERVATION_MANAGE_LINK_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_requires_handling__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_requires_handling(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal("12.30"),
-            subsidised_price=Decimal("12.30"),
-            applying_for_free_of_charge=True,
-            tax_percentage=Decimal("25.5"),
-            reservation_id=1234,
-            instructions_pending="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-            language="sv",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        **COMMON_CONTEXT,
+    },
+    "sv": {
+        "title": "Din bokning väntar på att behandlas",
+        "text_reservation_requires_handling": "Du har gjort en ny bokningsförfrågan",
         "text_pending_notification": (
             "Du kommer att få en bekräftelse via e-post när din bokning har behandlats. "
             "Vi kommer att kontakta dig om ytterligare information behövs angående din bokningsförfrågan."
         ),
-        "text_reservation_requires_handling": "Du har gjort en ny bokningsförfrågan",
-        "instructions_pending_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        "instructions_pending_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        "title": "Din bokning väntar på att behandlas",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
         **RESERVATION_MANAGE_LINK_CONTEXT_SV,
+        **COMMON_CONTEXT,
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__reservation_requires_handling__not_subsidised(lang: Lang):
+    expected = {
+        **LANGUAGE_CONTEXT[lang],
+        "price_can_be_subsidised": False,  # Subsidised price is not lower than normal price
+        "subsidised_price": Decimal("12.30"),
     }
 
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_requires_handling__subsidised():
+    params = {
+        "applying_for_free_of_charge": True,
+        "price": Decimal("12.30"),
+        "subsidised_price": Decimal("12.30"),
+    }
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_requires_handling(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal("12.30"),
-            subsidised_price=Decimal("10.30"),
-            applying_for_free_of_charge=True,
-            tax_percentage=Decimal("25.5"),
-            reservation_id=1234,
-            instructions_pending="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-            language="en",
-        )
+        assert get_context_for_reservation_requires_handling(**get_mock_params(**params), language=lang) == expected
+        assert get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, **params, language=lang) == expected
 
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "text_pending_notification": (
-            "You will receive a confirmation email once your booking has been processed. "
-            "We will contact you if further information is needed regarding your booking request."
-        ),
-        "text_reservation_requires_handling": "You have made a new booking request",
-        "instructions_pending_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        "instructions_pending_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        "title": "Your booking is waiting for processing",
-        **BASE_TEMPLATE_CONTEXT_EN,
-        **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **RESERVATION_PRICE_INFO_CONTEXT_EN,
-        **RESERVATION_MANAGE_LINK_CONTEXT_EN,
-        "subsidised_price": Decimal("10.30"),
-        "price_can_be_subsidised": True,
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__reservation_requires_handling__subsidised(lang: Lang):
+    expected = {
+        **LANGUAGE_CONTEXT[lang],
+        "price_can_be_subsidised": True,  # Subsidised price is lower than normal price
+        "subsidised_price": Decimal("10.00"),
     }
+
+    params = {
+        "applying_for_free_of_charge": True,
+        "price": Decimal("12.30"),
+        "subsidised_price": Decimal("10.00"),
+    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_requires_handling(**get_mock_params(**params), language=lang) == expected
+        assert get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, **params, language=lang) == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_get_context__reservation_requires_handling__instance__not_subsidised(email_reservation):
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        "reservation_id": f"{email_reservation.id}",
+        "price_can_be_subsidised": False,  # Subsidised price is not lower than normal price
+        "subsidised_price": Decimal("12.30"),
+    }
+
+    params = {
+        "reservation_id": email_reservation.id,
+        "applying_for_free_of_charge": True,
+        "price": Decimal("12.30"),
+        "subsidised_price": Decimal("12.30"),
+    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_requires_handling(**get_mock_params(**params), language="en") == expected
+
+    email_reservation.applying_for_free_of_charge = True
+    email_reservation.save()
+    ReservationUnitPricing.objects.update(lowest_price=Decimal("12.30"), highest_price=Decimal("12.30"))
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_requires_handling(reservation=email_reservation, language="en") == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_get_context__reservation_requires_handling__instance__subsidised(email_reservation):
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        "reservation_id": f"{email_reservation.id}",
+        "price_can_be_subsidised": True,  # Subsidised price is lower than normal price
+        "subsidised_price": Decimal("10.00"),
+    }
+
+    params = {
+        "reservation_id": email_reservation.id,
+        "applying_for_free_of_charge": True,
+        "price": Decimal("12.30"),
+        "subsidised_price": Decimal("10.00"),
+    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_requires_handling(**get_mock_params(**params), language="en") == expected
+
+    email_reservation.applying_for_free_of_charge = True
+    email_reservation.save()
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_requires_handling(reservation=email_reservation, language="en") == expected
 
 
 # RENDER TEXT ##########################################################################################################
@@ -285,7 +271,7 @@ def test_render_reservation_requires_handling__subsidised__text():
         From: 1.1.2024 at 12:00
         To: 1.1.2024 at 15:00
 
-        Price: 10,30 - 12,30 € (incl. VAT 25.5 %)
+        Price: 10,00 - 12,30 € (incl. VAT 25.5 %)
         Booking number: 1234
 
         {confirm}
@@ -405,7 +391,7 @@ def test_render_reservation_requires_handling__subsidised__html():
         [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
         To: **1.1.2024** at **15:00**
-        Price: **10,30 - 12,30€** (incl. VAT 25.5 %)
+        Price: **10,00 - 12,30€** (incl. VAT 25.5 %)
         Booking number: 1234
 
         {confirm}

@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.admin.email_template.utils import get_mock_data
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
@@ -24,97 +25,78 @@ from tests.test_integrations.test_email.helpers import (
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
+    get_application_details_urls,
     html_email_to_text,
 )
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
 
 # CONTEXT ##############################################################################################################
 
 
+COMMON_CONTEXT = {
+    "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+    "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
+    "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
+    "cancel_reason": "[PERUUTUKSEN SYY]",
+}
+LANGUAGE_CONTEXT = {
+    "en": {
+        "title": "Your seasonal booking has been cancelled",
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
+        **COMMON_CONTEXT,
+    },
+    "fi": {
+        "title": "Kausivarauksesi on peruttu",
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
+        **COMMON_CONTEXT,
+    },
+    "sv": {
+        "title": "Din säsongsbokning har avbokats",
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
+        **COMMON_CONTEXT,
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context_for_application_section_cancelled(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    params = {
+        "application_id": 0,
+        "application_section_id": 0,
+    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_application_section_cancelled(**get_mock_params(**params), language=lang) == expected
+        assert get_mock_data(email_type=EmailType.APPLICATION_SECTION_CANCELLED, **params, language=lang) == expected
+
+
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_application_section_cancelled__en(email_reservation):
+def test_get_context_for_application_section_cancelled__instance(email_reservation):
     section = email_reservation.actions.get_application_section()
 
-    with TranslationsFromPOFiles():
-        context = get_context_for_application_section_cancelled(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            application_section_name="[HAKEMUKSEN OSAN NIMI]",
-            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
-            cancel_reason="[PERUUTUKSEN SYY]",
-            application_id=section.application_id,
-            application_section_id=section.id,
-            language="en",
-        )
-
-    details_url = f"https://fake.varaamo.hel.fi/en/applications/{section.application_id}/view?tab=reservations&section={section.id}"
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "title": "Your seasonal booking has been cancelled",
-        "seasonal_booking_label": "Seasonal Booking",
-        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
-        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-        "cancel_reason": "[PERUUTUKSEN SYY]",
-        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
-        **BASE_TEMPLATE_CONTEXT_EN,
-        "check_booking_details_url": f"{details_url}",
-        "check_booking_details_url_html": f'<a href="{details_url}">varaamo.hel.fi</a>',
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        **get_application_details_urls(section),
     }
 
-    with TranslationsFromPOFiles():
-        assert context == get_context_for_application_section_cancelled(
-            application_section=email_reservation.actions.get_application_section(),
-            language="en",
-        )
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_application_section_cancelled__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_application_section_cancelled(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            application_section_name="[HAKEMUKSEN OSAN NIMI]",
-            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
-            cancel_reason="[PERUUTUKSEN SYY]",
-            application_id=None,
-            application_section_id=None,
-            language="fi",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "title": "Kausivarauksesi on peruttu",
-        "seasonal_booking_label": "Kausivaraus",
-        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
-        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-        "cancel_reason": "[PERUUTUKSEN SYY]",
-        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
-        **BASE_TEMPLATE_CONTEXT_FI,
+    params = {
+        "application_id": section.application_id,
+        "application_section_id": section.id,
     }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_application_section_cancelled_sv():
     with TranslationsFromPOFiles():
-        context = get_context_for_application_section_cancelled(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            application_section_name="[HAKEMUKSEN OSAN NIMI]",
-            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
-            cancel_reason="[PERUUTUKSEN SYY]",
-            application_id=None,
-            application_section_id=None,
-            language="sv",
-        )
+        assert get_context_for_application_section_cancelled(**get_mock_params(**params), language="en") == expected
 
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "title": "Din säsongsbokning har avbokats",
-        "seasonal_booking_label": "Säsongsbokning",
-        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
-        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-        "cancel_reason": "[PERUUTUKSEN SYY]",
-        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
-        **BASE_TEMPLATE_CONTEXT_SV,
-    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_application_section_cancelled(application_section=section, language="en") == expected
 
 
 # RENDER TEXT ##########################################################################################################

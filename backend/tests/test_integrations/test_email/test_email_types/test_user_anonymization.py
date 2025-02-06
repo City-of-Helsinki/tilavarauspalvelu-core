@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
@@ -26,15 +27,15 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
+
 # CONTEXT ##############################################################################################################
 
 
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__user_anonymization__en():
-    with TranslationsFromPOFiles():
-        context = get_context_for_user_anonymization(language="en")
-
-    assert context == {
+LANGUAGE_CONTEXT = {
+    "en": {
         "email_recipient_name": None,
         "title": "Your user account in the Varaamo service is expiring",
         "text_user_anonymization": (
@@ -45,15 +46,8 @@ def test_get_context__user_anonymization__en():
         "login_url": "https://fake.varaamo.hel.fi/en",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/en">https://fake.varaamo.hel.fi/en</a>',
         **BASE_TEMPLATE_CONTEXT_EN,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__user_anonymization__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_user_anonymization(language="fi")
-
-    assert context == {
+    },
+    "fi": {
         "email_recipient_name": None,
         "title": "Käyttäjätilisi Varaamo-palveluun on vanhentumassa",
         "text_user_anonymization": (
@@ -64,15 +58,8 @@ def test_get_context__user_anonymization__fi():
         "login_url": "https://fake.varaamo.hel.fi",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi">https://fake.varaamo.hel.fi</a>',
         **BASE_TEMPLATE_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__user_anonymization__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_user_anonymization(language="sv")
-
-    assert context == {
+    },
+    "sv": {
         "email_recipient_name": None,
         "title": "Ditt användarkonto i Varaamo-tjänsten håller på att gå ut",
         "text_user_anonymization": (
@@ -85,7 +72,18 @@ def test_get_context__user_anonymization__sv():
         "login_url": "https://fake.varaamo.hel.fi/sv",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/sv">https://fake.varaamo.hel.fi/sv</a>',
         **BASE_TEMPLATE_CONTEXT_SV,
-    }
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__user_anonymization(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        assert get_context_for_user_anonymization(language=lang) == expected
+        assert get_mock_data(email_type=EmailType.USER_ANONYMIZATION, language=lang) == expected
 
 
 # RENDER TEXT ##########################################################################################################

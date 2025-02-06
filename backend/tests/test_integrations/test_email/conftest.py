@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import pytest
 
-from tilavarauspalvelu.enums import ReservationStateChoice, WeekdayChoice
+from tilavarauspalvelu.enums import PriceUnit, ReservationStateChoice, WeekdayChoice
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -30,8 +31,9 @@ def email_reservation() -> Reservation:
         reservation_confirmed_instructions_en="[HYVÄKSYTYN VARAUKSEN OHJEET]",
         reservation_cancelled_instructions_en="[PERUUTETUN VARAUKSEN OHJEET]",
         reservation_pending_instructions_en="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        pricings__lowest_price=0,
-        pricings__highest_price=0,
+        pricings__lowest_price=Decimal(10),
+        pricings__highest_price=Decimal("12.30"),
+        pricings__price_unit=PriceUnit.PRICE_UNIT_FIXED,
     )
     application_section = ApplicationSectionFactory.create(
         name="[HAKEMUKSEN OSAN NIMI]",
@@ -41,13 +43,13 @@ def email_reservation() -> Reservation:
     recurring_reservation = RecurringReservationFactory.create(
         weekdays=f"{WeekdayChoice.MONDAY}",
         begin_date=datetime.date(2024, 1, 1),
-        begin_time=datetime.time(12),
+        begin_time=datetime.time(13),
         end_time=datetime.time(15),
         allocated_time_slot__reservation_unit_option__reservation_unit=reservation_unit,
         allocated_time_slot__reservation_unit_option__application_section=application_section,
     )
     reservation = ReservationFactory.create_for_reservation_unit(
-        name="Test reservation",
+        name="[VARAUKSEN NIMI]",
         reservation_unit=reservation_unit,
         user=application_section.application.user,
         state=ReservationStateChoice.CONFIRMED,
@@ -58,6 +60,9 @@ def email_reservation() -> Reservation:
         begin=local_datetime(2024, 1, 1, 12, 0),
         end=local_datetime(2024, 1, 1, 15, 0),
         recurring_reservation=recurring_reservation,
+        price=Decimal("12.30"),
+        non_subsidised_price=Decimal("12.30"),
+        tax_percentage_value=Decimal("25.5"),
     )
 
     recurring_reservation_2 = RecurringReservationFactory.create(

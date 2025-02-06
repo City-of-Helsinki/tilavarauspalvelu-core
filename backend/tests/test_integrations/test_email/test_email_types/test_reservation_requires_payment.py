@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-import datetime
-from decimal import Decimal
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.admin.email_template.utils import get_mock_data
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
 from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
@@ -35,123 +34,87 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
+
 # CONTEXT ##############################################################################################################
 
 
-@pytest.mark.django_db
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_requires_payment__en(email_reservation):
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_requires_payment(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal(0),
-            tax_percentage=Decimal(0),
-            payment_due_date=datetime.date(2024, 1, 1),
-            reservation_id=email_reservation.id,
-            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
-            language="en",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+COMMON_CONTEXT = {
+    "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+    "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+    "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+}
+LANGUAGE_CONTEXT = {
+    "en": {
+        "title": "Your booking has been confirmed, and can be paid",
+        "text_reservation_requires_payment": "Your booking has been confirmed, and can be paid",
         "payment_due_date_label": "Due date",
         "payment_due_date": "1.1.2024",
-        "text_reservation_requires_payment": "Your booking has been confirmed, and can be paid",
         "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/en/reservations">Pay the booking</a>',
         "pay_reservation_link": "Pay the booking: https://fake.varaamo.hel.fi/en/reservations",
-        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "title": "Your booking has been confirmed, and can be paid",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
-        "reservation_id": f"{email_reservation.id}",
-        "price": Decimal(0),
-        "subsidised_price": Decimal(0),
-        "tax_percentage": Decimal(0),
-    }
-
-    with TranslationsFromPOFiles():
-        assert context == get_context_for_reservation_requires_payment(
-            reservation=email_reservation,
-            language="en",
-        )
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_requires_payment__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_requires_payment(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            payment_due_date=datetime.date(2024, 2, 1),
-            reservation_id=1234,
-            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
-            language="fi",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "payment_due_date_label": "Eräpäivä",
-        "payment_due_date": "1.2.2024",
+        **COMMON_CONTEXT,
+    },
+    "fi": {
+        "title": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla",
         "text_reservation_requires_payment": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla",
+        "payment_due_date_label": "Eräpäivä",
+        "payment_due_date": "1.1.2024",
         "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/reservations">Maksa varaus</a>',
         "pay_reservation_link": "Maksa varaus: https://fake.varaamo.hel.fi/reservations",
-        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "title": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
         **RESERVATION_MANAGE_LINK_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_requires_payment__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_requires_payment(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            payment_due_date=datetime.date(2024, 2, 1),
-            reservation_id=1234,
-            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
-            language="sv",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "payment_due_date_label": "Förfallodatum",
-        "payment_due_date": "1.2.2024",
-        "text_reservation_requires_payment": "Din bokning har bekräftats och kan betalas",
-        "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/sv/reservations">Betala bokningen</a>',
-        "pay_reservation_link": "Betala bokningen: https://fake.varaamo.hel.fi/sv/reservations",
-        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        **COMMON_CONTEXT,
+    },
+    "sv": {
         "title": "Din bokning har bekräftats och kan betalas",
+        "text_reservation_requires_payment": "Din bokning har bekräftats och kan betalas",
+        "pay_reservation_link": "Betala bokningen: https://fake.varaamo.hel.fi/sv/reservations",
+        "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/sv/reservations">Betala bokningen</a>',
+        "payment_due_date": "1.1.2024",
+        "payment_due_date_label": "Förfallodatum",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
         **RESERVATION_MANAGE_LINK_CONTEXT_SV,
+        **COMMON_CONTEXT,
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__reservation_requires_payment(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_requires_payment(**get_mock_params(), language=lang) == expected
+        assert get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, language=lang) == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_get_context__reservation_requires_payment_instance(email_reservation):
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        "reservation_id": f"{email_reservation.id}",
     }
+
+    params = {
+        "reservation_id": email_reservation.id,
+    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_requires_payment(**get_mock_params(**params), language="en") == expected
+
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_requires_payment(reservation=email_reservation, language="en") == expected
 
 
 # RENDER TEXT ##########################################################################################################

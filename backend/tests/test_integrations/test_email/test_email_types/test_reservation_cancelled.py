@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-import datetime
-from decimal import Decimal
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.admin.email_template.utils import get_mock_data
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
 from tilavarauspalvelu.enums import EmailType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
@@ -32,108 +31,70 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
+
 # CONTEXT ##############################################################################################################
 
 
-@pytest.mark.django_db
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_cancelled__en(email_reservation):
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_cancelled(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            cancel_reason="[PERUUTUKSEN SYY]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal(0),
-            tax_percentage=Decimal(0),
-            reservation_id=email_reservation.id,
-            instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
-            language="en",
-        )
-
-    assert context == {
-        "cancel_reason": "[PERUUTUKSEN SYY]",
-        "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+COMMON_CONTEXT = {
+    "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+    "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
+    "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
+    "cancel_reason": "[PERUUTUKSEN SYY]",
+}
+LANGUAGE_CONTEXT = {
+    "en": {
         "title": "Your booking has been cancelled",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
-        "reservation_id": f"{email_reservation.id}",
-        "price": Decimal(0),
-        "subsidised_price": Decimal(0),
-        "tax_percentage": Decimal(0),
-    }
-
-    with TranslationsFromPOFiles():
-        assert context == get_context_for_reservation_cancelled(
-            reservation=email_reservation,
-            language="en",
-        )
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_cancelled__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_cancelled(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            cancel_reason="[PERUUTUKSEN SYY]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            reservation_id=1234,
-            instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
-            language="fi",
-        )
-
-    assert context == {
-        "cancel_reason": "[PERUUTUKSEN SYY]",
-        "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        **COMMON_CONTEXT,
+    },
+    "fi": {
         "title": "Varauksesi on peruttu",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_cancelled__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_cancelled(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            cancel_reason="[PERUUTUKSEN SYY]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            reservation_id=1234,
-            instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
-            language="sv",
-        )
-
-    assert context == {
-        "cancel_reason": "[PERUUTUKSEN SYY]",
-        "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        **COMMON_CONTEXT,
+    },
+    "sv": {
         "title": "Din bokning har avbokats",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
+        **COMMON_CONTEXT,
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__reservation_cancelled(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_cancelled(**get_mock_params(), language=lang) == expected
+        assert get_mock_data(email_type=EmailType.RESERVATION_CANCELLED, language=lang) == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_get_context__reservation_cancelled__instance(email_reservation):
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        "reservation_id": f"{email_reservation.id}",
     }
+
+    params = {
+        "reservation_id": email_reservation.id,
+    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_cancelled(**get_mock_params(**params), language="en") == expected
+
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_cancelled(reservation=email_reservation, language="en") == expected
 
 
 # RENDER TEXT ##########################################################################################################

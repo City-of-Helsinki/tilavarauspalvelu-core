@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
@@ -25,15 +26,15 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
+
 # CONTEXT ##############################################################################################################
 
 
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__permission_deactivation__en():
-    with TranslationsFromPOFiles():
-        context = get_context_for_permission_deactivation(language="en")
-
-    assert context == {
+LANGUAGE_CONTEXT = {
+    "en": {
         "email_recipient_name": None,
         "title": "Your staff access to Varaamo is expiring",
         "text_permission_deactivation": (
@@ -43,15 +44,8 @@ def test_get_context__permission_deactivation__en():
         "login_url": "https://fake.varaamo.hel.fi/kasittely",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/kasittely">https://fake.varaamo.hel.fi/kasittely</a>',
         **BASE_TEMPLATE_CONTEXT_EN,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__permission_deactivation__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_permission_deactivation(language="fi")
-
-    assert context == {
+    },
+    "fi": {
         "email_recipient_name": None,
         "title": "Henkilökunnan käyttöoikeutesi Varaamoon on vanhentumassa",
         "text_permission_deactivation": (
@@ -61,15 +55,8 @@ def test_get_context__permission_deactivation__fi():
         "login_url": "https://fake.varaamo.hel.fi/kasittely",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/kasittely">https://fake.varaamo.hel.fi/kasittely</a>',
         **BASE_TEMPLATE_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__permission_deactivation__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_permission_deactivation(language="sv")
-
-    assert context == {
+    },
+    "sv": {
         "email_recipient_name": None,
         "title": "Din personalåtkomst till Varaamo håller på att gå ut",
         "text_permission_deactivation": (
@@ -79,7 +66,18 @@ def test_get_context__permission_deactivation__sv():
         "login_url": "https://fake.varaamo.hel.fi/kasittely",
         "login_url_html": '<a href="https://fake.varaamo.hel.fi/kasittely">https://fake.varaamo.hel.fi/kasittely</a>',
         **BASE_TEMPLATE_CONTEXT_SV,
-    }
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__permission_deactivation(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        assert get_context_for_permission_deactivation(language=lang) == expected
+        assert get_mock_data(email_type=EmailType.PERMISSION_DEACTIVATION, language=lang) == expected
 
 
 # RENDER TEXT ##########################################################################################################
