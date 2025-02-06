@@ -26,7 +26,7 @@ runs:
         path: |
           /home/runner/.local/share/pypoetry
           /home/runner/.local/bin
-        key: cache-poetry-${{ inputs.poetry-version }}-python${{ inputs.python-version }}-v1
+        key: cache-poetry-${{ inputs.poetry-version }}-python-${{ inputs.python-version }}-v1
 
     - name: "Install poetry"
       if: steps.poetry-cache.outputs.cache-hit != 'true'
@@ -46,7 +46,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: backend/.venv
-        key: cache-venv-python${{ inputs.poetry-version }}-${{ hashFiles('**/poetry.lock') }}-v1
+        key: cache-venv-poetry-${{ inputs.poetry-version }}-python-${{ inputs.python-version }}-${{ hashFiles('**/poetry.lock') }}-v1
 
     - name: "Install dependencies"
       working-directory: backend
