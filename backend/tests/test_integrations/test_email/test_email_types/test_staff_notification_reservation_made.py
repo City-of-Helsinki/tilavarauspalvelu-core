@@ -31,7 +31,7 @@ from tests.test_integrations.test_email.helpers import (
 
 # CONTEXT ##############################################################################################################
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__staff_notification_reservation_made__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_reservation_made(
@@ -70,7 +70,7 @@ def test_get_context__staff_notification_reservation_made__en(email_reservation)
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__staff_notification_reservation_made__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_reservation_made(
@@ -103,7 +103,7 @@ def test_get_context__staff_notification_reservation_made__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__staff_notification_reservation_made__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_reservation_made(

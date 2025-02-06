@@ -31,7 +31,7 @@ from tests.test_integrations.test_email.helpers import (
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_application_section_cancelled__en(email_reservation):
     section = email_reservation.actions.get_application_section()
 
@@ -67,7 +67,7 @@ def test_get_context_for_application_section_cancelled__en(email_reservation):
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_application_section_cancelled__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_application_section_cancelled(
@@ -92,7 +92,7 @@ def test_get_context_for_application_section_cancelled__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_application_section_cancelled_sv():
     with TranslationsFromPOFiles():
         context = get_context_for_application_section_cancelled(
@@ -190,7 +190,7 @@ def test_render_application_section_cancelled_email__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_application_section_cancelled_email(outbox):
     application = ApplicationFactory.create_in_status_results_sent(
         user__email="user@email.com",
@@ -213,7 +213,7 @@ def test_email_service__send_application_section_cancelled_email(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_application_section_cancelled_email__no_reservations_email_not_sent(outbox):
     application_section = ApplicationSectionFactory.create_in_status_handled(application__user__email="user@email.com")
 
