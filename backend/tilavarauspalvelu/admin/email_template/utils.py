@@ -61,9 +61,9 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
     payment_due_date = kwargs.get("payment_due_date", end.date())
     tax_percentage = kwargs.get("tax_percentage", Decimal("25.5"))
     reservation_id = kwargs.get("reservation_id", 1234)
-    confirmed_instructions = kwargs.get("confirmed_instructions", "[HYVÄKSYTYN VARAUKSEN OHJEET]")
-    cancelled_instructions = kwargs.get("cancelled_instructions", "[PERUUTETUN VARAUKSEN OHJEET]")
-    pending_instructions = kwargs.get("pending_instructions", "[KÄSITELTÄVÄN VARAUKSEN OHJEET]")
+    instructions_confirmed = kwargs.get("instructions_confirmed", "[HYVÄKSYTYN VARAUKSEN OHJEET]")
+    instructions_cancelled = kwargs.get("instructions_cancelled", "[PERUUTETUN VARAUKSEN OHJEET]")
+    instructions_pending = kwargs.get("instructions_pending", "[KÄSITELTÄVÄN VARAUKSEN OHJEET]")
     weekday_value = kwargs.get("weekday_value", str(WeekdayChoice.MONDAY.label))
     time_value = kwargs.get("time_value", "13:00-15:00")
     application_section_name = kwargs.get("application_section_name", "[HAKEMUKSEN OSAN NIMI]")
@@ -129,7 +129,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 non_subsidised_price=non_subsidised_price,
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
-                instructions=confirmed_instructions,
+                instructions_confirmed=instructions_confirmed,
                 access_code_is_used=access_code_is_used,
                 access_code=access_code,
                 access_code_validity_period=access_code_validity_period,
@@ -147,7 +147,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 price=price,
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
-                instructions=cancelled_instructions,
+                instructions_cancelled=instructions_cancelled,
                 language=language,
             )
         case EmailType.RESERVATION_CONFIRMED:
@@ -161,7 +161,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 price=price,
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
-                instructions=confirmed_instructions,
+                instructions_confirmed=instructions_confirmed,
                 access_code_is_used=access_code_is_used,
                 access_code=access_code,
                 access_code_validity_period=access_code_validity_period,
@@ -178,7 +178,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 price=price,
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
-                instructions=confirmed_instructions,
+                instructions_confirmed=instructions_confirmed,
                 access_code_is_used=access_code_is_used,
                 access_code=access_code,
                 access_code_validity_period=access_code_validity_period,
@@ -194,7 +194,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 end_datetime=end,
                 rejection_reason=rejection_reason,
                 reservation_id=reservation_id,
-                instructions=cancelled_instructions,
+                instructions_cancelled=instructions_cancelled,
                 language=language,
             )
         case EmailType.RESERVATION_REQUIRES_HANDLING:
@@ -210,7 +210,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 applying_for_free_of_charge=applying_for_free_of_charge,
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
-                instructions=pending_instructions,
+                instructions_pending=instructions_pending,
                 language=language,
             )
         case EmailType.RESERVATION_REQUIRES_PAYMENT:
@@ -225,7 +225,7 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 tax_percentage=tax_percentage,
                 payment_due_date=payment_due_date,
                 reservation_id=reservation_id,
-                instructions=confirmed_instructions,
+                instructions_confirmed=instructions_confirmed,
                 language=language,
             )
 

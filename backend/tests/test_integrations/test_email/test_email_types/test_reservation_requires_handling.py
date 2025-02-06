@@ -54,7 +54,7 @@ def test_get_context__reservation_requires_handling__en(email_reservation):
             applying_for_free_of_charge=True,
             tax_percentage=Decimal(0),
             reservation_id=email_reservation.id,
-            instructions="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
+            instructions_pending="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
             language="en",
         )
 
@@ -65,8 +65,8 @@ def test_get_context__reservation_requires_handling__en(email_reservation):
             "We will contact you if further information is needed regarding your booking request."
         ),
         "text_reservation_requires_handling": "You have made a new booking request",
-        "instructions_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
-        "instructions_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
+        "instructions_pending_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
+        "instructions_pending_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
         "title": "Your booking is waiting for processing",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -100,7 +100,7 @@ def test_get_context__reservation_requires_handling__fi():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            instructions="Tässä ovat ohjeet",
+            instructions_pending="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
             language="fi",
         )
 
@@ -111,8 +111,8 @@ def test_get_context__reservation_requires_handling__fi():
             "Otamme sinuun yhteyttä, jos tarvitsemme lisätietoja varauspyyntöösi liittyen."
         ),
         "text_reservation_requires_handling": "Olet tehnyt alustavan varauksen",
-        "instructions_html": "Tässä ovat ohjeet",
-        "instructions_text": "Tässä ovat ohjeet",
+        "instructions_pending_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
+        "instructions_pending_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
         "title": "Varauksesi odottaa käsittelyä",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
@@ -136,7 +136,7 @@ def test_get_context__reservation_requires_handling__sv():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            instructions="Här är instruktionerna",
+            instructions_pending="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
             language="sv",
         )
 
@@ -147,8 +147,8 @@ def test_get_context__reservation_requires_handling__sv():
             "Vi kommer att kontakta dig om ytterligare information behövs angående din bokningsförfrågan."
         ),
         "text_reservation_requires_handling": "Du har gjort en ny bokningsförfrågan",
-        "instructions_html": "Här är instruktionerna",
-        "instructions_text": "Här är instruktionerna",
+        "instructions_pending_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
+        "instructions_pending_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
         "title": "Din bokning väntar på att behandlas",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -172,7 +172,7 @@ def test_get_context__reservation_requires_handling__subsidised():
             applying_for_free_of_charge=True,
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            instructions="These are the instructions",
+            instructions_pending="[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
             language="en",
         )
 
@@ -183,8 +183,8 @@ def test_get_context__reservation_requires_handling__subsidised():
             "We will contact you if further information is needed regarding your booking request."
         ),
         "text_reservation_requires_handling": "You have made a new booking request",
-        "instructions_html": "These are the instructions",
-        "instructions_text": "These are the instructions",
+        "instructions_pending_html": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
+        "instructions_pending_text": "[KÄSITELTÄVÄN VARAUKSEN OHJEET]",
         "title": "Your booking is waiting for processing",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
