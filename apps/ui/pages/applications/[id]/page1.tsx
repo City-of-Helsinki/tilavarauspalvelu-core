@@ -51,17 +51,13 @@ function Page1({ application }: PropsNarrowed): JSX.Element {
     }
   };
 
-  const { reservationUnits: selectedReservationUnits } =
-    useReservationUnitList(applicationRound);
+  const { getReservationUnits } = useReservationUnitList(applicationRound);
 
   const begin = new Date(applicationRound.reservationPeriodBegin);
   const end = new Date(applicationRound.reservationPeriodEnd);
   const form = useForm<ApplicationPage1FormValues>({
     mode: "onChange",
-    defaultValues: convertApplicationPage1(
-      application,
-      selectedReservationUnits
-    ),
+    defaultValues: convertApplicationPage1(application, getReservationUnits()),
     resolver: zodResolver(ApplicationPage1SchemaRefined({ begin, end })),
   });
 

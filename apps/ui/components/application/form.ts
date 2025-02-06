@@ -7,10 +7,9 @@ import {
   Weekday,
   Priority,
   type UpdateApplicationSectionForApplicationSerializerInput,
-  type ReservationUnitNode,
   type ApplicantFragment,
   type ApplicationPage1Query,
-  ApplicationPage2Query,
+  type ApplicationPage2Query,
 } from "@gql/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
@@ -669,7 +668,8 @@ export function convertApplicationPage2(
 }
 export function convertApplicationPage1(
   app: Node,
-  reservationUnits: Pick<ReservationUnitNode, "pk">[]
+  // We pass reservationUnits here so we have a default selection for a new application section
+  reservationUnits: number[]
 ): ApplicationPage1FormValues {
   const formAes = filterNonNullable(app?.applicationSections).map((ae) =>
     transformApplicationSectionToForm(ae)
@@ -690,7 +690,7 @@ export function convertApplicationPage1(
     begin: undefined,
     end: undefined,
     appliedReservationsPerWeek: 1,
-    reservationUnits: filterNonNullable(reservationUnits.map((ru) => ru.pk)),
+    reservationUnits: filterNonNullable(reservationUnits),
     accordionOpen: true,
   };
   return {

@@ -103,11 +103,9 @@ function SeasonalSearch({
   const searchValues = useSearchParams();
 
   const {
-    reservationUnits: selectedReservationUnits,
     selectReservationUnit,
     removeReservationUnit,
     containsReservationUnit,
-    clearSelections,
     // Hide other application rounds' reservation units
   } = useReservationUnitList(applicationRound);
 
@@ -170,10 +168,7 @@ function SeasonalSearch({
         fetchMore={(cursor) => fetchMore(cursor)}
         sortingComponent={<SortingComponent />}
       />
-      <StartApplicationBar
-        count={selectedReservationUnits.length}
-        clearSelections={clearSelections}
-      />
+      <StartApplicationBar applicationRound={applicationRound} />
     </>
   );
 }
