@@ -160,7 +160,12 @@ function IconList({
     reservationUnit.maxPersons != null
       ? {
           key: "maxPersons",
-          icon: <IconGroup aria-label={t("reservationUnit:maxPersons")} />,
+          icon: (
+            <IconGroup
+              aria-label={t("reservationUnit:maxPersons")}
+              aria-hidden="false"
+            />
+          ),
           text: t("reservationUnitCard:personRange", {
             count: reservationUnit.maxPersons,
             value:
@@ -177,7 +182,10 @@ function IconList({
       ? {
           key: "eventDuration",
           icon: (
-            <IconClock aria-label={t("reservationCalendar:eventDuration")} />
+            <IconClock
+              aria-label={t("reservationCalendar:eventDuration")}
+              aria-hidden="false"
+            />
           ),
           text: t(`reservationCalendar:eventDurationLiteral`, {
             min: minReservationDuration,
@@ -189,7 +197,10 @@ function IconList({
       ? {
           key: "unitPrice",
           icon: (
-            <IconEuroSign aria-label={t("prices:reservationUnitPriceLabel")} />
+            <IconEuroSign
+              aria-label={t("prices:reservationUnitPriceLabel")}
+              aria-hidden="false"
+            />
           ),
           text: (
             <>
