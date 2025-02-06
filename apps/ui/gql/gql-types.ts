@@ -8064,6 +8064,41 @@ export type ApplicationViewQuery = {
   } | null;
 };
 
+export type ApplicationRoundCriteriaQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ApplicationRoundCriteriaQuery = {
+  applicationRound?: {
+    pk?: number | null;
+    id: string;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+    criteriaFi?: string | null;
+    criteriaEn?: string | null;
+    criteriaSv?: string | null;
+    notesWhenApplyingFi?: string | null;
+    notesWhenApplyingEn?: string | null;
+    notesWhenApplyingSv?: string | null;
+  } | null;
+};
+
+export type ApplicationRoundQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ApplicationRoundQuery = {
+  applicationRound?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+    reservationUnits: Array<{ id: string; pk?: number | null }>;
+  } | null;
+};
+
 export type ReservationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -12419,6 +12454,188 @@ export type ApplicationViewSuspenseQueryHookResult = ReturnType<
 export type ApplicationViewQueryResult = Apollo.QueryResult<
   ApplicationViewQuery,
   ApplicationViewQueryVariables
+>;
+export const ApplicationRoundCriteriaDocument = gql`
+  query ApplicationRoundCriteria($id: ID!) {
+    applicationRound(id: $id) {
+      pk
+      id
+      nameFi
+      nameEn
+      nameSv
+      criteriaFi
+      criteriaEn
+      criteriaSv
+      notesWhenApplyingFi
+      notesWhenApplyingEn
+      notesWhenApplyingSv
+    }
+  }
+`;
+
+/**
+ * __useApplicationRoundCriteriaQuery__
+ *
+ * To run a query within a React component, call `useApplicationRoundCriteriaQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationRoundCriteriaQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationRoundCriteriaQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useApplicationRoundCriteriaQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationRoundCriteriaQuery,
+    ApplicationRoundCriteriaQueryVariables
+  > &
+    (
+      | { variables: ApplicationRoundCriteriaQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationRoundCriteriaQuery,
+    ApplicationRoundCriteriaQueryVariables
+  >(ApplicationRoundCriteriaDocument, options);
+}
+export function useApplicationRoundCriteriaLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationRoundCriteriaQuery,
+    ApplicationRoundCriteriaQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationRoundCriteriaQuery,
+    ApplicationRoundCriteriaQueryVariables
+  >(ApplicationRoundCriteriaDocument, options);
+}
+export function useApplicationRoundCriteriaSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationRoundCriteriaQuery,
+        ApplicationRoundCriteriaQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationRoundCriteriaQuery,
+    ApplicationRoundCriteriaQueryVariables
+  >(ApplicationRoundCriteriaDocument, options);
+}
+export type ApplicationRoundCriteriaQueryHookResult = ReturnType<
+  typeof useApplicationRoundCriteriaQuery
+>;
+export type ApplicationRoundCriteriaLazyQueryHookResult = ReturnType<
+  typeof useApplicationRoundCriteriaLazyQuery
+>;
+export type ApplicationRoundCriteriaSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationRoundCriteriaSuspenseQuery
+>;
+export type ApplicationRoundCriteriaQueryResult = Apollo.QueryResult<
+  ApplicationRoundCriteriaQuery,
+  ApplicationRoundCriteriaQueryVariables
+>;
+export const ApplicationRoundDocument = gql`
+  query ApplicationRound($id: ID!) {
+    applicationRound(id: $id) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+      reservationUnits {
+        id
+        pk
+      }
+    }
+  }
+`;
+
+/**
+ * __useApplicationRoundQuery__
+ *
+ * To run a query within a React component, call `useApplicationRoundQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationRoundQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationRoundQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useApplicationRoundQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationRoundQuery,
+    ApplicationRoundQueryVariables
+  > &
+    (
+      | { variables: ApplicationRoundQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ApplicationRoundQuery, ApplicationRoundQueryVariables>(
+    ApplicationRoundDocument,
+    options
+  );
+}
+export function useApplicationRoundLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationRoundQuery,
+    ApplicationRoundQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationRoundQuery,
+    ApplicationRoundQueryVariables
+  >(ApplicationRoundDocument, options);
+}
+export function useApplicationRoundSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationRoundQuery,
+        ApplicationRoundQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationRoundQuery,
+    ApplicationRoundQueryVariables
+  >(ApplicationRoundDocument, options);
+}
+export type ApplicationRoundQueryHookResult = ReturnType<
+  typeof useApplicationRoundQuery
+>;
+export type ApplicationRoundLazyQueryHookResult = ReturnType<
+  typeof useApplicationRoundLazyQuery
+>;
+export type ApplicationRoundSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationRoundSuspenseQuery
+>;
+export type ApplicationRoundQueryResult = Apollo.QueryResult<
+  ApplicationRoundQuery,
+  ApplicationRoundQueryVariables
 >;
 export const ReservationDocument = gql`
   query Reservation($id: ID!) {
