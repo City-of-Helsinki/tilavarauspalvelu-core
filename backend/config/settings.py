@@ -514,6 +514,7 @@ class Common(Environment):
     RAISE_ERROR_ON_REFRESH_FAILURE = False
 
     ICAL_HASH_SECRET = values.StringValue()
+    EXPORT_AUTHORIZATION_TOKEN = values.StringValue()
 
     # Allows faking membership to certain AD groups for testing automatic role assignment
     FAKE_SUPERUSER_AD_GROUPS = values.ListValue(default=[])
@@ -571,6 +572,7 @@ class EmptyDefaults:
 
     TPREK_UNIT_URL = ""
     ICAL_HASH_SECRET = ""  # nosec # NOSONAR
+    EXPORT_AUTHORIZATION_TOKEN = ""
 
     EMAIL_VARAAMO_EXT_LINK = ""
     EMAIL_FEEDBACK_EXT_LINK = ""
@@ -664,6 +666,7 @@ class Local(Common, overrides_from=LocalMixin):
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
+    EXPORT_AUTHORIZATION_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
     UPDATE_RESERVATION_UNIT_HIERARCHY = values.BooleanValue(default=True)
     UPDATE_SEARCH_VECTORS = values.BooleanValue(default=True)
     UPDATE_AFFECTING_TIME_SPANS = values.BooleanValue(default=True)
@@ -721,6 +724,7 @@ class Docker(Common, overrides_from=DockerMixin):
 
     GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
+    EXPORT_AUTHORIZATION_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
     RAISE_ERROR_ON_REFRESH_FAILURE = True
     FRONTEND_TESTING_API_ENABLED = values.BooleanValue(default=True)
 
@@ -847,6 +851,7 @@ class AutomatedTests(EmptyDefaults, Common, dotenv_path=None, overrides_from=Aut
 
     TPREK_UNIT_URL = "https://fake.test.tprek.com"
     ICAL_HASH_SECRET = "qhoew923uqqwee"  # noqa: S105 # nosec # NOSONAR
+    EXPORT_AUTHORIZATION_TOKEN = "CASO8I4V4ITNKCKTM48ZZNK8RT"  # noqa: S105 # nosec # NOSONAR
 
     # Turn off materialized view updates from signals during tests,
     # since they slow them down a lot in CI. Refresh should be called manually when needed.

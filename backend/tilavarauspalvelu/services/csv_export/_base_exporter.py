@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import csv
 import dataclasses
+import json
 from abc import ABC, abstractmethod
 from dataclasses import asdict
 from io import StringIO
-from itertools import chain
+from itertools import chain, zip_longest
 from typing import TYPE_CHECKING, Any, Self
 
 from django.http import FileResponse
+
+from utils.utils import to_ascii
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
@@ -29,16 +32,27 @@ class BaseExportRow:
         return self
 
     def as_row(self) -> Iterator[Any]:
-        """Export dataclass to an iterable of its values in the order they were defined."""
+        """Export the dataclass to an iterable of its values in the order they were defined."""
         data = asdict(self)
         extra_rows: Iterable[str] = data.pop("extra", [])
         return chain(data.values(), extra_rows)
+
+    def as_json(self, *, extra_headers: Iterable[str]) -> dict[str, Any]:
+        """Export the dataclass to a json encodable dict."""
+        data = asdict(self)
+
+        extra = data.pop("extra", [])
+        if extra_headers:
+            for extra_header, extra_value in zip_longest(extra_headers, extra, fillvalue=""):
+                data[extra_header] = extra_value
+
+        return json.loads(json.dumps(data, default=str))
 
 
 class BaseCSVExporter(ABC):
     """Base class for CSV exporters."""
 
-    def write(self) -> StringIO:
+    def write_csv(self) -> StringIO:
         """Write the CSV to a StringIO object based on the exporter queryset."""
         csv_file = StringIO()
         csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
@@ -48,11 +62,24 @@ class BaseCSVExporter(ABC):
             csv_writer.writerow(list(header_row.as_row()))
 
         # Write data rows
-        for section in self.queryset:
-            for row in self.get_data_rows(section):
+        for instance in self.queryset:
+            for row in self.get_data_rows(instance):
                 csv_writer.writerow(list(row.as_row()))
 
         return csv_file
+
+    def write_json(self) -> list[dict[str, Any]]:
+        """Write JSON based on the exporter queryset."""
+        extra_headers = [
+            to_ascii(string=extra.lower().replace(" ", "_"))
+            for header in self.get_header_rows()
+            for extra in header.extra
+        ]
+        return [
+            row.as_json(extra_headers=extra_headers)
+            for instance in self.queryset
+            for row in self.get_data_rows(instance)
+        ]
 
     def to_file_response(self, file_name: str | None = None) -> FileResponse:
         """
@@ -63,7 +90,7 @@ class BaseCSVExporter(ABC):
         if file_name is None:
             file_name = self.default_filename
 
-        csv_file = self.write()
+        csv_file = self.write_csv()
         response = FileResponse(csv_file.getvalue(), content_type="text/csv")
         response["Content-Disposition"] = f"attachment;filename={file_name}.csv"
         return response

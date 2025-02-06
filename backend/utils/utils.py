@@ -7,6 +7,7 @@ import hmac
 import json
 import operator
 import re
+import unicodedata
 import urllib.parse
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
@@ -28,12 +29,18 @@ if TYPE_CHECKING:
 __all__ = [
     "comma_sep_str",
     "get_text_search_language",
+    "to_ascii",
     "update_query_params",
     "with_indices",
 ]
 
 
 T = TypeVar("T")
+
+
+def to_ascii(string: str) -> str:
+    """Convert all non-ASCII characters in the string to their ASCII equivalents."""
+    return unicodedata.normalize("NFKD", string).encode("ascii", "ignore").decode("ascii")
 
 
 def comma_sep_str(values: Iterable[Any], *, last_sep: str = "&", quote: bool = False) -> str:

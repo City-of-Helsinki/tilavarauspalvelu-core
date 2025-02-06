@@ -50,7 +50,7 @@ def test_reservation_unit_export_multiple():
     # - The exporter is run for all reservation units
     exporter = ReservationUnitExporter()
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     # then:
     # - the writes contain the expected data
@@ -247,7 +247,7 @@ def test_reservation_unit_export_missing_relations(column_value_mapping, missing
     # - The exporter is run for all reservation units
     exporter = ReservationUnitExporter()
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     # then:
     # - the writes contain the expected data
@@ -268,7 +268,7 @@ def test_reservation_unit_export_subset():
     # - The exporter is run for the first 3 reservation units
     exporter = ReservationUnitExporter(queryset=ReservationUnit.objects.all()[:3])
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     # then:
     # - the writes contain only 3 rows (+header)

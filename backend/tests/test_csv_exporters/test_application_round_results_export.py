@@ -47,7 +47,7 @@ def test_application_round_results_export__single_application__all_fields(graphq
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     writes = mock_writer.get_writes()
     assert len(writes) == 2
@@ -84,7 +84,7 @@ def test_application_round_results_export__no_suitable_time_ranges(graphql):
     )
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
-    assert exporter.write()
+    assert exporter.write_csv()
 
 
 def test_application_round_results_export__application_status_is_expired(graphql):
@@ -96,7 +96,7 @@ def test_application_round_results_export__application_status_is_expired(graphql
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     writes = mock_writer.get_writes()
     assert len(writes) == 1  # Just the header
@@ -111,7 +111,7 @@ def test_application_round_results_export__application_status_is_draft(graphql):
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     writes = mock_writer.get_writes()
     assert len(writes) == 1  # Just the header
@@ -133,7 +133,7 @@ def test_application_round_results_export__section_has_no_allocated_time_slots(g
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     writes = mock_writer.get_writes()
     assert len(writes) == 2
@@ -175,7 +175,7 @@ def test_application_round_results_export__reservation_unit_option_ordering(grap
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     writes = mock_writer.get_writes()
     assert len(writes) == 4
@@ -221,7 +221,7 @@ def test_application_round_results_export__allocated_slot_ordering(graphql):
 
     exporter = ApplicationRoundResultCSVExporter(application_round_id=application_round.id)
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     writes = mock_writer.get_writes()
     assert len(writes) == 4
