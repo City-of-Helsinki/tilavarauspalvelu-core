@@ -7,10 +7,10 @@ import {
   IconSize,
   ButtonSize,
   ButtonVariant,
+  IconHome,
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import NextImage from "next/image";
 import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
 import { getMainImage } from "@/modules/util";
 import { getReservationUnitName } from "@/modules/reservationUnit";
@@ -57,15 +57,7 @@ export function ReservationUnitCard({
   const infos = [];
   if (reservationUnitTypeName) {
     infos.push({
-      icon: (
-        <NextImage
-          src="/icons/icon_premises.svg"
-          alt=""
-          width="24"
-          height="24"
-          aria-hidden
-        />
-      ),
+      icon: <IconHome size={IconSize.Small} />,
       value: reservationUnitTypeName,
     });
   }

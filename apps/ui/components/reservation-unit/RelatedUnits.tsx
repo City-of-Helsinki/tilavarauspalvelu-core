@@ -1,7 +1,12 @@
-import { IconArrowRight, IconGroup, IconTicket } from "hds-react";
+import {
+  IconArrowRight,
+  IconGroup,
+  IconHome,
+  IconSize,
+  IconTicket,
+} from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import NextImage from "next/image";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import type { RelatedReservationUnitsQuery } from "@gql/gql-types";
@@ -86,15 +91,7 @@ function RelatedUnitCard({
   const infos = [];
   if (reservationUnitTypeName) {
     infos.push({
-      icon: (
-        <NextImage
-          src="/icons/icon_premises.svg"
-          alt=""
-          width="24"
-          height="24"
-          aria-hidden="true"
-        />
-      ),
+      icon: <IconHome size={IconSize.Small} />,
       value: reservationUnitTypeName,
     });
   }
