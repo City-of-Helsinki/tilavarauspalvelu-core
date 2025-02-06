@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hmac
 import io
+import json
 from typing import TYPE_CHECKING
 
 from django.apps import apps
@@ -11,8 +12,10 @@ from django.http import FileResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
+from import_export.admin import ExportMixin
+from import_export.formats.base_formats import JSON
 
-from tilavarauspalvelu.models import Reservation, ReservationUnit, TermsOfUse
+from tilavarauspalvelu.models import Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.csv_export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
 from utils.utils import ical_hmac_signature
@@ -166,3 +169,22 @@ def reservation_unit_export(request: WSGIRequest) -> HttpResponse:
     data = exporter.write_json()
 
     return JsonResponse(data, safe=False, status=200)
+
+
+@require_GET
+@csrf_exempt  # NOSONAR
+def reservation_statistics_export(request: WSGIRequest) -> HttpResponse:
+    """Export reservation statistics to JSON."""
+    authorization = request.META.get("HTTP_AUTHORIZATION", "")
+    if authorization != settings.EXPORT_AUTHORIZATION_TOKEN:
+        msg = "Not authorized to export reservation statistics."
+        return HttpResponseForbidden(msg)
+
+    queryset = ReservationStatistic.objects.all()
+
+    exporter = ExportMixin()
+    exporter.model = ReservationStatistic
+    data_for_export = exporter.get_data_for_export(request, queryset)
+    export_data: str = JSON().export_data(data_for_export)
+
+    return JsonResponse(json.loads(export_data), safe=False, status=200)
