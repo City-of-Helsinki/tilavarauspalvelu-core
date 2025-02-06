@@ -102,9 +102,19 @@ const ApplicationSectionFormValueSchema = z
   .superRefine((val, ctx) => {
     checkValidDateOnly(fromUIDate(val.end ?? ""), ctx, `end`);
   })
-  .refine((s) => lessThanMaybeDate(s.begin, s.end), {
-    path: ["end"],
-    message: "End date must be after begin date",
+  .superRefine((val, ctx) => {
+    if (lessThanMaybeDate(val.end, val.begin)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["end"],
+        message: "End date must be after begin date",
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["begin"],
+        message: "Begin date must be before end date",
+      });
+    }
   });
 
 export type ApplicationSectionFormValue = z.infer<
@@ -669,6 +679,8 @@ export function convertApplicationPage1(
     pk: undefined,
     name: "",
     // TODO this is not unique if the user adds multiple new sections
+    // it doesn't matter as long as any newly added sections have different keys
+    // would be better if this returned empty array and the form added single section on mount
     formKey: "event-NEW",
     numPersons: undefined,
     ageGroup: 0,
