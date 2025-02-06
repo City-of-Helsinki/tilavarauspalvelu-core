@@ -38,7 +38,7 @@ function Page1({ application }: PropsNarrowed): JSX.Element {
   const [update] = useApplicationUpdate();
   const dislayError = useDisplayError();
 
-  const handleSave = async (values: ApplicationPage1FormValues) => {
+  const handleSave = (values: ApplicationPage1FormValues) => {
     return update(transformApplicationPage1(values));
   };
 
@@ -65,10 +65,6 @@ function Page1({ application }: PropsNarrowed): JSX.Element {
     resolver: zodResolver(ApplicationPage1SchemaRefined({ begin, end })),
   });
 
-  const {
-    formState: { isDirty },
-  } = form;
-
   const lang = convertLanguageCode(i18n.language);
   const applicationRoundName = getTranslationSafe(
     applicationRound,
@@ -82,7 +78,6 @@ function Page1({ application }: PropsNarrowed): JSX.Element {
         overrideText={applicationRoundName}
         translationKeyPrefix="application:Page1"
         application={application}
-        isDirty={isDirty}
       >
         <Page1Impl
           applicationRound={applicationRound}
