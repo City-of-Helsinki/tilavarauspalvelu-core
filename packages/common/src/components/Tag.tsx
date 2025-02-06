@@ -8,7 +8,7 @@ import {
 import styled from "styled-components";
 
 type TagPropsType = {
-  ariaLabel: string;
+  ariaLabel?: string;
   type?: StatusLabelType;
   onClick?: () => void;
   children: string;

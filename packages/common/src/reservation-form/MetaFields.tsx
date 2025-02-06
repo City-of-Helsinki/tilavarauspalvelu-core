@@ -90,11 +90,11 @@ const ReservationApplicationFieldsContainer = styled(AutoGrid)`
 const reserveeOptions = [
   {
     id: CustomerTypeChoice.Individual,
-    icon: <IconUser aria-hidden />,
+    icon: <IconUser />,
   },
   {
     id: CustomerTypeChoice.Nonprofit,
-    icon: <IconGroup aria-hidden />,
+    icon: <IconGroup />,
   },
   {
     id: CustomerTypeChoice.Business,

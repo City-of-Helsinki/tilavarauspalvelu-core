@@ -1,6 +1,6 @@
 import { type ApplicationRoundNode } from "common/gql/gql-types";
 import { getTranslation } from "./util";
-import { Maybe } from "@/gql/gql-types";
+import { type Maybe } from "@/gql/gql-types";
 
 export function getApplicationRoundName(
   applicationRound?:

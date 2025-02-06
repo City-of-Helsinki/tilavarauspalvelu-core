@@ -86,19 +86,19 @@ function getApplicationStatusLabelProps(
     case ApplicationStatusChoice.Draft:
       return {
         type: "draft",
-        icon: <IconPen aria-hidden="true" />,
+        icon: <IconPen />,
       };
     case ApplicationStatusChoice.ResultsSent:
       return {
         type: "success",
-        icon: <IconCheck aria-hidden="true" />,
+        icon: <IconCheck />,
       };
     case ApplicationStatusChoice.Handled:
     case ApplicationStatusChoice.InAllocation:
     case ApplicationStatusChoice.Received:
       return {
         type: "info",
-        icon: <IconCogwheel aria-hidden="true" />,
+        icon: <IconCogwheel />,
       };
     // These two should never be shown to the client, so they are shown as any other unexpected status
     case ApplicationStatusChoice.Cancelled:
@@ -106,7 +106,7 @@ function getApplicationStatusLabelProps(
     default:
       return {
         type: "neutral",
-        icon: <IconQuestionCircle aria-hidden="true" />,
+        icon: <IconQuestionCircle />,
       };
   }
 }
@@ -158,9 +158,7 @@ export function ApplicationCard({
       onClick={() => setIsWaitingForDelete(true)}
       size={ButtonSize.Small}
       variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Secondary}
-      iconEnd={
-        isLoading ? <LoadingSpinner small /> : <IconCross aria-hidden="true" />
-      }
+      iconEnd={isLoading ? <LoadingSpinner small /> : <IconCross />}
       disabled={!editable || isLoading}
       key="cancel"
     >
@@ -173,7 +171,7 @@ export function ApplicationCard({
       width="full"
     >
       {t("applicationCard:edit")}
-      <IconPen aria-hidden="true" />
+      <IconPen />
     </ButtonLikeLink>,
     <ButtonLikeLink
       href={getApplicationPath(application.pk, "view")}
@@ -182,7 +180,7 @@ export function ApplicationCard({
       width="full"
     >
       {t("applicationCard:view")}
-      <IconArrowRight aria-hidden="true" />
+      <IconArrowRight />
     </ButtonLikeLink>,
   ];
 

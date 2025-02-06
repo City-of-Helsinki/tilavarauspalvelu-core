@@ -12,12 +12,16 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import NextImage from "next/image";
 import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
-import { getMainImage, getTranslation } from "@/modules/util";
-import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
+import { getMainImage } from "@/modules/util";
+import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 type Node = ReservationUnitCardFieldsFragment;
 interface CardProps {
@@ -33,17 +37,18 @@ export function ReservationUnitCard({
   containsReservationUnit,
   removeReservationUnit,
 }: CardProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
 
   const name = getReservationUnitName(reservationUnit);
 
   const unitName = reservationUnit.unit
-    ? getUnitName(reservationUnit.unit)
+    ? getTranslationSafe(reservationUnit.unit, "name", lang)
     : "-";
 
   const reservationUnitTypeName =
     reservationUnit.reservationUnitType != null
-      ? getTranslation(reservationUnit.reservationUnitType, "name")
+      ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
       : undefined;
 
   const img = getMainImage(reservationUnit);
@@ -58,7 +63,7 @@ export function ReservationUnitCard({
           alt=""
           width="24"
           height="24"
-          aria-hidden="true"
+          aria-hidden
         />
       ),
       value: reservationUnitTypeName,
@@ -66,14 +71,7 @@ export function ReservationUnitCard({
   }
   if (reservationUnit.maxPersons) {
     infos.push({
-      icon: (
-        <IconGroup
-          aria-label={t("reservationUnitCard:maxPersons", {
-            maxPersons: reservationUnit.maxPersons,
-          })}
-          size={IconSize.Small}
-        />
-      ),
+      icon: <IconGroup size={IconSize.Small} />,
       value: t("reservationUnitCard:maxPersons", {
         count: reservationUnit.maxPersons,
       }),
@@ -86,7 +84,7 @@ export function ReservationUnitCard({
       <Button
         size={ButtonSize.Small}
         variant={ButtonVariant.Primary}
-        iconEnd={<IconCheck aria-hidden="true" />}
+        iconEnd={<IconCheck />}
         onClick={() => removeReservationUnit(reservationUnit)}
         data-testid="reservation-unit-card__button--select"
         key={t("common:removeReservationUnit")}
@@ -99,7 +97,7 @@ export function ReservationUnitCard({
       <Button
         size={ButtonSize.Small}
         variant={ButtonVariant.Secondary}
-        iconEnd={<IconPlus aria-hidden="true" />}
+        iconEnd={<IconPlus />}
         onClick={() => selectReservationUnit(reservationUnit)}
         data-testid="reservation-unit-card__button--select"
         key={t("common:selectReservationUnit")}
@@ -116,7 +114,7 @@ export function ReservationUnitCard({
       data-testid="reservation-unit-card__button--link"
       key="show"
     >
-      <IconLinkExternal aria-hidden="true" />
+      <IconLinkExternal />
       {t("common:show")}
     </ButtonLikeLink>
   );
