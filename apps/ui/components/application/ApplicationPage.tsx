@@ -86,7 +86,6 @@ type ApplicationPageProps = {
   application: Node;
   translationKeyPrefix: string;
   overrideText?: string;
-  isDirty?: boolean;
   children?: React.ReactNode;
   headContent?: React.ReactNode;
 };

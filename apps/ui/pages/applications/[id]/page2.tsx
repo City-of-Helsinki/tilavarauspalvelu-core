@@ -52,16 +52,11 @@ function Page2({ application }: PropsNarrowed): JSX.Element {
     resolver: zodResolver(ApplicationPage2Schema),
   });
 
-  const {
-    formState: { isDirty },
-  } = form;
-
   return (
     <FormProvider {...form}>
       <ApplicationPageWrapper
         translationKeyPrefix="application:Page2"
         application={application}
-        isDirty={isDirty}
       >
         <Page2Impl application={application} onNext={saveAndNavigate} />
       </ApplicationPageWrapper>
