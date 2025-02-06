@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import datetime
-from decimal import Decimal
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.admin.email_template.utils import get_mock_data
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
 from tilavarauspalvelu.enums import AccessType, EmailType
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
@@ -41,52 +41,78 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
+
 # CONTEXT ##############################################################################################################
 
 
-@pytest.mark.django_db
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_modified__en(email_reservation):
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_modified(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal(0),
-            tax_percentage=Decimal(0),
-            reservation_id=email_reservation.id,
-            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
-            access_code_is_used=False,
-            access_code="",
-            access_code_validity_period="",
-            language="en",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "text_reservation_modified": "Your booking has been updated",
-        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+COMMON_CONTEXT = {
+    "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+    "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+    "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+}
+LANGUAGE_CONTEXT = {
+    "en": {
         "title": "Your booking has been updated",
+        "text_reservation_modified": "Your booking has been updated",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
         **RESERVATION_MANAGE_LINK_CONTEXT_EN,
         **KEYLESS_ENTRY_CONTEXT_EN,
-        "reservation_id": f"{email_reservation.id}",
-        "price": Decimal(0),
-        "subsidised_price": Decimal(0),
-        "tax_percentage": Decimal(0),
-    }
+        **COMMON_CONTEXT,
+    },
+    "fi": {
+        "title": "Varaustasi on muutettu",
+        "text_reservation_modified": "Varaustasi on muutettu",
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **RESERVATION_PRICE_INFO_CONTEXT_FI,
+        **RESERVATION_MANAGE_LINK_CONTEXT_FI,
+        **KEYLESS_ENTRY_CONTEXT_FI,
+        **COMMON_CONTEXT,
+    },
+    "sv": {
+        "title": "Din bokning har uppdaterats",
+        "text_reservation_modified": "Din bokning har uppdaterats",
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **RESERVATION_PRICE_INFO_CONTEXT_SV,
+        **RESERVATION_MANAGE_LINK_CONTEXT_SV,
+        **KEYLESS_ENTRY_CONTEXT_SV,
+        **COMMON_CONTEXT,
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__reservation_modified(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        assert context == get_context_for_reservation_modified(
-            reservation=email_reservation,
-            language="en",
-        )
+        assert get_context_for_reservation_modified(**get_mock_params(), language=lang) == expected
+        assert get_mock_data(email_type=EmailType.RESERVATION_MODIFIED, language=lang) == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_get_context__reservation_modified_instance(email_reservation):
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        "reservation_id": f"{email_reservation.id}",
+    }
+
+    params = {
+        "reservation_id": email_reservation.id,
+    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_modified(**get_mock_params(**params), language="en") == expected
+
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_modified(reservation=email_reservation, language="en") == expected
 
 
 @patch_method(
@@ -99,118 +125,24 @@ def test_get_context__reservation_modified__en(email_reservation):
 )
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_modified__access_code__en(email_reservation):
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_modified(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal(0),
-            tax_percentage=Decimal(0),
-            reservation_id=email_reservation.id,
-            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
-            access_code_is_used=True,
-            access_code="123456",
-            access_code_validity_period="11:00-15:00",
-            language="en",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "text_reservation_modified": "Your booking has been updated",
-        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "title": "Your booking has been updated",
-        **BASE_TEMPLATE_CONTEXT_EN,
-        **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        **RESERVATION_PRICE_INFO_CONTEXT_EN,
-        **RESERVATION_MANAGE_LINK_CONTEXT_EN,
-        **KEYLESS_ENTRY_CONTEXT_EN,
+def test_get_context__reservation_modified__access_code(email_reservation):
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
         **KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT,
         "reservation_id": f"{email_reservation.id}",
-        "price": Decimal(0),
-        "subsidised_price": Decimal(0),
-        "tax_percentage": Decimal(0),
     }
+
+    params = {
+        **KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT,
+        "reservation_id": email_reservation.id,
+    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_modified(**get_mock_params(**params), language="en") == expected
 
     email_reservation.access_type = AccessType.ACCESS_CODE
     email_reservation.save()
     with TranslationsFromPOFiles():
-        assert context == get_context_for_reservation_modified(
-            reservation=email_reservation,
-            language="en",
-        )
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_modified__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_modified(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            reservation_id=1234,
-            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
-            access_code_is_used=False,
-            access_code="",
-            access_code_validity_period="",
-            language="fi",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "text_reservation_modified": "Varaustasi on muutettu",
-        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "title": "Varaustasi on muutettu",
-        **BASE_TEMPLATE_CONTEXT_FI,
-        **RESERVATION_BASIC_INFO_CONTEXT_FI,
-        **RESERVATION_PRICE_INFO_CONTEXT_FI,
-        **RESERVATION_MANAGE_LINK_CONTEXT_FI,
-        **KEYLESS_ENTRY_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_modified__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_modified(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            price=Decimal("12.30"),
-            tax_percentage=Decimal("25.5"),
-            reservation_id=1234,
-            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
-            access_code_is_used=False,
-            access_code="",
-            access_code_validity_period="",
-            language="sv",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "text_reservation_modified": "Din bokning har uppdaterats",
-        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "title": "Din bokning har uppdaterats",
-        **BASE_TEMPLATE_CONTEXT_SV,
-        **RESERVATION_BASIC_INFO_CONTEXT_SV,
-        **RESERVATION_PRICE_INFO_CONTEXT_SV,
-        **RESERVATION_MANAGE_LINK_CONTEXT_SV,
-        **KEYLESS_ENTRY_CONTEXT_SV,
-    }
+        assert get_context_for_reservation_modified(reservation=email_reservation, language="en") == expected
 
 
 # RENDER TEXT ##########################################################################################################

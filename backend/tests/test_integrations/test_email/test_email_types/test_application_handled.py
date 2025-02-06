@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
@@ -24,15 +25,15 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
+
 # CONTEXT ##############################################################################################################
 
 
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__application_handled__en():
-    with TranslationsFromPOFiles():
-        context = get_context_for_application_handled(language="en")
-
-    assert context == {
+LANGUAGE_CONTEXT = {
+    "en": {
         "email_recipient_name": None,
         "text_application_handled": "Your application has been processed",
         "text_view_application": (
@@ -46,15 +47,8 @@ def test_get_context__application_handled__en():
         ),
         "title": "Your application has been processed",
         **BASE_TEMPLATE_CONTEXT_EN,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__application_handled__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_application_handled(language="fi")
-
-    assert context == {
+    },
+    "fi": {
         "email_recipient_name": None,
         "text_application_handled": "Hakemuksesi on käsitelty",
         "text_view_application": (
@@ -67,15 +61,8 @@ def test_get_context__application_handled__fi():
         ),
         "title": "Hakemuksesi on käsitelty",
         **BASE_TEMPLATE_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__application_handled__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_application_handled(language="sv")
-
-    assert context == {
+    },
+    "sv": {
         "email_recipient_name": None,
         "text_application_handled": "Din ansökan har behandlats",
         "text_view_application": (
@@ -89,7 +76,18 @@ def test_get_context__application_handled__sv():
         ),
         "title": "Din ansökan har behandlats",
         **BASE_TEMPLATE_CONTEXT_SV,
-    }
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__application_handled(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        assert get_context_for_application_handled(language=lang) == expected
+        assert get_mock_data(email_type=EmailType.APPLICATION_HANDLED, language=lang) == expected
 
 
 # RENDER TEXT ##########################################################################################################

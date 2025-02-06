@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import datetime
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.admin.email_template.utils import get_mock_data
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
 from tilavarauspalvelu.enums import EmailType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
@@ -28,104 +29,71 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
+
 # CONTEXT ##############################################################################################################
+
+
+COMMON_CONTEXT = {
+    "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+    "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
+    "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
+    "rejection_reason": "[HYLKÄYKSEN SYY]",
+    "reservation_id": "1234",
+}
+LANGUAGE_CONTEXT = {
+    "en": {
+        "title": "Unfortunately your booking cannot be confirmed",
+        "text_reservation_rejected": "Unfortunately your booking cannot be confirmed",
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **COMMON_CONTEXT,
+    },
+    "fi": {
+        "title": "Valitettavasti varaustasi ei voida vahvistaa",
+        "text_reservation_rejected": "Valitettavasti varaustasi ei voida vahvistaa",
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **COMMON_CONTEXT,
+    },
+    "sv": {
+        "title": "Tyvärr kan vi inte bekräfta din bokning",
+        "text_reservation_rejected": "Tyvärr kan vi inte bekräfta din bokning",
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **COMMON_CONTEXT,
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__reservation_rejected(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_rejected(**get_mock_params(), language=lang) == expected
+        assert get_mock_data(email_type=EmailType.RESERVATION_REJECTED, language=lang) == expected
 
 
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_rejected__en(email_reservation):
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_rejected(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            rejection_reason="[HYLKÄYKSEN SYY]",
-            reservation_id=email_reservation.id,
-            instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
-            language="en",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "booking_number_label": "Booking number",
+def test_get_context__reservation_rejected__instance(email_reservation):
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
         "reservation_id": f"{email_reservation.id}",
-        "rejection_reason": "[HYLKÄYKSEN SYY]",
-        "text_reservation_rejected": "Unfortunately your booking cannot be confirmed",
-        "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "title": "Unfortunately your booking cannot be confirmed",
-        **BASE_TEMPLATE_CONTEXT_EN,
-        **RESERVATION_BASIC_INFO_CONTEXT_EN,
     }
 
-    with TranslationsFromPOFiles():
-        assert context == get_context_for_reservation_rejected(
-            reservation=email_reservation,
-            language="en",
-        )
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_rejected__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_reservation_rejected(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            rejection_reason="Tässä on hylkäyksen syy",
-            reservation_id=1234,
-            instructions_cancelled="[HYVÄKSYTYN VARAUKSEN OHJEET]",
-            language="fi",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "booking_number_label": "Varausnumero",
-        "reservation_id": "1234",
-        "rejection_reason": "Tässä on hylkäyksen syy",
-        "text_reservation_rejected": "Valitettavasti varaustasi ei voida vahvistaa",
-        "instructions_cancelled_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_cancelled_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "title": "Valitettavasti varaustasi ei voida vahvistaa",
-        **BASE_TEMPLATE_CONTEXT_FI,
-        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+    params = {
+        "reservation_id": email_reservation.id,
     }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__reservation_rejected__sv():
     with TranslationsFromPOFiles():
-        context = get_context_for_reservation_rejected(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            rejection_reason="Här är orsaken till avslagningen",
-            reservation_id=1234,
-            instructions_cancelled="[HYVÄKSYTYN VARAUKSEN OHJEET]",
-            language="sv",
-        )
+        assert get_context_for_reservation_rejected(**get_mock_params(**params), language="en") == expected
 
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "booking_number_label": "Bokningsnummer",
-        "reservation_id": "1234",
-        "rejection_reason": "Här är orsaken till avslagningen",
-        "text_reservation_rejected": "Tyvärr kan vi inte bekräfta din bokning",
-        "instructions_cancelled_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_cancelled_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "title": "Tyvärr kan vi inte bekräfta din bokning",
-        **BASE_TEMPLATE_CONTEXT_SV,
-        **RESERVATION_BASIC_INFO_CONTEXT_SV,
-    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_rejected(reservation=email_reservation, language="en") == expected
 
 
 # RENDER TEXT ##########################################################################################################
