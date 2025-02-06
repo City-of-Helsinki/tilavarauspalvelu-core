@@ -39,7 +39,7 @@ from tests.test_integrations.test_email.helpers import (
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_requires_payment__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_payment(
@@ -84,7 +84,7 @@ def test_get_context__reservation_requires_payment__en(email_reservation):
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_requires_payment__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_payment(
@@ -119,7 +119,7 @@ def test_get_context__reservation_requires_payment__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_requires_payment__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_payment(

@@ -36,7 +36,7 @@ from tests.test_integrations.test_email.helpers import (
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_cancelled__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_cancelled(
@@ -76,7 +76,7 @@ def test_get_context__reservation_cancelled__en(email_reservation):
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_cancelled__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_cancelled(
@@ -106,7 +106,7 @@ def test_get_context__reservation_cancelled__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_cancelled__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_cancelled(

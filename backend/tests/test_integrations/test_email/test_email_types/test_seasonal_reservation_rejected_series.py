@@ -30,7 +30,7 @@ from tests.test_integrations.test_email.helpers import (
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_seasonal_reservation_rejected_series__en(email_reservation):
     section = email_reservation.actions.get_application_section()
 
@@ -73,7 +73,7 @@ def test_get_context_for_seasonal_reservation_rejected_series__en(email_reservat
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_seasonal_reservation_rejected_series__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_rejected_series(
@@ -103,7 +103,7 @@ def test_get_context_for_seasonal_reservation_rejected_series__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for__seasonal_reservation_rejected_series_sv():
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_rejected_series(
@@ -211,7 +211,7 @@ def test_render_seasonal_reservation_rejected_series__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_seasonal_reservation_rejected_series(outbox):
     reservation_series = create_reservation_series(
         reservations__type=ReservationTypeChoice.SEASONAL,
@@ -231,7 +231,7 @@ def test_email_service__send_seasonal_reservation_rejected_series(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_seasonal_reservation_rejected_series__email_not_sent__no_allocated_time_slot(outbox):
     reservation_series = create_reservation_series(
         user__email="user@email.com",

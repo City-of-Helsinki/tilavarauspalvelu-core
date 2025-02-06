@@ -27,7 +27,7 @@ from tests.test_integrations.test_email.helpers import (
 # CONTEXT ##############################################################################################################
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__application_received__en():
     with TranslationsFromPOFiles():
         context = get_context_for_application_received(language="en")
@@ -49,7 +49,7 @@ def test_get_context__application_received__en():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__application_received__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_application_received(language="fi")
@@ -71,7 +71,7 @@ def test_get_context__application_received__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__application_received__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_application_received(language="sv")

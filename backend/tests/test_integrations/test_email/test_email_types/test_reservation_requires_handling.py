@@ -39,7 +39,7 @@ from tests.test_integrations.test_email.helpers import (
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_requires_handling__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_handling(
@@ -85,7 +85,7 @@ def test_get_context__reservation_requires_handling__en(email_reservation):
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_requires_handling__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_handling(
@@ -121,7 +121,7 @@ def test_get_context__reservation_requires_handling__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_requires_handling__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_handling(
@@ -157,7 +157,7 @@ def test_get_context__reservation_requires_handling__sv():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_requires_handling__subsidised():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_handling(
@@ -436,7 +436,7 @@ def test_render_reservation_requires_handling__subsidised__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_reservation_requires_handling_email(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.REQUIRES_HANDLING,
@@ -445,8 +445,8 @@ def test_email_service__send_reservation_requires_handling_email(outbox):
         reservation_units__name="foo",
         reservation_units__pricings__lowest_price=0,
         reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)
@@ -459,7 +459,7 @@ def test_email_service__send_reservation_requires_handling_email(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_reservation_requires_handling_email__wrong_state(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -468,8 +468,8 @@ def test_email_service__send_reservation_requires_handling_email__wrong_state(ou
         reservation_units__name="foo",
         reservation_units__pricings__lowest_price=0,
         reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)
@@ -479,7 +479,7 @@ def test_email_service__send_reservation_requires_handling_email__wrong_state(ou
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
 def test_email_service__send_reservation_requires_handling_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
@@ -489,8 +489,8 @@ def test_email_service__send_reservation_requires_handling_email__no_recipients(
         reservation_units__name="foo",
         reservation_units__pricings__lowest_price=0,
         reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)
@@ -512,8 +512,8 @@ def test_email_service__send_reservation_requires_handling_email__reservation_in
         reservation_units__name="foo",
         reservation_units__pricings__lowest_price=0,
         reservation_units__pricings__highest_price=0,
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_requires_handling_email(reservation)

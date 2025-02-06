@@ -34,7 +34,7 @@ from tests.test_integrations.test_email.helpers import (
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_seasonal_reservation_modified_single__en(email_reservation):
     section = email_reservation.actions.get_application_section()
 
@@ -70,7 +70,7 @@ def test_get_context_for_seasonal_reservation_modified_single__en(email_reservat
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_seasonal_reservation_modified_single__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_modified_single(
@@ -95,7 +95,7 @@ def test_get_context_for_seasonal_reservation_modified_single__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_seasonal_reservation_modified_single__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_modified_single(
@@ -200,7 +200,7 @@ def test_render_seasonal_reservation_modified_single__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_seasonal_reservation_modified_single(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -208,8 +208,8 @@ def test_email_service__send_seasonal_reservation_modified_single(outbox):
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_modified_email(reservation)

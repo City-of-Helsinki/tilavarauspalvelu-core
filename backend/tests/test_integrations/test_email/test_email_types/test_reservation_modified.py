@@ -45,7 +45,7 @@ from tests.test_integrations.test_email.helpers import (
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_modified__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_modified(
@@ -98,7 +98,7 @@ def test_get_context__reservation_modified__en(email_reservation):
     ),
 )
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_modified__access_code__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_modified(
@@ -145,7 +145,7 @@ def test_get_context__reservation_modified__access_code__en(email_reservation):
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_modified__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_modified(
@@ -179,7 +179,7 @@ def test_get_context__reservation_modified__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_modified__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_modified(
@@ -415,14 +415,14 @@ def test_render_reservation_modified__access_code__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_reservation_modified_email(outbox):
     reservation = ReservationFactory.create(
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_modified_email(reservation)
@@ -438,15 +438,15 @@ def test_email_service__send_reservation_modified_email(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
 def test_email_service__send_reservation_modified_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
         reservee_email="",
         user__email="",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_modified_email(reservation)
@@ -465,8 +465,8 @@ def test_email_service__send_reservation_modified_email__reservation_in_the_past
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_modified_email(reservation)

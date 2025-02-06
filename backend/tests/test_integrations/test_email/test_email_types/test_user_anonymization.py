@@ -29,7 +29,7 @@ from tests.test_integrations.test_email.helpers import (
 # CONTEXT ##############################################################################################################
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__user_anonymization__en():
     with TranslationsFromPOFiles():
         context = get_context_for_user_anonymization(language="en")
@@ -48,7 +48,7 @@ def test_get_context__user_anonymization__en():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__user_anonymization__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_user_anonymization(language="fi")
@@ -67,7 +67,7 @@ def test_get_context__user_anonymization__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__user_anonymization__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_user_anonymization(language="sv")
@@ -166,7 +166,7 @@ def test_render_user_anonymization__html():
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(
     SEND_EMAILS=True,
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
@@ -188,7 +188,7 @@ def test_email_service__send_user_anonymization_emails(outbox):
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(
     SEND_EMAILS=True,
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
@@ -208,7 +208,7 @@ def test_email_service__send_user_anonymization_emails__no_email(outbox):
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(
     SEND_EMAILS=True,
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
@@ -227,7 +227,7 @@ def test_email_service__send_user_anonymization_emails__logged_in_recently(outbo
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(
     SEND_EMAILS=True,
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
@@ -252,7 +252,7 @@ def test_email_service__send_user_anonymization_emails__going_to_be_old(outbox):
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(
     SEND_EMAILS=True,
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
@@ -273,7 +273,7 @@ def test_email_service__send_user_anonymization_emails__already_anonymized(outbo
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(
     SEND_EMAILS=True,
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
@@ -304,7 +304,7 @@ def test_email_service__send_user_anonymization_emails__multiple_languages(outbo
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(
     SEND_EMAILS=True,
     ANONYMIZE_USER_IF_LAST_LOGIN_IS_OLDER_THAN_DAYS=10,
