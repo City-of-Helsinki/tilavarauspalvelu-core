@@ -2,6 +2,35 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from utils.utils import html_2_text
+
+
+def html_email_to_text(html_content: str) -> str:
+    """Convert a rendered email to plain text, used only for testing purposes."""
+    converted_text = html_2_text(html_content)
+
+    # Cleanup the text a little bit.
+    text: str = ""
+    previous_was_linebreak: bool = False
+    for row in converted_text.split("\n"):
+        # Remove unnecessary markup.
+        row = row.replace("|", "")
+        row = row.replace("---", "")
+        row = row.strip()
+
+        # Remove multiple empty lines (leave the first one)
+        if not row:
+            if previous_was_linebreak:
+                continue
+            previous_was_linebreak = True
+        else:
+            previous_was_linebreak = False
+
+        text += row + "\n"
+
+    return text.strip()
+
+
 BASE_TEMPLATE_CONTEXT_EN = {
     "current_year": "2024",
     "font_src": "https://makasiini.hel.ninja/delivery/HelsinkiGrotesk/565d73a693abe0776c801607ac28f0bf.woff",
