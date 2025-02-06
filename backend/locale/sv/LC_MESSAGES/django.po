@@ -3414,6 +3414,43 @@ msgstr "inkl. moms"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
+msgid "Varaamo customer service"
+msgstr "Varaamo kundtjänst"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#, python-format
+msgctxt "Email"
+msgid ""
+"You can see the door code on the %(my_reservations)s at Varaamo. If the code "
+"is not visible in your booking details, please contact %(customer_service)s."
+msgstr ""
+"Du kan se dörrkoden på %(my_reservations)s i Varaamo. Om koden inte syns i "
+"dina bokningsuppgifter, vänligen kontakta %(customer_service)s."
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Door code"
+msgstr "Dörrkod"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Validity period of the door code"
+msgstr "Dörrkodens giltighetstid"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "You can access the space with the door code"
+msgstr "Du kan komma in i utrymmet med dörrkoden"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid ""
+"Here are your booking details and the door code for easy access to the space"
+msgstr ""
+"Här är dina bokningsuppgifter och dörrkoden för enkel åtkomst till utrymmet"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
 msgid "You can check your booking details at"
 msgstr "Du kan kontrollera dina bokningsuppgifter på"
 

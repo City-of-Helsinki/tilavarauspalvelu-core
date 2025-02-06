@@ -15,11 +15,13 @@ from .common import (
     get_contex_for_reservation_manage_link,
     get_contex_for_reservation_price,
     get_contex_for_seasonal_reservation_check_details_url,
+    get_context_for_keyless_entry,
     get_context_for_translations,
     get_my_reservations_ext_link,
     get_staff_reservations_ext_link,
     params_for_application_section_info,
     params_for_base_info,
+    params_for_keyless_entry,
     params_for_price_info,
     params_for_price_range_info,
     params_for_reservation_series_info,
@@ -81,6 +83,9 @@ def get_context_for_reservation_approved(
     tax_percentage: Decimal,
     reservation_id: int,
     instructions: str,
+    access_code_is_used: bool,
+    access_code: str,
+    access_code_validity_period: str,
 ) -> EmailContext: ...
 
 
@@ -98,6 +103,7 @@ def get_context_for_reservation_approved(
             "instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_info(reservation=reservation),
+            **params_for_keyless_entry(reservation=reservation),
         }
 
     text_reservation_approved = (
@@ -123,6 +129,12 @@ def get_context_for_reservation_approved(
             price=data["price"],
             tax_percentage=data["tax_percentage"],
             reservation_id=data["reservation_id"],
+        ),
+        **get_context_for_keyless_entry(
+            language=language,
+            access_code_is_used=data["access_code_is_used"],
+            access_code=data["access_code"],
+            access_code_validity_period=data["access_code_validity_period"],
         ),
         **get_contex_for_reservation_manage_link(language=language),
     }

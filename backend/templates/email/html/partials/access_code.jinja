@@ -1,0 +1,10 @@
+{% if access_code_is_used %}
+<mj-spacer />
+{% if access_code %}
+<mj-text>{{ text_access_code_to_access | sentence }}</mj-text>
+<mj-text>{{ access_code_label | safe }}: {{ access_code }}</mj-text>
+<mj-text>{{ access_code_validity_period_label | safe }}: {{ access_code_validity_period }}</mj-text>
+{% else %}
+<mj-text>{{ text_access_code_unavailable_instructions_html | sentence }}</mj-text>
+{% endif %}
+{% endif %}

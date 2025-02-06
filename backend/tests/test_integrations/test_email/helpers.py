@@ -183,6 +183,72 @@ BASE_TEMPLATE_CONTEXT_SV = (
     | APPLICATION_TRANSLATIONS_CONTEXT_SV
 )
 
+KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT = {
+    "access_code_is_used": True,
+    "access_code": "123456",
+    "access_code_validity_period": "11:00-15:00",
+}
+
+KEYLESS_ENTRY_CONTEXT_EN = {
+    "access_code_is_used": False,
+    "access_code": "",
+    "access_code_validity_period": "",
+    "access_code_label": "Door code",
+    "access_code_validity_period_label": "Validity period of the door code",
+    "text_access_code_to_access": "You can access the space with the door code",
+    "text_access_code_confirmed": "Here are your booking details and the door code for easy access to the space",
+    "text_access_code_unavailable_instructions_html": (
+        "You can see the door code on the "
+        "<a href=\"https://fake.varaamo.hel.fi/en/reservations\">'My bookings' page</a> at Varaamo. "
+        "If the code is not visible in your booking details, please contact "
+        '<a href="https://fake.varaamo.hel.fi/feedback?lang=en">Varaamo customer service</a>.'
+    ),
+    "text_access_code_unavailable_instructions": (
+        "You can see the door code on the https://fake.varaamo.hel.fi/en/reservations: 'My bookings' page at Varaamo. "
+        "If the code is not visible in your booking details, please contact "
+        "https://fake.varaamo.hel.fi/feedback?lang=en: Varaamo customer service."
+    ),
+}
+KEYLESS_ENTRY_CONTEXT_FI = {
+    "access_code_is_used": False,
+    "access_code": "",
+    "access_code_validity_period": "",
+    "access_code_label": "Ovikoodi",
+    "access_code_validity_period_label": "Ovikoodin voimassaoloaika",
+    "text_access_code_to_access": "Pääset tilaan sisään ovikoodilla",
+    "text_access_code_confirmed": "Tässä ovat varauksesi tiedot ja ovikoodi, jolla pääset tilaan helposti",
+    "text_access_code_unavailable_instructions_html": (
+        "Näet ovikoodin Varaamon "
+        "<a href=\"https://fake.varaamo.hel.fi/reservations\">'Omat Varaukset' -sivulla</a>. "
+        "Jos koodi ei ole näkyvissä varauksesi tiedoissa, ota yhteyttä "
+        '<a href="https://fake.varaamo.hel.fi/feedback?lang=fi">Varaamon asiakaspalveluun</a>.'
+    ),
+    "text_access_code_unavailable_instructions": (
+        "Näet ovikoodin Varaamon https://fake.varaamo.hel.fi/reservations: 'Omat Varaukset' -sivulla. "
+        "Jos koodi ei ole näkyvissä varauksesi tiedoissa, ota yhteyttä "
+        "https://fake.varaamo.hel.fi/feedback?lang=fi: Varaamon asiakaspalveluun."
+    ),
+}
+KEYLESS_ENTRY_CONTEXT_SV = {
+    "access_code_is_used": False,
+    "access_code": "",
+    "access_code_validity_period": "",
+    "access_code_label": "Dörrkod",
+    "access_code_validity_period_label": "Dörrkodens giltighetstid",
+    "text_access_code_to_access": "Du kan komma in i utrymmet med dörrkoden",
+    "text_access_code_confirmed": "Här är dina bokningsuppgifter och dörrkoden för enkel åtkomst till utrymmet",
+    "text_access_code_unavailable_instructions_html": (
+        "Du kan se dörrkoden på <a href=\"https://fake.varaamo.hel.fi/sv/reservations\">'Mina bokningar'</a> i Varaamo."
+        " Om koden inte syns i dina bokningsuppgifter, vänligen kontakta "
+        '<a href="https://fake.varaamo.hel.fi/feedback?lang=sv">Varaamo kundtjänst</a>.'
+    ),
+    "text_access_code_unavailable_instructions": (
+        "Du kan se dörrkoden på https://fake.varaamo.hel.fi/sv/reservations: 'Mina bokningar' i Varaamo. "
+        "Om koden inte syns i dina bokningsuppgifter, vänligen kontakta "
+        "https://fake.varaamo.hel.fi/feedback?lang=sv: Varaamo kundtjänst."
+    ),
+}
+
 
 RESERVATION_BASIC_INFO_CONTEXT_EN = {
     "reservation_unit_name": "Test reservation unit",
