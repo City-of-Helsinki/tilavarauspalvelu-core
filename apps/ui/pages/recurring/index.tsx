@@ -105,22 +105,18 @@ function RecurringLander({ applicationRounds }: Props): JSX.Element {
         <p>{t("recurringLander:subHeading")}</p>
       </div>
       <>
-        {activeApplicationRounds.length > 0 ? (
-          <Flex data-testid="recurring-lander__application-round-container--active">
-            <H2 $noMargin>{t("recurringLander:roundHeadings.active")}</H2>
-            {activeApplicationRounds.map((applicationRound) => (
-              <ApplicationRoundCard
-                key={applicationRound.pk}
-                applicationRound={applicationRound}
-              />
-            ))}
-          </Flex>
-        ) : (
-          <Flex data-testid="recurring-lander__application-round-container--active-empty">
-            <H2 $noMargin>{t("recurringLander:roundHeadings.active")}</H2>
-            {t("recurringLander:noRounds")}
-          </Flex>
-        )}
+        <Flex data-testid="recurring-lander__application-round-container--active">
+          <H2 $noMargin>{t("recurringLander:roundHeadings.active")}</H2>
+          {activeApplicationRounds.length > 0 ? null : (
+            <p>{t("recurringLander:noRounds")}</p>
+          )}
+          {activeApplicationRounds.map((applicationRound) => (
+            <ApplicationRoundCard
+              key={applicationRound.pk}
+              applicationRound={applicationRound}
+            />
+          ))}
+        </Flex>
         {pendingApplicationRounds.length > 0 && (
           <Flex data-testid="recurring-lander__application-round-container--pending">
             <H2 $noMargin>{t("recurringLander:roundHeadings.pending")}</H2>
