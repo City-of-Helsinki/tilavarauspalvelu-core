@@ -82,7 +82,7 @@ def get_context_for_reservation_approved(
     non_subsidised_price: Decimal,
     tax_percentage: Decimal,
     reservation_id: int,
-    instructions: str,
+    instructions_confirmed: str,
     access_code_is_used: bool,
     access_code: str,
     access_code_validity_period: str,
@@ -100,7 +100,7 @@ def get_context_for_reservation_approved(
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
             "non_subsidised_price": reservation.non_subsidised_price,
-            "instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
+            "instructions_confirmed": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_info(reservation=reservation),
             **params_for_keyless_entry(reservation=reservation),
@@ -115,8 +115,8 @@ def get_context_for_reservation_approved(
     return {
         "title": pgettext("Email", "Your booking is confirmed"),
         "text_reservation_approved": text_reservation_approved,
-        "instructions_html": data["instructions"],
-        "instructions_text": convert_html_to_text(data["instructions"]),
+        "instructions_confirmed_html": data["instructions_confirmed"],
+        "instructions_confirmed_text": convert_html_to_text(data["instructions_confirmed"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -165,7 +165,7 @@ def get_context_for_reservation_cancelled(
     price: Decimal,
     tax_percentage: Decimal,
     reservation_id: int,
-    instructions: str,
+    instructions_cancelled: str,
 ) -> EmailContext: ...
 
 
@@ -180,7 +180,7 @@ def get_context_for_reservation_cancelled(
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
             "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language=language),
-            "instructions": reservation.actions.get_instructions(kind="cancelled", language=language),
+            "instructions_cancelled": reservation.actions.get_instructions(kind="cancelled", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_info(reservation=reservation),
         }
@@ -188,8 +188,8 @@ def get_context_for_reservation_cancelled(
     return {
         "title": pgettext("Email", "Your booking has been cancelled"),
         "cancel_reason": data["cancel_reason"],
-        "instructions_html": data["instructions"],
-        "instructions_text": convert_html_to_text(data["instructions"]),
+        "instructions_cancelled_html": data["instructions_cancelled"],
+        "instructions_cancelled_text": convert_html_to_text(data["instructions_cancelled"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -230,7 +230,7 @@ def get_context_for_reservation_confirmed(
     price: Decimal,
     tax_percentage: Decimal,
     reservation_id: int,
-    instructions: str,
+    instructions_confirmed: str,
     access_code_is_used: bool,
     access_code: str,
     access_code_validity_period: str,
@@ -247,7 +247,7 @@ def get_context_for_reservation_confirmed(
     if reservation is not None:
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
-            "instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
+            "instructions_confirmed": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_info(reservation=reservation),
             **params_for_keyless_entry(reservation=reservation),
@@ -256,8 +256,8 @@ def get_context_for_reservation_confirmed(
     return {
         "title": pgettext("Email", "Thank you for your booking at Varaamo"),
         "text_reservation_confirmed": pgettext("Email", "You have made a new booking"),
-        "instructions_html": data["instructions"],
-        "instructions_text": convert_html_to_text(data["instructions"]),
+        "instructions_confirmed_html": data["instructions_confirmed"],
+        "instructions_confirmed_text": convert_html_to_text(data["instructions_confirmed"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -305,7 +305,7 @@ def get_context_for_reservation_modified(
     price: Decimal,
     tax_percentage: Decimal,
     reservation_id: int,
-    instructions: str,
+    instructions_confirmed: str,
     access_code_is_used: bool,
     access_code: str,
     access_code_validity_period: str,
@@ -322,7 +322,7 @@ def get_context_for_reservation_modified(
     if reservation is not None:
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
-            "instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
+            "instructions_confirmed": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_info(reservation=reservation),
             **params_for_keyless_entry(reservation=reservation),
@@ -331,8 +331,8 @@ def get_context_for_reservation_modified(
     return {
         "title": pgettext("Email", "Your booking has been updated"),
         "text_reservation_modified": pgettext("Email", "Your booking has been updated"),
-        "instructions_html": data["instructions"],
-        "instructions_text": convert_html_to_text(data["instructions"]),
+        "instructions_confirmed_html": data["instructions_confirmed"],
+        "instructions_confirmed_text": convert_html_to_text(data["instructions_confirmed"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -379,7 +379,7 @@ def get_context_for_reservation_rejected(
     end_datetime: datetime.datetime,
     rejection_reason: str,
     reservation_id: int,
-    instructions: str,
+    instructions_cancelled: str,
 ) -> EmailContext: ...
 
 
@@ -393,7 +393,7 @@ def get_context_for_reservation_rejected(
     if reservation is not None:
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
-            "instructions": reservation.actions.get_instructions(kind="cancelled", language=language),
+            "instructions_cancelled": reservation.actions.get_instructions(kind="cancelled", language=language),
             "rejection_reason": get_attr_by_language(reservation.deny_reason, "reason", language),
             "reservation_id": reservation.id,
             **params_for_base_info(reservation=reservation, language=language),
@@ -404,8 +404,8 @@ def get_context_for_reservation_rejected(
         "text_reservation_rejected": pgettext("Email", "Unfortunately your booking cannot be confirmed"),
         "rejection_reason": data["rejection_reason"],
         "reservation_id": str(data["reservation_id"]),
-        "instructions_html": data["instructions"],
-        "instructions_text": convert_html_to_text(data["instructions"]),
+        "instructions_cancelled_html": data["instructions_cancelled"],
+        "instructions_cancelled_text": convert_html_to_text(data["instructions_cancelled"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -443,7 +443,7 @@ def get_context_for_reservation_requires_handling(
     applying_for_free_of_charge: bool,
     tax_percentage: Decimal,
     reservation_id: int,
-    instructions: str,
+    instructions_pending: str,
 ) -> EmailContext: ...
 
 
@@ -457,7 +457,7 @@ def get_context_for_reservation_requires_handling(
     if reservation is not None:
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
-            "instructions": reservation.actions.get_instructions(kind="pending", language=language),
+            "instructions_pending": reservation.actions.get_instructions(kind="pending", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_range_info(reservation=reservation),
         }
@@ -471,8 +471,8 @@ def get_context_for_reservation_requires_handling(
             "You will receive a confirmation email once your booking has been processed. "
             "We will contact you if further information is needed regarding your booking request.",
         ),
-        "instructions_html": data["instructions"],
-        "instructions_text": convert_html_to_text(data["instructions"]),
+        "instructions_pending_html": data["instructions_pending"],
+        "instructions_pending_text": convert_html_to_text(data["instructions_pending"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],
@@ -517,7 +517,7 @@ def get_context_for_reservation_requires_payment(
     tax_percentage: Decimal,
     payment_due_date: datetime.date,
     reservation_id: int,
-    instructions: str,
+    instructions_confirmed: str,
 ) -> EmailContext: ...
 
 
@@ -532,7 +532,7 @@ def get_context_for_reservation_requires_payment(
         data: dict[str, Any] = {
             "email_recipient_name": reservation.actions.get_email_reservee_name(),
             "payment_due_date": local_date(),
-            "instructions": reservation.actions.get_instructions(kind="confirmed", language=language),
+            "instructions_confirmed": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_info(reservation=reservation),
         }
@@ -547,8 +547,8 @@ def get_context_for_reservation_requires_payment(
         "payment_due_date": data["payment_due_date"].strftime("%-d.%-m.%Y"),
         "pay_reservation_link_html": create_anchor_tag(link=link, text=text),
         "pay_reservation_link": f"{text}: {link}",
-        "instructions_html": data["instructions"],
-        "instructions_text": convert_html_to_text(data["instructions"]),
+        "instructions_confirmed_html": data["instructions_confirmed"],
+        "instructions_confirmed_text": convert_html_to_text(data["instructions_confirmed"]),
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_reservation_basic_info(
             reservation_unit_name=data["reservation_unit_name"],

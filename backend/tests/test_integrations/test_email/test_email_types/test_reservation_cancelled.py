@@ -50,14 +50,14 @@ def test_get_context__reservation_cancelled__en(email_reservation):
             price=Decimal(0),
             tax_percentage=Decimal(0),
             reservation_id=email_reservation.id,
-            instructions="[PERUUTETUN VARAUKSEN OHJEET]",
+            instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
             language="en",
         )
 
     assert context == {
         "cancel_reason": "[PERUUTUKSEN SYY]",
-        "instructions_html": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "instructions_text": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Your booking has been cancelled",
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -90,14 +90,14 @@ def test_get_context__reservation_cancelled__fi():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            instructions="Tässä ovat ohjeet",
+            instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
             language="fi",
         )
 
     assert context == {
         "cancel_reason": "[PERUUTUKSEN SYY]",
-        "instructions_html": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "instructions_text": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Varauksesi on peruttu",
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -120,14 +120,14 @@ def test_get_context__reservation_cancelled__sv():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            instructions="Här är instruktionerna",
+            instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
             language="sv",
         )
 
     assert context == {
         "cancel_reason": "[PERUUTUKSEN SYY]",
-        "instructions_html": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "instructions_text": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Din bokning har avbokats",
         **BASE_TEMPLATE_CONTEXT_SV,

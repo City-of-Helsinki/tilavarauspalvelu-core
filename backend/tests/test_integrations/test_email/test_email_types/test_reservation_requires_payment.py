@@ -53,7 +53,7 @@ def test_get_context__reservation_requires_payment__en(email_reservation):
             tax_percentage=Decimal(0),
             payment_due_date=datetime.date(2024, 1, 1),
             reservation_id=email_reservation.id,
-            instructions="[HYVÄKSYTYN VARAUKSEN OHJEET]",
+            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="en",
         )
 
@@ -64,8 +64,8 @@ def test_get_context__reservation_requires_payment__en(email_reservation):
         "text_reservation_requires_payment": "Your booking has been confirmed, and can be paid",
         "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/en/reservations">Pay the booking</a>',
         "pay_reservation_link": "Pay the booking: https://fake.varaamo.hel.fi/en/reservations",
-        "instructions_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "title": "Your booking has been confirmed, and can be paid",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -98,7 +98,7 @@ def test_get_context__reservation_requires_payment__fi():
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
             reservation_id=12,
-            instructions="Tässä ovat ohjeet",
+            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="fi",
         )
 
@@ -109,8 +109,8 @@ def test_get_context__reservation_requires_payment__fi():
         "text_reservation_requires_payment": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla",
         "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/reservations">Maksa varaus</a>',
         "pay_reservation_link": "Maksa varaus: https://fake.varaamo.hel.fi/reservations",
-        "instructions_html": "Tässä ovat ohjeet",
-        "instructions_text": "Tässä ovat ohjeet",
+        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "title": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
@@ -133,7 +133,7 @@ def test_get_context__reservation_requires_payment__sv():
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
             reservation_id=12,
-            instructions="Här är instruktionerna",
+            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="sv",
         )
 
@@ -144,8 +144,8 @@ def test_get_context__reservation_requires_payment__sv():
         "text_reservation_requires_payment": "Din bokning har bekräftats och kan betalas",
         "pay_reservation_link_html": '<a href="https://fake.varaamo.hel.fi/sv/reservations">Betala bokningen</a>',
         "pay_reservation_link": "Betala bokningen: https://fake.varaamo.hel.fi/sv/reservations",
-        "instructions_html": "Här är instruktionerna",
-        "instructions_text": "Här är instruktionerna",
+        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "title": "Din bokning har bekräftats och kan betalas",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,

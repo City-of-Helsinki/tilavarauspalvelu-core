@@ -44,7 +44,7 @@ def test_get_context__reservation_rejected__en(email_reservation):
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="[HYLKÄYKSEN SYY]",
             reservation_id=email_reservation.id,
-            instructions="[PERUUTETUN VARAUKSEN OHJEET]",
+            instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
             language="en",
         )
 
@@ -54,8 +54,8 @@ def test_get_context__reservation_rejected__en(email_reservation):
         "reservation_id": f"{email_reservation.id}",
         "rejection_reason": "[HYLKÄYKSEN SYY]",
         "text_reservation_rejected": "Unfortunately your booking cannot be confirmed",
-        "instructions_html": "[PERUUTETUN VARAUKSEN OHJEET]",
-        "instructions_text": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "instructions_cancelled_html": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "instructions_cancelled_text": "[PERUUTETUN VARAUKSEN OHJEET]",
         "title": "Unfortunately your booking cannot be confirmed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
@@ -80,7 +80,7 @@ def test_get_context__reservation_rejected__fi():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="Tässä on hylkäyksen syy",
             reservation_id=12,
-            instructions="Tässä ovat ohjeet",
+            instructions_cancelled="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="fi",
         )
 
@@ -90,8 +90,8 @@ def test_get_context__reservation_rejected__fi():
         "reservation_id": "12",
         "rejection_reason": "Tässä on hylkäyksen syy",
         "text_reservation_rejected": "Valitettavasti varaustasi ei voida vahvistaa",
-        "instructions_html": "Tässä ovat ohjeet",
-        "instructions_text": "Tässä ovat ohjeet",
+        "instructions_cancelled_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_cancelled_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "title": "Valitettavasti varaustasi ei voida vahvistaa",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
@@ -110,7 +110,7 @@ def test_get_context__reservation_rejected__sv():
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             rejection_reason="Här är orsaken till avslagningen",
             reservation_id=12,
-            instructions="Här är instruktionerna",
+            instructions_cancelled="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="sv",
         )
 
@@ -120,8 +120,8 @@ def test_get_context__reservation_rejected__sv():
         "reservation_id": "12",
         "rejection_reason": "Här är orsaken till avslagningen",
         "text_reservation_rejected": "Tyvärr kan vi inte bekräfta din bokning",
-        "instructions_html": "Här är instruktionerna",
-        "instructions_text": "Här är instruktionerna",
+        "instructions_cancelled_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_cancelled_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "title": "Tyvärr kan vi inte bekräfta din bokning",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,

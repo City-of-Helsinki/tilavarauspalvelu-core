@@ -58,7 +58,7 @@ def test_get_context__reservation_confirmed__en(email_reservation):
             price=Decimal(0),
             tax_percentage=Decimal(0),
             reservation_id=email_reservation.id,
-            instructions="[HYVÄKSYTYN VARAUKSEN OHJEET]",
+            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=False,
             access_code="",
             access_code_validity_period="",
@@ -67,8 +67,8 @@ def test_get_context__reservation_confirmed__en(email_reservation):
 
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "instructions_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "text_reservation_confirmed": "You have made a new booking",
         "title": "Thank you for your booking at Varaamo",
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -111,7 +111,7 @@ def test_get_context__reservation_confirmed__access_code__en(email_reservation):
             price=Decimal(0),
             tax_percentage=Decimal(0),
             reservation_id=email_reservation.id,
-            instructions="[HYVÄKSYTYN VARAUKSEN OHJEET]",
+            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=True,
             access_code="123456",
             access_code_validity_period="11:00-15:00",
@@ -120,8 +120,8 @@ def test_get_context__reservation_confirmed__access_code__en(email_reservation):
 
     assert context == {
         "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "instructions_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
-        "instructions_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "text_reservation_confirmed": "You have made a new booking",
         "title": "Thank you for your booking at Varaamo",
         **BASE_TEMPLATE_CONTEXT_EN,
@@ -158,7 +158,7 @@ def test_get_context__reservation_confirmed__fi():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            instructions="Nämä ovat ohjeet",
+            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=False,
             access_code="",
             access_code_validity_period="",
@@ -167,8 +167,8 @@ def test_get_context__reservation_confirmed__fi():
 
     assert context == {
         "email_recipient_name": "Mikko Mallikas",
-        "instructions_html": "Nämä ovat ohjeet",
-        "instructions_text": "Nämä ovat ohjeet",
+        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "text_reservation_confirmed": "Olet tehnyt uuden varauksen",
         "title": "Kiitos varauksestasi Varaamossa",
         **BASE_TEMPLATE_CONTEXT_FI,
@@ -192,7 +192,7 @@ def test_get_context__reservation_confirmed__sv():
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             reservation_id=12,
-            instructions="Här är instruktionerna",
+            instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=False,
             access_code="",
             access_code_validity_period="",
@@ -201,8 +201,8 @@ def test_get_context__reservation_confirmed__sv():
 
     assert context == {
         "email_recipient_name": "Magnus Persson",
-        "instructions_html": "Här är instruktionerna",
-        "instructions_text": "Här är instruktionerna",
+        "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
+        "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "text_reservation_confirmed": "Du har gjort en ny bokning",
         "title": "Tack för din bokning på Varaamo",
         **BASE_TEMPLATE_CONTEXT_SV,
