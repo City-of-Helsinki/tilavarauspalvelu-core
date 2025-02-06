@@ -13,6 +13,7 @@ from tilavarauspalvelu.api.rest.views import (
     liveness_check,
     readiness_check,
     reservation_ical,
+    reservation_unit_export,
     terms_of_use_pdf,
 )
 from tilavarauspalvelu.api.webhooks.urls import webhook_router
@@ -55,6 +56,7 @@ urlpatterns = [
     path("monitoring/system-status/", include("health_check.urls", namespace="health_check")),
     path("monitoring/liveness/", liveness_check, name="liveness_check"),
     path("monitoring/readiness/", readiness_check, name="readiness_check"),
+    path("v1/reports/reservation-units/", reservation_unit_export, name="reservation_unit_export"),
 ]
 
 if settings.MOCK_VERKKOKAUPPA_API_ENABLED:

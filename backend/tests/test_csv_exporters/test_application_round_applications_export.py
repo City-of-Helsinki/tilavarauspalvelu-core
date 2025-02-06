@@ -58,7 +58,7 @@ def test_application_round_applications_export__multiple_applications(graphql):
 
     exporter = ApplicationRoundApplicationsCSVExporter(application_round_id=application_round.id)
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     writes = mock_writer.get_writes()
 
@@ -227,7 +227,7 @@ def test_application_round_applications_export__missing_data(graphql, column_val
     # when:
     # - The exporter is run
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     # then:
     # - The writes to the csv file are correct
@@ -261,7 +261,7 @@ def test_application_round_applications_export__no_reservation_unit_options(grap
     # when:
     # - The exporter is run
     with mock_csv_writer() as mock_writer:
-        exporter.write()
+        exporter.write_csv()
 
     # then:
     # - The csv doesn't contain the reservation unit options column

@@ -5,17 +5,21 @@ import io
 from typing import TYPE_CHECKING
 
 from django.apps import apps
+from django.conf import settings
 from django.db import connection
-from django.http import FileResponse, HttpResponseRedirect, JsonResponse
+from django.http import FileResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 
-from tilavarauspalvelu.models import Reservation, TermsOfUse
+from tilavarauspalvelu.models import Reservation, ReservationUnit, TermsOfUse
+from tilavarauspalvelu.services.csv_export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
 from utils.utils import ical_hmac_signature
 
 if TYPE_CHECKING:
+    from django.http import HttpResponse
+
     from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
@@ -137,3 +141,28 @@ def readiness_check(request: WSGIRequest) -> JsonResponse:
         return JsonResponse({"status": "NOT_READY", "error": str(error)}, status=503)
 
     return JsonResponse({"status": "READY"}, status=200)
+
+
+@require_GET
+@csrf_exempt  # NOSONAR
+def reservation_unit_export(request: WSGIRequest) -> HttpResponse:
+    """Export reservation units to JSON."""
+    authorization = request.META.get("HTTP_AUTHORIZATION", "")
+    if authorization != settings.EXPORT_AUTHORIZATION_TOKEN:
+        msg = "Not authorized to export reservation units."
+        return HttpResponseForbidden(msg)
+
+    try:
+        reservation_units = [int(pk) for pk in request.GET.get("only", "").split(",") if pk]
+    except (ValueError, TypeError):
+        msg = "'only' should be a comma separated list of reservation unit ids."
+        return HttpResponseBadRequest(msg)
+
+    queryset = ReservationUnit.objects.all()
+    if reservation_units:
+        queryset = queryset.filter(pk__in=reservation_units)
+
+    exporter = ReservationUnitExporter(queryset=queryset)
+    data = exporter.write_json()
+
+    return JsonResponse(data, safe=False, status=200)
