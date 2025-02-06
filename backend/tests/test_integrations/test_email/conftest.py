@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from tilavarauspalvelu.enums import WeekdayChoice
+from tilavarauspalvelu.enums import ReservationStateChoice, WeekdayChoice
 from utils.date_utils import local_datetime
 
 from tests.factories import (
@@ -50,6 +50,7 @@ def email_reservation() -> Reservation:
         name="Test reservation",
         reservation_unit=reservation_unit,
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
         reservee_first_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         reservee_last_name="",
         cancel_reason__reason_en="[PERUUTUKSEN SYY]",

@@ -43,7 +43,7 @@ __all__ = [
 
 
 @get_translated
-def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> EmailContext | None:  # noqa: PLR0912, PLR0911
+def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> EmailContext | None:  # noqa: PLR0912, PLR0911, PLR0915
     email_recipient_name = kwargs.get("email_recipient_name", "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]")
     reservee_name = kwargs.get("reservee_name", "[VARAAJAN NIMI]")
     reservation_name = kwargs.get("reservation_name", "[VARAUKSEN NIMI]")
@@ -83,6 +83,9 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
             },
         ],
     )
+    access_code_is_used = kwargs.get("access_code_is_used", False)
+    access_code = kwargs.get("access_code", "123456")
+    access_code_validity_period = kwargs.get("access_code_validity_period", "11:00-15:00")
 
     match email_type:
         # Application ##################################################################################################
@@ -129,6 +132,9 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 tax_percentage=tax_percentage,
                 reservation_id=reservation_id,
                 instructions=confirmed_instructions,
+                access_code_is_used=access_code_is_used,
+                access_code=access_code,
+                access_code_validity_period=access_code_validity_period,
                 language=language,
             )
         case EmailType.RESERVATION_CANCELLED:
