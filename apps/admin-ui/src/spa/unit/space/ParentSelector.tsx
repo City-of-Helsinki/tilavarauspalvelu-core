@@ -108,7 +108,6 @@ export function ParentSelector({
         error: errorText,
         assistive: helperText,
       }}
-      required
       disabled={options.length === 0}
       clearable={false}
       options={hdsOptions}

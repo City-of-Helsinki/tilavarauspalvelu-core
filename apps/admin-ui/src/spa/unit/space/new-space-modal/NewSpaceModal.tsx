@@ -46,10 +46,11 @@ export function NewSpaceModal({
     },
   });
 
-  async function createSpaces(values: SpaceUpdateForm) {
+  async function createSpaces({ parent, ...values }: SpaceUpdateForm) {
     try {
       await createSpace({
         ...values,
+        parent: parent != null && parent > 0 ? parent : null,
         name: values.nameFi,
       });
       closeModal();

@@ -42,11 +42,10 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
 
   const { t } = useTranslation();
 
-  const [updateSpaceMutation, { loading: isMutationLoading }] =
-    useUpdateSpaceMutation();
+  const [mutation, { loading: isMutationLoading }] = useUpdateSpaceMutation();
 
   const updateSpace = (input: SpaceUpdateMutationInput) =>
-    updateSpaceMutation({ variables: { input } });
+    mutation({ variables: { input } });
 
   const {
     data,
@@ -110,7 +109,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
 
   const onSubmit = async (values: SpaceUpdateForm) => {
     try {
-      const { surfaceArea, pk, ...rest } = values;
+      const { parent, surfaceArea, pk, ...rest } = values;
       if (pk == null || pk === 0) {
         errorToast({ text: t("SpaceEditor.saveFailed") });
         return;
@@ -118,6 +117,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
       await updateSpace({
         ...rest,
         pk,
+        parent: parent != null && parent > 0 ? parent : null,
         surfaceArea: Math.ceil(surfaceArea ?? 0),
       });
       successToast({
