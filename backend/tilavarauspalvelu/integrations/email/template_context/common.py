@@ -6,8 +6,10 @@ from django.conf import settings
 from django.utils.translation import pgettext
 
 from tilavarauspalvelu.enums import Weekday
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.translation import get_attr_by_language
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_time_string
 from utils.utils import update_query_params
 
 if TYPE_CHECKING:
@@ -155,6 +157,49 @@ def get_contex_for_reservation_price(
     }
 
 
+def get_context_for_keyless_entry(
+    *,
+    language: Lang,
+    access_code_is_used: bool,
+    access_code: str,
+    access_code_validity_period: str,
+) -> EmailContext:
+    my_reservations_link = get_my_reservations_ext_link(language=language)
+    my_reservations_text = pgettext("Email", "'My bookings' page")
+
+    feedback_link = get_feedback_ext_link(language=language)
+    feedback_text = pgettext("Email", "Varaamo customer service")
+
+    unavailable_instructions = pgettext(
+        "Email",
+        "You can see the door code on the %(my_reservations)s at Varaamo. "
+        "If the code is not visible in your booking details, please contact %(customer_service)s.",
+    )
+
+    return {
+        "access_code_is_used": access_code_is_used,
+        "access_code": access_code,
+        "access_code_validity_period": access_code_validity_period,
+        "access_code_label": pgettext("Email", "Door code"),
+        "access_code_validity_period_label": pgettext("Email", "Validity period of the door code"),
+        "text_access_code_to_access": pgettext("Email", "You can access the space with the door code"),
+        "text_access_code_confirmed": pgettext(
+            "Email", "Here are your booking details and the door code for easy access to the space"
+        ),
+        "text_access_code_modified": pgettext("Email", "The door code has changed"),
+        "text_access_code_unavailable_instructions_html": unavailable_instructions
+        % {
+            "my_reservations": create_anchor_tag(link=my_reservations_link, text=my_reservations_text),
+            "customer_service": create_anchor_tag(link=feedback_link, text=feedback_text),
+        },
+        "text_access_code_unavailable_instructions": unavailable_instructions
+        % {
+            "my_reservations": f"{my_reservations_link}: {my_reservations_text}",
+            "customer_service": f"{feedback_link}: {feedback_text}",
+        },
+    }
+
+
 def get_contex_for_seasonal_reservation_check_details_url(
     *,
     language: Lang,
@@ -211,6 +256,32 @@ def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
         "applying_for_free_of_charge": reservation.applying_for_free_of_charge,
         "tax_percentage": reservation.tax_percentage_value,
         "reservation_id": reservation.id,
+    }
+
+
+def params_for_keyless_entry(*, reservation: Reservation) -> dict[str, Any]:
+    if not reservation.access_code_should_be_active:
+        return {
+            "access_code_is_used": False,
+            "access_code": "",
+            "access_code_validity_period": "",
+        }
+
+    try:
+        response = PindoraClient.get_reservation(reservation=reservation)
+    except PindoraNotFoundError:
+        # Reservation should have an access code, but it is not available.
+        return {
+            "access_code_is_used": True,
+            "access_code": "",
+            "access_code_validity_period": "",
+        }
+
+    time_str = f"{local_time_string(response['begin'].time())}-{local_time_string(response['end'].time())}"
+    return {
+        "access_code_is_used": True,
+        "access_code": response["access_code"],
+        "access_code_validity_period": time_str,
     }
 
 

@@ -3489,6 +3489,42 @@ msgstr "sis. alv"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
+msgid "Varaamo customer service"
+msgstr "Varaamon asiakaspalveluun"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#, python-format
+msgctxt "Email"
+msgid ""
+"You can see the door code on the %(my_reservations)s at Varaamo. If the code "
+"is not visible in your booking details, please contact %(customer_service)s."
+msgstr ""
+"Näet ovikoodin Varaamon %(my_reservations)s. Jos koodi ei ole näkyvissä "
+"varauksesi tiedoissa, ota yhteyttä %(customer_service)s."
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Door code"
+msgstr "Ovikoodi"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Validity period of the door code"
+msgstr "Ovikoodin voimassaoloaika"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "You can access the space with the door code"
+msgstr "Pääset tilaan sisään ovikoodilla"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid ""
+"Here are your booking details and the door code for easy access to the space"
+msgstr "Tässä ovat varauksesi tiedot ja ovikoodi, jolla pääset tilaan helposti"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
 msgid "You can check your booking details at"
 msgstr "Voit käydä tarkistamassa varauksesi tiedot osoitteessa"
 
