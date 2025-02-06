@@ -250,40 +250,31 @@ KEYLESS_ENTRY_CONTEXT_SV = {
 }
 
 
-RESERVATION_BASIC_INFO_CONTEXT_EN = {
-    "reservation_unit_name": "Test reservation unit",
-    "unit_name": "Test unit",
-    "unit_location": "Test Street, City",
-    "begins_label": "From",
+RESERVATION_BASIC_INFO_CONTEXT_COMMON = {
+    "reservation_unit_name": "[VARAUSYKSIKÖN NIMI]",
+    "unit_name": "[TOIMIPISTEEN NIMI]",
+    "unit_location": "[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
     "begin_date": "1.1.2024",
     "begin_time": "12:00",
-    "ends_label": "To",
     "end_date": "1.1.2024",
-    "end_time": "14:00",
+    "end_time": "15:00",
+}
+RESERVATION_BASIC_INFO_CONTEXT_EN = {
+    **RESERVATION_BASIC_INFO_CONTEXT_COMMON,
+    "begins_label": "From",
+    "ends_label": "To",
     "o_clock_label": "at",
 }
 RESERVATION_BASIC_INFO_CONTEXT_FI = {
-    "reservation_unit_name": "Test reservation unit",
-    "unit_name": "Test unit",
-    "unit_location": "Test Street, City",
+    **RESERVATION_BASIC_INFO_CONTEXT_COMMON,
     "begins_label": "Alkamisaika",
-    "begin_date": "1.1.2024",
-    "begin_time": "12:00",
     "ends_label": "Päättymisaika",
-    "end_date": "1.1.2024",
-    "end_time": "14:00",
     "o_clock_label": "klo",
 }
 RESERVATION_BASIC_INFO_CONTEXT_SV = {
-    "reservation_unit_name": "Test reservation unit",
-    "unit_name": "Test unit",
-    "unit_location": "Test Street, City",
+    **RESERVATION_BASIC_INFO_CONTEXT_COMMON,
     "begins_label": "Börjar",
-    "begin_date": "1.1.2024",
-    "begin_time": "12:00",
     "ends_label": "Slutar",
-    "end_date": "1.1.2024",
-    "end_time": "14:00",
     "o_clock_label": "kl.",
 }
 
@@ -293,7 +284,7 @@ _RESERVATION_PRICE_INFO_CONTEXT_COMMON = {
     "subsidised_price": Decimal("12.30"),
     "price_can_be_subsidised": False,
     "tax_percentage": Decimal("25.5"),
-    "reservation_id": "12",
+    "reservation_id": "1234",
 }
 RESERVATION_PRICE_INFO_CONTEXT_EN = _RESERVATION_PRICE_INFO_CONTEXT_COMMON | {
     "price_label": "Price",

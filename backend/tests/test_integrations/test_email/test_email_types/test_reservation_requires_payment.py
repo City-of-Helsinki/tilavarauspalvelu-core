@@ -44,11 +44,11 @@ def test_get_context__reservation_requires_payment__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_payment(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal(0),
             tax_percentage=Decimal(0),
             payment_due_date=datetime.date(2024, 1, 1),
@@ -88,22 +88,22 @@ def test_get_context__reservation_requires_payment__en(email_reservation):
 def test_get_context__reservation_requires_payment__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_payment(
-            email_recipient_name="Mikko Mallikas",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="fi",
         )
 
     assert context == {
-        "email_recipient_name": "Mikko Mallikas",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "payment_due_date_label": "Eräpäivä",
         "payment_due_date": "1.2.2024",
         "text_reservation_requires_payment": "Varauksesi on hyväksytty, ja sen voi maksaa pankkitunnuksilla",
@@ -123,22 +123,22 @@ def test_get_context__reservation_requires_payment__fi():
 def test_get_context__reservation_requires_payment__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_requires_payment(
-            email_recipient_name="Magnus Persson",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
             payment_due_date=datetime.date(2024, 2, 1),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="sv",
         )
 
     assert context == {
-        "email_recipient_name": "Magnus Persson",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "payment_due_date_label": "Förfallodatum",
         "payment_due_date": "1.2.2024",
         "text_reservation_requires_payment": "Din bokning har bekräftats och kan betalas",
@@ -176,15 +176,15 @@ def test_render_reservation_requires_payment__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
         Booking number: 1234
 
-        Due date: 2.1.2024
+        Due date: 1.1.2024
 
         Pay the booking: https://fake.varaamo.hel.fi/en/reservations
 
@@ -230,12 +230,12 @@ def test_render_reservation_requires_payment__html():
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
         Booking number: 1234
-        Due date: **2.1.2024**
+        Due date: **1.1.2024**
         [Pay the booking](https://fake.varaamo.hel.fi/en/reservations)
 
         ## Additional information about your booking

@@ -54,11 +54,11 @@ def test_get_context__reservation_approved__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal(0),
             non_subsidised_price=Decimal(0),
             tax_percentage=Decimal(0),
@@ -98,16 +98,16 @@ def test_get_context__reservation_approved__en(email_reservation):
 def test_get_context__reservation_approved__discount__en():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
-            email_recipient_name="John Doe",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=False,
             access_code="",
@@ -116,7 +116,7 @@ def test_get_context__reservation_approved__discount__en():
         )
 
     assert context == {
-        "email_recipient_name": "John Doe",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "text_reservation_approved": "Your booking has been confirmed with the following discount:",
         "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
@@ -143,11 +143,11 @@ def test_get_context__reservation_approved__access_code__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal(0),
             non_subsidised_price=Decimal(0),
             tax_percentage=Decimal(0),
@@ -190,16 +190,16 @@ def test_get_context__reservation_approved__access_code__en(email_reservation):
 def test_get_context__reservation_approved__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
-            email_recipient_name="Mikko Mallikas",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=False,
             access_code="",
@@ -208,7 +208,7 @@ def test_get_context__reservation_approved__fi():
         )
 
     assert context == {
-        "email_recipient_name": "Mikko Mallikas",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "text_reservation_approved": "Varauksesi on nyt vahvistettu",
         "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
@@ -225,16 +225,16 @@ def test_get_context__reservation_approved__fi():
 def test_get_context__reservation_approved__discount__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
-            email_recipient_name="Mikko Mallikas",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=False,
             access_code="",
@@ -243,7 +243,7 @@ def test_get_context__reservation_approved__discount__fi():
         )
 
     assert context == {
-        "email_recipient_name": "Mikko Mallikas",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "text_reservation_approved": "Varauksesi on hyväksytty, ja varaukseen on myönnetty seuraava alennus:",
         "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
@@ -260,16 +260,16 @@ def test_get_context__reservation_approved__discount__fi():
 def test_get_context__reservation_approved__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
-            email_recipient_name="Magnus Persson",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=False,
             access_code="",
@@ -278,7 +278,7 @@ def test_get_context__reservation_approved__sv():
         )
 
     assert context == {
-        "email_recipient_name": "Magnus Persson",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "text_reservation_approved": "Din bokning har bekräftats",
         "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
@@ -295,16 +295,16 @@ def test_get_context__reservation_approved__sv():
 def test_get_context__reservation_approved__discount__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
-            email_recipient_name="Magnus Persson",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             non_subsidised_price=Decimal("14.30"),
             tax_percentage=Decimal("25.5"),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=False,
             access_code="",
@@ -313,7 +313,7 @@ def test_get_context__reservation_approved__discount__sv():
         )
 
     assert context == {
-        "email_recipient_name": "Magnus Persson",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "text_reservation_approved": "Din bokning har bekräftats med följande rabatt:",
         "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
@@ -350,10 +350,10 @@ def test_render_reservation_approved__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
         Booking number: 1234
@@ -397,10 +397,10 @@ def test_render_reservation_approved__discount__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
         Booking number: 1234
@@ -443,10 +443,10 @@ def test_render_reservation_approved__access_code__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
         Booking number: 1234
@@ -500,10 +500,10 @@ def test_render_reservation_approved__access_code_error__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
         Booking number: 1234
@@ -557,9 +557,9 @@ def test_render_reservation_approved__html():
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
         Booking number: 1234
 
@@ -612,9 +612,9 @@ def test_render_reservation_approved__discount__html():
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
         Booking number: 1234
 
@@ -666,9 +666,9 @@ def test_render_reservation_approved__access_code__html():
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
         Booking number: 1234
         You can access the space with the door code.
@@ -731,9 +731,9 @@ def test_render_reservation_approved__access_code_error__html():
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
         Booking number: 1234
         {access_code_text}
