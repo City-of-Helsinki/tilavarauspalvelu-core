@@ -4,47 +4,82 @@ import type { GetServerSidePropsContext } from "next";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
-  ApplicationRoundsUiDocument,
-  type ApplicationRoundsUiQuery,
-  type ApplicationRoundsUiQueryVariables,
+  ApplicationRoundCriteriaDocument,
+  ApplicationRoundCriteriaQuery,
+  ApplicationRoundCriteriaQueryVariables,
 } from "@gql/gql-types";
 import { breakpoints, H1, H2, H3 } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Sanitize } from "common/src/components/Sanitize";
-import { getTranslation } from "@/modules/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
 import { capitalize } from "lodash";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
+import { gql } from "@apollo/client";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
+export const APPLICATION_ROUND_CRITERIA_QUERY = gql`
+  query ApplicationRoundCriteria($id: ID!) {
+    applicationRound(id: $id) {
+      pk
+      id
+      nameFi
+      nameEn
+      nameSv
+      criteriaFi
+      criteriaEn
+      criteriaSv
+      notesWhenApplyingFi
+      notesWhenApplyingEn
+      notesWhenApplyingSv
+    }
+  }
+`;
+
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
-  const id = Number(params?.id);
+  const pk = toNumber(ignoreMaybeArray(params?.id));
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const { data } = await apolloClient.query<
-    ApplicationRoundsUiQuery,
-    ApplicationRoundsUiQueryVariables
-  >({
-    fetchPolicy: "no-cache",
-    query: ApplicationRoundsUiDocument,
-  });
-  const applicationRound = data?.applicationRounds?.edges
-    .map((n) => n?.node)
-    .find((n) => n?.pk === id);
-
-  const notFound = applicationRound == null;
-  return {
-    notFound,
+  const notFound = {
+    notFound: true,
     props: {
-      ...(notFound ? { notFound } : { applicationRound }),
       ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
+      notFound: true,
+    },
+  };
+
+  if (pk == null || !(pk > 0)) {
+    return notFound;
+  }
+  const { data } = await apolloClient.query<
+    ApplicationRoundCriteriaQuery,
+    ApplicationRoundCriteriaQueryVariables
+  >({
+    query: ApplicationRoundCriteriaDocument,
+    variables: {
+      id: base64encode(`ApplicationRoundNode:${pk}`),
+    },
+  });
+  const applicationRound = data?.applicationRound;
+
+  if (applicationRound == null) {
+    return notFound;
+  }
+  return {
+    props: {
+      ...commonProps,
+      applicationRound,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
@@ -68,7 +103,9 @@ const NotesWrapper = styled.div`
 function Criteria({
   applicationRound,
 }: Readonly<PropsNarrowed>): JSX.Element | null {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
+  const name = getTranslationSafe(applicationRound, "name", lang);
 
   const routes = [
     {
@@ -76,7 +113,7 @@ function Criteria({
       title: t("breadcrumb:recurring"),
     },
     {
-      title: getApplicationRoundName(applicationRound),
+      title: name,
       slug: getApplicationRoundPath(applicationRound.pk),
     },
     {
@@ -85,7 +122,8 @@ function Criteria({
   ] as const;
 
   const title = capitalize(t("applicationRound:criteria"));
-  const subtitle = `${getApplicationRoundName(applicationRound)} ${t("applicationRound:criteria")}`;
+  const subtitle = `${name} ${t("applicationRound:criteria")}`;
+  const criteria = getTranslationSafe(applicationRound, "criteria", lang);
 
   return (
     <>
@@ -95,7 +133,7 @@ function Criteria({
         {subtitle}
       </H3>
       <ContentWrapper>
-        <Sanitize html={getTranslation(applicationRound, "criteria")} />
+        <Sanitize html={criteria} />
         <NotesWrapper>
           <NotesWhenApplying applicationRound={applicationRound} />
         </NotesWrapper>
