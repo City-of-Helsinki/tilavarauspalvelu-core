@@ -1,7 +1,12 @@
-import { IconArrowRight, IconEuroSign, IconGroup, IconSize } from "hds-react";
+import {
+  IconArrowRight,
+  IconEuroSign,
+  IconGroup,
+  IconHome,
+  IconSize,
+} from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import NextImage from "next/image";
 import type {
   Maybe,
   ReservationUnitNode,
@@ -120,15 +125,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
   const infos = [];
   if (reservationUnitTypeName) {
     infos.push({
-      icon: (
-        <NextImage
-          src="/icons/icon_premises.svg"
-          alt=""
-          width="24"
-          height="24"
-          aria-hidden
-        />
-      ),
+      icon: <IconHome size={IconSize.Small} />,
       value: reservationUnitTypeName,
     });
   }
