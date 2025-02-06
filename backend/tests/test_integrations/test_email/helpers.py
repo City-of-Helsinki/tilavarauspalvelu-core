@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from utils.utils import html_2_text
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationSection
 
 
 def html_email_to_text(html_content: str) -> str:
@@ -29,6 +33,17 @@ def html_email_to_text(html_content: str) -> str:
         text += row + "\n"
 
     return text.strip()
+
+
+def get_application_details_urls(section: ApplicationSection) -> dict[str, str]:
+    details_url = (
+        f"https://fake.varaamo.hel.fi/en/applications/{section.application_id}/view"
+        f"?tab=reservations&section={section.id}"
+    )
+    return {
+        "check_booking_details_url": f"{details_url}",
+        "check_booking_details_url_html": f'<a href="{details_url}">varaamo.hel.fi</a>',
+    }
 
 
 AUTOMATIC_REPLY_CONTEXT_EN = {

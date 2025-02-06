@@ -3,19 +3,19 @@
 from __future__ import annotations
 
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.admin.email_template.utils import get_mock_data
-from tilavarauspalvelu.enums import EmailType, ReservationNotification, WeekdayChoice
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
+from tilavarauspalvelu.enums import EmailType, ReservationNotification
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context.application import (
     get_context_for_staff_notification_application_section_cancelled,
 )
-from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
 from tilavarauspalvelu.models import Reservation
 
 from tests.factories import ApplicationFactory, ReservationUnitFactory, UserFactory
@@ -28,149 +28,127 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
+
 # CONTEXT ##############################################################################################################
 
 
-@pytest.mark.django_db
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_staff_notification_application_section_cancelled__en(email_reservation):
-    reservation_id_1 = email_reservation.id
-    reservation_id_2 = Reservation.objects.exclude(id=reservation_id_1).first().id
-
-    with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_application_section_cancelled(
-            application_section_name="[HAKEMUKSEN OSAN NIMI]",
-            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
-            cancel_reason="[PERUUTUKSEN SYY]",
-            cancelled_reservation_series=[
-                {
-                    "weekday_value": "Monday",
-                    "time_value": "12:00:00-15:00:00",
-                    "reservation_url": get_staff_reservations_ext_link(reservation_id=reservation_id_1),
-                },
-                {
-                    "weekday_value": "Tuesday",
-                    "time_value": "21:00:00-22:00:00",
-                    "reservation_url": get_staff_reservations_ext_link(reservation_id=reservation_id_2),
-                },
-            ],
-            language="en",
-        )
-
-    assert context == {
-        "email_recipient_name": None,
+COMMON_CONTEXT = {
+    "email_recipient_name": None,
+    "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
+    "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
+    "cancel_reason": "[PERUUTUKSEN SYY]",
+}
+LANGUAGE_CONTEXT = {
+    "en": {
         "title": "The customer has canceled the seasonal booking",
-        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
-        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-        "cancel_reason": "[PERUUTUKSEN SYY]",
         "cancelled_reservation_series": [
             {
                 "weekday_value": "Monday",
-                "time_value": "12:00:00-15:00:00",
-                "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}",
-            },
-            {
-                "weekday_value": "Tuesday",
-                "time_value": "21:00:00-22:00:00",
-                "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_2}",
-            },
-        ],
-        **BASE_TEMPLATE_CONTEXT_EN,
-    }
-
-    with TranslationsFromPOFiles():
-        assert context == get_context_for_staff_notification_application_section_cancelled(
-            application_section=email_reservation.actions.get_application_section(),
-            language="en",
-        )
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_staff_notification_application_section_cancelled__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_application_section_cancelled(
-            application_section_name="[HAKEMUKSEN OSAN NIMI]",
-            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
-            cancel_reason="[PERUUTUKSEN SYY]",
-            language="fi",
-            cancelled_reservation_series=[
-                {
-                    "weekday_value": WeekdayChoice.MONDAY.label,
-                    "time_value": "12:00:00-15:00:00",
-                    "reservation_url": get_staff_reservations_ext_link(reservation_id=1234),
-                },
-                {
-                    "weekday_value": WeekdayChoice.TUESDAY.label,
-                    "time_value": "21:00:00-22:00:00",
-                    "reservation_url": get_staff_reservations_ext_link(reservation_id=5678),
-                },
-            ],
-        )
-
-    assert context == {
-        "email_recipient_name": None,
-        "title": "Asiakas on perunut kausivarauksen",
-        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
-        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-        "cancel_reason": "[PERUUTUKSEN SYY]",
-        "cancelled_reservation_series": [
-            {
-                "weekday_value": "Monday",
-                "time_value": "12:00:00-15:00:00",
+                "time_value": "13:00-15:00",
                 "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
             },
             {
                 "weekday_value": "Tuesday",
-                "time_value": "21:00:00-22:00:00",
+                "time_value": "21:00-22:00",
+                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
+            },
+        ],
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **COMMON_CONTEXT,
+    },
+    "fi": {
+        "title": "Asiakas on perunut kausivarauksen",
+        "cancelled_reservation_series": [
+            {
+                "weekday_value": "Maanantai",
+                "time_value": "13:00-15:00",
+                "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+            },
+            {
+                "weekday_value": "Tiistai",
+                "time_value": "21:00-22:00",
                 "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_staff_notification_application_section_cancelled_sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_application_section_cancelled(
-            application_section_name="[HAKEMUKSEN OSAN NIMI]",
-            application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
-            cancel_reason="[PERUUTUKSEN SYY]",
-            language="sv",
-            cancelled_reservation_series=[
-                {
-                    "weekday_value": WeekdayChoice.MONDAY.label,
-                    "time_value": "12:00:00-15:00:00",
-                    "reservation_url": get_staff_reservations_ext_link(reservation_id=1234),
-                },
-                {
-                    "weekday_value": WeekdayChoice.TUESDAY.label,
-                    "time_value": "21:00:00-22:00:00",
-                    "reservation_url": get_staff_reservations_ext_link(reservation_id=5678),
-                },
-            ],
-        )
-
-    assert context == {
-        "email_recipient_name": None,
+        **COMMON_CONTEXT,
+    },
+    "sv": {
         "title": "Kunden har avbokat säsongsbokningen",
-        "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
-        "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
-        "cancel_reason": "[PERUUTUKSEN SYY]",
         "cancelled_reservation_series": [
             {
-                "weekday_value": "Monday",
-                "time_value": "12:00:00-15:00:00",
+                "weekday_value": "Måndag",
+                "time_value": "13:00-15:00",
                 "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
             },
             {
-                "weekday_value": "Tuesday",
-                "time_value": "21:00:00-22:00:00",
+                "weekday_value": "Tisdag",
+                "time_value": "21:00-22:00",
                 "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/5678",
             },
         ],
         **BASE_TEMPLATE_CONTEXT_SV,
+        **COMMON_CONTEXT,
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context_for_staff_notification_application_section_cancelled(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        context = get_context_for_staff_notification_application_section_cancelled(
+            **get_mock_params(language=lang),
+            language=lang,
+        )
+        assert context == expected
+
+        context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, language=lang)
+        assert context == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_get_context_for_staff_notification_application_section_cancelled__instance(email_reservation):
+    reservation_id_1 = email_reservation.id
+    reservation_id_2 = Reservation.objects.exclude(id=reservation_id_1).first().id
+
+    section = email_reservation.actions.get_application_section()
+    cancelled_reservation_series = [
+        {
+            "weekday_value": "Monday",
+            "time_value": "13:00-15:00",
+            "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}",
+        },
+        {
+            "weekday_value": "Tuesday",
+            "time_value": "21:00-22:00",
+            "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_2}",
+        },
+    ]
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        "cancelled_reservation_series": cancelled_reservation_series,
     }
+
+    params = {
+        "cancelled_reservation_series": cancelled_reservation_series,
+    }
+    with TranslationsFromPOFiles():
+        context = get_context_for_staff_notification_application_section_cancelled(
+            **get_mock_params(**params, language="en"),
+            language="en",
+        )
+        assert context == expected
+
+    with TranslationsFromPOFiles():
+        context = get_context_for_staff_notification_application_section_cancelled(section, language="en")
+        assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################

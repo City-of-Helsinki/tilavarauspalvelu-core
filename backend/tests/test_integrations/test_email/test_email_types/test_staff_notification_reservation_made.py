@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import datetime
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.admin.email_template.utils import get_mock_data
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
 from tilavarauspalvelu.enums import EmailType, ReservationNotification, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
@@ -28,112 +28,91 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
 
 # CONTEXT ##############################################################################################################
+
+
+COMMON_CONTEXT = {
+    "email_recipient_name": None,
+    "reservee_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+    "reservation_id": "1234",
+    "reservation_name": "[VARAUKSEN NIMI]",
+    "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
+    "staff_reservations_ext_link_html": (
+        '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/1234">'
+        "https://fake.varaamo.hel.fi/kasittely/reservations/1234</a>"
+    ),
+}
+LANGUAGE_CONTEXT = {
+    "en": {
+        "title": "New booking 1234 has been made for [TOIMIPISTEEN NIMI]",
+        "text_staff_reservation_made": "A new booking has been confirmed for [VARAUSYKSIKÖN NIMI]",
+        **BASE_TEMPLATE_CONTEXT_EN,
+        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        **COMMON_CONTEXT,
+    },
+    "fi": {
+        "title": "Toimipisteeseen [TOIMIPISTEEN NIMI] on tehty uusi tilavaraus 1234",
+        "text_staff_reservation_made": "Varausyksikköön [VARAUSYKSIKÖN NIMI] on tehty uusi hyväksytty varaus",
+        **BASE_TEMPLATE_CONTEXT_FI,
+        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+        **COMMON_CONTEXT,
+    },
+    "sv": {
+        "title": "Ny bokning 1234 har gjorts för [TOIMIPISTEEN NIMI]",
+        "text_staff_reservation_made": "En ny bokningsförfrågan för [VARAUSYKSIKÖN NIMI] har bekräftats",
+        **BASE_TEMPLATE_CONTEXT_SV,
+        **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **COMMON_CONTEXT,
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__staff_notification_reservation_made(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        context = get_context_for_staff_notification_reservation_made(**get_mock_params(), language=lang)
+        assert context == expected
+
+        context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_MADE, language=lang)
+        assert context == expected
+
+
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__staff_notification_reservation_made__en(email_reservation):
-    with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_reservation_made(
-            reservee_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_name="Test reservation",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            reservation_id=email_reservation.id,
-            language="en",
-        )
-
-    assert context == {
-        "email_recipient_name": None,
-        "reservation_name": "Test reservation",
-        "booking_number_label": "Booking number",
-        "reservation_id": f"{email_reservation.id}",
-        "reservee_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+def test_get_context__staff_notification_reservation_made__instance(email_reservation):
+    staff_urls = {
         "staff_reservations_ext_link": f"https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}",
         "staff_reservations_ext_link_html": (
             f'<a href="https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}">'
             f"https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}</a>"
         ),
-        "text_staff_reservation_made": "A new booking has been confirmed for [VARAUSYKSIKÖN NIMI]",
+    }
+
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        **staff_urls,
         "title": f"New booking {email_reservation.id} has been made for [TOIMIPISTEEN NIMI]",
-        **BASE_TEMPLATE_CONTEXT_EN,
-        **RESERVATION_BASIC_INFO_CONTEXT_EN,
+        "reservation_id": f"{email_reservation.id}",
     }
 
-    with TranslationsFromPOFiles():
-        assert context == get_context_for_staff_notification_reservation_made(
-            reservation=email_reservation,
-            language="en",
-        )
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__staff_notification_reservation_made__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_reservation_made(
-            reservee_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_name="Test reservation",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            reservation_id=1234,
-            language="fi",
-        )
-
-    assert context == {
-        "email_recipient_name": None,
-        "reservation_name": "Test reservation",
-        "booking_number_label": "Varausnumero",
-        "reservation_id": "1234",
-        "reservee_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
-        "staff_reservations_ext_link_html": (
-            '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/1234">'
-            "https://fake.varaamo.hel.fi/kasittely/reservations/1234</a>"
-        ),
-        "text_staff_reservation_made": "Varausyksikköön [VARAUSYKSIKÖN NIMI] on tehty uusi hyväksytty varaus",
-        "title": "Toimipisteeseen [TOIMIPISTEEN NIMI] on tehty uusi tilavaraus 1234",
-        **BASE_TEMPLATE_CONTEXT_FI,
-        **RESERVATION_BASIC_INFO_CONTEXT_FI,
+    params = {
+        "reservation_id": email_reservation.id,
+        **staff_urls,
     }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__staff_notification_reservation_made__sv():
     with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_reservation_made(
-            reservee_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_name="Test reservation",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            reservation_id=1234,
-            language="sv",
-        )
+        context = get_context_for_staff_notification_reservation_made(**get_mock_params(**params), language="en")
+        assert context == expected
 
-    assert context == {
-        "email_recipient_name": None,
-        "reservation_name": "Test reservation",
-        "booking_number_label": "Bokningsnummer",
-        "reservation_id": "1234",
-        "reservee_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-        "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
-        "staff_reservations_ext_link_html": (
-            '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/1234">'
-            "https://fake.varaamo.hel.fi/kasittely/reservations/1234</a>"
-        ),
-        "text_staff_reservation_made": "En ny bokningsförfrågan för [VARAUSYKSIKÖN NIMI] har bekräftats",
-        "title": "Ny bokning 1234 har gjorts för [TOIMIPISTEEN NIMI]",
-        **BASE_TEMPLATE_CONTEXT_SV,
-        **RESERVATION_BASIC_INFO_CONTEXT_SV,
-    }
+    with TranslationsFromPOFiles():
+        context = get_context_for_staff_notification_reservation_made(reservation=email_reservation, language="en")
+        assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################
@@ -150,7 +129,7 @@ def test_render_reservation_staff_notification_reservation_made__text():
 
         A new booking has been confirmed for [VARAUSYKSIKÖN NIMI]: [VARAUKSEN NIMI].
 
-        Reservee name: [VARAAJAN NIMI]
+        Reservee name: [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]
         Booking number: 1234
 
         [VARAUSYKSIKÖN NIMI]
@@ -190,7 +169,7 @@ def test_render_reservation_staff_notification_reservation_made__html():
 
         A new booking has been confirmed for [VARAUSYKSIKÖN NIMI]: **[VARAUKSEN NIMI]**.
 
-        Reservee name: [VARAAJAN NIMI]
+        Reservee name: [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]
         Booking number: 1234
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]

@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import datetime
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
 from freezegun import freeze_time
 
-from tilavarauspalvelu.admin.email_template.utils import get_mock_data
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
 from tilavarauspalvelu.enums import EmailType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
@@ -27,97 +28,86 @@ from tests.test_integrations.test_email.helpers import (
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
     SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
+    get_application_details_urls,
     html_email_to_text,
 )
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
 
 # CONTEXT ##############################################################################################################
 
 
-@pytest.mark.django_db
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_seasonal_reservation_modified_single__en(email_reservation):
-    section = email_reservation.actions.get_application_section()
-
-    with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_modified_single(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            application_id=section.application_id,
-            application_section_id=section.id,
-            language="en",
-        )
-
-    details_url = f"https://fake.varaamo.hel.fi/en/applications/{section.application_id}/view?tab=reservations&section={section.id}"
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+COMMON_CONTEXT = {
+    "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+}
+LANGUAGE_CONTEXT = {
+    "en": {
         "title": "The time of the space reservation included in your seasonal booking has changed",
         "text_reservation_modified": "The time of the space reservation included in your seasonal booking has changed",
-        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
-        "check_booking_details_url": f"{details_url}",
-        "check_booking_details_url_html": f'<a href="{details_url}">varaamo.hel.fi</a>',
-    }
-
-    with TranslationsFromPOFiles():
-        assert context == get_context_for_seasonal_reservation_modified_single(
-            reservation=email_reservation,
-            language="en",
-        )
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_seasonal_reservation_modified_single__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_modified_single(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            application_id=None,
-            application_section_id=None,
-            language="fi",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
+        **COMMON_CONTEXT,
+    },
+    "fi": {
         "title": "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut",
         "text_reservation_modified": "Kausivaraukseesi kuuluvan tilavarauksen ajankohta on muuttunut",
-        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context_for_seasonal_reservation_modified_single__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_modified_single(
-            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
-            unit_name="[TOIMIPISTEEN NIMI]",
-            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
-            begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 15),
-            application_id=None,
-            application_section_id=None,
-            language="sv",
-        )
-
-    assert context == {
-        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
+        **COMMON_CONTEXT,
+    },
+    "sv": {
         "title": "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats",
         "text_reservation_modified": "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats",
-        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
+        **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
+        **COMMON_CONTEXT,
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context_for_seasonal_reservation_modified_single(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    params = {
+        "application_id": 0,
+        "application_section_id": 0,
     }
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_modified_single(**get_mock_params(**params), language=lang)
+        assert context == expected
+
+        context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_MODIFIED_SINGLE, **params, language=lang)
+        assert context == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_get_context_for_seasonal_reservation_modified_single__instance(email_reservation):
+    section = email_reservation.actions.get_application_section()
+
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        **get_application_details_urls(section),
+    }
+
+    params = {
+        "application_id": section.application_id,
+        "application_section_id": section.id,
+    }
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_modified_single(**get_mock_params(**params), language="en")
+        assert context == expected
+
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_modified_single(reservation=email_reservation, language="en")
+        assert context == expected
 
 
 # RENDER TEXT ##########################################################################################################

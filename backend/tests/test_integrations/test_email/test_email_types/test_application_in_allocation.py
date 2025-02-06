@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from inspect import cleandoc
+from typing import TYPE_CHECKING
 
 import pytest
 from django.test import override_settings
@@ -24,15 +25,15 @@ from tests.test_integrations.test_email.helpers import (
     html_email_to_text,
 )
 
+if TYPE_CHECKING:
+    from tilavarauspalvelu.typing import Lang
+
+
 # CONTEXT ##############################################################################################################
 
 
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__application_in_allocation__en():
-    with TranslationsFromPOFiles():
-        context = get_context_for_application_in_allocation(language="en")
-
-    assert context == {
+LANGUAGE_CONTEXT = {
+    "en": {
         "email_recipient_name": None,
         "text_application_in_allocation": (
             "The application deadline has passed. "
@@ -49,15 +50,8 @@ def test_get_context__application_in_allocation__en():
         ),
         "title": "Your application is being processed",
         **BASE_TEMPLATE_CONTEXT_EN,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__application_in_allocation__fi():
-    with TranslationsFromPOFiles():
-        context = get_context_for_application_in_allocation(language="fi")
-
-    assert context == {
+    },
+    "fi": {
         "email_recipient_name": None,
         "text_application_in_allocation": (
             "Hakuaika on päättynyt. Ilmoitamme käsittelyn tuloksesta, kun hakemuksesi on käsitelty."
@@ -73,15 +67,8 @@ def test_get_context__application_in_allocation__fi():
         ),
         "title": "Hakemustasi käsitellään",
         **BASE_TEMPLATE_CONTEXT_FI,
-    }
-
-
-@freeze_time("2024-01-01 12:00:00+02:00")
-def test_get_context__application_in_allocation__sv():
-    with TranslationsFromPOFiles():
-        context = get_context_for_application_in_allocation(language="sv")
-
-    assert context == {
+    },
+    "sv": {
         "email_recipient_name": None,
         "text_application_in_allocation": (
             "Ansökningstiden har löpt ut. Vi skickar ett meddelande till e-postadressen när din ansökan har behandlats."
@@ -97,7 +84,18 @@ def test_get_context__application_in_allocation__sv():
         ),
         "title": "Din ansökan behandlas",
         **BASE_TEMPLATE_CONTEXT_SV,
-    }
+    },
+}
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+@freeze_time("2024-01-01T12:00:00+02:00")
+def test_get_context__application_in_allocation(lang: Lang):
+    expected = LANGUAGE_CONTEXT[lang]
+
+    with TranslationsFromPOFiles():
+        assert get_context_for_application_in_allocation(language=lang) == expected
+        assert get_mock_data(email_type=EmailType.APPLICATION_IN_ALLOCATION, language=lang) == expected
 
 
 # RENDER TEXT ##########################################################################################################

@@ -2928,31 +2928,31 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgid "Monday"
-msgstr ""
+msgstr "Måndag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Tuesday"
-msgstr ""
+msgstr "Tisdag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Wednesday"
-msgstr ""
+msgstr "Onsdag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Thursday"
-msgstr ""
+msgstr "Torsdag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Friday"
-msgstr ""
+msgstr "Fredag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Saturday"
-msgstr ""
+msgstr "Lördag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Sunday"
-msgstr ""
+msgstr "Söndag"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "Priority"
