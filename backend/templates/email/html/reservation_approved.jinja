@@ -4,7 +4,7 @@
     <mj-text>{{ text_reservation_approved | sentence | safe }}</mj-text>
     {% include "email/html/partials/reservation_basic_info.jinja" %}
     {% include "email/html/partials/reservation_price.jinja" %}
-    {% include "email/html/partials/access_code.jinja" %}
+    {% include "email/html/partials/access_code_with_instructions.jinja" %}
 {% endblock %}
 
 {% block content_secondary %}
