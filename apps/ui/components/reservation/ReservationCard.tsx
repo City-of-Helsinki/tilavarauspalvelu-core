@@ -11,18 +11,17 @@ import {
   isReservationCancellable,
   getNormalizedReservationOrderStatus,
 } from "@/modules/reservation";
-import {
-  getPrice,
-  getReservationUnitName,
-  getUnitName,
-} from "@/modules/reservationUnit";
+import { getPrice } from "@/modules/reservationUnit";
 import { ReservationOrderStatus } from "./ReservationOrderStatus";
 import { ReservationStatus } from "./ReservationStatus";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { getImageSource } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { getReservationPath } from "@/modules/urls";
-import { convertLanguageCode } from "common/src/common/util";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 type CardType = "upcoming" | "past" | "cancelled";
 
@@ -49,12 +48,13 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
   const lang = convertLanguageCode(i18n.language);
   const price = getPrice(t, reservation, lang);
 
-  const title = trim(
-    `${getReservationUnitName(reservationUnit)}, ${getUnitName(
-      reservationUnit?.unit ?? undefined
-    )}`,
-    ", "
+  const name = getTranslationSafe(reservationUnit, "name", lang);
+  const unitName = getTranslationSafe(
+    reservationUnit?.unit ?? {},
+    "name",
+    lang
   );
+  const title = trim(`${name}, ${unitName}`, ", ");
 
   const normalizedOrderStatus =
     getNormalizedReservationOrderStatus(reservation);
@@ -73,7 +73,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
   tags.push(
     <ReservationStatus
       data-testid="reservation-card__status"
-      state={reservation.state ?? ReservationStateChoice.Confirmed}
+      state={reservation.state ?? ReservationStateChoice.Created}
       key="status"
     />
   );

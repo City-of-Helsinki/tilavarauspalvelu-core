@@ -12,12 +12,7 @@ import { breakpoints } from "common/src/common/style";
 import type { RelatedReservationUnitsQuery } from "@gql/gql-types";
 import { getMainImage } from "@/modules/util";
 import Carousel from "../Carousel";
-import {
-  getActivePricing,
-  getPriceString,
-  getReservationUnitName,
-  getUnitName,
-} from "@/modules/reservationUnit";
+import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { getImageSource } from "common/src/helpers";
@@ -77,7 +72,8 @@ function RelatedUnitCard({
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
-  const name = getReservationUnitName(reservationUnit, lang);
+  const name = getTranslationSafe(reservationUnit, "name", lang);
+  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
   const pricing = getActivePricing(reservationUnit);
   const unitPrice =
     pricing != null ? getPriceString({ t, pricing }) : undefined;
@@ -130,7 +126,7 @@ function RelatedUnitCard({
       variant="vertical"
       key={reservationUnit.pk}
       heading={name ?? ""}
-      text={getUnitName(reservationUnit.unit) ?? ""}
+      text={unitName}
       infos={infos}
       buttons={buttons}
       imageSrc={imgSrc}

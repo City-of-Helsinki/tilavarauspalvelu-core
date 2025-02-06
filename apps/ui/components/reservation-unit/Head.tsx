@@ -21,8 +21,6 @@ import { Images } from "./Images";
 import {
   getActivePricing,
   getPriceString,
-  getReservationUnitName,
-  getUnitName,
   isReservationUnitPaid,
 } from "@/modules/reservationUnit";
 import { isReservationStartInFuture } from "@/modules/reservation";
@@ -90,8 +88,10 @@ export function Head({
   reservationUnitIsReservable,
   subventionSuffix,
 }: HeadProps): JSX.Element {
-  const reservationUnitName = getReservationUnitName(reservationUnit);
-  const unitName = getUnitName(reservationUnit.unit ?? undefined);
+  const { i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
+  const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
+  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
 
   return (
     <Wrapper>

@@ -31,7 +31,6 @@ import {
   getPriceString,
   getReservationUnitName,
   getReservationUnitPrice,
-  getUnitName,
   isReservationUnitPublished,
   isReservationUnitReservable,
   type GetPriceType,
@@ -649,56 +648,6 @@ describe("getReservationUnitName", () => {
     };
 
     expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
-  });
-});
-
-describe("getUnitName", () => {
-  it("should return the name of the unit", () => {
-    const unit = {
-      nameFi: "Unit 1 FI",
-      nameEn: "Unit 1 EN",
-      nameSv: "Unit 1 SV",
-    };
-
-    expect(getUnitName(unit)).toEqual("Unit 1 FI");
-  });
-
-  it("should return the name of the unit in the current language", () => {
-    const unit = {
-      nameFi: "Unit 1 FI",
-      nameEn: "Unit 1 EN",
-      nameSv: "Unit 1 SV",
-    };
-
-    expect(getUnitName(unit, "sv")).toEqual("Unit 1 SV");
-  });
-
-  it("should return the name of the unit in the default language", () => {
-    const unit = {
-      nameFi: "Unit 1 FI",
-      nameEn: "",
-      nameSv: "",
-    };
-
-    expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
-  });
-
-  it("should return the name of the unit in the default language", () => {
-    const unit = {
-      nameFi: "Unit 1 FI",
-    };
-
-    expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
-  });
-
-  it("should return the name of the unit in the default language", () => {
-    const unit = {
-      nameFi: "Unit 1 FI",
-      nameEn: null,
-      nameSv: null,
-    };
-
-    expect(getUnitName(unit, "sv")).toEqual("Unit 1 FI");
   });
 });
 
