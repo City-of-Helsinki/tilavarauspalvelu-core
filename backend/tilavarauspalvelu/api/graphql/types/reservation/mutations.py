@@ -8,8 +8,9 @@ from django.core.exceptions import ValidationError
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import delete_pindora_reservation
@@ -156,10 +157,13 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
             cls.validate_payment_order(payment_order)
 
         # Try Pindora delete, but if it fails, retry in background
-        try:
-            PindoraClient.delete_reservation(reservation=reservation)
-        except Exception:  # noqa: BLE001
-            delete_pindora_reservation.delay(str(reservation.ext_uuid))
+        if reservation.access_type == AccessType.ACCESS_CODE:
+            try:
+                PindoraClient.delete_reservation(reservation=reservation)
+            except PindoraNotFoundError:
+                pass
+            except Exception:  # noqa: BLE001
+                delete_pindora_reservation.delay(str(reservation.ext_uuid))
 
     @classmethod
     def validate_payment_order(cls, payment_order: PaymentOrder) -> None:
