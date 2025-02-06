@@ -24,6 +24,7 @@ from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
+    EMAIL_LOGO_HTML,
     RESERVATION_BASIC_INFO_CONTEXT_EN,
     RESERVATION_BASIC_INFO_CONTEXT_FI,
     RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -172,10 +173,8 @@ def test_render_reservation_staff_notification_reservation_requires_handling__ht
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
-        """
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        f"""
+        {EMAIL_LOGO_HTML}
 
         **Hi,**
 
@@ -197,9 +196,7 @@ def test_render_reservation_staff_notification_reservation_requires_handling__ht
         Varaamo
         This is an automated message, please do not reply.
 
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        {EMAIL_LOGO_HTML}
 
         (C) City of Helsinki 2024
         """

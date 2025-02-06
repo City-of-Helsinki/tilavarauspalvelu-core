@@ -371,3 +371,36 @@ SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV = {
     "check_booking_details_url": "https://fake.varaamo.hel.fi/sv/applications",
     "check_booking_details_url_html": '<a href="https://fake.varaamo.hel.fi/sv/applications">varaamo.hel.fi</a>',
 }
+
+
+EMAIL_LOGO_HTML = """![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
+
+        **Varaamo**"""
+
+MANAGE_RESERVATIONS_LINK_TEXT_EN = (
+    "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
+    "and cancellation on the 'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
+)
+MANAGE_RESERVATIONS_LINK_HTML_EN = (
+    "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
+    "and cancellation on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations)."
+)
+
+EMAIL_CLOSING_TEXT_EN = """Kind regards
+        Varaamo
+
+        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
+
+        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+"""
+
+EMAIL_CLOSING_HTML_EN = f"""Kind regards
+        Varaamo
+        This is an automated message, please do not reply.
+        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
+        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
+
+        {EMAIL_LOGO_HTML}
+
+        (C) City of Helsinki 2024
+"""

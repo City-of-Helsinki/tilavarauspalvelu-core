@@ -22,6 +22,9 @@ from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
+    EMAIL_CLOSING_HTML_EN,
+    EMAIL_CLOSING_TEXT_EN,
+    EMAIL_LOGO_HTML,
     RESERVATION_BASIC_INFO_CONTEXT_EN,
     RESERVATION_BASIC_INFO_CONTEXT_FI,
     RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -118,7 +121,7 @@ def test_render_seasonal_reservation_cancelled_single_text():
     text_content = text_content.replace("&amp;", "&")
 
     assert text_content == cleandoc(
-        """
+        f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         The space reservation included in your seasonal booking has been cancelled.
@@ -133,12 +136,7 @@ def test_render_seasonal_reservation_cancelled_single_text():
 
         You can check your booking details at: https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678
 
-        Kind regards
-        Varaamo
-
-        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
-
-        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        {EMAIL_CLOSING_TEXT_EN}
         """
     )
 
@@ -153,10 +151,8 @@ def test_render_seasonal_reservation_cancelled_single__html():
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
-        """
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        f"""
+        {EMAIL_LOGO_HTML}
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
@@ -170,17 +166,7 @@ def test_render_seasonal_reservation_cancelled_single__html():
         To: **1.1.2024** at **15:00**
         You can check your booking details at: [varaamo.hel.fi](https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678)
 
-        Kind regards
-        Varaamo
-        This is an automated message, please do not reply.
-        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
-        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
-
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
-
-        (C) City of Helsinki 2024
+        {EMAIL_CLOSING_HTML_EN}
         """
     )
 

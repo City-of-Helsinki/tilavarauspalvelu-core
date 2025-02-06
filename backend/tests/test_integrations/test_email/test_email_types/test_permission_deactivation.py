@@ -23,6 +23,9 @@ from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
+    EMAIL_CLOSING_HTML_EN,
+    EMAIL_CLOSING_TEXT_EN,
+    EMAIL_LOGO_HTML,
     html_email_to_text,
 )
 
@@ -89,7 +92,7 @@ def test_render_permission_deactivation__text():
     text_content = render_text(email_type=EmailType.PERMISSION_DEACTIVATION, context=context)
 
     assert text_content == cleandoc(
-        """
+        f"""
         Hi,
 
         Your staff access to Varaamo will expire if you do not log in to the service within two weeks.
@@ -97,12 +100,7 @@ def test_render_permission_deactivation__text():
         Log in to the service at:
         https://fake.varaamo.hel.fi/kasittely
 
-        Kind regards
-        Varaamo
-
-        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
-
-        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        {EMAIL_CLOSING_TEXT_EN}
         """
     )
 
@@ -117,10 +115,8 @@ def test_render_permission_deactivation__html():
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
-        """
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        f"""
+        {EMAIL_LOGO_HTML}
 
         **Hi,**
 
@@ -129,17 +125,7 @@ def test_render_permission_deactivation__html():
         Log in to the service at:
         <https://fake.varaamo.hel.fi/kasittely>
 
-        Kind regards
-        Varaamo
-        This is an automated message, please do not reply.
-        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
-        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
-
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
-
-        (C) City of Helsinki 2024
+        {EMAIL_CLOSING_HTML_EN}
         """
     )
 

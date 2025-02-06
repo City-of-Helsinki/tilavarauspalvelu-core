@@ -24,6 +24,9 @@ from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
+    EMAIL_CLOSING_HTML_EN,
+    EMAIL_CLOSING_TEXT_EN,
+    EMAIL_LOGO_HTML,
     html_email_to_text,
 )
 
@@ -108,12 +111,7 @@ def test_render_user_anonymization__text():
         You can extend the validity of your user account by logging into the service at:
         https://fake.varaamo.hel.fi/en
 
-        Kind regards
-        Varaamo
-
-        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
-
-        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        {EMAIL_CLOSING_TEXT_EN}
         """
     )
 
@@ -134,9 +132,7 @@ def test_render_user_anonymization__html():
 
     assert text_content == cleandoc(
         f"""
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        {EMAIL_LOGO_HTML}
 
         **Hi,**
 
@@ -145,17 +141,7 @@ def test_render_user_anonymization__html():
         You can extend the validity of your user account by logging into the service at:
         <https://fake.varaamo.hel.fi/en>
 
-        Kind regards
-        Varaamo
-        This is an automated message, please do not reply.
-        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
-        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
-
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
-
-        (C) City of Helsinki 2024
+        {EMAIL_CLOSING_HTML_EN}
         """
     )
 

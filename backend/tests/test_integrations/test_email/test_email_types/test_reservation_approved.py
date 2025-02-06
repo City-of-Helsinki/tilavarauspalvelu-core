@@ -26,10 +26,15 @@ from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
+    EMAIL_CLOSING_HTML_EN,
+    EMAIL_CLOSING_TEXT_EN,
+    EMAIL_LOGO_HTML,
     KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT,
     KEYLESS_ENTRY_CONTEXT_EN,
     KEYLESS_ENTRY_CONTEXT_FI,
     KEYLESS_ENTRY_CONTEXT_SV,
+    MANAGE_RESERVATIONS_LINK_HTML_EN,
+    MANAGE_RESERVATIONS_LINK_TEXT_EN,
     RESERVATION_BASIC_INFO_CONTEXT_EN,
     RESERVATION_BASIC_INFO_CONTEXT_FI,
     RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -182,11 +187,6 @@ def test_render_reservation_approved__text():
     )
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
 
-    manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
-        "and cancellation on the 'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
-    )
-
     assert text_content == cleandoc(
         f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
@@ -206,15 +206,10 @@ def test_render_reservation_approved__text():
         Additional information about your booking:
         [HYVÄKSYTYN VARAUKSEN OHJEET]
 
-        {manage}
+        {MANAGE_RESERVATIONS_LINK_TEXT_EN}
 
         Thank you for choosing Varaamo!
-        Kind regards
-        Varaamo
-
-        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
-
-        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        {EMAIL_CLOSING_TEXT_EN}
         """
     )
 
@@ -228,11 +223,6 @@ def test_render_reservation_approved__discount__text():
         non_subsidised_price=Decimal("15.30"),
     )
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
-
-    manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
-        "and cancellation on the 'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
-    )
 
     assert text_content == cleandoc(
         f"""
@@ -253,15 +243,10 @@ def test_render_reservation_approved__discount__text():
         Additional information about your booking:
         [HYVÄKSYTYN VARAUKSEN OHJEET]
 
-        {manage}
+        {MANAGE_RESERVATIONS_LINK_TEXT_EN}
 
         Thank you for choosing Varaamo!
-        Kind regards
-        Varaamo
-
-        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
-
-        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        {EMAIL_CLOSING_TEXT_EN}
         """
     )
 
@@ -274,11 +259,6 @@ def test_render_reservation_approved__access_code__text():
         access_code_is_used=True,
     )
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
-
-    manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
-        "and cancellation on the 'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
-    )
 
     assert text_content == cleandoc(
         f"""
@@ -303,15 +283,10 @@ def test_render_reservation_approved__access_code__text():
         Additional information about your booking:
         [HYVÄKSYTYN VARAUKSEN OHJEET]
 
-        {manage}
+        {MANAGE_RESERVATIONS_LINK_TEXT_EN}
 
         Thank you for choosing Varaamo!
-        Kind regards
-        Varaamo
-
-        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
-
-        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        {EMAIL_CLOSING_TEXT_EN}
         """
     )
 
@@ -327,10 +302,6 @@ def test_render_reservation_approved__access_code_error__text():
     )
     text_content = render_text(email_type=EmailType.RESERVATION_APPROVED, context=context)
 
-    manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's terms of contract "
-        "and cancellation on the 'My bookings' page: https://fake.varaamo.hel.fi/en/reservations."
-    )
     access_code_error = (
         "You can see the door code on the https://fake.varaamo.hel.fi/en/reservations: 'My bookings' page at Varaamo. "
         "If the code is not visible in your booking details, please contact "
@@ -358,15 +329,10 @@ def test_render_reservation_approved__access_code_error__text():
         Additional information about your booking:
         [HYVÄKSYTYN VARAUKSEN OHJEET]
 
-        {manage}
+        {MANAGE_RESERVATIONS_LINK_TEXT_EN}
 
         Thank you for choosing Varaamo!
-        Kind regards
-        Varaamo
-
-        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
-
-        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        {EMAIL_CLOSING_TEXT_EN}
         """
     )
 
@@ -385,16 +351,9 @@ def test_render_reservation_approved__html():
     html_content = render_html(email_type=EmailType.RESERVATION_APPROVED, context=context)
     text_content = html_email_to_text(html_content)
 
-    manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
-        "terms of contract and cancellation on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations)."
-    )
-
     assert text_content == cleandoc(
         f"""
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        {EMAIL_LOGO_HTML}
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
@@ -412,19 +371,9 @@ def test_render_reservation_approved__html():
 
         [HYVÄKSYTYN VARAUKSEN OHJEET]
 
-        {manage}
+        {MANAGE_RESERVATIONS_LINK_HTML_EN}
         Thank you for choosing Varaamo!
-        Kind regards
-        Varaamo
-        This is an automated message, please do not reply.
-        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
-        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
-
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
-
-        (C) City of Helsinki 2024
+        {EMAIL_CLOSING_HTML_EN}
         """
     )
 
@@ -440,16 +389,9 @@ def test_render_reservation_approved__discount__html():
     html_content = render_html(email_type=EmailType.RESERVATION_APPROVED, context=context)
     text_content = html_email_to_text(html_content)
 
-    manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
-        "terms of contract and cancellation on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations)."
-    )
-
     assert text_content == cleandoc(
         f"""
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        {EMAIL_LOGO_HTML}
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
@@ -467,19 +409,9 @@ def test_render_reservation_approved__discount__html():
 
         [HYVÄKSYTYN VARAUKSEN OHJEET]
 
-        {manage}
+        {MANAGE_RESERVATIONS_LINK_HTML_EN}
         Thank you for choosing Varaamo!
-        Kind regards
-        Varaamo
-        This is an automated message, please do not reply.
-        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
-        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
-
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
-
-        (C) City of Helsinki 2024
+        {EMAIL_CLOSING_HTML_EN}
         """
     )
 
@@ -494,16 +426,9 @@ def test_render_reservation_approved__access_code__html():
     html_content = render_html(email_type=EmailType.RESERVATION_APPROVED, context=context)
     text_content = html_email_to_text(html_content)
 
-    manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
-        "terms of contract and cancellation on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations)."
-    )
-
     assert text_content == cleandoc(
         f"""
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        {EMAIL_LOGO_HTML}
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
@@ -524,19 +449,9 @@ def test_render_reservation_approved__access_code__html():
 
         [HYVÄKSYTYN VARAUKSEN OHJEET]
 
-        {manage}
+        {MANAGE_RESERVATIONS_LINK_HTML_EN}
         Thank you for choosing Varaamo!
-        Kind regards
-        Varaamo
-        This is an automated message, please do not reply.
-        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
-        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
-
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
-
-        (C) City of Helsinki 2024
+        {EMAIL_CLOSING_HTML_EN}
         """
     )
 
@@ -553,10 +468,6 @@ def test_render_reservation_approved__access_code_error__html():
     html_content = render_html(email_type=EmailType.RESERVATION_APPROVED, context=context)
     text_content = html_email_to_text(html_content)
 
-    manage = (
-        "Manage your booking at Varaamo. You can check the details of your booking and Varaamo's "
-        "terms of contract and cancellation on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations)."
-    )
     access_code_text = (
         "You can see the door code on the "
         "<a href=\"https://fake.varaamo.hel.fi/en/reservations\">'My bookings' page</a> at Varaamo. "
@@ -566,9 +477,7 @@ def test_render_reservation_approved__access_code_error__html():
 
     assert text_content == cleandoc(
         f"""
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        {EMAIL_LOGO_HTML}
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
@@ -587,19 +496,9 @@ def test_render_reservation_approved__access_code_error__html():
 
         [HYVÄKSYTYN VARAUKSEN OHJEET]
 
-        {manage}
+        {MANAGE_RESERVATIONS_LINK_HTML_EN}
         Thank you for choosing Varaamo!
-        Kind regards
-        Varaamo
-        This is an automated message, please do not reply.
-        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
-        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
-
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
-
-        (C) City of Helsinki 2024
+        {EMAIL_CLOSING_HTML_EN}
         """
     )
 
