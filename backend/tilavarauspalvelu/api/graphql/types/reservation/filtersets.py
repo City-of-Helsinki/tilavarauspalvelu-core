@@ -37,6 +37,9 @@ Matches email domains like:
 
 
 class ReservationFilterSet(ModelFilterSet):
+    pk = IntMultipleChoiceFilter()
+    ext_uuid = django_filters.UUIDFilter()
+
     reservation_units = IntMultipleChoiceFilter(field_name="reservation_units")
     unit = IntMultipleChoiceFilter(field_name="reservation_units__unit")
     user = IntMultipleChoiceFilter(field_name="user")

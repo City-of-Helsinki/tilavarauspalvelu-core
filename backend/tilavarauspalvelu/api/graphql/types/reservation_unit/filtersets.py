@@ -59,6 +59,7 @@ class ReservationUnitFilterSetMixin:
 
 class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     pk = IntMultipleChoiceFilter()
+    uuid = django_filters.UUIDFilter()
     tprek_id = django_filters.CharFilter(field_name="unit__tprek_id")
     tprek_department_id = django_filters.CharFilter(field_name="unit__tprek_department_id")
     unit = IntMultipleChoiceFilter()

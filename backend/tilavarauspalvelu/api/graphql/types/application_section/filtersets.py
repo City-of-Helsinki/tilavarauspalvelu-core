@@ -35,6 +35,7 @@ __all__ = [
 
 class ApplicationSectionFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
+    ext_uuid = django_filters.UUIDFilter()
     name = django_filters.CharFilter(lookup_expr="istartswith")
     user = IntChoiceFilter(field_name="application__user")
     application = IntChoiceFilter(field_name="application__pk")

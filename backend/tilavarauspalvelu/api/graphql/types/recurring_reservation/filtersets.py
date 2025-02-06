@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import django_filters
 from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
+from graphene_django_extensions.filters import IntMultipleChoiceFilter
 
 from tilavarauspalvelu.models import RecurringReservation, ReservationUnit, ReservationUnitType, Unit, User
 
@@ -17,6 +18,8 @@ __all__ = [
 
 
 class RecurringReservationFilterSet(ModelFilterSet):
+    pk = IntMultipleChoiceFilter()
+    ext_uuid = django_filters.UUIDFilter()
     begin_date = django_filters.DateFilter(field_name="begin_date", lookup_expr="gte")
     end_date = django_filters.DateFilter(field_name="end_date", lookup_expr="lte")
     begin_time = django_filters.TimeFilter(field_name="begin_time", lookup_expr="gte")
