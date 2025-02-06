@@ -241,8 +241,6 @@ class ApplicationSectionCancelledTemplateTesterForm(EmailRecipientFormMixin, Bas
         return get_context_for_application_section_cancelled(
             **self.get_context_params(),
             email_recipient_name=self.cleaned_data["email_recipient_name"],
-            weekday_value=self.cleaned_data["weekday_value"],
-            time_value=self.cleaned_data["time_value"],
             application_id=self.cleaned_data["application_id"],
             application_section_id=self.cleaned_data["application_section_id"],
             application_section_name=self.cleaned_data["application_section_name"],

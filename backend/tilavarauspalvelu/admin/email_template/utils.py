@@ -100,8 +100,6 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
         case EmailType.APPLICATION_SECTION_CANCELLED:
             return get_context_for_application_section_cancelled(
                 email_recipient_name=email_recipient_name,
-                weekday_value=weekday_value,
-                time_value=time_value,
                 application_section_name=application_section_name,
                 application_round_name=application_round_name,
                 cancel_reason=cancel_reason,
