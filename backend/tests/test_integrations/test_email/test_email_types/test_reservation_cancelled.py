@@ -80,11 +80,11 @@ def test_get_context__reservation_cancelled__en(email_reservation):
 def test_get_context__reservation_cancelled__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_cancelled(
-            email_recipient_name="Mikko Mallikas",
-            cancel_reason="Tässä on syyni",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            cancel_reason="[PERUUTUKSEN SYY]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
@@ -95,10 +95,10 @@ def test_get_context__reservation_cancelled__fi():
         )
 
     assert context == {
-        "cancel_reason": "Tässä on syyni",
-        "instructions_html": "Tässä ovat ohjeet",
-        "instructions_text": "Tässä ovat ohjeet",
-        "email_recipient_name": "Mikko Mallikas",
+        "cancel_reason": "[PERUUTUKSEN SYY]",
+        "instructions_html": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "instructions_text": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Varauksesi on peruttu",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
@@ -110,11 +110,11 @@ def test_get_context__reservation_cancelled__fi():
 def test_get_context__reservation_cancelled__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_cancelled(
-            email_recipient_name="Magnus Persson",
-            cancel_reason="Här är anledningen",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            cancel_reason="[PERUUTUKSEN SYY]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
             end_datetime=datetime.datetime(2024, 1, 1, 14),
             price=Decimal("12.30"),
@@ -125,10 +125,10 @@ def test_get_context__reservation_cancelled__sv():
         )
 
     assert context == {
-        "cancel_reason": "Här är anledningen",
-        "instructions_html": "Här är instruktionerna",
-        "instructions_text": "Här är instruktionerna",
-        "email_recipient_name": "Magnus Persson",
+        "cancel_reason": "[PERUUTUKSEN SYY]",
+        "instructions_html": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "instructions_text": "[PERUUTETUN VARAUKSEN OHJEET]",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "title": "Din bokning har avbokats",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
