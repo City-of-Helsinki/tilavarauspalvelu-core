@@ -45,7 +45,7 @@ from tests.test_integrations.test_email.helpers import (
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_approved__en(email_reservation):
     email_reservation.reservation_units.update(
         reservation_confirmed_instructions_en='<p>[HYVÄKSYTYN VARAUKSEN OHJEET] <a href="https://foo.bar">LINK</a></p>'
@@ -94,7 +94,7 @@ def test_get_context__reservation_approved__en(email_reservation):
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_approved__discount__en():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
@@ -138,7 +138,7 @@ def test_get_context__reservation_approved__discount__en():
     ),
 )
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_approved__access_code__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
@@ -186,7 +186,7 @@ def test_get_context__reservation_approved__access_code__en(email_reservation):
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_approved__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
@@ -221,7 +221,7 @@ def test_get_context__reservation_approved__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_approved__discount__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
@@ -256,7 +256,7 @@ def test_get_context__reservation_approved__discount__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_approved__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
@@ -291,7 +291,7 @@ def test_get_context__reservation_approved__sv():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__reservation_approved__discount__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_approved(
@@ -764,15 +764,15 @@ def test_render_reservation_approved__access_code_error__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_reservation_approved_email(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_approved_email(reservation)
@@ -788,15 +788,15 @@ def test_email_service__send_reservation_approved_email(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_reservation_approved_email__wrong_state(outbox):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CANCELLED,
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_approved_email(reservation)
@@ -806,7 +806,7 @@ def test_email_service__send_reservation_approved_email__wrong_state(outbox):
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
 def test_email_service__send_reservation_approved_email__no_recipients(outbox):
     reservation = ReservationFactory.create(
@@ -814,8 +814,8 @@ def test_email_service__send_reservation_approved_email__no_recipients(outbox):
         reservee_email="",
         user__email="",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_approved_email(reservation)
@@ -835,8 +835,8 @@ def test_email_service__send_reservation_approved_email__reservation_in_the_past
         reservee_email="reservee@email.com",
         user__email="user@email.com",
         reservation_units__name="foo",
-        begin=datetime.datetime(2024, 1, 1, 10, 0),
-        end=datetime.datetime(2024, 1, 1, 12, 0),
+        begin=datetime.datetime(2024, 1, 1, 20, 0),
+        end=datetime.datetime(2024, 1, 1, 22, 0),
     )
 
     EmailService.send_reservation_approved_email(reservation)

@@ -32,7 +32,7 @@ from tests.test_integrations.test_email.helpers import (
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_staff_notification_application_section_cancelled__en(email_reservation):
     reservation_id_1 = email_reservation.id
     reservation_id_2 = Reservation.objects.exclude(id=reservation_id_1).first().id
@@ -85,7 +85,7 @@ def test_get_context_for_staff_notification_application_section_cancelled__en(em
         )
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_staff_notification_application_section_cancelled__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_application_section_cancelled(
@@ -129,7 +129,7 @@ def test_get_context_for_staff_notification_application_section_cancelled__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context_for_staff_notification_application_section_cancelled_sv():
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_application_section_cancelled(
@@ -251,7 +251,7 @@ def test_render_staff_notification_application_section_cancelled_email__html():
 
 @pytest.mark.django_db
 @override_settings(SEND_EMAILS=True)
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_staff_notification_application_section_cancelled_email(outbox):
     application = ApplicationFactory.create_in_status_results_sent(user__email="user@email.com")
     application_section = application.application_sections.first()

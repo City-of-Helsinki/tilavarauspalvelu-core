@@ -28,7 +28,7 @@ from tests.test_integrations.test_email.helpers import (
 # CONTEXT ##############################################################################################################
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__permission_deactivation__en():
     with TranslationsFromPOFiles():
         context = get_context_for_permission_deactivation(language="en")
@@ -46,7 +46,7 @@ def test_get_context__permission_deactivation__en():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__permission_deactivation__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_permission_deactivation(language="fi")
@@ -64,7 +64,7 @@ def test_get_context__permission_deactivation__fi():
     }
 
 
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 def test_get_context__permission_deactivation__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_permission_deactivation(language="sv")
@@ -150,7 +150,7 @@ def test_render_permission_deactivation__html():
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails(outbox):
     UserFactory.create_superuser(
@@ -168,7 +168,7 @@ def test_email_service__send_permission_deactivation_emails(outbox):
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails__logged_in_recently(outbox):
     UserFactory.create_superuser(
@@ -183,7 +183,7 @@ def test_email_service__send_permission_deactivation_emails__logged_in_recently(
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails__permissions_going_to_expire(outbox):
     UserFactory.create_superuser(
@@ -203,7 +203,7 @@ def test_email_service__send_permission_deactivation_emails__permissions_going_t
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails__no_email(outbox):
     UserFactory.create_superuser(
@@ -219,7 +219,7 @@ def test_email_service__send_permission_deactivation_emails__no_email(outbox):
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails__general_admin(outbox):
     UserFactory.create_with_general_role(
@@ -237,7 +237,7 @@ def test_email_service__send_permission_deactivation_emails__general_admin(outbo
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails__general_admin__role_inactive(outbox):
     UserFactory.create_with_general_role(
@@ -253,7 +253,7 @@ def test_email_service__send_permission_deactivation_emails__general_admin__role
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails__unit_admin(outbox):
     UserFactory.create_with_unit_role(
@@ -272,7 +272,7 @@ def test_email_service__send_permission_deactivation_emails__unit_admin(outbox):
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails__unit_admin__role_inactive(outbox):
     UserFactory.create_with_unit_role(
@@ -289,7 +289,7 @@ def test_email_service__send_permission_deactivation_emails__unit_admin__role_in
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails__multiple_languages(outbox):
     UserFactory.create_superuser(
@@ -316,7 +316,7 @@ def test_email_service__send_permission_deactivation_emails__multiple_languages(
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails__no_permissions(outbox):
     UserFactory.create(
@@ -331,7 +331,7 @@ def test_email_service__send_permission_deactivation_emails__no_permissions(outb
 
 
 @pytest.mark.django_db
-@freeze_time("2024-01-01")
+@freeze_time("2024-01-01 12:00:00+02:00")
 @override_settings(SEND_EMAILS=True, PERMISSIONS_VALID_FROM_LAST_LOGIN_DAYS=10, PERMISSION_NOTIFICATION_BEFORE_DAYS=5)
 def test_email_service__send_permission_deactivation_emails__email_already_sent(outbox):
     UserFactory.create_superuser(
