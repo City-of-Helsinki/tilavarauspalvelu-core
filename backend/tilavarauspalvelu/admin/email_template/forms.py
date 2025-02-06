@@ -143,15 +143,15 @@ class ReservationPriceFormMixin(forms.Form):
 
 
 class ConfirmedInstructionsFormMixin(forms.Form):
-    instructions = forms.CharField(initial="[HYVÄKSYTYN VARAUKSEN OHJEET]", widget=text_area_widget)
+    instructions_confirmed = forms.CharField(initial="[HYVÄKSYTYN VARAUKSEN OHJEET]", widget=text_area_widget)
 
 
 class CancelledInstructionsFormMixin(forms.Form):
-    instructions = forms.CharField(initial="[PERUUTETUN VARAUKSEN OHJEET]", widget=text_area_widget)
+    instructions_cancelled = forms.CharField(initial="[PERUUTETUN VARAUKSEN OHJEET]", widget=text_area_widget)
 
 
 class PendingInstructionsFormMixin(forms.Form):
-    instructions = forms.CharField(initial="[KÄSITELTÄVÄN VARAUKSEN OHJEET]", widget=text_area_widget)
+    instructions_pending = forms.CharField(initial="[KÄSITELTÄVÄN VARAUKSEN OHJEET]", widget=text_area_widget)
 
 
 # --- Base forms -------------------------------------------------------------------------------------------------
@@ -276,7 +276,7 @@ class ReservationApprovedEmailTemplateTesterForm(
     def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
-            "instructions": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
+            "instructions_confirmed": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
         }
 
     def to_context(self) -> EmailContext:
@@ -287,7 +287,7 @@ class ReservationApprovedEmailTemplateTesterForm(
             non_subsidised_price=self.cleaned_data["non_subsidised_price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
             reservation_id=self.cleaned_data["reservation_id"],
-            instructions=self.cleaned_data["instructions"],
+            instructions_confirmed=self.cleaned_data["instructions"],
         )
 
 
@@ -302,7 +302,7 @@ class ReservationCancelledEmailTemplateTesterForm(
     def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
-            "instructions": get_attr_by_language(instance, "reservation_cancelled_instructions", language),
+            "instructions_cancelled": get_attr_by_language(instance, "reservation_cancelled_instructions", language),
         }
 
     def to_context(self) -> EmailContext:
@@ -313,7 +313,7 @@ class ReservationCancelledEmailTemplateTesterForm(
             price=self.cleaned_data["price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
             reservation_id=self.cleaned_data["reservation_id"],
-            instructions=self.cleaned_data["instructions"],
+            instructions_cancelled=self.cleaned_data["instructions_cancelled"],  # FIXME
         )
 
 
@@ -326,7 +326,7 @@ class ReservationConfirmedEmailTemplateTesterForm(
     def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
-            "instructions": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
+            "instructions_confirmed": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
         }
 
     def to_context(self) -> EmailContext:
@@ -336,7 +336,7 @@ class ReservationConfirmedEmailTemplateTesterForm(
             price=self.cleaned_data["price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
             reservation_id=self.cleaned_data["reservation_id"],
-            instructions=self.cleaned_data["instructions"],
+            instructions_confirmed=self.cleaned_data["instructions_confirmed"],
         )
 
 
@@ -349,7 +349,7 @@ class ReservationModifiedEmailTemplateTesterForm(
     def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
-            "instructions": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
+            "instructions_confirmed": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
         }
 
     def to_context(self) -> EmailContext:
@@ -359,7 +359,7 @@ class ReservationModifiedEmailTemplateTesterForm(
             price=self.cleaned_data["price"],
             tax_percentage=self.cleaned_data["tax_percentage"],
             reservation_id=self.cleaned_data["reservation_id"],
-            instructions=self.cleaned_data["instructions"],
+            instructions_confirmed=self.cleaned_data["instructions_confirmed"],
         )
 
 
@@ -374,7 +374,7 @@ class ReservationRejectedEmailTemplateTesterForm(
     def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
-            "instructions": get_attr_by_language(instance, "reservation_cancelled_instructions", language),
+            "instructions_cancelled": get_attr_by_language(instance, "reservation_cancelled_instructions", language),
         }
 
     def to_context(self) -> EmailContext:
@@ -383,7 +383,7 @@ class ReservationRejectedEmailTemplateTesterForm(
             email_recipient_name=self.cleaned_data["email_recipient_name"],
             rejection_reason=self.cleaned_data["rejection_reason"],
             reservation_id=self.cleaned_data["reservation_id"],
-            instructions=self.cleaned_data["instructions"],
+            instructions_cancelled=self.cleaned_data["instructions_cancelled"],
         )
 
 
@@ -399,7 +399,7 @@ class ReservationRequiresHandlingEmailTemplateTesterForm(
     def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
-            "instructions": get_attr_by_language(instance, "reservation_pending_instructions", language),
+            "instructions_pending": get_attr_by_language(instance, "reservation_pending_instructions", language),
         }
 
     def to_context(self) -> EmailContext:
@@ -411,7 +411,7 @@ class ReservationRequiresHandlingEmailTemplateTesterForm(
             applying_for_free_of_charge=self.cleaned_data["applying_for_free_of_charge"],
             tax_percentage=self.cleaned_data["tax_percentage"],
             reservation_id=self.cleaned_data["reservation_id"],
-            instructions=self.cleaned_data["instructions"],
+            instructions_pending=self.cleaned_data["instructions_pending"],
         )
 
 
@@ -426,7 +426,7 @@ class ReservationRequiresPaymentEmailTemplateTesterForm(
     def get_initial_data_from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> dict[str, Any]:
         return {
             **super().get_initial_data_from_reservation_unit(instance, language=language),
-            "instructions": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
+            "instructions_confirmed": get_attr_by_language(instance, "reservation_confirmed_instructions", language),
         }
 
     def to_context(self) -> EmailContext:
@@ -437,7 +437,7 @@ class ReservationRequiresPaymentEmailTemplateTesterForm(
             tax_percentage=self.cleaned_data["tax_percentage"],
             payment_due_date=self.cleaned_data["payment_due_date"],
             reservation_id=self.cleaned_data["reservation_id"],
-            instructions=self.cleaned_data["instructions"],
+            instructions_confirmed=self.cleaned_data["instructions_confirmed"],
         )
 
 
