@@ -45,7 +45,7 @@ def test_get_context_for_staff_notification_application_section_cancelled__en(em
             cancelled_reservation_series=[
                 {
                     "weekday_value": "Monday",
-                    "time_value": "12:00:00-14:00:00",
+                    "time_value": "12:00:00-15:00:00",
                     "reservation_url": get_staff_reservations_ext_link(reservation_id=reservation_id_1),
                 },
                 {
@@ -66,7 +66,7 @@ def test_get_context_for_staff_notification_application_section_cancelled__en(em
         "cancelled_reservation_series": [
             {
                 "weekday_value": "Monday",
-                "time_value": "12:00:00-14:00:00",
+                "time_value": "12:00:00-15:00:00",
                 "reservation_url": f"https://fake.varaamo.hel.fi/kasittely/reservations/{reservation_id_1}",
             },
             {
@@ -96,7 +96,7 @@ def test_get_context_for_staff_notification_application_section_cancelled__fi():
             cancelled_reservation_series=[
                 {
                     "weekday_value": WeekdayChoice.MONDAY.label,
-                    "time_value": "12:00:00-14:00:00",
+                    "time_value": "12:00:00-15:00:00",
                     "reservation_url": get_staff_reservations_ext_link(reservation_id=1234),
                 },
                 {
@@ -116,7 +116,7 @@ def test_get_context_for_staff_notification_application_section_cancelled__fi():
         "cancelled_reservation_series": [
             {
                 "weekday_value": "Monday",
-                "time_value": "12:00:00-14:00:00",
+                "time_value": "12:00:00-15:00:00",
                 "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
             },
             {
@@ -140,7 +140,7 @@ def test_get_context_for_staff_notification_application_section_cancelled_sv():
             cancelled_reservation_series=[
                 {
                     "weekday_value": WeekdayChoice.MONDAY.label,
-                    "time_value": "12:00:00-14:00:00",
+                    "time_value": "12:00:00-15:00:00",
                     "reservation_url": get_staff_reservations_ext_link(reservation_id=1234),
                 },
                 {
@@ -160,7 +160,7 @@ def test_get_context_for_staff_notification_application_section_cancelled_sv():
         "cancelled_reservation_series": [
             {
                 "weekday_value": "Monday",
-                "time_value": "12:00:00-14:00:00",
+                "time_value": "12:00:00-15:00:00",
                 "reservation_url": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
             },
             {
