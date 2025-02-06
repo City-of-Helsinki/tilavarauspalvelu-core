@@ -108,8 +108,6 @@ def get_context_for_application_section_cancelled(
     language: Lang,
     cancel_reason: str,
     email_recipient_name: str,
-    weekday_value: str,
-    time_value: str,
     application_section_name: str,
     application_round_name: str,
     application_id: int | None,

@@ -38,8 +38,6 @@ def test_get_context_for_application_section_cancelled__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_application_section_cancelled(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            weekday_value="[VIIKONPÄIVÄ]",
-            time_value="[KELLONAIKA]",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
@@ -74,8 +72,6 @@ def test_get_context_for_application_section_cancelled__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_application_section_cancelled(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            weekday_value="[VIIKONPÄIVÄ]",
-            time_value="[KELLONAIKA]",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
@@ -101,8 +97,6 @@ def test_get_context_for_application_section_cancelled_sv():
     with TranslationsFromPOFiles():
         context = get_context_for_application_section_cancelled(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            weekday_value="[VIIKONPÄIVÄ]",
-            time_value="[KELLONAIKA]",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
