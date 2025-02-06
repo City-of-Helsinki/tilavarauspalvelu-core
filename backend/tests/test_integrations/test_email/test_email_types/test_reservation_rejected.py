@@ -37,11 +37,11 @@ def test_get_context__reservation_rejected__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_rejected(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             rejection_reason="[HYLKÄYKSEN SYY]",
             reservation_id=email_reservation.id,
             instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
@@ -72,22 +72,22 @@ def test_get_context__reservation_rejected__en(email_reservation):
 def test_get_context__reservation_rejected__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_rejected(
-            email_recipient_name="Mikko Mallikas",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             rejection_reason="Tässä on hylkäyksen syy",
-            reservation_id=12,
+            reservation_id=1234,
             instructions_cancelled="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="fi",
         )
 
     assert context == {
-        "email_recipient_name": "Mikko Mallikas",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "booking_number_label": "Varausnumero",
-        "reservation_id": "12",
+        "reservation_id": "1234",
         "rejection_reason": "Tässä on hylkäyksen syy",
         "text_reservation_rejected": "Valitettavasti varaustasi ei voida vahvistaa",
         "instructions_cancelled_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
@@ -102,22 +102,22 @@ def test_get_context__reservation_rejected__fi():
 def test_get_context__reservation_rejected__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_rejected(
-            email_recipient_name="Magnus Persson",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             rejection_reason="Här är orsaken till avslagningen",
-            reservation_id=12,
+            reservation_id=1234,
             instructions_cancelled="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             language="sv",
         )
 
     assert context == {
-        "email_recipient_name": "Magnus Persson",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "booking_number_label": "Bokningsnummer",
-        "reservation_id": "12",
+        "reservation_id": "1234",
         "rejection_reason": "Här är orsaken till avslagningen",
         "text_reservation_rejected": "Tyvärr kan vi inte bekräfta din bokning",
         "instructions_cancelled_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
@@ -145,10 +145,10 @@ def test_render_reservation_rejected__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         Booking number: 1234
 
@@ -187,9 +187,9 @@ def test_render_reservation_rejected__html():
         Reason: [HYLKÄYKSEN SYY]
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
         Booking number: 1234
 
         ## Additional information

@@ -41,11 +41,11 @@ def test_get_context_for_seasonal_reservation_rejected_single__en(email_reservat
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_rejected_single(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             rejection_reason="[HYLKÄYKSEN SYY]",
             application_id=section.application_id,
             application_section_id=section.id,
@@ -77,11 +77,11 @@ def test_get_context_for_seasonal_reservation_rejected_single__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_rejected_single(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             rejection_reason="[HYLKÄYKSEN SYY]",
             application_id=None,
             application_section_id=None,
@@ -104,11 +104,11 @@ def test_get_context_for_seasonal_reservation_rejected_single__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_rejected_single(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             rejection_reason="[HYLKÄYKSEN SYY]",
             application_id=None,
             application_section_id=None,
@@ -144,10 +144,10 @@ def test_render_seasonal_reservation_rejected_single__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         You can check your booking details at: https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678
 
@@ -183,9 +183,9 @@ def test_render_seasonal_reservation_rejected_single__html():
         Reason: [HYLKÄYKSEN SYY]
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
         You can check your booking details at: [varaamo.hel.fi](https://fake.varaamo.hel.fi/en/applications/1234/view?tab=reservations&section=5678)
 
         Kind regards

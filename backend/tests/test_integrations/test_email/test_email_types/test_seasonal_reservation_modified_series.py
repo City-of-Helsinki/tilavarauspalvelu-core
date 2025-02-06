@@ -38,7 +38,7 @@ def test_get_context_for_seasonal_reservation_modified_series__en(email_reservat
         context = get_context_for_seasonal_reservation_modified_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             weekday_value="Monday",
-            time_value="12:00:00-14:00:00",
+            time_value="12:00:00-15:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             application_id=section.application_id,
@@ -55,7 +55,7 @@ def test_get_context_for_seasonal_reservation_modified_series__en(email_reservat
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
         "weekday_value": "Monday",
-        "time_value": "12:00:00-14:00:00",
+        "time_value": "12:00:00-15:00:00",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_EN,
         **BASE_TEMPLATE_CONTEXT_EN,
         "check_booking_details_url": f"{details_url}",
@@ -75,7 +75,7 @@ def test_get_context_for_seasonal_reservation_modified_series__fi():
         context = get_context_for_seasonal_reservation_modified_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             weekday_value="[VIIKONPÄIVÄ]",
-            time_value="12:00:00-14:00:00",
+            time_value="12:00:00-15:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             application_id=None,
@@ -91,7 +91,7 @@ def test_get_context_for_seasonal_reservation_modified_series__fi():
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
         "weekday_value": "[VIIKONPÄIVÄ]",
-        "time_value": "12:00:00-14:00:00",
+        "time_value": "12:00:00-15:00:00",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_FI,
         **BASE_TEMPLATE_CONTEXT_FI,
     }
@@ -103,7 +103,7 @@ def test_get_context_for_seasonal_reservation_modified_series__sv():
         context = get_context_for_seasonal_reservation_modified_series(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             weekday_value="[VIIKONPÄIVÄ]",
-            time_value="12:00:00-14:00:00",
+            time_value="12:00:00-15:00:00",
             application_section_name="[HAKEMUKSEN OSAN NIMI]",
             application_round_name="[KAUSIVARAUSKIERROKSEN NIMI]",
             application_id=None,
@@ -119,7 +119,7 @@ def test_get_context_for_seasonal_reservation_modified_series__sv():
         "application_section_name": "[HAKEMUKSEN OSAN NIMI]",
         "application_round_name": "[KAUSIVARAUSKIERROKSEN NIMI]",
         "weekday_value": "[VIIKONPÄIVÄ]",
-        "time_value": "12:00:00-14:00:00",
+        "time_value": "12:00:00-15:00:00",
         **SEASONAL_RESERVATION_CHECK_BOOKING_DETAILS_LINK_SV,
         **BASE_TEMPLATE_CONTEXT_SV,
     }

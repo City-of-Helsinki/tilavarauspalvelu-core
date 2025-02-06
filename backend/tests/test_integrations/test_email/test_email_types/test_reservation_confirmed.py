@@ -50,11 +50,11 @@ def test_get_context__reservation_confirmed__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_confirmed(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal(0),
             tax_percentage=Decimal(0),
             reservation_id=email_reservation.id,
@@ -103,11 +103,11 @@ def test_get_context__reservation_confirmed__access_code__en(email_reservation):
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_confirmed(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal(0),
             tax_percentage=Decimal(0),
             reservation_id=email_reservation.id,
@@ -149,15 +149,15 @@ def test_get_context__reservation_confirmed__access_code__en(email_reservation):
 def test_get_context__reservation_confirmed__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_confirmed(
-            email_recipient_name="Mikko Mallikas",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=False,
             access_code="",
@@ -166,7 +166,7 @@ def test_get_context__reservation_confirmed__fi():
         )
 
     assert context == {
-        "email_recipient_name": "Mikko Mallikas",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "text_reservation_confirmed": "Olet tehnyt uuden varauksen",
@@ -183,15 +183,15 @@ def test_get_context__reservation_confirmed__fi():
 def test_get_context__reservation_confirmed__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_confirmed(
-            email_recipient_name="Magnus Persson",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_confirmed="[HYVÄKSYTYN VARAUKSEN OHJEET]",
             access_code_is_used=False,
             access_code="",
@@ -200,7 +200,7 @@ def test_get_context__reservation_confirmed__sv():
         )
 
     assert context == {
-        "email_recipient_name": "Magnus Persson",
+        "email_recipient_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         "instructions_confirmed_html": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "instructions_confirmed_text": "[HYVÄKSYTYN VARAUKSEN OHJEET]",
         "text_reservation_confirmed": "Du har gjort en ny bokning",
@@ -234,10 +234,10 @@ def test_render_reservation_confirmed__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
         Booking number: 1234
@@ -276,10 +276,10 @@ def test_render_reservation_confirmed__access_code__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
         Booking number: 1234
@@ -329,9 +329,9 @@ def test_render_reservation_confirmed__html():
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
         Booking number: 1234
 
@@ -379,9 +379,9 @@ def test_render_reservation_confirmed__access_code__html():
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
         Booking number: 1234
         Door code: 123456

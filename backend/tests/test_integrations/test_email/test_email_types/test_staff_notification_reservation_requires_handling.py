@@ -40,11 +40,11 @@ def test_get_context__staff_notification_reservation_requires_handling__en(email
         context = get_context_for_staff_notification_reservation_requires_handling(
             reservee_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_name="Test reservation",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             reservation_id=email_reservation.id,
             language="en",
         )
@@ -61,9 +61,9 @@ def test_get_context__staff_notification_reservation_requires_handling__en(email
             f"https://fake.varaamo.hel.fi/kasittely/reservations/{email_reservation.id}</a>"
         ),
         "text_staff_reservation_requires_handling": (
-            "A booking request for Test reservation unit is waiting for processing"
+            "A booking request for [VARAUSYKSIKÖN NIMI] is waiting for processing"
         ),
-        "title": f"New booking {email_reservation.id} requires handling at unit Test unit",
+        "title": f"New booking {email_reservation.id} requires handling at unit [TOIMIPISTEEN NIMI]",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
     }
@@ -79,14 +79,14 @@ def test_get_context__staff_notification_reservation_requires_handling__en(email
 def test_get_context__staff_notification_reservation_requires_handling__fi():
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_reservation_requires_handling(
-            reservee_name="Mikko Mallikas",
+            reservee_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_name="Test reservation",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            reservation_id=12,
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
+            reservation_id=1234,
             language="fi",
         )
 
@@ -94,17 +94,17 @@ def test_get_context__staff_notification_reservation_requires_handling__fi():
         "email_recipient_name": None,
         "reservation_name": "Test reservation",
         "booking_number_label": "Varausnumero",
-        "reservation_id": "12",
-        "reservee_name": "Mikko Mallikas",
-        "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
+        "reservation_id": "1234",
+        "reservee_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
         "staff_reservations_ext_link_html": (
-            '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/12">'
-            "https://fake.varaamo.hel.fi/kasittely/reservations/12</a>"
+            '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/1234">'
+            "https://fake.varaamo.hel.fi/kasittely/reservations/1234</a>"
         ),
         "text_staff_reservation_requires_handling": (
-            "Varausyksikköön Test reservation unit on tehty uusi käsittelyä vaativa varauspyyntö"
+            "Varausyksikköön [VARAUSYKSIKÖN NIMI] on tehty uusi käsittelyä vaativa varauspyyntö"
         ),
-        "title": "Uusi tilavaraus 12 odottaa käsittelyä toimipisteessä Test unit",
+        "title": "Uusi tilavaraus 1234 odottaa käsittelyä toimipisteessä [TOIMIPISTEEN NIMI]",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
     }
@@ -114,14 +114,14 @@ def test_get_context__staff_notification_reservation_requires_handling__fi():
 def test_get_context__staff_notification_reservation_requires_handling__sv():
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_reservation_requires_handling(
-            reservee_name="Magnus Persson",
+            reservee_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             reservation_name="Test reservation",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
-            reservation_id=12,
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
+            reservation_id=1234,
             language="sv",
         )
 
@@ -129,17 +129,17 @@ def test_get_context__staff_notification_reservation_requires_handling__sv():
         "email_recipient_name": None,
         "reservation_name": "Test reservation",
         "booking_number_label": "Bokningsnummer",
-        "reservation_id": "12",
-        "reservee_name": "Magnus Persson",
-        "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/12",
+        "reservation_id": "1234",
+        "reservee_name": "[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
+        "staff_reservations_ext_link": "https://fake.varaamo.hel.fi/kasittely/reservations/1234",
         "staff_reservations_ext_link_html": (
-            '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/12">'
-            "https://fake.varaamo.hel.fi/kasittely/reservations/12</a>"
+            '<a href="https://fake.varaamo.hel.fi/kasittely/reservations/1234">'
+            "https://fake.varaamo.hel.fi/kasittely/reservations/1234</a>"
         ),
         "text_staff_reservation_requires_handling": (
-            "En ny bokningsförfrågan för Test reservation unit väntar på at behandlats"
+            "En ny bokningsförfrågan för [VARAUSYKSIKÖN NIMI] väntar på at behandlats"
         ),
-        "title": "Ny bokningsförfrågan 12 för Test unit väntar på at behandlats",
+        "title": "Ny bokningsförfrågan 1234 för [TOIMIPISTEEN NIMI] väntar på at behandlats",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
     }
@@ -164,10 +164,10 @@ def test_render_reservation_staff_notification_reservation_requires_handling__te
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         You can view and handle the booking at:
         https://fake.varaamo.hel.fi/kasittely/reservations/1234
@@ -203,9 +203,9 @@ def test_render_reservation_staff_notification_reservation_requires_handling__ht
         Booking number: 1234
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
 
         ## You can view and handle the booking at
 

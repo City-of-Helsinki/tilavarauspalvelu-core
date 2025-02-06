@@ -42,11 +42,11 @@ def test_get_context__reservation_cancelled__en(email_reservation):
         context = get_context_for_reservation_cancelled(
             email_recipient_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
             cancel_reason="[PERUUTUKSEN SYY]",
-            reservation_unit_name="Test reservation unit",
-            unit_name="Test unit",
-            unit_location="Test Street, City",
+            reservation_unit_name="[VARAUSYKSIKÖN NIMI]",
+            unit_name="[TOIMIPISTEEN NIMI]",
+            unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal(0),
             tax_percentage=Decimal(0),
             reservation_id=email_reservation.id,
@@ -86,10 +86,10 @@ def test_get_context__reservation_cancelled__fi():
             unit_name="[TOIMIPISTEEN NIMI]",
             unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
             language="fi",
         )
@@ -116,10 +116,10 @@ def test_get_context__reservation_cancelled__sv():
             unit_name="[TOIMIPISTEEN NIMI]",
             unit_location="[TOIMIPISTEEN OSOITE], [KAUPUNKI]",
             begin_datetime=datetime.datetime(2024, 1, 1, 12),
-            end_datetime=datetime.datetime(2024, 1, 1, 14),
+            end_datetime=datetime.datetime(2024, 1, 1, 15),
             price=Decimal("12.30"),
             tax_percentage=Decimal("25.5"),
-            reservation_id=12,
+            reservation_id=1234,
             instructions_cancelled="[PERUUTETUN VARAUKSEN OHJEET]",
             language="sv",
         )
@@ -153,10 +153,10 @@ def test_render_reservation_cancelled__text():
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
 
         From: 1.1.2024 at 12:00
-        To: 2.1.2024 at 15:00
+        To: 1.1.2024 at 15:00
 
         Price: 12,30 € (incl. VAT 25.5 %)
         Booking number: 1234
@@ -197,9 +197,9 @@ def test_render_reservation_cancelled__html():
         Your reason for cancellation: [PERUUTUKSEN SYY]
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
-        [TOIMIPISTEEN OSOITE]
+        [TOIMIPISTEEN OSOITE], [KAUPUNKI]
         From: **1.1.2024** at **12:00**
-        To: **2.1.2024** at **15:00**
+        To: **1.1.2024** at **15:00**
         Price: **12,30 €** (incl. VAT 25.5 %)
         Booking number: 1234
 
