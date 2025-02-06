@@ -23,6 +23,9 @@ from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
+    EMAIL_CLOSING_HTML_EN,
+    EMAIL_CLOSING_TEXT_EN,
+    EMAIL_LOGO_HTML,
     RESERVATION_BASIC_INFO_CONTEXT_EN,
     RESERVATION_BASIC_INFO_CONTEXT_FI,
     RESERVATION_BASIC_INFO_CONTEXT_SV,
@@ -105,7 +108,7 @@ def test_render_reservation_rejected__text():
     text_content = render_text(email_type=EmailType.RESERVATION_REJECTED, context=context)
 
     assert text_content == cleandoc(
-        """
+        f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
         Unfortunately your booking cannot be confirmed.
@@ -123,12 +126,7 @@ def test_render_reservation_rejected__text():
         Additional information:
         [PERUUTETUN VARAUKSEN OHJEET]
 
-        Kind regards
-        Varaamo
-
-        This is an automated message, please do not reply. Contact us: https://fake.varaamo.hel.fi/feedback?lang=en.
-
-        Book the city's premises and equipment for your use at https://fake.varaamo.hel.fi/en.
+        {EMAIL_CLOSING_TEXT_EN}
         """
     )
 
@@ -143,10 +141,8 @@ def test_render_reservation_rejected__html():
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
-        """
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        f"""
+        {EMAIL_LOGO_HTML}
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
@@ -164,17 +160,7 @@ def test_render_reservation_rejected__html():
 
         [PERUUTETUN VARAUKSEN OHJEET]
 
-        Kind regards
-        Varaamo
-        This is an automated message, please do not reply.
-        [Contact us](https://fake.varaamo.hel.fi/feedback?lang=en).
-        Book the city's premises and equipment for your use at [varaamo.hel.fi](https://fake.varaamo.hel.fi/en).
-
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
-
-        (C) City of Helsinki 2024
+        {EMAIL_CLOSING_HTML_EN}
         """
     )
 

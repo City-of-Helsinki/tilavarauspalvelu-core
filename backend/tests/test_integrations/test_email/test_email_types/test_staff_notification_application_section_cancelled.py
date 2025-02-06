@@ -25,6 +25,7 @@ from tests.test_integrations.test_email.helpers import (
     BASE_TEMPLATE_CONTEXT_EN,
     BASE_TEMPLATE_CONTEXT_FI,
     BASE_TEMPLATE_CONTEXT_SV,
+    EMAIL_LOGO_HTML,
     html_email_to_text,
 )
 
@@ -194,10 +195,8 @@ def test_render_staff_notification_application_section_cancelled_email__html():
     text_content = html_email_to_text(html_content)
 
     assert text_content == cleandoc(
-        """
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        f"""
+        {EMAIL_LOGO_HTML}
 
         **Hi,**
 
@@ -215,9 +214,7 @@ def test_render_staff_notification_application_section_cancelled_email__html():
         Varaamo
         This is an automated message, please do not reply.
 
-        ![](https://makasiini.hel.ninja/helsinki-logos/helsinki-logo-black.png)
-
-        **Varaamo**
+        {EMAIL_LOGO_HTML}
 
         (C) City of Helsinki 2024
         """
