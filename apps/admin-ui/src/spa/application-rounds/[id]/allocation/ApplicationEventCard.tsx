@@ -222,7 +222,7 @@ export function ApplicationSectionCard({
           <b>
             {applicationSection.application.pk}-{applicationSection.pk}
           </b>
-          <IconLinkExternal size={IconSize.ExtraSmall} aria-hidden="true" />
+          <IconLinkExternal size={IconSize.ExtraSmall} />
         </StyledLink>
         <div>
           {t("Allocation.ageGroup")}:{" "}

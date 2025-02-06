@@ -6,11 +6,14 @@ import {
   ApplicationRoundStatusChoice,
 } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
-import { getApplicationRoundName } from "@/modules/applicationRound";
 import { isValid } from "date-fns";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { getApplicationRoundPath } from "@/modules/urls";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 interface CardProps {
   applicationRound: ApplicationRoundFieldsFragment;
@@ -46,15 +49,11 @@ function translateRoundDate(
 export function ApplicationRoundCard({
   applicationRound,
 }: CardProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
 
   const state = applicationRound.status;
-  if (state == null) {
-    // eslint-disable-next-line no-console
-    console.warn("Application round status is null");
-  }
-
-  const name = getApplicationRoundName(applicationRound);
+  const name = getTranslationSafe(applicationRound, "name", lang);
   const timeString = translateRoundDate(t, applicationRound);
   const reservationPeriod = t(`applicationRound:card.reservationPeriod`, {
     // TODO check if time is needed
@@ -87,7 +86,7 @@ export function ApplicationRoundCard({
         width="full"
       >
         {t("application:Intro.startNewApplication")}
-        <IconArrowRight aria-hidden />
+        <IconArrowRight />
       </ButtonLikeLink>
     );
   }

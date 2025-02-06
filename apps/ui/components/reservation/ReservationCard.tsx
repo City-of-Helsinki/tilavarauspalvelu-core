@@ -80,7 +80,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
 
   const infos = [
     {
-      icon: <IconEuroSign aria-label={t("common:price")} />,
+      icon: <IconEuroSign aria-label={t("common:price")} aria-hidden="false" />,
       value: price ?? "",
     },
   ];
@@ -95,7 +95,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
         width="full"
       >
         {t("reservations:cancel.reservationAbbreviated")}
-        <IconCross aria-hidden />
+        <IconCross />
       </ButtonLikeLink>
     );
   }
@@ -107,7 +107,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
       width="full"
     >
       {t("common:show")}
-      <IconArrowRight aria-hidden />
+      <IconArrowRight />
     </ButtonLikeLink>
   );
 
