@@ -6,7 +6,7 @@ from typing import Any
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from tilavarauspalvelu.services.csv_export import ReservationUnitExporter
+from tilavarauspalvelu.services.export import ReservationUnitExporter
 
 
 class Command(BaseCommand):

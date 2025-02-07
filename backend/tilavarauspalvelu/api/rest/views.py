@@ -16,7 +16,7 @@ from import_export.admin import ExportMixin
 from import_export.formats.base_formats import JSON
 
 from tilavarauspalvelu.models import Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
-from tilavarauspalvelu.services.csv_export import ReservationUnitExporter
+from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
 from utils.utils import ical_hmac_signature
 

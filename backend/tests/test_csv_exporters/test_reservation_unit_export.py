@@ -10,7 +10,7 @@ from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import AuthenticationType, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit
-from tilavarauspalvelu.services.csv_export import ReservationUnitExporter
+from tilavarauspalvelu.services.export import ReservationUnitExporter
 from utils.date_utils import local_datetime_string, local_timedelta_string
 
 from tests.factories import ReservationUnitFactory

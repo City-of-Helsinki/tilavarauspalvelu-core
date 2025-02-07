@@ -15,10 +15,7 @@ from tilavarauspalvelu.admin.application_round.form import ApplicationRoundAdmin
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ApplicationRound
-from tilavarauspalvelu.services.csv_export import (
-    ApplicationRoundApplicationsCSVExporter,
-    ApplicationRoundResultCSVExporter,
-)
+from tilavarauspalvelu.services.export import ApplicationRoundApplicationsCSVExporter, ApplicationRoundResultCSVExporter
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet

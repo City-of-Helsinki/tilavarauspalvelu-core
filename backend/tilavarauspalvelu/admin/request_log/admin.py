@@ -15,7 +15,7 @@ from tilavarauspalvelu.admin.helpers import ImmutableModelAdmin
 from tilavarauspalvelu.admin.sql_log.admin import SQLLogAdminInline
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models.request_log.model import RequestLog
-from tilavarauspalvelu.services.csv_export import SQLLogCSVExporter
+from tilavarauspalvelu.services.export import SQLLogCSVExporter
 
 if TYPE_CHECKING:
     from django.http import FileResponse

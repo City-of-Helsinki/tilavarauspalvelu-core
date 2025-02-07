@@ -7,8 +7,8 @@ import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice, Priority, Weekday
-from tilavarauspalvelu.services.csv_export import ApplicationRoundApplicationsCSVExporter
-from tilavarauspalvelu.services.csv_export.application_round_applications_exporter import ApplicationExportRow
+from tilavarauspalvelu.services.export import ApplicationRoundApplicationsCSVExporter
+from tilavarauspalvelu.services.export.application_round_applications_exporter import ApplicationExportRow
 from utils.date_utils import local_date_string, local_datetime, local_timedelta_string
 
 from tests.factories import ApplicationFactory, ApplicationRoundFactory

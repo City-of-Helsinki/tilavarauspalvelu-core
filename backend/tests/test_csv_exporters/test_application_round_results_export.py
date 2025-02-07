@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 import pytest
 
 from tilavarauspalvelu.enums import Weekday
-from tilavarauspalvelu.services.csv_export import ApplicationRoundResultCSVExporter
-from tilavarauspalvelu.services.csv_export.application_round_result_exporter import ApplicationSectionExportRow
+from tilavarauspalvelu.services.export import ApplicationRoundResultCSVExporter
+from tilavarauspalvelu.services.export.application_round_result_exporter import ApplicationSectionExportRow
 from utils.date_utils import local_date_string, local_timedelta_string
 
 from tests.factories import (
