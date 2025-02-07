@@ -139,16 +139,12 @@
     },
     "company": {
       "name": "Yrityksen virallinen nimi",
-      "coreBusiness": "Yrityksen ydintoiminta",
-      "identifier": "Y-tunnus"
+      "coreBusiness": "Yrityksen ydintoiminta"
     },
     "organisation": {
       "name": "Virallinen nimi",
+      "identifier": "Y-tunnus",
       "coreBusiness": "Ydintoiminta",
-      "registrationNumber": "Y-tunnus",
-      "streetAddress": "Katuosoite",
-      "postCode": "Postinumero",
-      "city": "Postitoimipaikka",
       "notRegistered": "Ei Y-tunnusta",
       "separateInvoicingAddress": "Laskutusosoite eri kuin postiosoite"
     },
