@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { BillingAddress } from "./BillingAddress";
 import { FormSubHeading, SpanFullRow } from "./styled";
-import { ApplicationFormTextInput } from "./CompanyForm";
+import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
 
 export function IndividualForm(): JSX.Element {
   const { t } = useTranslation();

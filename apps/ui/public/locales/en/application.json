@@ -138,16 +138,12 @@
     },
     "company": {
       "name": "Company’s official name",
-      "coreBusiness": "Company’s core business",
-      "identifier": "Business ID"
+      "coreBusiness": "Company’s core business"
     },
     "organisation": {
       "name": "Official name",
+      "identifier": "Business ID",
       "coreBusiness": "Core business",
-      "registrationNumber": "Business ID",
-      "streetAddress": "Address",
-      "postCode": "Postal code",
-      "city": "City",
       "notRegistered": "No business ID",
       "separateInvoicingAddress": "Billing address different to postal address"
     },

@@ -44,8 +44,32 @@ function Page3Form(): JSX.Element | null {
   const { options } = useOptions();
   const { cityOptions } = options;
 
-  const { watch } = useFormContext<ApplicationPage3FormValues>();
+  const { watch, unregister, register } =
+    useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
+
+  useEffect(() => {
+    if (type === ApplicantTypeChoice.Individual) {
+      unregister("organisation");
+    }
+    const hasRegistration =
+      type === ApplicantTypeChoice.Association ||
+      type === ApplicantTypeChoice.Company;
+    if (hasRegistration) {
+      register("organisation.identifier", { required: true });
+    } else {
+      unregister("organisation.identifier");
+    }
+  }, [type, register, unregister]);
+
+  const hasBillingAddress = watch("hasBillingAddress");
+  useEffect(() => {
+    if (!hasBillingAddress) {
+      unregister("billingAddress");
+      unregister("billingAddress.postCode");
+      unregister("billingAddress.city");
+    }
+  }, [hasBillingAddress, unregister]);
 
   switch (type) {
     case ApplicantTypeChoice.Individual:
@@ -71,7 +95,7 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
     reValidateMode: "onChange",
   });
 
-  const { handleSubmit, reset, watch } = form;
+  const { handleSubmit, reset, formState } = form;
 
   useEffect(() => {
     if (application != null) {
@@ -93,7 +117,7 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
 
   const onPrev = () => router.push(getApplicationPath(application.pk, "page2"));
 
-  const isValid = watch("applicantType") != null;
+  const { isValid } = formState;
 
   return (
     <FormProvider {...form}>

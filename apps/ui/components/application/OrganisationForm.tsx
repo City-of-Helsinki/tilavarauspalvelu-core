@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Checkbox } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
@@ -8,7 +8,8 @@ import { type ApplicationPage3FormValues } from "./form";
 import { FormSubHeading } from "./styled";
 import { ControlledSelect } from "common/src/components/form";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
-import { ApplicationFormTextInput, ContactPersonSection } from "./CompanyForm";
+import { ContactPersonSection } from "./CompanyForm";
+import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
 
 type OptionType = {
   label: string;
@@ -22,8 +23,6 @@ export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
   const { t } = useTranslation();
 
   const {
-    register,
-    unregister,
     control,
     formState: { errors },
     watch,
@@ -33,26 +32,6 @@ export function OrganisationForm({ homeCityOptions }: Props): JSX.Element {
   const applicantType = watch("applicantType");
   const hasRegistration = applicantType === ApplicantTypeChoice.Association;
   const hasBillingAddress = watch("hasBillingAddress");
-
-  useEffect(() => {
-    if (hasRegistration) {
-      register("organisation.identifier", { required: true });
-    } else {
-      unregister("organisation.identifier");
-    }
-  }, [hasRegistration, register, unregister]);
-
-  useEffect(() => {
-    if (hasBillingAddress) {
-      register("billingAddress", { required: true });
-      register("billingAddress.postCode", { required: true });
-      register("billingAddress.city", { required: true });
-    } else {
-      unregister("billingAddress");
-      unregister("billingAddress.postCode");
-      unregister("billingAddress.city");
-    }
-  }, [hasBillingAddress, register, unregister]);
 
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`application:validation.${errorMsg}`) : "";
