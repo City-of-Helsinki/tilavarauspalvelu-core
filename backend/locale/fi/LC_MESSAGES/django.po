@@ -2530,6 +2530,11 @@ msgstr "Ilmoituksen hallitsija."
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
+msgid "Reservation modified access code"
+msgstr "Varausta muokattu ovikoodi"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Application handled"
 msgstr "Kausivaraushakemus käsitelty"
 
@@ -3522,6 +3527,12 @@ msgctxt "Email"
 msgid ""
 "Here are your booking details and the door code for easy access to the space"
 msgstr "Tässä ovat varauksesi tiedot ja ovikoodi, jolla pääset tilaan helposti"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "The door code has changed"
+msgstr "Ovikoodi on vaihtunut"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"

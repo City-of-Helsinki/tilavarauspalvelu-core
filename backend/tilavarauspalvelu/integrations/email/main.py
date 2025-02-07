@@ -5,7 +5,13 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.db import models
 
-from tilavarauspalvelu.enums import ApplicationStatusChoice, EmailType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    ApplicationStatusChoice,
+    EmailType,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, User
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
@@ -44,6 +50,7 @@ from .template_context import (
     get_context_for_user_anonymization,
 )
 from .template_context.application import get_context_for_staff_notification_application_section_cancelled
+from .template_context.reservation import get_context_for_reservation_modified_access_code
 from .typing import EmailData
 
 if TYPE_CHECKING:
@@ -348,6 +355,41 @@ class EmailService:
             email_type = EmailType.RESERVATION_MODIFIED
             context = get_context_for_reservation_modified(reservation, language=language)
 
+        attachment = get_reservation_ical_attachment(reservation)
+        email = EmailData.build(recipients, context, email_type, attachment=attachment)
+        send_emails_in_batches_task.delay(email_data=email)
+
+    @staticmethod
+    def send_reservation_modified_access_code_email(reservation: Reservation, *, language: Lang | None = None) -> None:
+        """
+        Sends an email about the reservation access code being modified.
+
+        :param reservation: The reservation the email concerns.
+        :param language: The language of the email. Determine from reservation if not given.
+        """
+        if reservation.type not in {ReservationTypeChoice.NORMAL, ReservationTypeChoice.SEASONAL}:
+            return
+
+        if reservation.access_type != AccessType.ACCESS_CODE:
+            return
+
+        # Only send emails if reservation is not in the past.
+        if local_datetime() >= reservation.end.astimezone(DEFAULT_TIMEZONE):
+            return
+
+        recipients = get_reservation_email_recipients(reservation=reservation)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for reservation modified access code email",
+                details={"reservation": reservation.pk},
+            )
+            return
+
+        if language is None:
+            language = get_reservation_email_language(reservation=reservation)
+
+        email_type = EmailType.RESERVATION_MODIFIED_ACCESS_CODE
+        context = get_context_for_reservation_modified_access_code(reservation, language=language)
         attachment = get_reservation_ical_attachment(reservation)
         email = EmailData.build(recipients, context, email_type, attachment=attachment)
         send_emails_in_batches_task.delay(email_data=email)

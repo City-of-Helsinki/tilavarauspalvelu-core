@@ -271,6 +271,10 @@ class EmailType(models.TextChoices):
     RESERVATION_CANCELLED = "reservation_cancelled", pgettext_lazy("EmailType", "Reservation cancelled")
     RESERVATION_CONFIRMED = "reservation_confirmed", pgettext_lazy("EmailType", "Reservation confirmed")
     RESERVATION_MODIFIED = "reservation_modified", pgettext_lazy("EmailType", "Reservation modified")
+    RESERVATION_MODIFIED_ACCESS_CODE = (
+        "reservation_modified_access_code",
+        pgettext_lazy("EmailType", "Reservation modified access code"),
+    )
     RESERVATION_REJECTED = "reservation_rejected", pgettext_lazy("EmailType", "Reservation rejected")
     RESERVATION_REQUIRES_HANDLING = (
         "reservation_requires_handling",

@@ -2454,6 +2454,11 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "EmailType"
+msgid "Reservation modified access code"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "EmailType"
 msgid "Application handled"
 msgstr ""
 
@@ -3448,6 +3453,12 @@ msgid ""
 "Here are your booking details and the door code for easy access to the space"
 msgstr ""
 "Här är dina bokningsuppgifter och dörrkoden för enkel åtkomst till utrymmet"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "The door code has changed"
+msgstr "Dörrkoden har ändrats"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
