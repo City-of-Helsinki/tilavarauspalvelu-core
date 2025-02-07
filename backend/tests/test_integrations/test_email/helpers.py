@@ -212,6 +212,7 @@ KEYLESS_ENTRY_CONTEXT_EN = {
     "access_code_validity_period_label": "Validity period of the door code",
     "text_access_code_to_access": "You can access the space with the door code",
     "text_access_code_confirmed": "Here are your booking details and the door code for easy access to the space",
+    "text_access_code_modified": "The door code has changed",
     "text_access_code_unavailable_instructions_html": (
         "You can see the door code on the "
         "<a href=\"https://fake.varaamo.hel.fi/en/reservations\">'My bookings' page</a> at Varaamo. "
@@ -232,6 +233,7 @@ KEYLESS_ENTRY_CONTEXT_FI = {
     "access_code_validity_period_label": "Ovikoodin voimassaoloaika",
     "text_access_code_to_access": "Pääset tilaan sisään ovikoodilla",
     "text_access_code_confirmed": "Tässä ovat varauksesi tiedot ja ovikoodi, jolla pääset tilaan helposti",
+    "text_access_code_modified": "Ovikoodi on vaihtunut",
     "text_access_code_unavailable_instructions_html": (
         "Näet ovikoodin Varaamon "
         "<a href=\"https://fake.varaamo.hel.fi/reservations\">'Omat Varaukset' -sivulla</a>. "
@@ -252,6 +254,7 @@ KEYLESS_ENTRY_CONTEXT_SV = {
     "access_code_validity_period_label": "Dörrkodens giltighetstid",
     "text_access_code_to_access": "Du kan komma in i utrymmet med dörrkoden",
     "text_access_code_confirmed": "Här är dina bokningsuppgifter och dörrkoden för enkel åtkomst till utrymmet",
+    "text_access_code_modified": "Dörrkoden har ändrats",
     "text_access_code_unavailable_instructions_html": (
         "Du kan se dörrkoden på <a href=\"https://fake.varaamo.hel.fi/sv/reservations\">'Mina bokningar'</a> i Varaamo."
         " Om koden inte syns i dina bokningsuppgifter, vänligen kontakta "
