@@ -21,7 +21,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { ReservationUnitCard } from "@/components/search/ReservationUnitCard";
 import { useReservationUnitList } from "@/hooks";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
-import StartApplicationBar from "@/components/common/StartApplicationBar";
+import { StartApplicationBar } from "@/components/common/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
