@@ -1,4 +1,4 @@
-import { LoadingSpinner } from "hds-react";
+import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import styled, { css } from "styled-components";
 import { breakpoints } from "../src";
 
@@ -142,4 +142,45 @@ export const TitleSection = styled(Flex).attrs({
   $gap: "xs",
 })<{ $noMargin?: boolean }>`
   margin-top: ${({ $noMargin }) => ($noMargin ? "0" : "var(--spacing-l)")};
+`;
+
+// inverted button colors to be used on dark background
+export const WhiteButton = styled(Button)<{
+  disabled?: boolean;
+  variant: ButtonVariant;
+  colorVariant?: "light" | "dark";
+}>`
+  && {
+    --color-hover: var(--color-black);
+    --color-focus: var(--color-black);
+
+    ${({ variant, colorVariant }) => {
+      switch (variant) {
+        case "primary":
+          return `
+      --color: var(--color-black);
+      --background-color: var(--color-white);
+      --background-color-hover: var(--color-black-80);
+      --background-color-focus: var(--color-black-80);
+      --color-disabled: var(--color-black-80);
+      --color-hover: var(--color-white);
+      --color-focus: var(--color-white);
+  `;
+        case "secondary":
+          return `
+      --color: var(--color-white);
+      --border-color: var(--color-white);
+      --background-color: var(--color-bus${colorVariant === "light" ? "" : "-dark"});
+  `;
+        case "supplementary":
+          return `
+      --color: var(--color-white);
+      --background-color: var(--color-bus${colorVariant === "light" ? "" : "-dark"});
+      --border-color: transparent;
+  `;
+        default:
+          return "";
+      }
+    }}
+  }
 `;

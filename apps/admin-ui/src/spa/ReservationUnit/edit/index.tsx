@@ -52,6 +52,7 @@ import {
   Flex,
   TitleSection,
   CenterSpinner,
+  WhiteButton,
 } from "common/styles/util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
@@ -76,6 +77,7 @@ import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { SeasonalSection } from "./SeasonalSection";
 import { getValidationErrors } from "common/src/apolloUtils";
 import { getReservationUnitUrl, getUnitUrl } from "@/common/urls";
+import { pageSideMargins } from "common/styles/layout";
 
 const RichTextInput = dynamic(
   () => import("../../../component/RichTextInput"),
@@ -134,34 +136,28 @@ const SubAccordion = styled(Accordion)`
   }
 `;
 
-const Preview = styled.a<{ $disabled: boolean }>`
+const PreviewLink = styled.a`
   display: flex;
   place-items: center;
-  border: 2px solid;
-  border-color: var(--color-white) !important;
-  background-color: var(--color-bus-dark);
+  border: 2px solid var(--color-white);
+  background-color: transparent;
   text-decoration: none;
-  &:hover {
-    background-color: var(--color-bus-dark);
-  }
-  ${({ $disabled }) =>
-    $disabled
-      ? `
-    opacity: 0.5;
-    cursor: not-allowed;
+
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--color-white);
+
+  :link,
+  :visited {
+    opacity: 1;
     color: var(--color-white);
-    &:hover {
-      background-color: var(--color-bus-dark);
-      }  `
-      : `
-      color: var(--color-white);
     cursor: pointer;
     &:hover {
       background-color: var(--color-white);
       color: var(--color-black);
-      }
+    }
+  }
 
-  `}
   > span {
     margin: 0 var(--spacing-m);
   }
@@ -171,12 +167,14 @@ const ButtonsStripe = styled.div`
   position: fixed;
   bottom: 0;
   left: 0;
-  right: 0;
+  width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: var(--spacing-s);
   background-color: var(--color-bus-dark);
   z-index: var(--tilavaraus-admin-stack-button-stripe);
+
+  padding: var(--spacing-s) 0;
+  ${pageSideMargins}
 
   /* back button should be left aligned */
   gap: var(--spacing-m);
@@ -193,57 +191,6 @@ const ButtonsStripe = styled.div`
       display: flex;
     }
   }
-`;
-
-// Point of this is to have lighter colour buttons on dark background (inverted colours)
-const WhiteButton = styled(Button)<{
-  disabled?: boolean;
-  variant: ButtonVariant;
-}>`
-  /* stylelint-disable csstools/value-no-unknown-custom-properties */
-  --bg: var(--color-white);
-  --fg: var(--color-black);
-  --hbg: var(--fg);
-  --hfg: var(--bg);
-  && {
-    --border-color: var(--color-white);
-  }
-
-  ${({ variant }) => {
-    switch (variant) {
-      case "secondary":
-        return `--fg: var(--color-white);
-      --bg: var(--color-bus-dark);`;
-      case "supplementary":
-        return `--fg: var(--color-white);
-        --bg: var(--color-bus-dark);
-        --border-color: transparent;`;
-      default:
-        return "";
-    }
-  }}
-
-  ${({ disabled }) =>
-    disabled
-      ? `
-        opacity: 0.5;
-        --hbg: var(--bg);
-        --hfg: var(--fg);
-      `
-      : null}
-
-  height: 52px;
-  border: 2px var(--border-color) solid !important;
-
-  color: var(--fg) !important;
-  background-color: var(--bg) !important;
-
-  &:hover {
-    color: var(--hfg) !important;
-    background-color: var(--hbg) !important;
-  }
-  /* stylelint-enable csstools/value-no-unknown-custom-properties */
-  margin: 0;
 `;
 
 const bufferTimeOptions = [
@@ -1898,17 +1845,20 @@ function ReservationUnitEditor({
         <WhiteButton
           size={ButtonSize.Small}
           variant={ButtonVariant.Supplementary}
-          iconStart={<IconArrowLeft aria-hidden="true" />}
+          iconStart={<IconArrowLeft />}
           disabled={isSaving}
           onClick={handleBack}
         >
           {t("common.prev")}
         </WhiteButton>
-        <Preview
+        <PreviewLink
           target="_blank"
           rel="noopener noreferrer"
-          $disabled={previewDisabled}
-          href={`${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}`}
+          href={
+            !previewDisabled
+              ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}`
+              : undefined
+          }
           onClick={(e) => previewDisabled && e.preventDefault()}
           title={t(
             hasChanges
@@ -1917,7 +1867,7 @@ function ReservationUnitEditor({
           )}
         >
           <span>{t("ReservationUnitEditor.preview")}</span>
-        </Preview>
+        </PreviewLink>
         <WhiteButton
           size={ButtonSize.Small}
           variant={isSaving ? ButtonVariant.Clear : ButtonVariant.Secondary}
