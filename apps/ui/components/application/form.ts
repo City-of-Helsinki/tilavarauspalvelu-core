@@ -444,21 +444,26 @@ export function ApplicationPage1SchemaRefined(round: {
   });
 }
 
-// TODO refine the form (different applicant types require different fields)
 // if applicantType === Organisation | Company => organisation.identifier is required
-// if hasBillingAddress | applicantType === Individual => billingAddress is required
+// if hasBillingAddress || applicantType === Individual => billingAddress is required
 export const ApplicationPage3Schema = z
   .object({
     pk: z.number(),
     applicantType: ApplicantTypeSchema.optional(),
     organisation: OrganisationFormValuesSchema.optional(),
-    contactPerson: PersonFormValuesSchema.optional(),
+    contactPerson: PersonFormValuesSchema,
     billingAddress: AddressFormValueSchema.optional(),
     // this is not submitted, we can use it to remove the billing address from submit without losing the frontend state
-    hasBillingAddress: z.boolean().optional(),
+    hasBillingAddress: z.boolean(),
     // TODO what is the max length for this?
     additionalInformation: z.string().optional(),
+    // why is this optional and for what cases?
     homeCity: z.number().optional(),
+  })
+  // have to check at form level otherwise it forbids undefined initialization
+  .refine((val) => val.applicantType != null, {
+    message: "Required",
+    path: ["applicantType"],
   })
   .superRefine((val, ctx) => {
     switch (val.applicantType) {
@@ -474,97 +479,6 @@ export const ApplicationPage3Schema = z
         break;
       default:
         break;
-    }
-    if (val.applicantType !== ApplicantTypeChoice.Individual) {
-      if (val.organisation?.name == null) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["organisation", "name"],
-          message: "Required",
-        });
-      }
-      if (val.organisation?.coreBusiness == null) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["organisation", "coreBusiness"],
-          message: "Required",
-        });
-      }
-      if (!val.organisation?.address?.streetAddress) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["organisation", "address", "streetAddress"],
-          message: "Required",
-        });
-      }
-      if (!val.organisation?.address?.city) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["organisation", "address", "city"],
-          message: "Required",
-        });
-      }
-      if (!val.organisation?.address?.postCode) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["organisation", "address", "postCode"],
-          message: "Required",
-        });
-      }
-    }
-    // TODO need to split
-    if (!val.contactPerson?.firstName) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["contactPerson", "firstName"],
-        message: "Required",
-      });
-    }
-    if (!val.contactPerson?.lastName) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["contactPerson", "lastName"],
-        message: "Required",
-      });
-    }
-    if (!val.contactPerson?.email) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["contactPerson", "email"],
-        message: "Required",
-      });
-    }
-    if (!val.contactPerson?.phoneNumber) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["contactPerson", "phoneNumber"],
-        message: "Required",
-      });
-    }
-
-    // TODO need to check the subfields of the address
-    if (val.hasBillingAddress) {
-      if (!val.billingAddress?.streetAddress) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["billingAddress", "streetAddress"],
-          message: "Required",
-        });
-      }
-      if (!val.billingAddress?.city) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["billingAddress", "city"],
-          message: "Required",
-        });
-      }
-      if (!val.billingAddress?.postCode) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["billingAddress", "postCode"],
-          message: "Required",
-        });
-      }
     }
   });
 
@@ -747,15 +661,21 @@ function transformOrganisation(org: OrganisationFormValues) {
 export function convertApplicationPage3(
   app?: Maybe<ApplicantFragment>
 ): ApplicationPage3FormValues {
+  const hasBillingAddress =
+    app?.applicantType !== ApplicantTypeChoice.Individual &&
+    app?.billingAddress?.streetAddressFi != null &&
+    app?.billingAddress?.streetAddressFi !== "";
   return {
     pk: app?.pk ?? 0,
     applicantType: app?.applicantType ?? undefined,
-    organisation: convertOrganisation(app?.organisation),
+    organisation: app?.organisation
+      ? convertOrganisation(app.organisation)
+      : undefined,
     contactPerson: convertPerson(app?.contactPerson),
-    billingAddress: convertAddress(app?.billingAddress),
-    hasBillingAddress:
-      app?.applicantType !== ApplicantTypeChoice.Individual &&
-      app?.billingAddress?.streetAddressFi != null,
+    billingAddress: hasBillingAddress
+      ? convertAddress(app.billingAddress)
+      : undefined,
+    hasBillingAddress,
     additionalInformation: app?.additionalInformation ?? "",
     homeCity: app?.homeCity?.pk ?? undefined,
   };

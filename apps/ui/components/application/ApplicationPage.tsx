@@ -137,7 +137,9 @@ export function ApplicationPageWrapper({
   }));
 
   const handleStepClick = (i: number) => {
-    if (Number.isNaN(i) || i > 3) return; // invalid step
+    if (i < 0 || i > 3) {
+      return; // invalid step
+    }
     const targetPageIndex = i + 1;
     if (
       targetPageIndex === 4

@@ -138,16 +138,12 @@
     },
     "company": {
       "name": "Företagets officiella namn",
-      "coreBusiness": "Företagets kärnverksamhet",
-      "identifier": "FO-nummer"
+      "coreBusiness": "Företagets kärnverksamhet"
     },
     "organisation": {
       "name": "Officiella namnet",
+      "identifier": "FO-nummer",
       "coreBusiness": "Kärnverksamhet",
-      "registrationNumber": "FO-nummer",
-      "streetAddress": "Adress",
-      "postCode": "Postnummer",
-      "city": "Postanstalt",
       "notRegistered": "Inget FO-nummer",
       "separateInvoicingAddress": "Faktureringsadressen avviker från postadressen"
     },
