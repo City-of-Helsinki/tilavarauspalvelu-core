@@ -1,0 +1,17 @@
+{% extends "email/html/partials/base.jinja" %}
+
+{% block content_main %}
+    <mj-text>{{ text_reservation_modified | sentence | safe }}</mj-text>
+    {% include "email/html/partials/reservation_basic_info.jinja" %}
+    {% include "email/html/partials/reservation_price.jinja" %}
+    {% include "email/html/partials/access_code.jinja" %}
+{% endblock %}
+
+{% block content_secondary %}
+    {% include "email/html/partials/instructions.jinja" %}
+{% endblock %}
+
+{% block content_closing %}
+    {% include "email/html/partials/reservation_manage_link.jinja" %}
+    {% include "email/html/partials/closing_polite.jinja" %}
+{% endblock %}

@@ -39,6 +39,7 @@ __all__ = [
     "get_context_for_reservation_cancelled",
     "get_context_for_reservation_confirmed",
     "get_context_for_reservation_modified",
+    "get_context_for_reservation_modified_access_code",
     "get_context_for_reservation_rejected",
     "get_context_for_reservation_requires_handling",
     "get_context_for_reservation_requires_payment",
@@ -353,6 +354,57 @@ def get_context_for_reservation_modified(
             access_code_validity_period=data["access_code_validity_period"],
         ),
         **get_contex_for_reservation_manage_link(language=language),
+    }
+
+
+# type: EmailType.RESERVATION_MODIFIED_ACCESS_CODE #####################################################################
+
+
+@overload
+def get_context_for_reservation_modified_access_code(
+    reservation: Reservation,
+    *,
+    language: Lang,
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_reservation_modified_access_code(
+    *,
+    language: Lang,
+    email_recipient_name: str,
+    reservation_unit_name: str,
+    unit_name: str,
+    unit_location: str,
+    begin_datetime: datetime.datetime,
+    end_datetime: datetime.datetime,
+    price: Decimal,
+    tax_percentage: Decimal,
+    reservation_id: int,
+    instructions_confirmed: str,
+    access_code_is_used: bool,
+    access_code: str,
+    access_code_validity_period: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_reservation_modified_access_code(
+    reservation: Reservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if reservation is not None:
+        data = get_context_for_reservation_modified(reservation=reservation, language=language)
+    else:
+        data = get_context_for_reservation_modified(**data, language=language)
+
+    title = pgettext("Email", "The door code has changed")
+    return {
+        **data,
+        "title": title,
+        "text_reservation_modified": title,
     }
 
 

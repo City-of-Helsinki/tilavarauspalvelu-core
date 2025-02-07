@@ -31,6 +31,9 @@ from tilavarauspalvelu.integrations.email.template_context.application import (
     get_context_for_staff_notification_application_section_cancelled,
 )
 from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
+from tilavarauspalvelu.integrations.email.template_context.reservation import (
+    get_context_for_reservation_modified_access_code,
+)
 from tilavarauspalvelu.translation import get_translated
 from utils.date_utils import local_datetime
 
@@ -202,6 +205,23 @@ def get_mock_data(*, email_type: EmailType, language: Lang, **kwargs: Any) -> Em
                 reservation_id=mock_params["reservation_id"],
                 instructions_confirmed=mock_params["instructions_confirmed"],
                 access_code_is_used=mock_params["access_code_is_used"],
+                access_code=mock_params["access_code"],
+                access_code_validity_period=mock_params["access_code_validity_period"],
+                language=language,
+            )
+        case EmailType.RESERVATION_MODIFIED_ACCESS_CODE:
+            return get_context_for_reservation_modified_access_code(
+                email_recipient_name=mock_params["email_recipient_name"],
+                reservation_unit_name=mock_params["reservation_unit_name"],
+                unit_name=mock_params["unit_name"],
+                unit_location=mock_params["unit_location"],
+                begin_datetime=mock_params["begin_datetime"],
+                end_datetime=mock_params["end_datetime"],
+                price=mock_params["price"],
+                tax_percentage=mock_params["tax_percentage"],
+                reservation_id=mock_params["reservation_id"],
+                instructions_confirmed=mock_params["instructions_confirmed"],
+                access_code_is_used=True,
                 access_code=mock_params["access_code"],
                 access_code_validity_period=mock_params["access_code_validity_period"],
                 language=language,
