@@ -834,18 +834,20 @@ export function ApplicationSection({
     .slice(0, N_RESERVATIONS_TO_SHOW);
 
   return (
-    <Flex $gap="none">
-      <MarginHeader>
-        {t("application:view.reservationsTab.reservationUnitsTitle")}
-      </MarginHeader>
-      <ReservationUnitTable reservationUnits={reservationUnits} />
-      <MarginHeader>
-        {t("application:view.reservationsTab.reservationsTitle")}
-      </MarginHeader>
-      <ReservationsTable
-        reservations={reservations}
-        application={application}
-      />
+    <Flex>
+      <div>
+        <MarginHeader>
+          {t("application:view.reservationsTab.reservationUnitsTitle")}
+        </MarginHeader>
+        <ReservationUnitTable reservationUnits={reservationUnits} />
+        <MarginHeader>
+          {t("application:view.reservationsTab.reservationsTitle")}
+        </MarginHeader>
+        <ReservationsTable
+          reservations={reservations}
+          application={application}
+        />
+      </div>
       <ButtonContainer $justifyContent="center">
         <ButtonLikeLink
           href={getApplicationSectionPath(
