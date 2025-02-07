@@ -1,0 +1,27 @@
+{
+  "dateTypeAll": "Koska tahansa",
+  "dateTypeThisWeek": "Tällä viikolla",
+  "dateTypeToday": "Tänään",
+  "dateTypeTomorrow": "Huomenna",
+  "dateTypeWeekend": "Viikonloppuna",
+  "infoDate": "pp.kk.vvvv",
+  "labelEndDate": "Päättymispäivä",
+  "labelStartDate": "Alkamispäivä",
+  "errors": {
+    "endDateBeforeStartDate": "Alkamispäivän on oltava ennen päättymispäivää",
+    "dateInvalid": "Päivämäärän on oltava muotoa pp.kk.vvvv",
+    "dateIsTooSmall": "Päivämäärän on oltava jälkeen {{minDate}}",
+    "dateIsTooBig": "Päivämäärän on oltava ennen {{maxDate}}"
+  },
+  "menu": {
+    "buttonBack": "Takaisin",
+    "buttonClose": "Sulje",
+    "buttonCustom": "Valitse päivät"
+  },
+  "title": "Valitse ajankohta",
+  "accessibility": {
+    "chooseDayPrefix": "Valitse",
+    "nextMonth": "Seuraava kuukausi",
+    "previousMonth": "Edellinen kuukausi"
+  }
+}

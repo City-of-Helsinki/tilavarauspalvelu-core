@@ -1,0 +1,14 @@
+{
+  "space": "Space",
+  "purpose": "Purpose of use",
+  "begin": "From",
+  "end": "To",
+  "weekDay": "Day",
+  "time": "Time",
+  "notAvailable": "Exceptions when a seasonal booking is not available to you",
+  "duration": "Duration {{duration}}",
+  "everyWeek": "Weekly",
+  "everyOtherWeek": "Every other week",
+  "showList": "Show detailed booking list",
+  "downloadCalendarFeed": "Download calendar entries (.ics)"
+}

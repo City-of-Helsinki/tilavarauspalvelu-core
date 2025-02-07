@@ -1,0 +1,10 @@
+{
+  "heading": "Kausivaraus",
+  "subHeading": "Hae Helsingin kaupungin tiloja säännölliseen käyttöön.",
+  "roundHeadings": {
+    "active": "Käynnissä olevat haut",
+    "pending": "Tulevat haut",
+    "past": "Päättyneet haut"
+  },
+  "noRounds": "Ei aktiivisia tai tulevia hakuja."
+}

@@ -1,0 +1,37 @@
+@use "font";
+@use "variables";
+
+/* TODO is this correct? if it's it should be in common/styles/global.scss */
+a {
+  &:visited {
+    color: inherit;
+  }
+
+  color: var(--color-bus);
+  text-underline-offset: 0.1rem;
+  text-decoration: none;
+}
+
+/* TODO is this correct? if it's it should be in common/styles/global.scss */
+ul {
+  padding-left: var(--spacing-m);
+
+  li {
+    line-height: var(--lineheight-l);
+  }
+}
+
+// cookiehub overrides
+.ch2 {
+  color: hotpink;
+  .ch2-dialog {
+    min-width: 260px;
+  }
+}
+
+@media print {
+  header,
+  footer {
+    display: none;
+  }
+}

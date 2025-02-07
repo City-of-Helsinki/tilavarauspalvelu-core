@@ -1,0 +1,32 @@
+{
+  "extends": "tsconfig/nextjs.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./*"],
+      "@gql/*": ["./gql/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.d.ts",
+    "env.mjs",
+    "jest.config.mjs",
+    "jest.setup.mjs",
+    "types/**/*.d.ts",
+    "next.config.mjs",
+    "next-env.d.ts",
+    "next-i18next.config.js",
+    "jest.config.mjs",
+    "jest.setup.mjs",
+    "stylelint.config.cjs",
+    "sentry.server.config.js",
+    "sentry.edge.config.js",
+    "sentry.client.config.js",
+    ".eslintrc.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

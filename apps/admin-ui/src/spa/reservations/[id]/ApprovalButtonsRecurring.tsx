@@ -1,0 +1,95 @@
+import React from "react";
+import { type ReservationQuery } from "@gql/gql-types";
+import { useTranslation } from "next-i18next";
+import { Button, ButtonSize, ButtonVariant } from "hds-react";
+import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { DenyDialogSeries } from "@/component/DenyDialog";
+import { useModal } from "@/context/ModalContext";
+import { useRecurringReservations } from "@/hooks";
+import { isPossibleToDeny } from "@/modules/reservationModificationRules";
+
+// TODO use a fragment
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type RecurringReservationType = NonNullable<
+  ReservationType["recurringReservation"]
+>;
+type Props = {
+  recurringReservation: RecurringReservationType;
+  handleClose: () => void;
+  // TODO weird name for the after deny callback
+  handleAccept: () => void;
+  disableNonEssentialButtons?: boolean;
+};
+
+// NOTE some copy paste from ApprovalButtons
+export function ApprovalButtonsRecurring({
+  recurringReservation,
+  handleClose,
+  handleAccept,
+  disableNonEssentialButtons,
+}: Props): JSX.Element | null {
+  const { setModalContent } = useModal();
+  const { t } = useTranslation();
+
+  // check if there are any reservations that can be deleted
+  const { loading, reservations, refetch } = useRecurringReservations(
+    recurringReservation.pk ?? undefined
+  );
+
+  const handleReject = () => {
+    refetch();
+    handleAccept();
+  };
+
+  // TODO don't need to do this anymore we can just pass the first reservation here
+  // need to do get all data here otherwise totalCount is incorrect (filter here instead of in the query)
+  const reservationsPossibleToDeny = reservations.filter((x) =>
+    isPossibleToDeny(x.state, new Date(x.begin))
+  );
+
+  const handleDenyClick = () => {
+    const reservation = reservationsPossibleToDeny.find(() => true);
+    if (reservation == null) {
+      return;
+    }
+    setModalContent(
+      <DenyDialogSeries
+        reservation={reservation}
+        recurringReservation={recurringReservation}
+        onReject={handleReject}
+        onClose={handleClose}
+        title={t("ApprovalButtons.recurring.DenyDialog.title")}
+      />
+    );
+  };
+
+  if (loading || reservationsPossibleToDeny.length === 0) {
+    return null;
+  }
+
+  return (
+    <>
+      <Button
+        size={ButtonSize.Small}
+        variant={ButtonVariant.Secondary}
+        onClick={handleDenyClick}
+        data-testid="approval-buttons-recurring__reject-button"
+      >
+        {t("ApprovalButtons.recurring.rejectAllButton")}
+      </Button>
+      {!disableNonEssentialButtons && (
+        <>
+          <ButtonLikeLink
+            to="edit"
+            data-testid="approval-buttons-recurring__edit-link"
+          >
+            {t("ApprovalButtons.edit")}
+          </ButtonLikeLink>
+          <ButtonLikeLink to="series">
+            {t("ApprovalButtons.editSeriesTime")}
+          </ButtonLikeLink>
+        </>
+      )}
+    </>
+  );
+}

@@ -1,0 +1,11 @@
+{
+  "selectReservationUnit": "Lisää hakemukselle",
+  "unSelectReservationUnit": "Poista hakemukselta",
+  "heading": "Lisää tiloja hakemukselle",
+  "searchTermLabel": "Haku",
+  "searchPurposeLabel": "Käyttötarkoitus",
+  "searchReservationUnitTypeLabel": "Tilan tyyppi",
+  "searchUnitLabel": "Toimipiste",
+  "openLinkToNewTab": "Avaa välilehdellä",
+  "returnToApplication": "Palaa hakemukselle"
+}

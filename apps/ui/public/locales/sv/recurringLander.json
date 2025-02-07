@@ -1,0 +1,10 @@
+{
+  "heading": "Säsongsbokning",
+  "subHeading": "Sök Helsingfors stads lokaler för regelbunden användning.",
+  "roundHeadings": {
+    "active": "Pågående ansökningar",
+    "pending": "Kommande ansökningar",
+    "past": "Tidigare ansökningar"
+  },
+  "noRounds": "Inte aktiva eller kommande ansökningar."
+}

@@ -1,0 +1,15 @@
+{
+  "Navigation": {
+    "feedbackLabel": "Contact us",
+    "serviceTermsLabel": "General Terms of Service"
+  },
+  "Base": {
+    "Item": {
+      "privacyStatement": "Privacy Statement",
+      "accessibilityStatement": "Accessibility"
+    },
+    "copyrightHolder": "City of Helsinki",
+    "copyrightText": "All rights reserved",
+    "backToTop": "Back to top"
+  }
+}

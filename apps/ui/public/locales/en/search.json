@@ -1,0 +1,22 @@
+{
+  "recurring": {
+    "heading": "Search and book spaces for next season",
+    "text": "Select the spaces you want to apply to be used during the next season"
+  },
+  "single": {
+    "heading": "Book spaces and equipment"
+  },
+  "sorting": {
+    "action": {
+      "ascending": "Arrange in ascending order",
+      "descending": "Arrange in descending order"
+    },
+    "ascendingLabel": "Ascending order",
+    "descendingLabel": "Descending order",
+    "label": {
+      "name": "Name",
+      "type": "Type",
+      "unit": "Location"
+    }
+  }
+}

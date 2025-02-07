@@ -1,0 +1,22 @@
+{
+  "recurring": {
+    "heading": "Varaa tila koko kaudeksi",
+    "text": "Valitse hakemukselle tilat, joita haluat käyttää säännöllisesti ensi kauden aikana."
+  },
+  "single": {
+    "heading": "Varaa tiloja ja laitteita"
+  },
+  "sorting": {
+    "action": {
+      "ascending": "Järjestä nousevasti",
+      "descending": "Järjestä laskevasti"
+    },
+    "ascendingLabel": "Nouseva järjestys",
+    "descendingLabel": "Laskeva järjestys",
+    "label": {
+      "name": "Nimen mukaan",
+      "type": "Tyypin mukaan",
+      "unit": "Toimipisteen mukaan"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "Navigation": {
+    "feedbackLabel": "Ota yhteyttä",
+    "serviceTermsLabel": "Palvelun yleiset käyttöehdot"
+  },
+  "Base": {
+    "Item": {
+      "privacyStatement": "Tietosuojaseloste",
+      "accessibilityStatement": "Saavutettavuus"
+    },
+    "copyrightHolder": "Helsingin kaupunki",
+    "copyrightText": "Kaikki oikeudet pidätetään",
+    "backToTop": "Sivun alkuun"
+  }
+}

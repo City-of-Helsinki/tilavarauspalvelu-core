@@ -1,0 +1,36 @@
+{
+  "404": {
+    "body": "Sidan kan inte hittas"
+  },
+  "500": {
+    "body": "Något oväntat hände"
+  },
+  "deactivatedAccount": {
+    "heading": "Ditt användar-ID är inte giltigt.",
+    "subHeadingA": "Var god och kontakta vår kundtjänst via email på",
+    "subHeadingB": "eller via Ta kontakt-formuläret.",
+    "email": "varaamo@hel.fi",
+    "button": "Ta kontakt"
+  },
+  "applicationMutation": {
+    "Validation error": "Ett fel uppstod i API-anropet",
+    "Form validation error": "Formuläret innehåller fel",
+    "Unknown network error": "Okänt nätverksfel",
+    "Unknown GQL error": "Okänt GQL-fel",
+    "Unknown error": "Okänt fel"
+  },
+  "general_error": "Odefinierat fel.",
+  "update_reservation_not_found": "Bokningen hittades inte.",
+  "CHANGES_NOT_ALLOWED": "Du kan inte göra ändringar.",
+  "RESERVATION_UNIT_NOT_RESERVABLE": "Objektet går inte att boka.",
+  "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
+  "RESERVATION_UNIT_IS_NOT_OPEN": "Objektet är för närvarande stängt.",
+  "RESERVATION_UNIT_IN_OPEN_ROUND": "Du kan ansöka om en säsongsbokning för detta objekt.",
+  "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Förkorta bokningstiden.",
+  "RESERVATION_UNIT_MIN_DURATION_NOT_EXCEEDED": "Förläng bokningstiden.",
+  "MAX_NUMBER_OF_ACTIVE_RESERVATIONS_EXCEEDED": "Det maximala antalet bokningar har överskridits.",
+  "RESERVATION_OVERLAP": "Överlappande bokningar.",
+  "RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL": "Kontrollera bokningstiden.",
+  "RESERVATION_NOT_WITHIN_ALLOWED_TIME_RANGE": "Kontrollera bokningstiden.",
+  "RESERVATION_UNIT_TYPE_IS_SEASON": "Du kan bara göra en ansökan om säsongsbokning för detta objekt."
+}

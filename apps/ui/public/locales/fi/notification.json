@@ -1,0 +1,15 @@
+{
+  "waitingForPayment": {
+    "title": "Varauksesi odottaa maksua",
+    "body": "Varauksesi peruuntuu automaattisesti, jos maksua ei suoriteta {{time}} minuutin kuluessa.",
+    "cancelReservation": "Peru varaus",
+    "cancelingReservation": "Perutaan varausta...",
+    "payReservation": "Maksa varaus",
+    "reservationCancelledTitle": "Varauksesi on peruttu!"
+  },
+  "createdReservation": {
+    "title": "Varauksesi on keskeneräinen",
+    "body": "Varauksesi peruuntuu automaattisesti, jos et viimestele sitä 20 minuutin kuluessa.",
+    "continueReservation": "Jatka varaamista"
+  }
+}

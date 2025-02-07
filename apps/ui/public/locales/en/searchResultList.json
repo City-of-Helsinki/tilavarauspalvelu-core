@@ -1,0 +1,12 @@
+{
+  "count_one": "{{count}} result",
+  "count_other": "{{count}} results",
+  "paginationSummary_one": "{{count}} result shown",
+  "paginationSummary_other": "{{count}} result shown",
+  "noResults": "No search results",
+  "error": "Error occurred when searching for spaces. Please try again!",
+  "listButton": "Show in list",
+  "mapButton": "Show on map",
+  "sortButtonLabel": "Sort by",
+  "sortButtonPlaceholder": "Sort by location"
+}

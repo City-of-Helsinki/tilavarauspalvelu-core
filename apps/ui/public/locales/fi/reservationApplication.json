@@ -1,0 +1,97 @@
+{
+  "title": "Uusi varaus",
+  "titleSent": "Varauksesi on nyt käsiteltävänä",
+  "applicationInfo": "Varauksen tiedot",
+  "summaryIngress": "Varaksesi on käsiteltävänä. Tutustu varauksen yhteenvetoon.",
+  "reserveeTypePrefix": "Varaan",
+  "reserveeTypes": {
+    "labels": {
+      "nonprofit": "Järjestön tai muun yhteisön puolesta",
+      "business": "yrityksen puolesta",
+      "individual": "yksityishenkilönä"
+    }
+  },
+  "label": {
+    "common": {
+      "name": "Varauksen nimi (julkinen)",
+      "description": "Varauksen kuvaus",
+      "purpose": "Varauksen käyttötarkoitus",
+      "numPersons": "Osallistujamäärä",
+      "ageGroup": "Ikäryhmä",
+      "applyingForFreeOfChargeButton": "Tarkista alennusryhmät <button>tästä</button>.",
+      "applyingForFreeOfCharge": "Haen maksutonta käyttöä tai hinnan alennusta ja olen tutustunut alennusryhmiin.",
+      "freeOfChargeReason": "Perustelut maksuttomaan varaukseen",
+      "reserveeType": "Hakijan tyyppi"
+    },
+    "nonprofit": {
+      "reserveeFirstName": "Yhteyshenkilön etunimi",
+      "reserveeLastName": "Yhteyshenkilön sukunimi",
+      "reserveeAddressStreet": "Katuosoite",
+      "reserveeAddressZip": "Postinumero",
+      "reserveeAddressCity": "Postitoimipaikka",
+      "reserveeEmail": "Yhteyshenkilön sähköpostiosoite",
+      "reserveePhone": "Yhteyshenkilön puhelinnumero",
+      "reserveeOrganisationName": "Virallinen nimi",
+      "reserveeId": "Y-tunnus",
+      "reserveeIsUnregisteredAssociation": "Yhteisöä ei ole rekisteröity",
+      "homeCity": "Kotipaikka",
+      "showBillingAddress": "Erillinen laskutusosoite",
+      "billingFirstName": "Varaajan etunimi",
+      "billingLastName": "Varaajan sukunimi",
+      "billingPhone": "Puhelinnumero",
+      "billingEmail": "Sähköpostiosoite",
+      "billingAddressStreet": "Katuosoite",
+      "billingAddressZip": "Postinumero",
+      "billingAddressCity": "Postitoimipaikka"
+    },
+    "individual": {
+      "reserveeFirstName": "Etunimi",
+      "reserveeLastName": "Sukunimi",
+      "reserveeAddressStreet": "Katuosoite",
+      "reserveeAddressZip": "Postinumero",
+      "reserveeAddressCity": "Postitoimipaikka",
+      "reserveeEmail": "Sähköpostiosoite",
+      "reserveePhone": "Puhelinnumero",
+      "homeCity": "Kotipaikka",
+      "showBillingAddress": "Erillinen laskutusosoite",
+      "billingFirstName": "Varaajan etunimi",
+      "billingLastName": "Varaajan sukunimi",
+      "billingPhone": "Puhelinnumero",
+      "billingEmail": "Sähköpostiosoite",
+      "billingAddressStreet": "Katuosoite",
+      "billingAddressZip": "Postinumero",
+      "billingAddressCity": "Postitoimipaikka"
+    },
+    "business": {
+      "reserveeFirstName": "Yhteyshenkilön etunimi",
+      "reserveeLastName": "Yhteyshenkilön sukunimi",
+      "reserveeAddressStreet": "Katuosoite",
+      "reserveeAddressZip": "Postinumero",
+      "reserveeAddressCity": "Postitoimipaikka",
+      "reserveeEmail": "Yhteyshenkilön sähköpostiosoite",
+      "reserveePhone": "Yhteyshenkilön puhelinnumero",
+      "reserveeOrganisationName": "Virallinen nimi",
+      "reserveeId": "Y-tunnus",
+      "homeCity": "Kotipaikka",
+      "showBillingAddress": "Erillinen laskutusosoite",
+      "billingFirstName": "Varaajan etunimi",
+      "billingLastName": "Varaajan sukunimi",
+      "billingPhone": "Puhelinnumero",
+      "billingEmail": "Sähköpostiosoite",
+      "billingAddressStreet": "Katuosoite",
+      "billingAddressZip": "Postinumero",
+      "billingAddressCity": "Postitoimipaikka"
+    },
+    "headings": {
+      "companyInfo": "Yrityksen tiedot",
+      "nonprofitInfo": "Yhdistyksen tiedot",
+      "contactInfo": "Yhteyshenkilön tiedot"
+    },
+    "subHeadings": {
+      "subvention": "Hinnan alennuksen hakeminen"
+    }
+  },
+  "processLabels": {
+    "handlingRequired": "Varaus käsittelyssä"
+  }
+}

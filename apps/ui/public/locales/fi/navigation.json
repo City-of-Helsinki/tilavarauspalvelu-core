@@ -1,0 +1,18 @@
+{
+  "userNoName": "Nimetön Käyttäjä",
+  "Item": {
+    "home": "Etusivu",
+    "spaceReservation": "Kausivaraus",
+    "reservationUnitSearch": "Tilan varaus",
+    "reservations": "Omat varaukset",
+    "applications": "Omat hakemukset"
+  },
+  "profileLinkLabel": "Siirry Helsinki-profiiliin",
+  "skipToMainContent": "Siirry sivun pääsisältöön",
+  "languageSelection": "Valitse kieli",
+  "languages": {
+    "fi": "Suomi",
+    "sv": "Svenska",
+    "en": "English"
+  }
+}

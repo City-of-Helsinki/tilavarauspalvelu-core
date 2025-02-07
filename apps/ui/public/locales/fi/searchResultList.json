@@ -1,0 +1,12 @@
+{
+  "count_one": "{{count}} hakutulos",
+  "count_other": "{{count}} hakutulosta",
+  "paginationSummary_one": "{{count}} tulosta näytetty",
+  "paginationSummary_other": "{{count}} tulosta näytetty",
+  "noResults": "Ei hakutuloksia",
+  "error": "Tapahtui virhe haettaessa tiloja. Yritä uudelleen!",
+  "listButton": "Näytä listassa",
+  "mapButton": "Näytä kartalla",
+  "sortButtonLabel": "Järjestä",
+  "sortButtonPlaceholder": "Sijainnin mukaan"
+}

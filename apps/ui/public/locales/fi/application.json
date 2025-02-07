@@ -1,0 +1,249 @@
+{
+  "error": {
+    "saveFailed": "Hakemuksen tallennus ei onnistunut",
+    "required": "Pakollinen",
+    "requiredField": "Kenttä on pakollinen",
+    "pattern": "Tarkista muoto",
+    "numPersonsMin": "Ryhmän koko virheellinen",
+    "minDurationBiggerThanMaxDuration": "Vähimmäiskesto on suurempi kuin enimmäiskesto",
+    "maxDurationSmallerThanMinDuration": "Enimmäiskesto on pienempi kuin vähimmäiskesto",
+    "eventsPerWeekMin": "Vähintään yksi varaus viikossa",
+    "beginAfterEnd": "Kauden aloituspäivä myöhempi kuin lopetuspäivä",
+    "beginBeforePeriodBegin": "Kauden aloituspäivä on liian aikainen",
+    "beginAfterPeriodEnd": "Kauden aloituspäivä on liian myöhäinen",
+    "endAfterPeriodEnd": "Kauden lopetuspäivä on liian myöhäinen",
+    "endBeforeBegin": "Kauden lopetuspäivä on aikaisempi kuin aloituspäivä",
+    "endBeforePeriodBegin": "Kauden lopetuspäivä on liian aikainen",
+    "missingSchedule": "Lisää kaikille kausivarauksille vähintään yksi aika",
+    "otherEventsHaveErrors": "Korjaa virheellisesti täytetyt kentät",
+    "noReservationUnits": "Lisää hakemukselle yksi tai useampi tila",
+    "noEvents": "Lisää hakemukselle yksi tai useampi kausivaraus",
+    "maxLength": "Enimmäismerkkimäärä: {{count}}"
+  },
+  "validation": {
+    "Required": "Pakollinen",
+    "End date must be after begin date": "Päättymispäivän pitää olla aloituspäivän jälkeen",
+    "Expected number, received nan": "Pitää olla numero",
+    "Number must be greater than or equal to 1": "Pitää olla vähintään 1",
+    "Number must be less than or equal to 7": "Pitää olla enintään 7",
+    "Maximum duration must be greater than minimum duration": "Enimmäiskeston pitää olla suurempi kuin vähimmäiskesto",
+    "reservationUnitTooSmall": "Tila on liian pieni ryhmän käyttöön",
+    "begin date must be after application round begin date": "Aloituspäivän pitää olla hakukierroksen alkamispäivän jälkeen",
+    "begin date must be before application round end date": "Aloituspäivän pitää olla ennen hakukierroksen päättymispäivän",
+    "end date must be before application round end date": "Päättymispäivän pitää olla ennen hakukierroksen päättymispäivän",
+    "end date must be after application round begin date": "Päättymispäivän pitää olla hakukierroksen alkamispäivän jälkeen",
+    "Invalid date": "Virheellinen päivämäärä",
+    "String must contain at most 255 character(s)": "Maksimissaan 255 merkkiä",
+    "String must contain at most 100 character(s)": "Maksimissaan 100 merkkiä"
+  },
+  "Intro": {
+    "startNewApplication": "Täytä hakemus",
+    "heading": "Kausivaraushakemus",
+    "createFailedHeading": "Hakemuksen luominen epäonnistui",
+    "createFailedContent": "Yritä myöhemmin uudelleen"
+  },
+  "applicationEventSaved": "Kausivaraus tallennettu hakemukselle",
+  "Page1": {
+    "heading": "1. Täytä varauksen tiedot",
+    "text": "Lisää hakemukselle ensi kauden varaustoiveesi",
+    "basicInformationSubHeading": "Varauksen perustiedot",
+    "name": "Kausivarauksen nimi",
+    "groupSize": "Ryhmän koko",
+    "ageGroup": "Ikäryhmä",
+    "abilityGroup": "Tasoryhmä",
+    "purpose": "Varauksen käyttötarkoitus",
+    "spacesSubHeading": "Toivotut tilat",
+    "defaultPeriodPrefix": "Käytä oletuskestoa",
+    "applicationRoundSubHeading": "Varauskausi",
+    "periodStartDate": "Kauden aloituspäivä",
+    "periodEndDate": "Kauden päätöspäivä",
+    "minDuration": "Varauksen vähimmäiskesto",
+    "maxDuration": "Varauksen enimmäiskesto",
+    "eventsPerWeek": "Varausten määrä viikossa",
+    "biweekly": "Varaus vain joka toinen viikko",
+    "defaultDurationLabel": "1 tunti 30 min",
+    "createNew": "Lisää uusi kausivaraus",
+    "applicationEventName": "Nimetön kausivaraus",
+    "applicationEventSummary": "Yhteenveto",
+    "applicationEventSaved": "Kausivaraustoive tallennettu hakemukselle",
+    "saveEvent": "Tallenna",
+    "deleteEvent": "Poista varaus",
+    "deleteEventCancel": "Palaa poistamatta",
+    "deleteEventHeading": "Oletko varma, että haluat poistaa varauksen?",
+    "deleteEventContent": "Kun varaus on peruttu, sen tietoja ei ole mahdollista palauttaa."
+  },
+  "Page2": {
+    "heading": "2. Valitse varauksen ajankohta",
+    "subHeading": "Ilmoita kaikki sinulle sopivat ajankohdat. Tarkista aukioloajat tilan kuvauksesta.",
+    "info": "Voit ilmoittaa sekä ensisijaisia että vaihtoehtoisia aikoja. Useamman tila- ja aikatoiveen ilmoittaminen parantaa mahdollisuuksiasi saada toiveidesi mukaiset tilat ja ajat.",
+    "text": "Ilmoita toivomasi ajankohdat kausivaraukselle",
+    "copyTimes": "Kopioi ajat kaikille varaustoiveille",
+    "resetTimes": "Tyhjennä kalenteri",
+    "summary": "Yhteenveto",
+    "prioritySelectLabel": "Aikatoiveen tyyppi",
+    "reservationUnitSelectLabel": "Näytä kausivarattavat ajankohdat tilalle",
+    "priorityLabels": {
+      "300": "Valitse ensisijaiset aikatoiveet",
+      "200": "Valitse muut aikatoiveet"
+    },
+    "legend": {
+      "unavailable": "Ei varattavissa",
+      "selected-1": "Ensisijainen toive",
+      "selected-2": "Muu toive",
+      "within-opening-hours": "Varattavissa",
+      "outside-opening-hours": "Ei merkitty kausivarattavaksi"
+    },
+    "primarySchedules": "Ensisijaiset aikatoiveet",
+    "secondarySchedules": "Muut aikatoiveet",
+    "notification": {
+      "copyCells": "Ajat kopioitu onnistuneesti kaikille varaustoiveille",
+      "minDuration": {
+        "title": "Ilmoitetut aikatoiveet eivät vastaa varauksen kestoa",
+        "bodySingle": "Valitse kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
+        "body_one": "Valitse varauksen {{title}} kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
+        "body_other": "Valitse varausten {{title}} kalentereista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa."
+      }
+    }
+  },
+  "Page3": {
+    "heading": "3. Täytä hakijan tiedot",
+    "text": "Voit jättää hakemuksen yhteisönä, yksityishenkilönä tai yrityksenä. Viimeisin hakemus on voimassa.",
+    "firstName": "Etunimi",
+    "homeCity": "Kotipaikka",
+    "lastName": "Sukunimi",
+    "phoneNumber": "Puhelinnumero",
+    "email": "Hakemukselle liitettävä sähköpostiosoite",
+    "emailNotification": "Kaikki hakemukseen liittyvät viestit lähetetään alla olevaan sähköpostiin",
+    "subHeading": {
+      "basicInfo": "Hakijan perustiedot",
+      "postalAddress": "Postiosoite",
+      "billingAddress": "Laskutusosoite",
+      "contactInfo": "Yhteyshenkilön tiedot"
+    },
+    "as": {
+      "prefix": "Luon hakemuksen",
+      "type": {
+        "ASSOCIATION": "järjestön, ryhmän tai yhteisön puolesta",
+        "COMPANY": "yrityksen puolesta",
+        "INDIVIDUAL": "yksityishenkilönä"
+      }
+    },
+    "contactPerson": {
+      "firstName": "Yhteyshenkilön etunimi",
+      "lastName": "Yhteyshenkilön sukunimi",
+      "phoneNumber": "Yhteyshenkilön puhelinnumero"
+    },
+    "billingAddress": {
+      "streetAddress": "Katuosoite",
+      "postCode": "Postinumero",
+      "city": "Postitoimipaikka"
+    },
+    "company": {
+      "name": "Yrityksen virallinen nimi",
+      "coreBusiness": "Yrityksen ydintoiminta",
+      "registrationNumber": "Y-tunnus"
+    },
+    "organisation": {
+      "name": "Virallinen nimi",
+      "coreBusiness": "Ydintoiminta",
+      "registrationNumber": "Y-tunnus",
+      "streetAddress": "Katuosoite",
+      "postCode": "Postinumero",
+      "city": "Postitoimipaikka",
+      "notRegistered": "Ei Y-tunnusta",
+      "separateInvoicingAddress": "Laskutusosoite eri kuin postiosoite"
+    },
+    "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta"
+  },
+  "preview": {
+    "applicantType": {
+      "COMMUNITY": "Rekisteröimätön yhdistys",
+      "COMPANY": "Yritys",
+      "INDIVIDUAL": "Yksityishenkilö",
+      "ASSOCIATION": "Rekisteröity yhdistys"
+    },
+    "homeCity": "Kotipaikka",
+    "heading": "4. Tarkista ja lähetä hakemus",
+    "text": "Yhteenveto hakemuksestasi",
+    "basicInfoSubHeading": "Hakijan tiedot",
+    "contactPerson": "Yhteyshenkilö",
+    "contactInfo": "Yhteystiedot",
+    "address": "Postiosoite",
+    "additionalInformation": "Lisätietoja varauksen käyttötarkoituksesta",
+    "organisation": {
+      "name": "Yhdistyksen tai yhteisön virallinen nimi",
+      "coreBusiness": "Ydintoiminta",
+      "registrationNumber": "Y-tunnus",
+      "billingAddress": "Laskutusosoite"
+    },
+    "applicationEvent": {
+      "applicationInfo": "Hakemuksen tiedot",
+      "numPersons": "Ryhmän koko",
+      "ageGroup": "Ikäryhmä",
+      "abilityGroup": "Tasoryhmä",
+      "purpose": "Varauksen käyttötarkoitus",
+      "additionalInfo": "Lisätietoja varaukseen liittyen",
+      "period": "Kausi",
+      "duration": "Varauksen kesto",
+      "eventsPerWeek": "Varausten määrä viikossa",
+      "appliedSpaces": "Tilatoiveet",
+      "schedules": "Aikatoiveet",
+      "scheduleTooltip": "Toissijaiset aikatoiveet merkitty sulkumerkeillä ( )"
+    },
+    "applicationEventSchedules": "Aikatoiveet",
+    "noData": {
+      "heading": "Lomakkeen tietoja ei ole vielä olemassa",
+      "text": "Täytä ensin lomake"
+    },
+    "notification": {
+      "processing": "Käsittely",
+      "body": "Hakemusten käsittely aloitetaan, kun hakuaika on päättynyt. Ilmoitamme antamaasi sähköpostiosoitteeseen eri vaiheista."
+    },
+    "reservationUnitTerms": "Täydentävät varausehdot",
+    "termsOfService": "Helsingin kaupungin tilojen ja laitteiden varausehdot",
+    "userAcceptsTerms": "Olen lukenut ja hyväksyn sopimusehdot ja täydentävät varausehdot.",
+    "reservationDeleted": "Varaus peruttu.",
+    "applicationSectionCancelled": "Peruttu {{ cancelled }} / {{ future }} varausta.",
+    "applicationSectionCancelledAll": "Peruttu kaikki {{ cancelled }} varausta."
+  },
+  "applicationEventStatus": {
+    "UNALLOCATED": "Vastaanotettu",
+    "IN_ALLOCATION": "Käsittelyssä",
+    "HANDLED": "Hyväksytty",
+    "REJECTED": "Hylätty"
+  },
+  "view": {
+    "heading": "Kausivaraushakemus",
+    "reservations": "Hyväksytyt varaukset",
+    "application": "Hakemus",
+    "handledDate": "Käsitelty",
+    "allReservations": "Kaikki varaukset",
+    "reservationsTab": {
+      "reservationUnit": "Tila",
+      "rejected": "Hylätty",
+      "modified": "Muokattu",
+      "showAllReservations": "Näytä kaikki varaukset",
+      "cancelApplication": "Peru kaikki varaukset",
+      "reservationUnitsTitle": "Toimipiste",
+      "reservationsTitle": "Varaukset",
+      "others": "muuta",
+      "reservationCountPostfix": "varausta"
+    },
+    "helpLink": "Ohjeet",
+    "helpLinkLong": "Tilakohtaiset ohjeet",
+    "helpModal": {
+      "title": "Tilakohtaiset ohjeet"
+    }
+  },
+  "sent": {
+    "heading": "Kiitos hakemuksesta!",
+    "subHeading": "Hakemuksesi on vastaanotettu ja siirtyy käsiteltäväksi hakuajan päätyttyä.",
+    "body": "Voit halutessasi muokata hakemustasi ennen hakuajan päättymistä. Vain viimeisin lähetetty hakemus huomioidaan. Poistathan aiemmin lähetetyt hakemukset.\n\nLähetetyn hakemuksen tunnistat sinisestä Käsittelyssä-symbolista."
+  },
+  "navigation": {
+    "page1": "Varauksen tiedot",
+    "page2": "Varauksen ajankohta",
+    "page3": "Hakijan tiedot",
+    "preview": "Tarkista ja lähetä"
+  }
+}

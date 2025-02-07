@@ -1,0 +1,14 @@
+{
+  "home": "Kausivaraus",
+  "search": "Haku",
+  "searchSingle": "Tilan varaus",
+  "application": "Kausivaraushakemus",
+  "criteria": "Hakuehdot",
+  "singleReservations": "Yksittäisvaraukset",
+  "frontpage": "Etusivu",
+  "recurring": "Kausivaraus",
+  "applications": "Omat hakemukset",
+  "reservationUnit": "Varausyksikkö",
+  "reservations": "Omat varaukset",
+  "confirmation": "Vahvistus"
+}

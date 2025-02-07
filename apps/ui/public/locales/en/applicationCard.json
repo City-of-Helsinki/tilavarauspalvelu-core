@@ -1,0 +1,30 @@
+{
+  "cancelHeading": "Are you sure you want to cancel your application?",
+  "cancelContent": "If you cancel your application, you can no longer edit or send it.",
+  "cancelFailed": "Application cancellation failed",
+  "cancelled": "Your application has been cancelled.",
+  "edit": "Edit",
+  "cancel": "Cancel",
+  "view": "View",
+  "status": {
+    "draft": "Draft",
+    "processing": "In process",
+    "sent": "Processed",
+    "CANCELLED": "Cancelled",
+    "DRAFT": "Draft",
+    "EXPIRED": "Expired",
+    "HANDLED": "In process",
+    "IN_ALLOCATION": "In process",
+    "RECEIVED": "Sent",
+    "RESULTS_SENT": "Processed"
+  },
+  "reservations": "Bookings",
+  "saved": "Last saved:",
+  "person": "Application created: as a private person",
+  "organisation": "Application created: {{type}}, {{name}}",
+  "applicantType": {
+    "community": "association",
+    "association": "registered association",
+    "company": "company"
+  }
+}

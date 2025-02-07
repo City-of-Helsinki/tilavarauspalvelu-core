@@ -1,0 +1,15 @@
+{
+  "Navigation": {
+    "feedbackLabel": "Ta kontakt",
+    "serviceTermsLabel": "Allmänna användarvillkor"
+  },
+  "Base": {
+    "Item": {
+      "privacyStatement": "Dataskyddspolicy",
+      "accessibilityStatement": "Tillgänglighet"
+    },
+    "copyrightHolder": "Helsingfors stad",
+    "copyrightText": "Alla rättigheter förbehålls",
+    "backToTop": "Tillbaka till början"
+  }
+}

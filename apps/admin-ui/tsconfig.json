@@ -1,0 +1,24 @@
+{
+  "extends": "tsconfig/nextjs.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@gql/*": ["./gql/*"]
+    }
+  },
+  "exclude": ["node_modules"],
+  "include": [
+    "src",
+    "types/**/*.d.ts",
+    "i18next.d.ts",
+    "middleware.ts",
+    ".eslintrc.cjs",
+    "stylelint.config.js",
+    "next-i18next.config.js",
+    "jest.config.mjs",
+    "__mocks__",
+    "next.config.mjs",
+    "next-env.d.ts"
+  ]
+}

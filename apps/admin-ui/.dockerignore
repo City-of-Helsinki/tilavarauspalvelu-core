@@ -1,0 +1,24 @@
+#################################################
+# Exclude all by default
+#################################################
+*
+
+#################################################
+# Whitelisted folders
+#################################################
+!public*
+!src*
+!server
+
+#################################################
+# Whitelisted files
+#################################################
+!next.config.mjs
+!package.json
+!tsconfig.json
+!LICENSE
+#!webpack.server*
+!.babel*
+#!tsconfig.server*
+# allow env for now because it is required for builds
+!.env*

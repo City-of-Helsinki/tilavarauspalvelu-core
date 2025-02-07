@@ -1,0 +1,13 @@
+{
+  "heading": "Omat hakemukset",
+  "subHeading": "Hallinnoi omia hakemuksiasi",
+  "noApplications": "Hakemuksia ei ole.",
+  "group": {
+    "draft": "Luonnokset",
+    "processing": "Käsittelyssä",
+    "sent": "Käsitelty",
+    "declined": "Hylätty",
+    "cancelled": "Peruttu",
+    "received": "Vastaanotettu"
+  }
+}

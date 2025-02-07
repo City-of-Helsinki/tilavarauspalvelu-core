@@ -1,0 +1,5769 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type AbilityGroupNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+"""
+How is the reservee able to enter the space in their reservation unit?
+"""
+enum AccessType {
+  ACCESS_CODE
+  OPENED_BY_STAFF
+  PHYSICAL_KEY
+  UNRESTRICTED
+}
+
+type AddressNode implements Node {
+  city: String!
+  cityEn: String
+  cityFi: String
+  citySv: String
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+  postCode: String!
+  streetAddress: String!
+  streetAddressEn: String
+  streetAddressFi: String
+  streetAddressSv: String
+}
+
+input AddressSerializerInput {
+  city: String!
+  cityEn: String
+  cityFi: String
+  citySv: String
+  pk: Int
+  postCode: String!
+  streetAddress: String!
+  streetAddressEn: String
+  streetAddressFi: String
+  streetAddressSv: String
+}
+
+type AgeGroupNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  maximum: Int
+  minimum: Int!
+  pk: Int
+}
+
+type AgeGroupNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [AgeGroupNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `AgeGroupNode` and its cursor.
+"""
+type AgeGroupNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: AgeGroupNode
+}
+
+input AllocatedTimeSlotCreateMutationInput {
+  beginTime: Time!
+  dayOfTheWeek: Weekday!
+  endTime: Time!
+  force: Boolean
+  pk: Int
+  reservationUnitOption: Int!
+}
+
+type AllocatedTimeSlotCreateMutationPayload {
+  beginTime: Time
+  dayOfTheWeek: Weekday
+  endTime: Time
+  pk: Int
+  reservationUnitOption: Int
+}
+
+input AllocatedTimeSlotDeleteMutationInput {
+  pk: ID!
+}
+
+type AllocatedTimeSlotDeleteMutationPayload {
+  deleted: Boolean
+}
+
+type AllocatedTimeSlotNode implements Node {
+  beginTime: Time!
+  dayOfTheWeek: Weekday!
+  endTime: Time!
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+  recurringReservation: RecurringReservationNode
+  reservationUnitOption: ReservationUnitOptionNode!
+}
+
+type AllocatedTimeSlotNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [AllocatedTimeSlotNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `AllocatedTimeSlotNode` and its cursor.
+"""
+type AllocatedTimeSlotNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: AllocatedTimeSlotNode
+}
+
+"""
+Ordering fields for the 'AllocatedTimeSlot' model.
+"""
+enum AllocatedTimeSlotOrderingChoices {
+  allocatedReservationUnitNameEnAsc
+  allocatedReservationUnitNameEnDesc
+  allocatedReservationUnitNameFiAsc
+  allocatedReservationUnitNameFiDesc
+  allocatedReservationUnitNameSvAsc
+  allocatedReservationUnitNameSvDesc
+  allocatedTimeOfWeekAsc
+  allocatedTimeOfWeekDesc
+  allocatedUnitNameEnAsc
+  allocatedUnitNameEnDesc
+  allocatedUnitNameFiAsc
+  allocatedUnitNameFiDesc
+  allocatedUnitNameSvAsc
+  allocatedUnitNameSvDesc
+  applicantAsc
+  applicantDesc
+  applicationPkAsc
+  applicationPkDesc
+  applicationSectionNameAsc
+  applicationSectionNameDesc
+  applicationSectionPkAsc
+  applicationSectionPkDesc
+  applicationSectionStatusAsc
+  applicationSectionStatusDesc
+  applicationStatusAsc
+  applicationStatusDesc
+  dayOfTheWeekAsc
+  dayOfTheWeekDesc
+  pkAsc
+  pkDesc
+}
+
+type ApplicantNode implements Node {
+  dateOfBirth: Date
+  email: String!
+  firstName: String!
+  generalRoles: [GeneralRoleNode!]!
+  """
+  The ID of the object
+  """
+  id: ID!
+  isAdAuthenticated: Boolean
+  isStronglyAuthenticated: Boolean
+  """
+  Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella.
+  """
+  isSuperuser: Boolean!
+  lastName: String!
+  name: String
+  pk: Int
+  reservationNotification: String
+  unitRoles: [UnitRoleNode!]!
+  """
+  Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja.
+  """
+  username: String!
+  uuid: UUID!
+}
+
+"""
+An enumeration.
+"""
+enum ApplicantTypeChoice {
+  ASSOCIATION
+  COMMUNITY
+  COMPANY
+  INDIVIDUAL
+}
+
+input ApplicationCancelMutationInput {
+  pk: Int!
+}
+
+type ApplicationCancelMutationPayload {
+  pk: Int
+}
+
+input ApplicationCreateMutationInput {
+  additionalInformation: String
+  applicantType: ApplicantTypeChoice
+  applicationRound: Int!
+  applicationSections: [ApplicationSectionForApplicationSerializerInput]
+  billingAddress: AddressSerializerInput
+  cancelledDate: DateTime
+  contactPerson: PersonSerializerInput
+  homeCity: Int
+  organisation: OrganisationSerializerInput
+  pk: Int
+  sentDate: DateTime
+}
+
+type ApplicationCreateMutationPayload {
+  additionalInformation: String
+  applicantType: ApplicantTypeChoice
+  applicationRound: Int
+  applicationSections: [ApplicationSectionNode]
+  billingAddress: AddressNode
+  cancelledDate: DateTime
+  contactPerson: PersonNode
+  createdDate: DateTime
+  homeCity: Int
+  lastModifiedDate: DateTime
+  organisation: OrganisationNode
+  pk: Int
+  sentDate: DateTime
+  status: Status
+}
+
+type ApplicationNode implements Node {
+  additionalInformation: String
+  applicantType: ApplicantTypeChoice
+  applicationRound: ApplicationRoundNode!
+  applicationSections(
+    ageGroup: [Int]
+    applicantType: [ApplicantTypeChoice]
+    application: Int
+    applicationRound: Int
+    applicationStatus: [ApplicationStatusChoice]
+    hasAllocations: Boolean
+    homeCity: [Int]
+    includePreferredOrder10OrHigher: Boolean
+    name: String
+    """
+    Järjestä
+    """
+    orderBy: [ApplicationSectionOrderingChoices]
+    pk: [Int]
+    preferredOrder: [Int]
+    priority: [Priority]
+    purpose: [Int]
+    reservationUnit: [Int]
+    status: [ApplicationSectionStatusChoice]
+    textSearch: String
+    unit: [Int]
+    user: Int
+  ): [ApplicationSectionNode!]
+  billingAddress: AddressNode
+  cancelledDate: DateTime
+  contactPerson: PersonNode
+  createdDate: DateTime!
+  homeCity: CityNode
+  """
+  The ID of the object
+  """
+  id: ID!
+  lastModifiedDate: DateTime!
+  organisation: OrganisationNode
+  pk: Int
+  sentDate: DateTime
+  status: ApplicationStatusChoice
+  user: ApplicantNode
+  workingMemo: String!
+}
+
+type ApplicationNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ApplicationNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ApplicationNode` and its cursor.
+"""
+type ApplicationNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ApplicationNode
+}
+
+"""
+Ordering fields for the 'Application' model.
+"""
+enum ApplicationOrderingChoices {
+  applicantAsc
+  applicantDesc
+  applicantTypeAsc
+  applicantTypeDesc
+  pkAsc
+  pkDesc
+  preferredUnitNameEnAsc
+  preferredUnitNameEnDesc
+  preferredUnitNameFiAsc
+  preferredUnitNameFiDesc
+  preferredUnitNameSvAsc
+  preferredUnitNameSvDesc
+  sentDateAsc
+  sentDateDesc
+  statusAsc
+  statusDesc
+}
+
+type ApplicationRoundNode implements Node {
+  applicationPeriodBegin: DateTime!
+  applicationPeriodEnd: DateTime!
+  applicationsCount: Int
+  criteria: String!
+  criteriaEn: String
+  criteriaFi: String
+  criteriaSv: String
+  handledDate: DateTime
+  """
+  The ID of the object
+  """
+  id: ID!
+  isSettingHandledAllowed: Boolean
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  notesWhenApplying: String!
+  notesWhenApplyingEn: String
+  notesWhenApplyingFi: String
+  notesWhenApplyingSv: String
+  pk: Int
+  publicDisplayBegin: DateTime!
+  publicDisplayEnd: DateTime!
+  purposes(
+    nameEn: String
+    nameFi: String
+    nameSv: String
+    """
+    Järjestä
+    """
+    orderBy: [ReservationPurposeOrderingChoices]
+    pk: [Int]
+  ): [ReservationPurposeNode!]!
+  reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice
+  reservationPeriodBegin: Date!
+  reservationPeriodEnd: Date!
+  reservationUnitCount: Int
+  reservationUnits(
+    accessType: [AccessType]
+    accessTypeEndDate: Date
+    accessTypeStartDate: Date
+    applicationRound: [Int]
+    calculateFirstReservableTime: Boolean
+    descriptionEn: String
+    descriptionEn_Icontains: String
+    descriptionFi: String
+    descriptionFi_Icontains: String
+    descriptionSv: String
+    descriptionSv_Icontains: String
+    equipments: [Int]
+    isDraft: Boolean
+    isVisible: Boolean
+    maxPersonsGte: Decimal
+    maxPersonsLte: Decimal
+    minPersonsGte: Decimal
+    minPersonsLte: Decimal
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ReservationUnitOrderingChoices]
+    personsAllowed: Decimal
+    pk: [Int]
+    publishingState: [ReservationUnitPublishingState]
+    purposes: [Int]
+    qualifiers: [Int]
+    rankGte: Decimal
+    rankLte: Decimal
+    reservableDateEnd: Date
+    reservableDateStart: Date
+    reservableMinimumDurationMinutes: Decimal
+    reservableTimeEnd: Time
+    reservableTimeStart: Time
+    reservationKind: String
+    reservationState: [ReservationUnitReservationState]
+    reservationUnitType: [Int]
+    showOnlyReservable: Boolean
+    surfaceAreaGte: Decimal
+    surfaceAreaLte: Decimal
+    textSearch: String
+    tprekDepartmentId: String
+    tprekId: String
+    typeRankGte: Decimal
+    typeRankLte: Decimal
+    unit: [Int]
+  ): [ReservationUnitNode!]!
+  sentDate: DateTime
+  status: ApplicationRoundStatusChoice
+  statusTimestamp: DateTime
+  termsOfUse: TermsOfUseNode
+}
+
+type ApplicationRoundNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ApplicationRoundNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ApplicationRoundNode` and its cursor.
+"""
+type ApplicationRoundNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ApplicationRoundNode
+}
+
+"""
+Ordering fields for the 'ApplicationRound' model.
+"""
+enum ApplicationRoundOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+"""
+An enumeration.
+"""
+enum ApplicationRoundReservationCreationStatusChoice {
+  COMPLETED
+  FAILED
+  NOT_COMPLETED
+}
+
+"""
+An enumeration.
+"""
+enum ApplicationRoundStatusChoice {
+  HANDLED
+  IN_ALLOCATION
+  OPEN
+  RESULTS_SENT
+  UPCOMING
+}
+
+type ApplicationRoundTimeSlotNode implements Node {
+  closed: Boolean!
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+  reservableTimes: [TimeSlotType]
+  weekday: Int!
+}
+
+input ApplicationRoundTimeSlotSerializerInput {
+  closed: Boolean
+  reservableTimes: [TimeSlotSerializerInput]
+  weekday: Int!
+}
+
+input ApplicationSectionCreateMutationInput {
+  ageGroup: Int
+  application: Int!
+  appliedReservationsPerWeek: Int!
+  name: String!
+  numPersons: Int!
+  pk: Int
+  purpose: Int
+  reservationMaxDuration: Duration!
+  reservationMinDuration: Duration!
+  reservationUnitOptions: [ReservationUnitOptionApplicantSerializerInput]!
+  reservationsBeginDate: Date!
+  reservationsEndDate: Date!
+  suitableTimeRanges: [SuitableTimeRangeSerializerInput]!
+}
+
+type ApplicationSectionCreateMutationPayload {
+  ageGroup: Int
+  application: Int
+  appliedReservationsPerWeek: Int
+  name: String
+  numPersons: Int
+  pk: Int
+  purpose: Int
+  reservationMaxDuration: Duration
+  reservationMinDuration: Duration
+  reservationUnitOptions: [ReservationUnitOptionNode]
+  reservationsBeginDate: Date
+  reservationsEndDate: Date
+  suitableTimeRanges: [SuitableTimeRangeNode]
+}
+
+input ApplicationSectionDeleteMutationInput {
+  pk: ID!
+}
+
+type ApplicationSectionDeleteMutationPayload {
+  deleted: Boolean
+}
+
+input ApplicationSectionForApplicationSerializerInput {
+  ageGroup: Int
+  appliedReservationsPerWeek: Int!
+  name: String!
+  numPersons: Int!
+  pk: Int
+  purpose: Int
+  reservationMaxDuration: Duration!
+  reservationMinDuration: Duration!
+  reservationUnitOptions: [ReservationUnitOptionApplicantSerializerInput]!
+  reservationsBeginDate: Date!
+  reservationsEndDate: Date!
+  suitableTimeRanges: [SuitableTimeRangeSerializerInput]!
+}
+
+type ApplicationSectionNode implements Node {
+  ageGroup: AgeGroupNode
+  allocations: Int
+  application: ApplicationNode!
+  appliedReservationsPerWeek: Int!
+  extUuid: UUID!
+  hasReservations: Boolean!
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  numPersons: Int!
+  pk: Int
+  purpose: ReservationPurposeNode
+  reservationMaxDuration: Duration!
+  reservationMinDuration: Duration!
+  reservationUnitOptions(
+    """
+    Järjestä
+    """
+    orderBy: [ReservationUnitOptionOrderingChoices]
+    pk: [Int]
+    preferredOrder: [Int]
+    reservationUnit: [Int]
+  ): [ReservationUnitOptionNode!]!
+  reservationsBeginDate: Date!
+  reservationsEndDate: Date!
+  status: ApplicationSectionStatusChoice
+  suitableTimeRanges(
+    fulfilled: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [SuitableTimeRangeOrderingChoices]
+    pk: [Int]
+    priority: [Priority]
+  ): [SuitableTimeRangeNode!]!
+}
+
+type ApplicationSectionNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ApplicationSectionNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ApplicationSectionNode` and its cursor.
+"""
+type ApplicationSectionNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ApplicationSectionNode
+}
+
+"""
+Ordering fields for the 'ApplicationSection' model.
+"""
+enum ApplicationSectionOrderingChoices {
+  allocationsAsc
+  allocationsDesc
+  applicantAsc
+  applicantDesc
+  applicationPkAsc
+  applicationPkDesc
+  applicationStatusAsc
+  applicationStatusDesc
+  hasAllocationsAsc
+  hasAllocationsDesc
+  nameAsc
+  nameDesc
+  pkAsc
+  pkDesc
+  preferredUnitNameEnAsc
+  preferredUnitNameEnDesc
+  preferredUnitNameFiAsc
+  preferredUnitNameFiDesc
+  preferredUnitNameSvAsc
+  preferredUnitNameSvDesc
+  statusAsc
+  statusDesc
+}
+
+input ApplicationSectionReservationCancellationMutationInput {
+  cancelDetails: String
+  cancelReason: Int!
+  pk: Int!
+}
+
+type ApplicationSectionReservationCancellationMutationPayload {
+  cancelled: Int
+  future: Int
+}
+
+"""
+An enumeration.
+"""
+enum ApplicationSectionStatusChoice {
+  HANDLED
+  IN_ALLOCATION
+  REJECTED
+  UNALLOCATED
+}
+
+input ApplicationSectionUpdateMutationInput {
+  ageGroup: Int
+  application: Int
+  appliedReservationsPerWeek: Int
+  name: String
+  numPersons: Int
+  pk: Int!
+  purpose: Int
+  reservationMaxDuration: Duration
+  reservationMinDuration: Duration
+  reservationUnitOptions: [UpdateReservationUnitOptionApplicantSerializerInput]
+  reservationsBeginDate: Date
+  reservationsEndDate: Date
+  suitableTimeRanges: [UpdateSuitableTimeRangeSerializerInput]
+}
+
+type ApplicationSectionUpdateMutationPayload {
+  ageGroup: Int
+  application: Int
+  appliedReservationsPerWeek: Int
+  name: String
+  numPersons: Int
+  pk: Int
+  purpose: Int
+  reservationMaxDuration: Duration
+  reservationMinDuration: Duration
+  reservationUnitOptions: [ReservationUnitOptionNode]
+  reservationsBeginDate: Date
+  reservationsEndDate: Date
+  suitableTimeRanges: [SuitableTimeRangeNode]
+}
+
+input ApplicationSendMutationInput {
+  pk: Int!
+}
+
+type ApplicationSendMutationPayload {
+  pk: Int
+}
+
+"""
+An enumeration.
+"""
+enum ApplicationStatusChoice {
+  CANCELLED
+  DRAFT
+  EXPIRED
+  HANDLED
+  IN_ALLOCATION
+  RECEIVED
+  RESULTS_SENT
+}
+
+input ApplicationUpdateMutationInput {
+  additionalInformation: String
+  applicantType: ApplicantTypeChoice
+  applicationRound: Int
+  applicationSections: [UpdateApplicationSectionForApplicationSerializerInput]
+  billingAddress: UpdateAddressSerializerInput
+  cancelledDate: DateTime
+  contactPerson: UpdatePersonSerializerInput
+  homeCity: Int
+  organisation: UpdateOrganisationSerializerInput
+  pk: Int!
+  sentDate: DateTime
+  workingMemo: String
+}
+
+type ApplicationUpdateMutationPayload {
+  additionalInformation: String
+  applicantType: ApplicantTypeChoice
+  applicationRound: Int
+  applicationSections: [ApplicationSectionNode]
+  billingAddress: AddressNode
+  cancelledDate: DateTime
+  contactPerson: PersonNode
+  createdDate: DateTime
+  homeCity: Int
+  lastModifiedDate: DateTime
+  organisation: OrganisationNode
+  pk: Int
+  sentDate: DateTime
+  status: Status
+  workingMemo: String
+}
+
+"""
+An enumeration.
+"""
+enum Authentication {
+  """
+  Vahva
+  """
+  STRONG
+  """
+  Heikko
+  """
+  WEAK
+}
+
+input BannerNotificationCreateMutationInput {
+  activeFrom: DateTime
+  activeUntil: DateTime
+  draft: Boolean
+  level: BannerNotificationLevel!
+  message: String
+  messageEn: String
+  messageFi: String
+  messageSv: String
+  name: String!
+  pk: Int
+  target: BannerNotificationTarget!
+}
+
+type BannerNotificationCreateMutationPayload {
+  activeFrom: DateTime
+  activeUntil: DateTime
+  draft: Boolean
+  level: BannerNotificationLevel
+  message: String
+  messageEn: String
+  messageFi: String
+  messageSv: String
+  name: String
+  pk: Int
+  target: BannerNotificationTarget
+}
+
+input BannerNotificationDeleteMutationInput {
+  pk: ID!
+}
+
+type BannerNotificationDeleteMutationPayload {
+  deleted: Boolean
+}
+
+"""
+An enumeration.
+"""
+enum BannerNotificationLevel {
+  """
+  Poikkeus
+  """
+  EXCEPTION
+  """
+  Normaali
+  """
+  NORMAL
+  """
+  Varoitus
+  """
+  WARNING
+}
+
+type BannerNotificationNode implements Node {
+  activeFrom: DateTime
+  activeUntil: DateTime
+  draft: Boolean!
+  """
+  The ID of the object
+  """
+  id: ID!
+  level: BannerNotificationLevel!
+  message: String!
+  messageEn: String
+  messageFi: String
+  messageSv: String
+  name: String!
+  pk: Int
+  state: BannerNotificationState
+  target: BannerNotificationTarget!
+}
+
+type BannerNotificationNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [BannerNotificationNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `BannerNotificationNode` and its cursor.
+"""
+type BannerNotificationNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: BannerNotificationNode
+}
+
+"""
+Ordering fields for the 'BannerNotification' model.
+"""
+enum BannerNotificationOrderingChoices {
+  endsAsc
+  endsDesc
+  levelAsc
+  levelDesc
+  nameAsc
+  nameDesc
+  pkAsc
+  pkDesc
+  startsAsc
+  startsDesc
+  stateAsc
+  stateDesc
+  targetAsc
+  targetDesc
+}
+
+"""
+An enumeration.
+"""
+enum BannerNotificationState {
+  ACTIVE
+  DRAFT
+  SCHEDULED
+}
+
+"""
+An enumeration.
+"""
+enum BannerNotificationTarget {
+  """
+  Kaikki
+  """
+  ALL
+  """
+  Henkilökunta
+  """
+  STAFF
+  """
+  Käyttäjä
+  """
+  USER
+}
+
+input BannerNotificationUpdateMutationInput {
+  activeFrom: DateTime
+  activeUntil: DateTime
+  draft: Boolean
+  level: BannerNotificationLevel
+  message: String
+  messageEn: String
+  messageFi: String
+  messageSv: String
+  name: String
+  pk: Int!
+  target: BannerNotificationTarget
+}
+
+type BannerNotificationUpdateMutationPayload {
+  activeFrom: DateTime
+  activeUntil: DateTime
+  draft: Boolean
+  level: BannerNotificationLevel
+  message: String
+  messageEn: String
+  messageFi: String
+  messageSv: String
+  name: String
+  pk: Int
+  target: BannerNotificationTarget
+}
+
+type CityNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  municipalityCode: String!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type CityNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [CityNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `CityNode` and its cursor.
+"""
+type CityNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: CityNode
+}
+
+input CurrentUserUpdateMutationInput {
+  preferredLanguage: PreferredLanguage
+}
+
+type CurrentUserUpdateMutationPayload {
+  pk: Int
+  preferredLanguage: PreferredLanguage
+}
+
+"""
+An enumeration.
+"""
+enum CustomerTypeChoice {
+  BUSINESS
+  INDIVIDUAL
+  NONPROFIT
+}
+
+"""
+The `Date` scalar type represents a Date
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar Date
+
+"""
+The `DateTime` scalar type represents a DateTime
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar DateTime
+
+"""
+The `Decimal` scalar type represents a python Decimal.
+"""
+scalar Decimal
+
+"""
+Represents a DurationField value as an integer in seconds.
+"""
+scalar Duration
+
+"""
+This Node should be kept to the bare minimum and never expose any relations to avoid performance issues.
+"""
+type EquipmentAllNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+input EquipmentCategoryCreateMutationInput {
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type EquipmentCategoryCreateMutationPayload {
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+input EquipmentCategoryDeleteMutationInput {
+  pk: ID!
+}
+
+type EquipmentCategoryDeleteMutationPayload {
+  deleted: Boolean
+}
+
+type EquipmentCategoryNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type EquipmentCategoryNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [EquipmentCategoryNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `EquipmentCategoryNode` and its cursor.
+"""
+type EquipmentCategoryNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: EquipmentCategoryNode
+}
+
+"""
+Ordering fields for the 'EquipmentCategory' model.
+"""
+enum EquipmentCategoryOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+input EquipmentCategoryUpdateMutationInput {
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int!
+}
+
+type EquipmentCategoryUpdateMutationPayload {
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+input EquipmentCreateMutationInput {
+  category: Int!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type EquipmentCreateMutationPayload {
+  category: Int
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+input EquipmentDeleteMutationInput {
+  pk: ID!
+}
+
+type EquipmentDeleteMutationPayload {
+  deleted: Boolean
+}
+
+type EquipmentNode implements Node {
+  category: EquipmentCategoryNode!
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type EquipmentNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [EquipmentNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `EquipmentNode` and its cursor.
+"""
+type EquipmentNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: EquipmentNode
+}
+
+"""
+Ordering fields for the 'Equipment' model.
+"""
+enum EquipmentOrderingChoices {
+  categoryRankAsc
+  categoryRankDesc
+  nameAsc
+  nameDesc
+  nameEnAsc
+  nameEnDesc
+  nameFiAsc
+  nameFiDesc
+  nameSvAsc
+  nameSvDesc
+}
+
+input EquipmentUpdateMutationInput {
+  category: Int
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int!
+}
+
+type EquipmentUpdateMutationPayload {
+  category: Int
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type GeneralRoleNode implements Node {
+  assigner: UserNode
+  created: DateTime!
+  """
+  The ID of the object
+  """
+  id: ID!
+  modified: DateTime!
+  permissions: [UserPermissionChoice]
+  role: UserRoleChoice!
+  user: UserNode!
+}
+
+type HelsinkiProfileDataNode {
+  birthday: Date
+  city: String
+  email: String
+  firstName: String
+  isStrongLogin: Boolean!
+  lastName: String
+  loginMethod: LoginMethod
+  municipalityCode: String
+  municipalityName: String
+  phone: String
+  pk: Int!
+  postalCode: String
+  ssn: String
+  streetAddress: String
+}
+
+"""
+An enumeration.
+"""
+enum ImageType {
+  """
+  Pohjapiirros
+  """
+  GROUND_PLAN
+  """
+  Pääkuva
+  """
+  MAIN
+  """
+  Kartta
+  """
+  MAP
+  """
+  Muu
+  """
+  OTHER
+}
+
+type LocationNode implements Node {
+  addressCity: String!
+  addressCityEn: String
+  addressCityFi: String
+  addressCitySv: String
+  addressStreet: String!
+  addressStreetEn: String
+  addressStreetFi: String
+  addressStreetSv: String
+  addressZip: String!
+  """
+  The ID of the object
+  """
+  id: ID!
+  latitude: String
+  longitude: String
+  pk: Int
+}
+
+"""
+An enumeration.
+"""
+enum LocationType {
+  """
+  Kiinteä
+  """
+  FIXED
+  """
+  Siirrettävä
+  """
+  MOVABLE
+}
+
+"""
+An enumeration.
+"""
+enum LoginMethod {
+  AD
+  OTHER
+  PROFILE
+}
+
+type Mutation {
+  addReservationToSeries(
+    input: ReservationSeriesAddMutationInput!
+  ): ReservationSeriesAddMutationPayload
+  adjustReservationTime(
+    input: ReservationAdjustTimeMutationInput!
+  ): ReservationAdjustTimeMutationPayload
+  approveReservation(
+    input: ReservationApproveMutationInput!
+  ): ReservationApproveMutationPayload
+  cancelAllApplicationSectionReservations(
+    input: ApplicationSectionReservationCancellationMutationInput!
+  ): ApplicationSectionReservationCancellationMutationPayload
+  cancelApplication(
+    input: ApplicationCancelMutationInput!
+  ): ApplicationCancelMutationPayload
+  cancelReservation(
+    input: ReservationCancellationMutationInput!
+  ): ReservationCancellationMutationPayload
+  confirmReservation(
+    input: ReservationConfirmMutationInput!
+  ): ReservationConfirmMutationPayload
+  createAllocatedTimeslot(
+    input: AllocatedTimeSlotCreateMutationInput!
+  ): AllocatedTimeSlotCreateMutationPayload
+  createApplication(
+    input: ApplicationCreateMutationInput!
+  ): ApplicationCreateMutationPayload
+  createApplicationSection(
+    input: ApplicationSectionCreateMutationInput!
+  ): ApplicationSectionCreateMutationPayload
+  createBannerNotification(
+    input: BannerNotificationCreateMutationInput!
+  ): BannerNotificationCreateMutationPayload
+  createEquipment(
+    input: EquipmentCreateMutationInput!
+  ): EquipmentCreateMutationPayload
+  createEquipmentCategory(
+    input: EquipmentCategoryCreateMutationInput!
+  ): EquipmentCategoryCreateMutationPayload
+  createPurpose(
+    input: PurposeCreateMutationInput!
+  ): PurposeCreateMutationPayload
+  createReservation(
+    input: ReservationCreateMutationInput!
+  ): ReservationCreateMutationPayload
+  createReservationSeries(
+    input: ReservationSeriesCreateMutationInput!
+  ): ReservationSeriesCreateMutationPayload
+  createReservationUnit(
+    input: ReservationUnitCreateMutationInput!
+  ): ReservationUnitCreateMutationPayload
+  createReservationUnitImage(
+    input: ReservationUnitImageCreateMutationInput!
+  ): ReservationUnitImageCreateMutationPayload
+  createResource(
+    input: ResourceCreateMutationInput!
+  ): ResourceCreateMutationPayload
+  createSpace(input: SpaceCreateMutationInput!): SpaceCreateMutationPayload
+  createStaffReservation(
+    input: ReservationStaffCreateMutationInput!
+  ): ReservationStaffCreateMutationPayload
+  deleteAllocatedTimeslot(
+    input: AllocatedTimeSlotDeleteMutationInput!
+  ): AllocatedTimeSlotDeleteMutationPayload
+  deleteApplicationSection(
+    input: ApplicationSectionDeleteMutationInput!
+  ): ApplicationSectionDeleteMutationPayload
+  deleteBannerNotification(
+    input: BannerNotificationDeleteMutationInput!
+  ): BannerNotificationDeleteMutationPayload
+  deleteEquipment(
+    input: EquipmentDeleteMutationInput!
+  ): EquipmentDeleteMutationPayload
+  deleteEquipmentCategory(
+    input: EquipmentCategoryDeleteMutationInput!
+  ): EquipmentCategoryDeleteMutationPayload
+  deleteReservation(
+    input: ReservationDeleteMutationInput!
+  ): ReservationDeleteMutationPayload
+    @deprecated(reason: "Renamed to 'deleteTentativeReservation'.")
+  deleteReservationUnitImage(
+    input: ReservationUnitImageDeleteMutationInput!
+  ): ReservationUnitImageDeleteMutationPayload
+  deleteResource(
+    input: ResourceDeleteMutationInput!
+  ): ResourceDeleteMutationPayload
+  deleteSpace(input: SpaceDeleteMutationInput!): SpaceDeleteMutationPayload
+  """
+  Used only for deleting a reservation before it is confirmed.
+  """
+  deleteTentativeReservation(
+    input: ReservationDeleteTentativeMutationInput!
+  ): ReservationDeleteTentativeMutationPayload
+  denyReservation(
+    input: ReservationDenyMutationInput!
+  ): ReservationDenyMutationPayload
+  denyReservationSeries(
+    input: ReservationSeriesDenyMutationInput!
+  ): ReservationSeriesDenyMutationPayload
+  refreshOrder(input: RefreshOrderMutationInput!): RefreshOrderMutationPayload
+  refundReservation(
+    input: ReservationRefundMutationInput!
+  ): ReservationRefundMutationPayload
+  rejectAllApplicationOptions(
+    input: RejectAllApplicationOptionsMutationInput!
+  ): RejectAllApplicationOptionsMutationPayload
+  rejectAllSectionOptions(
+    input: RejectAllSectionOptionsMutationInput!
+  ): RejectAllSectionOptionsMutationPayload
+  requireHandlingForReservation(
+    input: ReservationRequiresHandlingMutationInput!
+  ): ReservationRequiresHandlingMutationPayload
+  rescheduleReservationSeries(
+    input: ReservationSeriesRescheduleMutationInput!
+  ): ReservationSeriesRescheduleMutationPayload
+  restoreAllApplicationOptions(
+    input: RestoreAllApplicationOptionsMutationInput!
+  ): RestoreAllApplicationOptionsMutationPayload
+  restoreAllSectionOptions(
+    input: RestoreAllSectionOptionsMutationInput!
+  ): RestoreAllSectionOptionsMutationPayload
+  sendApplication(
+    input: ApplicationSendMutationInput!
+  ): ApplicationSendMutationPayload
+  setApplicationRoundHandled(
+    input: SetApplicationRoundHandledMutationInput!
+  ): SetApplicationRoundHandledMutationPayload
+  setApplicationRoundResultsSent(
+    input: SetApplicationRoundResultsSentMutationInput!
+  ): SetApplicationRoundResultsSentMutationPayload
+  staffAdjustReservationTime(
+    input: ReservationStaffAdjustTimeMutationInput!
+  ): ReservationStaffAdjustTimeMutationPayload
+  staffChangeReservationAccessCode(
+    input: ReservationStaffChangeAccessCodeMutationInput!
+  ): ReservationStaffChangeAccessCodeMutationPayload
+  staffRepairReservationAccessCode(
+    input: ReservationStaffRepairAccessCodeMutationInput!
+  ): ReservationStaffRepairAccessCodeMutationPayload
+  staffReservationModify(
+    input: ReservationStaffModifyMutationInput!
+  ): ReservationStaffModifyMutationPayload
+  updateApplication(
+    input: ApplicationUpdateMutationInput!
+  ): ApplicationUpdateMutationPayload
+  updateApplicationSection(
+    input: ApplicationSectionUpdateMutationInput!
+  ): ApplicationSectionUpdateMutationPayload
+  updateBannerNotification(
+    input: BannerNotificationUpdateMutationInput!
+  ): BannerNotificationUpdateMutationPayload
+  updateCurrentUser(
+    input: CurrentUserUpdateMutationInput!
+  ): CurrentUserUpdateMutationPayload
+  updateEquipment(
+    input: EquipmentUpdateMutationInput!
+  ): EquipmentUpdateMutationPayload
+  updateEquipmentCategory(
+    input: EquipmentCategoryUpdateMutationInput!
+  ): EquipmentCategoryUpdateMutationPayload
+  updatePurpose(
+    input: PurposeUpdateMutationInput!
+  ): PurposeUpdateMutationPayload
+  updateReservation(
+    input: ReservationUpdateMutationInput!
+  ): ReservationUpdateMutationPayload
+  updateReservationSeries(
+    input: ReservationSeriesUpdateMutationInput!
+  ): ReservationSeriesUpdateMutationPayload
+  updateReservationUnit(
+    input: ReservationUnitUpdateMutationInput!
+  ): ReservationUnitUpdateMutationPayload
+  updateReservationUnitImage(
+    input: ReservationUnitImageUpdateMutationInput!
+  ): ReservationUnitImageUpdateMutationPayload
+  updateReservationUnitOption(
+    input: ReservationUnitOptionUpdateMutationInput!
+  ): ReservationUnitOptionUpdateMutationPayload
+  updateReservationWorkingMemo(
+    input: ReservationWorkingMemoMutationInput!
+  ): ReservationWorkingMemoMutationPayload
+  updateResource(
+    input: ResourceUpdateMutationInput!
+  ): ResourceUpdateMutationPayload
+  updateSpace(input: SpaceUpdateMutationInput!): SpaceUpdateMutationPayload
+  updateStaffUser(
+    input: UserStaffUpdateMutationInput!
+  ): UserStaffUpdateMutationPayload
+  updateUnit(input: UnitUpdateMutationInput!): UnitUpdateMutationPayload
+}
+
+"""
+An object with an ID
+"""
+interface Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+}
+
+"""
+An enumeration.
+"""
+enum OrderStatus {
+  CANCELLED
+  DRAFT
+  EXPIRED
+  PAID
+  PAID_MANUALLY
+  REFUNDED
+}
+
+"""
+Same as OrderStatus, but includes the 'FREE' option used for filtering reservations without payments.
+"""
+enum OrderStatusWithFree {
+  CANCELLED
+  DRAFT
+  EXPIRED
+  FREE
+  PAID
+  PAID_MANUALLY
+  REFUNDED
+}
+
+type OrganisationNode implements Node {
+  activeMembers: Int
+  address: AddressNode
+  coreBusiness: String!
+  coreBusinessEn: String
+  coreBusinessFi: String
+  coreBusinessSv: String
+  email: String!
+  """
+  The ID of the object
+  """
+  id: ID!
+  identifier: String
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  organisationType: OrganizationTypeChoice!
+  pk: Int
+  yearEstablished: Int
+}
+
+input OrganisationSerializerInput {
+  activeMembers: Int
+  address: AddressSerializerInput!
+  coreBusiness: String
+  coreBusinessEn: String
+  coreBusinessFi: String
+  coreBusinessSv: String
+  email: String
+  identifier: String
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  organisationType: OrganizationTypeChoice
+  pk: Int
+  yearEstablished: Int
+}
+
+"""
+An enumeration.
+"""
+enum OrganizationTypeChoice {
+  """
+  Yritys
+  """
+  COMPANY
+  """
+  Kuntakonsortio
+  """
+  MUNICIPALITY_CONSORTIUM
+  """
+  Julkinen yhdistys
+  """
+  PUBLIC_ASSOCIATION
+  """
+  Rekisteröity yhdistys
+  """
+  REGISTERED_ASSOCIATION
+  """
+  Uskonnollinen yhteisö
+  """
+  RELIGIOUS_COMMUNITY
+  """
+  Rekisteröimätön yhdistys
+  """
+  UNREGISTERED_ASSOCIATION
+}
+
+"""
+The Relay compliant `PageInfo` type, containing data necessary to paginate this connection.
+"""
+type PageInfo {
+  """
+  When paginating forwards, the cursor to continue.
+  """
+  endCursor: String
+  """
+  When paginating forwards, are there more items?
+  """
+  hasNextPage: Boolean!
+  """
+  When paginating backwards, are there more items?
+  """
+  hasPreviousPage: Boolean!
+  """
+  When paginating backwards, the cursor to continue.
+  """
+  startCursor: String
+}
+
+type PaymentMerchantNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  pk: UUID
+}
+
+type PaymentOrderNode implements Node {
+  checkoutUrl: String
+  expiresInMinutes: Int
+  """
+  The ID of the object
+  """
+  id: ID!
+  orderUuid: UUID
+  paymentType: PaymentType!
+  processedAt: DateTime
+  receiptUrl: String
+  refundUuid: UUID
+  reservationPk: String
+  status: OrderStatus
+}
+
+type PaymentProductNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  merchant: PaymentMerchantNode
+  pk: UUID
+}
+
+"""
+An enumeration.
+"""
+enum PaymentType {
+  INVOICE
+  ONLINE
+  ON_SITE
+}
+
+type PermissionCheckerType {
+  hasPermission: Boolean!
+}
+
+type PersonNode implements Node {
+  email: String
+  firstName: String!
+  """
+  The ID of the object
+  """
+  id: ID!
+  lastName: String!
+  phoneNumber: String
+  pk: Int
+}
+
+input PersonSerializerInput {
+  email: String
+  firstName: String!
+  lastName: String!
+  phoneNumber: String
+  pk: Int
+}
+
+type PindoraInfoType {
+  accessCode: String!
+  accessCodeBeginsAt: DateTime!
+  accessCodeEndsAt: DateTime!
+  accessCodeGeneratedAt: DateTime!
+  accessCodeIsActive: Boolean!
+  accessCodeKeypadUrl: String!
+  accessCodePhoneNumber: String!
+  accessCodeSmsMessage: String!
+  accessCodeSmsNumber: String!
+}
+
+"""
+An enumeration.
+"""
+enum PreferredLanguage {
+  """
+  Englanti
+  """
+  EN
+  """
+  Suomi
+  """
+  FI
+  """
+  Ruotsi
+  """
+  SV
+}
+
+"""
+An enumeration.
+"""
+enum PriceUnit {
+  """
+  per kerta
+  """
+  FIXED
+  """
+  per 15 minuuttia
+  """
+  PER_15_MINS
+  """
+  per 30 minuuttia
+  """
+  PER_30_MINS
+  """
+  per päivä
+  """
+  PER_DAY
+  """
+  per puolipäivää
+  """
+  PER_HALF_DAY
+  """
+  per tunti
+  """
+  PER_HOUR
+  """
+  per viikko
+  """
+  PER_WEEK
+}
+
+"""
+An enumeration.
+"""
+enum Priority {
+  PRIMARY
+  SECONDARY
+}
+
+input PurposeCreateMutationInput {
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type PurposeCreateMutationPayload {
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type PurposeNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  imageUrl: String
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+  rank: Int!
+  smallUrl: String
+}
+
+type PurposeNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [PurposeNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `PurposeNode` and its cursor.
+"""
+type PurposeNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: PurposeNode
+}
+
+"""
+Ordering fields for the 'Purpose' model.
+"""
+enum PurposeOrderingChoices {
+  nameEnAsc
+  nameEnDesc
+  nameFiAsc
+  nameFiDesc
+  nameSvAsc
+  nameSvDesc
+  rankAsc
+  rankDesc
+}
+
+input PurposeUpdateMutationInput {
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int!
+}
+
+type PurposeUpdateMutationPayload {
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type QualifierNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type QualifierNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [QualifierNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `QualifierNode` and its cursor.
+"""
+type QualifierNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: QualifierNode
+}
+
+"""
+Ordering fields for the 'Qualifier' model.
+"""
+enum QualifierOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+type Query {
+  """
+  Return all allocations that affect allocations for given reservation unit (through space hierarchy or common resource) during the given time period.
+  """
+  affectingAllocatedTimeSlots(
+    beginDate: Date!
+    endDate: Date!
+    reservationUnit: Int!
+  ): [AllocatedTimeSlotNode!]
+  """
+  Find all reservations that affect other reservations through the space hierarchy or a common resource.
+  """
+  affectingReservations(
+    applyingForFreeOfCharge: Boolean
+    beginDate: Date
+    createdAtGte: Date
+    createdAtLte: Date
+    endDate: Date
+    """
+    Reservations should contain at least one these reservation units.
+    """
+    forReservationUnits: [Int] = []
+    """
+    Reservations should contain at least one reservation unit that belongs to any of these units.
+    """
+    forUnits: [Int] = []
+    isRecurring: Boolean
+    onlyWithHandlingPermission: Boolean
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ReservationOrderingChoices]
+    orderStatus: [OrderStatusWithFree]
+    priceGte: Decimal
+    priceLte: Decimal
+    recurringReservation: [Int]
+    requested: Boolean
+    reservationType: [ReservationTypeChoice]
+    reservationUnitNameEn: String
+    reservationUnitNameFi: String
+    reservationUnitNameSv: String
+    reservationUnitType: [Int]
+    reservationUnits: [Int]
+    state: [ReservationStateChoice]
+    textSearch: String
+    unit: [Int]
+    user: [Int]
+  ): [ReservationNode!]
+  ageGroups(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+  ): AgeGroupNodeConnection
+  allocatedTimeSlots(
+    after: String
+    allocatedReservationUnit: [Int]
+    allocatedUnit: [Int]
+    applicantType: [ApplicantTypeChoice]
+    applicationRound: Int
+    applicationSectionStatus: [ApplicationSectionStatusChoice]
+    before: String
+    dayOfTheWeek: [Weekday]
+    first: Int
+    last: Int
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [AllocatedTimeSlotOrderingChoices]
+    pk: [Int]
+    textSearch: String
+  ): AllocatedTimeSlotNodeConnection
+  application(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): ApplicationNode
+  applicationRound(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): ApplicationRoundNode
+  applicationRounds(
+    active: Boolean
+    after: String
+    before: String
+    first: Int
+    last: Int
+    name: String
+    offset: Int
+    ongoing: Boolean
+    onlyWithPermissions: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ApplicationRoundOrderingChoices]
+    pk: [Int]
+  ): ApplicationRoundNodeConnection
+  applicationSection(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): ApplicationSectionNode
+  applicationSections(
+    after: String
+    ageGroup: [Int]
+    applicantType: [ApplicantTypeChoice]
+    application: Int
+    applicationRound: Int
+    applicationStatus: [ApplicationStatusChoice]
+    before: String
+    first: Int
+    hasAllocations: Boolean
+    homeCity: [Int]
+    includePreferredOrder10OrHigher: Boolean
+    last: Int
+    name: String
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [ApplicationSectionOrderingChoices]
+    pk: [Int]
+    preferredOrder: [Int]
+    priority: [Priority]
+    purpose: [Int]
+    reservationUnit: [Int]
+    status: [ApplicationSectionStatusChoice]
+    textSearch: String
+    unit: [Int]
+    user: Int
+  ): ApplicationSectionNodeConnection
+  applications(
+    after: String
+    applicantType: [ApplicantTypeChoice]
+    applicationRound: Int
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [ApplicationOrderingChoices]
+    pk: [Int]
+    status: [ApplicationStatusChoice]
+    textSearch: String
+    unit: [Int]
+    user: Int
+  ): ApplicationNodeConnection
+  bannerNotification(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): BannerNotificationNode
+  bannerNotifications(
+    after: String
+    before: String
+    first: Int
+    isActive: Boolean
+    isVisible: Boolean
+    last: Int
+    name: String
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [BannerNotificationOrderingChoices]
+    target: BannerNotificationTarget
+  ): BannerNotificationNodeConnection
+  checkPermissions(
+    permission: UserPermissionChoice!
+    requireAll: Boolean = false
+    units: [Int!]
+  ): PermissionCheckerType
+  cities(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+  ): CityNodeConnection
+  currentUser: UserNode
+  equipment(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): EquipmentNode
+  equipmentCategories(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [EquipmentCategoryOrderingChoices]
+    pk: [Int]
+  ): EquipmentCategoryNodeConnection
+  equipmentCategory(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): EquipmentCategoryNode
+  equipments(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    name: String
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    name_Icontains: String
+    name_Istartswith: String
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [EquipmentOrderingChoices]
+    pk: [Int]
+    rankGte: Decimal
+    rankLte: Decimal
+  ): EquipmentNodeConnection
+  equipmentsAll(
+    """
+    Järjestä
+    """
+    orderBy: [EquipmentOrderingChoices]
+  ): [EquipmentAllNode!]
+  metadataSets(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+  ): ReservationMetadataSetNodeConnection
+  order(orderUuid: String!): PaymentOrderNode
+  """
+  Get information about a user from Helsinki profile. If user is not a profile user, still return data stored in our database, e.g. first and last name. Use only one of 'reservation_id' or 'application_id' to select the user. This determines the required permissions to view the user's data.
+  """
+  profileData(
+    """
+    View profile data for this application's user.
+    """
+    applicationId: Int
+    """
+    View profile data for this reservation's user.
+    """
+    reservationId: Int
+  ): HelsinkiProfileDataNode
+  purposes(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    nameEn: String
+    nameFi: String
+    nameSv: String
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [PurposeOrderingChoices]
+    pk: [Int]
+  ): PurposeNodeConnection
+  qualifiers(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    nameEn: String
+    nameFi: String
+    nameSv: String
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [QualifierOrderingChoices]
+    pk: [Int]
+  ): QualifierNodeConnection
+  recurringReservation(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): RecurringReservationNode
+  recurringReservations(
+    after: String
+    before: String
+    beginDate: Date
+    beginTime: Time
+    endDate: Date
+    endTime: Time
+    first: Int
+    last: Int
+    name: String
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [RecurringReservationOrderingChoices]
+    reservationUnit: [ID]
+    reservationUnitNameEn: String
+    reservationUnitNameFi: String
+    reservationUnitNameSv: String
+    reservationUnitType: [ID]
+    unit: [ID]
+    user: ID
+  ): RecurringReservationNodeConnection
+  rejectedOccurrence(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): RejectedOccurrenceNode
+  rejectedOccurrences(
+    after: String
+    applicationRound: Int
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [RejectedOccurrenceOrderingChoices]
+    pk: [Int]
+    recurringReservation: Int
+    reservationUnit: [Int]
+    textSearch: String
+    unit: [Int]
+  ): RejectedOccurrenceNodeConnection
+  reservation(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): ReservationNode
+  reservationCancelReasons(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [ReservationCancelReasonOrderingChoices]
+    pk: [Int]
+    reason: String
+  ): ReservationCancelReasonNodeConnection
+  reservationDenyReasons(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [ReservationDenyReasonOrderingChoices]
+    pk: [Int]
+    reason: String
+  ): ReservationDenyReasonNodeConnection
+  reservationPurposes(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    nameEn: String
+    nameFi: String
+    nameSv: String
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [ReservationPurposeOrderingChoices]
+    pk: [Int]
+  ): ReservationPurposeNodeConnection
+  reservationUnit(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): ReservationUnitNode
+  reservationUnitCancellationRules(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    name: String
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [ReservationUnitCancellationRuleOrderingChoices]
+    pk: [Int]
+  ): ReservationUnitCancellationRuleNodeConnection
+  reservationUnitTypes(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [ReservationUnitTypeOrderingChoices]
+    pk: [Int]
+  ): ReservationUnitTypeNodeConnection
+  reservationUnits(
+    accessType: [AccessType]
+    accessTypeEndDate: Date
+    accessTypeStartDate: Date
+    after: String
+    applicationRound: [Int]
+    before: String
+    calculateFirstReservableTime: Boolean
+    descriptionEn: String
+    descriptionEn_Icontains: String
+    descriptionFi: String
+    descriptionFi_Icontains: String
+    descriptionSv: String
+    descriptionSv_Icontains: String
+    equipments: [Int]
+    first: Int
+    isDraft: Boolean
+    isVisible: Boolean
+    last: Int
+    maxPersonsGte: Decimal
+    maxPersonsLte: Decimal
+    minPersonsGte: Decimal
+    minPersonsLte: Decimal
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    offset: Int
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ReservationUnitOrderingChoices]
+    personsAllowed: Decimal
+    pk: [Int]
+    publishingState: [ReservationUnitPublishingState]
+    purposes: [Int]
+    qualifiers: [Int]
+    rankGte: Decimal
+    rankLte: Decimal
+    reservableDateEnd: Date
+    reservableDateStart: Date
+    reservableMinimumDurationMinutes: Decimal
+    reservableTimeEnd: Time
+    reservableTimeStart: Time
+    reservationKind: String
+    reservationState: [ReservationUnitReservationState]
+    reservationUnitType: [Int]
+    showOnlyReservable: Boolean
+    surfaceAreaGte: Decimal
+    surfaceAreaLte: Decimal
+    textSearch: String
+    tprekDepartmentId: String
+    tprekId: String
+    typeRankGte: Decimal
+    typeRankLte: Decimal
+    unit: [Int]
+  ): ReservationUnitNodeConnection
+  reservationUnitsAll(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ReservationUnitOrderingChoices]
+    unit: [Int]
+  ): [ReservationUnitAllNode!]
+  reservations(
+    after: String
+    applyingForFreeOfCharge: Boolean
+    before: String
+    beginDate: Date
+    createdAtGte: Date
+    createdAtLte: Date
+    endDate: Date
+    first: Int
+    isRecurring: Boolean
+    last: Int
+    offset: Int
+    onlyWithHandlingPermission: Boolean
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ReservationOrderingChoices]
+    orderStatus: [OrderStatusWithFree]
+    priceGte: Decimal
+    priceLte: Decimal
+    recurringReservation: [Int]
+    requested: Boolean
+    reservationType: [ReservationTypeChoice]
+    reservationUnitNameEn: String
+    reservationUnitNameFi: String
+    reservationUnitNameSv: String
+    reservationUnitType: [Int]
+    reservationUnits: [Int]
+    state: [ReservationStateChoice]
+    textSearch: String
+    unit: [Int]
+    user: [Int]
+  ): ReservationNodeConnection
+  resource(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): ResourceNode
+  resources(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    offset: Int
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ResourceOrderingChoices]
+    pk: [Int]
+  ): ResourceNodeConnection
+  space(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): SpaceNode
+  spaces(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    offset: Int
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [SpaceOrderingChoices]
+    pk: [Int]
+  ): SpaceNodeConnection
+  taxPercentages(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [TaxPercentageOrderingChoices]
+    pk: [Int]
+    value: Decimal
+  ): TaxPercentageNodeConnection
+  termsOfUse(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+    """
+    Järjestä
+    """
+    orderBy: [TermsOfUseOrderingChoices]
+    pk: [String]
+    termsType: TermsType
+  ): TermsOfUseNodeConnection
+  unit(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): UnitNode
+  unitGroups(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    offset: Int
+  ): UnitGroupNodeConnection
+  units(
+    after: String
+    before: String
+    first: Int
+    last: Int
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    offset: Int
+    onlyDirectBookable: Boolean
+    onlySeasonalBookable: Boolean
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [UnitOrderingChoices]
+    ownReservations: Boolean
+    pk: [Int]
+    publishedReservationUnits: Boolean
+  ): UnitNodeConnection
+  unitsAll(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyDirectBookable: Boolean
+    onlySeasonalBookable: Boolean
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [UnitOrderingChoices]
+    ownReservations: Boolean
+    publishedReservationUnits: Boolean
+    unit: [Int]
+  ): [UnitAllNode!]
+  user(
+    """
+    The ID of the object
+    """
+    id: ID!
+  ): UserNode
+}
+
+type RecurringReservationNode implements Node {
+  abilityGroup: AbilityGroupNode
+  ageGroup: AgeGroupNode
+  allocatedTimeSlot: AllocatedTimeSlotNode
+  beginDate: Date
+  beginTime: Time
+  created: DateTime!
+  description: String!
+  endDate: Date
+  endTime: Time
+  extUuid: UUID!
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  pk: Int
+  recurrenceInDays: Int
+  rejectedOccurrences(
+    applicationRound: Int
+    """
+    Järjestä
+    """
+    orderBy: [RejectedOccurrenceOrderingChoices]
+    pk: [Int]
+    recurringReservation: Int
+    reservationUnit: [Int]
+    textSearch: String
+    unit: [Int]
+  ): [RejectedOccurrenceNode!]!
+  reservationUnit: ReservationUnitNode!
+  reservations(
+    applyingForFreeOfCharge: Boolean
+    beginDate: Date
+    createdAtGte: Date
+    createdAtLte: Date
+    endDate: Date
+    isRecurring: Boolean
+    onlyWithHandlingPermission: Boolean
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ReservationOrderingChoices]
+    orderStatus: [OrderStatusWithFree]
+    priceGte: Decimal
+    priceLte: Decimal
+    recurringReservation: [Int]
+    requested: Boolean
+    reservationType: [ReservationTypeChoice]
+    reservationUnitNameEn: String
+    reservationUnitNameFi: String
+    reservationUnitNameSv: String
+    reservationUnitType: [Int]
+    reservationUnits: [Int]
+    state: [ReservationStateChoice]
+    textSearch: String
+    unit: [Int]
+    user: [Int]
+  ): [ReservationNode!]!
+  user: UserNode
+  weekdays: [Int]
+}
+
+type RecurringReservationNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [RecurringReservationNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `RecurringReservationNode` and its cursor.
+"""
+type RecurringReservationNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: RecurringReservationNode
+}
+
+"""
+Ordering fields for the 'RecurringReservation' model.
+"""
+enum RecurringReservationOrderingChoices {
+  beginDateAsc
+  beginDateDesc
+  beginTimeAsc
+  beginTimeDesc
+  createdAsc
+  createdDesc
+  endDateAsc
+  endDateDesc
+  endTimeAsc
+  endTimeDesc
+  nameAsc
+  nameDesc
+  pkAsc
+  pkDesc
+  reservationUnitNameEnAsc
+  reservationUnitNameEnDesc
+  reservationUnitNameFiAsc
+  reservationUnitNameFiDesc
+  reservationUnitNameSvAsc
+  reservationUnitNameSvDesc
+  unitNameEnAsc
+  unitNameEnDesc
+  unitNameFiAsc
+  unitNameFiDesc
+  unitNameSvAsc
+  unitNameSvDesc
+}
+
+input RefreshOrderMutationInput {
+  orderUuid: String!
+}
+
+type RefreshOrderMutationPayload {
+  orderUuid: String
+  reservationPk: Int
+  status: String
+}
+
+input RejectAllApplicationOptionsMutationInput {
+  pk: Int!
+}
+
+type RejectAllApplicationOptionsMutationPayload {
+  pk: Int
+}
+
+input RejectAllSectionOptionsMutationInput {
+  pk: Int!
+}
+
+type RejectAllSectionOptionsMutationPayload {
+  pk: Int
+}
+
+type RejectedOccurrenceNode implements Node {
+  beginDatetime: DateTime!
+  createdAt: DateTime!
+  endDatetime: DateTime!
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+  recurringReservation: RecurringReservationNode!
+  rejectionReason: RejectionReadinessChoice!
+}
+
+type RejectedOccurrenceNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [RejectedOccurrenceNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `RejectedOccurrenceNode` and its cursor.
+"""
+type RejectedOccurrenceNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: RejectedOccurrenceNode
+}
+
+"""
+Ordering fields for the 'RejectedOccurrence' model.
+"""
+enum RejectedOccurrenceOrderingChoices {
+  applicantAsc
+  applicantDesc
+  applicationPkAsc
+  applicationPkDesc
+  applicationSectionNameAsc
+  applicationSectionNameDesc
+  applicationSectionPkAsc
+  applicationSectionPkDesc
+  beginDatetimeAsc
+  beginDatetimeDesc
+  endDatetimeAsc
+  endDatetimeDesc
+  pkAsc
+  pkDesc
+  rejectionReasonAsc
+  rejectionReasonDesc
+  reservationUnitNameAsc
+  reservationUnitNameDesc
+  reservationUnitPkAsc
+  reservationUnitPkDesc
+  unitNameAsc
+  unitNameDesc
+  unitPkAsc
+  unitPkDesc
+}
+
+"""
+An enumeration.
+"""
+enum RejectionReadinessChoice {
+  """
+  Aloitusaika ei sallittu
+  """
+  INTERVAL_NOT_ALLOWED
+  """
+  Päällekkäisiä varauksia
+  """
+  OVERLAPPING_RESERVATIONS
+  """
+  Varausyksikkö suljettu
+  """
+  RESERVATION_UNIT_CLOSED
+}
+
+type ReservableTimeSpanType {
+  endDatetime: DateTime
+  startDatetime: DateTime
+}
+
+input ReservationAdjustTimeMutationInput {
+  begin: DateTime!
+  end: DateTime!
+  pk: Int!
+}
+
+type ReservationAdjustTimeMutationPayload {
+  begin: DateTime
+  end: DateTime
+  pk: Int
+  state: ReservationStateChoice
+}
+
+input ReservationApproveMutationInput {
+  handlingDetails: String!
+  pk: Int!
+  price: Decimal!
+}
+
+type ReservationApproveMutationPayload {
+  handledAt: DateTime
+  handlingDetails: String
+  pk: Int
+  price: Decimal
+  state: ReservationStateChoice
+}
+
+type ReservationCancelReasonNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+  reason: String!
+  reasonEn: String
+  reasonFi: String
+  reasonSv: String
+}
+
+type ReservationCancelReasonNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ReservationCancelReasonNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ReservationCancelReasonNode` and its cursor.
+"""
+type ReservationCancelReasonNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ReservationCancelReasonNode
+}
+
+"""
+Ordering fields for the 'ReservationCancelReason' model.
+"""
+enum ReservationCancelReasonOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+input ReservationCancellationMutationInput {
+  cancelDetails: String
+  cancelReason: Int!
+  pk: Int!
+}
+
+type ReservationCancellationMutationPayload {
+  cancelDetails: String
+  cancelReason: Int
+  pk: Int
+  state: ReservationStateChoice
+}
+
+input ReservationConfirmMutationInput {
+  pk: Int!
+}
+
+type ReservationConfirmMutationPayload {
+  order: PaymentOrderNode
+  pk: Int
+  state: ReservationStateChoice
+}
+
+input ReservationCreateMutationInput {
+  begin: DateTime!
+  end: DateTime!
+  pk: Int
+  reservationUnit: Int!
+}
+
+type ReservationCreateMutationPayload {
+  pk: Int
+}
+
+input ReservationDeleteMutationInput {
+  pk: ID!
+}
+
+type ReservationDeleteMutationPayload {
+  deleted: Boolean
+}
+
+input ReservationDeleteTentativeMutationInput {
+  pk: ID!
+}
+
+"""
+Used only for deleting a reservation before it is confirmed.
+"""
+type ReservationDeleteTentativeMutationPayload {
+  deleted: Boolean
+}
+
+input ReservationDenyMutationInput {
+  denyReason: Int!
+  handlingDetails: String!
+  pk: Int!
+}
+
+type ReservationDenyMutationPayload {
+  denyReason: Int
+  handledAt: DateTime
+  handlingDetails: String
+  pk: Int
+  state: ReservationStateChoice
+}
+
+type ReservationDenyReasonNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+  reason: String!
+  reasonEn: String
+  reasonFi: String
+  reasonSv: String
+}
+
+type ReservationDenyReasonNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ReservationDenyReasonNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ReservationDenyReasonNode` and its cursor.
+"""
+type ReservationDenyReasonNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ReservationDenyReasonNode
+}
+
+"""
+Ordering fields for the 'ReservationDenyReason' model.
+"""
+enum ReservationDenyReasonOrderingChoices {
+  rankAsc
+  rankDesc
+}
+
+"""
+An enumeration.
+"""
+enum ReservationKind {
+  """
+  Suora
+  """
+  DIRECT
+  """
+  Suora ja kausi
+  """
+  DIRECT_AND_SEASON
+  """
+  Kausi
+  """
+  SEASON
+}
+
+type ReservationMetadataFieldNode implements Node {
+  fieldName: String!
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+}
+
+type ReservationMetadataSetNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  pk: Int
+  requiredFields: [ReservationMetadataFieldNode!]!
+  supportedFields: [ReservationMetadataFieldNode!]!
+}
+
+type ReservationMetadataSetNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ReservationMetadataSetNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ReservationMetadataSetNode` and its cursor.
+"""
+type ReservationMetadataSetNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ReservationMetadataSetNode
+}
+
+type ReservationNode implements Node {
+  accessCodeGeneratedAt: DateTime
+  accessCodeIsActive: Boolean!
+  accessCodeShouldBeActive: Boolean
+  accessType: AccessType!
+  """
+  Which reservation units' reserveability is affected by this reservation?
+  """
+  affectedReservationUnits: [Int]
+  ageGroup: AgeGroupNode
+  applyingForFreeOfCharge: Boolean
+  begin: DateTime!
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  bufferTimeAfter: Duration!
+  bufferTimeBefore: Duration!
+  calendarUrl: String
+  cancelDetails: String
+  cancelReason: ReservationCancelReasonNode
+  createdAt: DateTime
+  denyReason: ReservationDenyReasonNode
+  description: String
+  end: DateTime!
+  extUuid: UUID!
+  freeOfChargeReason: String
+  handledAt: DateTime
+  handlingDetails: String
+  homeCity: CityNode
+  """
+  The ID of the object
+  """
+  id: ID!
+  isBlocked: Boolean
+  isHandled: Boolean
+  name: String
+  numPersons: Int
+  order: PaymentOrderNode
+    @deprecated(reason: "Please use to 'paymentOrder' instead.")
+  paymentOrder: [PaymentOrderNode!]!
+  """
+  Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized.
+  """
+  pindoraInfo: PindoraInfoType
+  pk: Int
+  price: Decimal
+  priceNet: Decimal
+  purpose: ReservationPurposeNode
+  recurringReservation: RecurringReservationNode
+  reservationUnits(
+    accessType: [AccessType]
+    accessTypeEndDate: Date
+    accessTypeStartDate: Date
+    applicationRound: [Int]
+    calculateFirstReservableTime: Boolean
+    descriptionEn: String
+    descriptionEn_Icontains: String
+    descriptionFi: String
+    descriptionFi_Icontains: String
+    descriptionSv: String
+    descriptionSv_Icontains: String
+    equipments: [Int]
+    isDraft: Boolean
+    isVisible: Boolean
+    maxPersonsGte: Decimal
+    maxPersonsLte: Decimal
+    minPersonsGte: Decimal
+    minPersonsLte: Decimal
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ReservationUnitOrderingChoices]
+    personsAllowed: Decimal
+    pk: [Int]
+    publishingState: [ReservationUnitPublishingState]
+    purposes: [Int]
+    qualifiers: [Int]
+    rankGte: Decimal
+    rankLte: Decimal
+    reservableDateEnd: Date
+    reservableDateStart: Date
+    reservableMinimumDurationMinutes: Decimal
+    reservableTimeEnd: Time
+    reservableTimeStart: Time
+    reservationKind: String
+    reservationState: [ReservationUnitReservationState]
+    reservationUnitType: [Int]
+    showOnlyReservable: Boolean
+    surfaceAreaGte: Decimal
+    surfaceAreaLte: Decimal
+    textSearch: String
+    tprekDepartmentId: String
+    tprekId: String
+    typeRankGte: Decimal
+    typeRankLte: Decimal
+    unit: [Int]
+  ): [ReservationUnitNode!]!
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLastName: String
+  reserveeName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: CustomerTypeChoice
+  staffEvent: Boolean @deprecated(reason: "Please use to 'type' instead.")
+  state: ReservationStateChoice
+  taxPercentageValue: Decimal
+  type: ReservationTypeChoice
+  unitPrice: Decimal
+  user: UserNode
+  workingMemo: String
+}
+
+type ReservationNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ReservationNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ReservationNode` and its cursor.
+"""
+type ReservationNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ReservationNode
+}
+
+"""
+An enumeration.
+"""
+enum ReservationNotification {
+  """
+  All
+  """
+  ALL
+  """
+  None
+  """
+  NONE
+  """
+  Only Handling Required
+  """
+  ONLY_HANDLING_REQUIRED
+}
+
+"""
+Ordering fields for the 'Reservation' model.
+"""
+enum ReservationOrderingChoices {
+  beginAsc
+  beginDesc
+  createdAtAsc
+  createdAtDesc
+  endAsc
+  endDesc
+  nameAsc
+  nameDesc
+  orderStatusAsc
+  orderStatusDesc
+  pkAsc
+  pkDesc
+  priceAsc
+  priceDesc
+  reservationUnitNameEnAsc
+  reservationUnitNameEnDesc
+  reservationUnitNameFiAsc
+  reservationUnitNameFiDesc
+  reservationUnitNameSvAsc
+  reservationUnitNameSvDesc
+  reserveeNameAsc
+  reserveeNameDesc
+  stateAsc
+  stateDesc
+  unitNameEnAsc
+  unitNameEnDesc
+  unitNameFiAsc
+  unitNameFiDesc
+  unitNameSvAsc
+  unitNameSvDesc
+}
+
+type ReservationPurposeNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+  rank: Int!
+}
+
+type ReservationPurposeNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ReservationPurposeNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ReservationPurposeNode` and its cursor.
+"""
+type ReservationPurposeNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ReservationPurposeNode
+}
+
+"""
+Ordering fields for the 'ReservationPurpose' model.
+"""
+enum ReservationPurposeOrderingChoices {
+  nameEnAsc
+  nameEnDesc
+  nameFiAsc
+  nameFiDesc
+  nameSvAsc
+  nameSvDesc
+  rankAsc
+  rankDesc
+}
+
+input ReservationRefundMutationInput {
+  pk: Int!
+}
+
+type ReservationRefundMutationPayload {
+  pk: Int
+}
+
+input ReservationRequiresHandlingMutationInput {
+  pk: Int!
+}
+
+type ReservationRequiresHandlingMutationPayload {
+  pk: Int
+  state: ReservationStateChoice
+}
+
+input ReservationSeriesAddMutationInput {
+  begin: DateTime!
+  bufferTimeAfter: String
+  bufferTimeBefore: String
+  end: DateTime!
+  pk: Int!
+}
+
+type ReservationSeriesAddMutationPayload {
+  pk: Int
+}
+
+input ReservationSeriesCreateMutationInput {
+  abilityGroup: Int
+  ageGroup: Int
+  beginDate: Date!
+  beginTime: Time!
+  checkOpeningHours: Boolean
+  description: String
+  endDate: Date!
+  endTime: Time!
+  name: String
+  pk: Int
+  recurrenceInDays: Int!
+  reservationDetails: ReservationSeriesReservationCreateSerializerInput!
+  reservationUnit: Int!
+  skipDates: [Date]
+  weekdays: [Int]!
+}
+
+type ReservationSeriesCreateMutationPayload {
+  abilityGroup: Int
+  ageGroup: Int
+  beginDate: Date
+  beginTime: Time
+  description: String
+  endDate: Date
+  endTime: Time
+  name: String
+  pk: Int
+  recurrenceInDays: Int
+  reservationUnit: Int
+  weekdays: [Int]
+}
+
+input ReservationSeriesDenyMutationInput {
+  denyReason: Int!
+  handlingDetails: String
+  pk: Int!
+}
+
+type ReservationSeriesDenyMutationPayload {
+  denied: Int
+  future: Int
+}
+
+input ReservationSeriesRescheduleMutationInput {
+  beginDate: Date
+  beginTime: Time
+  bufferTimeAfter: String
+  bufferTimeBefore: String
+  endDate: Date
+  endTime: Time
+  pk: Int!
+  skipDates: [Date]
+  weekdays: [Int]
+}
+
+type ReservationSeriesRescheduleMutationPayload {
+  beginDate: Date
+  beginTime: Time
+  endDate: Date
+  endTime: Time
+  pk: Int
+  weekdays: [Int]
+}
+
+input ReservationSeriesReservationCreateSerializerInput {
+  ageGroup: Int
+  applyingForFreeOfCharge: Boolean
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  confirmedAt: DateTime
+  description: String
+  freeOfChargeReason: String
+  handledAt: DateTime
+  homeCity: Int
+  name: String
+  numPersons: Int
+  purpose: Int
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLastName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: ReserveeType
+  state: ReservationStateChoice
+  type: ReservationTypeStaffChoice!
+  user: Int!
+  workingMemo: String
+}
+
+input ReservationSeriesUpdateMutationInput {
+  ageGroup: Int
+  description: String
+  name: String
+  pk: Int!
+  reservationDetails: UpdateReservationSeriesReservationUpdateSerializerInput
+  skipReservations: [Int]
+}
+
+type ReservationSeriesUpdateMutationPayload {
+  ageGroup: Int
+  description: String
+  name: String
+  pk: Int
+}
+
+input ReservationStaffAdjustTimeMutationInput {
+  begin: DateTime
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  end: DateTime
+  pk: Int!
+}
+
+type ReservationStaffAdjustTimeMutationPayload {
+  begin: DateTime
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  end: DateTime
+  pk: Int
+  state: ReservationStateChoice
+}
+
+input ReservationStaffChangeAccessCodeMutationInput {
+  pk: Int!
+}
+
+type ReservationStaffChangeAccessCodeMutationPayload {
+  accessCodeGeneratedAt: DateTime
+  accessCodeIsActive: Boolean
+  pk: Int
+}
+
+input ReservationStaffCreateMutationInput {
+  ageGroup: Int
+  applyingForFreeOfCharge: Boolean
+  begin: DateTime!
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  description: String
+  end: DateTime!
+  freeOfChargeReason: String
+  homeCity: Int
+  name: String
+  numPersons: Int
+  pk: Int
+  purpose: Int
+  reservationUnit: Int!
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLastName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: CustomerTypeChoice
+  type: ReservationTypeChoice!
+  workingMemo: String
+}
+
+type ReservationStaffCreateMutationPayload {
+  ageGroup: Int
+  applyingForFreeOfCharge: Boolean
+  begin: DateTime
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  confirmedAt: DateTime
+  description: String
+  end: DateTime
+  freeOfChargeReason: String
+  handledAt: DateTime
+  homeCity: Int
+  name: String
+  numPersons: Int
+  pk: Int
+  purpose: Int
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLastName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: CustomerTypeChoice
+  state: ReservationStateChoice
+  type: ReservationTypeChoice
+  workingMemo: String
+}
+
+input ReservationStaffModifyMutationInput {
+  ageGroup: Int
+  applyingForFreeOfCharge: Boolean
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  description: String
+  freeOfChargeReason: String
+  homeCity: Int
+  name: String
+  numPersons: Int
+  pk: Int!
+  purpose: Int
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLastName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: CustomerTypeChoice
+  type: ReservationTypeChoice
+}
+
+type ReservationStaffModifyMutationPayload {
+  ageGroup: Int
+  applyingForFreeOfCharge: Boolean
+  begin: DateTime
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  confirmedAt: DateTime
+  description: String
+  end: DateTime
+  freeOfChargeReason: String
+  homeCity: Int
+  name: String
+  nonSubsidisedPrice: Decimal
+  nonSubsidisedPriceNet: String
+  numPersons: Int
+  pk: Int
+  price: Decimal
+  priceNet: String
+  purpose: Int
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLastName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: CustomerTypeChoice
+  state: ReservationStateChoice
+  taxPercentageValue: Decimal
+  type: ReservationTypeChoice
+  unitPrice: Decimal
+}
+
+input ReservationStaffRepairAccessCodeMutationInput {
+  pk: Int!
+}
+
+type ReservationStaffRepairAccessCodeMutationPayload {
+  accessCodeGeneratedAt: DateTime
+  accessCodeIsActive: Boolean
+  pk: Int
+}
+
+"""
+An enumeration.
+"""
+enum ReservationStartInterval {
+  """
+  15 minuuttia
+  """
+  INTERVAL_15_MINS
+  """
+  30 minuuttia
+  """
+  INTERVAL_30_MINS
+  """
+  60 minuuttia
+  """
+  INTERVAL_60_MINS
+  """
+  90 minuuttia
+  """
+  INTERVAL_90_MINS
+  """
+  2 tuntia
+  """
+  INTERVAL_120_MINS
+  """
+  3 tuntia
+  """
+  INTERVAL_180_MINS
+  """
+  4 tuntia
+  """
+  INTERVAL_240_MINS
+  """
+  5 tuntia
+  """
+  INTERVAL_300_MINS
+  """
+  6 tuntia
+  """
+  INTERVAL_360_MINS
+  """
+  7 tuntia
+  """
+  INTERVAL_420_MINS
+}
+
+"""
+An enumeration.
+"""
+enum ReservationStateChoice {
+  CANCELLED
+  CONFIRMED
+  CREATED
+  DENIED
+  REQUIRES_HANDLING
+  WAITING_FOR_PAYMENT
+}
+
+"""
+An enumeration.
+"""
+enum ReservationTypeChoice {
+  BEHALF
+  BLOCKED
+  NORMAL
+  SEASONAL
+  STAFF
+}
+
+"""
+An enumeration.
+"""
+enum ReservationTypeStaffChoice {
+  """
+  Puolesta
+  """
+  BEHALF
+  """
+  Suljettu
+  """
+  BLOCKED
+  """
+  Henkilökunta
+  """
+  STAFF
+}
+
+"""
+This Node should be kept to the bare minimum and never expose any relations to avoid performance issues.
+"""
+type ReservationUnitAllNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type ReservationUnitCancellationRuleNode implements Node {
+  canBeCancelledTimeBefore: Duration
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+}
+
+type ReservationUnitCancellationRuleNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ReservationUnitCancellationRuleNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ReservationUnitCancellationRuleNode` and its cursor.
+"""
+type ReservationUnitCancellationRuleNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ReservationUnitCancellationRuleNode
+}
+
+"""
+Ordering fields for the 'ReservationUnitCancellationRule' model.
+"""
+enum ReservationUnitCancellationRuleOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+input ReservationUnitCreateMutationInput {
+  accessType: AccessType
+  accessTypeEndDate: Date
+  accessTypeStartDate: Date
+  allowReservationsWithoutOpeningHours: Boolean
+  applicationRoundTimeSlots: [ApplicationRoundTimeSlotSerializerInput]
+  authentication: Authentication
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  canApplyFreeOfCharge: Boolean
+  cancellationRule: Int
+  cancellationTerms: String
+  contactInformation: String
+  description: String
+  descriptionEn: String
+  descriptionFi: String
+  descriptionSv: String
+  equipments: [Int]
+  images: [ReservationUnitImageFieldSerializerInput]
+  isArchived: Boolean
+  isDraft: Boolean
+  maxPersons: Int
+  maxReservationDuration: Duration
+  maxReservationsPerUser: Int
+  metadataSet: Int
+  minPersons: Int
+  minReservationDuration: Duration
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  paymentTerms: String
+  paymentTypes: [String]
+  pk: Int
+  pricingTerms: String
+  pricings: [ReservationUnitPricingSerializerInput]
+  publishBegins: DateTime
+  publishEnds: DateTime
+  purposes: [Int]
+  qualifiers: [Int]
+  requireAdultReservee: Boolean
+  requireReservationHandling: Boolean
+  reservationBegins: DateTime
+  reservationBlockWholeDay: Boolean
+  reservationCancelledInstructions: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructions: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsSv: String
+  reservationEnds: DateTime
+  reservationKind: ReservationKind
+  reservationPendingInstructions: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsSv: String
+  reservationStartInterval: ReservationStartInterval
+  reservationUnitType: Int
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
+  resources: [Int]
+  searchTerms: [String]
+  serviceSpecificTerms: String
+  spaces: [Int]
+  surfaceArea: Int
+  termsOfUse: String
+  termsOfUseEn: String
+  termsOfUseFi: String
+  termsOfUseSv: String
+  unit: Int
+}
+
+type ReservationUnitCreateMutationPayload {
+  accessType: AccessType
+  accessTypeEndDate: Date
+  accessTypeStartDate: Date
+  allowReservationsWithoutOpeningHours: Boolean
+  applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
+  authentication: Authentication
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  canApplyFreeOfCharge: Boolean
+  cancellationRule: Int
+  cancellationTerms: String
+  contactInformation: String
+  description: String
+  descriptionEn: String
+  descriptionFi: String
+  descriptionSv: String
+  equipments: [Int]
+  images: [ReservationUnitImageNode]
+  isArchived: Boolean
+  isDraft: Boolean
+  maxPersons: Int
+  maxReservationDuration: Duration
+  maxReservationsPerUser: Int
+  metadataSet: Int
+  minPersons: Int
+  minReservationDuration: Duration
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  paymentTerms: String
+  paymentTypes: [String]
+  pk: Int
+  pricingTerms: String
+  pricings: [ReservationUnitPricingNode]
+  publishBegins: DateTime
+  publishEnds: DateTime
+  publishingState: String
+  purposes: [Int]
+  qualifiers: [Int]
+  requireAdultReservee: Boolean
+  requireReservationHandling: Boolean
+  reservationBegins: DateTime
+  reservationBlockWholeDay: Boolean
+  reservationCancelledInstructions: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructions: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsSv: String
+  reservationEnds: DateTime
+  reservationKind: ReservationKind
+  reservationPendingInstructions: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsSv: String
+  reservationStartInterval: ReservationStartInterval
+  reservationUnitType: Int
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
+  resources: [Int]
+  searchTerms: [String]
+  serviceSpecificTerms: String
+  spaces: [Int]
+  surfaceArea: Int
+  termsOfUse: String
+  termsOfUseEn: String
+  termsOfUseFi: String
+  termsOfUseSv: String
+  unit: Int
+  uuid: String
+}
+
+input ReservationUnitImageCreateMutationInput {
+  image: Upload!
+  imageType: ImageType!
+  pk: Int
+  reservationUnit: Int!
+}
+
+type ReservationUnitImageCreateMutationPayload {
+  imageType: ImageType
+  pk: Int
+  reservationUnit: Int
+}
+
+input ReservationUnitImageDeleteMutationInput {
+  pk: ID!
+}
+
+type ReservationUnitImageDeleteMutationPayload {
+  deleted: Boolean
+}
+
+input ReservationUnitImageFieldSerializerInput {
+  imageType: ImageType!
+  imageUrl: Upload!
+  largeUrl: String
+  mediumUrl: String
+  smallUrl: String
+}
+
+type ReservationUnitImageNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  imageType: ImageType!
+  imageUrl: String
+  largeUrl: String
+  mediumUrl: String
+  pk: Int
+  smallUrl: String
+}
+
+input ReservationUnitImageUpdateMutationInput {
+  imageType: ImageType
+  pk: Int!
+}
+
+type ReservationUnitImageUpdateMutationPayload {
+  imageType: ImageType
+  pk: Int
+}
+
+type ReservationUnitNode implements Node {
+  accessType: AccessType!
+  accessTypeEndDate: Date
+  accessTypeStartDate: Date
+  allowReservationsWithoutOpeningHours: Boolean!
+  applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode!]!
+  applicationRounds(
+    active: Boolean
+    name: String
+    ongoing: Boolean
+    onlyWithPermissions: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ApplicationRoundOrderingChoices]
+    pk: [Int]
+  ): [ApplicationRoundNode!]!
+  authentication: Authentication!
+  bufferTimeAfter: Duration!
+  bufferTimeBefore: Duration!
+  calculatedSurfaceArea: Int
+  canApplyFreeOfCharge: Boolean!
+  cancellationRule: ReservationUnitCancellationRuleNode
+  cancellationTerms: TermsOfUseNode
+  contactInformation: String!
+  currentAccessType: AccessType
+  description: String!
+  descriptionEn: String
+  descriptionFi: String
+  descriptionSv: String
+  equipments(
+    name: String
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    name_Icontains: String
+    name_Istartswith: String
+    """
+    Järjestä
+    """
+    orderBy: [EquipmentOrderingChoices]
+    pk: [Int]
+    rankGte: Decimal
+    rankLte: Decimal
+  ): [EquipmentNode!]!
+  firstReservableDatetime: DateTime
+  haukiUrl: String
+  """
+  The ID of the object
+  """
+  id: ID!
+  images: [ReservationUnitImageNode!]!
+  isArchived: Boolean!
+  isClosed: Boolean
+  isDraft: Boolean!
+  location: LocationNode
+  maxPersons: Int
+  maxReservationDuration: Duration
+  maxReservationsPerUser: Int
+  metadataSet: ReservationMetadataSetNode
+  minPersons: Int
+  minReservationDuration: Duration
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  numActiveUserReservations: Int
+  paymentMerchant: PaymentMerchantNode
+  paymentProduct: PaymentProductNode
+  paymentTerms: TermsOfUseNode
+  paymentTypes: [ReservationUnitPaymentTypeNode!]!
+  pk: Int
+  pricingTerms: TermsOfUseNode
+  pricings: [ReservationUnitPricingNode!]!
+  publishBegins: DateTime
+  publishEnds: DateTime
+  publishingState: ReservationUnitPublishingState
+  purposes(
+    nameEn: String
+    nameFi: String
+    nameSv: String
+    """
+    Järjestä
+    """
+    orderBy: [PurposeOrderingChoices]
+    pk: [Int]
+  ): [PurposeNode!]!
+  qualifiers(
+    nameEn: String
+    nameFi: String
+    nameSv: String
+    """
+    Järjestä
+    """
+    orderBy: [QualifierOrderingChoices]
+    pk: [Int]
+  ): [QualifierNode!]!
+  rank: Int!
+  requireAdultReservee: Boolean!
+  requireReservationHandling: Boolean!
+  reservableTimeSpans(
+    endDate: Date!
+    startDate: Date!
+  ): [ReservableTimeSpanType]
+  reservationBegins: DateTime
+  reservationBlockWholeDay: Boolean!
+  reservationCancelledInstructions: String!
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructions: String!
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsSv: String
+  reservationEnds: DateTime
+  reservationKind: ReservationKind!
+  reservationPendingInstructions: String!
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsSv: String
+  reservationStartInterval: ReservationStartInterval!
+  reservationState: ReservationUnitReservationState
+  reservationUnitType: ReservationUnitTypeNode
+  reservations(
+    applyingForFreeOfCharge: Boolean
+    beginDate: Date
+    createdAtGte: Date
+    createdAtLte: Date
+    endDate: Date
+    isRecurring: Boolean
+    onlyWithHandlingPermission: Boolean
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ReservationOrderingChoices]
+    orderStatus: [OrderStatusWithFree]
+    priceGte: Decimal
+    priceLte: Decimal
+    recurringReservation: [Int]
+    requested: Boolean
+    reservationType: [ReservationTypeChoice]
+    reservationUnitNameEn: String
+    reservationUnitNameFi: String
+    reservationUnitNameSv: String
+    reservationUnitType: [Int]
+    reservationUnits: [Int]
+    state: [ReservationStateChoice]
+    textSearch: String
+    unit: [Int]
+    user: [Int]
+  ): [ReservationNode!]
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
+  resources(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ResourceOrderingChoices]
+    pk: [Int]
+  ): [ResourceNode!]!
+  searchTerms: [String!]!
+  serviceSpecificTerms: TermsOfUseNode
+  spaces(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [SpaceOrderingChoices]
+    pk: [Int]
+  ): [SpaceNode!]!
+  surfaceArea: Int
+  termsOfUse: String
+  termsOfUseEn: String
+  termsOfUseFi: String
+  termsOfUseSv: String
+  unit: UnitNode
+  uuid: UUID!
+}
+
+type ReservationUnitNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ReservationUnitNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ReservationUnitNode` and its cursor.
+"""
+type ReservationUnitNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ReservationUnitNode
+}
+
+input ReservationUnitOptionApplicantSerializerInput {
+  pk: Int
+  preferredOrder: Int!
+  reservationUnit: Int!
+}
+
+type ReservationUnitOptionNode implements Node {
+  allocatedTimeSlots(
+    allocatedReservationUnit: [Int]
+    allocatedUnit: [Int]
+    applicantType: [ApplicantTypeChoice]
+    applicationRound: Int
+    applicationSectionStatus: [ApplicationSectionStatusChoice]
+    dayOfTheWeek: [Weekday]
+    """
+    Järjestä
+    """
+    orderBy: [AllocatedTimeSlotOrderingChoices]
+    pk: [Int]
+    textSearch: String
+  ): [AllocatedTimeSlotNode!]!
+  applicationSection: ApplicationSectionNode!
+  """
+  The ID of the object
+  """
+  id: ID!
+  locked: Boolean!
+  pk: Int
+  preferredOrder: Int!
+  rejected: Boolean!
+  reservationUnit: ReservationUnitNode!
+}
+
+"""
+Ordering fields for the 'ReservationUnitOption' model.
+"""
+enum ReservationUnitOptionOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+input ReservationUnitOptionUpdateMutationInput {
+  locked: Boolean
+  pk: Int!
+  rejected: Boolean
+}
+
+type ReservationUnitOptionUpdateMutationPayload {
+  locked: Boolean
+  pk: Int
+  rejected: Boolean
+}
+
+"""
+Ordering fields for the 'ReservationUnit' model.
+"""
+enum ReservationUnitOrderingChoices {
+  maxPersonsAsc
+  maxPersonsDesc
+  nameEnAsc
+  nameEnDesc
+  nameFiAsc
+  nameFiDesc
+  nameSvAsc
+  nameSvDesc
+  pkAsc
+  pkDesc
+  rankAsc
+  rankDesc
+  surfaceAreaAsc
+  surfaceAreaDesc
+  typeEnAsc
+  typeEnDesc
+  typeFiAsc
+  typeFiDesc
+  typeRankAsc
+  typeRankDesc
+  typeSvAsc
+  typeSvDesc
+  unitNameEnAsc
+  unitNameEnDesc
+  unitNameFiAsc
+  unitNameFiDesc
+  unitNameSvAsc
+  unitNameSvDesc
+}
+
+type ReservationUnitPaymentTypeNode implements Node {
+  code: String!
+  """
+  The ID of the object
+  """
+  id: ID!
+}
+
+type ReservationUnitPricingNode implements Node {
+  begins: Date!
+  highestPrice: Decimal!
+  highestPriceNet: Decimal
+  """
+  The ID of the object
+  """
+  id: ID!
+  lowestPrice: Decimal!
+  lowestPriceNet: Decimal
+  pk: Int
+  priceUnit: PriceUnit!
+  taxPercentage: TaxPercentageNode!
+}
+
+input ReservationUnitPricingSerializerInput {
+  begins: Date!
+  highestPrice: Decimal
+  highestPriceNet: String
+  isActivatedOnBegins: Boolean
+  lowestPrice: Decimal
+  lowestPriceNet: String
+  pk: Int
+  priceUnit: PriceUnit
+  taxPercentage: Int
+}
+
+"""
+An enumeration.
+"""
+enum ReservationUnitPublishingState {
+  ARCHIVED
+  DRAFT
+  HIDDEN
+  PUBLISHED
+  SCHEDULED_HIDING
+  SCHEDULED_PERIOD
+  SCHEDULED_PUBLISHING
+}
+
+"""
+An enumeration.
+"""
+enum ReservationUnitReservationState {
+  RESERVABLE
+  RESERVATION_CLOSED
+  SCHEDULED_CLOSING
+  SCHEDULED_PERIOD
+  SCHEDULED_RESERVATION
+}
+
+type ReservationUnitTypeNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+  rank: Int!
+}
+
+type ReservationUnitTypeNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ReservationUnitTypeNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ReservationUnitTypeNode` and its cursor.
+"""
+type ReservationUnitTypeNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ReservationUnitTypeNode
+}
+
+"""
+Ordering fields for the 'ReservationUnitType' model.
+"""
+enum ReservationUnitTypeOrderingChoices {
+  nameEnAsc
+  nameEnDesc
+  nameFiAsc
+  nameFiDesc
+  nameSvAsc
+  nameSvDesc
+  rankAsc
+  rankDesc
+}
+
+input ReservationUnitUpdateMutationInput {
+  accessType: AccessType
+  accessTypeEndDate: Date
+  accessTypeStartDate: Date
+  allowReservationsWithoutOpeningHours: Boolean
+  applicationRoundTimeSlots: [UpdateApplicationRoundTimeSlotSerializerInput]
+  authentication: Authentication
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  canApplyFreeOfCharge: Boolean
+  cancellationRule: Int
+  cancellationTerms: String
+  contactInformation: String
+  description: String
+  descriptionEn: String
+  descriptionFi: String
+  descriptionSv: String
+  equipments: [Int]
+  images: [UpdateReservationUnitImageFieldSerializerInput]
+  isArchived: Boolean
+  isDraft: Boolean
+  maxPersons: Int
+  maxReservationDuration: Duration
+  maxReservationsPerUser: Int
+  metadataSet: Int
+  minPersons: Int
+  minReservationDuration: Duration
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  paymentTerms: String
+  paymentTypes: [String]
+  pk: Int!
+  pricingTerms: String
+  pricings: [UpdateReservationUnitPricingSerializerInput]
+  publishBegins: DateTime
+  publishEnds: DateTime
+  purposes: [Int]
+  qualifiers: [Int]
+  requireAdultReservee: Boolean
+  requireReservationHandling: Boolean
+  reservationBegins: DateTime
+  reservationBlockWholeDay: Boolean
+  reservationCancelledInstructions: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructions: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsSv: String
+  reservationEnds: DateTime
+  reservationKind: ReservationKind
+  reservationPendingInstructions: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsSv: String
+  reservationStartInterval: ReservationStartInterval
+  reservationUnitType: Int
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
+  resources: [Int]
+  searchTerms: [String]
+  serviceSpecificTerms: String
+  spaces: [Int]
+  surfaceArea: Int
+  termsOfUse: String
+  termsOfUseEn: String
+  termsOfUseFi: String
+  termsOfUseSv: String
+  unit: Int
+}
+
+type ReservationUnitUpdateMutationPayload {
+  accessType: AccessType
+  accessTypeEndDate: Date
+  accessTypeStartDate: Date
+  allowReservationsWithoutOpeningHours: Boolean
+  applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode]
+  authentication: Authentication
+  bufferTimeAfter: Duration
+  bufferTimeBefore: Duration
+  canApplyFreeOfCharge: Boolean
+  cancellationRule: Int
+  cancellationTerms: String
+  contactInformation: String
+  description: String
+  descriptionEn: String
+  descriptionFi: String
+  descriptionSv: String
+  equipments: [Int]
+  images: [ReservationUnitImageNode]
+  isArchived: Boolean
+  isDraft: Boolean
+  maxPersons: Int
+  maxReservationDuration: Duration
+  maxReservationsPerUser: Int
+  metadataSet: Int
+  minPersons: Int
+  minReservationDuration: Duration
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  paymentTerms: String
+  paymentTypes: [String]
+  pk: Int
+  pricingTerms: String
+  pricings: [ReservationUnitPricingNode]
+  publishBegins: DateTime
+  publishEnds: DateTime
+  publishingState: String
+  purposes: [Int]
+  qualifiers: [Int]
+  requireAdultReservee: Boolean
+  requireReservationHandling: Boolean
+  reservationBegins: DateTime
+  reservationBlockWholeDay: Boolean
+  reservationCancelledInstructions: String
+  reservationCancelledInstructionsEn: String
+  reservationCancelledInstructionsFi: String
+  reservationCancelledInstructionsSv: String
+  reservationConfirmedInstructions: String
+  reservationConfirmedInstructionsEn: String
+  reservationConfirmedInstructionsFi: String
+  reservationConfirmedInstructionsSv: String
+  reservationEnds: DateTime
+  reservationKind: ReservationKind
+  reservationPendingInstructions: String
+  reservationPendingInstructionsEn: String
+  reservationPendingInstructionsFi: String
+  reservationPendingInstructionsSv: String
+  reservationStartInterval: ReservationStartInterval
+  reservationUnitType: Int
+  reservationsMaxDaysBefore: Int
+  reservationsMinDaysBefore: Int
+  resources: [Int]
+  searchTerms: [String]
+  serviceSpecificTerms: String
+  spaces: [Int]
+  surfaceArea: Int
+  termsOfUse: String
+  termsOfUseEn: String
+  termsOfUseFi: String
+  termsOfUseSv: String
+  unit: Int
+  uuid: String
+}
+
+input ReservationUpdateMutationInput {
+  ageGroup: Int
+  applyingForFreeOfCharge: Boolean
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  description: String
+  freeOfChargeReason: String
+  homeCity: Int
+  name: String
+  numPersons: Int
+  pk: Int!
+  purpose: Int
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLastName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: CustomerTypeChoice
+}
+
+type ReservationUpdateMutationPayload {
+  ageGroup: Int
+  applyingForFreeOfCharge: Boolean
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  description: String
+  freeOfChargeReason: String
+  homeCity: Int
+  name: String
+  numPersons: Int
+  pk: Int
+  purpose: Int
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLastName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: CustomerTypeChoice
+  state: ReservationStateChoice
+}
+
+input ReservationWorkingMemoMutationInput {
+  pk: Int!
+  workingMemo: String!
+}
+
+type ReservationWorkingMemoMutationPayload {
+  pk: Int
+  workingMemo: String
+}
+
+"""
+An enumeration.
+"""
+enum ReserveeType {
+  """
+  Yritys
+  """
+  BUSINESS
+  """
+  Yksityinen
+  """
+  INDIVIDUAL
+  """
+  Voittoa tavoittelematon
+  """
+  NONPROFIT
+}
+
+input ResourceCreateMutationInput {
+  locationType: LocationType
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+  space: Int
+}
+
+type ResourceCreateMutationPayload {
+  locationType: LocationType
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+  space: Int
+}
+
+input ResourceDeleteMutationInput {
+  pk: ID!
+}
+
+type ResourceDeleteMutationPayload {
+  deleted: Boolean
+}
+
+"""
+An enumeration.
+"""
+enum ResourceLocationType {
+  FIXED
+  MOVABLE
+}
+
+type ResourceNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  locationType: ResourceLocationType
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+  space: SpaceNode
+}
+
+type ResourceNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [ResourceNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `ResourceNode` and its cursor.
+"""
+type ResourceNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: ResourceNode
+}
+
+"""
+Ordering fields for the 'Resource' model.
+"""
+enum ResourceOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+input ResourceUpdateMutationInput {
+  locationType: LocationType
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int!
+  space: Int
+}
+
+type ResourceUpdateMutationPayload {
+  locationType: LocationType
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+  space: Int
+}
+
+input RestoreAllApplicationOptionsMutationInput {
+  pk: Int!
+}
+
+type RestoreAllApplicationOptionsMutationPayload {
+  pk: Int
+}
+
+input RestoreAllSectionOptionsMutationInput {
+  pk: Int!
+}
+
+type RestoreAllSectionOptionsMutationPayload {
+  pk: Int
+}
+
+input SetApplicationRoundHandledMutationInput {
+  pk: Int!
+}
+
+type SetApplicationRoundHandledMutationPayload {
+  pk: Int
+}
+
+input SetApplicationRoundResultsSentMutationInput {
+  pk: Int!
+}
+
+type SetApplicationRoundResultsSentMutationPayload {
+  pk: Int
+}
+
+input SpaceCreateMutationInput {
+  code: String
+  maxPersons: Int
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  parent: Int
+  pk: Int
+  surfaceArea: Int
+  unit: Int
+}
+
+type SpaceCreateMutationPayload {
+  code: String
+  maxPersons: Int
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  parent: Int
+  pk: Int
+  surfaceArea: Int
+  unit: Int
+}
+
+input SpaceDeleteMutationInput {
+  pk: ID!
+}
+
+type SpaceDeleteMutationPayload {
+  deleted: Boolean
+}
+
+type SpaceNode implements Node {
+  children(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [SpaceOrderingChoices]
+    pk: [Int]
+  ): [SpaceNode!]
+  code: String!
+  """
+  The ID of the object
+  """
+  id: ID!
+  maxPersons: Int
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  parent: SpaceNode
+  pk: Int
+  resources(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ResourceOrderingChoices]
+    pk: [Int]
+  ): [ResourceNode!]!
+  surfaceArea: Int
+  unit: UnitNode
+}
+
+type SpaceNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [SpaceNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `SpaceNode` and its cursor.
+"""
+type SpaceNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: SpaceNode
+}
+
+"""
+Ordering fields for the 'Space' model.
+"""
+enum SpaceOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+input SpaceUpdateMutationInput {
+  code: String
+  maxPersons: Int
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  parent: Int
+  pk: Int!
+  surfaceArea: Int
+  unit: Int
+}
+
+type SpaceUpdateMutationPayload {
+  code: String
+  maxPersons: Int
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  parent: Int
+  pk: Int
+  surfaceArea: Int
+  unit: Int
+}
+
+"""
+An enumeration.
+"""
+enum Status {
+  """
+  Peruttu
+  """
+  CANCELLED
+  """
+  Luonnos
+  """
+  DRAFT
+  """
+  Rauennut
+  """
+  EXPIRED
+  """
+  Käsitelty
+  """
+  HANDLED
+  """
+  Käsittelyssä
+  """
+  IN_ALLOCATION
+  """
+  Vastaanotettu
+  """
+  RECEIVED
+  """
+  Päätökset lähetetty
+  """
+  RESULT_SENT
+}
+
+type SuitableTimeRangeNode implements Node {
+  applicationSection: ApplicationSectionNode!
+  beginTime: Time!
+  dayOfTheWeek: Weekday!
+  endTime: Time!
+  fulfilled: Boolean
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+  priority: Priority!
+}
+
+"""
+Ordering fields for the 'SuitableTimeRange' model.
+"""
+enum SuitableTimeRangeOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+input SuitableTimeRangeSerializerInput {
+  beginTime: Time!
+  dayOfTheWeek: Weekday!
+  endTime: Time!
+  pk: Int
+  priority: Priority!
+}
+
+type TaxPercentageNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  pk: Int
+  value: Decimal!
+}
+
+type TaxPercentageNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [TaxPercentageNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `TaxPercentageNode` and its cursor.
+"""
+type TaxPercentageNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: TaxPercentageNode
+}
+
+"""
+Ordering fields for the 'TaxPercentage' model.
+"""
+enum TaxPercentageOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+type TermsOfUseNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: String
+  termsType: TermsType!
+  text: String!
+  textEn: String
+  textFi: String
+  textSv: String
+}
+
+type TermsOfUseNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [TermsOfUseNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `TermsOfUseNode` and its cursor.
+"""
+type TermsOfUseNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: TermsOfUseNode
+}
+
+"""
+Ordering fields for the 'TermsOfUse' model.
+"""
+enum TermsOfUseOrderingChoices {
+  pkAsc
+  pkDesc
+}
+
+"""
+An enumeration.
+"""
+enum TermsType {
+  """
+  Peruutusehdot
+  """
+  CANCELLATION_TERMS
+  """
+  Yleiset ehdot
+  """
+  GENERIC_TERMS
+  """
+  Maksuehdot
+  """
+  PAYMENT_TERMS
+  """
+  Hinnoitteluehdot
+  """
+  PRICING_TERMS
+  """
+  Kausivarauksen ehdot
+  """
+  RECURRING_TERMS
+  """
+  Palvelukohtaiset ehdot
+  """
+  SERVICE_TERMS
+}
+
+"""
+Time scalar that can parse time-strings from database.
+"""
+scalar Time
+
+input TimeSlotSerializerInput {
+  begin: Time!
+  end: Time!
+}
+
+type TimeSlotType {
+  begin: Time!
+  end: Time!
+}
+
+"""
+Leverages the internal Python implementation of UUID (uuid.UUID) to provide native UUID objects
+in fields, resolvers and input.
+"""
+scalar UUID
+
+"""
+This Node should be kept to the bare minimum and never expose any relations to avoid performance issues.
+"""
+type UnitAllNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+  tprekId: String
+}
+
+type UnitGroupNode implements Node {
+  """
+  The ID of the object
+  """
+  id: ID!
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  pk: Int
+  units(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyDirectBookable: Boolean
+    onlySeasonalBookable: Boolean
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [UnitOrderingChoices]
+    ownReservations: Boolean
+    pk: [Int]
+    publishedReservationUnits: Boolean
+  ): [UnitNode!]!
+}
+
+type UnitGroupNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [UnitGroupNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `UnitGroupNode` and its cursor.
+"""
+type UnitGroupNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: UnitGroupNode
+}
+
+type UnitNode implements Node {
+  description: String!
+  descriptionEn: String
+  descriptionFi: String
+  descriptionSv: String
+  email: String!
+  """
+  The ID of the object
+  """
+  id: ID!
+  location: LocationNode
+  name: String!
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  paymentMerchant: PaymentMerchantNode
+  phone: String!
+  pk: Int
+  reservationUnits(
+    accessType: [AccessType]
+    accessTypeEndDate: Date
+    accessTypeStartDate: Date
+    applicationRound: [Int]
+    calculateFirstReservableTime: Boolean
+    descriptionEn: String
+    descriptionEn_Icontains: String
+    descriptionFi: String
+    descriptionFi_Icontains: String
+    descriptionSv: String
+    descriptionSv_Icontains: String
+    equipments: [Int]
+    isDraft: Boolean
+    isVisible: Boolean
+    maxPersonsGte: Decimal
+    maxPersonsLte: Decimal
+    minPersonsGte: Decimal
+    minPersonsLte: Decimal
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [ReservationUnitOrderingChoices]
+    personsAllowed: Decimal
+    pk: [Int]
+    publishingState: [ReservationUnitPublishingState]
+    purposes: [Int]
+    qualifiers: [Int]
+    rankGte: Decimal
+    rankLte: Decimal
+    reservableDateEnd: Date
+    reservableDateStart: Date
+    reservableMinimumDurationMinutes: Decimal
+    reservableTimeEnd: Time
+    reservableTimeStart: Time
+    reservationKind: String
+    reservationState: [ReservationUnitReservationState]
+    reservationUnitType: [Int]
+    showOnlyReservable: Boolean
+    surfaceAreaGte: Decimal
+    surfaceAreaLte: Decimal
+    textSearch: String
+    tprekDepartmentId: String
+    tprekId: String
+    typeRankGte: Decimal
+    typeRankLte: Decimal
+    unit: [Int]
+  ): [ReservationUnitNode!]!
+  shortDescription: String!
+  shortDescriptionEn: String
+  shortDescriptionFi: String
+  shortDescriptionSv: String
+  spaces(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [SpaceOrderingChoices]
+    pk: [Int]
+  ): [SpaceNode!]!
+  tprekId: String
+  unitGroups: [UnitGroupNode!]!
+  webPage: String!
+}
+
+type UnitNodeConnection {
+  """
+  Contains the nodes in this connection.
+  """
+  edges: [UnitNodeEdge]!
+  """
+  Pagination data for this connection.
+  """
+  pageInfo: PageInfo!
+  totalCount: Int
+}
+
+"""
+A Relay edge containing a `UnitNode` and its cursor.
+"""
+type UnitNodeEdge {
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
+  """
+  The item at the end of the edge
+  """
+  node: UnitNode
+}
+
+"""
+Ordering fields for the 'Unit' model.
+"""
+enum UnitOrderingChoices {
+  nameEnAsc
+  nameEnDesc
+  nameFiAsc
+  nameFiDesc
+  nameSvAsc
+  nameSvDesc
+  pkAsc
+  pkDesc
+  rankAsc
+  rankDesc
+  reservationCountAsc
+  reservationCountDesc
+  reservationUnitsCountAsc
+  reservationUnitsCountDesc
+  unitGroupNameEnAsc
+  unitGroupNameEnDesc
+  unitGroupNameFiAsc
+  unitGroupNameFiDesc
+  unitGroupNameSvAsc
+  unitGroupNameSvDesc
+}
+
+type UnitRoleNode implements Node {
+  assigner: UserNode
+  created: DateTime!
+  """
+  The ID of the object
+  """
+  id: ID!
+  modified: DateTime!
+  permissions: [UserPermissionChoice]
+  role: UserRoleChoice!
+  unitGroups: [UnitGroupNode!]!
+  units(
+    nameEn: String
+    nameEn_Icontains: String
+    nameEn_Istartswith: String
+    nameFi: String
+    nameFi_Icontains: String
+    nameFi_Istartswith: String
+    nameSv: String
+    nameSv_Icontains: String
+    nameSv_Istartswith: String
+    onlyDirectBookable: Boolean
+    onlySeasonalBookable: Boolean
+    onlyWithPermission: Boolean
+    """
+    Järjestä
+    """
+    orderBy: [UnitOrderingChoices]
+    ownReservations: Boolean
+    pk: [Int]
+    publishedReservationUnits: Boolean
+  ): [UnitNode!]!
+  user: UserNode!
+}
+
+input UnitUpdateMutationInput {
+  description: String
+  descriptionEn: String
+  descriptionFi: String
+  descriptionSv: String
+  email: String
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  phone: String
+  pk: Int!
+  shortDescription: String
+  shortDescriptionEn: String
+  shortDescriptionFi: String
+  shortDescriptionSv: String
+  tprekId: String
+  webPage: String
+}
+
+type UnitUpdateMutationPayload {
+  description: String
+  descriptionEn: String
+  descriptionFi: String
+  descriptionSv: String
+  email: String
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  phone: String
+  pk: Int
+  shortDescription: String
+  shortDescriptionEn: String
+  shortDescriptionFi: String
+  shortDescriptionSv: String
+  tprekId: String
+  webPage: String
+}
+
+input UpdateAddressSerializerInput {
+  city: String
+  cityEn: String
+  cityFi: String
+  citySv: String
+  pk: Int
+  postCode: String
+  streetAddress: String
+  streetAddressEn: String
+  streetAddressFi: String
+  streetAddressSv: String
+}
+
+input UpdateApplicationRoundTimeSlotSerializerInput {
+  closed: Boolean
+  reservableTimes: [TimeSlotSerializerInput]
+  weekday: Int!
+}
+
+input UpdateApplicationSectionForApplicationSerializerInput {
+  ageGroup: Int
+  appliedReservationsPerWeek: Int
+  name: String
+  numPersons: Int
+  pk: Int
+  purpose: Int
+  reservationMaxDuration: Duration
+  reservationMinDuration: Duration
+  reservationUnitOptions: [UpdateReservationUnitOptionApplicantSerializerInput]
+  reservationsBeginDate: Date
+  reservationsEndDate: Date
+  suitableTimeRanges: [UpdateSuitableTimeRangeSerializerInput]
+}
+
+input UpdateOrganisationSerializerInput {
+  activeMembers: Int
+  address: UpdateAddressSerializerInput
+  coreBusiness: String
+  coreBusinessEn: String
+  coreBusinessFi: String
+  coreBusinessSv: String
+  email: String
+  identifier: String
+  name: String
+  nameEn: String
+  nameFi: String
+  nameSv: String
+  organisationType: OrganizationTypeChoice
+  pk: Int
+  yearEstablished: Int
+}
+
+input UpdatePersonSerializerInput {
+  email: String
+  firstName: String
+  lastName: String
+  phoneNumber: String
+  pk: Int
+}
+
+input UpdateReservationSeriesReservationUpdateSerializerInput {
+  ageGroup: Int
+  applyingForFreeOfCharge: Boolean
+  billingAddressCity: String
+  billingAddressStreet: String
+  billingAddressZip: String
+  billingEmail: String
+  billingFirstName: String
+  billingLastName: String
+  billingPhone: String
+  description: String
+  freeOfChargeReason: String
+  homeCity: Int
+  name: String
+  numPersons: Int
+  purpose: Int
+  reserveeAddressCity: String
+  reserveeAddressStreet: String
+  reserveeAddressZip: String
+  reserveeEmail: String
+  reserveeFirstName: String
+  reserveeId: String
+  reserveeIsUnregisteredAssociation: Boolean
+  reserveeLastName: String
+  reserveeOrganisationName: String
+  reserveePhone: String
+  reserveeType: ReserveeType
+  workingMemo: String
+}
+
+input UpdateReservationUnitImageFieldSerializerInput {
+  imageType: ImageType
+  imageUrl: Upload!
+  largeUrl: String
+  mediumUrl: String
+  smallUrl: String
+}
+
+input UpdateReservationUnitOptionApplicantSerializerInput {
+  pk: Int
+  preferredOrder: Int
+  reservationUnit: Int
+}
+
+input UpdateReservationUnitPricingSerializerInput {
+  begins: Date
+  highestPrice: Decimal
+  highestPriceNet: String
+  isActivatedOnBegins: Boolean
+  lowestPrice: Decimal
+  lowestPriceNet: String
+  pk: Int
+  priceUnit: PriceUnit
+  taxPercentage: Int
+}
+
+input UpdateSuitableTimeRangeSerializerInput {
+  beginTime: Time
+  dayOfTheWeek: Weekday
+  endTime: Time
+  pk: Int
+  priority: Priority
+}
+
+"""
+Represents a file upload.
+"""
+scalar Upload
+
+type UserNode implements Node {
+  dateOfBirth: Date
+  email: String!
+  firstName: String!
+  generalRoles: [GeneralRoleNode!]!
+  """
+  The ID of the object
+  """
+  id: ID!
+  isAdAuthenticated: Boolean
+  isStronglyAuthenticated: Boolean
+  """
+  Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella.
+  """
+  isSuperuser: Boolean!
+  lastName: String!
+  name: String
+  pk: Int
+  reservationNotification: String
+  unitRoles: [UnitRoleNode!]!
+  """
+  Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja.
+  """
+  username: String!
+  uuid: UUID!
+}
+
+"""
+An enumeration.
+"""
+enum UserPermissionChoice {
+  CAN_CREATE_STAFF_RESERVATIONS
+  CAN_MANAGE_APPLICATIONS
+  CAN_MANAGE_NOTIFICATIONS
+  CAN_MANAGE_RESERVATIONS
+  CAN_MANAGE_RESERVATION_RELATED_DATA
+  CAN_MANAGE_RESERVATION_UNITS
+  CAN_VIEW_APPLICATIONS
+  CAN_VIEW_RESERVATIONS
+  CAN_VIEW_USERS
+}
+
+"""
+An enumeration.
+"""
+enum UserRoleChoice {
+  """
+  Pääkäyttäjä
+  """
+  ADMIN
+  """
+  Käsittelijä
+  """
+  HANDLER
+  """
+  Ilmoituksen hallitsija.
+  """
+  NOTIFICATION_MANAGER
+  """
+  Varaaja
+  """
+  RESERVER
+  """
+  Katselija
+  """
+  VIEWER
+}
+
+input UserStaffUpdateMutationInput {
+  pk: Int!
+  reservationNotification: ReservationNotification
+}
+
+type UserStaffUpdateMutationPayload {
+  pk: Int
+  reservationNotification: ReservationNotification
+}
+
+"""
+An enumeration.
+"""
+enum Weekday {
+  FRIDAY
+  MONDAY
+  SATURDAY
+  SUNDAY
+  THURSDAY
+  TUESDAY
+  WEDNESDAY
+}

@@ -1,0 +1,10 @@
+# Blacklisted folders
+#################################################
+node_modules
+.next
+azure-pipelines-dev.yml
+azure-pipelines-release.yml
+cypress
+cypress.json
+# TODO block all env files after we have a working Dockerfile and scripts
+.env*

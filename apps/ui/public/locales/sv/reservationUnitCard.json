@@ -1,0 +1,16 @@
+{
+  "maxPersons": "{{count}} person",
+  "maxPersons_other": "{{count}} personer",
+  "personRange": "{{value}} person",
+  "personRange_other": "{{value}} personer",
+  "RelatedUnits": {
+    "heading": "Se även"
+  },
+  "address": "Adress",
+  "type": "",
+  "seeMore": "Visa",
+  "available": "Ledigt",
+  "noTimes": "Inga lediga tider",
+  "closed": "Stängt",
+  "firstAvailableTime": "Första lediga tid"
+}

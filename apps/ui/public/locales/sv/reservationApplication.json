@@ -1,0 +1,97 @@
+{
+  "title": "Ny bokning",
+  "titleSent": "Din bokning behandlas",
+  "applicationInfo": "Uppgifter om bokningen",
+  "summaryIngress": "Din bokning behandlas. Se bokningsöversikten.",
+  "reserveeTypePrefix": "Skapa ansökan…",
+  "reserveeTypes": {
+    "labels": {
+      "nonprofit": "för en organisation, grupp eller samfund",
+      "business": "för ett företag",
+      "individual": "som privatkund"
+    }
+  },
+  "label": {
+    "common": {
+      "name": "Bokningens namn (offentligt)",
+      "description": "Beskrivning av bokningen",
+      "purpose": "Bokningens användningsändamål",
+      "numPersons": "Antal deltagare",
+      "ageGroup": "Åldersgrupp",
+      "applyingForFreeOfChargeButton": "Kolla rabattgrupper <button>här</button>",
+      "applyingForFreeOfCharge": "Jag ansöker om avgiftsfri användning eller rabatt och jag har bekantat mig med rabattgrupperna.",
+      "freeOfChargeReason": "Motiveringar",
+      "reserveeType": "Typ av sökande"
+    },
+    "nonprofit": {
+      "reserveeFirstName": "Kontaktpersonens förnamn",
+      "reserveeLastName": "Kontaktpersonens efternamn",
+      "reserveeAddressStreet": "Gatuadress",
+      "reserveeAddressZip": "Postnummer",
+      "reserveeAddressCity": "Postanstalt",
+      "reserveeEmail": "Kontaktpersonens e-postadress",
+      "reserveePhone": "Kontaktpersonens telefonnummer",
+      "reserveeOrganisationName": "Officiellt namn",
+      "reserveeId": "FO-nummer",
+      "reserveeIsUnregisteredAssociation": "Sammanslutningen är inte registrerad",
+      "homeCity": "Hemort",
+      "showBillingAddress": "Faktureringsadress",
+      "billingFirstName": "Bokarens förnamn",
+      "billingLastName": "Bokarens efternamn",
+      "billingPhone": "Telefonnummer",
+      "billingEmail": "E-postadress",
+      "billingAddressStreet": "Gatuadress",
+      "billingAddressZip": "Postnummer",
+      "billingAddressCity": "Postanstalt"
+    },
+    "individual": {
+      "reserveeFirstName": "Förnamn",
+      "reserveeLastName": "Efternamn",
+      "reserveeAddressStreet": "Gatuadress",
+      "reserveeAddressZip": "Postnummer",
+      "reserveeAddressCity": "Postanstalt",
+      "reserveeEmail": "E-postadress",
+      "reserveePhone": "Telefonnummer",
+      "homeCity": "Hemort",
+      "showBillingAddress": "Faktureringsadress",
+      "billingFirstName": "Bokarens förnamn",
+      "billingLastName": "Bokarens efternamn",
+      "billingPhone": "Telefonnummer",
+      "billingEmail": "E-postadress",
+      "billingAddressStreet": "Gatuadress",
+      "billingAddressZip": "Postnummer",
+      "billingAddressCity": "Postanstalt"
+    },
+    "business": {
+      "reserveeFirstName": "Kontaktpersonens förnamn",
+      "reserveeLastName": "Kontaktpersonens efternamn",
+      "reserveeAddressStreet": "Gatuadress",
+      "reserveeAddressZip": "Postnummer",
+      "reserveeAddressCity": "Postanstalt",
+      "reserveeEmail": "Kontaktpersonens e-postadress",
+      "reserveePhone": "Kontaktpersonens telefonnummer",
+      "reserveeOrganisationName": "Officiellt namn",
+      "reserveeId": "FO-nummer",
+      "homeCity": "Hemort",
+      "showBillingAddress": "Faktureringsadress",
+      "billingFirstName": "Bokarens förnamn",
+      "billingLastName": "Bokarens efternamn",
+      "billingPhone": "Telefonnummer",
+      "billingEmail": "E-postadress",
+      "billingAddressStreet": "Gatuadress",
+      "billingAddressZip": "Postnummer",
+      "billingAddressCity": "Postanstalt"
+    },
+    "headings": {
+      "companyInfo": "Uppgifter om företaget",
+      "nonprofitInfo": "Föreningens uppgifter",
+      "contactInfo": "Kontaktpersonens uppgifter"
+    },
+    "subHeadings": {
+      "subvention": "Ansökan om rabatt på priset"
+    }
+  },
+  "processLabels": {
+    "handlingRequired": "Bokningen behandlas"
+  }
+}

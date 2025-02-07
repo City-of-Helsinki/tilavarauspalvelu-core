@@ -1,0 +1,30 @@
+{
+  "cancelHeading": "Oletko varma, että haluat perua hakemuksesi?",
+  "cancelContent": "Jos perut hakemuksen, et voi enää muokata tai lähettää sitä.",
+  "cancelFailed": "Hakemuksen peruminen epäonnistui",
+  "cancelled": "Hakemus on peruutettu onnistuneesti.",
+  "edit": "Muokkaa",
+  "cancel": "Peru",
+  "view": "Näytä",
+  "status": {
+    "draft": "Kesken",
+    "processing": "Käsittelyssä",
+    "sent": "Käsitelty",
+    "CANCELLED": "Peruttu",
+    "DRAFT": "Luonnos",
+    "EXPIRED": "Rauennut",
+    "HANDLED": "Käsittelyssä",
+    "IN_ALLOCATION": "Käsittelyssä",
+    "RECEIVED": "Käsittelyssä",
+    "RESULTS_SENT": "Käsitelty"
+  },
+  "reservations": "Varaukset",
+  "saved": "Viimeksi tallennettu:",
+  "person": "Hakemus luotu: yksityishenkilönä",
+  "organisation": "Hakemus luotu: {{type}}, {{name}}",
+  "applicantType": {
+    "community": "yhdistykselle",
+    "association": "rekisteröidylle yhdistykselle",
+    "company": "yritykselle"
+  }
+}

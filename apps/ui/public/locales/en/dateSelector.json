@@ -1,0 +1,27 @@
+{
+  "dateTypeAll": "Anytime",
+  "dateTypeThisWeek": "This week",
+  "dateTypeToday": "Today",
+  "dateTypeTomorrow": "Tomorrow",
+  "dateTypeWeekend": "On the weekend",
+  "infoDate": "dd.mm.yyyy",
+  "labelEndDate": "End date",
+  "labelStartDate": "Start date",
+  "errors": {
+    "endDateBeforeStartDate": "End date must be after start date",
+    "dateInvalid": "The date must be in the format dd.mm.yyyy",
+    "dateIsTooSmall": "The date must be after {{minDate}}",
+    "dateIsTooBig": "The date must be before {{maxDate}}"
+  },
+  "menu": {
+    "buttonBack": "Back",
+    "buttonClose": "Close",
+    "buttonCustom": "Select dates"
+  },
+  "title": "Select time",
+  "accessibility": {
+    "chooseDayPrefix": "Select",
+    "nextMonth": "Next month",
+    "previousMonth": "Previous month"
+  }
+}

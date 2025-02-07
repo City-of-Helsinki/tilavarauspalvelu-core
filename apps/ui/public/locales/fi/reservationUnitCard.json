@@ -1,0 +1,17 @@
+{
+  "maxPersons": "{{count}} henkilöä",
+  "maxPersons_one": "{{count}} henkilö",
+  "maxPersons_other": "{{count}} henkilöä",
+  "personRange_one": "{{value}} henkilö",
+  "personRange_other": "{{value}} henkilöä",
+  "RelatedUnits": {
+    "heading": "Samankaltaiset"
+  },
+  "address": "Katuosoite",
+  "type": "Palvelun tyyppi",
+  "seeMore": "Näytä",
+  "available": "Vapaa",
+  "noTimes": "Ei vapaita aikoja",
+  "closed": "Suljettu",
+  "firstAvailableTime": "Ensimmäinen vapaa aika"
+}

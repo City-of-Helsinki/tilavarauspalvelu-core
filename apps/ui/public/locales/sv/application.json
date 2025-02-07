@@ -1,0 +1,247 @@
+{
+  "error": {
+    "saveFailed": "Det gick inte att spara ansökningen",
+    "required": "Obligatorisk",
+    "requiredField": "Fältet är obligatoriskt",
+    "pattern": "Kontrollera form",
+    "numPersonsMin": "min",
+    "minDurationBiggerThanMaxDuration": "Den minsta varaktigheten för bokningen är längre än den maximala varaktigheten",
+    "maxDurationSmallerThanMinDuration": "Den maximala varaktigheten för bokningen är kortare än den minsta varaktigheten",
+    "eventsPerWeekMin": "Minst en bokning per vecka",
+    "beginAfterEnd": "Säsongsstart är senare än slutdagen",
+    "beginBeforePeriodBegin": "Säsongsstart är för tidigt",
+    "beginAfterPeriodEnd": "Säsongsstart är för sent",
+    "endAfterPeriodEnd": "Säsongsavslutning är för sent",
+    "endBeforeBegin": "Säsongsavslutning är tidigare än startdagen",
+    "endBeforePeriodBegin": "Säsongsavslutning är för tidigt",
+    "missingSchedule": "Ange åtminstone en tid för alla säsongbokningar",
+    "otherEventsHaveErrors": "Korrigera felaktigt ifyllda fält",
+    "noReservationUnits": "Lägg till en eller flera lokaler till ansökningen",
+    "noEvents": "Lägg till en eller flera säsongbokningar till ansökningen",
+    "maxLength": "Maximalt antal tecken: {{count}}"
+  },
+  "validation": {
+    "Required": "Obligatorisk",
+    "End date must be after begin date": "Slutdatum måste vara efter startdatum",
+    "Expected number, received nan": "Felaktigt nummer",
+    "Number must be greater than or equal to 1": "Numret måste vara större än eller lika med 1",
+    "Number must be less than or equal to 7": "Numret måste vara mindre än eller lika med 7",
+    "Maximum duration must be greater than minimum duration": "Maximala varaktigheten måste vara större än den minsta varaktigheten",
+    "reservationUnitTooSmall": "Lokalen är för liten för gruppens användning",
+    "begin date must be after application round begin date": "Startdatum måste vara efter ansökningsperiodens startdatum",
+    "begin date must be before application round end date": "Startdatum måste vara före ansökningsperiodens slutdatum",
+    "end date must be before application round end date": "Slutdatum måste vara före ansökningsperiodens slutdatum",
+    "end date must be after application round begin date": "Slutdatum måste vara efter ansökningsperiodens startdatum",
+    "Invalid date": "Ogiltigt datum",
+    "String must contain at most 255 character(s)": "Max 255 tecken",
+    "String must contain at most 100 character(s)": "Max 100 tecken"
+  },
+  "Intro": {
+    "startNewApplication": "Fyll i ansökan",
+    "heading": "Säsongbokningsansökan",
+    "createFailedHeading": "Kunde inte skapa en ansökan",
+    "createFailedContent": "Försök igen senare"
+  },
+  "applicationEventSaved": "Säsongsbokning sparad på ansökningen",
+  "Page1": {
+    "heading": "1. Fyll i bokningsuppgifter",
+    "text": "Lägg till dina bokningsönskemål för nästa säsong",
+    "basicInformationSubHeading": "Grundläggande bokningsuppgifter",
+    "name": "Säsongbokningens namn",
+    "groupSize": "Gruppstorlek",
+    "ageGroup": "Åldersgrupp",
+    "abilityGroup": "",
+    "purpose": "Användningsändamål",
+    "spacesSubHeading": "Lokalönskemål",
+    "defaultPeriodPrefix": "Använd standard bokningsperiod",
+    "applicationRoundSubHeading": "Period",
+    "periodStartDate": "Startdatum",
+    "periodEndDate": "Slutdatum",
+    "minDuration": "Minsta varaktighet",
+    "maxDuration": "Maximala varaktighet",
+    "eventsPerWeek": "Antal bokningar per vecka",
+    "biweekly": "",
+    "defaultDurationLabel": "1 timme 30 min",
+    "createNew": "Lägg till en bokning",
+    "applicationEventName": "Namnlös säsongbokning",
+    "applicationEventSummary": "Sammanfattning",
+    "applicationEventSaved": "Säsongbokningsönskemål sparat på ansökningen",
+    "saveEvent": "Spara",
+    "deleteEvent": "Radera",
+    "deleteEventCancel": "Tillbaka",
+    "deleteEventHeading": "Är du säker på att du vill radera ansökningen?",
+    "deleteEventContent": "Ansökningens information kan inte återställas då ansökningen har raderats."
+  },
+  "Page2": {
+    "heading": "2. Välj bokningens tidpunkt",
+    "info": "Välj både de tider som du i första hand önskar och också tider som alternativt passar för dig. Att ange flera önskemål om lokaler och tider förbättrar dina chanser att få de lokaler och tider du vill ha.",
+    "text": "Ange de tidpunkter du önskar för säsongbokningen",
+    "copyTimes": "Kopiera tiderna till alla önskemål",
+    "resetTimes": "Töm kalendern",
+    "summary": "Sammanfattning",
+    "prioritySelectLabel": "Typ av tidsönskemål",
+    "reservationUnitSelectLabel": "Visa säsongbokningstider för lokalen",
+    "priorityLabels": {
+      "300": "Välj prioriterade tidsönskemål",
+      "200": "Välj alternativa tidsönskemål"
+    },
+    "legend": {
+      "unavailable": "Kan inte bokas",
+      "selected-1": "Prioriterat önskemål",
+      "selected-2": "Alternativt önskemål",
+      "within-opening-hours": "Kan reserveras",
+      "outside-opening-hours": "Inte för säsongbokning"
+    },
+    "primarySchedules": "Prioriterade tidsönskemål",
+    "secondarySchedules": "Alternativa tidsönskemål",
+    "notification": {
+      "copyCells": "Kopieringen av tiderna till alla bokningsönskemål lyckades",
+      "minDuration": {
+        "title": "Dina tidsönskemål överensstämmer inte med bokningens varaktighet",
+        "bodySingle": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
+        "body_one": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
+        "body_other": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg."
+      }
+    }
+  },
+  "Page3": {
+    "heading": "3. Kontaktuppgifter",
+    "text": "Du kan lämna ansökningen som ett samfund, en privatperson eller ett företag. Den senaste ansökningen gäller.",
+    "firstName": "Förnamn",
+    "homeCity": "Hemort",
+    "lastName": "Efternamn",
+    "phoneNumber": "Telefonnummer",
+    "email": "E-postadress som skall bifogas till ansökan",
+    "emailNotification": "Alla meddelanden som har att göra med ansökningen skickas till nedanstående e-postadress",
+    "subHeading": {
+      "basicInfo": "Bokningsinformation",
+      "postalAddress": "Postadress",
+      "billingAddress": "Fakturaadress",
+      "contactInfo": "Kontaktinformation"
+    },
+    "as": {
+      "prefix": "Skapa ansökan",
+      "type": {
+        "ASSOCIATION": "för en organisation, grupp eller samfund",
+        "COMPANY": "för ett företag",
+        "INDIVIDUAL": "som privatkund"
+      }
+    },
+    "contactPerson": {
+      "firstName": "Kontaktpersonens förnamn",
+      "lastName": "Kontaktpersonens efternamn",
+      "phoneNumber": "Kontaktpersonens telefonnummer"
+    },
+    "billingAddress": {
+      "streetAddress": "Adress",
+      "postCode": "Postnummer",
+      "city": "Postanstalt"
+    },
+    "company": {
+      "name": "Företagets officiella namn",
+      "coreBusiness": "Företagets kärnverksamhet",
+      "registrationNumber": "FO-nummer"
+    },
+    "organisation": {
+      "name": "Officiella namnet",
+      "coreBusiness": "Kärnverksamhet",
+      "registrationNumber": "FO-nummer",
+      "streetAddress": "Adress",
+      "postCode": "Postnummer",
+      "city": "Postanstalt",
+      "notRegistered": "Inget FO-nummer",
+      "separateInvoicingAddress": "Faktureringsadressen avviker från postadressen"
+    },
+    "additionalInformation": "Tilläggsinformation om bokningens ändamål"
+  },
+  "preview": {
+    "applicantType": {
+      "community": "Oregistrerad förening",
+      "company": "Företag",
+      "individual": "Privatkund",
+      "association": "Registrerad förening"
+    },
+    "homeCity": "Hemort",
+    "heading": "4. Kontrollera och lämna in ansökan",
+    "text": "Sammandrag av din ansökan",
+    "basicInfoSubHeading": "Ansökningsinformation",
+    "contactPerson": "Kontaktperson",
+    "contactInfo": "Kontaktinformation",
+    "address": "Postadress",
+    "additionalInformation": "Tilläggsinformation om bokningens ändamål",
+    "organisation": {
+      "name": "Ansökarens namn",
+      "coreBusiness": "Kärnverksamhet",
+      "billingAddress": "Fakturaadress"
+    },
+    "applicationEvent": {
+      "applicationInfo": "Säsongbokningens detaljer",
+      "numPersons": "Gruppstorlek",
+      "ageGroup": "Åldersgrupp",
+      "abilityGroup": "",
+      "purpose": "Användningsändamål",
+      "additionalInfo": "Tilläggsuppgifter om bokningen",
+      "period": "Bokningsperiod",
+      "duration": "Säsongbokningens varaktighet",
+      "eventsPerWeek": "Bokningar per vecka",
+      "appliedSpaces": "Önskade lokaler",
+      "schedules": "Önskade tider",
+      "scheduleTooltip": "Sekundära tidsönskemål i parentes ( )"
+    },
+    "applicationEventSchedules": "Önskade tider",
+    "noData": {
+      "heading": "Blankettens uppgifter existerar ännu inte",
+      "text": "Fyll i blanketten först"
+    },
+    "notification": {
+      "processing": "Behandling",
+      "body": "Behandlingen av ansökningarna börjar när ansökningstiden har löpt ut. Vi skickar meddelanden till e-postadressen du har angett med information om de olika skedena."
+    },
+    "reservationUnitTerms": "Kompletterande bokningssvillkor",
+    "termsOfService": "Bokningsvillkor för Helsingfors stads lokaler och utrustning",
+    "userAcceptsTerms": "Jag har läst avtalsvillkoren och de kompletterande bokningsvillkoren och godkänner dessa.",
+    "reservationDeleted": "Bokning avbruten.",
+    "applicationSectionCancelled": "Avbruten {{ cancelled }} / {{ future }} bokning.",
+    "applicationSectionCancelledAll": "Avbruten alla {{ cancelled }} bokning."
+  },
+  "applicationEventStatus": {
+    "UNALLOCATED": "Mottagen",
+    "IN_ALLOCATION": "I behandling",
+    "HANDLED": "Behandlad",
+    "REJECTED": "Avslagen"
+  },
+  "view": {
+    "heading": "Säsongbokningsansökan",
+    "reservations": "Godkända bokningar",
+    "application": "Ansökan",
+    "handledDate": "Behandlad",
+    "allReservations": "Alla bokningar",
+    "reservationsTab": {
+      "reservationUnit": "Utrymme",
+      "rejected": "Avslagen",
+      "modified": "Ändrad",
+      "showAllReservations": "Visa alla bokningar",
+      "cancelApplication": "Avboka alla bokningar",
+      "reservationUnitsTitle": "Verksamhetsställe",
+      "reservationsTitle": "Bokningar",
+      "others": "andra",
+      "reservationCountPostfix": "bokningar"
+    },
+    "helpLink": "Instruktioner",
+    "helpLinkLong": "Hjälp för ansökan",
+    "helpModal": {
+      "title": "Lokalens instruktioner"
+    }
+  },
+  "sent": {
+    "heading": "Tack för din ansökan!",
+    "subHeading": "Din ansökan är mottagen och kommer att behandlas efter ansökningsperioden avslutat.",
+    "body": "Alla uppgifter i ansökan kan vid behov ändras fram till den sista ansökningsdagen. Vänligen notera att endast den sist inlämnade ansökan kommer att beaktas. Vänligen radera tidigare inlämnade ansökningar.\n\nDen inlämnade ansökan känner du igen av den blåa I behandling ikonen."
+  },
+  "navigation": {
+    "page1": "Bokningsuppgifter",
+    "page2": "Bokningstider",
+    "page3": "Kontaktuppgifter",
+    "preview": "Kontrollera och skicka"
+  }
+}

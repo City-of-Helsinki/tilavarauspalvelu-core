@@ -1,0 +1,17 @@
+# defaults
+**/.git
+**/.husky
+**/node_modules
+
+# next.js
+**/.next
+**/out
+
+# production
+**/dist
+**/build
+
+# IDE's
+.vscode
+.vs
+.idea

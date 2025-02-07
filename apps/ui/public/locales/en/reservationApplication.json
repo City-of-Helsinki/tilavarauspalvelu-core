@@ -1,0 +1,97 @@
+{
+  "title": "New booking",
+  "titleSent": "Your booking is now being processed",
+  "applicationInfo": "Booking details",
+  "summaryIngress": "Your booking is being processed. Please see the booking summary.",
+  "reserveeTypePrefix": "I am creating the application...",
+  "reserveeTypes": {
+    "labels": {
+      "nonprofit": "on behalf of an association or community",
+      "business": "on behalf of the company",
+      "individual": "as a private person"
+    }
+  },
+  "label": {
+    "common": {
+      "name": "Name of the booking (public)",
+      "description": "Description of the booking",
+      "purpose": "Purpose of use of the booking",
+      "numPersons": "Number of participants",
+      "ageGroup": "Age group",
+      "applyingForFreeOfChargeButton": "Check discount groups <button>here</button>.",
+      "applyingForFreeOfCharge": "I apply for a reduced fee and I have familiarised myself with the discount groups.",
+      "freeOfChargeReason": "Justification",
+      "reserveeType": "Applicant type"
+    },
+    "nonprofit": {
+      "reserveeFirstName": "Contact person’s first name",
+      "reserveeLastName": "Contact person’s last name",
+      "reserveeAddressStreet": "Street address",
+      "reserveeAddressZip": "Postal code",
+      "reserveeAddressCity": "City",
+      "reserveeEmail": "Contact person’s e-mail address",
+      "reserveePhone": "Contact person’s telephone number",
+      "reserveeOrganisationName": "Official name",
+      "reserveeId": "Business ID",
+      "reserveeIsUnregisteredAssociation": "The community is not registered",
+      "homeCity": "Domicile",
+      "showBillingAddress": "Invoicing address",
+      "billingFirstName": "Booker’s first name",
+      "billingLastName": "Booker’s last name",
+      "billingPhone": "Telephone",
+      "billingEmail": "E-mail address",
+      "billingAddressStreet": "Street address",
+      "billingAddressZip": "Postal code",
+      "billingAddressCity": "City"
+    },
+    "individual": {
+      "reserveeFirstName": "First name",
+      "reserveeLastName": "Last name",
+      "reserveeAddressStreet": "Street address",
+      "reserveeAddressZip": "Postal code",
+      "reserveeAddressCity": "City",
+      "reserveeEmail": "E-mail address",
+      "reserveePhone": "Telephone",
+      "homeCity": "Domicile",
+      "showBillingAddress": "Invoicing address",
+      "billingFirstName": "Booker’s first name",
+      "billingLastName": "Booker’s last name",
+      "billingPhone": "Telephone",
+      "billingEmail": "E-mail address",
+      "billingAddressStreet": "Street address",
+      "billingAddressZip": "Postal code",
+      "billingAddressCity": "City"
+    },
+    "business": {
+      "reserveeFirstName": "Contact person’s first name",
+      "reserveeLastName": "Contact person’s last name",
+      "reserveeAddressStreet": "Street address",
+      "reserveeAddressZip": "Postal code",
+      "reserveeAddressCity": "City",
+      "reserveeEmail": "Contact person’s e-mail address",
+      "reserveePhone": "Contact person’s telephone number",
+      "reserveeOrganisationName": "Official name",
+      "reserveeId": "Business ID",
+      "homeCity": "Domicile",
+      "showBillingAddress": "Invoicing address",
+      "billingFirstName": "Booker’s first name",
+      "billingLastName": "Booker’s last name",
+      "billingPhone": "Telephone",
+      "billingEmail": "E-mail address",
+      "billingAddressStreet": "Street address",
+      "billingAddressZip": "Postal code",
+      "billingAddressCity": "City"
+    },
+    "headings": {
+      "companyInfo": "Company information",
+      "nonprofitInfo": "Information of the association",
+      "contactInfo": "Contact person’s information"
+    },
+    "subHeadings": {
+      "subvention": "Apply for a reduced price"
+    }
+  },
+  "processLabels": {
+    "handlingRequired": "Booking is being processed"
+  }
+}

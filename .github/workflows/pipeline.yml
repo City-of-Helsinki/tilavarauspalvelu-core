@@ -1,0 +1,103 @@
+name: Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  SKIP_ENV_VALIDATION: "true"
+
+jobs:
+  # Disabled because it broke, and no idea why.
+  #changed-packages:
+  #  name: Determine which apps changed
+  #  uses: ./.github/workflows/changed-packages.yml
+
+  lint-admin-ui:
+    name: Lint admin ui
+    runs-on: ubuntu-latest
+    #needs: [changed-packages]
+    # if: needs.changed-packages.outputs.admin_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Lint admin ui
+        run: |
+          pnpm tsc:check --filter=admin-ui...
+          pnpm lint --filter=admin-ui...
+          pnpm lint:css --filter=admin-ui...
+
+  test-admin-ui:
+    name: Test admin ui
+    runs-on: ubuntu-latest
+    # needs: [changed-packages]
+    # if: needs.changed-packages.outputs.admin_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Test admin ui
+        run: pnpm test --filter=admin-ui...
+
+  lint-ui:
+    name: Lint ui
+    runs-on: ubuntu-latest
+    # needs: [changed-packages]
+    # if: needs.changed-packages.outputs.ui_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Lint ui
+        run: |
+          pnpm tsc:check --filter=ui...
+          pnpm lint --filter=ui...
+          pnpm lint:css --filter=ui...
+
+  test-ui:
+    name: Unit tests ui
+    runs-on: ubuntu-latest
+    # needs: [changed-packages]
+    # if: needs.changed-packages.outputs.ui_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Test ui
+        run: pnpm test --filter=ui...

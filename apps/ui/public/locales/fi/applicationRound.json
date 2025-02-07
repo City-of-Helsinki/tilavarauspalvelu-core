@@ -1,0 +1,13 @@
+{
+  "card": {
+    "applyButton": "Hae tiloja",
+    "displayPastButton": "Näytä tilat",
+    "criteria": "Tutustu hakuehtoihin",
+    "pending": "Haku avautuu {{opening}}",
+    "open": "Haku auki {{until}} saakka",
+    "past": "Haku sulkeutui {{closing}}",
+    "reservationPeriod": "Tilat varattavissa ajalle {{reservationPeriodBegin}} - {{reservationPeriodEnd}}"
+  },
+  "criteria": "hakuehdot",
+  "notesWhenApplying": "Huomioi hakiessa"
+}

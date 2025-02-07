@@ -1,0 +1,15 @@
+
+<svg
+   width="23px"
+   height="23px"
+   viewBox="0 0 32 32"
+>
+  <g>
+    <circle stroke="white"
+       style="fill:#0053f8;filter: drop-shadow( 0px 1px 2px rgba(0, 0, 0, .5);stroke:current-color);"
+       stroke-width="3"
+       cx="16"
+       cy="16"
+       r="12"/>
+  </g>
+</svg>

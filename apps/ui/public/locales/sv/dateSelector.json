@@ -1,0 +1,27 @@
+{
+  "dateTypeAll": "När som helst",
+  "dateTypeThisWeek": "Den här veckan",
+  "dateTypeToday": "I dag",
+  "dateTypeTomorrow": "I morgon",
+  "dateTypeWeekend": "Denna helg",
+  "infoDate": "dd.mm.åååå",
+  "labelEndDate": "Slutdatum",
+  "labelStartDate": "Startdatum",
+  "errors": {
+    "endDateBeforeStartDate": "Startdatumet måste vara före slutdatumet",
+    "dateInvalid": "Datumet måste vara i formatet dd.mm.åååå",
+    "dateIsTooSmall": "Datumet måste vara efter {{minDate}}",
+    "dateIsTooBig": "Datumet måste vara före {{maxDate}}"
+  },
+  "menu": {
+    "buttonBack": "Tillbaka",
+    "buttonClose": "Stäng",
+    "buttonCustom": "Välj dagar"
+  },
+  "title": "Välj tid",
+  "accessibility": {
+    "chooseDayPrefix": "Välj",
+    "nextMonth": "Nästa månad",
+    "previousMonth": "Föregående månad"
+  }
+}
