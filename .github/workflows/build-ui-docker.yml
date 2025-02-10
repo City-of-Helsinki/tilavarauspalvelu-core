@@ -1,5 +1,5 @@
 # Generic workflow to build a frontend application and push it to the GitHub Container Registry.
-name: "Build docker"
+name: "Build UI docker image"
 
 on:
   workflow_call:

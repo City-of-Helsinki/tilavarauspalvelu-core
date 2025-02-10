@@ -1,4 +1,4 @@
-name: "Tests"
+name: "Backend tests"
 
 on:
   push:
@@ -82,7 +82,7 @@ jobs:
           DATABASE_URL: postgis://tvp:tvp@localhost:5432/tvp
 
   test:
-    name: "Run tests (${{ matrix.group }}/12)"
+    name: "Run tests (${{ matrix.group }}/8)"
     runs-on: ubuntu-latest
 
     services:
@@ -116,8 +116,8 @@ jobs:
 
     strategy:
       matrix:
-        # Length must match "--splits" in test run.
-        group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        # Length must match "--splits".
+        group: [1, 2, 3, 4, 5, 6, 7, 8]
 
     steps:
       - name: "Checkout code"
@@ -134,7 +134,7 @@ jobs:
         with:
           python-version: ${{ steps.setup-python.outputs.python-version }}
 
-      - name: "Download test durations artefact"
+      - name: "Download test durations artifact"
         uses: dawidd6/action-download-artifact@v8
         with:
           workflow: update_test_durations.yml
@@ -147,7 +147,7 @@ jobs:
             --branch \
             -m pytest \
               --disable-warnings \
-              --splits 12 \
+              --splits 8 \
               --splitting-algorithm least_duration \
               --group ${{ matrix.group }}
         env:
@@ -162,7 +162,7 @@ jobs:
             echo ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }} | sed 's/[":<>|*?\r\n\\/]/-/g'
           )" >> $GITHUB_OUTPUT
 
-      - name: "Upload coverage artefact"
+      - name: "Upload coverage artifact"
         uses: actions/upload-artifact@v4
         with:
           name: cov-${{ steps.artifact.outputs.artifact }}-${{ matrix.group }}
@@ -192,7 +192,7 @@ jobs:
             echo ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }} | sed 's/[":<>|*?\r\n\\/]/-/g'
           )" >> $GITHUB_OUTPUT
 
-      - name: "Download coverage artefacts"
+      - name: "Download coverage artifacts"
         uses: actions/download-artifact@v4
         with:
           path: ./backend

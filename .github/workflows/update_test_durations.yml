@@ -1,4 +1,4 @@
-name: "Update test durations to project artefacts"
+name: "Update test durations to project artifacts"
 
 on:
   workflow_dispatch:
@@ -63,7 +63,7 @@ jobs:
         env:
           DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
 
-      - name: "Upload test durations artefact"
+      - name: "Upload test durations artifact"
         uses: actions/upload-artifact@v4
         with:
           name: test_durations

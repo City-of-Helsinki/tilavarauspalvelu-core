@@ -1,4 +1,4 @@
-name: Fast-forward merge a pull request
+name: "Fast-forward merge a pull request"
 
 on:
   issue_comment:

@@ -1,4 +1,4 @@
-name: Pipeline
+name: "Frontend tests"
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
   # Disabled because it broke, and no idea why.
   #changed-packages:
   #  name: Determine which apps changed
-  #  uses: ./.github/workflows/changed-packages.yml
+  #  uses: ./.github/reusable/changed-packages.yml
 
   lint-admin-ui:
     name: Lint admin ui

@@ -1,9 +1,7 @@
-name: "Build"
+name: "Build backend docker images"
 
 on:
   push:
-    paths:
-      - backend/**
     branches:
       - main
     tags:

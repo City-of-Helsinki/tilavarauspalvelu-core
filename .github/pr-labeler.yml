@@ -1,3 +1,4 @@
 feature: ["add-*"]
 fix: ["fix-*"]
+refactor: ["refactor-*"]
 dependencies: ["pre-commit-ci-update-config"]

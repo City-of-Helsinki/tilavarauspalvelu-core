@@ -1,4 +1,4 @@
-name: E2E tests
+name: "Frontend end-to-end tests"
 
 # Disabled automatic running because these are totally broken
 on:
