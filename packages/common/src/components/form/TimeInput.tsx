@@ -1,7 +1,7 @@
 import React, { Ref, forwardRef } from "react";
 import styled from "styled-components";
-import { IconAlertCircleFill } from "hds-react";
 import { breakpoints } from "../../common/style";
+import { IconAlertCircleFill } from "hds-react";
 
 const TimeInputContainer = styled.div`
   --border-width: 2px;
@@ -60,16 +60,6 @@ const TimeInputContainer = styled.div`
       max-width: unset;
     }
   }
-`;
-
-// NOTE Extra div around the svg is required because of scaling issues with multi line text
-const ErrorText = styled.div`
-  display: flex;
-  color: var(--color-error);
-  & > div {
-    margin-right: var(--spacing-3-xs);
-  }
-  margin-right: var(--spacing-3-xs);
 `;
 
 const isValid = (value: string): boolean => {
@@ -187,14 +177,28 @@ export const TimeInput = forwardRef(function TimeInput(
         onKeyDown={handleKeyDown}
         onChange={handleOnChange}
       />
-      {error && (
-        <ErrorText>
-          <div>
-            <IconAlertCircleFill />
-          </div>
-          <span>{error}</span>
-        </ErrorText>
-      )}
+      {error && <ErrorText>{error}</ErrorText>}
     </TimeInputContainer>
   );
 });
+
+// NOTE Extra div around the svg is required because of scaling issues with multi line text
+const ErrorWrapper = styled.div`
+  display: flex;
+  color: var(--color-error);
+  & > div {
+    margin-right: var(--spacing-3-xs);
+  }
+  margin-right: var(--spacing-3-xs);
+`;
+
+function ErrorText({ children }: { children: string }): JSX.Element {
+  return (
+    <ErrorWrapper>
+      <div>
+        <IconAlertCircleFill />
+      </div>
+      <span>{children}</span>
+    </ErrorWrapper>
+  );
+}
