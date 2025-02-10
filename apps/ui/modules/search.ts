@@ -154,7 +154,10 @@ type ProcessVariablesParams =
       language: string;
       kind: ReservationKind.Season;
       applicationRound: number;
+      reservationPeriodBegin: string;
+      reservationPeriodEnd: string;
     };
+
 export function processVariables({
   values,
   language,
@@ -193,6 +196,14 @@ export function processVariables({
     ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
   const applicationRound =
     "applicationRound" in rest && isSeasonal ? rest.applicationRound : null;
+  const reservationPeriodBegin =
+    "reservationPeriodBegin" in rest && isSeasonal
+      ? rest.reservationPeriodBegin
+      : null;
+  const reservationPeriodEnd =
+    "reservationPeriodEnd" in rest && isSeasonal
+      ? rest.reservationPeriodEnd
+      : null;
   const timeEnd = ignoreMaybeArray(values.getAll("timeEnd"));
   const timeBegin = ignoreMaybeArray(values.getAll("timeBegin"));
   const accessType = values.getAll("accessType").map(transformAccessTypeSafe);
@@ -217,8 +228,10 @@ export function processVariables({
     reservationUnitType: reservationUnitTypes,
     equipments,
     accessType,
-    accessTypeStartDate: reservableDateStart,
-    accessTypeEndDate: reservableDateEnd,
+    accessTypeStartDate: isSeasonal
+      ? reservationPeriodBegin
+      : reservableDateStart,
+    accessTypeEndDate: isSeasonal ? reservationPeriodEnd : reservableDateEnd,
     ...(startDate != null
       ? {
           reservableDateStart,
@@ -260,15 +273,6 @@ export function processVariables({
   };
 }
 
-export function mapSingleParamToFormValue(
-  param: string | string[] | undefined
-): string | null {
-  if (param == null) return null;
-  if (param === "") return null;
-  if (Array.isArray(param)) return param.join(",");
-  return param;
-}
-
 // default to false if the param is present but not true, null if not present
 export function mapSingleBooleanParamToFormValue(
   param: string | string[] | undefined
@@ -284,39 +288,6 @@ export function mapSingleBooleanParamToFormValue(
   return param === "true";
 }
 
-export function mapQueryParamToStringArray(
-  param: string | string[] | undefined
-): string[] {
-  if (param == null) return [];
-  if (param === "") return [];
-  if (Array.isArray(param)) return param;
-  return [param];
-}
-
-export function mapQueryParamToNumber(
-  param: string | string[] | undefined
-): number | null {
-  if (param == null) return null;
-  if (param === "") return null;
-  if (Array.isArray(param)) {
-    return toNumber(param[0]);
-  }
-  return toNumber(param);
-}
-
-export function mapQueryParamToNumberArray(
-  param: string | string[] | undefined
-): number[] {
-  if (param == null) return [];
-  if (param === "") return [];
-  if (Array.isArray(param)) {
-    return param.map(Number).filter(Number.isInteger);
-  }
-  const v = Number(param);
-  if (Number.isNaN(v)) {
-    return [];
-  }
-  return [v];
 export function mapParamToNumber(param: string[], min?: number): number[] {
   const numbers = param.map(Number).filter(Number.isInteger);
   return min != null ? numbers.filter((n) => n >= min) : numbers;
