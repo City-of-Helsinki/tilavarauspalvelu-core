@@ -176,7 +176,6 @@ export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
     currentAccessType
     accessTypes(isActiveOrFuture: true) {
       accessType
-      beginDate
     }
   }
 `;
