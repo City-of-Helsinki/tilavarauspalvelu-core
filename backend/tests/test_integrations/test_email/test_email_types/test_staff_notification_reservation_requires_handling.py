@@ -10,12 +10,13 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
-from tilavarauspalvelu.enums import EmailType, ReservationNotification, ReservationStateChoice
+from tilavarauspalvelu.enums import ReservationNotification, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_staff_notification_reservation_requires_handling,
 )
+from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 
 from tests.factories import ReservationFactory, UnitFactory, UserFactory

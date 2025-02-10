@@ -27,7 +27,6 @@ __all__ = [
     "BannerNotificationTarget",
     "CalendarProperty",
     "CustomerTypeChoice",
-    "EmailType",
     "EventProperty",
     "HaukiResourceState",
     "Language",
@@ -248,94 +247,6 @@ class UserRoleChoice(models.TextChoices):
 # but we also don't duplicate permissions from the roles above. This should be fine,
 # as the enum is not really used in our code but meant for the frontend.
 UserPermissionChoice = models.TextChoices("UserPermissionChoice", UserRoleChoice.permission_choices())
-
-
-class EmailType(models.TextChoices):
-    # Application
-    APPLICATION_HANDLED = "application_handled", pgettext_lazy("EmailType", "Application handled")
-    APPLICATION_IN_ALLOCATION = "application_in_allocation", pgettext_lazy("EmailType", "Application in allocation")
-    APPLICATION_RECEIVED = "application_received", pgettext_lazy("EmailType", "Application received")
-
-    APPLICATION_SECTION_CANCELLED = (
-        "application_section_cancelled",
-        pgettext_lazy("EmailType", "Application section cancelled"),
-    )
-    """User cancels all reservations in their application section"""
-
-    # Permissions
-    PERMISSION_DEACTIVATION = "permission_deactivation", pgettext_lazy("EmailType", "Permission deactivation")
-    USER_ANONYMIZATION = "user_anonymization", pgettext_lazy("EmailType", "User anonymization")
-
-    # Reservation
-    RESERVATION_APPROVED = "reservation_approved", pgettext_lazy("EmailType", "Reservation approved")
-    RESERVATION_CANCELLED = "reservation_cancelled", pgettext_lazy("EmailType", "Reservation cancelled")
-    RESERVATION_CONFIRMED = "reservation_confirmed", pgettext_lazy("EmailType", "Reservation confirmed")
-    RESERVATION_MODIFIED = "reservation_modified", pgettext_lazy("EmailType", "Reservation modified")
-    RESERVATION_MODIFIED_ACCESS_CODE = (
-        "reservation_modified_access_code",
-        pgettext_lazy("EmailType", "Reservation modified access code"),
-    )
-    RESERVATION_REJECTED = "reservation_rejected", pgettext_lazy("EmailType", "Reservation rejected")
-    RESERVATION_REQUIRES_HANDLING = (
-        "reservation_requires_handling",
-        pgettext_lazy("EmailType", "Reservation requires handling"),
-    )
-    RESERVATION_REQUIRES_PAYMENT = (
-        "reservation_requires_payment",
-        pgettext_lazy("EmailType", "Reservation requires payment"),
-    )
-
-    SEASONAL_RESERVATION_CANCELLED_SINGLE = (
-        "seasonal_reservation_cancelled_single",
-        pgettext_lazy("EmailType", "Seasonal reservation cancelled single"),
-    )
-    """User cancels one of their seasonal reservations"""
-
-    SEASONAL_RESERVATION_MODIFIED_SERIES = (
-        "seasonal_reservation_modified_series",
-        pgettext_lazy("EmailType", "Seasonal reservation modified series"),
-    )
-    """Staff modifies a seasonal reservation series"""
-
-    SEASONAL_RESERVATION_MODIFIED_SINGLE = (
-        "seasonal_reservation_modified_single",
-        pgettext_lazy("EmailType", "Seasonal reservation modified single"),
-    )
-    """Staff modifies a single seasonal reservation"""
-
-    SEASONAL_RESERVATION_REJECTED_SERIES = (
-        "seasonal_reservation_rejected_series",
-        pgettext_lazy("EmailType", "Seasonal reservation rejected series"),
-    )
-    """Staff rejects a seasonal reservation series"""
-
-    SEASONAL_RESERVATION_REJECTED_SINGLE = (
-        "seasonal_reservation_rejected_single",
-        pgettext_lazy("EmailType", "Seasonal reservation rejected single"),
-    )
-    """Staff rejects a single reservation in a seasonal reservation series"""
-
-    # Staff
-    STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED = (
-        "staff_notification_application_section_cancelled",
-        pgettext_lazy("EmailType", "Staff notification application section cancelled"),
-    )
-    STAFF_NOTIFICATION_RESERVATION_MADE = (
-        "staff_notification_reservation_made",
-        pgettext_lazy("EmailType", "Staff notification reservation made"),
-    )
-    STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING = (
-        "staff_notification_reservation_requires_handling",
-        pgettext_lazy("EmailType", "Staff notification reservation requires handling"),
-    )
-
-    @enum.property
-    def html_path(self) -> str:
-        return f"email/html/{self.value}.jinja"
-
-    @enum.property
-    def text_path(self) -> str:
-        return f"email/text/{self.value}.jinja"
 
 
 class HaukiResourceState(models.TextChoices):

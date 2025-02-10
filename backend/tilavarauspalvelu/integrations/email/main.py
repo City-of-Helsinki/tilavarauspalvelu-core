@@ -5,13 +5,7 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.db import models
 
-from tilavarauspalvelu.enums import (
-    AccessType,
-    ApplicationStatusChoice,
-    EmailType,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-)
+from tilavarauspalvelu.enums import AccessType, ApplicationStatusChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Application, User
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
@@ -51,7 +45,7 @@ from .template_context import (
 )
 from .template_context.application import get_context_for_staff_notification_application_section_cancelled
 from .template_context.reservation import get_context_for_reservation_modified_access_code
-from .typing import EmailData
+from .typing import EmailData, EmailType
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation

@@ -8,7 +8,7 @@ from django.template.loader import get_template
 if TYPE_CHECKING:
     from django_jinja.backend import Template
 
-    from tilavarauspalvelu.enums import EmailType
+    from tilavarauspalvelu.integrations.email.typing import EmailType
     from tilavarauspalvelu.typing import EmailContext
 
 

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, Self
 
 from django import forms
 
-from tilavarauspalvelu.enums import EmailType, Language, WeekdayChoice
+from tilavarauspalvelu.enums import Language, WeekdayChoice
 from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
@@ -33,6 +33,7 @@ from tilavarauspalvelu.integrations.email.template_context.application import (
     get_context_for_staff_notification_application_section_cancelled,
 )
 from tilavarauspalvelu.integrations.email.template_context.common import get_staff_reservations_ext_link
+from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.translation import get_attr_by_language
 from utils.date_utils import local_date
 
