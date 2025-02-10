@@ -111,6 +111,8 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
     onNext(values);
   };
 
+  const openByDefault =
+    applicationSections?.filter((ae) => ae != null).length === 1;
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
       {/* NOTE can't filter this because we have undefined values in the array so the index would break
@@ -127,7 +129,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
             }}
             onDeleteEvent={() => handleDeleteEvent(event.formKey)}
             onToggleAccordion={() => handleToggleAccordion(event.formKey)}
-            isVisible={isAccordionOpen(event.formKey)}
+            isVisible={openByDefault || isAccordionOpen(event.formKey)}
           />
         ) : null
       )}

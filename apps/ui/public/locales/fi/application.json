@@ -1,27 +1,11 @@
 {
   "error": {
-    "saveFailed": "Hakemuksen tallennus ei onnistunut",
-    "required": "Pakollinen",
-    "requiredField": "Kenttä on pakollinen",
-    "pattern": "Tarkista muoto",
-    "numPersonsMin": "Ryhmän koko virheellinen",
-    "minDurationBiggerThanMaxDuration": "Vähimmäiskesto on suurempi kuin enimmäiskesto",
-    "maxDurationSmallerThanMinDuration": "Enimmäiskesto on pienempi kuin vähimmäiskesto",
-    "eventsPerWeekMin": "Vähintään yksi varaus viikossa",
-    "beginAfterEnd": "Kauden aloituspäivä myöhempi kuin lopetuspäivä",
-    "beginBeforePeriodBegin": "Kauden aloituspäivä on liian aikainen",
-    "beginAfterPeriodEnd": "Kauden aloituspäivä on liian myöhäinen",
-    "endAfterPeriodEnd": "Kauden lopetuspäivä on liian myöhäinen",
-    "endBeforeBegin": "Kauden lopetuspäivä on aikaisempi kuin aloituspäivä",
-    "endBeforePeriodBegin": "Kauden lopetuspäivä on liian aikainen",
-    "missingSchedule": "Lisää kaikille kausivarauksille vähintään yksi aika",
-    "otherEventsHaveErrors": "Korjaa virheellisesti täytetyt kentät",
-    "noReservationUnits": "Lisää hakemukselle yksi tai useampi tila",
-    "noEvents": "Lisää hakemukselle yksi tai useampi kausivaraus",
-    "maxLength": "Enimmäismerkkimäärä: {{count}}"
+    "saveFailed": "Hakemuksen tallennus ei onnistunut"
   },
   "validation": {
     "Required": "Pakollinen",
+    "Expected number, received null": "Pakollinen",
+    "noReservationUnits": "Lisää hakemukselle yksi tai useampi tila",
     "End date must be after begin date": "Päättymispäivän pitää olla aloituspäivän jälkeen",
     "Expected number, received nan": "Pitää olla numero",
     "Number must be greater than or equal to 1": "Pitää olla vähintään 1",
@@ -33,8 +17,19 @@
     "end date must be before application round end date": "Päättymispäivän pitää olla ennen hakukierroksen päättymispäivän",
     "end date must be after application round begin date": "Päättymispäivän pitää olla hakukierroksen alkamispäivän jälkeen",
     "Invalid date": "Virheellinen päivämäärä",
+    "Invalid email": "Virheellinen sähköpostiosoite",
+    "String must contain at least 1 character(s)": "Pakollinen",
     "String must contain at most 255 character(s)": "Maksimissaan 255 merkkiä",
-    "String must contain at most 100 character(s)": "Maksimissaan 100 merkkiä"
+    "String must contain at most 254 character(s)": "Maksimissaan 254 merkkiä",
+    "String must contain at most 100 character(s)": "Maksimissaan 100 merkkiä",
+    "String must contain at most 80 character(s)": "Maksimissaan 80 merkkiä",
+    "String must contain at most 32 character(s)": "Maksimissaan 32 merkkiä",
+    "calendar": {
+      "title": "Ilmoitetut aikatoiveet eivät vastaa varauksen kestoa",
+      "Suitable time range must be at least as long as the minimum duration": "Valitse kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
+      "At least as many suitable time ranges as applied reservations per week": "Valitse kalenterista lisää aikatoiveita tai vähennä hakemuksen edellisessä vaiheessa valittua varausten määrää viikossa.",
+      "Array must contain at least 1 element(s)": "Valitse kalenterista aikatoiveita"
+    }
   },
   "Intro": {
     "startNewApplication": "Täytä hakemus",
@@ -96,12 +91,6 @@
     "secondarySchedules": "Muut aikatoiveet",
     "notification": {
       "copyCells": "Ajat kopioitu onnistuneesti kaikille varaustoiveille"
-    },
-    "errors": {
-      "title": "Ilmoitetut aikatoiveet eivät vastaa varauksen kestoa",
-      "Suitable time range must be at least as long as the minimum duration": "Valitse kalenterista lisää aikatoiveita tai lyhennä hakemuksen edellisessä vaiheessa valittua varauksen vähimmäiskestoa.",
-      "At least as many suitable time ranges as applied reservations per week": "Valitse kalenterista lisää aikatoiveita tai vähennä hakemuksen edellisessä vaiheessa valittua varausten määrää viikossa.",
-      "Array must contain at least 1 element(s)": "Valitse kalenterista aikatoiveita"
     }
   },
   "Page3": {

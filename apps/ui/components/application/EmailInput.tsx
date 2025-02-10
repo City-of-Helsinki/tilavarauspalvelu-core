@@ -27,12 +27,7 @@ export function EmailInput() {
         </Notification>
       </SpanFullRow>
       <TextInput
-        {...register("contactPerson.email", {
-          required: true,
-          maxLength: 254,
-          pattern:
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        })}
+        {...register("contactPerson.email")}
         label={t("application:Page3.email")}
         id="contactPerson.email"
         name="contactPerson.email"

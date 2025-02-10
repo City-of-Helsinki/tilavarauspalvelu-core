@@ -1,7 +1,6 @@
 import {
   IconArrowDown,
   IconArrowUp,
-  Notification,
   ButtonSize,
   ButtonVariant,
   Button,
@@ -23,6 +22,7 @@ import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { Flex } from "common/styles/util";
+import { ErrorText } from "common/src/components/ErrorText";
 
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
 type Props = {
@@ -33,7 +33,7 @@ type Props = {
   last: boolean;
   onMoveUp: (reservationUnit: ReservationUnitType) => void;
   onMoveDown: (reservationUnit: ReservationUnitType) => void;
-  invalid: boolean;
+  error?: string;
 };
 
 const NameCardContainer = styled(Flex).attrs({ $gap: "none" })`
@@ -199,13 +199,6 @@ const DownButton = styled(OrderButton)`
   }
 `;
 
-// NOTE size=small causes text to disappear
-const ErrorNotification = styled(Notification).attrs({
-  type: "error",
-})`
-  --fontsize-heading-xs: var(--fontsize-body-s);
-`;
-
 /// Custom card for selecting reservation units for application
 export function OrderedReservationUnitCard({
   reservationUnit,
@@ -215,7 +208,7 @@ export function OrderedReservationUnitCard({
   last,
   onMoveUp,
   onMoveDown,
-  invalid,
+  error,
 }: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
 
@@ -227,11 +220,7 @@ export function OrderedReservationUnitCard({
 
   return (
     <>
-      {invalid ? (
-        <ErrorNotification
-          label={t("application:validation.reservationUnitTooSmall")}
-        />
-      ) : null}
+      {error && <ErrorText>{error}</ErrorText>}
       <NameCardContainer>
         <PreCardLabel>
           <span>{t("reservationUnitList:option")} </span>

@@ -1,27 +1,11 @@
 {
   "error": {
-    "saveFailed": "Det gick inte att spara ansökningen",
-    "required": "Obligatorisk",
-    "requiredField": "Fältet är obligatoriskt",
-    "pattern": "Kontrollera form",
-    "numPersonsMin": "min",
-    "minDurationBiggerThanMaxDuration": "Den minsta varaktigheten för bokningen är längre än den maximala varaktigheten",
-    "maxDurationSmallerThanMinDuration": "Den maximala varaktigheten för bokningen är kortare än den minsta varaktigheten",
-    "eventsPerWeekMin": "Minst en bokning per vecka",
-    "beginAfterEnd": "Säsongsstart är senare än slutdagen",
-    "beginBeforePeriodBegin": "Säsongsstart är för tidigt",
-    "beginAfterPeriodEnd": "Säsongsstart är för sent",
-    "endAfterPeriodEnd": "Säsongsavslutning är för sent",
-    "endBeforeBegin": "Säsongsavslutning är tidigare än startdagen",
-    "endBeforePeriodBegin": "Säsongsavslutning är för tidigt",
-    "missingSchedule": "Ange åtminstone en tid för alla säsongbokningar",
-    "otherEventsHaveErrors": "Korrigera felaktigt ifyllda fält",
-    "noReservationUnits": "Lägg till en eller flera lokaler till ansökningen",
-    "noEvents": "Lägg till en eller flera säsongbokningar till ansökningen",
-    "maxLength": "Maximalt antal tecken: {{count}}"
+    "saveFailed": "Det gick inte att spara ansökningen"
   },
   "validation": {
     "Required": "Obligatorisk",
+    "Expected number, received null": "Obligatorisk",
+    "noReservationUnits": "Lägg till en eller flera lokaler till ansökningen",
     "End date must be after begin date": "Slutdatum måste vara efter startdatum",
     "Expected number, received nan": "Felaktigt nummer",
     "Number must be greater than or equal to 1": "Numret måste vara större än eller lika med 1",
@@ -33,8 +17,19 @@
     "end date must be before application round end date": "Slutdatum måste vara före ansökningsperiodens slutdatum",
     "end date must be after application round begin date": "Slutdatum måste vara efter ansökningsperiodens startdatum",
     "Invalid date": "Ogiltigt datum",
+    "Invalid email": "Ogiltig e-postadress",
+    "String must contain at least 1 character(s)": "Obligatorisk",
     "String must contain at most 255 character(s)": "Max 255 tecken",
-    "String must contain at most 100 character(s)": "Max 100 tecken"
+    "String must contain at most 254 character(s)": "Max 254 tecken",
+    "String must contain at most 100 character(s)": "Max 100 tecken",
+    "String must contain at most 80 character(s)": "Max 80 tecken",
+    "String must contain at most 32 character(s)": "Max 32 tecken",
+    "calendar": {
+      "title": "Dina tidsönskemål överensstämmer inte med bokningens varaktighet",
+      "Suitable time range must be at least as long as the minimum duration": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
+      "At least as many suitable time ranges as applied reservations per week": "Ange flera tidsönskemål i kalendern eller minska antalet bokningar per vecka i föregående steg.",
+      "Array must contain at least 1 element(s)": "Ange minst en tid för alla säsongbokningar"
+    }
   },
   "Intro": {
     "startNewApplication": "Fyll i ansökan",
@@ -95,12 +90,6 @@
     "secondarySchedules": "Alternativa tidsönskemål",
     "notification": {
       "copyCells": "Kopieringen av tiderna till alla bokningsönskemål lyckades"
-    },
-    "errors": {
-      "title": "Dina tidsönskemål överensstämmer inte med bokningens varaktighet",
-      "Suitable time range must be at least as long as the minimum duration": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
-      "At least as many suitable time ranges as applied reservations per week": "Ange flera tidsönskemål i kalendern eller minska antalet bokningar per vecka i föregående steg.",
-      "Array must contain at least 1 element(s)": "Ange minst en tid för alla säsongbokningar"
     }
   },
   "Page3": {

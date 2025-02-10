@@ -28,6 +28,7 @@ import {
 import { successToast } from "common/src/common/toast";
 import { type ApplicationPage2Query } from "@/gql/gql-types";
 import { fontBold } from "common";
+import { ErrorText } from "common/src/components/ErrorText";
 
 // TODO fragment
 type ApplicationT = NonNullable<ApplicationPage2Query["application"]>;
@@ -534,18 +535,16 @@ function ErrorMessage({ index }: { index: number }): JSX.Element | null {
   }
   const errorMsg = suitableTimeErrors.message;
   const msg = errorMsg
-    ? t(`application:Page2.errors.${errorMsg}`)
+    ? t(`application:validation.calendar.${errorMsg}`)
     : t("errors:general_error");
 
   return (
-    <Notification
-      type="alert"
-      // TODO do we need the title?
-      label={t("application:Page2.errors.title")}
-      closeButtonLabelText={t("common:close")}
+    <ErrorText
+      size={NotificationSize.Medium}
+      title={t("application:validation.calendar.title")}
       data-testid="application__page2--notification-min-duration"
     >
       {msg}
-    </Notification>
+    </ErrorText>
   );
 }

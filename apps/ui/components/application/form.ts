@@ -457,7 +457,7 @@ export const ApplicationPage3Schema = z
     hasBillingAddress: z.boolean(),
     // TODO what is the max length for this?
     additionalInformation: z.string().optional(),
-    // why is this optional and for what cases?
+    // homeCity is only for Organisations
     homeCity: z.number().optional(),
   })
   // have to check at form level otherwise it forbids undefined initialization
@@ -469,7 +469,7 @@ export const ApplicationPage3Schema = z
     switch (val.applicantType) {
       case ApplicantTypeChoice.Association:
       case ApplicantTypeChoice.Company:
-        if (val.organisation?.identifier == null) {
+        if (!val.organisation?.identifier) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["organisation", "identifier"],
@@ -479,6 +479,18 @@ export const ApplicationPage3Schema = z
         break;
       default:
         break;
+    }
+    if (
+      val.applicantType === ApplicantTypeChoice.Community ||
+      val.applicantType === ApplicantTypeChoice.Association
+    ) {
+      if (!val.homeCity) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["homeCity"],
+          message: "Required",
+        });
+      }
     }
   });
 
