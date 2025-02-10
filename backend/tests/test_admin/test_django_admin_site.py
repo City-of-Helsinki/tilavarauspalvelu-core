@@ -8,7 +8,7 @@ from django.contrib import admin
 from django.test import Client
 from django.urls import reverse
 
-from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import BugReport, RequestLog, Reservation, SQLLog
 from tilavarauspalvelu.models.bug_report.model import (

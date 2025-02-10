@@ -10,10 +10,10 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock_params
-from tilavarauspalvelu.enums import EmailType
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_application_section_cancelled
+from tilavarauspalvelu.integrations.email.typing import EmailType
 
 from tests.factories import ApplicationFactory, ApplicationSectionFactory
 from tests.helpers import TranslationsFromPOFiles

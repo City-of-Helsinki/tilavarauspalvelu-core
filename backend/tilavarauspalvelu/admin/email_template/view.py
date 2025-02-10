@@ -9,10 +9,9 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.utils.html import format_html
 
-from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.admin.email_template.utils import get_mock_data
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-
-from .utils import get_mock_data
+from tilavarauspalvelu.integrations.email.typing import EmailType
 
 if TYPE_CHECKING:
     from django.utils.safestring import SafeString

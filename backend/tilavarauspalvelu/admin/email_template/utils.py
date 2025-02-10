@@ -4,7 +4,7 @@ import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-from tilavarauspalvelu.enums import EmailType, WeekdayChoice
+from tilavarauspalvelu.enums import WeekdayChoice
 from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_application_handled,
     get_context_for_application_in_allocation,
@@ -34,6 +34,7 @@ from tilavarauspalvelu.integrations.email.template_context.common import get_sta
 from tilavarauspalvelu.integrations.email.template_context.reservation import (
     get_context_for_reservation_modified_access_code,
 )
+from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.translation import get_translated
 from utils.date_utils import local_datetime
 
