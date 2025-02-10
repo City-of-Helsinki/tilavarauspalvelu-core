@@ -1,20 +1,25 @@
-# Build and deploy to the test environment after merging to the main branch.
+# Build and deploy to the test environment after creating a tag with the given pattern.
 
 resources:
   repositories:
-  # Azure DevOps repository.
-  - repository: tilavarauspalvelu-pipelines
-    type: git
-    # Azure DevOps project/repository.
-    name: tilavarauspalvelu/tilavarauspalvelu-pipelines
+    # Azure DevOps repository.
+    - repository: tilavarauspalvelu-pipelines
+      type: git
+      # Azure DevOps project/repository.
+      name: tilavarauspalvelu/tilavarauspalvelu-pipelines
 
 trigger:
   batch: false
   tags:
+    # Trigger when creating tags like v1.0.0, release-1.0.0, hotfix-1.0.0, release-1.0.0-core,
+    # but not when creating tags like v1.0.0-ui, v1.0.0-admin, etc.
     include:
-    - v*
-    - release-*
-    - hotfix-*
+      - "v*"
+      - "release-*"
+      - "hotfix-*"
+    exclude:
+      - "*-ui"
+      - "*-admin"
 
 # Don't use Azure pipelines for PRs.
 pr: none

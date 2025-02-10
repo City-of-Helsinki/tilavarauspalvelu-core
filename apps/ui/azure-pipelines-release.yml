@@ -12,13 +12,14 @@ trigger:
   batch: false
   tags:
     # Trigger when creating tags like v1.0.0, release-1.0.0, hotfix-1.0.0, release-1.0.0-ui,
-    # but not when creating tags like v1.0.0-admin, etc.
+    # but not when creating tags like v1.0.0-admin, v1.0.0-core, etc.
     include:
       - "v*"
       - "release-*"
       - "hotfix-*"
     exclude:
       - "*-admin"
+      - "*-core"
 
 # Don't use Azure pipelines for PRs.
 pr: none
