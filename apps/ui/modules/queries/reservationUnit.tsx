@@ -190,6 +190,9 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $reservationUnitType: [Int]
     $purposes: [Int]
     $equipments: [Int]
+    $accessType: [AccessType]
+    $accessTypeStartDate: Date
+    $accessTypeEndDate: Date
     $reservableDateStart: Date
     $reservableDateEnd: Date
     $reservableTimeStart: Time
@@ -216,6 +219,9 @@ export const SEARCH_RESERVATION_UNITS = gql`
       reservationUnitType: $reservationUnitType
       purposes: $purposes
       equipments: $equipments
+      accessType: $accessType
+      accessTypeStartDate: $accessTypeStartDate
+      accessTypeEndDate: $accessTypeEndDate
       reservableDateStart: $reservableDateStart
       reservableDateEnd: $reservableDateEnd
       reservableTimeStart: $reservableTimeStart
