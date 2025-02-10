@@ -6556,6 +6556,7 @@ export type ReservationUnitPageFieldsFragment = {
   reservationState?: ReservationUnitReservationState | null;
   numActiveUserReservations?: number | null;
   requireReservationHandling: boolean;
+  currentAccessType?: AccessType | null;
   termsOfUseFi?: string | null;
   termsOfUseEn?: string | null;
   termsOfUseSv?: string | null;
@@ -6729,6 +6730,7 @@ export type ReservationUnitPageQuery = {
     reservationState?: ReservationUnitReservationState | null;
     numActiveUserReservations?: number | null;
     requireReservationHandling: boolean;
+    currentAccessType?: AccessType | null;
     maxReservationDuration?: number | null;
     minReservationDuration?: number | null;
     reservationsMaxDaysBefore?: number | null;
@@ -6860,6 +6862,7 @@ export type ReservationUnitPageQuery = {
 
 export type ReservationUnitCardFieldsFragment = {
   maxPersons?: number | null;
+  currentAccessType?: AccessType | null;
   id: string;
   pk?: number | null;
   nameFi?: string | null;
@@ -6897,6 +6900,7 @@ export type ReservationUnitCardFieldsFragment = {
     smallUrl?: string | null;
     imageType: ImageType;
   }>;
+  accessTypes: Array<{ accessType: AccessType; beginDate: string }>;
 };
 
 export type SearchReservationUnitsQueryVariables = Exact<{
@@ -6927,6 +6931,11 @@ export type SearchReservationUnitsQueryVariables = Exact<{
     | Array<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
+  accessType?: InputMaybe<
+    Array<InputMaybe<AccessType>> | InputMaybe<AccessType>
+  >;
+  accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
   reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
@@ -6954,6 +6963,7 @@ export type SearchReservationUnitsQuery = {
         reservationEnds?: string | null;
         isClosed?: boolean | null;
         firstReservableDatetime?: string | null;
+        currentAccessType?: AccessType | null;
         maxPersons?: number | null;
         id: string;
         pk?: number | null;
@@ -7000,6 +7010,7 @@ export type SearchReservationUnitsQuery = {
           smallUrl?: string | null;
           imageType: ImageType;
         }>;
+        accessTypes: Array<{ accessType: AccessType; beginDate: string }>;
       } | null;
     } | null>;
     pageInfo: { endCursor?: string | null; hasNextPage: boolean };
@@ -9537,6 +9548,7 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
       id
       ...EquipmentFields
     }
+    currentAccessType
   }
   ${AddressFieldsFragmentDoc}
   ${TermsOfUseFragmentDoc}
@@ -9601,6 +9613,11 @@ export const ReservationUnitCardFieldsFragmentDoc = gql`
       ...Image
     }
     maxPersons
+    currentAccessType
+    accessTypes(isActiveOrFuture: true) {
+      accessType
+      beginDate
+    }
   }
   ${ReservationUnitNameFieldsFragmentDoc}
   ${UnitNameFieldsI18NFragmentDoc}
@@ -11408,6 +11425,9 @@ export const SearchReservationUnitsDocument = gql`
     $reservationUnitType: [Int]
     $purposes: [Int]
     $equipments: [Int]
+    $accessType: [AccessType]
+    $accessTypeBeginDate: Date
+    $accessTypeEndDate: Date
     $reservableDateStart: Date
     $reservableDateEnd: Date
     $reservableTimeStart: Time
@@ -11434,6 +11454,9 @@ export const SearchReservationUnitsDocument = gql`
       reservationUnitType: $reservationUnitType
       purposes: $purposes
       equipments: $equipments
+      accessType: $accessType
+      accessTypeBeginDate: $accessTypeBeginDate
+      accessTypeEndDate: $accessTypeEndDate
       reservableDateStart: $reservableDateStart
       reservableDateEnd: $reservableDateEnd
       reservableTimeStart: $reservableTimeStart
@@ -11456,6 +11479,7 @@ export const SearchReservationUnitsDocument = gql`
           reservationEnds
           isClosed
           firstReservableDatetime
+          currentAccessType
           pricings {
             ...PricingFields
           }
@@ -11493,6 +11517,9 @@ export const SearchReservationUnitsDocument = gql`
  *      reservationUnitType: // value for 'reservationUnitType'
  *      purposes: // value for 'purposes'
  *      equipments: // value for 'equipments'
+ *      accessType: // value for 'accessType'
+ *      accessTypeBeginDate: // value for 'accessTypeBeginDate'
+ *      accessTypeEndDate: // value for 'accessTypeEndDate'
  *      reservableDateStart: // value for 'reservableDateStart'
  *      reservableDateEnd: // value for 'reservableDateEnd'
  *      reservableTimeStart: // value for 'reservableTimeStart'

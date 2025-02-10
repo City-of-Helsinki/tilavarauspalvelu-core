@@ -14,10 +14,8 @@ import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import {
-  mapQueryParamToNumber,
-  mapQueryParamToNumberArray,
+  mapParamToNumber,
   mapSingleBooleanParamToFormValue,
-  mapSingleParamToFormValue,
 } from "@/modules/search";
 import {
   BottomContainer,
@@ -26,6 +24,8 @@ import {
   StyledSubmitButton,
 } from "./styled";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
+import { AccessType } from "@gql/gql-types";
+import { toNumber } from "common/src/helpers";
 
 const StyledCheckBox = styled(Checkbox)`
   margin: 0 !important;
@@ -39,6 +39,7 @@ type FormValues = {
   unit: number[];
   equipments: number[];
   reservationUnitTypes: number[];
+  accessType: string[];
   timeBegin: string | null;
   timeEnd: string | null;
   startDate: string | null;
@@ -51,27 +52,29 @@ type FormValues = {
 };
 
 function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
-  const dur = mapQueryParamToNumber(params.getAll("duration"));
+  const dur = toNumber(params.get("duration"));
   const duration = dur != null && dur > 0 ? dur : null;
   const showOnlyReservable =
     mapSingleBooleanParamToFormValue(params.getAll("showOnlyReservable")) ??
     true;
   return {
-    purposes: mapQueryParamToNumberArray(params.getAll("purposes")),
-    unit: mapQueryParamToNumberArray(params.getAll("unit")),
-    equipments: mapQueryParamToNumberArray(params.getAll("equipments")),
-    reservationUnitTypes: mapQueryParamToNumberArray(
-      params.getAll("reservationUnitTypes")
+    purposes: mapParamToNumber(params.getAll("purposes"), 1),
+    unit: mapParamToNumber(params.getAll("unit"), 1),
+    equipments: mapParamToNumber(params.getAll("equipments"), 1),
+    reservationUnitTypes: mapParamToNumber(
+      params.getAll("reservationUnitTypes"),
+      1
     ),
-    timeBegin: mapSingleParamToFormValue(params.getAll("timeBegin")),
-    timeEnd: mapSingleParamToFormValue(params.getAll("timeEnd")),
-    startDate: mapSingleParamToFormValue(params.getAll("startDate")),
-    endDate: mapSingleParamToFormValue(params.getAll("endDate")),
+    accessType: params.getAll("accessType"),
+    timeBegin: params.get("timeBegin"),
+    timeEnd: params.get("timeEnd"),
+    startDate: params.get("startDate"),
+    endDate: params.get("endDate"),
     duration,
-    minPersons: mapQueryParamToNumber(params.getAll("minPersons")),
-    maxPersons: mapQueryParamToNumber(params.getAll("maxPersons")),
+    minPersons: toNumber(params.get("minPersons")),
+    maxPersons: toNumber(params.get("maxPersons")),
     showOnlyReservable,
-    textSearch: mapSingleParamToFormValue(params.getAll("textSearch")) ?? "",
+    textSearch: params.get("textSearch") ?? "",
   };
 }
 
@@ -89,12 +92,14 @@ const filterOrder = [
   "unit",
   "purposes",
   "equipments",
+  "accessType",
 ] as const;
 const multiSelectFilters = [
   "unit",
   "reservationUnitTypes",
   "purposes",
   "equipments",
+  "accessType",
 ] as const;
 // we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
 const hideTagList = ["showOnlyReservable", "order", "sort", "ref"];
@@ -106,13 +111,13 @@ export function SingleSearchForm({
   unitOptions,
   equipmentsOptions,
   isLoading,
-}: {
+}: Readonly<{
   reservationUnitTypeOptions: Array<{ value: number; label: string }>;
   purposeOptions: Array<{ value: number; label: string }>;
   unitOptions: Array<{ value: number; label: string }>;
   equipmentsOptions: Array<{ value: number; label: string }>;
   isLoading: boolean;
-}): JSX.Element | null {
+}>): JSX.Element | null {
   const { handleSearch } = useSearchModify();
   const { t } = useTranslation();
   const searchValues = useSearchParams();
@@ -121,6 +126,10 @@ export function SingleSearchForm({
   const form = useForm<FormValues>({
     values: formValues,
   });
+  const accessTypeOptions = Object.values(AccessType).map((value) => ({
+    value,
+    label: t(`reservationUnit:accessTypes.${value}`),
+  }));
 
   const { handleSubmit, setValue, getValues, control, register } = form;
   const unitTypeOptions = reservationUnitTypeOptions;
@@ -142,6 +151,8 @@ export function SingleSearchForm({
         return equipmentsOptions.find((n) => compFn(n, value))?.label;
       case "duration":
         return durationOptions.find((n) => compFn(n, value))?.label;
+      case "accessType":
+        return accessTypeOptions.find((n) => compFn(n, value))?.label;
       case "startDate":
       case "endDate":
       case "timeBegin":
@@ -288,6 +299,14 @@ export function SingleSearchForm({
                 handleSubmit(onSearch)();
               }
             }}
+          />
+          <ControlledSelect
+            multiselect
+            clearable
+            name="accessType"
+            control={control}
+            options={accessTypeOptions}
+            label={t("searchForm:accessTypeFilter")}
           />
         </OptionalFilters>
         <Controller
