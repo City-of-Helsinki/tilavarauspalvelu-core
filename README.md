@@ -12,12 +12,13 @@ and resources owned by the City of Helsinki. This project replaces the [old Vara
 For more detailed information, please refer to the [Tilavarauspalvelu page in Confluence]
 (accessible to the City of Helsinki organization only).
 
-The project is moving to a monorepo structure.
 Backend specific documentation can be found in the [backend README].
+Frontend specific documentation can be found in the [frontend README].
 
-[backend README]: https://github.com/City-of-Helsinki/tilavarauspalvelu-core/blob/main/backend/README.md
+[backend README]: https://github.com/City-of-Helsinki/tilavarauspalvelu-core/blob/main/README.md
 [Coverage Link]: https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core
 [Coverage]: https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=coverage
+[frontend README]: https://github.com/City-of-Helsinki/tilavarauspalvelu-core/blob/main/README-ui.md
 [License Link]: https://github.com/City-of-Helsinki/tilavarauspalvelu-core/blob/main/LICENSE
 [License]: https://img.shields.io/badge/license-MIT-blue.svg
 [Maintainability Rating Link]: https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core
@@ -28,3 +29,4 @@ Backend specific documentation can be found in the [backend README].
 [reservation platform]: https://tilavaraus.hel.fi/
 [Security Rating Link]: https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core
 [Security Rating]: https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=security_rating
+[Tilavarauspalvelu page in Confluence]: https://helsinkisolutionoffice.atlassian.net/wiki/spaces/KAN/pages/887029864/Tilavarauspalvelu+Varaamo
