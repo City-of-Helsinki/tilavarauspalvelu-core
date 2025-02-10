@@ -77,7 +77,7 @@ def test_get_context_for_application_section_cancelled(lang: Lang):
         "application_section_id": 0,
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_application_section_cancelled(**get_mock_params(**params), language=lang) == expected
+        assert get_context_for_application_section_cancelled(**get_mock_params(**params, language=lang)) == expected
         assert get_mock_data(email_type=EmailType.APPLICATION_SECTION_CANCELLED, **params, language=lang) == expected
 
 
@@ -96,7 +96,7 @@ def test_get_context_for_application_section_cancelled__instance(email_reservati
         "application_section_id": section.id,
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_application_section_cancelled(**get_mock_params(**params), language="en") == expected
+        assert get_context_for_application_section_cancelled(**get_mock_params(**params, language="en")) == expected
 
     with TranslationsFromPOFiles():
         assert get_context_for_application_section_cancelled(application_section=section, language="en") == expected

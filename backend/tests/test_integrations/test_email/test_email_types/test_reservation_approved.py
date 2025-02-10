@@ -105,7 +105,7 @@ def test_get_context__reservation_approved(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_approved(**get_mock_params(), language=lang) == expected
+        assert get_context_for_reservation_approved(**get_mock_params(language=lang)) == expected
         assert get_mock_data(email_type=EmailType.RESERVATION_APPROVED, language=lang) == expected
 
 
@@ -119,7 +119,7 @@ def test_get_context__reservation_approved__discount(lang: Lang):
         "non_subsidised_price": Decimal("14.30"),
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_approved(**get_mock_params(**params), language=lang) == expected
+        assert get_context_for_reservation_approved(**get_mock_params(**params, language=lang)) == expected
         assert get_mock_data(email_type=EmailType.RESERVATION_APPROVED, **params, language=lang) == expected
 
 
@@ -138,7 +138,7 @@ def test_get_context__reservation_approved__instance(email_reservation):
         "instructions_confirmed": '<p>[HYVÄKSYTYN VARAUKSEN OHJEET] <a href="https://foo.bar">LINK</a></p>',
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_approved(**get_mock_params(**params), language="en") == expected
+        assert get_context_for_reservation_approved(**get_mock_params(**params, language="en")) == expected
 
     email_reservation.reservation_units.update(
         reservation_confirmed_instructions_en='<p>[HYVÄKSYTYN VARAUKSEN OHJEET] <a href="https://foo.bar">LINK</a></p>'
@@ -169,7 +169,7 @@ def test_get_context__reservation_approved__access_code(email_reservation):
         "reservation_id": email_reservation.id,
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_approved(**get_mock_params(**params), language="en") == expected
+        assert get_context_for_reservation_approved(**get_mock_params(**params, language="en")) == expected
 
     email_reservation.access_type = AccessType.ACCESS_CODE
     email_reservation.save()

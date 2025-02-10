@@ -87,7 +87,7 @@ def test_get_context__staff_notification_reservation_requires_handling(lang: Lan
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_reservation_requires_handling(**get_mock_params(), language=lang)
+        context = get_context_for_staff_notification_reservation_requires_handling(**get_mock_params(language=lang))
         assert context == expected
 
         context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_RESERVATION_REQUIRES_HANDLING, language=lang)
@@ -118,7 +118,7 @@ def test_get_context__staff_notification_reservation_requires_handling__instance
     }
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_reservation_requires_handling(
-            **get_mock_params(**params), language="en"
+            **get_mock_params(**params, language="en")
         )
         assert context == expected
 
