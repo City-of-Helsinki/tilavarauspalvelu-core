@@ -2,20 +2,22 @@
 
 resources:
   repositories:
-  # Azure DevOps repository.
-  - repository: tilavarauspalvelu-pipelines
-    type: git
-    # Azure DevOps project/repository.
-    name: tilavarauspalvelu/tilavarauspalvelu-pipelines
+    # Azure DevOps repository.
+    - repository: tilavarauspalvelu-pipelines
+      type: git
+      # Azure DevOps project/repository.
+      name: tilavarauspalvelu/tilavarauspalvelu-pipelines
 
 trigger:
   batch: false
   branches:
     include:
-    - main
+      - main
   paths:
+    include:
+      - backend
     exclude:
-    - README.md
+      - README.md
 
 # Don't use Azure pipelines for PRs.
 pr: none
