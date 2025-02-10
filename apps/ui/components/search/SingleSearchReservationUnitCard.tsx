@@ -3,6 +3,7 @@ import {
   IconEuroSign,
   IconGroup,
   IconHome,
+  IconLock,
   IconSize,
 } from "hds-react";
 import React from "react";
@@ -142,10 +143,32 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
   }
   if (reservationUnit.maxPersons) {
     infos.push({
-      icon: <IconGroup size={IconSize.Small} />,
+      icon: (
+        <IconGroup
+          aria-hidden="false"
+          aria-label={t("reservationUnitCard:maxPersons", {
+            maxPersons: reservationUnit.maxPersons,
+          })}
+          size={IconSize.Small}
+        />
+      ),
       value: t("reservationUnitCard:maxPersons", {
         count: reservationUnit.maxPersons,
       }),
+    });
+  }
+  if (reservationUnit.currentAccessType) {
+    infos.push({
+      icon: (
+        <IconLock
+          aria-hidden="false"
+          aria-label={t("reservationUnit:accessType")}
+          size={IconSize.Small}
+        />
+      ),
+      value: t(
+        `reservationUnit:accessTypes.${reservationUnit.currentAccessType}`
+      ),
     });
   }
 

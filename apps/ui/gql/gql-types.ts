@@ -6900,7 +6900,7 @@ export type ReservationUnitCardFieldsFragment = {
     smallUrl?: string | null;
     imageType: ImageType;
   }>;
-  accessTypes: Array<{ accessType: AccessType; beginDate: string }>;
+  accessTypes: Array<{ accessType: AccessType }>;
 };
 
 export type SearchReservationUnitsQueryVariables = Exact<{
@@ -7010,7 +7010,7 @@ export type SearchReservationUnitsQuery = {
           smallUrl?: string | null;
           imageType: ImageType;
         }>;
-        accessTypes: Array<{ accessType: AccessType; beginDate: string }>;
+        accessTypes: Array<{ accessType: AccessType }>;
       } | null;
     } | null>;
     pageInfo: { endCursor?: string | null; hasNextPage: boolean };
@@ -9616,7 +9616,6 @@ export const ReservationUnitCardFieldsFragmentDoc = gql`
     currentAccessType
     accessTypes(isActiveOrFuture: true) {
       accessType
-      beginDate
     }
   }
   ${ReservationUnitNameFieldsFragmentDoc}
