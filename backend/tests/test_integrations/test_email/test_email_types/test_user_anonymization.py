@@ -11,10 +11,11 @@ from django.test import override_settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.admin.email_template.utils import get_mock_data
-from tilavarauspalvelu.enums import EmailType, Language
+from tilavarauspalvelu.enums import Language
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
 from tilavarauspalvelu.integrations.email.template_context import get_context_for_user_anonymization
+from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.models.user.actions import ANONYMIZED_FIRST_NAME, ANONYMIZED_LAST_NAME
 from utils.date_utils import local_datetime
 

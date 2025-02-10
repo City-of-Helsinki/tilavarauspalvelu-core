@@ -10,9 +10,9 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.enums import EmailType, Language
+from tilavarauspalvelu.enums import Language
 from tilavarauspalvelu.integrations.email.sending import send_emails_in_batches_task
-from tilavarauspalvelu.integrations.email.typing import EmailData
+from tilavarauspalvelu.integrations.email.typing import EmailData, EmailType
 from tilavarauspalvelu.models import ReservationUnit
 from utils.utils import safe_getattr
 
