@@ -15,7 +15,7 @@ repos:
         args: ["--markdown-linebreak-ext=md"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.3
+    rev: v0.9.6
     hooks:
       - id: ruff
         entry: bash -c 'cd backend && ruff check --force-exclude'
