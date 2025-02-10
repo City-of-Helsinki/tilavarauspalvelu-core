@@ -9,17 +9,27 @@ resources:
       name: tilavarauspalvelu/tilavarauspalvelu-pipelines
 
 trigger:
-  batch: false
+  # If another instance of this pipeline is running,
+  # wait for it to complete and then run all other changes in a batch.
+  batch: true
   tags:
-    # Trigger when creating tags like v1.0.0, release-1.0.0, hotfix-1.0.0, release-1.0.0-admin,
-    # but not when creating tags like v1.0.0-ui, v1.0.0-core, etc.
+    # Trigger when creating tags like v1.0.0, release-1.0.0, hotfix-1.0.0, v1.0.0-ui, v1.0.0-admin,
+    # but not when creating tags like v1.0.0-customer, v1.0.0-core, etc.
     include:
       - "v*"
       - "release-*"
       - "hotfix-*"
     exclude:
-      - "*-ui"
+      - "*-customer"
       - "*-core"
+  paths:
+    # Should use turborepo to calculate the real needed packages,
+    # but currently this is not possible.
+    include:
+      - packages/common
+      - apps/admin-ui
+    exclude:
+      - README.md
 
 # Don't use Azure pipelines for PRs.
 pr: none

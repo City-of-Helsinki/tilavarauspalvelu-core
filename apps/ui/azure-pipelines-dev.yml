@@ -9,7 +9,9 @@ resources:
       name: tilavarauspalvelu/tilavarauspalvelu-pipelines
 
 trigger:
-  batch: false
+  # If another instance of this pipeline is running,
+  # wait for it to complete and then run all other changes in a batch.
+  batch: true
   branches:
     include:
       - main
