@@ -94,6 +94,7 @@ export const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
       id
       ...EquipmentFields
     }
+    currentAccessType
   }
 `;
 
@@ -172,6 +173,11 @@ export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
       ...Image
     }
     maxPersons
+    currentAccessType
+    accessTypes(isActiveOrFuture: true) {
+      accessType
+      beginDate
+    }
   }
 `;
 
@@ -190,6 +196,9 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $reservationUnitType: [Int]
     $purposes: [Int]
     $equipments: [Int]
+    $accessType: [AccessType]
+    $accessTypeBeginDate: Date
+    $accessTypeEndDate: Date
     $reservableDateStart: Date
     $reservableDateEnd: Date
     $reservableTimeStart: Time
@@ -216,6 +225,9 @@ export const SEARCH_RESERVATION_UNITS = gql`
       reservationUnitType: $reservationUnitType
       purposes: $purposes
       equipments: $equipments
+      accessType: $accessType
+      accessTypeBeginDate: $accessTypeBeginDate
+      accessTypeEndDate: $accessTypeEndDate
       reservableDateStart: $reservableDateStart
       reservableDateEnd: $reservableDateEnd
       reservableTimeStart: $reservableTimeStart
@@ -238,6 +250,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
           reservationEnds
           isClosed
           firstReservableDatetime
+          currentAccessType
           pricings {
             ...PricingFields
           }

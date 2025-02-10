@@ -1,26 +1,27 @@
 /// This file contains the search query for reservation units
 /// e.g. the common search pages (both seasonal and single)
 import {
-  type LocalizationLanguages,
+  filterNonNullable,
   getLocalizationLang,
-  toNumber,
   ignoreMaybeArray,
+  type LocalizationLanguages,
+  toNumber,
 } from "common/src/helpers";
 import {
+  AccessType,
+  EquipmentOrderingChoices,
+  OptionsDocument,
+  type OptionsQuery,
+  PurposeOrderingChoices,
   type QueryReservationUnitsArgs,
   ReservationKind,
   ReservationUnitOrderingChoices,
-  type OptionsQuery,
-  OptionsDocument,
-  EquipmentOrderingChoices,
-  UnitOrderingChoices,
   ReservationUnitTypeOrderingChoices,
-  PurposeOrderingChoices,
+  SearchFormParamsUnitDocument,
   SearchFormParamsUnitQuery,
   SearchFormParamsUnitQueryVariables,
-  SearchFormParamsUnitDocument,
+  UnitOrderingChoices,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -74,6 +75,21 @@ function transformOrderByTypeRank(
   return desc
     ? ReservationUnitOrderingChoices.TypeRankDesc
     : ReservationUnitOrderingChoices.TypeRankAsc;
+}
+
+function transformAccessTypeSafe(t: string): AccessType | null {
+  switch (t) {
+    case AccessType.AccessCode:
+      return AccessType.AccessCode;
+    case AccessType.PhysicalKey:
+      return AccessType.PhysicalKey;
+    case AccessType.OpenedByStaff:
+      return AccessType.OpenedByStaff;
+    case AccessType.Unrestricted:
+      return AccessType.Unrestricted;
+    default:
+      return null;
+  }
 }
 
 function transformOrderBy(
@@ -138,7 +154,10 @@ type ProcessVariablesParams =
       language: string;
       kind: ReservationKind.Season;
       applicationRound: number;
+      reservationPeriodBegin: string;
+      reservationPeriodEnd: string;
     };
+
 export function processVariables({
   values,
   language,
@@ -177,8 +196,17 @@ export function processVariables({
     ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
   const applicationRound =
     "applicationRound" in rest && isSeasonal ? rest.applicationRound : null;
+  const reservationPeriodBegin =
+    "reservationPeriodBegin" in rest && isSeasonal
+      ? rest.reservationPeriodBegin
+      : null;
+  const reservationPeriodEnd =
+    "reservationPeriodEnd" in rest && isSeasonal
+      ? rest.reservationPeriodEnd
+      : null;
   const timeEnd = ignoreMaybeArray(values.getAll("timeEnd"));
   const timeBegin = ignoreMaybeArray(values.getAll("timeBegin"));
+  const accessType = values.getAll("accessType").map(transformAccessTypeSafe);
   return {
     ...(textSearch !== ""
       ? {
@@ -199,6 +227,11 @@ export function processVariables({
     unit,
     reservationUnitType: reservationUnitTypes,
     equipments,
+    accessType,
+    accessTypeBeginDate: isSeasonal
+      ? reservationPeriodBegin
+      : reservableDateStart,
+    accessTypeEndDate: isSeasonal ? reservationPeriodEnd : reservableDateEnd,
     ...(startDate != null
       ? {
           reservableDateStart,
@@ -264,6 +297,15 @@ export function mapSingleBooleanParamToFormValue(
   return param === "true";
 }
 
+export function mapQueryParamToStringArray(
+  param: string | string[] | undefined
+): string[] {
+  if (param == null) return [];
+  if (param === "") return [];
+  if (Array.isArray(param)) return param;
+  return [param];
+}
+
 export function mapQueryParamToNumber(
   param: string | string[] | undefined
 ): number | null {
@@ -288,6 +330,9 @@ export function mapQueryParamToNumberArray(
     return [];
   }
   return [v];
+export function mapParamToNumber(param: string[], min?: number): number[] {
+  const numbers = param.map(Number).filter(Number.isInteger);
+  return min != null ? numbers.filter((n) => n >= min) : numbers;
 }
 
 export async function getSearchOptions(

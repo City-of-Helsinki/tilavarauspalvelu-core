@@ -42,7 +42,7 @@ function SearchSingle({
   reservationUnitTypeOptions,
   purposeOptions,
   equipmentsOptions,
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const searchValues = useSearchParams();
