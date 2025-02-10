@@ -8,6 +8,7 @@ import {
   ButtonSize,
   ButtonVariant,
   IconHome,
+  IconLock,
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
@@ -36,7 +37,7 @@ export function ReservationUnitCard({
   selectReservationUnit,
   containsReservationUnit,
   removeReservationUnit,
-}: CardProps): JSX.Element {
+}: Readonly<CardProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
@@ -67,6 +68,20 @@ export function ReservationUnitCard({
       value: t("reservationUnitCard:maxPersons", {
         count: reservationUnit.maxPersons,
       }),
+    });
+  }
+  if (reservationUnit.currentAccessType) {
+    infos.push({
+      icon: (
+        <IconLock
+          aria-hidden="false"
+          aria-label={t("reservationUnit:accessType")}
+          size={IconSize.Small}
+        />
+      ),
+      value: t(
+        `reservationUnit:accessTypes.${reservationUnit.currentAccessType}`
+      ),
     });
   }
 

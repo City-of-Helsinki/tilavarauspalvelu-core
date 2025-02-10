@@ -273,15 +273,6 @@ export function processVariables({
   };
 }
 
-export function mapSingleParamToFormValue(
-  param: string | string[] | undefined
-): string | null {
-  if (param == null) return null;
-  if (param === "") return null;
-  if (Array.isArray(param)) return param.join(",");
-  return param;
-}
-
 // default to false if the param is present but not true, null if not present
 export function mapSingleBooleanParamToFormValue(
   param: string | string[] | undefined
@@ -297,39 +288,6 @@ export function mapSingleBooleanParamToFormValue(
   return param === "true";
 }
 
-export function mapQueryParamToStringArray(
-  param: string | string[] | undefined
-): string[] {
-  if (param == null) return [];
-  if (param === "") return [];
-  if (Array.isArray(param)) return param;
-  return [param];
-}
-
-export function mapQueryParamToNumber(
-  param: string | string[] | undefined
-): number | null {
-  if (param == null) return null;
-  if (param === "") return null;
-  if (Array.isArray(param)) {
-    return toNumber(param[0]);
-  }
-  return toNumber(param);
-}
-
-export function mapQueryParamToNumberArray(
-  param: string | string[] | undefined
-): number[] {
-  if (param == null) return [];
-  if (param === "") return [];
-  if (Array.isArray(param)) {
-    return param.map(Number).filter(Number.isInteger);
-  }
-  const v = Number(param);
-  if (Number.isNaN(v)) {
-    return [];
-  }
-  return [v];
 export function mapParamToNumber(param: string[], min?: number): number[] {
   const numbers = param.map(Number).filter(Number.isInteger);
   return min != null ? numbers.filter((n) => n >= min) : numbers;
