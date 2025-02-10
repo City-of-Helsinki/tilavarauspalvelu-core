@@ -48,7 +48,7 @@ __all__ = [
 
 
 @get_translated
-def get_mock_params(**kwargs: Any) -> EmailContext | datetime | bool:
+def get_mock_params(language: Lang, **kwargs: Any) -> EmailContext | datetime | bool:
     """
     Return mock parameters that can be used for creating ANY email template context.
 
@@ -106,6 +106,7 @@ def get_mock_params(**kwargs: Any) -> EmailContext | datetime | bool:
         "access_code_validity_period": (
             kwargs.get("access_code_validity_period", "11:00-15:00") if access_code_is_used else ""
         ),
+        "language": language,
     }
 
 
