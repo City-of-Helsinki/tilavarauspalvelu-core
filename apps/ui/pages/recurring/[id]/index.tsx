@@ -37,7 +37,7 @@ function SeasonalSearch({
   unitOptions,
   reservationUnitTypeOptions,
   purposeOptions,
-}: NarrowedProps): JSX.Element {
+}: Readonly<NarrowedProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const searchValues = useSearchParams();
 
@@ -53,6 +53,8 @@ function SeasonalSearch({
     language: i18n.language,
     kind: ReservationKind.Season,
     applicationRound: applicationRound.pk ?? 0,
+    reservationPeriodBegin: applicationRound?.reservationPeriodBegin ?? "",
+    reservationPeriodEnd: applicationRound?.reservationPeriodEnd ?? "",
   });
   const query = useSearchQuery(variables);
   const { data, isLoading, error, fetchMore, previousData } = query;
@@ -129,7 +131,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       notFound: true,
     },
   };
-  if (pk == null || !(pk > 0)) {
+  if (pk == null || pk <= 0) {
     return notFound;
   }
   const { data } = await apolloClient.query<
@@ -167,6 +169,8 @@ export const APPLICATION_ROUND_QUERY = gql`
       nameFi
       nameEn
       nameSv
+      reservationPeriodBegin
+      reservationPeriodEnd
       reservationUnits {
         id
         pk

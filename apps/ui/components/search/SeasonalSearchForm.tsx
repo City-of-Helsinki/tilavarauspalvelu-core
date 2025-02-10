@@ -12,14 +12,11 @@ import { useSearchModify } from "@/hooks/useSearchValues";
 import { FilterTagList } from "./FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { BottomContainer, Filters, StyledSubmitButton } from "./styled";
-import {
-  mapQueryParamToNumber,
-  mapQueryParamToNumberArray,
-  mapSingleParamToFormValue,
-} from "@/modules/search";
+import { mapParamToNumber } from "@/modules/search";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
-import { type URLSearchParams } from "node:url";
-import { useSearchParams } from "next/navigation";
+import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
+import { AccessType } from "@gql/gql-types";
+import { toNumber } from "common/src/helpers";
 
 const filterOrder = [
   "applicationRound",
@@ -29,6 +26,7 @@ const filterOrder = [
   "reservationUnitTypes",
   "unit",
   "purposes",
+  "accessType",
 ] as const;
 
 type FormValues = {
@@ -38,19 +36,22 @@ type FormValues = {
   reservationUnitTypes: number[];
   purposes: number[];
   textSearch: string;
+  accessType: string[];
 };
 
 // TODO combine as much as possible with the one in single-search (move them to a common place)
-function mapQueryToForm(query: URLSearchParams): FormValues {
+function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
   return {
-    purposes: mapQueryParamToNumberArray(query.getAll("purposes")),
-    unit: mapQueryParamToNumberArray(query.getAll("unit")),
-    reservationUnitTypes: mapQueryParamToNumberArray(
-      query.getAll("reservationUnitTypes")
+    purposes: mapParamToNumber(params.getAll("purposes"), 1),
+    unit: mapParamToNumber(params.getAll("unit"), 1),
+    reservationUnitTypes: mapParamToNumber(
+      params.getAll("reservationUnitTypes"),
+      1
     ),
-    minPersons: mapQueryParamToNumber(query.getAll("minPersons")),
-    maxPersons: mapQueryParamToNumber(query.getAll("maxPersons")),
-    textSearch: mapSingleParamToFormValue(query.getAll("textSearch")) ?? "",
+    minPersons: toNumber(params.get("minPersons")),
+    maxPersons: toNumber(params.get("maxPersons")),
+    textSearch: params.get("textSearch") ?? "",
+    accessType: params.getAll("accessType"),
   };
 }
 
@@ -60,12 +61,12 @@ export function SeasonalSearchForm({
   purposeOptions,
   unitOptions,
   isLoading,
-}: {
+}: Readonly<{
   reservationUnitTypeOptions: OptionType[];
   purposeOptions: OptionType[];
   unitOptions: OptionType[];
   isLoading: boolean;
-}): JSX.Element | null {
+}>): JSX.Element | null {
   const { t } = useTranslation();
 
   const { handleSearch } = useSearchModify();
@@ -79,6 +80,11 @@ export function SeasonalSearchForm({
     handleSearch(criteria, true);
   };
 
+  const accessTypeOptions = Object.values(AccessType).map((value) => ({
+    value,
+    label: t(`reservationUnit:accessTypes.${value}`),
+  }));
+
   const translateTag = (key: string, value: string): string | undefined => {
     switch (key) {
       case "unit":
@@ -88,6 +94,8 @@ export function SeasonalSearchForm({
           ?.label;
       case "purposes":
         return purposeOptions.find((n) => String(n.value) === value)?.label;
+      case "accessType":
+        return accessTypeOptions.find((n) => String(n.value) === value)?.label;
       default:
         return "";
     }
@@ -97,6 +105,7 @@ export function SeasonalSearchForm({
     "unit",
     "reservationUnitTypes",
     "purposes",
+    "accessType",
   ] as const;
   const hideList = [
     "id",
@@ -167,6 +176,14 @@ export function SeasonalSearchForm({
           control={control}
           options={purposeOptions}
           label={t("searchForm:purposesFilter")}
+        />
+        <ControlledSelect
+          multiselect
+          clearable
+          name="accessType"
+          control={control}
+          options={accessTypeOptions}
+          label={t("searchForm:accessTypeFilter")}
         />
       </Filters>
       <BottomContainer>
