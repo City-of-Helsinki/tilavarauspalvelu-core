@@ -23,6 +23,7 @@ import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
 import { breakpoints } from "common";
 import { gql } from "@apollo/client";
 import ClientOnly from "common/src/ClientOnly";
+import { ErrorText } from "common/src/components/ErrorText";
 
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
 export type OptionType = { value: number; label: string };
@@ -141,13 +142,7 @@ export function ReservationUnitList({
   return (
     <Flex>
       {hasNoUnitsError && (
-        <Notification
-          type="error"
-          label={t("application:error.noReservationUnits")}
-          size={NotificationSize.Small}
-        >
-          {t("application:error.noReservationUnits")}
-        </Notification>
+        <ErrorText>{t("application:validation.noReservationUnits")}</ErrorText>
       )}
       <Notification
         size={NotificationSize.Small}
@@ -160,10 +155,12 @@ export function ReservationUnitList({
           {currentReservationUnits.map((ru, i, all) => (
             <OrderedReservationUnitCard
               key={ru.pk}
-              invalid={
+              error={
                 minSize != null &&
                 ru.maxPersons != null &&
                 minSize > ru.maxPersons
+                  ? t("application:validation.reservationUnitTooSmall")
+                  : undefined
               }
               onDelete={remove}
               reservationUnit={ru}

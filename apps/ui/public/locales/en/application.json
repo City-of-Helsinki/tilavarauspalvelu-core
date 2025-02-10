@@ -1,27 +1,11 @@
 {
   "error": {
-    "saveFailed": "Application could not be saved",
-    "required": "Required",
-    "requiredField": "Application could not be saved",
-    "pattern": "Check format",
-    "numPersonsMin": "Group size incorrect",
-    "minDurationBiggerThanMaxDuration": "Minimum duration is greater than maximum duration",
-    "maxDurationSmallerThanMinDuration": "Maximum duration is less than minimum duration",
-    "eventsPerWeekMin": "At least one booking per week",
-    "beginAfterEnd": "Season start date is later than end date",
-    "beginBeforePeriodBegin": "Season start date is too early",
-    "beginAfterPeriodEnd": "Season start date is too late",
-    "endAfterPeriodEnd": "Season end date is too late",
-    "endBeforeBegin": "Season end date is earlier than start date",
-    "endBeforePeriodBegin": "Season end date is too early",
-    "missingSchedule": "Add at least one time slot for all season bookings",
-    "otherEventsHaveErrors": "Fix incorrectly filled fields",
-    "noReservationUnits": "Add one or more spaces to the application",
-    "noEvents": "Add one or more seasonal bookings to the application",
-    "maxLength": "Maximum length: {{count}}"
+    "saveFailed": "Application could not be saved"
   },
   "validation": {
     "Required": "Required",
+    "Expected number, received null": "Required",
+    "noReservationUnits": "Add one or more spaces to the application",
     "End date must be after begin date": "End date must be after start date",
     "Expected number, received nan": "Has to be a number",
     "Number must be greater than or equal to 1": "Has to be at least 1",
@@ -33,8 +17,19 @@
     "end date must be before application round end date": "End date must be before application round end date",
     "end date must be after application round begin date": "End date must be after application round begin date",
     "Invalid date": "Invalid date",
+    "Invalid email": "Invalid email",
+    "String must contain at least 1 character(s)": "Required",
     "String must contain at most 255 character(s)": "Maximum of 255 characters",
-    "String must contain at most 100 character(s)": "Maximum of 100 characters"
+    "String must contain at most 254 character(s)": "Maximum of 254 characters",
+    "String must contain at most 100 character(s)": "Maximum of 100 characters",
+    "String must contain at most 80 character(s)": "Maximum of 80 characters",
+    "String must contain at most 32 character(s)": "Maximum of 32 characters",
+    "calendar": {
+      "title": "Your selected time slots do not correspond to the duration of your booking",
+      "Suitable time range must be at least as long as the minimum duration": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
+      "At least as many suitable time ranges as applied reservations per week": "Select more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
+      "Array must contain at least 1 element(s)": "Valitse kalenterista aikatoiveita"
+    }
   },
   "Intro": {
     "startNewApplication": "Apply",
@@ -95,12 +90,6 @@
     "secondarySchedules": "Other time slots",
     "notification": {
       "copyCells": "Times successfully copied for all booking requests"
-    },
-    "errors": {
-      "title": "Your selected time slots do not correspond to the duration of your booking",
-      "Suitable time range must be at least as long as the minimum duration": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
-      "At least as many suitable time ranges as applied reservations per week": "Select more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
-      "Array must contain at least 1 element(s)": "Valitse kalenterista aikatoiveita"
     }
   },
   "Page3": {

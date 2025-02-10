@@ -95,7 +95,7 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
     reValidateMode: "onChange",
   });
 
-  const { handleSubmit, reset, formState } = form;
+  const { handleSubmit, reset } = form;
 
   useEffect(() => {
     if (application != null) {
@@ -117,8 +117,6 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
 
   const onPrev = () => router.push(getApplicationPath(application.pk, "page2"));
 
-  const { isValid } = formState;
-
   return (
     <FormProvider {...form}>
       <ApplicationPageWrapper
@@ -127,7 +125,7 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
       >
         <Flex as="form" noValidate onSubmit={handleSubmit(onSubmit)}>
           <ApplicantTypeSelector />
-          <AutoGrid $alignCenter>
+          <AutoGrid>
             <FormSubHeading as="h2">
               {t("application:Page3.subHeading.basicInfo")}
             </FormSubHeading>
@@ -148,7 +146,6 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
               iconEnd={<IconArrowRight />}
               size={ButtonSize.Small}
               type="submit"
-              disabled={!isValid}
             >
               {t("common:next")}
             </Button>
@@ -167,8 +164,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
 
   const { query } = ctx;
-  const pkstring = ignoreMaybeArray(query.id);
-  const pk = toNumber(pkstring ?? "");
+  const pk = toNumber(ignoreMaybeArray(query.id));
   const notFound = {
     notFound: true,
     props: {
