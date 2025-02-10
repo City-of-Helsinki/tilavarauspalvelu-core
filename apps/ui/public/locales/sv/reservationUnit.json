@@ -55,6 +55,7 @@
     "onlyRecurring": "Kan bokas endast säsongsbokning",
     "futureOpening": "Du kan boka detta objekt från och med {{date}}."
   },
+  "accessType": "Tillträde till utrymmet",
   "accessTypes": {
     "ACCESS_CODE": "Dörrkod",
     "PHYSICAL_KEY": "Nyckel",

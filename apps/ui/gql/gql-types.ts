@@ -6757,6 +6757,7 @@ export type ReservationUnitPageQuery = {
 
 export type ReservationUnitCardFieldsFragment = {
   maxPersons?: number | null;
+  currentAccessType?: AccessType | null;
   id: string;
   pk?: number | null;
   nameFi?: string | null;
@@ -6856,6 +6857,7 @@ export type SearchReservationUnitsQuery = {
         reservationEnds?: string | null;
         isClosed?: boolean | null;
         firstReservableDatetime?: string | null;
+        currentAccessType?: AccessType | null;
         maxPersons?: number | null;
         id: string;
         pk?: number | null;
@@ -8961,6 +8963,7 @@ export const ReservationUnitCardFieldsFragmentDoc = gql`
       ...Image
     }
     maxPersons
+    currentAccessType
   }
   ${ReservationUnitNameFieldsFragmentDoc}
   ${UnitNameFieldsI18NFragmentDoc}
@@ -10909,6 +10912,7 @@ export const SearchReservationUnitsDocument = gql`
           reservationEnds
           isClosed
           firstReservableDatetime
+          currentAccessType
           pricings {
             ...PricingFields
           }

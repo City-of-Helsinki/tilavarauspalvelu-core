@@ -172,6 +172,7 @@ export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
       ...Image
     }
     maxPersons
+    currentAccessType
   }
 `;
 
@@ -244,6 +245,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
           reservationEnds
           isClosed
           firstReservableDatetime
+          currentAccessType
           pricings {
             ...PricingFields
           }

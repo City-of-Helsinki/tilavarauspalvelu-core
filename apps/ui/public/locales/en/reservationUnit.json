@@ -55,6 +55,7 @@
     "onlyRecurring": "Can only be booked seasonally",
     "futureOpening": "You can make bookings for this item starting on {{date}}."
   },
+  "accessType": "Access to the space",
   "accessTypes": {
     "ACCESS_CODE": "Door code",
     "PHYSICAL_KEY": "Key",
