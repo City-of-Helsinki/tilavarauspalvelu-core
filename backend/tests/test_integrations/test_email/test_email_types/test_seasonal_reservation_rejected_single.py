@@ -85,7 +85,7 @@ def test_get_context_for_seasonal_reservation_rejected_single(lang: Lang):
         "application_section_id": 0,
     }
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_rejected_single(**get_mock_params(**params), language=lang)
+        context = get_context_for_seasonal_reservation_rejected_single(**get_mock_params(**params, language=lang))
         assert context == expected
 
         context = get_mock_data(email_type=EmailType.SEASONAL_RESERVATION_REJECTED_SINGLE, **params, language=lang)
@@ -107,7 +107,7 @@ def test_get_context_for_seasonal_reservation_rejected_single__instance(email_re
         "application_section_id": section.id,
     }
     with TranslationsFromPOFiles():
-        context = get_context_for_seasonal_reservation_rejected_single(**get_mock_params(**params), language="en")
+        context = get_context_for_seasonal_reservation_rejected_single(**get_mock_params(**params, language="en"))
         assert context == expected
 
     with TranslationsFromPOFiles():

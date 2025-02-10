@@ -14,9 +14,7 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context.reservation import (
-    get_context_for_reservation_modified_access_code,
-)
+from tilavarauspalvelu.integrations.email.template_context import get_context_for_reservation_modified_access_code
 from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservationResponse
@@ -105,8 +103,7 @@ def test_get_context__reservation_modified_access_code(lang: Lang):
 
     with TranslationsFromPOFiles():
         context = get_context_for_reservation_modified_access_code(
-            **get_mock_params(access_code_is_used=True),
-            language=lang,
+            **get_mock_params(access_code_is_used=True, language=lang),
         )
         assert context == expected
 
@@ -140,7 +137,7 @@ def test_get_context__reservation_modified__access_code_access_code(email_reserv
         "reservation_id": email_reservation.id,
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_modified_access_code(**get_mock_params(**params), language="en") == expected
+        assert get_context_for_reservation_modified_access_code(**get_mock_params(**params, language="en")) == expected
 
     email_reservation.access_type = AccessType.ACCESS_CODE
     email_reservation.save()

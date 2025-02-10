@@ -13,7 +13,7 @@ from tilavarauspalvelu.admin.email_template.utils import get_mock_data, get_mock
 from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.email.rendering import render_html, render_text
-from tilavarauspalvelu.integrations.email.template_context.application import (
+from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_staff_notification_application_section_cancelled,
 )
 from tilavarauspalvelu.integrations.email.typing import EmailType
@@ -104,10 +104,7 @@ def test_get_context_for_staff_notification_application_section_cancelled(lang: 
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        context = get_context_for_staff_notification_application_section_cancelled(
-            **get_mock_params(language=lang),
-            language=lang,
-        )
+        context = get_context_for_staff_notification_application_section_cancelled(**get_mock_params(language=lang))
         assert context == expected
 
         context = get_mock_data(email_type=EmailType.STAFF_NOTIFICATION_APPLICATION_SECTION_CANCELLED, language=lang)
@@ -143,8 +140,7 @@ def test_get_context_for_staff_notification_application_section_cancelled__insta
     }
     with TranslationsFromPOFiles():
         context = get_context_for_staff_notification_application_section_cancelled(
-            **get_mock_params(**params, language="en"),
-            language="en",
+            **get_mock_params(**params, language="en")
         )
         assert context == expected
 

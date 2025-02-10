@@ -100,7 +100,7 @@ def test_get_context__reservation_requires_payment(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_payment(**get_mock_params(), language=lang) == expected
+        assert get_context_for_reservation_requires_payment(**get_mock_params(language=lang)) == expected
         assert get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_PAYMENT, language=lang) == expected
 
 
@@ -116,7 +116,7 @@ def test_get_context__reservation_requires_payment_instance(email_reservation):
         "reservation_id": email_reservation.id,
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_payment(**get_mock_params(**params), language="en") == expected
+        assert get_context_for_reservation_requires_payment(**get_mock_params(**params, language="en")) == expected
 
     with TranslationsFromPOFiles():
         assert get_context_for_reservation_requires_payment(reservation=email_reservation, language="en") == expected

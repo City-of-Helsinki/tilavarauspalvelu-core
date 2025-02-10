@@ -113,7 +113,7 @@ def test_get_context__reservation_requires_handling__not_subsidised(lang: Lang):
         "subsidised_price": Decimal("12.30"),
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_handling(**get_mock_params(**params), language=lang) == expected
+        assert get_context_for_reservation_requires_handling(**get_mock_params(**params, language=lang)) == expected
         assert get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, **params, language=lang) == expected
 
 
@@ -132,7 +132,7 @@ def test_get_context__reservation_requires_handling__subsidised(lang: Lang):
         "subsidised_price": Decimal("10.00"),
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_handling(**get_mock_params(**params), language=lang) == expected
+        assert get_context_for_reservation_requires_handling(**get_mock_params(**params, language=lang)) == expected
         assert get_mock_data(email_type=EmailType.RESERVATION_REQUIRES_HANDLING, **params, language=lang) == expected
 
 
@@ -153,7 +153,7 @@ def test_get_context__reservation_requires_handling__instance__not_subsidised(em
         "subsidised_price": Decimal("12.30"),
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_handling(**get_mock_params(**params), language="en") == expected
+        assert get_context_for_reservation_requires_handling(**get_mock_params(**params, language="en")) == expected
 
     email_reservation.applying_for_free_of_charge = True
     email_reservation.save()
@@ -179,7 +179,7 @@ def test_get_context__reservation_requires_handling__instance__subsidised(email_
         "subsidised_price": Decimal("10.00"),
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_requires_handling(**get_mock_params(**params), language="en") == expected
+        assert get_context_for_reservation_requires_handling(**get_mock_params(**params, language="en")) == expected
 
     email_reservation.applying_for_free_of_charge = True
     email_reservation.save()

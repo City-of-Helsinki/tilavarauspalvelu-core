@@ -99,7 +99,7 @@ def test_get_context__reservation_confirmed(lang: Lang):
     expected = LANGUAGE_CONTEXT[lang]
 
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_confirmed(**get_mock_params(), language=lang) == expected
+        assert get_context_for_reservation_confirmed(**get_mock_params(language=lang)) == expected
         assert get_mock_data(email_type=EmailType.RESERVATION_CONFIRMED, language=lang) == expected
 
 
@@ -115,7 +115,7 @@ def test_get_context__reservation_confirmed__instance(email_reservation):
         "reservation_id": email_reservation.id,
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_confirmed(**get_mock_params(**params), language="en") == expected
+        assert get_context_for_reservation_confirmed(**get_mock_params(**params, language="en")) == expected
 
     with TranslationsFromPOFiles():
         assert get_context_for_reservation_confirmed(reservation=email_reservation, language="en") == expected
@@ -143,7 +143,7 @@ def test_get_context__reservation_confirmed__access_code(email_reservation):
         "reservation_id": email_reservation.id,
     }
     with TranslationsFromPOFiles():
-        assert get_context_for_reservation_confirmed(**get_mock_params(**params), language="en") == expected
+        assert get_context_for_reservation_confirmed(**get_mock_params(**params, language="en")) == expected
 
     email_reservation.access_type = AccessType.ACCESS_CODE
     email_reservation.save()
