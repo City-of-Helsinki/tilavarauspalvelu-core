@@ -100,7 +100,6 @@
     "homeCity": "Kotipaikka",
     "lastName": "Sukunimi",
     "phoneNumber": "Puhelinnumero",
-    "email": "Hakemukselle liitettävä sähköpostiosoite",
     "emailNotification": "Kaikki hakemukseen liittyvät viestit lähetetään alla olevaan sähköpostiin",
     "subHeading": {
       "basicInfo": "Hakijan perustiedot",
@@ -119,7 +118,8 @@
     "contactPerson": {
       "firstName": "Yhteyshenkilön etunimi",
       "lastName": "Yhteyshenkilön sukunimi",
-      "phoneNumber": "Yhteyshenkilön puhelinnumero"
+      "phoneNumber": "Yhteyshenkilön puhelinnumero",
+      "email": "Hakemukselle liitettävä sähköpostiosoite"
     },
     "billingAddress": {
       "streetAddress": "Katuosoite",

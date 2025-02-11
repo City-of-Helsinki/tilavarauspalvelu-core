@@ -99,7 +99,6 @@
     "homeCity": "Hemort",
     "lastName": "Efternamn",
     "phoneNumber": "Telefonnummer",
-    "email": "E-postadress som skall bifogas till ansökan",
     "emailNotification": "Alla meddelanden som har att göra med ansökningen skickas till nedanstående e-postadress",
     "subHeading": {
       "basicInfo": "Bokningsinformation",
@@ -118,7 +117,8 @@
     "contactPerson": {
       "firstName": "Kontaktpersonens förnamn",
       "lastName": "Kontaktpersonens efternamn",
-      "phoneNumber": "Kontaktpersonens telefonnummer"
+      "phoneNumber": "Kontaktpersonens telefonnummer",
+      "email": "E-postadress som skall bifogas till ansökan"
     },
     "billingAddress": {
       "streetAddress": "Adress",
