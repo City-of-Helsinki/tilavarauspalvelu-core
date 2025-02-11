@@ -27,6 +27,7 @@ from .mutations import (
     ApplicationSectionUpdateMutation,
     ApplicationSendMutation,
     ApplicationUpdateMutation,
+    ApplicationWorkingMemoMutation,
     BannerNotificationCreateMutation,
     BannerNotificationDeleteMutation,
     BannerNotificationUpdateMutation,
@@ -308,6 +309,7 @@ class Mutation(graphene.ObjectType):
     update_application = ApplicationUpdateMutation.Field()
     send_application = ApplicationSendMutation.Field()
     cancel_application = ApplicationCancelMutation.Field()
+    update_application_working_memo = ApplicationWorkingMemoMutation.Field()
     create_application_section = ApplicationSectionCreateMutation.Field()
     update_application_section = ApplicationSectionUpdateMutation.Field()
     delete_application_section = ApplicationSectionDeleteMutation.Field()
