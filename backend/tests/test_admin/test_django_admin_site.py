@@ -143,7 +143,7 @@ def test_django_admin_site__pages_load__data_views():
             converter = next(iter(url_pattern.pattern.converters))
             if converter == "email_type":
                 # Test with all email types
-                for email_type in EmailType:
+                for email_type in EmailType.options:
                     admin_url = reverse(f"admin:{url_pattern.name}", args=[email_type.value])
                     assert client.get(admin_url).status_code == 200, admin_url
             else:
