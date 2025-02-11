@@ -24,7 +24,6 @@ import { ApplicationPageWrapper } from "@/components/application/ApplicationPage
 import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import {
   Button,
@@ -41,6 +40,7 @@ import { FormSubHeading, SpanFullRow } from "@/components/application/styled";
 import { createApolloClient } from "@/modules/apolloClient";
 import { gql } from "@apollo/client";
 import { ApplicationFormTextInput } from "@/components/application/ApplicationFormTextInput";
+import { useDisplayError } from "@/hooks/useDisplayError";
 
 function Page3Form(): JSX.Element | null {
   const { options } = useOptions();
@@ -107,13 +107,14 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
 
   const { t } = useTranslation();
   const [update] = useApplicationUpdate();
+  const dislayError = useDisplayError();
 
   const onSubmit = async (values: ApplicationPage3FormValues) => {
     try {
       const pk = await update(transformPage3Application(values));
       router.push(getApplicationPath(pk, "preview"));
-    } catch (e) {
-      errorToast({ text: t("common:error.dataError") });
+    } catch (err) {
+      dislayError(err);
     }
   };
 

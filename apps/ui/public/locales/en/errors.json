@@ -38,6 +38,7 @@
     "validation": {
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "The person making the reservation must be 18 years old",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "The applicant must be 18 years old.",
+      "invalid": "Invalid value.",
       "generic_validation_error": "An error occurred."
     }
   }
