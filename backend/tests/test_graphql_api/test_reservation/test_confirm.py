@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from decimal import Decimal
 
 import pytest
@@ -15,6 +16,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservationResponse
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
@@ -466,6 +468,14 @@ def test_reservation__confirm__without_price_and_with_free_pricing_does_not_requ
     assert PaymentOrder.objects.count() == 0
 
 
+@patch_method(
+    PindoraClient.get_reservation,  # Called by email sending
+    return_value=PindoraReservationResponse(
+        access_code="123456",
+        begin=datetime.datetime(2024, 1, 1, 11),
+        end=datetime.datetime(2024, 1, 1, 15),
+    ),
+)
 @patch_method(PindoraClient.activate_reservation_access_code)
 def test_reservation__confirm__pindora_api__call_succeeds(graphql):
     reservation = ReservationFactory.create_for_confirmation(
@@ -486,6 +496,14 @@ def test_reservation__confirm__pindora_api__call_succeeds(graphql):
     assert PindoraClient.activate_reservation_access_code.call_count == 1
 
 
+@patch_method(
+    PindoraClient.get_reservation,  # Called by email sending
+    return_value=PindoraReservationResponse(
+        access_code="123456",
+        begin=datetime.datetime(2024, 1, 1, 11),
+        end=datetime.datetime(2024, 1, 1, 15),
+    ),
+)
 @patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraAPIError("Error"))
 def test_reservation__confirm__pindora_api__call_fails(graphql):
     reservation = ReservationFactory.create_for_confirmation(

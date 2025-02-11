@@ -504,6 +504,7 @@ def test_reservation__adjust_time__update_reservation_buffer_on_adjust(graphql):
     assert reservation.buffer_time_after == datetime.timedelta(hours=2)
 
 
+@patch_method(PindoraClient.get_reservation)  # Called by email sending
 @patch_method(PindoraClient.reschedule_reservation)
 @patch_method(PindoraClient.deactivate_reservation_access_code)
 def test_reservation__adjust_time__same_access_type(graphql):
@@ -549,6 +550,7 @@ def test_reservation__adjust_time__same_access_type__requires_handling(graphql):
     assert reservation.access_code_is_active is False
 
 
+@patch_method(PindoraClient.get_reservation)  # Called by email sending
 @patch_method(
     PindoraClient.create_reservation,
     return_value={
