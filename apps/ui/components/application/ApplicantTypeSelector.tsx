@@ -15,8 +15,10 @@ const Label = styled.p`
 export function ApplicantTypeSelector(): JSX.Element {
   const { t } = useTranslation();
 
-  const { control, getFieldState } =
-    useFormContext<ApplicationPage3FormValues>();
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext<ApplicationPage3FormValues>();
   const {
     field: { value, onChange },
   } = useController({
@@ -34,7 +36,7 @@ export function ApplicantTypeSelector(): JSX.Element {
       (id === ApplicantTypeChoice.Association &&
         value === ApplicantTypeChoice.Community)
   );
-  const { error } = getFieldState("applicantType");
+  const error = errors.applicantType;
 
   const errorText = error?.message
     ? t(`application:validation.${error.message}`)

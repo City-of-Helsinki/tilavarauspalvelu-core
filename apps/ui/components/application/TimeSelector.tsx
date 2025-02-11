@@ -167,32 +167,30 @@ function Day({
   return (
     <div>
       <CalendarHead>{head}</CalendarHead>
-      {cells.map((cell, cellIndex) => {
-        return (
-          <TimeSelectionButton
-            key={cell.key}
-            $state={cell.state}
-            $firstRow={cellIndex === 0}
-            type="button"
-            onMouseDown={(evt) => handleMouseDown(cell, evt)}
-            onMouseUp={() => setPainting(false)}
-            onKeyDown={() =>
-              setCellValue(cell, priority === cell.state ? false : priority)
+      {cells.map((cell, cellIndex) => (
+        <TimeSelectionButton
+          key={cell.key}
+          $state={cell.state}
+          $firstRow={cellIndex === 0}
+          type="button"
+          onMouseDown={(evt) => handleMouseDown(cell, evt)}
+          onMouseUp={() => setPainting(false)}
+          onKeyDown={() =>
+            setCellValue(cell, priority === cell.state ? false : priority)
+          }
+          onMouseEnter={() => {
+            if (painting) {
+              setCellValue(cell, paintState);
             }
-            onMouseEnter={() => {
-              if (painting) {
-                setCellValue(cell, paintState);
-              }
-            }}
-            role="option"
-            aria-label={constructAriaLabel(t, cell, labelHead)}
-            aria-selected={cell.state > 100}
-            data-testid={`time-selector__button--${cell.key}`}
-          >
-            {cell.label}
-          </TimeSelectionButton>
-        );
-      })}
+          }}
+          role="option"
+          aria-label={constructAriaLabel(t, cell, labelHead)}
+          aria-selected={cell.state > 100}
+          data-testid={`time-selector__button--${cell.key}`}
+        >
+          {cell.label}
+        </TimeSelectionButton>
+      ))}
     </div>
   );
 }
@@ -335,9 +333,9 @@ export function TimeSelector({
   >(false); // toggle value true = set, false = clear: ;
   const [painting, setPainting] = useState(false); // is painting 'on'
 
-  const cellTypes = CELL_TYPES.map((cell) => ({
-    ...cell,
-    label: t(cell.label),
+  const cellTypes = CELL_TYPES.map(({ type, label }) => ({
+    type,
+    label: t(label),
   }));
 
   const { setValue, watch } = useFormContext<ApplicationPage2FormValues>();
@@ -527,13 +525,13 @@ function OptionSelector({
 
 function ErrorMessage({ index }: { index: number }): JSX.Element | null {
   const { t } = useTranslation();
-  const { getFieldState } = useFormContext<ApplicationPage2FormValues>();
   const fieldName = `applicationSections.${index}.suitableTimeRanges` as const;
-  const suitableTimeErrors = getFieldState(fieldName)?.error;
-  if (suitableTimeErrors == null) {
+  const { getFieldState } = useFormContext<ApplicationPage2FormValues>();
+  const state = getFieldState(fieldName);
+  if (!state.invalid) {
     return null;
   }
-  const errorMsg = suitableTimeErrors.message;
+  const errorMsg = state.error?.message;
   const msg = errorMsg
     ? t(`application:validation.calendar.${errorMsg}`)
     : t("errors:general_error");
