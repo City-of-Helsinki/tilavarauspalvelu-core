@@ -99,7 +99,6 @@
     "homeCity": "City",
     "lastName": "Surname",
     "phoneNumber": "Phone number",
-    "email": "Email address to be attached to the application",
     "emailNotification": "All messages concerning the application will be sent to the email address below",
     "subHeading": {
       "basicInfo": "Basic information",
@@ -118,7 +117,8 @@
     "contactPerson": {
       "firstName": "Contact person's first name ",
       "lastName": "Contact person's surname ",
-      "phoneNumber": "Contact person's phone number"
+      "phoneNumber": "Contact person's phone number",
+      "email": "Email address to be attached to the application"
     },
     "billingAddress": {
       "streetAddress": "Address",

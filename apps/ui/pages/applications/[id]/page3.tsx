@@ -32,13 +32,15 @@ import {
   ButtonVariant,
   IconArrowLeft,
   IconArrowRight,
+  Notification,
+  NotificationSize,
 } from "hds-react";
 import { AutoGrid, ButtonContainer, Flex } from "common/styles/util";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EmailInput } from "@/components/application/EmailInput";
-import { FormSubHeading } from "@/components/application/styled";
+import { FormSubHeading, SpanFullRow } from "@/components/application/styled";
 import { createApolloClient } from "@/modules/apolloClient";
 import { gql } from "@apollo/client";
+import { ApplicationFormTextInput } from "@/components/application/ApplicationFormTextInput";
 
 function Page3Form(): JSX.Element | null {
   const { options } = useOptions();
@@ -130,7 +132,15 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
               {t("application:Page3.subHeading.basicInfo")}
             </FormSubHeading>
             <Page3Form />
-            <EmailInput />
+            <SpanFullRow>
+              <Notification
+                size={NotificationSize.Small}
+                label={t("application:Page3.emailNotification")}
+              >
+                {t("application:Page3.emailNotification")}
+              </Notification>
+            </SpanFullRow>
+            <ApplicationFormTextInput name="contactPerson.email" />
           </AutoGrid>
           <ButtonContainer>
             <Button
