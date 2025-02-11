@@ -185,7 +185,8 @@
     },
     "reservationUnitTerms": "Täydentävät varausehdot",
     "termsOfService": "Helsingin kaupungin tilojen ja laitteiden varausehdot",
-    "userAcceptsTerms": "Olen lukenut ja hyväksyn sopimusehdot ja täydentävät varausehdot.",
+    "userAcceptsGeneralTerms": "Olen lukenut ja hyväksyn sopimusehdot.",
+    "userAcceptsSpecificTerms": "Olen lukenut ja hyväksyn täydentävät varausehdot.",
     "reservationDeleted": "Varaus peruttu.",
     "applicationSectionCancelled": "Peruttu {{ cancelled }} / {{ future }} varausta.",
     "applicationSectionCancelledAll": "Peruttu kaikki {{ cancelled }} varausta."

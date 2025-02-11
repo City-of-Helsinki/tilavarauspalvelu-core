@@ -38,6 +38,7 @@
     "validation": {
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED":  "Varaajan on oltava täysi-ikäinen.",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Hakijan on oltava täysi-ikäinen.",
+      "invalid": "Virheellinen arvo.",
       "generic_validation_error": "Tapahtui virhe."
     }
   }
