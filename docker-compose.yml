@@ -3,6 +3,8 @@ services:
   db:
     container_name: tvp-db
     image: "postgis/postgis:13-3.3-alpine"
+    profiles:
+      - backend
     environment:
       POSTGRES_USER: tvp
       POSTGRES_PASSWORD: tvp
@@ -20,6 +22,8 @@ services:
   redis:
     container_name: tvp-redis
     image: "redis:7-alpine"
+    profiles:
+      - backend
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -31,6 +35,8 @@ services:
   backend:
     container_name: tvp-core
     image: tvp-core
+    profiles:
+      - backend
     build:
       context: backend/
       dockerfile: docker/Dockerfile
@@ -46,14 +52,64 @@ services:
     environment:
       DJANGO_SETTINGS_ENVIRONMENT: Docker
     ports:
-      - "127.0.0.1:8000:8000"
+      - "8000:8000"
     volumes:
       - tvp-media:/media
     entrypoint: /tvp/docker/entrypoint_dev.sh
 
+  customer:
+    container_name: tvp-customer
+    image: tvp-customer
+    profiles:
+      - frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP: "ui"
+        NEXT_PUBLIC_BASE_URL: ""
+        NEXT_PUBLIC_SOURCE_VERSION: "local"
+        NEXT_PUBLIC_SOURCE_BRANCH_NAME: "main"
+        EMAIL_VARAAMO_EXT_LINK: "https://lomake.hel.fi/varaamo-palaute"
+        CI: false
+    environment:
+      TILAVARAUS_API_URL: "http://host.docker.internal:8000"
+#    env_file:
+#      - apps/ui/.env.local
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  admin:
+    container_name: tvp-admin
+    image: tvp-admin
+    profiles:
+      - frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP: "admin-ui"
+        NEXT_PUBLIC_BASE_URL: "/kasittely"
+        NEXT_PUBLIC_SOURCE_VERSION: "local"
+        NEXT_PUBLIC_SOURCE_BRANCH_NAME: "main"
+        EMAIL_VARAAMO_EXT_LINK: "https://lomake.hel.fi/varaamo-palaute"
+        CI: false
+    environment:
+      TILAVARAUS_API_URL: "http://host.docker.internal:8000"
+    env_file:
+      - apps/admin-ui/.env.local
+    ports:
+      - "127.0.0.1:3001:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   celery:
     container_name: tvp-celery
     image: tvp-celery
+    profiles:
+      - backend
     depends_on:
       backend:
         condition: service_started

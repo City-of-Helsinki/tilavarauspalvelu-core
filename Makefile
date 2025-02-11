@@ -1,9 +1,9 @@
 .PHONY: Makefile
+.PHONY: backend
 .PHONY: bash
+.PHONY: frontend
 .PHONY: help
-.PHONY: hooks
 .PHONY: run
-.PHONY: services
 .PHONY: stop
 
 # Trick to allow passing commands to make
@@ -19,10 +19,11 @@ define helptext
 
  Commands:
 
-  bash                               Open bash in backend container.
-  run                                Start docker containers for frontend development.
-  services                           Run required services in docker.
-  stop                               Stop running containers.
+  backend           Start backend containers.
+  bash              Open bash in backend container.
+  frontend          Start frontend containers.
+  run               Start docker containers.
+  stop              Stop running containers.
 
 endef
 
@@ -32,14 +33,17 @@ export helptext
 help:
 	@echo "$$helptext"
 
+be:
+	@docker compose --profile backend up --detach --build
+
 bash:
 	@docker exec -it tvp-core bash
 
-run:
-	@docker compose up --detach --build
+fe:
+	@docker compose --profile frontend up --detach --build
 
-services:
-	@docker compose up --detach --build db redis
+run:
+	@docker compose --profile frontend --profile backend up --detach --build
 
 stop:
-	@docker compose stop
+	@docker compose --profile frontend --profile backend stop
