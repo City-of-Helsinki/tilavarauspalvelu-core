@@ -17,7 +17,6 @@ import {
   getGenericTerms,
 } from "@/modules/serverUtils";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { errorToast } from "common/src/common/toast";
 import { getApplicationPath } from "@/modules/urls";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ButtonContainer, Flex } from "common/styles/util";
@@ -28,6 +27,7 @@ import {
   IconArrowLeft,
   LoadingSpinner,
 } from "hds-react";
+import { useDisplayError } from "@/hooks/useDisplayError";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -36,16 +36,29 @@ type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 // This uses separate Send mutation (not update) so no onNext like the other pages
 // we could also remove the FormContext here
 function Preview({ application, tos }: PropsNarrowed): JSX.Element {
-  const [acceptTermsOfUse, setAcceptTermsOfUse] = useState(false);
   const router = useRouter();
-
+  const dislayError = useDisplayError();
   const { t } = useTranslation();
+
+  const [isTermsAccepted, setIsTermsAccepted] = useState({
+    general: false,
+    specific: false,
+  });
+
+  const handleTermsAcceptedChange = (
+    key: "general" | "specific",
+    val: boolean
+  ) => {
+    setIsTermsAccepted({ ...isTermsAccepted, [key]: val });
+  };
 
   const [send, { loading: isMutationLoading }] = useSendApplicationMutation();
 
+  const hasTermsAccepted = isTermsAccepted.general && isTermsAccepted.specific;
+
   const onSubmit = async (evt: React.FormEvent) => {
     evt.preventDefault();
-    if (!acceptTermsOfUse) {
+    if (!hasTermsAccepted) {
       return;
     }
     try {
@@ -67,8 +80,8 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
       }
 
       router.push(getApplicationPath(resPk, "sent"));
-    } catch (e) {
-      errorToast({ text: t("errors:applicationMutation.Validation error") });
+    } catch (err) {
+      dislayError(err);
     }
   };
 
@@ -81,8 +94,8 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
         <ViewApplication
           application={application}
           tos={tos}
-          acceptTermsOfUse={acceptTermsOfUse}
-          setAcceptTermsOfUse={setAcceptTermsOfUse}
+          isTermsAccepted={isTermsAccepted}
+          setIsTermsAccepted={handleTermsAcceptedChange}
         />
         <ButtonContainer>
           <ButtonLikeLink href={getApplicationPath(application.pk, "page3")}>
@@ -97,7 +110,7 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
             }
             iconStart={isMutationLoading ? <LoadingSpinner /> : undefined}
             size={ButtonSize.Small}
-            disabled={!acceptTermsOfUse || isMutationLoading}
+            disabled={!hasTermsAccepted || isMutationLoading}
           >
             {t("common:submit")}
           </Button>

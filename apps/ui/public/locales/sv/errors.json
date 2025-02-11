@@ -38,6 +38,7 @@
     "validation": {
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Personen som gör bokningen måste vara myndig.",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Sökanden måste vara myndig.",
+      "invalid": "Ogiltigt värde.",
       "generic_validation_error": "Ett fel uppstod."
     }
   }

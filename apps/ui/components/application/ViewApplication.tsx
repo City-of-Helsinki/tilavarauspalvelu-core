@@ -24,15 +24,15 @@ import {
 type ViewApplicationProps = {
   application: ApplicationCommonFragment;
   tos: Maybe<TermsOfUseTextFieldsFragment>;
-  acceptTermsOfUse?: boolean;
-  setAcceptTermsOfUse?: (value: boolean) => void;
+  isTermsAccepted?: { general: boolean; specific: boolean };
+  setIsTermsAccepted?: (key: "general" | "specific", val: boolean) => void;
 };
 
 export function ViewApplication({
   application,
   tos,
-  acceptTermsOfUse,
-  setAcceptTermsOfUse,
+  isTermsAccepted,
+  setIsTermsAccepted,
 }: ViewApplicationProps): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
@@ -61,6 +61,13 @@ export function ViewApplication({
           <TermsBox
             id="preview.acceptTermsOfUse"
             body={<Sanitize html={getTranslationSafe(tos, "text", lang)} />}
+            acceptLabel={t("application:preview.userAcceptsGeneralTerms")}
+            accepted={isTermsAccepted?.general}
+            setAccepted={
+              setIsTermsAccepted
+                ? (val) => setIsTermsAccepted("general", val)
+                : undefined
+            }
           />
         </Accordion>
       )}
@@ -69,9 +76,13 @@ export function ViewApplication({
           <TermsBox
             id="preview.acceptServiceSpecificTerms"
             body={<Sanitize html={getTranslationSafe(tos2, "text", lang)} />}
-            acceptLabel={t("application:preview.userAcceptsTerms")}
-            accepted={acceptTermsOfUse}
-            setAccepted={setAcceptTermsOfUse}
+            acceptLabel={t("application:preview.userAcceptsSpecificTerms")}
+            accepted={isTermsAccepted?.specific}
+            setAccepted={
+              setIsTermsAccepted
+                ? (val) => setIsTermsAccepted("specific", val)
+                : undefined
+            }
           />
         </Accordion>
       )}
