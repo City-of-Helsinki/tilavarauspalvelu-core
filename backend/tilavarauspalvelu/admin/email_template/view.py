@@ -25,10 +25,10 @@ def email_templates_admin_list_view(request: WSGIRequest, **kwargs: Any) -> Tabl
     links_text: list[SafeString] = []
     tester_links: list[SafeString] = []
 
-    for email_type, label in EmailType.choices:
+    for email_type in EmailType.options:
         base_url = reverse(
             viewname="admin:view_email_type",
-            kwargs={"email_type": email_type},
+            kwargs={"email_type": email_type.value},
             current_app=admin_data_settings.NAME,
         )
 
@@ -48,11 +48,11 @@ def email_templates_admin_list_view(request: WSGIRequest, **kwargs: Any) -> Tabl
 
         tester_url = reverse(
             "admin:email_tester",
-            kwargs={"email_type": email_type},
+            kwargs={"email_type": email_type.value},
             current_app=admin_data_settings.NAME,
         )
 
-        tester_link = format_html('<a href="{}">{}</a>', tester_url, label)
+        tester_link = format_html('<a href="{}">{}</a>', tester_url, email_type.label)
         tester_links.append(tester_link)
 
     return TableContext(
@@ -67,7 +67,7 @@ def email_templates_admin_list_view(request: WSGIRequest, **kwargs: Any) -> Tabl
 
 def email_type_admin_view(request: WSGIRequest, email_type: str) -> HttpResponse:
     try:
-        email_type = EmailType(email_type)
+        email_type = EmailType.get(email_type)
     except ValueError:
         return HttpResponse("Invalid email type")
 
@@ -82,7 +82,7 @@ def email_type_admin_view(request: WSGIRequest, email_type: str) -> HttpResponse
     return HttpResponse(content)
 
 
-def render_with_mock_data(*, email_type: EmailType, language: Lang, as_html: bool) -> str | None:
+def render_with_mock_data(*, email_type: type[EmailType], language: Lang, as_html: bool) -> str | None:
     context = get_mock_data(email_type=email_type, language=language)
 
     if as_html:
