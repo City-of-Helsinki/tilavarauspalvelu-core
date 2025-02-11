@@ -14,6 +14,7 @@ type TextFields =
   | "contactPerson.firstName"
   | "contactPerson.lastName"
   | "contactPerson.phoneNumber"
+  | "contactPerson.email"
   | "billingAddress.streetAddress"
   | "billingAddress.postCode"
   | "billingAddress.city"
@@ -26,8 +27,13 @@ export function ApplicationFormTextInput({
   disabled?: boolean;
 }): JSX.Element {
   const { t } = useTranslation();
-  const { register, getFieldState } =
+  const { control, getFieldState, formState } =
     useFormContext<ApplicationPage3FormValues>();
+  // NOTE getFieldState does not update unless we extract formState also
+  // but using errors is too difficult for nested fields
+  const { errors: _ } = formState;
+
+  const { register } = control;
 
   const translateError = (errorMsg?: string) =>
     errorMsg ? t(`application:validation.${errorMsg}`) : "";
@@ -46,7 +52,7 @@ export function ApplicationFormTextInput({
       id={name}
       required={!disabled}
       disabled={disabled}
-      invalid={!!state.error?.message}
+      invalid={state.invalid}
       errorText={translateError(state.error?.message)}
     />
   );
