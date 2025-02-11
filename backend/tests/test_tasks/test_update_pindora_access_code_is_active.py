@@ -6,17 +6,21 @@ import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from tilavarauspalvelu.tasks import update_pindora_access_code_is_active
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory
+from tests.factories import RecurringReservationFactory, ReservationFactory
 from tests.helpers import patch_method
 
 
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
+@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraClient.deactivate_reservation_access_code)
+@patch_method(EmailService.send_reservation_modified_access_code_email)
 def test_update_pindora_access_code_is_active__activate():
     now = local_datetime()
 
@@ -30,14 +34,11 @@ def test_update_pindora_access_code_is_active__activate():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    active_patch = patch_method(PindoraClient.activate_reservation_access_code)
-    deactivate_patch = patch_method(PindoraClient.deactivate_reservation_access_code)
+    update_pindora_access_code_is_active()
 
-    with active_patch as activate, deactivate_patch as deactivate:
-        update_pindora_access_code_is_active()
-
-    assert activate.called is True
-    assert deactivate.called is False
+    assert PindoraClient.activate_reservation_access_code.call_count == 1
+    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
+    assert EmailService.send_reservation_modified_access_code_email.call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is True
@@ -45,6 +46,8 @@ def test_update_pindora_access_code_is_active__activate():
 
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
+@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraClient.deactivate_reservation_access_code)
 def test_update_pindora_access_code_is_active__deactivate():
     now = local_datetime()
 
@@ -58,14 +61,10 @@ def test_update_pindora_access_code_is_active__deactivate():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    active_patch = patch_method(PindoraClient.activate_reservation_access_code)
-    deactivate_patch = patch_method(PindoraClient.deactivate_reservation_access_code)
+    update_pindora_access_code_is_active()
 
-    with active_patch as activate, deactivate_patch as deactivate:
-        update_pindora_access_code_is_active()
-
-    assert activate.called is False
-    assert deactivate.called is True
+    assert PindoraClient.activate_reservation_access_code.call_count == 0
+    assert PindoraClient.deactivate_reservation_access_code.call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False
@@ -73,6 +72,8 @@ def test_update_pindora_access_code_is_active__deactivate():
 
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
+@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraClient.deactivate_reservation_access_code)
 def test_update_pindora_access_code_is_active__already_active():
     now = local_datetime()
 
@@ -86,14 +87,10 @@ def test_update_pindora_access_code_is_active__already_active():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    active_patch = patch_method(PindoraClient.activate_reservation_access_code)
-    deactivate_patch = patch_method(PindoraClient.deactivate_reservation_access_code)
+    update_pindora_access_code_is_active()
 
-    with active_patch as activate, deactivate_patch as deactivate:
-        update_pindora_access_code_is_active()
-
-    assert activate.called is False
-    assert deactivate.called is False
+    assert PindoraClient.activate_reservation_access_code.call_count == 0
+    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is True
@@ -101,6 +98,8 @@ def test_update_pindora_access_code_is_active__already_active():
 
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
+@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraClient.deactivate_reservation_access_code)
 def test_update_pindora_access_code_is_active__already_not_active():
     now = local_datetime()
 
@@ -114,14 +113,10 @@ def test_update_pindora_access_code_is_active__already_not_active():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    active_patch = patch_method(PindoraClient.activate_reservation_access_code)
-    deactivate_patch = patch_method(PindoraClient.deactivate_reservation_access_code)
+    update_pindora_access_code_is_active()
 
-    with active_patch as activate, deactivate_patch as deactivate:
-        update_pindora_access_code_is_active()
-
-    assert activate.called is False
-    assert deactivate.called is False
+    assert PindoraClient.activate_reservation_access_code.call_count == 0
+    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False
@@ -129,6 +124,8 @@ def test_update_pindora_access_code_is_active__already_not_active():
 
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
+@patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraAPIError())
+@patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraAPIError())
 def test_update_pindora_access_code_is_active__activate__pindora_error():
     now = local_datetime()
 
@@ -142,14 +139,10 @@ def test_update_pindora_access_code_is_active__activate__pindora_error():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    active_patch = patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraAPIError())
-    deactivate_patch = patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraAPIError())
+    update_pindora_access_code_is_active()
 
-    with active_patch as activate, deactivate_patch as deactivate:
-        update_pindora_access_code_is_active()
-
-    assert activate.called is True
-    assert deactivate.called is False
+    assert PindoraClient.activate_reservation_access_code.call_count == 1
+    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False
@@ -157,6 +150,8 @@ def test_update_pindora_access_code_is_active__activate__pindora_error():
 
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
+@patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraNotFoundError("error"))
+@patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraNotFoundError("error"))
 def test_update_pindora_access_code_is_active__activate__pindora_error__404():
     now = local_datetime()
 
@@ -170,15 +165,10 @@ def test_update_pindora_access_code_is_active__activate__pindora_error__404():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    error = PindoraNotFoundError("error")
-    active_patch = patch_method(PindoraClient.activate_reservation_access_code, side_effect=error)
-    deactivate_patch = patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=error)
+    update_pindora_access_code_is_active()
 
-    with active_patch as activate, deactivate_patch as deactivate:
-        update_pindora_access_code_is_active()
-
-    assert activate.called is True
-    assert deactivate.called is False
+    assert PindoraClient.activate_reservation_access_code.call_count == 1
+    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False
@@ -186,6 +176,8 @@ def test_update_pindora_access_code_is_active__activate__pindora_error__404():
 
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
+@patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraAPIError())
+@patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraAPIError())
 def test_update_pindora_access_code_is_active__deactivate__pindora_error():
     now = local_datetime()
 
@@ -199,14 +191,10 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    active_patch = patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraAPIError())
-    deactivate_patch = patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraAPIError())
+    update_pindora_access_code_is_active()
 
-    with active_patch as activate, deactivate_patch as deactivate:
-        update_pindora_access_code_is_active()
-
-    assert activate.called is False
-    assert deactivate.called is True
+    assert PindoraClient.activate_reservation_access_code.call_count == 0
+    assert PindoraClient.deactivate_reservation_access_code.call_count == 1
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is True
@@ -214,6 +202,8 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error():
 
 @pytest.mark.django_db
 @freeze_time("2023-01-01")
+@patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraNotFoundError("error"))
+@patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraNotFoundError("error"))
 def test_update_pindora_access_code_is_active__deactivate__pindora_error__404():
     now = local_datetime()
 
@@ -227,15 +217,37 @@ def test_update_pindora_access_code_is_active__deactivate__pindora_error__404():
         end=now + datetime.timedelta(days=1, hours=1),
     )
 
-    error = PindoraNotFoundError("error")
-    active_patch = patch_method(PindoraClient.activate_reservation_access_code, side_effect=error)
-    deactivate_patch = patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=error)
+    update_pindora_access_code_is_active()
 
-    with active_patch as activate, deactivate_patch as deactivate:
-        update_pindora_access_code_is_active()
+    assert PindoraClient.activate_reservation_access_code.call_count == 0
+    assert PindoraClient.deactivate_reservation_access_code.call_count == 1
 
-    assert activate.called is False
-    assert deactivate.called is True
+    reservation.refresh_from_db()
+    assert reservation.access_code_is_active is False
+
+
+@pytest.mark.django_db
+@freeze_time("2023-01-01")
+@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraClient.deactivate_reservation_access_code)
+def test_update_pindora_access_code_is_active__recurring_reservation_is_ignored():
+    now = local_datetime()
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_generated_at=local_datetime(),
+        access_code_is_active=False,
+        begin=now + datetime.timedelta(days=1),
+        end=now + datetime.timedelta(days=1, hours=1),
+        recurring_reservation=RecurringReservationFactory.create(),
+    )
+
+    update_pindora_access_code_is_active()
+
+    assert PindoraClient.activate_reservation_access_code.call_count == 0
+    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is False

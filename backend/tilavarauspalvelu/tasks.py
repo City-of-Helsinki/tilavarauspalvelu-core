@@ -29,6 +29,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     Weekday,
 )
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraClientError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
@@ -760,6 +761,11 @@ def create_missing_pindora_reservations() -> None:
             # Update reservations in loop so that in case of a timeout we have done some work.
             reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
 
+            # Since the access code was unable to be created when the reservation was initially made,
+            # send an email with the access code to the user.
+            if reservation.access_code_is_active and reservation.access_code_generated_at:
+                EmailService.send_reservation_modified_access_code_email(reservation=reservation)
+
 
 @app.task(name="update_pindora_access_code_is_active")
 def update_pindora_access_code_is_active() -> None:
@@ -796,6 +802,10 @@ def update_pindora_access_code_is_active() -> None:
 
                 else:
                     reservation.access_code_is_active = True
+
+                    # Access code was activated in Pindora, inform the user by email.
+                    if reservation.access_code_is_active and reservation.access_code_generated_at:
+                        EmailService.send_reservation_modified_access_code_email(reservation=reservation)
             else:
                 try:
                     PindoraClient.deactivate_reservation_access_code(reservation=reservation)
