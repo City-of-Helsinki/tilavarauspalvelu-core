@@ -12,7 +12,7 @@ from tilavarauspalvelu.models import (
     ReservationUnitOption,
     SuitableTimeRange,
 )
-from utils.date_utils import local_datetime
+from utils.date_utils import local_date, local_datetime
 
 from tests.factories import ApplicationRoundFactory
 from tests.test_graphql_api.test_application.helpers import get_application_create_data
@@ -86,6 +86,23 @@ def test_application__create__with_application_sections(graphql):
     assert ReservationUnitOption.objects.count() == 1
 
 
+def test_application__create__with_application_sections__too_many(graphql, settings):
+    settings.MAXIMUM_SECTIONS_PER_APPLICATION = 0
+
+    application_round = ApplicationRoundFactory.create_in_status_open()
+    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
+
+    assert Application.objects.count() == 0
+
+    input_data = get_application_create_data(application_round, create_sections=True)
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationSections") == [
+        "Cannot create more than 0 application sections in one application",
+    ]
+
+
 @pytest.mark.parametrize("field", ["city", "postCode", "streetAddress"])
 def test_application__create__sub_serializer_error(graphql, field):
     # given:
@@ -130,3 +147,16 @@ def test_application__create__is_under_age(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages("user") == ["Application can only be created by an adult reservee"]
+
+
+def test_application__create__sent_date(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_open()
+    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
+
+    input_data = get_application_create_data(application_round)
+    input_data["sentDate"] = local_date().isoformat()
+
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    # Sent date cannot be updated, must use specific mutation for it.
+    assert response.has_schema_errors is True, response

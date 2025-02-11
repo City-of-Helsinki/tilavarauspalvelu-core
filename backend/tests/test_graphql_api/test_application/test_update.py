@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import Weekday
+from tilavarauspalvelu.enums import Priority, Weekday
 from tilavarauspalvelu.models import Address, ApplicationSection, Organisation, SuitableTimeRange
+from utils.date_utils import local_date, local_time
 
-from tests.factories import ApplicationFactory
+from tests.factories import ApplicationFactory, ApplicationRoundFactory
 
 from .helpers import UPDATE_MUTATION
 
@@ -368,6 +369,42 @@ def test_update_application__application_sections__not_deleted_if_not_given(grap
     assert suitable.pk == old_range_pk
 
 
+def test_update_application__application_sections__too_many(graphql, settings):
+    settings.MAXIMUM_SECTIONS_PER_APPLICATION = 0
+
+    application = ApplicationFactory.create_in_status_draft()
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": application.pk,
+        "applicationSections": [
+            {
+                "name": "foo",
+                "numPersons": 1,
+                "reservationsBeginDate": local_date().isoformat(),
+                "reservationsEndDate": local_date().isoformat(),
+                "reservationMinDuration": 100,
+                "reservationMaxDuration": 100,
+                "appliedReservationsPerWeek": 1,
+                "suitableTimeRanges": [
+                    {
+                        "priority": Priority.PRIMARY.value,
+                        "dayOfTheWeek": Weekday.MONDAY.value,
+                        "beginTime": local_time(hour=12).isoformat(),
+                        "endTime": local_time(hour=14).isoformat(),
+                    },
+                ],
+            },
+        ],
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages("applicationSections") == [
+        "Cannot create more than 0 application sections in one application",
+    ]
+
+
 def test_update_application__organisation__deleted_if_empty(graphql):
     # given:
     # - There is a draft application in an open application round
@@ -391,3 +428,60 @@ def test_update_application__organisation__deleted_if_empty(graphql):
 
     section = application.application_sections.first()
     assert section is None
+
+
+def test_update_application__user(graphql):
+    application = ApplicationFactory.create_in_status_draft()
+    user = graphql.login_with_superuser()
+
+    input_data = {
+        "pk": application.id,
+        "user": user.pk,
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    # User cannot be updated
+    assert response.has_schema_errors is True, response
+
+
+def test_update_application__application_round(graphql):
+    application_round = ApplicationRoundFactory.create()
+    application = ApplicationFactory.create_in_status_draft()
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": application.id,
+        "application_round": application_round.pk,
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    # Application round cannot be updated
+    assert response.has_schema_errors is True, response
+
+
+def test_update_application__sent_date(graphql):
+    application = ApplicationFactory.create_in_status_draft()
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": application.id,
+        "sentDate": local_date().isoformat(),
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    # Sent date cannot be updated, must use specific mutation
+    assert response.has_schema_errors is True, response
+
+
+def test_update_application__working_memo(graphql):
+    application = ApplicationFactory.create_in_status_draft()
+    graphql.login_with_superuser()
+
+    input_data = {
+        "pk": application.id,
+        "workingMemo": "foo",
+    }
+    response = graphql(UPDATE_MUTATION, input_data=input_data)
+
+    # Working memo cannot be updated, must use specific mutation
+    assert response.has_schema_errors is True, response
