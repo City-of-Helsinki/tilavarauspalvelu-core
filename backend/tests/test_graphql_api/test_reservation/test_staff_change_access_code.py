@@ -192,6 +192,7 @@ def test_staff_change_access_code__type_is_blocked(graphql):
 
 
 @patch_method(PindoraClient.change_reservation_access_code)
+@patch_method(PindoraClient.activate_reservation_access_code)
 def test_staff_change_access_code__ongoing(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -213,6 +214,7 @@ def test_staff_change_access_code__ongoing(graphql):
     assert response.has_errors is False, response.errors
 
     assert PindoraClient.change_reservation_access_code.call_count == 1
+    assert PindoraClient.activate_reservation_access_code.call_count == 1
 
 
 @patch_method(PindoraClient.change_reservation_access_code)
