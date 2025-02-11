@@ -23,6 +23,12 @@ class ApplicationPermission(BasePermission):
         return user.permissions.can_manage_application(instance)
 
 
+class ApplicationWorkingMemoPermission(BasePermission):
+    @classmethod
+    def has_update_permission(cls, instance: Application, user: AnyUser, input_data: dict[str, Any]) -> bool:
+        return user.permissions.can_view_application(instance, reserver_needs_role=True)
+
+
 class UpdateAllApplicationOptionsPermission(BasePermission):
     @classmethod
     def has_update_permission(cls, instance: Application, user: AnyUser, input_data: dict[str, Any]) -> bool:

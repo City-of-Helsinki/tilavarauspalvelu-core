@@ -3,7 +3,9 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
+from django.conf import settings
 from graphene_django_extensions import NestingModelSerializer
+from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
@@ -23,7 +25,6 @@ from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection, Organisation, User
-    from tilavarauspalvelu.typing import AnyUser
 
 
 class ApplicationCreateSerializer(NestingModelSerializer):
@@ -40,26 +41,28 @@ class ApplicationCreateSerializer(NestingModelSerializer):
         model = Application
         fields = [
             "pk",
+            "application_round",
             "applicant_type",
+            "additional_information",
+            "organisation",
+            "contact_person",
+            "billing_address",
+            "home_city",
+            "application_sections",
+            # Read-only
+            "user",
             "created_date",
             "last_modified_date",
             "cancelled_date",
             "sent_date",
-            "additional_information",
-            "application_round",
-            "organisation",
-            "contact_person",
-            "user",
-            "billing_address",
-            "home_city",
-            "application_sections",
             "status",
         ]
         extra_kwargs = {
-            "home_city": {
-                "required": False,
-                "allow_null": True,
-            },
+            "home_city": {"required": False, "allow_null": True},
+            "created_date": {"read_only": True},
+            "last_modified_date": {"read_only": True},
+            "cancelled_date": {"read_only": True},
+            "sent_date": {"read_only": True},
         }
 
     def validate_user(self, user: User) -> User:
@@ -69,20 +72,42 @@ class ApplicationCreateSerializer(NestingModelSerializer):
         msg = "Application can only be created by an adult reservee"
         raise ValidationError(msg, error_codes.APPLICATION_ADULT_RESERVEE_REQUIRED)
 
+    def validate_application_sections(self, sections: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        if len(sections) > settings.MAXIMUM_SECTIONS_PER_APPLICATION:
+            msg = (
+                f"Cannot create more than {settings.MAXIMUM_SECTIONS_PER_APPLICATION} "
+                f"application sections in one application"
+            )
+            raise ValidationError(msg, code=error_codes.APPLICATION_SECTIONS_MAXIMUM_EXCEEDED)
+        return sections
+
 
 class ApplicationUpdateSerializer(ApplicationCreateSerializer):
     instance: Application
 
+    user = IntegerPrimaryKeyField(read_only=True)
+
     class Meta(ApplicationCreateSerializer.Meta):
-        fields = [*ApplicationCreateSerializer.Meta.fields, "working_memo"]
+        extra_kwargs = {
+            **ApplicationCreateSerializer.Meta.extra_kwargs,
+            "application_round": {"read_only": True},
+        }
 
-    def validate_working_memo(self, value: str) -> str:
-        user: AnyUser = self.request_user
-        if not user.permissions.can_view_application(self.instance, reserver_needs_role=True):
-            msg = "No permission to access working memo."
-            raise serializers.ValidationError(msg)
+    def update(self, instance: Application, validated_data: dict[str, Any]) -> Application:
+        # If a sent application is updated, it needs to be sent and validated again
+        instance.sent_date = None
+        return super().update(instance, validated_data)
 
-        return value
+
+class ApplicationWorkingMemoSerializer(NestingModelSerializer):
+    instance: Application
+
+    class Meta:
+        model = Application
+        fields = [
+            "pk",
+            "working_memo",
+        ]
 
 
 class ApplicationSendSerializer(NestingModelSerializer):

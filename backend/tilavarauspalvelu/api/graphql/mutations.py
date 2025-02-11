@@ -22,6 +22,7 @@ from .types.application.mutations import (
     ApplicationCreateMutation,
     ApplicationSendMutation,
     ApplicationUpdateMutation,
+    ApplicationWorkingMemoMutation,
     RejectAllApplicationOptionsMutation,
     RestoreAllApplicationOptionsMutation,
 )
@@ -96,6 +97,7 @@ __all__ = [
     "ApplicationSectionUpdateMutation",
     "ApplicationSendMutation",
     "ApplicationUpdateMutation",
+    "ApplicationWorkingMemoMutation",
     "BannerNotificationCreateMutation",
     "BannerNotificationDeleteMutation",
     "BannerNotificationUpdateMutation",

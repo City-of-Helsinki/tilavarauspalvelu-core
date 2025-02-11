@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from graphene_django_extensions import CreateMutation, UpdateMutation
 
-from .permissions import ApplicationPermission, UpdateAllApplicationOptionsPermission
+from .permissions import ApplicationPermission, ApplicationWorkingMemoPermission, UpdateAllApplicationOptionsPermission
 from .serializers import (
     ApplicationCancelSerializer,
     ApplicationCreateSerializer,
     ApplicationSendSerializer,
     ApplicationUpdateSerializer,
+    ApplicationWorkingMemoSerializer,
     RejectAllApplicationOptionsSerializer,
     RestoreAllApplicationOptionsSerializer,
 )
@@ -17,6 +18,7 @@ __all__ = [
     "ApplicationCreateMutation",
     "ApplicationSendMutation",
     "ApplicationUpdateMutation",
+    "ApplicationWorkingMemoMutation",
     "RejectAllApplicationOptionsMutation",
     "RestoreAllApplicationOptionsMutation",
 ]
@@ -44,6 +46,12 @@ class ApplicationCancelMutation(UpdateMutation):
     class Meta:
         serializer_class = ApplicationCancelSerializer
         permission_classes = [ApplicationPermission]
+
+
+class ApplicationWorkingMemoMutation(UpdateMutation):
+    class Meta:
+        serializer_class = ApplicationWorkingMemoSerializer
+        permission_classes = [ApplicationWorkingMemoPermission]
 
 
 class RejectAllApplicationOptionsMutation(UpdateMutation):

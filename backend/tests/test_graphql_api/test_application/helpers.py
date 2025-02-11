@@ -24,6 +24,10 @@ UPDATE_MUTATION = build_mutation(
     "updateApplication",
     "ApplicationUpdateMutation",
 )
+WORKING_MEMO_MUTATION = build_mutation(
+    "updateApplicationWorkingMemo",
+    "ApplicationWorkingMemoMutation",
+)
 
 DECLINE_MUTATION = build_mutation(
     "declineApplication",
