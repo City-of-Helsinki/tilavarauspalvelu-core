@@ -5,6 +5,7 @@ import datetime
 import pytest
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraConflictError, PindoraNotFoundError
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
@@ -23,6 +24,7 @@ pytestmark = [
 @patch_method(PindoraClient.deactivate_reservation_access_code)
 @patch_method(PindoraClient.create_reservation)
 @patch_method(PindoraClient.get_reservation)
+@patch_method(EmailService.send_reservation_modified_access_code_email)
 def test_staff_repair_access_code__should_be_active(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -51,6 +53,7 @@ def test_staff_repair_access_code__should_be_active(graphql):
     assert PindoraClient.deactivate_reservation_access_code.call_count == 0
     assert PindoraClient.create_reservation.call_count == 0
     assert PindoraClient.get_reservation.call_count == 0
+    assert EmailService.send_reservation_modified_access_code_email.call_count == 1
 
 
 @patch_method(PindoraClient.activate_reservation_access_code)
@@ -87,6 +90,15 @@ def test_staff_repair_access_code__should_not_be_active(graphql):
     assert PindoraClient.get_reservation.call_count == 0
 
 
+@patch_method(EmailService.send_reservation_modified_access_code_email)
+@patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraNotFoundError("Not found"))
+@patch_method(
+    PindoraClient.create_reservation,
+    return_value={
+        "access_code_generated_at": datetime.datetime(2024, 1, 2, tzinfo=DEFAULT_TIMEZONE),
+        "access_code_is_active": True,
+    },
+)
 def test_staff_repair_access_code__create_new_access_code(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -102,18 +114,8 @@ def test_staff_repair_access_code__create_new_access_code(graphql):
         "pk": reservation.pk,
     }
 
-    response = {
-        "access_code_generated_at": datetime.datetime(2024, 1, 2, tzinfo=DEFAULT_TIMEZONE),
-        "access_code_is_active": True,
-    }
-
     graphql.login_with_superuser()
-
-    with (
-        patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraNotFoundError("Not found")),
-        patch_method(PindoraClient.create_reservation, return_value=response),
-    ):
-        response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -121,7 +123,18 @@ def test_staff_repair_access_code__create_new_access_code(graphql):
     assert reservation.access_code_is_active is True
     assert reservation.access_code_generated_at == datetime.datetime(2024, 1, 2, tzinfo=DEFAULT_TIMEZONE)
 
+    assert EmailService.send_reservation_modified_access_code_email.call_count == 1
 
+
+@patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraNotFoundError("Not found"))
+@patch_method(PindoraClient.create_reservation, side_effect=PindoraConflictError("Conflict"))
+@patch_method(
+    PindoraClient.get_reservation,
+    return_value={
+        "access_code_generated_at": datetime.datetime(2024, 1, 2, tzinfo=DEFAULT_TIMEZONE),
+        "access_code_is_active": True,
+    },
+)
 def test_staff_repair_access_code__get_access_code_info(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -137,19 +150,8 @@ def test_staff_repair_access_code__get_access_code_info(graphql):
         "pk": reservation.pk,
     }
 
-    response = {
-        "access_code_generated_at": datetime.datetime(2024, 1, 2, tzinfo=DEFAULT_TIMEZONE),
-        "access_code_is_active": True,
-    }
-
     graphql.login_with_superuser()
-
-    with (
-        patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraNotFoundError("Not found")),
-        patch_method(PindoraClient.create_reservation, side_effect=PindoraConflictError("Conflict")),
-        patch_method(PindoraClient.get_reservation, return_value=response),
-    ):
-        response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
 
@@ -204,6 +206,7 @@ def test_staff_repair_access_code__in_series(graphql):
 
 
 @patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(EmailService.send_reservation_modified_access_code_email)
 def test_staff_repair_access_code__ongoing(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -223,6 +226,7 @@ def test_staff_repair_access_code__ongoing(graphql):
     response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
+    assert EmailService.send_reservation_modified_access_code_email.call_count == 1
 
 
 @patch_method(PindoraClient.activate_reservation_access_code)
