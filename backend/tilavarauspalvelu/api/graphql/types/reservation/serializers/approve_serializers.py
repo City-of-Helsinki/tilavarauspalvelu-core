@@ -10,6 +10,7 @@ from rest_framework.fields import IntegerField
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraClientError
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
 
@@ -58,7 +59,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
     def update(self, instance: Reservation, validated_data: ReservationApproveData) -> Reservation:
         if self.instance.access_type == AccessType.ACCESS_CODE and instance.recurring_reservation is None:
             # Allow activation in Pindora to fail, will be handled by a background task.
-            with suppress(Exception):
+            with suppress(PindoraClientError):
                 # If access code has not been generated (e.g. returned to handling after a deny and then approved),
                 # create a new active access code in Pindora.
                 if instance.access_code_generated_at is None:

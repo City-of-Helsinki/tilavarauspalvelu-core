@@ -29,6 +29,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     Weekday,
 )
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraClientError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
@@ -745,7 +746,7 @@ def create_missing_pindora_reservations() -> None:
     for reservation in reservations:
         is_active = reservation.access_code_should_be_active
 
-        with suppress(Exception):
+        with suppress(PindoraClientError):
             try:
                 response = PindoraClient.create_reservation(reservation=reservation, is_active=is_active)
 
@@ -782,7 +783,7 @@ def update_pindora_access_code_is_active() -> None:
         return
 
     for reservation in reservations:
-        with suppress(Exception):
+        with suppress(PindoraClientError):
             if reservation.access_code_should_be_active:
                 try:
                     PindoraClient.activate_reservation_access_code(reservation=reservation)
