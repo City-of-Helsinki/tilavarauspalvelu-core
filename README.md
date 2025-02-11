@@ -15,6 +15,10 @@ For more detailed information, please refer to the [Tilavarauspalvelu page in Co
 Backend specific documentation can be found in the [backend README].
 Frontend specific documentation can be found in the [frontend README].
 
+## Setup
+
+
+
 [backend README]: https://github.com/City-of-Helsinki/tilavarauspalvelu-core/blob/main/README.md
 [Coverage Link]: https://sonarcloud.io/summary/new_code?id=City-of-Helsinki_tilavarauspalvelu-core
 [Coverage]: https://sonarcloud.io/api/project_badges/measure?project=City-of-Helsinki_tilavarauspalvelu-core&metric=coverage
