@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Literal, NotRequired, Protocol, TypedDict
 from django.contrib.auth.models import AnonymousUser
 from django.core.handlers import wsgi
 from graphql import GraphQLResolveInfo
+from rest_framework.exceptions import ValidationError
 
 if TYPE_CHECKING:
     import datetime
@@ -34,6 +35,7 @@ __all__ = [
     "AffectedTimeSpan",
     "AnyUser",
     "EmailContext",
+    "ErrorList",
     "GQLInfo",
     "HTTPMethod",
     "Lang",
@@ -59,6 +61,7 @@ type HTTPMethod = Literal["GET", "POST", "PUT", "PATCH", "DELETE"]
 type M2MAction = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
 type EmailContext = dict[str, str | int | Decimal | None]
 type Action = Literal["pre_add", "post_add", "pre_remove", "post_remove", "pre_clear", "post_clear"]
+type ErrorList = list[ValidationError]
 
 
 class AffectedTimeSpan(TypedDict):
