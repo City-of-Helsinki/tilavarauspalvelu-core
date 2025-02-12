@@ -92,6 +92,7 @@ class ReservationAdmin(admin.ModelAdmin):
         PaidReservationListFilter,
         ("reservation_units__unit", MultiSelectRelatedOnlyDropdownFilter),
         ("reservation_units", MultiSelectRelatedOnlyDropdownFilter),
+        "access_type",
     ]
 
     # Form
