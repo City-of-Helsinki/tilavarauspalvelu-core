@@ -6,7 +6,9 @@ from typing import TYPE_CHECKING
 
 from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
+from django.db.models import Exists
 from django.utils.translation import gettext_lazy as _
+from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import WeekdayChoice
 
@@ -124,3 +126,20 @@ class RecurringReservation(models.Model):
         from .validators import ReservationSeriesValidator
 
         return ReservationSeriesValidator(self)
+
+    @lookup_property(skip_codegen=True)
+    def should_have_active_access_code() -> bool:
+        """Should at least one reservation in this series contain an active access code?"""
+        from tilavarauspalvelu.models import Reservation
+
+        exists = Exists(
+            queryset=Reservation.objects.filter(
+                L(access_code_should_be_active=True),
+                recurring_reservation=models.OuterRef("pk"),
+            ),
+        )
+        return exists  # type: ignore[return-value]  # noqa: RET504
+
+    @should_have_active_access_code.override
+    def _(self) -> bool:
+        return self.reservations.filter(L(access_code_should_be_active=True)).exists()
