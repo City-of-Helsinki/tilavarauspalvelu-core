@@ -1154,6 +1154,20 @@ msgstr ""
 msgid "Search by first name or last name."
 msgstr ""
 
+#: tilavarauspalvelu/admin/recurring_reservation/filters.py
+msgid "Should have active access code"
+msgstr ""
+
+#: tilavarauspalvelu/admin/recurring_reservation/filters.py
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "Yes"
+msgstr ""
+
+#: tilavarauspalvelu/admin/recurring_reservation/filters.py
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "No"
+msgstr ""
+
 #: tilavarauspalvelu/admin/request_log/admin.py
 #: tilavarauspalvelu/admin/sql_log/admin.py
 msgid "Request ID"
@@ -1269,14 +1283,6 @@ msgstr ""
 #: tilavarauspalvelu/admin/reservation/filters.py
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Recurring reservation"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/filters.py
-msgid "Yes"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation/filters.py
-msgid "No"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/filters.py
