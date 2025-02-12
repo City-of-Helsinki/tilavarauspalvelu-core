@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import Reservation
+from utils.date_utils import DEFAULT_TIMEZONE
 
 
 class ReservationAdminForm(forms.ModelForm):
@@ -148,18 +149,39 @@ class ReservationAdminForm(forms.ModelForm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        if (
-            self.instance
-            and self.instance.recurring_reservation is None
-            and self.instance.access_type == AccessType.ACCESS_CODE
-        ):
+        if self.instance and self.instance.access_type == AccessType.ACCESS_CODE:
             pindora_field = self.fields["pindora_response"]
-            pindora_field.initial = self.get_pindora_response(self.instance)
             pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})
 
-    def get_pindora_response(self, obj: Reservation) -> str | None:
-        if obj.access_type != AccessType.ACCESS_CODE:
-            return None
+            if self.instance.recurring_reservation is None:
+                response = PindoraClient.get_reservation(reservation=self.instance)
+                pindora_field.initial = json.dumps(response, default=str, indent=2)
 
-        response = PindoraClient.get_reservation(reservation=obj)
-        return json.dumps(response, default=str, indent=2)
+            elif self.instance.recurring_reservation.allocated_time_slot is None:
+                response = PindoraClient.get_reservation_series(series=self.instance.recurring_reservation)
+
+                # Only show the validity for this reservation
+                response["reservation_unit_code_validity"] = [
+                    item
+                    for item in response["reservation_unit_code_validity"]
+                    if item["begin"] == self.instance.begin.astimezone(DEFAULT_TIMEZONE)
+                    and item["end"] == self.instance.end.astimezone(DEFAULT_TIMEZONE)
+                ]
+
+                pindora_field.initial = json.dumps(response, default=str, indent=2)
+
+            else:
+                allocation = self.instance.recurring_reservation.allocated_time_slot
+                section = allocation.reservation_unit_option.application_section
+                response = PindoraClient.get_seasonal_booking(section=section)
+
+                # Only show the validity for this reservation
+                response["reservation_unit_code_validity"] = [
+                    item
+                    for item in response["reservation_unit_code_validity"]
+                    if item["begin"] == self.instance.begin.astimezone(DEFAULT_TIMEZONE)
+                    and item["end"] == self.instance.end.astimezone(DEFAULT_TIMEZONE)
+                    and item["reservation_unit_id"] == self.instance.recurring_reservation.reservation_unit.uuid
+                ]
+
+                pindora_field.initial = json.dumps(response, default=str, indent=2)
