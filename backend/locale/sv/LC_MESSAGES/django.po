@@ -2453,116 +2453,6 @@ msgid "Notification manager"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation modified access code"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application handled"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application in allocation"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application received"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application section cancelled"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Permission deactivation"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "User anonymization"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation approved"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation cancelled"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation confirmed"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation modified"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation rejected"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation requires handling"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation requires payment"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation cancelled single"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation modified series"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation modified single"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation rejected series"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation rejected single"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Staff notification application section cancelled"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Staff notification reservation made"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Staff notification reservation requires handling"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
 msgctxt "HaukiResourceState"
 msgid "Open"
 msgstr ""
@@ -3614,6 +3504,121 @@ msgid ""
 "A booking request for %(reservation_unit_name)s is waiting for processing"
 msgstr ""
 "En ny bokningsförfrågan för %(reservation_unit_name)s väntar på at behandlats"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application handled"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application in allocation"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application received"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application section cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Permission deactivation"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "User anonymization"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation approved"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation confirmed"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation modified"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation modified access code"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation rejected"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation requires handling"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation requires payment"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation cancelled single"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified series"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified series access code"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified single"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation rejected series"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation rejected single"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Staff notification application section cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Staff notification reservation made"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Staff notification reservation requires handling"
+msgstr ""
 
 #: tilavarauspalvelu/models/ability_group/model.py
 msgid "ability group"

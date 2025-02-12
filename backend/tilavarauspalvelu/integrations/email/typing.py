@@ -31,6 +31,9 @@ from tilavarauspalvelu.integrations.email.template_context import (
     get_context_for_staff_notification_reservation_requires_handling,
     get_context_for_user_anonymization,
 )
+from tilavarauspalvelu.integrations.email.template_context.reservation import (
+    get_context_for_seasonal_reservation_modified_series_access_code,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -103,6 +106,7 @@ class EmailType:
             cls.RESERVATION_REQUIRES_PAYMENT,
             cls.SEASONAL_RESERVATION_CANCELLED_SINGLE,
             cls.SEASONAL_RESERVATION_MODIFIED_SERIES,
+            cls.SEASONAL_RESERVATION_MODIFIED_SERIES_ACCESS_CODE,
             cls.SEASONAL_RESERVATION_MODIFIED_SINGLE,
             cls.SEASONAL_RESERVATION_REJECTED_SERIES,
             cls.SEASONAL_RESERVATION_REJECTED_SINGLE,
@@ -362,6 +366,28 @@ class EmailType:
             "application_round_name",
             "application_id",
             "application_section_id",
+            "access_code_is_used",
+            "access_code",
+            "access_code_validity_period",
+        ]
+
+    class SEASONAL_RESERVATION_MODIFIED_SERIES_ACCESS_CODE(_BASE_EMAIL_TYPE):
+        """Staff modifies a seasonal reservation series"""
+
+        label = pgettext_lazy("EmailType", "Seasonal reservation modified series access code")
+        get_email_context = staticmethod(get_context_for_seasonal_reservation_modified_series_access_code)
+        context_variables = [
+            "language",
+            "email_recipient_name",
+            "weekday_value",
+            "time_value",
+            "application_section_name",
+            "application_round_name",
+            "application_id",
+            "application_section_id",
+            "access_code_is_used",
+            "access_code",
+            "access_code_validity_period",
         ]
 
     class SEASONAL_RESERVATION_MODIFIED_SINGLE(_BASE_EMAIL_TYPE):

@@ -260,7 +260,7 @@ def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
     }
 
 
-def params_for_keyless_entry(*, reservation: Reservation) -> dict[str, Any]:
+def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str, Any]:
     if not reservation.access_code_should_be_active:
         return {
             "access_code_is_used": False,
@@ -271,6 +271,8 @@ def params_for_keyless_entry(*, reservation: Reservation) -> dict[str, Any]:
     try:
         response = PindoraClient.get_reservation(reservation=reservation)
     except PindoraNotFoundError:
+        response = None  # Set as None to make mocking in tests easier
+    if not response:
         # Reservation should have an access code, but it is not available.
         return {
             "access_code_is_used": True,
@@ -279,6 +281,29 @@ def params_for_keyless_entry(*, reservation: Reservation) -> dict[str, Any]:
         }
 
     time_str = f"{local_time_string(response['begin'].time())}-{local_time_string(response['end'].time())}"
+    return {
+        "access_code_is_used": True,
+        "access_code": response["access_code"],
+        "access_code_validity_period": time_str,
+    }
+
+
+def params_for_access_code_reservation_series(*, reservation_series: RecurringReservation) -> dict[str, Any]:
+    try:
+        response = PindoraClient.get_reservation_series(series=reservation_series)
+    except PindoraNotFoundError:
+        # Reservation should have an access code, but it is not available.
+        return {
+            "access_code_is_used": False,  # Not supported for RecurringReservations yet.
+            "access_code": "",
+            "access_code_validity_period": "",
+        }
+
+    # All reservations in the series have the same TIME, so any validity period in the response is fine.
+    time_str = ""
+    validity = next(iter(response["reservation_unit_code_validity"]), None)
+    if validity:
+        time_str = f"{local_time_string(validity['begin'].time())}-{local_time_string(validity['end'].time())}"
     return {
         "access_code_is_used": True,
         "access_code": response["access_code"],

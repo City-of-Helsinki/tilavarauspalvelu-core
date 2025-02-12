@@ -2529,116 +2529,6 @@ msgid "Notification manager"
 msgstr "Ilmoituksen hallitsija."
 
 #: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation modified access code"
-msgstr "Varausta muokattu ovikoodi"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application handled"
-msgstr "Kausivaraushakemus käsitelty"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application in allocation"
-msgstr "Kausivaraushakemus käsittelyssä"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application received"
-msgstr "Kausivaraushakemus vastaanotettu"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application section cancelled"
-msgstr "Kausivaraushakemuksen osa peruttu"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Permission deactivation"
-msgstr "Käyttöoikeuksien deaktivointi"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "User anonymization"
-msgstr "Käyttäjän anonymisointi"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation approved"
-msgstr "Varaus hyväksytty"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation cancelled"
-msgstr "Varaus peruttu"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation confirmed"
-msgstr "Varaus vahvistettu"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation modified"
-msgstr "Varausta muokattu"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation rejected"
-msgstr "Varaus hylätty"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation requires handling"
-msgstr "Varaus odottaa käsittelyä"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation requires payment"
-msgstr "Varaus odottaa maksua"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation cancelled single"
-msgstr "Kausivaraus peruttu yksittäinen"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation modified series"
-msgstr "Kausivaraus muokattu sarja"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation modified single"
-msgstr "Kausivaraus muokattu yksittäinen"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation rejected series"
-msgstr "Kausivaraus hylätty sarja"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation rejected single"
-msgstr "Kausivaraus hylätty yksittäinen"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Staff notification application section cancelled"
-msgstr "Käsittelijä ilmoitus kausivaraushakemuksen osan perumisesta"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Staff notification reservation made"
-msgstr "Käsittelijä ilmoitus uudesta varauksesta"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Staff notification reservation requires handling"
-msgstr "Käsittelijän ilmoitus käsittelyä vaativasta varauksesta"
-
-#: tilavarauspalvelu/enums.py
 msgctxt "HaukiResourceState"
 msgid "Open"
 msgstr "Auki"
@@ -3689,6 +3579,121 @@ msgid ""
 msgstr ""
 "Varausyksikköön %(reservation_unit_name)s on tehty uusi käsittelyä vaativa "
 "varauspyyntö"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application handled"
+msgstr "Kausivaraushakemus käsitelty"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application in allocation"
+msgstr "Kausivaraushakemus käsittelyssä"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application received"
+msgstr "Kausivaraushakemus vastaanotettu"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application section cancelled"
+msgstr "Kausivaraushakemuksen osa peruttu"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Permission deactivation"
+msgstr "Käyttöoikeuksien deaktivointi"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "User anonymization"
+msgstr "Käyttäjän anonymisointi"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation approved"
+msgstr "Varaus hyväksytty"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation cancelled"
+msgstr "Varaus peruttu"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation confirmed"
+msgstr "Varaus vahvistettu"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation modified"
+msgstr "Varausta muokattu"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation modified access code"
+msgstr "Varausta muokattu ovikoodi"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation rejected"
+msgstr "Varaus hylätty"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation requires handling"
+msgstr "Varaus odottaa käsittelyä"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation requires payment"
+msgstr "Varaus odottaa maksua"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation cancelled single"
+msgstr "Kausivaraus peruttu yksittäinen"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified series"
+msgstr "Kausivaraus muokattu sarja"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified series access code"
+msgstr "Kausivaraus muokattu sarja ovikoodi"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified single"
+msgstr "Kausivaraus muokattu yksittäinen"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation rejected series"
+msgstr "Kausivaraus hylätty sarja"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation rejected single"
+msgstr "Kausivaraus hylätty yksittäinen"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Staff notification application section cancelled"
+msgstr "Käsittelijä ilmoitus kausivaraushakemuksen osan perumisesta"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Staff notification reservation made"
+msgstr "Käsittelijä ilmoitus uudesta varauksesta"
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Staff notification reservation requires handling"
+msgstr "Käsittelijän ilmoitus käsittelyä vaativasta varauksesta"
 
 #: tilavarauspalvelu/models/ability_group/model.py
 msgid "ability group"
