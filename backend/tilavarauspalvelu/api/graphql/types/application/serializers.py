@@ -8,7 +8,6 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from rest_framework.settings import api_settings
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.address.serializers import AddressSerializer
@@ -25,6 +24,18 @@ from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection, Organisation, User
+    from tilavarauspalvelu.typing import ErrorList
+
+
+__all__ = [
+    "ApplicationCancelSerializer",
+    "ApplicationCreateSerializer",
+    "ApplicationSendSerializer",
+    "ApplicationUpdateSerializer",
+    "ApplicationWorkingMemoSerializer",
+    "RejectAllApplicationOptionsSerializer",
+    "RestoreAllApplicationOptionsSerializer",
+]
 
 
 class ApplicationCreateSerializer(NestingModelSerializer):
@@ -70,7 +81,7 @@ class ApplicationCreateSerializer(NestingModelSerializer):
             return user
 
         msg = "Application can only be created by an adult reservee"
-        raise ValidationError(msg, error_codes.APPLICATION_ADULT_RESERVEE_REQUIRED)
+        raise ValidationError(msg, code=error_codes.APPLICATION_ADULT_RESERVEE_REQUIRED)
 
     def validate_application_sections(self, sections: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if len(sections) > settings.MAXIMUM_SECTIONS_PER_APPLICATION:
@@ -118,7 +129,7 @@ class ApplicationSendSerializer(NestingModelSerializer):
         fields = ["pk"]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        errors: defaultdict[str, list[str]] = defaultdict(list)
+        errors: ErrorList = []
 
         self.validate_application_sections(errors)
         self.validate_applicant(errors)
@@ -127,52 +138,61 @@ class ApplicationSendSerializer(NestingModelSerializer):
         status = self.instance.status
         if not status.can_send:
             msg = f"Application in status '{status.value}' cannot be sent."
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            error = ValidationError(msg, code=error_codes.APPLICATION_STATUS_CANNOT_SEND)
+            errors.append(error)
 
         if errors:
-            raise serializers.ValidationError(errors)
+            details = [detail for error in errors for detail in error.detail]
+            raise serializers.ValidationError(details)
 
         return data
 
-    def validate_application_sections(self, errors: defaultdict[str, list[str]]) -> None:
+    def validate_application_sections(self, errors: ErrorList) -> None:
         """Validate section and related data that has not been validated by database constraints."""
         sections = self.instance.application_sections.all()
 
         if not sections:
             msg = "Application requires application sections before it can be sent."
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            error = ValidationError(msg, code=error_codes.APPLICATION_SECTIONS_MISSING)
+            errors.append(error)
             return
 
         for section in sections:
             if not section.name:
                 msg = f"Application section {section.pk} name cannot be empty."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_EMPTY_NAME)
+                errors.append(error)
 
             if section.num_persons < 1:
                 msg = f"Application section {section.pk} must be for at least one person."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_NUM_PERSONS_ZERO)
+                errors.append(error)
 
             if section.age_group is None:
                 msg = f"Application section {section.pk} must have age group set."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_AGE_GROUP_MISSING)
+                errors.append(error)
 
             if section.purpose is None:
                 msg = f"Application section {section.pk} must have its purpose set."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_PURPOSE_MISSING)
+                errors.append(error)
 
             self.validate_suitable_time_ranges(section, errors)
 
             number_of_reservation_unit_options = section.reservation_unit_options.count()
             if number_of_reservation_unit_options < 1:
                 msg = f"Application section {section.pk} must have at least one reservation unit option selected."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_RESERVATION_UNIT_OPTIONS_MISSING)
+                errors.append(error)
 
-    def validate_suitable_time_ranges(self, section: ApplicationSection, errors: defaultdict[str, list[str]]) -> None:
+    def validate_suitable_time_ranges(self, section: ApplicationSection, errors: ErrorList) -> None:
         time_ranges = section.suitable_time_ranges.all()
 
         if not time_ranges:
             msg = f"Application section {section.pk} must have at least one suitable time range selected."
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_SUITABLE_TIME_RANGES_MISSING)
+            errors.append(error)
             return
 
         # Merge suitable times per weekday.
@@ -192,7 +212,8 @@ class ApplicationSendSerializer(NestingModelSerializer):
                 f"as requested reservations per week. Counted {number_of_suitable_weekdays} but expected "
                 f"at least {section.applied_reservations_per_week}."
             )
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_FEW)
+            errors.append(error)
 
         # Check that each weekday has a contiguous time range long enough for an allocation.
         for weekday, timeslots in time_slots.items():
@@ -208,9 +229,10 @@ class ApplicationSendSerializer(NestingModelSerializer):
                     f"do not contain a contiguous time range that is at least as long as the "
                     f"requested minimum reservation duration of {minimum_duration}."
                 )
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT)
+                errors.append(error)
 
-    def validate_applicant(self, errors: defaultdict[str, list[str]]) -> None:
+    def validate_applicant(self, errors: ErrorList) -> None:
         """Validate applicant differently based on applicant type."""
         applicant_type = ApplicantTypeChoice(self.instance.applicant_type)
 
@@ -227,65 +249,74 @@ class ApplicationSendSerializer(NestingModelSerializer):
             case ApplicantTypeChoice.COMPANY:
                 self.validate_company_applicant(errors)
 
-    def validate_individual_applicant(self, errors: defaultdict[str, list[str]]) -> None:
+    def validate_individual_applicant(self, errors: ErrorList) -> None:
         self.validate_contact_person(errors)
         self.validate_billing_address(errors)
 
-    def validate_community_applicant(self, errors: defaultdict[str, list[str]]) -> None:
+    def validate_community_applicant(self, errors: ErrorList) -> None:
         self.validate_contact_person(errors)
         self.validate_organisation(errors, require_home_city=True)
 
-    def validate_association_applicant(self, errors: defaultdict[str, list[str]]) -> None:
+    def validate_association_applicant(self, errors: ErrorList) -> None:
         self.validate_contact_person(errors)
         self.validate_organisation(errors, require_home_city=True)
 
-    def validate_company_applicant(self, errors: defaultdict[str, list[str]]) -> None:
+    def validate_company_applicant(self, errors: ErrorList) -> None:
         self.validate_contact_person(errors)
         self.validate_organisation(errors, require_identifier=True)
 
-    def validate_billing_address(self, errors: defaultdict[str, list[str]]) -> None:
+    def validate_billing_address(self, errors: ErrorList) -> None:
         if self.instance.billing_address is None:
             msg = "Application billing address is required."
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            error = ValidationError(msg, code=error_codes.APPLICATION_BILLING_ADDRESS_MISSING)
+            errors.append(error)
 
         else:
             if not self.instance.billing_address.street_address:
                 msg = "Application billing address must have a street address."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_BILLING_ADDRESS_STREET_ADDRESS_MISSING)
+                errors.append(error)
 
             if not self.instance.billing_address.post_code:
                 msg = "Application billing address must have a post code."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_BILLING_ADDRESS_POST_CODE_MISSING)
+                errors.append(error)
 
             if not self.instance.billing_address.city:
                 msg = "Application billing address must have a city."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_BILLING_ADDRESS_CITY_MISSING)
+                errors.append(error)
 
-    def validate_contact_person(self, errors: defaultdict[str, list[str]]) -> None:
+    def validate_contact_person(self, errors: ErrorList) -> None:
         if self.instance.contact_person is None:
             msg = "Application contact person is required."
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            error = ValidationError(msg, code=error_codes.APPLICATION_CONTACT_PERSON_MISSING)
+            errors.append(error)
 
         else:
             if not self.instance.contact_person.first_name:
                 msg = "Application contact person must have a first name."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_CONTACT_PERSON_FIRST_NAME_MISSING)
+                errors.append(error)
 
             if not self.instance.contact_person.last_name:
                 msg = "Application contact person must have a last name."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_CONTACT_PERSON_LAST_NAME_MISSING)
+                errors.append(error)
 
             if not self.instance.contact_person.email:
                 msg = "Application contact person must have an email address."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_CONTACT_PERSON_EMAIL_MISSING)
+                errors.append(error)
 
             if not self.instance.contact_person.phone_number:
                 msg = "Application contact person must have a phone number."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_CONTACT_PERSON_PHONE_NUMBER_MISSING)
+                errors.append(error)
 
     def validate_organisation(
         self,
-        errors: defaultdict[str, list[str]],
+        errors: ErrorList,
         *,
         require_home_city: bool = False,
         require_identifier: bool = False,
@@ -294,56 +325,66 @@ class ApplicationSendSerializer(NestingModelSerializer):
 
         if organisation is None:
             msg = "Application organisation is required."
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            error = ValidationError(msg, code=error_codes.APPLICATION_ORGANISATION_MISSING)
+            errors.append(error)
 
         else:
             if not organisation.name:
                 msg = "Application organisation must have a name."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_ORGANISATION_NAME_MISSING)
+                errors.append(error)
 
             if not organisation.core_business:
                 msg = "Application organisation must have a core business."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_ORGANISATION_CORE_BUSINESS_MISSING)
+                errors.append(error)
 
             if require_home_city and self.instance.home_city is None:
                 msg = "Application home city is required with organisation."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_ORGANISATION_HOME_CITY_MISSING)
+                errors.append(error)
 
             if require_identifier and organisation.identifier is None:
                 msg = "Application organisation must have an identifier."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_ORGANISATION_IDENTIFIER_MISSING)
+                errors.append(error)
 
             self.validate_organisation_address(organisation, errors)
 
-    def validate_organisation_address(self, organisation: Organisation, errors: defaultdict[str, list[str]]) -> None:
+    def validate_organisation_address(self, organisation: Organisation, errors: ErrorList) -> None:
         if organisation.address is None:
             msg = "Application organisation address is required."
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            error = ValidationError(msg, code=error_codes.APPLICATION_ORGANISATION_ADDRESS_MISSING)
+            errors.append(error)
 
         else:
             if not organisation.address.street_address:
                 msg = "Application organisation address must have a street address."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_ORGANISATION_ADDRESS_STREET_ADDRESS_MISSING)
+                errors.append(error)
 
             if not organisation.address.post_code:
                 msg = "Application organisation address must have a post code."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_ORGANISATION_ADDRESS_POST_CODE_MISSING)
+                errors.append(error)
 
             if not organisation.address.city:
                 msg = "Application organisation address must have a city."
-                errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+                error = ValidationError(msg, code=error_codes.APPLICATION_ORGANISATION_ADDRESS_CITY_MISSING)
+                errors.append(error)
 
             # Only validate billing address if applicant selected "use different billing address"
             # and thus filled out the billing address information.
             if self.instance.billing_address is not None:
                 self.validate_billing_address(errors)
 
-    def validate_user(self, user: User, errors: defaultdict[str, list[str]]) -> None:
+    def validate_user(self, user: User, errors: ErrorList) -> None:
         if user.actions.is_ad_user or user.actions.is_of_age:
             return
 
         msg = "Application can only be sent by an adult reservee"
-        errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+        error = ValidationError(msg, code=error_codes.APPLICATION_ADULT_RESERVEE_REQUIRED)
+        errors.append(error)
         return
 
     def save(self, **kwargs: Any) -> Application:
@@ -361,15 +402,17 @@ class ApplicationCancelSerializer(NestingModelSerializer):
         fields = ["pk"]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        errors: dict[str, list[str]] = defaultdict(list)
+        errors: ErrorList = []
 
         status = self.instance.status
         if not status.can_cancel:
             msg = f"Application in status '{status.value}' cannot be cancelled."
-            errors[api_settings.NON_FIELD_ERRORS_KEY].append(msg)
+            error = ValidationError(msg, code=error_codes.APPLICATION_STATUS_CANNOT_CANCEL)
+            errors.append(error)
 
         if errors:
-            raise serializers.ValidationError(errors)
+            details = [detail for error in errors for detail in error.detail]
+            raise serializers.ValidationError(details)
 
         return data
 
