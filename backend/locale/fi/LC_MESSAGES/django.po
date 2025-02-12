@@ -1196,6 +1196,20 @@ msgstr "Henkilön puhelinnumero"
 msgid "Search by first name or last name."
 msgstr "Etsi etu- tai sukunimellä."
 
+#: tilavarauspalvelu/admin/recurring_reservation/filters.py
+msgid "Should have active access code"
+msgstr "Pitäisi olla aktiivinen pääsykoodi"
+
+#: tilavarauspalvelu/admin/recurring_reservation/filters.py
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "Yes"
+msgstr "Kyllä"
+
+#: tilavarauspalvelu/admin/recurring_reservation/filters.py
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "No"
+msgstr "Ei"
+
 #: tilavarauspalvelu/admin/request_log/admin.py
 #: tilavarauspalvelu/admin/sql_log/admin.py
 msgid "Request ID"
@@ -1315,14 +1329,6 @@ msgstr "Ei varauksia hyvitettävillä maksetuilla tilauksilla."
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Recurring reservation"
 msgstr "Toistuva varaus"
-
-#: tilavarauspalvelu/admin/reservation/filters.py
-msgid "Yes"
-msgstr "Kyllä"
-
-#: tilavarauspalvelu/admin/reservation/filters.py
-msgid "No"
-msgstr "Ei"
 
 #: tilavarauspalvelu/admin/reservation/filters.py
 msgid "Paid reservation"
