@@ -206,11 +206,12 @@ def get_contex_for_seasonal_reservation_check_details_url(
     application_id: int | None = None,
     application_section_id: int | None = None,
 ) -> EmailContext:
-    link = get_my_applications_ext_link(
-        language=language,
-        application_id=application_id,
-        application_section_id=application_section_id,
-    )
+    link = get_my_applications_ext_link(language=language)
+    # e.g. https://varaamo.hel.fi/applications/{application_id}/view?tab=reservations&section={application_section_id}
+    if application_id:
+        link = f"{link}/{application_id}/view"
+        if application_section_id:
+            link = f"{link}?tab=reservations&section={application_section_id}"
     text = "varaamo.hel.fi"
 
     return {
@@ -317,25 +318,16 @@ def get_varaamo_ext_link(*, language: Lang) -> str:
 def get_my_applications_ext_link(
     *,
     language: Lang,
-    application_id: int | None = None,
-    application_section_id: int | None = None,
 ) -> str:
     """
     Return the link to the 'My applications' page:
-    e.g. https://varaamo.hel.fi/applications/{application_id}/view?tab=reservations&section={application_section_id}
+    e.g. https://varaamo.hel.fi/applications
     """
     url = settings.EMAIL_VARAAMO_EXT_LINK.removesuffix("/")
 
     if language != "fi":
         url = f"{url}/{language}"
-    url = f"{url}/applications"
-
-    if application_id:
-        url = f"{url}/{application_id}/view"
-        if application_section_id:
-            url = f"{url}?tab=reservations&section={application_section_id}"
-
-    return url
+    return f"{url}/applications"
 
 
 def get_my_reservations_ext_link(*, language: Lang) -> str:
