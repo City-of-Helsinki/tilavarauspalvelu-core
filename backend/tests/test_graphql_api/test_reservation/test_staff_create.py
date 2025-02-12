@@ -9,7 +9,7 @@ from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationS
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, next_hour
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
 
 from tests.factories import (
     AgeGroupFactory,
@@ -512,11 +512,9 @@ def test_reservation__staff_create__access_type__access_code(graphql):
 
 @patch_method(PindoraClient.create_reservation)
 def test_reservation__staff_create__access_type__changed_to_access_code_in_the_future(graphql):
-    today = local_date()
-
     reservation_unit = ReservationUnitFactory.create(
         access_type=AccessType.ACCESS_CODE,
-        access_type_start_date=today + datetime.timedelta(days=1),
+        access_type_start_date=next_hour(plus_days=1),
     )
 
     graphql.login_with_superuser()
@@ -536,11 +534,9 @@ def test_reservation__staff_create__access_type__changed_to_access_code_in_the_f
 
 @patch_method(PindoraClient.create_reservation)
 def test_reservation__staff_create__access_type__access_code_has_ended(graphql):
-    today = local_date()
-
     reservation_unit = ReservationUnitFactory.create(
         access_type=AccessType.ACCESS_CODE,
-        access_type_end_date=today - datetime.timedelta(days=1),
+        access_type_end_date=next_hour(plus_days=-1),
     )
 
     graphql.login_with_superuser()
