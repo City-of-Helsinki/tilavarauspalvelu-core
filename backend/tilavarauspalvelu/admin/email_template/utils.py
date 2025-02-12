@@ -84,7 +84,11 @@ def get_mock_params(language: Lang, **kwargs: Any) -> EmailContext | datetime | 
 
 @get_translated
 def get_mock_data(*, email_type: type[EmailType], language: Lang, **kwargs: Any) -> EmailContext | None:
-    if email_type == EmailType.RESERVATION_MODIFIED_ACCESS_CODE and "access_code_is_used" not in kwargs:
+    access_code_always_used = [
+        EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES_ACCESS_CODE,
+        EmailType.RESERVATION_MODIFIED_ACCESS_CODE,
+    ]
+    if email_type in access_code_always_used and "access_code_is_used" not in kwargs:
         kwargs["access_code_is_used"] = True
 
     mock_params = get_mock_params(language=language, **kwargs)

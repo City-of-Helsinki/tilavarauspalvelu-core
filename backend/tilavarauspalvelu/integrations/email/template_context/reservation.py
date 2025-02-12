@@ -19,9 +19,10 @@ from .common import (
     get_context_for_translations,
     get_my_reservations_ext_link,
     get_staff_reservations_ext_link,
+    params_for_access_code_reservation,
+    params_for_access_code_reservation_series,
     params_for_application_section_info,
     params_for_base_info,
-    params_for_keyless_entry,
     params_for_price_info,
     params_for_price_range_info,
     params_for_reservation_series_info,
@@ -45,6 +46,7 @@ __all__ = [
     "get_context_for_reservation_requires_payment",
     "get_context_for_seasonal_reservation_cancelled_single",
     "get_context_for_seasonal_reservation_modified_series",
+    "get_context_for_seasonal_reservation_modified_series_access_code",
     "get_context_for_seasonal_reservation_modified_single",
     "get_context_for_seasonal_reservation_rejected_series",
     "get_context_for_seasonal_reservation_rejected_single",
@@ -104,7 +106,7 @@ def get_context_for_reservation_approved(
             "instructions_confirmed": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_info(reservation=reservation),
-            **params_for_keyless_entry(reservation=reservation),
+            **params_for_access_code_reservation(reservation=reservation),
         }
 
     text_reservation_approved = (
@@ -251,7 +253,7 @@ def get_context_for_reservation_confirmed(
             "instructions_confirmed": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_info(reservation=reservation),
-            **params_for_keyless_entry(reservation=reservation),
+            **params_for_access_code_reservation(reservation=reservation),
         }
 
     return {
@@ -326,7 +328,7 @@ def get_context_for_reservation_modified(
             "instructions_confirmed": reservation.actions.get_instructions(kind="confirmed", language=language),
             **params_for_base_info(reservation=reservation, language=language),
             **params_for_price_info(reservation=reservation),
-            **params_for_keyless_entry(reservation=reservation),
+            **params_for_access_code_reservation(reservation=reservation),
         }
 
     return {
@@ -700,6 +702,9 @@ def get_context_for_seasonal_reservation_modified_series(
     application_round_name: str,
     application_id: int | None,
     application_section_id: int | None,
+    access_code_is_used: bool,
+    access_code: str,
+    access_code_validity_period: str,
 ) -> EmailContext: ...
 
 
@@ -719,6 +724,7 @@ def get_context_for_seasonal_reservation_modified_series(
             "application_section_id": getattr(application_section, "id", None),
             **params_for_reservation_series_info(reservation_series=reservation_series),
             **params_for_application_section_info(application_section=application_section, language=language),
+            **params_for_access_code_reservation_series(reservation_series=reservation_series),
         }
 
     title = pgettext("Email", "The time of the space reservation included in your seasonal booking has changed")
@@ -735,6 +741,60 @@ def get_context_for_seasonal_reservation_modified_series(
             application_id=data["application_id"],
             application_section_id=data["application_section_id"],
         ),
+        **get_context_for_keyless_entry(
+            language=language,
+            access_code_is_used=data["access_code_is_used"],
+            access_code=data["access_code"],
+            access_code_validity_period=data["access_code_validity_period"],
+        ),
+    }
+
+
+# type: EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES_ACCESS_CODE #####################################################
+
+
+@overload
+def get_context_for_seasonal_reservation_modified_series_access_code(
+    reservation_series: RecurringReservation, *, language: Lang
+) -> EmailContext: ...
+
+
+@overload
+def get_context_for_seasonal_reservation_modified_series_access_code(
+    *,
+    language: Lang,
+    email_recipient_name: str,
+    weekday_value: str,
+    time_value: str,
+    application_section_name: str,
+    application_round_name: str,
+    application_id: int | None,
+    application_section_id: int | None,
+    access_code_is_used: bool,
+    access_code: str,
+    access_code_validity_period: str,
+) -> EmailContext: ...
+
+
+@get_translated
+def get_context_for_seasonal_reservation_modified_series_access_code(
+    reservation_series: RecurringReservation | None = None,
+    *,
+    language: Lang,
+    **data: Any,
+) -> EmailContext:
+    if reservation_series is not None:
+        data = get_context_for_seasonal_reservation_modified_series(
+            reservation_series=reservation_series, language=language
+        )
+    else:
+        data = get_context_for_seasonal_reservation_modified_series(**data, language=language)
+
+    title = pgettext("Email", "The door code has changed")
+    return {
+        **data,
+        "title": title,
+        "text_reservation_modified": title,
     }
 
 

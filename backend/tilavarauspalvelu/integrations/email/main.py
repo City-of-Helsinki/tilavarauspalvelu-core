@@ -44,7 +44,10 @@ from .template_context import (
     get_context_for_user_anonymization,
 )
 from .template_context.application import get_context_for_staff_notification_application_section_cancelled
-from .template_context.reservation import get_context_for_reservation_modified_access_code
+from .template_context.reservation import (
+    get_context_for_reservation_modified_access_code,
+    get_context_for_seasonal_reservation_modified_series_access_code,
+)
 from .typing import EmailData, EmailType
 
 if TYPE_CHECKING:
@@ -513,7 +516,7 @@ class EmailService:
         recipients = get_application_email_recipients(application=application)
         if not recipients:
             SentryLogger.log_message(
-                "No recipients for reservation series modified email",
+                "No recipients for reservation modified series access code email",
                 details={"reservation_series": reservation_series.pk},
             )
             return
@@ -523,6 +526,43 @@ class EmailService:
 
         email_type = EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES
         context = get_context_for_seasonal_reservation_modified_series(reservation_series, language=language)
+        email = EmailData.build(recipients, context, email_type)
+        send_emails_in_batches_task.delay(email_data=email)
+
+    @staticmethod
+    def send_seasonal_reservation_modified_series_access_code_email(
+        reservation_series: RecurringReservation,
+        *,
+        language: Lang | None = None,
+    ) -> None:
+        # Do not send the email, if the reservation series not attached to an allocated time slot.
+        if reservation_series.allocated_time_slot is None:
+            return
+
+        reservation: Reservation | None = reservation_series.reservations.last()
+        if reservation is None:
+            return
+        if reservation.type != ReservationTypeChoice.SEASONAL:
+            return
+
+        application = reservation_series.allocated_time_slot.reservation_unit_option.application_section.application
+        if application.status != ApplicationStatusChoice.RESULTS_SENT:
+            return
+        recipients = get_application_email_recipients(application=application)
+        if not recipients:
+            SentryLogger.log_message(
+                "No recipients for reservation series modified email",
+                details={"reservation_series": reservation_series.pk},
+            )
+            return
+
+        if language is None:
+            language = get_application_email_language(application=application)
+
+        email_type = EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES_ACCESS_CODE
+        context = get_context_for_seasonal_reservation_modified_series_access_code(
+            reservation_series, language=language
+        )
         email = EmailData.build(recipients, context, email_type)
         send_emails_in_batches_task.delay(email_data=email)
 
