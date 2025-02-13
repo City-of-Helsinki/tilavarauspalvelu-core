@@ -28,30 +28,7 @@ export function ExternalScripts({
 
 function MatomoScript(): JSX.Element {
   return (
-    <Script
-      id="matomo"
-      type="text/plain"
-      strategy="afterInteractive"
-      dangerouslySetInnerHTML={{
-        __html: `
-(function () {
-  var _paq = (window._paq = window._paq || []);
-  _paq.push(["trackPageView"]);
-  _paq.push(["enableLinkTracking"]);
-
-  var u = "//webanalytics.digiaiiris.com/js/";
-  _paq.push(["setTrackerUrl", u + "tracker.php"]);
-  _paq.push(["setSiteId", "195"]);
-  var d = document;
-  var g = d.createElement("script");
-  var s = d.getElementsByTagName("script")[0];
-  g.type = "text/javascript";
-  g.src = u + "piwik.js";
-  s.parentNode.insertBefore(g, s);
-})();
-  `,
-      }}
-    />
+    <Script id="matomo" strategy="afterInteractive" src="init-matomo.js" />
   );
 }
 
@@ -60,7 +37,6 @@ function HotjarScript(): JSX.Element {
     <Script
       id="hotjar"
       strategy="afterInteractive"
-      type="text/plain"
       dangerouslySetInnerHTML={{
         __html: `
 (function(h,o,t,j,a,r){
