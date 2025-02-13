@@ -1,8 +1,9 @@
 import React from "react";
-import { IconEuroSign, IconCross, IconArrowRight } from "hds-react";
+import { IconEuroSign, IconCross, IconArrowRight, IconLock } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { trim } from "lodash";
 import {
+  AccessType,
   type ListReservationsQuery,
   ReservationStateChoice,
 } from "@gql/gql-types";
@@ -84,6 +85,18 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
       value: price ?? "",
     },
   ];
+
+  if (reservationUnit.accessType !== AccessType.Unrestricted) {
+    infos.push({
+      icon: (
+        <IconLock
+          aria-label={t("reservationUnit:accessType")}
+          aria-hidden="false"
+        />
+      ),
+      value: t(`reservationUnit:accessTypes.${reservationUnit?.accessType}`),
+    });
+  }
 
   const buttons = [];
   if (type === "upcoming" && isReservationCancellable(reservation)) {
