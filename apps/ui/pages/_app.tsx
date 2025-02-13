@@ -13,15 +13,44 @@ import "common/styles/global.scss";
 import "../styles/global.scss";
 import { updateSentryConfig } from "@/sentry.client.config";
 import { ToastContainer } from "common/src/common/toast";
-import {
-  CookieBanner,
-  CookieConsentChangeEvent,
-  CookieConsentContextProvider,
-  useGroupConsent,
-} from "hds-react";
+import { CookieBanner, CookieConsentContextProvider } from "hds-react";
 import sitesettings from "./sitesettings.json";
 import { convertLanguageCode } from "common/src/common/util";
-import { ANALYTICS_COOKIE_GROUP_NAME } from "@/modules/const";
+import { ANALYTICS_COOKIE_GROUP_NAME, isBrowser } from "@/modules/const";
+
+/// check if the user has accepted the statistics cookies
+/// only client side
+/// the HDS version of this hook doesn't work
+function hasUserAcceptedStatistics(): boolean {
+  if (!isBrowser) {
+    return false;
+  }
+  const cookies = document.cookie.split(";").map((cookie) => cookie.trim());
+  const consentCookie = cookies.find((cookie) =>
+    cookie.startsWith("varaamo-cookie-consents=")
+  );
+  if (consentCookie) {
+    const val = consentCookie.split("=")[1];
+    const des = decodeURIComponent(val);
+    const parsed = JSON.parse(des);
+    if (parsed) {
+      return parsed.groups[ANALYTICS_COOKIE_GROUP_NAME] != null;
+    }
+  }
+  return false;
+}
+
+// hook wrap so we can recheck the cookie as a side effect
+function useHasUserAcceptedStatistics() {
+  const [analyticsAccepted, setAnalyticsAccepted] = useState(false);
+  useEffect(() => {
+    setAnalyticsAccepted(hasUserAcceptedStatistics());
+  }, [setAnalyticsAccepted]);
+  return {
+    hasUserAcceptedStatistics: analyticsAccepted,
+    recheck: () => setAnalyticsAccepted(hasUserAcceptedStatistics()),
+  };
+}
 
 function MyApp({ Component, pageProps }: AppProps) {
   const {
@@ -38,27 +67,14 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, [sentryDsn, sentryEnvironment]);
 
   const { i18n } = useTranslation();
-
-  const statsEnabled = useGroupConsent(ANALYTICS_COOKIE_GROUP_NAME);
-  const [isStatisticsAccepted, setIsStatisticsAccepted] =
-    useState(statsEnabled);
-
-  const cookieSelectionChange = (evt: CookieConsentChangeEvent) => {
-    const statsAccepted = evt.acceptedGroups.find(
-      (group) => group === ANALYTICS_COOKIE_GROUP_NAME
-    );
-    if (statsAccepted) {
-      setIsStatisticsAccepted(true);
-    } else {
-      setIsStatisticsAccepted(false);
-    }
-  };
+  const { hasUserAcceptedStatistics: statisticsAccepted, recheck } =
+    useHasUserAcceptedStatistics();
 
   const client = createApolloClient(apiBaseUrl ?? "", undefined);
   const language = convertLanguageCode(i18n.language);
 
-  const enableMatomo = matomoEnabled && isStatisticsAccepted;
-  const enableHotjar = hotjarEnabled && isStatisticsAccepted;
+  const enableMatomo = matomoEnabled && statisticsAccepted;
+  const enableHotjar = hotjarEnabled && statisticsAccepted;
 
   return (
     <DataContextProvider>
@@ -67,7 +83,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         options={{
           language,
         }}
-        onChange={cookieSelectionChange}
+        onChange={recheck}
       >
         <TrackingWrapper matomoEnabled={enableMatomo}>
           {/* TODO is this ever called on the server? then the ctx is not undefined */}
