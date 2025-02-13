@@ -10,7 +10,7 @@ class ReservationWorkingMemoSerializer(NestingModelSerializer):
     """Update the working memo of a reservation."""
 
     pk = IntegerField(required=True)
-    working_memo = CharField(required=True, allow_blank=False)
+    working_memo = CharField(required=True, allow_blank=True)
 
     class Meta:
         model = Reservation

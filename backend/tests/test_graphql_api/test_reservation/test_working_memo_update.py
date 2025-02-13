@@ -107,3 +107,17 @@ def test_reservation__update__working_memo__reserver_staff_user_and_not_own_rese
 
     reservation.refresh_from_db()
     assert reservation.working_memo == ""
+
+
+def test_reservation__update__empty(graphql):
+    reservation = ReservationFactory.create(working_memo="foo")
+    graphql.login_with_superuser()
+
+    data = {"pk": reservation.pk, "workingMemo": ""}
+
+    response = graphql(UPDATE_WORKING_MEMO_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    reservation.refresh_from_db()
+    assert reservation.working_memo == ""
