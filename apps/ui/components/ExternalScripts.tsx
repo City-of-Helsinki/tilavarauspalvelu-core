@@ -28,7 +28,11 @@ export function ExternalScripts({
 
 function MatomoScript(): JSX.Element {
   return (
-    <Script id="matomo" strategy="afterInteractive" src="init-matomo.js" />
+    <Script
+      id="matomo"
+      strategy="afterInteractive"
+      src="/scripts/init-matomo.js"
+    />
   );
 }
 
