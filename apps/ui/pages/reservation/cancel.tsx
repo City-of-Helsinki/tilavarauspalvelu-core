@@ -8,7 +8,6 @@ import {
   getReservationByOrderUuid,
 } from "@/modules/serverUtils";
 import { useTranslation } from "next-i18next";
-import { mapSingleParamToFormValue } from "@/modules/search";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
   DeleteReservationDocument,
@@ -17,6 +16,7 @@ import {
 } from "@/gql/gql-types";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { reservationsPrefix } from "@/modules/urls";
+import { ignoreMaybeArray } from "common/src/helpers";
 
 // This is the callback page from webstore if user cancels the order
 // TODO this would be nicer if we could use a reservation/[id]/cancelled page (or reservation/[id])
@@ -49,7 +49,7 @@ function Cancel({ apiBaseUrl }: NarrowedProps): JSX.Element {
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
   const commonProps = getCommonServerSideProps();
-  const orderId = mapSingleParamToFormValue(query.orderId);
+  const orderId = ignoreMaybeArray(query.orderId);
 
   const notFoundValue = {
     notFound: true,

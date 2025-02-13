@@ -1,4 +1,10 @@
-import { IconArrowRight, IconEuroSign, IconGroup, IconSize } from "hds-react";
+import {
+  IconArrowRight,
+  IconEuroSign,
+  IconGroup,
+  IconLock,
+  IconSize,
+} from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import NextImage from "next/image";
@@ -32,9 +38,9 @@ interface PropsT {
 
 function StatusTag({
   data,
-}: {
+}: Readonly<{
   data: { closed: boolean; availableAt: string };
-}): JSX.Element {
+}>): JSX.Element {
   const { t } = useTranslation();
   const { closed, availableAt } = data;
 
@@ -142,7 +148,12 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
   }
   if (unitPrice) {
     infos.push({
-      icon: <IconEuroSign aria-label={t("prices:reservationUnitPriceLabel")} />,
+      icon: (
+        <IconEuroSign
+          aria-hidden="false"
+          aria-label={t("prices:reservationUnitPriceLabel")}
+        />
+      ),
       value: unitPrice,
     });
   }
@@ -150,6 +161,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
     infos.push({
       icon: (
         <IconGroup
+          aria-hidden="false"
           aria-label={t("reservationUnitCard:maxPersons", {
             maxPersons: reservationUnit.maxPersons,
           })}
@@ -159,6 +171,20 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
       value: t("reservationUnitCard:maxPersons", {
         count: reservationUnit.maxPersons,
       }),
+    });
+  }
+  if (reservationUnit.currentAccessType) {
+    infos.push({
+      icon: (
+        <IconLock
+          aria-hidden="false"
+          aria-label={t("reservationUnit:accessType")}
+          size={IconSize.Small}
+        />
+      ),
+      value: t(
+        `reservationUnit:accessTypes.${reservationUnit.currentAccessType}`
+      ),
     });
   }
 

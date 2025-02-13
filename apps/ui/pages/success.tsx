@@ -11,10 +11,10 @@ import {
 } from "@/modules/serverUtils";
 import { getReservationPath } from "@/modules/urls";
 import { createApolloClient } from "@/modules/apolloClient";
-import { mapSingleParamToFormValue } from "@/modules/search";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { CenterSpinner } from "common/styles/util";
+import { ignoreMaybeArray } from "common/src/helpers";
 
 // TODO should be moved to /reservations/success
 // but because this is webstore callback page we need to leave the url (use an url rewrite)
@@ -23,7 +23,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
   const commonProps = getCommonServerSideProps();
 
-  const orderId = mapSingleParamToFormValue(query.orderId);
+  const orderId = ignoreMaybeArray(query.orderId);
   const notFoundValue = {
     notFound: true,
     props: {

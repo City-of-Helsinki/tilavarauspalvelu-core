@@ -13,6 +13,7 @@
   "purposesFilter": "Användningsändamål",
   "equipmentsFilter": "Utrustning",
   "durationFilter": "Varaktighet",
+  "accessTypeFilter": "Tillträde till utrymmet",
   "beginTimeIsBeforeEndTime": "Sluttiden måste vara senare än starttiden",
   "resetForm": "Töm",
   "filters": {

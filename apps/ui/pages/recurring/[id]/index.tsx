@@ -12,7 +12,11 @@ import {
   type ApplicationRoundsUiQueryVariables,
   ApplicationRoundsUiDocument,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import {
+  filterNonNullable,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
 import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ReservationUnitCard } from "@/components/search/ReservationUnitCard";
@@ -20,11 +24,7 @@ import { useReservationUnitList } from "@/hooks";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
 import StartApplicationBar from "@/components/common/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import {
-  getSearchOptions,
-  mapQueryParamToNumber,
-  processVariables,
-} from "@/modules/search";
+import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SortingComponent } from "@/components/SortingComponent";
 import { useRouter } from "next/router";
@@ -70,12 +70,12 @@ function SeasonalSearch({
   unitOptions,
   reservationUnitTypeOptions,
   purposeOptions,
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const searchValues = useSearchParams();
 
-  const applicationRoundPk = mapQueryParamToNumber(router.query.id);
+  const applicationRoundPk = toNumber(ignoreMaybeArray(router.query.id));
   const selectedApplicationRound = applicationRounds.find(
     (ar) => ar.pk === applicationRoundPk
   );
@@ -93,6 +93,9 @@ function SeasonalSearch({
     language: i18n.language,
     kind: ReservationKind.Season,
     applicationRound: applicationRoundPk ?? 0,
+    reservationPeriodBegin:
+      selectedApplicationRound?.reservationPeriodBegin ?? "",
+    reservationPeriodEnd: selectedApplicationRound?.reservationPeriodEnd ?? "",
   });
   const query = useSearchQuery(variables);
   const { data, isLoading, error, fetchMore, previousData } = query;

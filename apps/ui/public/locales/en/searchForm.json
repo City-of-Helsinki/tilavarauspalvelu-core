@@ -13,6 +13,7 @@
   "purposesFilter": "Purpose of use",
   "equipmentsFilter": "Equipment",
   "durationFilter": "Duration",
+  "accessTypeFilter": "Access to the space",
   "beginTimeIsBeforeEndTime": "The start time must be before the end time",
   "resetForm": "Clear",
   "filters": {

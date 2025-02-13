@@ -7,6 +7,7 @@ import {
   IconSize,
   ButtonSize,
   ButtonVariant,
+  IconLock,
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
@@ -32,7 +33,7 @@ export function ReservationUnitCard({
   selectReservationUnit,
   containsReservationUnit,
   removeReservationUnit,
-}: CardProps): JSX.Element {
+}: Readonly<CardProps>): JSX.Element {
   const { t } = useTranslation();
 
   const name = getReservationUnitName(reservationUnit);
@@ -79,6 +80,20 @@ export function ReservationUnitCard({
       }),
     });
   }
+  if (reservationUnit.currentAccessType) {
+    infos.push({
+      icon: (
+        <IconLock
+          aria-hidden="false"
+          aria-label={t("reservationUnit:accessType")}
+          size={IconSize.Small}
+        />
+      ),
+      value: t(
+        `reservationUnit:accessTypes.${reservationUnit.currentAccessType}`
+      ),
+    });
+  }
 
   const buttons = [];
   if (containsReservationUnit(reservationUnit)) {
@@ -86,7 +101,7 @@ export function ReservationUnitCard({
       <Button
         size={ButtonSize.Small}
         variant={ButtonVariant.Primary}
-        iconEnd={<IconCheck aria-hidden="true" />}
+        iconEnd={<IconCheck />}
         onClick={() => removeReservationUnit(reservationUnit)}
         data-testid="reservation-unit-card__button--select"
         key={t("common:removeReservationUnit")}
@@ -99,7 +114,7 @@ export function ReservationUnitCard({
       <Button
         size={ButtonSize.Small}
         variant={ButtonVariant.Secondary}
-        iconEnd={<IconPlus aria-hidden="true" />}
+        iconEnd={<IconPlus />}
         onClick={() => selectReservationUnit(reservationUnit)}
         data-testid="reservation-unit-card__button--select"
         key={t("common:selectReservationUnit")}
@@ -116,7 +131,7 @@ export function ReservationUnitCard({
       data-testid="reservation-unit-card__button--link"
       key="show"
     >
-      <IconLinkExternal aria-hidden="true" />
+      <IconLinkExternal />
       {t("common:show")}
     </ButtonLikeLink>
   );

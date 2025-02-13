@@ -13,6 +13,7 @@
   "purposesFilter": "Käyttötarkoitus",
   "equipmentsFilter": "Varustelu",
   "durationFilter": "Kesto",
+  "accessTypeFilter": "Pääsy tilaan",
   "beginTimeIsBeforeEndTime": "Alkamisajan on oltava ennen loppumisaikaa",
   "resetForm": "Tyhjennä",
   "filters": {
