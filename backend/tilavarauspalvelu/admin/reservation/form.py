@@ -18,6 +18,8 @@ class ReservationAdminForm(forms.ModelForm):
     pindora_response = forms.CharField(
         widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}),
         required=False,
+        label=_("Pindora API response"),
+        help_text=_("Response from Pindora API"),
     )
 
     class Meta:
@@ -73,8 +75,6 @@ class ReservationAdminForm(forms.ModelForm):
             "billing_address_street": _("Billing address street"),
             "billing_address_city": _("Billing address city"),
             "billing_address_zip": _("Billing address zip code"),
-            #
-            "pindora_response": _("Pindora API response"),
             #
             "user": _("User"),
             "recurring_reservation": _("Recurring reservation"),
@@ -135,8 +135,6 @@ class ReservationAdminForm(forms.ModelForm):
             "billing_address_city": _("Billing address city"),
             "billing_address_zip": _("Billing address zip code"),
             #
-            "pindora_response": _("Response from Pindora API"),
-            #
             "user": _("User who made the reservation"),
             "recurring_reservation": _("Recurring reservation"),
             "deny_reason": _("Reason for denying the reservation"),
@@ -149,7 +147,7 @@ class ReservationAdminForm(forms.ModelForm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        if self.instance and self.instance.access_type == AccessType.ACCESS_CODE:
+        if getattr(self.instance, "pk", None) and self.instance.access_type == AccessType.ACCESS_CODE:
             pindora_field = self.fields["pindora_response"]
             pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})
 
