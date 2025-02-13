@@ -42,6 +42,7 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
       nameFi
       nameEn
       nameSv
+      accessType
       ...PriceReservationUnit
       images {
         ...Image
@@ -103,7 +104,7 @@ export function ReservationInfoCard({
   disableImage = false,
   className,
   style,
-}: Props): JSX.Element | null {
+}: Readonly<Props>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation.reservationUnits?.[0];
 

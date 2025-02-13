@@ -5454,6 +5454,7 @@ export type ReservationInfoCardFragment = {
     nameFi?: string | null;
     nameEn?: string | null;
     nameSv?: string | null;
+    accessType: AccessType;
     reservationBegins?: string | null;
     reservationEnds?: string | null;
     images: Array<{
@@ -6402,6 +6403,7 @@ export type ListReservationsQuery = {
           nameFi?: string | null;
           nameEn?: string | null;
           nameSv?: string | null;
+          accessType: AccessType;
           reservationBegins?: string | null;
           reservationEnds?: string | null;
           images: Array<{
@@ -8360,6 +8362,7 @@ export type ReservationQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
+      accessType: AccessType;
       minPersons?: number | null;
       maxPersons?: number | null;
       termsOfUseFi?: string | null;
@@ -8469,6 +8472,7 @@ export type ReservationCancelPageQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
+      accessType: AccessType;
       reservationBegins?: string | null;
       reservationEnds?: string | null;
       cancellationTerms?: {
@@ -8595,6 +8599,7 @@ export type ReservationConfirmationPageQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
+      accessType: AccessType;
       reservationPendingInstructionsFi?: string | null;
       reservationPendingInstructionsEn?: string | null;
       reservationPendingInstructionsSv?: string | null;
@@ -8692,6 +8697,7 @@ export type ReservationEditPageQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
+      accessType: AccessType;
       minPersons?: number | null;
       maxPersons?: number | null;
       reservationBegins?: string | null;
@@ -8822,6 +8828,7 @@ export type ReservationPageQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
+      accessType: AccessType;
       reservationPendingInstructionsFi?: string | null;
       reservationPendingInstructionsEn?: string | null;
       reservationPendingInstructionsSv?: string | null;
@@ -9009,6 +9016,7 @@ export const ReservationInfoCardFragmentDoc = gql`
       nameFi
       nameEn
       nameSv
+      accessType
       ...PriceReservationUnit
       images {
         ...Image
