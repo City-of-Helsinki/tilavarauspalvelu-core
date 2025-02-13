@@ -7,6 +7,6 @@ _paq.push(['enableLinkTracking']);
   _paq.push(['setTrackerUrl', u+'tracker.php']);
   _paq.push(['setSiteId', '195']);
   var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-  g.type='text/javascript'; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  g.type='text/javascript'; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
 })();
 
