@@ -145,6 +145,7 @@ msgstr "Varausyksikkövaihtoehto tälle allokoinnille."
 
 #: tilavarauspalvelu/admin/allocated_timeslot/form.py
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Begin time"
@@ -152,6 +153,7 @@ msgstr "Aloitusaika"
 
 #: tilavarauspalvelu/admin/allocated_timeslot/form.py
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "End time"
 msgstr "Lopetusaika"
@@ -182,6 +184,7 @@ msgstr "Luotu"
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/application_round/admin.py
 #: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/recurring_reservation/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 #: tilavarauspalvelu/admin/unit/admin.py tilavarauspalvelu/admin/user/admin.py
@@ -196,6 +199,7 @@ msgstr "Hakija"
 #: tilavarauspalvelu/admin/application/admin.py
 #: tilavarauspalvelu/admin/application_round/admin.py
 #: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/recurring_reservation/admin.py
 #: tilavarauspalvelu/admin/reservation/admin.py
 msgid "Time"
 msgstr "Aika"
@@ -419,6 +423,7 @@ msgstr ""
 #: tilavarauspalvelu/admin/bug_report/admin.py
 #: tilavarauspalvelu/admin/city/admin.py
 #: tilavarauspalvelu/admin/organisation/admin.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 #: tilavarauspalvelu/admin/unit/form.py
@@ -618,6 +623,7 @@ msgstr "Etsi nimellä, hakijan etu- tai sukunimellä"
 
 #: tilavarauspalvelu/admin/application_section/filters.py
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Age group"
 msgstr "Ikäryhmä"
@@ -629,6 +635,7 @@ msgstr "Varaustarkoitukset"
 
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
 msgid "Reservation unit"
 msgstr "Varausyksikkö"
 
@@ -711,6 +718,7 @@ msgstr ""
 "toistokerrat tälle hakemuksen osalle ovat lukittu tai hylätty. <br>"
 
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "External UUID"
@@ -734,6 +742,7 @@ msgid "Purpose"
 msgstr "Käyttötarkoitus"
 
 #: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "ID for external systems to use"
@@ -807,6 +816,7 @@ msgstr ""
 "aktiivisia."
 
 #: tilavarauspalvelu/admin/bug_report/admin.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 #: tilavarauspalvelu/admin/unit/form.py
@@ -1196,7 +1206,14 @@ msgstr "Henkilön puhelinnumero"
 msgid "Search by first name or last name."
 msgstr "Etsi etu- tai sukunimellä."
 
+#: tilavarauspalvelu/admin/recurring_reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Pindora information"
+msgstr "Pindora tiedot"
+
 #: tilavarauspalvelu/admin/recurring_reservation/filters.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
 msgid "Should have active access code"
 msgstr "Pitäisi olla aktiivinen pääsykoodi"
 
@@ -1209,6 +1226,108 @@ msgstr "Kyllä"
 #: tilavarauspalvelu/admin/reservation/filters.py
 msgid "No"
 msgstr "Ei"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Weekdays"
+msgstr "Viikonpäivät"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid ""
+"Comma separated list of weekday integers (0-6) on which reservations exists "
+"on this recurring reservation"
+msgstr ""
+"Pilkuin eroteltu lista viikonpäiviä (0-6) jolloin varauksia on olemassa "
+"tässä toistuvassa varauksessa"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Pindora API response"
+msgstr "Pindora rajapinnan vastaus"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Response from Pindora API"
+msgstr "Vastaus Pindora rajapinnasta"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Begin date"
+msgstr "Aloituspäivä"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "End date"
+msgstr "Päättymispäivä"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Recurrence in days"
+msgstr "Toistoväli päivissä"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/request_log/admin.py
+msgid "Created"
+msgstr "Luotu"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "User"
+msgstr "Käyttäjä"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Allocated time slot"
+msgstr "Jaettu vuoro"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Name of the recurring reservation"
+msgstr "Toistuvan varauksen nimi"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Description of the recurring reservation"
+msgstr "Toistuvan varauksen kuvaus"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Begin date of the recurring reservation"
+msgstr "Toistuvan varauksen aloituspäivä"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Begin time of reservations in this recurring reservation"
+msgstr "Varauksen aloitusaika tässä toistuvassa varauksessa"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "End date of the recurring reservation"
+msgstr "Toistuvan varauksen päättymispäivä"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "End time of reservations in this recurring reservation"
+msgstr "Varauksen päättymisaika tässä toistuvassa varauksessa"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Interval between reservations in this recurring reservation"
+msgstr "Intervalli varausten välillä tässä toistuvassa varauksessa"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "When this recurring reservation was created"
+msgstr "Milloin tämä toistuva varaus luotiin"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "User that created this recurring reservation"
+msgstr "Toistuvan varauksen tehnyt käyttäjä"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Reservation unit for this recurring reservation"
+msgstr "Varausyksikkö tässä toistuvassa varauksessa."
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Allocated time slot this recurring reservation is for"
+msgstr "Jaettu vuoro jota tämä toituva varaus koskee "
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Age group for this recurring reservation"
+msgstr "Toistuvan varauksen ikäryhmä."
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Should this recurring reservation have an active access code?"
+msgstr "Tulisiko tässä toistuvassa varauksessa olla aktiivista pääsykoodia?"
 
 #: tilavarauspalvelu/admin/request_log/admin.py
 #: tilavarauspalvelu/admin/sql_log/admin.py
@@ -1228,10 +1347,6 @@ msgstr "Sisältö"
 #: tilavarauspalvelu/admin/sql_log/admin.py
 msgid "Duration (ms)"
 msgstr "Kesto (ms)"
-
-#: tilavarauspalvelu/admin/request_log/admin.py
-msgid "Created"
-msgstr "Luotu"
 
 #: tilavarauspalvelu/admin/request_log/admin.py
 msgid "Random ID for grouping this log with other logs from the same request."
@@ -1291,11 +1406,6 @@ msgstr "Varaajan tiedot"
 #: tilavarauspalvelu/admin/reservation/admin.py
 msgid "Billing information"
 msgstr "Laskutustiedot"
-
-#: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation_unit/admin.py
-msgid "Pindora information"
-msgstr "Pindora tiedot"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
 msgid "None of the selected reservations can be denied."
@@ -1474,15 +1584,6 @@ msgid "Billing address zip code"
 msgstr "Varauksen maksajan postinumero"
 
 #: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Pindora API response"
-msgstr "Pindora rajapinnan vastaus"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-msgid "User"
-msgstr "Käyttäjä"
-
-#: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reason for deny"
 msgstr "Syy hylkäämiselle"
 
@@ -1623,11 +1724,6 @@ msgstr "Varaajan kaupunki"
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Reservee's zip code"
 msgstr "Varaajan postinumero"
-
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Response from Pindora API"
-msgstr "Vastaus Pindora rajapinnasta"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "User who made the reservation"
