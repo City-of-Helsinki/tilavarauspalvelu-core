@@ -54,5 +54,12 @@
     "notReservable": "Kohde ei ole tällä hetkellä varattavissa.",
     "onlyRecurring": "Varattavissa vain kausittain.",
     "futureOpening": "Voit tehdä varauksen tähän kohteeseen {{date}} alkaen."
+  },
+  "accessType": "Pääsy tilaan",
+  "accessTypes": {
+    "ACCESS_CODE": "Ovikoodi",
+    "PHYSICAL_KEY": "Avain",
+    "OPENED_BY_STAFF": "Henkilökunta",
+    "UNRESTRICTED": "Suora pääsy"
   }
 }

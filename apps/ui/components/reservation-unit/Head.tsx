@@ -4,6 +4,7 @@ import {
   IconEuroSign,
   IconHome,
   IconSize,
+  IconLock,
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
@@ -14,8 +15,12 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 import { fontRegular, H1, H3 } from "common/src/common/typography";
-import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
 import { formatDate, orderImages } from "@/modules/util";
+import {
+  AccessType,
+  ReservationKind,
+  type ReservationUnitPageQuery,
+} from "@gql/gql-types";
 import { IconWithText } from "../common/IconWithText";
 import { Images } from "./Images";
 import {
@@ -44,9 +49,9 @@ const NotificationWrapper = styled.div`
 
 function NonReservableNotification({
   reservationUnit,
-}: {
+}: Readonly<{
   reservationUnit: Pick<QueryT, "reservationKind" | "reservationBegins">;
-}) {
+}>) {
   const { t } = useTranslation();
 
   let returnText = t("reservationUnit:notifications.notReservable");
@@ -87,7 +92,7 @@ export function Head({
   reservationUnit,
   reservationUnitIsReservable,
   subventionSuffix,
-}: HeadProps): JSX.Element {
+}: Readonly<HeadProps>): JSX.Element {
   const { i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
@@ -132,10 +137,11 @@ const IconListWrapper = styled.div`
 function IconList({
   reservationUnit,
   subventionSuffix,
-}: Pick<HeadProps, "reservationUnit" | "subventionSuffix">): JSX.Element {
+}: Readonly<
+  Pick<HeadProps, "reservationUnit" | "subventionSuffix">
+>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-
   const minDur = reservationUnit.minReservationDuration ?? 0;
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
   const minReservationDuration = formatDuration(minDur / 60, t, true);
@@ -209,6 +215,18 @@ function IconList({
               {hasSubventionSuffix ? subventionSuffix : null}
             </>
           ),
+        }
+      : null,
+    reservationUnit.accessType !== AccessType.Unrestricted
+      ? {
+          key: "accessType",
+          icon: (
+            <IconLock
+              aria-hidden="false"
+              aria-label={t("reservationUnit:accessType")}
+            />
+          ),
+          text: t(`reservationUnit:accessTypes.${reservationUnit.accessType}`),
         }
       : null,
   ] as const);
