@@ -279,7 +279,6 @@ class ReservationUnit(models.Model):
         verbose_name = _("reservation unit")
         verbose_name_plural = _("reservation units")
         ordering = ["rank", "id"]
-        constraints = []
 
     def __str__(self) -> str:
         return f"{self.name}, {getattr(self.unit, 'name', '')}"

@@ -3136,6 +3136,11 @@ msgctxt "AccessType"
 msgid "unrestricted"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgctxt "AccessType"
+msgid "multi-valued"
+msgstr ""
+
 #: tilavarauspalvelu/integrations/email/template_context/application.py
 msgctxt "Email"
 msgid "'My applications' page"

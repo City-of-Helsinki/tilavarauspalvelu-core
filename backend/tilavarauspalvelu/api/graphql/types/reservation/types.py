@@ -47,7 +47,7 @@ class PindoraInfoData(NamedTuple):
     access_code_ends_at: datetime.datetime
 
 
-class PindoraInfoType(graphene.ObjectType):
+class PindoraReservationInfoType(graphene.ObjectType):
     access_code = graphene.String(required=True)
     access_code_generated_at = graphene.DateTime(required=True)
     access_code_is_active = graphene.Boolean(required=True)
@@ -102,7 +102,7 @@ class ReservationNode(DjangoNode):
     )
 
     pindora_info = MultiField(
-        PindoraInfoType,
+        PindoraReservationInfoType,
         fields=["access_type", "ext_uuid", "state", "end"],
         description=(
             "Info fetched from Pindora API. Cached per reservation for 30s. "
@@ -294,6 +294,10 @@ class ReservationNode(DjangoNode):
     def resolve_pindora_info(root: Reservation, info: GQLInfo) -> PindoraInfoData | None:
         # No Pindora info if access type is not 'ACCESS_CODE'
         if root.access_type != AccessType.ACCESS_CODE:
+            return None
+
+        # TODO: Implement fetching by recurring reservation / application section.
+        if root.recurring_reservation is not None:
             return None
 
         # No need to show Pindora info after 24 hours have passed since it ended

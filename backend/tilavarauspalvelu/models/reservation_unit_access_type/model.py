@@ -34,7 +34,7 @@ class ReservationUnitAccessType(models.Model):
     )
     access_type: AccessType = models.CharField(
         max_length=255,
-        choices=AccessType.choices,
+        choices=AccessType.model_choices,
         default=AccessType.UNRESTRICTED.value,
     )
     begin_date: datetime.date = models.DateField()

@@ -1179,3 +1179,11 @@ class AccessType(models.TextChoices):
     OPENED_BY_STAFF = "OPENED_BY_STAFF", pgettext_lazy("AccessType", "opened by staff")
     PHYSICAL_KEY = "PHYSICAL_KEY", pgettext_lazy("AccessType", "physical key")
     UNRESTRICTED = "UNRESTRICTED", pgettext_lazy("AccessType", "unrestricted")
+
+    # Should not be settable to models, only available in API responses.
+    MULTIVALUED = "MULTIVALUED", pgettext_lazy("AccessType", "multi-valued")
+
+    @classproperty
+    def model_choices(cls) -> list[tuple[str, str]]:
+        """Don't allow 'MULTIVALUED' to be set to models."""
+        return [(value, label) for value, label in cls.choices if value != cls.MULTIVALUED.value]

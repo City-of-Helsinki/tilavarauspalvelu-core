@@ -39,12 +39,14 @@ class SubqueryAggregate(models.Subquery):
         self,
         queryset: models.QuerySet,
         *,
+        aggregate: str | None = None,
         aggregate_field: str | None = None,
         alias: str | None = None,
         output_field: models.Field | None = None,
         **kwargs: Any,
     ) -> None:
-        self.template = self.template.format(function=self.aggregate)
+        aggregate = aggregate or self.aggregate
+        self.template = self.template.format(function=aggregate)
         kwargs["aggregate_field"] = aggregate_field or self.aggregate_field
         kwargs["alias"] = alias or self.default_alias
         super().__init__(queryset, output_field, **kwargs)
