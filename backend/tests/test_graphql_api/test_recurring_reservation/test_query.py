@@ -18,10 +18,17 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIEr
 from tilavarauspalvelu.integrations.keyless_entry.typing import (
     PindoraReservationSeriesAccessCodeValidity,
     PindoraReservationSeriesResponse,
+    PindoraSeasonalBookingAccessCodeValidity,
+    PindoraSeasonalBookingResponse,
 )
 from utils.date_utils import local_datetime
 
-from tests.factories import RecurringReservationFactory, ReservationFactory
+from tests.factories import (
+    ApplicationSectionFactory,
+    RecurringReservationFactory,
+    ReservationFactory,
+    ReservationUnitFactory,
+)
 from tests.helpers import patch_method
 
 from .helpers import recurring_reservation_query, recurring_reservations_query
@@ -355,3 +362,65 @@ def test_recurring_reservations__query__pindora_info__reservation_past(graphql):
     assert response.has_errors is False, response
 
     assert response.first_query_object["pindoraInfo"] is None
+
+
+@freeze_time(local_datetime(2022, 1, 1))
+def test_recurring_reservations__query__pindora_info__in_application_section(graphql):
+    section = ApplicationSectionFactory.create()
+    reservation_unit = ReservationUnitFactory.create()
+    series = RecurringReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 10),
+        end=local_datetime(2022, 1, 1, 12),
+        allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_unit=reservation_unit,
+    )
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    graphql.login_with_superuser()
+
+    query = pindora_query(series)
+
+    response = PindoraSeasonalBookingResponse(
+        access_code="12345",
+        access_code_keypad_url="https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
+        access_code_phone_number="+358407089833",
+        access_code_sms_number="+358407089834",
+        access_code_sms_message="a12345",
+        access_code_generated_at=local_datetime(2022, 1, 1),
+        access_code_is_active=True,
+        reservation_unit_code_validity=[
+            PindoraSeasonalBookingAccessCodeValidity(
+                reservation_unit_id=reservation_unit.uuid,
+                access_code_valid_minutes_before=10,
+                access_code_valid_minutes_after=5,
+                begin=local_datetime(2022, 1, 1, 12),
+                end=local_datetime(2022, 1, 1, 13),
+            ),
+        ],
+    )
+
+    with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    assert response.first_query_object["pindoraInfo"] == {
+        "accessCode": "12345",
+        "accessCodeGeneratedAt": "2022-01-01T00:00:00+02:00",
+        "accessCodeIsActive": True,
+        "accessCodeKeypadUrl": "https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
+        "accessCodePhoneNumber": "+358407089833",
+        "accessCodeSmsMessage": "a12345",
+        "accessCodeSmsNumber": "+358407089834",
+        "accessCodeValidity": [
+            {
+                "accessCodeBeginsAt": "2022-01-01T11:50:00+02:00",
+                "accessCodeEndsAt": "2022-01-01T13:05:00+02:00",
+            }
+        ],
+    }
