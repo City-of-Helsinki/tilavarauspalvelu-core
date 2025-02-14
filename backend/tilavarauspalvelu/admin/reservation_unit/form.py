@@ -21,6 +21,8 @@ if TYPE_CHECKING:
 class ReservationUnitAdminForm(forms.ModelForm):
     instance: ReservationUnit
 
+    access_type = forms.ChoiceField(choices=AccessType.model_choices, required=False)
+
     pindora_response = forms.CharField(
         widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}),
         required=False,

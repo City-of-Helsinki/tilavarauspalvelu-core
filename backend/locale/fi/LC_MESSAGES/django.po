@@ -621,6 +621,12 @@ msgstr "Onko varausyksikkö suljettu tänä viikonpäivänä?"
 msgid "Search by name, application user's first name or last name"
 msgstr "Etsi nimellä, hakijan etu- tai sukunimellä"
 
+#: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/recurring_reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+msgid "Pindora information"
+msgstr "Pindora tiedot"
+
 #: tilavarauspalvelu/admin/application_section/filters.py
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
@@ -721,6 +727,20 @@ msgstr ""
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Pindora API response"
+msgstr "Pindora rajapinnan vastaus"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Response from Pindora API"
+msgstr "Vastaus Pindora rajapinnasta"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "External UUID"
 msgstr "Ulkoinen UUID"
 
@@ -740,6 +760,12 @@ msgstr "Varausten loppumispäivä"
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Purpose"
 msgstr "Käyttötarkoitus"
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/filters.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Should have active access code"
+msgstr "Pitäisi olla aktiivinen pääsykoodi"
 
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
@@ -776,6 +802,10 @@ msgstr "Hakemuksen osan ikäryhmä."
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Purpose for this section."
 msgstr "Hakemuksen osan käyttötarkoitus."
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Should this application section have an active access code?"
+msgstr "Tulisiko tässä hakemuksen osassa olla aktiivista pääsykoodia?"
 
 #: tilavarauspalvelu/admin/banner_notification/admin.py
 msgid "Name of the notification. Should be unique."
@@ -1206,16 +1236,6 @@ msgstr "Henkilön puhelinnumero"
 msgid "Search by first name or last name."
 msgstr "Etsi etu- tai sukunimellä."
 
-#: tilavarauspalvelu/admin/recurring_reservation/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-msgid "Pindora information"
-msgstr "Pindora tiedot"
-
-#: tilavarauspalvelu/admin/recurring_reservation/filters.py
-#: tilavarauspalvelu/admin/recurring_reservation/form.py
-msgid "Should have active access code"
-msgstr "Pitäisi olla aktiivinen pääsykoodi"
-
 #: tilavarauspalvelu/admin/recurring_reservation/filters.py
 #: tilavarauspalvelu/admin/reservation/filters.py
 msgid "Yes"
@@ -1237,18 +1257,6 @@ msgid ""
 msgstr ""
 "Pilkuin eroteltu lista viikonpäiviä (0-6) jolloin varauksia on olemassa "
 "tässä toistuvassa varauksessa"
-
-#: tilavarauspalvelu/admin/recurring_reservation/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Pindora API response"
-msgstr "Pindora rajapinnan vastaus"
-
-#: tilavarauspalvelu/admin/recurring_reservation/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Response from Pindora API"
-msgstr "Vastaus Pindora rajapinnasta"
 
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
 msgid "Begin date"
@@ -1275,6 +1283,17 @@ msgstr "Käyttäjä"
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
 msgid "Allocated time slot"
 msgstr "Jaettu vuoro"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Access type"
+msgstr "Kulkuoikeus"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Used access types"
+msgstr "Käytetyt kulkuoikeudet"
 
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
 msgid "Name of the recurring reservation"
@@ -1327,6 +1346,20 @@ msgstr "Toistuvan varauksen ikäryhmä."
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
 msgid "Should this recurring reservation have an active access code?"
 msgstr "Tulisiko tässä toistuvassa varauksessa olla aktiivista pääsykoodia?"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid ""
+"Access type for the reservations in this recurring reservation (if "
+"unambiguous), otherwise access type will be 'multi-valued'"
+msgstr ""
+"Kulkutapa tässä toistuvassa varauksessa oleville varaukselle (jos "
+"yksiselitteinen), muussa tapauksessa kulkutapa on 'moniarvoinen'"
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid ""
+"All unique access types used in the reservations of this recurring "
+"reservation"
+msgstr "Kaikki varausten kulkutavat tässä toistuvassa varauksessa"
 
 #: tilavarauspalvelu/admin/request_log/admin.py
 #: tilavarauspalvelu/admin/sql_log/admin.py
@@ -1481,6 +1514,18 @@ msgstr "Käsitelty"
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Confirmed at"
 msgstr "Vahvistettu"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Access code is active"
+msgstr "Ovikoodi on aktiivinen"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Access code should be active"
+msgstr "Ovikoodi tulisi olla aktiivinen"
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Access code generated at"
+msgstr "Ovikoodi generoitu"
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Price net"
@@ -1776,11 +1821,6 @@ msgstr "Käyttöehdot"
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Instructions"
 msgstr "Ohjeet"
-
-#: tilavarauspalvelu/admin/reservation_unit/admin.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Access type"
-msgstr "Kulkuoikeus"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py

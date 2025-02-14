@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import (
     Application,
     ApplicationSection,
@@ -93,6 +95,8 @@ class SuitableTimeRangeInlineAdminForm(forms.ModelForm):
 
 
 class ApplicationSectionAdminForm(forms.ModelForm):
+    instance: ApplicationSection | None
+
     status = forms.CharField(
         widget=disabled_widget,
         required=False,
@@ -113,13 +117,30 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         },
     )
 
+    pindora_response = forms.CharField(
+        widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}),
+        required=False,
+        label=_("Pindora API response"),
+        help_text=_("Response from Pindora API"),
+    )
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         instance: ApplicationSection | None = kwargs.get("instance")
         if instance:
             kwargs.setdefault("initial", {})
             kwargs["initial"]["status"] = ApplicationSectionStatusChoice(instance.status).label
+
         self.base_fields["application"].queryset = Application.objects.select_related("user")
+
         super().__init__(*args, **kwargs)
+
+        if getattr(self.instance, "pk", None) and self.instance.should_have_active_access_code:
+            pindora_field = self.fields["pindora_response"]
+            pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})
+
+            response = PindoraClient.get_seasonal_booking(section=self.instance)
+
+            pindora_field.initial = json.dumps(response, default=str, indent=2)
 
     class Meta:
         model = ApplicationSection
@@ -137,6 +158,7 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "application": _("Application"),
             "age_group": _("Age group"),
             "purpose": _("Purpose"),
+            "should_have_active_access_code": _("Should have active access code"),
         }
         help_texts = {
             "ext_uuid": _("ID for external systems to use"),
@@ -150,4 +172,5 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "application": _("Application this section is in."),
             "age_group": _("Age group for this section."),
             "purpose": _("Purpose for this section."),
+            "should_have_active_access_code": _("Should this application section have an active access code?"),
         }
