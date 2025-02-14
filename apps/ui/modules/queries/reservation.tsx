@@ -103,6 +103,7 @@ export const LIST_RESERVATIONS = gql`
           name
           bufferTimeBefore
           bufferTimeAfter
+          accessType
           ...ReservationOrderStatus
           paymentOrder {
             id
@@ -176,6 +177,19 @@ export const REFRESH_ORDER = gql`
     refreshOrder(input: $input) {
       orderUuid
       status
+    }
+  }
+`;
+
+export const RESERVATION_ACCESS_CODE = gql`
+  query AccessCode($id: ID!) {
+    reservation(id: $id) {
+      id
+      pindoraInfo {
+        accessCode
+        accessCodeBeginsAt
+        accessCodeEndsAt
+      }
     }
   }
 `;

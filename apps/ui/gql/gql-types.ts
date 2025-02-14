@@ -5448,13 +5448,14 @@ export type ReservationInfoCardFragment = {
   end: string;
   state?: ReservationStateChoice | null;
   price?: string | null;
+  accessType: AccessType;
+  pindoraInfo?: { accessCode: string } | null;
   reservationUnits: Array<{
     id: string;
     pk?: number | null;
     nameFi?: string | null;
     nameEn?: string | null;
     nameSv?: string | null;
-    accessType: AccessType;
     reservationBegins?: string | null;
     reservationEnds?: string | null;
     images: Array<{
@@ -6384,6 +6385,7 @@ export type ListReservationsQuery = {
         name?: string | null;
         bufferTimeBefore: number;
         bufferTimeAfter: number;
+        accessType: AccessType;
         isBlocked?: boolean | null;
         pk?: number | null;
         taxPercentageValue?: string | null;
@@ -6403,7 +6405,6 @@ export type ListReservationsQuery = {
           nameFi?: string | null;
           nameEn?: string | null;
           nameSv?: string | null;
-          accessType: AccessType;
           reservationBegins?: string | null;
           reservationEnds?: string | null;
           images: Array<{
@@ -6433,6 +6434,7 @@ export type ListReservationsQuery = {
             taxPercentage: { id: string; pk?: number | null; value: string };
           }>;
         }>;
+        pindoraInfo?: { accessCode: string } | null;
       } | null;
     } | null>;
   } | null;
@@ -6506,6 +6508,20 @@ export type RefreshOrderMutationVariables = Exact<{
 
 export type RefreshOrderMutation = {
   refreshOrder?: { orderUuid?: string | null; status?: string | null } | null;
+};
+
+export type AccessCodeQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type AccessCodeQuery = {
+  reservation?: {
+    pindoraInfo?: {
+      accessCode: string;
+      accessCodeBeginsAt: string;
+      accessCodeEndsAt: string;
+    } | null;
+  } | null;
 };
 
 export type ReservationUnitTypeFieldsFragment = {
@@ -8328,6 +8344,7 @@ export type ReservationQuery = {
     end: string;
     state?: ReservationStateChoice | null;
     price?: string | null;
+    accessType: AccessType;
     reserveeFirstName?: string | null;
     reserveeLastName?: string | null;
     reserveeEmail?: string | null;
@@ -8362,7 +8379,6 @@ export type ReservationQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
-      accessType: AccessType;
       minPersons?: number | null;
       maxPersons?: number | null;
       termsOfUseFi?: string | null;
@@ -8449,6 +8465,7 @@ export type ReservationQuery = {
       nameSv?: string | null;
       nameEn?: string | null;
     } | null;
+    pindoraInfo?: { accessCode: string } | null;
   } | null;
 };
 
@@ -8466,13 +8483,13 @@ export type ReservationCancelPageQuery = {
     end: string;
     state?: ReservationStateChoice | null;
     price?: string | null;
+    accessType: AccessType;
     reservationUnits: Array<{
       id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
-      accessType: AccessType;
       reservationBegins?: string | null;
       reservationEnds?: string | null;
       cancellationTerms?: {
@@ -8535,6 +8552,7 @@ export type ReservationCancelPageQuery = {
         };
       } | null;
     } | null;
+    pindoraInfo?: { accessCode: string } | null;
   } | null;
   reservationCancelReasons?: {
     edges: Array<{
@@ -8584,6 +8602,7 @@ export type ReservationConfirmationPageQuery = {
     end: string;
     state?: ReservationStateChoice | null;
     price?: string | null;
+    accessType: AccessType;
     paymentOrder: Array<{
       id: string;
       reservationPk?: string | null;
@@ -8599,7 +8618,6 @@ export type ReservationConfirmationPageQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
-      accessType: AccessType;
       reservationPendingInstructionsFi?: string | null;
       reservationPendingInstructionsEn?: string | null;
       reservationPendingInstructionsSv?: string | null;
@@ -8651,6 +8669,7 @@ export type ReservationConfirmationPageQuery = {
       minimum: number;
       maximum?: number | null;
     } | null;
+    pindoraInfo?: { accessCode: string } | null;
   } | null;
 };
 
@@ -8673,6 +8692,7 @@ export type ReservationEditPageQuery = {
     end: string;
     state?: ReservationStateChoice | null;
     price?: string | null;
+    accessType: AccessType;
     reserveeFirstName?: string | null;
     reserveeLastName?: string | null;
     reserveeEmail?: string | null;
@@ -8697,7 +8717,6 @@ export type ReservationEditPageQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
-      accessType: AccessType;
       minPersons?: number | null;
       maxPersons?: number | null;
       reservationBegins?: string | null;
@@ -8754,6 +8773,7 @@ export type ReservationEditPageQuery = {
       nameSv?: string | null;
       nameEn?: string | null;
     } | null;
+    pindoraInfo?: { accessCode: string } | null;
   } | null;
 };
 
@@ -8812,6 +8832,7 @@ export type ReservationPageQuery = {
     end: string;
     state?: ReservationStateChoice | null;
     price?: string | null;
+    accessType: AccessType;
     paymentOrder: Array<{
       id: string;
       reservationPk?: string | null;
@@ -8828,7 +8849,6 @@ export type ReservationPageQuery = {
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
-      accessType: AccessType;
       reservationPendingInstructionsFi?: string | null;
       reservationPendingInstructionsEn?: string | null;
       reservationPendingInstructionsSv?: string | null;
@@ -8929,6 +8949,7 @@ export type ReservationPageQuery = {
       minimum: number;
       maximum?: number | null;
     } | null;
+    pindoraInfo?: { accessCode: string } | null;
   } | null;
 };
 
@@ -9010,13 +9031,16 @@ export const ReservationInfoCardFragmentDoc = gql`
     end
     state
     price
+    accessType
+    pindoraInfo {
+      accessCode
+    }
     reservationUnits {
       id
       pk
       nameFi
       nameEn
       nameSv
-      accessType
       ...PriceReservationUnit
       images {
         ...Image
@@ -10971,6 +10995,7 @@ export const ListReservationsDocument = gql`
           name
           bufferTimeBefore
           bufferTimeAfter
+          accessType
           ...ReservationOrderStatus
           paymentOrder {
             id
@@ -11324,6 +11349,87 @@ export type RefreshOrderMutationResult =
 export type RefreshOrderMutationOptions = Apollo.BaseMutationOptions<
   RefreshOrderMutation,
   RefreshOrderMutationVariables
+>;
+export const AccessCodeDocument = gql`
+  query AccessCode($id: ID!) {
+    reservation(id: $id) {
+      pindoraInfo {
+        accessCode
+        accessCodeBeginsAt
+        accessCodeEndsAt
+      }
+    }
+  }
+`;
+
+/**
+ * __useAccessCodeQuery__
+ *
+ * To run a query within a React component, call `useAccessCodeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAccessCodeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAccessCodeQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useAccessCodeQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    AccessCodeQuery,
+    AccessCodeQueryVariables
+  > &
+    (
+      | { variables: AccessCodeQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<AccessCodeQuery, AccessCodeQueryVariables>(
+    AccessCodeDocument,
+    options
+  );
+}
+export function useAccessCodeLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    AccessCodeQuery,
+    AccessCodeQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<AccessCodeQuery, AccessCodeQueryVariables>(
+    AccessCodeDocument,
+    options
+  );
+}
+export function useAccessCodeSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<AccessCodeQuery, AccessCodeQueryVariables>
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<AccessCodeQuery, AccessCodeQueryVariables>(
+    AccessCodeDocument,
+    options
+  );
+}
+export type AccessCodeQueryHookResult = ReturnType<typeof useAccessCodeQuery>;
+export type AccessCodeLazyQueryHookResult = ReturnType<
+  typeof useAccessCodeLazyQuery
+>;
+export type AccessCodeSuspenseQueryHookResult = ReturnType<
+  typeof useAccessCodeSuspenseQuery
+>;
+export type AccessCodeQueryResult = Apollo.QueryResult<
+  AccessCodeQuery,
+  AccessCodeQueryVariables
 >;
 export const ReservationUnitPageDocument = gql`
   query ReservationUnitPage(
