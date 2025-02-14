@@ -13,6 +13,7 @@ from tests.factories import AgeGroupFactory, ReservationPurposeFactory, Reservat
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Application, ApplicationSection
 
+section_query = partial(build_query, "applicationSection")
 sections_query = partial(build_query, "applicationSections", connection=True, order_by="pkAsc")
 
 CREATE_MUTATION = build_mutation(
