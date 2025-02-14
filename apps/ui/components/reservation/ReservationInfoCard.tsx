@@ -7,18 +7,20 @@ import styled from "styled-components";
 import { formatters as getFormatters } from "common";
 import { H4, Strong } from "common/src/common/typography";
 import {
-  ReservationStateChoice,
+  AccessType,
   type ReservationInfoCardFragment,
+  ReservationStateChoice,
+  useAccessCodeQuery,
 } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import {
   capitalize,
+  formatDateTimeRange,
   formatDuration,
   getMainImage,
   getTranslation,
-  formatDateTimeRange,
 } from "@/modules/util";
-import { getImageSource } from "common/src/helpers";
+import { base64encode, getImageSource } from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
 import { Flex } from "common/styles/util";
 import {
@@ -27,35 +29,6 @@ import {
 } from "common/src/common/util";
 
 type Type = "pending" | "confirmed" | "complete";
-
-export const RESERVATION_INFO_CARD_FRAGMENT = gql`
-  fragment ReservationInfoCard on ReservationNode {
-    pk
-    taxPercentageValue
-    begin
-    end
-    state
-    price
-    reservationUnits {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-      accessType
-      ...PriceReservationUnit
-      images {
-        ...Image
-      }
-      unit {
-        id
-        nameFi
-        nameEn
-        nameSv
-      }
-    }
-  }
-`;
 
 const Wrapper = styled.div<{ $type: Type }>`
   /* stylelint-disable custom-property-pattern */
@@ -107,7 +80,13 @@ export function ReservationInfoCard({
 }: Readonly<Props>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation.reservationUnits?.[0];
-
+  const { data, loading, error } = useAccessCodeQuery({
+    skip: !reservation || reservation.accessType !== AccessType.AccessCode,
+    variables: {
+      id: base64encode(`ReservationNode:${reservation.pk}`),
+    },
+  });
+  console.log(reservation, data);
   const { begin, end } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation
 
@@ -184,7 +163,45 @@ export function ReservationInfoCard({
               ),
             })})`}
         </div>
+        {reservationUnit.accessType === AccessType.Unrestricted && (
+          <div>
+            {t("reservationUnit:accessType")}:{" "}
+            {t(`reservationUnit:accessTypes.${reservationUnit.accessType}`)}
+          </div>
+        )}
       </Content>
     </Wrapper>
   );
 }
+
+export const RESERVATION_INFO_CARD_FRAGMENT = gql`
+  fragment ReservationInfoCard on ReservationNode {
+    pk
+    taxPercentageValue
+    begin
+    end
+    state
+    price
+    accessType
+    pindoraInfo {
+      accessCode
+    }
+    reservationUnits {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+      ...PriceReservationUnit
+      images {
+        ...Image
+      }
+      unit {
+        id
+        nameFi
+        nameEn
+        nameSv
+      }
+    }
+  }
+`;

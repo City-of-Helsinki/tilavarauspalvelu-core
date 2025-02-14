@@ -25,6 +25,8 @@ import {
   type ApplicationRecurringReservationQueryVariables,
   ApplicationRecurringReservationDocument,
   OrderStatus,
+  useAccessCodeQuery,
+  AccessType,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -141,7 +143,7 @@ function formatReserveeName(
 function ReserveeBusinessInfo({
   reservation,
   supportedFields,
-}: {
+}: Readonly<{
   reservation: Pick<
     NodeT,
     | "reserveeOrganisationName"
@@ -152,7 +154,7 @@ function ReserveeBusinessInfo({
     | "reserveeEmail"
   >;
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-}): JSX.Element {
+}>): JSX.Element {
   const { t } = useTranslation();
   const arr = [];
   if (containsField(supportedFields, "reserveeOrganisationName")) {
@@ -207,13 +209,13 @@ function ReserveeBusinessInfo({
 function ReserveePersonInfo({
   reservation,
   supportedFields,
-}: {
+}: Readonly<{
   reservation: Pick<
     NodeT,
     "reserveeEmail" | "reserveeFirstName" | "reserveeLastName" | "reserveePhone"
   >;
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-}) {
+}>) {
   const { t } = useTranslation();
   const arr = [];
   if (containsNameField(supportedFields)) {
@@ -253,7 +255,7 @@ function ReserveePersonInfo({
 function ReserveeInfo({
   reservation,
   supportedFields,
-}: {
+}: Readonly<{
   reservation: Pick<
     NodeT,
     | "reserveeType"
@@ -265,7 +267,7 @@ function ReserveeInfo({
     | "reserveeEmail"
   >;
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-}) {
+}>) {
   const { t } = useTranslation();
   const showBusinessFields =
     CustomerTypeChoice.Business === reservation.reserveeType ||
@@ -299,7 +301,7 @@ function LabelValuePair({
   label,
   value,
   testId,
-}: LabelValuePairProps): JSX.Element {
+}: Readonly<LabelValuePairProps>): JSX.Element {
   return (
     <p>
       {label}: <span data-testid={testId}>{value}</span>
@@ -312,7 +314,7 @@ function LabelValuePair({
 function Reservation({
   termsOfUse,
   reservation,
-}: PropsNarrowed): JSX.Element | null {
+}: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
 
   // NOTE typescript can't type array off index
@@ -497,15 +499,19 @@ function Reservation({
 function TermsInfo({
   reservation,
   termsOfUse,
-}: {
+}: Readonly<{
   reservation: Pick<
     NodeT,
     "reservationUnits" | "begin" | "applyingForFreeOfCharge"
   >;
   termsOfUse: PropsNarrowed["termsOfUse"];
-}) {
+}>) {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation.reservationUnits.find(() => true);
+  const reservationAccessCode = useAccessCodeQuery({
+    variables: { id: reservation.id },
+    skip: reservation.accessType !== AccessType.AccessCode,
+  });
   const shouldDisplayPricingTerms: boolean = useMemo(() => {
     if (!reservationUnit) {
       return false;
@@ -743,10 +749,10 @@ function getReservationValue(
 function ReservationInfo({
   reservation,
   supportedFields,
-}: {
+}: Readonly<{
   reservation: ReservationInfoFragment;
   supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-}) {
+}>) {
   const { t, i18n } = useTranslation();
   const POSSIBLE_FIELDS = [
     "purpose",
