@@ -86,7 +86,7 @@ export function Step1({
           disabled={!areTermsAccepted || isSubmitting}
         >
           {requiresPayment
-            ? t("notification:waitingForPayment.continueReservation")
+            ? t("notification:waitingForPayment.payReservation")
             : t("reservationCalendar:makeReservation")}
         </Button>
         <Button
