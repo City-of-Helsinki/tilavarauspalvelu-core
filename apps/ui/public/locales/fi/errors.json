@@ -45,6 +45,7 @@
       "APPLICATION_CONTACT_PERSON_MISSING": "Yhteyshenkilö puuttuu.",
       "APPLICATION_BILLING_ADDRESS_MISSING": "Laskutusosoite puuttuu.",
       "APPLICATION_APPLICANT_TYPE_MISSING": "Hakijan tyyppi puuttuu.",
+      "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
       "invalid": "Virheellinen arvo.",
       "generic_validation_error": "Tapahtui virhe."
     }

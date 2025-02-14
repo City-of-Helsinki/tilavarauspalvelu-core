@@ -10,6 +10,8 @@ import type { NextRequest } from "next/server";
 import { env } from "@/env.mjs";
 import { getSignInUrl, buildGraphQLUrl } from "common/src/urlBuilder";
 import { base64encode, type LocalizationLanguages } from "common/src/helpers";
+import { ReservationStateChoice, ReservationTypeChoice } from "./gql/gql-types";
+import { getReservationInProgressPath } from "./modules/urls";
 
 const apiBaseUrl = env.TILAVARAUS_API_URL ?? "";
 
@@ -72,10 +74,24 @@ type User = {
   pk: number;
   hasAccess: boolean;
 };
+type Data = {
+  reservation: {
+    state: ReservationStateChoice | undefined | null;
+    type: ReservationTypeChoice | undefined | null;
+    resUnitPk: number | null;
+  } | null;
+  user: User;
+};
 
 const RESERVATION_QUERY = `
   reservation(id: $reservationId) {
     id
+    type
+    state
+    reservationUnits {
+      id
+      pk
+    }
     user {
       id
       pk
@@ -95,13 +111,13 @@ const APPLICATION_QUERY = `
 /// @param req - NextRequest
 /// @param opts - optional parameters for fetching additional data
 /// @returns Promise<number | null> - user id or null if not logged in
-async function getCurrentUser(
+async function fetchUserData(
   req: NextRequest,
   opts?: {
     applicationPk?: number | null;
     reservationPk?: number | null;
   }
-): Promise<User | null> {
+): Promise<Data | null> {
   const { cookies } = req;
   const hasSession = cookies.has("sessionid");
   if (!hasSession) {
@@ -163,7 +179,61 @@ ${applicationId ? "$applicationId: ID!" : ""}
     return null;
   }
 
-  return parseUserGQLquery(data.data, reservationId, applicationId);
+  const user = parseUserGQLquery(data.data, reservationId, applicationId);
+  if (user == null) {
+    return null;
+  }
+
+  return {
+    reservation: parseReservationGQLquery(data.data),
+    user,
+  };
+}
+
+/// return reservation data from the gql query or null if it's not found
+function parseReservationGQLquery(data: unknown): Data["reservation"] | null {
+  if (data != null && typeof data === "object" && "reservation" in data) {
+    const { reservation } = data;
+    if (reservation != null && typeof reservation === "object") {
+      let state: ReservationStateChoice | null = null;
+      let type: ReservationTypeChoice | null = null;
+      let resUnitPk: number | null = null;
+      if (
+        "type" in reservation &&
+        reservation.type != null &&
+        typeof reservation.type === "string"
+      ) {
+        type = reservation.type as ReservationTypeChoice;
+      }
+
+      if (
+        "state" in reservation &&
+        reservation.state != null &&
+        typeof reservation.state === "string"
+      ) {
+        state = reservation.state as ReservationStateChoice;
+      }
+
+      if (
+        "reservationUnits" in reservation &&
+        reservation.reservationUnits != null &&
+        Array.isArray(reservation.reservationUnits)
+      ) {
+        const resUnitPks: Array<number | null> = reservation.reservationUnits
+          .map((unit) => {
+            if (unit != null && typeof unit === "object" && "pk" in unit) {
+              return typeof unit.pk === "number" ? unit.pk : null;
+            }
+            return null;
+          })
+          .filter((pk): pk is number => pk != null);
+        resUnitPk = resUnitPks.find(() => true) ?? null;
+      }
+      return { state, type, resUnitPk };
+    }
+  }
+
+  return null;
 }
 
 function parseUserGQLquery(
@@ -367,18 +437,17 @@ function redirectCsrfToken(req: NextRequest): URL | undefined {
 // refactor the matcher or fix the underlining matcher issue in nextjs
 // matcher syntax: /hard-path/:path* -> /hard-path/anything
 // our syntax: hard-path
-const reservationRoutes = [
+const RESERVATION_ROUTES = [
   "reservation", //:path*',
   "reservations", //:path*',
 ];
-const applicationRoutes = [
+const APPLICATION_ROUTES = [
   "applications", //:path*',
   "application", //:path*',
 ];
-const authenticatedRoutes = [
-  // just in case if the route falls through
-  ...reservationRoutes,
-  ...applicationRoutes,
+const AUTHENTICATED_ROUTES = [
+  ...RESERVATION_ROUTES,
+  ...APPLICATION_ROUTES,
   "success",
 ];
 // url matcher that is very specific to our case
@@ -388,15 +457,15 @@ function doesUrlMatch(url: string, route: string) {
 }
 
 export async function middleware(req: NextRequest) {
-  const redirectUrl = redirectCsrfToken(req);
-  if (redirectUrl) {
+  const csrfRedirectUrl = redirectCsrfToken(req);
+  if (csrfRedirectUrl) {
     // block infinite redirect loop (there is no graceful way to handle this)
     if (req.url.includes("redirect_to")) {
       // eslint-disable-next-line no-console
       console.error("Infinite redirect loop detected");
       return NextResponse.next();
     }
-    return NextResponse.redirect(redirectUrl);
+    return NextResponse.redirect(csrfRedirectUrl);
   }
 
   // don't make unnecessary requests to the backend for every asset
@@ -408,24 +477,26 @@ export async function middleware(req: NextRequest) {
   let reservationPk: number | null = null;
   let applicationPk: number | null = null;
 
-  if (reservationRoutes.some((route) => doesUrlMatch(req.url, route))) {
+  if (RESERVATION_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
     const id = url.pathname.match(/\/reservations?\/(\d+)/)?.[1];
     const pk = Number(id);
     // can be either an url issues (user error) or a bug in our matcher
     if (pk > 0) {
       reservationPk = pk;
-    } else {
+    } else if (id !== "") {
+      // fall through empty for listing page
       // eslint-disable-next-line no-console
       console.error("Invalid reservation id");
     }
   }
-  if (applicationRoutes.some((route) => doesUrlMatch(req.url, route))) {
+  if (APPLICATION_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
     const id = url.pathname.match(/\/applications?\/(\d+)/)?.[1];
     const pk = Number(id);
     // can be either an url issues (user error) or a bug in our matcher
     if (pk > 0) {
       applicationPk = pk;
-    } else {
+    } else if (id !== "") {
+      // fall through empty for listing page
       // eslint-disable-next-line no-console
       console.error("Invalid application id");
     }
@@ -436,12 +507,41 @@ export async function middleware(req: NextRequest) {
     reservationPk,
   };
 
-  const user = await getCurrentUser(req, options);
+  const data = await fetchUserData(req, options);
+  const user = data?.user ?? null;
   if (user != null && !user.hasAccess) {
     return NextResponse.error();
   }
 
-  if (authenticatedRoutes.some((route) => doesUrlMatch(req.url, route))) {
+  // only check /reservations/:id/* path (not the funnel page)
+  const reservationsPath = /^(\/\w+)?\/reservations\/\d+(\/?\w+)?/;
+  // listing page has no reservation data
+  const checkReservationPage = url.pathname.match(reservationsPath);
+  if (data?.reservation != null && checkReservationPage) {
+    if (data.reservation.state == null || data.reservation.type == null) {
+      return NextResponse.error();
+    }
+
+    if (data.reservation.state === ReservationStateChoice.Created) {
+      const langPrefix = checkReservationPage[1] ?? "";
+      const { resUnitPk } = data.reservation;
+      const redirectUrl = new URL(
+        `${langPrefix}${getReservationInProgressPath(resUnitPk, reservationPk)}`,
+        req.url
+      );
+      return NextResponse.redirect(redirectUrl);
+    }
+    // Because we use url rewrite for Seasonal we have to allow both here (and do per page SSR checks instead)
+    if (
+      data.reservation.type != null &&
+      data.reservation.type !== ReservationTypeChoice.Normal &&
+      data.reservation.type !== ReservationTypeChoice.Seasonal
+    ) {
+      return NextResponse.error();
+    }
+  }
+
+  if (AUTHENTICATED_ROUTES.some((route) => doesUrlMatch(req.url, route))) {
     const redirect = getRedirectProtectedRoute(req, user);
     if (redirect) {
       return NextResponse.redirect(new URL(redirect, req.url));
