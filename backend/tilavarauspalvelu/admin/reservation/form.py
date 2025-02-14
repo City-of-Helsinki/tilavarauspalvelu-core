@@ -15,6 +15,8 @@ from utils.date_utils import DEFAULT_TIMEZONE
 class ReservationAdminForm(forms.ModelForm):
     instance: Reservation
 
+    access_type = forms.ChoiceField(choices=AccessType.model_choices, required=False)
+
     pindora_response = forms.CharField(
         widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}),
         required=False,
@@ -45,6 +47,11 @@ class ReservationAdminForm(forms.ModelForm):
             "handled_at": _("Handled at"),
             "confirmed_at": _("Confirmed at"),
             "created_at": _("Created at"),
+            #
+            "access_type": _("Access type"),
+            "access_code_is_active": _("Access code is active"),
+            "access_code_should_be_active": _("Access code should be active"),
+            "access_code_generated_at": _("Access code generated at"),
             #
             "price": _("Price"),
             "price_net": _("Price net"),
@@ -104,6 +111,11 @@ class ReservationAdminForm(forms.ModelForm):
             "handled_at": _("When this reservation was handled"),
             "confirmed_at": _("When this reservation was confirmed"),
             "created_at": _("When this reservation was created"),
+            #
+            "access_type": _("Access type"),
+            "access_code_is_active": _("Access code is active"),
+            "access_code_should_be_active": _("Access code should be active"),
+            "access_code_generated_at": _("Access code generated at"),
             #
             "price": _("The price of this particular reservation including VAT"),
             "price_net": _("The price of this particular reservation excluding VAT"),

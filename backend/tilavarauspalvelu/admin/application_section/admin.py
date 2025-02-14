@@ -114,10 +114,20 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
                 ],
             },
         ],
+        [
+            _("Pindora information"),
+            {
+                "fields": [
+                    "should_have_active_access_code",
+                    "pindora_response",
+                ],
+            },
+        ],
     ]
     readonly_fields = [
         "id",
         "ext_uuid",
+        "should_have_active_access_code",
     ]
     inlines = [
         SuitableTimeRangeInline,
@@ -131,6 +141,7 @@ class ApplicationSectionAdmin(admin.ModelAdmin):
             .annotate(
                 status=L("status"),
                 application_status=L("application__status"),
+                should_have_active_access_code=L("should_have_active_access_code"),
             )
             .select_related(
                 "application",
