@@ -234,6 +234,12 @@ class ApplicationSendSerializer(NestingModelSerializer):
 
     def validate_applicant(self, errors: ErrorList) -> None:
         """Validate applicant differently based on applicant type."""
+        if self.instance.applicant_type is None:
+            msg = "Application applicant type is required."
+            error = ValidationError(msg, code=error_codes.APPLICATION_APPLICANT_TYPE_MISSING)
+            errors.append(error)
+            return
+
         applicant_type = ApplicantTypeChoice(self.instance.applicant_type)
 
         match applicant_type:
