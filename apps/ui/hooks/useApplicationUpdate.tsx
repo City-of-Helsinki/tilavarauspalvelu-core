@@ -13,11 +13,7 @@ export function useApplicationUpdate() {
     try {
       const response = await mutate({
         variables: {
-          input: {
-            ...input,
-            // force application back to Draft when saving
-            sentDate: null,
-          },
+          input,
         },
       });
       const { data, errors } = response;

@@ -238,12 +238,10 @@ export type ApplicationCreateMutationInput = {
     Array<InputMaybe<ApplicationSectionForApplicationSerializerInput>>
   >;
   billingAddress?: InputMaybe<AddressSerializerInput>;
-  cancelledDate?: InputMaybe<Scalars["DateTime"]["input"]>;
   contactPerson?: InputMaybe<PersonSerializerInput>;
   homeCity?: InputMaybe<Scalars["Int"]["input"]>;
   organisation?: InputMaybe<OrganisationSerializerInput>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
-  sentDate?: InputMaybe<Scalars["DateTime"]["input"]>;
 };
 
 export type ApplicationCreateMutationPayload = {
@@ -290,6 +288,7 @@ export type ApplicationNodeApplicationSectionsArgs = {
   application?: InputMaybe<Scalars["Int"]["input"]>;
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   applicationStatus?: InputMaybe<Array<InputMaybe<ApplicationStatusChoice>>>;
+  extUuid?: InputMaybe<Scalars["UUID"]["input"]>;
   hasAllocations?: InputMaybe<Scalars["Boolean"]["input"]>;
   homeCity?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   includePreferredOrder10OrHigher?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -443,6 +442,7 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
 export type ApplicationRoundNodeConnection = {
@@ -712,24 +712,20 @@ export enum ApplicationStatusChoice {
 export type ApplicationUpdateMutationInput = {
   additionalInformation?: InputMaybe<Scalars["String"]["input"]>;
   applicantType?: InputMaybe<ApplicantTypeChoice>;
-  applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   applicationSections?: InputMaybe<
     Array<InputMaybe<UpdateApplicationSectionForApplicationSerializerInput>>
   >;
   billingAddress?: InputMaybe<UpdateAddressSerializerInput>;
-  cancelledDate?: InputMaybe<Scalars["DateTime"]["input"]>;
   contactPerson?: InputMaybe<UpdatePersonSerializerInput>;
   homeCity?: InputMaybe<Scalars["Int"]["input"]>;
   organisation?: InputMaybe<UpdateOrganisationSerializerInput>;
   pk: Scalars["Int"]["input"];
-  sentDate?: InputMaybe<Scalars["DateTime"]["input"]>;
-  workingMemo?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type ApplicationUpdateMutationPayload = {
   additionalInformation?: Maybe<Scalars["String"]["output"]>;
   applicantType?: Maybe<ApplicantTypeChoice>;
-  applicationRound?: Maybe<Scalars["Int"]["output"]>;
+  applicationRound?: Maybe<Scalars["ID"]["output"]>;
   applicationSections?: Maybe<Array<Maybe<ApplicationSectionNode>>>;
   billingAddress?: Maybe<AddressNode>;
   cancelledDate?: Maybe<Scalars["DateTime"]["output"]>;
@@ -741,6 +737,16 @@ export type ApplicationUpdateMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
   sentDate?: Maybe<Scalars["DateTime"]["output"]>;
   status?: Maybe<Status>;
+  user?: Maybe<Scalars["ID"]["output"]>;
+};
+
+export type ApplicationWorkingMemoMutationInput = {
+  pk: Scalars["Int"]["input"];
+  workingMemo?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type ApplicationWorkingMemoMutationPayload = {
+  pk?: Maybe<Scalars["Int"]["output"]>;
   workingMemo?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -1230,6 +1236,7 @@ export type Mutation = {
   staffReservationModify?: Maybe<ReservationStaffModifyMutationPayload>;
   updateApplication?: Maybe<ApplicationUpdateMutationPayload>;
   updateApplicationSection?: Maybe<ApplicationSectionUpdateMutationPayload>;
+  updateApplicationWorkingMemo?: Maybe<ApplicationWorkingMemoMutationPayload>;
   updateBannerNotification?: Maybe<BannerNotificationUpdateMutationPayload>;
   updateCurrentUser?: Maybe<CurrentUserUpdateMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
@@ -1445,6 +1452,10 @@ export type MutationUpdateApplicationArgs = {
 
 export type MutationUpdateApplicationSectionArgs = {
   input: ApplicationSectionUpdateMutationInput;
+};
+
+export type MutationUpdateApplicationWorkingMemoArgs = {
+  input: ApplicationWorkingMemoMutationInput;
 };
 
 export type MutationUpdateBannerNotificationArgs = {
@@ -1876,6 +1887,7 @@ export type QueryAffectingReservationsArgs = {
   createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
   createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  extUuid?: InputMaybe<Scalars["UUID"]["input"]>;
   forReservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   forUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -1883,6 +1895,7 @@ export type QueryAffectingReservationsArgs = {
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
   orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -1962,6 +1975,7 @@ export type QueryApplicationSectionsArgs = {
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   applicationStatus?: InputMaybe<Array<InputMaybe<ApplicationStatusChoice>>>;
   before?: InputMaybe<Scalars["String"]["input"]>;
+  extUuid?: InputMaybe<Scalars["UUID"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   hasAllocations?: InputMaybe<Scalars["Boolean"]["input"]>;
   homeCity?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -2128,11 +2142,13 @@ export type QueryRecurringReservationsArgs = {
   beginTime?: InputMaybe<Scalars["Time"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
   endTime?: InputMaybe<Scalars["Time"]["input"]>;
+  extUuid?: InputMaybe<Scalars["UUID"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<RecurringReservationOrderingChoices>>>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
@@ -2301,6 +2317,7 @@ export type QueryReservationUnitsArgs = {
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
 export type QueryReservationUnitsAllArgs = {
@@ -2326,6 +2343,7 @@ export type QueryReservationsArgs = {
   createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
   createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  extUuid?: InputMaybe<Scalars["UUID"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
@@ -2334,6 +2352,7 @@ export type QueryReservationsArgs = {
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
   orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -2518,11 +2537,13 @@ export type RecurringReservationNodeReservationsArgs = {
   createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
   createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  extUuid?: InputMaybe<Scalars["UUID"]["input"]>;
   isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithHandlingPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
   orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -3007,6 +3028,7 @@ export type ReservationNodeReservationUnitsArgs = {
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
 export type ReservationNodeConnection = {
@@ -3894,11 +3916,13 @@ export type ReservationUnitNodeReservationsArgs = {
   createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
   createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  extUuid?: InputMaybe<Scalars["UUID"]["input"]>;
   isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithHandlingPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
   orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
@@ -4902,6 +4926,7 @@ export type UnitNodeReservationUnitsArgs = {
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
 export type UnitNodeSpacesArgs = {
@@ -6207,7 +6232,7 @@ export type UpdateApplicationWorkingMemoMutationVariables = Exact<{
 }>;
 
 export type UpdateApplicationWorkingMemoMutation = {
-  updateApplication?: {
+  updateApplicationWorkingMemo?: {
     pk?: number | null;
     workingMemo?: string | null;
   } | null;
@@ -10473,7 +10498,9 @@ export type UpdateReservationWorkingMemoMutationOptions =
   >;
 export const UpdateApplicationWorkingMemoDocument = gql`
   mutation UpdateApplicationWorkingMemo($pk: Int!, $workingMemo: String!) {
-    updateApplication(input: { pk: $pk, workingMemo: $workingMemo }) {
+    updateApplicationWorkingMemo(
+      input: { pk: $pk, workingMemo: $workingMemo }
+    ) {
       pk
       workingMemo
     }
