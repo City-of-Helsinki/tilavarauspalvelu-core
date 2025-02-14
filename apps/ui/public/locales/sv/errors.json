@@ -22,6 +22,7 @@
   "general_error": "Odefinierat fel.",
   "api": {
     "NOT_FOUND": "Bokningen hittades inte.",
+    "UNKNOWN": "Ett fel uppstod.",
     "CHANGES_NOT_ALLOWED": "Du kan inte göra ändringar.",
     "RESERVATION_UNIT_NOT_RESERVABLE": "Objektet går inte att boka.",
     "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
@@ -38,6 +39,11 @@
     "validation": {
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Personen som gör bokningen måste vara myndig.",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Sökanden måste vara myndig.",
+      "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "Önskad tid är för kort.",
+      "APPLICATION_SECTIONS_MISSING": "Ansökningsavsnitt saknas.",
+      "APPLICATION_CONTACT_PERSON_MISSING": "Kontaktperson saknas.",
+      "APPLICATION_BILLING_ADDRESS_MISSING": "Faktureringsadress saknas.",
+      "APPLICATION_APPLICANT_TYPE_MISSING": "Sökandens typ saknas.",
       "invalid": "Ogiltigt värde.",
       "generic_validation_error": "Ett fel uppstod."
     }
