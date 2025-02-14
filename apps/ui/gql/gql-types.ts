@@ -5696,6 +5696,36 @@ export type ApplicationFormFragment = {
     notesWhenApplyingFi?: string | null;
     notesWhenApplyingEn?: string | null;
     notesWhenApplyingSv?: string | null;
+    reservationPeriodBegin: string;
+    reservationPeriodEnd: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameSv?: string | null;
+    nameEn?: string | null;
+    reservationUnits: Array<{
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+      minPersons?: number | null;
+      maxPersons?: number | null;
+      images: Array<{
+        id: string;
+        imageUrl?: string | null;
+        largeUrl?: string | null;
+        mediumUrl?: string | null;
+        smallUrl?: string | null;
+        imageType: ImageType;
+      }>;
+      unit?: {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameSv?: string | null;
+        nameEn?: string | null;
+      } | null;
+    }>;
   };
   applicationSections?: Array<{
     hasReservations: boolean;
@@ -5804,6 +5834,7 @@ export type ApplicationCommonFragment = {
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
   applicationRound: {
+    id: string;
     sentDate?: string | null;
     applicationPeriodBegin: string;
     applicationPeriodEnd: string;
@@ -5811,7 +5842,6 @@ export type ApplicationCommonFragment = {
     applicationsCount?: number | null;
     reservationUnitCount?: number | null;
     statusTimestamp?: string | null;
-    id: string;
     notesWhenApplyingFi?: string | null;
     notesWhenApplyingEn?: string | null;
     notesWhenApplyingSv?: string | null;
@@ -7362,6 +7392,7 @@ export type ApplicationPage1Query = {
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
+      id: string;
       sentDate?: string | null;
       applicationPeriodBegin: string;
       applicationPeriodEnd: string;
@@ -7369,7 +7400,6 @@ export type ApplicationPage1Query = {
       applicationsCount?: number | null;
       reservationUnitCount?: number | null;
       statusTimestamp?: string | null;
-      id: string;
       notesWhenApplyingFi?: string | null;
       notesWhenApplyingEn?: string | null;
       notesWhenApplyingSv?: string | null;
@@ -7535,6 +7565,36 @@ export type ApplicationPage2Query = {
       notesWhenApplyingFi?: string | null;
       notesWhenApplyingEn?: string | null;
       notesWhenApplyingSv?: string | null;
+      reservationPeriodBegin: string;
+      reservationPeriodEnd: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+      reservationUnits: Array<{
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameSv?: string | null;
+        nameEn?: string | null;
+        minPersons?: number | null;
+        maxPersons?: number | null;
+        images: Array<{
+          id: string;
+          imageUrl?: string | null;
+          largeUrl?: string | null;
+          mediumUrl?: string | null;
+          smallUrl?: string | null;
+          imageType: ImageType;
+        }>;
+        unit?: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameSv?: string | null;
+          nameEn?: string | null;
+        } | null;
+      }>;
     };
     applicationSections?: Array<{
       hasReservations: boolean;
@@ -7656,6 +7716,36 @@ export type ApplicationPage3Query = {
       notesWhenApplyingFi?: string | null;
       notesWhenApplyingEn?: string | null;
       notesWhenApplyingSv?: string | null;
+      reservationPeriodBegin: string;
+      reservationPeriodEnd: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+      reservationUnits: Array<{
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameSv?: string | null;
+        nameEn?: string | null;
+        minPersons?: number | null;
+        maxPersons?: number | null;
+        images: Array<{
+          id: string;
+          imageUrl?: string | null;
+          largeUrl?: string | null;
+          mediumUrl?: string | null;
+          smallUrl?: string | null;
+          imageType: ImageType;
+        }>;
+        unit?: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameSv?: string | null;
+          nameEn?: string | null;
+        } | null;
+      }>;
     };
     applicationSections?: Array<{
       hasReservations: boolean;
@@ -7933,6 +8023,7 @@ export type ApplicationViewQuery = {
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
+      id: string;
       sentDate?: string | null;
       applicationPeriodBegin: string;
       applicationPeriodEnd: string;
@@ -7940,7 +8031,6 @@ export type ApplicationViewQuery = {
       applicationsCount?: number | null;
       reservationUnitCount?: number | null;
       statusTimestamp?: string | null;
-      id: string;
       notesWhenApplyingFi?: string | null;
       notesWhenApplyingEn?: string | null;
       notesWhenApplyingSv?: string | null;
@@ -8961,6 +9051,43 @@ export const ApplicantFragmentDoc = gql`
     }
   }
 `;
+export const ApplicationReservationUnitListFragmentDoc = gql`
+  fragment ApplicationReservationUnitList on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    nameSv
+    nameEn
+    reservationUnits {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+      minPersons
+      maxPersons
+      images {
+        ...Image
+      }
+      unit {
+        id
+        pk
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+  }
+  ${ImageFragmentDoc}
+`;
+export const ApplicationRoundForApplicationFragmentDoc = gql`
+  fragment ApplicationRoundForApplication on ApplicationRoundNode {
+    ...ApplicationReservationUnitList
+    reservationPeriodBegin
+    reservationPeriodEnd
+  }
+  ${ApplicationReservationUnitListFragmentDoc}
+`;
 export const ApplicationSectionDurationFragmentDoc = gql`
   fragment ApplicationSectionDuration on ApplicationSectionNode {
     reservationsEndDate
@@ -9049,6 +9176,7 @@ export const ApplicationFormFragmentDoc = gql`
     ...Applicant
     applicationRound {
       id
+      ...ApplicationRoundForApplication
       notesWhenApplyingFi
       notesWhenApplyingEn
       notesWhenApplyingSv
@@ -9058,44 +9186,8 @@ export const ApplicationFormFragmentDoc = gql`
     }
   }
   ${ApplicantFragmentDoc}
+  ${ApplicationRoundForApplicationFragmentDoc}
   ${ApplicationSectionUiFragmentDoc}
-`;
-export const ApplicationReservationUnitListFragmentDoc = gql`
-  fragment ApplicationReservationUnitList on ApplicationRoundNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
-    reservationUnits {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
-      minPersons
-      maxPersons
-      images {
-        ...Image
-      }
-      unit {
-        id
-        pk
-        nameFi
-        nameSv
-        nameEn
-      }
-    }
-  }
-  ${ImageFragmentDoc}
-`;
-export const ApplicationRoundForApplicationFragmentDoc = gql`
-  fragment ApplicationRoundForApplication on ApplicationRoundNode {
-    ...ApplicationReservationUnitList
-    reservationPeriodBegin
-    reservationPeriodEnd
-  }
-  ${ApplicationReservationUnitListFragmentDoc}
 `;
 export const TermsOfUseNameFieldsFragmentDoc = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
@@ -9126,7 +9218,7 @@ export const ApplicationCommonFragmentDoc = gql`
   fragment ApplicationCommon on ApplicationNode {
     ...ApplicationForm
     applicationRound {
-      ...ApplicationRoundForApplication
+      id
       sentDate
       applicationPeriodBegin
       applicationPeriodEnd
@@ -9141,7 +9233,6 @@ export const ApplicationCommonFragmentDoc = gql`
     }
   }
   ${ApplicationFormFragmentDoc}
-  ${ApplicationRoundForApplicationFragmentDoc}
   ${TermsOfUseFieldsFragmentDoc}
 `;
 export const ApplicationRoundFieldsFragmentDoc = gql`

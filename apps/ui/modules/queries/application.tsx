@@ -100,10 +100,8 @@ export const APPLICATIONS = gql`
   }
 `;
 
-// includes all the form fields for an application
-// the applicant section is required for the Stepper checks
-// applicationSections?
-// notesWhenApplying -> on all application pages (except for view?)
+// includes all the form fields for an application funnel
+// requires a lot of fields because we are doing full form validation for stepper / sending
 export const APPLICATION_MINIMAL = gql`
   fragment ApplicationForm on ApplicationNode {
     id
@@ -113,6 +111,7 @@ export const APPLICATION_MINIMAL = gql`
     ...Applicant
     applicationRound {
       id
+      ...ApplicationRoundForApplication
       notesWhenApplyingFi
       notesWhenApplyingEn
       notesWhenApplyingSv
@@ -128,7 +127,7 @@ export const APPLICATION_FRAGMENT = gql`
   fragment ApplicationCommon on ApplicationNode {
     ...ApplicationForm
     applicationRound {
-      ...ApplicationRoundForApplication
+      id
       sentDate
       applicationPeriodBegin
       applicationPeriodEnd
