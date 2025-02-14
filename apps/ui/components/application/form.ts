@@ -149,11 +149,12 @@ const ApplicationSectionPage2Schema = z
     path: ["suitableTimeRanges"],
     message: "Required",
   })
-  // TODO validate that we have at least as many time ranges on different days as appliedPerWeek
   .refine(
     (s) =>
       s.minDuration > 0 &&
-      s.suitableTimeRanges.find((tr) => lengthOfTimeRange(tr) >= s.minDuration),
+      // No too short time ranges allowed
+      s.suitableTimeRanges.filter((tr) => lengthOfTimeRange(tr) < s.minDuration)
+        .length === 0,
     {
       path: ["suitableTimeRanges"],
       message:
@@ -674,9 +675,9 @@ export function convertApplicationPage3(
   app?: Maybe<ApplicantFragment>
 ): ApplicationPage3FormValues {
   const hasBillingAddress =
-    app?.applicantType !== ApplicantTypeChoice.Individual &&
-    app?.billingAddress?.streetAddressFi != null &&
-    app?.billingAddress?.streetAddressFi !== "";
+    app?.applicantType === ApplicantTypeChoice.Individual ||
+    (app?.billingAddress?.streetAddressFi != null &&
+      app?.billingAddress?.streetAddressFi !== "");
   return {
     pk: app?.pk ?? 0,
     applicantType: app?.applicantType ?? undefined,

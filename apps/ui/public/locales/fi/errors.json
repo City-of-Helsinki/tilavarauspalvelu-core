@@ -22,6 +22,7 @@
   "general_error": "Tapahtui määrittämätön virhe.",
   "api": {
     "NOT_FOUND": "Varaus on vanhentunut.",
+    "UNKNOWN": "Tapahtui virhe.",
     "CHANGES_NOT_ALLOWED": "Muutoksia ei sallita.",
     "RESERVATION_UNIT_NOT_RESERVABLE": "Kohde ei ole varattavissa.",
     "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
@@ -38,6 +39,11 @@
     "validation": {
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED":  "Varaajan on oltava täysi-ikäinen.",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Hakijan on oltava täysi-ikäinen.",
+      "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "Toivottu aika on liian lyhyt.",
+      "APPLICATION_SECTIONS_MISSING": "Hakemusosio puuttuu.",
+      "APPLICATION_CONTACT_PERSON_MISSING": "Yhteyshenkilö puuttuu.",
+      "APPLICATION_BILLING_ADDRESS_MISSING": "Laskutusosoite puuttuu.",
+      "APPLICATION_APPLICANT_TYPE_MISSING": "Hakijan tyyppi puuttuu.",
       "invalid": "Virheellinen arvo.",
       "generic_validation_error": "Tapahtui virhe."
     }
