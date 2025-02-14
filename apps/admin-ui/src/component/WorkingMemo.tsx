@@ -45,8 +45,8 @@ function WorkingMemo({
       const mutRes =
         "updateReservationWorkingMemo" in data
           ? data.updateReservationWorkingMemo
-          : "updateApplication" in data
-            ? data.updateApplication
+          : "updateApplicationWorkingMemo" in data
+            ? data.updateApplicationWorkingMemo
             : null;
       if (mutRes?.pk == null) {
         throw new Error("No data returned");

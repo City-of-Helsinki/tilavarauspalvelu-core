@@ -242,12 +242,10 @@ input ApplicationCreateMutationInput {
   applicationRound: Int!
   applicationSections: [ApplicationSectionForApplicationSerializerInput]
   billingAddress: AddressSerializerInput
-  cancelledDate: DateTime
   contactPerson: PersonSerializerInput
   homeCity: Int
   organisation: OrganisationSerializerInput
   pk: Int
-  sentDate: DateTime
 }
 
 type ApplicationCreateMutationPayload {
@@ -277,6 +275,7 @@ type ApplicationNode implements Node {
     application: Int
     applicationRound: Int
     applicationStatus: [ApplicationStatusChoice]
+    extUuid: UUID
     hasAllocations: Boolean
     homeCity: [Int]
     includePreferredOrder10OrHigher: Boolean
@@ -457,6 +456,7 @@ type ApplicationRoundNode implements Node {
     typeRankGte: Decimal
     typeRankLte: Decimal
     unit: [Int]
+    uuid: UUID
   ): [ReservationUnitNode!]!
   sentDate: DateTime
   status: ApplicationRoundStatusChoice
@@ -761,22 +761,18 @@ enum ApplicationStatusChoice {
 input ApplicationUpdateMutationInput {
   additionalInformation: String
   applicantType: ApplicantTypeChoice
-  applicationRound: Int
   applicationSections: [UpdateApplicationSectionForApplicationSerializerInput]
   billingAddress: UpdateAddressSerializerInput
-  cancelledDate: DateTime
   contactPerson: UpdatePersonSerializerInput
   homeCity: Int
   organisation: UpdateOrganisationSerializerInput
   pk: Int!
-  sentDate: DateTime
-  workingMemo: String
 }
 
 type ApplicationUpdateMutationPayload {
   additionalInformation: String
   applicantType: ApplicantTypeChoice
-  applicationRound: Int
+  applicationRound: ID
   applicationSections: [ApplicationSectionNode]
   billingAddress: AddressNode
   cancelledDate: DateTime
@@ -788,6 +784,16 @@ type ApplicationUpdateMutationPayload {
   pk: Int
   sentDate: DateTime
   status: Status
+  user: ID
+}
+
+input ApplicationWorkingMemoMutationInput {
+  pk: Int!
+  workingMemo: String
+}
+
+type ApplicationWorkingMemoMutationPayload {
+  pk: Int
   workingMemo: String
 }
 
@@ -1503,6 +1509,9 @@ type Mutation {
   updateApplicationSection(
     input: ApplicationSectionUpdateMutationInput!
   ): ApplicationSectionUpdateMutationPayload
+  updateApplicationWorkingMemo(
+    input: ApplicationWorkingMemoMutationInput!
+  ): ApplicationWorkingMemoMutationPayload
   updateBannerNotification(
     input: BannerNotificationUpdateMutationInput!
   ): BannerNotificationUpdateMutationPayload
@@ -1963,6 +1972,7 @@ type Query {
     createdAtGte: Date
     createdAtLte: Date
     endDate: Date
+    extUuid: UUID
     """
     Reservations should contain at least one these reservation units.
     """
@@ -1979,6 +1989,7 @@ type Query {
     """
     orderBy: [ReservationOrderingChoices]
     orderStatus: [OrderStatusWithFree]
+    pk: [Int]
     priceGte: Decimal
     priceLte: Decimal
     recurringReservation: [Int]
@@ -2062,6 +2073,7 @@ type Query {
     applicationRound: Int
     applicationStatus: [ApplicationStatusChoice]
     before: String
+    extUuid: UUID
     first: Int
     hasAllocations: Boolean
     homeCity: [Int]
@@ -2255,6 +2267,7 @@ type Query {
     beginTime: Time
     endDate: Date
     endTime: Time
+    extUuid: UUID
     first: Int
     last: Int
     name: String
@@ -2263,6 +2276,7 @@ type Query {
     Järjestä
     """
     orderBy: [RecurringReservationOrderingChoices]
+    pk: [Int]
     reservationUnit: [ID]
     reservationUnitNameEn: String
     reservationUnitNameFi: String
@@ -2443,6 +2457,7 @@ type Query {
     typeRankGte: Decimal
     typeRankLte: Decimal
     unit: [Int]
+    uuid: UUID
   ): ReservationUnitNodeConnection
   reservationUnitsAll(
     nameEn: String
@@ -2469,6 +2484,7 @@ type Query {
     createdAtGte: Date
     createdAtLte: Date
     endDate: Date
+    extUuid: UUID
     first: Int
     isRecurring: Boolean
     last: Int
@@ -2480,6 +2496,7 @@ type Query {
     """
     orderBy: [ReservationOrderingChoices]
     orderStatus: [OrderStatusWithFree]
+    pk: [Int]
     priceGte: Decimal
     priceLte: Decimal
     recurringReservation: [Int]
@@ -2682,6 +2699,7 @@ type RecurringReservationNode implements Node {
     createdAtGte: Date
     createdAtLte: Date
     endDate: Date
+    extUuid: UUID
     isRecurring: Boolean
     onlyWithHandlingPermission: Boolean
     onlyWithPermission: Boolean
@@ -2690,6 +2708,7 @@ type RecurringReservationNode implements Node {
     """
     orderBy: [ReservationOrderingChoices]
     orderStatus: [OrderStatusWithFree]
+    pk: [Int]
     priceGte: Decimal
     priceLte: Decimal
     recurringReservation: [Int]
@@ -3245,6 +3264,7 @@ type ReservationNode implements Node {
     typeRankGte: Decimal
     typeRankLte: Decimal
     unit: [Int]
+    uuid: UUID
   ): [ReservationUnitNode!]!
   reserveeAddressCity: String
   reserveeAddressStreet: String
@@ -4220,6 +4240,7 @@ type ReservationUnitNode implements Node {
     createdAtGte: Date
     createdAtLte: Date
     endDate: Date
+    extUuid: UUID
     isRecurring: Boolean
     onlyWithHandlingPermission: Boolean
     onlyWithPermission: Boolean
@@ -4228,6 +4249,7 @@ type ReservationUnitNode implements Node {
     """
     orderBy: [ReservationOrderingChoices]
     orderStatus: [OrderStatusWithFree]
+    pk: [Int]
     priceGte: Decimal
     priceLte: Decimal
     recurringReservation: [Int]
@@ -5394,6 +5416,7 @@ type UnitNode implements Node {
     typeRankGte: Decimal
     typeRankLte: Decimal
     unit: [Int]
+    uuid: UUID
   ): [ReservationUnitNode!]!
   shortDescription: String!
   shortDescriptionEn: String
