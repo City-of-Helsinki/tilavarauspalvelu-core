@@ -95,6 +95,10 @@ export const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
       ...EquipmentFields
     }
     currentAccessType
+    accessTypes(isActiveOrFuture: true) {
+      accessType
+      beginDate
+    }
   }
 `;
 

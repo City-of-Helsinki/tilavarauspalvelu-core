@@ -4,6 +4,8 @@
   "timeLabel": "Kellonaika",
   "dateWithWeekday": "{{date, datetime}}",
   "dayTimeSeparator": " klo",
+  "dateGte": "{{value}} lähtien",
+  "dateLte": "{{value}} asti",
   "today": "Tänään",
   "tomorrow": "Huomenna",
   "day": "Päivä",

@@ -4,6 +4,8 @@ import {
   IconEuroSign,
   IconHome,
   IconSize,
+  IconLock,
+  Tooltip,
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
@@ -12,10 +14,15 @@ import {
   convertLanguageCode,
   formatDuration,
   getTranslationSafe,
+  toUIDate,
 } from "common/src/common/util";
 import { fontRegular, H1, H3 } from "common/src/common/typography";
-import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
 import { formatDate, orderImages } from "@/modules/util";
+import {
+  AccessType,
+  ReservationKind,
+  type ReservationUnitPageQuery,
+} from "@gql/gql-types";
 import { IconWithText } from "../common/IconWithText";
 import { Images } from "./Images";
 import {
@@ -27,6 +34,7 @@ import { isReservationStartInFuture } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
 import { Flex } from "common/styles/util";
 import { breakpoints } from "common";
+import { sub } from "date-fns";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 interface HeadProps {
@@ -44,9 +52,9 @@ const NotificationWrapper = styled.div`
 
 function NonReservableNotification({
   reservationUnit,
-}: {
+}: Readonly<{
   reservationUnit: Pick<QueryT, "reservationKind" | "reservationBegins">;
-}) {
+}>) {
   const { t } = useTranslation();
 
   let returnText = t("reservationUnit:notifications.notReservable");
@@ -87,7 +95,7 @@ export function Head({
   reservationUnit,
   reservationUnitIsReservable,
   subventionSuffix,
-}: HeadProps): JSX.Element {
+}: Readonly<HeadProps>): JSX.Element {
   const { i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
@@ -129,13 +137,72 @@ const IconListWrapper = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 `;
 
+const AccessTypeTooltipWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  gap: var(--spacing-xs);
+  font-size: var(--fontsize-body-s);
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+  li {
+    display: flex;
+    gap: var(--spacing-2-xs);
+    justify-content: space-between;
+  }
+`;
+
+function AccessTypeTooltip({
+  accessTypes,
+}: Readonly<{ accessTypes: QueryT["accessTypes"] }>): JSX.Element {
+  const { t } = useTranslation();
+  const accessTypeDurations = accessTypes.map((accessType) => ({
+    ...accessType,
+    endDate: "",
+  }));
+  for (let idx = 0; idx < accessTypeDurations.length; idx++) {
+    const beginDate = new Date(accessTypeDurations[idx].beginDate);
+    if (accessTypeDurations.length - idx > 1) {
+      const endDate = sub(new Date(accessTypeDurations[idx + 1].beginDate), {
+        days: 1,
+      });
+      accessTypeDurations[idx].endDate = toUIDate(endDate);
+    }
+    accessTypeDurations[idx].beginDate = toUIDate(beginDate);
+  }
+  return (
+    <Tooltip>
+      <ul>
+        {accessTypeDurations.map((accessTypeDuration) => (
+          <li key={accessTypeDuration.beginDate}>
+            <span>
+              {t(
+                `reservationUnit:accessTypes.${accessTypeDuration.accessType}`
+              )}
+              {": "}
+            </span>
+            <span>
+              {accessTypeDuration.endDate !== ""
+                ? `${accessTypeDuration.beginDate} – ${accessTypeDuration.endDate}`
+                : `${t("common:beginLabel")} ${accessTypeDuration.beginDate}`}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </Tooltip>
+  );
+}
+
 function IconList({
   reservationUnit,
   subventionSuffix,
-}: Pick<HeadProps, "reservationUnit" | "subventionSuffix">): JSX.Element {
+}: Readonly<
+  Pick<HeadProps, "reservationUnit" | "subventionSuffix">
+>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-
   const minDur = reservationUnit.minReservationDuration ?? 0;
   const maxDur = reservationUnit.maxReservationDuration ?? 0;
   const minReservationDuration = formatDuration(minDur / 60, t, true);
@@ -211,13 +278,37 @@ function IconList({
           ),
         }
       : null,
+    reservationUnit.currentAccessType &&
+    reservationUnit.currentAccessType !== AccessType.Unrestricted
+      ? {
+          key: "accessType",
+          icon: (
+            <IconLock
+              aria-hidden="false"
+              aria-label={t("reservationUnit:accessType")}
+            />
+          ),
+          text: t(
+            `reservationUnit:accessTypes.${reservationUnit.currentAccessType}`
+          ),
+        }
+      : null,
   ] as const);
 
   return (
     <IconListWrapper>
-      {iconsTexts.map(({ icon, key, text }) => (
-        <IconWithText key={key} icon={icon} text={text} />
-      ))}
+      {iconsTexts.map(({ icon, key, text }) =>
+        key !== "accessType" ? (
+          <IconWithText key={key} icon={icon} text={text} />
+        ) : (
+          <AccessTypeTooltipWrapper key={key}>
+            <IconWithText icon={icon} text={text} />
+            {reservationUnit.accessTypes.length > 1 && (
+              <AccessTypeTooltip accessTypes={reservationUnit.accessTypes} />
+            )}
+          </AccessTypeTooltipWrapper>
+        )
+      )}
     </IconListWrapper>
   );
 }
