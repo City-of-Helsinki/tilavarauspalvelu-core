@@ -13,7 +13,9 @@ export const UPDATE_RESERVATION_WORKING_MEMO = gql`
 
 export const UPDATE_APPLICATION_WORKING_MEMO = gql`
   mutation UpdateApplicationWorkingMemo($pk: Int!, $workingMemo: String!) {
-    updateApplication(input: { pk: $pk, workingMemo: $workingMemo }) {
+    updateApplicationWorkingMemo(
+      input: { pk: $pk, workingMemo: $workingMemo }
+    ) {
       pk
       workingMemo
     }
