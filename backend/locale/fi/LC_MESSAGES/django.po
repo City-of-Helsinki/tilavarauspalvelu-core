@@ -3210,6 +3210,11 @@ msgctxt "AccessType"
 msgid "unrestricted"
 msgstr "rajoittamaton"
 
+#: tilavarauspalvelu/enums.py
+msgctxt "AccessType"
+msgid "multi-valued"
+msgstr "moniarvoinen"
+
 #: tilavarauspalvelu/integrations/email/template_context/application.py
 msgctxt "Email"
 msgid "'My applications' page"
