@@ -29,7 +29,9 @@
       "Suitable time range must be at least as long as the minimum duration": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
       "At least as many suitable time ranges as applied reservations per week": "Select more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
       "Array must contain at least 1 element(s)": "Valitse kalenterista aikatoiveita"
-    }
+    },
+    "previewError": "Page {{ page }} has an error.",
+    "fix": "Fix"
   },
   "Intro": {
     "startNewApplication": "Apply",

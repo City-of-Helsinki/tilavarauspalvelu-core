@@ -40,6 +40,7 @@
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED":  "Varaajan on oltava täysi-ikäinen.",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Hakijan on oltava täysi-ikäinen.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "Toivottu aika on liian lyhyt.",
+      "APPLICATION_SECTION_SUITABLE_TIME_RANGES_MISSING": "Sopivat ajat puuttuvat.",
       "APPLICATION_SECTIONS_MISSING": "Hakemusosio puuttuu.",
       "APPLICATION_CONTACT_PERSON_MISSING": "Yhteyshenkilö puuttuu.",
       "APPLICATION_BILLING_ADDRESS_MISSING": "Laskutusosoite puuttuu.",

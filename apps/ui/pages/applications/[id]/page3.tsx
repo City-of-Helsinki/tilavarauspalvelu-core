@@ -133,6 +133,7 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
               {t("application:Page3.subHeading.basicInfo")}
             </FormSubHeading>
             <Page3Form />
+            {/* TODO this has an issue that the email is vislbe while type is not selected (other fields are not) */}
             <SpanFullRow>
               <Notification
                 size={NotificationSize.Small}

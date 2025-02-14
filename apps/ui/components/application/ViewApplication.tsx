@@ -11,7 +11,6 @@ import {
   ApplicationSection,
   ApplicationSectionHeader,
   StyledNotification,
-  TermsAccordion as Accordion,
 } from "./styled";
 import { ApplicationEventList } from "./ApplicationEventList";
 import { Sanitize } from "common/src/components/Sanitize";
@@ -53,38 +52,30 @@ export function ViewApplication({
         <ApplicationEventList application={application} />
       </div>
       {tos && (
-        <Accordion
+        <TermsBox
           id="preview.acceptTermsOfUse"
-          heading={t("reservationUnit:termsOfUse")}
-          open
-        >
-          <TermsBox
-            id="preview.acceptTermsOfUse"
-            body={<Sanitize html={getTranslationSafe(tos, "text", lang)} />}
-            acceptLabel={t("application:preview.userAcceptsGeneralTerms")}
-            accepted={isTermsAccepted?.general}
-            setAccepted={
-              setIsTermsAccepted
-                ? (val) => setIsTermsAccepted("general", val)
-                : undefined
-            }
-          />
-        </Accordion>
+          body={<Sanitize html={getTranslationSafe(tos, "text", lang)} />}
+          acceptLabel={t("application:preview.userAcceptsGeneralTerms")}
+          accepted={isTermsAccepted?.general}
+          setAccepted={
+            setIsTermsAccepted
+              ? (val) => setIsTermsAccepted("general", val)
+              : undefined
+          }
+        />
       )}
       {tos2 && (
-        <Accordion heading={t("application:preview.reservationUnitTerms")} open>
-          <TermsBox
-            id="preview.acceptServiceSpecificTerms"
-            body={<Sanitize html={getTranslationSafe(tos2, "text", lang)} />}
-            acceptLabel={t("application:preview.userAcceptsSpecificTerms")}
-            accepted={isTermsAccepted?.specific}
-            setAccepted={
-              setIsTermsAccepted
-                ? (val) => setIsTermsAccepted("specific", val)
-                : undefined
-            }
-          />
-        </Accordion>
+        <TermsBox
+          id="preview.acceptServiceSpecificTerms"
+          body={<Sanitize html={getTranslationSafe(tos2, "text", lang)} />}
+          acceptLabel={t("application:preview.userAcceptsSpecificTerms")}
+          accepted={isTermsAccepted?.specific}
+          setAccepted={
+            setIsTermsAccepted
+              ? (val) => setIsTermsAccepted("specific", val)
+              : undefined
+          }
+        />
       )}
       {shouldShowNotification && (
         <div>

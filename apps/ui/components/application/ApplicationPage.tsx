@@ -2,17 +2,14 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import {
-  ApplicantTypeChoice,
-  ApplicationFormFragment,
-  ApplicationStatusChoice,
-} from "@gql/gql-types";
+import { type ApplicationFormFragment } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 import { Breadcrumb } from "../common/Breadcrumb";
 import { fontBold, H1 } from "common";
 import { Stepper as HDSStepper, StepState } from "hds-react";
+import { validateApplication } from "./form";
 
 const InnerContainer = styled.div`
   display: grid;
@@ -42,78 +39,59 @@ const StyledStepper = styled(HDSStepper)`
   }
 `;
 
-// TODO this should have more complete checks (but we are thinking of splitting the form anyway)
-function calculateCompletedStep(aes: Node): 0 | 1 | 2 | 3 | 4 {
-  const { status } = aes;
-  // 4 should only be returned if the application state === Received
-  if (status === ApplicationStatusChoice.Received) {
-    return 4;
-  }
+function calculateCompletedStep(
+  application: ApplicationFormFragment
+): -1 | 0 | 1 | 2 | 3 {
+  const isValid = validateApplication(application);
 
-  // 3 if the user information is filled
-  if (
-    (aes.billingAddress?.streetAddressFi &&
-      aes.applicantType === ApplicantTypeChoice.Individual) ||
-    aes.contactPerson != null
-  ) {
+  if (isValid.valid) {
     return 3;
   }
 
-  // 2 only if application events have time schedules
-  if (
-    aes.applicationSections?.length &&
-    aes.applicationSections?.find((x) => x?.suitableTimeRanges) != null
-  ) {
+  const { page } = isValid;
+  if (page === 1) {
+    return 0;
+  } else if (page === 2) {
+    return 1;
+  } else if (page === 3) {
     return 2;
   }
-
-  // First page is valid
-  if (
-    aes.applicationSections?.[0]?.reservationUnitOptions?.length &&
-    aes.applicationSections?.[0]?.reservationsBeginDate &&
-    aes.applicationSections?.[0]?.reservationsEndDate &&
-    aes.applicationSections?.[0]?.name &&
-    aes.applicationSections?.[0]?.numPersons &&
-    aes.applicationSections?.[0]?.purpose
-  ) {
-    return 1;
-  }
-  return 0;
+  return -1;
 }
 
-type Node = ApplicationFormFragment;
+function getStepState(completedStep: number, step: number) {
+  if (step - 1 === completedStep) {
+    return StepState.available;
+  }
+  if (completedStep >= step) {
+    return StepState.completed;
+  }
+  return StepState.disabled;
+}
+
 type ApplicationPageProps = {
-  application: Node;
+  application: ApplicationFormFragment;
   translationKeyPrefix: string;
   overrideText?: string;
   children?: React.ReactNode;
   headContent?: React.ReactNode;
 };
 
-const getStep = (slug: string) => {
-  switch (slug) {
-    case "page1":
-      return 0;
-    case "page2":
-      return 1;
-    case "page3":
-      return 2;
-    case "preview":
-      return 3;
-    default:
-      return 0;
-  }
-};
+// Ordered list of steps by page slug
+export const PAGES_WITH_STEPPER = [
+  "page1",
+  "page2",
+  "page3",
+  "preview",
+] as const;
 
-const getStepState = (completedStep: number, step: number) => {
-  if (completedStep === step) {
-    return StepState.completed;
+function getStep(slug: string) {
+  const index = PAGES_WITH_STEPPER.findIndex((x) => x === slug);
+  if (index === -1) {
+    return 0;
   }
-  if (completedStep > step) {
-    return StepState.completed;
-  }
-  return StepState.disabled;
-};
+  return index;
+}
 
 export function ApplicationPageWrapper({
   application,
@@ -126,12 +104,10 @@ export function ApplicationPageWrapper({
   const router = useRouter();
   const { asPath, push } = router;
 
-  const pages = ["page1", "page2", "page3", "preview"] as const;
-
   const hideStepper =
-    pages.filter((x) => router.asPath.match(`/${x}`)).length === 0;
+    PAGES_WITH_STEPPER.filter((x) => router.asPath.match(`/${x}`)).length === 0;
   const completedStep = calculateCompletedStep(application);
-  const steps = pages.map((x, i) => ({
+  const steps = PAGES_WITH_STEPPER.map((x, i) => ({
     label: t(`application:navigation.${x}`),
     state: getStepState(completedStep, i),
   }));

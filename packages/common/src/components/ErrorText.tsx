@@ -9,7 +9,7 @@ const StyledNotification = styled(Notification)`
 `;
 
 type Props = {
-  children: string;
+  children: React.ReactNode;
   size?: NotificationSize;
   noTitle?: boolean;
   title?: string;
