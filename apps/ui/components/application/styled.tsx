@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { Notification } from "hds-react";
 import { breakpoints, fontMedium, fontRegular } from "common";
-import { AccordionWithState } from "@/components/Accordion";
 import { H5 } from "common/src/common/typography";
 import { Flex, FullRow } from "common/styles/util";
 
@@ -156,14 +155,6 @@ export const ScheduleDay = styled.div`
   grid-template-columns: 3rem 1fr 1fr;
   span:last-child {
     padding-left: var(--spacing-xs);
-  }
-`;
-
-export const TermsAccordion = styled(AccordionWithState)`
-  margin-bottom: 0;
-  --accordion-border-color: var(--color-black-90);
-  [class^="Button-module_label"] div {
-    font-size: var(--fontsize-heading-s);
   }
 `;
 

@@ -8,8 +8,8 @@ import {
   Priority,
   type UpdateApplicationSectionForApplicationSerializerInput,
   type ApplicantFragment,
-  type ApplicationPage1Query,
   type ApplicationPage2Query,
+  ApplicationFormFragment,
 } from "@gql/gql-types";
 import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
@@ -21,11 +21,11 @@ import {
 } from "common/src/schemas/schemaCommon";
 import { convertWeekday } from "common/src/conversion";
 
-// TODO fragment
-type Node = NonNullable<ApplicationPage1Query["application"]>;
-type Organisation = Node["organisation"];
+type Organisation = ApplicationFormFragment["organisation"];
 type Address = NonNullable<Organisation>["address"];
-type SectionType = NonNullable<Node["applicationSections"]>[0];
+type SectionType = NonNullable<
+  ApplicationFormFragment["applicationSections"]
+>[0];
 
 type NodePage2 = NonNullable<ApplicationPage2Query["application"]>;
 type SectionTypePage2 = NonNullable<NodePage2["applicationSections"]>[0];
@@ -594,7 +594,7 @@ export function convertApplicationPage2(
   };
 }
 export function convertApplicationPage1(
-  app: Node,
+  app: ApplicationFormFragment,
   // We pass reservationUnits here so we have a default selection for a new application section
   reservationUnits: number[]
 ): ApplicationPage1FormValues {
@@ -720,4 +720,29 @@ export function transformPage3Application(
       ? { homeCity: values.homeCity }
       : {}),
   };
+}
+
+export function validateApplication(
+  application: ApplicationFormFragment
+): { valid: true } | { valid: false; page: 1 | 2 | 3 } {
+  const { applicationRound } = application;
+  const begin = new Date(applicationRound.reservationPeriodBegin);
+  const end = new Date(applicationRound.reservationPeriodEnd);
+  const schema = ApplicationPage1SchemaRefined({ begin, end });
+  const page1 = schema.safeParse(convertApplicationPage1(application, []));
+  if (!page1.success) {
+    return { valid: false, page: 1 };
+  }
+  const form2 = convertApplicationPage2(application);
+  const page2 = ApplicationPage2Schema.safeParse(form2);
+  if (!page2.success) {
+    return { valid: false, page: 2 };
+  }
+  const page3 = ApplicationPage3Schema.safeParse(
+    convertApplicationPage3(application)
+  );
+  if (!page3.success) {
+    return { valid: false, page: 3 };
+  }
+  return { valid: true };
 }

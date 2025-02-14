@@ -11,7 +11,10 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ViewApplication } from "@/components/application/ViewApplication";
 import { createApolloClient } from "@/modules/apolloClient";
-import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
+import {
+  ApplicationPageWrapper,
+  PAGES_WITH_STEPPER,
+} from "@/components/application/ApplicationPage";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -28,6 +31,9 @@ import {
   LoadingSpinner,
 } from "hds-react";
 import { useDisplayError } from "@/hooks/useDisplayError";
+import { ErrorText } from "common/src/components/ErrorText";
+import Link from "next/link";
+import { validateApplication } from "@/components/application/form";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -85,6 +91,8 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
     }
   };
 
+  const isValid = validateApplication(application);
+
   return (
     <ApplicationPageWrapper
       translationKeyPrefix="application:preview"
@@ -97,6 +105,20 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
           isTermsAccepted={isTermsAccepted}
           setIsTermsAccepted={handleTermsAcceptedChange}
         />
+        {!isValid.valid && (
+          <ErrorText>
+            {t("application:validation.previewError", {
+              page: t(
+                `application:navigation.${PAGES_WITH_STEPPER[isValid.page]}`
+              ),
+            })}{" "}
+            <Link
+              href={getApplicationPath(application.pk, `page${isValid.page}`)}
+            >
+              {t("application:validation.fix")}
+            </Link>
+          </ErrorText>
+        )}
         <ButtonContainer>
           <ButtonLikeLink href={getApplicationPath(application.pk, "page3")}>
             <IconArrowLeft />

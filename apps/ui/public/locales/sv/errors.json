@@ -40,6 +40,7 @@
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "Personen som gör bokningen måste vara myndig.",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "Sökanden måste vara myndig.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "Önskad tid är för kort.",
+      "APPLICATION_SECTION_SUITABLE_TIME_RANGES_MISSING": "Passande tider saknas.",
       "APPLICATION_SECTIONS_MISSING": "Ansökningsavsnitt saknas.",
       "APPLICATION_CONTACT_PERSON_MISSING": "Kontaktperson saknas.",
       "APPLICATION_BILLING_ADDRESS_MISSING": "Faktureringsadress saknas.",

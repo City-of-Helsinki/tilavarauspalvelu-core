@@ -40,6 +40,7 @@
       "RESERVATION_UNIT_ADULT_RESERVEE_REQUIRED": "The person making the reservation must be 18 years old",
       "APPLICATION_ADULT_RESERVEE_REQUIRED": "The applicant must be 18 years old.",
       "APPLICATION_SECTION_SUITABLE_TIME_RANGES_TOO_SHORT": "The desired time is too short.",
+      "APPLICATION_SECTION_SUITABLE_TIME_RANGES_MISSING": "Suitable times are missing.",
       "APPLICATION_SECTIONS_MISSING": "Application section is missing.",
       "APPLICATION_CONTACT_PERSON_MISSING": "Contact person is missing.",
       "APPLICATION_BILLING_ADDRESS_MISSING": "Billing address is missing.",
