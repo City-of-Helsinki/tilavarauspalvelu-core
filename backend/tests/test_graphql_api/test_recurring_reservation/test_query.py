@@ -1,13 +1,33 @@
 from __future__ import annotations
 
-import freezegun
+from typing import TYPE_CHECKING
+
 import pytest
+from freezegun import freeze_time
+from graphql_relay import to_global_id
 
-from tilavarauspalvelu.enums import RejectionReadinessChoice, Weekday
+from tilavarauspalvelu.enums import (
+    AccessType,
+    RejectionReadinessChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+    Weekday,
+)
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.keyless_entry.typing import (
+    PindoraReservationSeriesAccessCodeValidity,
+    PindoraReservationSeriesResponse,
+)
+from utils.date_utils import local_datetime
 
-from tests.factories import RecurringReservationFactory
+from tests.factories import RecurringReservationFactory, ReservationFactory
+from tests.helpers import patch_method
 
-from .helpers import recurring_reservations_query
+from .helpers import recurring_reservation_query, recurring_reservations_query
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import RecurringReservation
 
 # Applied to all tests
 pytestmark = [
@@ -16,14 +36,7 @@ pytestmark = [
 
 
 def test_recurring_reservations__query(graphql):
-    recurring_reservation = RecurringReservationFactory.create(
-        reservations__name="foo",
-        age_group__minimum=18,
-        age_group__maximum=30,
-        ability_group__name="foo",
-        rejected_occurrences__rejection_reason=RejectionReadinessChoice.INTERVAL_NOT_ALLOWED,
-        allocated_time_slot__day_of_the_week=Weekday.MONDAY,
-    )
+    recurring_reservation = RecurringReservationFactory.create()
     graphql.login_with_superuser()
 
     fields = """
@@ -38,6 +51,45 @@ def test_recurring_reservations__query(graphql):
         recurrenceInDays
         weekdays
         created
+        shouldHaveActiveAccessCode
+        accessType
+    """
+    query = recurring_reservations_query(fields=fields)
+    response = graphql(query)
+
+    assert response.has_errors is False
+
+    assert len(response.edges) == 1
+    assert response.node(0) == {
+        "pk": recurring_reservation.pk,
+        "extUuid": str(recurring_reservation.ext_uuid),
+        "name": recurring_reservation.name,
+        "description": recurring_reservation.description,
+        "beginDate": recurring_reservation.begin_date.isoformat(),
+        "endDate": recurring_reservation.end_date.isoformat(),
+        "beginTime": recurring_reservation.begin_time.isoformat(),
+        "endTime": recurring_reservation.end_time.isoformat(),
+        "recurrenceInDays": recurring_reservation.recurrence_in_days,
+        "weekdays": [0],
+        "created": recurring_reservation.created.isoformat(),
+        "shouldHaveActiveAccessCode": False,
+        "accessType": AccessType.UNRESTRICTED.value,
+    }
+
+
+def test_recurring_reservations__query__relations(graphql):
+    recurring_reservation = RecurringReservationFactory.create(
+        reservations__name="foo",
+        age_group__minimum=18,
+        age_group__maximum=30,
+        ability_group__name="foo",
+        rejected_occurrences__rejection_reason=RejectionReadinessChoice.INTERVAL_NOT_ALLOWED,
+        allocated_time_slot__day_of_the_week=Weekday.MONDAY,
+    )
+    graphql.login_with_superuser()
+
+    fields = """
+        pk
         user {
             email
         }
@@ -79,16 +131,6 @@ def test_recurring_reservations__query(graphql):
     assert len(response.edges) == 1
     assert response.node(0) == {
         "pk": recurring_reservation.pk,
-        "extUuid": str(recurring_reservation.ext_uuid),
-        "name": recurring_reservation.name,
-        "description": recurring_reservation.description,
-        "beginDate": recurring_reservation.begin_date.isoformat(),
-        "endDate": recurring_reservation.end_date.isoformat(),
-        "beginTime": recurring_reservation.begin_time.isoformat(),
-        "endTime": recurring_reservation.end_time.isoformat(),
-        "recurrenceInDays": recurring_reservation.recurrence_in_days,
-        "weekdays": [0],
-        "created": recurring_reservation.created.isoformat(),
         "user": {
             "email": recurring_reservation.user.email,
         },
@@ -125,267 +167,191 @@ def test_recurring_reservations__query(graphql):
     }
 
 
-def test_recurring_reservations__filter__by_user(graphql):
-    recurring_reservation = RecurringReservationFactory.create()
-    RecurringReservationFactory.create()
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(user=recurring_reservation.user.pk)
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": recurring_reservation.pk}
-
-
-@pytest.mark.parametrize(
-    ("field", "value"),
-    [
-        ("reservationUnitNameFi", "FI"),
-        ("reservationUnitNameEn", "EN"),
-        ("reservationUnitNameSv", "SV"),
-    ],
-)
-def test_recurring_reservations__filter__by_reservation_unit_name(graphql, field, value):
-    recurring_reservation = RecurringReservationFactory.create(
-        name="1",
-        reservation_unit__name_fi="FI",
-        reservation_unit__name_en="EN",
-        reservation_unit__name_sv="SV",
-    )
-    RecurringReservationFactory.create(
-        name="2",
-        reservation_unit__name_fi="foo",
-        reservation_unit__name_en="bar",
-        reservation_unit__name_sv="baz",
-    )
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(**{field: value})
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": recurring_reservation.pk}
-
-
-@pytest.mark.parametrize(
-    ("field", "value"),
-    [
-        ("reservationUnitNameFi", "FI, foo"),
-        ("reservationUnitNameEn", "EN, bar"),
-        ("reservationUnitNameSv", "SV, baz"),
-    ],
-)
-def test_recurring_reservations__filter__by_reservation_unit_name__multiple(graphql, field, value):
-    recurring_reservation_1 = RecurringReservationFactory.create(
-        name="1",
-        reservation_unit__name_fi="FI",
-        reservation_unit__name_en="EN",
-        reservation_unit__name_sv="SV",
-    )
-    recurring_reservation_2 = RecurringReservationFactory.create(
-        name="2",
-        reservation_unit__name_fi="foo",
-        reservation_unit__name_en="bar",
-        reservation_unit__name_sv="baz",
-    )
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(**{field: value})
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": recurring_reservation_1.pk}
-    assert response.node(1) == {"pk": recurring_reservation_2.pk}
-
-
-def test_recurring_reservations__filter__by_reservation_unit(graphql):
-    recurring_reservation = RecurringReservationFactory.create()
-    RecurringReservationFactory.create()
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(reservationUnit=recurring_reservation.reservation_unit.pk)
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": recurring_reservation.pk}
-
-
-def test_recurring_reservations__filter__by_reservation_unit__multiple(graphql):
-    recurring_reservation_1 = RecurringReservationFactory.create(name="1")
-    recurring_reservation_2 = RecurringReservationFactory.create(name="2")
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(
-        reservationUnit=[recurring_reservation_1.reservation_unit.pk, recurring_reservation_2.reservation_unit.pk],
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": recurring_reservation_1.pk}
-    assert response.node(1) == {"pk": recurring_reservation_2.pk}
-
-
-def test_recurring_reservations__filter__by_unit(graphql):
-    recurring_reservation = RecurringReservationFactory.create()
-    RecurringReservationFactory.create()
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(unit=recurring_reservation.reservation_unit.unit.pk)
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": recurring_reservation.pk}
-
-
-def test_recurring_reservations__filter__by_unit__multiple(graphql):
-    recurring_reservation_1 = RecurringReservationFactory.create(name="1")
-    recurring_reservation_2 = RecurringReservationFactory.create(name="2")
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(
-        unit=[recurring_reservation_1.reservation_unit.unit.pk, recurring_reservation_2.reservation_unit.unit.pk],
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": recurring_reservation_1.pk}
-    assert response.node(1) == {"pk": recurring_reservation_2.pk}
-
-
-def test_recurring_reservations__filter__by_reservation_unit_type(graphql):
-    recurring_reservation = RecurringReservationFactory.create(reservation_unit__reservation_unit_type__name="foo")
-    RecurringReservationFactory.create(reservation_unit__reservation_unit_type__name="bar")
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(
-        reservation_unit_type=recurring_reservation.reservation_unit.reservation_unit_type.pk,
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 1
-    assert response.node(0) == {"pk": recurring_reservation.pk}
-
-
-def test_recurring_reservations__filter__by_reservation_unit_type__multiple(graphql):
-    recurring_reservation_1 = RecurringReservationFactory.create(
-        name="1",
-        reservation_unit__reservation_unit_type__name="foo",
-    )
-    recurring_reservation_2 = RecurringReservationFactory.create(
-        name="2",
-        reservation_unit__reservation_unit_type__name="bar",
-    )
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(
-        reservation_unit_type=[
-            recurring_reservation_1.reservation_unit.reservation_unit_type.pk,
-            recurring_reservation_2.reservation_unit.reservation_unit_type.pk,
+def pindora_response(series: RecurringReservation) -> PindoraReservationSeriesResponse:
+    return PindoraReservationSeriesResponse(
+        reservation_unit_id=series.reservation_unit.uuid,
+        access_code="1234",
+        access_code_generated_at=local_datetime(2022, 1, 1, 12),
+        access_code_is_active=True,
+        access_code_keypad_url="https://keypad.url",
+        access_code_phone_number="123456789",
+        access_code_sms_number="123456789",
+        access_code_sms_message="123456789",
+        reservation_unit_code_validity=[
+            PindoraReservationSeriesAccessCodeValidity(
+                access_code_valid_minutes_before=10,
+                access_code_valid_minutes_after=5,
+                begin=local_datetime(2022, 1, 1, 12),
+                end=local_datetime(2022, 1, 1, 13),
+            )
         ],
     )
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": recurring_reservation_1.pk}
-    assert response.node(1) == {"pk": recurring_reservation_2.pk}
 
 
-@pytest.mark.parametrize(
-    "field",
-    [
-        "reservationUnitNameFiAsc",
-        "reservationUnitNameEnAsc",
-        "reservationUnitNameSvAsc",
-    ],
-)
-def test_recurring_reservations__order__by_reservation_unit_name(graphql, field):
-    recurring_reservation_1 = RecurringReservationFactory.create(
-        reservation_unit__name_fi="1",
-        reservation_unit__name_en="3",
-        reservation_unit__name_sv="2",
+def pindora_query(series: RecurringReservation) -> str:
+    fields = """
+        pindoraInfo {
+            accessCode
+            accessCodeGeneratedAt
+            accessCodeIsActive
+            accessCodeKeypadUrl
+            accessCodePhoneNumber
+            accessCodeSmsNumber
+            accessCodeSmsMessage
+            accessCodeValidity {
+                accessCodeBeginsAt
+                accessCodeEndsAt
+            }
+        }
+    """
+    global_id = to_global_id("RecurringReservationNode", series.pk)
+    return recurring_reservation_query(fields=fields, id=global_id)
+
+
+@freeze_time(local_datetime(2022, 1, 1))
+def test_recurring_reservations__query__pindora_info(graphql):
+    series = RecurringReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 10),
+        end=local_datetime(2022, 1, 1, 12),
     )
-    recurring_reservation_2 = RecurringReservationFactory.create(
-        reservation_unit__name_fi="4",
-        reservation_unit__name_en="6",
-        reservation_unit__name_sv="5",
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
     )
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(order_by=field)
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": recurring_reservation_1.pk}
-    assert response.node(1) == {"pk": recurring_reservation_2.pk}
-
-
-@pytest.mark.parametrize(
-    "field",
-    [
-        "unitNameFiAsc",
-        "unitNameEnAsc",
-        "unitNameSvAsc",
-    ],
-)
-def test_recurring_reservations__order__by_unit_name(graphql, field):
-    recurring_reservation_1 = RecurringReservationFactory.create(
-        reservation_unit__unit__name_fi="1",
-        reservation_unit__unit__name_en="3",
-        reservation_unit__unit__name_sv="2",
-    )
-    recurring_reservation_2 = RecurringReservationFactory.create(
-        reservation_unit__unit__name_fi="4",
-        reservation_unit__unit__name_en="6",
-        reservation_unit__unit__name_sv="5",
-    )
-    graphql.login_with_superuser()
-
-    query = recurring_reservations_query(order_by=field)
-    response = graphql(query)
-
-    assert response.has_errors is False
-
-    assert len(response.edges) == 2
-    assert response.node(0) == {"pk": recurring_reservation_1.pk}
-    assert response.node(1) == {"pk": recurring_reservation_2.pk}
-
-
-def test_recurring_reservations__order__by_crated(graphql):
-    with freezegun.freeze_time("2023-01-02T12:00:00Z") as frozen_time:
-        recurring_reservation_1 = RecurringReservationFactory.create()
-        frozen_time.move_to("2023-01-03T12:00:00Z")
-        recurring_reservation_2 = RecurringReservationFactory.create()
-        frozen_time.move_to("2023-01-01T12:00:00Z")
-        recurring_reservation_3 = RecurringReservationFactory.create()
 
     graphql.login_with_superuser()
 
-    query = recurring_reservations_query(order_by="createdAsc")
-    response = graphql(query)
+    query = pindora_query(series)
 
-    assert response.has_errors is False
+    with patch_method(PindoraClient.get_reservation_series, return_value=pindora_response(series)):
+        response = graphql(query)
 
-    assert len(response.edges) == 3
-    assert response.node(0) == {"pk": recurring_reservation_3.pk}
-    assert response.node(1) == {"pk": recurring_reservation_1.pk}
-    assert response.node(2) == {"pk": recurring_reservation_2.pk}
+    assert response.has_errors is False, response
+
+    assert response.first_query_object["pindoraInfo"] == {
+        "accessCode": "1234",
+        "accessCodeGeneratedAt": "2022-01-01T12:00:00+02:00",
+        "accessCodeIsActive": True,
+        "accessCodeKeypadUrl": "https://keypad.url",
+        "accessCodePhoneNumber": "123456789",
+        "accessCodeSmsMessage": "123456789",
+        "accessCodeSmsNumber": "123456789",
+        "accessCodeValidity": [
+            {
+                "accessCodeBeginsAt": "2022-01-01T11:50:00+02:00",
+                "accessCodeEndsAt": "2022-01-01T13:05:00+02:00",
+            }
+        ],
+    }
+
+
+@freeze_time(local_datetime(2022, 1, 1))
+@pytest.mark.parametrize("as_reservee", [True, False])
+def test_recurring_reservations__query__pindora_info__access_code_not_active(graphql, as_reservee):
+    series = RecurringReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 10),
+        end=local_datetime(2022, 1, 1, 12),
+    )
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    if as_reservee:
+        graphql.force_login(series.user)
+    else:
+        graphql.login_with_superuser()
+
+    query = pindora_query(series)
+
+    response = pindora_response(series)
+    response["access_code_is_active"] = False
+
+    with patch_method(PindoraClient.get_reservation_series, return_value=response):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    if as_reservee:
+        assert response.first_query_object["pindoraInfo"] is None
+    else:
+        assert response.first_query_object["pindoraInfo"] is not None
+
+
+@freeze_time(local_datetime(2022, 1, 1))
+def test_recurring_reservations__query__pindora_info__access_type_not_access_code(graphql):
+    series = RecurringReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 10),
+        end=local_datetime(2022, 1, 1, 12),
+    )
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.PHYSICAL_KEY,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    graphql.login_with_superuser()
+
+    query = pindora_query(series)
+
+    with patch_method(PindoraClient.get_reservation_series, return_value=pindora_response(series)):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    assert response.first_query_object["pindoraInfo"] is None
+
+
+@freeze_time(local_datetime(2022, 1, 1))
+def test_recurring_reservations__query__pindora_info__pindora_call_fails(graphql):
+    series = RecurringReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 10),
+        end=local_datetime(2022, 1, 1, 12),
+    )
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    graphql.login_with_superuser()
+
+    query = pindora_query(series)
+
+    with patch_method(PindoraClient.get_reservation_series, side_effect=PindoraAPIError("Error")):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    assert response.first_query_object["pindoraInfo"] is None
+
+
+@freeze_time(local_datetime(2022, 1, 3))
+def test_recurring_reservations__query__pindora_info__reservation_past(graphql):
+    series = RecurringReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 10),
+        end=local_datetime(2022, 1, 1, 12),
+    )
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    graphql.login_with_superuser()
+
+    query = pindora_query(series)
+
+    with patch_method(PindoraClient.get_reservation_series, return_value=pindora_response(series)):
+        response = graphql(query)
+
+    assert response.has_errors is False, response
+
+    assert response.first_query_object["pindoraInfo"] is None

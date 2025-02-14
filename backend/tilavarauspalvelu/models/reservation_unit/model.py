@@ -124,7 +124,7 @@ class ReservationUnit(models.Model):
     )
     access_type: str = models.CharField(
         max_length=20,
-        choices=AccessType.choices,
+        choices=AccessType.model_choices,
         default=AccessType.UNRESTRICTED.value,
     )
 

@@ -4,13 +4,17 @@ import uuid
 from functools import cached_property
 from typing import TYPE_CHECKING
 
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.contrib.postgres.fields.array import IndexTransform
 from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 from django.db.models import Exists
+from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
-from tilavarauspalvelu.enums import WeekdayChoice
+from tilavarauspalvelu.enums import AccessType, WeekdayChoice
+from utils.db import SubqueryArray
 
 from .queryset import RecurringReservationManager
 
@@ -143,3 +147,52 @@ class RecurringReservation(models.Model):
     @should_have_active_access_code.override
     def _(self) -> bool:
         return self.reservations.filter(L(access_code_should_be_active=True)).exists()
+
+    @lookup_property(skip_codegen=True)
+    def used_access_types() -> list[AccessType]:
+        """List of all unique access types used in the reservations of this recurring reservation."""
+        from tilavarauspalvelu.models import Reservation
+
+        sq = SubqueryArray(
+            Reservation.objects.filter(recurring_reservation=models.OuterRef("pk")).values("access_type"),
+            agg_field="access_type",
+            distinct=True,
+            coalesce_output_type="varchar",
+            output_field=models.CharField(),
+        )
+        return sq  # type: ignore[return-value]  # noqa: RET504
+
+    @used_access_types.override
+    def _(self) -> list[AccessType]:
+        qs = self.reservations.aggregate(used_access_types=Coalesce(ArrayAgg("access_type", distinct=True), []))
+        return [AccessType(access_type) for access_type in qs["used_access_types"]]
+
+    @lookup_property(joins=["reservations"], skip_codegen=True)
+    def access_type() -> AccessType:
+        """
+        If reservations in this reservation series have different access types,
+        return the 'MULTIVALUED' access type, otherwise return the common access type.
+        """
+        case = models.Case(
+            models.When(
+                L(used_access_types__len__gt=1),
+                then=models.Value(AccessType.MULTIVALUED.value),
+            ),
+            default=Coalesce(
+                # "used_access_types__1" doesn't work with lookup properties.
+                # Note: Postgres arrays are 1-indexed by default.
+                IndexTransform(1, models.CharField(), L("used_access_types")),
+                models.Value(AccessType.UNRESTRICTED.value),  # If no reservations in series
+            ),
+            output_field=models.CharField(),
+        )
+        return case  # type: ignore[return-value]  # noqa: RET504
+
+    @access_type.override
+    def _(self) -> AccessType:
+        access_types: list[str] = self.used_access_types  # type: ignore[attr-defined]
+        if len(access_types) == 0:
+            return AccessType.UNRESTRICTED
+        if len(access_types) == 1:
+            return AccessType(access_types[0])
+        return AccessType.MULTIVALUED
