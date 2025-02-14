@@ -24,7 +24,11 @@ from .filtersets import ReservationFilterSet
 from .permissions import ReservationPermission
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import PaymentOrder
+    from tilavarauspalvelu.integrations.keyless_entry.typing import (
+        PindoraReservationSeriesAccessCodeValidity,
+        PindoraSeasonalBookingAccessCodeValidity,
+    )
+    from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, RecurringReservation
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import AnyUser, GQLInfo
 
@@ -33,7 +37,7 @@ __all__ = [
 ]
 
 
-class PindoraInfoData(NamedTuple):
+class PindoraReservationInfoData(NamedTuple):
     access_code: str
     access_code_generated_at: datetime.datetime
     access_code_is_active: bool
@@ -291,13 +295,9 @@ class ReservationNode(DjangoNode):
         signature = ical_hmac_signature(f"reservation-{root.pk}")
         return f"{scheme}://{host}{calendar_url}?hash={signature}"
 
-    def resolve_pindora_info(root: Reservation, info: GQLInfo) -> PindoraInfoData | None:
+    def resolve_pindora_info(root: Reservation, info: GQLInfo) -> PindoraReservationInfoData | None:
         # No Pindora info if access type is not 'ACCESS_CODE'
         if root.access_type != AccessType.ACCESS_CODE:
-            return None
-
-        # TODO: Implement fetching by recurring reservation / application section.
-        if root.recurring_reservation is not None:
             return None
 
         # No need to show Pindora info after 24 hours have passed since it ended
@@ -306,20 +306,28 @@ class ReservationNode(DjangoNode):
         if now > cutoff:
             return None
 
-        has_view_permissions = info.context.user.permissions.can_view_reservation(root, reserver_needs_role=True)
+        has_perms = info.context.user.permissions.can_view_reservation(root, reserver_needs_role=True)
 
         # Don't allow reserver to view Pindora info without view permissions if the reservation is not confirmed
-        if not has_view_permissions and root.state != ReservationStateChoice.CONFIRMED:
+        if not has_perms and root.state != ReservationStateChoice.CONFIRMED:
             return None
+
+        if root.recurring_reservation is not None:
+            return ReservationNode.series_pindora_info(
+                root.recurring_reservation,
+                begin=root.begin.astimezone(DEFAULT_TIMEZONE),
+                end=root.end.astimezone(DEFAULT_TIMEZONE),
+                has_perms=has_perms,
+            )
 
         try:
             response = PindoraClient.get_reservation(reservation=root.ext_uuid)
         except Exception:  # noqa: BLE001
             return None
 
-        # Don't allow reserver to view Pindora info without view permissions if the access code is not active
+        # Don't allow reserver to view Pindora info without permissions if the access code is not active
         access_code_is_active = response["access_code_is_active"]
-        if not has_view_permissions and not access_code_is_active:
+        if not has_perms and not access_code_is_active:
             return None
 
         begin = response["begin"]
@@ -329,7 +337,111 @@ class ReservationNode(DjangoNode):
         access_code_begins_at = begin - datetime.timedelta(minutes=access_code_valid_minutes_before)
         access_code_ends_at = end + datetime.timedelta(minutes=access_code_valid_minutes_after)
 
-        return PindoraInfoData(
+        return PindoraReservationInfoData(
+            access_code=response["access_code"],
+            access_code_generated_at=response["access_code_generated_at"],
+            access_code_is_active=access_code_is_active,
+            access_code_keypad_url=response["access_code_keypad_url"],
+            access_code_phone_number=response["access_code_phone_number"],
+            access_code_sms_number=response["access_code_sms_number"],
+            access_code_sms_message=response["access_code_sms_message"],
+            access_code_begins_at=access_code_begins_at,
+            access_code_ends_at=access_code_ends_at,
+        )
+
+    @staticmethod
+    def series_pindora_info(
+        series: RecurringReservation,
+        *,
+        begin: datetime.datetime,
+        end: datetime.datetime,
+        has_perms: bool,
+    ) -> PindoraReservationInfoData | None:
+        if series.allocated_time_slot is not None:
+            return ReservationNode.section_pindora_info(
+                series.allocated_time_slot.reservation_unit_option.application_section,
+                begin=begin,
+                end=end,
+                has_perms=has_perms,
+            )
+
+        try:
+            response = PindoraClient.get_reservation_series(series=series.ext_uuid)
+        except Exception:  # noqa: BLE001
+            return None
+
+        # Don't allow reserver to view Pindora info without permissions if the access code is not active
+        access_code_is_active = response["access_code_is_active"]
+        if not has_perms and not access_code_is_active:
+            return None
+
+        validity: PindoraReservationSeriesAccessCodeValidity | None = next(
+            (
+                validity
+                for validity in response["reservation_unit_code_validity"]
+                if validity["begin"] == begin and validity["end"] == end
+            ),
+            None,
+        )
+        if validity is None:
+            return None
+
+        begin = validity["begin"]
+        end = validity["end"]
+        access_code_valid_minutes_before = validity["access_code_valid_minutes_before"]
+        access_code_valid_minutes_after = validity["access_code_valid_minutes_after"]
+        access_code_begins_at = begin - datetime.timedelta(minutes=access_code_valid_minutes_before)
+        access_code_ends_at = end + datetime.timedelta(minutes=access_code_valid_minutes_after)
+
+        return PindoraReservationInfoData(
+            access_code=response["access_code"],
+            access_code_generated_at=response["access_code_generated_at"],
+            access_code_is_active=access_code_is_active,
+            access_code_keypad_url=response["access_code_keypad_url"],
+            access_code_phone_number=response["access_code_phone_number"],
+            access_code_sms_number=response["access_code_sms_number"],
+            access_code_sms_message=response["access_code_sms_message"],
+            access_code_begins_at=access_code_begins_at,
+            access_code_ends_at=access_code_ends_at,
+        )
+
+    @staticmethod
+    def section_pindora_info(
+        section: ApplicationSection,
+        *,
+        begin: datetime.datetime,
+        end: datetime.datetime,
+        has_perms: bool,
+    ) -> PindoraReservationInfoData | None:
+        try:
+            response = PindoraClient.get_seasonal_booking(section=section.ext_uuid)
+        except Exception:  # noqa: BLE001
+            return None
+
+        # Don't allow reserver to view Pindora info without permissions if the access code is not active
+        access_code_is_active = response["access_code_is_active"]
+        if not has_perms and not access_code_is_active:
+            return None
+
+        validity: PindoraSeasonalBookingAccessCodeValidity | None = next(
+            (
+                validity
+                for validity in response["reservation_unit_code_validity"]
+                if validity["begin"] == begin and validity["end"] == end
+            ),
+            None,
+        )
+        if validity is None:
+            return None
+
+        begin = validity["begin"]
+        end = validity["end"]
+        access_code_valid_minutes_before = validity["access_code_valid_minutes_before"]
+        access_code_valid_minutes_after = validity["access_code_valid_minutes_after"]
+        access_code_begins_at = begin - datetime.timedelta(minutes=access_code_valid_minutes_before)
+        access_code_ends_at = end + datetime.timedelta(minutes=access_code_valid_minutes_after)
+
+        return PindoraReservationInfoData(
             access_code=response["access_code"],
             access_code_generated_at=response["access_code_generated_at"],
             access_code_is_active=access_code_is_active,
