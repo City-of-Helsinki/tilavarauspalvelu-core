@@ -239,12 +239,10 @@ export type ApplicationCreateMutationInput = {
     Array<InputMaybe<ApplicationSectionForApplicationSerializerInput>>
   >;
   billingAddress?: InputMaybe<AddressSerializerInput>;
-  cancelledDate?: InputMaybe<Scalars["DateTime"]["input"]>;
   contactPerson?: InputMaybe<PersonSerializerInput>;
   homeCity?: InputMaybe<Scalars["Int"]["input"]>;
   organisation?: InputMaybe<OrganisationSerializerInput>;
   pk?: InputMaybe<Scalars["Int"]["input"]>;
-  sentDate?: InputMaybe<Scalars["DateTime"]["input"]>;
 };
 
 export type ApplicationCreateMutationPayload = {
@@ -718,24 +716,20 @@ export enum ApplicationStatusChoice {
 export type ApplicationUpdateMutationInput = {
   additionalInformation?: InputMaybe<Scalars["String"]["input"]>;
   applicantType?: InputMaybe<ApplicantTypeChoice>;
-  applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   applicationSections?: InputMaybe<
     Array<InputMaybe<UpdateApplicationSectionForApplicationSerializerInput>>
   >;
   billingAddress?: InputMaybe<UpdateAddressSerializerInput>;
-  cancelledDate?: InputMaybe<Scalars["DateTime"]["input"]>;
   contactPerson?: InputMaybe<UpdatePersonSerializerInput>;
   homeCity?: InputMaybe<Scalars["Int"]["input"]>;
   organisation?: InputMaybe<UpdateOrganisationSerializerInput>;
   pk: Scalars["Int"]["input"];
-  sentDate?: InputMaybe<Scalars["DateTime"]["input"]>;
-  workingMemo?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type ApplicationUpdateMutationPayload = {
   additionalInformation?: Maybe<Scalars["String"]["output"]>;
   applicantType?: Maybe<ApplicantTypeChoice>;
-  applicationRound?: Maybe<Scalars["Int"]["output"]>;
+  applicationRound?: Maybe<Scalars["ID"]["output"]>;
   applicationSections?: Maybe<Array<Maybe<ApplicationSectionNode>>>;
   billingAddress?: Maybe<AddressNode>;
   cancelledDate?: Maybe<Scalars["DateTime"]["output"]>;
@@ -747,6 +741,16 @@ export type ApplicationUpdateMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
   sentDate?: Maybe<Scalars["DateTime"]["output"]>;
   status?: Maybe<Status>;
+  user?: Maybe<Scalars["ID"]["output"]>;
+};
+
+export type ApplicationWorkingMemoMutationInput = {
+  pk: Scalars["Int"]["input"];
+  workingMemo?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type ApplicationWorkingMemoMutationPayload = {
+  pk?: Maybe<Scalars["Int"]["output"]>;
   workingMemo?: Maybe<Scalars["String"]["output"]>;
 };
 
@@ -1236,6 +1240,7 @@ export type Mutation = {
   staffReservationModify?: Maybe<ReservationStaffModifyMutationPayload>;
   updateApplication?: Maybe<ApplicationUpdateMutationPayload>;
   updateApplicationSection?: Maybe<ApplicationSectionUpdateMutationPayload>;
+  updateApplicationWorkingMemo?: Maybe<ApplicationWorkingMemoMutationPayload>;
   updateBannerNotification?: Maybe<BannerNotificationUpdateMutationPayload>;
   updateCurrentUser?: Maybe<CurrentUserUpdateMutationPayload>;
   updateEquipment?: Maybe<EquipmentUpdateMutationPayload>;
@@ -1451,6 +1456,10 @@ export type MutationUpdateApplicationArgs = {
 
 export type MutationUpdateApplicationSectionArgs = {
   input: ApplicationSectionUpdateMutationInput;
+};
+
+export type MutationUpdateApplicationWorkingMemoArgs = {
+  input: ApplicationWorkingMemoMutationInput;
 };
 
 export type MutationUpdateBannerNotificationArgs = {
@@ -6625,6 +6634,7 @@ export type ReservationUnitPageFieldsFragment = {
       nameSv?: string | null;
     };
   }>;
+  accessTypes: Array<{ accessType: AccessType; beginDate: string }>;
   serviceSpecificTerms?: {
     id: string;
     textFi?: string | null;
@@ -6799,6 +6809,7 @@ export type ReservationUnitPageQuery = {
         nameSv?: string | null;
       };
     }>;
+    accessTypes: Array<{ accessType: AccessType; beginDate: string }>;
     reservableTimeSpans?: Array<{
       startDatetime?: string | null;
       endDatetime?: string | null;
@@ -9542,6 +9553,10 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
       ...EquipmentFields
     }
     currentAccessType
+    accessTypes(isActiveOrFuture: true) {
+      accessType
+      beginDate
+    }
   }
   ${AddressFieldsFragmentDoc}
   ${TermsOfUseFragmentDoc}
