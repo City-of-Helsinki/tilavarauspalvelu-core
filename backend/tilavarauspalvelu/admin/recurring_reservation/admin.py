@@ -74,6 +74,8 @@ class RecurringReservationAdmin(admin.ModelAdmin):
             {
                 "fields": [
                     "should_have_active_access_code",
+                    "access_type",
+                    "used_access_types",
                     "pindora_response",
                 ],
             },
@@ -83,6 +85,8 @@ class RecurringReservationAdmin(admin.ModelAdmin):
         "ext_uuid",
         "created",
         "should_have_active_access_code",
+        "access_type",
+        "used_access_types",
     ]
     inlines = [ReservationInline]
 
@@ -98,5 +102,7 @@ class RecurringReservationAdmin(admin.ModelAdmin):
             )
             .annotate(
                 should_have_active_access_code=L("should_have_active_access_code"),
+                access_type=L("access_type"),
+                used_access_types=L("used_access_types"),
             )
         )

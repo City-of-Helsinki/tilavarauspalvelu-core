@@ -6,6 +6,7 @@ from django.contrib import admin, messages
 from django.contrib.admin import helpers
 from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
+from lookup_property import L
 from more_admin_filters import MultiSelectFilter
 from more_admin_filters.filters import MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilterBuilder
@@ -182,6 +183,10 @@ class ReservationAdmin(admin.ModelAdmin):
             _("Pindora information"),
             {
                 "fields": [
+                    "access_type",
+                    "access_code_is_active",
+                    "access_code_should_be_active",
+                    "access_code_generated_at",
                     "pindora_response",
                 ],
             },
@@ -212,11 +217,20 @@ class ReservationAdmin(admin.ModelAdmin):
         "created_at",
         "price_net",
         "non_subsidised_price_net",
+        "access_code_is_active",
+        "access_code_should_be_active",
+        "access_code_generated_at",
+        "access_type",
     ]
     inlines = [PaymentOrderInline]
 
     def get_queryset(self, request: WSGIRequest) -> QuerySet[Reservation]:
-        return super().get_queryset(request).prefetch_related("reservation_units")
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(access_code_should_be_active=L("access_code_should_be_active"))
+            .prefetch_related("reservation_units")
+        )
 
     def get_search_results(
         self,
