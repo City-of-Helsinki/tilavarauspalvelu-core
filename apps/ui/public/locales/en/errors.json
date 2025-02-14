@@ -45,6 +45,7 @@
       "APPLICATION_CONTACT_PERSON_MISSING": "Contact person is missing.",
       "APPLICATION_BILLING_ADDRESS_MISSING": "Billing address is missing.",
       "APPLICATION_APPLICANT_TYPE_MISSING": "Applicant type is missing.",
+      "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
       "invalid": "Invalid value.",
       "generic_validation_error": "An error occurred."
     }

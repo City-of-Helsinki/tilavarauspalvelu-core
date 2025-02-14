@@ -288,7 +288,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       fetchPolicy: "no-cache",
       variables: { id: resId },
     });
-    const reservation = data?.reservation ?? undefined;
+    const { reservation } = data;
 
     // TODO this is copy pasta from reservation-unit/[id].tsx
     const today = new Date();
