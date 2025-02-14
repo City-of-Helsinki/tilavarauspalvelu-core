@@ -604,6 +604,13 @@ msgstr ""
 msgid "Search by name, application user's first name or last name"
 msgstr ""
 
+#: tilavarauspalvelu/admin/application_section/admin.py
+#: tilavarauspalvelu/admin/recurring_reservation/admin.py
+#: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Pindora information"
+msgstr ""
+
 #: tilavarauspalvelu/admin/application_section/filters.py
 #: tilavarauspalvelu/admin/application_section/form.py
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
@@ -695,6 +702,20 @@ msgstr ""
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Pindora API response"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Response from Pindora API"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "External UUID"
 msgstr ""
 
@@ -713,6 +734,12 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Purpose"
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+#: tilavarauspalvelu/admin/recurring_reservation/filters.py
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Should have active access code"
 msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
@@ -748,6 +775,10 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/application_section/form.py
 msgid "Purpose for this section."
+msgstr ""
+
+#: tilavarauspalvelu/admin/application_section/form.py
+msgid "Should this application section have an active access code?"
 msgstr ""
 
 #: tilavarauspalvelu/admin/banner_notification/admin.py
@@ -1164,17 +1195,6 @@ msgstr ""
 msgid "Search by first name or last name."
 msgstr ""
 
-#: tilavarauspalvelu/admin/recurring_reservation/admin.py
-#: tilavarauspalvelu/admin/reservation/admin.py
-#: tilavarauspalvelu/admin/reservation_unit/admin.py
-msgid "Pindora information"
-msgstr ""
-
-#: tilavarauspalvelu/admin/recurring_reservation/filters.py
-#: tilavarauspalvelu/admin/recurring_reservation/form.py
-msgid "Should have active access code"
-msgstr ""
-
 #: tilavarauspalvelu/admin/recurring_reservation/filters.py
 #: tilavarauspalvelu/admin/reservation/filters.py
 msgid "Yes"
@@ -1193,18 +1213,6 @@ msgstr ""
 msgid ""
 "Comma separated list of weekday integers (0-6) on which reservations exists "
 "on this recurring reservation"
-msgstr ""
-
-#: tilavarauspalvelu/admin/recurring_reservation/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Pindora API response"
-msgstr ""
-
-#: tilavarauspalvelu/admin/recurring_reservation/form.py
-#: tilavarauspalvelu/admin/reservation/form.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Response from Pindora API"
 msgstr ""
 
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
@@ -1231,6 +1239,16 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
 msgid "Allocated time slot"
+msgstr ""
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Access type"
+msgstr ""
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid "Used access types"
 msgstr ""
 
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
@@ -1283,6 +1301,18 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
 msgid "Should this recurring reservation have an active access code?"
+msgstr ""
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid ""
+"Access type for the reservations in this recurring reservation (if "
+"unambiguous), otherwise access type will be 'multi-valued'"
+msgstr ""
+
+#: tilavarauspalvelu/admin/recurring_reservation/form.py
+msgid ""
+"All unique access types used in the reservations of this recurring "
+"reservation"
 msgstr ""
 
 #: tilavarauspalvelu/admin/request_log/admin.py
@@ -1435,6 +1465,18 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
 msgid "Confirmed at"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Access code is active"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Access code should be active"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation/form.py
+msgid "Access code generated at"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation/form.py
@@ -1744,10 +1786,6 @@ msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Reservation state"
-msgstr ""
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Access type"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
