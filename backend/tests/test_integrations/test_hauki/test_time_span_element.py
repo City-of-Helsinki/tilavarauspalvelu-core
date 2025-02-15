@@ -11,7 +11,7 @@ from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAP
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE
 
-from tests.test_external_services.test_hauki.test_reservable_time_spans_client import _get_date
+from tests.test_integrations.test_hauki.test_reservable_time_spans_client import _get_date
 
 
 class TimeSpanElementParams(NamedTuple):

@@ -22,7 +22,7 @@ from utils.date_utils import local_datetime
 
 from tests import factories
 from tests.helpers import ResponseMock, patch_method
-from tests.test_external_services.test_verkkokauppa.test_merchant_requests import get_merchant_response
+from tests.test_integrations.test_verkkokauppa.test_merchant_requests import get_merchant_response
 
 if TYPE_CHECKING:
     from django.urls import URLPattern

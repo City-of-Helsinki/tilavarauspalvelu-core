@@ -4,7 +4,7 @@ from tilavarauspalvelu.integrations.tprek.tprek_api_client import TprekAPIClient
 from utils.date_utils import local_datetime
 
 from tests.helpers import ResponseMock, patch_method
-from tests.test_external_services.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
+from tests.test_integrations.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
 
 
 @patch_method(
