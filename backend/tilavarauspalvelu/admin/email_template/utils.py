@@ -11,7 +11,9 @@ from tilavarauspalvelu.translation import get_translated
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.integrations.email.typing import EmailTemplateType
     from tilavarauspalvelu.typing import EmailContext, Lang
+
 
 __all__ = [
     "get_mock_data",
@@ -83,7 +85,7 @@ def get_mock_params(language: Lang, **kwargs: Any) -> EmailContext | datetime | 
 
 
 @get_translated
-def get_mock_data(*, email_type: type[EmailType], language: Lang, **kwargs: Any) -> EmailContext | None:
+def get_mock_data(*, email_type: EmailTemplateType, language: Lang, **kwargs: Any) -> EmailContext | None:
     access_code_always_used = [
         EmailType.SEASONAL_RESERVATION_MODIFIED_SERIES_ACCESS_CODE,
         EmailType.RESERVATION_MODIFIED_ACCESS_CODE,

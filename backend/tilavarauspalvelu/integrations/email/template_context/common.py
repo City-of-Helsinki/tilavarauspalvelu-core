@@ -51,10 +51,7 @@ def get_contex_for_automatic_message(*, language: Lang) -> EmailContext:
     text_feedback = pgettext("Email", "Contact us")
     contact_us_page_link = create_anchor_tag(link=link_feedback, text=text_feedback)
 
-    reserve_city_resources_at = pgettext(
-        "Email",
-        "Book the city's premises and equipment for your use at %(link)s",
-    )
+    reserve_city_resources_at = pgettext("Email", "Book the city's premises and equipment for your use at %(link)s")
 
     return {
         "automatic_message_do_not_reply": pgettext("Email", "This is an automated message, please do not reply"),

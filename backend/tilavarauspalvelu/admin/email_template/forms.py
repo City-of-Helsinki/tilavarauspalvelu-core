@@ -9,7 +9,7 @@ from tilavarauspalvelu.enums import AccessType, Language
 from tilavarauspalvelu.translation import get_attr_by_language
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.integrations.email.typing import EmailType
+    from tilavarauspalvelu.integrations.email.typing import EmailTemplateType
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.typing import EmailContext, Lang
 
@@ -18,7 +18,7 @@ __all__ = [
 ]
 
 
-def select_tester_form(*, email_type: type[EmailType]) -> type[EmailTesterForm]:
+def select_tester_form(*, email_type: EmailTemplateType) -> type[EmailTesterForm]:
     """Select email tester form based on email type."""
     email_form_class = EmailTesterForm
     email_form_class.email_type = email_type
@@ -26,7 +26,7 @@ def select_tester_form(*, email_type: type[EmailType]) -> type[EmailTesterForm]:
 
 
 class EmailTesterForm(forms.BaseForm):
-    email_type: type[EmailType]
+    email_type: EmailTemplateType
 
     def __init__(self, **kwargs: Any) -> None:
         email_tester_fields = get_email_tester_form_fields()
