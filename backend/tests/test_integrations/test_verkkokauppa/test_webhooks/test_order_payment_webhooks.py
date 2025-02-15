@@ -13,7 +13,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import 
 
 from tests.factories import PaymentOrderFactory, ReservationFactory
 from tests.helpers import patch_method
-from tests.test_external_services.test_verkkokauppa.test_webhooks.helpers import get_mock_order_payment_api
+from tests.test_integrations.test_verkkokauppa.test_webhooks.helpers import get_mock_order_payment_api
 
 # Applied to all tests
 pytestmark = [
