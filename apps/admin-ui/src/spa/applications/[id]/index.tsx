@@ -377,7 +377,6 @@ function RejectOptionButton({
     return null;
   }
   return (
-    // @ts-expect-error -- HDS incorrect typing for ButtonVariant.Supplementary
     <Button
       size={ButtonSize.Small}
       variant={loading ? ButtonVariant.Clear : ButtonVariant.Supplementary}

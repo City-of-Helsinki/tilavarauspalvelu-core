@@ -1,5 +1,5 @@
 import React from "react";
-import { defaultFilter, Option, Select } from "hds-react";
+import { defaultFilter, Option, Select, Tooltip } from "hds-react";
 import { useTranslation } from "next-i18next";
 import {
   type Control,
@@ -46,8 +46,7 @@ export function ControlledSelect<T extends FieldValues>({
   style,
   className,
   clearable,
-  // ignore till HDS provides an upstream fix
-  tooltip: _,
+  tooltip,
   helper: assistive,
   multiselect,
   disabled,
@@ -121,9 +120,12 @@ export function ControlledSelect<T extends FieldValues>({
         error,
         assistive,
         language,
-        // FIXME tooltip is missing is an upstream issue
-        // tooltipText: tooltip,
       }}
+      tooltip={
+        tooltip != null && tooltip !== "" ? (
+          <Tooltip>{tooltip}</Tooltip>
+        ) : undefined
+      }
       value={toHDSValue(options, value)}
       options={options.map(convertOptionToHDS)}
       onChange={handleChange}
