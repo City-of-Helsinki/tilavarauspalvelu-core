@@ -53,7 +53,9 @@ import {
 import {
   base64encode,
   filterNonNullable,
+  ignoreMaybeArray,
   LocalizationLanguages,
+  toNumber,
 } from "common/src/helpers";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
 import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
@@ -594,11 +596,21 @@ type NodeT = NonNullable<ReservationPageQuery["reservation"]>;
 // 500 should not be if the backend is down (which one is that?)
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, params } = ctx;
-  const pk = Number(params?.id);
+  const pk = toNumber(ignoreMaybeArray(params?.id));
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  if (isFinite(pk)) {
+  const notFound = {
+    notFound: true,
+    props: {
+      // have to double up notFound inside the props to get TS types dynamically
+      notFound: true,
+      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
+
+  if (pk != null && pk > 0) {
     const bookingTerms = await getGenericTerms(apolloClient);
 
     // NOTE errors will fallback to 404
@@ -621,7 +633,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         ApplicationRecurringReservationQueryVariables
       >({
         query: ApplicationRecurringReservationDocument,
-        fetchPolicy: "no-cache",
         variables: { id: recurringId },
       });
       const applicationPk =
@@ -636,9 +647,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
           notFound: true, // for prop narrowing
         },
       };
-    }
-
-    if (reservation != null) {
+    } else if (reservation != null) {
       return {
         props: {
           ...commonProps,
@@ -652,15 +661,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     }
   }
 
-  return {
-    notFound: true,
-    props: {
-      // have to double up notFound inside the props to get TS types dynamically
-      notFound: true,
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
+  return notFound;
 }
 
 export const GET_APPLICATION_RECURRING_RESERVATION_QUERY = gql`

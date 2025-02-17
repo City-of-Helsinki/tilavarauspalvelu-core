@@ -111,7 +111,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     } else if (reservation != null) {
       return {
         redirect: {
-          permanent: true,
+          permanent: false,
           destination: getReservationPath(reservation.pk),
         },
         props: {
