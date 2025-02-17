@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Literal, NotRequired, Protocol, TypedDict
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, NotRequired, Protocol, TypedDict
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.handlers import wsgi
@@ -316,3 +316,50 @@ class StaffCreateReservationData(TypedDict):
 
 class StaffReservationData(StaffCreateReservationData):
     pk: int
+
+
+class PindoraReservationInfoData(NamedTuple):
+    access_code: str
+    access_code_generated_at: datetime.datetime
+    access_code_is_active: bool
+
+    access_code_keypad_url: str
+    access_code_phone_number: str
+    access_code_sms_number: str
+    access_code_sms_message: str
+
+    access_code_begins_at: datetime.datetime
+    access_code_ends_at: datetime.datetime
+
+
+class PindoraValidityInfoData(NamedTuple):
+    reservation_id: int
+    reservation_series_id: int
+    access_code_begins_at: datetime.datetime
+    access_code_ends_at: datetime.datetime
+
+
+class PindoraSeriesInfoData(NamedTuple):
+    access_code: str
+    access_code_generated_at: datetime.datetime
+    access_code_is_active: bool
+
+    access_code_keypad_url: str
+    access_code_phone_number: str
+    access_code_sms_number: str
+    access_code_sms_message: str
+
+    access_code_validity: list[PindoraValidityInfoData]
+
+
+class PindoraSectionInfoData(NamedTuple):
+    access_code: str
+    access_code_generated_at: datetime.datetime
+    access_code_is_active: bool
+
+    access_code_keypad_url: str
+    access_code_phone_number: str
+    access_code_sms_number: str
+    access_code_sms_message: str
+
+    access_code_validity: list[PindoraValidityInfoData]
