@@ -7,7 +7,11 @@ import stamina
 from requests import request
 from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR
 
-from utils.external_service.errors import ExternalServiceParseJSONError, ExternalServiceRequestError
+from utils.external_service.errors import (
+    ExternalServiceError,
+    ExternalServiceParseJSONError,
+    ExternalServiceRequestError,
+)
 
 if TYPE_CHECKING:
     from requests import Response
@@ -81,7 +85,11 @@ class BaseExternalServiceClient:
 
     @classmethod
     def request(cls, method: Literal["get", "post", "put", "delete"], url: str, **kwargs: Any) -> Response:
-        return request(method, url, **kwargs, timeout=cls.REQUEST_TIMEOUT_SECONDS)
+        try:
+            return request(method, url, **kwargs, timeout=cls.REQUEST_TIMEOUT_SECONDS)
+        except Exception as err:
+            # Convert all exceptions to ExternalServiceError to allow easily suppressing them with
+            raise ExternalServiceError from err
 
     @classmethod
     @stamina.retry(on=Exception, attempts=3)  # Likely retry should happen no matter the exception
