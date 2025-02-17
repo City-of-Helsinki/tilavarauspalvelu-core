@@ -44,7 +44,6 @@ import {
   isReservationEditable,
   transformReservation,
 } from "@/modules/reservation";
-import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { breakpoints, H1 } from "common";
@@ -59,13 +58,6 @@ const StepperWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
     grid-column: 1 / span 1;
   }
-`;
-
-// copy of ReservationCancellation but some changes to grid layoout
-// see if we can refactor cancellation to use the same heading
-const HeadingSection = styled.div`
-  grid-column: 1 / -1;
-  grid-row: 1;
 `;
 
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
@@ -160,17 +152,6 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
       }
     }
   };
-
-  if (!isReservationEditable({ reservation })) {
-    return (
-      <>
-        <HeadingSection>
-          <H1 $marginTop="none">{t(title)}</H1>
-        </HeadingSection>
-        <NotModifiableReason reservation={reservation} />
-      </>
-    );
-  }
 
   const {
     formState: { isValid, dirtyFields },
@@ -268,7 +249,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const client = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const notFoundValue = {
+  const notFound = {
     notFound: true,
     props: {
       notFound: true,
@@ -277,7 +258,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 
-  if (pk != null) {
+  if (pk != null && pk > 0) {
     // TODO why are we doing two separate queries? the linked reservationUnit should be part of the reservation query
     const resId = base64encode(`ReservationNode:${pk}`);
     const { data } = await client.query<
@@ -285,19 +266,33 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       ReservationEditPageQueryVariables
     >({
       query: ReservationEditPageDocument,
-      fetchPolicy: "no-cache",
       variables: { id: resId },
     });
     const { reservation } = data;
+
+    if (reservation == null) {
+      return notFound;
+    }
+
+    if (!isReservationEditable({ reservation })) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: getReservationPath(reservation.pk),
+        },
+        props: {
+          notFound: true, // for prop narrowing
+        },
+      };
+    }
 
     // TODO this is copy pasta from reservation-unit/[id].tsx
     const today = new Date();
     const startDate = today;
     const endDate = addYears(today, 2);
-
-    const resUnitPk = reservation?.reservationUnits?.[0]?.pk;
+    const resUnitPk = reservation.reservationUnits.find(() => true)?.pk;
     if (resUnitPk == null) {
-      return notFoundValue;
+      return notFound;
     }
     const id = base64encode(`ReservationUnitNode:${resUnitPk}`);
     const { data: reservationUnitData } = await client.query<
@@ -305,7 +300,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       ReservationUnitPageQueryVariables
     >({
       query: ReservationUnitPageDocument,
-      fetchPolicy: "no-cache",
       variables: {
         id,
         pk: resUnitPk ?? 0,
@@ -339,7 +333,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     }
   }
 
-  return notFoundValue;
+  return notFound;
 }
 
 export const EDIT_PAGE_QUERY = gql`
