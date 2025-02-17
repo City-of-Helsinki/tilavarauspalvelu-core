@@ -50,12 +50,15 @@ class PindoraReservationResponse(TypedDict):
     end: datetime.datetime
 
 
-class PindoraSeasonalBookingAccessCodeValidity(TypedDict):
-    reservation_unit_id: uuid.UUID
+class PindoraAccessCodeValidity(TypedDict):
     access_code_valid_minutes_before: int
     access_code_valid_minutes_after: int
     begin: datetime.datetime
     end: datetime.datetime
+
+
+class PindoraSeasonalBookingAccessCodeValidity(PindoraAccessCodeValidity):
+    reservation_unit_id: uuid.UUID
 
 
 class PindoraSeasonalBookingResponse(TypedDict):
@@ -69,11 +72,7 @@ class PindoraSeasonalBookingResponse(TypedDict):
     reservation_unit_code_validity: list[PindoraSeasonalBookingAccessCodeValidity]
 
 
-class PindoraReservationSeriesAccessCodeValidity(TypedDict):
-    access_code_valid_minutes_before: int
-    access_code_valid_minutes_after: int
-    begin: datetime.datetime
-    end: datetime.datetime
+class PindoraReservationSeriesAccessCodeValidity(PindoraAccessCodeValidity): ...
 
 
 class PindoraReservationSeriesResponse(TypedDict):

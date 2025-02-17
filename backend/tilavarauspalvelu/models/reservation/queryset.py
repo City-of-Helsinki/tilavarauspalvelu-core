@@ -8,6 +8,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 from django.db.models.functions import Coalesce
 from helsinki_gdpr.models import SerializableMixin
+from lookup_property import L
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice, ReservationTypeChoice
 from utils.date_utils import local_datetime
@@ -231,6 +232,9 @@ class ReservationQuerySet(models.QuerySet):
             user=user,
             type=ReservationTypeChoice.NORMAL.value,
         )
+
+    def requires_active_access_code(self) -> Self:
+        return self.filter(L(access_code_should_be_active=True))
 
 
 class ReservationManager(SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)):

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, NamedTuple
+from typing import TYPE_CHECKING
 
 import graphene
 from graphene_django_extensions import DjangoNode
@@ -11,6 +11,7 @@ from query_optimizer import AnnotatedField, MultiField
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import RecurringReservation
+from tilavarauspalvelu.typing import PindoraSeriesInfoData
 from utils.date_utils import local_date
 
 from .filtersets import RecurringReservationFilterSet
@@ -19,7 +20,6 @@ from .permissions import RecurringReservationPermission
 if TYPE_CHECKING:
     from django.db import models
 
-    from tilavarauspalvelu.models import ApplicationSection, ReservationUnit
     from tilavarauspalvelu.typing import GQLInfo
 
 __all__ = [
@@ -27,25 +27,9 @@ __all__ = [
 ]
 
 
-class PindoraSeriesValidityInfoData(NamedTuple):
-    access_code_begins_at: datetime.datetime
-    access_code_ends_at: datetime.datetime
-
-
-class PindoraSeriesInfoData(NamedTuple):
-    access_code: str
-    access_code_generated_at: datetime.datetime
-    access_code_is_active: bool
-
-    access_code_keypad_url: str
-    access_code_phone_number: str
-    access_code_sms_number: str
-    access_code_sms_message: str
-
-    access_code_validity: list[PindoraSeriesValidityInfoData]
-
-
 class PindoraSeriesValidityInfoType(graphene.ObjectType):
+    reservation_id = graphene.Int(required=True)
+    reservation_series_id = graphene.Int(required=True)
     access_code_begins_at = graphene.DateTime(required=True)
     access_code_ends_at = graphene.DateTime(required=True)
 
@@ -143,11 +127,7 @@ class RecurringReservationNode(DjangoNode):
         has_perms = info.context.user.permissions.can_view_recurring_reservation(root, reserver_needs_role=True)
 
         if root.allocated_time_slot is not None:
-            return RecurringReservationNode.section_pindora_info(
-                root.allocated_time_slot.reservation_unit_option.application_section,
-                reservation_unit=root.reservation_unit,
-                has_perms=has_perms,
-            )
+            return RecurringReservationNode.section_pindora_info(root, has_perms=has_perms)
 
         try:
             response = PindoraClient.get_reservation_series(series=root.ext_uuid)
@@ -159,6 +139,8 @@ class RecurringReservationNode(DjangoNode):
         if not has_perms and not access_code_is_active:
             return None
 
+        access_code_validity = root.actions.get_access_code_validity_info(response["reservation_unit_code_validity"])
+
         return PindoraSeriesInfoData(
             access_code=response["access_code"],
             access_code_generated_at=response["access_code_generated_at"],
@@ -167,26 +149,17 @@ class RecurringReservationNode(DjangoNode):
             access_code_phone_number=response["access_code_phone_number"],
             access_code_sms_number=response["access_code_sms_number"],
             access_code_sms_message=response["access_code_sms_message"],
-            access_code_validity=[
-                PindoraSeriesValidityInfoData(
-                    access_code_begins_at=(
-                        validity["begin"] - datetime.timedelta(minutes=validity["access_code_valid_minutes_before"])
-                    ),
-                    access_code_ends_at=(
-                        validity["end"] + datetime.timedelta(minutes=validity["access_code_valid_minutes_after"])
-                    ),
-                )
-                for validity in response["reservation_unit_code_validity"]
-            ],
+            access_code_validity=access_code_validity,
         )
 
     @staticmethod
-    def section_pindora_info(
-        section: ApplicationSection,
-        *,
-        reservation_unit: ReservationUnit,
-        has_perms: bool,
-    ) -> PindoraSeriesInfoData | None:
+    def section_pindora_info(series: RecurringReservation, *, has_perms: bool) -> PindoraSeriesInfoData | None:
+        section = series.allocated_time_slot.reservation_unit_option.application_section
+
+        # Don't show Pindora info without permissions if the application round results haven't been sent yet
+        if not has_perms and section.application.application_round.sent_date is None:
+            return None
+
         try:
             response = PindoraClient.get_seasonal_booking(section=section.ext_uuid)
         except Exception:  # noqa: BLE001
@@ -197,6 +170,8 @@ class RecurringReservationNode(DjangoNode):
         if not has_perms and not access_code_is_active:
             return None
 
+        access_code_validity = series.actions.get_access_code_validity_info(response["reservation_unit_code_validity"])
+
         return PindoraSeriesInfoData(
             access_code=response["access_code"],
             access_code_generated_at=response["access_code_generated_at"],
@@ -205,17 +180,5 @@ class RecurringReservationNode(DjangoNode):
             access_code_phone_number=response["access_code_phone_number"],
             access_code_sms_number=response["access_code_sms_number"],
             access_code_sms_message=response["access_code_sms_message"],
-            access_code_validity=[
-                PindoraSeriesValidityInfoData(
-                    access_code_begins_at=(
-                        validity["begin"] - datetime.timedelta(minutes=validity["access_code_valid_minutes_before"])
-                    ),
-                    access_code_ends_at=(
-                        validity["end"] + datetime.timedelta(minutes=validity["access_code_valid_minutes_after"])
-                    ),
-                )
-                for validity in response["reservation_unit_code_validity"]
-                # NOTE: This doesn't guarantee that all reservations are from this series!
-                if validity["reservation_unit_id"] == reservation_unit.uuid
-            ],
+            access_code_validity=access_code_validity,
         )

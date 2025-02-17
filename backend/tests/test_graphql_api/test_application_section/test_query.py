@@ -15,7 +15,12 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import (
 )
 from utils.date_utils import local_date, local_datetime
 
-from tests.factories import ApplicationSectionFactory, ReservationFactory, SuitableTimeRangeFactory
+from tests.factories import (
+    ApplicationSectionFactory,
+    RecurringReservationFactory,
+    ReservationFactory,
+    SuitableTimeRangeFactory,
+)
 from tests.helpers import patch_method
 
 from .helpers import section_query, sections_query
@@ -207,6 +212,8 @@ def pindora_query(section: ApplicationSection) -> str:
             accessCodeSmsNumber
             accessCodeSmsMessage
             accessCodeValidity {
+                reservationId
+                reservationSeriesId
                 accessCodeBeginsAt
                 accessCodeEndsAt
             }
@@ -222,9 +229,13 @@ def test_application_section__query__pindora_info(graphql):
         reservations_begin_date=local_date(2022, 1, 1),
         reservations_end_date=local_date(2022, 1, 1),
     )
-
-    ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+    series = RecurringReservationFactory.create(
+        allocated_time_slot__reservation_unit_option__application_section=section,
+    )
+    reservation = ReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
+        recurring_reservation=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
@@ -249,6 +260,8 @@ def test_application_section__query__pindora_info(graphql):
         "accessCodeSmsNumber": "123456789",
         "accessCodeValidity": [
             {
+                "reservationId": reservation.pk,
+                "reservationSeriesId": series.pk,
                 "accessCodeBeginsAt": "2022-01-01T11:50:00+02:00",
                 "accessCodeEndsAt": "2022-01-01T13:05:00+02:00",
             }

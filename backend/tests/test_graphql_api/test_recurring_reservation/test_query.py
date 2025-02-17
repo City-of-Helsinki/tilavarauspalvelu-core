@@ -206,6 +206,8 @@ def pindora_query(series: RecurringReservation) -> str:
             accessCodeSmsNumber
             accessCodeSmsMessage
             accessCodeValidity {
+                reservationId
+                reservationSeriesId
                 accessCodeBeginsAt
                 accessCodeEndsAt
             }
@@ -221,7 +223,9 @@ def test_recurring_reservations__query__pindora_info(graphql):
         begin=local_datetime(2022, 1, 1, 10),
         end=local_datetime(2022, 1, 1, 12),
     )
-    ReservationFactory.create(
+    reservation = ReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
         recurring_reservation=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
@@ -247,6 +251,8 @@ def test_recurring_reservations__query__pindora_info(graphql):
         "accessCodeSmsNumber": "123456789",
         "accessCodeValidity": [
             {
+                "reservationId": reservation.pk,
+                "reservationSeriesId": series.pk,
                 "accessCodeBeginsAt": "2022-01-01T11:50:00+02:00",
                 "accessCodeEndsAt": "2022-01-01T13:05:00+02:00",
             }
@@ -366,7 +372,9 @@ def test_recurring_reservations__query__pindora_info__reservation_past(graphql):
 
 @freeze_time(local_datetime(2022, 1, 1))
 def test_recurring_reservations__query__pindora_info__in_application_section(graphql):
-    section = ApplicationSectionFactory.create()
+    section = ApplicationSectionFactory.create(
+        application__application_round__sent_date=local_datetime(2022, 1, 1),
+    )
     reservation_unit = ReservationUnitFactory.create()
     series = RecurringReservationFactory.create(
         begin=local_datetime(2022, 1, 1, 10),
@@ -374,14 +382,16 @@ def test_recurring_reservations__query__pindora_info__in_application_section(gra
         allocated_time_slot__reservation_unit_option__application_section=section,
         reservation_unit=reservation_unit,
     )
-    ReservationFactory.create(
+    reservation = ReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
         recurring_reservation=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
     )
 
-    graphql.login_with_superuser()
+    graphql.force_login(series.user)
 
     query = pindora_query(series)
 
@@ -407,7 +417,7 @@ def test_recurring_reservations__query__pindora_info__in_application_section(gra
     with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
         response = graphql(query)
 
-    assert response.has_errors is False, response
+    assert response.has_errors is False, response.errors
 
     assert response.first_query_object["pindoraInfo"] == {
         "accessCode": "12345",
@@ -419,8 +429,62 @@ def test_recurring_reservations__query__pindora_info__in_application_section(gra
         "accessCodeSmsNumber": "+358407089834",
         "accessCodeValidity": [
             {
+                "reservationId": reservation.pk,
+                "reservationSeriesId": series.pk,
                 "accessCodeBeginsAt": "2022-01-01T11:50:00+02:00",
                 "accessCodeEndsAt": "2022-01-01T13:05:00+02:00",
             }
         ],
     }
+
+
+@freeze_time(local_datetime(2022, 1, 1))
+def test_recurring_reservations__query__pindora_info__in_application_section__not_sent(graphql):
+    section = ApplicationSectionFactory.create(
+        application__application_round__sent_date=None,
+    )
+    reservation_unit = ReservationUnitFactory.create()
+    series = RecurringReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 10),
+        end=local_datetime(2022, 1, 1, 12),
+        allocated_time_slot__reservation_unit_option__application_section=section,
+        reservation_unit=reservation_unit,
+    )
+    ReservationFactory.create(
+        begin=local_datetime(2022, 1, 1, 12),
+        end=local_datetime(2022, 1, 1, 13),
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    graphql.force_login(series.user)
+
+    query = pindora_query(series)
+
+    response = PindoraSeasonalBookingResponse(
+        access_code="12345",
+        access_code_keypad_url="https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto",
+        access_code_phone_number="+358407089833",
+        access_code_sms_number="+358407089834",
+        access_code_sms_message="a12345",
+        access_code_generated_at=local_datetime(2022, 1, 1),
+        access_code_is_active=True,
+        reservation_unit_code_validity=[
+            PindoraSeasonalBookingAccessCodeValidity(
+                reservation_unit_id=reservation_unit.uuid,
+                access_code_valid_minutes_before=10,
+                access_code_valid_minutes_after=5,
+                begin=local_datetime(2022, 1, 1, 12),
+                end=local_datetime(2022, 1, 1, 13),
+            ),
+        ],
+    )
+
+    with patch_method(PindoraClient.get_seasonal_booking, return_value=response):
+        response = graphql(query)
+
+    assert response.has_errors is False, response.errors
+
+    assert response.first_query_object["pindoraInfo"] is None
