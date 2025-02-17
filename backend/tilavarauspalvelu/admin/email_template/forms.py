@@ -14,21 +14,16 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import EmailContext, Lang
 
 __all__ = [
-    "select_tester_form",
+    "EmailTesterForm",
 ]
-
-
-def select_tester_form(*, email_type: EmailTemplateType) -> type[EmailTesterForm]:
-    """Select email tester form based on email type."""
-    email_form_class = EmailTesterForm
-    email_form_class.email_type = email_type
-    return email_form_class
 
 
 class EmailTesterForm(forms.BaseForm):
     email_type: EmailTemplateType
 
-    def __init__(self, **kwargs: Any) -> None:
+    def __init__(self, email_type: EmailTemplateType, **kwargs: Any) -> None:
+        self.email_type = email_type
+
         email_tester_fields = get_email_tester_form_fields()
 
         # Select only the fields required for the email type
@@ -46,7 +41,7 @@ class EmailTesterForm(forms.BaseForm):
         return self.email_type.get_email_context(**context_params)
 
     @classmethod
-    def from_reservation_unit(cls, instance: ReservationUnit, *, language: Lang) -> Self:
+    def from_reservation_unit(cls, email_type: EmailTemplateType, instance: ReservationUnit, *, language: Lang) -> Self:
         """Initialise the form with data form from reservation unit information."""
         initial = {
             "reservation_unit_name": get_attr_by_language(instance, "name", language),
@@ -63,7 +58,7 @@ class EmailTesterForm(forms.BaseForm):
                 "access_code_validity_period": "",
             })
 
-        return cls(initial=initial)
+        return cls(email_type=email_type, initial=initial)
 
 
 WIDTH = 50
