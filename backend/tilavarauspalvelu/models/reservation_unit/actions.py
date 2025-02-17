@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 from django.db import models
 from lookup_property import L
 
-from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice, PaymentType, ReservationStartInterval
+from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, PaymentType, ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
@@ -26,6 +26,7 @@ from utils.external_service.errors import ExternalServiceError
 if TYPE_CHECKING:
     from collections.abc import Collection
 
+    from tilavarauspalvelu.enums import AccessType
     from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource
     from tilavarauspalvelu.models import (
         Location,
@@ -414,16 +415,9 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             return self.reservation_unit.unit.payment_accounting
         return None
 
-    def get_access_type_at(self, moment: datetime.datetime) -> AccessType:
-        moment = moment.astimezone(DEFAULT_TIMEZONE)
-
-        begin = self.reservation_unit.perceived_access_type_start_date
-        end = self.reservation_unit.perceived_access_type_end_date
-
-        if begin <= moment.date() <= end:
-            return AccessType(self.reservation_unit.access_type)
-
-        return AccessType.UNRESTRICTED
+    def get_access_type_at(self, moment: datetime.datetime) -> AccessType | None:
+        on_date = moment.astimezone(DEFAULT_TIMEZONE).date()
+        return self.reservation_unit.access_types.active(on_date=on_date).values_list("access_type", flat=True).first()
 
     @property
     def start_interval_minutes(self) -> int:
@@ -462,41 +456,37 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
 
         return moment < reservation_ends or reservation_begins <= moment
 
-    def update_access_type_for_reservations(
-        self,
-        access_type: AccessType,
-        access_type_start_date: datetime.date | None,
-        access_type_end_date: datetime.date | None,
-    ) -> None:
+    def update_access_types_for_reservations(self) -> None:
         """
-        Update access type for reservations in the reservation unit based on
-        how the given values differ from the reservation unit's current values.
+        Update access types for future reservations in the reservation unit
+        based on currently defined access types.
+        """
+        now = local_datetime()
 
-        In case access type changes to or from 'ACCESS_CODE', background tasks
-        will take care of removing or adding access codes to Pindora.
-        """
-        # No changes
-        if (
-            access_type == self.reservation_unit.access_type
-            and access_type_start_date == self.reservation_unit.access_type_start_date
-            and access_type_end_date == self.reservation_unit.access_type_end_date
-        ):
+        access_types = list(
+            self.reservation_unit.access_types.filter(L(end_date__gt=now.date())).order_by("-begin_date")
+        )
+        # If there are no access types, we don't know that to update the reservation to
+        if not access_types:
             return
 
-        now = local_datetime()
-        begin_date = access_type_start_date or datetime.date.min
-        end_date = access_type_end_date or datetime.date.max
+        # Build a list or 'when' expressions that set the access type from its begin date starting from
+        # the one most in the future and moving backwards until the current active one is reached.
+        # This way reservations will get the correct access type given the currently defined ones.
+        whens: list[models.When] = [
+            models.When(
+                models.Q(begin__date__gte=access_type.begin_date),
+                then=models.Value(access_type.access_type),
+            )
+            for access_type in access_types
+        ]
 
-        # Update all future or ongoing reservations in the reservation unit
+        # Update all future or ongoing reservations in the reservation unit to their current access types
         Reservation.objects.filter(reservation_units=self.reservation_unit, end__gt=now).update(
             access_type=models.Case(
-                # All reservations that begin during the period should belong to the access type
-                models.When(
-                    models.Q(begin__date__gte=begin_date, begin__date__lte=end_date),
-                    then=models.Value(access_type),
-                ),
-                # Others should have UNRESTRICTED access type by default
-                default=models.Value(AccessType.UNRESTRICTED),
+                *whens,
+                # Use the active access type as the default (even though we should never reach this)
+                default=models.Value(access_types[-1].access_type),
                 output_field=models.CharField(),
             )
         )

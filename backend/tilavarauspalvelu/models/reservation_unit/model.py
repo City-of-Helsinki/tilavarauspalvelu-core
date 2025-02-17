@@ -9,13 +9,12 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
-from django.db.models.functions import Coalesce, TruncDate
+from django.db.models import Subquery
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import (
-    AccessType,
     AuthenticationType,
     ReservationKind,
     ReservationStartInterval,
@@ -29,6 +28,7 @@ from .queryset import ReservationUnitManager
 if TYPE_CHECKING:
     from decimal import Decimal
 
+    from tilavarauspalvelu.enums import AccessType
     from tilavarauspalvelu.models import (
         OriginHaukiResource,
         PaymentAccounting,
@@ -91,8 +91,6 @@ class ReservationUnit(models.Model):
     max_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
-    access_type_start_date: datetime.date | None = models.DateField(null=True, blank=True)
-    access_type_end_date: datetime.date | None = models.DateField(null=True, blank=True)
 
     # Booleans
 
@@ -121,11 +119,6 @@ class ReservationUnit(models.Model):
         choices=ReservationKind.choices,
         default=ReservationKind.DIRECT_AND_SEASON.value,
         db_index=True,
-    )
-    access_type: str = models.CharField(
-        max_length=20,
-        choices=AccessType.choices,
-        default=AccessType.UNRESTRICTED.value,
     )
 
     # List fields
@@ -286,17 +279,7 @@ class ReservationUnit(models.Model):
         verbose_name = _("reservation unit")
         verbose_name_plural = _("reservation units")
         ordering = ["rank", "id"]
-        constraints = [
-            models.CheckConstraint(
-                check=(
-                    models.Q(access_type_start_date__isnull=True)
-                    | models.Q(access_type_end_date__isnull=True)
-                    | models.Q(access_type_start_date__lte=models.F("access_type_end_date"))
-                ),
-                name="access_type_starts_before_ends",
-                violation_error_message=_("Access type start date must be the same or before its end date"),
-            )
-        ]
+        constraints = []
 
     def __str__(self) -> str:
         return f"{self.name}, {getattr(self.unit, 'name', '')}"
@@ -529,41 +512,24 @@ class ReservationUnit(models.Model):
 
         return case  # type: ignore[return-value]  # noqa: RET504
 
-    @lookup_property
-    def current_access_type() -> AccessType:
+    @lookup_property(skip_codegen=True)
+    def current_access_type() -> AccessType | None:
         """The access type that is currently active for the reservation unit."""
-        case = models.Case(
-            models.When(
-                (
-                    L(perceived_access_type_start_date__lte=TruncDate(NowTT()))
-                    & L(perceived_access_type_end_date__gte=TruncDate(NowTT()))
-                ),
-                then=models.F("access_type"),
+        from tilavarauspalvelu.models import ReservationUnitAccessType
+
+        sq = Subquery(
+            queryset=(
+                ReservationUnitAccessType.objects.filter(reservation_unit=models.OuterRef("pk"))
+                .active()
+                .values("access_type")[:1]
             ),
-            default=models.Value(AccessType.UNRESTRICTED.value),
-            output_field=models.CharField(),
+            output_field=models.CharField(null=True),
         )
-        return case  # type: ignore[return-value]  # noqa: RET504
+        return sq  # type: ignore[return-value]  # noqa: RET504
 
-    @lookup_property
-    def perceived_access_type_start_date() -> datetime.date:
-        """Helper lookup property for `current_access_type`"""
-        expr = Coalesce(
-            models.F("access_type_start_date"),
-            models.Value(datetime.date.min),
-            output_field=models.DateField(),
-        )
-        return expr  # type: ignore[return-value]  # noqa: RET504
-
-    @lookup_property
-    def perceived_access_type_end_date() -> datetime.date:
-        """Helper lookup property for `current_access_type`"""
-        expr = Coalesce(
-            models.F("access_type_end_date"),
-            models.Value(datetime.date.max),
-            output_field=models.DateField(),
-        )
-        return expr  # type: ignore[return-value]  # noqa: RET504
+    @current_access_type.override
+    def _(self) -> AccessType | None:
+        return self.access_types.active().values_list("access_type", flat=True).first()
 
 
 AuditLogger.register(
@@ -574,7 +540,5 @@ AuditLogger.register(
         "_reservation_state",
         "_active_pricing_price",
         "_current_access_type",
-        "_perceived_access_type_start_date",
-        "_perceived_access_type_end_date",
     ],
 )
