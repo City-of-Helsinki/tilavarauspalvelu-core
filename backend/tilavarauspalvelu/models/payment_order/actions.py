@@ -9,13 +9,13 @@ from django.conf import settings
 from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraClientError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 from tilavarauspalvelu.integrations.verkkokauppa.payment.types import PaymentStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import local_datetime
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
@@ -119,7 +119,7 @@ class PaymentOrderActions:
 
             if reservation.access_type == AccessType.ACCESS_CODE:
                 # Allow activation in Pindora to fail, will be handled by a background task.
-                with suppress(PindoraClientError):
+                with suppress(ExternalServiceError):
                     PindoraClient.activate_reservation_access_code(reservation=reservation)
                     reservation.access_code_is_active = True
                     update_fields.append("access_code_is_active")
