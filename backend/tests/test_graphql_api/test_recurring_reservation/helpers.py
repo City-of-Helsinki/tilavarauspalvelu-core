@@ -15,6 +15,7 @@ from tests.factories import RecurringReservationFactory
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import RecurringReservation, ReservationUnit, User
 
+recurring_reservation_query = partial(build_query, "recurringReservation")
 recurring_reservations_query = partial(build_query, "recurringReservations", connection=True, order_by="nameAsc")
 
 CREATE_SERIES_MUTATION = build_mutation("createReservationSeries", "ReservationSeriesCreateMutation")

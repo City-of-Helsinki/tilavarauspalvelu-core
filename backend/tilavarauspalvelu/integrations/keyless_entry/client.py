@@ -16,7 +16,6 @@ from rest_framework.status import (
     HTTP_409_CONFLICT,
 )
 
-from tilavarauspalvelu.enums import ReservationStateChoice
 from utils.date_utils import local_iso_format
 from utils.external_service.base_external_service_client import BaseExternalServiceClient
 
@@ -260,19 +259,19 @@ class PindoraClient(BaseExternalServiceClient):
         cls,
         section: ApplicationSection,
         *,
-        is_active: bool = False,
+        is_active: bool = True,
     ) -> PindoraSeasonalBookingResponse:
         """Create a new seasonal booking in Pindora."""
         url = cls._build_url("seasonal-booking")
 
         reservations: list[Reservation] = list(
             section.actions.get_reservations()
-            .filter(state=ReservationStateChoice.CONFIRMED)
+            .requires_active_access_code()
             .select_related("recurring_reservation__reservation_unit")
         )
 
         if not reservations:
-            msg = f"No confirmed reservations in seasonal booking '{section.ext_uuid}'."
+            msg = f"No reservations require an access code in seasonal booking '{section.ext_uuid}'."
             raise PindoraClientError(msg)
 
         data = PindoraSeasonalBookingCreateData(
@@ -307,7 +306,7 @@ class PindoraClient(BaseExternalServiceClient):
 
         reservations: list[Reservation] = list(
             section.actions.get_reservations()
-            .filter(state=ReservationStateChoice.CONFIRMED)
+            .requires_active_access_code()
             .select_related("recurring_reservation__reservation_unit")
         )
 
@@ -431,15 +430,15 @@ class PindoraClient(BaseExternalServiceClient):
         cls,
         series: RecurringReservation,
         *,
-        is_active: bool = False,
+        is_active: bool = True,
     ) -> PindoraReservationSeriesResponse:
         """Create a new reservation series in Pindora."""
         url = cls._build_url("reservation-series")
 
-        reservations: list[Reservation] = list(series.reservations.filter(state=ReservationStateChoice.CONFIRMED))
+        reservations: list[Reservation] = list(series.reservations.requires_active_access_code())
 
         if not reservations:
-            msg = f"No confirmed reservations in reservation series '{series.ext_uuid}'."
+            msg = f"No reservations require an access code in reservation series '{series.ext_uuid}'."
             raise PindoraClientError(msg)
 
         data = PindoraReservationSeriesCreateData(
@@ -472,7 +471,7 @@ class PindoraClient(BaseExternalServiceClient):
         """Reschedule a reservation series in Pindora."""
         url = cls._build_url(f"reservation-series/reschedule/{series.ext_uuid}")
 
-        reservations: list[Reservation] = list(series.reservations.filter(state=ReservationStateChoice.CONFIRMED))
+        reservations: list[Reservation] = list(series.reservations.requires_active_access_code())
 
         if not reservations:
             msg = f"No confirmed reservations in reservation series '{series.ext_uuid}'."

@@ -434,12 +434,17 @@ class PermissionResolver:
             role_choices=role_choices,
         )
 
-    def can_view_recurring_reservation(self, recurring_reservation: RecurringReservation) -> bool:
+    def can_view_recurring_reservation(
+        self,
+        recurring_reservation: RecurringReservation,
+        *,
+        reserver_needs_role: bool = False,
+    ) -> bool:
         if self.is_user_anonymous_or_inactive():
             return False
         if self.user.is_superuser:
             return True
-        if self.user == recurring_reservation.user:
+        if self.user == recurring_reservation.user and (self.has_any_role() if reserver_needs_role else True):
             return True
 
         role_choices = UserRoleChoice.can_view_reservations()

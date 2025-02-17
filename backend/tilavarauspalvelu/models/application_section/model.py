@@ -6,7 +6,7 @@ from functools import cached_property
 from typing import TYPE_CHECKING
 
 from django.db import models
-from django.db.models import OrderBy
+from django.db.models import Exists, OrderBy
 from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
@@ -268,3 +268,27 @@ class ApplicationSection(SerializableMixin, models.Model):
             default=models.Value(5),
             output_field=models.IntegerField(),
         )
+
+    @lookup_property(skip_codegen=True)
+    def should_have_active_access_code() -> bool:
+        """Should at least one reservation in this application section contain an active access code?"""
+        from tilavarauspalvelu.models import Reservation
+
+        exists = Exists(
+            queryset=Reservation.objects.filter(
+                L(access_code_should_be_active=True),
+                recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
+                    models.OuterRef("pk")
+                ),
+            ),
+        )
+        return exists  # type: ignore[return-value]  # noqa: RET504
+
+    @should_have_active_access_code.override
+    def _(self) -> bool:
+        from tilavarauspalvelu.models import Reservation
+
+        return Reservation.objects.filter(
+            L(access_code_should_be_active=True),
+            recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=self,
+        ).exists()

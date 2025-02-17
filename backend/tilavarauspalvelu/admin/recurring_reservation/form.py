@@ -45,6 +45,8 @@ class ReservationSeriesAdminForm(forms.ModelForm):
             "allocated_time_slot": _("Allocated time slot"),
             "age_group": _("Age group"),
             "should_have_active_access_code": _("Should have active access code"),
+            "access_type": _("Access type"),
+            "used_access_types": _("Used access types"),
         }
         help_texts = {
             "ext_uuid": _("ID for external systems to use"),
@@ -61,6 +63,11 @@ class ReservationSeriesAdminForm(forms.ModelForm):
             "allocated_time_slot": _("Allocated time slot this recurring reservation is for"),
             "age_group": _("Age group for this recurring reservation"),
             "should_have_active_access_code": _("Should this recurring reservation have an active access code?"),
+            "access_type": _(
+                "Access type for the reservations in this recurring reservation (if unambiguous), "
+                "otherwise access type will be 'multi-valued'"
+            ),
+            "used_access_types": _("All unique access types used in the reservations of this recurring reservation"),
         }
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
