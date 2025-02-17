@@ -218,3 +218,8 @@ class ReservationUnitValidator:
         if reservation_type not in ReservationTypeChoice.types_that_staff_can_create:
             msg = "Staff users are not allowed to create reservations of this type."
             raise ValidationError(msg, code=error_codes.RESERVATION_TYPE_NOT_ALLOWED)
+
+    def validate_has_access_type(self) -> None:
+        if not self.reservation_unit.access_types.exists():
+            msg = "Reservation unit does not have an access type defined."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_NO_ACCESS_TYPE)

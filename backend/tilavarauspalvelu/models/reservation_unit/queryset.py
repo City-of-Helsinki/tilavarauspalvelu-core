@@ -9,10 +9,9 @@ from django.db import connections, models
 from django.db.models import Q, prefetch_related_objects
 from lookup_property import L
 
-from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from utils.date_utils import local_date
-from utils.db import ArrayUnnest, NowTT
+from utils.db import ArrayUnnest, NowTT, SubqueryArray
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
@@ -20,6 +19,7 @@ if TYPE_CHECKING:
 
     from query_optimizer.validators import PaginationArgs
 
+    from tilavarauspalvelu.enums import AccessType
     from tilavarauspalvelu.models import ReservationUnit
 
 
@@ -112,34 +112,41 @@ class ReservationUnitQuerySet(models.QuerySet):
     def with_reservation_state_in(self, states: list[str]) -> Self:
         return self.filter(L(reservation_state__in=states))
 
-    def with_access_type_at(
+    def with_available_access_types_on_period(
         self,
-        allowed_access_types: list[AccessType],
-        begin_date: datetime.date | None = None,
-        end_date: datetime.date | None = None,
+        begin_date: datetime.date | None = None,  # inclusive
+        end_date: datetime.date | None = None,  # inclusive
     ) -> Self:
-        """Filter to reservation units that have any of the allowed access types on the given date range."""
+        """Add annotation of all access types that are used on the given date range."""
+        from tilavarauspalvelu.models import ReservationUnitAccessType
+
         period_start = models.Value(begin_date or local_date())
         period_end = models.Value(end_date or datetime.date.max)
 
-        # If unrestricted access is allowed, the reservation unit is included if:
-        if AccessType.UNRESTRICTED in allowed_access_types:
-            return self.filter(
-                # 1) It's access type is "unrestricted", OR
-                models.Q(access_type=AccessType.UNRESTRICTED)
-                # 2) The given period extends outside the access type's period (since default is "unrestricted")
-                | L(perceived_access_type_start_date__gt=period_start)
-                | L(perceived_access_type_end_date__lt=period_end),
+        return self.annotate(
+            available_access_types=SubqueryArray(
+                queryset=(
+                    ReservationUnitAccessType.objects.filter(reservation_unit=models.OuterRef("pk"))
+                    .filter(L(end_date__gte=period_start) & models.Q(begin_date__lte=period_end))
+                    .values("access_type")
+                ),
+                agg_field="access_type",
+                coalesce_output_type="varchar",
+                output_field=models.CharField(null=True),
             )
-
-        # Otherwise, the reservation unit is included if:
-        return self.filter(
-            # 1) It has one of the allowed access types, AND
-            models.Q(access_type__in=allowed_access_types)
-            # 2) The given period overlaps with the access type's period
-            & L(perceived_access_type_start_date__lte=period_end)
-            & L(perceived_access_type_end_date__gte=period_start)
         )
+
+    def with_access_type_at(
+        self,
+        allowed_access_types: list[AccessType | str],
+        begin_date: datetime.date | None = None,  # inclusive
+        end_date: datetime.date | None = None,  # inclusive
+    ) -> Self:
+        """Filter to reservation units that have any of the allowed access types on the given date range."""
+        return self.with_available_access_types_on_period(
+            begin_date=begin_date,
+            end_date=end_date,
+        ).filter(available_access_types__overlap=allowed_access_types)
 
     def published(self) -> Self:
         return self.filter(is_draft=False, is_archived=False)

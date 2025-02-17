@@ -39,6 +39,7 @@ from .reservation_purpose.model import ReservationPurpose
 from .reservation_statistic.model import ReservationStatistic
 from .reservation_statistic_unit.model import ReservationStatisticsReservationUnit
 from .reservation_unit.model import ReservationUnit
+from .reservation_unit_access_type.model import ReservationUnitAccessType
 from .reservation_unit_cancellation_rule.model import ReservationUnitCancellationRule
 from .reservation_unit_hierarchy.model import ReservationUnitHierarchy
 from .reservation_unit_image.model import ReservationUnitImage
@@ -98,6 +99,7 @@ __all__ = [
     "ReservationStatistic",
     "ReservationStatisticsReservationUnit",
     "ReservationUnit",
+    "ReservationUnitAccessType",
     "ReservationUnitCancellationRule",
     "ReservationUnitHierarchy",
     "ReservationUnitImage",
