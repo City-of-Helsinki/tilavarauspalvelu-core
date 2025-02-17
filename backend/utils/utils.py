@@ -4,32 +4,46 @@ import base64
 import datetime
 import hashlib
 import hmac
+import inspect
 import json
 import operator
 import re
+import sys
 import unicodedata
 import urllib.parse
+from contextlib import contextmanager
+from functools import cached_property
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.utils.module_loading import import_string
 from django.utils.translation import get_language_from_path, get_language_from_request
 from html2text import HTML2Text  # noqa: TID251
+from rest_framework.exceptions import ValidationError
+from rest_framework.fields import get_error_detail
 
 from tilavarauspalvelu.enums import Language
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
+    from types import FrameType
 
     from django.http import HttpRequest
 
     from tilavarauspalvelu.typing import AnyUser, Lang, TextSearchLang
 
 __all__ = [
+    "LazyValidator",
     "comma_sep_str",
     "get_text_search_language",
+    "only_django_validation_errors",
+    "only_drf_validation_errors",
     "to_ascii",
+    "to_django_validation_error",
+    "to_drf_validation_error",
     "update_query_params",
     "with_indices",
 ]
@@ -269,3 +283,108 @@ def get_jwt_payload(json_web_token: str) -> dict[str, Any]:
     payload_part += "=" * divmod(len(payload_part), 4)[1]  # Add padding to the payload if needed
     payload: str = base64.urlsafe_b64decode(payload_part).decode()  # Decode the payload
     return json.loads(payload)  # Return the payload as a dict
+
+
+def to_django_validation_error(error: ValidationError) -> DjangoValidationError:
+    """Given a django-rest-framework ValidationError, return a Django ValidationError."""
+    return DjangoValidationError(message=str(error.detail[0]), code=error.detail[0].code)
+
+
+def to_drf_validation_error(error: DjangoValidationError) -> ValidationError:
+    """Given a Django ValidationError, return a django-rest-framework ValidationError."""
+    return ValidationError(get_error_detail(exc_info=error))
+
+
+@contextmanager
+def only_django_validation_errors() -> Generator[None]:
+    """Converts all raised errors in the context to Django ValidationErrors."""
+    try:
+        yield
+    except DjangoValidationError:
+        raise
+    except ValidationError as error:
+        raise to_django_validation_error(error) from error
+    except Exception as error:
+        raise DjangoValidationError(message=str(error)) from error
+
+
+@contextmanager
+def only_drf_validation_errors() -> Generator[None]:
+    """Converts all raised errors in the context to django-rest-framework ValidationErrors."""
+    try:
+        yield
+    except ValidationError:
+        raise
+    except DjangoValidationError as error:
+        raise to_drf_validation_error(error) from error
+    except Exception as error:
+        raise ValidationError(detail=str(error)) from error
+
+
+class LazyValidator:
+    """
+    Descriptor for accessing a Model's validator class lazily on the class or instance level.
+    Lazily evaluating the validator mitigates issues with cyclical imports that may happen
+    if validation requires importing other models for the validation logic.
+
+    Usage:
+
+    >>> from typing import TYPE_CHECKING
+    >>>
+    >>> if TYPE_CHECKING:
+    ...     from .validators import MyModelValidator
+    >>>
+    >>> class MyModel(models.Model):
+    ...     validator: MyModelValidator = LazyValidator()
+
+    Using the specific validator as a type hint is required and should be imported
+    in a `TYPE_CHECKING` block, just as written in the example above.
+
+    This descriptor works because of the specific structure in this project:
+    1. Model needs to be in a module inside a package.
+    2. Validator needs to be in a module named "validators" inside the same package.
+    3. Validator takes a single argument, which is the model instance begin validated.
+
+    For validators for updating or deleting existing instances of the model, define (regular) methods
+    on the validator class, and use the validator through an instance of the Model class.
+
+    >>> MyModel().validator.validate_can_update()
+
+    For validators for creating new instances of the model, define classmethods on the validator class,
+    and use the validator through the Model class itself.
+
+    >>> MyModel.validator.validate_can_create()
+
+    Due to limitations of the Python typing system, the returned type of `.validator` in this case will be
+    an instance of the validator class, but the actual return value is the validator class itself.
+    Developers should only use the appropriate validation methods (class/regular) depending on
+    which type of validation they are performing (create/update/delete).
+
+    This approach is used instead of a more conventional decorator-descriptor approach because
+    some type checkers (PyCharm in particular) do not infer types from descriptor-decorators
+    correctly (at least when this was written).
+    """
+
+    def __init__(self) -> None:
+        # Perform some python black magic to find the package where this class is instantiated,
+        # as well as the name of the type annotation of the class attribute this is being assigned to.
+        # Note that the class attribute should be defined on a single line for this to work.
+        frame: FrameType = sys._getframe(1)  # noqa: SLF001
+        source_code = inspect.findsource(frame)[0]
+        line = source_code[frame.f_lineno - 1]
+        definition = line.split("=", maxsplit=1)[0]
+
+        module: str = frame.f_locals["__module__"]
+        package: str = module.rsplit(".", maxsplit=1)[0]
+        class_name = definition.split(":", maxsplit=1)[1].strip()
+
+        self.path = f"{package}.validators.{class_name}"
+
+    def __get__(self, instance: Any | None, owner: type[Any]) -> Any:
+        if instance is None:
+            return self.get_class
+        return self.get_class(instance)
+
+    @cached_property
+    def get_class(self) -> type:
+        return import_string(self.path)
