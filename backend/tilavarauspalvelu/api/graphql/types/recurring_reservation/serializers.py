@@ -21,6 +21,7 @@ from tilavarauspalvelu.enums import (
     WeekdayChoice,
 )
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from tilavarauspalvelu.models import RecurringReservation, Reservation, ReservationDenyReason, ReservationStatistic
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
@@ -195,7 +196,7 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
         # Create both the recurring reservation and the reservations in a transaction.
         # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
-            instance = super().save()
+            instance: RecurringReservation = super().save()
             reservations = self.create_reservations(
                 instance=instance,
                 reservation_details=reservation_details,
@@ -210,6 +211,15 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
         if settings.SAVE_RESERVATION_STATISTICS:
             create_or_update_reservation_statistics.delay(
                 reservation_pks=[reservation.pk for reservation in reservations],
+            )
+
+        # Lastly, create any access codes without suppressing errors if they cannot be created,
+        # but don't fail creating the reservation series itself.
+        if instance.reservations.requires_active_access_code().exists():
+            response = PindoraClient.create_reservation_series(instance, is_active=True)
+            instance.reservations.requires_active_access_code().update(
+                access_code_generated_at=response["access_code_generated_at"],
+                access_code_is_active=response["access_code_is_active"],
             )
 
         return instance

@@ -260,30 +260,35 @@ class RecurringReservationActions:
         # Pick out the through model for the many-to-many relationship and use if for bulk creation
         ThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
 
+        reservation_unit = self.recurring_reservation.reservation_unit
+
         reservations: list[Reservation] = []
         through_models: list[models.Model] = []
 
         for period in periods:
-            if self.recurring_reservation.reservation_unit.reservation_block_whole_day:
+            if reservation_unit.reservation_block_whole_day:
                 reservation_details.setdefault(
                     "buffer_time_before",
-                    self.recurring_reservation.reservation_unit.actions.get_actual_before_buffer(period["begin"]),
+                    reservation_unit.actions.get_actual_before_buffer(period["begin"]),
                 )
                 reservation_details.setdefault(
                     "buffer_time_after",
-                    self.recurring_reservation.reservation_unit.actions.get_actual_after_buffer(period["end"]),
+                    reservation_unit.actions.get_actual_after_buffer(period["end"]),
                 )
+
+            access_type = reservation_unit.actions.get_access_type_at(period["begin"])
 
             reservation = Reservation(
                 begin=period["begin"],
                 end=period["end"],
                 recurring_reservation=self.recurring_reservation,
                 age_group=self.recurring_reservation.age_group,
+                access_type=access_type,
                 **reservation_details,
             )
             through = ThroughModel(
                 reservation=reservation,
-                reservationunit=self.recurring_reservation.reservation_unit,
+                reservationunit=reservation_unit,
             )
             reservations.append(reservation)
             through_models.append(through)
