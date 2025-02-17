@@ -217,7 +217,7 @@ jobs:
           sed -i 's@<source>@<source>backend/@g' coverage.xml
 
       - name: "SonarCloud Scan"
-        uses: SonarSource/sonarqube-scan-action@v4
+        uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectBaseDir: ./backend
         # Skip analysis for all bots
