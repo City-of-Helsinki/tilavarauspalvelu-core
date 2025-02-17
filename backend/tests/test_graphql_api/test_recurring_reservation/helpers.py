@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 import datetime
+import uuid
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
 from tilavarauspalvelu.enums import ReservationTypeChoice, WeekdayChoice
+from tilavarauspalvelu.integrations.keyless_entry.typing import (
+    PindoraReservationSeriesAccessCodeValidity,
+    PindoraReservationSeriesResponse,
+)
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_time
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_time
 
 from tests.factories import RecurringReservationFactory
 
@@ -93,3 +98,24 @@ def create_reservation_series(**kwargs: Any) -> RecurringReservation:
     AffectingTimeSpan.refresh()
 
     return recurring_reservation
+
+
+def pindora_response() -> PindoraReservationSeriesResponse:
+    return PindoraReservationSeriesResponse(
+        reservation_unit_id=uuid.uuid4(),
+        access_code="123456",
+        access_code_keypad_url="https://example.com/keypad",
+        access_code_phone_number="123456789",
+        access_code_sms_number="123456789",
+        access_code_sms_message="msg",
+        access_code_generated_at=local_datetime(2022, 1, 1),
+        access_code_is_active=True,
+        reservation_unit_code_validity=[
+            PindoraReservationSeriesAccessCodeValidity(
+                access_code_valid_minutes_before=10,
+                access_code_valid_minutes_after=5,
+                begin=local_datetime(2022, 1, 1, 10),
+                end=local_datetime(2022, 1, 1, 12),
+            )
+        ],
+    )
