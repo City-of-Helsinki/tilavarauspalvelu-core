@@ -78,11 +78,11 @@ importers:
         specifier: ^16.9.0
         version: 16.9.0
       hds-core:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.2.0
+        version: 4.2.0
       hds-react:
-        specifier: ^4.1.0
-        version: 4.1.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3)
       i18next:
         specifier: ^23.15.1
         version: 23.15.1
@@ -253,14 +253,14 @@ importers:
         specifier: ^16.9.0
         version: 16.9.0
       hds-core:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.2.0
+        version: 4.2.0
       hds-design-tokens:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^4.2.0
+        version: 4.2.0
       hds-react:
-        specifier: ^4.1.0
-        version: 4.1.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3)
       i18next:
         specifier: ^23.15.1
         version: 23.15.1
@@ -404,8 +404,8 @@ importers:
         specifier: ^10.2.3
         version: 10.2.3(prop-types@15.8.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       hds-react:
-        specifier: ^4.1.0
-        version: 4.1.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3)
+        specifier: ^4.2.0
+        version: 4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3)
       i18next:
         specifier: ^23.15.1
         version: 23.15.1
@@ -560,11 +560,11 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@apollo/client@3.12.5':
-    resolution: {integrity: sha512-lOE2TlHx1el4rHs8vaTE4IroyIO9/PD2w598YYiDahF0XSMDdsXMrTpOVh+FuQ6tZ+DXT+hsaMlilZqcFRgu+A==}
+  '@apollo/client@3.13.1':
+    resolution: {integrity: sha512-HaAt62h3jNUXpJ1v5HNgUiCzPP1c5zc2Q/FeTb2cTk/v09YlhoqKKHQFJI7St50VCJ5q8JVIc03I5bRcBrQxsg==}
     peerDependencies:
       graphql: ^15.0.0 || ^16.0.0
-      graphql-ws: ^5.5.5
+      graphql-ws: ^5.5.5 || ^6.0.3
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || >=19.0.0-rc
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || >=19.0.0-rc
       subscriptions-transport-ws: ^0.9.0 || ^0.11.0
@@ -2542,10 +2542,11 @@ packages:
   '@reach/observe-rect@1.2.0':
     resolution: {integrity: sha512-Ba7HmkFgfQxZqqaeIWWkNK0rEhpxVQHIoVyW1YDSkGsGIXzcaW4deC8B0pZrNSSyLTdIk7y+5olKt5+g0GmFIQ==}
 
-  '@react-aria/interactions@3.22.5':
-    resolution: {integrity: sha512-kMwiAD9E0TQp+XNnOs13yVJghiy8ET8L0cbkeuTgNI96sOAp/63EJ1FSrDf17iD8sdjt41LafwX/dKXW9nCcLQ==}
+  '@react-aria/interactions@3.23.0':
+    resolution: {integrity: sha512-0qR1atBIWrb7FzQ+Tmr3s8uH5mQdyRH78n0krYaG8tng9+u1JlSi8DGRSaC9ezKyNB84m7vHT207xnHXGeJ3Fg==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+      react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
   '@react-aria/ssr@3.9.7':
     resolution: {integrity: sha512-GQygZaGlmYjmYM+tiNBA5C6acmiDWF52Nqd40bBp0Znk4M4hP+LTmI0lpI1BuKMw45T8RIhrAsICIfKwZvi2Gg==}
@@ -2553,10 +2554,11 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@react-aria/utils@3.26.0':
-    resolution: {integrity: sha512-LkZouGSjjQ0rEqo4XJosS4L3YC/zzQkfRM3KoqK6fUOmUJ9t0jQ09WjiF+uOoG9u+p30AVg3TrZRUWmoTS+koQ==}
+  '@react-aria/utils@3.27.0':
+    resolution: {integrity: sha512-p681OtApnKOdbeN8ITfnnYqfdHS0z7GE+4l8EXlfLnr70Rp/9xicBO6d2rU+V/B3JujDw2gPWxYKEnEeh0CGCw==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+      react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
   '@react-aria/visually-hidden@3.8.16':
     resolution: {integrity: sha512-3zThVIzEprez4A/GajOut6/JQ4WCu2ROHGZ1xH1+2GFjBJQaTfPBIjg6UIwaT7sgHRQIik8QidogLqXHbp81yA==}
@@ -2595,8 +2597,8 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@react-types/shared@3.26.0':
-    resolution: {integrity: sha512-6FuPqvhmjjlpEDLTiYx29IJCbCNWPlsyO+ZUmCUXzhUv2ttShOXfw8CmeHWHftT/b2KweAWuzqSlfeXPR76jpw==}
+  '@react-types/shared@3.27.0':
+    resolution: {integrity: sha512-gvznmLhi6JPEf0bsq7SwRYTHAKKq/wcmKqFez9sRdbED+SPMUmK5omfZ6w3EwUFQHbYUa4zPBYedQ7Knv70RMw==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
@@ -4920,14 +4922,14 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hds-core@4.1.0:
-    resolution: {integrity: sha512-GZ8NnzxrZ7pB75G0hnsc/IjIDLnxpp2oKJTjZ+hFJsesWytDTVG0l+hYnQeg3wWSFALHDq5kA0unitWVAzFOEQ==}
+  hds-core@4.2.0:
+    resolution: {integrity: sha512-D9GqQ/CdIrJp2ypQRB2FEbkfT/D4s/ehjwSWVQ/7pc5bZ8plOEvUTaIf2Kfl46/7U8QrQ6+N9BUd8nSl9TE0hA==}
 
-  hds-design-tokens@4.1.0:
-    resolution: {integrity: sha512-+KlNPW/Bf1tmdkDqIW4DgOQsWDvtodQC/hDsyjAP7NOnS12fV4o8K+Sr5wrJbIBjMWxsha2xc5ipvGe30tRcEg==}
+  hds-design-tokens@4.2.0:
+    resolution: {integrity: sha512-rcYFYkVdoThf53pQANnSrif+4y9IW19aSY5q60lf6odhOD24SjB5LKSaJJzd2HXdWQApd3QaIp5HTicSPDmaYQ==}
 
-  hds-react@4.1.0:
-    resolution: {integrity: sha512-U1bliIqY3FajDt/PBOvdvceBu61KbxcT00yvny5d28840/xKJrduwG/IVSipq6QZau+d3bKD9vtb4/bLcWV3sQ==}
+  hds-react@4.2.0:
+    resolution: {integrity: sha512-Tj1TzAb2Ov+JO/WSllcEvD3vlxEkSjJznTBcF1ScrAV/ZNwPDsIix+cs7bVFY/uNB8Kl2qoESf9vcd88cN0HSQ==}
     peerDependencies:
       postcss: ^8.4.21
       react: ^16.8.0 || ^17
@@ -6581,10 +6583,6 @@ packages:
     resolution: {integrity: sha512-U7WjGVG9sH8tvjW5SmGbQuui75FiyjAX72HX15DwBBwF9dNiQZRQAg9nnPhYy+TUnE0+VcrttuvNI8oSxZcocA==}
     hasBin: true
 
-  response-iterator@0.2.11:
-    resolution: {integrity: sha512-5tdhcAeGMSyM0/FoxAYjoOxQZ2tRR2H/S/t6kGRXu6iiWcGY5UnZgkVANbTwBVUSGqWu0ADctmoi6lOCIF8uKQ==}
-    engines: {node: '>=0.8'}
-
   response-iterator@0.2.6:
     resolution: {integrity: sha512-pVzEEzrsg23Sh053rmDUvLSkGXluZio0qu8VT6ukrYuvtjVfCbDZH9d6PGXb8HZfzdNZt8feXv/jvUzlhRgLnw==}
     engines: {node: '>=0.8'}
@@ -7595,7 +7593,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@apollo/client@3.12.5(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@apollo/client@3.13.1(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
       '@wry/caches': 1.0.1
@@ -7607,7 +7605,6 @@ snapshots:
       optimism: 0.18.1
       prop-types: 15.8.1
       rehackt: 0.1.0(@types/react@18.2.7)(react@18.3.1)
-      response-iterator: 0.2.11
       symbol-observable: 4.0.0
       ts-invariant: 0.10.3
       tslib: 2.8.1
@@ -10659,35 +10656,39 @@ snapshots:
 
   '@reach/observe-rect@1.2.0': {}
 
-  '@react-aria/interactions@3.22.5(react@18.3.1)':
+  '@react-aria/interactions@3.23.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@react-aria/ssr': 3.9.7(react@18.3.1)
-      '@react-aria/utils': 3.26.0(react@18.3.1)
-      '@react-types/shared': 3.26.0(react@18.3.1)
+      '@react-aria/utils': 3.27.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-types/shared': 3.27.0(react@18.3.1)
       '@swc/helpers': 0.5.15
       react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@react-aria/ssr@3.9.7(react@18.3.1)':
     dependencies:
       '@swc/helpers': 0.5.15
       react: 18.3.1
 
-  '@react-aria/utils@3.26.0(react@18.3.1)':
+  '@react-aria/utils@3.27.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@react-aria/ssr': 3.9.7(react@18.3.1)
       '@react-stately/utils': 3.10.5(react@18.3.1)
-      '@react-types/shared': 3.26.0(react@18.3.1)
+      '@react-types/shared': 3.27.0(react@18.3.1)
       '@swc/helpers': 0.5.15
       clsx: 2.1.1
       react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
-  '@react-aria/visually-hidden@3.8.16(react@18.3.1)':
+  '@react-aria/visually-hidden@3.8.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@react-aria/interactions': 3.22.5(react@18.3.1)
-      '@react-aria/utils': 3.26.0(react@18.3.1)
-      '@react-types/shared': 3.26.0(react@18.3.1)
+      '@react-aria/interactions': 3.23.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/utils': 3.27.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-types/shared': 3.27.0(react@18.3.1)
       '@swc/helpers': 0.5.15
       react: 18.3.1
+    transitivePeerDependencies:
+      - react-dom
 
   '@react-spring/animated@9.3.2(react@18.3.1)':
     dependencies:
@@ -10726,7 +10727,7 @@ snapshots:
       '@swc/helpers': 0.5.15
       react: 18.3.1
 
-  '@react-types/shared@3.26.0(react@18.3.1)':
+  '@react-types/shared@3.27.0(react@18.3.1)':
     dependencies:
       react: 18.3.1
 
@@ -12712,7 +12713,7 @@ snapshots:
 
   downshift@6.0.6(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.26.9
+      '@babel/runtime': 7.17.9
       compute-scroll-into-view: 1.0.20
       prop-types: 15.8.1
       react: 18.3.1
@@ -13651,19 +13652,19 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hds-core@4.1.0: {}
+  hds-core@4.2.0: {}
 
-  hds-design-tokens@4.1.0: {}
+  hds-design-tokens@4.2.0: {}
 
-  hds-react@4.1.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3):
+  hds-react@4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.9.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3):
     dependencies:
-      '@apollo/client': 3.12.5(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@apollo/client': 3.13.1(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@babel/runtime': 7.17.9
       '@emotion/styled-base': 11.0.0
       '@hookform/resolvers': 2.9.11(react-hook-form@7.54.2(react@18.3.1))
       '@juggle/resize-observer': 3.2.0
       '@popperjs/core': 2.11.5
-      '@react-aria/visually-hidden': 3.8.16(react@18.3.1)
+      '@react-aria/visually-hidden': 3.8.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-spring/web': 9.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/cookie': 0.4.1
       '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.6.3)
@@ -13673,7 +13674,7 @@ snapshots:
       date-fns: 2.16.1
       downshift: 6.0.6(react@18.3.1)
       graphql: 16.9.0
-      hds-core: 4.1.0
+      hds-core: 4.2.0
       jwt-decode: 3.1.2
       kashe: 1.0.4
       lodash: 4.17.21
@@ -15583,8 +15584,6 @@ snapshots:
       is-core-module: 2.15.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
-
-  response-iterator@0.2.11: {}
 
   response-iterator@0.2.6: {}
 
