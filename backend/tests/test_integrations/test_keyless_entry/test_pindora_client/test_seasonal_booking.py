@@ -14,7 +14,7 @@ from rest_framework.status import (
     HTTP_500_INTERNAL_SERVER_ERROR,
 )
 
-from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraBadRequestError,
@@ -155,6 +155,8 @@ def test_pindora_client__create_seasonal_booking(is_active: bool):
         created_at=local_datetime(),
         user=application_section.application.user,
         state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_type=AccessType.ACCESS_CODE,
     )
 
     data = default_seasonal_booking_response(reservation, access_code_is_active=is_active)
@@ -217,6 +219,8 @@ def test_pindora_client__create_seasonal_booking__errors(status_code, exception,
         created_at=local_datetime(),
         user=application_section.application.user,
         state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_type=AccessType.ACCESS_CODE,
     )
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))
@@ -231,7 +235,7 @@ def test_pindora_client__create_seasonal_booking__no_reservations():
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
 
-    msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
+    msg = f"No reservations require an access code in seasonal booking '{application_section.ext_uuid}'."
     with patch, pytest.raises(PindoraClientError, match=exact(msg)):
         PindoraClient.create_seasonal_booking(application_section)
 
@@ -252,7 +256,7 @@ def test_pindora_client__create_seasonal_booking__no_confirmed_reservations():
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
 
-    msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
+    msg = f"No reservations require an access code in seasonal booking '{application_section.ext_uuid}'."
     with patch, pytest.raises(PindoraClientError, match=exact(msg)):
         PindoraClient.create_seasonal_booking(application_section)
 
@@ -269,6 +273,8 @@ def test_pindora_client__reschedule_seasonal_booking():
         created_at=local_datetime(),
         user=application_section.application.user,
         state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_type=AccessType.ACCESS_CODE,
     )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
@@ -309,6 +315,8 @@ def test_pindora_client__reschedule_seasonal_booking__errors(status_code, except
         created_at=local_datetime(),
         user=application_section.application.user,
         state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_type=AccessType.ACCESS_CODE,
     )
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=status_code))

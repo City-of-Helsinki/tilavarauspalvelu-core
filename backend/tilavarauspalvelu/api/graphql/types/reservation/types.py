@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import TYPE_CHECKING, NamedTuple
+from typing import TYPE_CHECKING
 
 import graphene
 from django.db import models
@@ -16,6 +16,7 @@ from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import Reservation, ReservationUnit, User
+from tilavarauspalvelu.typing import PindoraReservationInfoData
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.db import SubqueryArray
 from utils.utils import ical_hmac_signature
@@ -35,20 +36,6 @@ if TYPE_CHECKING:
 __all__ = [
     "ReservationNode",
 ]
-
-
-class PindoraReservationInfoData(NamedTuple):
-    access_code: str
-    access_code_generated_at: datetime.datetime
-    access_code_is_active: bool
-
-    access_code_keypad_url: str
-    access_code_phone_number: str
-    access_code_sms_number: str
-    access_code_sms_message: str
-
-    access_code_begins_at: datetime.datetime
-    access_code_ends_at: datetime.datetime
 
 
 class PindoraReservationInfoType(graphene.ObjectType):
@@ -413,6 +400,10 @@ class ReservationNode(DjangoNode):
         end: datetime.datetime,
         has_perms: bool,
     ) -> PindoraReservationInfoData | None:
+        # Don't show Pindora info without permissions if the application round results haven't been sent yet
+        if not has_perms and section.application.application_round.sent_date is None:
+            return None
+
         try:
             response = PindoraClient.get_seasonal_booking(section=section.ext_uuid)
         except Exception:  # noqa: BLE001
