@@ -275,6 +275,7 @@ export function SingleSearchForm({
             control={control}
             options={unitTypeOptions}
             enableSearch
+            clearable
             label={t("searchForm:typeLabel")}
           />
           <TextInput
