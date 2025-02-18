@@ -10,6 +10,7 @@ import { Breadcrumb } from "../common/Breadcrumb";
 import { fontBold, H1 } from "common";
 import { Stepper as HDSStepper, StepState } from "hds-react";
 import { validateApplication } from "./form";
+import { isSent } from "./module";
 
 const InnerContainer = styled.div`
   display: grid;
@@ -44,8 +45,11 @@ function calculateCompletedStep(
 ): -1 | 0 | 1 | 2 | 3 {
   const isValid = validateApplication(application);
 
-  if (isValid.valid) {
+  if (isSent(application?.status)) {
     return 3;
+  }
+  if (isValid.valid) {
+    return 2;
   }
 
   const { page } = isValid;
