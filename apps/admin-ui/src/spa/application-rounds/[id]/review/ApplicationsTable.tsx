@@ -2,16 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { memoize, orderBy, uniqBy } from "lodash";
 import type { TFunction } from "i18next";
-import {
-  IconArrowTopRight,
-  IconCheck,
-  IconClock,
-  IconCogwheel,
-  IconEnvelope,
-  IconLinkExternal,
-  IconQuestionCircle,
-  IconSize,
-} from "hds-react";
+import { IconLinkExternal, IconSize } from "hds-react";
 import { ApplicationsQuery, ApplicationStatusChoice } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicantName, truncate } from "@/helpers";
@@ -22,8 +13,7 @@ import {
 } from "./utils";
 import { getApplicationUrl } from "@/common/urls";
 import { ExternalTableLink } from "@/styles/util";
-import type { StatusLabelType } from "common/src/tags";
-import StatusLabel from "common/src/components/StatusLabel";
+import { ApplicationStatusLabel } from "common/src/components/statuses";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -45,28 +35,6 @@ type ApplicationView = {
   units: UnitType[];
   applicationCount: string;
   status?: ApplicationStatusChoice;
-};
-
-const getStatusProps = (
-  status?: ApplicationStatusChoice
-): { type: StatusLabelType; icon: JSX.Element } => {
-  switch (status) {
-    case ApplicationStatusChoice.Draft:
-      return { type: "draft", icon: <IconArrowTopRight aria-hidden="true" /> };
-    case ApplicationStatusChoice.InAllocation:
-      return { type: "alert", icon: <IconClock aria-hidden="true" /> };
-    case ApplicationStatusChoice.Received:
-      return { type: "info", icon: <IconCogwheel aria-hidden="true" /> };
-    case ApplicationStatusChoice.Handled:
-      return { type: "success", icon: <IconCheck aria-hidden="true" /> };
-    case ApplicationStatusChoice.ResultsSent:
-      return { type: "success", icon: <IconEnvelope aria-hidden="true" /> };
-    default:
-      return {
-        type: "neutral",
-        icon: <IconQuestionCircle aria-hidden="true" />,
-      };
-  }
 };
 
 export const SORT_KEYS = [
@@ -125,14 +93,9 @@ const getColConfig = (t: TFunction) =>
     {
       headerTKey: "Application.headings.phase",
       key: "application_status",
-      transform: ({ status }: { status: ApplicationStatusChoice }) => {
-        const statusProps = getStatusProps(status);
-        return (
-          <StatusLabel type={statusProps.type} icon={statusProps.icon} slim>
-            {t(`Application.statuses.${status}`)}
-          </StatusLabel>
-        );
-      },
+      transform: ({ status }: { status: ApplicationStatusChoice }) => (
+        <ApplicationStatusLabel status={status} user="admin" slim />
+      ),
     },
   ].map(({ headerTKey, key, ...col }) => ({
     ...col,

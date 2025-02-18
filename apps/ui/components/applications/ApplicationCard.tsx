@@ -6,11 +6,8 @@ import {
   ButtonSize,
   ButtonVariant,
   IconArrowRight,
-  IconCheck,
-  IconCogwheel,
   IconCross,
   IconPen,
-  IconQuestionCircle,
   LoadingSpinner,
 } from "hds-react";
 import { breakpoints } from "common/src/common/style";
@@ -26,9 +23,8 @@ import { getApplicationRoundName } from "@/modules/applicationRound";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import Card from "common/src/components/Card";
-import StatusLabel from "common/src/components/StatusLabel";
-import { type StatusLabelType } from "common/src/tags";
 import { getApplicationPath } from "@/modules/urls";
+import { ApplicationStatusLabel } from "common/src/components/statuses";
 
 const StyledButton = styled(Button)`
   @media (max-width: ${breakpoints.s}) {
@@ -79,38 +75,6 @@ function isEditable(
   return false;
 }
 
-function getApplicationStatusLabelProps(
-  status?: Maybe<ApplicationStatusChoice>
-): { type: StatusLabelType; icon: JSX.Element } {
-  switch (status) {
-    case ApplicationStatusChoice.Draft:
-      return {
-        type: "draft",
-        icon: <IconPen />,
-      };
-    case ApplicationStatusChoice.ResultsSent:
-      return {
-        type: "success",
-        icon: <IconCheck />,
-      };
-    case ApplicationStatusChoice.Handled:
-    case ApplicationStatusChoice.InAllocation:
-    case ApplicationStatusChoice.Received:
-      return {
-        type: "info",
-        icon: <IconCogwheel />,
-      };
-    // These two should never be shown to the client, so they are shown as any other unexpected status
-    case ApplicationStatusChoice.Cancelled:
-    case ApplicationStatusChoice.Expired:
-    default:
-      return {
-        type: "neutral",
-        icon: <IconQuestionCircle />,
-      };
-  }
-}
-
 export function ApplicationCard({
   application,
   actionCallback,
@@ -141,16 +105,12 @@ export function ApplicationCard({
 
   const editable = isEditable(application.status);
 
-  const labelProps = getApplicationStatusLabelProps(application.status);
-
   const tags = [
-    <StatusLabel
-      type={labelProps.type}
-      icon={labelProps.icon}
-      key="status-label"
-    >
-      {t(`applicationCard:status.${application.status}`)}
-    </StatusLabel>,
+    <ApplicationStatusLabel
+      status={application.status}
+      user="customer"
+      key="status"
+    />,
   ];
 
   const buttons = [
