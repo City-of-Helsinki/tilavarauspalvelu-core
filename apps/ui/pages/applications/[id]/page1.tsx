@@ -128,6 +128,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
+export default Page1;
+
 export const APPLICATION_PAGE1_QUERY = gql`
   query ApplicationPage1($id: ID!) {
     application(id: $id) {
@@ -135,5 +137,3 @@ export const APPLICATION_PAGE1_QUERY = gql`
     }
   }
 `;
-
-export default Page1;

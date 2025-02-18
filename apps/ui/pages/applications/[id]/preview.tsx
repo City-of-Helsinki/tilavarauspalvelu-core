@@ -35,9 +35,6 @@ import { ErrorText } from "common/src/components/ErrorText";
 import Link from "next/link";
 import { validateApplication } from "@/components/application/form";
 
-type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
-
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
 // we could also remove the FormContext here
@@ -142,6 +139,9 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
   );
 }
 
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
+
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
   const commonProps = getCommonServerSideProps();
@@ -171,7 +171,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: ApplicationPage1Document,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
-  const { application } = data ?? {};
+  const { application } = data;
   if (application == null) {
     return notFound;
   }

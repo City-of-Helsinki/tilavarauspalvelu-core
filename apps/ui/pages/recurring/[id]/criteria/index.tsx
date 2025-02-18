@@ -5,8 +5,8 @@ import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
   ApplicationRoundCriteriaDocument,
-  ApplicationRoundCriteriaQuery,
-  ApplicationRoundCriteriaQueryVariables,
+  type ApplicationRoundCriteriaQuery,
+  type ApplicationRoundCriteriaQueryVariables,
 } from "@gql/gql-types";
 import { breakpoints, H1, H2, H3 } from "common";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -25,65 +25,6 @@ import { gql } from "@apollo/client";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
-
-export const APPLICATION_ROUND_CRITERIA_QUERY = gql`
-  query ApplicationRoundCriteria($id: ID!) {
-    applicationRound(id: $id) {
-      pk
-      id
-      nameFi
-      nameEn
-      nameSv
-      criteriaFi
-      criteriaEn
-      criteriaSv
-      notesWhenApplyingFi
-      notesWhenApplyingEn
-      notesWhenApplyingSv
-    }
-  }
-`;
-
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale, params } = ctx;
-  const pk = toNumber(ignoreMaybeArray(params?.id));
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-
-  const notFound = {
-    notFound: true,
-    props: {
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
-      notFound: true,
-    },
-  };
-
-  if (pk == null || !(pk > 0)) {
-    return notFound;
-  }
-  const { data } = await apolloClient.query<
-    ApplicationRoundCriteriaQuery,
-    ApplicationRoundCriteriaQueryVariables
-  >({
-    query: ApplicationRoundCriteriaDocument,
-    variables: {
-      id: base64encode(`ApplicationRoundNode:${pk}`),
-    },
-  });
-  const applicationRound = data?.applicationRound;
-
-  if (applicationRound == null) {
-    return notFound;
-  }
-  return {
-    props: {
-      ...commonProps,
-      applicationRound,
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
-}
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -142,4 +83,63 @@ function Criteria({
   );
 }
 
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { locale, params } = ctx;
+  const pk = toNumber(ignoreMaybeArray(params?.id));
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+
+  const notFound = {
+    notFound: true,
+    props: {
+      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
+      notFound: true,
+    },
+  };
+
+  if (pk == null || !(pk > 0)) {
+    return notFound;
+  }
+  const { data } = await apolloClient.query<
+    ApplicationRoundCriteriaQuery,
+    ApplicationRoundCriteriaQueryVariables
+  >({
+    query: ApplicationRoundCriteriaDocument,
+    variables: {
+      id: base64encode(`ApplicationRoundNode:${pk}`),
+    },
+  });
+
+  const { applicationRound } = data;
+  if (applicationRound == null) {
+    return notFound;
+  }
+  return {
+    props: {
+      ...commonProps,
+      applicationRound,
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
+}
+
 export default Criteria;
+
+export const APPLICATION_ROUND_CRITERIA_QUERY = gql`
+  query ApplicationRoundCriteria($id: ID!) {
+    applicationRound(id: $id) {
+      pk
+      id
+      nameFi
+      nameEn
+      nameSv
+      criteriaFi
+      criteriaEn
+      criteriaSv
+      notesWhenApplyingFi
+      notesWhenApplyingEn
+      notesWhenApplyingSv
+    }
+  }
+`;
