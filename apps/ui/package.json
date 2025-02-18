@@ -65,7 +65,7 @@
     "happy-dom": "^16.5.3",
     "jest": "^29.7.0",
     "jest-axe": "^8.0.0",
-    "postcss-styled-syntax": "^0.6.4",
+    "postcss-styled-syntax": "^0.7.1",
     "prettier": "^3.5.1",
     "stylelint": "^16.2.1",
     "stylelint-config-standard": "^36.0.1",
