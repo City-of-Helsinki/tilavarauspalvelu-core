@@ -107,7 +107,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     )
 
     access_type = EnumMultipleChoiceFilter(method="filter_by_access_type", enum=AccessType)
-    access_type_start_date = django_filters.DateFilter(method="filter_by_access_type")
+    access_type_begin_date = django_filters.DateFilter(method="filter_by_access_type")
     access_type_end_date = django_filters.DateFilter(method="filter_by_access_type")
 
     only_with_permission = django_filters.BooleanFilter(method="get_only_with_permission")
@@ -215,8 +215,8 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
             return qs
 
         return qs.with_access_type_at(
-            allowed_access_types=[AccessType(access_type) for access_type in allowed_access_types],
-            begin_date=value.get("access_type_start_date"),
+            allowed_access_types=allowed_access_types,
+            begin_date=value.get("access_type_begin_date"),
             end_date=value.get("access_type_end_date"),
         )
 

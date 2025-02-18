@@ -1,29 +1,33 @@
 from __future__ import annotations
 
-import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from auditlog.models import LogEntry
 from django.conf import settings
 from django.db import transaction
-from django.db.transaction import atomic
 from graphene.utils.str_converters import to_camel_case
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.errors import GQLCodeError
-from graphene_django_extensions.serializers import NotProvided
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers import (
     ApplicationRoundTimeSlotSerializer,
 )
+from tilavarauspalvelu.api.graphql.types.reservation_unit_access_type.serializers import (
+    ReservationUnitAccessTypeSerializer,
+)
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
 from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationUnitPublishingState, WeekdayChoice
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
+
+if TYPE_CHECKING:
+    import datetime
 
 __all__ = [
     "ReservationUnitSerializer",
@@ -36,6 +40,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
     images = ReservationUnitImageFieldSerializer(many=True, required=False)
     pricings = ReservationUnitPricingSerializer(many=True, required=False)
     application_round_time_slots = ApplicationRoundTimeSlotSerializer(many=True, required=False)
+    access_types = ReservationUnitAccessTypeSerializer(many=True, required=False)
 
     class Meta:
         model = ReservationUnit
@@ -71,8 +76,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "max_reservation_duration",
             "buffer_time_before",
             "buffer_time_after",
-            "access_type_start_date",
-            "access_type_end_date",
             #
             # Booleans
             "is_draft",
@@ -87,7 +90,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "authentication",
             "reservation_start_interval",
             "reservation_kind",
-            "access_type",
             "publishing_state",
             #
             # List fields
@@ -114,16 +116,16 @@ class ReservationUnitSerializer(NestingModelSerializer):
             # Reverse one-to-many related
             "images",
             "pricings",
+            "access_types",
             "application_round_time_slots",
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        is_draft = data.get("is_draft", getattr(self.instance, "is_draft", False))
+        is_draft = self.get_or_default("is_draft", data)
 
         self._validate_reservation_duration_fields(data)
         self._validate_pricings(data)
-
-        self._validate_access_type(data)
+        self._validate_access_types(access_types=data.get("access_types", []), is_draft=is_draft)
 
         if not is_draft:
             self._validate_for_publish(data)
@@ -250,13 +252,73 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 msg = "Highest price cannot be less than lowest price."
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES)
 
-    def _validate_access_type(self, data: dict[str, Any]) -> None:
-        access_type_start_date = self.get_or_default("access_type_start_date", data) or datetime.date.min
-        access_type_end_date = self.get_or_default("access_type_end_date", data) or datetime.date.max
+    def _validate_access_types(self, *, access_types: list[dict[str, Any]], is_draft: bool) -> None:  # noqa: PLR0912
+        editing = getattr(self.instance, "pk", None) is not None
 
-        if access_type_end_date < access_type_start_date:
-            msg = "Access type start date must be before access type end date."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_ACCESS_TYPE_START_DATE_INVALID)
+        today = local_date()
+        has_active: bool = False
+        if editing:
+            has_active = self.instance.access_types.filter(begin_date__lte=today).exists()
+
+        if not access_types:
+            if is_draft:
+                return
+
+            if not has_active:
+                msg = "At least one active access type is required."
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_ACTIVE_ACCESS_TYPE)
+
+            return
+
+        need_to_check_pindora: bool = False
+
+        existing: dict[int, ReservationUnitAccessType] = {}
+        if editing:
+            pks: set[int] = {int(at["pk"]) for at in access_types if "pk" in at}
+            existing = {at.pk: at for at in self.instance.access_types.filter(pk__in=pks).order_by("begin_date")}
+
+        for access_type in access_types:
+            existing_access_type: ReservationUnitAccessType | None = None
+
+            pk: int | None = access_type.get("pk")
+            if pk is not None:
+                existing_access_type = existing.get(pk)
+                if existing_access_type is None:
+                    msg = "Access type with this primary key doesn't belong to this reservation unit"
+                    raise ValidationError(msg)
+
+            new_access_type: str = access_type["access_type"]
+            begin_date: datetime.date = access_type["begin_date"]
+
+            if not editing:
+                ReservationUnitAccessType.validator.validate_not_access_code(new_access_type)
+
+            if not need_to_check_pindora:
+                # Check from Pindora even if changed access type begin date is in the past since
+                # it could be the currently active one. For more precision, we would need to calculate
+                # the end dates for the new access types, but that would add a lot of complexity.
+                need_to_check_pindora = new_access_type == AccessType.ACCESS_CODE and (
+                    existing_access_type is None
+                    or (existing_access_type is not None and existing_access_type.access_type != AccessType.ACCESS_CODE)
+                )
+
+            if existing_access_type is not None:
+                existing_access_type.validator.validate_not_past(begin_date)
+                existing_access_type.validator.validate_not_moved_to_past(begin_date)
+            else:
+                ReservationUnitAccessType.validator.validate_new_not_in_past(begin_date)
+
+            has_active = has_active or begin_date <= today
+
+        if not has_active:
+            msg = "At least one active access type is required."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_ACTIVE_ACCESS_TYPE)
+
+        if need_to_check_pindora:
+            try:
+                PindoraClient.get_reservation_unit(self.instance)
+            except ExternalServiceError as error:
+                raise ValidationError(str(error)) from error
 
     @staticmethod
     def validate_application_round_time_slots(timeslots: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -289,6 +351,31 @@ class ReservationUnitSerializer(NestingModelSerializer):
         self.remove_personal_data_and_logs_on_archive(instance)
         self.update_hauki(instance)
         return instance
+
+    @transaction.atomic
+    def create(self, validated_data: dict[str, Any]) -> ReservationUnit:
+        pricings = validated_data.pop("pricings", [])
+        access_types = validated_data.pop("access_types", [])
+        reservation_unit = super().create(validated_data)
+        self.handle_pricings(pricings, reservation_unit)
+        self.handle_access_types(access_types, reservation_unit)
+        return reservation_unit
+
+    @transaction.atomic
+    def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
+        # The ReservationUnit can't be archived if it has active reservations in the future
+        if instance.publishing_state != ReservationUnitPublishingState.ARCHIVED and validated_data.get("is_archived"):
+            future_reservations = instance.reservations.going_to_occur().filter(end__gt=local_datetime())
+            if future_reservations.exists():
+                msg = "Reservation unit can't be archived if it has any reservations in the future"
+                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)
+
+        pricings = validated_data.pop("pricings", [])
+        access_types = validated_data.pop("access_types", [])
+        reservation_unit = super().update(instance, validated_data)
+        self.handle_pricings(pricings, reservation_unit)
+        self.handle_access_types(access_types, reservation_unit)
+        return reservation_unit
 
     def remove_personal_data_and_logs_on_archive(self, instance: ReservationUnit) -> None:
         """
@@ -324,7 +411,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
     @staticmethod
     def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
-        with atomic():
+        with transaction.atomic():
             # Delete future pricings that are not in the payload.
             # Past or Active pricings can not be deleted.
             pricing_pks = [pricing.get("pk") for pricing in pricings if "pk" in pricing]
@@ -341,32 +428,28 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 else:  # Create new pricings
                     ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
-    @transaction.atomic
-    def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
-        # The ReservationUnit can't be archived if it has active reservations in the future
-        if instance.publishing_state != ReservationUnitPublishingState.ARCHIVED and validated_data.get("is_archived"):
-            future_reservations = instance.reservations.going_to_occur().filter(end__gt=local_datetime())
-            if future_reservations.exists():
-                msg = "Reservation unit can't be archived if it has any reservations in the future"
-                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)
+    @staticmethod
+    def handle_access_types(access_types: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
+        """Update access types for a reservation unit."""
+        access_type_pks = [access_type.get("pk") for access_type in access_types if "pk" in access_type]
+        today = local_date()
 
-        access_type = validated_data.get("access_type", NotProvided)
-        access_type_start_date = validated_data.get("access_type_start_date", NotProvided)
-        access_type_end_date = validated_data.get("access_type_end_date", NotProvided)
+        with transaction.atomic():
+            # Delete future access types that are not in the payload.
+            # Past or active access types should not be deleted.
+            ReservationUnitAccessType.objects.filter(
+                reservation_unit=reservation_unit,
+                begin_date__gt=today,
+            ).exclude(pk__in=access_type_pks).delete()
 
-        # If at least one value was provided, we might need to update access type for reservations
-        if {access_type, access_type_start_date, access_type_end_date} != {NotProvided}:
-            access_type = AccessType(validated_data.get("access_type", self.instance.access_type))
-            access_type_start_date = validated_data.get("access_type_start_date", self.instance.access_type_start_date)
-            access_type_end_date = validated_data.get("access_type_end_date", self.instance.access_type_end_date)
-
-            self.instance.actions.update_access_type_for_reservations(
-                access_type=access_type,
-                access_type_start_date=access_type_start_date,
-                access_type_end_date=access_type_end_date,
+            ReservationUnitAccessType.objects.bulk_create(
+                objs=[
+                    ReservationUnitAccessType(**access_type, reservation_unit=reservation_unit)
+                    for access_type in access_types
+                ],
+                update_conflicts=True,
+                update_fields=["access_type", "begin_date"],
+                unique_fields=["pk"],
             )
 
-        pricings = validated_data.pop("pricings", [])
-        reservation_unit = super().update(instance, validated_data)
-        self.handle_pricings(pricings, instance)
-        return reservation_unit
+        reservation_unit.actions.update_access_types_for_reservations()
