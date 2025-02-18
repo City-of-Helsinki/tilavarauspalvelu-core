@@ -10,8 +10,8 @@ import {
   type ApplicantFragment,
   type ApplicationPage2Query,
   ApplicationFormFragment,
+  type Maybe,
 } from "@gql/gql-types";
-import { type Maybe } from "graphql/jsutils/Maybe";
 import { z } from "zod";
 import { toApiDate, toUIDate } from "common/src/common/util";
 import { fromUIDate } from "@/modules/util";
@@ -19,7 +19,6 @@ import {
   checkValidDateOnly,
   lessThanMaybeDate,
 } from "common/src/schemas/schemaCommon";
-import { convertWeekday } from "common/src/conversion";
 
 type Organisation = ApplicationFormFragment["organisation"];
 type Address = NonNullable<Organisation>["address"];
@@ -29,23 +28,6 @@ type SectionType = NonNullable<
 
 type NodePage2 = NonNullable<ApplicationPage2Query["application"]>;
 type SectionTypePage2 = NonNullable<NodePage2["applicationSections"]>[0];
-
-// NOTE the zod schemas have a lot of undefineds because the form is split into four pages
-// so you can't trust some of the zod validation (e.g. mandatory fields)
-// real solution is to split the forms per page so we have four schemas
-// the new mutation interface allows only updating the fields that are present
-// also then all manual validations and setErrors should be removed
-
-const ApplicationEventScheduleFormTypeSchema = z.object({
-  day: z.number().min(0).max(6),
-  begin: z.string(),
-  end: z.string(),
-  priority: z.number(),
-});
-
-export type ApplicationEventScheduleFormType = z.infer<
-  typeof ApplicationEventScheduleFormTypeSchema
->;
 
 const SuitableTimeRangeFormTypeSchema = z.object({
   pk: z.number().optional(),
@@ -59,13 +41,14 @@ export type SuitableTimeRangeFormValues = z.infer<
   typeof SuitableTimeRangeFormTypeSchema
 >;
 
-const ApplicationSectionFormValueSchema = z
+const ApplicationSectionPage1Schema = z
   .object({
     pk: z.number().optional(),
     name: z.string().min(1, { message: "Required" }).max(100),
     numPersons: z
       .number()
       .min(1)
+      // don't preselect a value for the user
       .optional()
       .refine((s) => s, {
         path: [""],
@@ -76,14 +59,8 @@ const ApplicationSectionFormValueSchema = z
     minDuration: z.number().min(1, { message: "Required" }),
     maxDuration: z.number().min(1, { message: "Required" }),
     appliedReservationsPerWeek: z.number().min(1).max(7),
-    begin: z
-      .string()
-      .optional()
-      .refine((s) => s, { path: [""], message: "Required" }),
-    end: z
-      .string()
-      .optional()
-      .refine((s) => s, { path: [""], message: "Required" }),
+    begin: z.string().min(1, { message: "Required" }),
+    end: z.string().min(1, { message: "Required" }),
     // TODO do we want to keep the pk of the options? so we can update them when the order changes and not recreate the whole list on save?
     reservationUnits: z.array(z.number()).min(1, { message: "Required" }),
     // frontend only props
@@ -116,11 +93,11 @@ const ApplicationSectionFormValueSchema = z
     }
   });
 
-export type ApplicationSectionFormValue = z.infer<
-  typeof ApplicationSectionFormValueSchema
+export type ApplicationSectionPage1FormValues = z.infer<
+  typeof ApplicationSectionPage1Schema
 >;
 
-export type ApplicationSectionPage2FormValue = z.infer<
+export type ApplicationSectionPage2FormValues = z.infer<
   typeof ApplicationSectionPage2Schema
 >;
 
@@ -135,19 +112,15 @@ function lengthOfTimeRange(timeRange: SuitableTimeRangeFormValues): number {
 const ApplicationSectionPage2Schema = z
   .object({
     pk: z.number(),
-    suitableTimeRanges: z.array(SuitableTimeRangeFormTypeSchema).min(1),
-    minDuration: z.number().min(1),
-    name: z.string().min(1).max(100),
-    // selected reservation unit to show for this section (only used by Page2)
-    // TODO split the form? so we have three schemas (common + page1 + page2)
-    reservationUnitPk: z.number().optional(),
-    priority: z.literal(200).or(z.literal(300)).optional(),
+    suitableTimeRanges: z
+      .array(SuitableTimeRangeFormTypeSchema)
+      .min(1, { message: "Required" }),
+    minDuration: z.number().min(1, { message: "Required" }),
+    name: z.string().min(1, { message: "Required" }).max(100),
+    reservationUnitPk: z.number(),
+    priority: z.literal(200).or(z.literal(300)),
     // NOTE: not sent or modified here, but required for validation
     appliedReservationsPerWeek: z.number().min(1).max(7),
-  })
-  .refine((s) => s.suitableTimeRanges.length > 0, {
-    path: ["suitableTimeRanges"],
-    message: "Required",
   })
   .refine(
     (s) =>
@@ -177,7 +150,7 @@ const ApplicationSectionPage2Schema = z
   );
 
 function transformApplicationSectionPage2(
-  values: ApplicationSectionPage2FormValue
+  values: ApplicationSectionPage2FormValues
 ): UpdateApplicationSectionForApplicationSerializerInput {
   return {
     pk: values.pk,
@@ -186,9 +159,10 @@ function transformApplicationSectionPage2(
     ),
   };
 }
+
 function convertApplicationSectionPage2(
   section: SectionTypePage2
-): ApplicationSectionPage2FormValue {
+): ApplicationSectionPage2FormValues {
   const reservationUnitPk =
     section.reservationUnitOptions.find(() => true)?.reservationUnit.pk ?? 0;
   const { name, appliedReservationsPerWeek } = section;
@@ -211,26 +185,9 @@ export const ApplicationPage2Schema = z.object({
 
 export type ApplicationPage2FormValues = z.infer<typeof ApplicationPage2Schema>;
 
-export function convertToSchedule(
-  b: NonNullable<
-    NonNullable<ApplicationPage2FormValues["applicationSections"]>[0]
-  >
-): ApplicationEventScheduleFormType[] {
-  return (
-    b.suitableTimeRanges?.map((range) => {
-      return {
-        day: range ? convertWeekday(range.dayOfTheWeek) : 0,
-        begin: range?.beginTime ?? "",
-        end: range?.endTime ?? "",
-        priority: range?.priority === Priority.Primary ? 300 : 200,
-      };
-    }) ?? []
-  );
-}
-
-function transformApplicationSectionToForm(
+function convertApplicationSectionPage1(
   section: SectionType
-): ApplicationSectionFormValue {
+): ApplicationSectionPage1FormValues {
   const reservationUnits = filterNonNullable(
     section.reservationUnitOptions?.map(
       ({ reservationUnit, preferredOrder }) => ({
@@ -259,8 +216,8 @@ function transformApplicationSectionToForm(
     appliedReservationsPerWeek: section.appliedReservationsPerWeek ?? 0,
     reservationUnits,
     // TODO why do these default to undefined instead of empty string?
-    begin: convertDate(section.reservationsBeginDate),
-    end: convertDate(section.reservationsEndDate),
+    begin: convertDate(section.reservationsBeginDate) ?? "",
+    end: convertDate(section.reservationsEndDate) ?? "",
     accordionOpen: false,
   };
 }
@@ -285,37 +242,35 @@ function convertDate(date: string | null | undefined): string | undefined {
   return toUIDate(new Date(date)) || undefined;
 }
 
-const AddressFormValueSchema = z.object({
+const AddressSchema = z.object({
   pk: z.number().optional(),
   streetAddress: z.string().min(1).max(80),
   city: z.string().min(1).max(80),
   postCode: z.string().min(1).max(32),
 });
-export type AddressFormValues = z.infer<typeof AddressFormValueSchema>;
+type AddressFormValues = z.infer<typeof AddressSchema>;
 
 // TODO identifier is only optional for Associations (not for Companies / Communities)
-const OrganisationFormValuesSchema = z.object({
+const OrganisationsSchema = z.object({
   pk: z.number().optional(),
   name: z.string().min(1).max(255),
   identifier: z.string().max(255).optional(),
   yearEstablished: z.number().optional(),
   coreBusiness: z.string().min(1).max(255),
-  address: AddressFormValueSchema,
+  address: AddressSchema,
 });
-export type OrganisationFormValues = z.infer<
-  typeof OrganisationFormValuesSchema
->;
+type OrganisationFormValues = z.infer<typeof OrganisationsSchema>;
 
-const PersonFormValuesSchema = z.object({
+const PersonsSchema = z.object({
   pk: z.number().optional(),
   firstName: z.string().min(1).max(255),
   lastName: z.string().min(1).max(255),
   email: z.string().min(1).max(254).email(),
   phoneNumber: z.string().min(1).max(255),
 });
-export type PersonFormValues = z.infer<typeof PersonFormValuesSchema>;
+type PersonFormValues = z.infer<typeof PersonsSchema>;
 
-export const convertPerson = (p: Maybe<PersonNode>): PersonFormValues => ({
+const convertPerson = (p: Maybe<PersonNode> | undefined): PersonFormValues => ({
   pk: p?.pk ?? undefined,
   firstName: p?.firstName ?? "",
   lastName: p?.lastName ?? "",
@@ -324,16 +279,14 @@ export const convertPerson = (p: Maybe<PersonNode>): PersonFormValues => ({
 });
 
 // TODO are these converters the wrong way around? (not input, but output)
-export const convertAddress = (a: Address): AddressFormValues => ({
+const convertAddress = (a: Address): AddressFormValues => ({
   pk: a?.pk ?? undefined,
   streetAddress: a?.streetAddressFi ?? "",
   city: a?.cityFi ?? "",
   postCode: a?.postCode ?? "",
 });
 
-export const convertOrganisation = (
-  o: Organisation
-): OrganisationFormValues => ({
+const convertOrganisation = (o: Organisation): OrganisationFormValues => ({
   pk: o?.pk ?? undefined,
   name: o?.nameFi ?? "",
   identifier: o?.identifier ?? "",
@@ -352,7 +305,7 @@ const ApplicationPage1Schema = z.object({
   pk: z.number(),
   applicantType: ApplicantTypeSchema.optional(),
   applicationSections: z
-    .array(ApplicationSectionFormValueSchema.optional())
+    .array(ApplicationSectionPage1Schema.optional())
     .optional(),
 });
 
@@ -394,7 +347,7 @@ function checkApplicationRoundDates(
     begin: Date;
     end: Date;
   },
-  val: ApplicationSectionFormValue,
+  val: ApplicationSectionPage1FormValues,
   pathRoot: string,
   ctx: z.RefinementCtx
 ) {
@@ -451,15 +404,14 @@ export const ApplicationPage3Schema = z
   .object({
     pk: z.number(),
     applicantType: ApplicantTypeSchema.optional(),
-    organisation: OrganisationFormValuesSchema.optional(),
-    contactPerson: PersonFormValuesSchema,
-    billingAddress: AddressFormValueSchema.optional(),
+    organisation: OrganisationsSchema.optional(),
+    contactPerson: PersonsSchema,
+    billingAddress: AddressSchema.optional(),
     // this is not submitted, we can use it to remove the billing address from submit without losing the frontend state
     hasBillingAddress: z.boolean(),
-    // TODO what is the max length for this?
-    additionalInformation: z.string().optional(),
+    additionalInformation: z.string().max(255).optional(),
     // homeCity is only for Organisations
-    homeCity: z.number().optional(),
+    homeCity: z.number().min(1, { message: "Required" }).optional(),
   })
   // have to check at form level otherwise it forbids undefined initialization
   .refine((val) => val.applicantType != null, {
@@ -529,7 +481,7 @@ function transformSuitableTimeRange(timeRange: SuitableTimeRangeFormValues) {
 // NOTE this works only for subsections of an application mutation
 // if needed without an application mutation needs to use a different SerializerInput
 function transformApplicationSection(
-  ae: ApplicationSectionFormValue
+  ae: ApplicationSectionPage1FormValues
 ): UpdateApplicationSectionForApplicationSerializerInput {
   const begin = transformDateString(ae.begin);
   const end = transformDateString(ae.end);
@@ -599,7 +551,7 @@ export function convertApplicationPage1(
   reservationUnits: number[]
 ): ApplicationPage1FormValues {
   const formAes = filterNonNullable(app?.applicationSections).map((ae) =>
-    transformApplicationSectionToForm(ae)
+    convertApplicationSectionPage1(ae)
   );
   // TODO do we need to set default values?
   const defaultAes: (typeof formAes)[0] = {
@@ -614,8 +566,8 @@ export function convertApplicationPage1(
     purpose: 0,
     minDuration: 0,
     maxDuration: 0,
-    begin: undefined,
-    end: undefined,
+    begin: "",
+    end: "",
     appliedReservationsPerWeek: 1,
     reservationUnits: filterNonNullable(reservationUnits),
     accordionOpen: true,

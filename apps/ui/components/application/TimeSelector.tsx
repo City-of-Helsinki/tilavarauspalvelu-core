@@ -14,7 +14,7 @@ import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import { arrowDown, arrowUp } from "@/styles/util";
 import { TimePreview } from "./TimePreview";
-import { convertToSchedule, type ApplicationPage2FormValues } from "./form";
+import { type ApplicationPage2FormValues } from "./form";
 import { useFormContext } from "react-hook-form";
 import { ControlledSelect } from "common/src/components/form";
 import { Flex, NoWrap } from "common/styles/util";
@@ -355,7 +355,7 @@ export function TimeSelector({
   const getSelectorData = (): Cell[][][] => {
     const applicationSections = filterNonNullable(watch("applicationSections"));
     const selectorData = applicationSections.map((ae) =>
-      aesToCells(convertToSchedule(ae), reservationUnitOpeningHours)
+      aesToCells(ae.suitableTimeRanges, reservationUnitOpeningHours)
     );
     return selectorData;
   };

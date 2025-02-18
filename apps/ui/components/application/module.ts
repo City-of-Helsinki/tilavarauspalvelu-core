@@ -1,10 +1,11 @@
-import {
-  type ApplicationEventScheduleFormType,
-  type SuitableTimeRangeFormValues,
-} from "./form";
+import { type SuitableTimeRangeFormValues } from "./form";
 import { ApplicationRoundTimeSlotNode, Priority } from "@/gql/gql-types";
-import { Day, transformWeekday } from "common/src/conversion";
-import { filterNonNullable } from "common/src/helpers";
+import { convertWeekday, Day, transformWeekday } from "common/src/conversion";
+import {
+  filterNonNullable,
+  formatApiTimeInterval,
+  timeToMinutes,
+} from "common/src/helpers";
 
 export type ApplicationEventSchedulePriority = 50 | 100 | 200 | 300;
 
@@ -29,7 +30,7 @@ type Timespan = {
 };
 
 export function aesToCells(
-  schedule: ApplicationEventScheduleFormType[],
+  schedule: SuitableTimeRangeFormValues[],
   openingHours?: DailyOpeningHours
 ): Cell[][] {
   const firstSlotStart = 7;
@@ -60,13 +61,15 @@ export function aesToCells(
   }
 
   for (const aes of schedule) {
-    const { day, priority } = aes;
-    const hourBegin = Number(aes.begin.substring(0, 2)) - firstSlotStart;
-    const hourEnd = (Number(aes.end.substring(0, 2)) || 24) - firstSlotStart;
+    const { dayOfTheWeek, priority } = aes;
+    const hourBegin = timeToMinutes(aes.beginTime) / 60 - firstSlotStart;
+    const hourEnd = (timeToMinutes(aes.endTime) / 60 || 24) - firstSlotStart;
+    const p = priority === Priority.Primary ? 300 : (200 as const);
+    const day = convertWeekday(dayOfTheWeek);
     for (let h = hourBegin; h < hourEnd; h += 1) {
       const cell = cells[day][h];
       if (cell) {
-        cell.state = convertPriorityToState(priority);
+        cell.state = p;
       }
     }
   }
@@ -94,19 +97,6 @@ function getOpeningHours(
     return null;
   }
   return dayOpeningHours.reservableTimes ?? null;
-}
-
-function convertPriorityToState(
-  priority: number
-): ApplicationEventSchedulePriority {
-  switch (priority) {
-    case 300:
-      return 300;
-    case 200:
-      return 200;
-    default:
-      return 100;
-  }
 }
 
 type OpeningHourPeriod = {
@@ -213,4 +203,14 @@ function formatNumber(n: number): string {
     return `0${n}`;
   }
   return `${n}`;
+}
+
+export function getDayTimes(
+  schedule: Omit<SuitableTimeRangeFormValues, "pk" | "priority">[],
+  day: number
+) {
+  return schedule
+    .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
+    .map((s) => formatApiTimeInterval(s))
+    .join(", ");
 }
