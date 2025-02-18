@@ -213,26 +213,6 @@ export function formatDateTime(
   return `${day} ${dateStr}${separator} ${time}`.trim();
 }
 
-export function getDayTimes(
-  schedule: {
-    day: number;
-    begin: string;
-    end: string;
-    priority: number;
-  }[],
-  day: number
-) {
-  return schedule
-    .filter((s) => s.day === day)
-    .map(
-      (cur) =>
-        `${Number(cur.begin.substring(0, 2))}-${Number(
-          cur.end.startsWith("00") ? 24 : cur.end.substring(0, 2)
-        )}`
-    )
-    .join(", ");
-}
-
 /// Creates time and date strings for reservations
 /// @param t - translation function
 /// @param res - reservation object

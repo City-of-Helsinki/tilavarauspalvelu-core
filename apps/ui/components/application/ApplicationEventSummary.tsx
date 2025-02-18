@@ -5,23 +5,9 @@ import { Trans, useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
 import { H4 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
-import { type ApplicationSectionFormValue } from "./form";
+import { type ApplicationSectionPage1FormValues } from "./form";
 import { Flex } from "common/styles/util";
 import { IconWithText } from "../common/IconWithText";
-
-type SectionT = Pick<
-  ApplicationSectionFormValue,
-  | "begin"
-  | "end"
-  | "appliedReservationsPerWeek"
-  | "minDuration"
-  | "maxDuration"
-  | "numPersons"
->;
-type Props = {
-  applicationSection?: SectionT;
-  name: string;
-};
 
 const Message = styled.p`
   margin-top: 0;
@@ -40,12 +26,12 @@ const Box = styled(Flex).attrs({
   padding: var(--spacing-l) var(--spacing-m);
 `;
 
-const numHours = (
+function numHours(
   startDate: string | undefined,
   endDate: string | undefined,
   eventsPerWeek: number,
   minDurationMinutes: number
-) => {
+) {
   if (!startDate || !endDate) {
     return 0;
   }
@@ -58,7 +44,7 @@ const numHours = (
 
   const hours = (numWeeks * eventsPerWeek * minDurationMinutes) / 60;
   return hours;
-};
+}
 
 function displayDuration(duration: number, t: TFunction) {
   if (!duration) {
@@ -72,6 +58,20 @@ function displayDuration(duration: number, t: TFunction) {
     displayMinutes ? t("common:minute", { count: displayMinutes }) : ""
   }`;
 }
+
+type Props = {
+  applicationSection?: SectionFormValues;
+  name: string;
+};
+type SectionFormValues = Pick<
+  ApplicationSectionPage1FormValues,
+  | "begin"
+  | "end"
+  | "appliedReservationsPerWeek"
+  | "minDuration"
+  | "maxDuration"
+  | "numPersons"
+>;
 
 export function ApplicationEventSummary({
   applicationSection,

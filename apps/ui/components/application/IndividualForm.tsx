@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { BillingAddress } from "./BillingAddress";
-import { FormSubHeading } from "./styled";
+import { FormSubHeading, SpanFullRow } from "./styled";
 import { ApplicationFormTextInput } from "./ApplicationFormTextInput";
 
 export function IndividualForm(): JSX.Element {
@@ -16,6 +16,10 @@ export function IndividualForm(): JSX.Element {
         {t("application:Page3.subHeading.contactInfo")}
       </FormSubHeading>
       <ApplicationFormTextInput name="contactPerson.phoneNumber" />
+      <ApplicationFormTextInput name="contactPerson.email" />
+      <SpanFullRow>
+        <ApplicationFormTextInput name="additionalInformation" />
+      </SpanFullRow>
     </>
   );
 }

@@ -48,6 +48,7 @@ export function ContactPersonSection(): JSX.Element {
       <ApplicationFormTextInput name="contactPerson.firstName" />
       <ApplicationFormTextInput name="contactPerson.lastName" />
       <ApplicationFormTextInput name="contactPerson.phoneNumber" />
+      <ApplicationFormTextInput name="contactPerson.email" />
     </>
   );
 }

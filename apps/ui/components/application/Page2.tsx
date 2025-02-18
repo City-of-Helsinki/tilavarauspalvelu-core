@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import { useFormContext } from "react-hook-form";
 import { type ApplicationPage2Query } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
-import { type ApplicationPage2FormValues, convertToSchedule } from "./form";
+import { type ApplicationPage2FormValues } from "./form";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -110,7 +110,7 @@ function ApplicationSectionTimePicker({
 
   const applicationSections = filterNonNullable(watch("applicationSections"));
   const selectorData = applicationSections.map((ae) =>
-    aesToCells(convertToSchedule(ae), reservationUnitOpeningHours)
+    aesToCells(ae.suitableTimeRanges, reservationUnitOpeningHours)
   );
   const aes = watch(`applicationSections.${sectionIndex}`);
 

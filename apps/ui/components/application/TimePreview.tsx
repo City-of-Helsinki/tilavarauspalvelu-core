@@ -6,13 +6,12 @@ import { fontBold, H4 } from "common/src/common/typography";
 import { fromMondayFirstUnsafe } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
 import type {
-  ApplicationEventScheduleFormType,
   ApplicationPage2FormValues,
+  SuitableTimeRangeFormValues,
 } from "./form";
-import { getDayTimes } from "@/modules/util";
 import { useFormContext } from "react-hook-form";
 import { Priority } from "@/gql/gql-types";
-import { convertWeekday } from "common/src/conversion";
+import { getDayTimes } from "./module";
 
 type Props = {
   index: number;
@@ -30,26 +29,22 @@ const Label = styled.div`
   width: 100%;
 `;
 
-function Weekdays({
-  schedules,
-}: {
-  schedules: ApplicationEventScheduleFormType[];
-}) {
+function Weekdays({ schedules }: { schedules: SuitableTimeRangeFormValues[] }) {
   const { t } = useTranslation();
   return (
     <>
-      {WEEKDAYS.map((day) => {
-        const value = getDayTimes(schedules, day);
-        return (
-          <WeekWrapper key={day}>
-            <Label>
-              {t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`)}
-              {value && ":"}
-            </Label>
-            <div>{value}</div>
-          </WeekWrapper>
-        );
-      })}
+      {WEEKDAYS.map((day) => ({
+        day,
+        times: getDayTimes(schedules, day),
+      })).map(({ day, times }) => (
+        <WeekWrapper key={day}>
+          <Label>
+            {t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`)}
+            {times && ":"}
+          </Label>
+          <div>{times}</div>
+        </WeekWrapper>
+      ))}
     </>
   );
 }
@@ -78,24 +73,9 @@ export function TimePreview({ index }: Props): JSX.Element {
 
   const { watch } = useFormContext<ApplicationPage2FormValues>();
 
-  const schedules =
-    watch(`applicationSections.${index}.suitableTimeRanges`) ?? [];
-  const primary = schedules
-    .filter((n) => n.priority === Priority.Primary)
-    .map((a) => ({
-      begin: a.beginTime,
-      end: a.endTime,
-      priority: 300 as const,
-      day: convertWeekday(a.dayOfTheWeek),
-    }));
-  const secondary = schedules
-    .filter((n) => n.priority === Priority.Secondary)
-    .map((a) => ({
-      begin: a.beginTime,
-      end: a.endTime,
-      priority: 200 as const,
-      day: convertWeekday(a.dayOfTheWeek),
-    }));
+  const schedules = watch(`applicationSections.${index}.suitableTimeRanges`);
+  const primary = schedules.filter((n) => n.priority === Priority.Primary);
+  const secondary = schedules.filter((n) => n.priority === Priority.Secondary);
 
   return (
     <Wrapper>

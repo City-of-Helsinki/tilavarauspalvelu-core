@@ -31,15 +31,12 @@ import {
   ButtonVariant,
   IconArrowLeft,
   IconArrowRight,
-  Notification,
-  NotificationSize,
 } from "hds-react";
 import { AutoGrid, ButtonContainer, Flex } from "common/styles/util";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormSubHeading, SpanFullRow } from "@/components/application/styled";
+import { FormSubHeading } from "@/components/application/styled";
 import { createApolloClient } from "@/modules/apolloClient";
 import { gql } from "@apollo/client";
-import { ApplicationFormTextInput } from "@/components/application/ApplicationFormTextInput";
 import { useDisplayError } from "@/hooks/useDisplayError";
 
 function Page3Form(): JSX.Element | null {
@@ -133,16 +130,6 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
               {t("application:Page3.subHeading.basicInfo")}
             </FormSubHeading>
             <Page3Form />
-            {/* TODO this has an issue that the email is vislbe while type is not selected (other fields are not) */}
-            <SpanFullRow>
-              <Notification
-                size={NotificationSize.Small}
-                label={t("application:Page3.emailNotification")}
-              >
-                {t("application:Page3.emailNotification")}
-              </Notification>
-            </SpanFullRow>
-            <ApplicationFormTextInput name="contactPerson.email" />
           </AutoGrid>
           <ButtonContainer>
             <Button

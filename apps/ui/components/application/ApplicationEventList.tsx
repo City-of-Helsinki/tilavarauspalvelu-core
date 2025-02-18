@@ -4,14 +4,12 @@ import { useTranslation } from "next-i18next";
 import {
   type AgeGroupNode,
   type Maybe,
-  type SuitableTimeRangeNode,
   Priority,
   ApplicationSectionStatusChoice,
   type ApplicationSectionUiFragment,
   type ApplicationCommonFragment,
 } from "@gql/gql-types";
 import { getTranslation, toUIDate } from "common/src/common/util";
-import { convertWeekday } from "common/src/conversion";
 import {
   ApplicationInfoContainer,
   ApplicationSection,
@@ -20,7 +18,7 @@ import {
   InfoItem,
   ScheduleDay,
 } from "./styled";
-import { ApplicationEventScheduleFormType } from "./form";
+import { SuitableTimeRangeFormValues } from "./form";
 import { WEEKDAYS } from "common/src/const";
 import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
 import StatusLabel from "common/src/components/StatusLabel";
@@ -31,27 +29,9 @@ import {
   IconQuestionCircleFill,
   Tooltip,
 } from "hds-react";
-import { getDayTimes } from "@/modules/util";
+import { getDayTimes } from "./module";
 
-const filterPrimary = (n: { priority: Priority }) =>
-  n.priority === Priority.Primary;
-const filterSecondary = (n: { priority: Priority }) =>
-  n.priority === Priority.Secondary;
-
-const convertApplicationSchedule = (
-  aes: Pick<
-    SuitableTimeRangeNode,
-    "beginTime" | "endTime" | "dayOfTheWeek" | "priority"
-  >
-) => ({
-  begin: aes.beginTime,
-  end: aes.endTime,
-  day: convertWeekday(aes.dayOfTheWeek),
-  // TODO conversion
-  priority: aes.priority === Priority.Primary ? 300 : 200,
-});
-
-const formatDurationSeconds = (seconds: number, t: TFunction): string => {
+function formatDurationSeconds(seconds: number, t: TFunction): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds - hours * 3600) / 60);
 
@@ -65,28 +45,28 @@ const formatDurationSeconds = (seconds: number, t: TFunction): string => {
     "common:abbreviations:minute",
     { count: minutes }
   )}`;
-};
+}
 
-const formatDurationRange = (
+function formatDurationRange(
   beginSecs: number,
   endSecs: number,
   t: TFunction
-): string => {
+): string {
   const beginHours = formatDurationSeconds(beginSecs, t);
   const endHours = formatDurationSeconds(endSecs, t);
   return beginSecs === endSecs ? beginHours : `${beginHours} - ${endHours}`;
-};
+}
 
-const ageGroupToString = (ag: Maybe<AgeGroupNode> | undefined): string => {
+function ageGroupToString(ag: Maybe<AgeGroupNode> | undefined): string {
   if (!ag) {
     return "";
   }
   return `${ag.minimum} - ${ag.maximum}`;
-};
+}
 
-const getLabelProps = (
+function getLabelProps(
   status: ApplicationSectionStatusChoice | undefined | null
-): { type: StatusLabelType; icon: JSX.Element } => {
+): { type: StatusLabelType; icon: JSX.Element } {
   switch (status) {
     case ApplicationSectionStatusChoice.Handled:
       return { type: "success", icon: <IconCheck /> };
@@ -95,14 +75,16 @@ const getLabelProps = (
     default:
       return { type: "info", icon: <IconQuestionCircleFill /> };
   }
-};
+}
 
-const InfoListItem = ({ label, value }: { label: string; value: string }) => (
-  <li>
-    <h4>{`${label}: `}</h4>
-    <span>{value}</span>
-  </li>
-);
+function InfoListItem({ label, value }: { label: string; value: string }) {
+  return (
+    <li>
+      <h4>{`${label}: `}</h4>
+      <span>{value}</span>
+    </li>
+  );
+}
 
 function SingleApplicationSection({
   applicationEvent,
@@ -110,8 +92,8 @@ function SingleApplicationSection({
   secondaryTimes,
 }: {
   applicationEvent: ApplicationSectionUiFragment;
-  primaryTimes: ApplicationEventScheduleFormType[];
-  secondaryTimes: ApplicationEventScheduleFormType[];
+  primaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
+  secondaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
 }) {
   const { t } = useTranslation();
   const reservationUnits = filterNonNullable(
@@ -235,6 +217,11 @@ function SingleApplicationSection({
 // No form context unlike the edit pages, use application query result
 type ApplicationT = Pick<ApplicationCommonFragment, "applicationSections">;
 
+const filterPrimary = (n: { priority: Priority }) =>
+  n.priority === Priority.Primary;
+const filterSecondary = (n: { priority: Priority }) =>
+  n.priority === Priority.Secondary;
+
 export function ApplicationEventList({
   application,
 }: {
@@ -244,14 +231,10 @@ export function ApplicationEventList({
     (applicationEvent) => {
       const primaryTimes = filterNonNullable(
         applicationEvent.suitableTimeRanges
-      )
-        .filter(filterPrimary)
-        .map(convertApplicationSchedule);
+      ).filter(filterPrimary);
       const secondaryTimes = filterNonNullable(
         applicationEvent.suitableTimeRanges
-      )
-        .filter(filterSecondary)
-        .map(convertApplicationSchedule);
+      ).filter(filterSecondary);
 
       return (
         <SingleApplicationSection
@@ -271,8 +254,8 @@ function Weekdays({
   primary,
   secondary,
 }: {
-  primary: ApplicationEventScheduleFormType[];
-  secondary: ApplicationEventScheduleFormType[];
+  primary: Omit<SuitableTimeRangeFormValues, "pk">[];
+  secondary: Omit<SuitableTimeRangeFormValues, "pk">[];
 }) {
   const { t } = useTranslation();
 
