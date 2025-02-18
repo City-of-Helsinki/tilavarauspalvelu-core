@@ -4,18 +4,112 @@ import json
 from typing import TYPE_CHECKING, Any
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.forms.formsets import DELETION_FIELD_NAME
+from django.forms.models import BaseInlineFormSet
 from django.utils.translation import gettext_lazy as _
 from subforms.fields import DynamicArrayField
 from tinymce.widgets import TinyMCE
 
 from tilavarauspalvelu.enums import AccessType, TermsOfUseTypeChoices
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.models import ReservationUnit, TermsOfUse
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, TermsOfUse
+from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     import datetime
+
+
+class ReservationUnitAccessTypeForm(forms.ModelForm):
+    instance: ReservationUnitAccessType
+
+    class Meta:
+        model = ReservationUnitAccessType
+        fields = ["access_type", "begin_date"]
+        labels = {
+            "access_type": _("Access type"),
+            "begin_date": _("Access type begin date"),
+        }
+        help_texts = {
+            "access_type": _("How is the reservee able to enter the space in their reservation unit?"),
+            "begin_date": _("Begin date of this access type"),
+        }
+
+    def clean(self) -> None:
+        cleaned_data = super().clean()
+        if not cleaned_data:
+            return
+
+        editing: bool = getattr(self.instance, "pk", None) is not None
+
+        if editing and cleaned_data.get(DELETION_FIELD_NAME, False):
+            self.validate_deletion()
+            return
+
+        today = local_date()
+
+        access_type: str = cleaned_data["access_type"]
+        begin_date: datetime.date = cleaned_data["begin_date"]
+
+        if editing:
+            # Changing date for existing access type
+            if self.instance.begin_date <= today and self.instance.begin_date != begin_date:
+                msg = "Past of active access type begin date cannot be changed."
+                raise ValidationError(msg)
+
+            # Moving existing access type to the past
+            if begin_date < today and self.instance.begin_date != begin_date:
+                msg = "Access type cannot be moved to the past."
+                raise ValidationError(msg)
+
+        # Creating new access type in the past
+        elif begin_date < today:
+            msg = "Access type cannot be set before today."
+            raise ValidationError(msg)
+
+        # For all future or active access types, check if reservation unit has been configured in Pindora.
+        if today <= begin_date and access_type == AccessType.ACCESS_CODE:
+            # No need to check if access type is already 'ACCESS_CODE'.
+            if editing and self.instance.access_type == AccessType.ACCESS_CODE:
+                return
+
+            try:
+                PindoraClient.get_reservation_unit(self.instance.reservation_unit)
+            except ExternalServiceError as error:
+                self.add_error("access_type", str(error))
+                return
+
+    def validate_deletion(self) -> None:
+        if self.instance.begin_date <= local_date():
+            msg = "Cannot delete past or active access type."
+            raise ValidationError(msg)
+
+        if (
+            self.instance.reservation_unit.access_types.count() == 1
+            and self.instance.reservation_unit.reservations.filter(begin__date__gte=self.instance.begin_date).exists()
+        ):
+            msg = "Cannot delete last access type since there are already reservations after it becomes active."
+            raise ValidationError(msg)
+
+
+class ReservationUnitAccessTypeFormSet(BaseInlineFormSet):
+    form = ReservationUnitAccessTypeForm
+
+    @transaction.atomic
+    def save(self, commit: bool = True) -> list[ReservationUnitAccessType]:  # noqa: FBT001, FBT002
+        access_types = super().save(commit=commit)
+        if not access_types:
+            return access_types
+
+        reservation_unit: ReservationUnit = access_types[0].reservation_unit
+        reservation_unit.actions.update_access_types_for_reservations()
+        return access_types
+
+    def _should_delete_form(self, form: ReservationUnitAccessTypeForm) -> bool:
+        # Required so errors from `validate_deletion` are not ignored.
+        return (not form.errors) and super()._should_delete_form(form)
 
 
 class ReservationUnitAdminForm(forms.ModelForm):
@@ -119,9 +213,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "payment_accounting": _("Payment accounting"),
             "payment_product": _("Payment product"),
             "search_terms": _("Search terms"),
-            "access_type": _("Access type"),
-            "access_type_start_date": _("Access type start date"),
-            "access_type_end_date": _("Access type end date"),
             "pindora_response": _("Pindora API response"),
         }
         help_texts = {
@@ -213,15 +304,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
                 "in the customer UI. These terms should be added to make sure search results using text search in "
                 "links from external sources work regardless of the UI language."
             ),
-            "access_type": _("How is the reservee able to enter the space in their reservation unit?"),
-            "access_type_start_date": _(
-                "If set, this is the date from which the access type is used. If current date is "
-                "before this date, the access type is 'unrestricted'."
-            ),
-            "access_type_end_date": _(
-                "If set, this is the date before which the access type is used. If current date is "
-                "after this date, the access type is 'unrestricted'."
-            ),
             "pindora_response": _("Response from Pindora API"),
         }
 
@@ -234,13 +316,15 @@ class ReservationUnitAdminForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        if self.instance and self.instance.access_type == AccessType.ACCESS_CODE:
+        editing: bool = getattr(self.instance, "pk", None) is not None
+
+        if editing and self.instance.current_access_type == AccessType.ACCESS_CODE:
             pindora_field = self.fields["pindora_response"]
             pindora_field.initial = self.get_pindora_response(self.instance)
             pindora_field.widget.attrs.update({"cols": "100", "rows": "10"})
 
     def get_pindora_response(self, obj: ReservationUnit) -> str | None:
-        if obj.access_type != AccessType.ACCESS_CODE:
+        if obj.current_access_type != AccessType.ACCESS_CODE:
             return None
 
         response = PindoraClient.get_reservation_unit(reservation_unit=obj)
@@ -249,33 +333,3 @@ class ReservationUnitAdminForm(forms.ModelForm):
             return None
 
         return json.dumps(response, default=str, indent=2)
-
-    def clean(self) -> None:
-        cleaned_data = super().clean()
-        if not cleaned_data:
-            return
-
-        access_type: str | None = cleaned_data.get("access_type")
-
-        # Check if reservation unit has been configured in Pindora.
-        # No need to check if access type is already 'ACCESS_CODE'.
-        if access_type == AccessType.ACCESS_CODE and self.instance.access_type != AccessType.ACCESS_CODE:
-            try:
-                PindoraClient.get_reservation_unit(self.instance)
-            except ExternalServiceError as error:
-                self.add_error("access_type", str(error))
-                return
-
-    @transaction.atomic
-    def save(self, commit: bool = True) -> ReservationUnit:  # noqa: FBT001, FBT002
-        access_type: str = self.cleaned_data.get("access_type")
-        access_type_start_date: datetime.date | None = self.cleaned_data.get("access_type_start_date")
-        access_type_end_date: datetime.date | None = self.cleaned_data.get("access_type_end_date")
-
-        reservation_unit: ReservationUnit = super().save(commit=commit)
-        reservation_unit.actions.update_access_type_for_reservations(
-            access_type=AccessType(access_type),
-            access_type_start_date=access_type_start_date,
-            access_type_end_date=access_type_end_date,
-        )
-        return reservation_unit
