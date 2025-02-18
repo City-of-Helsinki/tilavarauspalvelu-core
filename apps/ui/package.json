@@ -64,7 +64,7 @@
     "axe-core": "^4.10.0",
     "happy-dom": "^16.5.3",
     "jest": "^29.7.0",
-    "jest-axe": "^8.0.0",
+    "jest-axe": "^9.0.0",
     "postcss-styled-syntax": "^0.7.1",
     "prettier": "^3.5.1",
     "stylelint": "^16.2.1",
