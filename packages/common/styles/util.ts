@@ -138,7 +138,7 @@ export const TitleSection = styled(Flex).attrs({
   $direction: "row",
   $justifyContent: "space-between",
   $wrap: "wrap",
-  $alignItems: "center",
+  $alignItems: "flex-start",
   $gap: "xs",
 })<{ $noMargin?: boolean }>`
   margin-top: ${({ $noMargin }) => ($noMargin ? "0" : "var(--spacing-l)")};

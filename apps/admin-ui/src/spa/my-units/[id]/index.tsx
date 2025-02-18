@@ -24,6 +24,7 @@ type Params = {
 
 const LocationOnlyOnDesktop = styled.p`
   display: none;
+  margin: 0;
   @media (min-width: ${breakpoints.s}) {
     display: block;
   }

@@ -28,7 +28,7 @@ const ColoredLabel = styled(HDSStatusLabel)<{
     border-style: solid;
     border-color: ${(props) => getStatusBorderColor(props.$type)};
     white-space: nowrap;
-    margin-block: ${(props) => (props.$slim ? "-6px" : "inherit")};
+    margin-block: ${(props) => (props.$slim ? "-6px" : "unset")};
   }
   svg {
     scale: 0.8;
