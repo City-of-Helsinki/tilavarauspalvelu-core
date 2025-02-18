@@ -39,7 +39,7 @@
     "date-fns": "^4.1.0",
     "eslint-config-custom": "workspace:*",
     "form-data": "^4.0.0",
-    "graphql": "^16.9.0",
+    "graphql": "^16.10.0",
     "hds-core": "^4.2.0",
     "hds-react": "^4.2.0",
     "i18next": "^23.15.1",
