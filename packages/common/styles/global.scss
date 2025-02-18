@@ -43,6 +43,11 @@ strong {
   white-space: nowrap;
 }
 
+/* HDS supplementary button to use black theming */
+[class*="Button-module_supplementary__"]:not(:disabled) {
+  --color: var(--color-black);
+}
+
 /* HDS secndary button to use black theming */
 [class*="Button-module_secondary"]:not(:disabled) {
   --font-family: var(--font-medium);

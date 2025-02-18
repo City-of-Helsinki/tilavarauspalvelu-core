@@ -65,6 +65,18 @@ i18n.addResourceBundle(
   reservationApplicationFi
 );
 i18n.addResourceBundle("fi", "reservationForm", reservationFormFi);
+i18n.addResourceBundle("fi", "application", {
+  // NOTE these differ between customer and admin application
+  status: {
+    CANCELLED: "Peruttu",
+    DRAFT: "Luonnos",
+    EXPIRED: "Vanhentunut",
+    HANDLED: "Käsitelty",
+    IN_ALLOCATION: "Käsittelyssä",
+    RECEIVED: "Vastaanotettu",
+    RESULTS_SENT: "Lähetetty",
+  },
+});
 
 i18n.addResourceBundle("fi", "forms", {
   prefix: {

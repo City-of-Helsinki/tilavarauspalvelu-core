@@ -29,12 +29,12 @@ import {
 } from "@/components/application/ApprovedReservations";
 import { gql } from "@apollo/client";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { H1 } from "common";
 import styled from "styled-components";
 import { useToastIfQueryParam } from "@/hooks";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import { applicationsPrefix } from "@/modules/urls";
+import { ApplicationHead } from "@/components/application/ApplicationPage";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {
@@ -121,33 +121,34 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
     },
   ] as const;
 
+  const subTitle = showReservations
+    ? `${t("application:view.handledDate")} ${formatDateTime(t, handledDate, false)}`
+    : undefined;
   return (
     <>
       <Breadcrumb routes={routes} />
-      <H1 $noMargin>{applicationRoundName}</H1>
+      <ApplicationHead
+        title={applicationRoundName}
+        subTitle={subTitle}
+        status={application.status}
+      />
       {showReservations ? (
-        <>
-          <p>
-            {t("application:view.handledDate")}{" "}
-            {formatDateTime(t, handledDate, false)}
-          </p>
-          <Tabs initiallyActiveTab={tab === "application" ? 1 : 0}>
-            <Tabs.TabList>
-              <Tabs.Tab onClick={() => handleTabChange("reservations")}>
-                {t("application:view.reservations")}
-              </Tabs.Tab>
-              <Tabs.Tab onClick={() => handleTabChange("application")}>
-                {t("application:view.application")}
-              </Tabs.Tab>
-            </Tabs.TabList>
-            <TabPanel>
-              <ApprovedReservations application={application} />
-            </TabPanel>
-            <TabPanel>
-              <ViewApplication application={application} tos={tos} />
-            </TabPanel>
-          </Tabs>
-        </>
+        <Tabs initiallyActiveTab={tab === "application" ? 1 : 0}>
+          <Tabs.TabList>
+            <Tabs.Tab onClick={() => handleTabChange("reservations")}>
+              {t("application:view.reservations")}
+            </Tabs.Tab>
+            <Tabs.Tab onClick={() => handleTabChange("application")}>
+              {t("application:view.application")}
+            </Tabs.Tab>
+          </Tabs.TabList>
+          <TabPanel>
+            <ApprovedReservations application={application} />
+          </TabPanel>
+          <TabPanel>
+            <ViewApplication application={application} tos={tos} />
+          </TabPanel>
+        </Tabs>
       ) : (
         <ViewApplication application={application} tos={tos} />
       )}
