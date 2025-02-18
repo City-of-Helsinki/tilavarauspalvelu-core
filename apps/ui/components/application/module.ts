@@ -1,5 +1,10 @@
 import { type SuitableTimeRangeFormValues } from "./form";
-import { ApplicationRoundTimeSlotNode, Priority } from "@/gql/gql-types";
+import {
+  type ApplicationRoundTimeSlotNode,
+  ApplicationStatusChoice,
+  type Maybe,
+  Priority,
+} from "@/gql/gql-types";
 import { convertWeekday, Day, transformWeekday } from "common/src/conversion";
 import {
   filterNonNullable,
@@ -213,4 +218,23 @@ export function getDayTimes(
     .filter((s) => convertWeekday(s.dayOfTheWeek) === day)
     .map((s) => formatApiTimeInterval(s))
     .join(", ");
+}
+
+export function isSent(
+  status: Maybe<ApplicationStatusChoice> | undefined
+): boolean {
+  if (status == null) {
+    return false;
+  }
+  switch (status) {
+    case ApplicationStatusChoice.Draft:
+    case ApplicationStatusChoice.Expired:
+    case ApplicationStatusChoice.Cancelled:
+      return false;
+    case ApplicationStatusChoice.Received:
+    case ApplicationStatusChoice.ResultsSent:
+    case ApplicationStatusChoice.Handled:
+    case ApplicationStatusChoice.InAllocation:
+      return true;
+  }
 }
