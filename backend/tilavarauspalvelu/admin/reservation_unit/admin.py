@@ -16,10 +16,10 @@ from tilavarauspalvelu.admin.reservation_unit_pricing.admin import ReservationUn
 from tilavarauspalvelu.enums import ReservationKind
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import ReservationUnit
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 
-from .form import ReservationUnitAdminForm
+from .form import ReservationUnitAccessTypeForm, ReservationUnitAccessTypeFormSet, ReservationUnitAdminForm
 
 if TYPE_CHECKING:
     from django import forms
@@ -44,6 +44,13 @@ class ReservationUnitInline(admin.TabularInline):
         url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=(obj.pk,))
 
         return format_html(f"<a href={url}>{obj.name_fi}</a>")
+
+
+class ReservationUnitAccessTypeInline(admin.TabularInline):
+    model = ReservationUnitAccessType
+    form = ReservationUnitAccessTypeForm
+    formset = ReservationUnitAccessTypeFormSet
+    extra = 0
 
 
 @admin.register(ReservationUnit)
@@ -172,12 +179,9 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
             },
         ],
         [
-            _("Access type"),
+            _("Pindora information"),
             {
                 "fields": [
-                    "access_type",
-                    "access_type_start_date",
-                    "access_type_end_date",
                     "pindora_response",
                 ],
             },
@@ -210,6 +214,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         ReservationUnitImageInline,
         ReservationUnitPricingInline,
         ApplicationRoundTimeSlotInline,
+        ReservationUnitAccessTypeInline,
     ]
 
     @admin.display(description=_("Publishing state"), ordering=L("publishing_state"))
