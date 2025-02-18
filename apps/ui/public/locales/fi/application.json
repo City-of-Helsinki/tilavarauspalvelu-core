@@ -193,6 +193,15 @@
     "applicationSectionCancelled": "Peruttu {{ cancelled }} / {{ future }} varausta.",
     "applicationSectionCancelledAll": "Peruttu kaikki {{ cancelled }} varausta."
   },
+  "status": {
+    "CANCELLED": "Peruttu",
+    "DRAFT": "Luonnos",
+    "EXPIRED": "Rauennut",
+    "HANDLED": "Käsittelyssä",
+    "IN_ALLOCATION": "Käsittelyssä",
+    "RECEIVED": "Käsittelyssä",
+    "RESULTS_SENT": "Käsitelty"
+  },
   "applicationEventStatus": {
     "UNALLOCATED": "Vastaanotettu",
     "IN_ALLOCATION": "Käsittelyssä",

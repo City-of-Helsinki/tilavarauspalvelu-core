@@ -6,18 +6,6 @@
   "edit": "Muokkaa",
   "cancel": "Peru",
   "view": "Näytä",
-  "status": {
-    "draft": "Kesken",
-    "processing": "Käsittelyssä",
-    "sent": "Käsitelty",
-    "CANCELLED": "Peruttu",
-    "DRAFT": "Luonnos",
-    "EXPIRED": "Rauennut",
-    "HANDLED": "Käsittelyssä",
-    "IN_ALLOCATION": "Käsittelyssä",
-    "RECEIVED": "Käsittelyssä",
-    "RESULTS_SENT": "Käsitelty"
-  },
   "reservations": "Varaukset",
   "saved": "Viimeksi tallennettu:",
   "person": "Hakemus luotu: yksityishenkilönä",

@@ -197,6 +197,15 @@
     "applicationSectionCancelled": "Cancelled {{ cancelled }} / {{ future }} booking.",
     "applicationSectionCancelledAll": "All {{ cancelled }} bookings cancelled."
   },
+  "status": {
+    "CANCELLED": "Cancelled",
+    "DRAFT": "Draft",
+    "EXPIRED": "Expired",
+    "HANDLED": "In process",
+    "IN_ALLOCATION": "In process",
+    "RECEIVED": "Sent",
+    "RESULTS_SENT": "Processed"
+   },
   "applicationEventStatus": {
     "UNALLOCATED": "Unallocated",
     "IN_ALLOCATION": "In allocation",

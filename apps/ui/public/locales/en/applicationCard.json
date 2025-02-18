@@ -6,18 +6,6 @@
   "edit": "Edit",
   "cancel": "Cancel",
   "view": "View",
-  "status": {
-    "draft": "Draft",
-    "processing": "In process",
-    "sent": "Processed",
-    "CANCELLED": "Cancelled",
-    "DRAFT": "Draft",
-    "EXPIRED": "Expired",
-    "HANDLED": "In process",
-    "IN_ALLOCATION": "In process",
-    "RECEIVED": "Sent",
-    "RESULTS_SENT": "Processed"
-  },
   "reservations": "Bookings",
   "saved": "Last saved:",
   "person": "Application created: as a private person",

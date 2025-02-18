@@ -191,6 +191,15 @@
     "applicationSectionCancelled": "Avbruten {{ cancelled }} / {{ future }} bokning.",
     "applicationSectionCancelledAll": "Avbruten alla {{ cancelled }} bokning."
   },
+  "status": {
+    "CANCELLED": "Ångrad",
+    "DRAFT": "Utkast",
+    "EXPIRED": "Utgått",
+    "HANDLED": "Käsittelyssä",
+    "IN_ALLOCATION": "I behandling",
+    "RECEIVED": "Skickat",
+    "RESULTS_SENT": "Behandlad"
+   },
   "applicationEventStatus": {
     "UNALLOCATED": "Mottagen",
     "IN_ALLOCATION": "I behandling",
