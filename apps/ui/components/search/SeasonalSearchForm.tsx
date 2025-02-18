@@ -144,6 +144,7 @@ export function SeasonalSearchForm({
         <ControlledSelect
           multiselect
           enableSearch
+          clearable
           name="reservationUnitTypes"
           control={control}
           options={reservationUnitTypeOptions}
@@ -152,6 +153,7 @@ export function SeasonalSearchForm({
         <ControlledSelect
           multiselect
           enableSearch
+          clearable
           name="unit"
           control={control}
           options={unitOptions}
@@ -160,6 +162,7 @@ export function SeasonalSearchForm({
         <ControlledSelect
           multiselect
           enableSearch
+          clearable
           name="purposes"
           control={control}
           options={purposeOptions}
