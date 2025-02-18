@@ -7,7 +7,7 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.fields import IntegerField
 
-from tilavarauspalvelu.enums import ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import DEFAULT_TIMEZONE
@@ -62,7 +62,7 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
             ignore_ids=[self.instance.pk],
         )
 
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin)
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begin) or AccessType.UNRESTRICTED
 
         return data
 
