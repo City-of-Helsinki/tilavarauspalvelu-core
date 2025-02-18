@@ -25,21 +25,14 @@ import { getApplicationPath } from "@/modules/urls";
 import { useDisplayError } from "@/hooks/useDisplayError";
 import { gql } from "@apollo/client";
 
-type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
-
 function Page2({ application }: PropsNarrowed): JSX.Element {
   const router = useRouter();
   const [update] = useApplicationUpdate();
   const dislayError = useDisplayError();
 
-  const handleSave = async (values: ApplicationPage2FormValues) => {
-    return update(transformApplicationPage2(values));
-  };
-
   const saveAndNavigate = async (values: ApplicationPage2FormValues) => {
     try {
-      const pk = await handleSave(values);
+      const pk = await update(transformApplicationPage2(values));
       router.push(getApplicationPath(pk, "page3"));
     } catch (err) {
       dislayError(err);
@@ -63,6 +56,9 @@ function Page2({ application }: PropsNarrowed): JSX.Element {
     </FormProvider>
   );
 }
+
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale, query } = ctx;
@@ -105,6 +101,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
+export default Page2;
+
 export const APPLICATION_PAGE2_QUERY = gql`
   query ApplicationPage2($id: ID!) {
     application(id: $id) {
@@ -112,5 +110,3 @@ export const APPLICATION_PAGE2_QUERY = gql`
     }
   }
 `;
-
-export default Page2;

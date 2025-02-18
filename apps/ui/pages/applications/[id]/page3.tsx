@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import {
   ApplicantTypeChoice,
   ApplicationPage3Document,
-  ApplicationPage3Query,
+  type ApplicationPage3Query,
+  type ApplicationPage3QueryVariables,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
@@ -175,11 +176,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-  const { data } = await apolloClient.query<ApplicationPage3Query>({
+  const { data } = await apolloClient.query<
+    ApplicationPage3Query,
+    ApplicationPage3QueryVariables
+  >({
     query: ApplicationPage3Document,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
-  const { application } = data ?? {};
+  const { application } = data;
   if (application == null) {
     return notFound;
   }

@@ -18,6 +18,7 @@ import {
 import {
   ApplicationStatusChoice,
   ApplicationViewDocument,
+  type ApplicationViewQueryVariables,
   type ApplicationViewQuery,
 } from "@gql/gql-types";
 import { Tabs } from "hds-react";
@@ -154,24 +155,6 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
   );
 }
 
-// TODO refactor this by splitting the query based on tab
-// it includes all the application section information that is not required by by the View Application tab
-// the reservations tab doesn't need to know what the user applied for but what they got.
-// The query is already too complex at 22 complexity (requires backend changes to add more fields).
-// Terms of use is only required by the application tab.
-// ApplicationCommon fragment needs to be refactored so we have a separate minimal fragments for
-// - reservation tab
-// - application tab
-// They can both be included in the SSR query
-// (or alternatively the reservation tab can be fetched on the client side per each applicationSection)
-export const APPLICATION_VIEW_QUERY = gql`
-  query ApplicationView($id: ID!) {
-    application(id: $id) {
-      ...ApplicationCommon
-    }
-  }
-`;
-
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -180,15 +163,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  const tos = await getGenericTerms(apolloClient);
-
   const { query } = ctx;
-  const { id } = query;
+  const pk = toNumber(ignoreMaybeArray(query.id));
 
-  const pkstring = Array.isArray(id) ? id[0] : id;
-  const pk = Number.isNaN(Number(pkstring)) ? undefined : Number(pkstring);
-
-  const notFoundRetvalue = {
+  const notFound = {
     props: {
       notFound: true,
       ...commonProps,
@@ -196,23 +174,29 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     notFound: true,
   };
 
-  if (pk == null) {
-    return notFoundRetvalue;
+  if (pk == null || pk <= 0) {
+    return notFound;
   }
 
-  const { data } = await apolloClient.query<ApplicationViewQuery>({
+  const { data } = await apolloClient.query<
+    ApplicationViewQuery,
+    ApplicationViewQueryVariables
+  >({
     query: ApplicationViewDocument,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
 
-  if (!data?.application) {
-    return notFoundRetvalue;
+  const { application } = data;
+  if (application == null) {
+    return notFound;
   }
+
+  const tos = await getGenericTerms(apolloClient);
 
   return {
     props: {
       ...commonProps,
-      application: data.application,
+      application,
       tos,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
@@ -220,3 +204,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 }
 
 export default View;
+
+export const APPLICATION_VIEW_QUERY = gql`
+  query ApplicationView($id: ID!) {
+    application(id: $id) {
+      ...ApplicationCommon
+    }
+  }
+`;

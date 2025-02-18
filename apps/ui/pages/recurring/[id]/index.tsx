@@ -32,67 +32,6 @@ import { seasonalPrefix } from "@/modules/urls";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { gql } from "@apollo/client";
 
-type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type NarrowedProps = Exclude<Props, { notFound: boolean }>;
-
-export const APPLICATION_ROUND_QUERY = gql`
-  query ApplicationRound($id: ID!) {
-    applicationRound(id: $id) {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-      reservationUnits {
-        id
-        pk
-      }
-    }
-  }
-`;
-
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale, params } = ctx;
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-  const pk = toNumber(ignoreMaybeArray(params?.id));
-
-  const notFound = {
-    notFound: true,
-    props: {
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
-      notFound: true,
-    },
-  };
-  if (pk == null || !(pk > 0)) {
-    return notFound;
-  }
-  const { data } = await apolloClient.query<
-    ApplicationRoundQuery,
-    ApplicationRoundQueryVariables
-  >({
-    query: ApplicationRoundDocument,
-    variables: {
-      id: base64encode(`ApplicationRoundNode:${pk}`),
-    },
-  });
-  const applicationRound = data.applicationRound;
-  if (applicationRound == null) {
-    return notFound;
-  }
-
-  const opts = await getSearchOptions(apolloClient, "seasonal", locale ?? "");
-  return {
-    props: {
-      ...commonProps,
-      ...opts,
-      applicationRound,
-      ...(await serverSideTranslations(locale ?? "fi")),
-    },
-  };
-}
-
 function SeasonalSearch({
   applicationRound,
   unitOptions,
@@ -173,4 +112,65 @@ function SeasonalSearch({
   );
 }
 
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type NarrowedProps = Exclude<Props, { notFound: boolean }>;
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { locale, params } = ctx;
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+  const pk = toNumber(ignoreMaybeArray(params?.id));
+
+  const notFound = {
+    notFound: true,
+    props: {
+      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
+      notFound: true,
+    },
+  };
+  if (pk == null || !(pk > 0)) {
+    return notFound;
+  }
+  const { data } = await apolloClient.query<
+    ApplicationRoundQuery,
+    ApplicationRoundQueryVariables
+  >({
+    query: ApplicationRoundDocument,
+    variables: {
+      id: base64encode(`ApplicationRoundNode:${pk}`),
+    },
+  });
+  const { applicationRound } = data;
+  if (applicationRound == null) {
+    return notFound;
+  }
+
+  const opts = await getSearchOptions(apolloClient, "seasonal", locale ?? "");
+  return {
+    props: {
+      ...commonProps,
+      ...opts,
+      applicationRound,
+      ...(await serverSideTranslations(locale ?? "fi")),
+    },
+  };
+}
+
 export default SeasonalSearch;
+
+export const APPLICATION_ROUND_QUERY = gql`
+  query ApplicationRound($id: ID!) {
+    applicationRound(id: $id) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+      reservationUnits {
+        id
+        pk
+      }
+    }
+  }
+`;
