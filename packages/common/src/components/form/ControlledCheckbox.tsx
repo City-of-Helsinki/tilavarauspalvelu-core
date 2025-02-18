@@ -12,6 +12,9 @@ import {
 } from "react-hook-form";
 
 const StyledCheckbox = styled(Checkbox)`
+  && {
+    flex-wrap: nowrap;
+  }
   && label {
     ${fontRegular};
     line-height: var(--lineheight-l);
@@ -28,9 +31,12 @@ interface CheckboxProps<T extends FieldValues> extends UseControllerProps<T> {
   name: Path<T>;
   control: Control<T>;
   label: string;
+  tooltip?: string;
   required?: boolean;
   defaultValue?: PathValue<T, Path<T>>;
   error?: string;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
 export function ControlledCheckbox<T extends FieldValues>({
@@ -39,6 +45,9 @@ export function ControlledCheckbox<T extends FieldValues>({
   name,
   required,
   defaultValue,
+  label,
+  error,
+  tooltip,
   ...props
 }: CheckboxProps<T>): JSX.Element {
   const {
@@ -47,14 +56,16 @@ export function ControlledCheckbox<T extends FieldValues>({
 
   return (
     <StyledCheckbox
+      {...props}
       id={id ?? name}
       onChange={(e) => onChange(e.target.checked)}
       checked={value}
       defaultChecked={
         typeof defaultValue === "boolean" ? defaultValue : undefined
       }
-      label={props.label}
-      errorText={props.error}
+      label={label}
+      errorText={error}
+      tooltipText={tooltip}
     />
   );
 }

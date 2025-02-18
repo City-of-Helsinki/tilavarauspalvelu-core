@@ -350,6 +350,13 @@ function validateDateTimeInterval({
   }
 }
 
+// TODO use for the zod literal
+export const BUFFER_TIME_OPTIONS = [
+  "noBuffer",
+  // "blocksWholeDay",
+  "bufferTimesSet",
+] as const;
+
 export const ReservationUnitEditSchema = z
   .object({
     authentication: z.nativeEnum(Authentication),
@@ -357,10 +364,10 @@ export const ReservationUnitEditSchema = z
     // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
     bufferTimeBefore: z.number(),
-    reservationBlockWholeDay: z
-      .literal("no-buffer")
-      .or(z.literal("blocks-whole-day"))
-      .or(z.literal("buffer-times-set")),
+    bufferType: z
+      .literal("noBuffer")
+      .or(z.literal("blocksWholeDay"))
+      .or(z.literal("bufferTimesSet")),
     maxReservationsPerUser: z.number().nullable(),
     maxPersons: z.number().min(0).nullable(),
     minPersons: z.number().min(0).nullable(),
@@ -787,12 +794,12 @@ export function convertReservationUnit(
   data?: Node
 ): ReservationUnitEditFormValues {
   return {
-    reservationBlockWholeDay:
+    bufferType:
       data?.reservationBlockWholeDay === true
-        ? "blocks-whole-day"
+        ? "blocksWholeDay"
         : data?.bufferTimeAfter || data?.bufferTimeBefore
-          ? "buffer-times-set"
-          : "no-buffer",
+          ? "bufferTimesSet"
+          : "noBuffer",
     bufferTimeAfter: data?.bufferTimeAfter ?? 0,
     bufferTimeBefore: data?.bufferTimeBefore ?? 0,
     maxReservationsPerUser: data?.maxReservationsPerUser ?? null,
@@ -929,7 +936,7 @@ export function transformReservationUnit(
     hasBufferTimeBefore,
     hasBufferTimeAfter,
     hasCancellationRule,
-    reservationBlockWholeDay,
+    bufferType,
     bufferTimeAfter,
     bufferTimeBefore,
     cancellationRule,
@@ -978,13 +985,13 @@ export function transformReservationUnit(
       hasScheduledPublish && hasPublishEnds
         ? constructApiDate(publishEndsDate, publishEndsTime)
         : null,
-    reservationBlockWholeDay: reservationBlockWholeDay === "blocks-whole-day",
+    reservationBlockWholeDay: bufferType === "blocksWholeDay",
     bufferTimeAfter:
-      hasBufferTimeAfter && reservationBlockWholeDay === "buffer-times-set"
+      hasBufferTimeAfter && bufferType === "bufferTimesSet"
         ? bufferTimeAfter
         : 0,
     bufferTimeBefore:
-      hasBufferTimeBefore && reservationBlockWholeDay === "buffer-times-set"
+      hasBufferTimeBefore && bufferType === "bufferTimesSet"
         ? bufferTimeBefore
         : 0,
     isDraft,
