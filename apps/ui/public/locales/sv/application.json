@@ -28,7 +28,7 @@
       "title": "Dina tidsönskemål överensstämmer inte med bokningens varaktighet",
       "Suitable time range must be at least as long as the minimum duration": "Ange flera tidsönskemål i kalendern eller förkorta den minsta varaktigheten du valt i föregående steg.",
       "At least as many suitable time ranges as applied reservations per week": "Ange flera tidsönskemål i kalendern eller minska antalet bokningar per vecka i föregående steg.",
-      "Array must contain at least 1 element(s)": "Ange minst en tid för alla säsongbokningar"
+      "Required": "Ange minst en tid för alla säsongbokningar"
     },
     "previewError": "Sidan {{ page }} har ett fel.",
     "fix": "Korrigera"

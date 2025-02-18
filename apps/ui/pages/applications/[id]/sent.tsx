@@ -18,10 +18,9 @@ import { gql } from "@apollo/client";
 import {
   ApplicationSentPageDocument,
   type ApplicationSentPageQuery,
-  ApplicationStatusChoice,
-  type Maybe,
 } from "@/gql/gql-types";
 import { createApolloClient } from "@/modules/apolloClient";
+import { isSent } from "@/components/application/module";
 
 const Paragraph = styled.p`
   max-width: var(--prose-width);
@@ -55,7 +54,7 @@ function Sent({ pk }: PropsNarrowed): JSX.Element {
       <div>
         <ButtonLikeLink href={applicationsPath}>
           {t("navigation:Item.applications")}
-          <IconAngleRight aria-hidden="true" />
+          <IconAngleRight />
         </ButtonLikeLink>
       </div>
     </>
@@ -104,23 +103,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
-}
-
-function isSent(status: Maybe<ApplicationStatusChoice> | undefined): boolean {
-  if (status == null) {
-    return false;
-  }
-  switch (status) {
-    case ApplicationStatusChoice.Draft:
-    case ApplicationStatusChoice.Expired:
-    case ApplicationStatusChoice.Cancelled:
-      return false;
-    case ApplicationStatusChoice.Received:
-    case ApplicationStatusChoice.ResultsSent:
-    case ApplicationStatusChoice.Handled:
-    case ApplicationStatusChoice.InAllocation:
-      return true;
-  }
 }
 
 export default Sent;
