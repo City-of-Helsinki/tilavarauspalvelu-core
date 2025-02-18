@@ -6480,6 +6480,9 @@ export type ReservationUnitPageFieldsFragment = {
   reservationState?: ReservationUnitReservationState | null;
   numActiveUserReservations?: number | null;
   requireReservationHandling: boolean;
+  accessType: AccessType;
+  accessTypeStartDate?: string | null;
+  accessTypeEndDate?: string | null;
   termsOfUseFi?: string | null;
   termsOfUseEn?: string | null;
   termsOfUseSv?: string | null;
@@ -6653,6 +6656,9 @@ export type ReservationUnitPageQuery = {
     reservationState?: ReservationUnitReservationState | null;
     numActiveUserReservations?: number | null;
     requireReservationHandling: boolean;
+    accessType: AccessType;
+    accessTypeStartDate?: string | null;
+    accessTypeEndDate?: string | null;
     maxReservationDuration?: number | null;
     minReservationDuration?: number | null;
     reservationsMaxDaysBefore?: number | null;
@@ -9461,6 +9467,9 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
       id
       ...EquipmentFields
     }
+    accessType
+    accessTypeStartDate
+    accessTypeEndDate
   }
   ${AddressFieldsFragmentDoc}
   ${TermsOfUseFragmentDoc}

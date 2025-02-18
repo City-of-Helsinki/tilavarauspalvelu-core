@@ -94,6 +94,9 @@ export const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
       id
       ...EquipmentFields
     }
+    accessType
+    accessTypeStartDate
+    accessTypeEndDate
   }
 `;
 

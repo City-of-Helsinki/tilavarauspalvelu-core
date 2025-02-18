@@ -11,8 +11,8 @@ import {
   ReservationKind,
   ReservationStartInterval,
 } from "common/gql/gql-types";
-import { ReservationUnitPageQuery } from "@/gql/gql-types";
-import { ReservableMap, RoundPeriod, dateToKey } from "@/modules/reservable";
+import { AccessType, ReservationUnitPageQuery } from "@/gql/gql-types";
+import { dateToKey, ReservableMap, RoundPeriod } from "@/modules/reservable";
 
 describe("getLastPossibleReservationDate", () => {
   beforeAll(() => {
@@ -209,6 +209,7 @@ describe("getNextAvailableTime", () => {
       applicationRounds: [],
       equipments: [],
       pricings: [],
+      accessType: AccessType.Unrestricted,
     };
     return {
       start,

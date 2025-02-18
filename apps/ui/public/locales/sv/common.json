@@ -4,6 +4,8 @@
   "timeLabel": "Tid",
   "dateWithWeekday": "{{date, datetime}}",
   "dayTimeSeparator": " kl.",
+  "dateGte": "från {{value}}",
+  "dateLte": "till {{value}}",
   "today": "I dag",
   "tomorrow": "I morgon",
   "day": "Dag",

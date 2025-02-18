@@ -4,6 +4,8 @@
   "timeLabel": "Time",
   "dateWithWeekday": "{{date, datetime}}",
   "dayTimeSeparator": ",",
+  "dateGte": "from {{value}}",
+  "dateLte": "until {{value}}",
   "today": "Today",
   "tomorrow": "Tomorrow",
   "day": "Day",
