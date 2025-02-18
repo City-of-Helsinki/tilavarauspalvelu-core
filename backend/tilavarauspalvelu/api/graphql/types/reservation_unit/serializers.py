@@ -1,29 +1,32 @@
 from __future__ import annotations
 
-import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from auditlog.models import LogEntry
 from django.conf import settings
 from django.db import transaction
-from django.db.transaction import atomic
 from graphene.utils.str_converters import to_camel_case
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.errors import GQLCodeError
-from graphene_django_extensions.serializers import NotProvided
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.api.graphql.types.application_round_time_slot.serializers import (
     ApplicationRoundTimeSlotSerializer,
 )
+from tilavarauspalvelu.api.graphql.types.reservation_unit_access_type.serializers import (
+    ReservationUnitAccessTypeSerializer,
+)
 from tilavarauspalvelu.api.graphql.types.reservation_unit_image.serializers import ReservationUnitImageFieldSerializer
 from tilavarauspalvelu.api.graphql.types.reservation_unit_pricing.serializers import ReservationUnitPricingSerializer
-from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationUnitPublishingState, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationStartInterval, ReservationUnitPublishingState, WeekdayChoice
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing
 from utils.date_utils import local_date, local_datetime
 from utils.external_service.errors import ExternalServiceError
+
+if TYPE_CHECKING:
+    import datetime
 
 __all__ = [
     "ReservationUnitSerializer",
@@ -36,6 +39,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
     images = ReservationUnitImageFieldSerializer(many=True, required=False)
     pricings = ReservationUnitPricingSerializer(many=True, required=False)
     application_round_time_slots = ApplicationRoundTimeSlotSerializer(many=True, required=False)
+    access_types = ReservationUnitAccessTypeSerializer(many=True, required=False)
 
     class Meta:
         model = ReservationUnit
@@ -71,8 +75,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "max_reservation_duration",
             "buffer_time_before",
             "buffer_time_after",
-            "access_type_start_date",
-            "access_type_end_date",
             #
             # Booleans
             "is_draft",
@@ -87,7 +89,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "authentication",
             "reservation_start_interval",
             "reservation_kind",
-            "access_type",
             "publishing_state",
             #
             # List fields
@@ -114,6 +115,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             # Reverse one-to-many related
             "images",
             "pricings",
+            "access_types",
             "application_round_time_slots",
         ]
 
@@ -122,8 +124,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
         self._validate_reservation_duration_fields(data)
         self._validate_pricings(data)
-
-        self._validate_access_type(data)
 
         if not is_draft:
             self._validate_for_publish(data)
@@ -250,14 +250,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 msg = "Highest price cannot be less than lowest price."
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_PRICINGS_INVALID_PRICES)
 
-    def _validate_access_type(self, data: dict[str, Any]) -> None:
-        access_type_start_date = self.get_or_default("access_type_start_date", data) or datetime.date.min
-        access_type_end_date = self.get_or_default("access_type_end_date", data) or datetime.date.max
-
-        if access_type_end_date < access_type_start_date:
-            msg = "Access type start date must be before access type end date."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_ACCESS_TYPE_START_DATE_INVALID)
-
     @staticmethod
     def validate_application_round_time_slots(timeslots: list[dict[str, Any]]) -> list[dict[str, Any]]:
         errors: list[str] = []
@@ -324,7 +316,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
     @staticmethod
     def handle_pricings(pricings: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
-        with atomic():
+        with transaction.atomic():
             # Delete future pricings that are not in the payload.
             # Past or Active pricings can not be deleted.
             pricing_pks = [pricing.get("pk") for pricing in pricings if "pk" in pricing]
@@ -341,6 +333,31 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 else:  # Create new pricings
                     ReservationUnitPricing.objects.create(**pricing, reservation_unit=reservation_unit)
 
+    def handle_access_types(self, access_types: list[dict[Any, Any]], reservation_unit: ReservationUnit) -> None:
+        """Update access types for a reservation unit."""
+        access_type_pks = [access_type.get("pk") for access_type in access_types if "pk" in access_type]
+        today = local_date()
+
+        with transaction.atomic():
+            # Delete future access types that are not in the payload.
+            # Past or active access types should not be deleted.
+            ReservationUnitAccessType.objects.filter(
+                reservation_unit=reservation_unit,
+                begin_date__gt=today,
+            ).exclude(pk__in=access_type_pks).delete()
+
+            ReservationUnitAccessType.objects.bulk_create(
+                objs=[
+                    ReservationUnitAccessType(**access_type, reservation_unit=reservation_unit)
+                    for access_type in access_types
+                ],
+                update_conflicts=True,
+                update_fields=["access_type", "begin_date"],
+                unique_fields=["pk"],
+            )
+
+        self.instance.actions.update_access_types_for_reservations()
+
     @transaction.atomic
     def update(self, instance: ReservationUnit, validated_data: dict[str, Any]) -> ReservationUnit:
         # The ReservationUnit can't be archived if it has active reservations in the future
@@ -350,23 +367,9 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 msg = "Reservation unit can't be archived if it has any reservations in the future"
                 raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS)
 
-        access_type = validated_data.get("access_type", NotProvided)
-        access_type_start_date = validated_data.get("access_type_start_date", NotProvided)
-        access_type_end_date = validated_data.get("access_type_end_date", NotProvided)
-
-        # If at least one value was provided, we might need to update access type for reservations
-        if {access_type, access_type_start_date, access_type_end_date} != {NotProvided}:
-            access_type = AccessType(validated_data.get("access_type", self.instance.access_type))
-            access_type_start_date = validated_data.get("access_type_start_date", self.instance.access_type_start_date)
-            access_type_end_date = validated_data.get("access_type_end_date", self.instance.access_type_end_date)
-
-            self.instance.actions.update_access_type_for_reservations(
-                access_type=access_type,
-                access_type_start_date=access_type_start_date,
-                access_type_end_date=access_type_end_date,
-            )
-
         pricings = validated_data.pop("pricings", [])
+        access_types = validated_data.pop("access_types", [])
         reservation_unit = super().update(instance, validated_data)
         self.handle_pricings(pricings, instance)
+        self.handle_access_types(access_types, instance)
         return reservation_unit

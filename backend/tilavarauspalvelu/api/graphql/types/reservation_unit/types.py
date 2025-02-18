@@ -119,8 +119,6 @@ class ReservationUnitNode(DjangoNode):
             "max_reservation_duration",
             "buffer_time_before",
             "buffer_time_after",
-            "access_type_start_date",
-            "access_type_end_date",
             #
             # Booleans
             "is_draft",
@@ -137,7 +135,6 @@ class ReservationUnitNode(DjangoNode):
             "reservation_kind",
             "publishing_state",
             "reservation_state",
-            "access_type",
             "current_access_type",
             #
             # List fields
@@ -171,6 +168,7 @@ class ReservationUnitNode(DjangoNode):
             # Reverse one-to-many related
             "images",
             "pricings",
+            "access_types",
             "application_round_time_slots",
             #
             # "Special" fields

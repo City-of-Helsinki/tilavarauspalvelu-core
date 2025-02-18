@@ -89,7 +89,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
         data["unit_price"] = pricing.highest_price
         data["tax_percentage_value"] = pricing.tax_percentage.value
         data["non_subsidised_price"] = data["price"]
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin)
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begin) or AccessType.UNRESTRICTED
 
         if settings.PREFILL_RESERVATION_WITH_PROFILE_DATA:
             self.prefill_reservation_from_profile(data)
