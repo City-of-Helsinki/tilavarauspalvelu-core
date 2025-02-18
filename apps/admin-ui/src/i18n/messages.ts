@@ -1239,7 +1239,6 @@ const translations: ITranslations = {
   ReservationUnitEditor: {
     // NOTE the labels are used in a dynamic error summary (even if the key can't be found)
     label: {
-      reservationKind: ["Varaustyyppi"],
       nameFi: ["Varausyksikön nimi fi"],
       nameSv: ["Varausyksikön nimi sv"],
       nameEn: ["Varausyksikön nimi en"],
@@ -1312,10 +1311,19 @@ const translations: ITranslations = {
       reservationCancelledInstructionsSv: [
         "Varausvahvistuksen lisäohjeteksti ruotsiksi",
       ],
-      reservationKinds: {
-        DIRECT_AND_SEASON: ["Yksittäis- ja kausivaraus"],
-        DIRECT: ["Vain yksittäisvaraus"],
-        SEASON: ["Vain kausivaraus"],
+      reservationKind: ["Varaustyyppi"],
+      bufferType: ["Tauotus"],
+      options: {
+        reservationKind: {
+          DIRECT_AND_SEASON: ["Yksittäis- ja kausivaraus"],
+          DIRECT: ["Vain yksittäisvaraus"],
+          SEASON: ["Vain kausivaraus"],
+        },
+        bufferType: {
+          noBuffer: ["Tauotusta ei käytetä"],
+          blocksWholeDay: ["Vain yksi varaus vuorokaudessa"],
+          bufferTimesSet: ["Aseta varaukselle tauot"],
+        },
       },
       pricingType: ["Varausyksikön maksullisuus"],
       pricingTerms: ["Hinnoitteluperiaate"],
@@ -1656,9 +1664,6 @@ const translations: ITranslations = {
     contactInformationPlaceholder: ["Vastuuhenkilön yhteystiedot"],
     noPreviewUnsavedChangesTooltip: ["Tallenna ensin muutokset"],
     previewTooltip: ["Varausyksikön esikatselu"],
-    noBuffer: ["Tauotusta ei käytetä"],
-    blocksWholeDay: ["Vain yksi varaus vuorokaudessa"],
-    setBufferTime: ["Aseta varaukselle tauot"],
     bufferTimeBefore: ["Aseta tauko ennen vuoroa"],
     bufferTimeBeforeDuration: ["Tauon kesto"],
     bufferTimeAfter: ["Aseta tauko vuoron jälkeen"],
