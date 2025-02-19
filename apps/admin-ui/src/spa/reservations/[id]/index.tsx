@@ -7,6 +7,7 @@ import styled from "styled-components";
 import type { TFunction } from "i18next";
 import { add, startOfISOWeek } from "date-fns";
 import {
+  AccessType,
   CustomerTypeChoice,
   type ReservationQuery,
   ReservationStateChoice,
@@ -35,14 +36,15 @@ import { useRecurringReservations } from "@/hooks";
 import { ApprovalButtonsRecurring } from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { base64encode, isPriceFree } from "common/src/helpers";
-import { formatAgeGroup } from "@/common/util";
+import { formatAgeGroup, formatTime } from "@/common/util";
 import Error404 from "@/common/Error404";
-import { Accordion as AccordionBase } from "hds-react";
+import { Accordion as AccordionBase, IconAlertCircleFill } from "hds-react";
 import {
   ApplicationDatas,
   KVWrapper,
   Label,
   Summary,
+  SummaryFourColumns,
   Value,
 } from "@/styles/util";
 
@@ -54,8 +56,10 @@ const Accordion = styled(AccordionBase).attrs({
   > div > div:not([class^="LoadingSpinner-module_loadingSpinner"]) {
     width: 100%;
   }
+
   && {
     --icon-size: 24px;
+
     [class^="Accordion-module_accordionHeader__"] {
       --icon-size: 32px;
     }
@@ -253,6 +257,43 @@ function ReservationSummary({
   );
 }
 
+export function ReservationKeylessEntry({
+  reservation,
+}: Readonly<{
+  reservation: ReservationType;
+}>) {
+  const { t } = useTranslation();
+
+  return (
+    <Accordion
+      id="reservation__access-type"
+      heading={t("RequestedReservation.keylessEntry")}
+      initiallyOpen={false}
+    >
+      <div>
+        <SummaryFourColumns>
+          <DataWrapper label={t("RequestedReservation.accessCodeLabel")}>
+            {reservation.pindoraInfo?.accessCode}
+          </DataWrapper>
+          <DataWrapper label={t("RequestedReservation.accessCodeStatusLabel")}>
+            {reservation.pindoraInfo?.accessCodeIsActive
+              ? t("RequestedReservation.accessCodeStatusActive")
+              : t("RequestedReservation.accessCodeStatusInactive")}
+            {reservation.pindoraInfo?.accessCodeIsActive !==
+              reservation.accessCodeShouldBeActive && <IconAlertCircleFill />}
+          </DataWrapper>
+          <DataWrapper
+            label={t("RequestedReservation.accessCodeValidityLabel")}
+          >
+            {formatTime(reservation.pindoraInfo?.accessCodeBeginsAt)}-
+            {formatTime(reservation.pindoraInfo?.accessCodeEndsAt)}
+          </DataWrapper>
+        </SummaryFourColumns>
+      </div>
+    </Accordion>
+  );
+}
+
 const maybeStringToDate: (s?: string) => Date | undefined = (str) =>
   str ? new Date(str) : undefined;
 
@@ -398,6 +439,10 @@ function RequestedReservation({
   const reservationTagline = createTagString(reservation, t);
   const order = reservation.paymentOrder.find(() => true);
 
+  const showKeylessEntryAccordion =
+    reservation.accessType === AccessType.AccessCode &&
+    reservation.pindoraInfo != null;
+
   return (
     <>
       <ShowWhenTargetInvisible target={ref}>
@@ -447,6 +492,9 @@ function RequestedReservation({
             />
           </Accordion>
         </VisibleIfPermission>
+        {showKeylessEntryAccordion && (
+          <ReservationKeylessEntry reservation={reservation} />
+        )}
         <TimeBlock reservation={reservation} onReservationUpdated={refetch} />
         <Accordion
           id="reservation__reservation-details"

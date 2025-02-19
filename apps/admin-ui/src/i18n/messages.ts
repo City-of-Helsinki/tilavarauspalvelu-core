@@ -1993,6 +1993,12 @@ const translations: ITranslations = {
     hideBirthDate: ["Piilota"],
     showBirthDate: ["Näytä"],
     alreadyEnded: ["Päättynyt"],
+    keylessEntry: ["Avaimeton kulku"],
+    accessCodeLabel: ["Ovikoodi"],
+    accessCodeStatusLabel: ["Status"],
+    accessCodeStatusActive: ["Aktiivinen"],
+    accessCodeStatusInactive: ["Ei-aktiivinen"],
+    accessCodeValidityLabel: ["Voimassa"],
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],
