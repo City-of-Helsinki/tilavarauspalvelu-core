@@ -122,6 +122,19 @@ const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
   }
 `;
 
+const SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT = gql`
+  fragment ReservationAccessType on ReservationNode {
+    accessType
+    accessCodeShouldBeActive
+    pindoraInfo {
+      accessCode
+      accessCodeIsActive
+      accessCodeBeginsAt
+      accessCodeEndsAt
+    }
+  }
+`;
+
 export const SINGLE_RESERVATION_QUERY = gql`
   ${RESERVATION_META_FRAGMENT}
   ${RESERVATION_UNIT_FRAGMENT}
@@ -129,11 +142,13 @@ export const SINGLE_RESERVATION_QUERY = gql`
   ${RESERVATION_COMMON_FRAGMENT}
   ${RESERVATION_RECURRING_FRAGMENT}
   ${SPECIALISED_SINGLE_RESERVATION_FRAGMENT}
+  ${SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT}
   query Reservation($id: ID!) {
     reservation(id: $id) {
       ...ReservationCommon
       ...ReservationRecurring
       ...ReservationSpecialisation
+      ...ReservationAccessType
       reservationUnits {
         ...ReservationUnit
         ...ReservationUnitPricing

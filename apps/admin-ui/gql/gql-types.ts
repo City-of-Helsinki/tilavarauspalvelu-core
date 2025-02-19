@@ -8010,6 +8010,17 @@ export type ReservationSpecialisationFragment = {
   } | null;
 };
 
+export type ReservationAccessTypeFragment = {
+  accessType: AccessType;
+  accessCodeShouldBeActive?: boolean | null;
+  pindoraInfo?: {
+    accessCode: string;
+    accessCodeIsActive: boolean;
+    accessCodeBeginsAt: string;
+    accessCodeEndsAt: string;
+  } | null;
+};
+
 export type ReservationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8032,6 +8043,8 @@ export type ReservationQuery = {
     price?: string | null;
     taxPercentageValue?: string | null;
     handlingDetails?: string | null;
+    accessType: AccessType;
+    accessCodeShouldBeActive?: boolean | null;
     numPersons?: number | null;
     name?: string | null;
     description?: string | null;
@@ -8127,6 +8140,12 @@ export type ReservationQuery = {
     } | null;
     cancelReason?: { id: string; reasonFi?: string | null } | null;
     denyReason?: { id: string; reasonFi?: string | null } | null;
+    pindoraInfo?: {
+      accessCode: string;
+      accessCodeIsActive: boolean;
+      accessCodeBeginsAt: string;
+      accessCodeEndsAt: string;
+    } | null;
     ageGroup?: {
       id: string;
       minimum: number;
@@ -9276,6 +9295,18 @@ export const ReservationSpecialisationFragmentDoc = gql`
     }
     bufferTimeBefore
     bufferTimeAfter
+  }
+`;
+export const ReservationAccessTypeFragmentDoc = gql`
+  fragment ReservationAccessType on ReservationNode {
+    accessType
+    accessCodeShouldBeActive
+    pindoraInfo {
+      accessCode
+      accessCodeIsActive
+      accessCodeBeginsAt
+      accessCodeEndsAt
+    }
   }
 `;
 export const ChangeReservationTimeFragmentDoc = gql`
@@ -14907,6 +14938,7 @@ export const ReservationDocument = gql`
       ...ReservationCommon
       ...ReservationRecurring
       ...ReservationSpecialisation
+      ...ReservationAccessType
       reservationUnits {
         ...ReservationUnit
         ...ReservationUnitPricing
@@ -14917,6 +14949,7 @@ export const ReservationDocument = gql`
   ${ReservationCommonFragmentDoc}
   ${ReservationRecurringFragmentDoc}
   ${ReservationSpecialisationFragmentDoc}
+  ${ReservationAccessTypeFragmentDoc}
   ${ReservationUnitFragmentDoc}
   ${ReservationUnitPricingFragmentDoc}
   ${ReservationMetaFieldsFragmentDoc}
