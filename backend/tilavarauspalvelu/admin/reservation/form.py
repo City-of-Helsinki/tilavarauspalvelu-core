@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraClientError
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import DEFAULT_TIMEZONE
 
@@ -162,36 +163,47 @@ class ReservationAdminForm(forms.ModelForm):
         if getattr(self.instance, "pk", None) and self.instance.access_type == AccessType.ACCESS_CODE:
             pindora_field = self.fields["pindora_response"]
             pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})
+            pindora_field.initial = self.get_pindora_response()
 
-            if self.instance.recurring_reservation is None:
+    def get_pindora_response(self) -> str | None:
+        if self.instance.recurring_reservation is None:
+            try:
                 response = PindoraClient.get_reservation(reservation=self.instance)
-                pindora_field.initial = json.dumps(response, default=str, indent=2)
+            except PindoraClientError as error:
+                return str(error.msg)
+            return json.dumps(response, default=str, indent=2)
 
-            elif self.instance.recurring_reservation.allocated_time_slot is None:
+        if self.instance.recurring_reservation.allocated_time_slot is None:
+            try:
                 response = PindoraClient.get_reservation_series(series=self.instance.recurring_reservation)
+            except PindoraClientError as error:
+                return str(error.msg)
 
-                # Only show the validity for this reservation
-                response["reservation_unit_code_validity"] = [
-                    item
-                    for item in response["reservation_unit_code_validity"]
-                    if item["begin"] == self.instance.begin.astimezone(DEFAULT_TIMEZONE)
-                    and item["end"] == self.instance.end.astimezone(DEFAULT_TIMEZONE)
-                ]
+            # Only show the validity for this reservation
+            response["reservation_unit_code_validity"] = [
+                item
+                for item in response["reservation_unit_code_validity"]
+                if item["begin"] == self.instance.begin.astimezone(DEFAULT_TIMEZONE)
+                and item["end"] == self.instance.end.astimezone(DEFAULT_TIMEZONE)
+            ]
 
-                pindora_field.initial = json.dumps(response, default=str, indent=2)
+            return json.dumps(response, default=str, indent=2)
 
-            else:
-                allocation = self.instance.recurring_reservation.allocated_time_slot
-                section = allocation.reservation_unit_option.application_section
-                response = PindoraClient.get_seasonal_booking(section=section)
+        allocation = self.instance.recurring_reservation.allocated_time_slot
+        section = allocation.reservation_unit_option.application_section
 
-                # Only show the validity for this reservation
-                response["reservation_unit_code_validity"] = [
-                    item
-                    for item in response["reservation_unit_code_validity"]
-                    if item["begin"] == self.instance.begin.astimezone(DEFAULT_TIMEZONE)
-                    and item["end"] == self.instance.end.astimezone(DEFAULT_TIMEZONE)
-                    and item["reservation_unit_id"] == self.instance.recurring_reservation.reservation_unit.uuid
-                ]
+        try:
+            response = PindoraClient.get_seasonal_booking(section=section)
+        except PindoraClientError as error:
+            return str(error.msg)
 
-                pindora_field.initial = json.dumps(response, default=str, indent=2)
+        # Only show the validity for this reservation
+        response["reservation_unit_code_validity"] = [
+            item
+            for item in response["reservation_unit_code_validity"]
+            if item["begin"] == self.instance.begin.astimezone(DEFAULT_TIMEZONE)
+            and item["end"] == self.instance.end.astimezone(DEFAULT_TIMEZONE)
+            and item["reservation_unit_id"] == self.instance.recurring_reservation.reservation_unit.uuid
+        ]
+
+        return json.dumps(response, default=str, indent=2)
