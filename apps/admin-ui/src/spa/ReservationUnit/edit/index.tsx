@@ -700,6 +700,10 @@ function ReservationUnitSettings({
     label: t(`authentication.${choice}`),
   }));
 
+  const isDirect =
+    watch("reservationKind") === "DIRECT" ||
+    watch("reservationKind") === "DIRECT_AND_SEASON";
+
   const hasErrors =
     errors.reservationBeginsDate != null ||
     errors.reservationEndsDate != null ||
@@ -716,133 +720,153 @@ function ReservationUnitSettings({
   return (
     <Accordion open={hasErrors} heading={t("ReservationUnitEditor.settings")}>
       <AutoGrid $minWidth="24rem">
-        <FieldGroup
-          heading={t("ReservationUnitEditor.publishingSettings")}
-          tooltip={t("ReservationUnitEditor.tooltip.publishingSettings")}
-          style={{ gridColumn: "1 / span 1" }}
-        >
-          <ActivationGroup
-            label={t("ReservationUnitEditor.scheduledPublishing")}
-            control={control}
-            name="hasScheduledPublish"
+        {isDirect && (
+          <FieldGroup
+            heading={t("ReservationUnitEditor.publishingSettings")}
+            tooltip={t("ReservationUnitEditor.tooltip.publishingSettings")}
+            style={{ gridColumn: "1 / span 1" }}
           >
-            <Flex $gap="xs">
+            <ActivationGroup
+              label={t("ReservationUnitEditor.scheduledPublishing")}
+              control={control}
+              name="hasScheduledPublish"
+            >
+              <Flex $gap="xs">
+                {/* TODO the Two DateInputs need to touch each other to rerun common validation code */}
+                <ActivationGroup
+                  label={t("ReservationUnitEditor.publishBegins")}
+                  control={control}
+                  name="hasPublishBegins"
+                  noIndent
+                  noMargin
+                >
+                  <DateTimeInput
+                    control={control}
+                    name={{
+                      date: "publishBeginsDate",
+                      time: "publishBeginsTime",
+                    }}
+                    translateError={(err) => getTranslatedError(t, err)}
+                  />
+                </ActivationGroup>
+                <ActivationGroup
+                  label={t("ReservationUnitEditor.publishEnds")}
+                  control={control}
+                  name="hasPublishEnds"
+                  noIndent
+                  noMargin
+                >
+                  <DateTimeInput
+                    control={control}
+                    name={{ date: "publishEndsDate", time: "publishEndsTime" }}
+                    translateError={(err) => getTranslatedError(t, err)}
+                  />
+                </ActivationGroup>
+              </Flex>
+            </ActivationGroup>
+          </FieldGroup>
+        )}
+        {isDirect && (
+          <FieldGroup
+            heading={t("ReservationUnitEditor.reservationSettings")}
+            tooltip={t("ReservationUnitEditor.tooltip.reservationSettings")}
+            style={{ gridColumn: "1 / span 1" }}
+          >
+            <ActivationGroup
+              label={t("ReservationUnitEditor.scheduledReservation")}
+              control={control}
+              name="hasScheduledReservation"
+            >
               {/* TODO the Two DateInputs need to touch each other to rerun common validation code */}
               <ActivationGroup
-                label={t("ReservationUnitEditor.publishBegins")}
+                label={t("ReservationUnitEditor.reservationBegins")}
                 control={control}
-                name="hasPublishBegins"
+                name="hasReservationBegins"
                 noIndent
-                noMargin
               >
                 <DateTimeInput
                   control={control}
                   name={{
-                    date: "publishBeginsDate",
-                    time: "publishBeginsTime",
+                    date: "reservationBeginsDate",
+                    time: "reservationBeginsTime",
                   }}
+                  minDate={new Date()}
                   translateError={(err) => getTranslatedError(t, err)}
                 />
               </ActivationGroup>
               <ActivationGroup
-                label={t("ReservationUnitEditor.publishEnds")}
+                label={t("ReservationUnitEditor.reservationEnds")}
                 control={control}
-                name="hasPublishEnds"
+                name="hasReservationEnds"
                 noIndent
-                noMargin
               >
                 <DateTimeInput
                   control={control}
-                  name={{ date: "publishEndsDate", time: "publishEndsTime" }}
+                  name={{
+                    date: "reservationEndsDate",
+                    time: "reservationEndsTime",
+                  }}
+                  minDate={new Date()}
                   translateError={(err) => getTranslatedError(t, err)}
                 />
               </ActivationGroup>
-            </Flex>
-          </ActivationGroup>
-        </FieldGroup>
-        <FieldGroup
-          heading={t("ReservationUnitEditor.reservationSettings")}
-          tooltip={t("ReservationUnitEditor.tooltip.reservationSettings")}
-          style={{ gridColumn: "1 / span 1" }}
-        >
-          <ActivationGroup
-            label={t("ReservationUnitEditor.scheduledReservation")}
-            control={control}
-            name="hasScheduledReservation"
-          >
-            {/* TODO the Two DateInputs need to touch each other to rerun common validation code */}
-            <ActivationGroup
-              label={t("ReservationUnitEditor.reservationBegins")}
-              control={control}
-              name="hasReservationBegins"
-              noIndent
-            >
-              <DateTimeInput
-                control={control}
-                name={{
-                  date: "reservationBeginsDate",
-                  time: "reservationBeginsTime",
-                }}
-                minDate={new Date()}
-                translateError={(err) => getTranslatedError(t, err)}
-              />
             </ActivationGroup>
-            <ActivationGroup
-              label={t("ReservationUnitEditor.reservationEnds")}
+          </FieldGroup>
+        )}
+        {isDirect && (
+          <>
+            <ControlledSelect
               control={control}
-              name="hasReservationEnds"
-              noIndent
-            >
-              <DateTimeInput
-                control={control}
-                name={{
-                  date: "reservationEndsDate",
-                  time: "reservationEndsTime",
-                }}
-                minDate={new Date()}
-                translateError={(err) => getTranslatedError(t, err)}
-              />
-            </ActivationGroup>
-          </ActivationGroup>
-        </FieldGroup>
-        <ControlledSelect
-          control={control}
-          name="minReservationDuration"
-          options={durationOptions}
-          style={{ gridColumnStart: "1" }}
-          required
-          label={t("ReservationUnitEditor.label.minReservationDuration")}
-          error={getTranslatedError(t, errors.minReservationDuration?.message)}
-          tooltip={t("ReservationUnitEditor.tooltip.minReservationDuration")}
-        />
-        <ControlledSelect
-          control={control}
-          name="maxReservationDuration"
-          required
-          options={durationOptions}
-          label={t("ReservationUnitEditor.label.maxReservationDuration")}
-          error={getTranslatedError(t, errors.maxReservationDuration?.message)}
-          tooltip={t("ReservationUnitEditor.tooltip.maxReservationDuration")}
-        />
-        <ControlledSelect
-          control={control}
-          name="reservationsMaxDaysBefore"
-          options={reservationsMaxDaysBeforeOptions}
-          required
-          label={t("ReservationUnitEditor.label.reservationsMaxDaysBefore")}
-          error={getTranslatedError(
-            t,
-            errors.reservationsMaxDaysBefore?.message
-          )}
-          tooltip={t("ReservationUnitEditor.tooltip.reservationsMaxDaysBefore")}
-        />
-        <CustomNumberInput
-          name="reservationsMinDaysBefore"
-          max={watch("reservationsMaxDaysBefore")}
-          min={0}
-          form={form}
-          required
-        />
+              name="minReservationDuration"
+              options={durationOptions}
+              style={{ gridColumnStart: "1" }}
+              required
+              label={t("ReservationUnitEditor.label.minReservationDuration")}
+              error={getTranslatedError(
+                t,
+                errors.minReservationDuration?.message
+              )}
+              tooltip={t(
+                "ReservationUnitEditor.tooltip.minReservationDuration"
+              )}
+            />
+            <ControlledSelect
+              control={control}
+              name="maxReservationDuration"
+              required
+              options={durationOptions}
+              label={t("ReservationUnitEditor.label.maxReservationDuration")}
+              error={getTranslatedError(
+                t,
+                errors.maxReservationDuration?.message
+              )}
+              tooltip={t(
+                "ReservationUnitEditor.tooltip.maxReservationDuration"
+              )}
+            />
+            <ControlledSelect
+              control={control}
+              name="reservationsMaxDaysBefore"
+              options={reservationsMaxDaysBeforeOptions}
+              required
+              label={t("ReservationUnitEditor.label.reservationsMaxDaysBefore")}
+              error={getTranslatedError(
+                t,
+                errors.reservationsMaxDaysBefore?.message
+              )}
+              tooltip={t(
+                "ReservationUnitEditor.tooltip.reservationsMaxDaysBefore"
+              )}
+            />
+            <CustomNumberInput
+              name="reservationsMinDaysBefore"
+              max={watch("reservationsMaxDaysBefore")}
+              min={0}
+              form={form}
+              required
+            />
+          </>
+        )}
         <ControlledSelect
           control={control}
           name="reservationStartInterval"
@@ -903,7 +927,7 @@ function ReservationUnitSettings({
         <FieldGroup
           heading={t("ReservationUnitEditor.cancellationSettings")}
           tooltip={t("ReservationUnitEditor.tooltip.cancellationSettings")}
-          style={{ gridColumn: "1 / -1" }}
+          style={{ gridColumn: "1 / -1", alignItems: "start" }}
         >
           <ActivationGroup
             label={t("ReservationUnitEditor.cancellationIsPossible")}
@@ -919,47 +943,55 @@ function ReservationUnitSettings({
             />
           </ActivationGroup>
         </FieldGroup>
-        <ControlledSelect
-          control={control}
-          name="metadataSet"
-          required
-          options={metadataOptions}
-          label={t("ReservationUnitEditor.label.metadataSet")}
-          error={getTranslatedError(t, errors.metadataSet?.message)}
-          tooltip={t("ReservationUnitEditor.tooltip.metadataSet")}
-        />
-        <ControlledSelect
-          control={control}
-          name="authentication"
-          required
-          options={authenticationOptions}
-          label={t("ReservationUnitEditor.authenticationLabel")}
-          tooltip={t("ReservationUnitEditor.tooltip.authentication")}
-        />
-        <CustomNumberInput name="maxReservationsPerUser" min={1} form={form} />
-        <FieldGroup
-          // FIXME replace the text fields
-          heading={t("ReservationUnitEditor.requireAdultReserveeSettings")}
-          tooltip={t("ReservationUnitEditor.tooltip.requireAdultReservee")}
-          style={{ gridColumn: "1 / -1" }}
-        >
-          <ControlledCheckbox
-            control={control}
-            name="requireAdultReservee"
-            label={t("ReservationUnitEditor.requireAdultReserveeLabel")}
-          />
-        </FieldGroup>
-        <FieldGroup
-          heading={t("ReservationUnitEditor.handlingSettings")}
-          tooltip={t("ReservationUnitEditor.tooltip.handlingSettings")}
-          style={{ gridColumn: "1 / -1" }}
-        >
-          <ControlledCheckbox
-            control={control}
-            name="requireReservationHandling"
-            label={t("ReservationUnitEditor.requireReservationHandling")}
-          />
-        </FieldGroup>
+        {isDirect && (
+          <>
+            <ControlledSelect
+              control={control}
+              name="metadataSet"
+              required
+              options={metadataOptions}
+              label={t("ReservationUnitEditor.label.metadataSet")}
+              error={getTranslatedError(t, errors.metadataSet?.message)}
+              tooltip={t("ReservationUnitEditor.tooltip.metadataSet")}
+            />
+            <ControlledSelect
+              control={control}
+              name="authentication"
+              required
+              options={authenticationOptions}
+              label={t("ReservationUnitEditor.authenticationLabel")}
+              tooltip={t("ReservationUnitEditor.tooltip.authentication")}
+            />
+            <CustomNumberInput
+              name="maxReservationsPerUser"
+              min={1}
+              form={form}
+            />
+            <FieldGroup
+              // FIXME replace the text fields
+              heading={t("ReservationUnitEditor.requireAdultReserveeSettings")}
+              tooltip={t("ReservationUnitEditor.tooltip.requireAdultReservee")}
+              style={{ gridColumn: "1 / -1" }}
+            >
+              <ControlledCheckbox
+                control={control}
+                name="requireAdultReservee"
+                label={t("ReservationUnitEditor.requireAdultReserveeLabel")}
+              />
+            </FieldGroup>
+            <FieldGroup
+              heading={t("ReservationUnitEditor.handlingSettings")}
+              tooltip={t("ReservationUnitEditor.tooltip.handlingSettings")}
+              style={{ gridColumn: "1 / -1" }}
+            >
+              <ControlledCheckbox
+                control={control}
+                name="requireReservationHandling"
+                label={t("ReservationUnitEditor.requireReservationHandling")}
+              />
+            </FieldGroup>
+          </>
+        )}
       </AutoGrid>
     </Accordion>
   );
@@ -1724,13 +1756,11 @@ function ReservationUnitEditor({
           qualifiers={parametersData?.qualifiers}
           reservationUnitTypes={parametersData?.reservationUnitTypes}
         />
-        {isDirect && (
-          <ReservationUnitSettings
-            form={form}
-            metadataOptions={metadataOptions}
-            cancellationRuleOptions={cancellationRuleOptions}
-          />
-        )}
+        <ReservationUnitSettings
+          form={form}
+          metadataOptions={metadataOptions}
+          cancellationRuleOptions={cancellationRuleOptions}
+        />
         <PricingSection
           form={form}
           taxPercentageOptions={taxPercentageOptions}
