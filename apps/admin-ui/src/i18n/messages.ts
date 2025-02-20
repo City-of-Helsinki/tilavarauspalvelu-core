@@ -1243,6 +1243,7 @@ const translations: ITranslations = {
       nameSv: ["Varausyksikön nimi sv"],
       nameEn: ["Varausyksikön nimi en"],
       spaces: ["Tilat"],
+      seasons: ["Kausivarattavat ajat"],
       resources: ["Resurssit"],
       surfaceArea: ["Pinta-ala (m2)"],
       maxPersons: ["Henkilömäärä enintään"],
