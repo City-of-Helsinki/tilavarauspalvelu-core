@@ -70,7 +70,7 @@ const SeasonRowWrapper = styled.div`
 `;
 
 const SeasonalTimeWrapper = styled.div`
-  align-items: end;
+  align-items: start;
   display: grid;
   grid: subgrid / subgrid;
   grid-area: a;
@@ -302,13 +302,18 @@ export function SeasonalSection({
   form: UseFormReturn<ReservationUnitEditFormValues>;
 }): JSX.Element {
   const { t } = useTranslation();
-  const { setValue, watch } = form;
+  const {
+    setValue,
+    watch,
+    formState: { errors },
+  } = form;
 
   const seasons = watch("seasons");
   if (seasons.length !== 7) {
     // eslint-disable-next-line no-console
     console.warn("Seasons should always have 7 days");
   }
+  const error = errors.seasons;
 
   const handleClear = () => {
     const val = Array.from(Array(7)).map((_, i) => ({
@@ -326,7 +331,7 @@ export function SeasonalSection({
 
   return (
     <Accordion
-      open={false}
+      open={error != null}
       heading={t("ReservationUnitEditor.seasonalTimesTitle")}
     >
       <SeasonalInnerWrapper>
