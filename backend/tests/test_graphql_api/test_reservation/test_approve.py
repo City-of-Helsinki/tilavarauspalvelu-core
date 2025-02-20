@@ -115,7 +115,7 @@ def test_reservation__approve__succeeds_with_empty_handling_details(graphql):
 @patch_method(PindoraClient.create_reservation)
 def test_reservation__approve__succeeds__pindora_api__call_succeeds(graphql):
     reservation = ReservationFactory.create(
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.REQUIRES_HANDLING,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
@@ -140,7 +140,7 @@ def test_reservation__approve__succeeds__pindora_api__call_succeeds(graphql):
 @patch_method(PindoraClient.create_reservation)
 def test_reservation__approve__succeeds__pindora_api__call_fails(graphql):
     reservation = ReservationFactory.create(
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.REQUIRES_HANDLING,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
@@ -172,7 +172,7 @@ def test_reservation__approve__succeeds__pindora_api__call_fails(graphql):
 )
 def test_reservation__approve__succeeds__pindora_api__create_if_not_generated(graphql):
     reservation = ReservationFactory.create(
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.REQUIRES_HANDLING,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,

@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import AuthenticationType, TermsOfUseTypeChoices
+from tilavarauspalvelu.enums import AccessType, AuthenticationType, TermsOfUseTypeChoices
 from tilavarauspalvelu.models import ReservationUnit
 
 from tests.factories import ReservationMetadataSetFactory, ReservationUnitFactory, TermsOfUseFactory
@@ -170,8 +170,6 @@ def test_reservation_unit__update__archiving_removes_contact_information_and_aud
             "_reservation_state",
             "_active_pricing_price",
             "_current_access_type",
-            "_perceived_access_type_end_date",
-            "_perceived_access_type_start_date",
         ],
     )
 
@@ -224,6 +222,7 @@ def test_reservation_unit__update__publish(graphql):
         description_sv="foo",
         description_en="foo",
         pricings__highest_price=20,
+        access_types__access_type=AccessType.UNRESTRICTED,
     )
     data = get_draft_update_input_data(reservation_unit, isDraft=False)
 

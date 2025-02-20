@@ -509,7 +509,7 @@ def test_reservation__adjust_time__update_reservation_buffer_on_adjust(graphql):
 def test_reservation__adjust_time__same_access_type(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         access_type=AccessType.ACCESS_CODE,
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
     )
 
@@ -531,7 +531,7 @@ def test_reservation__adjust_time__same_access_type(graphql):
 def test_reservation__adjust_time__same_access_type__requires_handling(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         access_type=AccessType.ACCESS_CODE,
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         reservation_units__require_reservation_handling=True,
         access_code_is_active=True,
     )
@@ -559,7 +559,7 @@ def test_reservation__adjust_time__same_access_type__requires_handling(graphql):
 def test_reservation__adjust_time__change_to_access_code(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         access_type=AccessType.UNRESTRICTED,
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
     )
 
@@ -587,7 +587,7 @@ def test_reservation__adjust_time__change_to_access_code(graphql):
 def test_reservation__adjust_time__change_to_access_code__requires_handling(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         access_type=AccessType.UNRESTRICTED,
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         reservation_units__require_reservation_handling=True,
         access_code_is_active=False,
     )
@@ -610,7 +610,7 @@ def test_reservation__adjust_time__change_to_access_code__requires_handling(grap
 def test_reservation__adjust_time__change_from_access_code(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         access_type=AccessType.ACCESS_CODE,
-        reservation_units__access_type=AccessType.UNRESTRICTED,
+        reservation_units__access_types__access_type=AccessType.UNRESTRICTED,
         access_code_generated_at=datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE),
         access_code_is_active=True,
     )

@@ -15,6 +15,7 @@ from utils.date_utils import local_date, local_datetime
 from tests.factories import (
     ApplicationRoundFactory,
     EquipmentFactory,
+    ReservationUnitAccessTypeFactory,
     ReservationUnitFactory,
     ReservationUnitTypeFactory,
     UnitFactory,
@@ -801,123 +802,66 @@ def test_reservation_unit__filter__by_access_type(graphql):
 
     today = local_date()
 
-    # Always active access type
-    reservation_unit_1 = ReservationUnitFactory.create(
-        name="Always physical key",
-        access_type=AccessType.PHYSICAL_KEY,
-    )
-
-    # Access type before filter period.
+    # Access type before filter period
     ReservationUnitFactory.create(
-        name="physical key ends before filter period",
-        access_type=AccessType.PHYSICAL_KEY,
-        access_type_end_date=today - datetime.timedelta(days=1),
+        name="before filter period",
+        access_types__access_type=AccessType.UNRESTRICTED,
+        access_types__begin_date=today - datetime.timedelta(days=10),
     )
 
-    # Access type starts during the filter period.
-    reservation_unit_2 = ReservationUnitFactory.create(
-        name="physical key starts during filter period",
-        access_type=AccessType.PHYSICAL_KEY,
-        access_type_start_date=today + datetime.timedelta(days=1),
+    # Access type during the filter period
+    reservation_unit = ReservationUnitFactory.create(
+        name="on filter period",
+        access_types__access_type=AccessType.PHYSICAL_KEY,
+        access_types__begin_date=today,
     )
 
-    # Access type starts after the filter period.
+    # Access type after the filter period
     ReservationUnitFactory.create(
-        name="physical key starts after filter period",
-        access_type=AccessType.PHYSICAL_KEY,
-        access_type_start_date=today + datetime.timedelta(days=10),
-    )
-
-    # Access type ending during the filter period.
-    reservation_unit_3 = ReservationUnitFactory.create(
-        name="physical key ends during filter period",
-        access_type=AccessType.PHYSICAL_KEY,
-        access_type_end_date=today,
+        name="after filter period",
+        access_types__access_type=AccessType.PHYSICAL_KEY,
+        access_types__begin_date=today + datetime.timedelta(days=10),
     )
 
     # Access type something other
-    ReservationUnitFactory.create(name="unrestricted", access_type=AccessType.UNRESTRICTED)
-    ReservationUnitFactory.create(name="access code", access_type=AccessType.ACCESS_CODE)
-    ReservationUnitFactory.create(name="opened by staff", access_type=AccessType.OPENED_BY_STAFF)
+    ReservationUnitFactory.create(name="unrestricted", access_types__access_type=AccessType.UNRESTRICTED)
+    ReservationUnitFactory.create(name="access code", access_types__access_type=AccessType.ACCESS_CODE)
+    ReservationUnitFactory.create(name="opened by staff", access_types__access_type=AccessType.OPENED_BY_STAFF)
 
     query = reservation_units_query(
         fields="name",
         access_type=AccessType.PHYSICAL_KEY,
-        access_type_start_date=today.isoformat(),
+        access_type_begin_date=today.isoformat(),
         access_type_end_date=(today + datetime.timedelta(days=1)).isoformat(),
     )
     response = graphql(query)
 
     assert response.has_errors is False
-    assert len(response.edges) == 3
-    assert response.node(0) == {"name": reservation_unit_1.name}
-    assert response.node(1) == {"name": reservation_unit_2.name}
-    assert response.node(2) == {"name": reservation_unit_3.name}
-
-
-def test_reservation_unit__filter__by_access_type__open_access(graphql):
-    graphql.login_with_superuser()
-
-    today = local_date()
-
-    # Access type open access
-    reservation_unit_1 = ReservationUnitFactory.create(
-        name="Always open access",
-        access_type=AccessType.UNRESTRICTED,
-    )
-
-    # Other access type ends during the filter period
-    # => Has "open access" during rest of period.
-    reservation_unit_2 = ReservationUnitFactory.create(
-        name="ending during filter period",
-        access_type=AccessType.PHYSICAL_KEY,
-        access_type_end_date=today,
-    )
-
-    # Other access type starts during the filter period
-    # => Has "open access" during beginning of period.
-    reservation_unit_3 = ReservationUnitFactory.create(
-        name="starting during filter period",
-        access_type=AccessType.PHYSICAL_KEY,
-        access_type_start_date=today + datetime.timedelta(days=1),
-    )
-
-    # Access type something other.
-    ReservationUnitFactory.create(name="with key", access_type=AccessType.PHYSICAL_KEY)
-    ReservationUnitFactory.create(name="keyless", access_type=AccessType.ACCESS_CODE)
-    ReservationUnitFactory.create(name="opened by staff", access_type=AccessType.OPENED_BY_STAFF)
-
-    query = reservation_units_query(
-        fields="name",
-        access_type=AccessType.UNRESTRICTED,
-        access_type_start_date=today.isoformat(),
-        access_type_end_date=(today + datetime.timedelta(days=1)).isoformat(),
-    )
-    response = graphql(query)
-
-    assert response.has_errors is False
-    assert len(response.edges) == 3
-    assert response.node(0) == {"name": reservation_unit_1.name}
-    assert response.node(1) == {"name": reservation_unit_2.name}
-    assert response.node(2) == {"name": reservation_unit_3.name}
+    assert len(response.edges) == 1
+    assert response.node(0) == {"name": reservation_unit.name}
 
 
 def test_reservation_unit__filter__by_access_type__no_period(graphql):
-    graphql.login_with_superuser()
-
-    reservation_unit = ReservationUnitFactory.create(name="with key", access_type=AccessType.PHYSICAL_KEY)
-    ReservationUnitFactory.create(name="open access", access_type=AccessType.UNRESTRICTED)
-    ReservationUnitFactory.create(name="keyless", access_type=AccessType.ACCESS_CODE)
-    ReservationUnitFactory.create(name="opened by staff", access_type=AccessType.OPENED_BY_STAFF)
-
-    # Target access type was in the past, default filter only looks to the future.
-    ReservationUnitFactory.create(
+    reservation_unit = ReservationUnitFactory.create(
         name="with key",
-        access_type=AccessType.PHYSICAL_KEY,
-        access_type_end_date=local_date() - datetime.timedelta(days=1),
+        access_types__access_type=AccessType.PHYSICAL_KEY,
+        access_types__begin_date=local_date(),
     )
 
+    # Access type was in the past, default filter only looks to the future.
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.ACCESS_CODE,
+        begin_date=local_date() - datetime.timedelta(days=1),
+    )
+
+    # Other access types
+    ReservationUnitFactory.create(name="open access", access_types__access_type=AccessType.UNRESTRICTED)
+    ReservationUnitFactory.create(name="keyless", access_types__access_type=AccessType.ACCESS_CODE)
+    ReservationUnitFactory.create(name="opened by staff", access_types__access_type=AccessType.OPENED_BY_STAFF)
+
     query = reservation_units_query(fields="name", access_type=AccessType.PHYSICAL_KEY)
+    graphql.login_with_superuser()
     response = graphql(query)
 
     assert response.has_errors is False
