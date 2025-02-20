@@ -22,6 +22,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.models import (
     PaymentProduct,
     ReservationUnit,
+    ReservationUnitAccessType,
     ReservationUnitImage,
     ReservationUnitPricing,
     Resource,
@@ -33,6 +34,7 @@ from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
     PaymentProductFactory,
+    ReservationUnitAccessTypeFactory,
     ReservationUnitPricingFactory,
     ReservationUnitTypeFactory,
     ResourceFactory,
@@ -253,6 +255,7 @@ def _create_free_reservation_units(
     reservation_units: list[ReservationUnit] = []
     reservation_unit_spaces: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    access_types: list[ReservationUnitAccessType] = []
     images: list[ReservationUnitImage] = []
 
     reservation_unit_type = ReservationUnitTypeFactory.create(
@@ -321,7 +324,6 @@ def _create_free_reservation_units(
                 max_reservations_per_user=None,
                 reservation_unit_type=reservation_unit_type,
                 reservation_kind=reservation_kind,
-                access_type=AccessType.UNRESTRICTED,
                 cancellation_rule=random.choice(data.cancellation_rule_info.value),
                 require_reservation_handling=data.handling_info.handling_required,
                 metadata_set=metadata_sets[set_name],
@@ -368,6 +370,13 @@ def _create_free_reservation_units(
         )
         pricings.append(pricing)
 
+        access_type = ReservationUnitAccessTypeFactory.build(
+            reservation_unit=reservation_unit,
+            begin_date=datetime.date(2021, 1, 1),
+            access_type=AccessType.UNRESTRICTED,
+        )
+        access_types.append(access_type)
+
         image = _fetch_and_build_reservation_unit_image(
             reservation_unit=reservation_unit,
             image_url="https://images.unsplash.com/photo-1577412647305-991150c7d163",
@@ -380,6 +389,7 @@ def _create_free_reservation_units(
     ReservationUnit.objects.bulk_create(reservation_units)
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitAccessType.objects.bulk_create(access_types)
     ReservationUnitImage.objects.bulk_create(images)
 
 
@@ -462,6 +472,7 @@ def _create_paid_reservation_units(
     reservation_unit_spaces: list[models.Model] = []
     reservation_unit_payment_types: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    access_types: list[ReservationUnitAccessType] = []
     payment_products: list[PaymentProduct] = []
     images: list[ReservationUnitImage] = []
 
@@ -543,7 +554,6 @@ def _create_paid_reservation_units(
                 max_reservations_per_user=None,
                 reservation_unit_type=reservation_unit_type,
                 reservation_kind=reservation_kind,
-                access_type=AccessType.PHYSICAL_KEY,
                 cancellation_rule=random.choice(data.cancellation_rule_info.value),
                 require_reservation_handling=data.handling_info.handling_required,
                 metadata_set=metadata_sets[set_name],
@@ -595,6 +605,13 @@ def _create_paid_reservation_units(
             tax_percentage=tax_percentages[data.tax_percentage_info.value],
         )
         pricings.append(pricing)
+
+        access_type = ReservationUnitAccessTypeFactory.build(
+            reservation_unit=reservation_unit,
+            begin_date=datetime.date(2021, 1, 1),
+            access_type=AccessType.PHYSICAL_KEY,
+        )
+        access_types.append(access_type)
 
         image = _fetch_and_build_reservation_unit_image(
             reservation_unit=reservation_unit,
