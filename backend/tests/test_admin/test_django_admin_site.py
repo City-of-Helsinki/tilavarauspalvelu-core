@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from django.contrib import admin
-from django.test import Client, override_settings
+from django.test import Client
 from django.urls import reverse
 
 from tilavarauspalvelu.enums import EmailType
@@ -28,6 +28,11 @@ if TYPE_CHECKING:
     from django.urls import URLPattern
 
     from tests.factories._base import GenericDjangoModelFactory
+
+
+pytestmark = [
+    pytest.mark.django_db,
+]
 
 
 @pytest.fixture
@@ -64,14 +69,11 @@ def create_all_models():
         create_or_update_reservation_statistics(Reservation.objects.values_list("pk", flat=True))
 
 
-@pytest.mark.django_db
-# Override languages, since TinyMCE can't handle lazy language name translations in tests ¯\_(ツ)_/¯
-@override_settings(LANGUAGES=[("fi", "Finnish"), ("en", "English"), ("sv", "Swedish")])
-@pytest.mark.slow
 @patch_method(
     VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=200, json_data=get_merchant_response),
 )
+@pytest.mark.slow
 def test_django_admin_site__pages_load__model_admins(create_all_models):
     """Test that all Django admin pages load without errors."""
     user = factories.UserFactory.create_superuser()
@@ -118,7 +120,6 @@ def test_django_admin_site__pages_load__model_admins(create_all_models):
                 pytest.fail(f"Unknown lookup_str = {url_pattern}")
 
 
-@pytest.mark.django_db
 @pytest.mark.slow
 def test_django_admin_site__pages_load__data_views():
     """Test that all Django Admin data views load"""

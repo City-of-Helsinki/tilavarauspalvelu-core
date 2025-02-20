@@ -12,7 +12,7 @@ from tilavarauspalvelu.enums import (
     TermsOfUseTypeChoices,
     WeekdayChoice,
 )
-from utils.date_utils import local_datetime, next_hour
+from utils.date_utils import local_date, local_datetime, next_hour
 
 from tests.factories import (
     ApplicationRoundFactory,
@@ -134,8 +134,6 @@ def test_reservation_unit__query__all_fields(graphql):
         maxReservationDuration
         bufferTimeBefore
         bufferTimeAfter
-        accessTypeStartDate
-        accessTypeEndDate
 
         isDraft
         isArchived
@@ -149,7 +147,6 @@ def test_reservation_unit__query__all_fields(graphql):
         reservationKind
         publishingState
         reservationState
-        accessType
         currentAccessType
     """
 
@@ -214,8 +211,6 @@ def test_reservation_unit__query__all_fields(graphql):
         "maxReservationDuration": int(reservation_unit.max_reservation_duration.total_seconds()),
         "bufferTimeBefore": int(reservation_unit.buffer_time_before.total_seconds()),
         "bufferTimeAfter": int(reservation_unit.buffer_time_after.total_seconds()),
-        "accessTypeStartDate": None,
-        "accessTypeEndDate": None,
         #
         "isDraft": reservation_unit.is_draft,
         "isArchived": reservation_unit.is_archived,
@@ -229,7 +224,6 @@ def test_reservation_unit__query__all_fields(graphql):
         "reservationKind": reservation_unit.reservation_kind.upper(),
         "publishingState": reservation_unit.publishing_state,
         "reservationState": reservation_unit.reservation_state,
-        "accessType": reservation_unit.access_type,
         "currentAccessType": reservation_unit.current_access_type,
     }
 
@@ -336,12 +330,17 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
         applicationRoundTimeSlots {
             closed
         }
+        accessTypes {
+            accessType
+            beginDate
+        }
     """
 
     reservation_unit = ReservationUnitFactory.create(
         pricings__highest_price=20,
         images__large_url="https://example.com",
         application_round_time_slots__closed=False,
+        access_types__begin_date=local_date(),
     )
     graphql.login_with_superuser()
     query = reservation_units_query(fields=fields)
@@ -367,6 +366,12 @@ def test_reservation_unit__query__all_one_to_many_relations(graphql):
         "applicationRoundTimeSlots": [
             {
                 "closed": reservation_unit.application_round_time_slots.first().closed,
+            },
+        ],
+        "accessTypes": [
+            {
+                "accessType": reservation_unit.access_types.first().access_type,
+                "beginDate": reservation_unit.access_types.first().begin_date.isoformat(),
             },
         ],
     }

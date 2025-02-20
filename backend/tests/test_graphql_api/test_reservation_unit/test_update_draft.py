@@ -170,8 +170,6 @@ def test_reservation_unit__update__archiving_removes_contact_information_and_aud
             "_reservation_state",
             "_active_pricing_price",
             "_current_access_type",
-            "_perceived_access_type_end_date",
-            "_perceived_access_type_start_date",
         ],
     )
 

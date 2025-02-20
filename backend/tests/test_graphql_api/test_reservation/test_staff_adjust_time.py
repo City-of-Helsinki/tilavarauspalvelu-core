@@ -541,7 +541,7 @@ def test_reservation__staff_adjust_time__same_access_type(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
     )
 
@@ -564,7 +564,7 @@ def test_reservation__staff_adjust_time__same_access_type__requires_handling(gra
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         reservation_units__require_reservation_handling=True,
         access_code_is_active=True,
     )
@@ -593,7 +593,7 @@ def test_reservation__staff_adjust_time__change_to_access_code(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.UNRESTRICTED,
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         access_code_is_active=False,
     )
 
@@ -622,7 +622,7 @@ def test_reservation__staff_adjust_time__change_to_access_code__requires_handlin
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.UNRESTRICTED,
-        reservation_units__access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         reservation_units__require_reservation_handling=True,
         access_code_is_active=False,
     )
@@ -646,7 +646,7 @@ def test_reservation__staff_adjust_time__change_from_access_code(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
-        reservation_units__access_type=AccessType.UNRESTRICTED,
+        reservation_units__access_types__access_type=AccessType.UNRESTRICTED,
         access_code_generated_at=datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE),
         access_code_is_active=True,
     )

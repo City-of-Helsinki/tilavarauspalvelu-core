@@ -33,6 +33,7 @@ from .reservation_metadata_field import ReservationMetadataFieldFactory
 from .reservation_metadata_set import ReservationMetadataSetFactory
 from .reservation_purpose import ReservationPurposeFactory
 from .reservation_unit import ReservationUnitFactory
+from .reservation_unit_access_type import ReservationUnitAccessTypeFactory
 from .reservation_unit_cancellation_rule import ReservationUnitCancellationRuleFactory
 from .reservation_unit_image import ReservationUnitImageFactory
 from .reservation_unit_option import ReservationUnitOptionFactory
@@ -87,6 +88,7 @@ __all__ = [
     "ReservationMetadataFieldFactory",
     "ReservationMetadataSetFactory",
     "ReservationPurposeFactory",
+    "ReservationUnitAccessTypeFactory",
     "ReservationUnitCancellationRuleFactory",
     "ReservationUnitFactory",
     "ReservationUnitImageFactory",

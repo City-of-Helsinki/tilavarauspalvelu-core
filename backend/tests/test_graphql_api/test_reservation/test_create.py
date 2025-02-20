@@ -1117,7 +1117,9 @@ def test_reservation__create__require_adult_reservee__no_id_token(graphql):
     },
 )
 def test_reservation__create__access_type__access_code(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now(access_type=AccessType.ACCESS_CODE)
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        access_types__access_type=AccessType.ACCESS_CODE,
+    )
 
     graphql.login_with_regular_user()
 
@@ -1140,33 +1142,8 @@ def test_reservation__create__access_type__changes_to_access_code_in_the_future(
     today = local_date()
 
     reservation_unit = ReservationUnitFactory.create_reservable_now(
-        access_type=AccessType.ACCESS_CODE,
-        access_type_start_date=today + datetime.timedelta(days=1),
-    )
-
-    graphql.login_with_regular_user()
-
-    data = get_create_data(reservation_unit)
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
-
-    assert reservation.access_type == AccessType.UNRESTRICTED
-    assert reservation.access_code_generated_at is None
-    assert reservation.access_code_is_active is False
-
-    assert PindoraClient.create_reservation.call_count == 0
-
-
-@patch_method(PindoraClient.create_reservation)
-def test_reservation__create__access_type__access_code_has_ended(graphql):
-    today = local_date()
-
-    reservation_unit = ReservationUnitFactory.create_reservable_now(
-        access_type=AccessType.ACCESS_CODE,
-        access_type_end_date=today - datetime.timedelta(days=1),
+        access_types__access_type=AccessType.ACCESS_CODE,
+        access_types__begin_date=today + datetime.timedelta(days=1),
     )
 
     graphql.login_with_regular_user()
@@ -1187,7 +1164,9 @@ def test_reservation__create__access_type__access_code_has_ended(graphql):
 
 @patch_method(PindoraClient.create_reservation, side_effect=PindoraAPIError())
 def test_reservation__create__access_type__access_code__no_reservation_on_pindora_failure(graphql):
-    reservation_unit = ReservationUnitFactory.create_reservable_now(access_type=AccessType.ACCESS_CODE)
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        access_types__access_type=AccessType.ACCESS_CODE,
+    )
 
     graphql.login_with_regular_user()
 

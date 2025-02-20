@@ -13,7 +13,7 @@ from tilavarauspalvelu.enums import (
     ReservationStateChoice,
     TermsOfUseTypeChoices,
 )
-from utils.date_utils import local_datetime, next_hour
+from utils.date_utils import local_date, local_datetime, next_hour
 
 from tests.factories import (
     ReservationFactory,
@@ -364,7 +364,10 @@ def test_reservation_unit__update__archiving_not_blocked_if_reservation_unit_has
 def test_reservation_unit__update__access_type__change_future_reservations(graphql):
     graphql.login_with_superuser()
 
-    reservation_unit = ReservationUnitFactory.create(is_draft=False, access_type=AccessType.UNRESTRICTED)
+    reservation_unit = ReservationUnitFactory.create(
+        is_draft=False,
+        access_types__access_type=AccessType.UNRESTRICTED,
+    )
 
     past_reservation = ReservationFactory.create(
         reservation_units=[reservation_unit],
@@ -379,13 +382,14 @@ def test_reservation_unit__update__access_type__change_future_reservations(graph
         end=local_datetime(2024, 1, 1, 13),
     )
 
-    data = get_non_draft_update_input_data(reservation_unit, accessType=AccessType.ACCESS_CODE)
+    access_type_data = {
+        "accessType": AccessType.ACCESS_CODE,
+        "beginDate": local_date(2024, 1, 1).isoformat(),
+    }
+    data = get_non_draft_update_input_data(reservation_unit, accessTypes=access_type_data)
 
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
-
-    reservation_unit.refresh_from_db()
-    assert reservation_unit.access_type == AccessType.ACCESS_CODE
 
     past_reservation.refresh_from_db()
     assert past_reservation.access_type == AccessType.UNRESTRICTED
@@ -395,10 +399,13 @@ def test_reservation_unit__update__access_type__change_future_reservations(graph
 
 
 @freeze_time(local_datetime(2024, 1, 1))
-def test_reservation_unit__update__access_type__valid_for_period(graphql):
+def test_reservation_unit__update__access_type__change_period(graphql):
     graphql.login_with_superuser()
 
-    reservation_unit = ReservationUnitFactory.create(is_draft=False, access_type=AccessType.UNRESTRICTED)
+    reservation_unit = ReservationUnitFactory.create(
+        is_draft=False,
+        access_types__access_type=AccessType.UNRESTRICTED,
+    )
 
     before_period_reservation = ReservationFactory.create(
         reservation_units=[reservation_unit],
@@ -421,16 +428,22 @@ def test_reservation_unit__update__access_type__valid_for_period(graphql):
 
     data = get_non_draft_update_input_data(
         reservation_unit,
-        accessType=AccessType.ACCESS_CODE,
-        accessTypeStartDate="2024-01-02",
-        accessTypeEndDate="2024-01-02",
+        accessTypes=[
+            {
+                "accessType": AccessType.ACCESS_CODE,
+                "beginDate": "2024-01-02",
+            },
+            {
+                "accessType": AccessType.UNRESTRICTED,
+                "beginDate": "2024-01-03",
+            },
+        ],
     )
 
     response = graphql(UPDATE_MUTATION, input_data=data)
     assert response.has_errors is False, response
 
-    reservation_unit.refresh_from_db()
-    assert reservation_unit.access_type == AccessType.ACCESS_CODE
+    assert len(reservation_unit.access_types.all()) == 3
 
     before_period_reservation.refresh_from_db()
     assert before_period_reservation.access_type == AccessType.UNRESTRICTED
