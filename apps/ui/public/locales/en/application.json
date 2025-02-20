@@ -28,7 +28,7 @@
       "title": "Your selected time slots do not correspond to the duration of your booking",
       "Suitable time range must be at least as long as the minimum duration": "Select more time slots from the calendar or shorten the minimum duration selected in the previous step of the application.",
       "At least as many suitable time ranges as applied reservations per week": "Select more time slots from the calendar or reduce the number of bookings per week selected in the previous step of the application.",
-      "Array must contain at least 1 element(s)": "Valitse kalenterista aikatoiveita"
+      "Required": "Valitse kalenterista aikatoiveita"
     },
     "previewError": "Page {{ page }} has an error.",
     "fix": "Fix"
@@ -197,6 +197,15 @@
     "applicationSectionCancelled": "Cancelled {{ cancelled }} / {{ future }} booking.",
     "applicationSectionCancelledAll": "All {{ cancelled }} bookings cancelled."
   },
+  "status": {
+    "CANCELLED": "Cancelled",
+    "DRAFT": "Draft",
+    "EXPIRED": "Expired",
+    "HANDLED": "In process",
+    "IN_ALLOCATION": "In process",
+    "RECEIVED": "Sent",
+    "RESULTS_SENT": "Processed"
+   },
   "applicationEventStatus": {
     "UNALLOCATED": "Unallocated",
     "IN_ALLOCATION": "In allocation",

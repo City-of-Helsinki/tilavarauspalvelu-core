@@ -2,7 +2,11 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import { type ApplicationFormFragment } from "@gql/gql-types";
+import {
+  ApplicationStatusChoice,
+  Maybe,
+  type ApplicationFormFragment,
+} from "@gql/gql-types";
 import { useRouter } from "next/router";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
@@ -10,6 +14,9 @@ import { Breadcrumb } from "../common/Breadcrumb";
 import { fontBold, H1 } from "common";
 import { Stepper as HDSStepper, StepState } from "hds-react";
 import { validateApplication } from "./form";
+import { isSent } from "./module";
+import { Flex } from "common/styles/util";
+import { ApplicationStatusLabel } from "common/src/components/statuses";
 
 const InnerContainer = styled.div`
   display: grid;
@@ -44,8 +51,11 @@ function calculateCompletedStep(
 ): -1 | 0 | 1 | 2 | 3 {
   const isValid = validateApplication(application);
 
-  if (isValid.valid) {
+  if (isSent(application?.status)) {
     return 3;
+  }
+  if (isValid.valid) {
+    return 2;
   }
 
   const { page } = isValid;
@@ -74,7 +84,6 @@ type ApplicationPageProps = {
   translationKeyPrefix: string;
   overrideText?: string;
   children?: React.ReactNode;
-  headContent?: React.ReactNode;
 };
 
 // Ordered list of steps by page slug
@@ -96,7 +105,6 @@ function getStep(slug: string) {
 export function ApplicationPageWrapper({
   application,
   translationKeyPrefix,
-  headContent,
   overrideText,
   children,
 }: Readonly<ApplicationPageProps>): JSX.Element {
@@ -131,10 +139,6 @@ export function ApplicationPageWrapper({
     }
   };
 
-  const title = t(`${translationKeyPrefix}.heading`);
-  const subTitle =
-    headContent || overrideText || t(`${translationKeyPrefix}.text`);
-
   const routes = [
     {
       slug: applicationsPrefix,
@@ -145,13 +149,17 @@ export function ApplicationPageWrapper({
     },
   ] as const;
 
+  const title = t(`${translationKeyPrefix}.heading`);
+  const subTitle = overrideText || t(`${translationKeyPrefix}.text`);
+
   return (
     <>
       <Breadcrumb routes={routes} />
-      <div>
-        <H1 $noMargin>{title}</H1>
-        <p>{subTitle}</p>
-      </div>
+      <ApplicationHead
+        status={application.status}
+        title={title}
+        subTitle={subTitle}
+      />
       {hideStepper ? null : (
         <StyledStepper
           language={i18n.language}
@@ -170,5 +178,30 @@ export function ApplicationPageWrapper({
         </>
       </InnerContainer>
     </>
+  );
+}
+
+export function ApplicationHead({
+  status,
+  title,
+  subTitle,
+}: {
+  status: Maybe<ApplicationStatusChoice> | undefined;
+  title: string;
+  subTitle?: string;
+}): JSX.Element {
+  return (
+    <Flex
+      $direction="row"
+      $alignItems="flex-start"
+      $justifyContent="space-between"
+      $wrap="wrap"
+    >
+      <div>
+        <H1 $noMargin>{title}</H1>
+        {subTitle && <p>{subTitle}</p>}
+      </div>
+      <ApplicationStatusLabel status={status} user="customer" />
+    </Flex>
   );
 }

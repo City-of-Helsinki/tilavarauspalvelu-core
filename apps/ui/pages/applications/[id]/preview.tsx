@@ -127,7 +127,7 @@ function Preview({ application, tos }: PropsNarrowed): JSX.Element {
             variant={
               isMutationLoading ? ButtonVariant.Clear : ButtonVariant.Primary
             }
-            iconStart={isMutationLoading ? <LoadingSpinner /> : undefined}
+            iconStart={isMutationLoading ? <LoadingSpinner small /> : undefined}
             size={ButtonSize.Small}
             disabled={!hasTermsAccepted || isMutationLoading}
           >

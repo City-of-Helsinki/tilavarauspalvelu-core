@@ -3,13 +3,10 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import {
-  IconCheck,
-  IconEnvelope,
   Button,
   IconCross,
   IconArrowRedo,
   Tag,
-  IconCogwheel,
   ButtonSize,
   ButtonVariant,
   LoadingSpinner,
@@ -62,9 +59,8 @@ import Error404 from "@/common/Error404";
 import { useCheckPermission } from "@/hooks";
 import { errorToast } from "common/src/common/toast";
 import { CenterSpinner, Flex, TitleSection } from "common/styles/util";
-import { StatusLabelType } from "common/src/tags";
-import { StatusLabel } from "common/src/components";
 import { ApplicationDatas, Summary } from "@/styles/util";
+import { ApplicationStatusLabel } from "common/src/components/statuses";
 
 type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
 type ApplicationSectionType = NonNullable<
@@ -89,53 +85,6 @@ function printSuitableTimes(
   return schedules
     .map((s) => `${s.beginTime.substring(0, 2)}-${s.endTime.substring(0, 2)}`)
     .join(", ");
-}
-
-function getApplicationStatusIcon(status: ApplicationStatusChoice): {
-  icon: JSX.Element;
-  type: StatusLabelType;
-} {
-  switch (status) {
-    case ApplicationStatusChoice.Handled:
-      return {
-        type: "success",
-        icon: <IconCheck aria-hidden="true" />,
-      };
-    case ApplicationStatusChoice.ResultsSent:
-      return {
-        type: "success",
-        icon: <IconEnvelope aria-hidden />,
-      };
-    case ApplicationStatusChoice.InAllocation:
-    case ApplicationStatusChoice.Received:
-      return {
-        type: "info",
-        icon: <IconCogwheel aria-hidden="true" />,
-      };
-    case ApplicationStatusChoice.Cancelled:
-    case ApplicationStatusChoice.Draft:
-    case ApplicationStatusChoice.Expired:
-    default:
-      return {
-        type: "neutral",
-        icon: <IconCross aria-hidden="true" />,
-      };
-  }
-}
-
-function ApplicationStatusBlock({
-  status,
-}: {
-  status: ApplicationStatusChoice;
-}): JSX.Element {
-  const { t } = useTranslation();
-
-  const { icon, type } = getApplicationStatusIcon(status);
-  return (
-    <StatusLabel type={type} icon={icon}>
-      {t(`Application.statuses.${status}`)}
-    </StatusLabel>
-  );
 }
 
 const Value = styled.span`
@@ -890,7 +839,7 @@ function ApplicationDetails({
             {customerName}
           </H1>
           {application.status != null && (
-            <ApplicationStatusBlock status={application.status} />
+            <ApplicationStatusLabel status={application.status} user="admin" />
           )}
         </TitleSection>
         <PreCard>
