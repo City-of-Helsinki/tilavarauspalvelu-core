@@ -18,6 +18,7 @@ from tests.factories import (
     ReservableTimeSpanFactory,
     ReservationFactory,
     ReservationPurposeFactory,
+    ReservationUnitAccessTypeFactory,
     ReservationUnitFactory,
     SpaceFactory,
     UserFactory,
@@ -493,7 +494,7 @@ def test_reservation__staff_create__reservee_used_ad_login(graphql, amr, expecte
     },
 )
 def test_reservation__staff_create__access_type__access_code(graphql):
-    reservation_unit = ReservationUnitFactory.create(access_type=AccessType.ACCESS_CODE)
+    reservation_unit = ReservationUnitFactory.create(access_types__access_type=AccessType.ACCESS_CODE)
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)
@@ -515,8 +516,8 @@ def test_reservation__staff_create__access_type__changed_to_access_code_in_the_f
     today = local_date()
 
     reservation_unit = ReservationUnitFactory.create(
-        access_type=AccessType.ACCESS_CODE,
-        access_type_start_date=today + datetime.timedelta(days=1),
+        access_types__access_type=AccessType.ACCESS_CODE,
+        access_types__begin_date=today + datetime.timedelta(days=1),
     )
 
     graphql.login_with_superuser()
@@ -538,9 +539,16 @@ def test_reservation__staff_create__access_type__changed_to_access_code_in_the_f
 def test_reservation__staff_create__access_type__access_code_has_ended(graphql):
     today = local_date()
 
-    reservation_unit = ReservationUnitFactory.create(
+    reservation_unit = ReservationUnitFactory.create()
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
         access_type=AccessType.ACCESS_CODE,
-        access_type_end_date=today - datetime.timedelta(days=1),
+        begin_date=today - datetime.timedelta(days=10),
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=today - datetime.timedelta(days=1),
     )
 
     graphql.login_with_superuser()
@@ -566,7 +574,9 @@ def test_reservation__staff_create__access_type__access_code_has_ended(graphql):
     },
 )
 def test_reservation__staff_create__access_type__access_code__blocked(graphql):
-    reservation_unit = ReservationUnitFactory.create(access_type=AccessType.ACCESS_CODE)
+    reservation_unit = ReservationUnitFactory.create(
+        access_types__access_type=AccessType.ACCESS_CODE,
+    )
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit, type=ReservationTypeChoice.BLOCKED)
@@ -585,7 +595,9 @@ def test_reservation__staff_create__access_type__access_code__blocked(graphql):
 
 @patch_method(PindoraClient.create_reservation, side_effect=PindoraAPIError())
 def test_reservation__staff_create__access_type__access_code__create_reservation_on_pindora_failure(graphql):
-    reservation_unit = ReservationUnitFactory.create(access_type=AccessType.ACCESS_CODE)
+    reservation_unit = ReservationUnitFactory.create(
+        access_types__access_type=AccessType.ACCESS_CODE,
+    )
 
     graphql.login_with_superuser()
     data = get_staff_create_data(reservation_unit)

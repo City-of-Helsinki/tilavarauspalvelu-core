@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 from graphene_django_extensions.testing import build_mutation, build_query
 
-from tilavarauspalvelu.enums import AuthenticationType, PriceUnit, ReservationKind, ReservationStartInterval
-from utils.date_utils import local_datetime
+from tilavarauspalvelu.enums import AccessType, AuthenticationType, PriceUnit, ReservationKind, ReservationStartInterval
+from utils.date_utils import local_date, local_datetime
 
 from tests.factories import (
     PaymentProductFactory,
@@ -49,7 +49,7 @@ CREATE_MUTATION = build_mutation("createReservationUnit", "ReservationUnitCreate
 UPDATE_MUTATION = build_mutation("updateReservationUnit", "ReservationUnitUpdateMutation")
 
 
-def get_create_non_draft_input_data() -> dict[str, Any]:
+def get_create_non_draft_input_data(**overrides: Any) -> dict[str, Any]:
     unit = UnitFactory.create()
     space = SpaceFactory.create(unit=unit)
     resource = ResourceFactory.create(space=space)
@@ -57,6 +57,8 @@ def get_create_non_draft_input_data() -> dict[str, Any]:
     rule = ReservationUnitCancellationRuleFactory.create()
     metadata_set = ReservationMetadataSetFactory.create()
     tax_percentage = TaxPercentageFactory.create()
+
+    today = local_date()
 
     return {
         "isDraft": False,
@@ -94,13 +96,20 @@ def get_create_non_draft_input_data() -> dict[str, Any]:
         "reservationKind": ReservationKind.DIRECT.value.upper(),
         "pricings": [
             {
-                "begins": datetime.date.today().strftime("%Y-%m-%d"),
+                "begins": today.isoformat(),
                 "priceUnit": PriceUnit.PRICE_UNIT_PER_15_MINS.value.upper(),
                 "lowestPrice": "10.5",
                 "highestPrice": "18.8",
                 "taxPercentage": tax_percentage.id,
             }
         ],
+        "accessTypes": [
+            {
+                "beginDate": today.isoformat(),
+                "accessType": AccessType.UNRESTRICTED.value,
+            },
+        ],
+        **overrides,
     }
 
 
@@ -150,6 +159,7 @@ def get_draft_update_input_data(reservation_unit: ReservationUnit, **overrides) 
 
 
 def get_non_draft_update_input_data(reservation_unit: ReservationUnit, **overrides):
+    today = local_date()
     return {
         "pk": reservation_unit.pk,
         "name": "name",
@@ -160,6 +170,12 @@ def get_non_draft_update_input_data(reservation_unit: ReservationUnit, **overrid
         "descriptionEn": "description",
         "descriptionSv": "description",
         "pricings": [get_pricing_data()],
+        "accessTypes": [
+            {
+                "beginDate": today.isoformat(),
+                "accessType": AccessType.UNRESTRICTED.value,
+            },
+        ],
         **overrides,
     }
 

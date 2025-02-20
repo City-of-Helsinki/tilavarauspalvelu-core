@@ -15,6 +15,7 @@ from .helpers import (
     CREATE_MUTATION,
     UPDATE_MUTATION,
     get_create_draft_input_data,
+    get_create_non_draft_input_data,
     get_pricing_data,
     reservation_units_query,
 )
@@ -193,7 +194,7 @@ def test_reservation_unit__create__pricing__creating_future_pricing_without_acti
 
 def test_reservation_unit__update__pricing__active_pricing_can_be_created_on_update(graphql):
     graphql.login_with_superuser()
-    data = get_create_draft_input_data()
+    data = get_create_non_draft_input_data(pricings=[])
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
@@ -205,6 +206,7 @@ def test_reservation_unit__update__pricing__active_pricing_can_be_created_on_upd
     data["pk"] = reservation_unit.pk
     data["isDraft"] = False
     data["pricings"] = [get_pricing_data()]
+    data["accessTypes"] = []
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
@@ -373,7 +375,7 @@ def test_reservation_unit__update__pricing__remove_active_pricing_while_future_e
 def test_reservation_unit__update__pricing__pricings_not_sent_for_non_draft_reservation_unit(graphql):
     graphql.login_with_superuser()
 
-    data = get_create_draft_input_data(pricings=[get_pricing_data()])
+    data = get_create_non_draft_input_data(pricings=[get_pricing_data()])
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
@@ -384,6 +386,7 @@ def test_reservation_unit__update__pricing__pricings_not_sent_for_non_draft_rese
     data["pk"] = reservation_unit.pk
     data["isDraft"] = False
     del data["pricings"]
+    data["accessTypes"] = []
     response = graphql(UPDATE_MUTATION, input_data=data)
 
     assert response.has_errors is False, response
