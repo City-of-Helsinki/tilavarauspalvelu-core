@@ -1279,6 +1279,7 @@ msgid "Billing information"
 msgstr "Laskutustiedot"
 
 #: tilavarauspalvelu/admin/reservation/admin.py
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Pindora information"
 msgstr "Pindora tiedot"
 
@@ -1677,11 +1678,6 @@ msgstr "Ohjeet"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Access type"
-msgstr "Kulkuoikeus"
-
-#: tilavarauspalvelu/admin/reservation_unit/admin.py
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 #: tilavarauspalvelu/admin/unit/form.py
 msgid "Search terms"
 msgstr "Hakusanat"
@@ -1693,6 +1689,22 @@ msgstr "Julkaisun tila"
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Reservation state"
 msgstr "Varattavuuden tila"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Access type"
+msgstr "Kulkutapa"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Access type begin date"
+msgstr "Kulkutavan alkamispäivä"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "How is the reservee able to enter the space in their reservation unit?"
+msgstr "Millä tavalla varaaja varaaja pääsee sisään varausyksikön tilaan?"
+
+#: tilavarauspalvelu/admin/reservation_unit/form.py
+msgid "Begin date of this access type"
+msgstr "Päivä jolloin kulkutavan käyttö alkaa"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid ""
@@ -1946,14 +1958,6 @@ msgid "Payment product"
 msgstr "Maksutuote"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Access type start date"
-msgstr "Kulkuoikeuden alkamispäivä"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Access type end date"
-msgstr "Kulkuoikeuden päättymispäivä"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Payment terms for the reservation unit."
 msgstr "Varausyksikön maksuehdot."
 
@@ -2136,26 +2140,6 @@ msgstr "Maksujen kirjanpidon tiliöintitiedot"
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Product used for payments"
 msgstr "Tuote, jota käytetään maksuihin"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "How is the reservee able to enter the space in their reservation unit?"
-msgstr "Millä tavalla varaaja varaaja pääsee sisään varausyksikön tilaan?"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"If set, this is the date from which the access type is used. If current date "
-"is before this date, the access type is 'unrestricted'."
-msgstr ""
-"Jos asetettu, kulkuoikeutta käytetään tästä päivästä eteenpäin. Jos nykyinen "
-"päivä on ennen tätä päivää, kulkuoikeus on 'rajoittamaton'."
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid ""
-"If set, this is the date before which the access type is used. If current "
-"date is after this date, the access type is 'unrestricted'."
-msgstr ""
-"Jos asetettu, kulkuoikeutta käytetään tähän päivään asti. Jos nykyinen päivä "
-"on tämän päivän jälkeen, kulkuoikeus on 'rajoittamaton'."
 
 #: tilavarauspalvelu/admin/space/admin.py
 msgid "Search by name or unit name"
@@ -3940,10 +3924,17 @@ msgstr "varausyksikkö"
 msgid "reservation units"
 msgstr "varausyksiköt"
 
-#: tilavarauspalvelu/models/reservation_unit/model.py
-msgid "Access type start date must be the same or before its end date"
-msgstr ""
-"Kulkuoikeuden alkamispäivän tulee olla sama tai ennen sen päättymispäivää"
+#: tilavarauspalvelu/models/reservation_unit_access_type/model.py
+msgid "reservation unit access type"
+msgstr "varausyksikön kulkutapa"
+
+#: tilavarauspalvelu/models/reservation_unit_access_type/model.py
+msgid "reservation unit access types"
+msgstr "varausyksikön kulkutavat"
+
+#: tilavarauspalvelu/models/reservation_unit_access_type/model.py
+msgid "Access type already exists for this reservation unit and date"
+msgstr "Kulkutapa tälle varausyksikölle on jo olemassa alkaen tältä päivältä"
 
 #: tilavarauspalvelu/models/reservation_unit_cancellation_rule/model.py
 msgid "reservation unit cancellation rule"
