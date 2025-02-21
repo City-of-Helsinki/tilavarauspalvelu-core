@@ -8,7 +8,8 @@
 
 {{ text_pending_notification | sentence | safe }}
 
-{% include "email/text/partials/instructions.jinja" %}
+{{ instructions_booking_label | safe }}:
+{{ instructions_pending_text | safe }}
 
 {% include "email/text/partials/reservation_manage_link.jinja" %}
 

@@ -6,6 +6,7 @@
     <mj-spacer />
     <mj-text>{{ weekday_label | safe }}: {{ weekday_value | safe }}</mj-text>
     <mj-text>{{ time_label | safe }}: {{ time_value | safe }}</mj-text>
+    {% include "email/html/partials/access_code.jinja" %}
     <mj-spacer />
     <mj-text>{{ check_booking_details_text | safe }}: {{ check_booking_details_url_html | safe }}</mj-text>
 {% endblock %}

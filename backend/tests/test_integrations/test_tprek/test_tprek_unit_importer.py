@@ -14,7 +14,7 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import UnitFactory
 from tests.helpers import ResponseMock, patch_method
-from tests.test_external_services.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
+from tests.test_integrations.test_tprek.helpers import SINGLE_TPREK_UNIT_JSON
 
 # Applied to all tests
 pytestmark = [

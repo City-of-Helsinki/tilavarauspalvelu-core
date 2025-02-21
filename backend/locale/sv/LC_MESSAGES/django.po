@@ -2327,111 +2327,6 @@ msgid "Notification manager"
 msgstr ""
 
 #: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application handled"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application in allocation"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application received"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Application section cancelled"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Permission deactivation"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "User anonymization"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation approved"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation cancelled"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation confirmed"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation modified"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation rejected"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation requires handling"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Reservation requires payment"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation cancelled single"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation modified series"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation modified single"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation rejected series"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Seasonal reservation rejected single"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Staff notification application section cancelled"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Staff notification reservation made"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "EmailType"
-msgid "Staff notification reservation requires handling"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
 msgctxt "HaukiResourceState"
 msgid "Open"
 msgstr ""
@@ -2802,31 +2697,31 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgid "Monday"
-msgstr ""
+msgstr "Måndag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Tuesday"
-msgstr ""
+msgstr "Tisdag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Wednesday"
-msgstr ""
+msgstr "Onsdag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Thursday"
-msgstr ""
+msgstr "Torsdag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Friday"
-msgstr ""
+msgstr "Fredag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Saturday"
-msgstr ""
+msgstr "Lördag"
 
 #: tilavarauspalvelu/enums.py
 msgid "Sunday"
-msgstr ""
+msgstr "Söndag"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "Priority"
@@ -3111,39 +3006,8 @@ msgstr "Din säsongsbokning har avbokats"
 
 #: tilavarauspalvelu/integrations/email/template_context/application.py
 msgctxt "Email"
-msgid ""
-"All space reservations included in your seasonal booking have been cancelled"
-msgstr "Alla lokalbokningar som ingår i din säsongsbokning har avbokats"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Reason"
-msgstr "Orsak"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Seasonal Booking"
-msgstr "Säsongsbokning"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
 msgid "The customer has canceled the seasonal booking"
 msgstr "Kunden har avbokat säsongsbokningen"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-msgctxt "Email"
-msgid ""
-"The customer has canceled all space reservations included in the seasonal "
-"booking"
-msgstr "Kunden har avbokat alla lokalbokningar som ingår i säsongsbokningen"
-
-#: tilavarauspalvelu/integrations/email/template_context/application.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "You can view the booking at"
-msgstr "Du kan se bokningen på"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3172,8 +3036,13 @@ msgstr "Tack för att du använder Varaamo!"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
-msgid "This is an automated message, please do not reply"
-msgstr "Detta är ett automatiskt meddelande som inte kan besvaras"
+msgid "Reason"
+msgstr "Orsak"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Your reason for cancellation"
+msgstr "Din anledning till avbokning"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3185,6 +3054,87 @@ msgstr "Ta kontakt"
 msgctxt "Email"
 msgid "Book the city's premises and equipment for your use at %(link)s"
 msgstr "Boka enkelt stadens lokaler och utrustning för eget bruk på %(link)s"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "This is an automated message, please do not reply"
+msgstr "Detta är ett automatiskt meddelande som inte kan besvaras"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Booking number"
+msgstr "Bokningsnummer"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Reservee name"
+msgstr "Bokare"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Additional information about your booking"
+msgstr "Mer information om din bokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Additional information about cancellation"
+msgstr "Mer information om avbokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Additional information"
+msgstr "Mer information"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Day"
+msgstr "Dag"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Time"
+msgstr "Tid"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "You can view the booking at"
+msgstr "Du kan se bokningen på"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "You can view and handle the booking at"
+msgstr "Du kan se bokningen på"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "Your booking has been cancelled"
+msgstr "Din bokning har avbokats"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid ""
+"The space reservation included in your seasonal booking has been cancelled"
+msgstr "Lokalbokningen som ingår i din säsongsbokning har avbokats"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Seasonal Booking"
+msgstr "Säsongsbokning"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid ""
+"All space reservations included in your seasonal booking have been cancelled"
+msgstr "Alla lokalbokningar som ingår i din säsongsbokning har avbokats"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid ""
+"The customer has canceled all space reservations included in the seasonal "
+"booking"
+msgstr "Kunden har avbokat alla lokalbokningar som ingår i säsongsbokningen"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3227,10 +3177,47 @@ msgid "incl. VAT"
 msgstr "inkl. moms"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Varaamo customer service"
+msgstr "Varaamo kundtjänst"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+#, python-format
+msgctxt "Email"
+msgid ""
+"You can see the door code on the %(my_reservations)s at Varaamo. If the code "
+"is not visible in your booking details, please contact %(customer_service)s."
+msgstr ""
+"Du kan se dörrkoden på %(my_reservations)s i Varaamo. Om koden inte syns i "
+"dina bokningsuppgifter, vänligen kontakta %(customer_service)s."
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Door code"
+msgstr "Dörrkod"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "Validity period of the door code"
+msgstr "Dörrkodens giltighetstid"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid "You can access the space with the door code"
+msgstr "Du kan komma in i utrymmet med dörrkoden"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
+msgctxt "Email"
+msgid ""
+"Here are your booking details and the door code for easy access to the space"
+msgstr ""
+"Här är dina bokningsuppgifter och dörrkoden för enkel åtkomst till utrymmet"
+
+#: tilavarauspalvelu/integrations/email/template_context/common.py
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Booking number"
-msgstr "Bokningsnummer"
+msgid "The door code has changed"
+msgstr "Dörrkoden har ändrats"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
@@ -3298,26 +3285,6 @@ msgstr "Din bokning är bekräftad"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
-msgid "Additional information about your booking"
-msgstr "Mer information om din bokning"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Your booking has been cancelled"
-msgstr "Din bokning har avbokats"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Your reason for cancellation"
-msgstr "Din anledning till avbokning"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Additional information about cancellation"
-msgstr "Mer information om avbokning"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
 msgid "Thank you for your booking at Varaamo"
 msgstr "Tack för din bokning på Varaamo"
 
@@ -3335,11 +3302,6 @@ msgstr "Din bokning har uppdaterats"
 msgctxt "Email"
 msgid "Unfortunately your booking cannot be confirmed"
 msgstr "Tyvärr kan vi inte bekräfta din bokning"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Additional information"
-msgstr "Mer information"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
@@ -3380,25 +3342,9 @@ msgstr "Förfallodatum"
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"
 msgid ""
-"The space reservation included in your seasonal booking has been cancelled"
-msgstr "Lokalbokningen som ingår i din säsongsbokning har avbokats"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid ""
 "The time of the space reservation included in your seasonal booking has "
 "changed"
 msgstr "Tiden för lokalbokningen som ingår i din säsongsbokning har ändrats"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Day"
-msgstr "Dag"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Time"
-msgstr "Tid"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
@@ -3411,11 +3357,6 @@ msgstr "Ny bokning %(reservation_id)s har gjorts för %(unit_name)s"
 msgctxt "Email"
 msgid "A new booking has been confirmed for %(reservation_unit_name)s"
 msgstr "En ny bokningsförfrågan för %(reservation_unit_name)s har bekräftats"
-
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "Reservee name"
-msgstr "Bokare"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 #, python-format
@@ -3433,10 +3374,120 @@ msgid ""
 msgstr ""
 "En ny bokningsförfrågan för %(reservation_unit_name)s väntar på at behandlats"
 
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "You can view and handle the booking at"
-msgstr "Du kan se bokningen på"
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application handled"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application in allocation"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application received"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Application section cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Permission deactivation"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "User anonymization"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation approved"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation confirmed"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation modified"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation modified access code"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation rejected"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation requires handling"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Reservation requires payment"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation cancelled single"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified series"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified series access code"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation modified single"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation rejected series"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Seasonal reservation rejected single"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Staff notification application section cancelled"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Staff notification reservation made"
+msgstr ""
+
+#: tilavarauspalvelu/integrations/email/typing.py
+msgctxt "EmailType"
+msgid "Staff notification reservation requires handling"
+msgstr ""
 
 #: tilavarauspalvelu/models/ability_group/model.py
 msgid "ability group"

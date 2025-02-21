@@ -8,7 +8,7 @@ from django.contrib import admin
 from django.test import Client, override_settings
 from django.urls import reverse
 
-from tilavarauspalvelu.enums import EmailType
+from tilavarauspalvelu.integrations.email.typing import EmailType
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import BugReport, RequestLog, Reservation, SQLLog
 from tilavarauspalvelu.models.bug_report.model import (
@@ -22,7 +22,7 @@ from utils.date_utils import local_datetime
 
 from tests import factories
 from tests.helpers import ResponseMock, patch_method
-from tests.test_external_services.test_verkkokauppa.test_merchant_requests import get_merchant_response
+from tests.test_integrations.test_verkkokauppa.test_merchant_requests import get_merchant_response
 
 if TYPE_CHECKING:
     from django.urls import URLPattern
@@ -142,7 +142,7 @@ def test_django_admin_site__pages_load__data_views():
             converter = next(iter(url_pattern.pattern.converters))
             if converter == "email_type":
                 # Test with all email types
-                for email_type in EmailType:
+                for email_type in EmailType.options:
                     admin_url = reverse(f"admin:{url_pattern.name}", args=[email_type.value])
                     assert client.get(admin_url).status_code == 200, admin_url
             else:

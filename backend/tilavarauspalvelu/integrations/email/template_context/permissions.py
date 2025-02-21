@@ -6,13 +6,7 @@ from django.utils.translation import pgettext
 
 from tilavarauspalvelu.translation import get_translated
 
-from .common import (
-    create_anchor_tag,
-    get_contex_for_base_template,
-    get_contex_for_closing,
-    get_staff_login_link,
-    get_varaamo_ext_link,
-)
+from .common import create_anchor_tag, get_context_for_translations, get_staff_login_link, get_varaamo_ext_link
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import EmailContext, Lang
@@ -39,8 +33,7 @@ def get_context_for_permission_deactivation(*, language: Lang) -> EmailContext:
         "text_login_to_prevent": pgettext("Email", "Log in to the service at"),
         "login_url": link,
         "login_url_html": link_tag,
-        **get_contex_for_base_template(),
-        **get_contex_for_closing(language=language),
+        **get_context_for_translations(language=language, email_recipient_name=None),
     }
 
 
@@ -66,6 +59,5 @@ def get_context_for_user_anonymization(*, language: Lang) -> EmailContext:
         ),
         "login_url": link,
         "login_url_html": link_tag,
-        **get_contex_for_base_template(),
-        **get_contex_for_closing(language=language),
+        **get_context_for_translations(language=language, email_recipient_name=None),
     }

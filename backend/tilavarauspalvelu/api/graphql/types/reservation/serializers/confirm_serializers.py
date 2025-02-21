@@ -22,6 +22,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateO
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import PaymentOrder, Reservation
 from utils.date_utils import local_datetime
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.verkkokauppa.order.types import CreateOrderParams, Order
@@ -89,7 +90,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         if instance.state == ReservationStateChoice.CONFIRMED:
             if self.instance.access_type == AccessType.ACCESS_CODE and instance.recurring_reservation is None:
                 # Allow activation in Pindora to fail, will be handled by a background task.
-                with suppress(Exception):
+                with suppress(ExternalServiceError):
                     PindoraClient.activate_reservation_access_code(reservation=instance)
                     instance.access_code_is_active = True
                     instance.save(update_fields=["access_code_is_active"])

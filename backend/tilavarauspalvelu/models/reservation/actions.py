@@ -22,6 +22,7 @@ from tilavarauspalvelu.enums import (
     TimezoneRuleProperty,
 )
 from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraConflictError, PindoraNotFoundError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
@@ -342,6 +343,7 @@ class ReservationActions:
                 if should_be_active:
                     PindoraClient.activate_reservation_access_code(reservation=self.reservation)
                     self.reservation.access_code_is_active = True
+                    EmailService.send_reservation_modified_access_code_email(reservation=self.reservation)
                 else:
                     PindoraClient.deactivate_reservation_access_code(reservation=self.reservation)
                     self.reservation.access_code_is_active = False
@@ -354,6 +356,9 @@ class ReservationActions:
                 response = PindoraClient.create_reservation(reservation=self.reservation, is_active=should_be_active)
                 self.reservation.access_code_generated_at = response["access_code_generated_at"]
                 self.reservation.access_code_is_active = response["access_code_is_active"]
+
+                if should_be_active:
+                    EmailService.send_reservation_modified_access_code_email(reservation=self.reservation)
 
             except PindoraConflictError:
                 response = PindoraClient.get_reservation(reservation=self.reservation)

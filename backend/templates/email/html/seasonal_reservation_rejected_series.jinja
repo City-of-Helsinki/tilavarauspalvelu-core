@@ -2,7 +2,7 @@
 
 {% block content_main %}
     <mj-text>{{ text_reservation_rejected | sentence | safe }}</mj-text>
-    <mj-text>{{ rejection_reason_label | safe }}: {{ rejection_reason | safe }}</mj-text>
+    <mj-text>{{ reason_label | safe }}: {{ rejection_reason | safe }}</mj-text>
     {% include "email/html/partials/application_section_name.jinja" %}
     <mj-spacer />
     <mj-text>{{ weekday_label | safe }}: {{ weekday_value | safe }}</mj-text>

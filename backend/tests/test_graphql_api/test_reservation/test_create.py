@@ -1137,11 +1137,9 @@ def test_reservation__create__access_type__access_code(graphql):
 
 @patch_method(PindoraClient.create_reservation)
 def test_reservation__create__access_type__changes_to_access_code_in_the_future(graphql):
-    today = local_date()
-
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         access_type=AccessType.ACCESS_CODE,
-        access_type_start_date=today + datetime.timedelta(days=1),
+        access_type_start_date=next_hour(plus_days=1),
     )
 
     graphql.login_with_regular_user()
@@ -1162,11 +1160,9 @@ def test_reservation__create__access_type__changes_to_access_code_in_the_future(
 
 @patch_method(PindoraClient.create_reservation)
 def test_reservation__create__access_type__access_code_has_ended(graphql):
-    today = local_date()
-
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         access_type=AccessType.ACCESS_CODE,
-        access_type_end_date=today - datetime.timedelta(days=1),
+        access_type_end_date=next_hour(plus_days=-1),
     )
 
     graphql.login_with_regular_user()
