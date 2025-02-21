@@ -7,13 +7,22 @@ from abc import ABC, abstractmethod
 from dataclasses import asdict
 from io import StringIO
 from itertools import chain, zip_longest
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any, Literal, Self
 
 from django.http import FileResponse
 
+from utils.date_utils import (
+    DEFAULT_TIMEZONE,
+    local_date_string,
+    local_datetime_string,
+    local_time_string,
+    local_timedelta_string,
+    timedelta_to_json,
+)
 from utils.utils import to_ascii
 
 if TYPE_CHECKING:
+    import datetime
     from collections.abc import Iterable, Iterator
 
     from django.db import models
@@ -51,6 +60,13 @@ class BaseExportRow:
 
 class BaseCSVExporter(ABC):
     """Base class for CSV exporters."""
+
+    def __init__(
+        self,
+        *,
+        datetime_format: Literal["ISO", "local"] = "local",
+    ) -> None:
+        self.datetime_format = datetime_format
 
     def write_csv(self) -> StringIO:
         """Write the CSV to a StringIO object based on the exporter queryset."""
@@ -94,6 +110,38 @@ class BaseCSVExporter(ABC):
         response = FileResponse(csv_file.getvalue(), content_type="text/csv")
         response["Content-Disposition"] = f"attachment;filename={file_name}.csv"
         return response
+
+    def format_datetime(self, value: datetime.datetime | None) -> str | None:
+        """Format a datetime as string to the given format."""
+        if not value:
+            return None
+        if self.datetime_format == "ISO":
+            return value.astimezone(DEFAULT_TIMEZONE).isoformat(timespec="seconds")
+        return local_datetime_string(value)
+
+    def format_date(self, value: datetime.date | None) -> str | None:
+        """Format a date as string to the given format."""
+        if not value:
+            return None
+        if self.datetime_format == "ISO":
+            return value.isoformat()
+        return local_date_string(value)
+
+    def format_time(self, value: datetime.time | None) -> str | None:
+        """Format a time as string to the given format."""
+        if not value:
+            return None
+        if self.datetime_format == "ISO":
+            return value.replace(tzinfo=DEFAULT_TIMEZONE).isoformat(timespec="seconds")
+        return local_time_string(value.replace(tzinfo=DEFAULT_TIMEZONE))
+
+    def format_timedelta(self, value: datetime.timedelta | None) -> str | None:
+        """Format a timedelta as string to the given format."""
+        if not value:
+            return None
+        if self.datetime_format == "ISO":
+            return timedelta_to_json(value)
+        return local_timedelta_string(value)
 
     @property
     @abstractmethod

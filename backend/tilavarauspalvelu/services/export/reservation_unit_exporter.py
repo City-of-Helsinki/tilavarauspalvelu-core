@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from django.db import models
 from lookup_property import L
 
 from tilavarauspalvelu.enums import AuthenticationType, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
-from utils.date_utils import local_date, local_datetime_string, local_timedelta_string
+from utils.date_utils import local_date
 
 from ._base_exporter import BaseCSVExporter, BaseExportRow
 
@@ -96,8 +96,14 @@ class ReservationUnitExportRow(BaseExportRow):
 class ReservationUnitExporter(BaseCSVExporter):
     """Exports reservation units to a CSV file."""
 
-    def __init__(self, queryset: ReservationUnitQuerySet | None = None) -> None:
+    def __init__(
+        self,
+        queryset: ReservationUnitQuerySet | None = None,
+        *,
+        datetime_format: Literal["ISO", "local"] = "local",
+    ) -> None:
         self._queryset: ReservationUnitQuerySet = queryset or ReservationUnit.objects.all()
+        super().__init__(datetime_format=datetime_format)
 
     @property
     def queryset(self) -> models.QuerySet:
@@ -252,16 +258,8 @@ class ReservationUnitExporter(BaseCSVExporter):
                 unit=getattr(instance.unit, "name", ""),
                 contact_information=instance.contact_information,
                 is_this_in_draft_state=instance.is_draft,
-                publish_begins=(
-                    local_datetime_string(instance.publish_begins)  #
-                    if instance.publish_begins is not None
-                    else None
-                ),
-                publish_ends=(
-                    local_datetime_string(instance.publish_ends)  #
-                    if instance.publish_ends is not None
-                    else None
-                ),
+                publish_begins=self.format_datetime(instance.publish_begins),
+                publish_ends=self.format_datetime(instance.publish_ends),
                 spaces=", ".join(space.name_fi for space in instance.spaces.all()),
                 resources=", ".join(resource.name_fi for resource in instance.resources.all()),
                 qualifiers=", ".join(qualifier.name_fi for qualifier in instance.qualifiers.all()),
@@ -273,16 +271,8 @@ class ReservationUnitExporter(BaseCSVExporter):
                 lowest_price=getattr(pricing, "lowest_price", ""),
                 highest_price=getattr(pricing, "highest_price", ""),
                 tax_percentage=getattr(pricing, "tax_percentage", ""),
-                reservation_begins=(
-                    local_datetime_string(instance.reservation_begins)  #
-                    if instance.reservation_begins
-                    else None
-                ),
-                reservation_ends=(
-                    local_datetime_string(instance.reservation_ends)  #
-                    if instance.reservation_ends
-                    else None
-                ),
+                reservation_begins=self.format_datetime(instance.reservation_begins),
+                reservation_ends=self.format_datetime(instance.reservation_ends),
                 reservation_metadata_set=getattr(instance.metadata_set, "name", ""),
                 require_a_handling=instance.require_reservation_handling,
                 authentication=AuthenticationType(instance.authentication).label,
@@ -298,29 +288,13 @@ class ReservationUnitExporter(BaseCSVExporter):
                 additional_instructions_for_cancelled_reservations_fi=instance.reservation_cancelled_instructions_fi,
                 additional_instructions_for_cancelled_reservations_sv=instance.reservation_cancelled_instructions_sv,
                 additional_instructions_for_cancelled_reservations_en=instance.reservation_cancelled_instructions_en,
-                maximum_reservation_duration=(
-                    local_timedelta_string(instance.max_reservation_duration)  #
-                    if instance.max_reservation_duration is not None
-                    else None
-                ),
-                minimum_reservation_duration=(
-                    local_timedelta_string(instance.min_reservation_duration)  #
-                    if instance.min_reservation_duration is not None
-                    else None
-                ),
+                maximum_reservation_duration=self.format_timedelta(instance.max_reservation_duration),
+                minimum_reservation_duration=self.format_timedelta(instance.min_reservation_duration),
                 maximum_number_of_persons=instance.max_persons,
                 minimum_number_of_persons=instance.min_persons,
                 surface_area=instance.surface_area,
-                buffer_time_before_reservation=(
-                    local_timedelta_string(instance.buffer_time_before)  #
-                    if instance.buffer_time_before
-                    else None
-                ),
-                buffer_time_after_reservation=(
-                    local_timedelta_string(instance.buffer_time_after)  #
-                    if instance.buffer_time_after
-                    else None
-                ),
+                buffer_time_before_reservation=self.format_timedelta(instance.buffer_time_before),
+                buffer_time_after_reservation=self.format_timedelta(instance.buffer_time_after),
                 hauki_resource_id=getattr(instance.origin_hauki_resource, "id", None),
                 reservation_start_interval=ReservationStartInterval(instance.reservation_start_interval).label,
                 maximum_number_of_days_before_reservations_can_be_made=instance.reservations_max_days_before,

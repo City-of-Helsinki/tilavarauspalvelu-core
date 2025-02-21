@@ -8,13 +8,21 @@ from typing import TYPE_CHECKING
 from django.apps import apps
 from django.conf import settings
 from django.db import connection
-from django.http import FileResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
+from django.http import FileResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 from import_export.admin import ExportMixin
 from import_export.formats.base_formats import JSON
+from import_export.resources import modelresource_factory
+from import_export.widgets import DateTimeWidget, TimeWidget
 
+from tilavarauspalvelu.api.rest.utils import (
+    ReservationUnitParams,
+    StatisticsParams,
+    validate_pagination,
+    validation_error_as_response,
+)
 from tilavarauspalvelu.models import Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
@@ -22,6 +30,7 @@ from utils.utils import ical_hmac_signature
 
 if TYPE_CHECKING:
     from django.http import HttpResponse
+    from import_export.fields import Field as ImportExportField
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -148,43 +157,125 @@ def readiness_check(request: WSGIRequest) -> JsonResponse:
 
 @require_GET
 @csrf_exempt  # NOSONAR
+@validation_error_as_response
 def reservation_unit_export(request: WSGIRequest) -> HttpResponse:
     """Export reservation units to JSON."""
+    # --- Authorization ----------------------------------------------------------------------------------------------
+
     authorization = request.META.get("HTTP_AUTHORIZATION", "")
     if authorization != settings.EXPORT_AUTHORIZATION_TOKEN:
         msg = "Not authorized to export reservation units."
         return HttpResponseForbidden(msg)
 
-    try:
-        reservation_units = [int(pk) for pk in request.GET.get("only", "").split(",") if pk]
-    except (ValueError, TypeError):
-        msg = "'only' should be a comma separated list of reservation unit ids."
-        return HttpResponseBadRequest(msg)
+    # --- Parsing ----------------------------------------------------------------------------------------------------
 
-    queryset = ReservationUnit.objects.all()
-    if reservation_units:
-        queryset = queryset.filter(pk__in=reservation_units)
+    params = ReservationUnitParams.from_request(request)
 
-    exporter = ReservationUnitExporter(queryset=queryset)
+    # --- Pagination -------------------------------------------------------------------------------------------------
+
+    start, stop = validate_pagination(request)
+
+    # --- Filtering --------------------------------------------------------------------------------------------------
+
+    queryset = ReservationUnit.objects.order_by("id")
+
+    if params.reservation_units:
+        queryset = queryset.filter(pk__in=params.reservation_units)
+    if params.tprek_id:
+        queryset = queryset.filter(unit__tprek_id=params.tprek_id)
+
+    total_count = queryset.count()
+    queryset = queryset[start:stop]
+
+    # --- Export -----------------------------------------------------------------------------------------------------
+
+    exporter = ReservationUnitExporter(queryset=queryset, datetime_format="ISO")
     data = exporter.write_json()
 
-    return JsonResponse(data, safe=False, status=200)
+    # --- Response ---------------------------------------------------------------------------------------------------
+
+    headers: dict[str, str] = {
+        "Varaamo-Pagination-Total-Count": str(total_count),
+        "Varaamo-Pagination-Start": str(queryset.query.low_mark),
+        "Varaamo-Pagination-Stop": str(queryset.query.high_mark),
+    }
+
+    return JsonResponse(
+        data,
+        safe=False,
+        status=200,
+        headers=headers,
+        json_dumps_params={"sort_keys": True},
+    )
 
 
 @require_GET
 @csrf_exempt  # NOSONAR
+@validation_error_as_response
 def reservation_statistics_export(request: WSGIRequest) -> HttpResponse:
     """Export reservation statistics to JSON."""
+    # --- Authorization ----------------------------------------------------------------------------------------------
+
     authorization = request.META.get("HTTP_AUTHORIZATION", "")
     if authorization != settings.EXPORT_AUTHORIZATION_TOKEN:
         msg = "Not authorized to export reservation statistics."
         return HttpResponseForbidden(msg)
 
-    queryset = ReservationStatistic.objects.all()
+    # --- Parsing ----------------------------------------------------------------------------------------------------
+
+    params = StatisticsParams.from_request(request)
+
+    # --- Pagination -------------------------------------------------------------------------------------------------
+
+    start, stop = validate_pagination(request)
+
+    # --- Filtering --------------------------------------------------------------------------------------------------
+
+    queryset = ReservationStatistic.objects.order_by("id")
+
+    if params.reservations:
+        queryset = queryset.filter(reservation__in=params.reservations)
+    if params.tprek_id:
+        queryset = queryset.filter(primary_reservation_unit__unit__tprek_id=params.tprek_id)
+    if params.begins_after:
+        queryset = queryset.filter(begin__gte=params.begins_after)
+    if params.begins_before:
+        queryset = queryset.filter(begin__lt=params.begins_before)
+
+    total_count = queryset.count()
+    queryset = queryset[start:stop]
+
+    # --- Export -----------------------------------------------------------------------------------------------------
 
     exporter = ExportMixin()
     exporter.model = ReservationStatistic
+    resource_class = modelresource_factory(ReservationStatistic)
+
+    field: ImportExportField
+    for field in resource_class.fields.values():
+        match field.widget:
+            case DateTimeWidget():
+                field.widget.formats = ["%Y-%m-%dT%H:%M:%S%:z"]
+            case TimeWidget():
+                field.widget.formats = ["%H:%M:%S%:z"]
+
+    exporter.resource_classes = [resource_class]
+
     data_for_export = exporter.get_data_for_export(request, queryset)
     export_data: str = JSON().export_data(data_for_export)
 
-    return JsonResponse(json.loads(export_data), safe=False, status=200)
+    # --- Response ---------------------------------------------------------------------------------------------------
+
+    headers: dict[str, str] = {
+        "Varaamo-Pagination-Total-Count": str(total_count),
+        "Varaamo-Pagination-Start": str(queryset.query.low_mark),
+        "Varaamo-Pagination-Stop": str(queryset.query.high_mark),
+    }
+
+    return JsonResponse(
+        json.loads(export_data),
+        safe=False,
+        status=200,
+        headers=headers,
+        json_dumps_params={"sort_keys": True},
+    )
