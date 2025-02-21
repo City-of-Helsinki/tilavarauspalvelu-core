@@ -5430,6 +5430,60 @@ export type ApplicationReservationUnitListFragment = {
   }>;
 };
 
+export type ApplicationCardFragment = {
+  id: string;
+  pk?: number | null;
+  status?: ApplicationStatusChoice | null;
+  lastModifiedDate: string;
+  applicantType?: ApplicantTypeChoice | null;
+  applicationRound: {
+    id: string;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+  };
+  organisation?: {
+    id: string;
+    nameFi?: string | null;
+    organisationType: OrganizationTypeChoice;
+  } | null;
+  contactPerson?: { id: string; lastName: string; firstName: string } | null;
+};
+
+export type ApplicationsGroupFragment = {
+  sentDate?: string | null;
+  id: string;
+  pk?: number | null;
+  status?: ApplicationStatusChoice | null;
+  lastModifiedDate: string;
+  applicantType?: ApplicantTypeChoice | null;
+  applicationRound: {
+    id: string;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+  };
+  organisation?: {
+    id: string;
+    nameFi?: string | null;
+    organisationType: OrganizationTypeChoice;
+  } | null;
+  contactPerson?: { id: string; lastName: string; firstName: string } | null;
+};
+
+export type ApplicationRoundCardFragment = {
+  id: string;
+  pk?: number | null;
+  nameFi?: string | null;
+  nameEn?: string | null;
+  nameSv?: string | null;
+  reservationPeriodBegin: string;
+  reservationPeriodEnd: string;
+  applicationPeriodBegin: string;
+  applicationPeriodEnd: string;
+  status?: ApplicationRoundStatusChoice | null;
+};
+
 export type AddressFieldsFragment = {
   id: string;
   tprekId?: string | null;
@@ -5716,67 +5770,6 @@ export type ApplicationReservationsQuery = {
         }>;
       }>;
     }> | null;
-  } | null;
-};
-
-export type ApplicationsQueryVariables = Exact<{
-  user: Scalars["Int"]["input"];
-  status:
-    | Array<InputMaybe<ApplicationStatusChoice>>
-    | InputMaybe<ApplicationStatusChoice>;
-  orderBy:
-    | Array<InputMaybe<ApplicationOrderingChoices>>
-    | InputMaybe<ApplicationOrderingChoices>;
-}>;
-
-export type ApplicationsQuery = {
-  applications?: {
-    edges: Array<{
-      node?: {
-        id: string;
-        pk?: number | null;
-        status?: ApplicationStatusChoice | null;
-        lastModifiedDate: string;
-        sentDate?: string | null;
-        applicantType?: ApplicantTypeChoice | null;
-        applicationRound: {
-          pk?: number | null;
-          id: string;
-          nameFi?: string | null;
-          nameEn?: string | null;
-          nameSv?: string | null;
-          reservationPeriodBegin: string;
-          reservationPeriodEnd: string;
-          publicDisplayBegin: string;
-          publicDisplayEnd: string;
-          applicationPeriodBegin: string;
-          applicationPeriodEnd: string;
-          status?: ApplicationRoundStatusChoice | null;
-          criteriaFi?: string | null;
-          criteriaEn?: string | null;
-          criteriaSv?: string | null;
-          notesWhenApplyingFi?: string | null;
-          notesWhenApplyingEn?: string | null;
-          notesWhenApplyingSv?: string | null;
-          reservationUnits: Array<{
-            id: string;
-            pk?: number | null;
-            unit?: { id: string; pk?: number | null } | null;
-          }>;
-        };
-        user?: { id: string; name?: string | null } | null;
-        organisation?: {
-          id: string;
-          nameFi?: string | null;
-          organisationType: OrganizationTypeChoice;
-        } | null;
-        contactPerson?: {
-          id: string;
-          lastName: string;
-          firstName: string;
-        } | null;
-      } | null;
-    } | null>;
   } | null;
 };
 
@@ -6124,91 +6117,6 @@ export type CancelApplicationSectionMutation = {
   cancelAllApplicationSectionReservations?: {
     future?: number | null;
     cancelled?: number | null;
-  } | null;
-};
-
-export type ApplicationRoundFieldsFragment = {
-  pk?: number | null;
-  id: string;
-  nameFi?: string | null;
-  nameEn?: string | null;
-  nameSv?: string | null;
-  reservationPeriodBegin: string;
-  reservationPeriodEnd: string;
-  publicDisplayBegin: string;
-  publicDisplayEnd: string;
-  applicationPeriodBegin: string;
-  applicationPeriodEnd: string;
-  status?: ApplicationRoundStatusChoice | null;
-  criteriaFi?: string | null;
-  criteriaEn?: string | null;
-  criteriaSv?: string | null;
-  notesWhenApplyingFi?: string | null;
-  notesWhenApplyingEn?: string | null;
-  notesWhenApplyingSv?: string | null;
-  reservationUnits: Array<{
-    id: string;
-    pk?: number | null;
-    unit?: { id: string; pk?: number | null } | null;
-  }>;
-};
-
-export type ApplicationRoundPeriodsQueryVariables = Exact<{
-  [key: string]: never;
-}>;
-
-export type ApplicationRoundPeriodsQuery = {
-  applicationRounds?: {
-    edges: Array<{
-      node?: {
-        id: string;
-        pk?: number | null;
-        reservationPeriodBegin: string;
-        reservationPeriodEnd: string;
-        applicationPeriodBegin: string;
-        status?: ApplicationRoundStatusChoice | null;
-        reservationUnits: Array<{ id: string; pk?: number | null }>;
-      } | null;
-    } | null>;
-  } | null;
-};
-
-export type ApplicationRoundsUiQueryVariables = Exact<{
-  orderBy?: InputMaybe<
-    | Array<InputMaybe<ApplicationRoundOrderingChoices>>
-    | InputMaybe<ApplicationRoundOrderingChoices>
-  >;
-}>;
-
-export type ApplicationRoundsUiQuery = {
-  applicationRounds?: {
-    edges: Array<{
-      node?: {
-        pk?: number | null;
-        id: string;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-        reservationPeriodBegin: string;
-        reservationPeriodEnd: string;
-        publicDisplayBegin: string;
-        publicDisplayEnd: string;
-        applicationPeriodBegin: string;
-        applicationPeriodEnd: string;
-        status?: ApplicationRoundStatusChoice | null;
-        criteriaFi?: string | null;
-        criteriaEn?: string | null;
-        criteriaSv?: string | null;
-        notesWhenApplyingFi?: string | null;
-        notesWhenApplyingEn?: string | null;
-        notesWhenApplyingSv?: string | null;
-        reservationUnits: Array<{
-          id: string;
-          pk?: number | null;
-          unit?: { id: string; pk?: number | null } | null;
-        }>;
-      } | null;
-    } | null>;
   } | null;
 };
 
@@ -8316,6 +8224,47 @@ export type ApplicationViewQuery = {
   } | null;
 };
 
+export type ApplicationsQueryVariables = Exact<{
+  user: Scalars["Int"]["input"];
+  status:
+    | Array<InputMaybe<ApplicationStatusChoice>>
+    | InputMaybe<ApplicationStatusChoice>;
+  orderBy:
+    | Array<InputMaybe<ApplicationOrderingChoices>>
+    | InputMaybe<ApplicationOrderingChoices>;
+}>;
+
+export type ApplicationsQuery = {
+  applications?: {
+    edges: Array<{
+      node?: {
+        sentDate?: string | null;
+        id: string;
+        pk?: number | null;
+        status?: ApplicationStatusChoice | null;
+        lastModifiedDate: string;
+        applicantType?: ApplicantTypeChoice | null;
+        applicationRound: {
+          id: string;
+          nameFi?: string | null;
+          nameEn?: string | null;
+          nameSv?: string | null;
+        };
+        organisation?: {
+          id: string;
+          nameFi?: string | null;
+          organisationType: OrganizationTypeChoice;
+        } | null;
+        contactPerson?: {
+          id: string;
+          lastName: string;
+          firstName: string;
+        } | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type ApplicationRoundCriteriaQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8350,6 +8299,71 @@ export type ApplicationRoundQuery = {
     reservationPeriodBegin: string;
     reservationPeriodEnd: string;
     reservationUnits: Array<{ id: string; pk?: number | null }>;
+  } | null;
+};
+
+export type ApplicationRoundFieldsFragment = {
+  publicDisplayBegin: string;
+  publicDisplayEnd: string;
+  criteriaFi?: string | null;
+  criteriaEn?: string | null;
+  criteriaSv?: string | null;
+  notesWhenApplyingFi?: string | null;
+  notesWhenApplyingEn?: string | null;
+  notesWhenApplyingSv?: string | null;
+  id: string;
+  pk?: number | null;
+  nameFi?: string | null;
+  nameEn?: string | null;
+  nameSv?: string | null;
+  reservationPeriodBegin: string;
+  reservationPeriodEnd: string;
+  applicationPeriodBegin: string;
+  applicationPeriodEnd: string;
+  status?: ApplicationRoundStatusChoice | null;
+  reservationUnits: Array<{
+    id: string;
+    pk?: number | null;
+    unit?: { id: string; pk?: number | null } | null;
+  }>;
+};
+
+export type ApplicationRoundsUiQueryVariables = Exact<{
+  orderBy?: InputMaybe<
+    | Array<InputMaybe<ApplicationRoundOrderingChoices>>
+    | InputMaybe<ApplicationRoundOrderingChoices>
+  >;
+}>;
+
+export type ApplicationRoundsUiQuery = {
+  applicationRounds?: {
+    edges: Array<{
+      node?: {
+        publicDisplayBegin: string;
+        publicDisplayEnd: string;
+        criteriaFi?: string | null;
+        criteriaEn?: string | null;
+        criteriaSv?: string | null;
+        notesWhenApplyingFi?: string | null;
+        notesWhenApplyingEn?: string | null;
+        notesWhenApplyingSv?: string | null;
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        reservationPeriodBegin: string;
+        reservationPeriodEnd: string;
+        applicationPeriodBegin: string;
+        applicationPeriodEnd: string;
+        status?: ApplicationRoundStatusChoice | null;
+        reservationUnits: Array<{
+          id: string;
+          pk?: number | null;
+          unit?: { id: string; pk?: number | null } | null;
+        }>;
+      } | null;
+    } | null>;
   } | null;
 };
 
@@ -9019,6 +9033,44 @@ export const InstructionsFragmentDoc = gql`
     }
   }
 `;
+export const ApplicationNameFragmentDoc = gql`
+  fragment ApplicationName on ApplicationNode {
+    applicantType
+    organisation {
+      id
+      nameFi
+      organisationType
+    }
+    contactPerson {
+      id
+      lastName
+      firstName
+    }
+  }
+`;
+export const ApplicationCardFragmentDoc = gql`
+  fragment ApplicationCard on ApplicationNode {
+    id
+    pk
+    ...ApplicationName
+    status
+    lastModifiedDate
+    applicationRound {
+      id
+      nameFi
+      nameEn
+      nameSv
+    }
+  }
+  ${ApplicationNameFragmentDoc}
+`;
+export const ApplicationsGroupFragmentDoc = gql`
+  fragment ApplicationsGroup on ApplicationNode {
+    ...ApplicationCard
+    sentDate
+  }
+  ${ApplicationCardFragmentDoc}
+`;
 export const PricingFieldsFragmentDoc = gql`
   fragment PricingFields on ReservationUnitPricingNode {
     id
@@ -9392,36 +9444,6 @@ export const ApplicationCommonFragmentDoc = gql`
   ${ApplicationFormFragmentDoc}
   ${TermsOfUseFieldsFragmentDoc}
 `;
-export const ApplicationRoundFieldsFragmentDoc = gql`
-  fragment ApplicationRoundFields on ApplicationRoundNode {
-    pk
-    id
-    nameFi
-    nameEn
-    nameSv
-    reservationPeriodBegin
-    reservationPeriodEnd
-    publicDisplayBegin
-    publicDisplayEnd
-    applicationPeriodBegin
-    applicationPeriodEnd
-    status
-    criteriaFi
-    criteriaEn
-    criteriaSv
-    notesWhenApplyingFi
-    notesWhenApplyingEn
-    notesWhenApplyingSv
-    reservationUnits {
-      id
-      pk
-      unit {
-        id
-        pk
-      }
-    }
-  }
-`;
 export const CancelReasonFieldsFragmentDoc = gql`
   fragment CancelReasonFields on ReservationCancelReasonNode {
     id
@@ -9699,21 +9721,6 @@ export const ReservationUnitCardFieldsFragmentDoc = gql`
   ${ReservationUnitTypeFieldsFragmentDoc}
   ${ImageFragmentDoc}
 `;
-export const ApplicationNameFragmentDoc = gql`
-  fragment ApplicationName on ApplicationNode {
-    applicantType
-    organisation {
-      id
-      nameFi
-      organisationType
-    }
-    contactPerson {
-      id
-      lastName
-      firstName
-    }
-  }
-`;
 export const ReserveeNameFieldsFragmentDoc = gql`
   fragment ReserveeNameFields on ReservationNode {
     reserveeFirstName
@@ -9783,6 +9790,42 @@ export const BannerNotificationCommonFragmentDoc = gql`
     messageFi
     messageSv
   }
+`;
+export const ApplicationRoundCardFragmentDoc = gql`
+  fragment ApplicationRoundCard on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    reservationPeriodBegin
+    reservationPeriodEnd
+    applicationPeriodBegin
+    applicationPeriodEnd
+    status
+  }
+`;
+export const ApplicationRoundFieldsFragmentDoc = gql`
+  fragment ApplicationRoundFields on ApplicationRoundNode {
+    ...ApplicationRoundCard
+    publicDisplayBegin
+    publicDisplayEnd
+    criteriaFi
+    criteriaEn
+    criteriaSv
+    notesWhenApplyingFi
+    notesWhenApplyingEn
+    notesWhenApplyingSv
+    reservationUnits {
+      id
+      pk
+      unit {
+        id
+        pk
+      }
+    }
+  }
+  ${ApplicationRoundCardFragmentDoc}
 `;
 export const ReservationInfoFragmentDoc = gql`
   fragment ReservationInfo on ReservationNode {
@@ -10030,112 +10073,6 @@ export type ApplicationReservationsSuspenseQueryHookResult = ReturnType<
 export type ApplicationReservationsQueryResult = Apollo.QueryResult<
   ApplicationReservationsQuery,
   ApplicationReservationsQueryVariables
->;
-export const ApplicationsDocument = gql`
-  query Applications(
-    $user: Int!
-    $status: [ApplicationStatusChoice]!
-    $orderBy: [ApplicationOrderingChoices]!
-  ) {
-    applications(user: $user, status: $status, orderBy: $orderBy) {
-      edges {
-        node {
-          id
-          pk
-          applicationRound {
-            ...ApplicationRoundFields
-          }
-          user {
-            id
-            name
-          }
-          status
-          ...ApplicationName
-          lastModifiedDate
-          sentDate
-        }
-      }
-    }
-  }
-  ${ApplicationRoundFieldsFragmentDoc}
-  ${ApplicationNameFragmentDoc}
-`;
-
-/**
- * __useApplicationsQuery__
- *
- * To run a query within a React component, call `useApplicationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useApplicationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useApplicationsQuery({
- *   variables: {
- *      user: // value for 'user'
- *      status: // value for 'status'
- *      orderBy: // value for 'orderBy'
- *   },
- * });
- */
-export function useApplicationsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ApplicationsQuery,
-    ApplicationsQueryVariables
-  > &
-    (
-      | { variables: ApplicationsQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ApplicationsQuery, ApplicationsQueryVariables>(
-    ApplicationsDocument,
-    options
-  );
-}
-export function useApplicationsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ApplicationsQuery,
-    ApplicationsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ApplicationsQuery, ApplicationsQueryVariables>(
-    ApplicationsDocument,
-    options
-  );
-}
-export function useApplicationsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ApplicationsQuery,
-        ApplicationsQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<ApplicationsQuery, ApplicationsQueryVariables>(
-    ApplicationsDocument,
-    options
-  );
-}
-export type ApplicationsQueryHookResult = ReturnType<
-  typeof useApplicationsQuery
->;
-export type ApplicationsLazyQueryHookResult = ReturnType<
-  typeof useApplicationsLazyQuery
->;
-export type ApplicationsSuspenseQueryHookResult = ReturnType<
-  typeof useApplicationsSuspenseQuery
->;
-export type ApplicationsQueryResult = Apollo.QueryResult<
-  ApplicationsQuery,
-  ApplicationsQueryVariables
 >;
 export const CreateApplicationDocument = gql`
   mutation CreateApplication($input: ApplicationCreateMutationInput!) {
@@ -10391,179 +10328,6 @@ export type CancelApplicationSectionMutationOptions =
     CancelApplicationSectionMutation,
     CancelApplicationSectionMutationVariables
   >;
-export const ApplicationRoundPeriodsDocument = gql`
-  query ApplicationRoundPeriods {
-    applicationRounds {
-      edges {
-        node {
-          id
-          pk
-          reservationPeriodBegin
-          reservationPeriodEnd
-          applicationPeriodBegin
-          status
-          reservationUnits {
-            id
-            pk
-          }
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useApplicationRoundPeriodsQuery__
- *
- * To run a query within a React component, call `useApplicationRoundPeriodsQuery` and pass it any options that fit your needs.
- * When your component renders, `useApplicationRoundPeriodsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useApplicationRoundPeriodsQuery({
- *   variables: {
- *   },
- * });
- */
-export function useApplicationRoundPeriodsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ApplicationRoundPeriodsQuery,
-    ApplicationRoundPeriodsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ApplicationRoundPeriodsQuery,
-    ApplicationRoundPeriodsQueryVariables
-  >(ApplicationRoundPeriodsDocument, options);
-}
-export function useApplicationRoundPeriodsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ApplicationRoundPeriodsQuery,
-    ApplicationRoundPeriodsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ApplicationRoundPeriodsQuery,
-    ApplicationRoundPeriodsQueryVariables
-  >(ApplicationRoundPeriodsDocument, options);
-}
-export function useApplicationRoundPeriodsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ApplicationRoundPeriodsQuery,
-        ApplicationRoundPeriodsQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ApplicationRoundPeriodsQuery,
-    ApplicationRoundPeriodsQueryVariables
-  >(ApplicationRoundPeriodsDocument, options);
-}
-export type ApplicationRoundPeriodsQueryHookResult = ReturnType<
-  typeof useApplicationRoundPeriodsQuery
->;
-export type ApplicationRoundPeriodsLazyQueryHookResult = ReturnType<
-  typeof useApplicationRoundPeriodsLazyQuery
->;
-export type ApplicationRoundPeriodsSuspenseQueryHookResult = ReturnType<
-  typeof useApplicationRoundPeriodsSuspenseQuery
->;
-export type ApplicationRoundPeriodsQueryResult = Apollo.QueryResult<
-  ApplicationRoundPeriodsQuery,
-  ApplicationRoundPeriodsQueryVariables
->;
-export const ApplicationRoundsUiDocument = gql`
-  query ApplicationRoundsUi($orderBy: [ApplicationRoundOrderingChoices]) {
-    applicationRounds(orderBy: $orderBy) {
-      edges {
-        node {
-          ...ApplicationRoundFields
-        }
-      }
-    }
-  }
-  ${ApplicationRoundFieldsFragmentDoc}
-`;
-
-/**
- * __useApplicationRoundsUiQuery__
- *
- * To run a query within a React component, call `useApplicationRoundsUiQuery` and pass it any options that fit your needs.
- * When your component renders, `useApplicationRoundsUiQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useApplicationRoundsUiQuery({
- *   variables: {
- *      orderBy: // value for 'orderBy'
- *   },
- * });
- */
-export function useApplicationRoundsUiQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ApplicationRoundsUiQuery,
-    ApplicationRoundsUiQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ApplicationRoundsUiQuery,
-    ApplicationRoundsUiQueryVariables
-  >(ApplicationRoundsUiDocument, options);
-}
-export function useApplicationRoundsUiLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ApplicationRoundsUiQuery,
-    ApplicationRoundsUiQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ApplicationRoundsUiQuery,
-    ApplicationRoundsUiQueryVariables
-  >(ApplicationRoundsUiDocument, options);
-}
-export function useApplicationRoundsUiSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ApplicationRoundsUiQuery,
-        ApplicationRoundsUiQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ApplicationRoundsUiQuery,
-    ApplicationRoundsUiQueryVariables
-  >(ApplicationRoundsUiDocument, options);
-}
-export type ApplicationRoundsUiQueryHookResult = ReturnType<
-  typeof useApplicationRoundsUiQuery
->;
-export type ApplicationRoundsUiLazyQueryHookResult = ReturnType<
-  typeof useApplicationRoundsUiLazyQuery
->;
-export type ApplicationRoundsUiSuspenseQueryHookResult = ReturnType<
-  typeof useApplicationRoundsUiSuspenseQuery
->;
-export type ApplicationRoundsUiQueryResult = Apollo.QueryResult<
-  ApplicationRoundsUiQuery,
-  ApplicationRoundsUiQueryVariables
->;
 export const SearchFormParamsUnitDocument = gql`
   query SearchFormParamsUnit(
     $publishedReservationUnits: Boolean
@@ -12832,6 +12596,99 @@ export type ApplicationViewQueryResult = Apollo.QueryResult<
   ApplicationViewQuery,
   ApplicationViewQueryVariables
 >;
+export const ApplicationsDocument = gql`
+  query Applications(
+    $user: Int!
+    $status: [ApplicationStatusChoice]!
+    $orderBy: [ApplicationOrderingChoices]!
+  ) {
+    applications(user: $user, status: $status, orderBy: $orderBy) {
+      edges {
+        node {
+          ...ApplicationsGroup
+        }
+      }
+    }
+  }
+  ${ApplicationsGroupFragmentDoc}
+`;
+
+/**
+ * __useApplicationsQuery__
+ *
+ * To run a query within a React component, call `useApplicationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationsQuery({
+ *   variables: {
+ *      user: // value for 'user'
+ *      status: // value for 'status'
+ *      orderBy: // value for 'orderBy'
+ *   },
+ * });
+ */
+export function useApplicationsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationsQuery,
+    ApplicationsQueryVariables
+  > &
+    (
+      | { variables: ApplicationsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ApplicationsQuery, ApplicationsQueryVariables>(
+    ApplicationsDocument,
+    options
+  );
+}
+export function useApplicationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationsQuery,
+    ApplicationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<ApplicationsQuery, ApplicationsQueryVariables>(
+    ApplicationsDocument,
+    options
+  );
+}
+export function useApplicationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationsQuery,
+        ApplicationsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<ApplicationsQuery, ApplicationsQueryVariables>(
+    ApplicationsDocument,
+    options
+  );
+}
+export type ApplicationsQueryHookResult = ReturnType<
+  typeof useApplicationsQuery
+>;
+export type ApplicationsLazyQueryHookResult = ReturnType<
+  typeof useApplicationsLazyQuery
+>;
+export type ApplicationsSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationsSuspenseQuery
+>;
+export type ApplicationsQueryResult = Apollo.QueryResult<
+  ApplicationsQuery,
+  ApplicationsQueryVariables
+>;
 export const ApplicationRoundCriteriaDocument = gql`
   query ApplicationRoundCriteria($id: ID!) {
     applicationRound(id: $id) {
@@ -13015,6 +12872,89 @@ export type ApplicationRoundSuspenseQueryHookResult = ReturnType<
 export type ApplicationRoundQueryResult = Apollo.QueryResult<
   ApplicationRoundQuery,
   ApplicationRoundQueryVariables
+>;
+export const ApplicationRoundsUiDocument = gql`
+  query ApplicationRoundsUi($orderBy: [ApplicationRoundOrderingChoices]) {
+    applicationRounds(orderBy: $orderBy) {
+      edges {
+        node {
+          ...ApplicationRoundFields
+        }
+      }
+    }
+  }
+  ${ApplicationRoundFieldsFragmentDoc}
+`;
+
+/**
+ * __useApplicationRoundsUiQuery__
+ *
+ * To run a query within a React component, call `useApplicationRoundsUiQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationRoundsUiQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationRoundsUiQuery({
+ *   variables: {
+ *      orderBy: // value for 'orderBy'
+ *   },
+ * });
+ */
+export function useApplicationRoundsUiQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ApplicationRoundsUiQuery,
+    ApplicationRoundsUiQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationRoundsUiQuery,
+    ApplicationRoundsUiQueryVariables
+  >(ApplicationRoundsUiDocument, options);
+}
+export function useApplicationRoundsUiLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationRoundsUiQuery,
+    ApplicationRoundsUiQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationRoundsUiQuery,
+    ApplicationRoundsUiQueryVariables
+  >(ApplicationRoundsUiDocument, options);
+}
+export function useApplicationRoundsUiSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationRoundsUiQuery,
+        ApplicationRoundsUiQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationRoundsUiQuery,
+    ApplicationRoundsUiQueryVariables
+  >(ApplicationRoundsUiDocument, options);
+}
+export type ApplicationRoundsUiQueryHookResult = ReturnType<
+  typeof useApplicationRoundsUiQuery
+>;
+export type ApplicationRoundsUiLazyQueryHookResult = ReturnType<
+  typeof useApplicationRoundsUiLazyQuery
+>;
+export type ApplicationRoundsUiSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationRoundsUiSuspenseQuery
+>;
+export type ApplicationRoundsUiQueryResult = Apollo.QueryResult<
+  ApplicationRoundsUiQuery,
+  ApplicationRoundsUiQueryVariables
 >;
 export const ReservationDocument = gql`
   query Reservation($id: ID!) {
