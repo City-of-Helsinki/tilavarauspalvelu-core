@@ -16,6 +16,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Flex } from "common/styles/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { gql } from "@apollo/client";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -30,7 +31,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     ApplicationRoundsUiQueryVariables
   >({
     query: ApplicationRoundsUiDocument,
-    fetchPolicy: "no-cache",
     variables: {
       orderBy: [ApplicationRoundOrderingChoices.PkAsc],
     },
@@ -145,3 +145,38 @@ function RecurringLander({ applicationRounds }: Props): JSX.Element {
 }
 
 export default RecurringLander;
+
+export const APPLICATION_ROUND_FRAGMENT = gql`
+  fragment ApplicationRoundFields on ApplicationRoundNode {
+    ...ApplicationRoundCard
+    publicDisplayBegin
+    publicDisplayEnd
+    criteriaFi
+    criteriaEn
+    criteriaSv
+    notesWhenApplyingFi
+    notesWhenApplyingEn
+    notesWhenApplyingSv
+    reservationUnits {
+      id
+      pk
+      unit {
+        id
+        pk
+      }
+    }
+  }
+`;
+
+export const APPLICATION_ROUNDS = gql`
+  ${APPLICATION_ROUND_FRAGMENT}
+  query ApplicationRoundsUi($orderBy: [ApplicationRoundOrderingChoices]) {
+    applicationRounds(orderBy: $orderBy) {
+      edges {
+        node {
+          ...ApplicationRoundFields
+        }
+      }
+    }
+  }
+`;

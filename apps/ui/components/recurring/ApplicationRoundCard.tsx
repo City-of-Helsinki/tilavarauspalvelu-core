@@ -2,7 +2,7 @@ import React from "react";
 import { IconArrowRight, IconLinkExternal } from "hds-react";
 import { type TFunction, useTranslation } from "next-i18next";
 import {
-  type ApplicationRoundFieldsFragment,
+  type ApplicationRoundCardFragment,
   ApplicationRoundStatusChoice,
 } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
@@ -14,20 +14,22 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { gql } from "@apollo/client";
 
 interface CardProps {
-  applicationRound: ApplicationRoundFieldsFragment;
+  applicationRound: ApplicationRoundCardFragment;
 }
 
 function translateRoundDate(
   t: TFunction,
-  round: ApplicationRoundFieldsFragment
+  round: Pick<
+    ApplicationRoundCardFragment,
+    "applicationPeriodBegin" | "applicationPeriodEnd" | "status"
+  >
 ) {
   const begin = new Date(round.applicationPeriodBegin);
   const end = new Date(round.applicationPeriodEnd);
   if (!isValid(begin) || !isValid(end)) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid application period dates");
     return "";
   }
 
@@ -39,7 +41,6 @@ function translateRoundDate(
     case ApplicationRoundStatusChoice.Open:
       return t("applicationRound:card.open", { until: formatDateTime(t, end) });
     default:
-      // TODO no time here
       return t("applicationRound:card.past", {
         closing: formatDateTime(t, end),
       });
@@ -52,19 +53,20 @@ export function ApplicationRoundCard({
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
-  const state = applicationRound.status;
   const name = getTranslationSafe(applicationRound, "name", lang);
   const timeString = translateRoundDate(t, applicationRound);
+  const reservationPeriodBegin = formatDateTime(
+    t,
+    new Date(applicationRound.reservationPeriodBegin)
+  );
+  const reservationPeriodEnd = formatDateTime(
+    t,
+    new Date(applicationRound.reservationPeriodEnd)
+  );
+
   const reservationPeriod = t(`applicationRound:card.reservationPeriod`, {
-    // TODO check if time is needed
-    reservationPeriodBegin: formatDateTime(
-      t,
-      new Date(applicationRound.reservationPeriodBegin)
-    ),
-    reservationPeriodEnd: formatDateTime(
-      t,
-      new Date(applicationRound.reservationPeriodEnd)
-    ),
+    reservationPeriodBegin,
+    reservationPeriodEnd,
   });
 
   const buttons = [
@@ -78,7 +80,8 @@ export function ApplicationRoundCard({
       <IconLinkExternal />
     </ButtonLikeLink>,
   ];
-  if (state === ApplicationRoundStatusChoice.Open) {
+
+  if (applicationRound.status === ApplicationRoundStatusChoice.Open) {
     buttons.push(
       <ButtonLikeLink
         key="button"
@@ -97,3 +100,18 @@ export function ApplicationRoundCard({
     </Card>
   );
 }
+
+export const APPLICATION_ROUND_CARD_FRAGMENT = gql`
+  fragment ApplicationRoundCard on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    reservationPeriodBegin
+    reservationPeriodEnd
+    applicationPeriodBegin
+    applicationPeriodEnd
+    status
+  }
+`;
