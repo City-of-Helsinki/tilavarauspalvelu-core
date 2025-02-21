@@ -70,36 +70,6 @@ export const APPLICATION_RESERVATIONS_QUERY = gql`
   }
 `;
 
-// NOTE because this doesn't have pagination we use orderBy for development purposes only
-// if you create new application it's the first one in the list
-export const APPLICATIONS = gql`
-  query Applications(
-    $user: Int!
-    $status: [ApplicationStatusChoice]!
-    $orderBy: [ApplicationOrderingChoices]!
-  ) {
-    applications(user: $user, status: $status, orderBy: $orderBy) {
-      edges {
-        node {
-          id
-          pk
-          applicationRound {
-            ...ApplicationRoundFields
-          }
-          user {
-            id
-            name
-          }
-          status
-          ...ApplicationName
-          lastModifiedDate
-          sentDate
-        }
-      }
-    }
-  }
-`;
-
 // includes all the form fields for an application funnel
 // requires a lot of fields because we are doing full form validation for stepper / sending
 export const APPLICATION_MINIMAL = gql`
