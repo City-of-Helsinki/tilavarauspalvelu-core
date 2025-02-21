@@ -16,7 +16,8 @@ import {
   ApplicationStatusChoice,
   type Maybe,
   useCancelApplicationMutation,
-  type ApplicationsQuery,
+  type ApplicationNameFragment,
+  type ApplicationCardFragment,
 } from "@gql/gql-types";
 import { formatDateTime } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
@@ -25,6 +26,7 @@ import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import Card from "common/src/components/Card";
 import { getApplicationPath } from "@/modules/urls";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
+import { gql } from "@apollo/client";
 
 const StyledButton = styled(Button)`
   @media (max-width: ${breakpoints.s}) {
@@ -32,19 +34,10 @@ const StyledButton = styled(Button)`
   }
 `;
 
-type ApplicationType = NonNullable<
-  NonNullable<
-    NonNullable<ApplicationsQuery["applications"]>["edges"][0]
-  >["node"]
->;
-type Props = {
-  application: ApplicationType;
-  // TODO refactor the action callback (it's not a good idea in general, but especially error callback)
-  actionCallback: (string: "error" | "cancel") => Promise<void>;
-};
-
-// TODO should use a name fragment
-function getApplicant(application: ApplicationType, t: TFunction): string {
+function getApplicant(
+  application: ApplicationNameFragment,
+  t: TFunction
+): string {
   if (application.applicantType === ApplicantTypeChoice.Individual) {
     return t("applicationCard:person");
   }
@@ -75,6 +68,12 @@ function isEditable(
   return false;
 }
 
+type Props = {
+  application: ApplicationCardFragment;
+  // TODO refactor the action callback (it's not a good idea in general, but especially error callback)
+  actionCallback: (string: "error" | "cancel") => Promise<void>;
+};
+
 export function ApplicationCard({
   application,
   actionCallback,
@@ -88,20 +87,17 @@ export function ApplicationCard({
         pk: application.pk ?? 0,
       },
     },
-    onCompleted: () => {
-      actionCallback("cancel");
-    },
-    onError: () => {
-      actionCallback("error");
-    },
   });
 
   const cancel = async () => {
-    await mutation();
-    setIsWaitingForDelete(false);
+    try {
+      await mutation();
+      setIsWaitingForDelete(false);
+      actionCallback("cancel");
+    } catch (e) {
+      actionCallback("error");
+    }
   };
-
-  const { applicationRound } = application;
 
   const editable = isEditable(application.status);
 
@@ -146,11 +142,9 @@ export function ApplicationCard({
 
   return (
     <Card
-      heading={getApplicationRoundName(applicationRound)}
+      heading={getApplicationRoundName(application.applicationRound)}
       headingLevel={3}
-      text={
-        application.applicantType != null ? getApplicant(application, t) : ""
-      }
+      text={getApplicant(application, t)}
       tags={tags}
       buttons={buttons}
     >
@@ -173,3 +167,19 @@ export function ApplicationCard({
     </Card>
   );
 }
+
+export const APPLICATION_CARD_FRAGMENT = gql`
+  fragment ApplicationCard on ApplicationNode {
+    id
+    pk
+    ...ApplicationName
+    status
+    lastModifiedDate
+    applicationRound {
+      id
+      nameFi
+      nameEn
+      nameSv
+    }
+  }
+`;
