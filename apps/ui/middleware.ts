@@ -518,7 +518,8 @@ export async function middleware(req: NextRequest) {
   // listing page has no reservation data
   const checkReservationPage = url.pathname.match(reservationsPath);
   if (data?.reservation != null && checkReservationPage) {
-    if (data.reservation.state == null || data.reservation.type == null) {
+    // type can be null for regular users
+    if (data.reservation.state == null) {
       return NextResponse.error();
     }
 
