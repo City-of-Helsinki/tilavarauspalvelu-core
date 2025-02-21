@@ -161,6 +161,9 @@ def reservation_unit_export(request: WSGIRequest) -> HttpResponse:
         msg = "'only' should be a comma separated list of reservation unit ids."
         return HttpResponseBadRequest(msg)
 
+    # TODO: 'tprek_id', reservation_unit_id
+    # TODO: ISO formatti päivämäärät
+
     queryset = ReservationUnit.objects.all()
     if reservation_units:
         queryset = queryset.filter(pk__in=reservation_units)
@@ -181,6 +184,9 @@ def reservation_statistics_export(request: WSGIRequest) -> HttpResponse:
         return HttpResponseForbidden(msg)
 
     queryset = ReservationStatistic.objects.all()
+
+    # TODO: 'tprek_id', 'begin', (end), reservation_id
+    # TODO: Aikavyöhyke tieto mukana
 
     exporter = ExportMixin()
     exporter.model = ReservationStatistic
