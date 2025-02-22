@@ -10,5 +10,6 @@
   "applications": "Mina bokningar",
   "reservationUnit": "Bokningsenhet",
   "reservations": "Mina bokningar",
-  "confirmation": "Bekräftelse"
+  "confirmation": "Bekräftelse",
+  "breadcrumb": "Brödsmulor"
 }
