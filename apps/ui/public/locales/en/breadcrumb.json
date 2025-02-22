@@ -10,5 +10,6 @@
   "applications": "My applications",
   "reservationUnit": "Reservation unit",
   "reservations": "My bookings",
-  "confirmation": "Confirmation"
+  "confirmation": "Confirmation",
+  "breadcrumb": "Breadcrumb"
 }

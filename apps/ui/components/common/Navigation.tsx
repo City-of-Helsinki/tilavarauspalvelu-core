@@ -148,7 +148,7 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
   };
 
   return (
-    <Header.NavigationMenu>
+    <Header.NavigationMenu aria-label={t("navigation:navigation")}>
       {menuItems.map((item) => {
         if (item.requireLogin && !user) {
           return null;
@@ -163,6 +163,7 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
           <Header.ActionBarSubItem
             key={item.label}
             label={t(item.label)}
+            aria-label={t(item.label)}
             href={
               getLocalizationLang(i18n.language) === "fi"
                 ? item.routes[0]
@@ -174,6 +175,11 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
                 ? "active"
                 : ""
             }
+            aria-current={checkActive(
+              pathname,
+              item.routes,
+              item.exact ?? false
+            )}
           />
         );
       })}

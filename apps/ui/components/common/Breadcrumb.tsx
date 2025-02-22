@@ -42,13 +42,12 @@ const currentCss = css`
   ${fontMedium}
 `;
 
-// const LIMIT_CURRENT_CH = 40;
 const LIMIT_DEFAULT_CH = 25;
 const Anchor = styled(Link)<{ $current?: boolean; $isMobile?: boolean }>`
   && {
-    ${truncatedText}
     display: inline-block;
     max-width: ${LIMIT_DEFAULT_CH}ch;
+    ${truncatedText}
     ${({ $current }) => {
       switch ($current) {
         case true:
@@ -108,11 +107,20 @@ function BreadcrumbImpl({
             <IconAngleRight size={IconSize.Small} aria-hidden="true" />
           )}
           {item.slug ? (
-            <Anchor href={item.slug} $current={index === routes.length - 1}>
+            <Anchor
+              href={item.slug}
+              $current={index === routes.length - 1}
+              aria-current={index === routes.length - 1}
+            >
               {item.title}
             </Anchor>
           ) : (
-            <Slug $current={index === routes.length - 1}>{item.title}</Slug>
+            <Slug
+              $current={index === routes.length - 1}
+              aria-current={index === routes.length - 1}
+            >
+              {item.title}
+            </Slug>
           )}
         </Item>
       ))}
@@ -120,7 +128,7 @@ function BreadcrumbImpl({
   );
 }
 
-export function Breadcrumb({ routes }: Props): JSX.Element {
+export function Breadcrumb({ routes }: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
@@ -129,7 +137,11 @@ export function Breadcrumb({ routes }: Props): JSX.Element {
     ...routes,
   ];
   return (
-    <Nav data-testid="breadcrumb__wrapper" $isMobile={isMobile}>
+    <Nav
+      data-testid="breadcrumb__wrapper"
+      $isMobile={isMobile}
+      aria-label={t("breadcrumb:breadcrumb")}
+    >
       <BreadcrumbImpl routes={routesWithFrontPage} isMobile={isMobile} />
     </Nav>
   );

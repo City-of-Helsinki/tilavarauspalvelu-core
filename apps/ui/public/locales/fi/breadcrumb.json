@@ -10,5 +10,6 @@
   "applications": "Omat hakemukset",
   "reservationUnit": "Varausyksikkö",
   "reservations": "Omat varaukset",
-  "confirmation": "Vahvistus"
+  "confirmation": "Vahvistus",
+  "breadcrumb": "Murupolku"
 }

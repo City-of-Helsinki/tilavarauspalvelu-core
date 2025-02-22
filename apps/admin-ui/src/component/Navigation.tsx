@@ -215,13 +215,13 @@ function NavigationLink({
   exact,
   exclude,
   count,
-}: {
+}: Readonly<{
   title: string;
   routes: string[];
   exact?: boolean;
   exclude?: string[];
   count?: number;
-}) {
+}>) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -245,6 +245,7 @@ function NavigationLink({
       onClick={handleClick}
       href={`/kasittely${routes[0]}`}
       label={t(title)}
+      aria-label={t(title)}
       className={
         checkActive(pathname, routes, exact ?? false, exclude) ? "active" : ""
       }
@@ -252,6 +253,7 @@ function NavigationLink({
       notificationBubbleContent={
         shouldDisplayCount ? count?.toString() : undefined
       }
+      aria-current={checkActive(pathname, routes, exact ?? false, exclude)}
     />
   );
 }
@@ -320,6 +322,7 @@ const Navigation = ({ apiBaseUrl }: Props) => {
               exact={item.exact}
               exclude={item.excludeRoutes}
               count={handlingCount}
+              aria-label={t("navigation:navigation")}
             />
           ))}
         </Header.NavigationMenu>
