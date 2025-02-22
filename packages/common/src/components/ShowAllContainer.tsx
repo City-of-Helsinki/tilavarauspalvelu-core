@@ -79,6 +79,7 @@ const ShowAllContainer = ({
         <ul
           data-testid="show-all__content"
           className="ShowAllContainer__Content"
+          aria-live="polite"
         >
           {showAll
             ? children
@@ -91,6 +92,8 @@ const ShowAllContainer = ({
         <div
           data-testid="show-all__content"
           className="ShowAllContainer__Content"
+          aria-live="polite"
+          aria-expanded={showAll}
         >
           {showAll
             ? children
