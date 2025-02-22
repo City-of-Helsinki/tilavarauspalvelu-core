@@ -210,7 +210,7 @@ export function ReservationTimePicker({
   submitReservation,
   startingTimeOptions,
   blockingReservations,
-}: Props) {
+}: Readonly<Props>) {
   const { t, i18n } = useTranslation();
   const [calendarViewType, setCalendarViewType] = useState<WeekOptions>("week");
   const { watch, setValue } = reservationForm;
@@ -386,6 +386,8 @@ export function ReservationTimePicker({
           mode: "edit",
         } as const);
 
+  const areControlsVisible = watch("isControlsVisible");
+
   return (
     <>
       {/* TODO is calendar ref necessary? */}
@@ -435,7 +437,7 @@ export function ReservationTimePicker({
           longPressThreshold={100}
         />
       </div>
-      <CalendarFooter>
+      <CalendarFooter aria-live="polite" aria-expanded={areControlsVisible}>
         <ReservationCalendarControls
           {...controlProps}
           reservationUnit={reservationUnit}
