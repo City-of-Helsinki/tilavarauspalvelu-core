@@ -8,6 +8,7 @@
     "past": "Haku sulkeutui {{closing}}",
     "reservationPeriod": "Tilat varattavissa ajalle {{reservationPeriodBegin}} - {{reservationPeriodEnd}}"
   },
+  "startNewApplication": "Täytä hakemus",
   "criteria": "hakuehdot",
   "notesWhenApplying": "Huomioi hakiessa"
 }

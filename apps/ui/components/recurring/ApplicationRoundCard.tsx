@@ -55,14 +55,10 @@ export function ApplicationRoundCard({
 
   const name = getTranslationSafe(applicationRound, "name", lang);
   const timeString = translateRoundDate(t, applicationRound);
-  const reservationPeriodBegin = formatDateTime(
-    t,
-    new Date(applicationRound.reservationPeriodBegin)
-  );
-  const reservationPeriodEnd = formatDateTime(
-    t,
-    new Date(applicationRound.reservationPeriodEnd)
-  );
+  const begin = new Date(applicationRound.reservationPeriodBegin);
+  const end = new Date(applicationRound.reservationPeriodEnd);
+  const reservationPeriodBegin = formatDateTime(t, begin);
+  const reservationPeriodEnd = formatDateTime(t, end);
 
   const reservationPeriod = t(`applicationRound:card.reservationPeriod`, {
     reservationPeriodBegin,
@@ -88,7 +84,7 @@ export function ApplicationRoundCard({
         href={getApplicationRoundPath(applicationRound.pk)}
         width="full"
       >
-        {t("application:Intro.startNewApplication")}
+        {t("applicationRound:startNewApplication")}
         <IconArrowRight />
       </ButtonLikeLink>
     );

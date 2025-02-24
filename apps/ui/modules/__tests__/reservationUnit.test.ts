@@ -44,12 +44,6 @@ function mockT(str: string): ReturnType<TFunction> {
   const path = str.replace("prices:", "");
   return mockGet(mockTranslations, path);
 }
-jest.mock("next-i18next", () => ({
-  i18n: {
-    t: mockT,
-    language: "fi",
-  },
-}));
 
 // Turn into describe block and spec the tests
 describe("getPossibleTimesForDay", () => {

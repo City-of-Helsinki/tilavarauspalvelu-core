@@ -34,7 +34,6 @@
     "fix": "Korjaa"
   },
   "Intro": {
-    "startNewApplication": "Täytä hakemus",
     "heading": "Kausivaraushakemus",
     "createFailedHeading": "Hakemuksen luominen epäonnistui"
   },
