@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import {
   ApplicantTypeChoice,
   ApplicationPage3Document,
+  useUpdateApplicationMutation,
   type ApplicationPage3Query,
   type ApplicationPage3QueryVariables,
 } from "@gql/gql-types";
@@ -22,7 +23,6 @@ import {
   transformPage3Application,
 } from "@/components/application/form";
 import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
-import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
@@ -104,12 +104,17 @@ function Page3({ application }: PropsNarrowed): JSX.Element {
   }, [application, reset]);
 
   const { t } = useTranslation();
-  const [update] = useApplicationUpdate();
+  const [mutate] = useUpdateApplicationMutation();
   const dislayError = useDisplayError();
 
   const onSubmit = async (values: ApplicationPage3FormValues) => {
     try {
-      const pk = await update(transformPage3Application(values));
+      const input = transformPage3Application(values);
+      const { data } = await mutate({ variables: { input } });
+      const { pk } = data?.updateApplication ?? {};
+      if (pk == null) {
+        throw new Error("Failed to save application");
+      }
       router.push(getApplicationPath(pk, "preview"));
     } catch (err) {
       dislayError(err);

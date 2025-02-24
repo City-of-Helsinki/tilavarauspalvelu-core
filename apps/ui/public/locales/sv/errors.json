@@ -45,6 +45,7 @@
       "APPLICATION_CONTACT_PERSON_MISSING": "Kontaktperson saknas.",
       "APPLICATION_BILLING_ADDRESS_MISSING": "Faktureringsadress saknas.",
       "APPLICATION_APPLICANT_TYPE_MISSING": "Sökandens typ saknas.",
+      "APPLICATION_STATUS_CANNOT_SEND": "Ansökan kan inte skickas.",
       "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
       "invalid": "Ogiltigt värde.",
       "generic_validation_error": "Ett fel uppstod."
