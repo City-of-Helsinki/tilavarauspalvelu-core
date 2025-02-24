@@ -390,7 +390,7 @@ def test_pindora_client__delete_reservation_series__errors(status_code, exceptio
 def test_pindora_client__change_reservation_series_access_code():
     series = RecurringReservationFactory.build()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK)) as patch:
         PindoraClient.change_reservation_series_access_code(series)
 
     assert patch.call_count == 1
