@@ -4,6 +4,7 @@ import pytest
 import requests
 from graphene_django_extensions.testing import parametrize_helper
 from rest_framework.status import (
+    HTTP_200_OK,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
@@ -291,7 +292,7 @@ def test_pindora_client__delete_reservation__errors(status_code, exception, erro
 def test_pindora_client__change_reservation_access_code():
     reservation = ReservationFactory.build()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK)) as patch:
         PindoraClient.change_reservation_access_code(reservation)
 
     assert patch.call_count == 1

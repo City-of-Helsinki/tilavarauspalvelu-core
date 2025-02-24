@@ -398,7 +398,7 @@ def test_pindora_client__delete_seasonal_booking__errors(status_code, exception,
 def test_pindora_client__change_seasonal_booking_access_code():
     application_section = ApplicationSectionFactory.build()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
+    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK)) as patch:
         PindoraClient.change_seasonal_booking_access_code(application_section)
 
     assert patch.call_count == 1

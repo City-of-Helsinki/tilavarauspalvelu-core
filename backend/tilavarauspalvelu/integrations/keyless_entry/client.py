@@ -175,7 +175,7 @@ class PindoraClient(BaseExternalServiceClient):
             response,
             reservation_uuid=reservation_uuid,
             action="changing access code for reservation",
-            expected_status_code=HTTP_204_NO_CONTENT,
+            expected_status_code=HTTP_200_OK,
         )
         cls.clear_cached_reservation_response(ext_uuid=reservation_uuid)
 
@@ -346,7 +346,7 @@ class PindoraClient(BaseExternalServiceClient):
             response,
             application_section_uuid=section_uuid,
             action="changing access code for seasonal booking",
-            expected_status_code=HTTP_204_NO_CONTENT,
+            expected_status_code=HTTP_200_OK,
         )
         cls.clear_cached_seasonal_booking_response(ext_uuid=section_uuid)
 
@@ -508,7 +508,7 @@ class PindoraClient(BaseExternalServiceClient):
             response,
             series_uuid=series_uuid,
             action="changing access code for reservation series",
-            expected_status_code=HTTP_204_NO_CONTENT,
+            expected_status_code=HTTP_200_OK,
         )
         cls.clear_cached_reservation_series_response(ext_uuid=series_uuid)
 
