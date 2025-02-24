@@ -42,8 +42,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const filteredApplicationRounds = applicationRounds.filter(
     (applicationRound) =>
-      applicationRound?.publicDisplayBegin &&
-      applicationRound?.publicDisplayEnd &&
       new Date(applicationRound.publicDisplayBegin) <= now &&
       new Date(applicationRound.publicDisplayEnd) >= now
   );
