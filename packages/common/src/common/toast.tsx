@@ -167,12 +167,13 @@ function ToastNotification({
   duration,
   ariaLabel,
   dataTestId,
-}: ToastProps): JSX.Element {
+}: Readonly<ToastProps>): JSX.Element {
   return (
     <HDSNotification
       type={type}
       label={label}
       notificationAriaLabel={ariaLabel ?? label ?? text}
+      role={type === "error" || type === "alert" ? "alert" : "output"}
       data-testid={dataTestId}
     >
       {
@@ -197,6 +198,7 @@ function ToastContainer(): JSX.Element {
       pauseOnFocusLoss
       draggable
       draggablePercent={60}
+      aria-live="polite"
     />
   );
 }
