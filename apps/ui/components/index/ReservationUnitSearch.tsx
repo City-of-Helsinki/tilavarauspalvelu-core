@@ -46,7 +46,15 @@ const ReservationUnitSearch = (): JSX.Element => {
     <form onSubmit={(e) => handleSubmit(e)}>
       <StyledTextInput
         placeholder={t("home:head.searchPlaceholder")}
-        label={<IconSearch onClick={(e) => handleSubmit(e)} aria-hidden />}
+        label={
+          <IconSearch
+            onClick={(e) => handleSubmit(e)}
+            tabIndex={0}
+            aria-label={t("common:search")}
+            aria-hidden="false"
+          />
+        }
+        aria-label={t("home:head.searchPlaceholder")}
         id="front-page__search--reservation-unit"
         onChange={(e) => setSearchTerm(e.target.value)}
       />
