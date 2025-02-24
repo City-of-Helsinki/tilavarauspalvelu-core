@@ -42,11 +42,13 @@ describe("ApplicationRoundCard", () => {
       status: ApplicationRoundStatusChoice.Open,
     });
     const view = render(<ApplicationRoundCard applicationRound={card} />);
+    // TODO check the link target
     expect(
       view.getByRole("link", {
         name: "applicationRound:startNewApplication",
       })
     ).toBeInTheDocument();
+    // TODO check the link target
     expect(
       view.getByRole("link", { name: "applicationRound:card.criteria" })
     ).toBeInTheDocument();
@@ -60,6 +62,7 @@ describe("ApplicationRoundCard", () => {
         name: "applicationRound:startNewApplication",
       })
     ).not.toBeInTheDocument();
+    // TODO check the link target
     expect(
       view.getByRole("link", { name: "applicationRound:card.criteria" })
     ).toBeInTheDocument();
@@ -80,6 +83,7 @@ describe("ApplicationRoundCard", () => {
         name: "applicationRound:startNewApplication",
       })
     ).not.toBeInTheDocument();
+    // TODO check the link target
     expect(
       view.getByRole("link", { name: "applicationRound:card.criteria" })
     ).toBeInTheDocument();
