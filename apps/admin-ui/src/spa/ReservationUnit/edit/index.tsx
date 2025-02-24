@@ -7,8 +7,6 @@ import {
   IconLinkExternal,
   LoadingSpinner,
   Notification,
-  RadioButton,
-  SelectionGroup,
   TextInput,
   Tooltip,
 } from "hds-react";
@@ -84,6 +82,7 @@ import { getValidationErrors } from "common/src/apolloUtils";
 import { getReservationUnitUrl, getUnitUrl } from "@/common/urls";
 import { pageSideMargins } from "common/styles/layout";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
+import { ControlledRadioGroup } from "common/src/components/form";
 
 const RichTextInput = dynamic(
   () => import("../../../component/RichTextInput"),
@@ -494,7 +493,7 @@ function CustomNumberInput({
   );
 }
 
-function ControlledRadioGroup({
+function SpecializedRadioGroup({
   name,
   options,
   control,
@@ -512,7 +511,7 @@ function ControlledRadioGroup({
   required?: boolean;
 }): JSX.Element {
   const { t } = useTranslation();
-  const { field, fieldState } = useController({ name, control });
+  const { fieldState } = useController({ name, control });
   const { error } = fieldState;
 
   const groupLabel = !noLabel
@@ -521,30 +520,27 @@ function ControlledRadioGroup({
   const tooltip = !noTooltip
     ? t(`ReservationUnitEditor.tooltip.${name}`)
     : undefined;
+  const opts = options.map((opt) => {
+    const prefix = `ReservationUnitEditor.label.options.${name}`;
+    const label = typeof opt === "string" ? `${prefix}.${opt}` : opt.label;
+    const value = typeof opt === "string" ? opt : opt.value;
+    return {
+      value,
+      label,
+    };
+  });
+
   return (
-    <SelectionGroup
+    <ControlledRadioGroup
+      name={name}
+      control={control}
       label={groupLabel}
-      tooltipText={tooltip}
+      tooltip={tooltip}
       required={required}
       direction={direction}
-      errorText={getTranslatedError(t, error?.message)}
-    >
-      {options.map((opt) => {
-        const prefix = `ReservationUnitEditor.label.options.${name}`;
-        const label = typeof opt === "string" ? `${prefix}.${opt}` : opt.label;
-        const value = typeof opt === "string" ? opt : opt.value;
-        return (
-          <RadioButton
-            id={`${name}.${label}`}
-            key={label}
-            style={{ margin: 0 }}
-            label={t(label)}
-            onChange={() => field.onChange(value)}
-            checked={field.value === value}
-          />
-        );
-      })}
-    </SelectionGroup>
+      error={getTranslatedError(t, error?.message)}
+      options={opts}
+    />
   );
 }
 
@@ -594,7 +590,7 @@ function BasicSection({
     >
       <AutoGrid>
         <FullRow>
-          <ControlledRadioGroup
+          <SpecializedRadioGroup
             name="reservationKind"
             options={["DIRECT_AND_SEASON", "DIRECT", "SEASON"] as const}
             control={control}
@@ -885,7 +881,7 @@ function ReservationUnitSettings({
           style={{ gridColumn: "1 / -1" }}
         >
           <AutoGrid>
-            <ControlledRadioGroup
+            <SpecializedRadioGroup
               name="bufferType"
               options={BUFFER_TIME_OPTIONS}
               control={control}
@@ -934,7 +930,7 @@ function ReservationUnitSettings({
             control={control}
             name="hasCancellationRule"
           >
-            <ControlledRadioGroup
+            <SpecializedRadioGroup
               name="cancellationRule"
               options={cancellationRuleOptions}
               control={control}

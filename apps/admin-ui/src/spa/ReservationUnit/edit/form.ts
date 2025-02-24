@@ -350,12 +350,16 @@ function validateDateTimeInterval({
   }
 }
 
-// TODO use for the zod literal
-export const BUFFER_TIME_OPTIONS = [
-  "noBuffer",
-  // "blocksWholeDay",
-  "bufferTimesSet",
-] as const;
+const bufferTimeSchema = z
+  .literal("noBuffer")
+  .or(z.literal("blocksWholeDay"))
+  .or(z.literal("bufferTimesSet"));
+
+// Don't enable blocksWholeDay as selectable option for users
+// because it doesn't work in customer ui (backend supports it though)
+export const BUFFER_TIME_OPTIONS = ["noBuffer", "bufferTimesSet"] as const;
+
+export type BufferTime = z.infer<typeof bufferTimeSchema>;
 
 export const ReservationUnitEditSchema = z
   .object({
@@ -364,10 +368,7 @@ export const ReservationUnitEditSchema = z
     // because if they are set (non undefined) we should show the active checkbox
     bufferTimeAfter: z.number(),
     bufferTimeBefore: z.number(),
-    bufferType: z
-      .literal("noBuffer")
-      .or(z.literal("blocksWholeDay"))
-      .or(z.literal("bufferTimesSet")),
+    bufferType: bufferTimeSchema,
     maxReservationsPerUser: z.number().nullable(),
     maxPersons: z.number().min(0).nullable(),
     minPersons: z.number().min(0).nullable(),
