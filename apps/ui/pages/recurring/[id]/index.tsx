@@ -16,12 +16,12 @@ import {
   ignoreMaybeArray,
   toNumber,
 } from "common/src/helpers";
-import { SeasonalSearchForm } from "@/components/search/SeasonalSearchForm";
+import { SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
-import { ReservationUnitCard } from "@/components/search/ReservationUnitCard";
+import { ReservationUnitCard } from "@/components/recurring/RecurringCard";
 import { useReservationUnitList } from "@/hooks";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
-import { StartApplicationBar } from "@/components/common/StartApplicationBar";
+import { StartApplicationBar } from "@/components/recurring/StartApplicationBar";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { getSearchOptions, processVariables } from "@/modules/search";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
@@ -34,10 +34,8 @@ import { gql } from "@apollo/client";
 
 function SeasonalSearch({
   applicationRound,
-  unitOptions,
-  reservationUnitTypeOptions,
-  purposeOptions,
-}: Readonly<NarrowedProps>): JSX.Element {
+  options,
+}: Readonly<Pick<NarrowedProps, "applicationRound" | "options">>): JSX.Element {
   const { t, i18n } = useTranslation();
   const searchValues = useSearchParams();
 
@@ -87,12 +85,7 @@ function SeasonalSearch({
           {t("searchResultList:error")}
         </Notification>
       ) : null}
-      <SeasonalSearchForm
-        unitOptions={unitOptions}
-        reservationUnitTypeOptions={reservationUnitTypeOptions}
-        purposeOptions={purposeOptions}
-        isLoading={isLoading}
-      />
+      <SeasonalSearchForm options={options} isLoading={isLoading} />
       <ListWithPagination
         items={reservationUnits?.map((ru) => (
           <ReservationUnitCard
@@ -152,8 +145,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return {
     props: {
       ...commonProps,
-      ...opts,
       applicationRound,
+      options: opts,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
