@@ -247,6 +247,12 @@ const translations: ITranslations = {
       RESERVATION_DENYING_NOT_ALLOWED: [
         "Ainoastaan käsiteltävät ja hyväksytyt varaukset voidaan hylätä",
       ],
+      RESERVATION_WRONG_ACCESS_TYPE: [
+        "Toimintoa ei voida suorittaa, koska varaus ei käytä ovikoodia",
+      ],
+      RESERVATION_ACCESS_CODE_CHANGE_NOT_ALLOWED: [
+        "Ovikoodia ei voida vaihtaa, varauksen tilan tai tyypin takia",
+      ],
     },
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [
@@ -1999,6 +2005,10 @@ const translations: ITranslations = {
     accessCodeStatusActive: ["Aktiivinen"],
     accessCodeStatusInactive: ["Ei-aktiivinen"],
     accessCodeValidityLabel: ["Voimassa"],
+    accessCodeChange: ["Vaihda ovikoodi"],
+    accessCodeRepair: ["Korjaa ovikoodi"],
+    accessCodeChangedSuccess: ["Ovikoodi vaihdettu"],
+    accessCodeRepairedSuccess: ["Ovikoodi korjattu"],
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],
