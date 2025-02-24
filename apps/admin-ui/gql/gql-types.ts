@@ -8269,6 +8269,30 @@ export type RequireHandlingMutation = {
   } | null;
 };
 
+export type ChangeReservationAccessCodeMutationVariables = Exact<{
+  input: ReservationStaffChangeAccessCodeMutationInput;
+}>;
+
+export type ChangeReservationAccessCodeMutation = {
+  staffChangeReservationAccessCode?: {
+    pk?: number | null;
+    accessCodeIsActive?: boolean | null;
+    accessCodeGeneratedAt?: string | null;
+  } | null;
+};
+
+export type RepairReservationAccessCodeMutationVariables = Exact<{
+  input: ReservationStaffRepairAccessCodeMutationInput;
+}>;
+
+export type RepairReservationAccessCodeMutation = {
+  staffRepairReservationAccessCode?: {
+    pk?: number | null;
+    accessCodeIsActive?: boolean | null;
+    accessCodeGeneratedAt?: string | null;
+  } | null;
+};
+
 export type SeriesPageQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -15212,6 +15236,116 @@ export type RequireHandlingMutationOptions = Apollo.BaseMutationOptions<
   RequireHandlingMutation,
   RequireHandlingMutationVariables
 >;
+export const ChangeReservationAccessCodeDocument = gql`
+  mutation ChangeReservationAccessCode(
+    $input: ReservationStaffChangeAccessCodeMutationInput!
+  ) {
+    staffChangeReservationAccessCode(input: $input) {
+      pk
+      accessCodeIsActive
+      accessCodeGeneratedAt
+    }
+  }
+`;
+export type ChangeReservationAccessCodeMutationFn = Apollo.MutationFunction<
+  ChangeReservationAccessCodeMutation,
+  ChangeReservationAccessCodeMutationVariables
+>;
+
+/**
+ * __useChangeReservationAccessCodeMutation__
+ *
+ * To run a mutation, you first call `useChangeReservationAccessCodeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeReservationAccessCodeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeReservationAccessCodeMutation, { data, loading, error }] = useChangeReservationAccessCodeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useChangeReservationAccessCodeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ChangeReservationAccessCodeMutation,
+    ChangeReservationAccessCodeMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    ChangeReservationAccessCodeMutation,
+    ChangeReservationAccessCodeMutationVariables
+  >(ChangeReservationAccessCodeDocument, options);
+}
+export type ChangeReservationAccessCodeMutationHookResult = ReturnType<
+  typeof useChangeReservationAccessCodeMutation
+>;
+export type ChangeReservationAccessCodeMutationResult =
+  Apollo.MutationResult<ChangeReservationAccessCodeMutation>;
+export type ChangeReservationAccessCodeMutationOptions =
+  Apollo.BaseMutationOptions<
+    ChangeReservationAccessCodeMutation,
+    ChangeReservationAccessCodeMutationVariables
+  >;
+export const RepairReservationAccessCodeDocument = gql`
+  mutation RepairReservationAccessCode(
+    $input: ReservationStaffRepairAccessCodeMutationInput!
+  ) {
+    staffRepairReservationAccessCode(input: $input) {
+      pk
+      accessCodeIsActive
+      accessCodeGeneratedAt
+    }
+  }
+`;
+export type RepairReservationAccessCodeMutationFn = Apollo.MutationFunction<
+  RepairReservationAccessCodeMutation,
+  RepairReservationAccessCodeMutationVariables
+>;
+
+/**
+ * __useRepairReservationAccessCodeMutation__
+ *
+ * To run a mutation, you first call `useRepairReservationAccessCodeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRepairReservationAccessCodeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [repairReservationAccessCodeMutation, { data, loading, error }] = useRepairReservationAccessCodeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRepairReservationAccessCodeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RepairReservationAccessCodeMutation,
+    RepairReservationAccessCodeMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RepairReservationAccessCodeMutation,
+    RepairReservationAccessCodeMutationVariables
+  >(RepairReservationAccessCodeDocument, options);
+}
+export type RepairReservationAccessCodeMutationHookResult = ReturnType<
+  typeof useRepairReservationAccessCodeMutation
+>;
+export type RepairReservationAccessCodeMutationResult =
+  Apollo.MutationResult<RepairReservationAccessCodeMutation>;
+export type RepairReservationAccessCodeMutationOptions =
+  Apollo.BaseMutationOptions<
+    RepairReservationAccessCodeMutation,
+    RepairReservationAccessCodeMutationVariables
+  >;
 export const SeriesPageDocument = gql`
   query SeriesPage($id: ID!) {
     reservation(id: $id) {

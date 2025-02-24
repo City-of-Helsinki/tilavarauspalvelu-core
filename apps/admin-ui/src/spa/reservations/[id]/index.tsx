@@ -11,6 +11,8 @@ import {
   CustomerTypeChoice,
   type ReservationQuery,
   ReservationStateChoice,
+  useChangeReservationAccessCodeMutation,
+  useRepairReservationAccessCodeMutation,
   useReservationQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
@@ -38,7 +40,12 @@ import ReservationTitleSection from "./ReservationTitleSection";
 import { base64encode, isPriceFree } from "common/src/helpers";
 import { formatAgeGroup, formatTime } from "@/common/util";
 import Error404 from "@/common/Error404";
-import { Accordion as AccordionBase, IconAlertCircleFill } from "hds-react";
+import {
+  Accordion as AccordionBase,
+  Button,
+  ButtonSize,
+  IconAlertCircleFill,
+} from "hds-react";
 import {
   ApplicationDatas,
   KVWrapper,
@@ -47,6 +54,7 @@ import {
   SummaryFourColumns,
   Value,
 } from "@/styles/util";
+import { errorToast, successToast } from "common/src/common/toast";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
@@ -259,10 +267,60 @@ function ReservationSummary({
 
 export function ReservationKeylessEntry({
   reservation,
+  onSuccess,
 }: Readonly<{
   reservation: ReservationType;
+  onSuccess: () => void;
 }>) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [changeAccessCodeMutation] = useChangeReservationAccessCodeMutation();
+  const [repairAccessCodeAccessCodeMutation] =
+    useRepairReservationAccessCodeMutation();
+
+  const handleButton = async (reservationPk: number) => {
+    const payload = { variables: { input: { pk: reservationPk } } };
+
+    try {
+      if (
+        reservation.pindoraInfo?.accessCodeIsActive ===
+        reservation.accessCodeShouldBeActive
+      ) {
+        await changeAccessCodeMutation(payload);
+        successToast({
+          text: t("RequestedReservation.accessCodeChangedSuccess"),
+        });
+      } else {
+        await repairAccessCodeAccessCodeMutation(payload);
+        successToast({
+          text: t("RequestedReservation.accessCodeRepairedSuccess"),
+        });
+      }
+      onSuccess(); // refetch reservation
+    } catch (err) {
+      handleError(err);
+    }
+  };
+
+  const handleError = (e: unknown) => {
+    const mutError = e.graphQLErrors.find(
+      (err) =>
+        "code" in err.extensions &&
+        err.extensions.code === "MUTATION_VALIDATION_ERROR"
+    );
+    if (mutError) {
+      const err = mutError;
+      if ("errors" in err.extensions && Array.isArray(err.extensions.errors)) {
+        const errCode = err.extensions.errors[0].code;
+        if (i18n.exists(`errors.backendValidation.${errCode}`)) {
+          errorToast({ text: t(`errors.backendValidation.${errCode}`) });
+          return;
+        }
+        errorToast({ text: err.extensions.errors[0].message });
+        return;
+      }
+    }
+    errorToast({ text: t("errors.descriptive.genericError") });
+  };
 
   return (
     <Accordion
@@ -288,6 +346,15 @@ export function ReservationKeylessEntry({
             {formatTime(reservation.pindoraInfo?.accessCodeBeginsAt)}-
             {formatTime(reservation.pindoraInfo?.accessCodeEndsAt)}
           </DataWrapper>
+          <Button
+            size={ButtonSize.Small}
+            onClick={() => handleButton(reservation.pk)}
+          >
+            {reservation.pindoraInfo?.accessCodeIsActive ===
+            reservation.accessCodeShouldBeActive
+              ? t("RequestedReservation.accessCodeChange")
+              : t("RequestedReservation.accessCodeRepair")}
+          </Button>
         </SummaryFourColumns>
       </div>
     </Accordion>
@@ -493,7 +560,10 @@ function RequestedReservation({
           </Accordion>
         </VisibleIfPermission>
         {showKeylessEntryAccordion && (
-          <ReservationKeylessEntry reservation={reservation} />
+          <ReservationKeylessEntry
+            reservation={reservation}
+            onSuccess={refetch}
+          />
         )}
         <TimeBlock reservation={reservation} onReservationUpdated={refetch} />
         <Accordion
