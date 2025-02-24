@@ -9,7 +9,7 @@ import { toUIDate } from "common/src/common/util";
 import { fromUIDate } from "@/modules/util";
 import { getDurationOptions, participantCountOptions } from "@/modules/const";
 import { DateRangePicker } from "@/components/form";
-import { FilterTagList } from "./FilterTagList";
+import { FilterTagList } from "../FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
