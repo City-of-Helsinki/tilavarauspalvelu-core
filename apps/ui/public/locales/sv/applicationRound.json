@@ -8,6 +8,7 @@
     "past": "Ansökningsperioden stängdes {{closing}}",
     "reservationPeriod": "Lokaler kan bokas för perioden {{reservationPeriodBegin}} - {{reservationPeriodEnd}}"
   },
+  "startNewApplication": "Fyll i ansökan",
   "criteria": "ansökningsvillkor",
   "notesWhenApplying": "Observera när du ansöker"
 }

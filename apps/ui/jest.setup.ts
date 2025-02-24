@@ -1,7 +1,25 @@
-// @ts-check
 import "@testing-library/jest-dom";
-// import { toHaveNoViolations } from "jest-axe";
-// expect.extend(toHaveNoViolations);
+import { toHaveNoViolations } from "jest-axe";
+
+expect.extend(toHaveNoViolations);
+
+jest.mock("next-i18next", () => ({
+  useTranslation: () => {
+    return {
+      t: (str: string) => str,
+      i18n: {
+        changeLanguage: () => new Promise(() => {}),
+        language: "fi",
+        exists: (str: string) => {
+          if (str.match(/failExistsOnPurpose/i)) {
+            return false;
+          }
+          return true;
+        },
+      },
+    };
+  },
+}));
 
 // eslint-disable-next-line no-console
 const originalError = console.error.bind(console.error);

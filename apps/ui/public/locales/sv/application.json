@@ -34,7 +34,6 @@
     "fix": "Korrigera"
   },
   "Intro": {
-    "startNewApplication": "Fyll i ansökan",
     "heading": "Säsongbokningsansökan",
     "createFailedHeading": "Kunde inte skapa en ansökan"
   },

@@ -9,7 +9,7 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 const customJestConfig = {
   modulePathIgnorePatterns: ["<rootDir>/.next/"],
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.mjs"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleDirectories: ["node_modules", "<rootDir>/"],
   // jsdom has broken stylesheet parsing
   testEnvironment: "@happy-dom/jest-environment",
