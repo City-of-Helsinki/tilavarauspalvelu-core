@@ -9,8 +9,6 @@ import { SubmitButton } from "@/styles/util";
 
 /// Filter container using responsive grid
 export const Filters = styled.div`
-  grid-gap: var(--spacing-m);
-
   /* TODO this should be a default value or a separate styled component */
   label {
     ${fontMedium}

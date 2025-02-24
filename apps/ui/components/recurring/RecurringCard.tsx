@@ -27,6 +27,7 @@ import {
 type Node = ReservationUnitCardFieldsFragment;
 interface CardProps {
   reservationUnit: Node;
+  // TODO all of these are accessible from a hook but does that make testing more difficult?
   selectReservationUnit: (reservationUnit: Node) => void;
   containsReservationUnit: (reservationUnit: Node) => boolean;
   removeReservationUnit: (reservationUnit: Node) => void;
