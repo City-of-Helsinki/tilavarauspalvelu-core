@@ -39,8 +39,8 @@ importers:
   apps/admin-ui:
     dependencies:
       '@apollo/client':
-        specifier: ^3.9.7
-        version: 3.9.7(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^3.13.1
+        version: 3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.9.0(react-hook-form@7.54.2(react@18.3.1))
@@ -58,7 +58,7 @@ importers:
         version: 8.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.26.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.53.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.26.0(@opentelemetry/api@1.9.0))(next@15.1.7(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.81.0))(react@18.3.1)(webpack@5.94.0)
       apollo-upload-client:
         specifier: 17.0.0
-        version: 17.0.0(@apollo/client@3.9.7(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(graphql@16.10.0)
+        version: 17.0.0(@apollo/client@3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(graphql@16.10.0)
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -82,7 +82,7 @@ importers:
         version: 4.2.0
       hds-react:
         specifier: ^4.2.0
-        version: 4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.10.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
+        version: 4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
       i18next:
         specifier: ^23.15.1
         version: 23.15.1
@@ -158,7 +158,7 @@ importers:
         version: 14.5.2(@testing-library/dom@10.4.0)
       '@types/apollo-upload-client':
         specifier: 17.0.2
-        version: 17.0.2(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 17.0.2(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/jest':
         specifier: ^29.5.13
         version: 29.5.13
@@ -226,8 +226,8 @@ importers:
   apps/ui:
     dependencies:
       '@apollo/client':
-        specifier: ^3.9.7
-        version: 3.9.7(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^3.13.1
+        version: 3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.9.0(react-hook-form@7.54.2(react@18.3.1))
@@ -260,7 +260,7 @@ importers:
         version: 4.2.0
       hds-react:
         specifier: ^4.2.0
-        version: 4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.10.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
+        version: 4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
       i18next:
         specifier: ^23.15.1
         version: 23.15.1
@@ -405,7 +405,7 @@ importers:
         version: 10.2.3(prop-types@15.8.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       hds-react:
         specifier: ^4.2.0
-        version: 4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.10.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
+        version: 4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
       i18next:
         specifier: ^23.15.1
         version: 23.15.1
@@ -450,8 +450,8 @@ importers:
         version: 3.23.8
     devDependencies:
       '@apollo/client':
-        specifier: ^3.9.7
-        version: 3.9.7(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^3.13.1
+        version: 3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@happy-dom/jest-environment':
         specifier: ^16.5.3
         version: 16.5.3
@@ -567,24 +567,6 @@ packages:
       graphql-ws: ^5.5.5 || ^6.0.3
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || >=19.0.0-rc
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || >=19.0.0-rc
-      subscriptions-transport-ws: ^0.9.0 || ^0.11.0
-    peerDependenciesMeta:
-      graphql-ws:
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
-      subscriptions-transport-ws:
-        optional: true
-
-  '@apollo/client@3.9.7':
-    resolution: {integrity: sha512-OEEwt55bkFhqihCT5d75KUxZt50JZ9MuIYwG7VZlyPPIAb9K+qzVWlXWlf3tB5DaV43yXkUSLQfNpdIBFOB55Q==}
-    peerDependencies:
-      graphql: ^15.0.0 || ^16.0.0
-      graphql-ws: ^5.5.5
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
       subscriptions-transport-ws: ^0.9.0 || ^0.11.0
     peerDependenciesMeta:
       graphql-ws:
@@ -3257,10 +3239,6 @@ packages:
     resolution: {integrity: sha512-BRFORjsTuQv5gxcXsuDXx6oGRhuVsEGwZy6LOzRRfgu+eSfxbhUQ9L9YtSEIuIjY/o7g3iWFjrc5eSY1GXP2Dw==}
     engines: {node: '>=8'}
 
-  '@wry/trie@0.4.3':
-    resolution: {integrity: sha512-I6bHwH0fSf6RqQcnnXLJKhkSXG45MFral3GxPaY4uAl0LYDZM+YDVDAiU9bYwjTuysy1S0IeecWtmq1SZA3M1w==}
-    engines: {node: '>=8'}
-
   '@wry/trie@0.5.0':
     resolution: {integrity: sha512-FNoYzHawTMk/6KMQoEG5O4PuioX19UbwdQKF44yw0nLfOypfQdjtfZzo/UIJWAJ23sNIFbD1Ug9lbaDGMwbqQA==}
     engines: {node: '>=8'}
@@ -4852,12 +4830,6 @@ packages:
     peerDependencies:
       graphql: '>=0.11 <=16'
 
-  graphql-ws@5.16.0:
-    resolution: {integrity: sha512-Ju2RCU2dQMgSKtArPbEtsK5gNLnsQyTNIo/T7cZNp96niC1x0KdJNZV0TIoilceBPQwfb5itrGl8pkFeOUMl4A==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      graphql: '>=0.11 <=16'
-
   graphql-ws@6.0.4:
     resolution: {integrity: sha512-8b4OZtNOvv8+NZva8HXamrc0y1jluYC0+13gdh7198FKjVzXyTvVc95DCwGzaKEfn3YuWZxUqjJlHe3qKM/F2g==}
     engines: {node: '>=20'}
@@ -6002,9 +5974,6 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.6.0
 
-  optimism@0.18.0:
-    resolution: {integrity: sha512-tGn8+REwLRNFnb9WmcY5IfpOqeX2kpaYJ1s6Ae3mn12AeydLkR3j+jSCmVQFoXqU8D41PAJ1RG1rCRNWmNZVmQ==}
-
   optimism@0.18.1:
     resolution: {integrity: sha512-mLXNwWPa9dgFyDqkNi54sjDyNJ9/fTI6WGBLgnXku1vdKY/jovHfZT5r+aiVeFFLOz+foPNOm5YJ4mqgld2GBQ==}
 
@@ -6493,17 +6462,6 @@ packages:
     resolution: {integrity: sha512-dQUtn90WanSNl+7mQKcXAgZxvUe7Z0SqXlgzv0za4LwiUhyzBC58yQO3liFoUgu8GiJVInAhJjkj1N0EtQ5nkQ==}
     hasBin: true
 
-  rehackt@0.0.6:
-    resolution: {integrity: sha512-l3WEzkt4ntlEc/IB3/mF6SRgNHA6zfQR7BlGOgBTOmx7IJJXojDASav+NsgXHFjHn+6RmwqsGPFgZpabWpeOdw==}
-    peerDependencies:
-      '@types/react': '*'
-      react: '*'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      react:
-        optional: true
-
   rehackt@0.1.0:
     resolution: {integrity: sha512-7kRDOuLHB87D/JESKxQoRwv4DzbIdwkAGQ7p6QKGdVlY1IZheUnVhlk/4UZlNUVxdAXpyxikE3URsG067ybVzw==}
     peerDependencies:
@@ -6580,10 +6538,6 @@ packages:
   resolve@2.0.0-next.5:
     resolution: {integrity: sha512-U7WjGVG9sH8tvjW5SmGbQuui75FiyjAX72HX15DwBBwF9dNiQZRQAg9nnPhYy+TUnE0+VcrttuvNI8oSxZcocA==}
     hasBin: true
-
-  response-iterator@0.2.6:
-    resolution: {integrity: sha512-pVzEEzrsg23Sh053rmDUvLSkGXluZio0qu8VT6ukrYuvtjVfCbDZH9d6PGXb8HZfzdNZt8feXv/jvUzlhRgLnw==}
-    engines: {node: '>=0.8'}
 
   restore-cursor@3.1.0:
     resolution: {integrity: sha512-l+sSefzHpj5qimhFSE5a8nufZYAM3sBSVMAPtYkmC+4EH2anSGaEMXSD0izRQbu9nfyQ9y5JrVmp7E8oZrUjvA==}
@@ -7603,7 +7557,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@apollo/client@3.13.1(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@apollo/client@3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.10.0)
       '@wry/caches': 1.0.1
@@ -7620,31 +7574,7 @@ snapshots:
       tslib: 2.8.1
       zen-observable-ts: 1.2.5
     optionalDependencies:
-      graphql-ws: 5.16.0(graphql@16.10.0)
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-    transitivePeerDependencies:
-      - '@types/react'
-
-  '@apollo/client@3.9.7(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@graphql-typed-document-node/core': 3.2.0(graphql@16.10.0)
-      '@wry/caches': 1.0.1
-      '@wry/equality': 0.5.7
-      '@wry/trie': 0.5.0
-      graphql: 16.10.0
-      graphql-tag: 2.12.6(graphql@16.10.0)
-      hoist-non-react-statics: 3.3.2
-      optimism: 0.18.0
-      prop-types: 15.8.1
-      rehackt: 0.0.6(@types/react@18.2.7)(react@18.3.1)
-      response-iterator: 0.2.6
-      symbol-observable: 4.0.0
-      ts-invariant: 0.10.3
-      tslib: 2.7.0
-      zen-observable-ts: 1.2.5
-    optionalDependencies:
-      graphql-ws: 5.16.0(graphql@16.10.0)
+      graphql-ws: 6.0.4(graphql@16.10.0)(ws@8.18.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     transitivePeerDependencies:
@@ -9354,7 +9284,7 @@ snapshots:
       '@graphql-tools/utils': 9.2.1(graphql@16.10.0)
       globby: 11.1.0
       graphql: 16.10.0
-      tslib: 2.7.0
+      tslib: 2.8.1
       unixify: 1.0.0
     transitivePeerDependencies:
       - '@babel/core'
@@ -9617,7 +9547,7 @@ snapshots:
       '@babel/types': 7.25.6
       '@graphql-tools/utils': 9.2.1(graphql@16.10.0)
       graphql: 16.10.0
-      tslib: 2.7.0
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@babel/core'
       - supports-color
@@ -9902,7 +9832,7 @@ snapshots:
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.10.0)
       graphql: 16.10.0
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@graphql-tools/wrap@10.0.31(graphql@16.10.0)':
     dependencies:
@@ -11138,9 +11068,9 @@ snapshots:
 
   '@trysound/sax@0.2.0': {}
 
-  '@types/apollo-upload-client@17.0.2(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@types/apollo-upload-client@17.0.2(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@apollo/client': 3.9.7(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@apollo/client': 3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/extract-files': 13.0.1
       graphql: 16.10.0
     transitivePeerDependencies:
@@ -11714,7 +11644,7 @@ snapshots:
 
   '@wry/caches@1.0.1':
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@wry/context@0.7.4':
     dependencies:
@@ -11722,15 +11652,11 @@ snapshots:
 
   '@wry/equality@0.5.7':
     dependencies:
-      tslib: 2.7.0
-
-  '@wry/trie@0.4.3':
-    dependencies:
       tslib: 2.8.1
 
   '@wry/trie@0.5.0':
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@xobotyi/scrollbar-width@1.9.5': {}
 
@@ -11834,9 +11760,9 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  apollo-upload-client@17.0.0(@apollo/client@3.9.7(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(graphql@16.10.0):
+  apollo-upload-client@17.0.0(@apollo/client@3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(graphql@16.10.0):
     dependencies:
-      '@apollo/client': 3.9.7(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@apollo/client': 3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       extract-files: 11.0.0
       graphql: 16.10.0
 
@@ -13625,7 +13551,7 @@ snapshots:
       jiti: 1.17.1
       minimatch: 4.2.3
       string-env-interpolation: 1.0.1
-      tslib: 2.7.0
+      tslib: 2.8.1
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
@@ -13670,16 +13596,11 @@ snapshots:
   graphql-tag@2.12.6(graphql@16.10.0):
     dependencies:
       graphql: 16.10.0
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   graphql-ws@5.12.1(graphql@16.10.0):
     dependencies:
       graphql: 16.10.0
-
-  graphql-ws@5.16.0(graphql@16.10.0):
-    dependencies:
-      graphql: 16.10.0
-    optional: true
 
   graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.0):
     dependencies:
@@ -13734,9 +13655,9 @@ snapshots:
 
   hds-design-tokens@4.2.0: {}
 
-  hds-react@4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@5.16.0(graphql@16.10.0))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3):
+  hds-react@4.2.0(@types/react@18.2.7)(eslint@8.57.1)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.4.45)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3):
     dependencies:
-      '@apollo/client': 3.13.1(@types/react@18.2.7)(graphql-ws@5.16.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@apollo/client': 3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@babel/runtime': 7.17.9
       '@emotion/styled-base': 11.0.0
       '@hookform/resolvers': 2.9.11(react-hook-form@7.54.2(react@18.3.1))
@@ -15125,13 +15046,6 @@ snapshots:
       - supports-color
     optional: true
 
-  optimism@0.18.0:
-    dependencies:
-      '@wry/caches': 1.0.1
-      '@wry/context': 0.7.4
-      '@wry/trie': 0.4.3
-      tslib: 2.7.0
-
   optimism@0.18.1:
     dependencies:
       '@wry/caches': 1.0.1
@@ -15655,11 +15569,6 @@ snapshots:
     dependencies:
       jsesc: 0.5.0
 
-  rehackt@0.0.6(@types/react@18.2.7)(react@18.3.1):
-    optionalDependencies:
-      '@types/react': 18.2.7
-      react: 18.3.1
-
   rehackt@0.1.0(@types/react@18.2.7)(react@18.3.1):
     optionalDependencies:
       '@types/react': 18.2.7
@@ -15727,8 +15636,6 @@ snapshots:
       is-core-module: 2.15.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
-
-  response-iterator@0.2.6: {}
 
   restore-cursor@3.1.0:
     dependencies:
@@ -16379,7 +16286,7 @@ snapshots:
 
   ts-invariant@0.10.3:
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   ts-jest@29.2.5(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))(jest@29.7.0(@types/node@22.13.4))(typescript@5.7.3):
     dependencies:
