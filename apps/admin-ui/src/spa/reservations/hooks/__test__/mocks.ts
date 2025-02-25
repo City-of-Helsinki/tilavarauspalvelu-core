@@ -1,14 +1,15 @@
 import { GraphQLError } from "graphql";
 import { addDays, addHours, startOfDay } from "date-fns";
 import {
-  ReservationStateChoice,
-  UpdateStaffReservationDocument,
-  RecurringReservationDocument,
-  UpdateRecurringReservationDocument,
-  ReservationTypeChoice,
+  AccessType,
   CustomerTypeChoice,
+  RecurringReservationDocument,
   type RecurringReservationQuery,
   ReservationQuery,
+  ReservationStateChoice,
+  ReservationTypeChoice,
+  UpdateRecurringReservationDocument,
+  UpdateStaffReservationDocument,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { toApiDateUnsafe } from "common/src/common/util";
@@ -303,6 +304,7 @@ export const mockReservation: ReservationType = {
   paymentOrder: [],
   workingMemo: "empty",
   handlingDetails: "",
+  accessType: AccessType.Unrestricted,
 };
 
 export function createMockRecurringReservation(props: {

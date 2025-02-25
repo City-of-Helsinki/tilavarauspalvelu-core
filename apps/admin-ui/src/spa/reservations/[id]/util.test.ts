@@ -1,10 +1,11 @@
 import type { TFunction } from "i18next";
 import {
-  PriceUnit,
-  ReservationStateChoice,
-  ReservationQuery,
+  AccessType,
   Authentication,
+  PriceUnit,
+  ReservationQuery,
   ReservationStartInterval,
+  ReservationStateChoice,
 } from "@gql/gql-types";
 import { createTagString, getReservatinUnitPricing } from "./util";
 import { addHours, addMonths } from "date-fns";
@@ -68,6 +69,7 @@ function constructReservation(
     bufferTimeBefore: 0,
     bufferTimeAfter: 0,
     state: ReservationStateChoice.Confirmed,
+    accessType: AccessType.Unrestricted,
     paymentOrder: [],
     reservationUnits: [
       {

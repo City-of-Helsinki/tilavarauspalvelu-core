@@ -59,6 +59,7 @@ const CALENDAR_RESERVATION_FRAGMENT = gql`
     bufferTimeBefore
     bufferTimeAfter
     affectedReservationUnits
+    accessType
   }
 `;
 

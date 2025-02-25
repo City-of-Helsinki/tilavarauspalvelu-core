@@ -7939,6 +7939,7 @@ export type CalendarReservationFragment = {
   bufferTimeBefore: number;
   bufferTimeAfter: number;
   affectedReservationUnits?: Array<number | null> | null;
+  accessType: AccessType;
   user?: { id: string; email: string } | null;
 };
 
@@ -7968,6 +7969,7 @@ export type ReservationsByReservationUnitQuery = {
       bufferTimeBefore: number;
       bufferTimeAfter: number;
       affectedReservationUnits?: Array<number | null> | null;
+      accessType: AccessType;
       user?: { id: string; email: string } | null;
     }> | null;
   } | null;
@@ -7983,6 +7985,7 @@ export type ReservationsByReservationUnitQuery = {
     bufferTimeBefore: number;
     bufferTimeAfter: number;
     affectedReservationUnits?: Array<number | null> | null;
+    accessType: AccessType;
     user?: { id: string; email: string } | null;
   }> | null;
 };
@@ -9289,6 +9292,7 @@ export const CalendarReservationFragmentDoc = gql`
     bufferTimeBefore
     bufferTimeAfter
     affectedReservationUnits
+    accessType
   }
 `;
 export const ReservationSpecialisationFragmentDoc = gql`
