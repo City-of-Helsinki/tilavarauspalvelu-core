@@ -4,20 +4,13 @@ import re
 from typing import TYPE_CHECKING
 
 import django_filters
-from django.db import models
-from django.db.models import Case, CharField, F, Q, Value, When
-from django.db.models.functions import Concat
+from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
+from lookup_property import L
 
 from tilavarauspalvelu.api.graphql.extensions.filters import TimezoneAwareDateFilter
-from tilavarauspalvelu.enums import (
-    CustomerTypeChoice,
-    OrderStatusWithFree,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-    UserRoleChoice,
-)
+from tilavarauspalvelu.enums import OrderStatusWithFree, ReservationStateChoice, ReservationTypeChoice, UserRoleChoice
 from tilavarauspalvelu.models import Reservation
 from utils.db import text_search
 from utils.utils import log_text_search
@@ -219,25 +212,4 @@ class ReservationFilterSet(ModelFilterSet):
 
     @staticmethod
     def order_by_reservee_name(qs: QuerySet, desc: bool) -> QuerySet:
-        return qs.alias(
-            reservee_name=Case(
-                When(
-                    reservee_type=CustomerTypeChoice.BUSINESS,
-                    then=F("reservee_organisation_name"),
-                ),
-                When(
-                    reservee_type=CustomerTypeChoice.NONPROFIT,
-                    then=F("reservee_organisation_name"),
-                ),
-                When(
-                    reservee_type=CustomerTypeChoice.INDIVIDUAL,
-                    then=Concat(
-                        "reservee_first_name",
-                        Value(" "),
-                        "reservee_last_name",
-                    ),
-                ),
-                default=Value(""),
-                output_field=CharField(),
-            )
-        ).order_by(models.OrderBy(models.F("reservee_name"), descending=desc))
+        return qs.order_by(L("reservee_name").order_by(descending=desc))
