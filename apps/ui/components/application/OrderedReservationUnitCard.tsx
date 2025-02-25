@@ -247,7 +247,7 @@ export function OrderedReservationUnitCard({
               </DeleteButton>
             </DeleteContainer>
             <UpButton
-              iconStart={<IconArrowUp aria-hidden="true" />}
+              iconStart={<IconArrowUp />}
               variant={ButtonVariant.Supplementary}
               theme={ButtonPresetTheme.Black}
               size={ButtonSize.Small}
@@ -257,7 +257,7 @@ export function OrderedReservationUnitCard({
               {t("reservationUnitList:buttonUp")}
             </UpButton>
             <DownButton
-              iconStart={<IconArrowDown aria-hidden="true" />}
+              iconStart={<IconArrowDown />}
               variant={ButtonVariant.Supplementary}
               theme={ButtonPresetTheme.Black}
               size={ButtonSize.Small}

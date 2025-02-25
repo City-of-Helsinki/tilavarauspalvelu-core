@@ -317,6 +317,9 @@ const ButtonContainer = styled.div`
   gap: var(--spacing-xs);
   flex-direction: column;
   align-items: flex-end;
+  > * {
+    width: 100%;
+  }
 
   @media (min-width: ${breakpoints.m}) {
     .card--default & {
