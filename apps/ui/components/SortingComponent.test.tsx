@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
 import { SortingComponent } from "./SortingComponent";
+import { vi, describe, test, expect } from "vitest";
 
 // TODO move the router mocks to general setup
 // problem with that is we lose the control of the mock
@@ -7,25 +8,25 @@ import { SortingComponent } from "./SortingComponent";
 // or what values it was called with
 // also we'd have to manage local state for the mock if we want to inspect
 // the values it was called with
-jest.mock("next/router", () => ({
+vi.mock("next/router", () => ({
   useRouter() {
     return {
       route: "/",
       pathname: "",
       query: "",
       asPath: "",
-      push: jest.fn(),
+      push: vi.fn(),
       events: {
-        on: jest.fn(),
-        off: jest.fn(),
+        on: vi.fn(),
+        off: vi.fn(),
       },
-      beforePopState: jest.fn(() => null),
-      prefetch: jest.fn(() => null),
+      beforePopState: vi.fn(() => null),
+      prefetch: vi.fn(() => null),
     };
   },
 }));
 
-jest.mock("next/navigation", () => ({
+vi.mock("next/navigation", () => ({
   useSearchParams() {
     const vals: URLSearchParams = new URLSearchParams();
     return vals;

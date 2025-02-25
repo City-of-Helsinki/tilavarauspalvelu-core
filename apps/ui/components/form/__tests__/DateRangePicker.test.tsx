@@ -2,10 +2,11 @@ import userEvent from "@testing-library/user-event";
 import { get as mockGet } from "lodash";
 import React from "react";
 import mockTranslations from "@/public/locales/fi/dateSelector.json";
-import { configure, render, screen } from "@/test/testUtils";
+import { configure, render, screen } from "@testing-library/react";
 import { DateRangePicker, DateRangePickerProps } from "../DateRangePicker";
+import { vi, test, expect, beforeAll, afterAll } from "vitest";
 
-jest.mock("next-i18next", () => ({
+vi.mock("next-i18next", () => ({
   useTranslation: () => {
     return {
       t: (str: string) => {
@@ -21,19 +22,27 @@ configure({ defaultHidden: true });
 
 const defaultProps: DateRangePickerProps = {
   endDate: null,
-  onChangeEndDate: jest.fn(),
-  onChangeStartDate: jest.fn(),
+  onChangeEndDate: vi.fn(),
+  onChangeStartDate: vi.fn(),
   startDate: null,
 };
 
+// TODO move to global mocks
 beforeAll(() => {
-  jest.useFakeTimers({
+  // Workaround react-testing-library hard coding to jest.useFakeTimers
+  vi.stubGlobal("jest", {
+    advanceTimersByTime: vi.advanceTimersByTime.bind(vi),
+  });
+});
+
+beforeAll(() => {
+  vi.useFakeTimers({
     now: new Date(2020, 10, 10, 9, 0, 0),
   });
 });
 
 afterAll(() => {
-  jest.useRealTimers();
+  vi.useRealTimers();
 });
 
 const renderComponent = (props?: Partial<DateRangePickerProps>) =>
@@ -42,7 +51,9 @@ const renderComponent = (props?: Partial<DateRangePickerProps>) =>
 test("should show error start date must be before end date", async () => {
   const view = renderComponent();
   // NOTE weird issues with the default delay causing the test to fail always
-  const user = userEvent.setup({ delay: null });
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
 
   const startDateText = view.getByText(/alkamispäivä/i);
   expect(startDateText).toBeInTheDocument();

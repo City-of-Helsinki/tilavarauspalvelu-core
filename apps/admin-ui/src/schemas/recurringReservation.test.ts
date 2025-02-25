@@ -8,6 +8,7 @@ import {
   RecurringReservationFormSchema,
 } from "./recurringReservation";
 import { toUIDate } from "common/src/common/util";
+import { test, expect } from "vitest";
 
 const tomorrow = addDays(new Date(), 1);
 const interval = ReservationStartInterval.Interval_15Mins;

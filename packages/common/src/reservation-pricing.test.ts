@@ -1,4 +1,5 @@
 import { getReservationPrice } from "./reservation-pricing";
+import { describe, test, expect } from "vitest";
 
 describe("getReservationPrice", () => {
   test("with no price", () => {

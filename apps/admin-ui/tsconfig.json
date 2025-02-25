@@ -10,13 +10,15 @@
   "exclude": ["node_modules"],
   "include": [
     "src",
+    "gql",
     "types/**/*.d.ts",
     "i18next.d.ts",
     "middleware.ts",
     ".eslintrc.cjs",
     "stylelint.config.js",
     "next-i18next.config.js",
-    "jest.config.mjs",
+    "vitest.config.mts",
+    "vitest.setup.ts",
     "__mocks__",
     "next.config.mjs",
     "next-env.d.ts"

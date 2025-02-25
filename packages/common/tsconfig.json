@@ -7,12 +7,14 @@
   "exclude": ["node_modules/"],
   "include": [
     "src",
+    "gql",
     "styles",
     "index.ts",
     "types/**/*.d.ts",
-    ".eslintrc.js",
+    ".eslintrc.cjs",
+    "prettier.config.cjs",
     "stylelint.config.js",
-    "jest.setup.ts",
-    "jest.config.cjs"
+    "vitest.setup.ts",
+    "vitest.config.mts"
   ]
 }

@@ -27,6 +27,15 @@ import {
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { toApiDate } from "common/src/common/util";
 import { type TFunction } from "i18next";
+import {
+  vi,
+  describe,
+  test,
+  expect,
+  beforeAll,
+  beforeEach,
+  afterAll,
+} from "vitest";
 
 function createMockReservationUnit({
   reservationsMinDaysBefore,
@@ -121,7 +130,7 @@ function createMockReservation({
   };
 }
 
-jest.mock("next-i18next", () => ({
+vi.mock("next-i18next", () => ({
   i18n: {
     t: (str: string) => {
       const path = str.replace("prices:", "");
@@ -241,12 +250,12 @@ describe("getDurationOptions", () => {
 
 describe("isReservationCancellable", () => {
   beforeAll(() => {
-    jest.useFakeTimers({
+    vi.useFakeTimers({
       now: new Date(2024, 0, 1, 9, 0, 0),
     });
   });
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   function constructInput({
@@ -477,12 +486,12 @@ describe("isReservationEditable", () => {
 
 describe("canReservationBeChanged", () => {
   beforeAll(() => {
-    jest.useFakeTimers({
+    vi.useFakeTimers({
       now: new Date(2024, 0, 1, 9, 0, 0),
     });
   });
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   let mockReservableTimes: ReservableMap;
@@ -702,7 +711,7 @@ describe("getCheckoutUrl", () => {
 
   test("returns undefined if checkoutUrl is not an url", () => {
     // we are expecting console.errors => suppress
-    jest.spyOn(console, "error").mockImplementation(jest.fn());
+    vi.spyOn(console, "error").mockImplementation(vi.fn());
     expect(
       getCheckoutUrl({
         ...order,
