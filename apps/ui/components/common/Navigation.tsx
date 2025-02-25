@@ -35,6 +35,7 @@ type HeaderProps = {
 };
 
 const Wrapper = styled.div`
+  z-index: var(--tilavaraus-stack-order-navigation);
   @media (min-width: ${breakpoints.l}) {
     [class*="module_headerNavigationMenuContainer__"] li {
       a {
