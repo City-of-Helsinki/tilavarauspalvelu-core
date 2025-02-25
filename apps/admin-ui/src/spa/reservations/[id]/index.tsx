@@ -55,6 +55,7 @@ import {
   Value,
 } from "@/styles/util";
 import { errorToast, successToast } from "common/src/common/toast";
+import { getValidationErrors } from "common/src/apolloUtils";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
@@ -277,6 +278,10 @@ export function ReservationKeylessEntry({
   const [repairAccessCodeAccessCodeMutation] =
     useRepairReservationAccessCodeMutation();
 
+  if (reservation.pindoraInfo == null) {
+    return null;
+  }
+
   const handleButton = async (reservationPk: number) => {
     const payload = { variables: { input: { pk: reservationPk } } };
 
@@ -296,30 +301,30 @@ export function ReservationKeylessEntry({
         });
       }
       onSuccess(); // refetch reservation
-    } catch (err) {
+    } catch (err: unknown) {
       handleError(err);
     }
   };
 
   const handleError = (e: unknown) => {
-    const mutError = e.graphQLErrors.find(
-      (err) =>
-        "code" in err.extensions &&
-        err.extensions.code === "MUTATION_VALIDATION_ERROR"
-    );
-    if (mutError) {
-      const err = mutError;
-      if ("errors" in err.extensions && Array.isArray(err.extensions.errors)) {
-        const errCode = err.extensions.errors[0].code;
-        if (i18n.exists(`errors.backendValidation.${errCode}`)) {
-          errorToast({ text: t(`errors.backendValidation.${errCode}`) });
-          return;
-        }
-        errorToast({ text: err.extensions.errors[0].message });
+    const validationErrors = getValidationErrors(e);
+    if (validationErrors.length > 0) {
+      const code = validationErrors[0].validation_code;
+      if (code && i18n.exists(`errors.backendValidation.${code}`)) {
+        errorToast({ text: t(`errors.backendValidation.${code}`) });
         return;
       }
+      errorToast({
+        text: validationErrors[0].message ?? validationErrors[0].code,
+      });
+      return;
     }
-    errorToast({ text: t("errors.descriptive.genericError") });
+
+    if (e instanceof Error) {
+      errorToast({ text: e.message });
+    } else {
+      errorToast({ text: t("errors.descriptive.genericError") });
+    }
   };
 
   return (
@@ -331,24 +336,24 @@ export function ReservationKeylessEntry({
       <div>
         <SummaryFourColumns>
           <DataWrapper label={t("RequestedReservation.accessCodeLabel")}>
-            {reservation.pindoraInfo?.accessCode}
+            {reservation.pindoraInfo.accessCode}
           </DataWrapper>
           <DataWrapper label={t("RequestedReservation.accessCodeStatusLabel")}>
-            {reservation.pindoraInfo?.accessCodeIsActive
+            {reservation.pindoraInfo.accessCodeIsActive
               ? t("RequestedReservation.accessCodeStatusActive")
               : t("RequestedReservation.accessCodeStatusInactive")}
-            {reservation.pindoraInfo?.accessCodeIsActive !==
+            {reservation.pindoraInfo.accessCodeIsActive !==
               reservation.accessCodeShouldBeActive && <IconAlertCircleFill />}
           </DataWrapper>
           <DataWrapper
             label={t("RequestedReservation.accessCodeValidityLabel")}
           >
-            {formatTime(reservation.pindoraInfo?.accessCodeBeginsAt)}-
-            {formatTime(reservation.pindoraInfo?.accessCodeEndsAt)}
+            {formatTime(reservation.pindoraInfo.accessCodeBeginsAt)}–
+            {formatTime(reservation.pindoraInfo.accessCodeEndsAt)}
           </DataWrapper>
           <Button
             size={ButtonSize.Small}
-            onClick={() => handleButton(reservation.pk)}
+            onClick={() => handleButton(reservation.pk ?? 0)}
           >
             {reservation.pindoraInfo?.accessCodeIsActive ===
             reservation.accessCodeShouldBeActive

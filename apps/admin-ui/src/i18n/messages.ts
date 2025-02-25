@@ -253,6 +253,7 @@ const translations: ITranslations = {
       RESERVATION_ACCESS_CODE_CHANGE_NOT_ALLOWED: [
         "Ovikoodia ei voida vaihtaa, varauksen tilan tai tyypin takia",
       ],
+      RESERVATION_HAS_ENDED: ["Varaus on jo päättynyt"],
     },
     descriptive: {
       "Reservation overlaps with reservation before due to buffer time.": [
