@@ -1,9 +1,19 @@
 import { type IsReservableFieldsFragment } from "@/gql/gql-types";
 import { type ReservableMap, type RoundPeriod } from "@/modules/reservable";
-import { act, fireEvent } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import { ReservationStartInterval } from "common/gql/gql-types";
 import { addDays } from "date-fns";
-import wait from "waait";
+
+// Default implementation fakes all timers (expect tick), remove performance from the list
+export const TIMERS_TO_FAKE = [
+  "setTimeout",
+  "clearTimeout",
+  "setInterval",
+  "clearInterval",
+  "setImmediate",
+  "clearImmediate",
+  "Date",
+] as const;
 
 export const arrowUpKeyPressHelper = (): boolean =>
   fireEvent.keyDown(document, { code: 38, key: "ArrowUp" });
@@ -19,13 +29,6 @@ export const escKeyPressHelper = (): boolean =>
 
 export const tabKeyPressHelper = (): boolean =>
   fireEvent.keyDown(document, { code: 9, key: "Tab" });
-
-export const actWait = (amount?: number): Promise<void> =>
-  act(() => wait(amount));
-
-// re-export everything
-export * from "@testing-library/react";
-export { default as userEvent } from "@testing-library/user-event";
 
 type ReservationUnitType = Omit<
   IsReservableFieldsFragment,

@@ -1,3 +1,5 @@
+import { describe, test } from "vitest";
+
 describe("SeasonalSearchForm", () => {
   test.todo("should render empty search form");
   test.todo("should preselect based on query params");

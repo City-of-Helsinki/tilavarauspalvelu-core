@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react";
 import { ReservationUnitCard } from "./RecurringCard";
 import { ReservationUnitCardFieldsFragment } from "@/gql/gql-types";
+import { vi, describe, test, expect } from "vitest";
 
 type MockReservationUnitInputs = {
   name: string;
@@ -57,9 +58,9 @@ function createReservationUnitType({ name }: { name?: string }) {
 function createInput(props: MockReservationUnitInputs) {
   return {
     reservationUnit: createReservationUnit(props),
-    selectReservationUnit: jest.fn(),
-    containsReservationUnit: jest.fn(),
-    removeReservationUnit: jest.fn(),
+    selectReservationUnit: vi.fn(),
+    containsReservationUnit: vi.fn(),
+    removeReservationUnit: vi.fn(),
   };
 }
 
