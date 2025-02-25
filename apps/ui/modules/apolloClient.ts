@@ -2,7 +2,6 @@ import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { getCookie } from "typescript-cookie";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { onError } from "@apollo/client/link/error";
-import { GraphQLError } from "graphql";
 // eslint-disable-next-line unicorn/prefer-node-protocol -- node:querystring breaks the app
 import qs, { ParsedUrlQuery } from "querystring";
 import { GetServerSidePropsContext, PreviewData } from "next";
@@ -13,10 +12,10 @@ import { isBrowser } from "./const";
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    graphQLErrors.forEach(async (error: GraphQLError) => {
+    for (const error of graphQLErrors) {
       // eslint-disable-next-line no-console
       console.error(`GQL_ERROR: ${JSON.stringify(error, null, 2)}`);
-    });
+    }
   }
 
   if (networkError) {

@@ -1,5 +1,5 @@
 import { ApolloError } from "@apollo/client";
-import { type GraphQLErrors } from "@apollo/client/errors";
+import { type GraphQLFormattedError } from "graphql";
 
 // TODO narrow down the error codes and transform unknowns to catch all
 type ErrorCode = string;
@@ -18,10 +18,16 @@ export interface OverlappingError extends ApiError {
   overlapping: { begin: string; end: string }[];
 }
 
-function mapValidationError(gqlError: GraphQLErrors[0]): ValidationError[] {
+function mapValidationError(
+  gqlError: GraphQLFormattedError
+): ValidationError[] {
   const { extensions } = gqlError;
   const code = getExtensionCode(gqlError);
-  if ("errors" in extensions && Array.isArray(extensions.errors)) {
+  if (
+    extensions != null &&
+    "errors" in extensions &&
+    Array.isArray(extensions.errors)
+  ) {
     // field errors
     const { errors } = extensions;
     const errs = errors.map((err: unknown) => {
@@ -110,11 +116,11 @@ extensions: {
   overlapping : [{…}]
 }
 */
-function mapOverlapError(gqlError: GraphQLErrors[0]) {
+function mapOverlapError(gqlError: GraphQLFormattedError) {
   const { extensions } = gqlError;
 
   const code = getExtensionCode(gqlError);
-  if ("overlapping" in extensions) {
+  if (extensions != null && "overlapping" in extensions) {
     const { overlapping } = extensions ?? {};
     if (
       code == null ||
@@ -192,7 +198,7 @@ export function getApiErrors(error: unknown): ApiError[] {
   return [];
 }
 
-function getExtensionCode(e: GraphQLErrors[0]): string | null {
+function getExtensionCode(e: GraphQLFormattedError): string | null {
   if (e.extensions == null) {
     return null;
   }

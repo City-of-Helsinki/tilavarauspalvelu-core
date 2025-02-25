@@ -8,7 +8,6 @@ import {
 import { createUploadLink } from "apollo-upload-client";
 import { getCookie } from "typescript-cookie";
 import { onError } from "@apollo/client/link/error";
-import { GraphQLError } from "graphql/error/GraphQLError";
 import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
@@ -33,10 +32,10 @@ const authLink = new ApolloLink((operation, forward) => {
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
-    graphQLErrors.forEach(async (error: GraphQLError) => {
+    for (const error of graphQLErrors) {
       // eslint-disable-next-line no-console
       console.error(`GQL_ERROR: ${JSON.stringify(error, null, 2)}`);
-    });
+    }
   }
 
   if (networkError) {

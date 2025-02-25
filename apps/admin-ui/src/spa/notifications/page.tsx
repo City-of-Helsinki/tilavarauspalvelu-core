@@ -1,7 +1,7 @@
 import React, { type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useParams, useNavigate } from "react-router-dom";
-import { gql, ApolloError } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { z } from "zod";
@@ -50,6 +50,7 @@ import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
 import { CenterSpinner, Flex, TitleSection } from "common/styles/util";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
+import { getValidationErrors } from "common/src/apolloUtils";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,
@@ -389,21 +390,14 @@ const NotificationForm = ({
       });
       navigate("..");
     } catch (e) {
-      // TODO what is the format of these errors?
-      if (e instanceof ApolloError) {
-        const gqlerrors = e.graphQLErrors;
-        for (const err of gqlerrors) {
-          if ("code" in err.extensions) {
-            const { code } = err.extensions;
-            if (code === "NOT_FOUND") {
-              errorToast({ text: t("error.submit.NOT_FOUND") });
-              return;
-            }
-          }
+      const mutErrors = getValidationErrors(e);
+      if (mutErrors.length > 0) {
+        const hasNotFound = mutErrors.some((err) => err.code === "NOT_FOUND");
+        if (hasNotFound) {
+          errorToast({ text: t("error.submit.NOT_FOUND") });
+          return;
         }
       }
-      // eslint-disable-next-line no-console
-      console.error("unkown error thrown:", e);
       // TODO this is not necessary gql error, for example notifySuccess can throw on null
       handleError(["gql threw an error"]);
     }
