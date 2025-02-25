@@ -1,4 +1,4 @@
-import { ApolloError, type ApolloQueryResult } from "@apollo/client";
+import { type ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import {
   type AllocatedTimeSlotCreateMutationInput,
@@ -15,6 +15,7 @@ import {
   timeSlotKeyToScheduleTime,
 } from "./modules/applicationRoundAllocation";
 import { errorToast, successToast } from "common/src/common/toast";
+import { getValidationErrors, ValidationError } from "common/src/apolloUtils";
 
 export function useFocusApplicationEvent(): [
   number | undefined,
@@ -182,8 +183,7 @@ type HookReturnValue = [
 
 // Return the translation key for a mutation error
 // these are new errors using the backend code system, so don't work most of the mutations.
-type ERROR_EXTENSION = { message: string; code: string; field: string };
-function getTranslatedMutationError(err: ERROR_EXTENSION) {
+function getTranslatedMutationError(err: ValidationError): string | null {
   // TODO remove the message variation
   // "Given time slot has already been allocated for another application section with a related reservation unit or resource."
   const ALREADY_ALLOCATED_WITH_SPACE_HIERARCHY_CODE =
@@ -206,12 +206,13 @@ function getTranslatedMutationError(err: ERROR_EXTENSION) {
   if (err.message === STATUS_HANDLED) {
     return "Allocation.errors.accepting.statusHandled";
   }
-  if (err.message.includes(MAX_ALLOCATIONS)) {
+  if (err.message?.includes(MAX_ALLOCATIONS)) {
     return "Allocation.errors.accepting.maxAllocations";
   }
-  if (err.message.includes(ALREADY_ALLOCATED_FOR_THAT_DAY)) {
+  if (err.message?.includes(ALREADY_ALLOCATED_FOR_THAT_DAY)) {
     return "Allocation.errors.accepting.alreadyAllocated";
   }
+  return null;
 }
 
 export function useAcceptSlotMutation({
@@ -285,31 +286,17 @@ export function useAcceptSlotMutation({
       successToast({ text: msg });
       refresh();
     } catch (e) {
-      if (e instanceof ApolloError) {
-        const gqlerrors = e.graphQLErrors;
-        const mutError = gqlerrors.find(
-          (err) =>
-            "code" in err.extensions &&
-            err.extensions.code === "MUTATION_VALIDATION_ERROR"
-        );
-        if (mutError) {
-          const err = mutError;
-          if (
-            "errors" in err.extensions &&
-            Array.isArray(err.extensions.errors)
-          ) {
-            // TODO type check the error
-            // TODO check the number of errors (should be 1)
-            const errMsg = getTranslatedMutationError(err.extensions.errors[0]);
+      const mutErrors = getValidationErrors(e);
+      if (mutErrors.length > 0) {
+        const err = mutErrors[0];
+        const errMsg = getTranslatedMutationError(err);
 
-            const { name } = applicationSection;
-            if (errMsg != null) {
-              const title = "Allocation.errors.accepting.title";
-              errorToast({ text: t(errMsg, { name }), label: t(title) });
-              refresh(false);
-              return;
-            }
-          }
+        const { name } = applicationSection;
+        if (errMsg != null) {
+          const title = "Allocation.errors.accepting.title";
+          errorToast({ text: t(errMsg, { name }), label: t(title) });
+          refresh(false);
+          return;
         }
       } else {
         // eslint-disable-next-line no-console
@@ -387,21 +374,17 @@ export function useRemoveAllocation({
         refresh();
       }
     } catch (e) {
-      if (e instanceof ApolloError) {
-        const gqlerrors = e.graphQLErrors;
-        for (const err of gqlerrors) {
-          if ("code" in err.extensions) {
-            const { code } = err.extensions;
-            if (code === "NOT_FOUND") {
-              const { name } = applicationSection;
-              errorToast({
-                text: t("Allocation.errors.remove.alreadyDeleted", { name }),
-                label: t("Allocation.errors.remove.title"),
-              });
-              refresh(false);
-              return;
-            }
-          }
+      const mutErrors = getValidationErrors(e);
+      if (mutErrors.length > 0) {
+        const hasNotFound = mutErrors.some((err) => err.code === "NOT_FOUND");
+        if (hasNotFound) {
+          const { name } = applicationSection;
+          errorToast({
+            text: t("Allocation.errors.remove.alreadyDeleted", { name }),
+            label: t("Allocation.errors.remove.title"),
+          });
+          refresh(false);
+          return;
         }
       }
       errorToast({
