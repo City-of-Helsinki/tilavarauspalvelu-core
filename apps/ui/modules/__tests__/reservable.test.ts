@@ -20,15 +20,16 @@ import {
   ReservationStateChoice,
 } from "@/gql/gql-types";
 import { createMockReservationUnit } from "@/test/testUtils";
+import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
 
 describe("generateReservableMap", () => {
   beforeAll(() => {
-    jest.useFakeTimers({
+    vi.useFakeTimers({
       now: new Date(2024, 0, 1, 9, 0, 0),
     });
   });
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // Range format: { start: Date, end: Date }

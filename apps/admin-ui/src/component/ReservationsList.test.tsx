@@ -1,9 +1,9 @@
 import React from "react";
-import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import { addDays } from "date-fns";
 import { toUIDate } from "common/src/common/util";
 import { ReservationList } from "./ReservationsList";
+import { describe, test, expect } from "vitest";
 
 const today = new Date();
 

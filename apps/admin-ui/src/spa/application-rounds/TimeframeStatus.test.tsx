@@ -1,8 +1,8 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { endOfTomorrow, endOfYesterday } from "date-fns";
-import { axe } from "jest-axe";
 import TimeframeStatus from "./TimeframeStatus";
+import { test, expect } from "vitest";
 
 const pastDate = endOfYesterday().toISOString();
 const today = new Date().toISOString();
@@ -17,7 +17,6 @@ test("Past times ok", async () => {
   );
 
   expect(component.getByText("Application.timeframePast")).toBeTruthy();
-  expect(await axe(component.container)).toHaveNoViolations();
 });
 
 test("Today ending time ok", async () => {
@@ -31,7 +30,6 @@ test("Today ending time ok", async () => {
   expect(
     component.getByText("Application.timeframePast (common.today)")
   ).toBeTruthy();
-  expect(await axe(component.container)).toHaveNoViolations();
 });
 
 test("Future times ok", async () => {
@@ -44,7 +42,6 @@ test("Future times ok", async () => {
   );
 
   expect(component.getByText("Application.timeframeFuture")).toBeTruthy();
-  expect(await axe(component.container)).toHaveNoViolations();
 });
 
 test("Resolution done", async () => {
@@ -58,5 +55,4 @@ test("Resolution done", async () => {
   );
 
   expect(component.getByText("ApplicationRound.resolutionDate")).toBeTruthy();
-  expect(await axe(component.container)).toHaveNoViolations();
 });

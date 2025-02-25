@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react";
-import "@testing-library/jest-dom";
 import {
   fireEvent,
   render,
@@ -12,12 +11,14 @@ import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
 import { MemoryRouter } from "react-router-dom";
 import { RecurringReservationForm } from "./RecurringReservationForm";
+import { vi, test, expect, afterAll, beforeEach, beforeAll } from "vitest";
 import {
   YEAR,
   mocks,
   mondayMorningReservations,
   createReservationUnits,
 } from "./__test__/mocks";
+import { afterEach } from "node:test";
 
 function customRender() {
   return render(
@@ -38,28 +39,58 @@ const getReservationUnitBtn = () => {
   return btn;
 };
 
-beforeEach(() => {
-  // Hide radio button warnings
-  jest.spyOn(console, "warn").mockImplementation(() => {});
-});
-// TODO these should be set in the test setup
+// TODO move to global mocks
 beforeAll(() => {
-  jest.useFakeTimers({
-    now: new Date(2024, 0, 1, 0, 0, 0),
-    // NOTE without these the tests will fail with a timeout (async doesn't work properly)
-    doNotFake: [
-      "nextTick",
-      "setImmediate",
-      "clearImmediate",
-      "setInterval",
-      "clearInterval",
-      "setTimeout",
-      "clearTimeout",
-    ],
+  // Workaround react-testing-library hard coding to jest.useFakeTimers
+  vi.stubGlobal("jest", {
+    advanceTimersByTime: vi.advanceTimersByTime.bind(vi),
   });
 });
 afterAll(() => {
-  jest.useRealTimers();
+  vi.unstubAllGlobals();
+});
+
+// TODO these should be set in the test setup
+beforeEach(() => {
+  vi.useFakeTimers({
+    now: new Date(2024, 0, 1, 0, 0, 0),
+    // NOTE without these the tests will fail with a timeout (async doesn't work properly)
+    /*
+    toFake: [
+  'setTimeout',
+  'clearTimeout',
+  'setInterval',
+  'clearInterval',
+  'setImmediate',
+  'clearImmediate',
+  'Date',
+    ],
+    */
+  });
+});
+afterEach(() => {
+  vi.runOnlyPendingTimers();
+  vi.useRealTimers();
+});
+
+// Smoke test (if this fails, all others will fail also, and it's harder to debug)
+// TODO make it so that it skips the other tests if this fails
+test("SMOKE: selecting unit field allows input to other mandatory fields", async () => {
+  const view = customRender();
+  await selectUnit();
+
+  const selectorFields = ["repeatPattern"];
+  for (const f of selectorFields) {
+    const labelElem = view.getByRole("combobox", { name: RegExp(f) });
+    expect(labelElem).toBeInTheDocument();
+    expect(labelElem).not.toBeDisabled();
+  }
+  const dateFields = ["startingDate", "endingDate"];
+  for (const f of dateFields) {
+    const labelElem = view.getByRole("textbox", { name: RegExp(f) });
+    expect(labelElem).toBeInTheDocument();
+    expect(labelElem).not.toBeDisabled();
+  }
 });
 
 test("Render recurring reservation form with all but unit field disabled", async () => {
@@ -111,7 +142,10 @@ test("Render recurring reservation form with all but unit field disabled", async
 });
 
 async function selectUnit() {
-  const user = userEvent.setup();
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+    // delay: null
+  });
   const container = screen.getByText(/filters.label.reservationUnit/);
   const btn = within(container.parentElement!).getByRole("combobox");
   expect(btn).toBeInTheDocument();
@@ -130,26 +164,6 @@ async function selectUnit() {
   await user.click(option);
   expect(btn).toHaveTextContent(unitName);
 }
-
-// Smoke test (if this fails, all others will fail also, and it's harder to debug)
-// TODO make it so that it skips the other tests if this fails
-test("SMOKE: selecting unit field allows input to other mandatory fields", async () => {
-  const view = customRender();
-  await selectUnit();
-
-  const selectorFields = ["repeatPattern"];
-  for (const f of selectorFields) {
-    const labelElem = view.getByRole("combobox", { name: RegExp(f) });
-    expect(labelElem).toBeInTheDocument();
-    expect(labelElem).not.toBeDisabled();
-  }
-  const dateFields = ["startingDate", "endingDate"];
-  for (const f of dateFields) {
-    const labelElem = view.getByRole("textbox", { name: RegExp(f) });
-    expect(labelElem).toBeInTheDocument();
-    expect(labelElem).not.toBeDisabled();
-  }
-});
 
 test("Submit is disabled if all mandatory fields are not set", async () => {
   const view = customRender();
@@ -218,7 +232,10 @@ async function fillForm({
     throw new Error("No parent element found for reservation unit button");
   }
   const btn = within(container.parentElement).getByRole("combobox");
-  const user = userEvent.setup();
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+    // delay: null
+  });
   expect(btn).toBeInTheDocument();
   expect(btn).toBeVisible();
   expect(btn).not.toBeDisabled();

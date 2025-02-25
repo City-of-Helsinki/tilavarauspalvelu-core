@@ -13,15 +13,25 @@ import {
 } from "common/gql/gql-types";
 import { AccessType, ReservationUnitPageQuery } from "@/gql/gql-types";
 import { dateToKey, ReservableMap, RoundPeriod } from "@/modules/reservable";
+import {
+  vi,
+  describe,
+  test,
+  expect,
+  beforeAll,
+  beforeEach,
+  afterAll,
+} from "vitest";
+import { TIMERS_TO_FAKE } from "@/test/testUtils";
 
 describe("getLastPossibleReservationDate", () => {
   beforeAll(() => {
-    jest.useFakeTimers({
+    vi.useFakeTimers({
       now: new Date(2024, 0, 1, 9, 0, 0),
     });
   });
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   function createInput({
@@ -132,14 +142,14 @@ function constructDate(d: Date, hours: number, minutes: number) {
 
 describe("getNextAvailableTime", () => {
   beforeAll(() => {
-    jest.useFakeTimers({
-      doNotFake: ["performance"],
+    vi.useFakeTimers({
+      toFake: [...TIMERS_TO_FAKE],
       // There is some weird time zone issues (this seems to work)
       now: new Date(2024, 0, 1, 9, 0, 0),
     });
   });
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   let reservableTimes: ReservableMap;
