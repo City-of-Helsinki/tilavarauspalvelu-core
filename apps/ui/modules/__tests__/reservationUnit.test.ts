@@ -36,9 +36,10 @@ import {
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "../reservable";
-import { createMockReservationUnit } from "@/test/testUtils";
+import { createMockReservationUnit, TIMERS_TO_FAKE } from "@/test/testUtils";
 import { base64encode } from "common/src/helpers";
 import { type TFunction } from "i18next";
+import { vi, describe, test, it, expect, beforeAll, afterAll } from "vitest";
 
 function mockT(str: string): ReturnType<TFunction> {
   const path = str.replace("prices:", "");
@@ -48,14 +49,14 @@ function mockT(str: string): ReturnType<TFunction> {
 // Turn into describe block and spec the tests
 describe("getPossibleTimesForDay", () => {
   beforeAll(() => {
-    jest.useFakeTimers({
-      doNotFake: ["performance"],
+    vi.useFakeTimers({
+      toFake: [...TIMERS_TO_FAKE],
       // use two numbers for hour so we don't need to pad with 0
       now: new Date(2024, 0, 1, 10, 0, 0),
     });
   });
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   function mockReservableTimes(): ReservableMap {
@@ -806,13 +807,13 @@ function constructPricing({
 
 describe("getReservationUnitPrice", () => {
   beforeAll(() => {
-    jest.useFakeTimers({
-      doNotFake: ["performance"],
+    vi.useFakeTimers({
+      toFake: [...TIMERS_TO_FAKE],
       now: new Date(2024, 0, 1, 10, 0, 0),
     });
   });
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   function connstructInput({
