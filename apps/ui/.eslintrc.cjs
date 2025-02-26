@@ -5,8 +5,7 @@ module.exports = {
     "node_modules/",
     ".next/",
     "out/",
+    ".turbo/",
     "public/",
-    "cypress/",
-    "cypress.config.ts",
   ],
 };
