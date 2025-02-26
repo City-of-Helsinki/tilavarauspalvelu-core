@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.1",
-    "@hookform/resolvers": "^3.9.0",
+    "@hookform/resolvers": "^4.1.2",
     "@sentry/nextjs": "^8.29.0",
     "common": "workspace:*",
     "date-fns": "^4.1.0",

@@ -141,6 +141,7 @@ function RecurringReservationForm({
       enableBufferTimeBefore: false,
       repeatPattern: "weekly",
     },
+    // @ts-expect-error -- schema refinement breaks typing
     resolver: zodResolver(RecurringReservationFormSchema(interval)),
   });
 

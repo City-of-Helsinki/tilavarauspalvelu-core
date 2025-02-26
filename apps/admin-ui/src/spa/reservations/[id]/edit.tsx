@@ -62,6 +62,7 @@ function EditReservation({
 
   // TODO recurring requires a description and a name box
   const form = useForm<FormValueType>({
+    // @ts-expect-error -- schema refinement breaks typing
     resolver: zodResolver(
       ReservationChangeFormSchema.refine(
         (x) => x.seriesName || !reservation.recurringReservation,
