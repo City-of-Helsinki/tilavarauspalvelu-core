@@ -50,6 +50,7 @@ export type AbilityGroupNode = Node & {
 /** How is the reservee able to enter the space in their reservation unit? */
 export enum AccessType {
   AccessCode = "ACCESS_CODE",
+  Multivalued = "MULTIVALUED",
   OpenedByStaff = "OPENED_BY_STAFF",
   PhysicalKey = "PHYSICAL_KEY",
   Unrestricted = "UNRESTRICTED",
@@ -386,8 +387,8 @@ export type ApplicationRoundNodePurposesArgs = {
 
 export type ApplicationRoundNodeReservationUnitsArgs = {
   accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
   accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -568,6 +569,8 @@ export type ApplicationSectionNode = Node & {
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
   numPersons: Scalars["Int"]["output"];
+  /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple sections, queries to Pindora are not optimized. */
+  pindoraInfo?: Maybe<PindoraSectionInfoType>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   purpose?: Maybe<ReservationPurposeNode>;
   reservationMaxDuration: Scalars["Duration"]["output"];
@@ -575,6 +578,7 @@ export type ApplicationSectionNode = Node & {
   reservationUnitOptions: Array<ReservationUnitOptionNode>;
   reservationsBeginDate: Scalars["Date"]["output"];
   reservationsEndDate: Scalars["Date"]["output"];
+  shouldHaveActiveAccessCode?: Maybe<Scalars["Boolean"]["output"]>;
   status?: Maybe<ApplicationSectionStatusChoice>;
   suitableTimeRanges: Array<SuitableTimeRangeNode>;
 };
@@ -1668,7 +1672,7 @@ export type PersonSerializerInput = {
   pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
-export type PindoraInfoType = {
+export type PindoraReservationInfoType = {
   accessCode: Scalars["String"]["output"];
   accessCodeBeginsAt: Scalars["DateTime"]["output"];
   accessCodeEndsAt: Scalars["DateTime"]["output"];
@@ -1678,6 +1682,42 @@ export type PindoraInfoType = {
   accessCodePhoneNumber: Scalars["String"]["output"];
   accessCodeSmsMessage: Scalars["String"]["output"];
   accessCodeSmsNumber: Scalars["String"]["output"];
+};
+
+export type PindoraSectionInfoType = {
+  accessCode: Scalars["String"]["output"];
+  accessCodeGeneratedAt: Scalars["DateTime"]["output"];
+  accessCodeIsActive: Scalars["Boolean"]["output"];
+  accessCodeKeypadUrl: Scalars["String"]["output"];
+  accessCodePhoneNumber: Scalars["String"]["output"];
+  accessCodeSmsMessage: Scalars["String"]["output"];
+  accessCodeSmsNumber: Scalars["String"]["output"];
+  accessCodeValidity: Array<Maybe<PindoraSectionValidityInfoType>>;
+};
+
+export type PindoraSectionValidityInfoType = {
+  accessCodeBeginsAt: Scalars["DateTime"]["output"];
+  accessCodeEndsAt: Scalars["DateTime"]["output"];
+  reservationId: Scalars["Int"]["output"];
+  reservationSeriesId: Scalars["Int"]["output"];
+};
+
+export type PindoraSeriesInfoType = {
+  accessCode: Scalars["String"]["output"];
+  accessCodeGeneratedAt: Scalars["DateTime"]["output"];
+  accessCodeIsActive: Scalars["Boolean"]["output"];
+  accessCodeKeypadUrl: Scalars["String"]["output"];
+  accessCodePhoneNumber: Scalars["String"]["output"];
+  accessCodeSmsMessage: Scalars["String"]["output"];
+  accessCodeSmsNumber: Scalars["String"]["output"];
+  accessCodeValidity: Array<Maybe<PindoraSeriesValidityInfoType>>;
+};
+
+export type PindoraSeriesValidityInfoType = {
+  accessCodeBeginsAt: Scalars["DateTime"]["output"];
+  accessCodeEndsAt: Scalars["DateTime"]["output"];
+  reservationId: Scalars["Int"]["output"];
+  reservationSeriesId: Scalars["Int"]["output"];
 };
 
 /** An enumeration. */
@@ -2256,8 +2296,8 @@ export type QueryReservationUnitTypesArgs = {
 
 export type QueryReservationUnitsArgs = {
   accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
   accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   before?: InputMaybe<Scalars["String"]["input"]>;
@@ -2500,6 +2540,7 @@ export type QueryUserArgs = {
 
 export type RecurringReservationNode = Node & {
   abilityGroup?: Maybe<AbilityGroupNode>;
+  accessType?: Maybe<AccessType>;
   ageGroup?: Maybe<AgeGroupNode>;
   allocatedTimeSlot?: Maybe<AllocatedTimeSlotNode>;
   beginDate?: Maybe<Scalars["Date"]["output"]>;
@@ -2512,11 +2553,14 @@ export type RecurringReservationNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
+  /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple series, queries to Pindora are not optimized. */
+  pindoraInfo?: Maybe<PindoraSeriesInfoType>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   recurrenceInDays?: Maybe<Scalars["Int"]["output"]>;
   rejectedOccurrences: Array<RejectedOccurrenceNode>;
   reservationUnit: ReservationUnitNode;
   reservations: Array<ReservationNode>;
+  shouldHaveActiveAccessCode?: Maybe<Scalars["Boolean"]["output"]>;
   user?: Maybe<UserNode>;
   weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
 };
@@ -2941,7 +2985,7 @@ export type ReservationNode = Node & {
   order?: Maybe<PaymentOrderNode>;
   paymentOrder: Array<PaymentOrderNode>;
   /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized. */
-  pindoraInfo?: Maybe<PindoraInfoType>;
+  pindoraInfo?: Maybe<PindoraReservationInfoType>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   price?: Maybe<Scalars["Decimal"]["output"]>;
   priceNet?: Maybe<Scalars["Decimal"]["output"]>;
@@ -2972,8 +3016,8 @@ export type ReservationNode = Node & {
 
 export type ReservationNodeReservationUnitsArgs = {
   accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
   accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -3517,6 +3561,29 @@ export enum ReservationTypeStaffChoice {
   Staff = "STAFF",
 }
 
+export type ReservationUnitAccessTypeNode = Node & {
+  accessType: AccessType;
+  beginDate: Scalars["Date"]["output"];
+  /** The ID of the object */
+  id: Scalars["ID"]["output"];
+  pk?: Maybe<Scalars["Int"]["output"]>;
+  reservationUnit: ReservationUnitNode;
+};
+
+/** Ordering fields for the 'ReservationUnitAccessType' model. */
+export enum ReservationUnitAccessTypeOrderingChoices {
+  BeginDateAsc = "beginDateAsc",
+  BeginDateDesc = "beginDateDesc",
+  PkAsc = "pkAsc",
+  PkDesc = "pkDesc",
+}
+
+export type ReservationUnitAccessTypeSerializerInput = {
+  accessType?: InputMaybe<AccessType>;
+  beginDate: Scalars["Date"]["input"];
+  pk?: InputMaybe<Scalars["Int"]["input"]>;
+};
+
 /** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
 export type ReservationUnitAllNode = Node & {
   /** The ID of the object */
@@ -3562,9 +3629,9 @@ export enum ReservationUnitCancellationRuleOrderingChoices {
 }
 
 export type ReservationUnitCreateMutationInput = {
-  accessType?: InputMaybe<AccessType>;
-  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
+  accessTypes?: InputMaybe<
+    Array<InputMaybe<ReservationUnitAccessTypeSerializerInput>>
+  >;
   allowReservationsWithoutOpeningHours?: InputMaybe<
     Scalars["Boolean"]["input"]
   >;
@@ -3644,9 +3711,7 @@ export type ReservationUnitCreateMutationInput = {
 };
 
 export type ReservationUnitCreateMutationPayload = {
-  accessType?: Maybe<AccessType>;
-  accessTypeEndDate?: Maybe<Scalars["Date"]["output"]>;
-  accessTypeStartDate?: Maybe<Scalars["Date"]["output"]>;
+  accessTypes?: Maybe<Array<Maybe<ReservationUnitAccessTypeNode>>>;
   allowReservationsWithoutOpeningHours?: Maybe<Scalars["Boolean"]["output"]>;
   applicationRoundTimeSlots?: Maybe<Array<Maybe<ApplicationRoundTimeSlotNode>>>;
   authentication?: Maybe<Authentication>;
@@ -3770,9 +3835,7 @@ export type ReservationUnitImageUpdateMutationPayload = {
 };
 
 export type ReservationUnitNode = Node & {
-  accessType: AccessType;
-  accessTypeEndDate?: Maybe<Scalars["Date"]["output"]>;
-  accessTypeStartDate?: Maybe<Scalars["Date"]["output"]>;
+  accessTypes: Array<ReservationUnitAccessTypeNode>;
   allowReservationsWithoutOpeningHours: Scalars["Boolean"]["output"];
   applicationRoundTimeSlots: Array<ApplicationRoundTimeSlotNode>;
   applicationRounds: Array<ApplicationRoundNode>;
@@ -3859,6 +3922,15 @@ export type ReservationUnitNode = Node & {
   termsOfUseSv?: Maybe<Scalars["String"]["output"]>;
   unit?: Maybe<UnitNode>;
   uuid: Scalars["UUID"]["output"];
+};
+
+export type ReservationUnitNodeAccessTypesArgs = {
+  isActiveOrFuture?: InputMaybe<Scalars["Boolean"]["input"]>;
+  orderBy?: InputMaybe<
+    Array<InputMaybe<ReservationUnitAccessTypeOrderingChoices>>
+  >;
+  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type ReservationUnitNodeApplicationRoundsArgs = {
@@ -4160,9 +4232,9 @@ export enum ReservationUnitTypeOrderingChoices {
 }
 
 export type ReservationUnitUpdateMutationInput = {
-  accessType?: InputMaybe<AccessType>;
-  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
+  accessTypes?: InputMaybe<
+    Array<InputMaybe<UpdateReservationUnitAccessTypeSerializerInput>>
+  >;
   allowReservationsWithoutOpeningHours?: InputMaybe<
     Scalars["Boolean"]["input"]
   >;
@@ -4242,9 +4314,7 @@ export type ReservationUnitUpdateMutationInput = {
 };
 
 export type ReservationUnitUpdateMutationPayload = {
-  accessType?: Maybe<AccessType>;
-  accessTypeEndDate?: Maybe<Scalars["Date"]["output"]>;
-  accessTypeStartDate?: Maybe<Scalars["Date"]["output"]>;
+  accessTypes?: Maybe<Array<Maybe<ReservationUnitAccessTypeNode>>>;
   allowReservationsWithoutOpeningHours?: Maybe<Scalars["Boolean"]["output"]>;
   applicationRoundTimeSlots?: Maybe<Array<Maybe<ApplicationRoundTimeSlotNode>>>;
   authentication?: Maybe<Authentication>;
@@ -4870,8 +4940,8 @@ export type UnitNode = Node & {
 
 export type UnitNodeReservationUnitsArgs = {
   accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
   accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  accessTypeStartDate?: InputMaybe<Scalars["Date"]["input"]>;
   applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -5148,6 +5218,12 @@ export type UpdateReservationSeriesReservationUpdateSerializerInput = {
   reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
   reserveeType?: InputMaybe<ReserveeType>;
   workingMemo?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type UpdateReservationUnitAccessTypeSerializerInput = {
+  accessType?: InputMaybe<AccessType>;
+  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type UpdateReservationUnitImageFieldSerializerInput = {

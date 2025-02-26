@@ -19,7 +19,6 @@ import {
   ReservationStartInterval,
   ReservationUnitReservationState,
   type PriceReservationUnitFragment,
-  AccessType,
 } from "@gql/gql-types";
 import {
   type GetReservationUnitPriceProps,
@@ -926,7 +925,7 @@ describe("isReservationUnitReservable", () => {
     const reservationUnit: ReservationUnitNode = {
       pk: 1,
       id: base64encode("ReservationUnitNode:1"),
-      accessType: AccessType.Unrestricted,
+      accessTypes: [],
       allowReservationsWithoutOpeningHours: true,
       applicationRoundTimeSlots: [],
       applicationRounds: [],
