@@ -1,7 +1,9 @@
+// @ts-check
+
 module.exports = {
   root: true,
   extends: [
-    "./react.cjs",
+    "./react.mjs",
     require.resolve('@vercel/style-guide/eslint/next'),
   ],
 };

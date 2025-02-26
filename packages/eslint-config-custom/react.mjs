@@ -34,11 +34,11 @@ module.exports = defineConfig({
   ],
   root: true,
   extends: [
-    require.resolve('@vercel/style-guide/eslint/node'),
-    require.resolve('@vercel/style-guide/eslint/typescript'),
-    require.resolve('@vercel/style-guide/eslint/browser'),
-    require.resolve('@vercel/style-guide/eslint/react'),
-    require.resolve('@vercel/style-guide/eslint/jest-react'),
+    resolve('@vercel/style-guide/eslint/node'),
+    resolve('@vercel/style-guide/eslint/typescript'),
+    resolve('@vercel/style-guide/eslint/browser'),
+    resolve('@vercel/style-guide/eslint/react'),
+    resolve('@vercel/style-guide/eslint/jest-react'),
     "plugin:prettier/recommended",
   ],
   plugins: [

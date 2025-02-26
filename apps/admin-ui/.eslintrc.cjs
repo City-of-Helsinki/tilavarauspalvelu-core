@@ -8,8 +8,8 @@ module.exports = {
   ignorePatterns: [
     "node_modules/",
     ".next/",
+    ".turbo/",
     "out/",
     "public/",
-    "jest.setup.ts",
   ],
 };
