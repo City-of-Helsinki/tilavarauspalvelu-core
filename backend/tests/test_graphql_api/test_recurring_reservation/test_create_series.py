@@ -600,7 +600,7 @@ def test_recurring_reservations__create_series__block_whole_day(graphql):
 
 @patch_method(PindoraClient.create_reservation_series, return_value=pindora_response())
 def test_recurring_reservations__create_series__access_type_access_code(graphql):
-    reservation_unit = ReservationUnitFactory.create(access_type=AccessType.ACCESS_CODE)
+    reservation_unit = ReservationUnitFactory.create(access_types__access_type=AccessType.ACCESS_CODE)
     user = graphql.login_with_superuser()
 
     data = get_minimal_series_data(reservation_unit, user)
@@ -624,8 +624,8 @@ def test_recurring_reservations__create_series__access_type_access_code(graphql)
 @patch_method(PindoraClient.create_reservation_series, return_value=pindora_response())
 def test_recurring_reservations__create_series__access_type_access_code__only_some_reservations(graphql):
     reservation_unit = ReservationUnitFactory.create(
-        access_type=AccessType.ACCESS_CODE,
-        access_type_start_date=datetime.date(2024, 1, 5),
+        access_types__access_type=AccessType.ACCESS_CODE,
+        access_types__begin_date=datetime.date(2024, 1, 5),
     )
     user = graphql.login_with_superuser()
 
@@ -654,7 +654,7 @@ def test_recurring_reservations__create_series__access_type_access_code__only_so
 
 @patch_method(PindoraClient.create_reservation_series, side_effect=PindoraAPIError("Pindora Error"))
 def test_recurring_reservations__create_series__access_type_access_code__pindora_call_fails(graphql):
-    reservation_unit = ReservationUnitFactory.create(access_type=AccessType.ACCESS_CODE)
+    reservation_unit = ReservationUnitFactory.create(access_types__access_type=AccessType.ACCESS_CODE)
     user = graphql.login_with_superuser()
 
     data = get_minimal_series_data(reservation_unit, user)

@@ -5,7 +5,7 @@ import datetime
 from itertools import chain
 from typing import TYPE_CHECKING, Any, TypedDict
 
-from tilavarauspalvelu.enums import RejectionReadinessChoice
+from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationSection, RejectedOccurrence, Reservation
 from tilavarauspalvelu.typing import PindoraValidityInfoData
@@ -276,7 +276,7 @@ class RecurringReservationActions:
                     reservation_unit.actions.get_actual_after_buffer(period["end"]),
                 )
 
-            access_type = reservation_unit.actions.get_access_type_at(period["begin"])
+            access_type = reservation_unit.actions.get_access_type_at(period["begin"]) or AccessType.UNRESTRICTED
 
             reservation = Reservation(
                 begin=period["begin"],
