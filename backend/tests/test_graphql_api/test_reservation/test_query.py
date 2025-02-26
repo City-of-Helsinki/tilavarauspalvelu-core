@@ -618,7 +618,7 @@ def test_reservation__query__pindora_info__pindora_data_cached(graphql):
     graphql.force_login(reservation.user)
 
     data = pindora_response()
-    PindoraClient.cache_reservation_response(data=data, ext_uuid=reservation.ext_uuid)
+    PindoraClient._cache_reservation_response(data=data, ext_uuid=reservation.ext_uuid)
 
     with patch_method(PindoraClient.get) as pindora_api:
         response = graphql(query)
