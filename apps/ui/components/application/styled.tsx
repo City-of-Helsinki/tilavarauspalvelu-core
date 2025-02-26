@@ -55,8 +55,8 @@ export const ApplicationInfoContainer = styled.div`
 `;
 
 export const InfoItemContainer = styled(Flex).attrs({
-  alignItems: "flex-end",
-  gap: "none",
+  $alignItems: "flex-end",
+  $gap: "none",
 })<{ $fullWidth?: boolean }>`
   box-sizing: border-box;
   position: relative;
