@@ -278,10 +278,6 @@ export function ReservationKeylessEntry({
   const [repairAccessCodeAccessCodeMutation] =
     useRepairReservationAccessCodeMutation();
 
-  if (reservation.pindoraInfo == null) {
-    return null;
-  }
-
   const handleButton = async (reservationPk: number) => {
     const payload = { variables: { input: { pk: reservationPk } } };
 
@@ -336,20 +332,21 @@ export function ReservationKeylessEntry({
       <div>
         <SummaryFourColumns>
           <DataWrapper label={t("RequestedReservation.accessCodeLabel")}>
-            {reservation.pindoraInfo.accessCode}
+            {reservation.pindoraInfo?.accessCode ?? "-"}
           </DataWrapper>
           <DataWrapper label={t("RequestedReservation.accessCodeStatusLabel")}>
-            {reservation.pindoraInfo.accessCodeIsActive
+            {reservation.pindoraInfo?.accessCodeIsActive
               ? t("RequestedReservation.accessCodeStatusActive")
               : t("RequestedReservation.accessCodeStatusInactive")}
-            {reservation.pindoraInfo.accessCodeIsActive !==
+            {reservation.pindoraInfo?.accessCodeIsActive !==
               reservation.accessCodeShouldBeActive && <IconAlertCircleFill />}
           </DataWrapper>
           <DataWrapper
             label={t("RequestedReservation.accessCodeValidityLabel")}
           >
-            {formatTime(reservation.pindoraInfo.accessCodeBeginsAt)}–
-            {formatTime(reservation.pindoraInfo.accessCodeEndsAt)}
+            {reservation.pindoraInfo
+              ? `${formatTime(reservation.pindoraInfo.accessCodeBeginsAt)}–${formatTime(reservation.pindoraInfo.accessCodeEndsAt)}`
+              : "-"}
           </DataWrapper>
           <Button
             size={ButtonSize.Small}
@@ -511,10 +508,6 @@ function RequestedReservation({
   const reservationTagline = createTagString(reservation, t);
   const order = reservation.paymentOrder.find(() => true);
 
-  const showKeylessEntryAccordion =
-    reservation.accessType === AccessType.AccessCode &&
-    reservation.pindoraInfo != null;
-
   return (
     <>
       <ShowWhenTargetInvisible target={ref}>
@@ -564,7 +557,7 @@ function RequestedReservation({
             />
           </Accordion>
         </VisibleIfPermission>
-        {showKeylessEntryAccordion && (
+        {reservation.accessType === AccessType.AccessCode && (
           <ReservationKeylessEntry
             reservation={reservation}
             onSuccess={refetch}
