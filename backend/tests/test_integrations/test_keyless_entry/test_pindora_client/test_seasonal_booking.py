@@ -36,7 +36,7 @@ from tests.factories import (
 )
 from tests.helpers import ResponseMock, exact, patch_method, use_retries
 
-from .helpers import ErrorParams, default_seasonal_booking_response
+from .helpers import ErrorParams, default_access_code_modify_response, default_seasonal_booking_response
 
 
 def test_pindora_client__get_seasonal_booking():
@@ -277,7 +277,9 @@ def test_pindora_client__reschedule_seasonal_booking():
         access_type=AccessType.ACCESS_CODE,
     )
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
+    data = default_access_code_modify_response()
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         PindoraClient.reschedule_seasonal_booking(application_section)
 
     assert patch.call_count == 1
@@ -398,7 +400,9 @@ def test_pindora_client__delete_seasonal_booking__errors(status_code, exception,
 def test_pindora_client__change_seasonal_booking_access_code():
     application_section = ApplicationSectionFactory.build()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK)) as patch:
+    data = default_access_code_modify_response()
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         PindoraClient.change_seasonal_booking_access_code(application_section)
 
     assert patch.call_count == 1

@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     import uuid
 
 __all__ = [
+    "PindoraAccessCodeModifyResponse",
     "PindoraReservationCreateData",
     "PindoraReservationRescheduleData",
     "PindoraReservationResponse",
@@ -33,6 +34,11 @@ class PindoraReservationUnitResponse(TypedDict):
     reservation_unit_id: uuid.UUID
     name: str
     keypad_url: str  # url
+
+
+class PindoraAccessCodeModifyResponse(TypedDict):
+    access_code_generated_at: datetime.datetime
+    access_code_is_active: bool
 
 
 class PindoraReservationResponse(TypedDict):

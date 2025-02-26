@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, NamedTuple
 
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation, ReservationUnit
@@ -79,6 +79,15 @@ def default_reservation_series_response(reservation: Reservation, **overrides: A
                 "end": reservation.end.astimezone(DEFAULT_TIMEZONE).isoformat(),
             },
         ],
+        **overrides,
+    }
+
+
+def default_access_code_modify_response(**overrides: Any) -> dict[str, Any]:
+    # This is the json response form Pindora API, which is processed to `PindoraAccessCodeModifyResponse`.
+    return {
+        "access_code_generated_at": local_datetime().isoformat(),
+        "access_code_is_active": True,
         **overrides,
     }
 

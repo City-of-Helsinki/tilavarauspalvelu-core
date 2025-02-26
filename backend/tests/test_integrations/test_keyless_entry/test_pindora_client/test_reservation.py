@@ -4,7 +4,6 @@ import pytest
 import requests
 from graphene_django_extensions.testing import parametrize_helper
 from rest_framework.status import (
-    HTTP_200_OK,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
@@ -29,7 +28,7 @@ from utils.external_service.errors import ExternalServiceRequestError
 from tests.factories import ReservationFactory
 from tests.helpers import ResponseMock, exact, patch_method, use_retries
 
-from .helpers import ErrorParams, default_reservation_response
+from .helpers import ErrorParams, default_access_code_modify_response, default_reservation_response
 
 
 def test_pindora_client__get_reservation():
@@ -216,7 +215,9 @@ def test_pindora_client__create_reservation__errors(status_code, exception, erro
 def test_pindora_client__reschedule_reservation():
     reservation = ReservationFactory.build()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)) as patch:
+    data = default_access_code_modify_response()
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         PindoraClient.reschedule_reservation(reservation)
 
     assert patch.call_count == 1
@@ -292,7 +293,9 @@ def test_pindora_client__delete_reservation__errors(status_code, exception, erro
 def test_pindora_client__change_reservation_access_code():
     reservation = ReservationFactory.build()
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK)) as patch:
+    data = default_access_code_modify_response()
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)) as patch:
         PindoraClient.change_reservation_access_code(reservation)
 
     assert patch.call_count == 1

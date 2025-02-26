@@ -31,6 +31,7 @@ from .exceptions import (
     PindoraUnexpectedResponseError,
 )
 from .typing import (
+    PindoraAccessCodeModifyResponse,
     PindoraReservationCreateData,
     PindoraReservationRescheduleData,
     PindoraReservationResponse,
@@ -145,7 +146,7 @@ class PindoraClient(BaseExternalServiceClient):
         return parsed_data
 
     @classmethod
-    def reschedule_reservation(cls, reservation: Reservation) -> None:
+    def reschedule_reservation(cls, reservation: Reservation) -> PindoraAccessCodeModifyResponse:
         """Reschedule a reservation in Pindora."""
         url = cls._build_url(f"reservation/reschedule/{reservation.ext_uuid}")
 
@@ -159,12 +160,16 @@ class PindoraClient(BaseExternalServiceClient):
             response,
             reservation_uuid=reservation.ext_uuid,
             action="rescheduling reservation",
-            expected_status_code=HTTP_204_NO_CONTENT,
+            expected_status_code=HTTP_200_OK,
         )
-        cls.clear_cached_reservation_response(ext_uuid=reservation.ext_uuid)
+
+        data = cls.response_json(response)
+        parsed_data = cls._parse_access_code_modify_response(data)
+        cls.update_cached_reservation_response(parsed_data, ext_uuid=reservation.ext_uuid)
+        return parsed_data
 
     @classmethod
-    def change_reservation_access_code(cls, reservation: Reservation | uuid.UUID) -> None:
+    def change_reservation_access_code(cls, reservation: Reservation | uuid.UUID) -> PindoraAccessCodeModifyResponse:
         """Change a reservation's access code in Pindora."""
         reservation_uuid = reservation if isinstance(reservation, uuid.UUID) else reservation.ext_uuid
 
@@ -177,7 +182,11 @@ class PindoraClient(BaseExternalServiceClient):
             action="changing access code for reservation",
             expected_status_code=HTTP_200_OK,
         )
-        cls.clear_cached_reservation_response(ext_uuid=reservation_uuid)
+
+        data = cls.response_json(response)
+        parsed_data = cls._parse_access_code_modify_response(data)
+        cls.update_cached_reservation_response(parsed_data, ext_uuid=reservation_uuid)
+        return parsed_data
 
     @classmethod
     def activate_reservation_access_code(cls, reservation: Reservation | uuid.UUID) -> None:
@@ -300,7 +309,7 @@ class PindoraClient(BaseExternalServiceClient):
         return parsed_data
 
     @classmethod
-    def reschedule_seasonal_booking(cls, section: ApplicationSection) -> None:
+    def reschedule_seasonal_booking(cls, section: ApplicationSection) -> PindoraAccessCodeModifyResponse:
         """Reschedule a seasonal booking in Pindora."""
         url = cls._build_url(f"seasonal-booking/reschedule/{section.ext_uuid}")
 
@@ -330,12 +339,19 @@ class PindoraClient(BaseExternalServiceClient):
             response,
             application_section_uuid=section.ext_uuid,
             action="rescheduling seasonal booking",
-            expected_status_code=HTTP_204_NO_CONTENT,
+            expected_status_code=HTTP_200_OK,
         )
-        cls.clear_cached_seasonal_booking_response(ext_uuid=section.ext_uuid)
+
+        data = cls.response_json(response)
+        parsed_data = cls._parse_access_code_modify_response(data)
+        cls.update_cached_seasonal_booking_response(parsed_data, ext_uuid=section.ext_uuid)
+        return parsed_data
 
     @classmethod
-    def change_seasonal_booking_access_code(cls, section: ApplicationSection | uuid.UUID) -> None:
+    def change_seasonal_booking_access_code(
+        cls,
+        section: ApplicationSection | uuid.UUID,
+    ) -> PindoraAccessCodeModifyResponse:
         """Change a seasonal booking's access code in Pindora."""
         section_uuid = section if isinstance(section, uuid.UUID) else section.ext_uuid
 
@@ -348,7 +364,11 @@ class PindoraClient(BaseExternalServiceClient):
             action="changing access code for seasonal booking",
             expected_status_code=HTTP_200_OK,
         )
-        cls.clear_cached_seasonal_booking_response(ext_uuid=section_uuid)
+
+        data = cls.response_json(response)
+        parsed_data = cls._parse_access_code_modify_response(data)
+        cls.update_cached_seasonal_booking_response(parsed_data, ext_uuid=section_uuid)
+        return parsed_data
 
     @classmethod
     def activate_seasonal_booking_access_code(cls, section: ApplicationSection | uuid.UUID) -> None:
@@ -467,7 +487,7 @@ class PindoraClient(BaseExternalServiceClient):
         return parsed_data
 
     @classmethod
-    def reschedule_reservation_series(cls, series: RecurringReservation) -> None:
+    def reschedule_reservation_series(cls, series: RecurringReservation) -> PindoraAccessCodeModifyResponse:
         """Reschedule a reservation series in Pindora."""
         url = cls._build_url(f"reservation-series/reschedule/{series.ext_uuid}")
 
@@ -492,12 +512,19 @@ class PindoraClient(BaseExternalServiceClient):
             response,
             series_uuid=series.ext_uuid,
             action="rescheduling reservation series",
-            expected_status_code=HTTP_204_NO_CONTENT,
+            expected_status_code=HTTP_200_OK,
         )
-        cls.clear_cached_reservation_series_response(ext_uuid=series.ext_uuid)
+
+        data = cls.response_json(response)
+        parsed_data = cls._parse_access_code_modify_response(data)
+        cls.update_cached_reservation_series_response(parsed_data, ext_uuid=series.ext_uuid)
+        return parsed_data
 
     @classmethod
-    def change_reservation_series_access_code(cls, series: RecurringReservation | uuid.UUID) -> None:
+    def change_reservation_series_access_code(
+        cls,
+        series: RecurringReservation | uuid.UUID,
+    ) -> PindoraAccessCodeModifyResponse:
         """Change a reservation series' access code in Pindora."""
         series_uuid = series if isinstance(series, uuid.UUID) else series.ext_uuid
 
@@ -510,7 +537,11 @@ class PindoraClient(BaseExternalServiceClient):
             action="changing access code for reservation series",
             expected_status_code=HTTP_200_OK,
         )
-        cls.clear_cached_reservation_series_response(ext_uuid=series_uuid)
+
+        data = cls.response_json(response)
+        parsed_data = cls._parse_access_code_modify_response(data)
+        cls.update_cached_reservation_series_response(parsed_data, ext_uuid=series_uuid)
+        return parsed_data
 
     @classmethod
     def activate_reservation_series_access_code(cls, series: RecurringReservation | uuid.UUID) -> None:
@@ -584,6 +615,20 @@ class PindoraClient(BaseExternalServiceClient):
         return cls._cache_response(data, ext_uuid=ext_uuid, prefix="reservation")
 
     @classmethod
+    def update_cached_reservation_response(
+        cls,
+        data: PindoraAccessCodeModifyResponse,
+        *,
+        ext_uuid: uuid.UUID,
+    ) -> None:
+        cached_data = cls.get_cached_reservation_response(ext_uuid=ext_uuid)
+        if cached_data is None:
+            return
+
+        cached_data.update(data)
+        cls.cache_reservation_response(cached_data, ext_uuid=ext_uuid)
+
+    @classmethod
     def get_cached_reservation_response(cls, *, ext_uuid: uuid.UUID) -> PindoraReservationResponse | None:
         data = cls._get_cached_response(ext_uuid=ext_uuid, prefix="reservation")
         if data is None:
@@ -599,6 +644,20 @@ class PindoraClient(BaseExternalServiceClient):
         return cls._cache_response(data, ext_uuid=ext_uuid, prefix="seasonal-booking")
 
     @classmethod
+    def update_cached_seasonal_booking_response(
+        cls,
+        data: PindoraAccessCodeModifyResponse,
+        *,
+        ext_uuid: uuid.UUID,
+    ) -> None:
+        cached_data = cls.get_cached_seasonal_booking_response(ext_uuid=ext_uuid)
+        if cached_data is None:
+            return
+
+        cached_data.update(data)
+        cls.cache_seasonal_booking_response(cached_data, ext_uuid=ext_uuid)
+
+    @classmethod
     def get_cached_seasonal_booking_response(cls, *, ext_uuid: uuid.UUID) -> PindoraSeasonalBookingResponse | None:
         data = cls._get_cached_response(ext_uuid=ext_uuid, prefix="seasonal-booking")
         if data is None:
@@ -612,6 +671,20 @@ class PindoraClient(BaseExternalServiceClient):
     @classmethod
     def cache_reservation_series_response(cls, data: PindoraReservationSeriesResponse, *, ext_uuid: uuid.UUID) -> str:
         return cls._cache_response(data, ext_uuid=ext_uuid, prefix="reservation-series")
+
+    @classmethod
+    def update_cached_reservation_series_response(
+        cls,
+        data: PindoraAccessCodeModifyResponse,
+        *,
+        ext_uuid: uuid.UUID,
+    ) -> None:
+        cached_data = cls.get_cached_reservation_series_response(ext_uuid=ext_uuid)
+        if cached_data is None:
+            return
+
+        cached_data.update(data)
+        cls.cache_reservation_series_response(cached_data, ext_uuid=ext_uuid)
 
     @classmethod
     def get_cached_reservation_series_response(cls, *, ext_uuid: uuid.UUID) -> PindoraReservationSeriesResponse | None:
@@ -685,6 +758,19 @@ class PindoraClient(BaseExternalServiceClient):
                 end=datetime.datetime.fromisoformat(data["end"]),
             )
 
+        except KeyError as error:
+            raise PindoraMissingKeyError(entity="reservation", key=error) from error
+
+        except (ValueError, TypeError) as error:
+            raise PindoraInvalidValueError(entity="reservation", error=error) from error
+
+    @classmethod
+    def _parse_access_code_modify_response(cls, data: dict[str, Any]) -> PindoraAccessCodeModifyResponse:
+        try:
+            return PindoraAccessCodeModifyResponse(
+                access_code_generated_at=datetime.datetime.fromisoformat(data["access_code_generated_at"]),
+                access_code_is_active=bool(data["access_code_is_active"]),
+            )
         except KeyError as error:
             raise PindoraMissingKeyError(entity="reservation", key=error) from error
 
