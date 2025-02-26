@@ -3,7 +3,7 @@ import {
   getReservationPrice,
   getUnRoundedReservationVolume,
 } from "common";
-import { flatten, trim, uniq } from "lodash";
+import { flatten, trim, uniq } from "lodash-es";
 import {
   addMinutes,
   differenceInMinutes,

@@ -7,7 +7,7 @@ import {
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { uniq } from "lodash";
+import { uniq } from "lodash-es";
 import {
   type ApplicationRoundForApplicationFragment,
   useSearchFormParamsUnitQuery,

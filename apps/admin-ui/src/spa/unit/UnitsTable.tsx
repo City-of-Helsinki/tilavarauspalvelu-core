@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { memoize } from "lodash";
+import { memoize } from "lodash-es";
 import type { UnitsQuery } from "@gql/gql-types";
 import type { TFunction } from "i18next";
 import { truncate } from "@/helpers";

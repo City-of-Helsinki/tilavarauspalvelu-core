@@ -1,5 +1,5 @@
 import { type ApolloQueryResult } from "@apollo/client";
-import { trim } from "lodash";
+import { trim } from "lodash-es";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useSearchParams } from "react-router-dom";

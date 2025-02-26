@@ -1,4 +1,4 @@
-import { camelCase, get, uniq } from "lodash";
+import { camelCase, get, uniq } from "lodash-es";
 import {
   CustomerTypeChoice,
   type ReservationMetadataFieldNode,

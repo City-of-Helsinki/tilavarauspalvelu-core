@@ -4,14 +4,14 @@ import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
-import { H3 } from "common/src/common/typography";
 import type { PurposeNode } from "@gql/gql-types";
-import { ShowAllContainer } from "common/src/components";
 import { singleSearchPrefix } from "@/modules/urls";
 import ReservationUnitSearch from "./ReservationUnitSearch";
-import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 import { pixel } from "@/styles/util";
+import { breakpoints } from "common/src/common/style";
+import { H3 } from "common/src/common/typography";
+import { ShowAllContainer } from "common/src/components";
+import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 import { getTranslationSafe } from "common/src/common/util";
 import { getLocalizationLang } from "common/src/helpers";
 import { Flex } from "common/styles/util";
@@ -73,9 +73,7 @@ const Image = styled.img`
 
 export function Purposes({ purposes }: Props): JSX.Element {
   const { t, i18n } = useTranslation(["home", "common"]);
-
   const isMobile = useMedia(`(max-width: ${breakpoints.s})`, false);
-
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
 
   const getImg = (item: Pick<PurposeNode, "smallUrl" | "imageUrl">) => {

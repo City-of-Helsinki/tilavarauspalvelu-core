@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { trim } from "lodash";
+import { trim } from "lodash-es";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {

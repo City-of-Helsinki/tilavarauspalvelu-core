@@ -17,7 +17,7 @@ import {
   useReservationUnitQuery,
 } from "@gql/gql-types";
 import styled from "styled-components";
-import { get } from "lodash";
+import { get } from "lodash-es";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";

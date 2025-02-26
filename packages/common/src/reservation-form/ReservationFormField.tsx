@@ -1,5 +1,5 @@
 import { NumberInput, TextArea, TextInput } from "hds-react";
-import get from "lodash/get";
+import { get } from "lodash-es";
 import React, { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";

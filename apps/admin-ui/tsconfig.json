@@ -1,11 +1,37 @@
 {
-  "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "composite": false,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "inlineSources": false,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveWatchOutput": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictNullChecks": true,
     "paths": {
       "@/*": ["./src/*"],
       "@gql/*": ["./gql/*"]
-    }
+    },
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "jsx": "preserve"
   },
   "exclude": ["node_modules"],
   "include": [
@@ -15,8 +41,8 @@
     "i18next.d.ts",
     "middleware.ts",
     ".eslintrc.cjs",
-    "stylelint.config.js",
-    "next-i18next.config.js",
+    "stylelint.config.cjs",
+    "next-i18next.config.cjs",
     "vitest.config.mts",
     "vitest.setup.ts",
     "__mocks__",

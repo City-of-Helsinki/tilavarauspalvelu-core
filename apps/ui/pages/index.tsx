@@ -14,8 +14,8 @@ import {
 } from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Head } from "@/components/index/Header";
-import { SearchGuides } from "@/components/index/SearchGuides";
 import { Purposes } from "@/components/index/Purposes";
+import { SearchGuides } from "@/components/index/SearchGuides";
 import { Units } from "@/components/index/Units";
 import { createApolloClient } from "@/modules/apolloClient";
 import { filterNonNullable } from "common/src/helpers";

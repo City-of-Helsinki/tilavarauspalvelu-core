@@ -3,6 +3,7 @@
   "license": "MIT",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "devDependencies": {
     "@graphql-eslint/eslint-plugin": "^3.20.1",
     "@vercel/style-guide": "^6.0.0",

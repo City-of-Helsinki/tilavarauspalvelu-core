@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "preinstall": "npx -y only-allow pnpm",
     "test:browser:ci": "cd apps/ui && pnpm run test:browser:ci",

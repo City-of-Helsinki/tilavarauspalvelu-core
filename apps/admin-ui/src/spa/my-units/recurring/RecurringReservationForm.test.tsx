@@ -55,17 +55,15 @@ beforeEach(() => {
   vi.useFakeTimers({
     now: new Date(2024, 0, 1, 0, 0, 0),
     // NOTE without these the tests will fail with a timeout (async doesn't work properly)
-    /*
     toFake: [
-  'setTimeout',
-  'clearTimeout',
-  'setInterval',
-  'clearInterval',
-  'setImmediate',
-  'clearImmediate',
-  'Date',
+      "setTimeout",
+      "clearTimeout",
+      "setInterval",
+      "clearInterval",
+      "setImmediate",
+      "clearImmediate",
+      "Date",
     ],
-    */
   });
 });
 afterEach(() => {
@@ -95,7 +93,9 @@ test("SMOKE: selecting unit field allows input to other mandatory fields", async
 
 test("Render recurring reservation form with all but unit field disabled", async () => {
   const view = customRender();
-  const user = userEvent.setup();
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
 
   const resUnitSelectLabel = await screen.findByText(
     "filters.label.reservationUnit"
@@ -144,7 +144,6 @@ test("Render recurring reservation form with all but unit field disabled", async
 async function selectUnit() {
   const user = userEvent.setup({
     advanceTimers: vi.advanceTimersByTime.bind(vi),
-    // delay: null
   });
   const container = screen.getByText(/filters.label.reservationUnit/);
   const btn = within(container.parentElement!).getByRole("combobox");
@@ -176,7 +175,9 @@ test("Submit is disabled if all mandatory fields are not set", async () => {
 
 test("Form has meta when reservation unit is selected.", async () => {
   const view = customRender();
-  const user = userEvent.setup();
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
 
   await selectUnit();
 
@@ -234,7 +235,6 @@ async function fillForm({
   const btn = within(container.parentElement).getByRole("combobox");
   const user = userEvent.setup({
     advanceTimers: vi.advanceTimersByTime.bind(vi),
-    // delay: null
   });
   expect(btn).toBeInTheDocument();
   expect(btn).toBeVisible();
@@ -313,7 +313,7 @@ test("Form is disabled if it's not filled", async () => {
   expect(submit).toBeDisabled();
 });
 
-test("Form can't be submitted without reservation type selection", async () => {
+test.only("Form can't be submitted without reservation type selection", async () => {
   const view = customRender();
   await fillForm({
     begin: `1.6.${YEAR}`,

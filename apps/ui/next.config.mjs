@@ -1,15 +1,11 @@
 // @ts-check
 import { join } from "node:path";
 import * as url from "node:url";
-// eslint-disable-next-line import/extensions -- removing extension breaks build
-import i18nconfig from "./next-i18next.config.js";
+
+import * as i18nconfig from "./next-i18next.config.cjs";
 import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./env.mjs";
 import { getVersion } from "./modules/baseUtils.mjs";
-
-// TODO why was this necessary?
-// This breaks tests, they work on admin-ui but not here...
-// await import ("./env.mjs");
 
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 
@@ -17,7 +13,7 @@ const { i18n } = i18nconfig;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false,
+  reactStrictMode: true,
   transpilePackages: ["common"],
   // create a smaller bundle
   output: "standalone",
@@ -28,6 +24,9 @@ const nextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  sassOptions: {
+    silenceDeprecations: ["legacy-js-api"],
   },
   i18n,
   basePath: env.NEXT_PUBLIC_BASE_URL,
@@ -53,8 +52,32 @@ const nextConfig = {
       },
     ];
   },
-  sassOptions: {
-    silenceDeprecations: ["legacy-js-api"],
+  // NOTE webpack.experimental.topLevelAwait breaks middleware (it hangs forever)
+  webpack(config) {
+    // Grab the existing rule that handles SVG imports
+    // @ts-expect-error -- implicit any, hard to type webpack config
+    const fileLoaderRule = config.module.rules.find((rule) =>
+      rule.test?.test?.(".svg")
+    );
+    config.module.rules.push(
+      // Reapply the existing rule, but only for svg imports ending in ?url
+      {
+        ...fileLoaderRule,
+        test: /\.svg$/i,
+        resourceQuery: /url/, // *.svg?url
+      },
+      // Convert all other *.svg imports to React components
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        resourceQuery: { not: /url/ }, // exclude if *.svg?url
+        use: ["@svgr/webpack"],
+      }
+    );
+    // Modify the file loader rule to ignore *.svg, since we have it handled now.
+    fileLoaderRule.exclude = /\.svg$/i;
+
+    return config;
   },
   compiler: {
     styledComponents: {
@@ -62,7 +85,6 @@ const nextConfig = {
       displayName: true,
     },
   },
-  // NOTE webpack.experimental.topLevelAwait breaks middleware (it hangs forever)
 };
 
 export default withSentryConfig(nextConfig, {
