@@ -344,8 +344,8 @@ importers:
         specifier: 18.3.0
         version: 18.3.0
       '@types/react-transition-group':
-        specifier: ^4.4.11
-        version: 4.4.11
+        specifier: ^4.4.12
+        version: 4.4.12(@types/react@18.2.7)
       '@types/styled-components':
         specifier: ^5.1.29
         version: 5.1.34
@@ -2977,8 +2977,10 @@ packages:
   '@types/react-router@5.1.20':
     resolution: {integrity: sha512-jGjmu/ZqS7FjSH6owMcD5qpq19+1RS9DeVRqfl1FeBMxTDQAGwlMWOcs52NDoXaNKyG3d1cYQFMs9rCrb88o9Q==}
 
-  '@types/react-transition-group@4.4.11':
-    resolution: {integrity: sha512-RM05tAniPZ5DZPzzNFP+DmrcOdD0efDUxMy3145oljWSl3x9ZV5vhme98gTxFrj2lhXvmGNnUiuDyJgY9IKkNA==}
+  '@types/react-transition-group@4.4.12':
+    resolution: {integrity: sha512-8TV6R3h2j7a91c+1DXdJi3Syo69zzIZbz7Lg5tORM5LEJG7X/E6a1V3drRyBRZq7/utz7A+c4OgYLiLcYGHG6w==}
+    peerDependencies:
+      '@types/react': '*'
 
   '@types/react@18.2.7':
     resolution: {integrity: sha512-ojrXpSH2XFCmHm7Jy3q44nXDyN54+EYKP2lBhJ2bqfyPj6cIUW/FZW/Csdia34NQgq7KYcAlHi5184m4X88+yw==}
@@ -11205,7 +11207,7 @@ snapshots:
       '@types/history': 4.7.11
       '@types/react': 18.2.7
 
-  '@types/react-transition-group@4.4.11':
+  '@types/react-transition-group@4.4.12(@types/react@18.2.7)':
     dependencies:
       '@types/react': 18.2.7
 
