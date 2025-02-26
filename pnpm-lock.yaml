@@ -142,8 +142,8 @@ importers:
         version: 3.23.8
     devDependencies:
       '@happy-dom/jest-environment':
-        specifier: ^16.5.3
-        version: 16.5.3
+        specifier: ^17.1.8
+        version: 17.1.8
       '@svgr/webpack':
         specifier: ^8.1.0
         version: 8.1.0(typescript@5.7.3)
@@ -314,8 +314,8 @@ importers:
         version: 3.23.8
     devDependencies:
       '@happy-dom/jest-environment':
-        specifier: ^16.5.3
-        version: 16.5.3
+        specifier: ^17.1.8
+        version: 17.1.8
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.6.3
@@ -456,8 +456,8 @@ importers:
         specifier: ^3.13.1
         version: 3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@happy-dom/jest-environment':
-        specifier: ^16.5.3
-        version: 16.5.3
+        specifier: ^17.1.8
+        version: 17.1.8
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.6.3
@@ -599,10 +599,6 @@ packages:
 
   '@babel/code-frame@7.24.7':
     resolution: {integrity: sha512-BcYH1CVJBO9tvyIZ2jVeXgSIMvGZ2FDRvDdOIVQyuklNKSsx+eppDEBq/g47Ayw+RqNFE+URvOShmf+f/qwAlA==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/code-frame@7.25.7':
-    resolution: {integrity: sha512-0xZJFNE5XMpENsgfHYTw8FbX4kv53mFLn2i3XPoq69LyhYSCBJtitaHx9QnsVTrsogI4Z3+HtEfZ2/GFPOtf5g==}
     engines: {node: '>=6.9.0'}
 
   '@babel/code-frame@7.26.2':
@@ -767,10 +763,6 @@ packages:
 
   '@babel/highlight@7.24.7':
     resolution: {integrity: sha512-EStJpq4OuY8xYfhGVXngigBJRWxftKX9ksiGDnmlY3o7B/V7KIAc9X4oiK87uPJSc/vs5L869bem5fhZa8caZw==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/highlight@7.25.7':
-    resolution: {integrity: sha512-iYyACpW3iW8Fw+ZybQK+drQre+ns/tKpXbNESfrhNnPLIklLbXr7MYJ6gPEd0iETGLOK+SxMjVvKb/ffmk+FEw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/parser@7.25.6':
@@ -1893,8 +1885,8 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@happy-dom/jest-environment@16.5.3':
-    resolution: {integrity: sha512-64c2zF87K3w7TYTqOncOANZoR3fpnCY6fQ/zTkILzFS2OoPScvOiX93CP+N47IxH7GZ1Qc9iNAiiS8xDf55rMQ==}
+  '@happy-dom/jest-environment@17.1.8':
+    resolution: {integrity: sha512-cqgpNXvX0Xnsyn2/GcfAVaaYpf8vwcV7NakmrK/2hd9zEzntGMsoNvSNFQJamo+lrbBO0o3mUobosH34AyV9eg==}
     engines: {node: '>=18.0.0'}
 
   '@hookform/resolvers@2.9.11':
@@ -4858,6 +4850,10 @@ packages:
     resolution: {integrity: sha512-7zGnyROZuntn+5X84MQ535qiQ3ccm45uHl+Q7EFAcPP0NhkbrfPitqprz0GgszX91/QqsZKQ7nTYkyObCTDUjg==}
     engines: {node: '>=18.0.0'}
 
+  happy-dom@17.1.8:
+    resolution: {integrity: sha512-Yxbq/FG79z1rhAf/iB6YM8wO2JB/JDQBy99RiLSs+2siEAi5J05x9eW1nnASHZJbpldjJE2KuFLsLZ+AzX/IxA==}
+    engines: {node: '>=18.0.0'}
+
   has-ansi@2.0.0:
     resolution: {integrity: sha512-C8vBJ8DwUCx19vhm7urhTuUsr4/IyP6l4VzNQDv+ryHQObW3TTTp9yB68WpYgRe2bbaGuZ/se74IqFeVnMnLZg==}
     engines: {node: '>=0.10.0'}
@@ -7631,11 +7627,6 @@ snapshots:
       '@babel/highlight': 7.24.7
       picocolors: 1.1.1
 
-  '@babel/code-frame@7.25.7':
-    dependencies:
-      '@babel/highlight': 7.25.7
-      picocolors: 1.1.1
-
   '@babel/code-frame@7.26.2':
     dependencies:
       '@babel/helper-validator-identifier': 7.25.9
@@ -7912,13 +7903,6 @@ snapshots:
   '@babel/highlight@7.24.7':
     dependencies:
       '@babel/helper-validator-identifier': 7.24.7
-      chalk: 2.4.2
-      js-tokens: 4.0.0
-      picocolors: 1.1.1
-
-  '@babel/highlight@7.25.7':
-    dependencies:
-      '@babel/helper-validator-identifier': 7.25.9
       chalk: 2.4.2
       js-tokens: 4.0.0
       picocolors: 1.1.1
@@ -9855,12 +9839,12 @@ snapshots:
     dependencies:
       graphql: 16.10.0
 
-  '@happy-dom/jest-environment@16.5.3':
+  '@happy-dom/jest-environment@17.1.8':
     dependencies:
       '@jest/environment': 29.7.0
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      happy-dom: 16.5.3
+      happy-dom: 17.1.8
       jest-mock: 29.7.0
       jest-util: 29.7.0
 
@@ -13553,6 +13537,11 @@ snapshots:
       webidl-conversions: 7.0.0
       whatwg-mimetype: 3.0.0
 
+  happy-dom@17.1.8:
+    dependencies:
+      webidl-conversions: 7.0.0
+      whatwg-mimetype: 3.0.0
+
   has-ansi@2.0.0:
     dependencies:
       ansi-regex: 2.1.1
@@ -14175,7 +14164,7 @@ snapshots:
 
   jest-message-util@29.7.0:
     dependencies:
-      '@babel/code-frame': 7.25.7
+      '@babel/code-frame': 7.26.2
       '@jest/types': 29.6.3
       '@types/stack-utils': 2.0.3
       chalk: 4.1.2

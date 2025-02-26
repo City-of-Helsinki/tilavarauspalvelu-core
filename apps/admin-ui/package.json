@@ -63,7 +63,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@happy-dom/jest-environment": "^16.5.3",
+    "@happy-dom/jest-environment": "^17.1.8",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
