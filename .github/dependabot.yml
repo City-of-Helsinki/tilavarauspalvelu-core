@@ -22,8 +22,7 @@ updates:
   # description of the workaround: https://github.com/dependabot/dependabot-core/issues/1778#issuecomment-1814577069
   - package-ecosystem: "npm"
     schedule:
-      # use daily till we are happy with the config and up to date with the deps
-      interval: "daily"
+      interval: "weekly"
     directory: "/"
     pull-request-branch-name:
       separator: "-"
@@ -69,8 +68,7 @@ updates:
     target-branch: "main"
     directory: "/"
     schedule:
-      # use daily till we are happy with the config and up to date with the deps
-      interval: "daily"
+      interval: "weekly"
     pull-request-branch-name:
       separator: "-"
     ignore:
