@@ -24,7 +24,7 @@
     "focus-trap-react": "^10.2.3",
     "graphql": "^16.10.0",
     "hds-react": "^4.2.0",
-    "i18next": "^23.15.1",
+    "i18next": "^24.2.2",
     "lodash-es": "^4.17.21",
     "next": "15.1.7",
     "react": "^18.3.1",
@@ -33,10 +33,10 @@
     "react-hook-form": "^7.54.2",
     "react-toastify": "^10.0.5",
     "react-use": "^17.5.1",
-    "sanitize-html": "^2.13.0",
+    "sanitize-html": "^2.14.0",
     "styled-components": "5.3.11",
     "tsconfig": "workspace:*",
-    "zod": "^3.23.8"
+    "zod": "^3.24.2"
   },
   "peerDependencies": {
     "@apollo/client": "^3.13.1",
@@ -63,8 +63,8 @@
     "happy-dom": "^17.1.8",
     "next-i18next": "^15.4.2",
     "prettier": "^3.5.2",
-    "stylelint": "^16.2.1",
-    "stylelint-config-standard": "^36.0.1",
+    "stylelint": "^16.14.1",
+    "stylelint-config-standard": "^37.0.0",
     "stylelint-config-styled-components": "^0.1.1",
     "typescript": "^5.7.3",
     "typescript-cookie": "^1.0.6",
