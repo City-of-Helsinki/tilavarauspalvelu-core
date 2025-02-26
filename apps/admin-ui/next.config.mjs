@@ -6,8 +6,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./src/env.mjs";
 import { getVersion } from "./src/modules/baseUtils.mjs";
 
-// @ts-expect-error -- This works because it's only run on node (not browser)
-await import("./src/env.mjs");
+// await import("./src/env.mjs");
 
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 

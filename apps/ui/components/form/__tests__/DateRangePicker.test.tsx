@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event";
-import { get as mockGet } from "lodash";
+import { get as mockGet } from "lodash-es";
 import React from "react";
 import mockTranslations from "@/public/locales/fi/dateSelector.json";
 import { configure, render, screen } from "@testing-library/react";

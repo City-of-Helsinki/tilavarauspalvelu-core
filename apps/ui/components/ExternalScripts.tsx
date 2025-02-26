@@ -31,7 +31,7 @@ function MatomoScript(): JSX.Element {
     <Script
       id="matomo"
       strategy="afterInteractive"
-      src="/scripts/init-matomo.js"
+      src="/scripts/init-matomo.cjs"
     />
   );
 }

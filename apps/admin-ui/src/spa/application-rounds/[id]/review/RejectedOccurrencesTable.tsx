@@ -4,7 +4,7 @@ import { getApplicationUrl, getReservationUrl } from "@/common/urls";
 import type { RejectedOccurrencesQuery } from "@gql/gql-types";
 import { truncate } from "common/src/helpers";
 import { IconLinkExternal, IconSize } from "hds-react";
-import { memoize } from "lodash";
+import { memoize } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { getApplicantName } from "@/helpers";

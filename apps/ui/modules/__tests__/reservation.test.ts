@@ -1,4 +1,4 @@
-import { get as mockGet } from "lodash";
+import { get as mockGet } from "lodash-es";
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
   type PaymentOrderNode,

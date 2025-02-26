@@ -13,6 +13,8 @@ import {
   CreateReservationSeriesDocument,
   type ReservationUnitFragment,
   ReservationsInIntervalFragment,
+  CurrentUserDocument,
+  type CurrentUserQuery,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
@@ -216,7 +218,29 @@ const reservationsByUnitResponse: ReservationsInIntervalFragment[] =
       affectedReservationUnits: [],
     }));
 
+const AdminUserMock: CurrentUserQuery = {
+  currentUser: {
+    id: "UserNode:1",
+    username: "test",
+    firstName: "Test",
+    lastName: "User",
+    email: "test@foobar.com",
+    isSuperuser: true,
+    pk: 1,
+    unitRoles: [],
+    generalRoles: [],
+  },
+};
+
 export const mocks = [
+  {
+    request: {
+      query: CurrentUserDocument,
+    },
+    result: {
+      data: AdminUserMock,
+    },
+  },
   {
     request: {
       query: ReservationUnitDocument,

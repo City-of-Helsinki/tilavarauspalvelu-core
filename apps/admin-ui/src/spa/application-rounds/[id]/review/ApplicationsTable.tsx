@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { memoize, orderBy, uniqBy } from "lodash";
+import { memoize, orderBy, uniqBy } from "lodash-es";
 import type { TFunction } from "i18next";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { ApplicationsQuery, ApplicationStatusChoice } from "@gql/gql-types";

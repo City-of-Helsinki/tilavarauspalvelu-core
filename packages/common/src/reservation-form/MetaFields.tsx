@@ -13,7 +13,7 @@ import React, { Fragment } from "react";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { camelCase, capitalize } from "lodash";
+import { camelCase, capitalize } from "lodash-es";
 import { CustomerTypeChoice, MetadataSetsFragment } from "../../gql/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
