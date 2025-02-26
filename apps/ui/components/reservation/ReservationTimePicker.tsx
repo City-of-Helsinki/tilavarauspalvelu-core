@@ -1,5 +1,4 @@
 import React, { Children, useEffect, useMemo, useState } from "react";
-import classNames from "classnames";
 import {
   BlockingReservationFieldsFragment,
   ReservationNode,
@@ -70,7 +69,7 @@ function EventWrapperComponent({
     if (diff <= 120) isMedium = true;
   }
   return (
-    <EventWrapper {...props} className={classNames({ isSmall, isMedium })} />
+    <EventWrapper {...props} /> // className={classNames({ isSmall, isMedium })} />
   );
 }
 

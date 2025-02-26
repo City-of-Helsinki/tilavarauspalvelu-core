@@ -6,7 +6,7 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "main": "./dist/index.js",
+  "main": "./index.ts",
   "types": "./dist/index.d.ts",
   "scripts": {
     "preinstall": "npx -y only-allow pnpm",
@@ -19,7 +19,6 @@
     "tsc:clean": "tsc --build --clean"
   },
   "dependencies": {
-    "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
     "eslint-config-custom": "workspace:*",
     "focus-trap-react": "^10.2.3",
@@ -61,10 +60,7 @@
     "@types/styled-components": "^5.1.29",
     "@vercel/style-guide": "^6.0.0",
     "@vitejs/plugin-react": "^4.3.4",
-    "chalk": "^5.4.1",
     "happy-dom": "^17.1.8",
-    "jsdom": "^26.0.0",
-    "mkdirp": "^3.0.1",
     "next-i18next": "^15.4.2",
     "prettier": "^3.5.2",
     "stylelint": "^16.2.1",
