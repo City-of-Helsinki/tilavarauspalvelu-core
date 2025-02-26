@@ -51,7 +51,7 @@
     "react-i18next": "^15.4.1",
     "react-quill": "2.0.0",
     "react-router-dom": "^6.23.1",
-    "react-use": "^17.5.1",
+    "react-use": "^17.6.0",
     "reactjs-popup": "^2.0.6",
     "styled-components": "5.3.11",
     "tsconfig": "workspace:*",
