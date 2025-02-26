@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Select, Tabs } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { uniqBy } from "lodash";
+import { uniqBy } from "lodash-es";
 import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
 import { H1, fontBold, fontMedium } from "common/src/common/typography";

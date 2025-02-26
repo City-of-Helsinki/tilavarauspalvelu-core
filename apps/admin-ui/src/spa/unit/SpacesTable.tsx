@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { IconGroup } from "hds-react";
-import { trim } from "lodash";
+import { trim } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import { gql, type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";

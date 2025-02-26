@@ -1,4 +1,4 @@
-import { camelCase } from "lodash";
+import { camelCase } from "lodash-es";
 import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { OrderStatus } from "@/gql/gql-types";

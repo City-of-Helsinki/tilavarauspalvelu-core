@@ -1,6 +1,6 @@
 module.exports = {
   root: true,
-  extends: ["custom/next"],
+  extends: ["custom/next.cjs"],
   ignorePatterns: [
     "node_modules/",
     ".next/",
