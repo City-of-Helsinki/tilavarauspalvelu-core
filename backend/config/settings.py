@@ -123,6 +123,7 @@ class Common(Environment):
 
     CORS_ALLOWED_ORIGINS = values.ListValue()
     CSRF_TRUSTED_ORIGINS = values.ListValue()
+    CORS_ALLOWED_ORIGIN_REGEXES = values.ListValue(default=[])
     CORS_ALLOW_CREDENTIALS = True
 
     # --- Proxy settings ---------------------------------------------------------------------------------------------
