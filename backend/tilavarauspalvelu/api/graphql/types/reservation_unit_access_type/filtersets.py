@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import django_filters
-from django.db import models
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import IntMultipleChoiceFilter
 from lookup_property import L
@@ -35,5 +34,5 @@ class ReservationUnitAccessTypeFilterSet(ModelFilterSet):
     @staticmethod
     def filter_is_active_or_future(qs: ReservationUnitAccessTypeQuerySet, name: str, value: bool) -> QuerySet:
         today = local_date()
-        ftr = models.Q(begin_date__gte=today) & L(end_date__lte=today)
+        ftr = L(end_date__gt=today)
         return qs.filter(ftr if value else ~ftr)

@@ -127,7 +127,7 @@ class ReservationUnitQuerySet(models.QuerySet):
             available_access_types=SubqueryArray(
                 queryset=(
                     ReservationUnitAccessType.objects.filter(reservation_unit=models.OuterRef("pk"))
-                    .filter(L(end_date__gte=period_start) & models.Q(begin_date__lte=period_end))
+                    .filter(L(end_date__gt=period_start) & models.Q(begin_date__lte=period_end))
                     .values("access_type")
                 ),
                 agg_field="access_type",
