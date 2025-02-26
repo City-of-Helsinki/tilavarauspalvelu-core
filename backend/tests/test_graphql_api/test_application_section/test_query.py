@@ -358,32 +358,6 @@ def test_application_section__query__pindora_info__pindora_call_fails(graphql):
 
 
 @freeze_time(local_datetime(2022, 1, 3))
-def test_application_section__query__pindora_info__reservation_past(graphql):
-    section = ApplicationSectionFactory.create_in_status_unallocated(
-        reservations_begin_date=local_date(2022, 1, 1),
-        reservations_end_date=local_date(2022, 1, 1),
-    )
-
-    ReservationFactory.create(
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
-        access_type=AccessType.ACCESS_CODE,
-        state=ReservationStateChoice.CONFIRMED,
-        type=ReservationTypeChoice.NORMAL,
-    )
-
-    query = pindora_query(section)
-
-    graphql.login_with_superuser()
-
-    with patch_method(PindoraClient.get_seasonal_booking, return_value=pindora_response(section)):
-        response = graphql(query)
-
-    assert response.has_errors is False, response.errors
-
-    assert response.first_query_object["pindoraInfo"] is None
-
-
-@freeze_time(local_datetime(2022, 1, 3))
 def test_application_section__query__pindora_info__section_past(graphql):
     section = ApplicationSectionFactory.create_in_status_unallocated(
         reservations_begin_date=local_date(2022, 1, 1),
