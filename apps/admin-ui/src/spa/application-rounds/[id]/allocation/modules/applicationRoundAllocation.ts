@@ -1,4 +1,4 @@
-import { padStart, sortBy } from "lodash";
+import { padStart, sortBy } from "lodash-es";
 import {
   type SuitableTimeRangeNode,
   type ApplicationSectionNode,

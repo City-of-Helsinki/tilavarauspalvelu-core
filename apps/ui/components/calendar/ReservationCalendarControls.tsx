@@ -9,7 +9,7 @@ import {
   IconCross,
   IconSize,
 } from "hds-react";
-import { maxBy } from "lodash";
+import { maxBy } from "lodash-es";
 import { fromUIDate } from "common/src/common/util";
 import { Transition } from "react-transition-group";
 import {
