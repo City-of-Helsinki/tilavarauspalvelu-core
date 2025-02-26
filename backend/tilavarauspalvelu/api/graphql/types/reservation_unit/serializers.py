@@ -264,9 +264,10 @@ class ReservationUnitSerializer(NestingModelSerializer):
             if is_draft:
                 return
 
-            if not has_active:
-                msg = "At least one active access type is required."
-                raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_ACTIVE_ACCESS_TYPE)
+            # TODO: Add back later once frontend is updated
+            #  if not has_active:
+            #  msg = "At least one active access type is required."  # noqa: ERA001
+            #  raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_ACTIVE_ACCESS_TYPE)  # noqa: ERA001
 
             return
 
@@ -310,9 +311,10 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
             has_active = has_active or begin_date <= today
 
-        if not has_active:
-            msg = "At least one active access type is required."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_ACTIVE_ACCESS_TYPE)
+        # TODO: Add back later once frontend is updated
+        #  if not has_active:
+        #  msg = "At least one active access type is required."  # noqa: ERA001
+        #  raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_ACTIVE_ACCESS_TYPE)  # noqa: ERA001
 
         if need_to_check_pindora:
             try:
