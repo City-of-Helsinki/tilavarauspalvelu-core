@@ -22,15 +22,15 @@ def test_pindora_client__caching__reservation_unit_response():
         keypad_url="https://example.com",
     )
 
-    PindoraClient.cache_reservation_unit_response(data=data, ext_uuid=reservation_unit_id)
+    PindoraClient._cache_reservation_unit_response(data=data, ext_uuid=reservation_unit_id)
 
-    response = PindoraClient.get_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
+    response = PindoraClient._get_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
     assert response == data
 
-    succeeded = PindoraClient.clear_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
+    succeeded = PindoraClient._clear_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
     assert succeeded is True
 
-    response = PindoraClient.get_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
+    response = PindoraClient._get_cached_reservation_unit_response(ext_uuid=reservation_unit_id)
     assert response is None
 
 
@@ -52,15 +52,15 @@ def test_pindora_client__caching__reservation_response():
         end=local_datetime(2022, 1, 1, 13),
     )
 
-    PindoraClient.cache_reservation_response(data=data, ext_uuid=reservation_id)
+    PindoraClient._cache_reservation_response(data=data, ext_uuid=reservation_id)
 
-    response = PindoraClient.get_cached_reservation_response(ext_uuid=reservation_id)
+    response = PindoraClient._get_cached_reservation_response(ext_uuid=reservation_id)
     assert response == data
 
-    succeeded = PindoraClient.clear_cached_reservation_response(ext_uuid=reservation_id)
+    succeeded = PindoraClient._clear_cached_reservation_response(ext_uuid=reservation_id)
     assert succeeded is True
 
-    response = PindoraClient.get_cached_reservation_response(ext_uuid=reservation_id)
+    response = PindoraClient._get_cached_reservation_response(ext_uuid=reservation_id)
     assert response is None
 
 
@@ -86,15 +86,15 @@ def test_pindora_client__caching__seasonal_booking_response():
         ],
     )
 
-    PindoraClient.cache_seasonal_booking_response(data=data, ext_uuid=section_id)
+    PindoraClient._cache_seasonal_booking_response(data=data, ext_uuid=section_id)
 
-    response = PindoraClient.get_cached_seasonal_booking_response(ext_uuid=section_id)
+    response = PindoraClient._get_cached_seasonal_booking_response(ext_uuid=section_id)
     assert response == data
 
-    succeeded = PindoraClient.clear_cached_seasonal_booking_response(ext_uuid=section_id)
+    succeeded = PindoraClient._clear_cached_seasonal_booking_response(ext_uuid=section_id)
     assert succeeded is True
 
-    response = PindoraClient.get_cached_seasonal_booking_response(ext_uuid=section_id)
+    response = PindoraClient._get_cached_seasonal_booking_response(ext_uuid=section_id)
     assert response is None
 
 
@@ -120,13 +120,13 @@ def test_pindora_client__caching__reservation_series_response():
         ],
     )
 
-    PindoraClient.cache_reservation_series_response(data=data, ext_uuid=series_id)
+    PindoraClient._cache_reservation_series_response(data=data, ext_uuid=series_id)
 
-    response = PindoraClient.get_cached_reservation_series_response(ext_uuid=series_id)
+    response = PindoraClient._get_cached_reservation_series_response(ext_uuid=series_id)
     assert response == data
 
-    succeeded = PindoraClient.clear_cached_reservation_series_response(ext_uuid=series_id)
+    succeeded = PindoraClient._clear_cached_reservation_series_response(ext_uuid=series_id)
     assert succeeded is True
 
-    response = PindoraClient.get_cached_reservation_series_response(ext_uuid=series_id)
+    response = PindoraClient._get_cached_reservation_series_response(ext_uuid=series_id)
     assert response is None
