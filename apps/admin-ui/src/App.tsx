@@ -22,9 +22,7 @@ const ApplicationDetails = dynamic(
   () => import("./spa/applications/[id]/index")
 );
 
-const ReservationUnits = dynamic(
-  () => import("./spa/reservation-units/ReservationUnits")
-);
+const ReservationUnits = dynamic(() => import("./spa/reservation-units/index"));
 
 const HomePage = dynamic(() => import("./spa/HomePage"));
 
