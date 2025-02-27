@@ -94,7 +94,7 @@ export function ApplicationCard({
       await mutation();
       setIsWaitingForDelete(false);
       actionCallback("cancel");
-    } catch (e) {
+    } catch (_) {
       actionCallback("error");
     }
   };

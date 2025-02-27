@@ -5,9 +5,7 @@
 // but it doesn't hot reload nor does it seem to do anything even if doing a full page reload
 const reloadOnPrerender = process.env.NODE_ENV === "development";
 
-/**
- * @type {import('next-i18next').UserConfig}
- */
+/** @type {import('next-i18next').UserConfig} */
 module.exports = {
   debug: false, // process.env.NODE_ENV === "development",
   i18n: {
@@ -17,7 +15,8 @@ module.exports = {
   },
   localePath:
     typeof window === "undefined"
-      ? require("node:path").resolve("./public/locales")
+      ? // eslint-disable-next-line @typescript-eslint/no-require-imports -- next-i18next doesn't support ESM
+        require("node:path").resolve("./public/locales")
       : "/public/locales",
   reloadOnPrerender,
 };

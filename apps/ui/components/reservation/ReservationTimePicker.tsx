@@ -59,6 +59,7 @@ function EventWrapperComponent({
 }: {
   event: CalendarEvent<ReservationNode>;
 }) {
+  /*
   let isSmall = false;
   let isMedium = false;
   // TODO don't override state enums with strings
@@ -68,6 +69,7 @@ function EventWrapperComponent({
     if (diff <= 30) isSmall = true;
     if (diff <= 120) isMedium = true;
   }
+  */
   return (
     <EventWrapper {...props} /> // className={classNames({ isSmall, isMedium })} />
   );
