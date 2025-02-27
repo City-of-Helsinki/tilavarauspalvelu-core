@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
-import type { PurposeNode } from "@gql/gql-types";
+import type { PurposeCardFragment } from "@gql/gql-types";
 import { singleSearchPrefix } from "@/modules/urls";
 import ReservationUnitSearch from "./ReservationUnitSearch";
 import { pixel } from "@/styles/util";
@@ -15,13 +15,7 @@ import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 import { getTranslationSafe } from "common/src/common/util";
 import { getLocalizationLang } from "common/src/helpers";
 import { Flex } from "common/styles/util";
-
-type Props = {
-  purposes: Pick<
-    PurposeNode,
-    "pk" | "nameFi" | "nameEn" | "nameSv" | "smallUrl" | "imageUrl"
-  >[];
-};
+import { gql } from "@apollo/client";
 
 const Top = styled(Flex).attrs({
   $justifyContent: "space-between",
@@ -71,16 +65,22 @@ const Image = styled.img`
   }
 `;
 
+type Props = {
+  purposes: PurposeCardFragment[];
+};
+
 export function Purposes({ purposes }: Props): JSX.Element {
   const { t, i18n } = useTranslation(["home", "common"]);
   const isMobile = useMedia(`(max-width: ${breakpoints.s})`, false);
   const itemLimit = useMemo(() => (isMobile ? 4 : 8), [isMobile]);
 
-  const getImg = (item: Pick<PurposeNode, "smallUrl" | "imageUrl">) => {
+  const getImg = (item: Pick<PurposeCardFragment, "smallUrl" | "imageUrl">) => {
     return item.smallUrl || item.imageUrl || pixel;
   };
   const lang = getLocalizationLang(i18n.language);
-  const getName = (item: Pick<PurposeNode, "nameFi" | "nameEn" | "nameSv">) => {
+  const getName = (
+    item: Pick<PurposeCardFragment, "nameFi" | "nameEn" | "nameSv">
+  ) => {
     return getTranslationSafe(item, "name", lang);
   };
 
@@ -118,3 +118,15 @@ export function Purposes({ purposes }: Props): JSX.Element {
     </>
   );
 }
+
+export const PURPOSE_CARD_FRAGMENT = gql`
+  fragment PurposeCard on PurposeNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    imageUrl
+    smallUrl
+  }
+`;
