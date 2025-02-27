@@ -92,7 +92,7 @@ export function useStaffReservationMutation({
         mutation({ variables });
         handleSuccess(false);
       }
-    } catch (e) {
+    } catch (_) {
       handleError();
     }
   };

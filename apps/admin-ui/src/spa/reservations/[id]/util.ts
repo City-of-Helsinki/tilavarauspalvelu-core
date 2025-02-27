@@ -172,7 +172,7 @@ export function createTagString(
       return createRecurringTagString(reservation, t);
     }
     return createSingleTagString(reservation, t);
-  } catch (e) {
+  } catch (_) {
     return "";
   }
 }

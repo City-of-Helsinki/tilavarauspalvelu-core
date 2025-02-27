@@ -68,7 +68,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         // TODO missing translation
         errorToast({ text: t("SpaceTable.removeFailed") });
       }
-    } catch (e) {
+    } catch (_) {
       /* TODO handle this error
        "extensions": {
         "code": "MUTATION_VALIDATION_ERROR",

@@ -76,7 +76,7 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
         },
       });
       handleNext();
-    } catch (e) {
+    } catch (_) {
       errorToast({
         text: t("reservations:cancel.mutationFailed"),
       });

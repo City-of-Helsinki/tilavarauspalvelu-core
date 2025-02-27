@@ -63,7 +63,7 @@ export function toApiDate(date: Date, formatStr = "yyyy-MM-dd"): string | null {
   }
   try {
     return format(date, formatStr);
-  } catch (e) {
+  } catch (_) {
     return null;
   }
 }
@@ -82,7 +82,7 @@ export function fromApiDate(date: string): Date | null {
       return null;
     }
     return d;
-  } catch (e) {
+  } catch (_) {
     return null;
   }
 }
@@ -97,7 +97,7 @@ export function fromUIDate(date: string): Date | null {
   try {
     const d = parse(date, "d.M.yyyy", new Date());
     return isValidDate(d) ? d : null;
-  } catch (e) {
+  } catch (_) {
     return null;
   }
 }
@@ -116,7 +116,7 @@ export function toUIDate(date: Date | null, formatStr = "d.M.yyyy"): string {
   }
   try {
     return format(date, formatStr, { locale: fi });
-  } catch (e) {
+  } catch (_) {
     return "";
   }
 }

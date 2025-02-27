@@ -107,7 +107,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
       successToast({ text: t("ResourceTable.removeSuccess") });
       setResourceWaitingForDelete(null);
       refetch();
-    } catch (error) {
+    } catch (_) {
       errorToast({ text: t("ResourceTable.removeFailed") });
     }
   };

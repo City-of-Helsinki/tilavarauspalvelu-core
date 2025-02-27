@@ -145,7 +145,7 @@ function EndAllocation({
       await sendResults({
         variables: { pk: applicationRound.pk ?? 0 },
       });
-    } catch (err) {
+    } catch (_) {
       errorToast({ text: t("errors.errorSendingResults") });
     }
     refetch();

@@ -322,7 +322,7 @@ function SchedulesList({
         },
       });
       refetch();
-    } catch (e) {
+    } catch (_) {
       errorToast({ text: t("errors.mutationFailed") });
     }
   };

@@ -5,6 +5,7 @@ import {
   InMemoryCache,
   from,
 } from "@apollo/client";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore -- types require nodenext which breaks bundler option that breaks the build
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 import { getCookie } from "typescript-cookie";

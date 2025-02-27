@@ -31,7 +31,6 @@ export function toNumber(filter: Maybe<string> | undefined): number | null {
   return n;
 }
 
-/* eslint-disable @typescript-eslint/prefer-reduce-type-parameter -- generic reduce requires type casting */
 export function pick<T, K extends keyof T>(
   reservation: T,
   keys: ReadonlyArray<K>
@@ -46,7 +45,6 @@ export function pick<T, K extends keyof T>(
     {} as Pick<T, K>
   );
 }
-/* eslint-enable @typescript-eslint/prefer-reduce-type-parameter */
 
 export const toMondayFirstUnsafe = (day: number) => {
   if (day < 0 || day > 6) {

@@ -109,7 +109,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
       });
       refetch();
       history(-1);
-    } catch (error) {
+    } catch (_) {
       errorToast({ text: t("ResourceModal.saveError") });
     }
   };

@@ -358,7 +358,7 @@ const useImageMutations = () => {
           delImage({ variables: { pk: image.pk?.toString() ?? "" } })
         );
       await Promise.all(deletePromises);
-    } catch (e) {
+    } catch (_) {
       return false;
     }
 
@@ -377,7 +377,7 @@ const useImageMutations = () => {
         );
 
       await Promise.all(addPromises);
-    } catch (e) {
+    } catch (_) {
       return false;
     }
 
@@ -397,7 +397,7 @@ const useImageMutations = () => {
         });
 
       await Promise.all(changeTypePromises);
-    } catch (e) {
+    } catch (_) {
       return false;
     }
 
