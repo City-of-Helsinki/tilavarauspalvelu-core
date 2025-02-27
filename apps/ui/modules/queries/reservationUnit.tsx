@@ -95,7 +95,8 @@ export const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
       ...EquipmentFields
     }
     currentAccessType
-    accessTypes(isActiveOrFuture: true) {
+    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+      id
       accessType
       beginDate
     }
@@ -178,7 +179,8 @@ export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
     }
     maxPersons
     currentAccessType
-    accessTypes(isActiveOrFuture: true) {
+    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+      id
       accessType
     }
   }

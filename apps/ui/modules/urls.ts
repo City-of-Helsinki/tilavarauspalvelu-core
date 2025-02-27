@@ -98,3 +98,16 @@ export function getReservationUnitPath(pk: Maybe<number> | undefined): string {
   }
   return `${reservationUnitPrefix}/${pk}`;
 }
+
+export function getFeedbackUrl(
+  feedbackUrl: string,
+  i18n: { language: string }
+) {
+  try {
+    const url = new URL(feedbackUrl);
+    url.searchParams.set("lang", i18n.language);
+    return url.toString();
+  } catch (e) {
+    return null;
+  }
+}

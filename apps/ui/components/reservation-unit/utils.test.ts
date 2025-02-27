@@ -209,7 +209,13 @@ describe("getNextAvailableTime", () => {
       applicationRounds: [],
       equipments: [],
       pricings: [],
-      accessType: AccessType.Unrestricted,
+      accessTypes: [
+        {
+          id: "123",
+          accessType: AccessType.Unrestricted,
+          beginDate: new Date().toISOString(),
+        },
+      ],
     };
     return {
       start,

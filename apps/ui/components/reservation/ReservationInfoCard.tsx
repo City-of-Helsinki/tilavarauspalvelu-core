@@ -80,13 +80,16 @@ export function ReservationInfoCard({
 }: Readonly<Props>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation.reservationUnits?.[0];
-  const { data, loading, error } = useAccessCodeQuery({
+  const { data: accessCodeData } = useAccessCodeQuery({
     skip: !reservation || reservation.accessType !== AccessType.AccessCode,
     variables: {
       id: base64encode(`ReservationNode:${reservation.pk}`),
     },
   });
-  console.log(reservation, data);
+  const { accessCode } = accessCodeData?.reservation?.pindoraInfo ?? {};
+  const shouldDisplayAccessCode =
+    accessCodeData?.reservation?.pindoraInfo?.accessCodeIsActive;
+
   const { begin, end } = reservation || {};
   // NOTE can be removed after this has been refactored not to be used for PendingReservation
 
@@ -163,10 +166,11 @@ export function ReservationInfoCard({
               ),
             })})`}
         </div>
-        {reservationUnit.accessType === AccessType.Unrestricted && (
+        {reservation.accessType !== AccessType.Unrestricted && (
           <div>
-            {t("reservationUnit:accessType")}:{" "}
-            {t(`reservationUnit:accessTypes.${reservationUnit.accessType}`)}
+            {!shouldDisplayAccessCode && `${t("reservationUnit:accessType")}: `}
+            {t(`reservationUnit:accessTypes.${reservation.accessType}`)}
+            {shouldDisplayAccessCode && accessCode && `: ${accessCode}`}
           </div>
         )}
       </Content>
