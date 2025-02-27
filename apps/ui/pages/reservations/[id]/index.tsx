@@ -8,6 +8,7 @@ import {
   IconCalendar,
   IconCross,
   IconLinkExternal,
+  IconLock,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
 import { H1, H4, fontRegular } from "common/src/common/typography";
@@ -68,6 +69,7 @@ import {
 import { ReservationPageWrapper } from "@/components/reservations/styles";
 import {
   getApplicationPath,
+  getFeedbackUrl,
   getReservationPath,
   getReservationUnitPath,
   reservationsPrefix,
@@ -79,6 +81,8 @@ import {
 } from "common/src/common/util";
 import { Instructions } from "@/components/Instructions";
 import { gql } from "@apollo/client";
+import StatusLabel from "common/src/components/StatusLabel";
+import IconButton from "common/src/components/IconButton";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -314,8 +318,18 @@ function LabelValuePair({
 function Reservation({
   termsOfUse,
   reservation,
+  feedbackUrl,
 }: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
+  const isAccessCodeReservation =
+    reservation.accessType === AccessType.AccessCode;
+  const { data: accessCodeData } = useAccessCodeQuery({
+    skip: !reservation || !isAccessCodeReservation,
+    variables: {
+      id: base64encode(`ReservationNode:${reservation.pk}`),
+    },
+  });
+  const { pindoraInfo } = accessCodeData?.reservation ?? {};
 
   // NOTE typescript can't type array off index
   const order = reservation.paymentOrder.find(() => true);
@@ -395,6 +409,20 @@ function Reservation({
                   orderStatus={normalizedOrderStatus}
                   testId="reservation__payment-status"
                 />
+              )}
+              {isAccessCodeReservation && (
+                <StatusLabel
+                  type="info"
+                  icon={
+                    <IconLock
+                      aria-hidden="false"
+                      aria-label={t(`reservationUnit:accessType`)}
+                    />
+                  }
+                  data-testid="reservation__access-code"
+                >
+                  {t("reservationUnit:accessTypes.ACCESS_CODE")}
+                </StatusLabel>
               )}
             </Flex>
           </Flex>
@@ -485,6 +513,12 @@ function Reservation({
             reservation={reservation}
             supportedFields={supportedFields}
           />
+          {isAccessCodeReservation && (
+            <AccessCodeInfo
+              pindoraInfo={pindoraInfo}
+              feedbackUrl={feedbackUrl}
+            />
+          )}
           <TermsInfo reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
             title={getReservationUnitName(reservationUnit) ?? "-"}
@@ -508,10 +542,7 @@ function TermsInfo({
 }>) {
   const { t, i18n } = useTranslation();
   const reservationUnit = reservation.reservationUnits.find(() => true);
-  const reservationAccessCode = useAccessCodeQuery({
-    variables: { id: reservation.id },
-    skip: reservation.accessType !== AccessType.AccessCode,
-  });
+
   const shouldDisplayPricingTerms: boolean = useMemo(() => {
     if (!reservationUnit) {
       return false;
@@ -589,6 +620,53 @@ function TermsInfo({
           />
         )}
       </Accordion>
+    </div>
+  );
+}
+
+function AccessCodeInfo({
+  pindoraInfo,
+  feedbackUrl,
+}: Readonly<{
+  pindoraInfo:
+    | {
+        accessCode: string | null;
+        accessCodeBeginsAt: string;
+        accessCodeEndsAt: string;
+        accessCodeIsActive: boolean;
+      }
+    | null
+    | undefined;
+  feedbackUrl: string;
+}>): JSX.Element {
+  const { t, i18n } = useTranslation();
+  return (
+    <div>
+      <H4 as="h2">{t("reservationUnit:accessType")}</H4>
+      {pindoraInfo?.accessCodeIsActive ? (
+        <>
+          <LabelValuePair
+            label={t("reservationUnit:accessTypes.ACCESS_CODE")}
+            value={pindoraInfo.accessCode ?? "-"}
+            testId="reservation__access-code"
+          />
+          <LabelValuePair
+            label={t("reservations:accessCodeDuration")}
+            value={formatDateTimeRange(
+              t,
+              new Date(pindoraInfo.accessCodeBeginsAt),
+              new Date(pindoraInfo.accessCodeEndsAt)
+            )}
+            testId="reservation__access-code-duration"
+          />
+        </>
+      ) : (
+        <IconButton
+          href={getFeedbackUrl(feedbackUrl, i18n)}
+          label={t("reservations:contactSupport")}
+          icon={<IconLinkExternal />}
+        />
+      )}
     </div>
   );
 }

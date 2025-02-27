@@ -35,7 +35,7 @@ interface PropsT {
   type?: CardType;
 }
 
-function ReservationCard({ reservation, type }: PropsT): JSX.Element {
+function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnits?.[0] ?? undefined;
@@ -86,7 +86,8 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
     },
   ];
 
-  if (reservationUnit.accessType !== AccessType.Unrestricted) {
+  // TODO: Remove this check when all reservations have an accessType
+  if (reservation.accessType !== AccessType.Unrestricted) {
     infos.push({
       icon: (
         <IconLock
@@ -94,7 +95,7 @@ function ReservationCard({ reservation, type }: PropsT): JSX.Element {
           aria-hidden="false"
         />
       ),
-      value: t(`reservationUnit:accessTypes.${reservationUnit?.accessType}`),
+      value: t(`reservationUnit:accessTypes.${reservation.accessType}`),
     });
   }
 

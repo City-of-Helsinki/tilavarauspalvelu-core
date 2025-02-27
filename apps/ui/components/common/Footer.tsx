@@ -3,6 +3,7 @@ import { useTranslation } from "next-i18next";
 import { Footer as HDSFooter, IconLinkExternal, IconSize } from "hds-react";
 import Logo from "common/src/components/Logo";
 import styled from "styled-components";
+import { getFeedbackUrl } from "@/modules/urls";
 
 const Wrapper = styled(HDSFooter)`
   margin-top: var(--spacing-xl);
@@ -18,20 +19,10 @@ const Wrapper = styled(HDSFooter)`
   }
 `;
 
-function constructFeedbackUrl(feedbackUrl: string, i18n: { language: string }) {
-  try {
-    const url = new URL(feedbackUrl);
-    url.searchParams.set("lang", i18n.language);
-    return url.toString();
-  } catch (e) {
-    return null;
-  }
-}
-
 function Footer({ feedbackUrl }: { feedbackUrl: string }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === "fi" ? "" : `/${i18n.language}`;
-  const languageUrl = constructFeedbackUrl(feedbackUrl, i18n);
+  const languageUrl = getFeedbackUrl(feedbackUrl, i18n);
   return (
     <Wrapper korosType="basic" theme="light" title="Varaamo">
       <HDSFooter.Navigation>

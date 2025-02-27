@@ -49,7 +49,7 @@ export function ReservationUnitList({
   applicationRound,
   options,
   minSize,
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
 
@@ -233,6 +233,10 @@ export const APPLICATION_RESERVATION_UNIT_LIST_FRAGMENT = gql`
         nameFi
         nameSv
         nameEn
+      }
+      accessTypes {
+        id
+        accessType
       }
     }
   }

@@ -15,7 +15,7 @@ interface IconButtonProps {
   // a HDS-icon element (use `null` if no icon is desired)
   icon: React.ReactNode;
   // the link URI (defaults to "javascript:void(0);" to not interfere with onClick if not in use)
-  href?: string;
+  href?: string | null;
   // should the link open in a new tab (true if href begins "http...", otherwise false by default)
   openInNewTab?: boolean;
   // an optional function to call when clicking the button

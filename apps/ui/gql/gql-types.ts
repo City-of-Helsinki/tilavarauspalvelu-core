@@ -5377,6 +5377,7 @@ export type ApplicationRoundForApplicationFragment = {
       nameSv?: string | null;
       nameEn?: string | null;
     } | null;
+    accessTypes: Array<{ id: string; accessType: AccessType }>;
   }>;
 };
 
@@ -5409,6 +5410,7 @@ export type ApplicationReservationUnitListFragment = {
       nameSv?: string | null;
       nameEn?: string | null;
     } | null;
+    accessTypes: Array<{ id: string; accessType: AccessType }>;
   }>;
 };
 
@@ -5803,6 +5805,7 @@ export type ApplicationFormFragment = {
         nameSv?: string | null;
         nameEn?: string | null;
       } | null;
+      accessTypes: Array<{ id: string; accessType: AccessType }>;
     }>;
   };
   applicationSections?: Array<{
@@ -5963,6 +5966,7 @@ export type ApplicationCommonFragment = {
         nameSv?: string | null;
         nameEn?: string | null;
       } | null;
+      accessTypes: Array<{ id: string; accessType: AccessType }>;
     }>;
   };
   applicationSections?: Array<{
@@ -6385,7 +6389,6 @@ export type ListReservationsQuery = {
         name?: string | null;
         bufferTimeBefore: number;
         bufferTimeAfter: number;
-        accessType: AccessType;
         isBlocked?: boolean | null;
         pk?: number | null;
         taxPercentageValue?: string | null;
@@ -6393,6 +6396,7 @@ export type ListReservationsQuery = {
         end: string;
         state?: ReservationStateChoice | null;
         price?: string | null;
+        accessType: AccessType;
         paymentOrder: Array<{
           id: string;
           checkoutUrl?: string | null;
@@ -6520,6 +6524,7 @@ export type AccessCodeQuery = {
       accessCode: string;
       accessCodeBeginsAt: string;
       accessCodeEndsAt: string;
+      accessCodeIsActive: boolean;
     } | null;
   } | null;
 };
@@ -6652,7 +6657,7 @@ export type ReservationUnitPageFieldsFragment = {
       nameSv?: string | null;
     };
   }>;
-  accessTypes: Array<{ accessType: AccessType; beginDate: string }>;
+  accessTypes: Array<{ id: string; accessType: AccessType; beginDate: string }>;
   serviceSpecificTerms?: {
     id: string;
     textFi?: string | null;
@@ -6827,7 +6832,11 @@ export type ReservationUnitPageQuery = {
         nameSv?: string | null;
       };
     }>;
-    accessTypes: Array<{ accessType: AccessType; beginDate: string }>;
+    accessTypes: Array<{
+      id: string;
+      accessType: AccessType;
+      beginDate: string;
+    }>;
     reservableTimeSpans?: Array<{
       startDatetime?: string | null;
       endDatetime?: string | null;
@@ -6920,7 +6929,7 @@ export type ReservationUnitCardFieldsFragment = {
     smallUrl?: string | null;
     imageType: ImageType;
   }>;
-  accessTypes: Array<{ accessType: AccessType }>;
+  accessTypes: Array<{ id: string; accessType: AccessType }>;
 };
 
 export type SearchReservationUnitsQueryVariables = Exact<{
@@ -7030,7 +7039,7 @@ export type SearchReservationUnitsQuery = {
           smallUrl?: string | null;
           imageType: ImageType;
         }>;
-        accessTypes: Array<{ accessType: AccessType }>;
+        accessTypes: Array<{ id: string; accessType: AccessType }>;
       } | null;
     } | null>;
     pageInfo: { endCursor?: string | null; hasNextPage: boolean };
@@ -7550,6 +7559,7 @@ export type ApplicationPage1Query = {
           nameSv?: string | null;
           nameEn?: string | null;
         } | null;
+        accessTypes: Array<{ id: string; accessType: AccessType }>;
       }>;
     };
     applicationSections?: Array<{
@@ -7701,6 +7711,7 @@ export type ApplicationPage2Query = {
           nameSv?: string | null;
           nameEn?: string | null;
         } | null;
+        accessTypes: Array<{ id: string; accessType: AccessType }>;
       }>;
     };
     applicationSections?: Array<{
@@ -7852,6 +7863,7 @@ export type ApplicationPage3Query = {
           nameSv?: string | null;
           nameEn?: string | null;
         } | null;
+        accessTypes: Array<{ id: string; accessType: AccessType }>;
       }>;
     };
     applicationSections?: Array<{
@@ -8181,6 +8193,7 @@ export type ApplicationViewQuery = {
           nameSv?: string | null;
           nameEn?: string | null;
         } | null;
+        accessTypes: Array<{ id: string; accessType: AccessType }>;
       }>;
     };
     applicationSections?: Array<{
@@ -9199,6 +9212,10 @@ export const ApplicationReservationUnitListFragmentDoc = gql`
         nameSv
         nameEn
       }
+      accessTypes {
+        id
+        accessType
+      }
     }
   }
   ${ImageFragmentDoc}
@@ -9585,7 +9602,8 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
       ...EquipmentFields
     }
     currentAccessType
-    accessTypes(isActiveOrFuture: true) {
+    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+      id
       accessType
       beginDate
     }
@@ -9654,7 +9672,8 @@ export const ReservationUnitCardFieldsFragmentDoc = gql`
     }
     maxPersons
     currentAccessType
-    accessTypes(isActiveOrFuture: true) {
+    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+      id
       accessType
     }
   }
@@ -10995,7 +11014,6 @@ export const ListReservationsDocument = gql`
           name
           bufferTimeBefore
           bufferTimeAfter
-          accessType
           ...ReservationOrderStatus
           paymentOrder {
             id
@@ -11357,6 +11375,7 @@ export const AccessCodeDocument = gql`
         accessCode
         accessCodeBeginsAt
         accessCodeEndsAt
+        accessCodeIsActive
       }
     }
   }
