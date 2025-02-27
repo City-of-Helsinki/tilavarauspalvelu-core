@@ -19,8 +19,7 @@ import { SearchGuides } from "@/components/index/SearchGuides";
 import { Units } from "@/components/index/Units";
 import { createApolloClient } from "@/modules/apolloClient";
 import { filterNonNullable } from "common/src/helpers";
-
-type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+import { gql } from "@apollo/client";
 
 function Home({ purposes, units }: Props): JSX.Element {
   const { t } = useTranslation(["home", "common"]);
@@ -34,6 +33,8 @@ function Home({ purposes, units }: Props): JSX.Element {
     </>
   );
 }
+
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
@@ -85,5 +86,17 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     },
   };
 }
+
+export const RESERVATION_UNIT_PURPOSES = gql`
+  query ReservationUnitPurposes($orderBy: [PurposeOrderingChoices]) {
+    purposes(orderBy: $orderBy) {
+      edges {
+        node {
+          ...PurposeCard
+        }
+      }
+    }
+  }
+`;
 
 export default Home;
