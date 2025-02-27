@@ -28,7 +28,7 @@ export function parseDateTimeSafe(
       return undefined;
     }
     return d;
-  } catch (e) {
+  } catch (_) {
     return undefined;
   }
 }
@@ -47,7 +47,7 @@ export function fromAPIDateTime(
       return null;
     }
     return set(d, duration);
-  } catch (e) {
+  } catch (_) {
     return null;
   }
 }

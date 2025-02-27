@@ -44,11 +44,11 @@ export function useConfirmNavigation(props: {
           }
         }
       }
-      // eslint-disable-next-line no-alert
+
       if (!window.confirm(confirmMessage)) {
         // TODO should use a custom error type and catch it in the page / component
         // but if we inherit from Error we need to catch it and error-boundary is not designed for ignoring errors.
-        // eslint-disable-next-line @typescript-eslint/only-throw-error -- we don't want this to be processed
+
         throw "Route Canceled";
       }
       onNavigationConfirmed?.();

@@ -42,13 +42,14 @@ const ReservationFormSchema = z
 // refinements are only ran if the required fields are set
 // this shows refinement errors before required of course we need to either do a second
 // pass or add custom Required refinements
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ReservationFormSchemaPartial = ReservationFormSchema.partial();
+type ReservationFormSchemaPartialType = z.infer<
+  typeof ReservationFormSchemaPartial
+>;
 
 export const checkStartEndTime = (
-  data: Pick<
-    z.infer<typeof ReservationFormSchemaPartial>,
-    "startTime" | "endTime"
-  >,
+  data: Pick<ReservationFormSchemaPartialType, "startTime" | "endTime">,
   ctx: z.RefinementCtx
 ) => {
   if (

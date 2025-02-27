@@ -201,7 +201,7 @@ function SeasonRow({
         return (
           <>
             {i !== 0 && <AndSpan>{t("common.and")}</AndSpan>}
-            {/* eslint-disable-next-line react/no-array-index-key -- TODO key */}
+            {}
             <SeasonalTimeWrapper key={i} style={{ gridArea: area }}>
               <Controller
                 control={control}

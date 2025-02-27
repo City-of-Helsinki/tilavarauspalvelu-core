@@ -55,7 +55,7 @@ export function NewSpaceModal({
       });
       closeModal();
       refetch();
-    } catch (e) {
+    } catch (_) {
       errorToast({ text: t("SpaceModal.page2.saveFailed") });
     }
   }

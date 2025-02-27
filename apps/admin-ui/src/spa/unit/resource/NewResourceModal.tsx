@@ -79,7 +79,7 @@ export function NewResourceModal({
       });
       closeModal();
       refetch();
-    } catch (error) {
+    } catch (_) {
       errorToast({ text: t("ResourceModal.saveError") });
     }
   };

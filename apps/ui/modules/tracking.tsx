@@ -3,10 +3,9 @@ import { useRouter } from "next/router";
 
 const trackPageView = () => {
   try {
-    // eslint-disable-next-line
     const _paq = (window._paq = window._paq || []);
     _paq.push(["trackPageView"]);
-  } catch (e) {
+  } catch (_) {
     // ignore
   }
 };
