@@ -5471,6 +5471,16 @@ export type ApplicationsGroupFragment = {
   contactPerson?: { id: string; lastName: string; firstName: string } | null;
 };
 
+export type PurposeCardFragment = {
+  id: string;
+  pk?: number | null;
+  nameFi?: string | null;
+  nameEn?: string | null;
+  nameSv?: string | null;
+  imageUrl?: string | null;
+  smallUrl?: string | null;
+};
+
 export type ApplicationRoundCardFragment = {
   id: string;
   pk?: number | null;
@@ -6197,28 +6207,6 @@ export type SearchFormParamsUnitQuery = {
     nameEn?: string | null;
     nameSv?: string | null;
   }> | null;
-};
-
-export type ReservationUnitPurposesQueryVariables = Exact<{
-  orderBy?: InputMaybe<
-    | Array<InputMaybe<PurposeOrderingChoices>>
-    | InputMaybe<PurposeOrderingChoices>
-  >;
-}>;
-
-export type ReservationUnitPurposesQuery = {
-  purposes?: {
-    edges: Array<{
-      node?: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-        smallUrl?: string | null;
-      } | null;
-    } | null>;
-  } | null;
 };
 
 export type CreateReservationMutationVariables = Exact<{
@@ -8265,6 +8253,29 @@ export type ApplicationsQuery = {
   } | null;
 };
 
+export type ReservationUnitPurposesQueryVariables = Exact<{
+  orderBy?: InputMaybe<
+    | Array<InputMaybe<PurposeOrderingChoices>>
+    | InputMaybe<PurposeOrderingChoices>
+  >;
+}>;
+
+export type ReservationUnitPurposesQuery = {
+  purposes?: {
+    edges: Array<{
+      node?: {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        imageUrl?: string | null;
+        smallUrl?: string | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type ApplicationRoundCriteriaQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -9070,6 +9081,17 @@ export const ApplicationsGroupFragmentDoc = gql`
     sentDate
   }
   ${ApplicationCardFragmentDoc}
+`;
+export const PurposeCardFragmentDoc = gql`
+  fragment PurposeCard on PurposeNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    imageUrl
+    smallUrl
+  }
 `;
 export const PricingFieldsFragmentDoc = gql`
   fragment PricingFields on ReservationUnitPricingNode {
@@ -10425,93 +10447,6 @@ export type SearchFormParamsUnitSuspenseQueryHookResult = ReturnType<
 export type SearchFormParamsUnitQueryResult = Apollo.QueryResult<
   SearchFormParamsUnitQuery,
   SearchFormParamsUnitQueryVariables
->;
-export const ReservationUnitPurposesDocument = gql`
-  query ReservationUnitPurposes($orderBy: [PurposeOrderingChoices]) {
-    purposes(orderBy: $orderBy) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
-          smallUrl
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useReservationUnitPurposesQuery__
- *
- * To run a query within a React component, call `useReservationUnitPurposesQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationUnitPurposesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationUnitPurposesQuery({
- *   variables: {
- *      orderBy: // value for 'orderBy'
- *   },
- * });
- */
-export function useReservationUnitPurposesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
-  >(ReservationUnitPurposesDocument, options);
-}
-export function useReservationUnitPurposesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
-  >(ReservationUnitPurposesDocument, options);
-}
-export function useReservationUnitPurposesSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationUnitPurposesQuery,
-        ReservationUnitPurposesQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
-  >(ReservationUnitPurposesDocument, options);
-}
-export type ReservationUnitPurposesQueryHookResult = ReturnType<
-  typeof useReservationUnitPurposesQuery
->;
-export type ReservationUnitPurposesLazyQueryHookResult = ReturnType<
-  typeof useReservationUnitPurposesLazyQuery
->;
-export type ReservationUnitPurposesSuspenseQueryHookResult = ReturnType<
-  typeof useReservationUnitPurposesSuspenseQuery
->;
-export type ReservationUnitPurposesQueryResult = Apollo.QueryResult<
-  ReservationUnitPurposesQuery,
-  ReservationUnitPurposesQueryVariables
 >;
 export const CreateReservationDocument = gql`
   mutation CreateReservation($input: ReservationCreateMutationInput!) {
@@ -12688,6 +12623,89 @@ export type ApplicationsSuspenseQueryHookResult = ReturnType<
 export type ApplicationsQueryResult = Apollo.QueryResult<
   ApplicationsQuery,
   ApplicationsQueryVariables
+>;
+export const ReservationUnitPurposesDocument = gql`
+  query ReservationUnitPurposes($orderBy: [PurposeOrderingChoices]) {
+    purposes(orderBy: $orderBy) {
+      edges {
+        node {
+          ...PurposeCard
+        }
+      }
+    }
+  }
+  ${PurposeCardFragmentDoc}
+`;
+
+/**
+ * __useReservationUnitPurposesQuery__
+ *
+ * To run a query within a React component, call `useReservationUnitPurposesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationUnitPurposesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationUnitPurposesQuery({
+ *   variables: {
+ *      orderBy: // value for 'orderBy'
+ *   },
+ * });
+ */
+export function useReservationUnitPurposesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ReservationUnitPurposesQuery,
+    ReservationUnitPurposesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationUnitPurposesQuery,
+    ReservationUnitPurposesQueryVariables
+  >(ReservationUnitPurposesDocument, options);
+}
+export function useReservationUnitPurposesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationUnitPurposesQuery,
+    ReservationUnitPurposesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationUnitPurposesQuery,
+    ReservationUnitPurposesQueryVariables
+  >(ReservationUnitPurposesDocument, options);
+}
+export function useReservationUnitPurposesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationUnitPurposesQuery,
+        ReservationUnitPurposesQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationUnitPurposesQuery,
+    ReservationUnitPurposesQueryVariables
+  >(ReservationUnitPurposesDocument, options);
+}
+export type ReservationUnitPurposesQueryHookResult = ReturnType<
+  typeof useReservationUnitPurposesQuery
+>;
+export type ReservationUnitPurposesLazyQueryHookResult = ReturnType<
+  typeof useReservationUnitPurposesLazyQuery
+>;
+export type ReservationUnitPurposesSuspenseQueryHookResult = ReturnType<
+  typeof useReservationUnitPurposesSuspenseQuery
+>;
+export type ReservationUnitPurposesQueryResult = Apollo.QueryResult<
+  ReservationUnitPurposesQuery,
+  ReservationUnitPurposesQueryVariables
 >;
 export const ApplicationRoundCriteriaDocument = gql`
   query ApplicationRoundCriteria($id: ID!) {
