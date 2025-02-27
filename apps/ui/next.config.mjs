@@ -1,11 +1,14 @@
 // @ts-check
 import { join } from "node:path";
 import * as url from "node:url";
-
-import * as i18nconfig from "./next-i18next.config.cjs";
+import i18nconfig from "./next-i18next.config.cjs";
 import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./env.mjs";
 import { getVersion } from "./modules/baseUtils.mjs";
+
+// NOTE required for next-i18next to find the config file (when not .js)
+// required to be cjs because they don't support esm
+process.env.I18NEXT_DEFAULT_CONFIG_PATH = "./next-i18next.config.cjs";
 
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 

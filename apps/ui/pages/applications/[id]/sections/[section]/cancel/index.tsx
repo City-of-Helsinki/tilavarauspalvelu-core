@@ -99,7 +99,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
           router.push(url);
         }
       }
-    } catch (e) {
+    } catch (_) {
       errorToast({
         text: t("reservations:cancel.mutationFailed"),
       });

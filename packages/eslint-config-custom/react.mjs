@@ -1,52 +1,181 @@
 // @ts-check
-const { defineConfig } = require('eslint-define-config');
-const { resolve } = require('node:path');
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import globals from "globals";
+import reactPlugin from 'eslint-plugin-react';
+import eslintPluginReactHooks from "eslint-plugin-react-hooks";
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
-const project = resolve(process.cwd(), "tsconfig.json");
+// const project = resolve(process.cwd(), "tsconfig.json");
 
-const SCHEMA_PATH = "../../tilavaraus.graphql";
+// const SCHEMA_PATH = "../../tilavaraus.graphql";
 
-/// <reference types="@eslint-types/typescript-eslint" />
-module.exports = defineConfig({
-  overrides: [
+// import graphqlPlugin from '@graphql-eslint/eslint-plugin';
+// import { processors as gqlProcessor } from '@graphql-eslint/eslint-plugin'
+import graphqlPlugin from '@graphql-eslint/eslint-plugin'
+// import { GraphQLConfig } from "graphql-config";
+//
+
+  /*
+const gqlConfig = {
+ overrides: [
     {
       "files": ["*.ts", "*.tsx"],
       "processor": "@graphql-eslint/graphql",
     },
     {
-      "files": ["*.graphql"],
-      "parser": "@graphql-eslint/eslint-plugin",
-      "plugins": ["@graphql-eslint"],
-      // operations is the client side queries
-      "extends": "plugin:@graphql-eslint/operations-recommended",
+      files: ["*.graphql"],
+      parser: processors.parser , // "@graphql-eslint/eslint-plugin",
       parserOptions: {
-        schema: SCHEMA_PATH,
-        // monorepo paths... should use a find root function
-        operations: ["../../apps/**/*.{ts,tsx}", "../../packages/**/*.{ts,tsx}"],
-        // our graphql codegen config is old and has issues disable it and use the above
-        skipGraphQLConfig: true
-     },
+        graphQLConfig: {
+          schema: SCHEMA_PATH,
+          */
+          // monorepo paths... should use a find root function
+          // operations: ["../../apps/**/*.{ts,tsx}", "../../packages/**/*.{ts,tsx}"],
+  /*
+          // our graphql codegen config is old and has issues disable it and use the above
+          skipGraphQLConfig: true
+        }
+      },
+      "plugins": {
+        "@graphql-eslint": graphqlPlugin,
+      },
+      // operations is the client side queries
+      // "extends": "plugin:@graphql-eslint/operations-recommended",
       rules: {
         "@graphql-eslint/no-deprecated": "warn",
         "@graphql-eslint/selection-set-depth": ["error", { maxDepth: 10 }],
       },
     },
   ],
-  root: true,
+  ignorePatterns: [
+    'gql-types.ts',
+  ],
+  },
+}
+  */
+const gqlConfig = {
+    files: ['**/*.graphql'],
+    languageOptions: {
+      parser: graphqlPlugin.parser
+    },
+    plugins: {
+      '@graphql-eslint': graphqlPlugin
+    },
+    rules: {
+      '@graphql-eslint/known-type-names': 'error'
+      // ... other GraphQL-ESLint rules
+    }
+  };
+
+/** @type {import('eslint').Linter.RulesRecord} */
+const myRules = {
+  "no-console": "error",
+  // enforce null checks are == / != everything else ===
+  eqeqeq: ["error", "always", { null: "never" }],
+  // afaik this conflicts with @typescript-eslint/no-unused-vars
+  "no-unused-vars": 0,
+  // allow deconstruction and _ for unused vars
+  "@typescript-eslint/no-unused-vars": [
+    "error",
+    {
+      args: "all",
+      argsIgnorePattern: "^_",
+      varsIgnorePattern: "^_|^React$",
+      caughtErrors: "all",
+      caughtErrorsIgnorePattern: "^_",
+      destructuredArrayIgnorePattern: "^_",
+      ignoreRestSiblings: true,
+    },
+  ],
+  // for some reason this raises errors for "key" props in jsx arrays
+  "react/prop-types": "off"
+  // mixing mjs with ts in nextjs causes issues
+  /*
+  "import/extensions": [
+    "error",
+    "never",
+    {
+      "mjs": "always",
+      "cjs": "always",
+      "json": "always",
+    },
+  ],
+  */
+};
+
+const myConfig = {
+  ...reactPlugin.configs.flat.recommended,
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
+  languageOptions: {
+    ...reactPlugin.configs.flat.recommended.languageOptions,
+    ecmaVersion: 2022,
+    sourceType: "module",
+    parserOptions: {
+      ecmaFeatures: {
+        jsx: true,
+      },
+    },
+    globals: {
+      ...globals.browser,
+      ...globals.node,
+    },
+  },
+  plugins: {
+    react: reactPlugin,
+  },
+  rules: myRules,
+};
+
+const tsConfig = tseslint.config(
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
+);
+
+export default [
+  ...tsConfig,
+  gqlConfig,
+  reactPlugin.configs.flat['jsx-runtime'],
+  {
+    plugins: {
+      "react-hooks": eslintPluginReactHooks,
+    },
+    rules: { ...eslintPluginReactHooks.configs.recommended.rules },
+  },
+  eslintPluginPrettierRecommended,
+  myConfig,
+  {
+    ignores: [
+      "node_modules/",
+      ".next/",
+      ".turbo/",
+      "out/",
+      "public/",
+    ]
+  }
+];
+/*
+export default [
+  myConfig,
+];
+*/
+
+/// <reference types="@eslint-types/typescript-eslint" />
+/*
+export default [{
+   root: true,
   extends: [
-    resolve('@vercel/style-guide/eslint/node'),
-    resolve('@vercel/style-guide/eslint/typescript'),
-    resolve('@vercel/style-guide/eslint/browser'),
-    resolve('@vercel/style-guide/eslint/react'),
-    resolve('@vercel/style-guide/eslint/jest-react'),
+    "eslint:recommended",
     "plugin:prettier/recommended",
   ],
   plugins: [
     "prettier",
   ],
-  parserOptions: {
-    project,
-  },
+
   settings: {
     'import/resolver': {
       typescript: {
@@ -54,18 +183,7 @@ module.exports = defineConfig({
       },
     },
   },
-  ignorePatterns: [
-    'gql-types.ts',
-  ],
-  env: {
-    browser: true,
-    jest: true,
-    node: true,
-  },
-  globals: {
-    React: true,
-    JSX: true,
-  },
+
   rules: {
     // TODO temp rules from migrating from airbnb to vercel style-guide
     "@typescript-eslint/prefer-nullish-coalescing": 0,
@@ -126,20 +244,6 @@ module.exports = defineConfig({
     "prefer-named-capture-group": 0,
     // fails to find lodash...
     "import/named": 0,
-    // afaik this conflicts with @typescript-eslint/no-unused-vars
-    "no-unused-vars": 0,
-    // enforce null checks are == / != everything else ===
-    eqeqeq: ["error", "always", { null: "never" }],
-    // mixing mjs with ts in nextjs causes issues
-    "import/extensions": [
-      "error",
-      "never",
-      {
-        "mjs": "always",
-        "cjs": "always",
-        "json": "always",
-      },
-    ],
     // prefer explicit cases over defaults
     "default-case": 0,
     // FIXME this is missing
@@ -150,15 +254,7 @@ module.exports = defineConfig({
         devDependencies: true,
       },
     ],
-    // allow deconstruction and _ for unused vars
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        varsIgnorePattern: "^_",
-        argsIgnorePattern: "^_",
-        ignoreRestSiblings: true,
-      },
-    ],
+
     "import/no-unresolved": "off",
     "import/prefer-default-export": 0,
     "jsx-a11y/alt-text": 1,
@@ -204,4 +300,5 @@ module.exports = defineConfig({
       },
     ],
   },
-});
+}];
+*/

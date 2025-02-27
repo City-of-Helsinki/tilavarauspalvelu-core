@@ -107,7 +107,7 @@ export function getFeedbackUrl(
     const url = new URL(feedbackUrl);
     url.searchParams.set("lang", i18n.language);
     return url.toString();
-  } catch (e) {
+  } catch (_) {
     return null;
   }
 }

@@ -125,7 +125,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
       });
       refetch();
       history(-1);
-    } catch (e) {
+    } catch (_) {
       errorToast({ text: t("SpaceEditor.saveFailed") });
     }
   };
