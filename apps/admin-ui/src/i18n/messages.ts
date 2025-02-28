@@ -2007,6 +2007,13 @@ const translations: ITranslations = {
     accessCodeRepair: ["Korjaa ovikoodi"],
     accessCodeChangedSuccess: ["Ovikoodi vaihdettu"],
     accessCodeRepairedSuccess: ["Ovikoodi korjattu"],
+    accessCodeChangeConfirm: [
+      "Uuden ovikoodin generointi nollaa aiemman ovikoodit. Haluatko varmasti generoida uuden ovikoodin?",
+    ],
+    accessCodeChangeMultiple: ["Vaihda kausivarauksen ovikoodi"],
+    accessCodeChangeConfirmMultiple: [
+      "Ovikoodi vaihtuu myös muille tähän kausivaraukseen liittyville viikkovuoroille. Haluatko varmasti vaihtaa ovikoodin?",
+    ],
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],
