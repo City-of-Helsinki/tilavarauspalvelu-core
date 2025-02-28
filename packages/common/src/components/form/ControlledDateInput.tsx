@@ -44,7 +44,7 @@ export function ControlledDateInput<T extends FieldValues>({
     <DateInput
       {...rest}
       id={id ?? `controlled-date-input__${name}`}
-      label={label ?? t(`ReservationDialog.${name}`)}
+      label={label ?? t(`common.${name}`)}
       minDate={minDate ?? new Date()}
       maxDate={maxDate ?? addYears(new Date(), 2)}
       initialMonth={initialMonth}

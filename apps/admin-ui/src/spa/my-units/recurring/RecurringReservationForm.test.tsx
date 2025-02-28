@@ -235,14 +235,14 @@ async function fillForm({
   // make sure that the form is active and can be filled before continuing
   await waitFor(async () => {
     const startDateLabel = screen.getByRole("textbox", {
-      name: /ReservationDialog.startingDate/,
+      name: /common.startingDate/,
     });
 
     return expect(startDateLabel).not.toBeDisabled();
   });
 
   const startDateLabel = screen.getByRole("textbox", {
-    name: /ReservationDialog.startingDate/,
+    name: /common.startingDate/,
   });
   await user.click(startDateLabel);
   await user.keyboard(begin);
@@ -252,7 +252,7 @@ async function fillForm({
   await user.tab();
   await user.keyboard(end);
   const endDateLabel = screen.getByRole("textbox", {
-    name: /ReservationDialog.endingDate/,
+    name: /common.endingDate/,
   });
   expect(endDateLabel).toHaveValue(end);
 
