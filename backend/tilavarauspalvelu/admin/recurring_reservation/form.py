@@ -6,8 +6,9 @@ from typing import Any
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import RecurringReservation
+from utils.external_service.errors import ExternalServiceError
 
 
 class ReservationSeriesAdminForm(forms.ModelForm):
@@ -76,24 +77,17 @@ class ReservationSeriesAdminForm(forms.ModelForm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        if getattr(self.instance, "pk", None) and self.instance.should_have_active_access_code:
+        editing = getattr(self.instance, "pk", None) is not None
+
+        if editing and self.instance.should_have_active_access_code:
             pindora_field = self.fields["pindora_response"]
             pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})
+            pindora_field.initial = self.get_pindora_response()
 
-            if self.instance.allocated_time_slot is None:
-                response = PindoraClient.get_reservation_series(series=self.instance)
+    def get_pindora_response(self) -> str | None:
+        try:
+            response = PindoraService.get_access_code(obj=self.instance)
+        except ExternalServiceError as error:
+            return str(error)
 
-                pindora_field.initial = json.dumps(response, default=str, indent=2)
-
-            else:
-                section = self.instance.allocated_time_slot.reservation_unit_option.application_section
-                response = PindoraClient.get_seasonal_booking(section=section)
-
-                # Only show validity for this series's reservation unit (might not match one-to-one with the series)
-                response["reservation_unit_code_validity"] = [
-                    item
-                    for item in response["reservation_unit_code_validity"]
-                    if item["reservation_unit_id"] == self.instance.reservation_unit.uuid
-                ]
-
-                pindora_field.initial = json.dumps(response, default=str, indent=2)
+        return json.dumps(response, default=str, indent=2)

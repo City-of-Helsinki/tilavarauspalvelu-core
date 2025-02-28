@@ -7,7 +7,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import (
     Application,
     ApplicationSection,
@@ -15,6 +15,7 @@ from tilavarauspalvelu.models import (
     ReservationUnitOption,
     SuitableTimeRange,
 )
+from utils.external_service.errors import ExternalServiceError
 from utils.fields.forms import disabled_widget
 
 
@@ -124,24 +125,6 @@ class ApplicationSectionAdminForm(forms.ModelForm):
         help_text=_("Response from Pindora API"),
     )
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        instance: ApplicationSection | None = kwargs.get("instance")
-        if instance:
-            kwargs.setdefault("initial", {})
-            kwargs["initial"]["status"] = ApplicationSectionStatusChoice(instance.status).label
-
-        self.base_fields["application"].queryset = Application.objects.select_related("user")
-
-        super().__init__(*args, **kwargs)
-
-        if getattr(self.instance, "pk", None) and self.instance.should_have_active_access_code:
-            pindora_field = self.fields["pindora_response"]
-            pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})
-
-            response = PindoraClient.get_seasonal_booking(section=self.instance)
-
-            pindora_field.initial = json.dumps(response, default=str, indent=2)
-
     class Meta:
         model = ApplicationSection
         fields = []  # Use fields from ModelAdmin
@@ -174,3 +157,28 @@ class ApplicationSectionAdminForm(forms.ModelForm):
             "purpose": _("Purpose for this section."),
             "should_have_active_access_code": _("Should this application section have an active access code?"),
         }
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        instance: ApplicationSection | None = kwargs.get("instance")
+        if instance:
+            kwargs.setdefault("initial", {})
+            kwargs["initial"]["status"] = ApplicationSectionStatusChoice(instance.status).label
+
+        self.base_fields["application"].queryset = Application.objects.select_related("user")
+
+        super().__init__(*args, **kwargs)
+
+        editing = getattr(self.instance, "pk", None) is not None
+
+        if editing and self.instance.should_have_active_access_code:
+            pindora_field = self.fields["pindora_response"]
+            pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})
+            pindora_field.initial = self.get_pindora_response()
+
+    def get_pindora_response(self) -> str | None:
+        try:
+            response = PindoraService.get_access_code(obj=self.instance)
+        except ExternalServiceError as error:
+            return str(error)
+
+        return json.dumps(response, default=str, indent=2)

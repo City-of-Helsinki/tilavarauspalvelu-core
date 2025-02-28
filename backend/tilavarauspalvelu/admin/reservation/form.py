@@ -7,10 +7,9 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import AccessType
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraClientError
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.external_service.errors import ExternalServiceError
 
 
 class ReservationAdminForm(forms.ModelForm):
@@ -160,50 +159,17 @@ class ReservationAdminForm(forms.ModelForm):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        if getattr(self.instance, "pk", None) and self.instance.access_type == AccessType.ACCESS_CODE:
+        editing = getattr(self.instance, "pk", None) is not None
+
+        if editing and self.instance.access_type == AccessType.ACCESS_CODE:
             pindora_field = self.fields["pindora_response"]
             pindora_field.widget.attrs.update({"cols": "100", "rows": "20"})
             pindora_field.initial = self.get_pindora_response()
 
     def get_pindora_response(self) -> str | None:
-        if self.instance.recurring_reservation is None:
-            try:
-                response = PindoraClient.get_reservation(reservation=self.instance)
-            except PindoraClientError as error:
-                return str(error.msg)
-            return json.dumps(response, default=str, indent=2)
-
-        if self.instance.recurring_reservation.allocated_time_slot is None:
-            try:
-                response = PindoraClient.get_reservation_series(series=self.instance.recurring_reservation)
-            except PindoraClientError as error:
-                return str(error.msg)
-
-            # Only show the validity for this reservation
-            response["reservation_unit_code_validity"] = [
-                item
-                for item in response["reservation_unit_code_validity"]
-                if item["begin"] == self.instance.begin.astimezone(DEFAULT_TIMEZONE)
-                and item["end"] == self.instance.end.astimezone(DEFAULT_TIMEZONE)
-            ]
-
-            return json.dumps(response, default=str, indent=2)
-
-        allocation = self.instance.recurring_reservation.allocated_time_slot
-        section = allocation.reservation_unit_option.application_section
-
         try:
-            response = PindoraClient.get_seasonal_booking(section=section)
-        except PindoraClientError as error:
-            return str(error.msg)
-
-        # Only show the validity for this reservation
-        response["reservation_unit_code_validity"] = [
-            item
-            for item in response["reservation_unit_code_validity"]
-            if item["begin"] == self.instance.begin.astimezone(DEFAULT_TIMEZONE)
-            and item["end"] == self.instance.end.astimezone(DEFAULT_TIMEZONE)
-            and item["reservation_unit_id"] == self.instance.recurring_reservation.reservation_unit.uuid
-        ]
+            response = PindoraService.get_access_code(obj=self.instance)
+        except ExternalServiceError as error:
+            return str(error)
 
         return json.dumps(response, default=str, indent=2)
