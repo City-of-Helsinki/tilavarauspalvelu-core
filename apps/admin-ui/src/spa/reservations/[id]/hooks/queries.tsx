@@ -94,6 +94,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
 // Possible optmisation: this fragment is only required for some queries.
 const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
   fragment ReservationSpecialisation on ReservationNode {
+    id
     calendarUrl
     price
     taxPercentageValue
@@ -125,6 +126,7 @@ const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
 
 const SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT = gql`
   fragment ReservationAccessType on ReservationNode {
+    id
     accessType
     isAccessCodeIsActiveCorrect
     pindoraInfo {

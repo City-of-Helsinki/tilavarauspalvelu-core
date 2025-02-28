@@ -15,6 +15,7 @@ const Subheading = styled(H4).attrs({ as: "h2", $noMargin: true })`
 
 export const RESERVATION_INFO_CONTAINER_FRAGMENT = gql`
   fragment ReservationInfoContainer on ReservationUnitNode {
+    id
     reservationBegins
     reservationEnds
     reservationsMaxDaysBefore

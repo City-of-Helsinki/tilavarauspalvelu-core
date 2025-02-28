@@ -5514,6 +5514,7 @@ export type AddressFieldsFragment = {
 };
 
 export type ReservationInfoContainerFragment = {
+  id: string;
   reservationBegins?: string | null;
   reservationEnds?: string | null;
   reservationsMaxDaysBefore?: number | null;
@@ -5524,6 +5525,7 @@ export type ReservationInfoContainerFragment = {
 };
 
 export type ReservationInfoCardFragment = {
+  id: string;
   pk?: number | null;
   taxPercentageValue?: string | null;
   begin: string;
@@ -6149,6 +6151,7 @@ export type UnitNameFieldsI18NFragment = {
 };
 
 export type TermsOfUseFragment = {
+  id: string;
   termsOfUseFi?: string | null;
   termsOfUseEn?: string | null;
   termsOfUseSv?: string | null;
@@ -6171,10 +6174,10 @@ export type TermsOfUseFragment = {
     textSv?: string | null;
   } | null;
   pricingTerms?: {
+    id: string;
     nameFi?: string | null;
     nameEn?: string | null;
     nameSv?: string | null;
-    id: string;
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
@@ -6265,6 +6268,7 @@ export type CancellationRuleFieldsFragment = {
 };
 
 export type ReservationOrderStatusFragment = {
+  id: string;
   state?: ReservationStateChoice | null;
   paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
 };
@@ -6590,10 +6594,10 @@ export type ReservationUnitPageFieldsFragment = {
     textSv?: string | null;
   } | null;
   pricingTerms?: {
+    id: string;
     nameFi?: string | null;
     nameEn?: string | null;
     nameSv?: string | null;
-    id: string;
     textFi?: string | null;
     textEn?: string | null;
     textSv?: string | null;
@@ -6620,6 +6624,7 @@ export type BlockingReservationFieldsFragment = {
 };
 
 export type IsReservableFieldsFragment = {
+  id: string;
   bufferTimeBefore: number;
   bufferTimeAfter: number;
   maxReservationDuration?: number | null;
@@ -6773,10 +6778,10 @@ export type ReservationUnitPageQuery = {
       textSv?: string | null;
     } | null;
     pricingTerms?: {
+      id: string;
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
-      id: string;
       textFi?: string | null;
       textEn?: string | null;
       textSv?: string | null;
@@ -7037,6 +7042,7 @@ export type CurrentUserQuery = {
 };
 
 export type PriceReservationUnitFragment = {
+  id: string;
   reservationBegins?: string | null;
   reservationEnds?: string | null;
   pricings: Array<{
@@ -7090,6 +7096,7 @@ export type BannerNotificationsListQuery = {
 };
 
 export type ApplicationNameFragment = {
+  id: string;
   applicantType?: ApplicantTypeChoice | null;
   organisation?: {
     id: string;
@@ -7100,6 +7107,7 @@ export type ApplicationNameFragment = {
 };
 
 export type ApplicationSectionDurationFragment = {
+  id: string;
   reservationsEndDate: string;
   reservationsBeginDate: string;
   appliedReservationsPerWeek: number;
@@ -7191,6 +7199,7 @@ export type ApplicationSectionUiFragment = {
 };
 
 export type ApplicantFragment = {
+  id: string;
   pk?: number | null;
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
@@ -7235,6 +7244,7 @@ export type ApplicantFragment = {
 };
 
 export type ReserveeNameFieldsFragment = {
+  id: string;
   reserveeFirstName?: string | null;
   reserveeLastName?: string | null;
   reserveeEmail?: string | null;
@@ -7245,6 +7255,7 @@ export type ReserveeNameFieldsFragment = {
 };
 
 export type ReserveeBillingFieldsFragment = {
+  id: string;
   reserveeId?: string | null;
   reserveeIsUnregisteredAssociation?: boolean | null;
   reserveeAddressStreet?: string | null;
@@ -7264,6 +7275,7 @@ export type MetaFieldsFragment = {
   freeOfChargeReason?: string | null;
   description?: string | null;
   numPersons?: number | null;
+  id: string;
   reserveeFirstName?: string | null;
   reserveeLastName?: string | null;
   reserveeEmail?: string | null;
@@ -7305,6 +7317,7 @@ export type MetaFieldsFragment = {
 };
 
 export type TermsOfUseNameFieldsFragment = {
+  id: string;
   nameFi?: string | null;
   nameEn?: string | null;
   nameSv?: string | null;
@@ -7320,10 +7333,10 @@ export type TermsOfUseTextFieldsFragment = {
 export type TermsOfUseFieldsFragment = {
   pk?: string | null;
   termsType: TermsType;
+  id: string;
   nameFi?: string | null;
   nameEn?: string | null;
   nameSv?: string | null;
-  id: string;
   textFi?: string | null;
   textEn?: string | null;
   textSv?: string | null;
@@ -8483,10 +8496,10 @@ export type ReservationQuery = {
         textSv?: string | null;
       } | null;
       pricingTerms?: {
+        id: string;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
-        id: string;
         textFi?: string | null;
         textEn?: string | null;
         textSv?: string | null;
@@ -8974,10 +8987,10 @@ export type ReservationPageQuery = {
         textSv?: string | null;
       } | null;
       pricingTerms?: {
+        id: string;
         nameFi?: string | null;
         nameEn?: string | null;
         nameSv?: string | null;
-        id: string;
         textFi?: string | null;
         textEn?: string | null;
         textSv?: string | null;
@@ -9009,6 +9022,7 @@ export type ReservationPageQuery = {
 };
 
 export type ReservationInfoFragment = {
+  id: string;
   description?: string | null;
   numPersons?: number | null;
   purpose?: {
@@ -9046,6 +9060,7 @@ export const InstructionsFragmentDoc = gql`
 `;
 export const ApplicationNameFragmentDoc = gql`
   fragment ApplicationName on ApplicationNode {
+    id
     applicantType
     organisation {
       id
@@ -9109,6 +9124,7 @@ export const PricingFieldsFragmentDoc = gql`
 `;
 export const PriceReservationUnitFragmentDoc = gql`
   fragment PriceReservationUnit on ReservationUnitNode {
+    id
     pricings {
       ...PricingFields
     }
@@ -9129,6 +9145,7 @@ export const ImageFragmentDoc = gql`
 `;
 export const ReservationInfoCardFragmentDoc = gql`
   fragment ReservationInfoCard on ReservationNode {
+    id
     pk
     taxPercentageValue
     begin
@@ -9235,6 +9252,7 @@ export const ApplicationSectionReservationFragmentDoc = gql`
 `;
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {
+    id
     pk
     applicantType
     contactPerson {
@@ -9321,6 +9339,7 @@ export const ApplicationRoundForApplicationFragmentDoc = gql`
 `;
 export const ApplicationSectionDurationFragmentDoc = gql`
   fragment ApplicationSectionDuration on ApplicationSectionNode {
+    id
     reservationsEndDate
     reservationsBeginDate
     appliedReservationsPerWeek
@@ -9422,6 +9441,7 @@ export const ApplicationFormFragmentDoc = gql`
 `;
 export const TermsOfUseNameFieldsFragmentDoc = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
+    id
     nameFi
     nameEn
     nameSv
@@ -9477,6 +9497,7 @@ export const CancelReasonFieldsFragmentDoc = gql`
 `;
 export const ReservationOrderStatusFragmentDoc = gql`
   fragment ReservationOrderStatus on ReservationNode {
+    id
     state
     paymentOrder {
       id
@@ -9535,6 +9556,7 @@ export const AddressFieldsFragmentDoc = gql`
 `;
 export const TermsOfUseFragmentDoc = gql`
   fragment TermsOfUse on ReservationUnitNode {
+    id
     termsOfUseFi
     termsOfUseEn
     termsOfUseSv
@@ -9584,6 +9606,7 @@ export const ReservationUnitTypeFieldsFragmentDoc = gql`
 `;
 export const ReservationInfoContainerFragmentDoc = gql`
   fragment ReservationInfoContainer on ReservationUnitNode {
+    id
     reservationBegins
     reservationEnds
     reservationsMaxDaysBefore
@@ -9695,6 +9718,7 @@ export const BlockingReservationFieldsFragmentDoc = gql`
 `;
 export const IsReservableFieldsFragmentDoc = gql`
   fragment IsReservableFields on ReservationUnitNode {
+    id
     bufferTimeBefore
     bufferTimeAfter
     reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
@@ -9745,6 +9769,7 @@ export const ReservationUnitCardFieldsFragmentDoc = gql`
 `;
 export const ReserveeNameFieldsFragmentDoc = gql`
   fragment ReserveeNameFields on ReservationNode {
+    id
     reserveeFirstName
     reserveeLastName
     reserveeEmail
@@ -9756,6 +9781,7 @@ export const ReserveeNameFieldsFragmentDoc = gql`
 `;
 export const ReserveeBillingFieldsFragmentDoc = gql`
   fragment ReserveeBillingFields on ReservationNode {
+    id
     reserveeId
     reserveeIsUnregisteredAssociation
     reserveeAddressStreet
@@ -9851,6 +9877,7 @@ export const ApplicationRoundFieldsFragmentDoc = gql`
 `;
 export const ReservationInfoFragmentDoc = gql`
   fragment ReservationInfo on ReservationNode {
+    id
     description
     purpose {
       id

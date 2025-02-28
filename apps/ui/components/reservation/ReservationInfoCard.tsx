@@ -186,6 +186,7 @@ export function ReservationInfoCard({
 
 export const RESERVATION_INFO_CARD_FRAGMENT = gql`
   fragment ReservationInfoCard on ReservationNode {
+    id
     pk
     taxPercentageValue
     begin
