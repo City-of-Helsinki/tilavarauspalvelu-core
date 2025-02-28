@@ -3,6 +3,7 @@ import {
   type ReservationQuery,
   useChangeReservationAccessCodeMutation,
   useRepairReservationAccessCodeMutation,
+  UserPermissionChoice,
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
 import { getValidationErrors } from "common/src/apolloUtils";
@@ -20,6 +21,7 @@ import styled, { css } from "styled-components";
 import { breakpoints } from "common";
 import { ButtonContainer } from "common/styles/util";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
+import { useCheckPermission } from "@/hooks";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
@@ -152,6 +154,11 @@ function AccessCodeChangeRepairButton({
     reservation.pindoraInfo?.accessCodeIsActive !==
     reservation.accessCodeShouldBeActive;
 
+  const { hasPermission } = useCheckPermission({
+    units: [reservation.reservationUnits?.[0]?.unit?.pk ?? 0],
+    permission: UserPermissionChoice.CanManageReservations,
+  });
+
   const handleExecuteMutation = async () => {
     const payload = { variables: { input: { pk: reservation.pk ?? 0 } } };
 
@@ -214,6 +221,7 @@ function AccessCodeChangeRepairButton({
           }
         }}
         iconStart={<IconRefresh />}
+        disabled={!hasPermission}
       >
         {reservation.pindoraInfo?.accessCodeIsActive ===
         reservation.accessCodeShouldBeActive
