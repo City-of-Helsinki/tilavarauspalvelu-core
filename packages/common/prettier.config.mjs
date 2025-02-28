@@ -1,5 +1,2 @@
-/** @type {import('prettier').Options} */
-export default {
-  singleQuote: false,
-  trailingComma: "es5",
-};
+import config from "eslint-config-custom/prettier.mjs";
+export default config;
