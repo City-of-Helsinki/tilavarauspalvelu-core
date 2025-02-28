@@ -13,12 +13,13 @@ import {
   IconRefresh,
 } from "hds-react";
 import { formatDate, formatTime } from "@/common/util";
-import React from "react";
+import React, { useState } from "react";
 
 import { Accordion, DataWrapper } from "@/spa/reservations/[id]/components";
 import styled, { css } from "styled-components";
 import { breakpoints } from "common";
 import { ButtonContainer } from "common/styles/util";
+import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
@@ -142,18 +143,20 @@ function AccessCodeChangeRepairButton({
   onSuccess: () => void;
 }>) {
   const { t, i18n } = useTranslation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [changeAccessCodeMutation] = useChangeReservationAccessCodeMutation();
   const [repairAccessCodeMutation] = useRepairReservationAccessCodeMutation();
 
-  const handleButton = async (reservationPk: number) => {
-    const payload = { variables: { input: { pk: reservationPk } } };
+  const isAccessCodeBroken =
+    reservation.pindoraInfo?.accessCodeIsActive !==
+    reservation.accessCodeShouldBeActive;
+
+  const handleExecuteMutation = async () => {
+    const payload = { variables: { input: { pk: reservation.pk ?? 0 } } };
 
     try {
-      if (
-        reservation.pindoraInfo?.accessCodeIsActive ===
-        reservation.accessCodeShouldBeActive
-      ) {
+      if (isAccessCodeBroken) {
         await changeAccessCodeMutation(payload);
         successToast({
           text: t("RequestedReservation.accessCodeChangedSuccess"),
@@ -166,11 +169,13 @@ function AccessCodeChangeRepairButton({
       }
       onSuccess(); // refetch reservation
     } catch (err: unknown) {
-      handleError(err);
+      handleExecuteMutationError(err);
     }
+
+    setIsModalOpen(false);
   };
 
-  const handleError = (e: unknown) => {
+  const handleExecuteMutationError = (e: unknown) => {
     const validationErrors = getValidationErrors(e);
     if (validationErrors.length > 0) {
       const code = validationErrors[0].validation_code;
@@ -199,7 +204,15 @@ function AccessCodeChangeRepairButton({
     >
       <Button
         size={ButtonSize.Small}
-        onClick={() => handleButton(reservation.pk ?? 0)}
+        onClick={() => {
+          if (isAccessCodeBroken) {
+            // if access code is broken, execute mutation immediately, no need to confirm
+            handleExecuteMutation();
+          } else {
+            // Otherwise open confirmation dialog
+            setIsModalOpen(true);
+          }
+        }}
         iconStart={<IconRefresh />}
       >
         {reservation.pindoraInfo?.accessCodeIsActive ===
@@ -207,6 +220,24 @@ function AccessCodeChangeRepairButton({
           ? t("RequestedReservation.accessCodeChange")
           : t("RequestedReservation.accessCodeRepair")}
       </Button>
+      <ConfirmationDialog
+        isOpen={isModalOpen}
+        onAccept={() => handleExecuteMutation()}
+        onCancel={() => setIsModalOpen(false)}
+        heading={
+          reservation.recurringReservation
+            ? t("RequestedReservation.accessCodeChangeMultiple")
+            : t("RequestedReservation.accessCodeChange")
+        }
+        content={
+          reservation.recurringReservation
+            ? t("RequestedReservation.accessCodeChangeConfirmMultiple")
+            : t("RequestedReservation.accessCodeChangeConfirm")
+        }
+        acceptLabel={t("RequestedReservation.accessCodeChange")}
+        cancelLabel={t("RequestedReservation.cancel")}
+        acceptIcon={<IconRefresh />}
+      />
     </SingleButtonContainer>
   );
 }
