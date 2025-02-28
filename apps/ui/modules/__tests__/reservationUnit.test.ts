@@ -656,6 +656,7 @@ describe("getFuturePricing", () => {
     days: readonly Date[];
   }) {
     return {
+      id: "1",
       reservationBegins: reservationBegins?.toISOString() ?? null,
       reservationEnds: reservationEnds?.toISOString() ?? null,
       pricings: days.map((date) =>
@@ -825,6 +826,7 @@ describe("getReservationUnitPrice", () => {
       t: mockT as TFunction,
       pricingDate: date,
       reservationUnit: {
+        id: "1",
         pricings: [
           constructPricing({
             begins: addDays(new Date(), 10),
@@ -868,6 +870,7 @@ describe("getReservationUnitPrice", () => {
       pricingDate: date,
       t: mockT as TFunction,
       reservationUnit: {
+        id: "1",
         pricings: [
           constructPricing({
             begins: addDays(new Date(), -10),
@@ -890,6 +893,7 @@ describe("getReservationUnitPrice", () => {
       t: mockT as TFunction,
       pricingDate: date,
       reservationUnit: {
+        id: "1",
         pricings: [
           constructPricing({
             begins: addDays(new Date(), -10),

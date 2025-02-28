@@ -5370,6 +5370,7 @@ export type BannerNotificationsListQuery = {
 };
 
 export type ApplicationNameFragment = {
+  id: string;
   applicantType?: ApplicantTypeChoice | null;
   organisation?: {
     id: string;
@@ -5380,6 +5381,7 @@ export type ApplicationNameFragment = {
 };
 
 export type ApplicationSectionDurationFragment = {
+  id: string;
   reservationsEndDate: string;
   reservationsBeginDate: string;
   appliedReservationsPerWeek: number;
@@ -5471,6 +5473,7 @@ export type ApplicationSectionUiFragment = {
 };
 
 export type ApplicantFragment = {
+  id: string;
   pk?: number | null;
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
@@ -5515,6 +5518,7 @@ export type ApplicantFragment = {
 };
 
 export type ReserveeNameFieldsFragment = {
+  id: string;
   reserveeFirstName?: string | null;
   reserveeLastName?: string | null;
   reserveeEmail?: string | null;
@@ -5525,6 +5529,7 @@ export type ReserveeNameFieldsFragment = {
 };
 
 export type ReserveeBillingFieldsFragment = {
+  id: string;
   reserveeId?: string | null;
   reserveeIsUnregisteredAssociation?: boolean | null;
   reserveeAddressStreet?: string | null;
@@ -5544,6 +5549,7 @@ export type MetaFieldsFragment = {
   freeOfChargeReason?: string | null;
   description?: string | null;
   numPersons?: number | null;
+  id: string;
   reserveeFirstName?: string | null;
   reserveeLastName?: string | null;
   reserveeEmail?: string | null;
@@ -5585,6 +5591,7 @@ export type MetaFieldsFragment = {
 };
 
 export type TermsOfUseNameFieldsFragment = {
+  id: string;
   nameFi?: string | null;
   nameEn?: string | null;
   nameSv?: string | null;
@@ -5600,10 +5607,10 @@ export type TermsOfUseTextFieldsFragment = {
 export type TermsOfUseFieldsFragment = {
   pk?: string | null;
   termsType: TermsType;
+  id: string;
   nameFi?: string | null;
   nameEn?: string | null;
   nameSv?: string | null;
-  id: string;
   textFi?: string | null;
   textEn?: string | null;
   textSv?: string | null;
@@ -5690,6 +5697,7 @@ export type TermsOfUseQuery = {
 
 export const ApplicationNameFragmentDoc = gql`
   fragment ApplicationName on ApplicationNode {
+    id
     applicantType
     organisation {
       id
@@ -5705,6 +5713,7 @@ export const ApplicationNameFragmentDoc = gql`
 `;
 export const ApplicationSectionDurationFragmentDoc = gql`
   fragment ApplicationSectionDuration on ApplicationSectionNode {
+    id
     reservationsEndDate
     reservationsBeginDate
     appliedReservationsPerWeek
@@ -5784,6 +5793,7 @@ export const ApplicationSectionUiFragmentDoc = gql`
 `;
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {
+    id
     pk
     applicantType
     contactPerson {
@@ -5829,6 +5839,7 @@ export const ApplicantFragmentDoc = gql`
 `;
 export const ReserveeNameFieldsFragmentDoc = gql`
   fragment ReserveeNameFields on ReservationNode {
+    id
     reserveeFirstName
     reserveeLastName
     reserveeEmail
@@ -5840,6 +5851,7 @@ export const ReserveeNameFieldsFragmentDoc = gql`
 `;
 export const ReserveeBillingFieldsFragmentDoc = gql`
   fragment ReserveeBillingFields on ReservationNode {
+    id
     reserveeId
     reserveeIsUnregisteredAssociation
     reserveeAddressStreet
@@ -5888,6 +5900,7 @@ export const MetaFieldsFragmentDoc = gql`
 `;
 export const TermsOfUseNameFieldsFragmentDoc = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
+    id
     nameFi
     nameEn
     nameSv

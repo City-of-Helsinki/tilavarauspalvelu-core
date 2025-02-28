@@ -56,6 +56,7 @@ export function createMockReservationUnit({
   reservationsMaxDaysBefore = null,
 }: MockReservationUnitProps): ReservationUnitType {
   const reservationUnit: ReservationUnitType = {
+    id: "1",
     bufferTimeBefore: 60 * 60 * bufferTimeBefore,
     bufferTimeAfter: 60 * 60 * bufferTimeAfter,
     maxReservationDuration,

@@ -866,6 +866,7 @@ function ReservationInfo({
 
 export const RESERVATION_INFO_FRAGMENT = gql`
   fragment ReservationInfo on ReservationNode {
+    id
     description
     purpose {
       id

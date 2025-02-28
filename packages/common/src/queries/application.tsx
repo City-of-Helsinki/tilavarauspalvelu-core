@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 
 export const APPLICANT_NAME_FRAGMENT = gql`
   fragment ApplicationName on ApplicationNode {
+    id
     applicantType
     organisation {
       id
@@ -18,6 +19,7 @@ export const APPLICANT_NAME_FRAGMENT = gql`
 
 export const APPLICATION_SECTION_DURATION_FRAGMENT = gql`
   fragment ApplicationSectionDuration on ApplicationSectionNode {
+    id
     reservationsEndDate
     reservationsBeginDate
     appliedReservationsPerWeek
@@ -26,7 +28,6 @@ export const APPLICATION_SECTION_DURATION_FRAGMENT = gql`
 `;
 
 export const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
-  ${APPLICATION_SECTION_DURATION_FRAGMENT}
   fragment ApplicationSectionCommon on ApplicationSectionNode {
     id
     pk
@@ -50,7 +51,6 @@ export const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
 `;
 
 export const APPLICATION_SECTION_UI_FRAGMENT = gql`
-  ${APPLICATION_SECTION_COMMON_FRAGMENT}
   fragment ApplicationSectionUI on ApplicationSectionNode {
     ...ApplicationSectionCommon
     hasReservations
@@ -100,6 +100,7 @@ export const APPLICATION_SECTION_UI_FRAGMENT = gql`
 
 export const APPLICANT_FRAGMENT = gql`
   fragment Applicant on ApplicationNode {
+    id
     pk
     applicantType
     contactPerson {

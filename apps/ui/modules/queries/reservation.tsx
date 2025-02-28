@@ -60,6 +60,7 @@ const CANCELLATION_RULE_FRAGMENT = gql`
 
 const RESERVATION_ORDER_STATUS_FRAGMENT = gql`
   fragment ReservationOrderStatus on ReservationNode {
+    id
     state
     paymentOrder {
       id

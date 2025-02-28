@@ -190,6 +190,7 @@ export function getActivePricing(reservationUnit: {
 
 export const RESERVATION_INFO_CARD_FRAGMENT = gql`
   fragment PriceReservationUnit on ReservationUnitNode {
+    id
     pricings {
       ...PricingFields
     }

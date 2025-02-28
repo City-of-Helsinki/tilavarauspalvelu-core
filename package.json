@@ -18,9 +18,9 @@
     "test": "turbo test",
     "tsc:check": "turbo tsc:check",
     "tsc:clean": "turbo tsc:clean",
-    "codegen:admin": "graphql-codegen --config codegen.ts --project admin-ui",
-    "codegen:ui": "graphql-codegen --config codegen.ts --project ui",
-    "codegen:common": "graphql-codegen --config codegen.ts --project common",
+    "codegen:admin": "graphql-codegen --project admin-ui",
+    "codegen:ui": "graphql-codegen --project ui",
+    "codegen:common": "graphql-codegen --project common",
     "codegen": "pnpm codegen:admin & pnpm codegen:ui & pnpm codegen:common",
     "codegen:watch": "pnpm codegen:admin --watch & pnpm codegen:ui --watch & pnpm codegen:common --watch"
   },
