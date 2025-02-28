@@ -15,6 +15,7 @@ export const UNIT_NAME_FRAGMENT_I18N = gql`
 
 export const TERMS_OF_USE_FRAGMENT = gql`
   fragment TermsOfUse on ReservationUnitNode {
+    id
     termsOfUseFi
     termsOfUseEn
     termsOfUseSv
