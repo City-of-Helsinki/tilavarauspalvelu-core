@@ -63,12 +63,6 @@ export const Summary = styled(ApplicationDatas)`
   background: var(--color-black-5);
 `;
 
-export const SummaryFourColumns = styled(Summary)`
-  @media (min-width: ${breakpoints.s}) {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-`;
-
 export const Label = styled.div<{ $isSummary?: boolean }>`
   ${({ $isSummary }) =>
     $isSummary &&
