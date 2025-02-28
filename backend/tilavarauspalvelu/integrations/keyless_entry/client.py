@@ -264,7 +264,9 @@ class PindoraReservationClient(BasePindoraClient):
         return parsed_data
 
     @classmethod
-    def reschedule_reservation(cls, reservation: Reservation) -> PindoraAccessCodeModifyResponse:
+    def reschedule_reservation(
+        cls, reservation: Reservation, *, is_active: bool = ...
+    ) -> PindoraAccessCodeModifyResponse:
         """Reschedule a reservation in Pindora."""
         url = cls._build_url(f"reservation/reschedule/{reservation.ext_uuid}")
 
@@ -272,6 +274,8 @@ class PindoraReservationClient(BasePindoraClient):
             begin=local_iso_format(reservation.begin),
             end=local_iso_format(reservation.end),
         )
+        if is_active is not ...:
+            data["is_active"] = is_active
 
         response = cls.put(url=url, json=data)
         cls._validate_reservation_response(
