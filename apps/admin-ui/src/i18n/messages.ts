@@ -81,7 +81,6 @@ const translations: ITranslations = {
     allResults: ["Kaikki {{totalCount}} tulosta näytetty"],
   },
   common: {
-    week: ["Viikko"],
     showMore: ["Näytä lisää"],
     view: ["Näytä"],
     clearAllSelections: ["Tyhjennä valinnat"],
@@ -153,6 +152,7 @@ const translations: ITranslations = {
     option: ["Vaihtoehto"],
     same: ["Sama"],
     day: ["Päivä"],
+    week: ["Viikko"],
     month: ["Kuukausi"],
     year: ["Vuosi"],
     begins: ["Alkaa"],
@@ -167,6 +167,10 @@ const translations: ITranslations = {
     weekday: ["Viikonpäivä"],
     date: ["Päivämäärä"],
     time: ["Kellonaika"],
+    startingDate: ["Aloituspäivä"],
+    endingDate: ["Päättymispäivä"],
+    startTime: ["Aloitusaika"],
+    endTime: ["Päättymisaika"],
     and: ["ja"],
     peopleSuffixShort: ["hlö"],
     // TODO AriaLabel is not needed in the key value
@@ -1156,12 +1160,6 @@ const translations: ITranslations = {
     removeFailed: ["Tilan poistaminen ei onnistunut."],
   },
   ReservationDialog: {
-    // field names (for input controls) => should be moved (not dialog specific)
-    date: ["Päivämäärä"],
-    startingDate: ["Aloituspäivä"],
-    endingDate: ["Päättymispäivä"],
-    startTime: ["Aloitusaika"],
-    endTime: ["Päättymisaika"],
     // dialog specific
     title: ["Varaa {{reservationUnit}}"],
     accept: ["Varaa"],
