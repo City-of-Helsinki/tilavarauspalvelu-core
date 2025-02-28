@@ -34,7 +34,7 @@ import Error404 from "@/common/Error404";
 import { ApplicationDatas, Summary } from "@/styles/util";
 import { Accordion, DataWrapper } from "./components";
 import { ReservationKeylessEntry } from "./ReservationKeylessEntrySection";
-import { TimeBlock } from "./Calendar";
+import { TimeBlock } from "./ReservationTimeBlockSection";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
