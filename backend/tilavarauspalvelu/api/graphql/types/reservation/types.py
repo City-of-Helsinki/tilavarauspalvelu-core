@@ -14,9 +14,8 @@ from rest_framework.reverse import reverse
 
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation, ReservationUnit, User
-from tilavarauspalvelu.typing import PindoraReservationInfoData
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 from utils.db import SubqueryArray
 from utils.utils import ical_hmac_signature
@@ -25,13 +24,9 @@ from .filtersets import ReservationFilterSet
 from .permissions import ReservationPermission
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.integrations.keyless_entry.typing import (
-        PindoraReservationSeriesAccessCodeValidity,
-        PindoraSeasonalBookingAccessCodeValidity,
-    )
-    from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, RecurringReservation
+    from tilavarauspalvelu.models import PaymentOrder
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
-    from tilavarauspalvelu.typing import AnyUser, GQLInfo
+    from tilavarauspalvelu.typing import AnyUser, GQLInfo, PindoraReservationInfoData
 
 __all__ = [
     "ReservationNode",
@@ -299,147 +294,21 @@ class ReservationNode(DjangoNode):
         if not has_perms and root.state != ReservationStateChoice.CONFIRMED:
             return None
 
-        if root.recurring_reservation is not None:
-            return ReservationNode.series_pindora_info(
-                root.recurring_reservation,
-                begin=root.begin.astimezone(DEFAULT_TIMEZONE),
-                end=root.end.astimezone(DEFAULT_TIMEZONE),
-                has_perms=has_perms,
-            )
+        if root.recurring_reservation is not None and root.recurring_reservation.allocated_time_slot is not None:
+            section = root.recurring_reservation.allocated_time_slot.reservation_unit_option.application_section
+            application_round = section.application.application_round
+
+            # Don't show Pindora info without permissions if the application round results haven't been sent yet
+            if not has_perms and application_round.sent_date is None:
+                return None
 
         try:
-            response = PindoraClient.get_reservation(reservation=root.ext_uuid)
+            response = PindoraService.get_access_code(obj=root)
         except Exception:  # noqa: BLE001
             return None
 
         # Don't allow reserver to view Pindora info without permissions if the access code is not active
-        access_code_is_active = response["access_code_is_active"]
-        if not has_perms and not access_code_is_active:
+        if not has_perms and not response.access_code_is_active:
             return None
 
-        begin = response["begin"]
-        end = response["end"]
-        access_code_valid_minutes_before = response["access_code_valid_minutes_before"]
-        access_code_valid_minutes_after = response["access_code_valid_minutes_after"]
-        access_code_begins_at = begin - datetime.timedelta(minutes=access_code_valid_minutes_before)
-        access_code_ends_at = end + datetime.timedelta(minutes=access_code_valid_minutes_after)
-
-        return PindoraReservationInfoData(
-            access_code=response["access_code"],
-            access_code_generated_at=response["access_code_generated_at"],
-            access_code_is_active=access_code_is_active,
-            access_code_keypad_url=response["access_code_keypad_url"],
-            access_code_phone_number=response["access_code_phone_number"],
-            access_code_sms_number=response["access_code_sms_number"],
-            access_code_sms_message=response["access_code_sms_message"],
-            access_code_begins_at=access_code_begins_at,
-            access_code_ends_at=access_code_ends_at,
-        )
-
-    @staticmethod
-    def series_pindora_info(
-        series: RecurringReservation,
-        *,
-        begin: datetime.datetime,
-        end: datetime.datetime,
-        has_perms: bool,
-    ) -> PindoraReservationInfoData | None:
-        if series.allocated_time_slot is not None:
-            return ReservationNode.section_pindora_info(
-                series.allocated_time_slot.reservation_unit_option.application_section,
-                begin=begin,
-                end=end,
-                has_perms=has_perms,
-            )
-
-        try:
-            response = PindoraClient.get_reservation_series(series=series.ext_uuid)
-        except Exception:  # noqa: BLE001
-            return None
-
-        # Don't allow reserver to view Pindora info without permissions if the access code is not active
-        access_code_is_active = response["access_code_is_active"]
-        if not has_perms and not access_code_is_active:
-            return None
-
-        validity: PindoraReservationSeriesAccessCodeValidity | None = next(
-            (
-                validity
-                for validity in response["reservation_unit_code_validity"]
-                if validity["begin"] == begin and validity["end"] == end
-            ),
-            None,
-        )
-        if validity is None:
-            return None
-
-        begin = validity["begin"]
-        end = validity["end"]
-        access_code_valid_minutes_before = validity["access_code_valid_minutes_before"]
-        access_code_valid_minutes_after = validity["access_code_valid_minutes_after"]
-        access_code_begins_at = begin - datetime.timedelta(minutes=access_code_valid_minutes_before)
-        access_code_ends_at = end + datetime.timedelta(minutes=access_code_valid_minutes_after)
-
-        return PindoraReservationInfoData(
-            access_code=response["access_code"],
-            access_code_generated_at=response["access_code_generated_at"],
-            access_code_is_active=access_code_is_active,
-            access_code_keypad_url=response["access_code_keypad_url"],
-            access_code_phone_number=response["access_code_phone_number"],
-            access_code_sms_number=response["access_code_sms_number"],
-            access_code_sms_message=response["access_code_sms_message"],
-            access_code_begins_at=access_code_begins_at,
-            access_code_ends_at=access_code_ends_at,
-        )
-
-    @staticmethod
-    def section_pindora_info(
-        section: ApplicationSection,
-        *,
-        begin: datetime.datetime,
-        end: datetime.datetime,
-        has_perms: bool,
-    ) -> PindoraReservationInfoData | None:
-        # Don't show Pindora info without permissions if the application round results haven't been sent yet
-        if not has_perms and section.application.application_round.sent_date is None:
-            return None
-
-        try:
-            response = PindoraClient.get_seasonal_booking(section=section.ext_uuid)
-        except Exception:  # noqa: BLE001
-            return None
-
-        # Don't allow reserver to view Pindora info without permissions if the access code is not active
-        access_code_is_active = response["access_code_is_active"]
-        if not has_perms and not access_code_is_active:
-            return None
-
-        validity: PindoraSeasonalBookingAccessCodeValidity | None = next(
-            (
-                validity
-                for validity in response["reservation_unit_code_validity"]
-                if validity["begin"] == begin and validity["end"] == end
-            ),
-            None,
-        )
-        if validity is None:
-            return None
-
-        begin = validity["begin"]
-        end = validity["end"]
-        access_code_valid_minutes_before = validity["access_code_valid_minutes_before"]
-        access_code_valid_minutes_after = validity["access_code_valid_minutes_after"]
-        access_code_begins_at = begin - datetime.timedelta(minutes=access_code_valid_minutes_before)
-        access_code_ends_at = end + datetime.timedelta(minutes=access_code_valid_minutes_after)
-
-        return PindoraReservationInfoData(
-            access_code=response["access_code"],
-            access_code_generated_at=response["access_code_generated_at"],
-            access_code_is_active=access_code_is_active,
-            access_code_keypad_url=response["access_code_keypad_url"],
-            access_code_phone_number=response["access_code_phone_number"],
-            access_code_sms_number=response["access_code_sms_number"],
-            access_code_sms_message=response["access_code_sms_message"],
-            access_code_begins_at=access_code_begins_at,
-            access_code_ends_at=access_code_ends_at,
-        )
+        return response

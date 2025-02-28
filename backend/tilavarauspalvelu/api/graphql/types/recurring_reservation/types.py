@@ -9,9 +9,8 @@ from lookup_property import L
 from query_optimizer import AnnotatedField, MultiField
 
 from tilavarauspalvelu.enums import AccessType
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import RecurringReservation
-from tilavarauspalvelu.typing import PindoraSeriesInfoData
 from utils.date_utils import local_date
 
 from .filtersets import RecurringReservationFilterSet
@@ -20,7 +19,7 @@ from .permissions import RecurringReservationPermission
 if TYPE_CHECKING:
     from django.db import models
 
-    from tilavarauspalvelu.typing import GQLInfo
+    from tilavarauspalvelu.typing import GQLInfo, PindoraSeriesInfoData
 
 __all__ = [
     "RecurringReservationNode",
@@ -127,58 +126,20 @@ class RecurringReservationNode(DjangoNode):
         has_perms = info.context.user.permissions.can_view_recurring_reservation(root, reserver_needs_role=True)
 
         if root.allocated_time_slot is not None:
-            return RecurringReservationNode.section_pindora_info(root, has_perms=has_perms)
+            section = root.allocated_time_slot.reservation_unit_option.application_section
+            application_round = section.application.application_round
+
+            # Don't show Pindora info without permissions if the application round results haven't been sent yet
+            if not has_perms and application_round.sent_date is None:
+                return None
 
         try:
-            response = PindoraClient.get_reservation_series(series=root.ext_uuid)
+            response = PindoraService.get_access_code(obj=root)
         except Exception:  # noqa: BLE001
             return None
 
         # Don't allow reserver to view Pindora info without view permissions if the access code is not active
-        access_code_is_active = response["access_code_is_active"]
-        if not has_perms and not access_code_is_active:
+        if not has_perms and not response.access_code_is_active:
             return None
 
-        access_code_validity = root.actions.get_access_code_validity_info(response["reservation_unit_code_validity"])
-
-        return PindoraSeriesInfoData(
-            access_code=response["access_code"],
-            access_code_generated_at=response["access_code_generated_at"],
-            access_code_is_active=response["access_code_is_active"],
-            access_code_keypad_url=response["access_code_keypad_url"],
-            access_code_phone_number=response["access_code_phone_number"],
-            access_code_sms_number=response["access_code_sms_number"],
-            access_code_sms_message=response["access_code_sms_message"],
-            access_code_validity=access_code_validity,
-        )
-
-    @staticmethod
-    def section_pindora_info(series: RecurringReservation, *, has_perms: bool) -> PindoraSeriesInfoData | None:
-        section = series.allocated_time_slot.reservation_unit_option.application_section
-
-        # Don't show Pindora info without permissions if the application round results haven't been sent yet
-        if not has_perms and section.application.application_round.sent_date is None:
-            return None
-
-        try:
-            response = PindoraClient.get_seasonal_booking(section=section.ext_uuid)
-        except Exception:  # noqa: BLE001
-            return None
-
-        # Don't allow reserver to view Pindora info without permissions if the access code is not active
-        access_code_is_active = response["access_code_is_active"]
-        if not has_perms and not access_code_is_active:
-            return None
-
-        access_code_validity = series.actions.get_access_code_validity_info(response["reservation_unit_code_validity"])
-
-        return PindoraSeriesInfoData(
-            access_code=response["access_code"],
-            access_code_generated_at=response["access_code_generated_at"],
-            access_code_is_active=access_code_is_active,
-            access_code_keypad_url=response["access_code_keypad_url"],
-            access_code_phone_number=response["access_code_phone_number"],
-            access_code_sms_number=response["access_code_sms_number"],
-            access_code_sms_message=response["access_code_sms_message"],
-            access_code_validity=access_code_validity,
-        )
+        return response

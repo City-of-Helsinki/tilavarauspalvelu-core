@@ -11,9 +11,8 @@ from query_optimizer import AnnotatedField, ManuallyOptimizedField, MultiField
 from query_optimizer.optimizer import QueryOptimizer
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, UserRoleChoice
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.models import Application, ApplicationSection, RecurringReservation, Reservation, User
-from tilavarauspalvelu.typing import PindoraSectionInfoData
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.models import Application, ApplicationSection, Reservation, User
 from utils.date_utils import local_date
 
 from .filtersets import ApplicationSectionFilterSet
@@ -22,7 +21,7 @@ from .permissions import ApplicationSectionPermission
 if TYPE_CHECKING:
     from tilavarauspalvelu.models.application.queryset import ApplicationQuerySet
     from tilavarauspalvelu.models.application_section.queryset import ApplicationSectionQuerySet
-    from tilavarauspalvelu.typing import GQLInfo, PindoraValidityInfoData
+    from tilavarauspalvelu.typing import GQLInfo, PindoraSectionInfoData
 
 __all__ = [
     "ApplicationSectionNode",
@@ -174,29 +173,12 @@ class ApplicationSectionNode(DjangoNode):
             return None
 
         try:
-            response = PindoraClient.get_seasonal_booking(section=root.ext_uuid)
+            response = PindoraService.get_access_code(obj=root)
         except Exception:  # noqa: BLE001
             return None
 
         # Don't show Pindora info without permissions if the access code is not active
-        access_code_is_active = response["access_code_is_active"]
-        if not has_perms and not access_code_is_active:
+        if not has_perms and not response.access_code_is_active:
             return None
 
-        qs = RecurringReservation.objects.filter(allocated_time_slot__reservation_unit_option__application_section=root)
-
-        access_code_validity: list[PindoraValidityInfoData] = []
-        for series in qs:
-            validity = series.actions.get_access_code_validity_info(response["reservation_unit_code_validity"])
-            access_code_validity.extend(validity)
-
-        return PindoraSectionInfoData(
-            access_code=response["access_code"],
-            access_code_generated_at=response["access_code_generated_at"],
-            access_code_is_active=response["access_code_is_active"],
-            access_code_keypad_url=response["access_code_keypad_url"],
-            access_code_phone_number=response["access_code_phone_number"],
-            access_code_sms_number=response["access_code_sms_number"],
-            access_code_sms_message=response["access_code_sms_message"],
-            access_code_validity=access_code_validity,
-        )
+        return response
