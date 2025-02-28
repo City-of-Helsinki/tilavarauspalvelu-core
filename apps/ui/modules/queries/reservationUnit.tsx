@@ -121,6 +121,7 @@ export const BLOCKING_RESERVATION_FRAGMENT = gql`
 
 export const IS_RESERVABLE_FRAGMENT = gql`
   fragment IsReservableFields on ReservationUnitNode {
+    id
     bufferTimeBefore
     bufferTimeAfter
     reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {

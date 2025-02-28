@@ -353,6 +353,7 @@ describe("getNormalizedReservationOrderStatus", () => {
   test("return correct value", () => {
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.Cancelled,
         paymentOrder: [
           {
@@ -365,6 +366,7 @@ describe("getNormalizedReservationOrderStatus", () => {
 
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.Cancelled,
         paymentOrder: [
           {
@@ -377,6 +379,7 @@ describe("getNormalizedReservationOrderStatus", () => {
 
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.Confirmed,
         paymentOrder: [
           {
@@ -391,6 +394,7 @@ describe("getNormalizedReservationOrderStatus", () => {
   test("null if created", () => {
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.Created,
         paymentOrder: [
           {
@@ -405,6 +409,7 @@ describe("getNormalizedReservationOrderStatus", () => {
   test("null if Waiting for Payment", () => {
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.WaitingForPayment,
         paymentOrder: [
           {
@@ -419,6 +424,7 @@ describe("getNormalizedReservationOrderStatus", () => {
   test("null if Requires Handling", () => {
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.RequiresHandling,
         paymentOrder: [
           {
