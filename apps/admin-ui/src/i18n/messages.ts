@@ -159,7 +159,6 @@ const translations: ITranslations = {
     ends: ["Päättyy"],
     weekly: ["Viikoittain"],
     biweekly: ["Vuoroviikoittain"],
-    timeOfDay: ["Kellonaika"],
     unhandledCount: ["{{count}} käsittelemättä"],
     inspect: ["Tarkastele"],
     cityOfHelsinki: ["Helsingin kaupunki"],
