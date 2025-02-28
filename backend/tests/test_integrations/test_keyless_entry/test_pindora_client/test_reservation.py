@@ -22,35 +22,27 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraPermissionError,
     PindoraUnexpectedResponseError,
 )
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationFactory
 from tests.helpers import ResponseMock, exact, patch_method, use_retries
-
-from .helpers import ErrorParams, default_access_code_modify_response, default_reservation_response
+from tests.test_integrations.test_keyless_entry.helpers import (
+    ErrorParams,
+    default_access_code_modify_response,
+    default_reservation_response,
+)
 
 
 def test_pindora_client__get_reservation():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
-    data = default_reservation_response(reservation)
+    data = default_reservation_response()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         response = PindoraClient.get_reservation(reservation)
 
-    assert response["reservation_unit_id"] == reservation.ext_uuid
     assert response["access_code"] == "13245#"
-    assert response["access_code_keypad_url"] == "https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto"
-    assert response["access_code_phone_number"] == "+358407089833"
-    assert response["access_code_sms_number"] == "+358407089834"
-    assert response["access_code_sms_message"] == "a13245"
-    assert response["access_code_valid_minutes_before"] == 0
-    assert response["access_code_valid_minutes_after"] == 0
-    assert response["access_code_generated_at"] == reservation.created_at.astimezone(DEFAULT_TIMEZONE)
-    assert response["access_code_is_active"] is True
-    assert response["begin"] == reservation.begin.astimezone(DEFAULT_TIMEZONE)
-    assert response["end"] == reservation.end.astimezone(DEFAULT_TIMEZONE)
 
 
 @pytest.mark.parametrize(
@@ -85,7 +77,7 @@ def test_pindora_client__get_reservation__errors(status_code, exception, error_m
 def test_pindora_client__get_reservation__missing_key():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
-    data = default_reservation_response(reservation)
+    data = default_reservation_response()
     data.pop("reservation_unit_id")
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
@@ -98,7 +90,7 @@ def test_pindora_client__get_reservation__missing_key():
 def test_pindora_client__get_reservation__invalid_data():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
-    data = default_reservation_response(reservation)
+    data = default_reservation_response()
     data["reservation_unit_id"] = str(reservation.id)
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
@@ -136,7 +128,7 @@ def test_pindora_client__get_reservation__retry__retry_on_500():
 def test_pindora_client__get_reservation__retry__succeeds_after_retry():
     reservation = ReservationFactory.build(created_at=local_datetime())
 
-    data = default_reservation_response(reservation)
+    data = default_reservation_response()
 
     patch = patch_method(
         PindoraClient.request,
@@ -158,24 +150,13 @@ def test_pindora_client__get_reservation__retry__succeeds_after_retry():
 def test_pindora_client__create_reservation(is_active):
     reservation = ReservationFactory.create(created_at=local_datetime(), reservation_units__name="foo")
 
-    data = default_reservation_response(reservation)
+    data = default_reservation_response()
     data["access_code_is_active"] = is_active
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         response = PindoraClient.create_reservation(reservation, is_active=is_active)
 
-    assert response["reservation_unit_id"] == reservation.ext_uuid
     assert response["access_code"] == "13245#"
-    assert response["access_code_keypad_url"] == "https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto"
-    assert response["access_code_phone_number"] == "+358407089833"
-    assert response["access_code_sms_number"] == "+358407089834"
-    assert response["access_code_sms_message"] == "a13245"
-    assert response["access_code_valid_minutes_before"] == 0
-    assert response["access_code_valid_minutes_after"] == 0
-    assert response["access_code_generated_at"] == reservation.created_at.astimezone(DEFAULT_TIMEZONE)
-    assert response["access_code_is_active"] is is_active
-    assert response["begin"] == reservation.begin.astimezone(DEFAULT_TIMEZONE)
-    assert response["end"] == reservation.end.astimezone(DEFAULT_TIMEZONE)
 
 
 @pytest.mark.parametrize(

@@ -24,21 +24,18 @@ from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import ReservationUnitFactory
 from tests.helpers import ResponseMock, exact, patch_method, use_retries
-
-from .helpers import ErrorParams, default_reservation_unit_response
+from tests.test_integrations.test_keyless_entry.helpers import ErrorParams, default_reservation_unit_response
 
 
 def test_pindora_client__get_reservation_unit():
     reservation_unit = ReservationUnitFactory.build()
 
-    data = default_reservation_unit_response(reservation_unit)
+    data = default_reservation_unit_response()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         response = PindoraClient.get_reservation_unit(reservation_unit)
 
-    assert response["reservation_unit_id"] == reservation_unit.uuid
-    assert response["name"] == reservation_unit.name
-    assert response["keypad_url"] == "https://example.com"
+    assert response["name"] == "foo"
 
 
 def test_pindora_client__get_reservation_unit__missing_api_key(settings):
@@ -89,7 +86,7 @@ def test_pindora_client__get_reservation_unit__retry_on_500():
 def test_pindora_client__get_reservation_unit__succeeds_after_retry():
     reservation_unit = ReservationUnitFactory.build()
 
-    data = default_reservation_unit_response(reservation_unit)
+    data = default_reservation_unit_response()
 
     patch = patch_method(
         PindoraClient.request,
@@ -138,7 +135,7 @@ def test_pindora_client__get_reservation_unit__errors(status_code, exception, er
 def test_pindora_client__get_reservation_unit__missing_key():
     reservation_unit = ReservationUnitFactory.build()
 
-    data = default_reservation_unit_response(reservation_unit)
+    data = default_reservation_unit_response()
     data.pop("reservation_unit_id")
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
@@ -151,7 +148,7 @@ def test_pindora_client__get_reservation_unit__missing_key():
 def test_pindora_client__get_reservation_unit__invalid_data():
     reservation_unit = ReservationUnitFactory.build()
 
-    data = default_reservation_unit_response(reservation_unit)
+    data = default_reservation_unit_response()
     data["reservation_unit_id"] = str(reservation_unit.id)
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))

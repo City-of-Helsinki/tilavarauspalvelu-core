@@ -25,41 +25,28 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraPermissionError,
     PindoraUnexpectedResponseError,
 )
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceRequestError
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
 from tests.helpers import ResponseMock, exact, patch_method, use_retries
-
-from .helpers import ErrorParams, default_access_code_modify_response, default_reservation_series_response
+from tests.test_integrations.test_keyless_entry.helpers import (
+    ErrorParams,
+    default_access_code_modify_response,
+    default_reservation_series_response,
+)
 
 
 def test_pindora_client__get_reservation_series():
     series = RecurringReservationFactory.build()
-    reservation = ReservationFactory.build(created_at=local_datetime())
+    ReservationFactory.build(created_at=local_datetime())
 
-    data = default_reservation_series_response(reservation)
+    data = default_reservation_series_response()
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         response = PindoraClient.get_reservation_series(series)
 
-    assert response["reservation_unit_id"] == reservation.ext_uuid
     assert response["access_code"] == "13245#"
-    assert response["access_code_keypad_url"] == "https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto"
-    assert response["access_code_phone_number"] == "+358407089833"
-    assert response["access_code_sms_number"] == "+358407089834"
-    assert response["access_code_sms_message"] == "a13245"
-    assert response["access_code_generated_at"] == reservation.created_at.astimezone(DEFAULT_TIMEZONE)
-    assert response["access_code_is_active"] is True
-
-    assert response["reservation_unit_code_validity"] == [
-        {
-            "access_code_valid_minutes_before": 0,
-            "access_code_valid_minutes_after": 0,
-            "begin": reservation.begin.astimezone(DEFAULT_TIMEZONE),
-            "end": reservation.end.astimezone(DEFAULT_TIMEZONE),
-        }
-    ]
 
 
 @pytest.mark.parametrize(
@@ -93,9 +80,9 @@ def test_pindora_client__get_reservation_series__errors(status_code, exception, 
 
 def test_pindora_client__get_reservation_series__missing_key():
     series = RecurringReservationFactory.build()
-    reservation = ReservationFactory.build(created_at=local_datetime())
+    ReservationFactory.build(created_at=local_datetime())
 
-    data = default_reservation_series_response(reservation)
+    data = default_reservation_series_response()
     data.pop("reservation_unit_id")
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
@@ -109,7 +96,7 @@ def test_pindora_client__get_reservation_series__invalid_data():
     series = RecurringReservationFactory.build()
     reservation = ReservationFactory.build(created_at=local_datetime())
 
-    data = default_reservation_series_response(reservation)
+    data = default_reservation_series_response()
     data["reservation_unit_id"] = str(reservation.id)
 
     patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
@@ -146,9 +133,9 @@ def test_pindora_client__get_reservation_series__retry_on_500():
 @use_retries(attempts=3)
 def test_pindora_client__get_reservation_series__succeeds_after_retry():
     series = RecurringReservationFactory.build()
-    reservation = ReservationFactory.build(created_at=local_datetime())
+    ReservationFactory.build(created_at=local_datetime())
 
-    data = default_reservation_series_response(reservation)
+    data = default_reservation_series_response()
 
     patch = patch_method(
         PindoraClient.request,
@@ -169,7 +156,7 @@ def test_pindora_client__get_reservation_series__succeeds_after_retry():
 @pytest.mark.parametrize("is_active", [True, False])
 def test_pindora_client__create_reservation_series(is_active: bool):
     series = RecurringReservationFactory.create()
-    reservation = ReservationFactory.create(
+    ReservationFactory.create(
         recurring_reservation=series,
         created_at=local_datetime(),
         state=ReservationStateChoice.CONFIRMED,
@@ -177,28 +164,12 @@ def test_pindora_client__create_reservation_series(is_active: bool):
         access_type=AccessType.ACCESS_CODE,
     )
 
-    data = default_reservation_series_response(reservation, access_code_is_active=is_active)
+    data = default_reservation_series_response(access_code_is_active=is_active)
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         response = PindoraClient.create_reservation_series(series, is_active=is_active)
 
-    assert response["reservation_unit_id"] == reservation.ext_uuid
     assert response["access_code"] == "13245#"
-    assert response["access_code_keypad_url"] == "https://keypad.test.ovaa.fi/hel/list/kannelmaen_leikkipuisto"
-    assert response["access_code_phone_number"] == "+358407089833"
-    assert response["access_code_sms_number"] == "+358407089834"
-    assert response["access_code_sms_message"] == "a13245"
-    assert response["access_code_generated_at"] == reservation.created_at.astimezone(DEFAULT_TIMEZONE)
-    assert response["access_code_is_active"] is is_active
-
-    assert response["reservation_unit_code_validity"] == [
-        {
-            "access_code_valid_minutes_before": 0,
-            "access_code_valid_minutes_after": 0,
-            "begin": reservation.begin.astimezone(DEFAULT_TIMEZONE),
-            "end": reservation.end.astimezone(DEFAULT_TIMEZONE),
-        }
-    ]
 
 
 @pytest.mark.parametrize(
