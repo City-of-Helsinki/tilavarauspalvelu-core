@@ -285,10 +285,10 @@ class PindoraReservationClient(BasePindoraClient):
             expected_status_code=HTTP_200_OK,
         )
 
+        cls._clear_cached_reservation_response(ext_uuid=reservation.ext_uuid)
+
         data = cls.response_json(response)
-        parsed_data = cls._parse_access_code_modify_response(data)
-        cls._update_cached_reservation_response(parsed_data, ext_uuid=reservation.ext_uuid)
-        return parsed_data
+        return cls._parse_access_code_modify_response(data)
 
     @classmethod
     def change_reservation_access_code(cls, reservation: Reservation | uuid.UUID) -> PindoraAccessCodeModifyResponse:
@@ -545,10 +545,10 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             expected_status_code=HTTP_200_OK,
         )
 
+        cls._clear_cached_seasonal_booking_response(ext_uuid=section.ext_uuid)
+
         data = cls.response_json(response)
-        parsed_data = cls._parse_access_code_modify_response(data)
-        cls._update_cached_seasonal_booking_response(parsed_data, ext_uuid=section.ext_uuid)
-        return parsed_data
+        return cls._parse_access_code_modify_response(data)
 
     @classmethod
     def change_seasonal_booking_access_code(
@@ -804,10 +804,10 @@ class PindoraReservationSeriesClient(BasePindoraClient):
             expected_status_code=HTTP_200_OK,
         )
 
+        cls._clear_cached_reservation_series_response(ext_uuid=series.ext_uuid)
+
         data = cls.response_json(response)
-        parsed_data = cls._parse_access_code_modify_response(data)
-        cls._update_cached_reservation_series_response(parsed_data, ext_uuid=series.ext_uuid)
-        return parsed_data
+        return cls._parse_access_code_modify_response(data)
 
     @classmethod
     def change_reservation_series_access_code(
