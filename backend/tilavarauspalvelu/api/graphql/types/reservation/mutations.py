@@ -9,7 +9,7 @@ from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMut
 
 from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
 from tilavarauspalvelu.models import Reservation
@@ -159,7 +159,7 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
         # Try Pindora delete, but if it fails, retry in background
         if reservation.access_type == AccessType.ACCESS_CODE:
             try:
-                PindoraClient.delete_reservation(reservation=reservation)
+                PindoraService.delete_access_code(obj=reservation)
             except PindoraNotFoundError:
                 pass
             except Exception:  # noqa: BLE001

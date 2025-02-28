@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any, TypedDict
 from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationSection, RejectedOccurrence, Reservation
-from tilavarauspalvelu.typing import PindoraValidityInfoData
 from utils.date_utils import DEFAULT_TIMEZONE, combine, get_periods_between
 
 if TYPE_CHECKING:
@@ -22,7 +21,6 @@ if TYPE_CHECKING:
         ReservationTypeChoice,
         ReservationTypeStaffChoice,
     )
-    from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraAccessCodeValidity
     from tilavarauspalvelu.models import (
         AgeGroup,
         City,
@@ -31,7 +29,6 @@ if TYPE_CHECKING:
         ReservationPurpose,
         User,
     )
-    from tilavarauspalvelu.typing import PindoraSeriesValidityInfoData
 
 
 class ReservationPeriod(TypedDict):
@@ -346,39 +343,3 @@ class RecurringReservationActions:
         return ApplicationSection.objects.filter(
             reservation_unit_options__allocated_time_slots__recurring_reservation=self.recurring_reservation
         ).first()
-
-    def get_access_code_validity_info(self, info: list[PindoraAccessCodeValidity]) -> list[PindoraValidityInfoData]:
-        """
-        Given the list of access code validity info from Pindora (either for a reservation series
-        or an application section), construct a list of info objects for this reservation series with
-        the pre-calculated access code validity times as well as the reservation and series ids.
-        """
-        reservations_by_period: dict[tuple[datetime.datetime, datetime.datetime], int] = {}
-
-        for reservation in self.recurring_reservation.reservations.requires_active_access_code():
-            begin = reservation.begin.astimezone(DEFAULT_TIMEZONE)
-            end = reservation.end.astimezone(DEFAULT_TIMEZONE)
-            reservations_by_period[begin, end] = reservation.pk
-
-        access_code_validity: list[PindoraSeriesValidityInfoData] = []
-        for validity in info:
-            reservation_id = reservations_by_period.get((validity["begin"], validity["end"]))
-
-            # This will filter out other series' reservations in case info is from an application section
-            # (although it might filter out legitimate reservations in this series if dates don't match exactly).
-            if reservation_id is None:
-                continue
-
-            begins = validity["begin"] - datetime.timedelta(minutes=validity["access_code_valid_minutes_before"])
-            ends = validity["end"] + datetime.timedelta(minutes=validity["access_code_valid_minutes_after"])
-
-            access_code_validity.append(
-                PindoraValidityInfoData(
-                    reservation_id=reservation_id,
-                    reservation_series_id=self.recurring_reservation.pk,
-                    access_code_begins_at=begins,
-                    access_code_ends_at=ends,
-                )
-            )
-
-        return access_code_validity

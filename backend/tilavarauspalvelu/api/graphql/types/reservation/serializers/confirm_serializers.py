@@ -12,7 +12,7 @@ from rest_framework.fields import IntegerField
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, OrderStatus, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
     create_mock_verkkokauppa_order,
@@ -88,12 +88,10 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         instance = super().update(instance=instance, validated_data=validated_data)
 
         if instance.state == ReservationStateChoice.CONFIRMED:
-            if self.instance.access_type == AccessType.ACCESS_CODE and instance.recurring_reservation is None:
+            if instance.access_type == AccessType.ACCESS_CODE:
                 # Allow activation in Pindora to fail, will be handled by a background task.
                 with suppress(ExternalServiceError):
-                    PindoraClient.activate_reservation_access_code(reservation=instance)
-                    instance.access_code_is_active = True
-                    instance.save(update_fields=["access_code_is_active"])
+                    PindoraService.activate_access_code(obj=instance)
 
             EmailService.send_reservation_confirmed_email(reservation=instance)
             EmailService.send_staff_notification_reservation_made_email(reservation=instance)

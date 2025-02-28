@@ -6,7 +6,7 @@ import pytest
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice, UserRoleChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, UserFactory
@@ -18,7 +18,7 @@ pytestmark = [
 ]
 
 
-@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraService.sync_access_code)
 def test_staff_repair_access_code__regular_user(graphql):
     reservation = ReservationFactory.create(
         state=ReservationStateChoice.CONFIRMED,
@@ -39,10 +39,10 @@ def test_staff_repair_access_code__regular_user(graphql):
 
     assert response.error_message() == "No permission to update."
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 0
+    assert PindoraService.sync_access_code.call_count == 0
 
 
-@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraService.sync_access_code)
 @patch_method(EmailService.send_reservation_modified_access_code_email)
 def test_staff_repair_access_code__unit_handler(graphql):
     reservation_unit = ReservationUnitFactory.create()
@@ -68,11 +68,11 @@ def test_staff_repair_access_code__unit_handler(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 1
+    assert PindoraService.sync_access_code.call_count == 1
     assert EmailService.send_reservation_modified_access_code_email.call_count == 1
 
 
-@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraService.sync_access_code)
 @patch_method(EmailService.send_reservation_modified_access_code_email)
 def test_staff_repair_access_code__general_handler(graphql):
     reservation = ReservationFactory.create(
@@ -96,5 +96,5 @@ def test_staff_repair_access_code__general_handler(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 1
+    assert PindoraService.sync_access_code.call_count == 1
     assert EmailService.send_reservation_modified_access_code_email.call_count == 1

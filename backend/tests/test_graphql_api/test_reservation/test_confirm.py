@@ -14,7 +14,7 @@ from tilavarauspalvelu.enums import (
     ReservationNotification,
     ReservationStateChoice,
 )
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.keyless_entry.typing import PindoraReservationResponse
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -40,7 +40,7 @@ pytestmark = [
 
 
 @override_settings(SEND_EMAILS=True)
-@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraService.activate_access_code)
 def test_reservation__confirm__changes_state__confirmed(graphql, outbox):
     reservation = ReservationFactory.create_for_confirmation()
 
@@ -65,7 +65,7 @@ def test_reservation__confirm__changes_state__confirmed(graphql, outbox):
     unit_name = reservation.reservation_units.first().unit.name
     assert outbox[1].subject == f"New booking {reservation.id} has been made for {unit_name}"
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 0
+    assert PindoraService.activate_access_code.call_count == 0
 
 
 @override_settings(SEND_EMAILS=True)
@@ -476,7 +476,7 @@ def test_reservation__confirm__without_price_and_with_free_pricing_does_not_requ
         end=datetime.datetime(2024, 1, 1, 15),
     ),
 )
-@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraService.activate_access_code)
 def test_reservation__confirm__pindora_api__call_succeeds(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         access_type=AccessType.ACCESS_CODE,
@@ -491,9 +491,8 @@ def test_reservation__confirm__pindora_api__call_succeeds(graphql):
 
     reservation.refresh_from_db()
     assert reservation.state == ReservationStateChoice.CONFIRMED
-    assert reservation.access_code_is_active is True
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 1
+    assert PindoraService.activate_access_code.call_count == 1
 
 
 @patch_method(
@@ -504,7 +503,7 @@ def test_reservation__confirm__pindora_api__call_succeeds(graphql):
         end=datetime.datetime(2024, 1, 1, 15),
     ),
 )
-@patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraAPIError("Error"))
+@patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Error"))
 def test_reservation__confirm__pindora_api__call_fails(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         access_type=AccessType.ACCESS_CODE,
@@ -522,4 +521,4 @@ def test_reservation__confirm__pindora_api__call_fails(graphql):
     assert reservation.state == ReservationStateChoice.CONFIRMED
     assert reservation.access_code_is_active is False
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 1
+    assert PindoraService.activate_access_code.call_count == 1

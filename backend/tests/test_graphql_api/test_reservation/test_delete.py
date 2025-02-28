@@ -8,7 +8,7 @@ from django.test import override_settings
 
 from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
@@ -179,7 +179,7 @@ def test_reservation__delete__mock_verkkokauppa(graphql):
     assert payment_order.status == OrderStatus.CANCELLED
 
 
-@patch_method(PindoraClient.delete_reservation)
+@patch_method(PindoraService.delete_access_code)
 def test_reservation__delete__delete_from_pindora__call_succeeds(graphql):
     reservation = ReservationFactory.create_for_delete(
         state=ReservationStateChoice.WAITING_FOR_PAYMENT,
@@ -192,10 +192,10 @@ def test_reservation__delete__delete_from_pindora__call_succeeds(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.delete_reservation.called is True
+    assert PindoraService.delete_access_code.called is True
 
 
-@patch_method(PindoraClient.delete_reservation, side_effect=PindoraAPIError())
+@patch_method(PindoraService.delete_access_code, side_effect=PindoraAPIError())
 def test_reservation__delete__delete_from_pindora__call_fails_runs_task(graphql):
     reservation = ReservationFactory.create_for_delete(
         state=ReservationStateChoice.WAITING_FOR_PAYMENT,
@@ -212,5 +212,5 @@ def test_reservation__delete__delete_from_pindora__call_fails_runs_task(graphql)
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.delete_reservation.called is True
+    assert PindoraService.delete_access_code.called is True
     assert task.called is True

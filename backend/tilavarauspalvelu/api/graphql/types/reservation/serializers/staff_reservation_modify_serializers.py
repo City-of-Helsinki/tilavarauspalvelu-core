@@ -8,7 +8,7 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPr
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose
 
@@ -135,18 +135,14 @@ class StaffReservationModifySerializer(NestingModelSerializer):
         # If reservation was changed to or from blocked, change access code active state in Pindora.
         changed_with_blocked = type_before != type_after and ReservationTypeChoice.BLOCKED in {type_before, type_after}
 
-        if (
-            instance.access_type == AccessType.ACCESS_CODE
-            and instance.recurring_reservation is None
-            and changed_with_blocked
-        ):
+        instance = super().update(instance=instance, validated_data=validated_data)
+
+        if instance.access_type == AccessType.ACCESS_CODE and changed_with_blocked:
             # Allow reservation modification to succeed if reservation doesn't exist in Pindora.
             with suppress(PindoraNotFoundError):
                 if type_after == ReservationTypeChoice.BLOCKED:
-                    PindoraClient.deactivate_reservation_access_code(reservation=instance)
-                    validated_data["access_code_is_active"] = False
+                    PindoraService.deactivate_access_code(obj=instance)
                 else:
-                    PindoraClient.activate_reservation_access_code(reservation=instance)
-                    validated_data["access_code_is_active"] = True
+                    PindoraService.activate_access_code(obj=instance)
 
-        return super().update(instance=instance, validated_data=validated_data)
+        return instance

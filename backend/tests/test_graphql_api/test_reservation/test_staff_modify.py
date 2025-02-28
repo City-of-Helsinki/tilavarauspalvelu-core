@@ -5,7 +5,7 @@ import datetime
 import pytest
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from utils.date_utils import next_hour
 
@@ -129,7 +129,7 @@ def test_reservation__staff_modify__blocked_reservation_to_normal(graphql):
     ]
 
 
-@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraService.activate_access_code)
 def test_reservation__staff_modify__blocked_reservation_to_staff(graphql):
     reservation = ReservationFactory.create_for_staff_update(type=ReservationTypeChoice.BLOCKED)
 
@@ -142,10 +142,10 @@ def test_reservation__staff_modify__blocked_reservation_to_staff(graphql):
     reservation.refresh_from_db()
     assert reservation.type == ReservationTypeChoice.STAFF
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 0
+    assert PindoraService.activate_access_code.call_count == 0
 
 
-@patch_method(PindoraClient.activate_reservation_access_code)
+@patch_method(PindoraService.activate_access_code)
 def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__call_succeeds(graphql):
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.BLOCKED,
@@ -161,12 +161,11 @@ def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__c
 
     reservation.refresh_from_db()
     assert reservation.type == ReservationTypeChoice.STAFF
-    assert reservation.access_code_is_active is True
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 1
+    assert PindoraService.activate_access_code.call_count == 1
 
 
-@patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraAPIError("Pindora API error"))
+@patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Pindora API error"))
 def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__call_fails(graphql):
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.BLOCKED,
@@ -180,10 +179,10 @@ def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__c
 
     assert response.error_message() == "Pindora API error"
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 1
+    assert PindoraService.activate_access_code.call_count == 1
 
 
-@patch_method(PindoraClient.activate_reservation_access_code, side_effect=PindoraNotFoundError("Error"))
+@patch_method(PindoraService.activate_access_code, side_effect=PindoraNotFoundError("Error"))
 def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__call_fails__404(graphql):
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.BLOCKED,
@@ -202,10 +201,10 @@ def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__c
     assert reservation.type == ReservationTypeChoice.STAFF
     assert reservation.access_code_is_active is False
 
-    assert PindoraClient.activate_reservation_access_code.call_count == 1
+    assert PindoraService.activate_access_code.call_count == 1
 
 
-@patch_method(PindoraClient.deactivate_reservation_access_code)
+@patch_method(PindoraService.deactivate_access_code)
 def test_reservation__staff_modify__staff_reservation_to_blocked(graphql):
     reservation = ReservationFactory.create_for_staff_update(type=ReservationTypeChoice.STAFF)
 
@@ -219,10 +218,10 @@ def test_reservation__staff_modify__staff_reservation_to_blocked(graphql):
     assert reservation.type == ReservationTypeChoice.BLOCKED
     assert reservation.access_code_is_active is False
 
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 0
+    assert PindoraService.deactivate_access_code.call_count == 0
 
 
-@patch_method(PindoraClient.deactivate_reservation_access_code)
+@patch_method(PindoraService.deactivate_access_code)
 def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__call_succeeds(graphql):
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.STAFF,
@@ -238,12 +237,11 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
 
     reservation.refresh_from_db()
     assert reservation.type == ReservationTypeChoice.BLOCKED
-    assert reservation.access_code_is_active is False
 
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 1
+    assert PindoraService.deactivate_access_code.call_count == 1
 
 
-@patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraAPIError("Pindora API error"))
+@patch_method(PindoraService.deactivate_access_code, side_effect=PindoraAPIError("Pindora API error"))
 def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__call_fails(graphql):
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.STAFF,
@@ -257,10 +255,10 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
 
     assert response.error_message() == "Pindora API error"
 
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 1
+    assert PindoraService.deactivate_access_code.call_count == 1
 
 
-@patch_method(PindoraClient.deactivate_reservation_access_code, side_effect=PindoraNotFoundError("Error"))
+@patch_method(PindoraService.deactivate_access_code, side_effect=PindoraNotFoundError("Error"))
 def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__call_succeeds__404(graphql):
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.STAFF,
@@ -279,4 +277,4 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
     assert reservation.type == ReservationTypeChoice.BLOCKED
     assert reservation.access_code_is_active is True
 
-    assert PindoraClient.deactivate_reservation_access_code.call_count == 1
+    assert PindoraService.deactivate_access_code.call_count == 1

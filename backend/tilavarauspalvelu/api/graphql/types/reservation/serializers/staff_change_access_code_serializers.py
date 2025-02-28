@@ -7,7 +7,7 @@ from graphene_django_extensions import NestingModelSerializer
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import Reservation
 
@@ -45,17 +45,20 @@ class StaffChangeReservationAccessCodeSerializer(NestingModelSerializer):
         self.instance.validator.validate_not_in_reservation_series()
         return data
 
-    def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:
+    def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:  # noqa: ARG002
         try:
-            PindoraClient.change_reservation_access_code(reservation=instance)
+            PindoraService.change_access_code(obj=instance)
+
         except PindoraNotFoundError:
             instance.access_code_generated_at = None
             instance.access_code_is_active = False
-        else:
-            if instance.access_code_should_be_active:
-                with suppress(ExternalServiceError):
-                    PindoraClient.activate_reservation_access_code(reservation=instance)
-                    instance.access_code_is_active = True
-                EmailService.send_reservation_modified_access_code_email(reservation=instance)
+            instance.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+            return instance
 
-        return super().update(instance=instance, validated_data=validated_data)
+        if instance.access_code_should_be_active:
+            with suppress(ExternalServiceError):
+                PindoraService.activate_access_code(obj=instance)
+
+            EmailService.send_reservation_modified_access_code_email(reservation=instance)
+
+        return instance

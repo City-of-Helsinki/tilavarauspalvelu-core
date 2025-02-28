@@ -12,7 +12,7 @@ from rest_framework.fields import DateTimeField, IntegerField
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE
@@ -127,10 +127,6 @@ class ReservationCreateSerializer(NestingModelSerializer):
 
         # Pindora request must succeed, or the reservation is not created.
         if reservation.access_type == AccessType.ACCESS_CODE:
-            response = PindoraClient.create_reservation(reservation=reservation)
-
-            reservation.access_code_generated_at = response["access_code_generated_at"]
-            reservation.access_code_is_active = response["access_code_is_active"]
-            reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+            PindoraService.create_access_code(obj=reservation)
 
         return reservation

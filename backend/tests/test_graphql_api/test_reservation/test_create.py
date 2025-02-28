@@ -20,7 +20,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
 )
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
@@ -1109,13 +1109,7 @@ def test_reservation__create__require_adult_reservee__no_id_token(graphql):
     assert reservation is not None
 
 
-@patch_method(
-    PindoraClient.create_reservation,
-    return_value={
-        "access_code_generated_at": datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        "access_code_is_active": False,
-    },
-)
+@patch_method(PindoraService.create_access_code)
 def test_reservation__create__access_type__access_code(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         access_types__access_type=AccessType.ACCESS_CODE,
@@ -1131,13 +1125,11 @@ def test_reservation__create__access_type__access_code(graphql):
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
     assert reservation.access_type == AccessType.ACCESS_CODE
-    assert reservation.access_code_generated_at == datetime.datetime(2023, 1, 1, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.access_code_is_active is False
 
-    PindoraClient.create_reservation.assert_called_with(reservation=reservation)
+    assert PindoraService.create_access_code.called is True
 
 
-@patch_method(PindoraClient.create_reservation)
+@patch_method(PindoraService.create_access_code)
 def test_reservation__create__access_type__changes_to_access_code_in_the_future(graphql):
     today = local_date()
 
@@ -1156,13 +1148,11 @@ def test_reservation__create__access_type__changes_to_access_code_in_the_future(
     reservation: Reservation = Reservation.objects.get(pk=response.first_query_object["pk"])
 
     assert reservation.access_type == AccessType.UNRESTRICTED
-    assert reservation.access_code_generated_at is None
-    assert reservation.access_code_is_active is False
 
-    assert PindoraClient.create_reservation.call_count == 0
+    assert PindoraService.create_access_code.call_count == 0
 
 
-@patch_method(PindoraClient.create_reservation, side_effect=PindoraAPIError())
+@patch_method(PindoraService.create_access_code, side_effect=PindoraAPIError())
 def test_reservation__create__access_type__access_code__no_reservation_on_pindora_failure(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         access_types__access_type=AccessType.ACCESS_CODE,

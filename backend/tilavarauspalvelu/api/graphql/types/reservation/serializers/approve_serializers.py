@@ -9,7 +9,8 @@ from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
@@ -57,21 +58,17 @@ class ReservationApproveSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: Reservation, validated_data: ReservationApproveData) -> Reservation:
-        if self.instance.access_type == AccessType.ACCESS_CODE and instance.recurring_reservation is None:
+        instance = super().update(instance=instance, validated_data=validated_data)
+
+        if instance.access_type == AccessType.ACCESS_CODE:
             # Allow activation in Pindora to fail, will be handled by a background task.
             with suppress(ExternalServiceError):
-                # If access code has not been generated (e.g. returned to handling after a deny and then approved),
-                # create a new active access code in Pindora.
-                if instance.access_code_generated_at is None:
-                    response = PindoraClient.create_reservation(reservation=instance, is_active=True)
-                    validated_data["access_code_generated_at"] = response["access_code_generated_at"]
-                    validated_data["access_code_is_active"] = response["access_code_is_active"]
-
-                else:
-                    PindoraClient.activate_reservation_access_code(reservation=instance)
-                    validated_data["access_code_is_active"] = True
-
-        instance = super().update(instance=instance, validated_data=validated_data)
+                try:
+                    PindoraService.activate_access_code(instance)
+                except PindoraNotFoundError:
+                    # If access code has not been generated (e.g. returned to handling after a deny and then approved),
+                    # create a new active access code in Pindora.
+                    PindoraService.create_access_code(instance, is_active=True)
 
         EmailService.send_reservation_approved_email(reservation=instance)
         EmailService.send_staff_notification_reservation_made_email(reservation=instance)

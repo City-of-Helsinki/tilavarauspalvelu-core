@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from contextlib import suppress
 from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
@@ -11,7 +10,6 @@ from django.utils.translation import pgettext
 from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
 
 from tilavarauspalvelu.enums import (
-    AccessType,
     CalendarProperty,
     CustomerTypeChoice,
     EventProperty,
@@ -22,9 +20,6 @@ from tilavarauspalvelu.enums import (
     TimezoneRuleProperty,
 )
 from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
-from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraConflictError, PindoraNotFoundError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import ApplicationSection, ReservationMetadataField, Space
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
@@ -294,75 +289,3 @@ class ReservationActions:
 
         payment_order.status = OrderStatus.REFUNDED
         payment_order.save(update_fields=["refund_id", "status"])
-
-    def create_or_update_reservation_access_code_if_required(self, *, from_access_type: AccessType) -> None:
-        """Notify Pindora about the time of the reservation if required."""
-        # Recurring reservations should be handled with separate endpoints
-        if self.reservation.recurring_reservation is not None:
-            return
-
-        current_access_type = self.reservation.access_type
-
-        is_active = self.reservation.access_code_should_be_active
-
-        # Access type remains 'ACCESS_CODE', reschedule the reservation
-        if {from_access_type, current_access_type} == {AccessType.ACCESS_CODE}:
-            with suppress(PindoraNotFoundError):
-                if not is_active:
-                    PindoraClient.deactivate_reservation_access_code(reservation=self.reservation)
-                    self.reservation.access_code_is_active = False
-                    self.reservation.save(update_fields=["access_code_is_active"])
-
-                PindoraClient.reschedule_reservation(reservation=self.reservation)
-
-        # Access type no longer 'ACCESS_CODE', delete the reservation
-        elif from_access_type == AccessType.ACCESS_CODE:
-            with suppress(PindoraNotFoundError):
-                PindoraClient.delete_reservation(reservation=self.reservation)
-                self.reservation.access_code_generated_at = None
-                self.reservation.access_code_is_active = False
-                self.reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
-
-        # Access type now 'ACCESS_CODE', create access code
-        elif current_access_type == AccessType.ACCESS_CODE:
-            response = PindoraClient.create_reservation(reservation=self.reservation, is_active=is_active)
-            self.reservation.access_code_generated_at = response["access_code_generated_at"]
-            self.reservation.access_code_is_active = response["access_code_is_active"]
-            self.reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
-
-    def repair_reservation_access_code(self) -> None:
-        """
-        Synchronizes the state of access codes for a reservation between Pindora and Varaamo
-        so that the access code is generated and activated/deactivated in Pindora according to what
-        Varaamo thinks is should be its current state.
-        """
-        should_be_active = self.reservation.access_code_should_be_active
-
-        if self.reservation.access_code_generated_at is not None:
-            try:
-                if should_be_active:
-                    PindoraClient.activate_reservation_access_code(reservation=self.reservation)
-                    self.reservation.access_code_is_active = True
-                    EmailService.send_reservation_modified_access_code_email(reservation=self.reservation)
-                else:
-                    PindoraClient.deactivate_reservation_access_code(reservation=self.reservation)
-                    self.reservation.access_code_is_active = False
-            except PindoraNotFoundError:
-                self.reservation.access_code_generated_at = None
-                self.reservation.access_code_is_active = False
-
-        if self.reservation.access_code_generated_at is None:
-            try:
-                response = PindoraClient.create_reservation(reservation=self.reservation, is_active=should_be_active)
-                self.reservation.access_code_generated_at = response["access_code_generated_at"]
-                self.reservation.access_code_is_active = response["access_code_is_active"]
-
-                if should_be_active:
-                    EmailService.send_reservation_modified_access_code_email(reservation=self.reservation)
-
-            except PindoraConflictError:
-                response = PindoraClient.get_reservation(reservation=self.reservation)
-                self.reservation.access_code_generated_at = response["access_code_generated_at"]
-                self.reservation.access_code_is_active = response["access_code_is_active"]
-
-        self.reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])

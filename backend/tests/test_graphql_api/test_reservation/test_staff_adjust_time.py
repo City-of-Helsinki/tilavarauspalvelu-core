@@ -7,7 +7,7 @@ import pytest
 from django.test import override_settings
 
 from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
 
@@ -535,8 +535,7 @@ def test_reservation__staff_adjust_time__reservation_block_whole_day__ignore_giv
     assert reservation.buffer_time_after == datetime.timedelta(hours=11)
 
 
-@patch_method(PindoraClient.reschedule_reservation)
-@patch_method(PindoraClient.deactivate_reservation_access_code)
+@patch_method(PindoraService.sync_access_code)
 def test_reservation__staff_adjust_time__same_access_type(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
@@ -551,15 +550,10 @@ def test_reservation__staff_adjust_time__same_access_type(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.reschedule_reservation.called is True
-    assert PindoraClient.deactivate_reservation_access_code.called is False
-
-    reservation.refresh_from_db()
-    assert reservation.access_code_is_active is True
+    assert PindoraService.sync_access_code.called is True
 
 
-@patch_method(PindoraClient.reschedule_reservation)
-@patch_method(PindoraClient.deactivate_reservation_access_code)
+@patch_method(PindoraService.sync_access_code)
 def test_reservation__staff_adjust_time__same_access_type__requires_handling(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
@@ -575,20 +569,13 @@ def test_reservation__staff_adjust_time__same_access_type__requires_handling(gra
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.reschedule_reservation.called is True
-    assert PindoraClient.deactivate_reservation_access_code.called is False
+    assert PindoraService.sync_access_code.called is True
 
     reservation.refresh_from_db()
     assert reservation.access_code_is_active is True
 
 
-@patch_method(
-    PindoraClient.create_reservation,
-    return_value={
-        "access_code_generated_at": datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        "access_code_is_active": True,
-    },
-)
+@patch_method(PindoraService.sync_access_code)
 def test_reservation__staff_adjust_time__change_to_access_code(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
@@ -603,21 +590,10 @@ def test_reservation__staff_adjust_time__change_to_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.create_reservation.called is True
-    assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is True
-
-    reservation.refresh_from_db()
-    assert reservation.access_code_generated_at == datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.access_code_is_active is True
+    assert PindoraService.sync_access_code.called is True
 
 
-@patch_method(
-    PindoraClient.create_reservation,
-    return_value={
-        "access_code_generated_at": datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE),
-        "access_code_is_active": True,
-    },
-)
+@patch_method(PindoraService.sync_access_code)
 def test_reservation__staff_adjust_time__change_to_access_code__requires_handling(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
@@ -633,15 +609,10 @@ def test_reservation__staff_adjust_time__change_to_access_code__requires_handlin
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.create_reservation.called is True
-    assert PindoraClient.create_reservation.call_args.kwargs["is_active"] is True
-
-    reservation.refresh_from_db()
-    assert reservation.access_code_generated_at == datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE)
-    assert reservation.access_code_is_active is True
+    assert PindoraService.sync_access_code.called is True
 
 
-@patch_method(PindoraClient.delete_reservation)
+@patch_method(PindoraService.sync_access_code)
 def test_reservation__staff_adjust_time__change_from_access_code(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
         type=ReservationTypeChoice.STAFF,
@@ -657,8 +628,4 @@ def test_reservation__staff_adjust_time__change_from_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.delete_reservation.called is True
-
-    reservation.refresh_from_db()
-    assert reservation.access_code_generated_at is None
-    assert reservation.access_code_is_active is False
+    assert PindoraService.sync_access_code.called is True

@@ -9,6 +9,7 @@ from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import DEFAULT_TIMEZONE
 
@@ -67,12 +68,13 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:
-        access_type_before = instance.access_type
+        was_access_code = instance.access_type == AccessType.ACCESS_CODE
 
         with transaction.atomic():
             instance = super().update(instance=instance, validated_data=validated_data)
 
-            instance.actions.create_or_update_reservation_access_code_if_required(from_access_type=access_type_before)
+            if was_access_code or instance.access_type == AccessType.ACCESS_CODE:
+                PindoraService.sync_access_code(obj=instance)
 
         EmailService.send_reservation_modified_email(reservation=instance)
         EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)

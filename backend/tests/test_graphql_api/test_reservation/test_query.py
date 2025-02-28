@@ -716,15 +716,22 @@ def test_reservation__query__pindora_info__in_recurring_reservation(graphql):
 
 @freeze_time(local_datetime(2022, 1, 1))
 def test_reservation__query__pindora_info__in_application_section(graphql):
+    user = UserFactory.create()
     section = ApplicationSectionFactory.create(
+        application__user=user,
         application__application_round__sent_date=local_datetime(2022, 1, 1),
     )
+    series = RecurringReservationFactory.create(
+        allocated_time_slot__reservation_unit_option__application_section=section,
+    )
     reservation = ReservationFactory.create(
+        user=user,
+        reservation_units=[series.reservation_unit],
+        recurring_reservation=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         begin=local_datetime(2022, 1, 1, 12),
         end=local_datetime(2022, 1, 1, 13),
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
     )
 
     query = pindora_query(reservation)
@@ -741,11 +748,11 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
         access_code_is_active=True,
         reservation_unit_code_validity=[
             PindoraSeasonalBookingAccessCodeValidity(
-                reservation_unit_id=uuid.uuid4(),
+                reservation_unit_id=series.reservation_unit.uuid,
                 access_code_valid_minutes_before=10,
                 access_code_valid_minutes_after=5,
-                begin=local_datetime(2022, 1, 1, 12),
-                end=local_datetime(2022, 1, 1, 13),
+                begin=reservation.begin,
+                end=reservation.end,
             ),
         ],
     )
@@ -770,13 +777,22 @@ def test_reservation__query__pindora_info__in_application_section(graphql):
 
 @freeze_time(local_datetime(2022, 1, 1))
 def test_reservation__query__pindora_info__in_application_section__not_sent(graphql):
-    section = ApplicationSectionFactory.create(application__application_round__sent_date=None)
+    user = UserFactory.create()
+    section = ApplicationSectionFactory.create(
+        application__user=user,
+        application__application_round__sent_date=None,
+    )
+    series = RecurringReservationFactory.create(
+        allocated_time_slot__reservation_unit_option__application_section=section,
+    )
     reservation = ReservationFactory.create(
+        user=user,
+        reservation_units=[series.reservation_unit],
+        recurring_reservation=series,
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         begin=local_datetime(2022, 1, 1, 12),
         end=local_datetime(2022, 1, 1, 13),
-        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
     )
 
     query = pindora_query(reservation)

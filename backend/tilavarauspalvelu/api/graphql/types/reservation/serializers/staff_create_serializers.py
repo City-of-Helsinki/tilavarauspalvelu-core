@@ -9,7 +9,7 @@ from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPr
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
@@ -161,10 +161,6 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
         # Don't fail reservation creation if Pindora request fails, but return an error in the response.
         if reservation.access_type == AccessType.ACCESS_CODE:
             is_active = reservation.type != ReservationTypeChoice.BLOCKED
-            response = PindoraClient.create_reservation(reservation=reservation, is_active=is_active)
-
-            reservation.access_code_generated_at = response["access_code_generated_at"]
-            reservation.access_code_is_active = response["access_code_is_active"]
-            reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+            PindoraService.create_access_code(obj=reservation, is_active=is_active)
 
         return reservation

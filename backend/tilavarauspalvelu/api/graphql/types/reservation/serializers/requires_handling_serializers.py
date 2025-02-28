@@ -9,7 +9,7 @@ from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import Reservation
 
@@ -50,18 +50,13 @@ class ReservationRequiresHandlingSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:
+        instance = super().update(instance=instance, validated_data=validated_data)
+
         # Denied reservations shouldn't have an access code. It will be regenerated if the reservation is approved.
-        if (
-            self.instance.access_type == AccessType.ACCESS_CODE
-            and instance.recurring_reservation is None
-            and instance.access_code_generated_at is not None
-        ):
+        if instance.access_type == AccessType.ACCESS_CODE:
             # Allow reservation modification to succeed if reservation doesn't exist in Pindora.
             with suppress(PindoraNotFoundError):
-                PindoraClient.deactivate_reservation_access_code(reservation=instance)
-                validated_data["access_code_is_active"] = False
-
-        instance = super().update(instance=instance, validated_data=validated_data)
+                PindoraService.deactivate_access_code(obj=instance)
 
         EmailService.send_reservation_requires_handling_email(reservation=instance)
         return instance
