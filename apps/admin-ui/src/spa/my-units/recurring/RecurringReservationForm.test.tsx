@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
 import { MemoryRouter } from "react-router-dom";
@@ -312,24 +306,29 @@ test("Form is disabled if it's not filled", async () => {
   expect(submit).toBeDisabled();
 });
 
-test.only("Form can't be submitted without reservation type selection", async () => {
+test("Form can't be submitted without reservation type selection", async () => {
   const view = customRender();
   await fillForm({
     begin: `1.6.${YEAR}`,
     end: `30.6.${YEAR}`,
     dayNumber: 1,
   });
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
 
   const submit = view.getByRole("button", { name: /common.reserve/ });
   expect(submit).toBeInTheDocument();
   expect(submit).not.toBeDisabled();
-  fireEvent.submit(submit);
+  user.click(submit);
   await view.findByText(/required/i);
 });
 
 test("Form submission without any blocking reservations", async () => {
   const view = customRender();
-
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
   await fillForm({
     begin: `1.6.${YEAR}`,
     end: `30.6.${YEAR}`,
@@ -337,7 +336,7 @@ test("Form submission without any blocking reservations", async () => {
   });
 
   const typeStaff = screen.getByLabelText(/STAFF/);
-  await userEvent.click(typeStaff);
+  await user.click(typeStaff);
 
   const list = view.getByTestId("reservations-list");
   expect(list).toBeInTheDocument();
@@ -350,8 +349,7 @@ test("Form submission without any blocking reservations", async () => {
   const submit = screen.getByText(/common.reserve/);
   expect(submit).toBeInTheDocument();
   expect(submit).not.toBeDisabled();
-  fireEvent.submit(submit);
-  // TODO need await after fireEvent it doesn't wait
+  user.click(submit);
 
   expect(view.queryByText(/required/)).not.toBeInTheDocument();
   /* TODO submit checking doesn't work
@@ -366,7 +364,9 @@ test("Form submission without any blocking reservations", async () => {
 
 test("Form submission with a lot of blocking reservations", async () => {
   const view = customRender();
-
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
   await fillForm({
     begin: `1.1.${YEAR}`,
     end: `31.12.${YEAR}`,
@@ -374,7 +374,7 @@ test("Form submission with a lot of blocking reservations", async () => {
   });
 
   const typeStaff = screen.getByLabelText(/STAFF/);
-  await userEvent.click(typeStaff);
+  await user.click(typeStaff);
 
   // Handle 52 / 53 mondays in a year
   let nMondays = 0;
@@ -410,7 +410,9 @@ test("Form submission with a lot of blocking reservations", async () => {
 
 test("Reservations can be removed and restored", async () => {
   const view = customRender();
-
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
   await fillForm({
     begin: `1.6.${YEAR}`,
     end: `30.6.${YEAR}`,
@@ -418,7 +420,7 @@ test("Reservations can be removed and restored", async () => {
   });
 
   const typeStaff = screen.getByLabelText(/STAFF/);
-  await userEvent.click(typeStaff);
+  await user.click(typeStaff);
 
   const list = view.getByTestId("reservations-list");
   expect(list).toBeInTheDocument();
@@ -434,12 +436,12 @@ test("Reservations can be removed and restored", async () => {
     expect(x).toHaveTextContent(/common.remove/);
   });
 
-  await userEvent.click(removeButtons[0]);
+  await user.click(removeButtons[0]);
   await within(list).findByText(/common.restore/);
   const restore = within(list).getByText(/common.restore/);
   expect(within(list).queryAllByText(/common.remove/)).toHaveLength(3);
 
-  await userEvent.click(restore);
+  await user.click(restore);
   await waitFor(
     async () => (await within(list).findAllByText(/common.remove/)).length === 4
   );
