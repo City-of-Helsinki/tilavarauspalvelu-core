@@ -6,13 +6,20 @@ import {
   useReservationsByReservationUnitQuery,
   ReservationUnitNode,
   ReservationNode,
+  type ReservationQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { toApiDate } from "common/src/common/util";
 import { errorToast } from "common/src/common/toast";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { type CalendarEventType } from "../Calendar";
 import { useRecurringReservations } from "@/hooks";
+import { CalendarEvent } from "common/src/calendar/Calendar";
+
+type ReservationType = Omit<
+  NonNullable<ReservationQuery["reservation"]>,
+  "user"
+>;
+type CalendarEventType = CalendarEvent<ReservationType>;
 
 const getEventName = (
   eventType?: ReservationTypeChoice | null,
