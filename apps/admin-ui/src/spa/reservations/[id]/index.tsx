@@ -1,10 +1,8 @@
 import { type ApolloQueryResult } from "@apollo/client";
 import { trim } from "lodash";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useParams, useSearchParams } from "react-router-dom";
-import type { TFunction } from "i18next";
-import { add, startOfISOWeek } from "date-fns";
+import { useParams } from "react-router-dom";
 import {
   AccessType,
   CustomerTypeChoice,
@@ -23,15 +21,11 @@ import {
   createTagString,
   getName,
   getReservatinUnitPricing,
-  getTranslationKeyForCustomerTypeChoice,
   reservationPrice,
+  translateReservationCustomerType,
 } from "./util";
-import Calendar from "./Calendar";
 import VisibleIfPermission from "@/component/VisibleIfPermission";
 import ApprovalButtons from "./ApprovalButtons";
-import { RecurringReservationsView } from "@/component/RecurringReservationsView";
-import { useReservationData } from "./hooks";
-import { useRecurringReservations } from "@/hooks";
 import { ApprovalButtonsRecurring } from "./ApprovalButtonsRecurring";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { base64encode, isPriceFree } from "common/src/helpers";
@@ -40,10 +34,11 @@ import Error404 from "@/common/Error404";
 import { ApplicationDatas, Summary } from "@/styles/util";
 import { Accordion, DataWrapper } from "./components";
 import { ReservationKeylessEntry } from "./ReservationKeylessEntrySection";
+import { TimeBlock } from "./Calendar";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
-function ButtonsWithPermChecks({
+function ApprovalButtonsWithPermChecks({
   reservation,
   isFree,
   onReservationUpdated,
@@ -92,16 +87,6 @@ function ButtonsWithPermChecks({
   );
 }
 
-function translateType(res: ReservationType, t: TFunction): string {
-  const [part1, part2] = getTranslationKeyForCustomerTypeChoice(
-    res.type,
-    res.reserveeType,
-    res.reserveeIsUnregisteredAssociation
-  );
-  const part2WithSpace = part2 ? ` ${t(part2)}` : "";
-  return `${t(part1)}${part2WithSpace}`;
-}
-
 function ReservationSummary({
   reservation,
   isFree,
@@ -111,226 +96,255 @@ function ReservationSummary({
 }>) {
   const { t } = useTranslation();
 
-  const type =
-    reservation.reserveeType != null
-      ? {
-          l: "RequestedReservation.reserveeType",
-          v: translateType(reservation, t),
-        }
-      : undefined;
-
-  const numPersons =
-    reservation.numPersons != null
-      ? { l: "RequestedReservation.numPersons", v: reservation.numPersons }
-      : undefined;
-
-  const ageGroupParams =
-    reservation.ageGroup != null
-      ? {
-          l: "filters.ageGroup",
-          v: `${formatAgeGroup(reservation.ageGroup)} ${t(
-            "RequestedReservation.ageGroupSuffix"
-          )}`,
-        }
-      : undefined;
-
-  const purpose =
-    reservation.purpose?.nameFi != null
-      ? { l: "filters.purpose", v: reservation.purpose.nameFi }
-      : undefined;
-
-  const description = reservation.description
-    ? { l: "RequestedReservation.description", v: reservation.description }
-    : undefined;
-
-  const price = !isFree
-    ? {
-        l: "RequestedReservation.price",
-        v: `${reservationPrice(reservation, t)}${
-          reservation.applyingForFreeOfCharge
-            ? `, ${t("RequestedReservation.appliesSubvention")}`
-            : ""
-        }`,
-      }
-    : undefined;
-
-  const cancelReasonString =
-    reservation.state === ReservationStateChoice.Cancelled
-      ? {
-          l: "RequestedReservation.cancelReason",
-          v: reservation?.cancelReason?.reasonFi || "-",
-        }
-      : undefined;
-  const rejectionReasonString =
-    reservation.state === ReservationStateChoice.Denied
-      ? {
-          l: "RequestedReservation.denyReason",
-          v: reservation?.denyReason?.reasonFi || "-",
-        }
-      : undefined;
-
-  const summary = [
-    ...(type != null ? [type] : []),
-    ...(numPersons != null ? [numPersons] : []),
-    ...(ageGroupParams != null ? [ageGroupParams] : []),
-    ...(purpose != null ? [purpose] : []),
-    ...(description != null ? [description] : []),
-    ...(price != null ? [price] : []),
-    ...(cancelReasonString != null ? [cancelReasonString] : []),
-    ...(rejectionReasonString != null ? [rejectionReasonString] : []),
-    ...(reservation.handlingDetails != null &&
-    reservation.handlingDetails !== ""
-      ? [
-          {
-            l: "RequestedReservation.handlingDetails",
-            v: reservation.handlingDetails,
-          },
-        ]
-      : []),
-  ];
-
-  if (summary.length === 0) {
-    return null;
-  }
-
   return (
     <Summary>
-      {summary
-        .filter((e) => e.v != null)
-        .map((e) => (
-          <DataWrapper
-            isSummary
-            key={e.l}
-            label={t(e.l)}
-            isWide={e.l === "RequestedReservation.handlingDetails"}
-          >
-            {e.v}
-          </DataWrapper>
-        ))}
+      {reservation.reserveeType && (
+        <DataWrapper isSummary label={t("RequestedReservation.reserveeType")}>
+          {translateReservationCustomerType(reservation, t)}
+        </DataWrapper>
+      )}
+      {reservation.numPersons && (
+        <DataWrapper isSummary label={t("RequestedReservation.numPersons")}>
+          {reservation.numPersons}
+        </DataWrapper>
+      )}
+      {reservation.ageGroup && (
+        <DataWrapper isSummary label={t("filters.ageGroup")}>
+          {`${formatAgeGroup(reservation.ageGroup)} ${t(
+            "RequestedReservation.ageGroupSuffix"
+          )}`}
+        </DataWrapper>
+      )}
+      {reservation.purpose?.nameFi && (
+        <DataWrapper isSummary label={t("filters.purpose")}>
+          {reservation.purpose.nameFi}
+        </DataWrapper>
+      )}
+      {reservation.description && (
+        <DataWrapper isSummary label={t("RequestedReservation.description")}>
+          {reservation.description}
+        </DataWrapper>
+      )}
+      {!isFree && (
+        <DataWrapper isSummary label={t("RequestedReservation.price")}>
+          {`${reservationPrice(reservation, t)}${
+            reservation.applyingForFreeOfCharge
+              ? `, ${t("RequestedReservation.appliesSubvention")}`
+              : ""
+          }`}
+        </DataWrapper>
+      )}
+      {reservation.state === ReservationStateChoice.Cancelled && (
+        <DataWrapper isSummary label={t("RequestedReservation.cancelReason")}>
+          {reservation?.cancelReason?.reasonFi || "-"}
+        </DataWrapper>
+      )}
+      {reservation.state === ReservationStateChoice.Denied && (
+        <DataWrapper isSummary label={t("RequestedReservation.denyReason")}>
+          {reservation?.denyReason?.reasonFi || "-"}
+        </DataWrapper>
+      )}
+      {reservation.handlingDetails && reservation.handlingDetails !== "" && (
+        <DataWrapper
+          isSummary
+          label={t("RequestedReservation.handlingDetails")}
+          isWide
+        >
+          {reservation.handlingDetails}
+        </DataWrapper>
+      )}
     </Summary>
   );
 }
 
-const maybeStringToDate: (s?: string) => Date | undefined = (str) =>
-  str ? new Date(str) : undefined;
-
-const onlyFutureDates: (d?: Date) => Date | undefined = (d) =>
-  d && d > new Date() ? d : undefined;
-
-function TimeBlock({
+function ReservationWorkingMemoAccordion({
   reservation,
   onReservationUpdated,
 }: Readonly<{
   reservation: ReservationType;
-  onReservationUpdated: () => Promise<ApolloQueryResult<ReservationQuery>>;
-}>): JSX.Element {
+  onReservationUpdated: () => void;
+}>) {
   const { t } = useTranslation();
 
-  // date focus rules for Calendar
-  // (1) if selected => show that
-  // (2) else if reservation is in the future => show that
-  // (3) else if reservation.recurrance has an event in the future => show that
-  // (4) else show today
-  const { reservations } = useRecurringReservations(
-    reservation.recurringReservation?.pk ?? undefined
-  );
-
-  const nextReservation = reservations.find(
-    (x) =>
-      x.state === ReservationStateChoice.Confirmed &&
-      new Date(x.begin) > new Date()
-  );
-
-  const shownReservation =
-    new Date(reservation.begin) > new Date() ? reservation : nextReservation;
-
-  const [focusDate, setFocusDate] = useState<Date>(
-    onlyFutureDates(maybeStringToDate(shownReservation?.begin)) ?? new Date()
-  );
-
-  const calendarRef = useRef<HTMLDivElement>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const setSelected = (pk: number) => {
-    const params = new URLSearchParams(searchParams);
-    if (pk > 0) {
-      params.set("selected", pk.toString());
-      setSearchParams(params, { replace: true });
-      const selectedReservation = reservations.find((x) => x.pk === pk);
-      if (selectedReservation) {
-        setFocusDate(new Date(selectedReservation.begin));
-        calendarRef.current?.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      params.delete("selected");
-      setSearchParams(params, { replace: true });
-    }
-  };
-
-  // No month view so always query the whole week even if a single day is selected
-  // to avoid spamming queries and having to deal with start of day - end of day.
-  // focus day can be in the middle of the week.
-  const { events: eventsAll, refetch: calendarRefetch } = useReservationData(
-    startOfISOWeek(focusDate),
-    add(startOfISOWeek(focusDate), { days: 7 }),
-    reservation?.reservationUnits?.[0]?.pk ?? undefined,
-    reservation?.pk ?? undefined
-  );
-
-  // Necessary because the reservation can be removed (denied) from the parent component
-  // so update the calendar when that happens.
-  useEffect(() => {
-    if (reservation != null) {
-      calendarRefetch();
-    }
-  }, [reservation, calendarRefetch]);
-
-  const handleChanged = async (): Promise<
-    ApolloQueryResult<ReservationQuery>
-  > => {
-    // TODO use allSettled
-    await calendarRefetch();
-    return onReservationUpdated();
-  };
-
   return (
-    <>
-      {reservation.recurringReservation?.pk && (
-        <Accordion
-          id="reservation__recurring"
-          heading={t("RequestedReservation.recurring")}
-        >
-          <RecurringReservationsView
-            recurringPk={reservation.recurringReservation.pk}
-            onSelect={setSelected}
-            onReservationUpdated={handleChanged}
-            onChange={handleChanged}
-            reservationToCopy={reservation}
-          />
-        </Accordion>
-      )}
+    <VisibleIfPermission
+      permission={UserPermissionChoice.CanViewReservations}
+      reservation={reservation}
+    >
       <Accordion
-        heading={t("RequestedReservation.calendar")}
-        initiallyOpen={reservation.recurringReservation != null}
-        id="reservation__calendar"
+        id="reservation__working-memo"
+        heading={t("RequestedReservation.workingMemo")}
+        initiallyOpen={
+          reservation.workingMemo?.length != null &&
+          reservation.workingMemo?.length > 0
+        }
       >
-        <Calendar
-          ref={calendarRef}
-          reservation={reservation}
-          focusDate={focusDate}
-          refetch={(d) => {
-            onReservationUpdated();
-            // NOTE setting focus date refetches calendar data, don't double refetch
-            if (!d || focusDate === d) {
-              calendarRefetch();
-            } else {
-              setFocusDate(d);
-            }
-          }}
-          events={eventsAll}
+        <ReservationWorkingMemo
+          reservationPk={reservation.pk ?? 0}
+          refetch={onReservationUpdated}
+          initialValue={reservation.workingMemo ?? ""}
         />
       </Accordion>
-    </>
+    </VisibleIfPermission>
+  );
+}
+
+function ReservationDetailsAccordion({
+  reservation,
+}: Readonly<{
+  reservation: ReservationType;
+}>) {
+  const { t } = useTranslation();
+
+  return (
+    <Accordion
+      id="reservation__reservation-details"
+      heading={t("RequestedReservation.reservationDetails")}
+    >
+      <ApplicationDatas>
+        <DataWrapper label={t("RequestedReservation.id")}>
+          {reservation.pk}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.numPersons")}>
+          {reservation.numPersons}
+        </DataWrapper>
+        {reservation.ageGroup && (
+          <DataWrapper label={t("filters.ageGroup")}>
+            {`${formatAgeGroup(reservation.ageGroup)} ${t("RequestedReservation.ageGroupSuffix")}`}
+          </DataWrapper>
+        )}
+        <DataWrapper label={t("filters.purpose")}>
+          {reservation.purpose?.nameFi}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.description")}>
+          {reservation.description}
+        </DataWrapper>
+      </ApplicationDatas>
+    </Accordion>
+  );
+}
+
+function ReservationUserAccordion({
+  reservation,
+}: Readonly<{
+  reservation: ReservationType;
+}>) {
+  const { t } = useTranslation();
+
+  return (
+    <Accordion
+      id="reservation__reservation-user"
+      heading={t("RequestedReservation.reservationUser")}
+    >
+      <ApplicationDatas>
+        <DataWrapper label={t("RequestedReservation.reserveeType")}>
+          {translateReservationCustomerType(reservation, t)}
+        </DataWrapper>
+        <DataWrapper
+          label={t(
+            reservation.reserveeType === CustomerTypeChoice.Business
+              ? "RequestedReservation.reserveeBusinessName"
+              : "RequestedReservation.reserveeOrganisationName"
+          )}
+        >
+          {reservation.reserveeOrganisationName}
+        </DataWrapper>
+        <DataWrapper label={t("filters.homeCity")}>
+          {reservation.homeCity?.nameFi}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.reserveeId")}>
+          {reservation.reserveeId || t("RequestedReservation.noReserveeId")}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.reserveeFirstName")}>
+          {reservation.reserveeFirstName}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.reserveeLastName")}>
+          {reservation.reserveeLastName}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.reserveePhone")}>
+          {reservation.reserveePhone}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.reserveeEmail")}>
+          {reservation.reserveeEmail}
+        </DataWrapper>
+      </ApplicationDatas>
+    </Accordion>
+  );
+}
+
+function ReservationPricingDetailsAccordion({
+  reservation,
+}: Readonly<{
+  reservation: ReservationType;
+}>) {
+  const { t } = useTranslation();
+  const order = reservation.paymentOrder.find(() => true);
+
+  return (
+    <Accordion
+      id="reservation__pricing-details"
+      heading={t("RequestedReservation.pricingDetails")}
+    >
+      <ApplicationDatas>
+        <DataWrapper label={t("RequestedReservation.price")}>
+          {reservation.price && reservationPrice(reservation, t)}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.paymentState")}>
+          {order?.status == null ? "-" : t(`Payment.status.${order?.status}`)}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.applyingForFreeOfCharge")}>
+          {t(
+            reservation.applyingForFreeOfCharge ? "common.true" : "common.false"
+          )}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.freeOfChargeReason")}>
+          {reservation.freeOfChargeReason}
+        </DataWrapper>
+      </ApplicationDatas>
+    </Accordion>
+  );
+}
+
+function ReservationReserveeDetailsAccordion({
+  reservation,
+}: Readonly<{
+  reservation: ReservationType;
+}>) {
+  const { t } = useTranslation();
+
+  return (
+    <Accordion
+      id="reservation__reservee-details"
+      heading={t("RequestedReservation.reserveeDetails")}
+    >
+      <ApplicationDatas>
+        <DataWrapper label={t("RequestedReservation.user")}>
+          {trim(
+            `${reservation?.user?.firstName || ""} ${
+              reservation?.user?.lastName || ""
+            }`
+          ) || t("RequestedReservation.noName")}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.email")}>
+          {reservation?.user?.email}
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.birthDate")}>
+          <BirthDate reservationPk={reservation?.pk ?? 0} />
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.addressStreet")}>
+          <span>{reservation.reserveeAddressStreet || "-"}</span>
+          <br />
+          <span>
+            {reservation.reserveeAddressZip || reservation.reserveeAddressCity
+              ? `${reservation.reserveeAddressZip} ${reservation.reserveeAddressCity}`
+              : ""}
+          </span>
+        </DataWrapper>
+        <DataWrapper label={t("RequestedReservation.addressCity")}>
+          {reservation.reserveeAddressCity || "-"}
+        </DataWrapper>
+      </ApplicationDatas>
+    </Accordion>
   );
 }
 
@@ -354,7 +368,6 @@ function RequestedReservation({
   const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
 
   const reservationTagline = createTagString(reservation, t);
-  const order = reservation.paymentOrder.find(() => true);
 
   return (
     <>
@@ -363,7 +376,7 @@ function RequestedReservation({
           name={getName(reservation, t)}
           tagline={reservationTagline}
           buttons={
-            <ButtonsWithPermChecks
+            <ApprovalButtonsWithPermChecks
               reservation={reservation}
               isFree={!isNonFree}
               onReservationUpdated={refetch}
@@ -372,169 +385,46 @@ function RequestedReservation({
           }
         />
       </ShowWhenTargetInvisible>
+
       <ReservationTitleSection
         ref={ref}
         reservation={reservation}
         tagline={reservationTagline}
       />
       <ButtonContainer $justifyContent="flex-start">
-        <ButtonsWithPermChecks
+        <ApprovalButtonsWithPermChecks
           reservation={reservation}
           onReservationUpdated={refetch}
           isFree={!isNonFree}
         />
       </ButtonContainer>
+
       <ReservationSummary reservation={reservation} isFree={!isNonFree} />
+
       <div>
-        <VisibleIfPermission
-          permission={UserPermissionChoice.CanViewReservations}
+        <ReservationWorkingMemoAccordion
           reservation={reservation}
-        >
-          <Accordion
-            id="reservation__working-memo"
-            heading={t("RequestedReservation.workingMemo")}
-            initiallyOpen={
-              reservation.workingMemo?.length != null &&
-              reservation.workingMemo?.length > 0
-            }
-          >
-            <ReservationWorkingMemo
-              reservationPk={reservation.pk ?? 0}
-              refetch={refetch}
-              initialValue={reservation.workingMemo ?? ""}
-            />
-          </Accordion>
-        </VisibleIfPermission>
+          onReservationUpdated={refetch}
+        />
+
         {reservation.accessType === AccessType.AccessCode && (
           <ReservationKeylessEntry
             reservation={reservation}
             onSuccess={refetch}
           />
         )}
+
         <TimeBlock reservation={reservation} onReservationUpdated={refetch} />
-        <Accordion
-          id="reservation__reservation-details"
-          heading={t("RequestedReservation.reservationDetails")}
-        >
-          <ApplicationDatas>
-            <DataWrapper label={t("RequestedReservation.id")}>
-              {reservation.pk}
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.numPersons")}>
-              {reservation.numPersons}
-            </DataWrapper>
-            {reservation.ageGroup && (
-              <DataWrapper label={t("filters.ageGroup")}>
-                {`${formatAgeGroup(reservation.ageGroup)} ${t("RequestedReservation.ageGroupSuffix")}`}
-              </DataWrapper>
-            )}
-            <DataWrapper label={t("filters.purpose")}>
-              {reservation.purpose?.nameFi}
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.description")}>
-              {reservation.description}
-            </DataWrapper>
-          </ApplicationDatas>
-        </Accordion>
-        <Accordion
-          id="reservation__reservation-user"
-          heading={t("RequestedReservation.reservationUser")}
-        >
-          <ApplicationDatas>
-            <DataWrapper label={t("RequestedReservation.reserveeType")}>
-              {translateType(reservation, t)}
-            </DataWrapper>
-            <DataWrapper
-              label={t(
-                reservation.reserveeType === CustomerTypeChoice.Business
-                  ? "RequestedReservation.reserveeBusinessName"
-                  : "RequestedReservation.reserveeOrganisationName"
-              )}
-            >
-              {reservation.reserveeOrganisationName}
-            </DataWrapper>
-            <DataWrapper label={t("filters.homeCity")}>
-              {reservation.homeCity?.nameFi}
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.reserveeId")}>
-              {reservation.reserveeId || t("RequestedReservation.noReserveeId")}
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.reserveeFirstName")}>
-              {reservation.reserveeFirstName}
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.reserveeLastName")}>
-              {reservation.reserveeLastName}
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.reserveePhone")}>
-              {reservation.reserveePhone}
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.reserveeEmail")}>
-              {reservation.reserveeEmail}
-            </DataWrapper>
-          </ApplicationDatas>
-        </Accordion>
+
+        <ReservationDetailsAccordion reservation={reservation} />
+
+        <ReservationUserAccordion reservation={reservation} />
+
         {isNonFree && (
-          <Accordion
-            id="reservation__pricing-details"
-            heading={t("RequestedReservation.pricingDetails")}
-          >
-            <ApplicationDatas>
-              <DataWrapper label={t("RequestedReservation.price")}>
-                {reservation.price && reservationPrice(reservation, t)}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.paymentState")}>
-                {order?.status == null
-                  ? "-"
-                  : t(`Payment.status.${order?.status}`)}
-              </DataWrapper>
-              <DataWrapper
-                label={t("RequestedReservation.applyingForFreeOfCharge")}
-              >
-                {t(
-                  reservation.applyingForFreeOfCharge
-                    ? "common.true"
-                    : "common.false"
-                )}
-              </DataWrapper>
-              <DataWrapper label={t("RequestedReservation.freeOfChargeReason")}>
-                {reservation.freeOfChargeReason}
-              </DataWrapper>
-            </ApplicationDatas>
-          </Accordion>
+          <ReservationPricingDetailsAccordion reservation={reservation} />
         )}
-        <Accordion
-          id="reservation__reservee-details"
-          heading={t("RequestedReservation.reserveeDetails")}
-        >
-          <ApplicationDatas>
-            <DataWrapper label={t("RequestedReservation.user")}>
-              {trim(
-                `${reservation?.user?.firstName || ""} ${
-                  reservation?.user?.lastName || ""
-                }`
-              ) || t("RequestedReservation.noName")}
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.email")}>
-              {reservation?.user?.email}
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.birthDate")}>
-              <BirthDate reservationPk={reservation?.pk ?? 0} />
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.addressStreet")}>
-              <span>{reservation.reserveeAddressStreet || "-"}</span>
-              <br />
-              <span>
-                {reservation.reserveeAddressZip ||
-                reservation.reserveeAddressCity
-                  ? `${reservation.reserveeAddressZip} ${reservation.reserveeAddressCity}`
-                  : ""}
-              </span>
-            </DataWrapper>
-            <DataWrapper label={t("RequestedReservation.addressCity")}>
-              {reservation.reserveeAddressCity || "-"}
-            </DataWrapper>
-          </ApplicationDatas>
-        </Accordion>
+
+        <ReservationReserveeDetailsAccordion reservation={reservation} />
       </div>
     </>
   );
