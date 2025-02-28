@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "PindoraAccessCodeModifyResponse",
+    "PindoraAccessCodePeriod",
     "PindoraReservationCreateData",
     "PindoraReservationRescheduleData",
     "PindoraReservationResponse",
@@ -63,6 +64,11 @@ class PindoraAccessCodeValidity(TypedDict):
     end: datetime.datetime
 
 
+class PindoraAccessCodePeriod(TypedDict):
+    access_code_begins_at: datetime.datetime
+    access_code_ends_at: datetime.datetime
+
+
 class PindoraSeasonalBookingAccessCodeValidity(PindoraAccessCodeValidity):
     reservation_unit_id: uuid.UUID
 
@@ -109,6 +115,7 @@ class PindoraReservationCreateData(TypedDict):
 class PindoraReservationRescheduleData(TypedDict):
     begin: str  # datetime
     end: str  # datetime
+    is_active: NotRequired[bool]
 
 
 class PindoraSeasonalBookingReservationData(TypedDict):
