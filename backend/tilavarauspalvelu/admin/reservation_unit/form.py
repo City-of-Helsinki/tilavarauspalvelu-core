@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import datetime
 import json
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -19,9 +20,6 @@ from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType,
 from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 from utils.utils import only_django_validation_errors
-
-if TYPE_CHECKING:
-    import datetime
 
 
 class ReservationUnitAccessTypeForm(forms.ModelForm):
@@ -84,7 +82,7 @@ class ReservationUnitAccessTypeFormSet(BaseInlineFormSet):
 
     def clean(self) -> None:
         today = local_date()
-        only_begun = (True for form in self.forms if form.cleaned_data["begin_date"] <= today)
+        only_begun = (True for form in self.forms if form.cleaned_data.get("begin_date", datetime.date.max) <= today)
         has_active = next(only_begun, None) is not None
         if not has_active:
             msg = "At least one active access type is required."
