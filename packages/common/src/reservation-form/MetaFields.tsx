@@ -80,11 +80,11 @@ const InfoHeading = styled(Subheading)<{ $zeroMargin?: boolean }>`
 `;
 
 const ReserverInfoHeading = styled(Subheading)`
-  margin: "var(--spacing-layout-m) 0 var(--spacing-xs)";
+  margin: var(--spacing-layout-m) 0 var(--spacing-xs);
 `;
 
 const ReservationApplicationFieldsContainer = styled(AutoGrid)`
-  margin: "var(--spacing-layout-m) 0 var(--spacing-layout-m)";
+  margin: var(--spacing-layout-m) 0 var(--spacing-layout-m);
 `;
 
 const reserveeOptions = [
