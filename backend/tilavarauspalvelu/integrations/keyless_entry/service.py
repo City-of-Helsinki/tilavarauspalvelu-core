@@ -381,11 +381,11 @@ class PindoraService:
         """
         match obj:
             case ApplicationSection():
-                cls._sync_seasonal_booking_access_code(section=obj)
+                cls._sync_series_or_seasonal_booking_access_code(obj)
 
             case RecurringReservation():
                 if obj.allocated_time_slot is None:
-                    cls._sync_reservation_series_access_code(series=obj)
+                    cls._sync_series_or_seasonal_booking_access_code(obj)
                     return
 
                 section = obj.allocated_time_slot.reservation_unit_option.application_section
@@ -393,7 +393,7 @@ class PindoraService:
 
             case Reservation():
                 if obj.recurring_reservation is None:
-                    cls._sync_reservation_access_code(reservation=obj)
+                    cls._sync_reservation_access_code(obj)
                     return
 
                 series = obj.recurring_reservation
@@ -432,34 +432,19 @@ class PindoraService:
         reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
 
     @classmethod
-    def _sync_reservation_series_access_code(cls, series: RecurringReservation) -> None:
-        should_be_active: bool = series.should_have_active_access_code  # type: ignore[attr-defined]
+    def _sync_series_or_seasonal_booking_access_code(cls, obj: RecurringReservation | ApplicationSection) -> None:
+        should_be_active: bool = obj.should_have_active_access_code  # type: ignore[attr-defined]
 
         try:
             if should_be_active:
-                cls.activate_access_code(obj=series)
+                cls.activate_access_code(obj=obj)
             else:
-                cls.deactivate_access_code(obj=series)
+                cls.deactivate_access_code(obj=obj)
         except PindoraNotFoundError:
-            # Reservation series always have an access code, even if it's not active.
-            cls.create_access_code(obj=series, is_active=should_be_active)
+            # Reservation series and application sections always have an access code, even if it's not active.
+            cls.create_access_code(obj=obj, is_active=should_be_active)
 
-        cls.reschedule_access_code(obj=series)
-
-    @classmethod
-    def _sync_seasonal_booking_access_code(cls, section: ApplicationSection) -> None:
-        should_be_active: bool = section.should_have_active_access_code  # type: ignore[attr-defined]
-
-        try:
-            if should_be_active:
-                cls.activate_access_code(obj=section)
-            else:
-                cls.deactivate_access_code(obj=section)
-        except PindoraNotFoundError:
-            # Application sections always have an access code, even if it's not active.
-            cls.create_access_code(obj=section, is_active=should_be_active)
-
-        cls.reschedule_access_code(obj=section)
+        cls.reschedule_access_code(obj=obj)
 
     @classmethod
     def _parse_series_validity_info(
