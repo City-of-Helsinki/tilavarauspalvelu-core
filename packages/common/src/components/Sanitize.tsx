@@ -7,7 +7,8 @@ type Props = {
 };
 
 const StyledContent = styled.div`
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: anywhere;
   p:empty {
     display: none;
   }

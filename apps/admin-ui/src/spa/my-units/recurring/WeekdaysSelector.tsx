@@ -9,7 +9,7 @@ import { WEEKDAYS } from "common/src/const";
 
 const Wrapper = styled.div`
   display: flex;
-  direction: column;
+  flex-direction: column;
   gap: var(--spacing-s);
 `;
 
