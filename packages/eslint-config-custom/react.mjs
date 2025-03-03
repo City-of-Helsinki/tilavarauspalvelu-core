@@ -7,22 +7,38 @@ import eslintPluginReactHooks from "eslint-plugin-react-hooks";
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import graphqlPlugin from '@graphql-eslint/eslint-plugin'
 
-const gqlConfig = {
-  files: ['**/*.graphql'],
-  languageOptions: {
-    parser: graphqlPlugin.parser,
-  },
-  plugins: {
-    '@graphql-eslint': graphqlPlugin
-  },
-  rules: {
-    ...graphqlPlugin.configs['flat/operations-recommended'].rules,
-    "@graphql-eslint/selection-set-depth": ["error", { maxDepth: 10 }],
-    // can't use shared fragments in common if this rule is on
-    // disabling rules inside gql doesn't work sometimes
-    "@graphql-eslint/no-unused-fragments": "off",
-  },
-};
+const SCHEMA_FILE = '../../tilavaraus.graphql';
+
+/** Construct a graphql config and only include that project's gql files
+ *  @param path {string}
+ *  @param disableUnusedFragments {boolean}
+ * */
+export function constructGQLConfig(path, disableUnusedFragments = false) {
+  return {
+    files: ['**/*.graphql'],
+    languageOptions: {
+      parser: graphqlPlugin.parser,
+      parserOptions: {
+        graphQLConfig: {
+          schema: SCHEMA_FILE,
+          documents: [
+            `${path}/**/!(*.d|gql-types).{ts,tsx}`,
+          ],
+        },
+      },
+    },
+    plugins: {
+      '@graphql-eslint': graphqlPlugin
+    },
+    rules: {
+      ...graphqlPlugin.configs['flat/operations-recommended'].rules,
+      "@graphql-eslint/selection-set-depth": ["error", { maxDepth: 10 }],
+      // can't use shared fragments in common if this rule is on
+      // disabling rules inside gql doesn't work sometimes
+      "@graphql-eslint/no-unused-fragments": disableUnusedFragments ? "off" : "error",
+    },
+  };
+}
 
 /** @type {import('eslint').Linter.RulesRecord} */
 const myRules = {
@@ -93,6 +109,15 @@ const tsConfig = tseslint.config(
   tseslint.configs.recommended,
 );
 
+const ignores = [
+  "node_modules/",
+  ".next/",
+  ".turbo/",
+  "out/",
+  "public/",
+  "**/gql-types.ts",
+];
+
 export default [
   ...tsConfig,
   reactPlugin.configs.flat['jsx-runtime'],
@@ -104,15 +129,7 @@ export default [
   },
   eslintPluginPrettierRecommended,
   myConfig,
-  gqlConfig,
   {
-    ignores: [
-      "node_modules/",
-      ".next/",
-      ".turbo/",
-      "out/",
-      "public/",
-      "**/gql-types.ts",
-    ]
-  }
+    ignores,
+  },
 ];
