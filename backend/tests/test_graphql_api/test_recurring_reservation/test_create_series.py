@@ -11,10 +11,10 @@ from tilavarauspalvelu.enums import (
     ReservationTypeChoice,
     ReservationTypeStaffChoice,
 )
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.models import AffectingTimeSpan, RecurringReservation, Reservation, ReservationUnitHierarchy
-from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_end_of_day, local_start_of_day
+from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_end_of_day, local_start_of_day
 
 from tests.factories import (
     AbilityGroupFactory,
@@ -29,7 +29,7 @@ from tests.factories import (
 )
 from tests.helpers import patch_method
 
-from .helpers import CREATE_SERIES_MUTATION, get_minimal_series_data, pindora_response
+from .helpers import CREATE_SERIES_MUTATION, get_minimal_series_data
 
 # Applied to all tests
 pytestmark = [
@@ -598,7 +598,7 @@ def test_recurring_reservations__create_series__block_whole_day(graphql):
     assert reservations[0].buffer_time_after == datetime.timedelta(hours=12)
 
 
-@patch_method(PindoraClient.create_reservation_series, return_value=pindora_response())
+@patch_method(PindoraService.create_access_code)
 def test_recurring_reservations__create_series__access_type_access_code(graphql):
     reservation_unit = ReservationUnitFactory.create(access_types__access_type=AccessType.ACCESS_CODE)
     user = graphql.login_with_superuser()
@@ -610,18 +610,14 @@ def test_recurring_reservations__create_series__access_type_access_code(graphql)
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.create_reservation_series.called is True
+    assert PindoraService.create_access_code.called is True
 
     pk = response.first_query_object["pk"]
     reservations: list[Reservation] = list(Reservation.objects.filter(recurring_reservation=pk))
     assert len(reservations) == 1
 
-    assert reservations[0].access_type == AccessType.ACCESS_CODE
-    assert reservations[0].access_code_generated_at == local_datetime(2022, 1, 1)
-    assert reservations[0].access_code_is_active is True
 
-
-@patch_method(PindoraClient.create_reservation_series, return_value=pindora_response())
+@patch_method(PindoraService.create_access_code)
 def test_recurring_reservations__create_series__access_type_access_code__only_some_reservations(graphql):
     reservation_unit = ReservationUnitFactory.create(
         access_types__access_type=AccessType.ACCESS_CODE,
@@ -637,22 +633,17 @@ def test_recurring_reservations__create_series__access_type_access_code__only_so
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraClient.create_reservation_series.called is True
+    assert PindoraService.create_access_code.called is True
 
     pk = response.first_query_object["pk"]
     reservations: list[Reservation] = list(Reservation.objects.order_by("begin").filter(recurring_reservation=pk))
     assert len(reservations) == 2
 
     assert reservations[0].access_type == AccessType.UNRESTRICTED
-    assert reservations[0].access_code_generated_at is None
-    assert reservations[0].access_code_is_active is False
-
     assert reservations[1].access_type == AccessType.ACCESS_CODE
-    assert reservations[1].access_code_generated_at == local_datetime(2022, 1, 1)
-    assert reservations[1].access_code_is_active is True
 
 
-@patch_method(PindoraClient.create_reservation_series, side_effect=PindoraAPIError("Pindora Error"))
+@patch_method(PindoraService.create_access_code, side_effect=PindoraAPIError("Pindora Error"))
 def test_recurring_reservations__create_series__access_type_access_code__pindora_call_fails(graphql):
     reservation_unit = ReservationUnitFactory.create(access_types__access_type=AccessType.ACCESS_CODE)
     user = graphql.login_with_superuser()
@@ -664,7 +655,7 @@ def test_recurring_reservations__create_series__access_type_access_code__pindora
 
     assert response.error_message() == "Pindora Error"
 
-    assert PindoraClient.create_reservation_series.called is True
+    assert PindoraService.create_access_code.called is True
 
     # Reservation series is still created, but access codes hae not been generated.
     recurring_reservation: RecurringReservation | None = RecurringReservation.objects.first()
