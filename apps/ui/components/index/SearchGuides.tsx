@@ -62,7 +62,8 @@ const StyledImageWithCard = styled(ImageWithCard)<{ cardAlignment: string }>`
 const InfoContainer = styled(Flex).attrs({
   $gap: "none",
 })`
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: anywhere;
 
   /* fix weird global positioning issues in the image card */
   @media (min-width: ${breakpoints.m}) {
