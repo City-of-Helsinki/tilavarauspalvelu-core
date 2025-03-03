@@ -254,10 +254,17 @@ class RecurringReservationActions:
         periods: Iterable[ReservationPeriod],
         reservation_details: ReservationDetails,
     ) -> list[Reservation]:
+        if not periods:
+            return []
+
         # Pick out the through model for the many-to-many relationship and use if for bulk creation
         ThroughModel: type[models.Model] = Reservation.reservation_units.through  # noqa: N806
 
         reservation_unit = self.recurring_reservation.reservation_unit
+
+        begin_date = min(period["begin"].date() for period in periods)
+        end_date = max(period["begin"].date() for period in periods)
+        access_type_map = reservation_unit.actions.get_access_types_on_period(begin_date, end_date)
 
         reservations: list[Reservation] = []
         through_models: list[models.Model] = []
@@ -273,7 +280,7 @@ class RecurringReservationActions:
                     reservation_unit.actions.get_actual_after_buffer(period["end"]),
                 )
 
-            access_type = reservation_unit.actions.get_access_type_at(period["begin"]) or AccessType.UNRESTRICTED
+            access_type = access_type_map.get(period["begin"].date(), AccessType.UNRESTRICTED)
 
             reservation = Reservation(
                 begin=period["begin"],
