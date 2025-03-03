@@ -172,4 +172,4 @@ class ReservationAdminForm(forms.ModelForm):
         except ExternalServiceError as error:
             return str(error)
 
-        return json.dumps(response, default=str, indent=2)
+        return json.dumps(response._asdict(), default=str, indent=2)
