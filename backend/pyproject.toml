@@ -203,6 +203,7 @@ extend-select = [
     "RUF040",   # invalid-assert-message-literal-argument
     "RUF041",   # unnecessary-nested-literal
     "RUF046",   # unnecessary-cast-to-int
+    "RUF053",   # class-with-mixed-type-vars
     "RUF055",   # unnecessary-regular-expression
     "RUF056",   # falsy-dict-get-fallback
     "RUF057",   # unnecessary-round
@@ -210,6 +211,9 @@ extend-select = [
     "UP042",    # replace-str-enum
     "UP044",    # non-pep646-unpack
     "UP045",    # non-pep604-annotation-optional
+    "UP046",    # non-pep695-generic-class
+    "UP047",    # non-pep695-generic-function
+    "UP049",    # private-type-parameter
 ]
 ignore = [
     # Conflicting with ruff-format

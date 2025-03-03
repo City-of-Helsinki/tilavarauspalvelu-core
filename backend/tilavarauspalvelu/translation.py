@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from functools import wraps
-from typing import TYPE_CHECKING, ParamSpec, TypeVar
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.utils import translation
@@ -167,11 +167,7 @@ class BannerNotificationTranslationOptions(TranslationOptions):
     fields = ["message"]
 
 
-P = ParamSpec("P")
-R = TypeVar("R")
-
-
-def get_translated(func: Callable[P, R]) -> Callable[P, R]:
+def get_translated[**P, R](func: Callable[P, R]) -> Callable[P, R]:
     """
     Wraps a function so that it's contents are translated using the language
     in the function's 'language' keyword argument. By default, translations will be made in Finnish.

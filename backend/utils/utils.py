@@ -13,7 +13,7 @@ import unicodedata
 import urllib.parse
 from contextlib import contextmanager
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.core.cache import cache
@@ -47,9 +47,6 @@ __all__ = [
     "update_query_params",
     "with_indices",
 ]
-
-
-T = TypeVar("T")
 
 
 def to_ascii(string: str) -> str:
@@ -87,7 +84,7 @@ def comma_sep_str(values: Iterable[Any], *, last_sep: str = "&", quote: bool = F
     return string
 
 
-class with_indices(Generic[T]):  # noqa: N801, RUF100
+class with_indices[T]:  # noqa: N801, RUF100
     """
     Iterate list items with indexes in a way that is safe for deletion.
     This can be used as a deletion safe replacement for `enumerate()`.
