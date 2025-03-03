@@ -9,7 +9,7 @@ import random
 from collections.abc import Callable
 from enum import StrEnum
 from functools import wraps
-from typing import TYPE_CHECKING, Annotated, Any, Literal, NamedTuple, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Annotated, Any, Literal, NamedTuple
 
 from django.test import override_settings
 
@@ -39,13 +39,11 @@ if TYPE_CHECKING:
         SuitableTimeRange,
     )
 
-T = TypeVar("T")
-P = ParamSpec("P")
 
 type Percentage = Literal["0", "10", "14", "24", "25.5"]
 
 
-def random_subset(
+def random_subset[T](
     sequence: Sequence[T],
     *,
     min_size: int = 0,
@@ -59,12 +57,12 @@ def random_subset(
     return random.sample(sequence, counts=counts, k=size)
 
 
-def weighted_choice(choices: Sequence[T], weights: list[int]) -> T:
+def weighted_choice[T](choices: Sequence[T], weights: list[int]) -> T:
     """Select a random item from the given choices, favouring the items with higher weights."""
     return random.choices(choices, weights=weights)[0]
 
 
-def with_logs(func: Callable[P, T]) -> Callable[P, T]:
+def with_logs[**P, T](func: Callable[P, T]) -> Callable[P, T]:
     """Log when the function is entered and exited."""
     name = func.__name__.replace("_", " ").strip()
     prefix = "Running"
@@ -87,7 +85,7 @@ def with_logs(func: Callable[P, T]) -> Callable[P, T]:
     return wrapper
 
 
-def refresh_materialized_views_at_the_end(func: Callable[P, None]) -> Callable[P, None]:
+def refresh_materialized_views_at_the_end[**P](func: Callable[P, None]) -> Callable[P, None]:
     @wraps(func)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
         with override_settings(
@@ -134,7 +132,7 @@ class FieldCombination(NamedTuple):
     required: list[str]
 
 
-def get_combinations(
+def get_combinations[T](
     *,
     iterables: Iterable[Sized[Any]],
     output_type: type[T],

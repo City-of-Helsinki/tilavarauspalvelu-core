@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from copy import copy, deepcopy
-from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
+from typing import TYPE_CHECKING, Any, Self
 
 import faker
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -32,9 +32,6 @@ __all__ = [
     "ReverseForeignKeyFactory",
     "ReverseOneToOneFactory",
 ]
-
-T = TypeVar("T")
-TModel = TypeVar("TModel", bound=Model)
 
 
 class BaseFaker(Faker):
@@ -133,7 +130,7 @@ class _CustomFactoryWrapper:
         return self.factory
 
 
-class _PostFactory(PostGeneration, Generic[TModel]):
+class _PostFactory[TModel: Model](PostGeneration):
     def __init__(self, factory: FactoryType) -> None:
         super().__init__(function=self.generate)
         self.field_name: str = ""
@@ -166,7 +163,7 @@ class _PostFactory(PostGeneration, Generic[TModel]):
 # --- Generic factories --------------------------------------------------------------------------------------------
 
 
-class GenericDjangoModelFactory(DjangoModelFactory, Generic[TModel]):
+class GenericDjangoModelFactory[TModel: Model](DjangoModelFactory):
     """
     DjangoModelFactory that adds return type annotations for the
     `build`, `create`, `build_batch`, and `create_batch` methods,
@@ -174,23 +171,23 @@ class GenericDjangoModelFactory(DjangoModelFactory, Generic[TModel]):
     """
 
     @classmethod
-    def build(cls: type[Generic[TModel]], **kwargs: Any) -> TModel:
+    def build(cls: TModel, **kwargs: Any) -> TModel:
         return super().build(**kwargs)
 
     @classmethod
-    def create(cls: type[Generic[TModel]], **kwargs: Any) -> TModel:
+    def create(cls: TModel, **kwargs: Any) -> TModel:
         return super().create(**kwargs)
 
     @classmethod
-    def build_batch(cls: type[Generic[TModel]], size: int, **kwargs: Any) -> list[TModel]:
+    def build_batch(cls: TModel, size: int, **kwargs: Any) -> list[TModel]:
         return super().build_batch(size, **kwargs)
 
     @classmethod
-    def create_batch(cls: type[Generic[TModel]], size: int, **kwargs: Any) -> list[TModel]:
+    def create_batch(cls: TModel, size: int, **kwargs: Any) -> list[TModel]:
         return super().create_batch(size, **kwargs)
 
     @classmethod
-    def pop_sub_kwargs(cls: type[Generic[TModel]], key: str, kwargs: dict[str, Any]) -> dict[str, Any]:
+    def pop_sub_kwargs(cls: TModel, key: str, kwargs: dict[str, Any]) -> dict[str, Any]:
         sub_kwargs = {}
         for kwarg in kwargs.copy():
             if kwarg.startswith(f"{key}__"):
@@ -198,31 +195,31 @@ class GenericDjangoModelFactory(DjangoModelFactory, Generic[TModel]):
         return sub_kwargs
 
     @classmethod
-    def has_sub_kwargs(cls: type[Generic[TModel]], key: str, kwargs: dict[str, Any]) -> bool:
+    def has_sub_kwargs(cls: TModel, key: str, kwargs: dict[str, Any]) -> bool:
         return any(kwarg == key or kwarg.startswith(f"{key}__") for kwarg in kwargs)
 
 
-class GenericFactory(Factory, Generic[T]):
+class GenericFactory[T](Factory):
     """Same as `GenericDjangoModelFactory`, but for regular factories."""
 
     @classmethod
-    def build(cls: Generic[T], **kwargs: Any) -> T:
+    def build(cls: T, **kwargs: Any) -> T:
         return super().build(**kwargs)
 
     @classmethod
-    def create(cls: Generic[T], **kwargs: Any) -> T:
+    def create(cls: T, **kwargs: Any) -> T:
         return super().create(**kwargs)
 
     @classmethod
-    def build_batch(cls: Generic[T], size: int, **kwargs: Any) -> list[T]:
+    def build_batch(cls: T, size: int, **kwargs: Any) -> list[T]:
         return super().build_batch(size, **kwargs)
 
     @classmethod
-    def create_batch(cls: Generic[T], size: int, **kwargs: Any) -> list[T]:
+    def create_batch(cls: T, size: int, **kwargs: Any) -> list[T]:
         return super().create_batch(size, **kwargs)
 
 
-class ModelFactoryBuilder(Generic[TModel]):
+class ModelFactoryBuilder[TModel: Model]:
     """
     Allows using the builder pattern to build-up kwargs for factories.
     Subclass this class and add custom builder methods to it.
@@ -264,7 +261,7 @@ class ModelFactoryBuilder(Generic[TModel]):
 # --- Related factories --------------------------------------------------------------------------------------------
 
 
-class ForeignKeyFactory(SubFactory, Generic[TModel]):
+class ForeignKeyFactory[TModel: Model](SubFactory):
     """
     Factory for forward 'many-to-one' (foreign key) related fields.
 
@@ -303,7 +300,7 @@ Basically the same as a SubFactory, but allows the related value to be 'None'.
 """
 
 
-class ReverseOneToOneFactory(_PostFactory[TModel]):
+class ReverseOneToOneFactory[TModel: Model](_PostFactory[TModel]):
     """
     Factory for reverse 'one-to-one' related fields.
     If given the related model, or 'factory style arguments' (related__field=value),
@@ -318,7 +315,7 @@ class ReverseOneToOneFactory(_PostFactory[TModel]):
             factory.create(**kwargs) if create else factory.build(**kwargs)
 
 
-class ReverseForeignKeyFactory(_PostFactory[TModel]):
+class ReverseForeignKeyFactory[TModel: Model](_PostFactory[TModel]):
     """
     Factory for reverse foreign keys (one-to-many).
     If given the related model, or "factory style arguments" (related__field=value),
@@ -347,7 +344,7 @@ class ReverseForeignKeyFactory(_PostFactory[TModel]):
             factory.create(**kwargs) if create else factory.build(**kwargs)
 
 
-class ManyToManyFactory(_PostFactory[TModel]):
+class ManyToManyFactory[TModel: Model](_PostFactory[TModel]):
     """
     Factory for forward/reverse many-to-many related fields.
     If given the related model, or "factory style arguments" (related__field=value),

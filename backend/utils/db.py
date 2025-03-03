@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import ast
 from inspect import cleandoc
-from typing import TYPE_CHECKING, Any, Literal, TypeVar
+from typing import TYPE_CHECKING, Any, Literal
 
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
@@ -251,10 +251,7 @@ def _(_: NowTT, state: State) -> ast.Call:
     return ast_function("now", ["datetime", "datetime"], **kwargs)
 
 
-TQuerySet = TypeVar("TQuerySet")
-
-
-def text_search(
+def text_search[TQuerySet](
     qs: TQuerySet,
     fields: Collection[str],
     text: str,

@@ -4,7 +4,7 @@ import re
 from contextlib import contextmanager
 from functools import wraps
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, Any, NamedTuple, ParamSpec, Self, TypeVar
+from typing import TYPE_CHECKING, Any, Self
 from unittest import mock
 from unittest.mock import patch
 
@@ -34,12 +34,6 @@ __all__ = [
     "TranslationsFromPOFiles",
     "exact",
 ]
-
-
-T = TypeVar("T")
-P = ParamSpec("P")
-
-TNamedTuple = TypeVar("TNamedTuple", bound=NamedTuple)
 
 
 class GraphQLClient(BaseGraphQLClient):
@@ -102,7 +96,7 @@ class patch_method:
         method_path = method.__module__ + "." + method.__qualname__  # type: ignore[attr-defined]
         self.patch = mock.patch(method_path, return_value=return_value, side_effect=side_effect)
 
-    def __call__(self, func: Callable[P, T]) -> Callable[P, T]:
+    def __call__[**P, T](self, func: Callable[P, T]) -> Callable[P, T]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
             # Run the test with the method patched

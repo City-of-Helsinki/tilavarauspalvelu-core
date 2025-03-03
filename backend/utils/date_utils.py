@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import zoneinfo
-from typing import TYPE_CHECKING, Generic, Literal, TypedDict, TypeVar
+from typing import TYPE_CHECKING, Literal, TypedDict
 
 from django.utils.timezone import get_default_timezone
 
@@ -49,14 +49,11 @@ __all__ = [
     "utc_time_min",
 ]
 
-TCanHaveTZ = TypeVar("TCanHaveTZ", datetime.datetime, datetime.time)
-TValid = TypeVar("TValid", datetime.datetime, datetime.time)
-
 
 DEFAULT_TIMEZONE = get_default_timezone()
 
 
-class _TZComparator(Generic[TCanHaveTZ, TValid]):  # noqa: N801, RUF100
+class _TZComparator[TCanHaveTZ: (datetime.datetime, datetime.time), TValid: (datetime.datetime, datetime.time)]:  # noqa: N801, RUF100
     def __init__(self, _input_1: TCanHaveTZ, _input_2: TCanHaveTZ) -> None:
         self._input_1 = self._validate_input(_input_1, name="Input 1")
         self._input_2 = self._validate_input(_input_2, name="Input 2")
