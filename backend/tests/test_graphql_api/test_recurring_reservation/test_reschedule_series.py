@@ -6,8 +6,9 @@ from typing import TYPE_CHECKING
 import pytest
 from freezegun import freeze_time
 
-from tilavarauspalvelu.enums import ReservationStateChoice, Weekday, WeekdayChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, Weekday, WeekdayChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry.service import PindoraService
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationStatistic, ReservationUnitHierarchy
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_time
@@ -760,3 +761,57 @@ def test_recurring_reservations__reschedule_series__same_day_future_reservation(
     assert reservations[6].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
     assert reservations[7].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
     assert reservations[8].begin.astimezone(DEFAULT_TIMEZONE).timetz() == local_time(hour=11)
+
+
+@freeze_time(local_datetime(year=2023, month=12, day=1))
+@patch_method(PindoraService.reschedule_access_code)
+def test_recurring_reservations__reschedule_series__is_access_code(graphql):
+    recurring_reservation = create_reservation_series(
+        reservations__access_type=AccessType.ACCESS_CODE,
+        reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
+    )
+
+    data = get_minimal_reschedule_data(recurring_reservation)
+
+    graphql.login_with_superuser()
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PindoraService.reschedule_access_code.called is True
+
+
+@freeze_time(local_datetime(year=2023, month=12, day=1))
+@patch_method(PindoraService.reschedule_access_code)
+def test_recurring_reservations__reschedule_series__was_access_code(graphql):
+    recurring_reservation = create_reservation_series(
+        reservations__access_type=AccessType.ACCESS_CODE,
+        reservation_unit__access_types__access_type=AccessType.UNRESTRICTED,
+    )
+
+    data = get_minimal_reschedule_data(recurring_reservation)
+
+    graphql.login_with_superuser()
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PindoraService.reschedule_access_code.called is True
+
+
+@freeze_time(local_datetime(year=2023, month=12, day=1))
+@patch_method(PindoraService.reschedule_access_code)
+def test_recurring_reservations__reschedule_series__changed_to_access_code(graphql):
+    recurring_reservation = create_reservation_series(
+        reservations__access_type=AccessType.UNRESTRICTED,
+        reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
+    )
+
+    data = get_minimal_reschedule_data(recurring_reservation)
+
+    graphql.login_with_superuser()
+    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PindoraService.reschedule_access_code.called is True

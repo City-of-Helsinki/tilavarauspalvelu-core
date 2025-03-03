@@ -13,6 +13,8 @@ from rest_framework.exceptions import ValidationError
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, WeekdayChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import RecurringReservation, ReservationStatistic
 from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
@@ -127,6 +129,8 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         buffer_time_before: datetime.timedelta | None = self.initial_data.get("buffer_time_before")
         buffer_time_after: datetime.timedelta | None = self.initial_data.get("buffer_time_after")
 
+        had_access_codes = instance.reservations.requires_active_access_code().exists()
+
         # Create both the recurring reservation and the reservations in a transaction.
         # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
@@ -138,6 +142,8 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
                 skip_dates=skip_dates,
             )
 
+        has_access_codes = instance.reservations.requires_active_access_code().exists()
+
         # Must refresh the materialized view since reservations changed time.
         if settings.UPDATE_AFFECTING_TIME_SPANS:
             update_affecting_time_spans_task.delay()
@@ -148,6 +154,12 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             )
 
         EmailService.send_seasonal_reservation_modified_series_email(instance)
+
+        if had_access_codes or has_access_codes:
+            try:
+                PindoraService.reschedule_access_code(instance)
+            except PindoraNotFoundError:
+                PindoraService.create_access_code(instance, is_active=True)
 
         return instance
 
