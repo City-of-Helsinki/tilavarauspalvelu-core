@@ -15,6 +15,7 @@ from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, WeekdayChoice
 from utils.db import SubqueryArray
+from utils.utils import LazyValidator
 
 from .queryset import RecurringReservationManager
 
@@ -119,17 +120,7 @@ class RecurringReservation(models.Model):
 
         return RecurringReservationActions(self)
 
-    @cached_property
-    def validator(self) -> ReservationSeriesValidator:
-        """
-        Validation logic that requires access to a RecurringReservation instance,
-        e.g. for update, delete, or validation of another model.
-        """
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .validators import ReservationSeriesValidator
-
-        return ReservationSeriesValidator(self)
+    validator: ReservationSeriesValidator = LazyValidator()
 
     @lookup_property(skip_codegen=True)
     def should_have_active_access_code() -> bool:
