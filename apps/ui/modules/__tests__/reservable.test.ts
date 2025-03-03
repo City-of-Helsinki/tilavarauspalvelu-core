@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- strict null checsk
+// @ts-nocheck -- disable because of missing strict null checks
 import {
   addDays,
   addHours,

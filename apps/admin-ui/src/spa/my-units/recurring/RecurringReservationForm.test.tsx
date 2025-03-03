@@ -102,11 +102,13 @@ test("Render recurring reservation form with all but unit field disabled", async
   const listbox = view.getByRole("listbox");
 
   const units = createReservationUnits();
-  expect(units[0].nameFi).toBeDefined();
-  expect(units[1].nameFi).toBeDefined();
+  expect(units[0]?.nameFi).toBeDefined();
+  expect(units[1]?.nameFi).toBeDefined();
   expect(listbox).toBeInTheDocument();
-  expect(within(listbox).getByText(units[0].nameFi!)).toBeInTheDocument();
-  expect(within(listbox).getByText(units[1].nameFi!)).toBeInTheDocument();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+  expect(within(listbox).getByText(units[0]?.nameFi!)).toBeInTheDocument();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+  expect(within(listbox).getByText(units[1]?.nameFi!)).toBeInTheDocument();
 
   const selectorFields = ["repeatPattern"];
   for (const f of selectorFields) {
@@ -149,8 +151,9 @@ async function selectUnit() {
 
   const listbox = screen.getByRole("listbox");
   const units = createReservationUnits();
-  expect(units[0].nameFi).toBeDefined();
-  const unitName = units[0].nameFi!;
+  expect(units[0]?.nameFi).toBeDefined();
+  // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+  const unitName = units[0]?.nameFi!;
 
   const option = within(listbox).getByText("Unit");
   await user.click(option);
@@ -436,7 +439,7 @@ test("Reservations can be removed and restored", async () => {
     expect(x).toHaveTextContent(/common.remove/);
   });
 
-  await user.click(removeButtons[0]);
+  await user.click(removeButtons[0]!);
   await within(list).findByText(/common.restore/);
   const restore = within(list).getByText(/common.restore/);
   expect(within(list).queryAllByText(/common.remove/)).toHaveLength(3);

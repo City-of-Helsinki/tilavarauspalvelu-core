@@ -38,7 +38,7 @@ function isNotFoundError(error: unknown): boolean {
     const { graphQLErrors } = error;
     if (graphQLErrors.length > 0) {
       const NOT_FOUND = "NOT_FOUND";
-      if (graphQLErrors[0].extensions == null) {
+      if (graphQLErrors[0]?.extensions == null) {
         return false;
       }
       return graphQLErrors[0].extensions.code === NOT_FOUND;

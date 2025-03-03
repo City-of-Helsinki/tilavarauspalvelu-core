@@ -18,7 +18,7 @@ import {
   dateToKey,
   isRangeReservable,
 } from "@/modules/reservable";
-import { dayMax, dayMin } from "common/src/helpers";
+import { dayMax, dayMin, timeToMinutes } from "common/src/helpers";
 
 type LastPossibleReservationDateProps = Pick<
   ReservationUnitNode,
@@ -97,7 +97,7 @@ function getAvailableTimesForDay({
     .map((n) => {
       const [slotHours, slotMinutes] = n.label.split(":").map(Number);
       const startDate = new Date(start);
-      startDate.setHours(slotHours, slotMinutes, 0, 0);
+      startDate.setHours(slotHours ?? 0, slotMinutes, 0, 0);
       const endDate = addMinutes(startDate, duration ?? 0);
       const startTime = new Date(start);
       startTime.setHours(timeHours, timeMinutes, 0, 0);
@@ -174,8 +174,8 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     const {
       value: [_key, value],
     } = result;
-    if (value.length > 0) {
-      const startValue = new Date(value[0].start);
+    const startValue = value[0]?.start;
+    if (startValue) {
       // the map contains all the days, skip the ones before the minDay
       if (isBefore(startValue, minDay)) {
         continue;
@@ -189,7 +189,8 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
   }
 
   const interval = openTimes[0];
-  const startDay = dayMax([new Date(interval.start), minDay]) ?? minDay;
+  const intervalStart = interval?.start;
+  const startDay = dayMax([intervalStart, minDay]) ?? minDay;
 
   // 2 years is the absolute maximum, use max days before as a performance optimization
   const MAX_DAYS = 2 * 365;
@@ -207,11 +208,8 @@ export function getNextAvailableTime(props: AvailableTimesProps): Date | null {
     const hasAvailableTimes = availableTimesForDay.length > 0;
     if (hasAvailableTimes) {
       const startDatetime = availableTimesForDay[0];
-      const [hours, minutes] = startDatetime
-        .split(":")
-        .map(Number)
-        .filter(Number.isFinite);
-      return set(singleDay, { hours, minutes });
+      const minutes = timeToMinutes(startDatetime ?? "");
+      return set(singleDay, { hours: 0, minutes });
     }
   }
 
