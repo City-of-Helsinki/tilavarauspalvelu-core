@@ -17,7 +17,7 @@ from tilavarauspalvelu.enums import (
     ReservationTypeStaffChoice,
     WeekdayChoice,
 )
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import RecurringReservation, Reservation
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from utils.fields.serializer import CurrentUserDefaultNullable, input_only_field
@@ -27,6 +27,7 @@ if TYPE_CHECKING:
 
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
+    from tilavarauspalvelu.typing import ReservationSeriesCreateData
 
 
 __all__ = [
@@ -182,7 +183,7 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
 
         return recurrence_in_days
 
-    def save(self, **kwargs: Any) -> RecurringReservation:
+    def create(self, validated_data: ReservationSeriesCreateData) -> RecurringReservation:
         reservation_details: ReservationDetails = self.initial_data.get("reservation_details", {})
         skip_dates = self.initial_data.get("skip_dates", [])
         check_opening_hours = self.initial_data.get("check_opening_hours", False)
@@ -190,7 +191,7 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
         # Create both the recurring reservation and the reservations in a transaction.
         # This way if we get, e.g., overlapping reservations, the whole operation is rolled back.
         with transaction.atomic():
-            instance: RecurringReservation = super().save()
+            instance: RecurringReservation = super().create(validated_data)
             reservations = self.create_reservations(
                 instance=instance,
                 reservation_details=reservation_details,
@@ -210,11 +211,7 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
         # Lastly, create any access codes without suppressing errors if they cannot be created,
         # but don't fail creating the reservation series itself.
         if instance.reservations.requires_active_access_code().exists():
-            response = PindoraClient.create_reservation_series(instance, is_active=True)
-            instance.reservations.requires_active_access_code().update(
-                access_code_generated_at=response["access_code_generated_at"],
-                access_code_is_active=response["access_code_is_active"],
-            )
+            PindoraService.create_access_code(instance, is_active=True)
 
         return instance
 
