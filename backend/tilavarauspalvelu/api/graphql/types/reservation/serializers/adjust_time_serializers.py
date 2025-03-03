@@ -79,7 +79,7 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
 
         data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
         data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin) or AccessType.UNRESTRICTED
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begin, default=AccessType.UNRESTRICTED)
 
         return data
 
