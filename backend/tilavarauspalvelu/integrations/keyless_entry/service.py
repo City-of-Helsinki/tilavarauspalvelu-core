@@ -4,7 +4,7 @@ import datetime
 from contextlib import suppress
 from typing import TYPE_CHECKING, overload
 
-from tilavarauspalvelu.enums import AccessType
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
 from tilavarauspalvelu.typing import (
     PindoraReservationInfoData,
@@ -405,8 +405,11 @@ class PindoraService:
 
     @classmethod
     def _sync_reservation_access_code(cls, reservation: Reservation) -> None:
-        # Access type is not 'ACCESS_CODE', delete the access code (if it exists)
-        if reservation.access_type != AccessType.ACCESS_CODE:
+        # Delete access code form reservation if it shouldn't have one.
+        if (
+            reservation.access_type != AccessType.ACCESS_CODE  #
+            or reservation.state in {ReservationStateChoice.DENIED, ReservationStateChoice.CANCELLED}
+        ):
             with suppress(PindoraNotFoundError):
                 cls.delete_access_code(obj=reservation)
             return

@@ -184,6 +184,30 @@ def test_sync_access_code__reservation__not_access_code__not_found():
     assert PindoraClient.reschedule_reservation.call_count == 0
 
 
+@patch_method(PindoraService.delete_access_code)
+@patch_method(PindoraClient.create_reservation, side_effect=access_code_response)
+@patch_method(PindoraClient.reschedule_reservation, side_effect=access_code_response)
+@pytest.mark.parametrize("state", [ReservationStateChoice.DENIED, ReservationStateChoice.CANCELLED])
+def test_sync_access_code__reservation__state_indicates_no_access_code(state):
+    reservation = ReservationFactory.create(
+        reservation_units__uuid=uuid.uuid4(),
+        recurring_reservation=None,
+        begin=local_datetime(2024, 1, 1, 12),
+        end=local_datetime(2024, 1, 1, 13),
+        access_type=AccessType.UNRESTRICTED,
+        state=state,
+        type=ReservationTypeChoice.NORMAL,
+        access_code_generated_at=local_datetime(2022, 1, 1),
+        access_code_is_active=True,
+    )
+
+    PindoraService.sync_access_code(obj=reservation)
+
+    assert PindoraService.delete_access_code.call_count == 1
+    assert PindoraClient.create_reservation.call_count == 0
+    assert PindoraClient.reschedule_reservation.call_count == 0
+
+
 @patch_method(PindoraService.activate_access_code)
 @patch_method(PindoraService.deactivate_access_code)
 @patch_method(PindoraService.create_access_code)
