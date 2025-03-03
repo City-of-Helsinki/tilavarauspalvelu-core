@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import datetime
+import itertools
 from typing import TYPE_CHECKING, Any
 
 from django.db import models
 from lookup_property import L
 
-from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, PaymentType, ReservationStartInterval
+from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice, PaymentType, ReservationStartInterval
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
@@ -26,13 +27,13 @@ from utils.external_service.errors import ExternalServiceError
 if TYPE_CHECKING:
     from collections.abc import Collection
 
-    from tilavarauspalvelu.enums import AccessType
     from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource
     from tilavarauspalvelu.models import (
         Location,
         PaymentAccounting,
         PaymentMerchant,
         ReservationUnit,
+        ReservationUnitAccessType,
         ReservationUnitPricing,
     )
     from tilavarauspalvelu.typing import TimeSpan
@@ -415,9 +416,52 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             return self.reservation_unit.unit.payment_accounting
         return None
 
-    def get_access_type_at(self, moment: datetime.datetime) -> AccessType | None:
+    def get_access_type_at(self, moment: datetime.datetime, *, default: AccessType | None = None) -> AccessType | None:
         on_date = moment.astimezone(DEFAULT_TIMEZONE).date()
-        return self.reservation_unit.access_types.active(on_date=on_date).values_list("access_type", flat=True).first()
+        qs = self.reservation_unit.access_types.active(on_date=on_date)
+        return qs.values_list("access_type", flat=True).first() or default
+
+    def get_access_types_on_period(
+        self,
+        begin_date: datetime.date,
+        end_date: datetime.date,
+    ) -> dict[datetime.date, AccessType]:
+        """
+        Get a dict that maps all dates on the given period to the access type that is active on that date.
+        A value from the period might be missing if no access type is active on that date.
+        An empty dict is returned if there are no access types found from the given period.
+        """
+        access_types_by_date: dict[datetime.date, AccessType] = {}
+
+        access_types: list[ReservationUnitAccessType] = list(
+            self.reservation_unit.access_types.filter(
+                L(end_date__gt=begin_date) & models.Q(begin_date__lte=end_date)
+            ).order_by("begin_date")
+        )
+        if not access_types:
+            return access_types_by_date
+
+        # Note: 'itertools.pairwise' will be empty if there is only one access type
+        for current_one, next_one in itertools.pairwise(access_types):
+            date = max(current_one.begin_date, begin_date)
+            access_type = AccessType(current_one.access_type)
+
+            while date < next_one.begin_date:
+                access_types_by_date[date] = access_type
+                date += datetime.timedelta(days=1)
+
+        # Handle last/only access type separately.
+        # If there is only one access type, this is needed since 'pairwise' will return an empty iterator.
+        # For last access type, this is needed to fill dict until 'end_date' since 'end_date' can be
+        # after the last access type's 'begin_date'
+        access_type = AccessType(access_types[-1].access_type)
+        date = access_types[-1].begin_date
+
+        while date <= end_date:
+            access_types_by_date[date] = access_type
+            date += datetime.timedelta(days=1)
+
+        return access_types_by_date
 
     @property
     def start_interval_minutes(self) -> int:
