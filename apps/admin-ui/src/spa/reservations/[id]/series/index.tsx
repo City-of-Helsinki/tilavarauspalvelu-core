@@ -275,8 +275,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
             ?.scrollIntoView();
         } else {
           const validationErrors = getValidationErrors(err);
-          if (validationErrors.length > 0) {
-            const validationError = validationErrors[0];
+          const validationError = validationErrors[0];
+          if (validationError != null) {
             errorToast({
               text: t(`errors.backendValidation.${validationError.code}`),
             });

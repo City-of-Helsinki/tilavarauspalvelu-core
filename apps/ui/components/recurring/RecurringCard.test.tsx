@@ -16,6 +16,7 @@ function createReservationUnit({
   return {
     id: "ReservationUnitNode:1",
     pk: 1,
+    accessTypes: [],
     reservationUnitType: createReservationUnitType({
       name: reservationUnitType,
     }),

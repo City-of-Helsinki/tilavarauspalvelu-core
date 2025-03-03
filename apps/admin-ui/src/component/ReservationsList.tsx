@@ -163,8 +163,9 @@ function AddNewReservationButton({
   reservationToCopy,
   refetch,
 }: AddNewReservationButtonProps) {
+  const unitPk = reservationToCopy?.reservationUnits?.[0]?.unit?.pk;
   const { hasPermission } = useCheckPermission({
-    units: [reservationToCopy?.reservationUnits?.[0].unit?.pk ?? 0],
+    units: unitPk ? [unitPk] : [],
     permission: UserPermissionChoice.CanManageReservations,
   });
   const { t } = useTranslation();

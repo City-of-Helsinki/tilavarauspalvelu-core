@@ -30,7 +30,7 @@ export function MultiSelectFilter({
     if (value == null || value.length === 0) {
       vals.delete(name);
     } else {
-      vals.set(name, value[0]);
+      vals.set(name, value[0] ?? "");
       value.forEach((v) => {
         if (!vals.has(name, v)) {
           vals.append(name, v);

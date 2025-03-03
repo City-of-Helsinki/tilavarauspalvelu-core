@@ -31,6 +31,9 @@ function hasUserAcceptedStatistics(): boolean {
   );
   if (consentCookie) {
     const val = consentCookie.split("=")[1];
+    if (val == null) {
+      return false;
+    }
     const des = decodeURIComponent(val);
     const parsed = JSON.parse(des);
     if (parsed) {

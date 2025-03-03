@@ -29,7 +29,7 @@ export function getReservationApplicationFields({
   // hack to add a form field (admin doesn't need this because the form is done correctly).
   // proper place would be to be either in the MetaFields or in the form creation (useForm).
   for (let i = 0; i < fields.length; i += 1) {
-    if (fields[i].includes("billing_")) {
+    if (fields[i]?.includes("billing_")) {
       fields.splice(i, 0, "show_billing_address");
       break;
     }

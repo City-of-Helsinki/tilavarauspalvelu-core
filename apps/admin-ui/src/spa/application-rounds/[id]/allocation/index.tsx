@@ -266,11 +266,7 @@ function ApplicationRoundAllocation({
   const applicantTypeFilterQuery = filterNonNullable(
     applicantTypeFilter.map((x) => transformApplicantType(x))
   );
-  const reservationUnitFilterQuery = Number.isFinite(
-    Number(selectedReservationUnit)
-  )
-    ? Number(selectedReservationUnit)
-    : null;
+  const reservationUnitFilterQuery = toNumber(selectedReservationUnit);
   const preferredOrderFilterQuery = orderFilter
     .map(Number)
     .filter((x) => x >= 0 && x <= 10);
@@ -498,6 +494,11 @@ function ApplicationRoundAllocation({
     (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
   );
 
+  const reservationUnit =
+    unitReservationUnits.find(
+      (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
+    ) ?? reservationUnits[0];
+
   return (
     <>
       <div>
@@ -556,18 +557,16 @@ function ApplicationRoundAllocation({
           </>
         )}
       </NumberOfResultsContainer>
-      <AllocationPageContent
-        applicationSections={applicationSections}
-        reservationUnit={
-          unitReservationUnits.find(
-            (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
-          ) || unitReservationUnits[0]
-        }
-        relatedAllocations={affectingAllocations}
-        // TODO overly complicated but doesn't properly handle single failures
-        refetchApplicationEvents={handleRefetchApplicationEvents}
-        applicationRoundStatus={applicationRoundStatus}
-      />
+      {reservationUnit && (
+        <AllocationPageContent
+          applicationSections={applicationSections}
+          reservationUnit={reservationUnit}
+          relatedAllocations={affectingAllocations}
+          // TODO overly complicated but doesn't properly handle single failures
+          refetchApplicationEvents={handleRefetchApplicationEvents}
+          applicationRoundStatus={applicationRoundStatus}
+        />
+      )}
     </>
   );
 }

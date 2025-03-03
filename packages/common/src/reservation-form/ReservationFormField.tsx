@@ -215,7 +215,7 @@ const ReservationFormField = ({
         label={label}
         control={control}
         required={required}
-        options={options[field]}
+        options={options[field] ?? []}
         error={errorText}
         placeholder={t("common:select")}
         afterChange={() => trigger(field)}

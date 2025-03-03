@@ -1,4 +1,9 @@
-import { convertTime, filterNonNullable, toNumber } from "common/src/helpers";
+import {
+  convertTime,
+  filterNonNullable,
+  timeToMinutes,
+  toNumber,
+} from "common/src/helpers";
 import {
   fromApiDate,
   fromUIDate,
@@ -61,10 +66,13 @@ const PricingFormSchema = z.object({
 type PricingFormValues = z.infer<typeof PricingFormSchema>;
 
 function refinePricing(
-  data: PricingFormValues,
+  data: PricingFormValues | undefined,
   ctx: z.RefinementCtx,
   path: string
 ) {
+  if (data == null) {
+    return;
+  }
   if (data.begins === "") {
     ctx.addIssue({
       message: "Required",
@@ -197,13 +205,8 @@ function validateSeasonalTimes(
       );
       checkTimeStringFormat(reservableTime?.end, ctx, `${path}.end`, "time");
 
-      const [h1, m1] = reservableTime.begin.split(":");
-      const [h2, m2] = reservableTime.end.split(":");
-      const begin = { hours: parseInt(h1, 10), minutes: parseInt(m1, 10) };
-      const end = { hours: parseInt(h2, 10), minutes: parseInt(m2, 10) };
-
-      const beginTimeMinutes = begin.hours * 60 + begin.minutes;
-      const endTimeMinutes = end.hours * 60 + end.minutes;
+      const beginTimeMinutes = timeToMinutes(reservableTime.begin);
+      const endTimeMinutes = timeToMinutes(reservableTime.end);
       // this corresponds to the backend error: "Timeslot 1 begin and end time must be at 30 minute intervals."
       if (beginTimeMinutes % 30 !== 0) {
         ctx.addIssue({
@@ -221,24 +224,20 @@ function validateSeasonalTimes(
       }
 
       // check that the begin is before the end
-      if (!Number.isNaN(begin.minutes) && !Number.isNaN(begin.hours)) {
-        const t1 = begin.hours * 60 + begin.minutes;
-        const t2 = end.hours * 60 + end.minutes;
-        if (t1 >= t2 && t2 !== 0) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Begin must be before end",
-            path: [`${path}.end`],
-          });
-        }
+      const t1 = beginTimeMinutes;
+      const t2 = endTimeMinutes;
+      if (t1 >= t2 && t2 !== 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Begin must be before end",
+          path: [`${path}.end`],
+        });
       }
 
       // check that the first can't end after the second begins
       if (i > 0) {
         if (lastEnd != null) {
-          const t2 = begin.hours * 60 + begin.minutes;
-
-          if (lastEnd === t2) {
+          if (lastEnd === beginTimeMinutes) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: "Previous end can't be the same as next begin",
@@ -246,7 +245,7 @@ function validateSeasonalTimes(
               path: [`${path}.begin`],
             });
           }
-          if (lastEnd === 0 || lastEnd > t2) {
+          if (lastEnd === 0 || lastEnd > beginTimeMinutes) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: "Previous end must be before next begin",
@@ -255,7 +254,7 @@ function validateSeasonalTimes(
             });
           }
         }
-        if (lastEnd == null && !Number.isNaN(begin.minutes)) {
+        if (lastEnd == null) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Not allowed to add a second time without first",
@@ -264,10 +263,7 @@ function validateSeasonalTimes(
         }
       }
 
-      if (!Number.isNaN(begin.hours)) {
-        const t2 = end.hours * 60 + end.minutes;
-        lastEnd = t2;
-      }
+      lastEnd = endTimeMinutes;
     });
   });
 }
@@ -725,16 +721,15 @@ function convertPricingList(pricings: PricingNode[]): PricingFormValues[] {
   const activePrices = convertedPrices.filter((p) => !p.isFuture);
   const futurePrices = convertedPrices.filter((p) => p.isFuture);
 
+  const activePrice = activePrices[activePrices.length - 1];
   // query data includes all past pricings also, remove them
   const prices =
-    activePrices.length > 1
-      ? [activePrices[activePrices.length - 1], ...futurePrices]
-      : convertedPrices;
+    activePrice != null ? [activePrice, ...futurePrices] : convertedPrices;
 
   // Always include at least two pricings in the form data (the frontend doesn't support dynamic adding)
   // negative pk for new pricings
   let rollingIndex = -1;
-  while (prices.length < 2 || !prices.some((p) => p.isFuture)) {
+  while (prices.length < 2 || !prices.some((p) => p?.isFuture)) {
     // if we need to add first price, it's always current
     const isFuture = prices.length > 0;
     const begins =

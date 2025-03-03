@@ -72,7 +72,7 @@ function constructEventTitle(
     reservation: res,
     t,
   });
-  if (unit.length > 0) {
+  if (unit != null && unit.length > 0) {
     return `${reservee} (${unit})`;
   }
   return reservee;

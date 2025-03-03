@@ -27,19 +27,19 @@ describe("TermsBox", () => {
   test("should render with default props", () => {
     renderComponent();
 
-    const link1 = screen.getByText(defaultProps.links[0].text);
-    const link2 = screen.getByText(defaultProps.links[1].text);
+    const link1 = screen.getByText(defaultProps.links[0]?.text ?? "");
+    const link2 = screen.getByText(defaultProps.links[1]?.text ?? "");
 
     expect(screen.getByText(defaultProps.heading)).toBeInTheDocument();
 
     expect(screen.getByText(bodyText)).toBeInTheDocument();
 
     expect(link1).toBeInTheDocument();
-    expect(link1).toHaveAttribute("href", defaultProps.links[0].href);
+    expect(link1).toHaveAttribute("href", defaultProps.links[0]?.href);
     expect(link1).toHaveAttribute("target", "_blank");
 
     expect(link2).toBeInTheDocument();
-    expect(link2).toHaveAttribute("href", defaultProps.links[1].href);
+    expect(link2).toHaveAttribute("href", defaultProps.links[1]?.href);
     expect(link2).toHaveAttribute("target", "_blank");
 
     expect(screen.getByText(defaultProps.acceptLabel)).toBeInTheDocument();

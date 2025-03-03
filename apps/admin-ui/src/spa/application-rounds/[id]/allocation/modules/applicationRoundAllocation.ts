@@ -8,9 +8,10 @@ import {
   ApplicationRoundFilterQuery,
 } from "@gql/gql-types";
 import { type TFunction } from "next-i18next";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, timeToMinutes, toNumber } from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
 import { Day, convertWeekday, transformWeekday } from "common/src/conversion";
+import { set } from "date-fns";
 
 type QueryT = NonNullable<
   ApplicationSectionAllocationsQuery["applicationSections"]
@@ -43,10 +44,13 @@ export type Cell = {
 
 // TODO why is there a similar function in ui?
 export function applicationEventSchedulesToCells(
-  firstSlotStart: number,
-  lastSlotStart: number
+  firstSlotStart: number | undefined,
+  lastSlotStart: number | undefined
 ): Cell[][] {
   const cells = [] as Cell[][];
+  if (firstSlotStart == null || lastSlotStart == null) {
+    return cells;
+  }
 
   // TODO don't string encode
   // if it's important then use a Map with { day: number, hour: number } as key
@@ -71,8 +75,11 @@ export function applicationEventSchedulesToCells(
 }
 
 export const timeSlotKeyToTime = (slot: string): number => {
-  const [, hour, minute] = slot.split("-").map(Number);
-  return new Date().setHours(hour, minute);
+  const [, hours, minutes] = slot.split("-").map(Number);
+  if (hours == null || minutes == null) {
+    return 0;
+  }
+  return set(new Date(), { hours, minutes }).getTime();
 };
 
 export function getTimeSlotOptions(
@@ -114,7 +121,7 @@ type TimeSlot = { day: number; hour: number };
 
 export function decodeTimeSlot(slot: string): TimeSlot {
   const [day, hour, min] = slot.split("-").map(Number);
-  return { day, hour: hour + min / 60 };
+  return { day: day ?? 0, hour: (hour ?? 0) + (min ?? 0) / 60 };
 }
 
 export function encodeTimeSlot(day: number, hour: number): string {
@@ -135,19 +142,8 @@ function constructTimeSlot(day: number, begin: string): TimeSlot | null {
 /// @return time in hours
 /// @param from a python time string: "HH:MM:SS"
 export function parseApiTime(time: string): number | null {
-  const t = time.split(":").map((n) => parseInt(n, 10));
-  if (t.length < 2) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid time", time);
-    return null;
-  }
-  const [h1, m1] = t;
-  if (h1 < 0 || h1 > 23 || m1 < 0 || m1 > 59) {
-    // eslint-disable-next-line no-console
-    console.warn("Invalid time", time);
-    return null;
-  }
-  return h1 + m1 / 60;
+  const mins = timeToMinutes(time);
+  return mins / 60;
 }
 
 export function getTimeSeries(
@@ -158,6 +154,9 @@ export function getTimeSeries(
   const [, startHours, startMinutes] = begin.split("-").map(Number);
   const [, endHours, endMinutes] = end.split("-").map(Number);
   const timeSlots: string[] = [];
+  if (startHours == null || startMinutes == null || endHours == null) {
+    return timeSlots;
+  }
   for (let i = startHours; i <= endHours; i += 1) {
     timeSlots.push(`${day}-${i}-00`);
     timeSlots.push(`${day}-${i}-30`);
@@ -201,10 +200,13 @@ export function formatTimeRangeList(
 }
 
 export const timeSlotKeyToScheduleTime = (
-  slot: string,
+  slot: string | undefined,
   padEnd = false
 ): string => {
-  let [, hours, minutes] = slot.split("-").map(Number);
+  let [, hours, minutes] = slot?.split("-").map(toNumber) ?? [];
+  if (hours == null || minutes == null) {
+    return "";
+  }
   if (padEnd) {
     if (minutes === 0) {
       minutes = 30;
@@ -270,6 +272,7 @@ export function getRelatedTimeSlots(
     if (begin == null || end == null) {
       return acc;
     }
+    // @ts-expect-error -- this can't fail
     acc[day].push({
       day,
       beginTime: begin * 60,

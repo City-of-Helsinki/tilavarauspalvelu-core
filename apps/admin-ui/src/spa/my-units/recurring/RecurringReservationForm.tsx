@@ -234,7 +234,7 @@ function RecurringReservationForm({
     };
 
     try {
-      const recurringPk = await mutate({
+      const recurringPk = await mutate?.({
         data,
         skipDates,
         reservationUnitPk: reservationUnit.pk,
@@ -259,8 +259,8 @@ function RecurringReservationForm({
           ?.scrollIntoView();
       } else {
         const validationErrors = getValidationErrors(e);
-        if (validationErrors.length > 0) {
-          const validationError = validationErrors[0];
+        const validationError = validationErrors[0];
+        if (validationError != null) {
           errorToast({
             text: t(`errors.backendValidation.${validationError.code}`),
           });

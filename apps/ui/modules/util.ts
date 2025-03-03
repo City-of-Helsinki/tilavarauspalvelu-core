@@ -83,7 +83,7 @@ export const getMainImage = (ru?: {
     );
   });
 
-  return images[0];
+  return images[0] ?? null;
 };
 
 export function orderImages(images: ImageFragment[]): ImageFragment[] {

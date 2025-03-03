@@ -252,7 +252,7 @@ function TimeChunkSection({
   let activeChunk = 0;
   for (let i = 0; i < timeChunks.length; i++) {
     if (
-      timeChunks[i].some((item) => {
+      timeChunks[i]?.some((item) => {
         return item === watch("time");
       })
     ) {

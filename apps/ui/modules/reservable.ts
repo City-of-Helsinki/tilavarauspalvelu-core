@@ -308,12 +308,15 @@ function isRangeReservable_({
   reservationEnds?: Date;
   activeApplicationRounds: readonly RoundPeriod[];
 }): boolean {
-  // eslint-disable-next-line no-console
-  console.assert(range.length === 2, "Invalid range", range);
+  const start = range[0];
+  const end = range[1];
+  if (!start || !end) {
+    return false;
+  }
   // TODO we should be able to check the range without generating all the slots
   const slots = generateSlots(
-    range[0],
-    range[1],
+    start,
+    end,
     ReservationStartInterval.Interval_15Mins
   );
 

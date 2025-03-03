@@ -1615,7 +1615,7 @@ function ReservationUnitEditor({
     if (upPk && !formValues.isArchived) {
       const { images } = formValues;
       // res unit is saved, we can save changes to images
-      const success = await reconcileImageChanges(upPk, images);
+      const success = await reconcileImageChanges?.(upPk, images);
       if (success) {
         // redirect if new one was created
         if (formValues.pk === 0 && upPk > 0) {
@@ -1640,8 +1640,8 @@ function ReservationUnitEditor({
 
   const handleError = (e: unknown) => {
     const validationErrors = getValidationErrors(e);
-    if (validationErrors.length > 0) {
-      const validationError = validationErrors[0];
+    const validationError = validationErrors[0];
+    if (validationError != null) {
       errorToast({
         text: t(`errors.backendValidation.${validationError.code}`),
       });
