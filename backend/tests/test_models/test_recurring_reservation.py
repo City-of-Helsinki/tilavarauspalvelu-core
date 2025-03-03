@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from lookup_property import L
 
-from tilavarauspalvelu.enums import AccessType
+from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued
 from tilavarauspalvelu.models import RecurringReservation
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
@@ -73,7 +73,7 @@ def test__recurring_reservation__access_type__multiple_different():
     ReservationFactory.create(recurring_reservation=series, access_type=AccessType.ACCESS_CODE)
 
     # Test non-ORM code
-    assert series.access_type == AccessType.MULTIVALUED
+    assert series.access_type == AccessTypeWithMultivalued.MULTIVALUED
     assert series.used_access_types == [AccessType.ACCESS_CODE, AccessType.PHYSICAL_KEY]
 
     series = RecurringReservation.objects.annotate(
@@ -82,5 +82,5 @@ def test__recurring_reservation__access_type__multiple_different():
     ).first()
 
     # Test ORM code
-    assert series.access_type == AccessType.MULTIVALUED
+    assert series.access_type == AccessTypeWithMultivalued.MULTIVALUED
     assert series.used_access_types == [AccessType.ACCESS_CODE, AccessType.PHYSICAL_KEY]

@@ -13,7 +13,7 @@ from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L, lookup_property
 
-from tilavarauspalvelu.enums import AccessType, WeekdayChoice
+from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, WeekdayChoice
 from utils.db import SubqueryArray
 
 from .queryset import RecurringReservationManager
@@ -168,7 +168,7 @@ class RecurringReservation(models.Model):
         return [AccessType(access_type) for access_type in qs["used_access_types"]]
 
     @lookup_property(joins=["reservations"], skip_codegen=True)
-    def access_type() -> AccessType:
+    def access_type() -> AccessTypeWithMultivalued:
         """
         If reservations in this reservation series have different access types,
         return the 'MULTIVALUED' access type, otherwise return the common access type.
@@ -176,23 +176,23 @@ class RecurringReservation(models.Model):
         case = models.Case(
             models.When(
                 L(used_access_types__len__gt=1),
-                then=models.Value(AccessType.MULTIVALUED.value),
+                then=models.Value(AccessTypeWithMultivalued.MULTIVALUED.value),
             ),
             default=Coalesce(
                 # "used_access_types__1" doesn't work with lookup properties.
                 # Note: Postgres arrays are 1-indexed by default.
                 IndexTransform(1, models.CharField(), L("used_access_types")),
-                models.Value(AccessType.UNRESTRICTED.value),  # If no reservations in series
+                models.Value(AccessTypeWithMultivalued.UNRESTRICTED.value),  # If no reservations in series
             ),
             output_field=models.CharField(),
         )
         return case  # type: ignore[return-value]  # noqa: RET504
 
     @access_type.override
-    def _(self) -> AccessType:
+    def _(self) -> AccessTypeWithMultivalued:
         access_types: list[str] = self.used_access_types  # type: ignore[attr-defined]
         if len(access_types) == 0:
-            return AccessType.UNRESTRICTED
+            return AccessTypeWithMultivalued.UNRESTRICTED
         if len(access_types) == 1:
-            return AccessType(access_types[0])
-        return AccessType.MULTIVALUED
+            return AccessTypeWithMultivalued(access_types[0])
+        return AccessTypeWithMultivalued.MULTIVALUED
