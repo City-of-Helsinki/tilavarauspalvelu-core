@@ -53,28 +53,6 @@ type WeekOptions = "day" | "week" | "month";
 
 const EventWrapper = styled.div``;
 
-function EventWrapperComponent({
-  event,
-  ...props
-}: {
-  event: CalendarEvent<ReservationNode>;
-}) {
-  /*
-  let isSmall = false;
-  let isMedium = false;
-  // TODO don't override state enums with strings
-  if (event.event?.state?.toString() === "INITIAL") {
-    const { start, end } = event;
-    const diff = differenceInMinutes(end, start);
-    if (diff <= 30) isSmall = true;
-    if (diff <= 120) isMedium = true;
-  }
-  */
-  return (
-    <EventWrapper {...props} /> // className={classNames({ isSmall, isMedium })} />
-  );
-}
-
 function TouchCellWrapper({
   children,
   value,
@@ -435,7 +413,7 @@ export function ReservationTimePicker({
           toolbarComponent={Toolbar}
           dateCellWrapperComponent={TouchCellWrapper}
           // @ts-expect-error: FIXME: fix this
-          eventWrapperComponent={EventWrapperComponent}
+          eventWrapperComponent={EventWrapper}
           resizable={!isReservationQuotaReached}
           // NOTE there was logic here to disable dragging on mobile
           // it breaks SSR render because it swaps the whole Calendar component

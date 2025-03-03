@@ -4,14 +4,21 @@ import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
 import { MemoryRouter } from "react-router-dom";
 import { RecurringReservationForm } from "./RecurringReservationForm";
-import { vi, test, expect, afterAll, beforeEach, beforeAll } from "vitest";
+import {
+  vi,
+  test,
+  expect,
+  afterAll,
+  afterEach,
+  beforeEach,
+  beforeAll,
+} from "vitest";
 import {
   YEAR,
   mocks,
   mondayMorningReservations,
   createReservationUnits,
 } from "./__test__/mocks";
-import { afterEach } from "node:test";
 
 function customRender() {
   return render(
