@@ -327,6 +327,19 @@ class ReservationSeriesAddData(TypedDict):
     access_type: AccessType
 
 
+class ReservationSeriesRescheduleData(TypedDict):
+    pk: int
+    begin_date: datetime.date
+    begin_time: datetime.time
+    end_date: datetime.date
+    end_time: datetime.time
+    weekdays: list[int]
+    buffer_time_before: datetime.timedelta
+    buffer_time_after: datetime.timedelta
+    skip_dates: list[datetime.date]
+    access_type: AccessType
+
+
 class PindoraReservationInfoData(NamedTuple):
     access_code: str
     access_code_generated_at: datetime.datetime
