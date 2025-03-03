@@ -63,7 +63,7 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
             ignore_ids=[self.instance.pk],
         )
 
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin) or AccessType.UNRESTRICTED
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begin, default=AccessType.UNRESTRICTED)
 
         return data
 

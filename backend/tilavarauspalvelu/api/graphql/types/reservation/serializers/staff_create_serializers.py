@@ -147,7 +147,7 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
         data["state"] = ReservationStateChoice.CONFIRMED
         data["user"] = user
         data["reservee_used_ad_login"] = False if id_token is None else id_token.is_ad_login
-        data["access_type"] = reservation_unit.actions.get_access_type_at(begin) or AccessType.UNRESTRICTED
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begin, default=AccessType.UNRESTRICTED)
 
         return data
 
