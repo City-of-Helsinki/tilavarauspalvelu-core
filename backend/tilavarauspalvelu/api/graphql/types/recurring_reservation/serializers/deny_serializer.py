@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
+from contextlib import suppress
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from graphene_django_extensions import NestingModelSerializer
@@ -10,9 +11,14 @@ from rest_framework.exceptions import ValidationError
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import RecurringReservation, ReservationDenyReason
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from utils.date_utils import local_datetime
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
 __all__ = [
     "ReservationSeriesDenyInputSerializer",
@@ -48,10 +54,12 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
     def update(self, instance: RecurringReservation, validated_data: dict[str, Any]) -> RecurringReservation:
         now = local_datetime()
 
-        reservations = instance.reservations.filter(
+        reservations: ReservationQuerySet = instance.reservations.filter(  # type: ignore[attr-defined]
             begin__gt=now,
             state__in=ReservationStateChoice.states_that_can_change_to_deny,
         )
+
+        has_access_code = reservations.requires_active_access_code().exists()
 
         reservations.update(
             state=ReservationStateChoice.DENIED,
@@ -70,6 +78,10 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
             )
 
         EmailService.send_seasonal_reservation_rejected_series_email(reservation_series=instance)
+
+        if has_access_code:
+            with suppress(PindoraNotFoundError):
+                PindoraService.delete_access_code(instance)
 
         return instance
 

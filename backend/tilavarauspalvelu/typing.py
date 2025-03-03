@@ -318,6 +318,22 @@ class StaffReservationData(StaffCreateReservationData):
     pk: int
 
 
+class ReservationSeriesCreateData(TypedDict):
+    pk: int
+    user: User
+    name: str
+    description: str
+    reservation_unit: int
+    age_group: int
+    ability_group: int
+    recurrence_in_days: int
+    weekdays: list[int]
+    begin_time: datetime.time
+    end_time: datetime.time
+    begin_date: datetime.date
+    end_date: datetime.date
+
+
 class ReservationSeriesAddData(TypedDict):
     pk: int
     begin: datetime.datetime
