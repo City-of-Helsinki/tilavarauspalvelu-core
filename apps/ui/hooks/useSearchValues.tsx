@@ -74,9 +74,9 @@ export function useSearchModify() {
     const newValues = new URLSearchParams(searchValues);
     if (value) {
       const values = searchValues.getAll(key);
-      const isOldFormat = values.length === 1 && values[0].includes(",");
+      const isOldFormat = values.length === 1 && values[0]?.includes(",");
       if (isOldFormat) {
-        const newVal = isOldFormat ? values[0].split(",") : values;
+        const newVal = isOldFormat ? (values[0]?.split(",") ?? []) : values;
         const newValue = newVal.filter((n) => n !== value);
         newValues.set(key, newValue.join(","));
       } else {

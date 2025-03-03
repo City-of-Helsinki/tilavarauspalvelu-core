@@ -883,7 +883,7 @@ function PriceChangeNotice({
       {showTaxNotice && (
         <strong>
           {t("reservationUnit:futurePriceNoticeTax", {
-            tax: formatters.strippedDecimal.format(taxPercentage),
+            tax: formatters.strippedDecimal?.format(taxPercentage),
           })}
         </strong>
       )}

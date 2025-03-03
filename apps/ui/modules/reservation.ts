@@ -33,6 +33,7 @@ import {
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { isValidDate, toUIDate } from "common/src/common/util";
 import { getTimeString } from "./reservationUnit";
+import { timeToMinutes } from "common/src/helpers";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
@@ -494,13 +495,10 @@ export function convertFormToFocustimeSlot({
 }
 
 export function createDateTime(date: string, time: string): Date {
-  const [hours, minutes]: Array<number | undefined> = time
-    .split(":")
-    .map(Number)
-    .filter((n) => Number.isFinite(n));
+  const minutes = timeToMinutes(time);
   const maybeDate = fromUIDate(date);
   if (maybeDate != null && isValidDate(maybeDate)) {
-    return set(maybeDate, { hours, minutes });
+    return set(maybeDate, { minutes });
   }
   return new Date();
 }
@@ -514,9 +512,9 @@ export function convertReservationFormToApi(
   if (date == null || time == null || duration == null) {
     return null;
   }
-  const [hours, minutes] = time.split(":").map(Number);
-  const begin: Date = set(date, { hours, minutes });
-  const end: Date = set(begin, { hours, minutes: minutes + duration });
+  const minutes = timeToMinutes(time);
+  const begin: Date = set(date, { minutes });
+  const end: Date = set(begin, { minutes: minutes + duration });
   return { begin: begin.toISOString(), end: end.toISOString() };
 }
 

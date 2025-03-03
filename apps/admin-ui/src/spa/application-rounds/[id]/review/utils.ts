@@ -109,7 +109,7 @@ export function formatAppliedReservationTime(time: {
   hours: number;
 }): string {
   const { count, hours } = time;
-  return `${formatNumber(count, "")} / ${formatters.oneDecimal.format(hours)} t`;
+  return `${formatNumber(count, "")} / ${formatters.oneDecimal?.format(hours) ?? hours} t`;
 }
 
 /// Clean query param selection and filter by possible units

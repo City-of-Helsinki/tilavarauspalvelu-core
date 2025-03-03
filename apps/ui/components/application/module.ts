@@ -47,8 +47,11 @@ export function aesToCells(
     const day: Cell[] = [];
     const openingHoursForADay = getOpeningHours(j, openingHours);
     const dayOpeningHours = filterNonNullable(openingHoursForADay).map((t) => ({
-      begin: t && +t.begin.split(":")[0],
-      end: t && +t.end.split(":")[0] === 0 ? 24 : t && +t.end.split(":")[0],
+      begin: t && +(t.begin.split(":")[0] ?? ""),
+      end:
+        t && +(t.end.split(":")[0] ?? "") === 0
+          ? 24
+          : t && +(t.end.split(":")[0] ?? ""),
     }));
     // state is 50 if the cell is outside the opening hours, 100 if it's inside
     for (let i = firstSlotStart; i <= lastSlotStart; i += 1) {
@@ -72,7 +75,7 @@ export function aesToCells(
     const p = priority === Priority.Primary ? 300 : (200 as const);
     const day = convertWeekday(dayOfTheWeek);
     for (let h = hourBegin; h < hourEnd; h += 1) {
-      const cell = cells[day][h];
+      const cell = cells[day]?.[h];
       if (cell) {
         cell.state = p;
       }
@@ -158,7 +161,7 @@ export function cellsToApplicationEventSchedules(
   }
   const range = [0, 1, 2, 3, 4, 5, 6] as const;
   for (const day of range) {
-    const dayCells = cells[day];
+    const dayCells = cells[day] ?? [];
     const transformedDayCells = dayCells
       .filter((cell) => cell.state)
       .map((cell) => ({
@@ -170,16 +173,20 @@ export function cellsToApplicationEventSchedules(
         if (!prev.length) {
           return [current];
         }
+        const prevCell = prev[prev.length - 1];
+        if (prevCell == null) {
+          throw new Error("prevCell is null");
+        }
         if (
-          prev[prev.length - 1].end === current.begin &&
-          prev[prev.length - 1].priority === current.priority
+          prevCell.end === current.begin &&
+          prevCell.priority === current.priority
         ) {
           return [
             ...prev.slice(0, prev.length - 1),
             {
-              begin: prev[prev.length - 1].begin,
-              end: prev[prev.length - 1].end + 1,
-              priority: prev[prev.length - 1].priority,
+              begin: prevCell.begin,
+              end: prevCell.end + 1,
+              priority: prevCell.priority,
             },
           ];
         }

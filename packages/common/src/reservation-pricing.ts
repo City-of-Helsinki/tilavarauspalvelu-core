@@ -66,6 +66,7 @@ export function getReservationPrice(
   if (p == null || p === 0) {
     return defaultText;
   }
-  const formatter = trailingZeros ? "currencyWithDecimals" : "currency";
-  return formatters(language)[formatter].format(p);
+  const formatterName = trailingZeros ? "currencyWithDecimals" : "currency";
+  const f = formatters(language)[formatterName];
+  return f?.format(p) ?? defaultText;
 }

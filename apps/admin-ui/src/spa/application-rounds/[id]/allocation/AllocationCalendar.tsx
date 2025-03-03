@@ -195,6 +195,9 @@ const HourLabel = styled(CalendarSlot)<{ $hour?: boolean }>`
 
 const isSlotFirst = (selection: string[], slot: string): boolean => {
   const [day, hour, minute] = slot.split("-").map(Number);
+  if (day == null || hour == null || minute == null) {
+    return false;
+  }
   return minute === 0
     ? !selection.includes(`${day}-${hour - 1}-30`)
     : !selection.includes(`${day}-${hour}-00`);
@@ -202,6 +205,9 @@ const isSlotFirst = (selection: string[], slot: string): boolean => {
 
 const isSlotLast = (selection: string[], slot: string): boolean => {
   const [day, hour, minute] = slot.split("-").map(Number);
+  if (day == null || hour == null || minute == null) {
+    return false;
+  }
   return minute === 0
     ? !selection.includes(`${day}-${hour}-30`)
     : !selection.includes(`${day}-${hour + 1}-00`);
@@ -372,7 +378,7 @@ export function AllocationCalendar({
     <Wrapper>
       <div>
         <DayLabel />
-        {cells[0].map((cell) => {
+        {cells[0]?.map((cell) => {
           const key = `${cell.hour}-${cell.minute}`;
           return cell.minute === 0 ? (
             <HourLabel $hour key={key}>
@@ -390,7 +396,7 @@ export function AllocationCalendar({
             allocated={allocated}
             suitable={timeslots}
             day={day}
-            cells={cells[day]}
+            cells={cells[day] ?? []}
             relatedTimeSpans={relatedTimeSpans}
             focusedSlots={focusedSlots}
           />
@@ -452,15 +458,19 @@ function CalendarDay({
   } = useSelection();
 
   const handleMouseEnter = (cell: Cell) => {
-    if (isSelecting && selection.length > 0) {
-      const [d] = selection ? selection[0].split("-") : cell.key.split("-");
+    const sel = selection[0];
+    if (isSelecting && sel != null) {
+      const [d] = sel.split("-"); // selection ? selection[0]?.split("-") : cell.key.split("-");
       const timeSeries = [...selection, cell.key].sort((a, b) => {
         return timeSlotKeyToTime(a) - timeSlotKeyToTime(b);
       });
+      if (d == null || timeSeries.length < 2) {
+        return;
+      }
       const newSelection = getTimeSeries(
         d,
-        timeSeries[0],
-        timeSeries[timeSeries.length - 1]
+        timeSeries[0]!,
+        timeSeries[timeSeries.length - 1]!
       );
       setSelection(newSelection);
     }
@@ -488,10 +498,10 @@ function CalendarDay({
         const isFocused = focusedSlot != null;
         // TODO these don't look nice and don't work if the array is not presorted
         const isFocusedFirst =
-          focused.length > 0 && focused[0].minutes === timeInMinutes;
+          focused.length > 0 && focused[0]?.minutes === timeInMinutes;
         const isFocusedLast =
           focused.length > 0 &&
-          focused[focused.length - 1].minutes === timeInMinutes;
+          focused[focused.length - 1]?.minutes === timeInMinutes;
         const isInsideRelatedTimeSpan =
           relatedTimeSpans?.some(
             (ts) => ts.beginTime <= timeInMinutes && ts.endTime > timeInMinutes

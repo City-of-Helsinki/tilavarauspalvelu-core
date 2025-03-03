@@ -36,7 +36,7 @@ function WorkingMemo({
     try {
       const res = await onMutate(workingMemo);
       if (res.errors != null) {
-        throw new Error(res.errors[0].message);
+        throw new Error(res.errors[0]?.message);
       }
       const { data } = res;
       if (data == null) {
