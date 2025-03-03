@@ -15,7 +15,7 @@ from utils.external_service.errors import ExternalServiceError
 class ReservationAdminForm(forms.ModelForm):
     instance: Reservation
 
-    access_type = forms.ChoiceField(choices=AccessType.model_choices, required=False)
+    access_type = forms.ChoiceField(choices=AccessType.choices, required=False)
 
     pindora_response = forms.CharField(
         widget=forms.Textarea(attrs={"disabled": True, "cols": "40", "rows": "1"}),

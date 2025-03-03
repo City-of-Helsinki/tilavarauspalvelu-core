@@ -77,7 +77,7 @@ class Reservation(SerializableMixin, models.Model):
     # Access information
     access_type: str = models.CharField(
         max_length=20,
-        choices=AccessType.model_choices,
+        choices=AccessType.choices,
         default=AccessType.UNRESTRICTED.value,
     )
     access_code_generated_at: datetime.datetime | None = models.DateTimeField(null=True, blank=True)
