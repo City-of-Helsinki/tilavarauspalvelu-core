@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import operator
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from django.db import models
@@ -16,6 +17,8 @@ from tilavarauspalvelu.api.graphql.types.reservation_unit_option.serializers imp
 from tilavarauspalvelu.api.graphql.types.suitable_time_range.serializers import SuitableTimeRangeSerializer
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
@@ -30,6 +33,8 @@ from utils.utils import comma_sep_str
 
 if TYPE_CHECKING:
     import datetime
+
+    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
 __all__ = [
     "ApplicationSectionSerializer",
@@ -256,7 +261,7 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=self.instance,
         )
 
-        cancellable_reservations = (
+        cancellable_reservations: ReservationQuerySet = (
             future_reservations.filter(
                 type=ReservationTypeChoice.SEASONAL,
                 state=ReservationStateChoice.CONFIRMED,
@@ -273,9 +278,14 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             .distinct()
         )
 
+        has_access_codes = cancellable_reservations.requires_active_access_code().exists()
+
         cancellable_reservations_count = cancellable_reservations.count()
+        future_reservations_count = future_reservations.count()
+        not_all_cancelled = future_reservations_count != cancellable_reservations_count
+
         data = CancellationOutput(
-            expected_cancellations=future_reservations.count(),
+            expected_cancellations=future_reservations_count,
             actual_cancellations=cancellable_reservations_count,
         )
 
@@ -288,6 +298,15 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
         if cancellable_reservations_count:
             EmailService.send_application_section_cancelled(application_section=self.instance)
             EmailService.send_staff_notification_application_section_cancelled(application_section=self.instance)
+
+            if has_access_codes:
+                # If there are still some non-cancelled future reservations, reschedule the reservation series.
+                # This removes all the cancelled reservations from Pindora.
+                if not_all_cancelled:
+                    PindoraService.reschedule_access_code(obj=self.instance)
+                else:
+                    with suppress(PindoraNotFoundError):
+                        PindoraService.delete_access_code(obj=self.instance)
 
         return data
 

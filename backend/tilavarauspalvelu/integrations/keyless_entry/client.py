@@ -516,6 +516,7 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
         """Reschedule a seasonal booking in Pindora."""
         url = cls._build_url(f"seasonal-booking/reschedule/{section.ext_uuid}")
 
+        # This only selects confirmed non-blocking reservations.
         reservations: list[Reservation] = list(
             section.actions.get_reservations()
             .requires_active_access_code()
@@ -780,6 +781,7 @@ class PindoraReservationSeriesClient(BasePindoraClient):
         """Reschedule a reservation series in Pindora."""
         url = cls._build_url(f"reservation-series/reschedule/{series.ext_uuid}")
 
+        # This only selects confirmed non-blocking reservations.
         reservations: list[Reservation] = list(series.reservations.requires_active_access_code())
 
         if not reservations:
