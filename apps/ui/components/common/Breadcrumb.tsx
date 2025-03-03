@@ -83,7 +83,8 @@ function BreadcrumbImpl({
   const isMobileEnabled =
     isMobile &&
     routesWithSlug.length > 0 &&
-    lastRoute.slug !== lastRouteWithSlug.slug;
+    lastRoute != null &&
+    lastRoute.slug !== lastRouteWithSlug?.slug;
 
   if (!isMobileEnabled && isMobile) {
     return null;
@@ -94,7 +95,7 @@ function BreadcrumbImpl({
       <Item>
         <IconAngleLeft size={IconSize.Small} aria-hidden="true" />
         <Anchor href={lastRouteWithSlug?.slug ?? ""} $isMobile>
-          {lastRouteWithSlug.title}
+          {lastRouteWithSlug?.title ?? "-"}
         </Anchor>
       </Item>
     );

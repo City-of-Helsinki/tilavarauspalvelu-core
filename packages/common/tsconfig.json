@@ -1,35 +1,9 @@
 {
+  "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
     "module": "esnext",
-    "moduleResolution": "bundler",
-    "moduleDetection": "force",
-    "composite": false,
-    "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowImportingTsExtensions": true,
-    "inlineSources": false,
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "preserveWatchOutput": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "useDefineForClassFields": true,
-    "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "noEmit": true,
-    "incremental": true,
-    "jsx": "preserve"
+    "moduleResolution": "bundler"
   },
   "exclude": ["node_modules/"],
   "include": [

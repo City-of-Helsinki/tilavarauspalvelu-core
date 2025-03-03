@@ -80,14 +80,14 @@ function ApplicationSectionTimePicker({
   section,
 }: {
   index: number;
-  section: NonNullable<Node["applicationSections"]>[0];
+  section: NonNullable<Node["applicationSections"]>[0] | undefined;
 }): JSX.Element {
   const { watch } = useFormContext<ApplicationPage2FormValues>();
 
   const { i18n } = useTranslation();
   const language = convertLanguageCode(i18n.language);
 
-  const allOpeningHours = section.reservationUnitOptions.map((ruo) => ({
+  const allOpeningHours = section?.reservationUnitOptions.map((ruo) => ({
     pk: ruo.reservationUnit.pk ?? 0,
     openingHours: ruo.reservationUnit.applicationRoundTimeSlots,
   }));
@@ -96,11 +96,11 @@ function ApplicationSectionTimePicker({
     `applicationSections.${sectionIndex}.reservationUnitPk`
   );
   const reservationUnitOpeningHours =
-    allOpeningHours.find((n) => n.pk === selectedReservationUnitPk)
+    allOpeningHours?.find((n) => n.pk === selectedReservationUnitPk)
       ?.openingHours ?? [];
 
   const reservationUnitOptions = filterNonNullable(
-    section.reservationUnitOptions
+    section?.reservationUnitOptions
   )
     .map((n) => n.reservationUnit)
     .map((n) => ({
@@ -124,7 +124,7 @@ function ApplicationSectionTimePicker({
     >
       <TimeSelector
         index={sectionIndex}
-        cells={selectorData[sectionIndex]}
+        cells={selectorData[sectionIndex] ?? []}
         reservationUnitOptions={reservationUnitOptions}
         reservationUnitOpeningHours={reservationUnitOpeningHours}
       />

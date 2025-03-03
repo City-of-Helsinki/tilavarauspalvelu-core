@@ -26,7 +26,11 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
-import { convertOptionToHDS, timeToMinutes } from "common/src/helpers";
+import {
+  convertOptionToHDS,
+  timeToMinutes,
+  toNumber,
+} from "common/src/helpers";
 import { addMinutes, startOfDay } from "date-fns";
 
 type Props = {
@@ -93,35 +97,51 @@ const EmptyState = styled.div`
   margin-bottom: var(--spacing-m);
 `;
 
-const getTimeLabel = (selection: string[], t: TFunction): string => {
-  if (!selection || selection.length < 1) {
+function getTimeLabel(selection: string[], t: TFunction): string {
+  const selectionStart = selection[0];
+  const selectionEnd = selection[selection.length - 1];
+  if (!selectionStart || !selectionEnd) {
     return "";
   }
-  const [startDay, startHour, startMinute] = selection[0].split("-");
-  const [, endHour, endMinute] = selection[selection.length - 1].split("-");
+  const [startDay, startHour, startMinute] = selectionStart
+    .split("-")
+    .map(toNumber);
+  const [, endHour, endMinute] = selectionEnd.split("-").map(toNumber);
+  if (
+    startDay == null ||
+    startHour == null ||
+    startMinute == null ||
+    endHour == null ||
+    endMinute == null
+  ) {
+    return "";
+  }
 
-  return `${t(`dayLong.${startDay}`)} ${startHour}:${startMinute} - ${
-    endMinute === "30"
-      ? endHour + endMinute === "2330"
-        ? 0
-        : Number(endHour) + 1
-      : endHour
-  }:${endMinute === "30" ? "00" : "30"}`;
-};
+  const dayString = `${t(`dayLong.${startDay}`)}`;
+  const beginString = `${startHour}:${startMinute}`;
+  const endH = endHour === 0 ? 24 : endHour;
+  const endString = `${endH}:${endMinute}`;
+
+  return `${dayString} ${beginString}–${endString}`;
+}
 
 function deserializeSlot(
   slot: string
 ): { day: Day; hour: number; mins: number } | null {
-  const res = slot.split("-").map(Number).filter(Number.isFinite);
+  const res = slot.split("-").map(toNumber);
   if (res.length !== 3) {
     return null;
   }
-  // safe coercion
-  if (res[0] < 0 || res[0] > 6) {
+  const [day, hour, mins] = res;
+  if (day == null || hour == null || mins == null) {
+    return null;
+  }
+  // safe coercion for day
+  if (day < 0 || day > 6) {
     return null;
   }
 
-  return { day: res[0] as Day, hour: res[1], mins: res[2] };
+  return { day: day as Day, hour, mins };
 }
 
 function TimeSelection(): JSX.Element {
@@ -130,8 +150,11 @@ function TimeSelection(): JSX.Element {
 
   const getOptions = useCallback(
     (type: "start" | "end") => {
-      if (!selection || selection.length < 1) return [];
-      const day = selection[0].split("-")[0];
+      const sel = selection[0];
+      if (sel == null) {
+        return [];
+      }
+      const day = sel.split("-")[0];
       const start = ALLOCATION_CALENDAR_TIMES[0];
       const end = ALLOCATION_CALENDAR_TIMES[1];
       // TODO unsafe
@@ -155,6 +178,9 @@ function TimeSelection(): JSX.Element {
     }
     const startSelection = startValue || selection[0];
     const endSelection = endValue || selection[selection.length - 1];
+    if (startSelection == null || endSelection == null) {
+      return;
+    }
     const start = deserializeSlot(startSelection);
     const end = deserializeSlot(endSelection);
     if (start == null || end == null) {
@@ -202,7 +228,7 @@ function TimeSelection(): JSX.Element {
 
     const endValue =
       startTime >= endTime
-        ? timeSlotEndOptions[startIndex + 1].value
+        ? timeSlotEndOptions[startIndex + 1]?.value
         : timeSlotEndOptions.find(
             (n) => n.value === selection?.[selection.length - 1]
           )?.value;
@@ -329,8 +355,8 @@ export function AllocationColumn({
     .map((s) => s.day)
     .filter((d): d is Day => d >= 0 && d <= 6)
     .reduce<Day>((acc, d) => (d > acc ? d : acc), 0);
-  const startHour = slots.length > 0 ? slots[0].hour : 0;
-  const endHour = slots.length > 0 ? slots[slots.length - 1].hour : 0;
+  const startHour = slots[0]?.hour ?? 0;
+  const endHour = slots[slots.length - 1]?.hour ?? 0;
 
   // TODO copy pasta from AllocationCalendar (the day part of this)
   const aes = applicationSections ?? [];
@@ -371,13 +397,15 @@ export function AllocationColumn({
     (as) => as.pk != null && allocatedPks.find((x) => x === as.pk)
   );
 
-  const doesCollideToOtherAllocations = relatedAllocations[day].some((slot) => {
-    return (
-      slot.day === day &&
-      slot.beginTime < endHour * 60 &&
-      slot.endTime > startHour * 60
-    );
-  });
+  const doesCollideToOtherAllocations = relatedAllocations[day]?.some(
+    (slot) => {
+      return (
+        slot.day === day &&
+        slot.beginTime < endHour * 60 &&
+        slot.endTime > startHour * 60
+      );
+    }
+  );
   const canAllocateSelection =
     allocatedSections.length === 0 && !doesCollideToOtherAllocations;
   const canAllocate = hasSelection && canAllocateSelection && isRoundAllocable;
@@ -425,7 +453,7 @@ export function AllocationColumn({
       <CloseBtn type="button" onClick={() => setSelection([])}>
         <IconCross />
       </CloseBtn>
-      <TimeLabel>{getTimeLabel(selection ?? [], t)}</TimeLabel>
+      <TimeLabel>{getTimeLabel(selection, t)}</TimeLabel>
       <StyledShowAllContainer
         showAllLabel={t("Allocation.changeTime")}
         maximumNumber={0}

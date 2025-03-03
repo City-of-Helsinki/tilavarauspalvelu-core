@@ -2209,6 +2209,7 @@ const traverse = (
       const key = `${prefix}.${k}`;
       const values = <string[]>obj[k];
       const [valFi, valEn, valSv] = values;
+      // @ts-expect-error -- this function is not worth fixing
       target.fi.translation[key] = valFi;
       target.en.translation[key] = valEn || `${valFi} en`;
       target.sv.translation[key] = valSv || `${valFi} sv`;

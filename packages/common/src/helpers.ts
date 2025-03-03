@@ -183,10 +183,16 @@ export function dayMax(days: Array<Date | undefined>): Date | undefined {
 
 /// @description Convert time string "HH:MM" to minutes
 /// safe for invalid time strings but not for invalid time values
+/// removes trailing seconds if present
 /// @return 0 if time is invalid otherwise the time in minutes
 export function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(":").map(Number).filter(Number.isFinite);
-  if (hours != null && minutes != null) {
+  const [hours, minutes] = time.split(":").map(Number);
+  if (
+    hours != null &&
+    minutes != null &&
+    isFinite(hours) &&
+    isFinite(minutes)
+  ) {
     return hours * 60 + minutes;
   }
   return 0;
@@ -243,9 +249,11 @@ export function calculateMedian(numbers: number[]): number {
   if (sorted.length === 0) {
     return 0;
   } else if (sorted.length % 2 === 0) {
-    return (sorted[middle - 1] + sorted[middle]) / 2;
+    const a = sorted[middle - 1] ?? 0;
+    const b = sorted[middle] ?? 0;
+    return (a + b) / 2;
   }
-  return sorted[middle];
+  return sorted[middle] ?? 0;
 }
 
 export function constructUrl(basePath: string, page: string): string {
@@ -256,8 +264,8 @@ export function constructUrl(basePath: string, page: string): string {
   return `${basePath}${separator}${page}`;
 }
 
-export function ignoreMaybeArray<T>(value: T | T[]): T {
-  return Array.isArray(value) ? value[0] : value;
+export function ignoreMaybeArray<T>(value: T | T[]): T | null {
+  return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
 export function convertOptionToHDS(option: {

@@ -173,10 +173,12 @@ export function processVariables({
   );
 
   const today = startOfDay(new Date());
-  const startDate = fromUIDate(ignoreMaybeArray(values.getAll("startDate")));
+  const startDate = fromUIDate(
+    ignoreMaybeArray(values.getAll("startDate")) ?? ""
+  );
   const reservableDateStart =
     startDate && startDate >= today ? toApiDate(startDate) : null;
-  const endDate = fromUIDate(ignoreMaybeArray(values.getAll("endDate")));
+  const endDate = fromUIDate(ignoreMaybeArray(values.getAll("endDate")) ?? "");
   const reservableDateEnd =
     endDate && endDate >= today ? toApiDate(endDate) : null;
 
