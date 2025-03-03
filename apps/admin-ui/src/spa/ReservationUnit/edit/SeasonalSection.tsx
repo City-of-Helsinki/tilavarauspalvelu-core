@@ -201,7 +201,6 @@ function SeasonRow({
         return (
           <>
             {i !== 0 && <AndSpan>{t("common.and")}</AndSpan>}
-            {}
             <SeasonalTimeWrapper key={i} style={{ gridArea: area }}>
               <Controller
                 control={control}

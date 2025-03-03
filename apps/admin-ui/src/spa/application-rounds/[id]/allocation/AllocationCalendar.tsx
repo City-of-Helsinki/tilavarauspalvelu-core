@@ -460,7 +460,7 @@ function CalendarDay({
   const handleMouseEnter = (cell: Cell) => {
     const sel = selection[0];
     if (isSelecting && sel != null) {
-      const [d] = sel.split("-"); // selection ? selection[0]?.split("-") : cell.key.split("-");
+      const [d] = sel.split("-");
       const timeSeries = [...selection, cell.key].sort((a, b) => {
         return timeSlotKeyToTime(a) - timeSlotKeyToTime(b);
       });
