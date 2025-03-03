@@ -178,6 +178,8 @@ extend-select = [
     "FURB188",  # slice-to-remove-prefix-or-suffix
     "FURB189",  # subclass-builtin
     "FURB192",  # sorted-min-max
+    "LOG004",   # log-exception-outside-except-handler
+    "LOG014",   # exc-info-outside-except-handler
     "PLC1802",  # len-test
     "PLC1901",  # compare-to-empty-string
     "PLC2701",  # import-private-name
@@ -195,6 +197,7 @@ extend-select = [
     "PLW1514",  # unspecified-encoding
     "PLW1641",  # eq-without-hash (NOTE: Does not check for __hash__ implementations in superclasses.)
     "PLW3201",  # bad-dunder-method-name
+    "PT028",    # pytest-parameter-with-default-argument
     "RUF027",   # missing-f-string-syntax
     "RUF028",   # invalid-formatter-suppression-comment
     "RUF031",   # incorrectly-parenthesized-tuple-in-subscript
@@ -202,7 +205,9 @@ extend-select = [
     "RUF036",   # none-not-at-end-of-union
     "RUF040",   # invalid-assert-message-literal-argument
     "RUF041",   # unnecessary-nested-literal
+    "RUF045",   # implicit-class-var-in-dataclass
     "RUF046",   # unnecessary-cast-to-int
+    "RUF047",   # needless-else
     "RUF053",   # class-with-mixed-type-vars
     "RUF055",   # unnecessary-regular-expression
     "RUF056",   # falsy-dict-get-fallback
