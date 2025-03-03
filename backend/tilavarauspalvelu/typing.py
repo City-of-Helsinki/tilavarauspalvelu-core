@@ -318,6 +318,15 @@ class StaffReservationData(StaffCreateReservationData):
     pk: int
 
 
+class ReservationSeriesAddData(TypedDict):
+    pk: int
+    begin: datetime.datetime
+    end: datetime.datetime
+    buffer_time_before: datetime.timedelta
+    buffer_time_after: datetime.timedelta
+    access_type: AccessType
+
+
 class PindoraReservationInfoData(NamedTuple):
     access_code: str
     access_code_generated_at: datetime.datetime

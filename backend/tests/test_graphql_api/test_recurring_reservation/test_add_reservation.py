@@ -5,7 +5,11 @@ import datetime
 import pytest
 from freezegun import freeze_time
 
+from tilavarauspalvelu.enums import AccessType
+from tilavarauspalvelu.integrations.keyless_entry.service import PindoraService
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+
+from tests.helpers import patch_method
 
 from .helpers import ADD_RESERVATION_TO_SERIES_MUTATION, create_reservation_series, get_minimal_add_data
 
@@ -72,4 +76,22 @@ def test_recurring_reservations__add_reservation__begin_after_end(graphql):
     assert recurring_reservation.reservations.count() == 9
 
 
-# TODO: More testing
+@freeze_time(local_datetime(2024, 1, 1))
+@patch_method(PindoraService.reschedule_access_code)
+def test_recurring_reservations__add_reservation__access_code(graphql):
+    recurring_reservation = create_reservation_series(
+        reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
+    )
+
+    assert recurring_reservation.reservations.count() == 9
+
+    data = get_minimal_add_data(recurring_reservation)
+
+    graphql.login_with_superuser()
+    response = graphql(ADD_RESERVATION_TO_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False
+
+    assert recurring_reservation.reservations.count() == 10
+
+    assert PindoraService.reschedule_access_code.called is True

@@ -8,7 +8,9 @@ from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 
-from tilavarauspalvelu.enums import ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import RecurringReservation
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
@@ -76,6 +78,8 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
             new_buffer_time_after=buffer_time_after,
         )
 
+        data["access_type"] = reservation_unit.actions.get_access_type_at(begin, default=AccessType.UNRESTRICTED)
+
         return data
 
     def update(self, instance: RecurringReservation, validated_data: ReservationSeriesAddData) -> RecurringReservation:
@@ -96,6 +100,7 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         reservation.end = validated_data["end"]
         reservation.buffer_time_before = validated_data["buffer_time_before"]
         reservation.buffer_time_after = validated_data["buffer_time_after"]
+        reservation.access_type = validated_data["access_type"]
 
         reservation.ext_uuid = uuid.uuid4()
         reservation.state = ReservationStateChoice.CONFIRMED
@@ -108,5 +113,12 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         with transaction.atomic():
             reservation.save()
             reservation.reservation_units.set([instance.reservation_unit])
+
+        # # Reschedule Pindora series or seasonal booking if new reservation uses access code
+        if validated_data["access_type"] == AccessType.ACCESS_CODE:
+            try:
+                PindoraService.reschedule_access_code(instance)
+            except PindoraNotFoundError:
+                PindoraService.create_access_code(instance, is_active=True)
 
         return instance
