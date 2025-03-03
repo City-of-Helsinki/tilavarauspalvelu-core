@@ -4,7 +4,6 @@ import { NumberFilter } from "./NumberFilter";
 const RangeContrainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  align-items: top;
   text-align: center;
 `;
 

@@ -162,17 +162,17 @@ const OrderButton = styled(Button)`
 
     @media (min-width: ${breakpoints.m}) {
       background-color: var(--color-black-5);
+
+      &:disabled {
+        --border-color-disabled: transparent;
+        ${fontRegular}
+      }
       &:hover,
       &:focus-within,
       &:focus-within:hover {
         --color-focus: var(--color-black-90);
         --background-color-focus: var(--color-black-5);
         --background-color-hover-focus: var(--color-black-10);
-      }
-
-      &:disabled {
-        --border-color-disabled: transparent;
-        ${fontRegular}
       }
     }
   }
