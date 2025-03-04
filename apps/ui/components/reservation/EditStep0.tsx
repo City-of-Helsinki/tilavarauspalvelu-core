@@ -6,13 +6,7 @@ import type {
   ReservationUnitPageQuery,
 } from "@gql/gql-types";
 import { differenceInMinutes } from "date-fns";
-import {
-  Button,
-  ButtonVariant,
-  IconArrowRight,
-  IconCross,
-  LoadingSpinner,
-} from "hds-react";
+import { Button, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
@@ -57,8 +51,6 @@ type Props = {
   activeApplicationRounds: readonly RoundPeriod[];
   blockingReservations: readonly BlockingReservationFieldsFragment[];
   nextStep: () => void;
-  apiBaseUrl: string;
-  isLoading: boolean;
 };
 
 const StyledCalendarWrapper = styled.div`
@@ -120,7 +112,6 @@ export function EditStep0({
   activeApplicationRounds,
   reservationForm,
   nextStep,
-  isLoading,
   blockingReservations: blockingReservationsOrig,
 }: Props): JSX.Element {
   const { t, i18n } = useTranslation();
@@ -266,20 +257,14 @@ export function EditStep0({
             href={getReservationPath(reservation.pk)}
             data-testid="reservation-edit__button--cancel"
           >
-            <IconCross aria-hidden="true" />
+            <IconCross />
             {t("common:stop")}
           </ButtonLikeLink>
           <Button
             type="submit"
-            variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
-            iconEnd={
-              isLoading ? (
-                <LoadingSpinner small />
-              ) : (
-                <IconArrowRight aria-hidden="true" />
-              )
-            }
-            disabled={!focusSlot.isReservable || !isDirty || isLoading}
+            variant={ButtonVariant.Primary}
+            iconEnd={<IconArrowRight />}
+            disabled={!focusSlot.isReservable || !isDirty}
             data-testid="reservation__button--continue"
           >
             {t("common:next")}
