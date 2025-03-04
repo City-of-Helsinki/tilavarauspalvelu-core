@@ -44,7 +44,7 @@ def test_staff_change_access_code(graphql):
     assert response.has_errors is False, response.errors
 
     assert PindoraService.change_access_code.call_count == 1
-    assert PindoraService.activate_access_code.call_count == 1
+    assert PindoraService.activate_access_code.call_count == 0
     assert EmailService.send_reservation_modified_access_code_email.call_count == 1
 
 
@@ -221,7 +221,7 @@ def test_staff_change_access_code__ongoing(graphql):
     assert response.has_errors is False, response.errors
 
     assert PindoraService.change_access_code.call_count == 1
-    assert PindoraService.activate_access_code.call_count == 1
+    assert PindoraService.activate_access_code.call_count == 0
     assert EmailService.send_reservation_modified_access_code_email.call_count == 1
 
 
