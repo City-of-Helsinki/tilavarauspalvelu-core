@@ -56,8 +56,9 @@ class StaffChangeReservationAccessCodeSerializer(NestingModelSerializer):
             return instance
 
         if instance.access_code_should_be_active:
-            with suppress(ExternalServiceError):
-                PindoraService.activate_access_code(obj=instance)
+            if not instance.access_code_is_active:
+                with suppress(ExternalServiceError):
+                    PindoraService.activate_access_code(obj=instance)
 
             EmailService.send_reservation_modified_access_code_email(reservation=instance)
 
