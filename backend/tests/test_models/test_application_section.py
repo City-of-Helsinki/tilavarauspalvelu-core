@@ -5,13 +5,20 @@ import datetime
 import pytest
 from lookup_property import L
 
-from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
+from tilavarauspalvelu.enums import (
+    AccessType,
+    ApplicationSectionStatusChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+    Weekday,
+)
 from tilavarauspalvelu.models import ApplicationSection
 
 from tests.factories import (
     AllocatedTimeSlotFactory,
     ApplicationRoundFactory,
     ApplicationSectionFactory,
+    ReservationFactory,
     ReservationUnitOptionFactory,
 )
 
@@ -171,3 +178,91 @@ def test_application_section__usable_reservation_unit_options():
     ReservationUnitOptionFactory.create(application_section=section)
     assert section.usable_reservation_unit_options == 1
     assert ApplicationSection.objects.filter(L(usable_reservation_unit_options=1)).exists()
+
+
+def test_application_section__should_have_active_access_code__active():
+    section = ApplicationSectionFactory.create()
+    ReservationFactory.create(
+        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    assert section.should_have_active_access_code is True
+
+
+def test_application_section__should_have_active_access_code__blocked():
+    section = ApplicationSectionFactory.create()
+    ReservationFactory.create(
+        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+    )
+
+    assert section.should_have_active_access_code is False
+
+
+def test_application_section__should_have_active_access_code__not_confirmed():
+    section = ApplicationSectionFactory.create()
+    ReservationFactory.create(
+        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CREATED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    assert section.should_have_active_access_code is False
+
+
+def test_application_section__is_access_code_is_active_correct__active_when_should_be():
+    section = ApplicationSectionFactory.create()
+    ReservationFactory.create(
+        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_code_is_active=True,
+    )
+
+    assert section.is_access_code_is_active_correct is True
+
+
+def test_application_section__is_access_code_is_active_correct__active_when_should_not_be():
+    section = ApplicationSectionFactory.create()
+    ReservationFactory.create(
+        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=True,
+    )
+
+    assert section.is_access_code_is_active_correct is False
+
+
+def test_application_section__is_access_code_is_active_correct__inactive_when_should_not_be():
+    section = ApplicationSectionFactory.create()
+    ReservationFactory.create(
+        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_code_is_active=False,
+    )
+
+    assert section.is_access_code_is_active_correct is False
+
+
+def test_application_section__is_access_code_is_active_correct__inactive_when_should_be():
+    section = ApplicationSectionFactory.create()
+    ReservationFactory.create(
+        recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=False,
+    )
+
+    assert section.is_access_code_is_active_correct is True
