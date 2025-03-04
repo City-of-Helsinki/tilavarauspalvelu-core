@@ -198,7 +198,7 @@ class PindoraService:
         match obj:
             case ApplicationSection():
                 response = PindoraClient.reschedule_seasonal_booking(obj)
-                obj.actions.get_reservations().requires_active_access_code().update(
+                obj.actions.get_reservations().update_access_code_info(
                     access_code_generated_at=response["access_code_generated_at"],
                     access_code_is_active=response["access_code_is_active"],
                 )
@@ -207,7 +207,7 @@ class PindoraService:
             case RecurringReservation():
                 if obj.allocated_time_slot is None:
                     response = PindoraClient.reschedule_reservation_series(obj)
-                    obj.reservations.requires_active_access_code().update(
+                    obj.reservations.update_access_code_info(
                         access_code_generated_at=response["access_code_generated_at"],
                         access_code_is_active=response["access_code_is_active"],
                     )
@@ -356,7 +356,9 @@ class PindoraService:
                     return
 
                 section = obj.allocated_time_slot.reservation_unit_option.application_section
-                cls.delete_access_code(section)
+                # If this series is part of an application section, should only remove this series
+                # from the section instead of deleting the access code for the whole application section.
+                cls.reschedule_access_code(section)
 
             case Reservation():
                 if obj.recurring_reservation is None:
@@ -367,7 +369,9 @@ class PindoraService:
                     return
 
                 series = obj.recurring_reservation
-                cls.delete_access_code(series)
+                # If the reservation is part of a series, should only remove the reservation from the series
+                # instead of deleting the access code for the whole series.
+                cls.reschedule_access_code(series)
 
             case _:
                 msg = f"Invalid delete target: {obj}"
@@ -405,7 +409,7 @@ class PindoraService:
 
     @classmethod
     def _sync_reservation_access_code(cls, reservation: Reservation) -> None:
-        # Delete access code form reservation if it shouldn't have one.
+        # Delete access code from reservation if it shouldn't have one.
         if (
             reservation.access_type != AccessType.ACCESS_CODE  #
             or reservation.state in {ReservationStateChoice.DENIED, ReservationStateChoice.CANCELLED}
@@ -443,11 +447,13 @@ class PindoraService:
                 cls.activate_access_code(obj=obj)
             else:
                 cls.deactivate_access_code(obj=obj)
+
         except PindoraNotFoundError:
             # Reservation series and application sections always have an access code, even if it's not active.
             cls.create_access_code(obj=obj, is_active=should_be_active)
 
-        cls.reschedule_access_code(obj=obj)
+        else:
+            cls.reschedule_access_code(obj=obj)
 
     @classmethod
     def _parse_series_validity_info(
