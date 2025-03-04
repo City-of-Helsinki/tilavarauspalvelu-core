@@ -503,18 +503,19 @@ export function createDateTime(date: string, time: string): Date {
   return new Date();
 }
 
+// NOTE backend throws errors in some cases if we accidentally send seconds or milliseconds that are not 0
 export function convertReservationFormToApi(
   formValues: PendingReservationFormType
 ): { begin: string; end: string } | null {
   const time = formValues.time;
-  const date = fromUIDate(formValues.date ?? "");
+  const date = fromUIDate(formValues.date);
   const duration = formValues.duration;
-  if (date == null || time == null || duration == null) {
+  if (date == null || time === "" || duration === 0) {
     return null;
   }
   const minutes = timeToMinutes(time);
-  const begin: Date = set(date, { minutes });
-  const end: Date = set(begin, { minutes: minutes + duration });
+  const begin: Date = set(date, { minutes, seconds: 0, milliseconds: 0 });
+  const end: Date = addMinutes(begin, duration);
   return { begin: begin.toISOString(), end: end.toISOString() };
 }
 

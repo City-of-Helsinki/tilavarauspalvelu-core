@@ -9,9 +9,6 @@ import {
   ReservationUnitPageDocument,
   type ReservationUnitPageQuery,
   type ReservationUnitPageQueryVariables,
-  type Mutation,
-  type MutationAdjustReservationTimeArgs,
-  useAdjustReservationTimeMutation,
   type ReservationEditPageQuery,
   type ReservationEditPageQueryVariables,
   ReservationEditPageDocument,
@@ -25,12 +22,10 @@ import {
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { gql, type FetchResult } from "@apollo/client";
-import { useRouter } from "next/router";
+import { gql } from "@apollo/client";
 import { StepState, Stepper } from "hds-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { errorToast } from "common/src/common/toast";
 import { EditStep0 } from "@/components/reservation/EditStep0";
 import { EditStep1 } from "@/components/reservation/EditStep1";
 import {
@@ -40,7 +35,6 @@ import {
 import { ReservationPageWrapper } from "@/components/reservations/styles";
 import { queryOptions } from "@/modules/queryOptions";
 import {
-  convertReservationFormToApi,
   isReservationEditable,
   transformReservation,
 } from "@/modules/reservation";
@@ -61,101 +55,39 @@ const StepperWrapper = styled.div`
 `;
 
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
-  const {
-    reservation,
-    reservationUnit,
-    apiBaseUrl,
-    options,
-    blockingReservations,
-  } = props;
+  const { reservation, reservationUnit, options, blockingReservations } = props;
   const { t, i18n } = useTranslation();
-  const router = useRouter();
 
   const [step, setStep] = useState<0 | 1>(0);
 
-  const [mutation, { loading: isLoading }] = useAdjustReservationTimeMutation();
-
-  // TODO should rework this so we don't pass a string here (use Dates till we do the mutation)
-  const adjustReservationTime = (
-    input: MutationAdjustReservationTimeArgs["input"]
-  ): Promise<FetchResult<Mutation>> => {
-    if (!input.pk) {
-      throw new Error("No reservation pk provided");
-    }
-    if (!input.begin || !input.end) {
-      throw new Error("No begin or end time provided");
-    }
-    // NOTE backend throws errors in some cases if we accidentally send seconds or milliseconds that are not 0
-    const { begin, end, ...rest } = input;
-    const beginDate = new Date(begin);
-    beginDate.setSeconds(0);
-    beginDate.setMilliseconds(0);
-    const endDate = new Date(end);
-    endDate.setSeconds(0);
-    endDate.setMilliseconds(0);
-    return mutation({
-      variables: {
-        input: {
-          begin: beginDate.toISOString(),
-          end: endDate.toISOString(),
-          ...rest,
-        },
-      },
-    });
-  };
-
-  const reservationForm = useForm<PendingReservationFormType>({
+  const form = useForm<PendingReservationFormType>({
     defaultValues: transformReservation(reservation),
     mode: "onChange",
     resolver: zodResolver(PendingReservationFormSchema),
   });
 
-  const { getValues, reset } = reservationForm;
+  const { reset } = form;
   useEffect(() => {
     reset(transformReservation(reservation));
   }, [reservation, reset]);
-
-  // TODO refactor to use form submit instead of getValues
-  const handleSubmit = async () => {
-    const formValues = getValues();
-    const times = convertReservationFormToApi(formValues);
-    if (reservation.pk == null || times == null) {
-      return;
-    }
-    try {
-      await adjustReservationTime({ pk: reservation.pk, ...times });
-      router.push(`${getReservationPath(reservation.pk)}?timeUpdated=true`);
-    } catch (e) {
-      if (e instanceof Error) {
-        // TODO don't print the error message to the user
-        errorToast({ text: e.message });
-      } else {
-        errorToast({ text: "Unknown error occurred" });
-      }
-    }
-  };
 
   const title =
     step === 0
       ? "reservations:editReservationTime"
       : "reservationCalendar:heading.pendingReservation";
 
-  const handleStepClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const target = e.currentTarget;
-    const s = target
-      .getAttribute("data-testid")
-      ?.replace("hds-stepper-step-", "");
-    if (s != null) {
-      const n = parseInt(s, 10);
-      if (n === 0 || n === 1) {
-        setStep(n);
-      }
+  const handleStepClick = (
+    _: React.MouseEvent<HTMLButtonElement>,
+    index: number
+  ) => {
+    if (index === 0 || index === 1) {
+      setStep(index);
     }
   };
 
   const {
     formState: { isValid, dirtyFields },
-  } = reservationForm;
+  } = form;
   // skip control fields
   const isDirty = dirtyFields.date || dirtyFields.time || dirtyFields.duration;
   const steps = [
@@ -193,10 +125,8 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
           reservation={reservation}
           reservationUnit={reservationUnit}
           activeApplicationRounds={activeApplicationRounds}
-          reservationForm={reservationForm}
+          reservationForm={form}
           nextStep={() => setStep(1)}
-          apiBaseUrl={apiBaseUrl}
-          isLoading={false}
           blockingReservations={blockingReservations}
         />
       ) : (
@@ -205,9 +135,7 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
           options={options}
           reservationUnit={reservationUnit}
           onBack={() => setStep(0)}
-          handleSubmit={handleSubmit}
-          form={reservationForm}
-          isSubmitting={isLoading}
+          form={form}
         />
       )}
     </ReservationPageWrapper>
