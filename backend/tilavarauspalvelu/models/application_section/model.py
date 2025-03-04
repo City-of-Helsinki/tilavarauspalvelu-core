@@ -292,3 +292,27 @@ class ApplicationSection(SerializableMixin, models.Model):
             L(access_code_should_be_active=True),
             recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=self,
         ).exists()
+
+    @lookup_property(skip_codegen=True)
+    def is_access_code_is_active_correct() -> bool:
+        """Check if all reservations in the section have their access code's "is_active" state correctly set."""
+        from tilavarauspalvelu.models import Reservation
+
+        exists = ~Exists(
+            queryset=Reservation.objects.filter(
+                L(is_access_code_is_active_correct=False),
+                recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
+                    models.OuterRef("pk")
+                ),
+            ),
+        )
+        return exists  # type: ignore[return-value]  # noqa: RET504
+
+    @is_access_code_is_active_correct.override
+    def _(self) -> bool:
+        from tilavarauspalvelu.models import Reservation
+
+        return not Reservation.objects.filter(
+            L(is_access_code_is_active_correct=False),
+            recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=self,
+        ).exists()
