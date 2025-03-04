@@ -22,15 +22,15 @@ import {
   ReservationStateChoice,
 } from "@/gql/gql-types";
 import { createMockReservationUnit } from "@/test/testUtils";
-import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
+import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 
 describe("generateReservableMap", () => {
-  beforeAll(() => {
+  beforeEach(() => {
     vi.useFakeTimers({
       now: new Date(2024, 0, 1, 9, 0, 0),
     });
   });
-  afterAll(() => {
+  afterEach(() => {
     vi.useRealTimers();
   });
 
