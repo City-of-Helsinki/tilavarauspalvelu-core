@@ -7,7 +7,7 @@ import pytest
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
-from utils.date_utils import next_hour
+from utils.date_utils import local_datetime, next_hour
 
 from tests.factories import ReservationFactory
 from tests.helpers import patch_method
@@ -227,6 +227,7 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     graphql.login_with_superuser()
@@ -247,6 +248,7 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     graphql.login_with_superuser()
@@ -264,6 +266,7 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
         type=ReservationTypeChoice.STAFF,
         access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     graphql.login_with_superuser()

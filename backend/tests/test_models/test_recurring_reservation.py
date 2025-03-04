@@ -5,6 +5,7 @@ from lookup_property import L
 
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import RecurringReservation
+from utils.date_utils import local_datetime
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
 
@@ -142,6 +143,7 @@ def test_recurring_reservation__access_code_is_active_correct__active_when_shoul
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     assert series.is_access_code_is_active_correct is True
@@ -155,6 +157,7 @@ def test_recurring_reservation__access_code_is_active_correct__active_when_shoul
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.BLOCKED,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     assert series.is_access_code_is_active_correct is False
