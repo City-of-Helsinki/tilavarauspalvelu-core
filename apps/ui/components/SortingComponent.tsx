@@ -17,7 +17,7 @@ import { convertOptionToHDS } from "common/src/helpers";
 import { focusStyles } from "common/styles/cssFragments";
 import { convertLanguageCode } from "common/src/common/util";
 
-const SORTING_OPTIONS = [
+export const SORTING_OPTIONS = [
   {
     label: "search:sorting.label.name",
     value: "name",
@@ -130,6 +130,9 @@ export function SortingComponent() {
       handleOrderChange("asc");
     }
   };
+  const sortValue = sortingOptions.find(
+    (option) => option.value === value
+  )?.value;
 
   return (
     <Wrapper>
@@ -145,11 +148,13 @@ export function SortingComponent() {
           <IconSortAscending
             size={IconSize.Medium}
             aria-label={t("search:sorting.ascendingLabel")}
+            aria-hidden="false"
           />
         ) : (
           <IconSortDescending
             size={IconSize.Medium}
             aria-label={t("search:sorting.descendingLabel")}
+            aria-hidden="false"
           />
         )}
       </OrderBtn>
@@ -160,8 +165,7 @@ export function SortingComponent() {
         }}
         options={sortingOptions}
         onChange={handleSelect}
-        clearable={false}
-        value={sortingOptions.find((option) => option.value === value)?.value}
+        value={sortValue}
       />
     </Wrapper>
   );
