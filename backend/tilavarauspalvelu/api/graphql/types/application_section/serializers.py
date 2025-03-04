@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import operator
-from contextlib import suppress
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from django.db import models
@@ -18,7 +17,6 @@ from tilavarauspalvelu.api.graphql.types.suitable_time_range.serializers import 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
@@ -282,7 +280,6 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
 
         cancellable_reservations_count = cancellable_reservations.count()
         future_reservations_count = future_reservations.count()
-        not_all_cancelled = future_reservations_count != cancellable_reservations_count
 
         data = CancellationOutput(
             expected_cancellations=future_reservations_count,
@@ -300,13 +297,10 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             EmailService.send_staff_notification_application_section_cancelled(application_section=self.instance)
 
             if has_access_codes:
-                # If there are still some non-cancelled future reservations, reschedule the reservation series.
-                # This removes all the cancelled reservations from Pindora.
-                if not_all_cancelled:
-                    PindoraService.reschedule_access_code(obj=self.instance)
-                else:
-                    with suppress(PindoraNotFoundError):
-                        PindoraService.delete_access_code(obj=self.instance)
+                # TODO: Only reschedule.
+                # Reschedule the reservation series to remove all cancelled reservations.
+                # This might remove leave an empty series, which is fine.
+                PindoraService.reschedule_access_code(obj=self.instance)
 
         return data
 
