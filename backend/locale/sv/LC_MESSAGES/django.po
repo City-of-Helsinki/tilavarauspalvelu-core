@@ -3972,6 +3972,10 @@ msgid "reservations"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation/model.py
+msgid "Reservation cannot be have active access code if one is not generated"
+msgstr ""
+
+#: tilavarauspalvelu/models/reservation/model.py
 msgid "Closed"
 msgstr ""
 
