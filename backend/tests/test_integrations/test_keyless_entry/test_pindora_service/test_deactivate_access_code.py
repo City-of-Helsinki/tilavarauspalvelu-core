@@ -27,6 +27,7 @@ def test_deactivate_access_code__reservation():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
@@ -47,6 +48,7 @@ def test_deactivate_access_code__reservation__in_series():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
     reservation_2 = ReservationFactory.create(
         reservation_units=[series.reservation_unit],
@@ -57,6 +59,7 @@ def test_deactivate_access_code__reservation__in_series():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
@@ -87,6 +90,7 @@ def test_deactivate_access_code__reservation__in_series__in_seasonal_booking():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
     reservation_2 = ReservationFactory.create(
         user=user,
@@ -98,6 +102,7 @@ def test_deactivate_access_code__reservation__in_series__in_seasonal_booking():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
@@ -121,6 +126,7 @@ def test_deactivate_access_code__series():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
     reservation_2 = ReservationFactory.create(
         reservation_units=[series.reservation_unit],
@@ -131,6 +137,7 @@ def test_deactivate_access_code__series():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
@@ -161,6 +168,7 @@ def test_deactivate_access_code__series__in_seasonal_booking():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
     reservation_2 = ReservationFactory.create(
         user=user,
@@ -172,6 +180,7 @@ def test_deactivate_access_code__series__in_seasonal_booking():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
@@ -202,6 +211,7 @@ def test_deactivate_access_code__seasonal_booking():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
     reservation_2 = ReservationFactory.create(
         user=user,
@@ -213,6 +223,7 @@ def test_deactivate_access_code__seasonal_booking():
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):

@@ -511,6 +511,7 @@ def test_reservation__adjust_time__same_access_type(graphql):
         access_type=AccessType.ACCESS_CODE,
         reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     graphql.login_with_superuser()
@@ -532,6 +533,7 @@ def test_reservation__adjust_time__same_access_type__requires_handling(graphql):
         reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
         reservation_units__require_reservation_handling=True,
         access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
     )
 
     graphql.login_with_superuser()
