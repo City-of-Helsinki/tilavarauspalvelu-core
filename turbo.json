@@ -23,9 +23,6 @@
     "lint:css": {},
     "test": {
       "env": ["SKIP_ENV_VALIDATION"],
-      "dependsOn": [
-        "build"
-      ],
       "inputs": [
         "**/*.tsx",
         "**/*.ts",

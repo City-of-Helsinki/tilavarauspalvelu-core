@@ -1,4 +1,5 @@
 import React from "react";
+import { addDays } from "date-fns";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
@@ -15,12 +16,24 @@ import {
 } from "vitest";
 import {
   YEAR,
-  mocks,
+  createGraphQLMocks,
   mondayMorningReservations,
   createReservationUnits,
 } from "./__test__/mocks";
+import { toUIDate } from "common/src/common/util";
 
-function customRender() {
+const DEFAULT_DATES = {
+  begin: new Date(YEAR, 0, 1),
+  end: new Date(YEAR, 12, 31),
+};
+
+function customRender(
+  props: {
+    begin: Date;
+    end: Date;
+  } = DEFAULT_DATES
+) {
+  const mocks = createGraphQLMocks(props);
   return render(
     <MemoryRouter>
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -54,16 +67,6 @@ afterAll(() => {
 beforeEach(() => {
   vi.useFakeTimers({
     now: new Date(2024, 0, 1, 0, 0, 0),
-    // NOTE without these the tests will fail with a timeout (async doesn't work properly)
-    toFake: [
-      "setTimeout",
-      "clearTimeout",
-      "setInterval",
-      "clearInterval",
-      "setImmediate",
-      "clearImmediate",
-      "Date",
-    ],
   });
 });
 afterEach(() => {
@@ -317,10 +320,12 @@ test("Form is disabled if it's not filled", async () => {
 });
 
 test("Form can't be submitted without reservation type selection", async () => {
-  const view = customRender();
+  const begin = new Date(YEAR, 5, 1);
+  const end = addDays(begin, 30);
+  const view = customRender({ begin, end });
   await fillForm({
-    begin: `1.6.${YEAR}`,
-    end: `30.6.${YEAR}`,
+    begin: toUIDate(begin),
+    end: toUIDate(end),
     dayNumber: 1,
   });
   const user = userEvent.setup({
@@ -334,14 +339,17 @@ test("Form can't be submitted without reservation type selection", async () => {
   await view.findByText(/required/i);
 });
 
-test("Form submission without any blocking reservations", async () => {
-  const view = customRender();
+// TODO: vi.useFakeTimers throws an error here (not mocked even though it is)
+test.skip("Form submission without any blocking reservations", async () => {
   const user = userEvent.setup({
     advanceTimers: vi.advanceTimersByTime.bind(vi),
   });
+  const begin = new Date(YEAR, 5, 1);
+  const end = addDays(begin, 30);
+  const view = customRender({ begin, end });
   await fillForm({
-    begin: `1.6.${YEAR}`,
-    end: `30.6.${YEAR}`,
+    begin: toUIDate(begin),
+    end: toUIDate(end),
     dayNumber: 1,
   });
 
@@ -370,16 +378,18 @@ test("Form submission without any blocking reservations", async () => {
   // TODO test submit and check both CREATE_RECURRING and CREATE_STAFF mutations get called
   // we need to return the specific values from those mutations
   // and check that the wanted 4 reservations were made (or if we want to test errors)
-}, 15_000);
+});
 
 test("Form submission with a lot of blocking reservations", async () => {
-  const view = customRender();
+  const begin = new Date(YEAR, 0, 1);
+  const end = new Date(YEAR, 11, 31);
+  const view = customRender({ begin, end });
   const user = userEvent.setup({
     advanceTimers: vi.advanceTimersByTime.bind(vi),
   });
   await fillForm({
-    begin: `1.1.${YEAR}`,
-    end: `31.12.${YEAR}`,
+    begin: toUIDate(begin),
+    end: toUIDate(end),
     dayNumber: 0,
   });
 
@@ -414,18 +424,18 @@ test("Form submission with a lot of blocking reservations", async () => {
   expect(overlaps).toHaveLength(mondayMorningReservations.length);
 
   // TODO test submit, but it doesn't work without extra context
-
-  // NOTE This test is long running by design. jest.setTimeout doesn't work for async functions
-}, 15_000);
+});
 
 test("Reservations can be removed and restored", async () => {
-  const view = customRender();
+  const begin = new Date(YEAR, 5, 1);
+  const end = addDays(begin, 30);
+  const view = customRender({ begin, end });
   const user = userEvent.setup({
     advanceTimers: vi.advanceTimersByTime.bind(vi),
   });
   await fillForm({
-    begin: `1.6.${YEAR}`,
-    end: `30.6.${YEAR}`,
+    begin: toUIDate(begin),
+    end: toUIDate(end),
     dayNumber: 1,
   });
 
@@ -455,7 +465,7 @@ test("Reservations can be removed and restored", async () => {
   await waitFor(
     async () => (await within(list).findAllByText(/common.remove/)).length === 4
   );
-}, 15_000);
+});
 
 // NOTE this requires us to fix submission checking
 test.todo("Removed reservations are not included in the mutation");

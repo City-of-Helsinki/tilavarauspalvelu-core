@@ -4,7 +4,15 @@ import React from "react";
 import mockTranslations from "@/public/locales/fi/dateSelector.json";
 import { configure, render, screen } from "@testing-library/react";
 import { DateRangePicker, DateRangePickerProps } from "../DateRangePicker";
-import { vi, test, expect, beforeAll, afterAll } from "vitest";
+import {
+  vi,
+  test,
+  expect,
+  beforeAll,
+  afterAll,
+  afterEach,
+  beforeEach,
+} from "vitest";
 
 vi.mock("next-i18next", () => ({
   useTranslation: () => {
@@ -34,14 +42,17 @@ beforeAll(() => {
     advanceTimersByTime: vi.advanceTimersByTime.bind(vi),
   });
 });
+afterAll(() => {
+  vi.unstubAllGlobals();
+});
 
-beforeAll(() => {
+beforeEach(() => {
   vi.useFakeTimers({
     now: new Date(2020, 10, 10, 9, 0, 0),
   });
 });
 
-afterAll(() => {
+afterEach(() => {
   vi.useRealTimers();
 });
 
