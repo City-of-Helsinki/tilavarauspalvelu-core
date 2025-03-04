@@ -264,7 +264,6 @@ def test_recurring_reservations__cancel_section_series__cancellation_rule(graphq
     assert reservation_2.state == ReservationStateChoice.CANCELLED
 
 
-@patch_method(PindoraService.delete_access_code)
 @patch_method(PindoraService.reschedule_access_code)
 @patch_method(EmailService.send_application_section_cancelled)
 @patch_method(EmailService.send_staff_notification_application_section_cancelled)
@@ -302,49 +301,4 @@ def test_recurring_reservations__cancel_section_series__access_codes(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.delete_access_code.called is True
-    assert PindoraService.reschedule_access_code.called is False
-
-
-@patch_method(PindoraService.delete_access_code)
-@patch_method(PindoraService.reschedule_access_code)
-@patch_method(EmailService.send_application_section_cancelled)
-@patch_method(EmailService.send_staff_notification_application_section_cancelled)
-@freeze_time(local_datetime(year=2024, month=1, day=1))
-def test_recurring_reservations__cancel_section_series__access_codes__not_all_cancelled(graphql):
-    reason = ReservationCancelReasonFactory.create()
-    user = UserFactory.create()
-
-    reservation_series = create_reservation_series(
-        user=user,
-        reservations__access_type=AccessType.ACCESS_CODE,
-        reservations__type=ReservationTypeChoice.SEASONAL,
-        reservations__price=0,
-        # Cancellation rule prevents next reservation from being cancelled
-        reservation_unit__cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(days=1),
-    )
-
-    application_round = ApplicationRoundFactory.create_in_status_results_sent()
-    allocation = AllocatedTimeSlotFactory.create(
-        reservation_unit_option__application_section__application__user=user,
-        reservation_unit_option__application_section__application__application_round=application_round,
-    )
-    section = allocation.reservation_unit_option.application_section
-
-    reservation_series.allocated_time_slot = allocation
-    reservation_series.save()
-
-    data = {
-        "pk": section.pk,
-        "cancelReason": reason.pk,
-        "cancelDetails": "Cancellation details",
-    }
-
-    graphql.force_login(user)
-    response = graphql(CANCEL_SECTION_SERIES_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    # Call reschedule instead of delete to remove all but the next reservation from Pindora
-    assert PindoraService.delete_access_code.called is False
     assert PindoraService.reschedule_access_code.called is True
