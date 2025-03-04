@@ -260,7 +260,7 @@ def test_sync_access_code__reservation__in_series__not_found(is_active):
     assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
     assert PindoraService.create_access_code.call_count == 1
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is is_active
-    assert PindoraService.reschedule_access_code.call_count == 1
+    assert PindoraService.reschedule_access_code.call_count == 0
 
 
 @patch_method(PindoraService.activate_access_code)
@@ -329,7 +329,7 @@ def test_sync_access_code__reservation__in_series__in_seasonal_booking__not_foun
     assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
     assert PindoraService.create_access_code.call_count == 1
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is is_active
-    assert PindoraService.reschedule_access_code.call_count == 1
+    assert PindoraService.reschedule_access_code.call_count == 0
 
 
 @patch_method(PindoraService.activate_access_code)
@@ -384,7 +384,7 @@ def test_sync_access_code__series__not_found(is_active):
     assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
     assert PindoraService.create_access_code.call_count == 1
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is is_active
-    assert PindoraService.reschedule_access_code.call_count == 1
+    assert PindoraService.reschedule_access_code.call_count == 0
 
 
 @patch_method(PindoraService.activate_access_code)
@@ -453,7 +453,7 @@ def test_sync_access_code__series__in_seasonal_booking__not_found(is_active):
     assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
     assert PindoraService.create_access_code.call_count == 1
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is is_active
-    assert PindoraService.reschedule_access_code.call_count == 1
+    assert PindoraService.reschedule_access_code.call_count == 0
 
 
 @patch_method(PindoraService.activate_access_code)
@@ -522,4 +522,4 @@ def test_sync_access_code__seasonal_booking__not_found(is_active):
     assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
     assert PindoraService.create_access_code.call_count == 1
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is is_active
-    assert PindoraService.reschedule_access_code.call_count == 1
+    assert PindoraService.reschedule_access_code.call_count == 0

@@ -11,6 +11,7 @@ from utils.date_utils import local_datetime
 
 from tests.factories import ApplicationSectionFactory, RecurringReservationFactory, ReservationFactory, UserFactory
 from tests.helpers import ResponseMock, patch_method
+from tests.test_integrations.test_keyless_entry.helpers import default_access_code_modify_response
 
 pytestmark = [
     pytest.mark.django_db,
@@ -39,6 +40,8 @@ def test_delete_access_code__reservation():
 
 
 def test_delete_access_code__reservation__in_series():
+    now = local_datetime()
+
     series = RecurringReservationFactory.create()
     reservation_1 = ReservationFactory.create(
         reservation_units=[series.reservation_unit],
@@ -48,7 +51,7 @@ def test_delete_access_code__reservation__in_series():
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
-        access_code_generated_at=local_datetime(),
+        access_code_generated_at=now,
         access_code_is_active=True,
     )
     reservation_2 = ReservationFactory.create(
@@ -57,18 +60,23 @@ def test_delete_access_code__reservation__in_series():
         begin=local_datetime(2024, 1, 1, 14),
         end=local_datetime(2024, 1, 1, 15),
         access_type=AccessType.ACCESS_CODE,
-        state=ReservationStateChoice.CONFIRMED,
+        state=ReservationStateChoice.CANCELLED,  # Cancelled, should remove access code
         type=ReservationTypeChoice.NORMAL,
-        access_code_generated_at=local_datetime(),
+        access_code_generated_at=now,
         access_code_is_active=True,
     )
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+    data = default_access_code_modify_response(
+        access_code_generated_at=now.isoformat(),
+        access_code_is_active=True,
+    )
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         PindoraService.delete_access_code(obj=reservation_1)
 
     reservation_1.refresh_from_db()
-    assert reservation_1.access_code_generated_at is None
-    assert reservation_1.access_code_is_active is False
+    assert reservation_1.access_code_generated_at is not None
+    assert reservation_1.access_code_is_active is True
 
     reservation_2.refresh_from_db()
     assert reservation_2.access_code_generated_at is None
@@ -76,6 +84,8 @@ def test_delete_access_code__reservation__in_series():
 
 
 def test_delete_access_code__reservation__in_series__in_seasonal_booking():
+    now = local_datetime()
+
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -92,7 +102,7 @@ def test_delete_access_code__reservation__in_series__in_seasonal_booking():
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
-        access_code_generated_at=local_datetime(),
+        access_code_generated_at=now,
         access_code_is_active=True,
     )
     reservation_2 = ReservationFactory.create(
@@ -102,18 +112,23 @@ def test_delete_access_code__reservation__in_series__in_seasonal_booking():
         begin=local_datetime(2024, 1, 1, 14),
         end=local_datetime(2024, 1, 1, 15),
         access_type=AccessType.ACCESS_CODE,
-        state=ReservationStateChoice.CONFIRMED,
+        state=ReservationStateChoice.CANCELLED,  # Cancelled, should remove access code
         type=ReservationTypeChoice.NORMAL,
-        access_code_generated_at=local_datetime(),
+        access_code_generated_at=now,
         access_code_is_active=True,
     )
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+    data = default_access_code_modify_response(
+        access_code_generated_at=now.isoformat(),
+        access_code_is_active=True,
+    )
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         PindoraService.delete_access_code(obj=reservation_1)
 
     reservation_1.refresh_from_db()
-    assert reservation_1.access_code_generated_at is None
-    assert reservation_1.access_code_is_active is False
+    assert reservation_1.access_code_generated_at is not None
+    assert reservation_1.access_code_is_active is True
 
     reservation_2.refresh_from_db()
     assert reservation_2.access_code_generated_at is None
@@ -158,6 +173,8 @@ def test_delete_access_code__series():
 
 
 def test_delete_access_code__series__in_seasonal_booking():
+    now = local_datetime()
+
     user = UserFactory.create()
     section = ApplicationSectionFactory.create(
         application__user=user,
@@ -174,7 +191,7 @@ def test_delete_access_code__series__in_seasonal_booking():
         access_type=AccessType.ACCESS_CODE,
         state=ReservationStateChoice.CONFIRMED,
         type=ReservationTypeChoice.NORMAL,
-        access_code_generated_at=local_datetime(),
+        access_code_generated_at=now,
         access_code_is_active=True,
     )
     reservation_2 = ReservationFactory.create(
@@ -184,18 +201,23 @@ def test_delete_access_code__series__in_seasonal_booking():
         begin=local_datetime(2024, 1, 1, 14),
         end=local_datetime(2024, 1, 1, 15),
         access_type=AccessType.ACCESS_CODE,
-        state=ReservationStateChoice.CONFIRMED,
+        state=ReservationStateChoice.CANCELLED,  # Cancelled, should remove access code
         type=ReservationTypeChoice.NORMAL,
-        access_code_generated_at=local_datetime(),
+        access_code_generated_at=now,
         access_code_is_active=True,
     )
 
-    with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
+    data = default_access_code_modify_response(
+        access_code_generated_at=now.isoformat(),
+        access_code_is_active=True,
+    )
+
+    with patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data)):
         PindoraService.delete_access_code(obj=series)
 
     reservation_1.refresh_from_db()
-    assert reservation_1.access_code_generated_at is None
-    assert reservation_1.access_code_is_active is False
+    assert reservation_1.access_code_generated_at is not None
+    assert reservation_1.access_code_is_active is True
 
     reservation_2.refresh_from_db()
     assert reservation_2.access_code_generated_at is None

@@ -236,6 +236,38 @@ class ReservationQuerySet(models.QuerySet):
     def requires_active_access_code(self) -> Self:
         return self.filter(L(access_code_should_be_active=True))
 
+    def dont_require_active_access_code(self) -> Self:
+        return self.filter(~L(access_code_should_be_active=True))
+
+    def update_access_code_info(
+        self,
+        *,
+        access_code_generated_at: datetime.datetime | None,
+        access_code_is_active: bool,
+    ) -> None:
+        """
+        Sets access code info to reservations in the queryset so that reservation that should have
+        active access codes get the given values, and the rest get empty values.
+        """
+        self.update(
+            access_code_generated_at=models.Case(
+                models.When(
+                    L(access_code_should_be_active=True),
+                    then=models.Value(access_code_generated_at),
+                ),
+                default=models.Value(None),
+                output_field=models.DateTimeField(null=True),
+            ),
+            access_code_is_active=models.Case(
+                models.When(
+                    L(access_code_should_be_active=True),
+                    then=models.Value(access_code_is_active),
+                ),
+                default=models.Value(False),  # noqa: FBT003
+                output_field=models.BooleanField(),
+            ),
+        )
+
 
 class ReservationManager(SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)):
     """Contains custom queryset methods and GDPR serialization."""
