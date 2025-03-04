@@ -11,15 +11,18 @@ import { participantCountOptions } from "@/modules/const";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { BottomContainer, Filters, StyledSubmitButton } from "../search/styled";
 import { mapParamToNumber } from "@/modules/search";
+import {
+  Filters,
+  SearchButtonContainer,
+  StyledSubmitButton,
+} from "../search/styled";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
 import { toNumber } from "common/src/helpers";
 
 const filterOrder = [
-  "applicationRound",
   "textSearch",
   "minPersons",
   "maxPersons",
@@ -56,17 +59,19 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
 }
 
 type OptionType = { value: number; label: string };
-export function SeasonalSearchForm({
-  isLoading,
-  options,
-}: Readonly<{
+export type SearchFormProps = {
   options: {
     reservationUnitTypeOptions: OptionType[];
     purposeOptions: OptionType[];
     unitOptions: OptionType[];
   };
   isLoading: boolean;
-}>): JSX.Element | null {
+};
+
+export function SeasonalSearchForm({
+  isLoading,
+  options,
+}: Readonly<SearchFormProps>): JSX.Element | null {
   const { t } = useTranslation();
 
   const { handleSearch } = useSearchModify();
@@ -158,6 +163,7 @@ export function SeasonalSearchForm({
           name="reservationUnitTypes"
           control={control}
           options={reservationUnitTypeOptions}
+          disabled={reservationUnitTypeOptions.length === 0}
           label={t("searchForm:typeLabel")}
         />
         <ControlledSelect
@@ -167,6 +173,7 @@ export function SeasonalSearchForm({
           name="unit"
           control={control}
           options={unitOptions}
+          disabled={unitOptions.length === 0}
           label={t("searchForm:unitFilter")}
         />
         <ControlledSelect
@@ -176,6 +183,7 @@ export function SeasonalSearchForm({
           name="purposes"
           control={control}
           options={purposeOptions}
+          disabled={purposeOptions.length === 0}
           label={t("searchForm:purposesFilter")}
         />
         <ControlledSelect
@@ -187,7 +195,7 @@ export function SeasonalSearchForm({
           label={t("searchForm:accessTypeFilter")}
         />
       </Filters>
-      <BottomContainer>
+      <SearchButtonContainer>
         <FilterTagList
           translateTag={translateTag}
           filters={filterOrder}
@@ -202,7 +210,7 @@ export function SeasonalSearchForm({
         >
           {t("searchForm:searchButton")}
         </StyledSubmitButton>
-      </BottomContainer>
+      </SearchButtonContainer>
     </form>
   );
 }

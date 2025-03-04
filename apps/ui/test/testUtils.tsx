@@ -1,8 +1,10 @@
 import { type IsReservableFieldsFragment } from "@/gql/gql-types";
 import { type ReservableMap, type RoundPeriod } from "@/modules/reservable";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, render, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { ReservationStartInterval } from "common/gql/gql-types";
 import { addDays } from "date-fns";
+import { expect } from "vitest";
 
 // Default implementation fakes all timers (expect tick), remove performance from the list
 export const TIMERS_TO_FAKE = [
@@ -68,4 +70,22 @@ export function createMockReservationUnit({
     reservationEnds: addDays(new Date(), 180).toISOString(),
   };
   return reservationUnit;
+}
+
+export async function selectOption(
+  view: ReturnType<typeof render>,
+  listLabel: RegExp | string,
+  optionLabel: RegExp | string
+) {
+  const user = userEvent.setup();
+  const btn = view.getByLabelText(listLabel, {
+    selector: "button",
+  });
+  expect(btn).toBeInTheDocument();
+  expect(btn).not.toHaveAttribute("aria-disabled", "true");
+  await user.click(btn);
+  const listbox = view.getByRole("listbox");
+  const type = within(listbox).getByText(optionLabel);
+  expect(type).toBeInTheDocument();
+  await user.click(type);
 }

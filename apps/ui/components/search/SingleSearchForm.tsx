@@ -18,9 +18,9 @@ import {
   mapSingleBooleanParamToFormValue,
 } from "@/modules/search";
 import {
-  BottomContainer,
   Filters,
   OptionalFilters,
+  SearchButtonContainer,
   StyledSubmitButton,
 } from "./styled";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
@@ -323,7 +323,7 @@ export function SingleSearchForm({
           )}
         />
       </Filters>
-      <BottomContainer>
+      <SearchButtonContainer>
         <FilterTagList
           translateTag={translateTag}
           filters={filterOrder}
@@ -344,7 +344,7 @@ export function SingleSearchForm({
         >
           {t("searchForm:searchButton")}
         </StyledSubmitButton>
-      </BottomContainer>
+      </SearchButtonContainer>
     </form>
   );
 }
