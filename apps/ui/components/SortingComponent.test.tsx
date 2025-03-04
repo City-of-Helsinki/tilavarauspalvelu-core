@@ -1,48 +1,118 @@
 import { render } from "@testing-library/react";
-import { SortingComponent } from "./SortingComponent";
-import { vi, describe, test, expect } from "vitest";
+import { SORTING_OPTIONS, SortingComponent } from "./SortingComponent";
+import { vi, describe, test, expect, afterEach, beforeEach } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { selectOption } from "@/test/testUtils";
 
-// TODO move the router mocks to general setup
-// problem with that is we lose the control of the mock
-// unless we wrap it in a function so we can't read the number of calls
-// or what values it was called with
-// also we'd have to manage local state for the mock if we want to inspect
-// the values it was called with
-vi.mock("next/router", () => ({
-  useRouter() {
-    return {
-      route: "/",
-      pathname: "",
+// Reusing mocks is ridiculously difficult because of hoisted imports
+const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
+  const mockedRouterReplace = vi.fn();
+  return {
+    useRouter: () => ({
+      replace: mockedRouterReplace,
       query: "",
-      asPath: "",
-      push: vi.fn(),
-      events: {
-        on: vi.fn(),
-        off: vi.fn(),
-      },
-      beforePopState: vi.fn(() => null),
-      prefetch: vi.fn(() => null),
-    };
-  },
-}));
+    }),
+    mockedRouterReplace,
+  };
+});
+
+const { mockedSearchParams, useSearchParams } = vi.hoisted(() => {
+  const params = vi.fn();
+  return {
+    useSearchParams: params,
+    mockedSearchParams: params,
+  };
+});
 
 vi.mock("next/navigation", () => ({
-  useSearchParams() {
-    const vals: URLSearchParams = new URLSearchParams();
-    return vals;
-  },
+  useSearchParams,
 }));
 
-describe("SortingComponent", () => {
-  test("should render sorting component", () => {
-    const view = render(<SortingComponent />);
-    expect(
-      view.getByText("searchResultList:sortButtonLabel")
-    ).toBeInTheDocument();
-    // TODO get by aria-label (button)
-    // expect(view.getByText("search:sorting.action.ascending")).toBeInTheDocument();
-    // TODO check that there is an option preselected in the select
+vi.mock("next/router", () => ({
+  useRouter,
+}));
+
+// everything should respond to query params
+// -> separate tests for fetching (they are based only on query params)
+describe("SortingComponent", async () => {
+  beforeEach(async () => {
+    mockedSearchParams.mockReturnValue(new URLSearchParams());
   });
-  test.todo("sorting component should respond to order asc/desc");
-  test.todo("sorting component should respond to order type select");
+
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
+  test("should render sorting component", async () => {
+    const view = render(<SortingComponent />);
+    const btnLabel = view.getByText("searchResultList:sortButtonLabel");
+    expect(btnLabel).toBeInTheDocument();
+  });
+
+  test("sort component should default to by name", async () => {
+    const view = render(<SortingComponent />);
+    const nameLabel = /sorting.label.name/;
+    expect(view.getByText(nameLabel)).toBeInTheDocument();
+  });
+
+  test("should respond to order asc/desc", async () => {
+    const view = render(<SortingComponent />);
+    const orderBtn = view.getByRole("button", {
+      name: "search:sorting.action.descending",
+    });
+    expect(orderBtn).toBeInTheDocument();
+    const user = userEvent.setup();
+    expect(mockedRouterReplace).toHaveBeenCalledTimes(0);
+    await user.click(orderBtn);
+    expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
+  });
+
+  test("should order by query param", async () => {
+    const params = new URLSearchParams();
+    params.set("order", "desc");
+    mockedSearchParams.mockReturnValue(params);
+    const view = render(<SortingComponent />);
+    const orderBtn = view.getByRole("button", {
+      name: "search:sorting.action.ascending",
+    });
+    expect(orderBtn).toBeInTheDocument();
+  });
+
+  test.for(SORTING_OPTIONS)(
+    "should select sort by query param $value",
+    async ({ value, label }) => {
+      const params = new URLSearchParams();
+      params.set("sort", value);
+      mockedSearchParams.mockReturnValue(params);
+      const view = render(<SortingComponent />);
+      expect(view.getByText(label)).toBeInTheDocument();
+    }
+  );
+
+  test.for(
+    SORTING_OPTIONS.map((option, i) => ({
+      ...option,
+      next:
+        i < SORTING_OPTIONS.length - 1
+          ? SORTING_OPTIONS[i + 1]
+          : SORTING_OPTIONS[0],
+    }))
+  )(
+    "should change sort value on select from $value to $next.value",
+    async ({ value, label, next }) => {
+      if (next == null) {
+        throw new Error("select is null");
+      }
+      const params = new URLSearchParams();
+      params.set("sort", value);
+      mockedSearchParams.mockReturnValue(params);
+      const view = render(<SortingComponent />);
+      expect(view.getByText(label)).toBeInTheDocument();
+      const optionLabel = next.label;
+      const listLabel = /searchResultList:sortButtonLabel/;
+      expect(mockedRouterReplace).toHaveBeenCalledTimes(0);
+      await selectOption(view, listLabel, optionLabel);
+      expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
+    }
+  );
 });

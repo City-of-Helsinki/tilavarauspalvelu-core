@@ -2,7 +2,7 @@ import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundFieldsFragment,
 } from "@/gql/gql-types";
-import RecurringLander from "../pages/recurring";
+import RecurringLander from "@/pages/recurring";
 import { render } from "@testing-library/react";
 import { base64encode } from "common/src/helpers";
 import { vi, describe, test, expect, afterEach, beforeEach } from "vitest";
