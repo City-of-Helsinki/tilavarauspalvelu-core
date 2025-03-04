@@ -6,6 +6,7 @@ import { RecurringReservationForm } from "./RecurringReservationForm";
 import { useRecurringReservationsUnits } from "./hooks";
 import { LinkPrev } from "@/component/LinkPrev";
 import { CenterSpinner } from "common/styles/util";
+import { toNumber } from "common/src/helpers";
 
 type Params = {
   unitId: string;
@@ -17,14 +18,12 @@ function RecurringReservationInner({ unitId }: { unitId: number }) {
 
   const { loading, reservationUnits } = useRecurringReservationsUnits(unitId);
 
-  if (loading) {
-    return <CenterSpinner />;
-  }
-
   return (
     <>
       <H1 $noMargin>{t("MyUnits.RecurringReservation.pageTitle")}</H1>
-      {reservationUnits !== undefined && reservationUnits?.length > 0 ? (
+      {loading ? (
+        <CenterSpinner />
+      ) : reservationUnits.length > 0 ? (
         <RecurringReservationForm reservationUnits={reservationUnits} />
       ) : (
         <p>{t("MyUnits.RecurringReservation.error.notPossibleForThisUnit")}</p>
@@ -42,7 +41,8 @@ function RecurringErrorPage() {
 export function RecurringReservation() {
   const { unitId } = useParams<Params>();
 
-  const isError = unitId == null || Number.isNaN(Number(unitId));
+  const unitPk = toNumber(unitId);
+  const isError = unitPk == null || unitPk <= 1;
   return (
     <>
       <LinkPrev />
@@ -50,7 +50,7 @@ export function RecurringReservation() {
         {isError ? (
           <RecurringErrorPage />
         ) : (
-          <RecurringReservationInner unitId={Number(unitId)} />
+          <RecurringReservationInner unitId={unitPk} />
         )}
       </>
     </>

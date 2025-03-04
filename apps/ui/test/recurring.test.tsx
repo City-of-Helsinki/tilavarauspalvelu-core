@@ -5,7 +5,8 @@ import {
 import RecurringLander from "../pages/recurring";
 import { render } from "@testing-library/react";
 import { base64encode } from "common/src/helpers";
-import { vi, describe, test, expect, beforeAll, afterAll } from "vitest";
+import { vi, describe, test, expect, afterEach } from "vitest";
+import { beforeEach } from "vitest";
 
 function createApplicationRound({
   pk = 1,
@@ -35,12 +36,13 @@ function createApplicationRound({
   };
 }
 
-beforeAll(() => {
+beforeEach(() => {
   vi.useFakeTimers({
     now: new Date(2024, 0, 1, 0, 0, 0),
   });
 });
-afterAll(() => {
+afterEach(() => {
+  vi.runOnlyPendingTimers();
   vi.useRealTimers();
 });
 
