@@ -8,6 +8,7 @@ type MockReservationUnitInputs = {
   unitName: string;
   reservationUnitType?: string;
 };
+
 function createReservationUnit({
   name,
   unitName,

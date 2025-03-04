@@ -36,7 +36,7 @@ export const OptionalFilters = styled(ShowAllContainer)<ShowAllContainerProps>`
   }
 `;
 
-export const BottomContainer = styled(Flex).attrs({
+export const SearchButtonContainer = styled(Flex).attrs({
   $justifyContent: "space-between",
   $alignItems: "center",
   $marginTop: "m",

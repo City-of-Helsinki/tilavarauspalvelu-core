@@ -20,6 +20,7 @@ import {
   ReservationPurposeOrderingChoices,
   TermsOfUseDocument,
   type TermsOfUseQuery,
+  type ReservationTimesInReservationUnitQueryVariables,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
@@ -321,16 +322,17 @@ const otherMocks = [
 function createInIntervalQueryMock({ begin, end }: { begin: Date; end: Date }) {
   const beginDate = toApiDateUnsafe(begin);
   const endDate = toApiDateUnsafe(end);
+  const variables: ReservationTimesInReservationUnitQueryVariables = {
+    id: base64encode(`ReservationUnitNode:1`),
+    pk: 1,
+    beginDate,
+    endDate,
+    state: RELATED_RESERVATION_STATES,
+  };
   return {
     request: {
       query: ReservationTimesInReservationUnitDocument,
-      variables: {
-        id: base64encode(`ReservationUnitNode:1`),
-        pk: 1,
-        beginDate,
-        endDate,
-        state: RELATED_RESERVATION_STATES,
-      },
+      variables,
     },
     result: {
       data: createReservationsInIntervalResponse(),

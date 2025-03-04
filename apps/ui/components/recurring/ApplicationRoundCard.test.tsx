@@ -5,6 +5,7 @@ import {
 import { render } from "@testing-library/react";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
+import { getApplicationRoundPath } from "@/modules/urls";
 
 function createApplicationRoundCard({
   status,
@@ -36,57 +37,52 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe("ApplicationRoundCard", () => {
-  test("should render both links for open rounds", () => {
+describe("ApplicationRoundCard Open Round", () => {
+  test("should render both links", () => {
     const card = createApplicationRoundCard({
       name: "Test",
       status: ApplicationRoundStatusChoice.Open,
     });
     const view = render(<ApplicationRoundCard applicationRound={card} />);
-    // TODO check the link target
-    expect(
-      view.getByRole("link", {
-        name: "applicationRound:startNewApplication",
-      })
-    ).toBeInTheDocument();
-    // TODO check the link target
-    expect(
-      view.getByRole("link", { name: "applicationRound:card.criteria" })
-    ).toBeInTheDocument();
+    const startLink = view.getByRole("link", {
+      name: "applicationRound:startNewApplication",
+    });
+    expect(startLink).toBeInTheDocument();
+    expect(startLink).toHaveAttribute(
+      "href",
+      getApplicationRoundPath(1).replace(/\/+$/, "")
+    );
+    const criteriaLink = view.getByRole("link", {
+      name: "applicationRound:card.criteria",
+    });
+    expect(criteriaLink).toBeInTheDocument();
+    expect(criteriaLink).toHaveAttribute(
+      "href",
+      getApplicationRoundPath(1, "criteria")
+    );
   });
+});
 
+describe.for([
+  [ApplicationRoundStatusChoice.Handled],
+  [ApplicationRoundStatusChoice.Upcoming],
+  [ApplicationRoundStatusChoice.ResultsSent],
+  [ApplicationRoundStatusChoice.InAllocation],
+])("should not render start round for %s", ([status]) => {
   test("should not render start for invalid round status", () => {
-    const card = createApplicationRoundCard({ name: "Test" });
-    const view = render(<ApplicationRoundCard applicationRound={card} />);
-    expect(
-      view.queryByRole("link", {
-        name: "applicationRound:startNewApplication",
-      })
-    ).not.toBeInTheDocument();
-    // TODO check the link target
-    expect(
-      view.getByRole("link", { name: "applicationRound:card.criteria" })
-    ).toBeInTheDocument();
-  });
-
-  test.each([
-    [
-      ApplicationRoundStatusChoice.Handled,
-      ApplicationRoundStatusChoice.Upcoming,
-      ApplicationRoundStatusChoice.ResultsSent,
-      ApplicationRoundStatusChoice.InAllocation,
-    ],
-  ])("should not render start round for %s", (status) => {
     const card = createApplicationRoundCard({ name: "Test", status });
     const view = render(<ApplicationRoundCard applicationRound={card} />);
-    expect(
-      view.queryByRole("link", {
-        name: "applicationRound:startNewApplication",
-      })
-    ).not.toBeInTheDocument();
-    // TODO check the link target
-    expect(
-      view.getByRole("link", { name: "applicationRound:card.criteria" })
-    ).toBeInTheDocument();
+    const startLink = view.queryByRole("link", {
+      name: "applicationRound:startNewApplication",
+    });
+    expect(startLink).not.toBeInTheDocument();
+    const criteriaLink = view.getByRole("link", {
+      name: "applicationRound:card.criteria",
+    });
+    expect(criteriaLink).toBeInTheDocument();
+    expect(criteriaLink).toHaveAttribute(
+      "href",
+      getApplicationRoundPath(1, "criteria")
+    );
   });
 });

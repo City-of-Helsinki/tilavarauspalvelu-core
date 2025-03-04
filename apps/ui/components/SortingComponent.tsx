@@ -147,11 +147,13 @@ export function SortingComponent() {
           <IconSortAscending
             size={IconSize.Medium}
             aria-label={t("search:sorting.ascendingLabel")}
+            aria-hidden="false"
           />
         ) : (
           <IconSortDescending
             size={IconSize.Medium}
             aria-label={t("search:sorting.descendingLabel")}
+            aria-hidden="false"
           />
         )}
       </OrderBtn>
