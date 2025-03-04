@@ -11,7 +11,7 @@ from django.db.models.functions import Concat, Trim
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
-from lookup_property import lookup_property
+from lookup_property import L, lookup_property
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
@@ -358,6 +358,22 @@ class Reservation(SerializableMixin, models.Model):
             ),
             default=models.Value(False),  # noqa: FBT003
             output_field=models.BooleanField(),
+        )
+        return case  # noqa: RET504 type: ignore[return-value]
+
+    @lookup_property
+    def is_access_code_is_active_correct() -> bool:
+        """Does the reservation's access code's "is_active" state match what is expected for the reservation?"""
+        # We don't care about whether the access code is generated or not:
+        # 1. Not generated AND active -> Not possible
+        # 2. Not generated AND not active -> Reservation doesn't use an access code
+        # Otherwise, we should generate the access code if its are somehow missing.
+        case = models.Case(
+            models.When(
+                L(access_code_should_be_active=True),
+                then=models.Q(access_code_is_active=True),
+            ),
+            default=models.Q(access_code_is_active=False),
         )
         return case  # noqa: RET504 type: ignore[return-value]
 

@@ -5,7 +5,7 @@ from typing import Any, NamedTuple
 import pytest
 from graphene_django_extensions.testing.utils import parametrize_helper
 
-from tilavarauspalvelu.enums import CustomerTypeChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 
 from tests.factories import ReservationFactory
 
@@ -136,7 +136,7 @@ class Params(NamedTuple):
         ),
     })
 )
-def test__reservation__reservee_name(fields: dict[str, Any], result: str, settings):
+def test_reservation__reservee_name(fields: dict[str, Any], result: str):
     fields.setdefault("type", None)
     fields.setdefault("reservee_type", None)
     fields.setdefault("reservee_organisation_name", "")
@@ -148,3 +148,79 @@ def test__reservation__reservee_name(fields: dict[str, Any], result: str, settin
 
     reservation = ReservationFactory.build(**fields)
     assert reservation.reservee_name == result
+
+
+def test_reservation__access_code_should_be_active():
+    reservation = ReservationFactory.build(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+    assert reservation.access_code_should_be_active is True
+
+
+def test_reservation__access_code_should_be_active__not_access_code():
+    reservation = ReservationFactory.build(
+        access_type=AccessType.UNRESTRICTED,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+    assert reservation.access_code_should_be_active is False
+
+
+def test_reservation__access_code_should_be_active__blocked():
+    reservation = ReservationFactory.build(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+    )
+    assert reservation.access_code_should_be_active is False
+
+
+def test_reservation__access_code_should_be_active__not_confirmed():
+    reservation = ReservationFactory.build(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CREATED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+    assert reservation.access_code_should_be_active is False
+
+
+def test_reservation__is_access_code_is_active_correct__active_when_should_be():
+    reservation = ReservationFactory.build(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_code_is_active=True,
+    )
+    assert reservation.is_access_code_is_active_correct is True
+
+
+def test_reservation__is_access_code_is_active_correct__active_when_should_not_be():
+    reservation = ReservationFactory.build(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=True,
+    )
+    assert reservation.is_access_code_is_active_correct is False
+
+
+def test_reservation__is_access_code_is_active_correct__inactive_when_should_not_be():
+    reservation = ReservationFactory.build(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_code_is_active=False,
+    )
+    assert reservation.is_access_code_is_active_correct is False
+
+
+def test_reservation__is_access_code_is_active_correct__inactive_when_should_be():
+    reservation = ReservationFactory.build(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=False,
+    )
+    assert reservation.is_access_code_is_active_correct is True
