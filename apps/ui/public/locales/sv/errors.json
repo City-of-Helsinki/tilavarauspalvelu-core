@@ -47,6 +47,7 @@
       "APPLICATION_APPLICANT_TYPE_MISSING": "Sökandens typ saknas.",
       "APPLICATION_STATUS_CANNOT_SEND": "Ansökan kan inte skickas.",
       "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
+      "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "För lång bokningstid.",
       "invalid": "Ogiltigt värde.",
       "generic_validation_error": "Ett fel uppstod."
     }

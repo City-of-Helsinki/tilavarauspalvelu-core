@@ -47,6 +47,7 @@
       "APPLICATION_APPLICANT_TYPE_MISSING": "Hakijan tyyppi puuttuu.",
       "APPLICATION_STATUS_CANNOT_SEND": "Hakemusta ei voi lähettää.",
       "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
+      "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Liian pitkä varausaika.",
       "invalid": "Virheellinen arvo.",
       "generic_validation_error": "Tapahtui virhe."
     }
