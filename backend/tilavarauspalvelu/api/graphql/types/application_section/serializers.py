@@ -276,7 +276,7 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             .distinct()
         )
 
-        has_access_codes = cancellable_reservations.requires_active_access_code().exists()
+        has_access_code = cancellable_reservations.requires_active_access_code().exists()
 
         cancellable_reservations_count = cancellable_reservations.count()
         future_reservations_count = future_reservations.count()
@@ -296,11 +296,10 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
             EmailService.send_application_section_cancelled(application_section=self.instance)
             EmailService.send_staff_notification_application_section_cancelled(application_section=self.instance)
 
-            if has_access_codes:
-                # TODO: Only reschedule.
-                # Reschedule the reservation series to remove all cancelled reservations.
-                # This might remove leave an empty series, which is fine.
-                PindoraService.reschedule_access_code(obj=self.instance)
+            if has_access_code:
+                # Reschedule the seasonal booking to remove all cancelled reservations.
+                # This might remove leave behind empty series', which is fine.
+                PindoraService.reschedule_access_code(self.instance)
 
         return data
 
