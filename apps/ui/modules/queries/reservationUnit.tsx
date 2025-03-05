@@ -196,8 +196,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $textSearch: String
     $pk: [Int]
     $applicationRound: [Int]
-    $minPersons: Decimal
-    $maxPersons: Decimal
+    $personsAllowed: Decimal
     $unit: [Int]
     $reservationUnitType: [Int]
     $purposes: [Int]
@@ -223,10 +222,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
       textSearch: $textSearch
       pk: $pk
       applicationRound: $applicationRound
-      maxPersonsGte: $minPersons
-      minPersonsGte: $minPersons
-      maxPersonsLte: $maxPersons
-      minPersonsLte: $maxPersons
+      personsAllowed: $personsAllowed
       unit: $unit
       reservationUnitType: $reservationUnitType
       purposes: $purposes

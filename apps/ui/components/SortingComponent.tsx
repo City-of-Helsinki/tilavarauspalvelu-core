@@ -48,8 +48,6 @@ const Wrapper = styled(Flex).attrs({
   $justifyContent: "flex-end",
   $wrap: "wrap",
 })`
-  flex-grow: 1;
-
   padding: var(--spacing-xs);
   background-color: var(--color-black-5);
 

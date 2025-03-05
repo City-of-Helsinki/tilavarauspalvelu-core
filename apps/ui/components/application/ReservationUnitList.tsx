@@ -31,7 +31,6 @@ export type OptionTypes = {
   ageGroupOptions?: OptionType[];
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
-  participantCountOptions: OptionType[];
   unitOptions: OptionType[];
 };
 

@@ -7,22 +7,20 @@ import {
   ButtonVariant,
 } from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { participantCountOptions } from "@/modules/const";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { BottomContainer, Filters, StyledSubmitButton } from "../search/styled";
 import { mapParamToNumber } from "@/modules/search";
-import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
+import { ControlledNumberInput } from "common/src/components/form";
 import { toNumber } from "common/src/helpers";
 
 const filterOrder = [
   "applicationRound",
   "textSearch",
-  "minPersons",
-  "maxPersons",
+  "personsAllowed",
   "reservationUnitTypes",
   "unit",
   "purposes",
@@ -30,8 +28,7 @@ const filterOrder = [
 ] as const;
 
 type FormValues = {
-  minPersons: number | null;
-  maxPersons: number | null;
+  personsAllowed: number | null;
   unit: number[];
   reservationUnitTypes: number[];
   purposes: number[];
@@ -48,8 +45,7 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
       params.getAll("reservationUnitTypes"),
       1
     ),
-    minPersons: toNumber(params.get("minPersons")),
-    maxPersons: toNumber(params.get("maxPersons")),
+    personsAllowed: toNumber(params.get("personsAllowed")),
     textSearch: params.get("textSearch") ?? "",
     accessType: params.getAll("accessType"),
   };
@@ -130,27 +126,12 @@ export function SeasonalSearchForm({
             }
           }}
         />
-        {/* TODO this could be combined as a common search option */}
-        <SingleLabelInputGroup label={t("searchForm:participantCountCombined")}>
-          <ControlledSelect
-            name="minPersons"
-            control={control}
-            clearable
-            options={participantCountOptions}
-            label={`${t("searchForm:participantCountCombined")} ${t("common:minimum")}`}
-            placeholder={t("common:minimum")}
-            className="inputSm inputGroupStart"
-          />
-          <ControlledSelect
-            name="maxPersons"
-            control={control}
-            clearable
-            options={participantCountOptions}
-            label={`${t("searchForm:participantCountCombined")} ${t("common:maximum")}`}
-            placeholder={t("common:maximum")}
-            className="inputSm inputGroupEnd"
-          />
-        </SingleLabelInputGroup>
+        <ControlledNumberInput
+          label={t("searchForm:participantCountCombined")}
+          name="personsAllowed"
+          control={control}
+          min={1}
+        />
         <ControlledSelect
           multiselect
           enableSearch

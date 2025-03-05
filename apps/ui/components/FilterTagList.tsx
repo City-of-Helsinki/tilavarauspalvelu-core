@@ -45,7 +45,7 @@ export function FilterTagList({
   multiSelectFilters,
   hideList,
   translateTag,
-}: FilterTagProps) {
+}: Readonly<FilterTagProps>) {
   const { t } = useTranslation();
 
   const { handleRemoveTag, handleResetTags } = useSearchModify();
@@ -86,7 +86,7 @@ export function FilterTagList({
         const label = t(`searchForm:filters.${key}`, {
           label: key,
           value,
-          count: value.length,
+          count: Number(value),
         });
         // Still have the old string encoded values (key=v1,v2,v3) for backwards compatibility
         // but support the better array version (key=v1&key=v2&key=v3) for new code
