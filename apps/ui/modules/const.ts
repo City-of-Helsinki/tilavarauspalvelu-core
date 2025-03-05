@@ -9,10 +9,6 @@ export const ANALYTICS_COOKIE_GROUP_NAME = "statistics";
 
 export const SEARCH_PAGING_LIMIT = 36;
 
-export const participantCountOptions = [
-  1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200,
-].map((v) => ({ label: `${v}`, value: v }));
-
 type DurationOption = { label: string; value: number };
 function durationMinuteOptions(t: TFunction) {
   const durations: DurationOption[] = [];

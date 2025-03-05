@@ -4,10 +4,13 @@ import { Checkbox, IconSearch, LoadingSpinner, TextInput } from "hds-react";
 import { type SubmitHandler, useForm, Controller } from "react-hook-form";
 import styled from "styled-components";
 import { addYears, startOfDay } from "date-fns";
-import { TimeRangePicker } from "common/src/components/form";
+import {
+  ControlledNumberInput,
+  TimeRangePicker,
+} from "common/src/components/form";
 import { toUIDate } from "common/src/common/util";
 import { fromUIDate } from "@/modules/util";
-import { getDurationOptions, participantCountOptions } from "@/modules/const";
+import { getDurationOptions } from "@/modules/const";
 import { DateRangePicker } from "@/components/form";
 import { FilterTagList } from "../FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
@@ -45,8 +48,7 @@ type FormValues = {
   startDate: string | null;
   endDate: string | null;
   duration: number | null;
-  minPersons: number | null;
-  maxPersons: number | null;
+  personsAllowed: number | null;
   showOnlyReservable?: boolean;
   textSearch: string;
 };
@@ -71,8 +73,7 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
     startDate: params.get("startDate"),
     endDate: params.get("endDate"),
     duration,
-    minPersons: toNumber(params.get("minPersons")),
-    maxPersons: toNumber(params.get("maxPersons")),
+    personsAllowed: toNumber(params.get("personsAllowed")),
     showOnlyReservable,
     textSearch: params.get("textSearch") ?? "",
   };
@@ -86,8 +87,7 @@ const filterOrder = [
   "startDate",
   "endDate",
   "duration",
-  "minPersons",
-  "maxPersons",
+  "personsAllowed",
   "reservationUnitTypes",
   "unit",
   "purposes",
@@ -169,8 +169,7 @@ export function SingleSearchForm({
 
   const showOptionalFilters =
     formValues.reservationUnitTypes.length !== 0 ||
-    formValues.minPersons != null ||
-    formValues.maxPersons != null ||
+    formValues.personsAllowed != null ||
     formValues.textSearch !== "";
 
   return (
@@ -258,28 +257,12 @@ export function SingleSearchForm({
           data-testid="search-form__filters--optional"
           initiallyOpen={showOptionalFilters}
         >
-          <SingleLabelInputGroup
+          <ControlledNumberInput
             label={t("searchForm:participantCountCombined")}
-          >
-            <ControlledSelect
-              name="minPersons"
-              control={control}
-              options={participantCountOptions}
-              clearable
-              label={`${t("searchForm:participantCountCombined")} ${t("common:minimum")}`}
-              placeholder={t("common:minimum")}
-              className="inputSm inputGroupStart"
-            />
-            <ControlledSelect
-              name="maxPersons"
-              control={control}
-              options={participantCountOptions}
-              clearable
-              label={`${t("searchForm:participantCountCombined")} ${t("common:maximum")}`}
-              placeholder={t("common:maximum")}
-              className="inputSm inputGroupEnd"
-            />
-          </SingleLabelInputGroup>
+            name="personsAllowed"
+            control={control}
+            min={1}
+          />
           <ControlledSelect
             name="reservationUnitTypes"
             multiselect
