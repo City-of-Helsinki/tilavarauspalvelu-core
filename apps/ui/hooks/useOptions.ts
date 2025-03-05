@@ -7,7 +7,6 @@ import {
   ReservationUnitTypeOrderingChoices,
   useOptionsQuery,
 } from "@gql/gql-types";
-import { participantCountOptions } from "@/modules/const";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { getParameterLabel } from "@/modules/util";
 
@@ -190,7 +189,6 @@ export function useOptions() {
     cityOptions,
     purposeOptions,
     reservationUnitTypeOptions,
-    participantCountOptions,
   };
 
   const params = {
