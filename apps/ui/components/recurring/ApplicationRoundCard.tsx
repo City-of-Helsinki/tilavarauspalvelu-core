@@ -13,6 +13,7 @@ import { getApplicationRoundPath } from "@/modules/urls";
 import {
   convertLanguageCode,
   getTranslationSafe,
+  toUIDate,
 } from "common/src/common/util";
 import { gql } from "@apollo/client";
 
@@ -49,7 +50,7 @@ function translateRoundDate(
 
 export function ApplicationRoundCard({
   applicationRound,
-}: CardProps): JSX.Element {
+}: Readonly<CardProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
@@ -57,8 +58,8 @@ export function ApplicationRoundCard({
   const timeString = translateRoundDate(t, applicationRound);
   const begin = new Date(applicationRound.reservationPeriodBegin);
   const end = new Date(applicationRound.reservationPeriodEnd);
-  const reservationPeriodBegin = formatDateTime(t, begin);
-  const reservationPeriodEnd = formatDateTime(t, end);
+  const reservationPeriodBegin = toUIDate(begin);
+  const reservationPeriodEnd = toUIDate(end);
 
   const reservationPeriod = t(`applicationRound:card.reservationPeriod`, {
     reservationPeriodBegin,
