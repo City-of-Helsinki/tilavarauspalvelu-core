@@ -4054,7 +4054,7 @@ msgid "reservations"
 msgstr "varaukset"
 
 #: tilavarauspalvelu/models/reservation/model.py
-msgid "Reservation cannot be have active access code if one is not generated"
+msgid "Reservation cannot have active access code if one is not generated"
 msgstr "Varauksella ei voi olla aktiivista ovikoodia jota ei ole luotu"
 
 #: tilavarauspalvelu/models/reservation/model.py
