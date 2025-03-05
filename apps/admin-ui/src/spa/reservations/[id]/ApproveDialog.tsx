@@ -171,18 +171,18 @@ const DialogContent = ({
       </Dialog.Content>
       <ActionButtons>
         <Button
-          variant={ButtonVariant.Secondary}
-          onClick={onClose}
-          data-testid="approval-dialog__cancel-button"
-        >
-          {t("common.cancel")}
-        </Button>
-        <Button
           disabled={!priceIsValid}
           onClick={handleApprove}
           data-testid="approval-dialog__accept-button"
         >
           {t("RequestedReservation.ApproveDialog.accept")}
+        </Button>
+        <Button
+          variant={ButtonVariant.Secondary}
+          onClick={onClose}
+          data-testid="approval-dialog__cancel-button"
+        >
+          {t("common.cancel")}
         </Button>
       </ActionButtons>
     </>

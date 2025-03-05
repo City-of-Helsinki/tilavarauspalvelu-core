@@ -60,11 +60,11 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
         <p id="modal-description" className="text-body" />
       </Dialog.Content>
       <Dialog.ActionButtons>
-        <Button variant={ButtonVariant.Secondary} onClick={onClose}>
-          {t("common.prev")}
-        </Button>
         <Button onClick={handleClick}>
           {t("RequestedReservation.ReturnToRequiresHandlingDialog.accept")}
+        </Button>
+        <Button variant={ButtonVariant.Secondary} onClick={onClose}>
+          {t("common.prev")}
         </Button>
       </Dialog.ActionButtons>
     </>

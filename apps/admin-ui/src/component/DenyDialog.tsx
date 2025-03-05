@@ -214,18 +214,18 @@ function DialogContent({ reservation, onClose, onReject }: Props): JSX.Element {
       </Dialog.Content>
       <ActionButtons>
         <Button
-          variant={ButtonVariant.Secondary}
-          onClick={onClose}
-          data-testid="deny-dialog__cancel-button"
-        >
-          {t("common.prev")}
-        </Button>
-        <Button
           disabled={!denyReasonPk || returnState === "not-decided"}
           onClick={handleDeny}
           data-testid="deny-dialog__deny-button"
         >
           {t("RequestedReservation.DenyDialog.reject")}
+        </Button>
+        <Button
+          variant={ButtonVariant.Secondary}
+          onClick={onClose}
+          data-testid="deny-dialog__cancel-button"
+        >
+          {t("common.prev")}
         </Button>
       </ActionButtons>
     </>

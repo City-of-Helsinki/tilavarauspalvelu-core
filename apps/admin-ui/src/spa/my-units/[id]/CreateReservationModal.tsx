@@ -190,14 +190,6 @@ function ActionContainer({
     <ActionButtons>
       <CollisionWarning form={form} reservationUnit={reservationUnit} />
       <Button
-        size={ButtonSize.Small}
-        variant={ButtonVariant.Secondary}
-        onClick={onCancel}
-        data-testid="CreateReservationModal__cancel-reservation"
-      >
-        {t("common.cancel")}
-      </Button>
-      <Button
         type="button"
         size={ButtonSize.Small}
         disabled={isDisabled}
@@ -207,6 +199,14 @@ function ActionContainer({
         data-testid="CreateReservationModal__accept-reservation"
       >
         {t("ReservationDialog.accept")}
+      </Button>
+      <Button
+        size={ButtonSize.Small}
+        variant={ButtonVariant.Secondary}
+        onClick={onCancel}
+        data-testid="CreateReservationModal__cancel-reservation"
+      >
+        {t("common.cancel")}
       </Button>
     </ActionButtons>
   );

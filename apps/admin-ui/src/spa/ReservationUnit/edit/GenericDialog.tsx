@@ -29,10 +29,10 @@ function DialogContent({
         </p>
       </Dialog.Content>
       <ActionButtons>
+        <Button onClick={onAccept}>{acceptLabel}</Button>
         <Button variant={ButtonVariant.Secondary} onClick={onClose}>
           {t("common.cancel")}
         </Button>
-        <Button onClick={onAccept}>{acceptLabel}</Button>
       </ActionButtons>
     </>
   );
