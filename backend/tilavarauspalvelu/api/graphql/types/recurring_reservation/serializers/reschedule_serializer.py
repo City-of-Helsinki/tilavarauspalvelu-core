@@ -159,7 +159,8 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             try:
                 PindoraService.reschedule_access_code(instance)
             except PindoraNotFoundError:
-                PindoraService.create_access_code(instance, is_active=True)
+                if has_access_codes:
+                    PindoraService.create_access_code(instance, is_active=True)
 
         return instance
 
