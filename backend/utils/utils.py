@@ -31,12 +31,14 @@ if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
     from types import FrameType
 
+    from django.db import models
     from django.http import HttpRequest
 
     from tilavarauspalvelu.typing import AnyUser, Lang, TextSearchLang
 
 __all__ = [
     "LazyModelAttribute",
+    "LazyModelManager",
     "comma_sep_str",
     "get_text_search_language",
     "only_django_validation_errors",
@@ -414,3 +416,41 @@ class LazyModelAttribute:
             module_name = ".".join(module_parts) + module_name
 
         return module_name
+
+
+class LazyModelManager(LazyModelAttribute):
+    """
+    Like `LazyModelAttribute`, but for lazily evaluating a model's manager.
+
+    Example:
+
+    >>> from typing import TYPE_CHECKING, ClassVar
+    >>>
+    >>> from django.db import models
+    >>>
+    >>> if TYPE_CHECKING:
+    ...     from .queryset import MyModelManager  # type: ignore
+    >>>
+    >>> class MyModel(models.Model):
+    ...     objects: ClassVar[MyModelManager] = LazyModelManager()
+    """
+
+    def __get__(self, instance: models.Model | None, model: type[models.Model] | None) -> Any:
+        # Copy some validation from 'django.db.models.manager.ManagerDescriptor'
+        if instance is not None:
+            msg = f"Manager isn't accessible via {model.__name__!r} instances"
+            raise AttributeError(msg)
+
+        if model._meta.abstract:
+            msg = f"Manager isn't available; {model._meta.object_name!r} is abstract"
+            raise AttributeError(msg)
+
+        if model._meta.swapped:
+            msg = f"Manager isn't available; {model._meta.label!r} has been swapped for {model._meta.swapped}!r"
+            raise AttributeError(msg)
+
+        return self.get_class()
+
+    def get_type_hint(self, frame: FrameType, source_code: list[str]) -> str:
+        type_hint = super().get_type_hint(frame, source_code)
+        return type_hint.replace("ClassVar[", "").replace("]", "")
