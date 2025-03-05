@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -12,7 +11,6 @@ from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import RecurringReservation, ReservationDenyReason
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from utils.date_utils import local_datetime
@@ -80,8 +78,9 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
         EmailService.send_seasonal_reservation_rejected_series_email(reservation_series=instance)
 
         if has_access_code:
-            with suppress(PindoraNotFoundError):
-                PindoraService.delete_access_code(instance)
+            # Reschedule the reservation series to remove all denied reservations.
+            # This might remove leave an empty series, which is fine.
+            PindoraService.reschedule_access_code(instance)
 
         return instance
 

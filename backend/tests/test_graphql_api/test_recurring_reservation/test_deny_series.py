@@ -117,7 +117,7 @@ def test_recurring_reservations__deny_series__only_deny_certain_states(graphql):
     assert response.first_query_object == {"denied": 4, "future": 5}
 
 
-@patch_method(PindoraService.delete_access_code)
+@patch_method(PindoraService.reschedule_access_code)
 @patch_method(EmailService.send_seasonal_reservation_rejected_series_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__deny_series__has_access_codes(graphql):
@@ -139,4 +139,4 @@ def test_recurring_reservations__deny_series__has_access_codes(graphql):
     assert response.has_errors is False, response.errors
 
     assert EmailService.send_seasonal_reservation_rejected_series_email.called is True
-    assert PindoraService.delete_access_code.called is True
+    assert PindoraService.reschedule_access_code.called is True
