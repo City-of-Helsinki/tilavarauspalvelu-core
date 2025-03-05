@@ -295,15 +295,15 @@ function DialogContent({
           </Notification>
         )}
         <ActionButtons>
+          <Button disabled={isDisabled} type="submit">
+            {t(`${translateKey}.acceptBtn`)}
+          </Button>
           <Button
             size={ButtonSize.Small}
             variant={ButtonVariant.Secondary}
             onClick={onClose}
           >
             {t("common.cancel")}
-          </Button>
-          <Button disabled={isDisabled} type="submit">
-            {t(`${translateKey}.acceptBtn`)}
           </Button>
         </ActionButtons>
       </StyledForm>

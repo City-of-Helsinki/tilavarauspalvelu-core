@@ -53,9 +53,6 @@ export function ConfirmationDialog(props: Props): JSX.Element | null {
         {content || t("confirm.text")}
       </Dialog.Content>
       <Dialog.ActionButtons>
-        <Button variant={ButtonVariant.Secondary} onClick={() => onCancel?.()}>
-          {cancelLabel || t("common.cancel")}
-        </Button>
         <Button
           variant={
             variant === "danger" ? ButtonVariant.Danger : ButtonVariant.Primary
@@ -64,6 +61,9 @@ export function ConfirmationDialog(props: Props): JSX.Element | null {
           iconStart={acceptIcon}
         >
           {acceptLabel || t("common.approve")}
+        </Button>
+        <Button variant={ButtonVariant.Secondary} onClick={() => onCancel?.()}>
+          {cancelLabel || t("common.cancel")}
         </Button>
       </Dialog.ActionButtons>
     </Dialog>
