@@ -31,7 +31,6 @@ export type OptionTypes = {
   ageGroupOptions?: OptionType[];
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
-  participantCountOptions: OptionType[];
   unitOptions: OptionType[];
 };
 
@@ -49,7 +48,7 @@ export function ReservationUnitList({
   applicationRound,
   options,
   minSize,
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
 
