@@ -15,7 +15,7 @@ from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, WeekdayChoice
 from utils.db import SubqueryArray
-from utils.utils import LazyValidator
+from utils.utils import LazyModelAttribute
 
 from .queryset import RecurringReservationManager
 
@@ -120,7 +120,7 @@ class RecurringReservation(models.Model):
 
         return RecurringReservationActions(self)
 
-    validator: ReservationSeriesValidator = LazyValidator()
+    validator: ReservationSeriesValidator = LazyModelAttribute()
 
     @lookup_property(skip_codegen=True)
     def should_have_active_access_code() -> bool:

@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import AnyUser, Lang, TextSearchLang
 
 __all__ = [
-    "LazyValidator",
+    "LazyModelAttribute",
     "comma_sep_str",
     "get_text_search_language",
     "only_django_validation_errors",
@@ -318,47 +318,40 @@ def only_drf_validation_errors() -> Generator[None]:
         raise ValidationError(detail=str(error)) from error
 
 
-class LazyValidator:
+class LazyModelAttribute:
     """
-    Descriptor for accessing a Model's validator class lazily on the class or instance level.
-    Lazily evaluating the validator mitigates issues with cyclical imports that may happen
-    if validation requires importing other models for the validation logic.
+    Descriptor for accessing an attribute on a Model lazily based on a type hint.
 
-    Usage:
+    Example:
 
     >>> from typing import TYPE_CHECKING
     >>>
+    >>> from django.db import models
+    >>>
     >>> if TYPE_CHECKING:
-    ...     from .validators import MyModelValidator
+    ...     from .validators import MyModelValidator  # type: ignore
     >>>
     >>> class MyModel(models.Model):
-    ...     validator: MyModelValidator = LazyValidator()
+    ...     validators: MyModelValidator = LazyModelAttribute()
 
-    Using the specific validator as a type hint is required and should be imported
-    in a `TYPE_CHECKING` block, just as written in the example above.
+    Here 'MyModelValidator' is a class that includes validation logic for the model.
+    It takes a single argument, which is the model instance begin validated,
+    which is the interface required for this descriptor.
 
-    This descriptor works because of the specific structure in this project:
-    1. Model needs to be in a module inside a package.
-    2. Validator needs to be in a module named "validators" inside the same package.
-    3. Validator takes a single argument, which is the model instance begin validated.
+    This descriptor is needed because 'MyModelValidator' contains imports from
+    other models, so importing it directly to the module might cause cyclical imports.
+    That's why it is imported in a 'TYPE_CHECKING' block and only added as a type hint
+    for the 'LazyModelAttribute', which can then lazily import the validator when it is first accessed.
 
-    For validators for updating or deleting existing instances of the model, define (regular) methods
-    on the validator class, and use the validator through an instance of the Model class.
+    'LazyModelAttribute' differs from properties by also allowing class-level access. Accessing the
+    attribute on the class level will return the hinted class itself, which in the validator example will
+    allow create validation using classmethods.
 
-    >>> MyModel().validator.validate_can_update()
+    Due to limitations of the Python typing system, the returned type on the class-level will be
+    an instance of the typed class, but the actual return value is the hinted class itself.
 
-    For validators for creating new instances of the model, define classmethods on the validator class,
-    and use the validator through the Model class itself.
-
-    >>> MyModel.validator.validate_can_create()
-
-    Due to limitations of the Python typing system, the returned type of `.validator` in this case will be
-    an instance of the validator class, but the actual return value is the validator class itself.
-    Developers should only use the appropriate validation methods (class/regular) depending on
-    which type of validation they are performing (create/update/delete).
-
-    This approach is used instead of a more conventional decorator-descriptor approach because
-    some type checkers (PyCharm in particular) do not infer types from descriptor-decorators
+    This approach is used instead of a more conventional 'decorator-descriptor' approach because
+    some type checkers (PyCharm in particular) do not infer types from 'decorator-descriptors'
     correctly (at least when this was written).
     """
 
@@ -368,14 +361,11 @@ class LazyValidator:
         # Note that the class attribute should be defined on a single line for this to work.
         frame: FrameType = sys._getframe(1)  # noqa: SLF001
         source_code = inspect.findsource(frame)[0]
-        line = source_code[frame.f_lineno - 1]
-        definition = line.split("=", maxsplit=1)[0]
 
-        module: str = frame.f_locals["__module__"]
-        package: str = module.rsplit(".", maxsplit=1)[0]
-        class_name = definition.split(":", maxsplit=1)[1].strip()
+        type_hint = self.get_type_hint(frame, source_code)
+        module_name = self.get_type_hint_module_name(type_hint, frame, source_code)
 
-        self.path = f"{package}.validators.{class_name}"
+        self.path = f"{module_name}.{type_hint}"
 
     def __get__(self, instance: Any | None, owner: type[Any]) -> Any:
         if instance is None:
@@ -385,3 +375,42 @@ class LazyValidator:
     @cached_property
     def get_class(self) -> type:
         return import_string(self.path)
+
+    def get_type_hint(self, frame: FrameType, source_code: list[str]) -> str:
+        """Get the type hint for the attribute this descriptor defined for."""
+        current_line = source_code[frame.f_lineno - 1]
+        definition = current_line.split("=", maxsplit=1)[0]
+        return definition.split(":", maxsplit=1)[1].strip()
+
+    def get_type_hint_module_name(self, type_hint: str, frame: FrameType, source_code: list[str]) -> str:
+        """
+        Go through the source code for the caller frame to find the line where the type hint
+        is imported. Note that the import should be defined on a single line for this to work.
+        """
+        module_name: str | None = None
+        for line in source_code:
+            if type_hint in line and "import" in line:
+                module_name = line.strip().removeprefix("from").split("import")[0].strip()
+                break
+
+        if module_name is None:
+            msg = (
+                f"Unable to find import path for {type_hint!r}. "
+                f"Make sure import for the attribute's type hint is defined on a single line."
+            )
+            raise RuntimeError(msg)
+
+        # Handle relative imports
+        if module_name.startswith("."):
+            caller_module: str = frame.f_locals["__module__"]
+
+            # Remove number parts in the caller module equal to the number of relative "dots" in the import
+            module_parts = caller_module.split(".")
+            for part in module_name.split("."):
+                if part:
+                    break
+                module_parts.pop()
+
+            module_name = ".".join(module_parts) + module_name
+
+        return module_name

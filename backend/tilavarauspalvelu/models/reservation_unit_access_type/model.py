@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from lookup_property import lookup_property
 
 from tilavarauspalvelu.enums import AccessType
-from utils.utils import LazyValidator
+from utils.utils import LazyModelAttribute
 
 from .queryset import ReservationUnitAccessTypeManager
 
@@ -67,7 +67,7 @@ class ReservationUnitAccessType(models.Model):
 
         return ReservationUnitAccessTypeActions(self)
 
-    validator: ReservationUnitAccessTypeValidator = LazyValidator()
+    validator: ReservationUnitAccessTypeValidator = LazyModelAttribute()
 
     @lookup_property(skip_codegen=True)
     def end_date() -> datetime.date:
