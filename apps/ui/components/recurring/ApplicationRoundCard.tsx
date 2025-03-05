@@ -13,6 +13,7 @@ import { getApplicationRoundPath } from "@/modules/urls";
 import {
   convertLanguageCode,
   getTranslationSafe,
+  toUIDate,
 } from "common/src/common/util";
 
 interface CardProps {
@@ -48,7 +49,7 @@ function translateRoundDate(
 
 export function ApplicationRoundCard({
   applicationRound,
-}: CardProps): JSX.Element {
+}: Readonly<CardProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
 
@@ -56,13 +57,10 @@ export function ApplicationRoundCard({
   const name = getTranslationSafe(applicationRound, "name", lang);
   const timeString = translateRoundDate(t, applicationRound);
   const reservationPeriod = t(`applicationRound:card.reservationPeriod`, {
-    // TODO check if time is needed
-    reservationPeriodBegin: formatDateTime(
-      t,
+    reservationPeriodBegin: toUIDate(
       new Date(applicationRound.reservationPeriodBegin)
     ),
-    reservationPeriodEnd: formatDateTime(
-      t,
+    reservationPeriodEnd: toUIDate(
       new Date(applicationRound.reservationPeriodEnd)
     ),
   });
