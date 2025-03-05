@@ -6909,8 +6909,7 @@ export type SearchReservationUnitsQueryVariables = Exact<{
     | Array<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
-  minPersons?: InputMaybe<Scalars["Decimal"]["input"]>;
-  maxPersons?: InputMaybe<Scalars["Decimal"]["input"]>;
+  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
   unit?: InputMaybe<
     | Array<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
@@ -11402,8 +11401,7 @@ export const SearchReservationUnitsDocument = gql`
     $textSearch: String
     $pk: [Int]
     $applicationRound: [Int]
-    $minPersons: Decimal
-    $maxPersons: Decimal
+    $personsAllowed: Decimal
     $unit: [Int]
     $reservationUnitType: [Int]
     $purposes: [Int]
@@ -11426,10 +11424,7 @@ export const SearchReservationUnitsDocument = gql`
       textSearch: $textSearch
       pk: $pk
       applicationRound: $applicationRound
-      maxPersonsGte: $minPersons
-      minPersonsGte: $minPersons
-      maxPersonsLte: $maxPersons
-      minPersonsLte: $maxPersons
+      personsAllowed: $personsAllowed
       unit: $unit
       reservationUnitType: $reservationUnitType
       purposes: $purposes
@@ -11487,8 +11482,7 @@ export const SearchReservationUnitsDocument = gql`
  *      textSearch: // value for 'textSearch'
  *      pk: // value for 'pk'
  *      applicationRound: // value for 'applicationRound'
- *      minPersons: // value for 'minPersons'
- *      maxPersons: // value for 'maxPersons'
+ *      personsAllowed: // value for 'personsAllowed'
  *      unit: // value for 'unit'
  *      reservationUnitType: // value for 'reservationUnitType'
  *      purposes: // value for 'purposes'

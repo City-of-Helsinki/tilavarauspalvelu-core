@@ -61,7 +61,6 @@ function ApplicationEventInner({
     ageGroupOptions,
     purposeOptions,
     reservationUnitTypeOptions,
-    participantCountOptions,
     unitOptions,
   } = optionTypes;
 
@@ -154,7 +153,6 @@ function ApplicationEventInner({
         options={{
           purposeOptions,
           reservationUnitTypeOptions,
-          participantCountOptions,
           unitOptions,
         }}
       />

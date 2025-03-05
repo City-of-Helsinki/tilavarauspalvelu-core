@@ -32,7 +32,10 @@ import { getReservationUnitPath } from "@/modules/urls";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
 import { useForm } from "react-hook-form";
-import { ControlledSelect } from "common/src/components/form";
+import {
+  ControlledNumberInput,
+  ControlledSelect,
+} from "common/src/components/form";
 
 const ImageSizeWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -138,7 +141,6 @@ type OptionType = {
 type OptionsType = {
   purposeOptions: OptionType[];
   reservationUnitTypeOptions: OptionType[];
-  participantCountOptions: OptionType[];
   unitOptions: OptionType[];
 };
 
@@ -146,7 +148,7 @@ type SearchFormValues = {
   searchTerm?: string;
   reservationUnitType?: number;
   unit?: number;
-  minPersons?: number;
+  personsAllowed?: number;
 };
 
 export function ReservationUnitModalContent({
@@ -155,18 +157,17 @@ export function ReservationUnitModalContent({
   handleRemove,
   currentReservationUnits,
   options,
-}: {
+}: Readonly<{
   applicationRound: AppRoundNode;
   handleAdd: (ru: ReservationUnitType) => void;
   handleRemove: (ru: ReservationUnitType) => void;
   currentReservationUnits: Pick<ReservationUnitType, "pk">[];
   options: OptionsType;
-}): JSX.Element {
+}>): JSX.Element {
   const { t } = useTranslation();
   const form = useForm<SearchFormValues>();
   const { control, watch, setValue } = form;
-  const { unitOptions, participantCountOptions, reservationUnitTypeOptions } =
-    options;
+  const { unitOptions, reservationUnitTypeOptions } = options;
 
   const reservationUnitType = watch("reservationUnitType");
   const unit = watch("unit");
@@ -175,7 +176,7 @@ export function ReservationUnitModalContent({
     variables: {
       applicationRound: [applicationRound.pk ?? 0],
       textSearch: watch("searchTerm"),
-      minPersons: watch("minPersons")?.toString(),
+      personsAllowed: watch("personsAllowed")?.toString(),
       reservationUnitType:
         reservationUnitType != null ? [reservationUnitType] : [],
       unit: unit != null ? [unit] : [],
@@ -209,12 +210,11 @@ export function ReservationUnitModalContent({
           options={reservationUnitTypeOptions}
           label={t("reservationUnitModal:searchReservationUnitTypeLabel")}
         />
-        <ControlledSelect
-          name="minPersons"
+        <ControlledNumberInput
+          name="personsAllowed"
           control={control}
-          clearable
-          label={t("searchForm:participantCountLabel")}
-          options={participantCountOptions}
+          min={1}
+          label={t("reservationUnitModal:searchPersonsAllowedLabel")}
         />
         <ControlledSelect
           name="unit"

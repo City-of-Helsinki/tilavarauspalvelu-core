@@ -7,7 +7,6 @@ import {
   ButtonVariant,
 } from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { participantCountOptions } from "@/modules/const";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { FilterTagList } from "./FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
@@ -17,23 +16,21 @@ import {
   mapQueryParamToNumberArray,
   mapSingleParamToFormValue,
 } from "@/modules/search";
-import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { type URLSearchParams } from "node:url";
 import { useSearchParams } from "next/navigation";
+import { ControlledNumberInput } from "common/src/components/form";
 
 const filterOrder = [
   "applicationRound",
   "textSearch",
-  "minPersons",
-  "maxPersons",
+  "personsAllowed",
   "reservationUnitTypes",
   "unit",
   "purposes",
 ] as const;
 
 type FormValues = {
-  minPersons: number | null;
-  maxPersons: number | null;
+  personsAllowed: number | null;
   unit: number[];
   reservationUnitTypes: number[];
   purposes: number[];
@@ -48,8 +45,7 @@ function mapQueryToForm(query: URLSearchParams): FormValues {
     reservationUnitTypes: mapQueryParamToNumberArray(
       query.getAll("reservationUnitTypes")
     ),
-    minPersons: mapQueryParamToNumber(query.getAll("minPersons")),
-    maxPersons: mapQueryParamToNumber(query.getAll("maxPersons")),
+    personsAllowed: mapQueryParamToNumber(query.getAll("personsAllowed")),
     textSearch: mapSingleParamToFormValue(query.getAll("textSearch")) ?? "",
   };
 }
@@ -60,12 +56,12 @@ export function SeasonalSearchForm({
   purposeOptions,
   unitOptions,
   isLoading,
-}: {
+}: Readonly<{
   reservationUnitTypeOptions: OptionType[];
   purposeOptions: OptionType[];
   unitOptions: OptionType[];
   isLoading: boolean;
-}): JSX.Element | null {
+}>): JSX.Element | null {
   const { t } = useTranslation();
 
   const { handleSearch } = useSearchModify();
@@ -120,27 +116,12 @@ export function SeasonalSearchForm({
             }
           }}
         />
-        {/* TODO this could be combined as a common search option */}
-        <SingleLabelInputGroup label={t("searchForm:participantCountCombined")}>
-          <ControlledSelect
-            name="minPersons"
-            control={control}
-            clearable
-            options={participantCountOptions}
-            label={`${t("searchForm:participantCountCombined")} ${t("common:minimum")}`}
-            placeholder={t("common:minimum")}
-            className="inputSm inputGroupStart"
-          />
-          <ControlledSelect
-            name="maxPersons"
-            control={control}
-            clearable
-            options={participantCountOptions}
-            label={`${t("searchForm:participantCountCombined")} ${t("common:maximum")}`}
-            placeholder={t("common:maximum")}
-            className="inputSm inputGroupEnd"
-          />
-        </SingleLabelInputGroup>
+        <ControlledNumberInput
+          label={t("searchForm:participantCountCombined")}
+          name="personsAllowed"
+          control={control}
+          min={1}
+        />
         <ControlledSelect
           multiselect
           enableSearch

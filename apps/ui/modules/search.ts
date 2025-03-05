@@ -165,8 +165,7 @@ export function processVariables({
   const duration = dur != null && dur > 0 ? dur : null;
   const isSeasonal = kind === ReservationKind.Season;
   const textSearch = ignoreMaybeArray(values.getAll("textSearch"));
-  const minPersons = toNumber(ignoreMaybeArray(values.getAll("minPersons")));
-  const maxPersons = toNumber(ignoreMaybeArray(values.getAll("maxPersons")));
+  const personsAllowed = ignoreMaybeArray(values.getAll("personsAllowed"));
   const purposes = paramToIntegers(values.getAll("purposes"));
   const unit = paramToIntegers(values.getAll("unit"));
   const reservationUnitTypes = paramToIntegers(
@@ -185,16 +184,7 @@ export function processVariables({
           textSearch,
         }
       : {}),
-    ...(minPersons != null && minPersons >= 0
-      ? {
-          minPersons,
-        }
-      : {}),
-    ...(maxPersons != null && maxPersons >= 0
-      ? {
-          maxPersons,
-        }
-      : {}),
+    personsAllowed,
     purposes,
     unit,
     reservationUnitType: reservationUnitTypes,
