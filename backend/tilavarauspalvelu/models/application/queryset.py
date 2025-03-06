@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, Literal, Self
 
+from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 from django.db.models import Subquery
@@ -10,6 +12,7 @@ from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
+from utils.date_utils import local_date
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Application
@@ -122,6 +125,14 @@ class ApplicationQuerySet(models.QuerySet):
             results_ready_notification_sent_date__isnull=True,
             application_sections__isnull=False,
         )
+
+    def delete_expired_applications(self) -> None:
+        cutoff_date = local_date() - datetime.timedelta(days=settings.REMOVE_EXPIRED_APPLICATIONS_OLDER_THAN_DAYS)
+        self.filter(
+            L(status__in=[ApplicationStatusChoice.EXPIRED, ApplicationStatusChoice.CANCELLED])
+            & L(application_round__status=ApplicationRoundStatusChoice.RESULTS_SENT)
+            & models.Q(application_round__application_period_end__lte=cutoff_date)
+        ).delete()
 
 
 class ApplicationManager(SerializableMixin.SerializableManager.from_queryset(ApplicationQuerySet)):

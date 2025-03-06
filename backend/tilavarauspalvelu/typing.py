@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass
 from decimal import Decimal
+from itertools import chain
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, NotRequired, Protocol, TypedDict
 
 from django.contrib.auth.models import AnonymousUser
@@ -11,6 +13,7 @@ from rest_framework.exceptions import ValidationError
 
 if TYPE_CHECKING:
     import datetime
+    from collections.abc import Iterable
 
     from django.contrib.sessions.backends.cache import SessionStore
 
@@ -20,6 +23,7 @@ if TYPE_CHECKING:
         PaymentType,
         ReservationStateChoice,
         ReservationTypeChoice,
+        ReservationTypeStaffChoice,
     )
     from tilavarauspalvelu.models import (
         AgeGroup,
@@ -401,3 +405,87 @@ class PindoraSectionInfoData(NamedTuple):
     access_code_sms_message: str
 
     access_code_validity: list[PindoraValidityInfoData]
+
+
+class ReservationPeriod(TypedDict):
+    begin: datetime.datetime
+    end: datetime.datetime
+
+
+@dataclasses.dataclass
+class ReservationSeriesCalculationResults:
+    non_overlapping: list[ReservationPeriod] = dataclasses.field(default_factory=list)
+    overlapping: list[ReservationPeriod] = dataclasses.field(default_factory=list)
+    not_reservable: list[ReservationPeriod] = dataclasses.field(default_factory=list)
+    invalid_start_interval: list[ReservationPeriod] = dataclasses.field(default_factory=list)
+
+    def as_json(self, periods: list[ReservationPeriod]) -> list[dict[str, Any]]:
+        return [
+            {
+                "begin": period["begin"].isoformat(timespec="seconds"),
+                "end": period["end"].isoformat(timespec="seconds"),
+            }
+            for period in periods
+        ]
+
+    @property
+    def overlapping_json(self) -> list[dict[str, Any]]:
+        return self.as_json(self.overlapping)
+
+    @property
+    def not_reservable_json(self) -> list[dict[str, Any]]:
+        return self.as_json(self.not_reservable)
+
+    @property
+    def invalid_start_interval_json(self) -> list[dict[str, Any]]:
+        return self.as_json(self.invalid_start_interval)
+
+    @property
+    def possible(self) -> Iterable[ReservationPeriod]:
+        return self.non_overlapping
+
+    @property
+    def not_possible(self) -> Iterable[ReservationPeriod]:
+        return chain(self.overlapping, self.not_reservable, self.invalid_start_interval)
+
+
+class ReservationDetails(TypedDict, total=False):
+    name: str
+    description: str
+    num_persons: int
+    state: ReservationStateChoice
+    type: ReservationTypeChoice | ReservationTypeStaffChoice
+    working_memo: str
+
+    buffer_time_before: datetime.timedelta
+    buffer_time_after: datetime.timedelta
+    handled_at: datetime.datetime
+    confirmed_at: datetime.datetime
+
+    applying_for_free_of_charge: bool
+    free_of_charge_reason: bool
+
+    reservee_id: str
+    reservee_first_name: str
+    reservee_last_name: str
+    reservee_email: str
+    reservee_phone: str
+    reservee_organisation_name: str
+    reservee_address_street: str
+    reservee_address_city: str
+    reservee_address_zip: str
+    reservee_is_unregistered_association: bool
+    reservee_type: CustomerTypeChoice
+
+    billing_first_name: str
+    billing_last_name: str
+    billing_email: str
+    billing_phone: str
+    billing_address_street: str
+    billing_address_city: str
+    billing_address_zip: str
+
+    user: int | User
+    purpose: int | ReservationPurpose
+    home_city: int | City
+    age_group: int | AgeGroup

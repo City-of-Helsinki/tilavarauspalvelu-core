@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Self
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db import models
+from django.db import models, transaction
 from django.db.models.functions import Coalesce
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
@@ -267,6 +267,56 @@ class ReservationQuerySet(models.QuerySet):
                 output_field=models.BooleanField(),
             ),
         )
+
+    def upsert_statistics(self, *, reservation_pks: list[int]) -> None:
+        from tilavarauspalvelu.models import ReservationStatistic, ReservationStatisticsReservationUnit, ReservationUnit
+
+        reservations = (
+            self.filter(pk__in=reservation_pks)
+            .select_related(
+                "user",
+                "recurring_reservation",
+                "recurring_reservation__ability_group",
+                "recurring_reservation__allocated_time_slot",
+                "deny_reason",
+                "cancel_reason",
+                "purpose",
+                "home_city",
+                "age_group",
+            )
+            .prefetch_related(
+                models.Prefetch(
+                    "reservation_units",
+                    queryset=ReservationUnit.objects.select_related("unit"),
+                ),
+            )
+        )
+
+        new_statistics: list[ReservationStatistic] = []
+        new_statistics_units: list[ReservationStatisticsReservationUnit] = []
+
+        for reservation in reservations:
+            statistic = ReservationStatistic.for_reservation(reservation, save=False)
+            statistic_units = ReservationStatisticsReservationUnit.for_statistic(statistic, save=False)
+            new_statistics.append(statistic)
+            new_statistics_units.extend(statistic_units)
+
+        fields_to_update: list[str] = [
+            field.name
+            for field in ReservationStatistic._meta.get_fields()
+            # Update all fields that can be updated
+            if field.concrete and not field.many_to_many and not field.primary_key
+        ]
+
+        with transaction.atomic():
+            new_statistics = ReservationStatistic.objects.bulk_create(
+                new_statistics,
+                update_conflicts=True,
+                update_fields=fields_to_update,
+                unique_fields=["reservation"],
+            )
+            ReservationStatisticsReservationUnit.objects.filter(reservation_statistics__in=new_statistics).delete()
+            ReservationStatisticsReservationUnit.objects.bulk_create(new_statistics_units)
 
 
 class ReservationManager(SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)):

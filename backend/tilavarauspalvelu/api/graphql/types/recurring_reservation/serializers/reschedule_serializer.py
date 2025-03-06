@@ -16,15 +16,14 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import RecurringReservation, ReservationStatistic
-from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
+from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_datetime
 from utils.fields.serializer import input_only_field
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
     from tilavarauspalvelu.typing import ReservationSeriesRescheduleData
-
 
 __all__ = [
     "ReservationSeriesRescheduleSerializer",
