@@ -9,6 +9,12 @@ import {
   ApplicationRoundDocument,
   type ApplicationRoundQuery,
   type ApplicationRoundQueryVariables,
+  type CreateApplicationMutationVariables,
+  type CreateApplicationMutation,
+  CreateApplicationDocument,
+  type ApplicationCreateMutationInput,
+  CurrentUserDocument,
+  type CurrentUserQuery,
 } from "@gql/gql-types";
 import {
   base64encode,
@@ -28,14 +34,17 @@ import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { SortingComponent } from "@/components/SortingComponent";
 import { useSearchParams } from "next/navigation";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { seasonalPrefix } from "@/modules/urls";
+import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { gql } from "@apollo/client";
 
 function SeasonalSearch({
+  apiBaseUrl,
   applicationRound,
   options,
-}: Readonly<Pick<NarrowedProps, "applicationRound" | "options">>): JSX.Element {
+}: Readonly<
+  Pick<NarrowedProps, "applicationRound" | "options" | "apiBaseUrl">
+>): JSX.Element {
   const { t, i18n } = useTranslation();
   const searchValues = useSearchParams();
 
@@ -102,7 +111,10 @@ function SeasonalSearch({
         fetchMore={(cursor) => fetchMore(cursor)}
         sortingComponent={<SortingComponent />}
       />
-      <StartApplicationBar applicationRound={applicationRound} />
+      <StartApplicationBar
+        applicationRound={applicationRound}
+        apiBaseUrl={apiBaseUrl}
+      />
     </>
   );
 }
@@ -111,10 +123,11 @@ type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type NarrowedProps = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { locale, params } = ctx;
+  const { locale, params, query } = ctx;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
   const pk = toNumber(ignoreMaybeArray(params?.id));
+  const isPostLogin = query.isPostLogin === "true";
 
   const notFound = {
     notFound: true,
@@ -141,7 +154,49 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return notFound;
   }
 
-  const opts = await getSearchOptions(apolloClient, "seasonal", locale ?? "");
+  const { data: userData } = await apolloClient.query<CurrentUserQuery>({
+    query: CurrentUserDocument,
+  });
+
+  if (isPostLogin && userData.currentUser != null) {
+    const input: ApplicationCreateMutationInput = {
+      applicationRound: applicationRound.pk ?? 0,
+    };
+
+    // don't catch errors here -> results in 500 page
+    // we can't display proper error message to user (no page for it)
+    // and we can't handle them
+    const mutRes = await apolloClient.mutate<
+      CreateApplicationMutation,
+      CreateApplicationMutationVariables
+    >({
+      mutation: CreateApplicationDocument,
+      variables: {
+        input,
+      },
+    });
+
+    if (mutRes.data?.createApplication?.pk) {
+      const { pk } = mutRes.data.createApplication;
+      const selected = query.selectedReservationUnits ?? [];
+      const forwardParams = new URLSearchParams();
+      for (const s of selected) {
+        forwardParams.append("selectedReservationUnits", s);
+      }
+      const url = `${getApplicationPath(pk, "page1")}?${forwardParams.toString()}`;
+      return {
+        redirect: {
+          permanent: false,
+          destination: url,
+        },
+        props: {
+          notFound: true, // for prop narrowing
+        },
+      };
+    }
+  }
+
+  const opts = await getSearchOptions(apolloClient, "seasonal", locale ?? "fi");
   return {
     props: {
       ...commonProps,
