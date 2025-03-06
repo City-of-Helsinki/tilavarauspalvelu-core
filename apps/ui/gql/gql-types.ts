@@ -55,6 +55,20 @@ export enum AccessType {
   Unrestricted = "UNRESTRICTED",
 }
 
+/**
+ *
+ * Same as AccessType, but includes the 'MULTIVALUED' option
+ * for series and seasonal bookings where access type between reservations varies.
+ *
+ */
+export enum AccessTypeWithMultivalued {
+  AccessCode = "ACCESS_CODE",
+  Multivalued = "MULTIVALUED",
+  OpenedByStaff = "OPENED_BY_STAFF",
+  PhysicalKey = "PHYSICAL_KEY",
+  Unrestricted = "UNRESTRICTED",
+}
+
 export type AddressNode = Node & {
   city: Scalars["String"]["output"];
   cityEn?: Maybe<Scalars["String"]["output"]>;
@@ -2539,7 +2553,7 @@ export type QueryUserArgs = {
 
 export type RecurringReservationNode = Node & {
   abilityGroup?: Maybe<AbilityGroupNode>;
-  accessType?: Maybe<AccessType>;
+  accessType?: Maybe<AccessTypeWithMultivalued>;
   ageGroup?: Maybe<AgeGroupNode>;
   allocatedTimeSlot?: Maybe<AllocatedTimeSlotNode>;
   beginDate?: Maybe<Scalars["Date"]["output"]>;
