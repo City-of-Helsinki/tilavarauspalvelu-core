@@ -21,7 +21,8 @@ export function signIn(apiBaseUrl: string, returnUrl?: unknown) {
     throw new Error("signIn can only be called in the browser");
   }
   const returnUrlParam = cleanupUrlParam(returnUrl);
-  const returnTo = returnUrlParam ?? window.location.href;
+  // encode otherwise backend will drop the query params
+  const returnTo = encodeURIComponent(returnUrlParam ?? window.location.href);
   const url = getSignInUrl(apiBaseUrl, returnTo);
   window.location.href = url;
 }

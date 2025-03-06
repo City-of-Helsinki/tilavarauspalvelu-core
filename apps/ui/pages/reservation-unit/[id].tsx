@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { Trans, useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
@@ -14,9 +14,7 @@ import {
   toUIDate,
 } from "common/src/common/util";
 import { formatters as getFormatters, H4 } from "common";
-import { useLocalStorage } from "react-use";
 import { breakpoints } from "common/src/common/style";
-import { type PendingReservation } from "@/modules/types";
 import {
   type ApplicationRoundTimeSlotNode,
   type ReservationCreateMutationInput,
@@ -27,12 +25,21 @@ import {
   RelatedReservationUnitsDocument,
   type RelatedReservationUnitsQuery,
   type RelatedReservationUnitsQueryVariables,
+  CreateReservationDocument,
+  type CreateReservationMutation,
+  type CreateReservationMutationVariables,
+  CurrentUserDocument,
+  type CurrentUserQuery,
+  type TimeSlotType,
 } from "@gql/gql-types";
 import {
   base64encode,
   filterNonNullable,
+  formatTimeRange,
   fromMondayFirstUnsafe,
+  ignoreMaybeArray,
   isPriceFree,
+  timeToMinutes,
   toNumber,
 } from "common/src/helpers";
 import { Head } from "@/components/reservation-unit/Head";
@@ -84,7 +91,7 @@ import {
   PendingReservationFormSchema,
   type PendingReservationFormType,
 } from "@/components/reservation-unit/schema";
-import LoginFragment from "@/components/LoginFragment";
+import { LoginFragment } from "@/components/LoginFragment";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ReservationTimePicker } from "@/components/reservation/ReservationTimePicker";
@@ -98,18 +105,66 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { Flex } from "common/styles/util";
 import { SubmitButton } from "@/styles/util";
 import { useDisplayError } from "@/hooks/useDisplayError";
+import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { params, query, locale } = ctx;
-  const pk = Number(params?.id);
+  const pk = toNumber(ignoreMaybeArray(params?.id));
   const uuid = query.ru;
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  if (pk) {
+  const notFound = {
+    props: {
+      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
+      notFound: true, // required for type narrowing
+    },
+    notFound: true,
+  };
+
+  const isPostLogin = query.isPostLogin === "true";
+
+  // recheck login status in case user cancelled the login
+  const { data: userData } = await apolloClient.query<CurrentUserQuery>({
+    query: CurrentUserDocument,
+  });
+  if (pk != null && pk > 0 && isPostLogin && userData?.currentUser != null) {
+    const begin = ignoreMaybeArray(query.begin);
+    const end = ignoreMaybeArray(query.end);
+
+    if (begin != null && end != null) {
+      const input: ReservationCreateMutationInput = {
+        begin,
+        end,
+        reservationUnit: pk,
+      };
+      const res = await apolloClient.mutate<
+        CreateReservationMutation,
+        CreateReservationMutationVariables
+      >({
+        mutation: CreateReservationDocument,
+        variables: {
+          input,
+        },
+      });
+      const { pk: reservationPk } = res.data?.createReservation ?? {};
+      return {
+        redirect: {
+          destination: getReservationInProgressPath(pk, reservationPk),
+          permanent: false,
+        },
+        props: {
+          notFound: true, // required for type narrowing
+        },
+      };
+    }
+  }
+
+  if (pk != null && pk > 0) {
     const today = new Date();
     const startDate = today;
     const endDate = addYears(today, 2);
@@ -121,7 +176,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       ReservationUnitPageQueryVariables
     >({
       query: ReservationUnitPageDocument,
-      fetchPolicy: "no-cache",
       variables: {
         id,
         beginDate: toApiDate(startDate) ?? "",
@@ -138,24 +192,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     const reservationUnit = reservationUnitData?.reservationUnit ?? undefined;
     if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
-      return {
-        props: {
-          ...commonProps,
-          notFound: true, // required for type narrowing
-        },
-        notFound: true,
-      };
+      return notFound;
     }
 
     const isDraft = reservationUnit?.isDraft;
     if (isDraft && !previewPass) {
-      return {
-        props: {
-          ...commonProps,
-          notFound: true, // required for type narrowing
-        },
-        notFound: true,
-      };
+      return notFound;
     }
 
     const bookingTerms = await getGenericTerms(apolloClient);
@@ -179,13 +221,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     }
 
     if (!reservationUnit?.pk) {
-      return {
-        props: {
-          ...commonProps,
-          notFound: true, // required for type narrowing
-        },
-        notFound: true,
-      };
+      return notFound;
     }
 
     const reservableTimeSpans = filterNonNullable(
@@ -194,9 +230,9 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const queryParams = new URLSearchParams(query as Record<string, string>);
     const searchDate = queryParams.get("date") ?? null;
     const searchTime = queryParams.get("time") ?? null;
-    const searchDuration = Number.isNaN(Number(queryParams.get("duration")))
-      ? null
-      : Number(queryParams.get("duration"));
+    const searchDuration = toNumber(
+      ignoreMaybeArray(queryParams.get("duration"))
+    );
 
     const blockingReservations = filterNonNullable(
       reservationUnitData?.affectingReservations
@@ -212,7 +248,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         relatedReservationUnits,
         activeApplicationRounds,
         termsOfUse: { genericTerms: bookingTerms },
-        isPostLogin: query?.isPostLogin === "true",
         searchDuration,
         searchDate,
         searchTime,
@@ -220,15 +255,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     };
   }
 
-  return {
-    props: {
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
-      notFound: true, // required for type narrowing
-      paramsId: pk,
-    },
-    notFound: true,
-  };
+  return notFound;
 }
 
 const StyledApplicationRoundScheduleDay = styled.p`
@@ -240,19 +267,26 @@ const StyledApplicationRoundScheduleDay = styled.p`
   }
 `;
 
+function formatTimeSlot(slot: TimeSlotType): string {
+  const { begin, end } = slot;
+  if (!begin || !end) {
+    return "";
+  }
+  const beginTime = timeToMinutes(begin);
+  const endTime = timeToMinutes(end);
+  const endTimeChecked = endTime === 0 ? 24 * 60 : endTime;
+  return formatTimeRange(beginTime, endTimeChecked, true);
+}
+
 // Returns an element for a weekday in the application round timetable, with up to two timespans
 function ApplicationRoundScheduleDay(
-  props: Omit<ApplicationRoundTimeSlotNode, "id" | "pk">
+  props: Pick<
+    ApplicationRoundTimeSlotNode,
+    "weekday" | "reservableTimes" | "closed"
+  >
 ) {
   const { t } = useTranslation();
   const { weekday, reservableTimes, closed } = props;
-  const noSeconds = (time: string) => time.split(":").slice(0, 2).join(":");
-  const timeSlotString = (idx: number): string =>
-    reservableTimes?.[idx]?.begin && reservableTimes?.[idx]?.end
-      ? `${noSeconds(String(reservableTimes?.[idx]?.begin))}-${noSeconds(
-          String(reservableTimes?.[idx]?.end)
-        )}`
-      : "";
   return (
     <StyledApplicationRoundScheduleDay>
       <span data-testid="application-round-time-slot__weekday">
@@ -263,8 +297,9 @@ function ApplicationRoundScheduleDay(
       ) : (
         reservableTimes && (
           <span data-testid="application-round-time-slot__value">
-            {reservableTimes[0] && timeSlotString(0)}
-            {reservableTimes[1] && ` ${t("common:and")} ${timeSlotString(1)}`}
+            {reservableTimes[0] && formatTimeSlot(reservableTimes[0])}
+            {reservableTimes[1] &&
+              ` ${t("common:and")} ${formatTimeSlot(reservableTimes[1])}`}
           </span>
         )
       )}
@@ -276,19 +311,30 @@ function SubmitFragment(
   props: Readonly<{
     focusSlot: FocusTimeSlot;
     apiBaseUrl: string;
-    actionCallback: () => void;
     reservationForm: UseFormReturn<PendingReservationFormType>;
     loadingText: string;
     buttonText: string;
   }>
-) {
+): JSX.Element {
   const { isSubmitting } = props.reservationForm.formState;
+  const { focusSlot } = props;
   const { isReservable } = props.focusSlot;
+  const returnToUrl = useMemo(() => {
+    if (!focusSlot.isReservable) {
+      return;
+    }
+    const { start: begin, end } = focusSlot ?? {};
+
+    const params = new URLSearchParams();
+    params.set("begin", begin.toISOString());
+    params.set("end", end.toISOString());
+    return getPostLoginUrl(params);
+  }, [focusSlot]);
+
   return (
     <LoginFragment
-      isActionDisabled={!props.focusSlot?.isReservable}
+      isActionDisabled={!isReservable}
       apiBaseUrl={props.apiBaseUrl}
-      actionCallback={props.actionCallback}
       componentIfAuthenticated={
         <SubmitButton
           type="submit"
@@ -300,7 +346,7 @@ function SubmitFragment(
           {isSubmitting ? props.loadingText : props.buttonText}
         </SubmitButton>
       }
-      returnUrl={getPostLoginUrl()}
+      returnUrl={returnToUrl}
     />
   );
 }
@@ -328,7 +374,6 @@ function ReservationUnit({
   activeApplicationRounds,
   blockingReservations,
   termsOfUse,
-  isPostLogin,
   apiBaseUrl,
   searchDuration,
   searchDate,
@@ -336,6 +381,7 @@ function ReservationUnit({
 }: PropsNarrowed): JSX.Element | null {
   const { t } = useTranslation();
   const router = useRouter();
+  useRemoveStoredReservation();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -455,7 +501,7 @@ function ReservationUnit({
     return reservationUnit.canApplyFreeOfCharge && isPaid;
   }, [reservationUnit.canApplyFreeOfCharge, reservationUnit.pricings]);
 
-  const [addReservation] = useCreateReservationMutation();
+  const [createReservationMutation] = useCreateReservationMutation();
 
   const displayError = useDisplayError();
 
@@ -466,7 +512,7 @@ function ReservationUnit({
       if (reservationUnit.pk == null) {
         throw new Error("Reservation unit pk is missing");
       }
-      const res = await addReservation({
+      const res = await createReservationMutation({
         variables: {
           input,
         },
@@ -475,9 +521,7 @@ function ReservationUnit({
       if (pk == null) {
         throw new Error("Reservation creation failed");
       }
-      if (reservationUnit.pk != null) {
-        router.push(getReservationInProgressPath(reservationUnit.pk, pk));
-      }
+      router.push(getReservationInProgressPath(reservationUnit.pk, pk));
     } catch (err) {
       displayError(err);
     }
@@ -491,70 +535,8 @@ function ReservationUnit({
     console.warn("not reservable because: ", reason);
   }
 
-  const [storedReservation, setStoredReservation] =
-    useLocalStorage<PendingReservation>("reservation");
+  const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;
 
-  const storeReservationForLogin = useCallback(() => {
-    if (reservationUnit.pk == null) {
-      return;
-    }
-    if (!focusSlot.isReservable) {
-      return;
-    }
-
-    const { start, end } = focusSlot ?? {};
-    // NOTE the only place where we use ISO strings since they are always converted to Date objects
-    // another option would be to refactor storaged reservation to use Date objects
-    setStoredReservation({
-      begin: start.toISOString(),
-      end: end.toISOString(),
-      price: undefined,
-      reservationUnitPk: reservationUnit.pk ?? 0,
-    });
-  }, [focusSlot, reservationUnit.pk, setStoredReservation]);
-
-  // If returning from login, continue on to reservation details
-  useEffect(() => {
-    if (
-      !!isPostLogin &&
-      storedReservation &&
-      !isReservationQuotaReached &&
-      reservationUnit?.pk
-    ) {
-      const { begin, end } = storedReservation;
-      const input: ReservationCreateMutationInput = {
-        begin,
-        end,
-        reservationUnit: reservationUnit.pk,
-      };
-      createReservation(input);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /* TODO why is this needed? do we need to reset the form values?
-  useEffect(() => {
-    const { begin, end } = storedReservation ?? {};
-    if (begin == null || end == null) {
-      return;
-    }
-
-    const beginDate = new Date(begin);
-    const endDate = new Date(end);
-
-    // TODO why? can't we set it using the form or can we make an intermediate reset function
-    handleCalendarEventChange({
-      start: beginDate,
-      end: endDate,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storedReservation?.begin, storedReservation?.end]);
-  */
-
-  const shouldDisplayBottomWrapper = useMemo(
-    () => relatedReservationUnits?.length > 0,
-    [relatedReservationUnits?.length]
-  );
   const termsOfUseContent = getTranslation(reservationUnit, "termsOfUse");
   const paymentTermsContent = reservationUnit.paymentTerms
     ? getTranslation(reservationUnit.paymentTerms, "text")
@@ -576,13 +558,12 @@ function ReservationUnit({
       <SubmitFragment
         focusSlot={focusSlot}
         apiBaseUrl={apiBaseUrl}
-        actionCallback={() => storeReservationForLogin()}
         reservationForm={reservationForm}
         loadingText={t("reservationCalendar:makeReservationLoading")}
         buttonText={t("reservationCalendar:makeReservation")}
       />
     ),
-    [apiBaseUrl, focusSlot, reservationForm, storeReservationForLogin, t]
+    [apiBaseUrl, focusSlot, reservationForm, t]
   );
 
   const startingTimeOptions = getPossibleTimesForDay({
