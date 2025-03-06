@@ -2783,6 +2783,7 @@ type RecurringReservationNode implements Node {
     user: [Int]
   ): [ReservationNode!]!
   shouldHaveActiveAccessCode: Boolean
+  usedAccessTypes: [AccessType]
   user: UserNode
   weekdays: [Int]
 }

@@ -8,7 +8,7 @@ from graphene_django_extensions import DjangoNode
 from lookup_property import L
 from query_optimizer import AnnotatedField, MultiField
 
-from tilavarauspalvelu.enums import AccessTypeWithMultivalued
+from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import RecurringReservation
 from utils.date_utils import local_date
@@ -50,6 +50,9 @@ class RecurringReservationNode(DjangoNode):
     weekdays = graphene.List(graphene.Int)
 
     access_type = AnnotatedField(graphene.Enum.from_enum(AccessTypeWithMultivalued), expression=L("access_type"))
+    used_access_types = AnnotatedField(
+        graphene.List(graphene.Enum.from_enum(AccessType)), expression=L("used_access_types")
+    )
     should_have_active_access_code = AnnotatedField(graphene.Boolean, expression=L("should_have_active_access_code"))
 
     pindora_info = MultiField(

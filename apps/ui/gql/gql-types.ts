@@ -2574,6 +2574,7 @@ export type RecurringReservationNode = Node & {
   reservationUnit: ReservationUnitNode;
   reservations: Array<ReservationNode>;
   shouldHaveActiveAccessCode?: Maybe<Scalars["Boolean"]["output"]>;
+  usedAccessTypes?: Maybe<Array<Maybe<AccessType>>>;
   user?: Maybe<UserNode>;
   weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
 };
