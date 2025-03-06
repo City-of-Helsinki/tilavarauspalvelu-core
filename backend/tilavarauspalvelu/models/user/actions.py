@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import operator
 import uuid
 from functools import reduce
@@ -40,6 +41,11 @@ if TYPE_CHECKING:
     from .model import User
 
 
+__all__ = [
+    "UserActions",
+]
+
+
 ANONYMIZED_FIRST_NAME = "ANON"
 ANONYMIZED_LAST_NAME = "ANONYMIZED"
 ANONYMIZED = "Anonymized"
@@ -47,9 +53,9 @@ SENSITIVE_RESERVATION = "Sensitive data of this reservation has been anonymized 
 SENSITIVE_APPLICATION = "Sensitive data of this application has been anonymized by a script"
 
 
+@dataclasses.dataclass(slots=True, frozen=True)
 class UserActions:
-    def __init__(self, user: User) -> None:
-        self.user = user
+    user: User
 
     def anonymize(self) -> None:
         self.anonymize_user()

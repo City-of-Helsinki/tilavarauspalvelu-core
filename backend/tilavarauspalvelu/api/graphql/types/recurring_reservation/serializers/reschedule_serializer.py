@@ -111,7 +111,7 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             )
             raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_ALREADY_STARTED)
 
-        RecurringReservation.validator.validate_series_time_slots(
+        RecurringReservation.validators.validate_series_time_slots(
             begin_date=begin_date,
             begin_time=begin_time,
             end_date=end_date,

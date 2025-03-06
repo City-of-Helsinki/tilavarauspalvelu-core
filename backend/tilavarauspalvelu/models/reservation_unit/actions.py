@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import datetime
 import itertools
 from typing import TYPE_CHECKING, Any
@@ -37,6 +38,11 @@ if TYPE_CHECKING:
         ReservationUnitPricing,
     )
     from tilavarauspalvelu.typing import TimeSpan
+
+
+__all__ = [
+    "ReservationUnitActions",
+]
 
 
 class ReservationUnitHaukiExporter:
@@ -141,9 +147,9 @@ class ReservationUnitHaukiExporter:
         HaukiAPIClient.update_resource(data=hauki_resource_data)
 
 
+@dataclasses.dataclass(slots=True, frozen=True)
 class ReservationUnitActions(ReservationUnitHaukiExporter):
-    def __init__(self, reservation_unit: ReservationUnit) -> None:
-        self.reservation_unit = reservation_unit
+    reservation_unit: ReservationUnit
 
     def get_actual_before_buffer(
         self,

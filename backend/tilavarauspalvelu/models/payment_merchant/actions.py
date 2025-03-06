@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -10,6 +11,6 @@ __all__ = [
 ]
 
 
+@dataclasses.dataclass(slots=True, frozen=True)
 class PaymentMerchantActions:
-    def __init__(self, payment_merchant: PaymentMerchant) -> None:
-        self.payment_merchant = payment_merchant
+    payment_merchant: PaymentMerchant

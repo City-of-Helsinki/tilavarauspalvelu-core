@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .model import ReservationCancelReason
 
 
+__all__ = [
+    "ReservationCancelReasonActions",
+]
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class ReservationCancelReasonActions:
-    def __init__(self, reservation_cancel_reason: ReservationCancelReason) -> None:
-        self.reservation_cancel_reason = reservation_cancel_reason
+    reservation_cancel_reason: ReservationCancelReason

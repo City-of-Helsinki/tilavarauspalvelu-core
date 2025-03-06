@@ -48,7 +48,7 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: ReservationSeriesAddData) -> ReservationSeriesAddData:
-        self.instance.validator.validate_has_reservations()
+        self.instance.validators.validate_has_reservations()
 
         reservation_unit = self.instance.reservation_unit
         first_reservation: Reservation = self.instance.reservations.first()

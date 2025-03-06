@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.models import RecurringReservation, Reservation
@@ -11,9 +12,14 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
 
+__all__ = [
+    "ApplicationSectionActions",
+]
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class ApplicationSectionActions:
-    def __init__(self, application_section: ApplicationSection) -> None:
-        self.application_section = application_section
+    application_section: ApplicationSection
 
     def get_reservation_series(self) -> QuerySet[RecurringReservation]:
         return (

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import datetime
 from contextlib import suppress
 from typing import TYPE_CHECKING
@@ -28,9 +29,9 @@ __all__ = [
 ]
 
 
+@dataclasses.dataclass(slots=True, frozen=True)
 class PaymentOrderActions:
-    def __init__(self, payment_order: PaymentOrder) -> None:
-        self.payment_order = payment_order
+    payment_order: PaymentOrder
 
     def get_order_payment_from_webshop(self) -> Payment | None:
         try:

@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .model import ReservationUnitHierarchy
 
 
+__all__ = [
+    "ReservationUnitHierarchyActions",
+]
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class ReservationUnitHierarchyActions:
-    def __init__(self, reservation_unit_hierarchy: ReservationUnitHierarchy) -> None:
-        self.reservation_unit_hierarchy = reservation_unit_hierarchy
+    reservation_unit_hierarchy: ReservationUnitHierarchy
