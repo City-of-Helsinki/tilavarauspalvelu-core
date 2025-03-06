@@ -107,6 +107,8 @@ function createReservationEdge({
   ];
 }
 
+// Necessary because API Date is not DateTime
+// convert ISO string -> Date -> API date string "YYYY-MM-DD"
 function convertDate(str: string) {
   const date = new Date(str);
   return toApiDateUnsafe(date);
@@ -133,8 +135,8 @@ function correctRecurringReservationQueryResult(
     // TODO this should not be empty
     weekdays: [],
     // TODO refactor the magic numbers out
-    beginDate: convertDate(getValidInterval(0)[0]),
-    endDate: convertDate(getValidInterval(7)[1]),
+    beginDate: convertDate(getValidInterval(0)[0] ?? ""),
+    endDate: convertDate(getValidInterval(7)[1] ?? ""),
     reservations,
     rejectedOccurrences: [],
   };

@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1, H2 } from "common/src/common/typography";
 import {
+  type ApplicationRoundFieldsFragment,
   ApplicationRoundOrderingChoices,
   ApplicationRoundStatusChoice,
   ApplicationRoundsUiDocument,
@@ -16,6 +17,7 @@ import { createApolloClient } from "@/modules/apolloClient";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Flex } from "common/styles/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { gql } from "@apollo/client";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
@@ -30,7 +32,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     ApplicationRoundsUiQueryVariables
   >({
     query: ApplicationRoundsUiDocument,
-    fetchPolicy: "no-cache",
     variables: {
       orderBy: [ApplicationRoundOrderingChoices.PkAsc],
     },
@@ -41,8 +42,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
   const filteredApplicationRounds = applicationRounds.filter(
     (applicationRound) =>
-      applicationRound?.publicDisplayBegin &&
-      applicationRound?.publicDisplayEnd &&
       new Date(applicationRound.publicDisplayBegin) <= now &&
       new Date(applicationRound.publicDisplayEnd) >= now
   );
@@ -56,39 +55,27 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-function getDateTime(date: string | Date) {
-  return new Date(date).getTime();
-}
-
-function RecurringLander({ applicationRounds }: Props): JSX.Element {
+function RecurringLander({
+  applicationRounds,
+}: Readonly<Pick<Props, "applicationRounds">>): JSX.Element {
   const { t } = useTranslation();
 
-  const activeApplicationRounds = applicationRounds
-    .filter((ar) => ar.status === ApplicationRoundStatusChoice.Open)
-    .sort(
-      (a, b) =>
-        getDateTime(b.applicationPeriodEnd) -
-        getDateTime(a.applicationPeriodEnd)
+  const active = applicationRounds
+    .filter(isActiveRound)
+    .sort((a, b) =>
+      compTimeStrings(a.applicationPeriodEnd, b.applicationPeriodEnd)
     );
 
-  const pendingApplicationRounds = applicationRounds
-    .filter((ar) => ar.status === ApplicationRoundStatusChoice.Upcoming)
-    .sort(
-      (a, b) =>
-        getDateTime(a.applicationPeriodBegin) -
-        getDateTime(b.applicationPeriodBegin)
+  const upcoming = applicationRounds
+    .filter(isFutureRound)
+    .sort((a, b) =>
+      compTimeStrings(a.applicationPeriodBegin, b.applicationPeriodBegin)
     );
 
-  const pastApplicationRounds = applicationRounds
-    .filter(
-      (ar) =>
-        ar.status !== ApplicationRoundStatusChoice.Open &&
-        ar.status !== ApplicationRoundStatusChoice.Upcoming
-    )
-    .sort(
-      (a, b) =>
-        getDateTime(b.applicationPeriodEnd) -
-        getDateTime(a.applicationPeriodEnd)
+  const past = applicationRounds
+    .filter(isPastRound)
+    .sort((a, b) =>
+      compTimeStrings(a.applicationPeriodEnd, b.applicationPeriodEnd)
     );
 
   const routes = [
@@ -107,35 +94,27 @@ function RecurringLander({ applicationRounds }: Props): JSX.Element {
       <>
         <Flex data-testid="recurring-lander__application-round-container--active">
           <H2 $noMargin>{t("recurringLander:roundHeadings.active")}</H2>
-          {activeApplicationRounds.length > 0 ? null : (
+          {active.length > 0 ? (
+            active.map((round) => (
+              <ApplicationRoundCard key={round.pk} applicationRound={round} />
+            ))
+          ) : (
             <p>{t("recurringLander:noRounds")}</p>
           )}
-          {activeApplicationRounds.map((applicationRound) => (
-            <ApplicationRoundCard
-              key={applicationRound.pk}
-              applicationRound={applicationRound}
-            />
-          ))}
         </Flex>
-        {pendingApplicationRounds.length > 0 && (
+        {upcoming.length > 0 && (
           <Flex data-testid="recurring-lander__application-round-container--pending">
             <H2 $noMargin>{t("recurringLander:roundHeadings.pending")}</H2>
-            {pendingApplicationRounds.map((applicationRound) => (
-              <ApplicationRoundCard
-                key={applicationRound.pk}
-                applicationRound={applicationRound}
-              />
+            {upcoming.map((round) => (
+              <ApplicationRoundCard key={round.pk} applicationRound={round} />
             ))}
           </Flex>
         )}
-        {pastApplicationRounds.length > 0 && (
+        {past.length > 0 && (
           <Flex data-testid="recurring-lander__application-round-container--past">
             <H2 $noMargin>{t("recurringLander:roundHeadings.past")}</H2>
-            {pastApplicationRounds.map((applicationRound) => (
-              <ApplicationRoundCard
-                key={applicationRound.pk}
-                applicationRound={applicationRound}
-              />
+            {past.map((round) => (
+              <ApplicationRoundCard key={round.pk} applicationRound={round} />
             ))}
           </Flex>
         )}
@@ -144,4 +123,68 @@ function RecurringLander({ applicationRounds }: Props): JSX.Element {
   );
 }
 
+function isPastRound(
+  round: Pick<ApplicationRoundFieldsFragment, "status">
+): boolean {
+  return (
+    round.status !== ApplicationRoundStatusChoice.Open &&
+    round.status !== ApplicationRoundStatusChoice.Upcoming
+  );
+}
+
+function isFutureRound(
+  round: Pick<ApplicationRoundFieldsFragment, "status">
+): boolean {
+  return round.status === ApplicationRoundStatusChoice.Upcoming;
+}
+
+function isActiveRound(
+  round: Pick<ApplicationRoundFieldsFragment, "status">
+): boolean {
+  return round.status === ApplicationRoundStatusChoice.Open;
+}
+
+function getDateTime(date: string) {
+  return new Date(date).getTime();
+}
+
+function compTimeStrings(a: string, b: string) {
+  return getDateTime(a) - getDateTime(b);
+}
+
 export default RecurringLander;
+
+export const APPLICATION_ROUND_FRAGMENT = gql`
+  fragment ApplicationRoundFields on ApplicationRoundNode {
+    ...ApplicationRoundCard
+    publicDisplayBegin
+    publicDisplayEnd
+    criteriaFi
+    criteriaEn
+    criteriaSv
+    notesWhenApplyingFi
+    notesWhenApplyingEn
+    notesWhenApplyingSv
+    reservationUnits {
+      id
+      pk
+      unit {
+        id
+        pk
+      }
+    }
+  }
+`;
+
+export const APPLICATION_ROUNDS = gql`
+  ${APPLICATION_ROUND_FRAGMENT}
+  query ApplicationRoundsUi($orderBy: [ApplicationRoundOrderingChoices]) {
+    applicationRounds(orderBy: $orderBy) {
+      edges {
+        node {
+          ...ApplicationRoundFields
+        }
+      }
+    }
+  }
+`;

@@ -85,7 +85,7 @@ const StyledSelect = styled(Select)`
     }
   }
 
-  min-width: 230px;
+  min-width: 300px;
   flex-grow: 1;
   @media (min-width: ${breakpoints.s}) {
     flex-grow: 0;

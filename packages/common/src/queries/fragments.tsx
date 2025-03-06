@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 
 export const RESERVEE_NAME_FRAGMENT = gql`
   fragment ReserveeNameFields on ReservationNode {
+    id
     reserveeFirstName
     reserveeLastName
     reserveeEmail
@@ -15,6 +16,7 @@ export const RESERVEE_NAME_FRAGMENT = gql`
 // TODO is this ever used without the name fields? duplicating reserveeId just in case
 export const RESERVEE_BILLING_FRAGMENT = gql`
   fragment ReserveeBillingFields on ReservationNode {
+    id
     reserveeId
     reserveeIsUnregisteredAssociation
     reserveeAddressStreet
@@ -63,6 +65,7 @@ export const METAFIELDS_FRAGMENT = gql`
 
 export const TERMS_OF_USE_NAME_FRAGMENT = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
+    id
     nameFi
     nameEn
     nameSv
@@ -79,8 +82,6 @@ export const TERMS_OF_USE_TEXT_FRAGMENT = gql`
 `;
 
 export const TERMS_OF_USE_FRAGMENT = gql`
-  ${TERMS_OF_USE_NAME_FRAGMENT}
-  ${TERMS_OF_USE_TEXT_FRAGMENT}
   fragment TermsOfUseFields on TermsOfUseNode {
     pk
     ...TermsOfUseNameFields
@@ -126,7 +127,6 @@ export const LOCATION_FRAGMENT = gql`
 `;
 
 export const LOCATION_FRAGMENT_I18N = gql`
-  ${LOCATION_FRAGMENT}
   fragment LocationFieldsI18n on LocationNode {
     ...LocationFields
     addressStreetEn

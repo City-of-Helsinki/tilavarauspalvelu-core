@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- strict null checsk
+// @ts-nocheck -- disable because of missing strict null checks
 import {
   addDays,
   addHours,
@@ -20,15 +22,16 @@ import {
   ReservationStateChoice,
 } from "@/gql/gql-types";
 import { createMockReservationUnit } from "@/test/testUtils";
+import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 
 describe("generateReservableMap", () => {
-  beforeAll(() => {
-    jest.useFakeTimers({
+  beforeEach(() => {
+    vi.useFakeTimers({
       now: new Date(2024, 0, 1, 9, 0, 0),
     });
   });
-  afterAll(() => {
-    jest.useRealTimers();
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   // Range format: { start: Date, end: Date }

@@ -1,7 +1,7 @@
 import React from "react";
 import { toApiDate } from "common/src/common/util";
 import CommonCalendar from "common/src/calendar/Calendar";
-import { get } from "lodash";
+import { get } from "lodash-es";
 import { addDays, endOfISOWeek, startOfISOWeek } from "date-fns";
 import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
@@ -72,7 +72,7 @@ function constructEventTitle(
     reservation: res,
     t,
   });
-  if (unit.length > 0) {
+  if (unit != null && unit.length > 0) {
     return `${reservee} (${unit})`;
   }
   return reservee;

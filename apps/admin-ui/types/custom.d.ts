@@ -4,6 +4,5 @@ declare module "*.svg" {
   const ReactComponent: FunctionComponent<SVGProps<SVGSVGElement>>;
   export { ReactComponent };
 
-  // eslint-disable-next-line no-undef
   export default string;
 }

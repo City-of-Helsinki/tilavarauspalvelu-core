@@ -7,7 +7,7 @@ import { Flex } from "common/styles/util";
 const Container = styled(Flex).attrs({
   $direction: "row",
   $alignItems: "center",
-  $gap: "var(--spacing-s)",
+  $gap: "m",
   $justifyContent: "space-between",
 })`
   padding: 0 var(--spacing-l);
@@ -44,5 +44,3 @@ export function CustomDialogHeader({
     </Container>
   );
 }
-
-CustomDialogHeader.componentName = "DialogHeader";

@@ -70,7 +70,7 @@ export function ControlledSelect<T extends FieldValues>({
         selection
           .map((x) => x.value)
           .map((x) => {
-            if (typeof options[0].value === "number") {
+            if (typeof options[0]?.value === "number") {
               return toNumber(x);
             }
             return x;
@@ -80,7 +80,7 @@ export function ControlledSelect<T extends FieldValues>({
       afterChange?.(v);
     } else if (Array.isArray(selection)) {
       const val = selection.find(() => true)?.value;
-      const v = typeof options[0].value === "number" ? toNumber(val) : val;
+      const v = typeof options[0]?.value === "number" ? toNumber(val) : val;
       onChange(v);
       afterChange?.(v ?? undefined);
     } else {

@@ -10,6 +10,7 @@ import {
 import { createTagString, getReservatinUnitPricing } from "./util";
 import { addHours, addMonths } from "date-fns";
 import { toApiDate } from "common/src/common/util";
+import { describe, test, expect } from "vitest";
 
 type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitNodeT = NonNullable<
@@ -53,7 +54,7 @@ function constructPaidPricing(): PricingNodeT {
   return constructPricing({
     lowestPrice: 120,
     highestPrice: 120,
-    begin: new Date("2022-01-01"),
+    begin: new Date("2022-03-01"),
   });
 }
 
@@ -97,7 +98,7 @@ describe("getReservatinUnitPricing", () => {
     );
     const second = getReservatinUnitPricing(
       input,
-      new Date("2022-02-01T00:00:01Z")
+      new Date("2022-04-01T00:00:01Z")
     );
     expect(first?.lowestPrice).toBe("0");
     expect(second?.lowestPrice).toBe("120");

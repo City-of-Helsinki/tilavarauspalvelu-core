@@ -16,7 +16,7 @@ export const PUBLIC_URL = env.NEXT_PUBLIC_BASE_URL ?? "";
 export const LIST_PAGE_SIZE = 50;
 export const LARGE_LIST_PAGE_SIZE = 100;
 
-export const ALLOCATION_CALENDAR_TIMES = [7, 23];
+export const ALLOCATION_CALENDAR_TIMES = [7, 23] as const;
 
 export const NUMBER_OF_DECIMALS = 6;
 

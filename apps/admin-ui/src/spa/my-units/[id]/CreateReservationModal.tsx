@@ -17,7 +17,7 @@ import {
   useReservationUnitQuery,
 } from "@gql/gql-types";
 import styled from "styled-components";
-import { get } from "lodash";
+import { get } from "lodash-es";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
@@ -226,6 +226,7 @@ function DialogContent({
     reservationUnit.reservationStartInterval
   );
   const form = useForm<FormValueType>({
+    // @ts-expect-error -- schema refinement breaks typing
     resolver: zodResolver(ReservationFormSchema(interval)),
     // TODO onBlur or onChange? onChange is anoying because it highlights even untouched fields
     // onBlur on the other hand does no validation on the focused field till it's blurred

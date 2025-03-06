@@ -1,6 +1,7 @@
 import { addDays, nextMonday } from "date-fns";
 import { generateReservations } from "./generateReservations";
 import { toUIDate } from "common/src/common/util";
+import { describe, test, expect } from "vitest";
 
 function createInput({
   startingDate,

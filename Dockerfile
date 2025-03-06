@@ -70,7 +70,7 @@ COPY --from=installer /app/apps/$APP/package.json .
 COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/.next/static ./apps/$APP/.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/public ./apps/$APP/public
-COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/next-i18next.config.js ./apps/$APP/
+COPY --from=installer --chown=nextjs:nodejs /app/apps/$APP/next-i18next.config.cjs ./apps/$APP/
 
 ENV BIN="apps/$APP/server.js"
 CMD ["sh", "-c", "dumb-init node $BIN"]

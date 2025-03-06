@@ -1,5 +1,5 @@
 import { type ApolloQueryResult } from "@apollo/client";
-import { trim } from "lodash";
+import { trim } from "lodash-es";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -154,7 +154,7 @@ function translateType(res: ReservationType, t: TFunction): string {
     res.reserveeIsUnregisteredAssociation
   );
   const part2WithSpace = part2 ? ` ${t(part2)}` : "";
-  return `${t(part1)}${part2WithSpace}`;
+  return `${t(part1 ?? "")}${part2WithSpace}`;
 }
 
 function ReservationSummary({
@@ -304,14 +304,15 @@ export function ReservationKeylessEntry({
 
   const handleError = (e: unknown) => {
     const validationErrors = getValidationErrors(e);
-    if (validationErrors.length > 0) {
-      const code = validationErrors[0].validation_code;
+    const validationError = validationErrors[0];
+    if (validationError != null) {
+      const code = validationError.validation_code;
       if (code && i18n.exists(`errors.backendValidation.${code}`)) {
         errorToast({ text: t(`errors.backendValidation.${code}`) });
         return;
       }
       errorToast({
-        text: validationErrors[0].message ?? validationErrors[0].code,
+        text: validationError.message ?? validationError.code,
       });
       return;
     }

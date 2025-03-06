@@ -11,7 +11,8 @@ import { env } from "@/env.mjs";
 import { ButtonContainer, Flex } from "common/styles/util";
 
 const Wrapper = styled.div`
-  word-break: break-word;
+  word-break: normal;
+  overflow-wrap: anywhere;
   gap: var(--spacing-layout-m);
   h1 {
     margin-bottom: 0;

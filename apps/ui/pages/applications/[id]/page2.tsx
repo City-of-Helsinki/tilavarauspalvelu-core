@@ -12,12 +12,12 @@ import {
   convertApplicationPage2,
   ApplicationPage2Schema,
 } from "@/components/application/form";
-import { useApplicationUpdate } from "@/hooks/useApplicationUpdate";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
   ApplicationPage2Document,
+  useUpdateApplicationMutation,
   type ApplicationPage2Query,
   type ApplicationPage2QueryVariables,
 } from "@/gql/gql-types";
@@ -27,12 +27,17 @@ import { gql } from "@apollo/client";
 
 function Page2({ application }: PropsNarrowed): JSX.Element {
   const router = useRouter();
-  const [update] = useApplicationUpdate();
+  const [mutate] = useUpdateApplicationMutation();
   const dislayError = useDisplayError();
 
   const saveAndNavigate = async (values: ApplicationPage2FormValues) => {
     try {
-      const pk = await update(transformApplicationPage2(values));
+      const input = transformApplicationPage2(values);
+      const { data } = await mutate({ variables: { input } });
+      const { pk } = data?.updateApplication ?? {};
+      if (pk == null) {
+        throw new Error("Failed to save application");
+      }
       router.push(getApplicationPath(pk, "page3"));
     } catch (err) {
       dislayError(err);

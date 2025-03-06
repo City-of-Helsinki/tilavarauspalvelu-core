@@ -103,8 +103,11 @@ export function ReservationUnitList({
   };
 
   const move = (units: number[], from: number, to: number): number[] => {
-    const copy = [...units];
     const i = units[from];
+    if (i == null) {
+      return units;
+    }
+    const copy = [...units];
     copy.splice(from, 1);
     copy.splice(to, 0, i);
     return copy;

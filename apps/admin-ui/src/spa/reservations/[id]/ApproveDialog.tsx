@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { trim } from "lodash";
+import { trim } from "lodash-es";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
@@ -20,6 +20,7 @@ import { useModal } from "@/context/ModalContext";
 import { Flex } from "common/styles/util";
 import { getReservationPriceDetails } from "./util";
 import { errorToast, successToast } from "common/src/common/toast";
+import { toNumber } from "common/src/helpers";
 
 const Label = styled.p`
   color: var(--color-black-70);
@@ -76,7 +77,7 @@ const DialogContent = ({
     }
   };
 
-  const [price, setPrice] = useState(Number(reservation.price) ?? 0);
+  const [price, setPrice] = useState(toNumber(reservation.price) ?? 0);
   const [handlingDetails, setHandlingDetails] = useState<string>(
     reservation.handlingDetails ?? ""
   );

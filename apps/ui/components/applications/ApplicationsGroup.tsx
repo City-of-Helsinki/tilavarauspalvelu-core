@@ -1,16 +1,13 @@
 import React from "react";
 import { H2 } from "common/src/common/typography";
-import { type ApplicationsQuery } from "@gql/gql-types";
+import { type ApplicationsGroupFragment } from "@gql/gql-types";
 import { ApplicationCard } from "./ApplicationCard";
 import { Flex } from "common/styles/util";
+import { gql } from "@apollo/client";
 
 type Props = {
   name: string;
-  applications: NonNullable<
-    NonNullable<
-      NonNullable<ApplicationsQuery["applications"]>["edges"][0]
-    >["node"]
-  >[];
+  applications: ApplicationsGroupFragment[];
   actionCallback: (string: "error" | "cancel") => Promise<void>;
 };
 
@@ -19,11 +16,7 @@ export function ApplicationsGroup({
   applications,
   actionCallback,
 }: Props): JSX.Element | null {
-  if (applications.length === 0 || !applications[0].applicationRound == null) {
-    return null;
-  }
-  const roundPk = applications[0].applicationRound.pk;
-  if (roundPk == null) {
+  if (applications.length === 0) {
     return null;
   }
   applications.sort((a, b) => {
@@ -47,3 +40,10 @@ export function ApplicationsGroup({
     </Flex>
   );
 }
+
+export const APPLICATIONS_GROUP_FRAGMENT = gql`
+  fragment ApplicationsGroup on ApplicationNode {
+    ...ApplicationCard
+    sentDate
+  }
+`;

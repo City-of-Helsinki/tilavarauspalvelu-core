@@ -1,4 +1,4 @@
-import { addHours, nextMonday, set } from "date-fns";
+import { addDays, addHours, nextMonday, set } from "date-fns";
 import {
   Authentication,
   ReservationKind,
@@ -13,9 +13,17 @@ import {
   CreateReservationSeriesDocument,
   type ReservationUnitFragment,
   ReservationsInIntervalFragment,
+  CurrentUserDocument,
+  type CurrentUserQuery,
+  OptionsDocument,
+  type OptionsQuery,
+  ReservationPurposeOrderingChoices,
+  TermsOfUseDocument,
+  type TermsOfUseQuery,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { toApiDateUnsafe } from "common/src/common/util";
 
 const unitCommon = {
   allowReservationsWithoutOpeningHours: true,
@@ -216,7 +224,69 @@ const reservationsByUnitResponse: ReservationsInIntervalFragment[] =
       affectedReservationUnits: [],
     }));
 
-export const mocks = [
+const AdminUserMock: CurrentUserQuery = {
+  currentUser: {
+    id: "UserNode:1",
+    username: "test",
+    firstName: "Test",
+    lastName: "User",
+    email: "test@foobar.com",
+    isSuperuser: true,
+    pk: 1,
+    unitRoles: [],
+    generalRoles: [],
+  },
+};
+
+const OptionsMock: OptionsQuery = {
+  reservationPurposes: {
+    edges: [],
+  },
+  ageGroups: {
+    edges: [],
+  },
+  cities: {
+    edges: [],
+  },
+};
+
+const TermsOfUseMock: TermsOfUseQuery = {
+  termsOfUse: {
+    edges: [],
+  },
+};
+
+const otherMocks = [
+  {
+    request: {
+      query: OptionsDocument,
+      variables: {
+        reservationPurposesOrderBy: [ReservationPurposeOrderingChoices.RankAsc],
+      },
+    },
+    result: {
+      data: OptionsMock,
+    },
+  },
+  {
+    request: {
+      query: TermsOfUseDocument,
+      variables: {
+        termsType: TermsType.GenericTerms,
+      },
+    },
+    result: {
+      data: TermsOfUseMock,
+    },
+  },
+  {
+    request: {
+      query: CurrentUserDocument,
+    },
+    result: {
+      data: AdminUserMock,
+    },
+  },
   {
     request: {
       query: ReservationUnitDocument,
@@ -224,21 +294,6 @@ export const mocks = [
     },
     result: {
       data: createReservationUnitResponse(),
-    },
-  },
-  {
-    request: {
-      query: ReservationTimesInReservationUnitDocument,
-      variables: {
-        id: base64encode(`ReservationUnitNode:1`),
-        pk: 1,
-        beginDate: `${YEAR}-01-01`,
-        endDate: `${YEAR + 1}-01-01`,
-        state: RELATED_RESERVATION_STATES,
-      },
-    },
-    result: {
-      data: createReservationsInIntervalResponse(),
     },
   },
   {
@@ -262,6 +317,39 @@ export const mocks = [
     },
   },
 ];
+
+function createInIntervalQueryMock({ begin, end }: { begin: Date; end: Date }) {
+  const beginDate = toApiDateUnsafe(begin);
+  const endDate = toApiDateUnsafe(end);
+  return {
+    request: {
+      query: ReservationTimesInReservationUnitDocument,
+      variables: {
+        id: base64encode(`ReservationUnitNode:1`),
+        pk: 1,
+        beginDate,
+        endDate,
+        state: RELATED_RESERVATION_STATES,
+      },
+    },
+    result: {
+      data: createReservationsInIntervalResponse(),
+    },
+  };
+}
+
+// TODO parametrize the mock generation
+export function createGraphQLMocks({ begin, end }: { begin: Date; end: Date }) {
+  const now = new Date();
+  return [
+    createInIntervalQueryMock({ begin: now, end: addDays(Date.now(), 1) }),
+    createInIntervalQueryMock({ begin, end }),
+    // NOTE: Apollo mock provider is a stack so add as many results as there are fetches
+    createInIntervalQueryMock({ begin, end: addDays(end, 1) }),
+    createInIntervalQueryMock({ begin, end: addDays(end, 1) }),
+    ...otherMocks,
+  ];
+}
 
 function createReservationUnitResponse(): ReservationUnitQuery {
   return {

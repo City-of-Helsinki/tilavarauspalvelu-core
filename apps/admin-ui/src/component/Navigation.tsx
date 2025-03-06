@@ -232,11 +232,13 @@ function NavigationLink({
 
   const handleClick = (evt: React.MouseEvent<HTMLAnchorElement>) => {
     evt.preventDefault();
-    if (!routes) return;
-    // NOTE: this is a workaround for the HDS Header component not closing the mobile menu on navigation, if there isn't a page reload
-    // TODO: remove this when HDS Header is fixed
-    document.getElementById("Menu")?.querySelector("button")?.click();
-    navigate(routes[0]);
+    const route = routes[0];
+    if (route != null) {
+      // NOTE: this is a workaround for the HDS Header component not closing the mobile menu on navigation, if there isn't a page reload
+      // TODO: remove this when HDS Header is fixed
+      document.getElementById("Menu")?.querySelector("button")?.click();
+      navigate(route);
+    }
   };
 
   return (

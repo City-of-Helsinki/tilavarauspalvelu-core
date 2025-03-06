@@ -1,4 +1,3 @@
-export { useApplicationUpdate } from "./useApplicationUpdate";
 export { useConfirmNavigation } from "./useConfirmNavigation";
 export { useDebounce } from "./useDebounce";
 export { useOptions } from "./useOptions";

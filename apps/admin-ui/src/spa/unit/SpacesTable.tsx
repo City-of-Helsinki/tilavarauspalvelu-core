@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { IconGroup } from "hds-react";
-import { trim } from "lodash";
+import { trim } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import { gql, type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
@@ -68,7 +68,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
         // TODO missing translation
         errorToast({ text: t("SpaceTable.removeFailed") });
       }
-    } catch (e) {
+    } catch (_) {
       /* TODO handle this error
        "extensions": {
         "code": "MUTATION_VALIDATION_ERROR",

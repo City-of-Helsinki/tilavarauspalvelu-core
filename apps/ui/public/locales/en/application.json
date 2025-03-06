@@ -34,7 +34,6 @@
     "fix": "Fix"
   },
   "Intro": {
-    "startNewApplication": "Apply",
     "heading": "Seasonal booking application",
     "createFailedHeading": "Application creation failed"
   },

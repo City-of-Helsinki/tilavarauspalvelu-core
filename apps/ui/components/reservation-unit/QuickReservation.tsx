@@ -233,6 +233,7 @@ function TimeChunkSection({
 > & {
   durationString: string;
 }) {
+  /* eslint-disable react-hooks/rules-of-hooks */
   const { t } = useTranslation();
   const { setValue, watch } = form;
 
@@ -245,12 +246,13 @@ function TimeChunkSection({
       itemsPerChunk
     );
   }, [startingTimeOptions]);
+  /* eslint-enable react-hooks/rules-of-hooks */
 
   // Find out which slide has the slot that reflects the selected focusSlot
   let activeChunk = 0;
   for (let i = 0; i < timeChunks.length; i++) {
     if (
-      timeChunks[i].some((item) => {
+      timeChunks[i]?.some((item) => {
         return item === watch("time");
       })
     ) {

@@ -11,7 +11,7 @@ import {
   ButtonVariant,
   LoadingSpinner,
 } from "hds-react";
-import { isEqual, trim } from "lodash";
+import { isEqual, trim } from "lodash-es";
 import { type ApolloQueryResult } from "@apollo/client";
 import { type TFunction } from "i18next";
 import {

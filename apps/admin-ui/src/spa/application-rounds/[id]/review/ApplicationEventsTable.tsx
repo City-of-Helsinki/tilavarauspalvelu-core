@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import { memoize, orderBy, uniqBy } from "lodash";
+import { memoize, orderBy, uniqBy } from "lodash-es";
 import {
   IconArrowBottomRight,
   IconCheck,

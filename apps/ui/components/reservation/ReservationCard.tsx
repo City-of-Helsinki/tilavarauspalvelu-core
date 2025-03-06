@@ -1,7 +1,7 @@
 import React from "react";
 import { IconEuroSign, IconCross, IconArrowRight, IconLock } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { trim } from "lodash";
+import { trim } from "lodash-es";
 import {
   AccessType,
   type ListReservationsQuery,
@@ -38,7 +38,7 @@ interface PropsT {
 function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.Element {
   const { t, i18n } = useTranslation();
 
-  const reservationUnit = reservation.reservationUnits?.[0] ?? undefined;
+  const reservationUnit = reservation.reservationUnits[0];
   const link = reservation.pk ? `/reservations/${reservation.pk}` : "";
 
   const { begin, end } = reservation;
@@ -49,7 +49,7 @@ function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.Element {
   const lang = convertLanguageCode(i18n.language);
   const price = getPrice(t, reservation, lang);
 
-  const name = getTranslationSafe(reservationUnit, "name", lang);
+  const name = getTranslationSafe(reservationUnit ?? {}, "name", lang);
   const unitName = getTranslationSafe(
     reservationUnit?.unit ?? {},
     "name",

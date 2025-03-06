@@ -2,7 +2,6 @@ import { ApolloClient, HttpLink, InMemoryCache, from } from "@apollo/client";
 import { getCookie } from "typescript-cookie";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { onError } from "@apollo/client/link/error";
-// eslint-disable-next-line unicorn/prefer-node-protocol -- node:querystring breaks the app
 import qs, { ParsedUrlQuery } from "querystring";
 import { GetServerSidePropsContext, PreviewData } from "next";
 import { IncomingHttpHeaders } from "node:http";

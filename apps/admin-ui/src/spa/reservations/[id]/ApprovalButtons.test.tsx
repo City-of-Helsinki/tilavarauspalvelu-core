@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { type ReservationNode, ReservationStateChoice } from "@gql/gql-types";
 import { addDays, addMinutes } from "date-fns";
 import ApprovalButtons from "./ApprovalButtons";
+import { vi, describe, test, expect } from "vitest";
 
 const wrappedRender = (reservation: ReservationNode) => {
   return render(
@@ -12,8 +13,8 @@ const wrappedRender = (reservation: ReservationNode) => {
         state={reservation.state ?? ReservationStateChoice.Created}
         isFree
         reservation={reservation}
-        handleClose={jest.fn()}
-        handleAccept={jest.fn()}
+        handleClose={vi.fn()}
+        handleAccept={vi.fn()}
       />
     </BrowserRouter>
   );

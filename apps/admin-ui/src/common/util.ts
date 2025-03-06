@@ -1,5 +1,5 @@
 import { format, getDay, isSameDay, parseISO } from "date-fns";
-import { trim } from "lodash";
+import { trim } from "lodash-es";
 import {
   type Maybe,
   type ReservationNode,
