@@ -54,13 +54,13 @@ class ReservationUnitAccessTypeForm(forms.ModelForm):
         reservation_unit: ReservationUnit = cleaned_data["reservation_unit"]
 
         if editing:
-            self.instance.validator.validate_not_past(begin_date)
-            self.instance.validator.validate_not_moved_to_past(begin_date)
+            self.instance.validators.validate_not_past(begin_date)
+            self.instance.validators.validate_not_moved_to_past(begin_date)
         else:
-            ReservationUnitAccessType.validator.validate_new_not_in_past(begin_date)
+            ReservationUnitAccessType.validators.validate_new_not_in_past(begin_date)
 
         if reservation_unit.pk is None:
-            ReservationUnitAccessType.validator.validate_not_access_code(access_type)
+            ReservationUnitAccessType.validators.validate_not_access_code(access_type)
 
         need_to_check_pindora = access_type == AccessType.ACCESS_CODE and (
             not editing or self.instance.access_type != AccessType.ACCESS_CODE
@@ -74,7 +74,7 @@ class ReservationUnitAccessTypeForm(forms.ModelForm):
                 return
 
     def validate_deletion(self) -> None:
-        self.instance.validator.validate_deleted_not_active_or_past()
+        self.instance.validators.validate_deleted_not_active_or_past()
 
 
 class ReservationUnitAccessTypeFormSet(BaseInlineFormSet):

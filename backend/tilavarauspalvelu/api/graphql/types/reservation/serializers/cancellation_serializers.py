@@ -51,16 +51,16 @@ class ReservationCancellationSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: ReservationCancellationData) -> ReservationCancellationData:
-        self.instance.validator.validate_reservation_state_allows_cancelling()
-        self.instance.validator.validate_reservation_type_allows_cancelling()
-        self.instance.validator.validate_reservation_not_past_or_ongoing()
-        self.instance.validator.validate_single_reservation_unit()
+        self.instance.validators.validate_reservation_state_allows_cancelling()
+        self.instance.validators.validate_reservation_type_allows_cancelling()
+        self.instance.validators.validate_reservation_not_past_or_ongoing()
+        self.instance.validators.validate_single_reservation_unit()
 
         reservation_unit: ReservationUnit = self.instance.reservation_units.first()
 
         begin = self.instance.begin.astimezone(DEFAULT_TIMEZONE)
 
-        reservation_unit.validator.validate_cancellation_rule(begin=begin)
+        reservation_unit.validators.validate_cancellation_rule(begin=begin)
 
         data["state"] = ReservationStateChoice.CANCELLED
 

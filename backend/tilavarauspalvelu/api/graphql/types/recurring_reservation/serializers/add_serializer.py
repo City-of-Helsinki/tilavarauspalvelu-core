@@ -48,7 +48,7 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: ReservationSeriesAddData) -> ReservationSeriesAddData:
-        self.instance.validator.validate_has_reservations()
+        self.instance.validators.validate_has_reservations()
 
         reservation_unit = self.instance.reservation_unit
         first_reservation: Reservation = self.instance.reservations.first()
@@ -69,9 +69,9 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         buffer_time_before = data.setdefault("buffer_time_before", reservation_unit.buffer_time_before)
         buffer_time_after = data.setdefault("buffer_time_after", reservation_unit.buffer_time_after)
 
-        reservation_unit.validator.validate_begin_before_end(begin, end)
-        reservation_unit.validator.validate_reservation_begin_time_staff(begin=begin)
-        reservation_unit.validator.validate_no_overlapping_reservations(
+        reservation_unit.validators.validate_begin_before_end(begin, end)
+        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begin)
+        reservation_unit.validators.validate_no_overlapping_reservations(
             begin=begin,
             end=end,
             new_buffer_time_before=buffer_time_before,

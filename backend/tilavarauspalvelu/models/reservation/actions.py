@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import datetime
 import uuid
 from typing import TYPE_CHECKING, Literal
@@ -37,9 +38,9 @@ __all__ = [
 ]
 
 
+@dataclasses.dataclass(slots=True, frozen=True)
 class ReservationActions:
-    def __init__(self, reservation: Reservation) -> None:
-        self.reservation = reservation
+    reservation: Reservation
 
     def get_actual_before_buffer(self) -> datetime.timedelta:
         buffer_time_before: datetime.timedelta = self.reservation.buffer_time_before or datetime.timedelta()

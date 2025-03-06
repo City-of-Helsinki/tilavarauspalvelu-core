@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .model import RequestLog
 
 
+__all__ = [
+    "RequestLogActions",
+]
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class RequestLogActions:
-    def __init__(self, request_log: RequestLog) -> None:
-        self.request_log = request_log
+    request_log: RequestLog

@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -22,8 +21,7 @@ from tilavarauspalvelu.enums import (
     ReservationUnitReservationState,
 )
 from utils.db import NowTT
-
-from .queryset import ReservationUnitManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -42,6 +40,7 @@ if TYPE_CHECKING:
     )
 
     from .actions import ReservationUnitActions
+    from .queryset import ReservationUnitManager
     from .validators import ReservationUnitValidator
 
 
@@ -271,7 +270,9 @@ class ReservationUnit(models.Model):
     reservation_cancelled_instructions_sv: str | None
     reservation_cancelled_instructions_en: str | None
 
-    objects = ReservationUnitManager()
+    objects: ClassVar[ReservationUnitManager] = LazyModelManager.new()
+    actions: ReservationUnitActions = LazyModelAttribute.new()
+    validators: ReservationUnitValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_unit"
@@ -282,27 +283,6 @@ class ReservationUnit(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name}, {getattr(self.unit, 'name', '')}"
-
-    @cached_property
-    def actions(self) -> ReservationUnitActions:
-        """Actions that can be executed on a ReservationUnit."""
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationUnitActions
-
-        return ReservationUnitActions(self)
-
-    @cached_property
-    def validator(self) -> ReservationUnitValidator:
-        """
-        Validation logic that requires access to a ReservationUnit instance,
-        e.g. for update, delete, or validation of another model.
-        """
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .validators import ReservationUnitValidator
-
-        return ReservationUnitValidator(self)
 
     @lookup_property(skip_codegen=True)
     def active_pricing_price() -> Decimal | None:

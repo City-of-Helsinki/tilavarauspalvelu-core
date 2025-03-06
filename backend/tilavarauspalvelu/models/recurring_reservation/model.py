@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.array import IndexTransform
@@ -15,9 +14,7 @@ from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, WeekdayChoice
 from utils.db import SubqueryArray
-from utils.utils import LazyModelAttribute
-
-from .queryset import RecurringReservationManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -26,6 +23,7 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
 
     from .actions import RecurringReservationActions
+    from .queryset import RecurringReservationManager
     from .validators import ReservationSeriesValidator
 
 
@@ -96,7 +94,9 @@ class RecurringReservation(models.Model):
     # Reverse relation typing helpers.
     reservations: ReservationQuerySet
 
-    objects = RecurringReservationManager()
+    objects: ClassVar[RecurringReservationManager] = LazyModelManager.new()
+    actions: RecurringReservationActions = LazyModelAttribute.new()
+    validators: ReservationSeriesValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "recurring_reservation"
@@ -111,16 +111,6 @@ class RecurringReservation(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name}"
-
-    @cached_property
-    def actions(self) -> RecurringReservationActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import RecurringReservationActions
-
-        return RecurringReservationActions(self)
-
-    validator: ReservationSeriesValidator = LazyModelAttribute()
 
     @lookup_property(skip_codegen=True)
     def should_have_active_access_code() -> bool:

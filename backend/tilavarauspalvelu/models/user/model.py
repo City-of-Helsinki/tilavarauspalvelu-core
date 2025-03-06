@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from functools import cached_property
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -15,9 +15,7 @@ from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
 from tilavarauspalvelu.services.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE
-from utils.utils import get_jwt_payload
-
-from .queryset import ProfileUserManager, UserManager
+from utils.utils import LazyModelAttribute, LazyModelManager, get_jwt_payload
 
 if TYPE_CHECKING:
     import datetime
@@ -29,6 +27,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import ExtraData
 
     from .actions import UserActions
+    from .queryset import ProfileUserManager, UserManager
+    from .validators import UserValidator
 
 
 __all__ = [
@@ -57,8 +57,9 @@ class User(AbstractUser):
     sent_email_about_deactivating_permissions = models.BooleanField(default=False, blank=True)
     sent_email_about_anonymization = models.BooleanField(default=False, blank=True)
 
-    objects = UserManager()
-
+    objects: ClassVar[UserManager] = LazyModelManager.new()
+    actions: UserActions = LazyModelAttribute.new()
+    validators: UserValidator = LazyModelAttribute.new()
     permissions = PermissionResolver()
 
     class Meta:
@@ -73,14 +74,6 @@ class User(AbstractUser):
         if self.last_login:
             return f"{default} - {self.last_login.astimezone(DEFAULT_TIMEZONE).strftime('%d.%m.%Y %H:%M')}"
         return default
-
-    @cached_property
-    def actions(self) -> UserActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import UserActions
-
-        return UserActions(self)
 
     def get_display_name(self) -> str:
         return f"{self.first_name} {self.last_name}".strip()
@@ -231,7 +224,7 @@ AnonymousUser.permissions = PermissionResolver()
 class ProfileUser(SerializableMixin, User):
     """User model for the GDPR API"""
 
-    objects = ProfileUserManager()
+    objects: ClassVar[ProfileUserManager] = LazyModelManager.new()
 
     class Meta:
         proxy = True

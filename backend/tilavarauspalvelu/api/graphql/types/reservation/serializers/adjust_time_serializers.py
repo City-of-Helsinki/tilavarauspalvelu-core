@@ -45,12 +45,12 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
         }
 
     def validate(self, data: ReservationAdjustTimeData) -> ReservationAdjustTimeData:
-        self.instance.validator.validate_reservation_state_allows_rescheduling()
-        self.instance.validator.validate_reservation_type_allows_rescheduling()
-        self.instance.validator.validate_reservation_not_handled()
-        self.instance.validator.validate_reservation_not_paid()
-        self.instance.validator.validate_reservation_not_past_or_ongoing()
-        self.instance.validator.validate_single_reservation_unit()
+        self.instance.validators.validate_reservation_state_allows_rescheduling()
+        self.instance.validators.validate_reservation_type_allows_rescheduling()
+        self.instance.validators.validate_reservation_not_handled()
+        self.instance.validators.validate_reservation_not_paid()
+        self.instance.validators.validate_reservation_not_past_or_ongoing()
+        self.instance.validators.validate_single_reservation_unit()
 
         begin = data["begin"].astimezone(DEFAULT_TIMEZONE)
         end = data["end"].astimezone(DEFAULT_TIMEZONE)
@@ -59,18 +59,18 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
 
         reservation_unit: ReservationUnit = self.instance.reservation_units.first()
 
-        reservation_unit.validator.validate_reservation_unit_is_direct_bookable()
-        reservation_unit.validator.validate_reservation_unit_is_published()
-        reservation_unit.validator.validate_reservation_unit_is_reservable_at(begin=begin)
-        reservation_unit.validator.validate_begin_before_end(begin=begin, end=end)
-        reservation_unit.validator.validate_duration_is_allowed(duration=end - begin)
-        reservation_unit.validator.validate_reservation_days_before(begin=begin)
-        reservation_unit.validator.validate_reservation_unit_is_open(begin=begin, end=end)
-        reservation_unit.validator.validate_not_rescheduled_to_paid_date(begin=begin)
-        reservation_unit.validator.validate_cancellation_rule(begin=current_begin)
-        reservation_unit.validator.validate_not_in_open_application_round(begin=begin.date(), end=end.date())
-        reservation_unit.validator.validate_reservation_begin_time(begin=begin)
-        reservation_unit.validator.validate_no_overlapping_reservations(
+        reservation_unit.validators.validate_reservation_unit_is_direct_bookable()
+        reservation_unit.validators.validate_reservation_unit_is_published()
+        reservation_unit.validators.validate_reservation_unit_is_reservable_at(begin=begin)
+        reservation_unit.validators.validate_begin_before_end(begin=begin, end=end)
+        reservation_unit.validators.validate_duration_is_allowed(duration=end - begin)
+        reservation_unit.validators.validate_reservation_days_before(begin=begin)
+        reservation_unit.validators.validate_reservation_unit_is_open(begin=begin, end=end)
+        reservation_unit.validators.validate_not_rescheduled_to_paid_date(begin=begin)
+        reservation_unit.validators.validate_cancellation_rule(begin=current_begin)
+        reservation_unit.validators.validate_not_in_open_application_round(begin=begin.date(), end=end.date())
+        reservation_unit.validators.validate_reservation_begin_time(begin=begin)
+        reservation_unit.validators.validate_no_overlapping_reservations(
             begin=begin, end=end, ignore_ids=[self.instance.pk]
         )
 

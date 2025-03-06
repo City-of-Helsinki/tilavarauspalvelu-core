@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.contrib.gis.db.models import PointField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.constants import COORDINATE_SYSTEM_ID
-
-from .queryset import LocationManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from django.contrib.gis.geos import Point
@@ -17,6 +15,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import Space, Unit
 
     from .actions import LocationActions
+    from .queryset import LocationManager
+    from .validators import LocationValidator
 
 
 __all__ = [
@@ -51,8 +51,6 @@ class Location(models.Model):
         blank=True,
     )
 
-    objects = LocationManager()
-
     # Translated field hints
     address_street_fi: str | None
     address_street_en: str | None
@@ -60,6 +58,10 @@ class Location(models.Model):
     address_city_fi: str | None
     address_city_en: str | None
     address_city_sv: str | None
+
+    objects: ClassVar[LocationManager] = LazyModelManager.new()
+    actions: LocationActions = LazyModelAttribute.new()
+    validators: LocationValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "location"
@@ -70,14 +72,6 @@ class Location(models.Model):
 
     def __str__(self) -> str:
         return self.address
-
-    @cached_property
-    def actions(self) -> LocationActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import LocationActions
-
-        return LocationActions(self)
 
     @property
     def address(self) -> str:

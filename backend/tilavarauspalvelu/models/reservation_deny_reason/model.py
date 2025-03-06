@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationDenyReasonManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import ReservationDenyReasonActions
+    from .queryset import ReservationDenyReasonManager
+    from .validators import ReservationDenyReasonValidator
 
 
 __all__ = [
@@ -27,7 +28,9 @@ class ReservationDenyReason(models.Model):
     reason_sv: str | None
     reason_en: str | None
 
-    objects = ReservationDenyReasonManager()
+    objects: ClassVar[ReservationDenyReasonManager] = LazyModelManager.new()
+    actions: ReservationDenyReasonActions = LazyModelAttribute.new()
+    validators: ReservationDenyReasonValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_deny_reason"
@@ -38,11 +41,3 @@ class ReservationDenyReason(models.Model):
 
     def __str__(self) -> str:
         return self.reason
-
-    @cached_property
-    def actions(self) -> ReservationDenyReasonActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationDenyReasonActions
-
-        return ReservationDenyReasonActions(self)

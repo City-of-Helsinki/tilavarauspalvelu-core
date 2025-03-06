@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from functools import cached_property
 from inspect import cleandoc
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -11,13 +10,14 @@ from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-
-from .queryset import ReservationUnitHierarchyManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
 
     from .actions import ReservationUnitHierarchyActions
+    from .queryset import ReservationUnitHierarchyManager
+    from .validators import ReservationUnitHierarchyValidator
 
 __all__ = [
     "ReservationUnitHierarchy",
@@ -39,7 +39,9 @@ class ReservationUnitHierarchy(models.Model):
     )
     related_reservation_unit_ids: list[int] = ArrayField(base_field=models.IntegerField())
 
-    objects = ReservationUnitHierarchyManager()
+    objects: ClassVar[ReservationUnitHierarchyManager] = LazyModelManager.new()
+    actions: ReservationUnitHierarchyActions = LazyModelAttribute.new()
+    validators: ReservationUnitHierarchyValidator = LazyModelAttribute.new()
 
     class Meta:
         managed = False
@@ -50,14 +52,6 @@ class ReservationUnitHierarchy(models.Model):
 
     def __str__(self) -> str:
         return f"Hierarchy for reservation unit: {self.reservation_unit_id}"
-
-    @cached_property
-    def actions(self) -> ReservationUnitHierarchyActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationUnitHierarchyActions
-
-        return ReservationUnitHierarchyActions(self)
 
     @classmethod
     def refresh(cls, using: str | None = None) -> None:

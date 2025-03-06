@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import PaymentProductManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import uuid
@@ -14,6 +13,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import PaymentMerchant
 
     from .actions import PaymentProductActions
+    from .queryset import PaymentProductManager
+    from .validators import PaymentProductValidator
 
 
 __all__ = [
@@ -31,7 +32,9 @@ class PaymentProduct(models.Model):
         null=True,
     )
 
-    objects = PaymentProductManager()
+    objects: ClassVar[PaymentProductManager] = LazyModelManager.new()
+    actions: PaymentProductActions = LazyModelAttribute.new()
+    validators: PaymentProductValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "payment_product"
@@ -42,11 +45,3 @@ class PaymentProduct(models.Model):
 
     def __str__(self) -> str:
         return str(self.id)
-
-    @cached_property
-    def actions(self) -> PaymentProductActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import PaymentProductActions
-
-        return PaymentProductActions(self)

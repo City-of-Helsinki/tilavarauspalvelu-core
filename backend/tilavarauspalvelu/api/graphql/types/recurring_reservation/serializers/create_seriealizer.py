@@ -157,7 +157,7 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
         reservation_unit: ReservationUnit = self.get_or_default("reservation_unit", data)
         interval = ReservationStartInterval(reservation_unit.reservation_start_interval)
 
-        RecurringReservation.validator.validate_series_time_slots(
+        RecurringReservation.validators.validate_series_time_slots(
             begin_date=begin_date,
             begin_time=begin_time,
             end_date=end_date,

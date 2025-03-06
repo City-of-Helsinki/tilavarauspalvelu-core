@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import pgettext_lazy
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-
-from .queryset import TermsOfUseManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import TermsOfUseActions
+    from .queryset import TermsOfUseManager
+    from .validators import TermsOfUseValidator
 
 __all__ = [
     "TermsOfUse",
@@ -39,7 +39,9 @@ class TermsOfUse(models.Model):
     text_en: str | None
     text_sv: str | None
 
-    objects = TermsOfUseManager()
+    objects: ClassVar[TermsOfUseManager] = LazyModelManager.new()
+    actions: TermsOfUseActions = LazyModelAttribute.new()
+    validators: TermsOfUseValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "terms_of_use"
@@ -50,14 +52,6 @@ class TermsOfUse(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @cached_property
-    def actions(self) -> TermsOfUseActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import TermsOfUseActions
-
-        return TermsOfUseActions(self)
 
 
 AuditLogger.register(TermsOfUse)

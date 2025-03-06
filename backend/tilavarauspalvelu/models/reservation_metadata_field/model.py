@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationMetadataFieldManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import ReservationMetadataFieldActions
+    from .queryset import ReservationMetadataFieldManager
+    from .validators import ReservationMetadataFieldValidator
 
 
 __all__ = [
@@ -20,7 +21,9 @@ __all__ = [
 class ReservationMetadataField(models.Model):
     field_name: str = models.CharField(max_length=100, unique=True)
 
-    objects = ReservationMetadataFieldManager()
+    objects: ClassVar[ReservationMetadataFieldManager] = LazyModelManager.new()
+    actions: ReservationMetadataFieldActions = LazyModelAttribute.new()
+    validators: ReservationMetadataFieldValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_metadata_field"
@@ -31,11 +34,3 @@ class ReservationMetadataField(models.Model):
 
     def __str__(self) -> str:
         return self.field_name
-
-    @cached_property
-    def actions(self) -> ReservationMetadataFieldActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationMetadataFieldActions
-
-        return ReservationMetadataFieldActions(self)

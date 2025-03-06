@@ -56,18 +56,18 @@ class ReservationCreateSerializer(NestingModelSerializer):
         # Endpoint requires users to be logged in
         user: User = self.context["request"].user
 
-        reservation_unit.validator.validate_reservation_unit_is_direct_bookable()
-        reservation_unit.validator.validate_reservation_unit_is_published()
-        reservation_unit.validator.validate_reservation_unit_is_reservable_at(begin=begin)
-        reservation_unit.validator.validate_user_is_adult_if_required(user=user)
-        reservation_unit.validator.validate_user_has_not_exceeded_max_reservations(user=user)
-        reservation_unit.validator.validate_begin_before_end(begin=begin, end=end)
-        reservation_unit.validator.validate_duration_is_allowed(duration=end - begin)
-        reservation_unit.validator.validate_reservation_days_before(begin=begin)
-        reservation_unit.validator.validate_reservation_unit_is_open(begin=begin, end=end)
-        reservation_unit.validator.validate_not_in_open_application_round(begin=begin.date(), end=end.date())
-        reservation_unit.validator.validate_reservation_begin_time(begin=begin)
-        reservation_unit.validator.validate_no_overlapping_reservations(begin=begin, end=end)
+        reservation_unit.validators.validate_reservation_unit_is_direct_bookable()
+        reservation_unit.validators.validate_reservation_unit_is_published()
+        reservation_unit.validators.validate_reservation_unit_is_reservable_at(begin=begin)
+        reservation_unit.validators.validate_user_is_adult_if_required(user=user)
+        reservation_unit.validators.validate_user_has_not_exceeded_max_reservations(user=user)
+        reservation_unit.validators.validate_begin_before_end(begin=begin, end=end)
+        reservation_unit.validators.validate_duration_is_allowed(duration=end - begin)
+        reservation_unit.validators.validate_reservation_days_before(begin=begin)
+        reservation_unit.validators.validate_reservation_unit_is_open(begin=begin, end=end)
+        reservation_unit.validators.validate_not_in_open_application_round(begin=begin.date(), end=end.date())
+        reservation_unit.validators.validate_reservation_begin_time(begin=begin)
+        reservation_unit.validators.validate_no_overlapping_reservations(begin=begin, end=end)
 
         pricing = reservation_unit.actions.get_active_pricing(by_date=begin.date())
 
@@ -76,8 +76,8 @@ class ReservationCreateSerializer(NestingModelSerializer):
             raise ValidationError(msg, code=error_codes.NO_PRICING_FOUND)
 
         if pricing.highest_price > 0:
-            reservation_unit.validator.validate_has_payment_type()
-            reservation_unit.validator.validate_has_payment_product()
+            reservation_unit.validators.validate_has_payment_type()
+            reservation_unit.validators.validate_has_payment_product()
 
         data["sku"] = reservation_unit.sku
         data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)

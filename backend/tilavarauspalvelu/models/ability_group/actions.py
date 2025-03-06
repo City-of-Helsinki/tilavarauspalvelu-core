@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .model import AbilityGroup
 
 
+__all__ = [
+    "AbilityGroupActions",
+]
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class AbilityGroupActions:
-    def __init__(self, ability_group: AbilityGroup) -> None:
-        self.ability_group = ability_group
+    ability_group: AbilityGroup

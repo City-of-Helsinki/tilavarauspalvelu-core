@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
 from django.db import models
@@ -16,13 +15,14 @@ from tilavarauspalvelu.enums import (
 )
 from utils.date_utils import local_datetime
 from utils.db import NowTT
-
-from .queryset import ApplicationRoundManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import TermsOfUse, Unit
 
     from .actions import ApplicationRoundActions
+    from .queryset import ApplicationRoundManager
+    from .validators import ApplicationRoundValidator
 
 
 __all__ = [
@@ -71,7 +71,9 @@ class ApplicationRound(models.Model):
         null=True,
     )
 
-    objects = ApplicationRoundManager()
+    objects: ClassVar[ApplicationRoundManager] = LazyModelManager.new()
+    actions: ApplicationRoundActions = LazyModelAttribute.new()
+    validators: ApplicationRoundValidator = LazyModelAttribute.new()
 
     # Translated field hints
     name_fi: str | None
@@ -93,14 +95,6 @@ class ApplicationRound(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.reservation_period_begin} - {self.reservation_period_end})"
-
-    @cached_property
-    def actions(self) -> ApplicationRoundActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ApplicationRoundActions
-
-        return ApplicationRoundActions(self)
 
     @lookup_property(skip_codegen=True)
     def status() -> ApplicationRoundStatusChoice:

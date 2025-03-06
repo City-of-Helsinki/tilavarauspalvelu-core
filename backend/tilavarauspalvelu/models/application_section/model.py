@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.db.models import Exists, OrderBy
@@ -15,13 +14,14 @@ from lookup_property import L, lookup_property
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from utils.date_utils import local_datetime
 from utils.db import NowTT, SubqueryCount
-
-from .queryset import ApplicationSectionManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import AgeGroup, Application, ReservationPurpose
 
     from .actions import ApplicationSectionActions
+    from .queryset import ApplicationSectionManager
+    from .validators import ApplicationSectionValidator
 
 
 __all__ = [
@@ -65,7 +65,9 @@ class ApplicationSection(SerializableMixin, models.Model):
         null=True,
     )
 
-    objects = ApplicationSectionManager()
+    objects: ClassVar[ApplicationSectionManager] = LazyModelManager.new()
+    actions: ApplicationSectionActions = LazyModelAttribute.new()
+    validators: ApplicationSectionValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "application_section"
@@ -111,14 +113,6 @@ class ApplicationSection(SerializableMixin, models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @cached_property
-    def actions(self) -> ApplicationSectionActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ApplicationSectionActions
-
-        return ApplicationSectionActions(self)
 
     @property
     def suitable_days_of_the_week(self) -> list[Weekday]:

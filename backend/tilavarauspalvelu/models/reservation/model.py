@@ -3,8 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from decimal import Decimal
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.db.models.functions import Concat, Trim
@@ -17,8 +16,7 @@ from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from utils.date_utils import datetime_range_as_string
 from utils.decimal_utils import round_decimal
-
-from .queryset import ReservationManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import (
@@ -33,6 +31,7 @@ if TYPE_CHECKING:
     )
 
     from .actions import ReservationActions
+    from .queryset import ReservationManager
     from .validators import ReservationValidator
 
 
@@ -177,7 +176,9 @@ class Reservation(SerializableMixin, models.Model):
         blank=True,
     )
 
-    objects = ReservationManager()
+    objects: ClassVar[ReservationManager] = LazyModelManager.new()
+    actions: ReservationActions = LazyModelAttribute.new()
+    validators: ReservationValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation"
@@ -225,26 +226,6 @@ class Reservation(SerializableMixin, models.Model):
     def __repr__(self) -> str:
         dt_range = datetime_range_as_string(start_datetime=self.begin, end_datetime=self.end)
         return f"<Reservation {self.name} ({dt_range})>"
-
-    @cached_property
-    def actions(self) -> ReservationActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationActions
-
-        return ReservationActions(self)
-
-    @cached_property
-    def validator(self) -> ReservationValidator:
-        """
-        Validation logic that requires access to a Reservation instance,
-        e.g. for update, delete, or validation of another model.
-        """
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .validators import ReservationValidator
-
-        return ReservationValidator(self)
 
     @property
     def price_net(self) -> Decimal:

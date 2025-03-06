@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from helsinki_gdpr.models import SerializableMixin
 
-from .queryset import AddressManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import AddressActions
+    from .queryset import AddressManager
+    from .validators import AddressValidator
 
 
 __all__ = [
@@ -31,7 +32,9 @@ class Address(SerializableMixin, models.Model):
     city_en: str | None
     city_sv: str | None
 
-    objects = AddressManager()
+    objects: ClassVar[AddressManager] = LazyModelManager.new()
+    actions: AddressActions = LazyModelAttribute.new()
+    validators: AddressValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "address"
@@ -55,14 +58,6 @@ class Address(SerializableMixin, models.Model):
 
     def __str__(self) -> str:
         return self.full_address
-
-    @cached_property
-    def actions(self) -> AddressActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import AddressActions
-
-        return AddressActions(self)
 
     @property
     def full_address(self) -> str:

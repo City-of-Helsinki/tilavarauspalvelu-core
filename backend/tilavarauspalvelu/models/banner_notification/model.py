@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -9,13 +8,16 @@ from django.utils.translation import gettext_lazy as _
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationState, BannerNotificationTarget
 from utils.date_utils import local_datetime
 from utils.fields.model import StrChoiceField
+from utils.utils import LazyModelAttribute, LazyModelManager
 
-from .queryset import BANNER_LEVEL_SORT_ORDER, BANNER_TARGET_SORT_ORDER, BannerNotificationManager
+from .queryset import BANNER_LEVEL_SORT_ORDER, BANNER_TARGET_SORT_ORDER
 
 if TYPE_CHECKING:
     import datetime
 
     from .actions import BannerNotificationActions
+    from .queryset import BannerNotificationManager
+    from .validators import BannerNotificationValidator
 
 
 __all__ = [
@@ -32,12 +34,14 @@ class BannerNotification(models.Model):
     active_from: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
     active_until: datetime.datetime | None = models.DateTimeField(null=True, blank=True, default=None)
 
-    objects = BannerNotificationManager()
-
     # Translated field hints
     message_fi: str | None
     message_sv: str | None
     message_en: str | None
+
+    objects: ClassVar[BannerNotificationManager] = LazyModelManager.new()
+    actions: BannerNotificationActions = LazyModelAttribute.new()
+    validators: BannerNotificationValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "banner_notification"
@@ -88,14 +92,6 @@ class BannerNotification(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @cached_property
-    def actions(self) -> BannerNotificationActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import BannerNotificationActions
-
-        return BannerNotificationActions(self)
 
     @property
     def is_active(self) -> bool:

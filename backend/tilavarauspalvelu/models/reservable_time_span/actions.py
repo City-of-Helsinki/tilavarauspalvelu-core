@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .model import ReservableTimeSpan
 
 
+__all__ = [
+    "ReservableTimeSpanActions",
+]
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class ReservableTimeSpanActions:
-    def __init__(self, reservable_time_span: ReservableTimeSpan) -> None:
-        self.reservable_time_span = reservable_time_span
+    reservable_time_span: ReservableTimeSpan

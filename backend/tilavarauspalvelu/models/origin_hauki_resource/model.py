@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import OriginHaukiResourceManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
 
     from .actions import OriginHaukiResourceActions
+    from .queryset import OriginHaukiResourceManager
+    from .validators import OriginHaukiResourceValidator
 
 
 __all__ = [
@@ -27,7 +28,9 @@ class OriginHaukiResource(models.Model):
     # Latest date fetched from Hauki opening hours API
     latest_fetched_date: datetime.datetime.date = models.DateField(blank=True, null=True)
 
-    objects = OriginHaukiResourceManager()
+    objects: ClassVar[OriginHaukiResourceManager] = LazyModelManager.new()
+    actions: OriginHaukiResourceActions = LazyModelAttribute.new()
+    validators: OriginHaukiResourceValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "origin_hauki_resource"
@@ -38,11 +41,3 @@ class OriginHaukiResource(models.Model):
 
     def __str__(self) -> str:
         return str(self.id)
-
-    @cached_property
-    def actions(self) -> OriginHaukiResourceActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import OriginHaukiResourceActions
-
-        return OriginHaukiResourceActions(self)

@@ -31,6 +31,14 @@ if TYPE_CHECKING:
     )
 
 
+__all__ = [
+    "RecurringReservationActions",
+    "ReservationDetails",
+    "ReservationSeriesCalculationResults",
+    "ReservationSeriesCalculationResults",
+]
+
+
 class ReservationPeriod(TypedDict):
     begin: datetime.datetime
     end: datetime.datetime
@@ -115,9 +123,9 @@ class ReservationDetails(TypedDict, total=False):
     age_group: int | AgeGroup
 
 
+@dataclasses.dataclass(slots=True, frozen=True)
 class RecurringReservationActions:
-    def __init__(self, recurring_reservation: RecurringReservation) -> None:
-        self.recurring_reservation = recurring_reservation
+    recurring_reservation: RecurringReservation
 
     def pre_calculate_slots(
         self,

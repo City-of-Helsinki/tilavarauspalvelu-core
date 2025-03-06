@@ -53,7 +53,7 @@ class ReservationDenySerializer(NestingModelSerializer):
         }
 
     def validate(self, data: ReservationDenyData) -> ReservationDenyData:
-        self.instance.validator.validate_reservation_state_allows_denying()
+        self.instance.validators.validate_reservation_state_allows_denying()
         data["state"] = ReservationStateChoice.DENIED
         data["handled_at"] = local_datetime()
         return data

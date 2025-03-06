@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import CityManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import CityActions
+    from .queryset import CityManager
+    from .validators import CityValidator
 
 __all__ = [
     "City",
@@ -25,7 +26,9 @@ class City(models.Model):
     name_en: str | None
     name_sv: str | None
 
-    objects = CityManager()
+    objects: ClassVar[CityManager] = LazyModelManager.new()
+    actions: CityActions = LazyModelAttribute.new()
+    validators: CityValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "city"
@@ -36,11 +39,3 @@ class City(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @cached_property
-    def actions(self) -> CityActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import CityActions
-
-        return CityActions(self)

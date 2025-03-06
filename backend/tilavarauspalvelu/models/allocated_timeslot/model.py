@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.db.models import Value
@@ -11,8 +10,7 @@ from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import Weekday
 from utils.fields.model import StrChoiceField
-
-from .queryset import AllocatedTimeSlotManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -20,6 +18,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnitOption
 
     from .actions import AllocatedTimeSlotActions
+    from .queryset import AllocatedTimeSlotManager
+    from .validators import AllocatedTimeSlotValidator
 
 
 __all__ = [
@@ -44,7 +44,9 @@ class AllocatedTimeSlot(models.Model):
         on_delete=models.CASCADE,
     )
 
-    objects = AllocatedTimeSlotManager()
+    objects: ClassVar[AllocatedTimeSlotManager] = LazyModelManager.new()
+    actions: AllocatedTimeSlotActions = LazyModelAttribute.new()
+    validators: AllocatedTimeSlotValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "allocated_time_slot"
@@ -70,14 +72,6 @@ class AllocatedTimeSlot(models.Model):
         begin_time = self.begin_time.isoformat(timespec="minutes")
         end_time = self.end_time.isoformat(timespec="minutes")
         return f"{Weekday(self.day_of_the_week).label} {begin_time}-{end_time}"
-
-    @cached_property
-    def actions(self) -> AllocatedTimeSlotActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import AllocatedTimeSlotActions
-
-        return AllocatedTimeSlotActions(self)
 
     @lookup_property
     def allocated_time_of_week() -> str:

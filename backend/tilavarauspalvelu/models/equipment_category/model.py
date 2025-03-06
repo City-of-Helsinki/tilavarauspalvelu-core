@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import EquipmentCategoryManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import EquipmentCategoryActions
+    from .queryset import EquipmentCategoryManager
+    from .validators import EquipmentCategoryValidator
 
 __all__ = [
     "EquipmentCategory",
@@ -26,7 +27,9 @@ class EquipmentCategory(models.Model):
     name_sv: str | None
     name_en: str | None
 
-    objects = EquipmentCategoryManager()
+    objects: ClassVar[EquipmentCategoryManager] = LazyModelManager.new()
+    actions: EquipmentCategoryActions = LazyModelAttribute.new()
+    validators: EquipmentCategoryValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "equipment_category"
@@ -37,11 +40,3 @@ class EquipmentCategory(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @cached_property
-    def actions(self) -> EquipmentCategoryActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import EquipmentCategoryActions
-
-        return EquipmentCategoryActions(self)

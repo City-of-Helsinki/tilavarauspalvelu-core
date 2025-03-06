@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationStatisticsReservationUnitManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationStatistic
 
     from .actions import ReservationStatisticsReservationUnitActions
+    from .queryset import ReservationStatisticsReservationUnitManager
+    from .validators import ReservationStatisticsReservationUnitValidator
 
 
 __all__ = [
@@ -36,7 +37,9 @@ class ReservationStatisticsReservationUnit(models.Model):
         null=True,
     )
 
-    objects = ReservationStatisticsReservationUnitManager()
+    objects: ClassVar[ReservationStatisticsReservationUnitManager] = LazyModelManager.new()
+    actions: ReservationStatisticsReservationUnitActions = LazyModelAttribute.new()
+    validators: ReservationStatisticsReservationUnitValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_statistics_reservation_unit"
@@ -47,14 +50,6 @@ class ReservationStatisticsReservationUnit(models.Model):
 
     def __str__(self) -> str:
         return f"{self.reservation_statistics} - {self.reservation_unit}"
-
-    @cached_property
-    def actions(self) -> ReservationStatisticsReservationUnitActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationStatisticsReservationUnitActions
-
-        return ReservationStatisticsReservationUnitActions(self)
 
     @classmethod
     def for_statistic(

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -10,13 +9,14 @@ from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
 from utils.db import SubqueryArray
-
-from .queryset import SpaceManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Unit
 
     from .actions import SpaceActions
+    from .queryset import SpaceManager
+    from .validators import SpaceValidator
 
 
 __all__ = [
@@ -51,12 +51,14 @@ class Space(MPTTModel):
     lft: int
     rght: int
 
-    objects = SpaceManager()
-
     # Translated field hints
     name_fi: str | None
     name_sv: str | None
     name_en: str | None
+
+    objects: ClassVar[SpaceManager] = LazyModelManager.new()
+    actions: SpaceActions = LazyModelAttribute.new()
+    validators: SpaceValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "space"
@@ -70,14 +72,6 @@ class Space(MPTTModel):
         if self.unit is not None:
             value += f", {self.unit!s}"
         return value
-
-    @cached_property
-    def actions(self) -> SpaceActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import SpaceActions
-
-        return SpaceActions(self)
 
     @lookup_property(skip_codegen=True)
     def family() -> list[int]:

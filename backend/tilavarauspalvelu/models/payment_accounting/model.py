@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -9,11 +8,12 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.validators import is_numeric, validate_accounting_project
-
-from .queryset import PaymentAccountingManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import PaymentAccountingActions
+    from .queryset import PaymentAccountingManager
+    from .validators import PaymentAccountingValidator
 
 
 __all__ = [
@@ -39,7 +39,9 @@ class PaymentAccounting(models.Model):
     operation_area: str = models.CharField(blank=True, default="", max_length=6, validators=[is_numeric])
     balance_profit_center: str = models.CharField(max_length=10)
 
-    objects = PaymentAccountingManager()
+    objects: ClassVar[PaymentAccountingManager] = LazyModelManager.new()
+    actions: PaymentAccountingActions = LazyModelAttribute.new()
+    validators: PaymentAccountingValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "payment_accounting"
@@ -62,14 +64,6 @@ class PaymentAccounting(models.Model):
             reservation_units = reservation_units_from_units.union(self.reservation_units.all())
             for reservation_unit in reservation_units:
                 refresh_reservation_unit_accounting.delay(reservation_unit.pk)
-
-    @cached_property
-    def actions(self) -> PaymentAccountingActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import PaymentAccountingActions
-
-        return PaymentAccountingActions(self)
 
     def clean(self) -> None:
         if not self.project and not self.profit_center and not self.internal_order:

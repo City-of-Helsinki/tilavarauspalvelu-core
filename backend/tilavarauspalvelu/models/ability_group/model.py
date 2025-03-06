@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import AbilityGroupManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import AbilityGroupActions
+    from .queryset import AbilityGroupManager
+    from .validators import AbilityGroupValidator
 
 
 __all__ = [
@@ -20,12 +21,14 @@ __all__ = [
 class AbilityGroup(models.Model):
     name: str = models.TextField(unique=True)
 
-    objects = AbilityGroupManager()
-
     # Translated field hints
     name_fi: str | None
     name_sv: str | None
     name_en: str | None
+
+    objects: ClassVar[AbilityGroupManager] = LazyModelManager.new()
+    actions: AbilityGroupActions = LazyModelAttribute.new()
+    validators: AbilityGroupValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "ability_group"
@@ -36,11 +39,3 @@ class AbilityGroup(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @cached_property
-    def actions(self) -> AbilityGroupActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import AbilityGroupActions
-
-        return AbilityGroupActions(self)

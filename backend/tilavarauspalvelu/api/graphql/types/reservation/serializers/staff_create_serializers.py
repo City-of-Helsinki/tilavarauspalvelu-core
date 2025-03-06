@@ -120,7 +120,7 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
 
         reservation_type = data.get("type")
-        reservation_unit.validator.validate_can_create_reservation_type(reservation_type=reservation_type)
+        reservation_unit.validators.validate_can_create_reservation_type(reservation_type=reservation_type)
 
         # For blocking reservations, buffer times can overlap existing reservations.
         if reservation_type == ReservationTypeChoice.BLOCKED:
@@ -130,9 +130,9 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             buffer_time_before = data.get("buffer_time_before")
             buffer_time_after = data.get("buffer_time_after")
 
-        reservation_unit.validator.validate_begin_before_end(begin=begin, end=end)
-        reservation_unit.validator.validate_reservation_begin_time_staff(begin=begin)
-        reservation_unit.validator.validate_no_overlapping_reservations(
+        reservation_unit.validators.validate_begin_before_end(begin=begin, end=end)
+        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begin)
+        reservation_unit.validators.validate_no_overlapping_reservations(
             begin=begin,
             end=end,
             new_buffer_time_before=buffer_time_before,

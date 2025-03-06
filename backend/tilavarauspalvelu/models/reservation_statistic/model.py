@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 import datetime
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import CustomerTypeChoice
-
-from .queryset import ReservationStatisticManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -18,6 +16,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
 
     from .actions import ReservationStatisticActions
+    from .queryset import ReservationStatisticManager
+    from .validators import ReservationStatisticValidator
 
 
 class ReservationStatistic(models.Model):
@@ -146,7 +146,9 @@ class ReservationStatistic(models.Model):
     is_applied: bool = models.BooleanField(default=False, blank=True)
     """Is the reservation done through application process."""
 
-    objects = ReservationStatisticManager()
+    objects: ClassVar[ReservationStatisticManager] = LazyModelManager.new()
+    actions: ReservationStatisticActions = LazyModelAttribute.new()
+    validators: ReservationStatisticValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_statistic"
@@ -157,14 +159,6 @@ class ReservationStatistic(models.Model):
 
     def __str__(self) -> str:
         return f"{self.reservee_uuid} - {self.begin} - {self.end}"
-
-    @cached_property
-    def actions(self) -> ReservationStatisticActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationStatisticActions
-
-        return ReservationStatisticActions(self)
 
     @classmethod
     def for_reservation(cls, reservation: Reservation, *, save: bool = True) -> ReservationStatistic:  # noqa: PLR0915

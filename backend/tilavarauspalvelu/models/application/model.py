@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.db.models.functions import Concat
@@ -17,8 +16,7 @@ from tilavarauspalvelu.enums import (
 )
 from utils.db import NowTT
 from utils.fields.model import StrChoiceField
-
-from .queryset import ApplicationManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -26,6 +24,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import Address, ApplicationRound, City, Organisation, Person, Unit, User
 
     from .actions import ApplicationActions
+    from .queryset import ApplicationManager
+    from .validators import ApplicationValidator
 
 
 __all__ = [
@@ -93,7 +93,9 @@ class Application(SerializableMixin, models.Model):
         null=True,
     )
 
-    objects = ApplicationManager()
+    objects: ClassVar[ApplicationManager] = LazyModelManager.new()
+    actions: ApplicationActions = LazyModelAttribute.new()
+    validators: ApplicationValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "application"
@@ -113,14 +115,6 @@ class Application(SerializableMixin, models.Model):
 
     def __str__(self) -> str:
         return f"{self.user} ({self.created_date.date()})"
-
-    @cached_property
-    def actions(self) -> ApplicationActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ApplicationActions
-
-        return ApplicationActions(self)
 
     @lookup_property(joins=["application_round"], skip_codegen=True)
     def status() -> ApplicationStatusChoice:

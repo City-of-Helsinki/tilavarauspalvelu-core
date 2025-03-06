@@ -43,9 +43,9 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
         begin = data["begin"].astimezone(DEFAULT_TIMEZONE)
         end = data["end"].astimezone(DEFAULT_TIMEZONE)
 
-        self.instance.validator.validate_reservation_state_allows_rescheduling()
-        self.instance.validator.validate_single_reservation_unit()
-        self.instance.validator.validate_reservation_can_be_modified_by_staff()
+        self.instance.validators.validate_reservation_state_allows_rescheduling()
+        self.instance.validators.validate_single_reservation_unit()
+        self.instance.validators.validate_reservation_can_be_modified_by_staff()
 
         reservation_unit: ReservationUnit = self.instance.reservation_units.first()
 
@@ -53,9 +53,9 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
             data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
             data["buffer_time_after"] = reservation_unit.actions.get_actual_after_buffer(end)
 
-        reservation_unit.validator.validate_begin_before_end(begin=begin, end=end)
-        reservation_unit.validator.validate_reservation_begin_time_staff(begin=begin)
-        reservation_unit.validator.validate_no_overlapping_reservations(
+        reservation_unit.validators.validate_begin_before_end(begin=begin, end=end)
+        reservation_unit.validators.validate_reservation_begin_time_staff(begin=begin)
+        reservation_unit.validators.validate_no_overlapping_reservations(
             begin=begin,
             end=end,
             new_buffer_time_before=data.get("buffer_time_before"),

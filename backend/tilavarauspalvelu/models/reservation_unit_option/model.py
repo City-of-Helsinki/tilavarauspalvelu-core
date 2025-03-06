@@ -1,17 +1,23 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationUnitOptionManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection, ReservationUnit
 
     from .actions import ReservationUnitOptionActions
+    from .queryset import ReservationUnitOptionManager
+    from .validators import ReservationUnitOptionValidator
+
+
+__all__ = [
+    "ReservationUnitOption",
+]
 
 
 class ReservationUnitOption(models.Model):
@@ -30,7 +36,9 @@ class ReservationUnitOption(models.Model):
         on_delete=models.PROTECT,
     )
 
-    objects = ReservationUnitOptionManager()
+    objects: ClassVar[ReservationUnitOptionManager] = LazyModelManager.new()
+    actions: ReservationUnitOptionActions = LazyModelAttribute.new()
+    validators: ReservationUnitOptionValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_unit_option"
@@ -54,11 +62,3 @@ class ReservationUnitOption(models.Model):
             f"{self.preferred_order}) application section '{self.application_section.name}' "
             f"reservation unit '{self.reservation_unit.name}'"
         )
-
-    @cached_property
-    def actions(self) -> ReservationUnitOptionActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationUnitOptionActions
-
-        return ReservationUnitOptionActions(self)

@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from utils.date_utils import DEFAULT_TIMEZONE
-
-from .queryset import ReservableTimeSpanManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -17,6 +15,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import OriginHaukiResource
 
     from .actions import ReservableTimeSpanActions
+    from .queryset import ReservableTimeSpanManager
+    from .validators import ReservableTimeSpanValidator
 
 
 __all__ = [
@@ -35,7 +35,9 @@ class ReservableTimeSpan(models.Model):
     start_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)
     end_datetime: datetime.datetime = models.DateTimeField(null=False, blank=False)
 
-    objects = ReservableTimeSpanManager()
+    objects: ClassVar[ReservableTimeSpanManager] = LazyModelManager.new()
+    actions: ReservableTimeSpanActions = LazyModelAttribute.new()
+    validators: ReservableTimeSpanValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservable_time_span"
@@ -57,14 +59,6 @@ class ReservableTimeSpan(models.Model):
 
     def __str__(self) -> str:
         return f"{self.resource} {self.get_datetime_str()}"
-
-    @cached_property
-    def actions(self) -> ReservableTimeSpanActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservableTimeSpanActions
-
-        return ReservableTimeSpanActions(self)
 
     def get_datetime_str(self) -> str:
         strformat = "%Y-%m-%d %H:%M"

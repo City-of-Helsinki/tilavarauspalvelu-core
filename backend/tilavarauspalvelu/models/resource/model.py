@@ -1,19 +1,19 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import ResourceLocationType
-
-from .queryset import ResourceManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Space
 
     from .actions import ResourceActions
+    from .queryset import ResourceManager
+    from .validators import ResourceValidator
 
 
 __all__ = [
@@ -43,7 +43,9 @@ class Resource(models.Model):
     name_sv: str | None
     name_en: str | None
 
-    objects = ResourceManager()
+    objects: ClassVar[ResourceManager] = LazyModelManager.new()
+    actions: ResourceActions = LazyModelAttribute.new()
+    validators: ResourceValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "resource"
@@ -57,11 +59,3 @@ class Resource(models.Model):
         if self.space is not None:
             value += f" ({self.space!s})"
         return value
-
-    @cached_property
-    def actions(self) -> ResourceActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ResourceActions
-
-        return ResourceActions(self)

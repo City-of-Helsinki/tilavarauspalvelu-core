@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
 from django.db import models
@@ -9,8 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
 
 from tilavarauspalvelu.enums import ReservationUnitImageType
-
-from .queryset import ReservationUnitImageManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from easy_thumbnails.files import ThumbnailerImageFieldFile
@@ -18,6 +16,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
 
     from .actions import ReservationUnitImageActions
+    from .queryset import ReservationUnitImageManager
+    from .validators import ReservationUnitImageValidator
 
 __all__ = [
     "ReservationUnitImage",
@@ -39,7 +39,9 @@ class ReservationUnitImage(models.Model):
     medium_url: str = models.URLField(max_length=255, default="", blank=True)
     small_url: str = models.URLField(max_length=255, default="", blank=True)
 
-    objects = ReservationUnitImageManager()
+    objects: ClassVar[ReservationUnitImageManager] = LazyModelManager.new()
+    actions: ReservationUnitImageActions = LazyModelAttribute.new()
+    validators: ReservationUnitImageValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_unit_image"
@@ -50,11 +52,3 @@ class ReservationUnitImage(models.Model):
 
     def __str__(self) -> str:
         return f"{self.reservation_unit.name} ({self.get_image_type_display()})"
-
-    @cached_property
-    def actions(self) -> ReservationUnitImageActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationUnitImageActions
-
-        return ReservationUnitImageActions(self)

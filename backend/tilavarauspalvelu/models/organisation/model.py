@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.text import format_lazy
@@ -12,13 +11,14 @@ from rest_framework.exceptions import ValidationError
 from tilavarauspalvelu.enums import OrganizationTypeChoice
 from utils.date_utils import local_datetime
 from utils.fields.model import StrChoiceField
-
-from .queryset import OrganisationManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Address
 
     from .actions import OrganisationActions
+    from .queryset import OrganisationManager
+    from .validators import OrganisationValidator
 
 __all__ = [
     "Organisation",
@@ -64,7 +64,9 @@ class Organisation(SerializableMixin, models.Model):
     core_business_en: str | None
     core_business_sv: str | None
 
-    objects = OrganisationManager()
+    objects: ClassVar[OrganisationManager] = LazyModelManager.new()
+    actions: OrganisationActions = LazyModelAttribute.new()
+    validators: OrganisationValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "organisation"
@@ -87,11 +89,3 @@ class Organisation(SerializableMixin, models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @cached_property
-    def actions(self) -> OrganisationActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import OrganisationActions
-
-        return OrganisationActions(self)

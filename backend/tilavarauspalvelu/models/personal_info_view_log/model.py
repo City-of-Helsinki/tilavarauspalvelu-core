@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import PersonalInfoViewLogManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -14,6 +13,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
 
     from .actions import PersonalInfoViewLogActions
+    from .queryset import PersonalInfoViewLogManager
+    from .validators import PersonalInfoViewLogValidator
 
 __all__ = [
     "PersonalInfoViewLog",
@@ -44,7 +45,9 @@ class PersonalInfoViewLog(models.Model):
         editable=False,
     )
 
-    objects = PersonalInfoViewLogManager()
+    objects: ClassVar[PersonalInfoViewLogManager] = LazyModelManager.new()
+    actions: PersonalInfoViewLogActions = LazyModelAttribute.new()
+    validators: PersonalInfoViewLogValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "personal_info_view_log"
@@ -55,11 +58,3 @@ class PersonalInfoViewLog(models.Model):
 
     def __str__(self) -> str:
         return f"{self.viewer_username} viewed {self.user}'s {self.field} at {self.access_time}"
-
-    @cached_property
-    def actions(self) -> PersonalInfoViewLogActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import PersonalInfoViewLogActions
-
-        return PersonalInfoViewLogActions(self)

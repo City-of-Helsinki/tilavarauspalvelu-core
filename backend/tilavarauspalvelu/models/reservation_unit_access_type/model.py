@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.db.models.functions import Coalesce
@@ -10,14 +9,13 @@ from django.utils.translation import gettext_lazy as _
 from lookup_property import lookup_property
 
 from tilavarauspalvelu.enums import AccessType
-from utils.utils import LazyModelAttribute
-
-from .queryset import ReservationUnitAccessTypeManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
 
     from .actions import ReservationUnitAccessTypeActions
+    from .queryset import ReservationUnitAccessTypeManager
     from .validators import ReservationUnitAccessTypeValidator
 
 
@@ -39,7 +37,9 @@ class ReservationUnitAccessType(models.Model):
     )
     begin_date: datetime.date = models.DateField()
 
-    objects = ReservationUnitAccessTypeManager()
+    objects: ClassVar[ReservationUnitAccessTypeManager] = LazyModelManager.new()
+    actions: ReservationUnitAccessTypeActions = LazyModelAttribute.new()
+    validators: ReservationUnitAccessTypeValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_unit_access_type"
@@ -57,17 +57,6 @@ class ReservationUnitAccessType(models.Model):
 
     def __str__(self) -> str:
         return f"{AccessType(self.access_type).label} for {self.reservation_unit} from {self.begin_date.isoformat()}"
-
-    @cached_property
-    def actions(self) -> ReservationUnitAccessTypeActions:
-        """Actions that can be executed on a ReservationUnitAccessType."""
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationUnitAccessTypeActions
-
-        return ReservationUnitAccessTypeActions(self)
-
-    validator: ReservationUnitAccessTypeValidator = LazyModelAttribute()
 
     @lookup_property(skip_codegen=True)
     def end_date() -> datetime.date:

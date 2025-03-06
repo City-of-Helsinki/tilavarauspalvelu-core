@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import ReservationUnitPaymentTypeManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import ReservationUnitPaymentTypeActions
+    from .queryset import ReservationUnitPaymentTypeManager
+    from .validators import ReservationUnitPaymentTypeValidator
 
 __all__ = [
     "ReservationUnitPaymentType",
@@ -19,7 +20,9 @@ __all__ = [
 class ReservationUnitPaymentType(models.Model):
     code: str = models.CharField(max_length=32, primary_key=True)
 
-    objects = ReservationUnitPaymentTypeManager()
+    objects: ClassVar[ReservationUnitPaymentTypeManager] = LazyModelManager.new()
+    actions: ReservationUnitPaymentTypeActions = LazyModelAttribute.new()
+    validators: ReservationUnitPaymentTypeValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_unit_payment_type"
@@ -30,11 +33,3 @@ class ReservationUnitPaymentType(models.Model):
 
     def __str__(self) -> str:
         return self.code
-
-    @cached_property
-    def actions(self) -> ReservationUnitPaymentTypeActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationUnitPaymentTypeActions
-
-        return ReservationUnitPaymentTypeActions(self)

@@ -25,9 +25,9 @@ class ReservationRefundSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        self.instance.validator.validate_reservation_is_paid()
-        self.instance.validator.validate_reservation_state_allows_refunding()
-        self.instance.validator.validate_reservation_has_been_paid()
+        self.instance.validators.validate_reservation_is_paid()
+        self.instance.validators.validate_reservation_state_allows_refunding()
+        self.instance.validators.validate_reservation_has_been_paid()
         return data
 
     def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:

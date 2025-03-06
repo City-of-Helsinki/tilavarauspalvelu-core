@@ -56,10 +56,10 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: ReservationConfirmData) -> ReservationConfirmData:
-        self.instance.validator.validate_can_change_reservation()
-        self.instance.validator.validate_no_payment_order()
-        self.instance.validator.validate_required_metadata_fields()
-        self.instance.validator.validate_single_reservation_unit()
+        self.instance.validators.validate_can_change_reservation()
+        self.instance.validators.validate_no_payment_order()
+        self.instance.validators.validate_required_metadata_fields()
+        self.instance.validators.validate_single_reservation_unit()
 
         data["confirmed_at"] = local_datetime()
 
@@ -71,8 +71,8 @@ class ReservationConfirmSerializer(NestingModelSerializer):
 
         reservation_unit: ReservationUnit = self.instance.reservation_units.first()
 
-        reservation_unit.validator.validate_has_payment_type()
-        reservation_unit.validator.validate_has_payment_product()
+        reservation_unit.validators.validate_has_payment_type()
+        reservation_unit.validators.validate_has_payment_product()
 
         data["payment_type"] = reservation_unit.actions.get_default_payment_type()
         data["state"] = self.instance.actions.get_state_on_reservation_confirmed(payment_type=data["payment_type"])

@@ -292,7 +292,7 @@ class ReservationUnitSerializer(NestingModelSerializer):
             begin_date: datetime.date = access_type["begin_date"]
 
             if not editing:
-                ReservationUnitAccessType.validator.validate_not_access_code(new_access_type)
+                ReservationUnitAccessType.validators.validate_not_access_code(new_access_type)
 
             if not need_to_check_pindora:
                 # Check from Pindora even if changed access type begin date is in the past since
@@ -304,10 +304,10 @@ class ReservationUnitSerializer(NestingModelSerializer):
                 )
 
             if existing_access_type is not None:
-                existing_access_type.validator.validate_not_past(begin_date)
-                existing_access_type.validator.validate_not_moved_to_past(begin_date)
+                existing_access_type.validators.validate_not_past(begin_date)
+                existing_access_type.validators.validate_not_moved_to_past(begin_date)
             else:
-                ReservationUnitAccessType.validator.validate_new_not_in_past(begin_date)
+                ReservationUnitAccessType.validators.validate_new_not_in_past(begin_date)
 
             has_active = has_active or begin_date <= today
 

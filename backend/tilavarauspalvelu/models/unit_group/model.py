@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import UnitGroupManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import UnitGroupActions
+    from .queryset import UnitGroupManager
+    from .validators import UnitGroupValidator
 
 
 __all__ = [
@@ -27,7 +28,9 @@ class UnitGroup(models.Model):
     name_sv: str | None
     name_en: str | None
 
-    objects = UnitGroupManager()
+    objects: ClassVar[UnitGroupManager] = LazyModelManager.new()
+    actions: UnitGroupActions = LazyModelAttribute.new()
+    validators: UnitGroupValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "unit_group"
@@ -38,11 +41,3 @@ class UnitGroup(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @cached_property
-    def actions(self) -> UnitGroupActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import UnitGroupActions
-
-        return UnitGroupActions(self)

@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import datetime
 from decimal import Decimal
-from functools import cached_property
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -11,8 +10,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import Language, OrderStatus, PaymentType
-
-from .queryset import PaymentOrderManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import uuid
@@ -20,6 +18,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
 
     from .actions import PaymentOrderActions
+    from .queryset import PaymentOrderManager
+    from .validators import PaymentOrderValidator
 
 
 __all__ = [
@@ -54,7 +54,9 @@ class PaymentOrder(models.Model):
     checkout_url: str = models.CharField(blank=True, default="", max_length=512)
     receipt_url: str = models.CharField(blank=True, default="", max_length=512)
 
-    objects = PaymentOrderManager()
+    objects: ClassVar[PaymentOrderManager] = LazyModelManager.new()
+    actions: PaymentOrderActions = LazyModelAttribute.new()
+    validators: PaymentOrderValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "payment_order"
@@ -66,17 +68,9 @@ class PaymentOrder(models.Model):
     def __str__(self) -> str:
         return f"PaymentOrder {self.pk}"
 
-    def save(self, *args: Any, **kwargs: Any) -> PaymentOrder:
+    def save(self, *args: Any, **kwargs: Any) -> None:
         self.full_clean()
-        return super().save(*args, **kwargs)
-
-    @cached_property
-    def actions(self) -> PaymentOrderActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import PaymentOrderActions
-
-        return PaymentOrderActions(self)
+        super().save(*args, **kwargs)
 
     def clean(self) -> None:
         validation_errors = {}

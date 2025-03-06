@@ -52,7 +52,7 @@ class ReservationApproveSerializer(NestingModelSerializer):
         }
 
     def validate(self, data: ReservationApproveData) -> ReservationApproveData:
-        self.instance.validator.validate_reservation_state_allows_approving()
+        self.instance.validators.validate_reservation_state_allows_approving()
         data["state"] = ReservationStateChoice.CONFIRMED
         data["handled_at"] = local_datetime()
         return data

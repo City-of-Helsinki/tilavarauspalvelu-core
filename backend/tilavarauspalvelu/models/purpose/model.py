@@ -1,19 +1,20 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
 
-from .queryset import PurposeManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from easy_thumbnails.files import ThumbnailerImageFieldFile
 
     from .actions import PurposeActions
+    from .queryset import PurposeManager
+    from .validators import PurposeValidator
 
 
 __all__ = [
@@ -34,7 +35,9 @@ class Purpose(models.Model):
     name_en: str | None
     name_sv: str | None
 
-    objects = PurposeManager()
+    objects: ClassVar[PurposeManager] = LazyModelManager.new()
+    actions: PurposeActions = LazyModelAttribute.new()
+    validators: PurposeValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "purpose"
@@ -45,11 +48,3 @@ class Purpose(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @cached_property
-    def actions(self) -> PurposeActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import PurposeActions
-
-        return PurposeActions(self)

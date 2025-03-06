@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import TaxPercentageManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import TaxPercentageActions
+    from .queryset import TaxPercentageManager
+    from .validators import TaxPercentageValidator
 
 __all__ = [
     "TaxPercentage",
@@ -20,7 +21,9 @@ __all__ = [
 class TaxPercentage(models.Model):
     value: Decimal = models.DecimalField(max_digits=5, decimal_places=2)
 
-    objects = TaxPercentageManager()
+    objects: ClassVar[TaxPercentageManager] = LazyModelManager.new()
+    actions: TaxPercentageActions = LazyModelAttribute.new()
+    validators: TaxPercentageValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "tax_percentage"
@@ -31,14 +34,6 @@ class TaxPercentage(models.Model):
 
     def __str__(self) -> str:
         return f"{self.value}%"
-
-    @cached_property
-    def actions(self) -> TaxPercentageActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import TaxPercentageActions
-
-        return TaxPercentageActions(self)
 
     @property
     def decimal(self) -> Decimal:

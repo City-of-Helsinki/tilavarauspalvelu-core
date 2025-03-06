@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -9,8 +8,7 @@ from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Priority, Weekday
 from utils.fields.model import StrChoiceField
-
-from .queryset import SuitableTimeRangeManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -18,6 +16,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationSection
 
     from .actions import SuitableTimeRangeActions
+    from .queryset import SuitableTimeRangeManager
+    from .validators import SuitableTimeRangeValidator
 
 
 __all__ = [
@@ -39,7 +39,9 @@ class SuitableTimeRange(models.Model):
         on_delete=models.CASCADE,
     )
 
-    objects = SuitableTimeRangeManager()
+    objects: ClassVar[SuitableTimeRangeManager] = LazyModelManager.new()
+    actions: SuitableTimeRangeActions = LazyModelAttribute.new()
+    validators: SuitableTimeRangeValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "suitable_time_range"
@@ -68,14 +70,6 @@ class SuitableTimeRange(models.Model):
 
     def __str__(self) -> str:
         return f"{self.day_of_the_week} {self.begin_time.isoformat()}-{self.end_time.isoformat()}"
-
-    @cached_property
-    def actions(self) -> SuitableTimeRangeActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import SuitableTimeRangeActions
-
-        return SuitableTimeRangeActions(self)
 
     @lookup_property(joins=["application_section"], skip_codegen=True)
     def fulfilled() -> bool:

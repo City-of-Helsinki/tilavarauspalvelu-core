@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import AgeGroupManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import AgeGroupActions
+    from .queryset import AgeGroupManager
+    from .validators import AgeGroupValidator
 
 __all__ = [
     "AgeGroup",
@@ -20,7 +21,9 @@ class AgeGroup(models.Model):
     minimum: int = models.PositiveIntegerField()
     maximum: int | None = models.PositiveIntegerField(null=True, blank=True)
 
-    objects = AgeGroupManager()
+    objects: ClassVar[AgeGroupManager] = LazyModelManager.new()
+    actions: AgeGroupActions = LazyModelAttribute.new()
+    validators: AgeGroupValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "age_group"
@@ -33,11 +36,3 @@ class AgeGroup(models.Model):
         if self.maximum is None:
             return f"{self.minimum}+"
         return f"{self.minimum} - {self.maximum}"
-
-    @cached_property
-    def actions(self) -> AgeGroupActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import AgeGroupActions
-
-        return AgeGroupActions(self)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import math
 from decimal import Decimal
 from typing import TYPE_CHECKING
@@ -11,10 +12,14 @@ if TYPE_CHECKING:
 
     from .model import ReservationUnitPricing
 
+__all__ = [
+    "ReservationUnitPricingActions",
+]
 
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class ReservationUnitPricingActions:
-    def __init__(self, pricing: ReservationUnitPricing) -> None:
-        self.pricing = pricing
+    pricing: ReservationUnitPricing
 
     def calculate_reservation_price(self, duration: datetime.timedelta, *, subsidised: bool = False) -> Decimal:
         if self.pricing.highest_price == 0:

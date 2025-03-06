@@ -37,9 +37,9 @@ class StaffRepairReservationAccessCodeSerializer(NestingModelSerializer):
         }
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
-        self.instance.validator.validate_reservation_access_type_is_access_code()
-        self.instance.validator.validate_reservation_has_not_ended()
-        self.instance.validator.validate_not_in_reservation_series()
+        self.instance.validators.validate_reservation_access_type_is_access_code()
+        self.instance.validators.validate_reservation_has_not_ended()
+        self.instance.validators.validate_not_in_reservation_series()
         return data
 
     def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:  # noqa: ARG002

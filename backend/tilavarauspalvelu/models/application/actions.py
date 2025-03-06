@@ -1,14 +1,20 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Application
 
 
+__all__ = [
+    "ApplicationActions",
+]
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class ApplicationActions:
-    def __init__(self, application: Application) -> None:
-        self.application = application
+    application: Application
 
     def reset_application_allocation(self) -> None:
         """

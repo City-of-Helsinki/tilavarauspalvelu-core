@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.contrib.postgres.fields import ArrayField, HStoreField
 from django.db import models
@@ -10,14 +9,15 @@ from django.utils.translation import gettext_lazy as _
 from tilavarauspalvelu.enums import WeekdayChoice
 from tilavarauspalvelu.validators import validate_reservable_times
 from utils.fields.model import IntChoiceField
-
-from .queryset import ApplicationRoundTimeSlotManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.typing import TimeSlotDB
 
     from .actions import ApplicationRoundTimeSlotActions
+    from .queryset import ApplicationRoundTimeSlotManager
+    from .validators import ApplicationRoundTimeSlotValidator
 
 
 class ApplicationRoundTimeSlot(models.Model):
@@ -36,7 +36,9 @@ class ApplicationRoundTimeSlot(models.Model):
         validators=[validate_reservable_times],
     )
 
-    objects = ApplicationRoundTimeSlotManager()
+    objects: ClassVar[ApplicationRoundTimeSlotManager] = LazyModelManager.new()
+    actions: ApplicationRoundTimeSlotActions = LazyModelAttribute.new()
+    validators: ApplicationRoundTimeSlotValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "application_round_time_slot"
@@ -68,11 +70,3 @@ class ApplicationRoundTimeSlot(models.Model):
 
     def __str__(self) -> str:
         return f"Timeslots for {self.reservation_unit.name} on {WeekdayChoice(self.weekday).name.capitalize()}"
-
-    @cached_property
-    def actions(self) -> ApplicationRoundTimeSlotActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ApplicationRoundTimeSlotActions
-
-        return ApplicationRoundTimeSlotActions(self)

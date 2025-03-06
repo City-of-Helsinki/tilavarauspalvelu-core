@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import PriceUnit
-
-from .queryset import ReservationUnitPricingManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -18,6 +16,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit, TaxPercentage
 
     from .actions import ReservationUnitPricingActions
+    from .queryset import ReservationUnitPricingManager
+    from .validators import ReservationUnitPricingValidator
 
 
 __all__ = [
@@ -56,7 +56,9 @@ class ReservationUnitPricing(models.Model):
         null=True,
     )
 
-    objects = ReservationUnitPricingManager()
+    objects: ClassVar[ReservationUnitPricingManager] = LazyModelManager.new()
+    actions: ReservationUnitPricingActions = LazyModelAttribute.new()
+    validators: ReservationUnitPricingValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "reservation_unit_pricing"
@@ -82,14 +84,6 @@ class ReservationUnitPricing(models.Model):
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: {self.pk} ({self!s})>"
-
-    @cached_property
-    def actions(self) -> ReservationUnitPricingActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import ReservationUnitPricingActions
-
-        return ReservationUnitPricingActions(self)
 
     @property
     def lowest_price_net(self) -> Decimal:

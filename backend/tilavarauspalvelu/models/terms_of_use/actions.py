@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -11,6 +12,6 @@ __all__ = [
 ]
 
 
+@dataclasses.dataclass(slots=True, frozen=True)
 class TermsOfUseActions:
-    def __init__(self, terms_of_use: TermsOfUse) -> None:
-        self.terms_of_use = terms_of_use
+    terms_of_use: TermsOfUse

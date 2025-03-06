@@ -1,18 +1,19 @@
 from __future__ import annotations
 
 import uuid
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import RequestLogManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
 
     from .actions import RequestLogActions
+    from .queryset import RequestLogManager
+    from .validators import RequestLogValidator
 
 
 __all__ = [
@@ -27,7 +28,9 @@ class RequestLog(models.Model):
     duration_ms: int = models.PositiveBigIntegerField(editable=False)
     created: datetime.datetime = models.DateTimeField(auto_now_add=True, editable=False)
 
-    objects = RequestLogManager()
+    objects: ClassVar[RequestLogManager] = LazyModelManager.new()
+    actions: RequestLogActions = LazyModelAttribute.new()
+    validators: RequestLogValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "request_log"
@@ -38,14 +41,6 @@ class RequestLog(models.Model):
 
     def __str__(self) -> str:
         return _("request log") + f" '{self.request_id}' ({self.duration_str} ms)"
-
-    @cached_property
-    def actions(self) -> RequestLogActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import RequestLogActions
-
-        return RequestLogActions(self)
 
     @property
     def duration_str(self) -> str:

@@ -119,12 +119,12 @@ class StaffReservationModifySerializer(NestingModelSerializer):
         }
 
     def validate(self, data: StaffReservationData) -> StaffReservationData:
-        self.instance.validator.validate_reservation_state_allows_staff_edit()
-        self.instance.validator.validate_reservation_can_be_modified_by_staff()
+        self.instance.validators.validate_reservation_state_allows_staff_edit()
+        self.instance.validators.validate_reservation_can_be_modified_by_staff()
 
         reservation_type = data.get("type")
         if reservation_type is not None:
-            self.instance.validator.validate_reservation_type_allows_staff_edit(new_type=reservation_type)
+            self.instance.validators.validate_reservation_type_allows_staff_edit(new_type=reservation_type)
 
         return data
 

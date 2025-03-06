@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .model import EquipmentCategory
 
 
+__all__ = [
+    "EquipmentCategoryActions",
+]
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class EquipmentCategoryActions:
-    def __init__(self, equipment_category: EquipmentCategory) -> None:
-        self.equipment_category = equipment_category
+    equipment_category: EquipmentCategory

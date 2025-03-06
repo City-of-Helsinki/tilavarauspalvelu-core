@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import datetime
-from functools import cached_property
 from inspect import cleandoc
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -14,14 +13,15 @@ from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, timedelta_to_json
-
-from .queryset import AffectingTimeSpanManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
     from tilavarauspalvelu.models import Reservation
 
     from .actions import AffectingTimeSpanActions
+    from .queryset import AffectingTimeSpanManager
+    from .validators import AffectingTimeSpanValidator
 
 
 class AffectingTimeSpan(models.Model):
@@ -52,7 +52,9 @@ class AffectingTimeSpan(models.Model):
     buffer_time_before: datetime.timedelta = models.DurationField()
     buffer_time_after: datetime.timedelta = models.DurationField()
 
-    objects = AffectingTimeSpanManager()
+    objects: ClassVar[AffectingTimeSpanManager] = LazyModelManager.new()
+    actions: AffectingTimeSpanActions = LazyModelAttribute.new()
+    validators: AffectingTimeSpanValidator = LazyModelAttribute.new()
 
     class Meta:
         managed = False
@@ -86,14 +88,6 @@ class AffectingTimeSpan(models.Model):
             duration_str += f", +{timedelta_to_json(self.buffer_time_after, timespec='minutes')}"
 
         return f"<AffectingTimeSpan({duration_str})>"
-
-    @cached_property
-    def actions(self) -> AffectingTimeSpanActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import AffectingTimeSpanActions
-
-        return AffectingTimeSpanActions(self)
 
     @classmethod
     def refresh(cls, using: str | None = None) -> None:

@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .model import SQLLog
 
 
+__all__ = [
+    "SQLLogActions",
+]
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class SQLLogActions:
-    def __init__(self, sql_log: SQLLog) -> None:
-        self.sql_log = sql_log
+    sql_log: SQLLog

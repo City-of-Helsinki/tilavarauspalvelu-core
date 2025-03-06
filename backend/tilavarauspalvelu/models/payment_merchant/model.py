@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import PaymentMerchantManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import uuid
 
     from .actions import PaymentMerchantActions
+    from .queryset import PaymentMerchantManager
+    from .validators import PaymentMerchantValidator
 
 
 __all__ = [
@@ -28,7 +29,9 @@ class PaymentMerchant(models.Model):
     id: uuid.UUID = models.UUIDField(primary_key=True)
     name: str = models.CharField(max_length=128)
 
-    objects = PaymentMerchantManager()
+    objects: ClassVar[PaymentMerchantManager] = LazyModelManager.new()
+    actions: PaymentMerchantActions = LazyModelAttribute.new()
+    validators: PaymentMerchantValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "payment_merchant"
@@ -39,11 +42,3 @@ class PaymentMerchant(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    @cached_property
-    def actions(self) -> PaymentMerchantActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import PaymentMerchantActions
-
-        return PaymentMerchantActions(self)

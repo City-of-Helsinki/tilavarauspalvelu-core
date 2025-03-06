@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import re
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 import sqlparse
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import SQLLogManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import SQLLogActions
+    from .queryset import SQLLogManager
+    from .validators import SQLLogValidator
 
 __all__ = [
     "SQLLog",
@@ -31,7 +32,9 @@ class SQLLog(models.Model):
     succeeded: bool = models.BooleanField(default=True, editable=False)
     stack_info: str = models.TextField(blank=True, editable=False)
 
-    objects = SQLLogManager()
+    objects: ClassVar[SQLLogManager] = LazyModelManager.new()
+    actions: SQLLogActions = LazyModelAttribute.new()
+    validators: SQLLogValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "sql_log"
@@ -42,14 +45,6 @@ class SQLLog(models.Model):
 
     def __str__(self) -> str:
         return _("SQL log") + f" ({self.duration_str} ms)"
-
-    @cached_property
-    def actions(self) -> SQLLogActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import SQLLogActions
-
-        return SQLLogActions(self)
 
     @property
     def duration_str(self) -> str:

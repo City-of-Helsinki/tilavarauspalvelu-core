@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -9,8 +8,7 @@ from graphene_django_extensions.fields.model import StrChoiceField
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import UserRoleChoice
-
-from .queryset import GeneralRoleManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -18,6 +16,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
 
     from .actions import GeneralRoleActions
+    from .queryset import GeneralRoleManager
+    from .validators import GeneralRoleValidator
 
 
 __all__ = [
@@ -42,7 +42,9 @@ class GeneralRole(models.Model):
 
     role_active: bool = models.BooleanField(default=True)
 
-    objects = GeneralRoleManager()
+    objects: ClassVar[GeneralRoleManager] = LazyModelManager.new()
+    actions: GeneralRoleActions = LazyModelAttribute.new()
+    validators: GeneralRoleValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "general_role"
@@ -53,14 +55,6 @@ class GeneralRole(models.Model):
 
     def __str__(self) -> str:
         return f"General Role '{self.role}' for {self.user.first_name} {self.user.last_name} ({self.user.email})"
-
-    @cached_property
-    def actions(self) -> GeneralRoleActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import GeneralRoleActions
-
-        return GeneralRoleActions(self)
 
 
 AuditLogger.register(GeneralRole)

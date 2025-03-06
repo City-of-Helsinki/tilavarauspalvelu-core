@@ -82,7 +82,7 @@ class ReservationUpdateSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: ReservationUpdateData) -> ReservationUpdateData:
-        self.instance.validator.validate_can_change_reservation()
-        self.instance.validator.validate_free_of_charge_arguments(**data)
-        self.instance.validator.validate_required_metadata_fields(**data)
+        self.instance.validators.validate_can_change_reservation()
+        self.instance.validators.validate_free_of_charge_arguments(**data)
+        self.instance.validators.validate_required_metadata_fields(**data)
         return data

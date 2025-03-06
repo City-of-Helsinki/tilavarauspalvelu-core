@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from graphene_django_extensions.fields.model import StrChoiceField
 
 from tilavarauspalvelu.enums import RejectionReadinessChoice
-
-from .queryset import RejectedOccurrenceManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
@@ -17,6 +15,8 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.models import RecurringReservation
 
     from .actions import RejectedOccurrenceActions
+    from .queryset import RejectedOccurrenceManager
+    from .validators import RejectedOccurrenceValidator
 
 
 __all__ = [
@@ -36,7 +36,9 @@ class RejectedOccurrence(models.Model):
         on_delete=models.CASCADE,
     )
 
-    objects = RejectedOccurrenceManager()
+    objects: ClassVar[RejectedOccurrenceManager] = LazyModelManager.new()
+    actions: RejectedOccurrenceActions = LazyModelAttribute.new()
+    validators: RejectedOccurrenceValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "rejected_occurrence"
@@ -50,11 +52,3 @@ class RejectedOccurrence(models.Model):
 
     def __str__(self) -> str:
         return _("rejected occurrence") + f" ({self.begin_datetime.isoformat()} - {self.end_datetime.isoformat()})"
-
-    @cached_property
-    def actions(self) -> RejectedOccurrenceActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import RejectedOccurrenceActions
-
-        return RejectedOccurrenceActions(self)

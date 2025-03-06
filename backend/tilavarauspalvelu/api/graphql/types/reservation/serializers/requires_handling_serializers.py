@@ -45,7 +45,7 @@ class ReservationRequiresHandlingSerializer(NestingModelSerializer):
         ]
 
     def validate(self, data: ReservationHandlingData) -> ReservationHandlingData:
-        self.instance.validator.validate_reservation_state_allows_handling()
+        self.instance.validators.validate_reservation_state_allows_handling()
         data["state"] = ReservationStateChoice.REQUIRES_HANDLING
         return data
 

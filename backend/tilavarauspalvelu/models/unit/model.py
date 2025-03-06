@@ -1,19 +1,20 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .queryset import UnitManager
+from utils.utils import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime
 
     from .actions import UnitActions
+    from .queryset import UnitManager
+    from .validators import UnitValidator
 
 
 __all__ = [
@@ -63,8 +64,7 @@ class Unit(models.Model):
         blank=True,
     )
 
-    objects = UnitManager()
-
+    # Translated field hints
     name_fi: str | None
     name_en: str | None
     name_sv: str | None
@@ -74,6 +74,10 @@ class Unit(models.Model):
     short_description_fi: str | None
     short_description_en: str | None
     short_description_sv: str | None
+
+    objects: ClassVar[UnitManager] = LazyModelManager.new()
+    actions: UnitActions = LazyModelAttribute.new()
+    validators: UnitValidator = LazyModelAttribute.new()
 
     class Meta:
         db_table = "unit"
@@ -102,14 +106,6 @@ class Unit(models.Model):
                 refresh_reservation_unit_product_mapping.delay(runit.pk)
 
         return result
-
-    @cached_property
-    def actions(self) -> UnitActions:
-        # Import actions inline to defer loading them.
-        # This allows us to avoid circular imports.
-        from .actions import UnitActions
-
-        return UnitActions(self)
 
     @property
     def hauki_department_id(self) -> str:
