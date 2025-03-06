@@ -6,12 +6,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { WEEKDAYS } from "common/src/const";
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-s);
-`;
+import { Flex } from "common/styles/util";
 
 const Day = styled.button`
   background-color: var(--color-black-5);
@@ -106,7 +101,7 @@ export function WeekdaysSelector({
   return (
     <div>
       <Label>{label}</Label>
-      <Wrapper>
+      <Flex $gap="s" $direction="row">
         {WEEKDAYS.map((weekday) => (
           <Day
             key={`weekday-${weekday}`}
@@ -119,7 +114,7 @@ export function WeekdaysSelector({
             {t(`dayShort.${weekday}`)}
           </Day>
         ))}
-      </Wrapper>
+      </Flex>
       {!disabled && errorText && (
         <ErrorText>
           <WarningIcon /> {errorText}
