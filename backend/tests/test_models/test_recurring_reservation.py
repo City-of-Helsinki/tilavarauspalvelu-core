@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from lookup_property import L
 
-from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued
+from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.models import RecurringReservation
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
@@ -13,7 +13,7 @@ pytestmark = [
 ]
 
 
-def test__recurring_reservation__access_type__single():
+def test_recurring_reservation__access_type__single():
     series = RecurringReservationFactory.create()
     ReservationFactory.create(recurring_reservation=series, access_type=AccessType.ACCESS_CODE)
 
@@ -31,7 +31,7 @@ def test__recurring_reservation__access_type__single():
     assert series.used_access_types == [AccessType.ACCESS_CODE]
 
 
-def test__recurring_reservation__access_type__zero():
+def test_recurring_reservation__access_type__zero():
     series = RecurringReservationFactory.create()
 
     # Test non-ORM code
@@ -48,7 +48,7 @@ def test__recurring_reservation__access_type__zero():
     assert series.used_access_types == []
 
 
-def test__recurring_reservation__access_type__multiple_same():
+def test_recurring_reservation__access_type__multiple_same():
     series = RecurringReservationFactory.create()
     ReservationFactory.create(recurring_reservation=series, access_type=AccessType.PHYSICAL_KEY)
     ReservationFactory.create(recurring_reservation=series, access_type=AccessType.PHYSICAL_KEY)
@@ -67,7 +67,7 @@ def test__recurring_reservation__access_type__multiple_same():
     assert series.used_access_types == [AccessType.PHYSICAL_KEY]
 
 
-def test__recurring_reservation__access_type__multiple_different():
+def test_recurring_reservation__access_type__multiple_different():
     series = RecurringReservationFactory.create()
     ReservationFactory.create(recurring_reservation=series, access_type=AccessType.PHYSICAL_KEY)
     ReservationFactory.create(recurring_reservation=series, access_type=AccessType.ACCESS_CODE)
@@ -84,3 +84,103 @@ def test__recurring_reservation__access_type__multiple_different():
     # Test ORM code
     assert series.access_type == AccessTypeWithMultivalued.MULTIVALUED
     assert series.used_access_types == [AccessType.ACCESS_CODE, AccessType.PHYSICAL_KEY]
+
+
+def test_recurring_reservation__should_have_active_access_code__active():
+    series = RecurringReservationFactory.create()
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    assert series.should_have_active_access_code is True
+
+
+def test_recurring_reservation__should_have_active_access_code__blocked():
+    series = RecurringReservationFactory.create()
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+    )
+
+    assert series.should_have_active_access_code is False
+
+
+def test_recurring_reservation__should_have_active_access_code__not_confirmed():
+    series = RecurringReservationFactory.create()
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CREATED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    assert series.should_have_active_access_code is False
+
+
+def test_recurring_reservation__should_have_active_access_code__not_access_code():
+    series = RecurringReservationFactory.create()
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.UNRESTRICTED,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    assert series.should_have_active_access_code is False
+
+
+def test_recurring_reservation__access_code_is_active_correct__active_when_should_be():
+    series = RecurringReservationFactory.create()
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_code_is_active=True,
+    )
+
+    assert series.is_access_code_is_active_correct is True
+
+
+def test_recurring_reservation__access_code_is_active_correct__active_when_should_not_be():
+    series = RecurringReservationFactory.create()
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=True,
+    )
+
+    assert series.is_access_code_is_active_correct is False
+
+
+def test_recurring_reservation__access_code_is_active_correct__inactive_when_should_be():
+    series = RecurringReservationFactory.create()
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=False,
+    )
+
+    assert series.is_access_code_is_active_correct is True
+
+
+def test_recurring_reservation__access_code_is_active_correct__inactive_when_should_not_be():
+    series = RecurringReservationFactory.create()
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_code_is_active=False,
+    )
+
+    assert series.is_access_code_is_active_correct is False
