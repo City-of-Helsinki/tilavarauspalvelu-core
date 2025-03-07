@@ -5,6 +5,7 @@
   "500": {
     "body": "Något oväntat hände"
   },
+  "search": "Ett fel uppstod när lokaler söktes",
   "deactivatedAccount": {
     "heading": "Ditt användar-ID är inte giltigt.",
     "subHeadingA": "Var god och kontakta vår kundtjänst via email på",

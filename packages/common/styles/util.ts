@@ -148,13 +148,13 @@ export const TitleSection = styled(Flex).attrs({
 export const WhiteButton = styled(Button)<{
   disabled?: boolean;
   variant: ButtonVariant;
-  colorVariant?: "light" | "dark";
+  $colorVariant?: "light" | "dark";
 }>`
   && {
     --color-hover: var(--color-black);
     --color-focus: var(--color-black);
 
-    ${({ variant, colorVariant }) => {
+    ${({ variant, $colorVariant }) => {
       switch (variant) {
         case "primary":
           return `
@@ -170,12 +170,12 @@ export const WhiteButton = styled(Button)<{
           return `
       --color: var(--color-white);
       --border-color: var(--color-white);
-      --background-color: var(--color-bus${colorVariant === "light" ? "" : "-dark"});
+      --background-color: var(--color-bus${$colorVariant === "light" ? "" : "-dark"});
   `;
         case "supplementary":
           return `
       --color: var(--color-white);
-      --background-color: var(--color-bus${colorVariant === "light" ? "" : "-dark"});
+      --background-color: var(--color-bus${$colorVariant === "light" ? "" : "-dark"});
       --border-color: transparent;
   `;
         default:

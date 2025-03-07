@@ -16,7 +16,7 @@ import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
 import { getMainImage } from "@/modules/util";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource } from "common/src/helpers";
-import Card from "common/src/components/Card";
+import Card, { CardInfoItem } from "common/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import {
@@ -33,7 +33,7 @@ interface CardProps {
   removeReservationUnit: (reservationUnit: Node) => void;
 }
 
-export function ReservationUnitCard({
+export function RecurringCard({
   reservationUnit,
   selectReservationUnit,
   containsReservationUnit,
@@ -56,10 +56,15 @@ export function ReservationUnitCard({
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "small");
 
-  const infos = [];
+  const infos: CardInfoItem[] = [];
   if (reservationUnitTypeName) {
     infos.push({
-      icon: <IconHome size={IconSize.Small} />,
+      icon: (
+        <IconHome
+          size={IconSize.Small}
+          data-testid="reservation-unit-card__icon--home"
+        />
+      ),
       value: reservationUnitTypeName,
     });
   }
@@ -86,40 +91,36 @@ export function ReservationUnitCard({
     });
   }
 
-  const buttons = [];
-  if (containsReservationUnit(reservationUnit)) {
-    buttons.push(
-      <Button
-        size={ButtonSize.Small}
-        variant={ButtonVariant.Primary}
-        iconEnd={<IconCheck />}
-        onClick={() => removeReservationUnit(reservationUnit)}
-        data-testid="reservation-unit-card__button--select"
-        key={t("common:removeReservationUnit")}
-      >
-        {t("common:removeReservationUnit")}
-      </Button>
-    );
-  } else {
-    buttons.push(
-      <Button
-        size={ButtonSize.Small}
-        variant={ButtonVariant.Secondary}
-        iconEnd={<IconPlus />}
-        onClick={() => selectReservationUnit(reservationUnit)}
-        data-testid="reservation-unit-card__button--select"
-        key={t("common:selectReservationUnit")}
-      >
-        {t("common:selectReservationUnit")}
-      </Button>
-    );
-  }
+  const isSelected = containsReservationUnit(reservationUnit);
+  const toggleSelect = () => {
+    if (isSelected) {
+      removeReservationUnit(reservationUnit);
+    } else {
+      selectReservationUnit(reservationUnit);
+    }
+  };
+
+  const buttons: JSX.Element[] = [];
+  buttons.push(
+    <Button
+      size={ButtonSize.Small}
+      variant={isSelected ? ButtonVariant.Secondary : ButtonVariant.Primary}
+      iconEnd={isSelected ? <IconCheck /> : <IconPlus />}
+      onClick={toggleSelect}
+      data-testid="recurring-card__button--toggle"
+      key={"common:selectReservationUnit"}
+    >
+      {isSelected
+        ? t("common:removeReservationUnit")
+        : t("common:selectReservationUnit")}
+    </Button>
+  );
   buttons.push(
     <ButtonLikeLink
       href={getReservationUnitPath(reservationUnit.pk)}
       target="_blank"
       rel="noopener noreferrer"
-      data-testid="reservation-unit-card__button--link"
+      data-testid="reservation-unit-card__button--show"
       key="show"
     >
       <IconLinkExternal />

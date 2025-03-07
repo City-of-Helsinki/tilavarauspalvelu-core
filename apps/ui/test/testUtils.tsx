@@ -1,8 +1,13 @@
-import { type IsReservableFieldsFragment } from "@/gql/gql-types";
+import {
+  ApplicationRoundFieldsFragment,
+  ApplicationRoundStatusChoice,
+  type IsReservableFieldsFragment,
+} from "@/gql/gql-types";
 import { type ReservableMap, type RoundPeriod } from "@/modules/reservable";
 import { fireEvent, render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ReservationStartInterval } from "common/gql/gql-types";
+import { base64encode } from "common/src/helpers";
 import { addDays } from "date-fns";
 import { expect } from "vitest";
 
@@ -70,6 +75,63 @@ export function createMockReservationUnit({
     reservationEnds: addDays(new Date(), 180).toISOString(),
   };
   return reservationUnit;
+}
+
+export function createMockApplicationRound({
+  pk = 1,
+  status,
+  applicationPeriodEnd,
+  applicationPeriodBegin,
+}: {
+  pk?: number;
+  status: ApplicationRoundStatusChoice;
+  applicationPeriodEnd: Date;
+  applicationPeriodBegin: Date;
+}): Readonly<ApplicationRoundFieldsFragment> {
+  return {
+    id: base64encode(`ApplicationRoundNode:${pk}`),
+    pk,
+    nameFi: `ApplicationRound ${pk} FI`,
+    nameSv: `ApplicationRound ${pk} SV`,
+    nameEn: `ApplicationRound ${pk} EN`,
+    status,
+    reservationPeriodBegin: "2024-02-01T00:00:00Z",
+    reservationPeriodEnd: "2025-01-01T00:00:00Z",
+    publicDisplayBegin: "2024-02-01T00:00:00Z",
+    publicDisplayEnd: "2025-01-01T00:00:00Z",
+    applicationPeriodBegin: applicationPeriodBegin.toISOString(),
+    applicationPeriodEnd: applicationPeriodEnd.toISOString(),
+    reservationUnits: [1, 2, 3].map((pk) => ({
+      id: base64encode(`ReservationUnitNode:${pk}`),
+      pk,
+      unit: {
+        id: base64encode(`UnitNode:${pk}`),
+        pk,
+      },
+    })),
+  };
+}
+
+export function createMockReservationUnitType(
+  props: { name: string; pk?: number } | null
+) {
+  if (props == null) {
+    return null;
+  }
+  const { name, pk } = props;
+  return {
+    id: `ReservationUnitTypeNode:${pk ?? 1}`,
+    pk: pk ?? 1,
+    ...generateNameFragment(name),
+  };
+}
+
+export function generateNameFragment(name: string) {
+  return {
+    nameFi: `${name} FI`,
+    nameSv: `${name} SV`,
+    nameEn: `${name} EN`,
+  };
 }
 
 export async function selectOption(

@@ -5,6 +5,7 @@
   "500": {
     "body": "Something unexpected happened"
   },
+  "search": "Error occurred when searching for spaces. Please try again!",
   "deactivatedAccount": {
     "heading": "Your User ID is not valid.",
     "subHeadingA": "Please contact support via email at",

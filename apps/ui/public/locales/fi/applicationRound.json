@@ -1,4 +1,8 @@
 {
+  "search": {
+    "title": "Varaa tila koko kaudeksi",
+    "subtitle": "Valitse hakemukselle tilat, joita haluat käyttää säännöllisesti ensi kauden aikana."
+  },
   "card": {
     "applyButton": "Hae tiloja",
     "displayPastButton": "Näytä tilat",

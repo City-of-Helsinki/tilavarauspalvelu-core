@@ -1,6 +1,8 @@
 {
   "next": "Continue to application",
   "nextShort": "Continue",
+  "loginAndReserve": "Log in to book",
+  "loginAndApply": "Log in and apply",
   "count": "{{count}} selected",
   "count_other": "{{count}} selected",
   "countShort_one": "{{count}} selected",

@@ -16,10 +16,10 @@ type ReservationUnitList = {
 };
 
 type HookVars = {
-  reservationUnits?: NodeList;
+  reservationUnits?: Readonly<NodeList>;
 };
 
-const PARAM_NAME = "selectedReservationUnits";
+export const SEASONAL_SELECTED_PARAM_KEY = "selectedReservationUnits";
 
 /// @param round filter the reservation units by the application round
 /// Problem with this is that the current system is not based on around requiring an application round
@@ -35,7 +35,7 @@ export function useReservationUnitList(
       return;
     }
     const vals = new URLSearchParams(searchValues);
-    vals.append(PARAM_NAME, ru.pk.toString());
+    vals.append(SEASONAL_SELECTED_PARAM_KEY, ru.pk.toString());
     handleRouteChange(vals);
   };
 
@@ -44,13 +44,13 @@ export function useReservationUnitList(
       return;
     }
     const vals = new URLSearchParams(searchValues);
-    vals.delete(PARAM_NAME, ru.pk.toString());
+    vals.delete(SEASONAL_SELECTED_PARAM_KEY, ru.pk.toString());
     handleRouteChange(vals);
   };
 
   const clearSelections = () => {
     const vals = new URLSearchParams(searchValues);
-    vals.delete(PARAM_NAME);
+    vals.delete(SEASONAL_SELECTED_PARAM_KEY);
     handleRouteChange(vals);
   };
 
@@ -58,12 +58,12 @@ export function useReservationUnitList(
     if (ru.pk == null) {
       return false;
     }
-    return searchValues.has(PARAM_NAME, ru.pk.toString());
+    return searchValues.has(SEASONAL_SELECTED_PARAM_KEY, ru.pk.toString());
   };
 
   const getReservationUnits = (): number[] => {
     const pks = searchValues
-      .getAll(PARAM_NAME)
+      .getAll(SEASONAL_SELECTED_PARAM_KEY)
       .map(Number)
       .filter(Number.isInteger);
     if (round) {
@@ -81,6 +81,6 @@ export function useReservationUnitList(
     clearSelections,
     removeReservationUnit,
     getReservationUnits,
-    PARAM_NAME,
+    PARAM_NAME: SEASONAL_SELECTED_PARAM_KEY,
   };
 }

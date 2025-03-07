@@ -20,11 +20,12 @@ import {
   base64encode,
   filterNonNullable,
   ignoreMaybeArray,
+  ReadonlyDeep,
   toNumber,
 } from "common/src/helpers";
 import { SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
-import { ReservationUnitCard } from "@/components/recurring/RecurringCard";
+import { RecurringCard } from "@/components/recurring/RecurringCard";
 import { useReservationUnitList } from "@/hooks";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
 import { StartApplicationBar } from "@/components/recurring/StartApplicationBar";
@@ -38,13 +39,15 @@ import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { gql } from "@apollo/client";
 
+type SeasonalSearchProps = ReadonlyDeep<
+  Pick<NarrowedProps, "applicationRound" | "options" | "apiBaseUrl">
+>;
+
 function SeasonalSearch({
   apiBaseUrl,
   applicationRound,
   options,
-}: Readonly<
-  Pick<NarrowedProps, "applicationRound" | "options" | "apiBaseUrl">
->): JSX.Element {
+}: Readonly<SeasonalSearchProps>): JSX.Element {
   const { t, i18n } = useTranslation();
   const searchValues = useSearchParams();
 
@@ -86,18 +89,18 @@ function SeasonalSearch({
     <>
       <Breadcrumb routes={routes} />
       <div>
-        <H1 $noMargin>{t("search:recurring.heading")}</H1>
-        <p>{t("search:recurring.text")}</p>
+        <H1 $noMargin>{t("applicationRound:search.title")}</H1>
+        <p>{t("applicationRound:search.subtitle")}</p>
       </div>
       {error ? (
         <Notification size={NotificationSize.Small} type="alert">
-          {t("searchResultList:error")}
+          {t("errors:search")}
         </Notification>
       ) : null}
       <SeasonalSearchForm options={options} isLoading={isLoading} />
       <ListWithPagination
         items={reservationUnits?.map((ru) => (
-          <ReservationUnitCard
+          <RecurringCard
             selectReservationUnit={selectReservationUnit}
             containsReservationUnit={containsReservationUnit}
             removeReservationUnit={removeReservationUnit}

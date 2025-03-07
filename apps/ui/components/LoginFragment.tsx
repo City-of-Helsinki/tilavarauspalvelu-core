@@ -9,6 +9,7 @@ type Props = {
   componentIfAuthenticated: JSX.Element;
   isActionDisabled?: boolean;
   returnUrl?: string;
+  type: "application" | "reservation";
 };
 
 export function LoginFragment({
@@ -16,6 +17,7 @@ export function LoginFragment({
   componentIfAuthenticated,
   isActionDisabled,
   returnUrl,
+  type,
 }: Props): JSX.Element {
   // TODO pass the isAuthenticated from SSR and remove the hook
   const { isAuthenticated } = useSession();
@@ -34,9 +36,11 @@ export function LoginFragment({
       onClick={handleClick}
       className="login-fragment__button--login"
       disabled={isActionDisabled}
-      size={ButtonSize.Small}
+      size={type === "application" ? ButtonSize.Small : ButtonSize.Medium}
     >
-      {t("reservationCalendar:loginAndReserve")}
+      {type === "application"
+        ? t("shoppingCart:loginAndApply")
+        : t("shoppingCart:loginAndReserve")}
     </Button>
   );
 }

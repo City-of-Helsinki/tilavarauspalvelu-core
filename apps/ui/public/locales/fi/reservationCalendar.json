@@ -12,7 +12,6 @@
     "timeIndicator": "Kuluva aika"
   },
   "selectTime": "Valitse aika",
-  "loginAndReserve": "Kirjaudu ja varaa",
   "loginInfo": "Kirjaudu sisään varataksesi.",
   "showCurrentDay": "Näytä tämä päivä",
   "showPrevious": "Naytä edellinen {{view}}",
