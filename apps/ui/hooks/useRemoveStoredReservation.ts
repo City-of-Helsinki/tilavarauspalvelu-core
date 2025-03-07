@@ -1,4 +1,3 @@
-import { ReservationProps } from "@/context/DataContext";
 import { useEffect } from "react";
 import { useLocalStorage } from "react-use";
 
@@ -6,7 +5,7 @@ import { useLocalStorage } from "react-use";
 /// leaving this hook for now to cleanup any existing users
 export function useRemoveStoredReservation() {
   const [storedReservation, , removeStoredReservation] =
-    useLocalStorage<ReservationProps>("reservation");
+    useLocalStorage<unknown>("reservation");
 
   useEffect(() => {
     if (storedReservation) removeStoredReservation();
