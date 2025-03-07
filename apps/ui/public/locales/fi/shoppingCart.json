@@ -1,6 +1,8 @@
 {
   "next": "Jatka täyttämään hakemusta",
   "nextShort": "Jatka",
+  "loginAndReserve": "Kirjaudu ja varaa",
+  "loginAndApply": "Kirjaudu ja hae",
   "count_one": "{{count}} tila valittuna",
   "count_other": "{{count}} tilaa valittuna",
   "countShort_one": "{{count}} tila",

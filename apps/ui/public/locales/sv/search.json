@@ -1,8 +1,4 @@
 {
-  "recurring": {
-    "heading": "Boka lokalen för hela säsongen",
-    "text": "Välj lokaler till ansökningen som du vill använda regelbundet under kommande säsong."
-  },
   "single": {
     "heading": "Boka lokaler och utrustning"
   },

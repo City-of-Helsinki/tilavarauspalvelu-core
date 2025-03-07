@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { Button, ButtonVariant } from "hds-react";
 import type { PageInfo, SearchReservationUnitsQuery } from "@gql/gql-types";
 import type { ApolloQueryResult } from "@apollo/client";
-import ClientOnly from "common/src/ClientOnly";
 import { CenterSpinner, Flex } from "common/styles/util";
 
 const HitCountSummary = styled.div`
@@ -28,40 +27,33 @@ function Content({
     count: items.length,
   });
 
-  if (items.length === 0) {
-    return null;
-  }
-
   return (
-    // TODO Hydration errors
-    <ClientOnly>
-      <Flex
-        data-testid="list-with-pagination__list--container"
-        $alignItems="center"
-      >
-        {items.map((item) => item)}
-        {loadingMore ? (
-          <div>
-            <CenterSpinner data-testid="loading-spinner__pagination" />
-          </div>
-        ) : (
-          <Flex $justifyContent="center">
-            <HitCountSummary data-testid="list-with-pagination__pagination--summary">
-              {hitCountSummary}
-            </HitCountSummary>
-            {showMore && (
-              <Button
-                onClick={fetchMore}
-                variant={ButtonVariant.Secondary}
-                data-testid="list-with-pagination__button--paginate"
-              >
-                {t("common:showMore")}
-              </Button>
-            )}
-          </Flex>
-        )}
-      </Flex>
-    </ClientOnly>
+    <Flex
+      data-testid="list-with-pagination__list--container"
+      $alignItems="center"
+    >
+      {items}
+      {loadingMore ? (
+        <div>
+          <CenterSpinner data-testid="loading-spinner__pagination" />
+        </div>
+      ) : items.length > 0 ? (
+        <Flex $justifyContent="center">
+          <HitCountSummary data-testid="list-with-pagination__pagination--summary">
+            {hitCountSummary}
+          </HitCountSummary>
+          {showMore && (
+            <Button
+              onClick={fetchMore}
+              variant={ButtonVariant.Secondary}
+              data-testid="list-with-pagination__button--paginate"
+            >
+              {t("common:showMore")}
+            </Button>
+          )}
+        </Flex>
+      ) : null}
+    </Flex>
   );
 }
 

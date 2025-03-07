@@ -7,6 +7,12 @@ import {
 import { pixel } from "./common/style";
 import { OptionInProps } from "hds-react";
 
+/// Enforce readonly on all nested properties
+/// only single level deep i.e. {a: {b: {c: string}}} -> {readonly a: {b: {c: string}}}
+export type ReadonlyDeep<T> = {
+  readonly [P in keyof T]: ReadonlyDeep<T[P]>;
+};
+
 export function filterNonNullable<T>(
   arr: Maybe<Maybe<T>[]> | undefined
 ): NonNullable<T>[] {

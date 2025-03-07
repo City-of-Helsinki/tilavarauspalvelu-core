@@ -334,6 +334,7 @@ function SubmitFragment(
     <LoginFragment
       isActionDisabled={!isReservable}
       apiBaseUrl={props.apiBaseUrl}
+      type="reservation"
       componentIfAuthenticated={
         <SubmitButton
           type="submit"

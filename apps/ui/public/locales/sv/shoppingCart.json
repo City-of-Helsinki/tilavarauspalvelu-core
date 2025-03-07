@@ -1,6 +1,8 @@
 {
   "next": "Fyll i ansökan",
   "nextShort": "Fyll i",
+  "loginAndReserve": "Logga in och boka",
+  "loginAndApply": "Logga in och ansök",
   "count_one": "{{count}} lokal vald",
   "count_other": "{{count}} lokaler valda",
   "countShort_one": "{{count}} vald",

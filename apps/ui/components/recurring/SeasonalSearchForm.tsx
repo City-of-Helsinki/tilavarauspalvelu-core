@@ -56,11 +56,11 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
 
 type OptionType = { value: number; label: string };
 export type SearchFormProps = {
-  options: {
-    reservationUnitTypeOptions: OptionType[];
-    purposeOptions: OptionType[];
-    unitOptions: OptionType[];
-  };
+  options: Readonly<{
+    reservationUnitTypeOptions: Readonly<OptionType[]>;
+    purposeOptions: Readonly<OptionType[]>;
+    unitOptions: Readonly<OptionType[]>;
+  }>;
   isLoading: boolean;
 };
 

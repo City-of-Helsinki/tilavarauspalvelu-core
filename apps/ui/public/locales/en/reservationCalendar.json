@@ -12,7 +12,6 @@
     "timeIndicator": "Current time"
   },
   "selectTime": "Select the time",
-  "loginAndReserve": "Log in to book",
   "loginInfo": "Log in to make the booking.",
   "showCurrentDay": "Show this day",
   "showPrevious": "Show previous {{view}}",

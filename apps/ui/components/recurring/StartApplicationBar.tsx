@@ -60,7 +60,7 @@ const InnerContainer = styled(Flex).attrs({
 type NodeList = Pick<ReservationUnitNode, "pk">[];
 type Props = {
   applicationRound: {
-    reservationUnits: NodeList;
+    reservationUnits: Readonly<NodeList>;
   };
   apiBaseUrl: string;
 };
@@ -68,7 +68,7 @@ type Props = {
 export function StartApplicationBar({
   apiBaseUrl,
   applicationRound,
-}: Props): JSX.Element | null {
+}: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
@@ -118,48 +118,48 @@ export function StartApplicationBar({
   const count = getReservationUnits().length;
   // This breaks SSR because the server knowns nothing about client side stores
   // we can't fix it with CSS since it doesn't update properly
-  if (count === 0) {
-    return null;
-  }
 
   return (
     <BackgroundContainer>
-      <InnerContainer>
-        <NoWrap id="reservationUnitCount">
-          {isMobile
-            ? t("shoppingCart:countShort", { count })
-            : t("shoppingCart:count", { count })}
-        </NoWrap>
-        <WhiteButton
-          onClick={clearSelections}
-          size={ButtonSize.Small}
-          data-testid="start-application-bar__button--clear-selections"
-          variant={ButtonVariant.Supplementary}
-          iconStart={<IconCross />}
-          colorVariant="light"
-        >
-          {isMobile
-            ? t("shoppingCart:deleteSelectionsShort")
-            : t("shoppingCart:deleteSelections")}
-        </WhiteButton>
-        <LoginFragment
-          returnUrl={getPostLoginUrl()}
-          apiBaseUrl={apiBaseUrl}
-          componentIfAuthenticated={
-            <WhiteButton
-              id="startApplicationButton"
-              variant={ButtonVariant.Supplementary}
-              size={ButtonSize.Small}
-              onClick={onNext}
-              disabled={isSaving}
-              iconEnd={<IconArrowRight />}
-              colorVariant="light"
-            >
-              {t("shoppingCart:nextShort")}
-            </WhiteButton>
-          }
-        />
-      </InnerContainer>
+      {count > 0 && (
+        <InnerContainer>
+          <NoWrap id="reservationUnitCount">
+            {isMobile
+              ? t("shoppingCart:countShort", { count })
+              : t("shoppingCart:count", { count })}
+          </NoWrap>
+          <WhiteButton
+            onClick={clearSelections}
+            size={ButtonSize.Small}
+            data-testid="start-application-bar__button--clear-selections"
+            variant={ButtonVariant.Supplementary}
+            iconStart={<IconCross />}
+            $colorVariant="light"
+          >
+            {isMobile
+              ? t("shoppingCart:deleteSelectionsShort")
+              : t("shoppingCart:deleteSelections")}
+          </WhiteButton>
+          <LoginFragment
+            returnUrl={getPostLoginUrl()}
+            apiBaseUrl={apiBaseUrl}
+            type="application"
+            componentIfAuthenticated={
+              <WhiteButton
+                id="startApplicationButton"
+                variant={ButtonVariant.Supplementary}
+                size={ButtonSize.Small}
+                onClick={onNext}
+                disabled={isSaving}
+                iconEnd={<IconArrowRight />}
+                $colorVariant="light"
+              >
+                {t("shoppingCart:nextShort")}
+              </WhiteButton>
+            }
+          />
+        </InnerContainer>
+      )}
     </BackgroundContainer>
   );
 }

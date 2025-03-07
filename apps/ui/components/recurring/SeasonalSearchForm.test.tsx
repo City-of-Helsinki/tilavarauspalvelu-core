@@ -31,24 +31,12 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-// TODO what we need to test?
-// on higher level (above this component) so on page level
-// - page framing (breadcrumbs / layout / title)
-// - query (backend) errors -> displayed as error component
-// - ordering component -> changes query params
-//  - this contains the search results. is this correct?
-// - start application bar
-//  - filters the full data based on search params
-// - SearchForm - this component
-//   - changes search params when form is submitted
-//   - does nothing if form is not submitted
-//   - preselects based on query params
+// - changes search params when form is submitted
+// - does nothing if form is not submitted
+// - preselects based on query params
 //
 // so need query selectors for HDS components that are present in the search form
 // - we are only concerned with the form part of the search form
-// - we check the results from query params (not the pagination / query itself)
-//  - this will become a separate test for
-
 const options: SearchFormProps["options"] = {
   reservationUnitTypeOptions: [1, 2, 3, 4, 5, 6].map((i) => ({
     value: i,
