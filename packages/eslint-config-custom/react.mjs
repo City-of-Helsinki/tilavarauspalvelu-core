@@ -6,6 +6,7 @@ import reactPlugin from 'eslint-plugin-react';
 import eslintPluginReactHooks from "eslint-plugin-react-hooks";
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import graphqlPlugin from '@graphql-eslint/eslint-plugin'
+import eslintPluginImportX from 'eslint-plugin-import-x'
 
 const SCHEMA_FILE = '../../tilavaraus.graphql';
 
@@ -61,10 +62,14 @@ const myRules = {
     },
   ],
   // for some reason this raises errors for "key" props in jsx arrays
-  "react/prop-types": "off"
+  "react/prop-types": "off",
+  // styled-components doesn't work with this (alternative would be disable this only for styled-components)
+  "import-x/no-named-as-default": "off",
+  // breaks admin-ui typescript paths
+  "import-x/no-unresolved": "off",
+  'import-x/no-dynamic-require': 'warn',
   // mixing mjs with ts in nextjs causes issues
-  /*
-  "import/extensions": [
+  "import-x/extensions": [
     "error",
     "never",
     {
@@ -73,7 +78,6 @@ const myRules = {
       "json": "always",
     },
   ],
-  */
 };
 
 const myConfig = {
@@ -128,6 +132,8 @@ export default [
     rules: { ...eslintPluginReactHooks.configs.recommended.rules },
   },
   eslintPluginPrettierRecommended,
+  eslintPluginImportX.flatConfigs.recommended,
+  eslintPluginImportX.flatConfigs.typescript,
   myConfig,
   {
     ignores,

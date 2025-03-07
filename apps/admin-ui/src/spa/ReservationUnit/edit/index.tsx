@@ -10,7 +10,6 @@ import {
   TextInput,
   Tooltip,
 } from "hds-react";
-import i18next from "i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import dynamic from "next/dynamic";
@@ -214,17 +213,6 @@ const reservationsMaxDaysBeforeOptions = [
   { value: 365, label: "12 kk" },
   { value: 730, label: "24 kk" },
 ];
-
-const durationOptions = bufferTimeOptions.concat(
-  Array.from({ length: (23 - 2) * 2 + 1 })
-    .map((_v, i) => 3600 * 2 + i * 1800)
-    .map((v) => ({
-      value: v,
-      label: i18next.t("ReservationUnitEditor.durationHours", {
-        hours: (v / 3600).toLocaleString("fi"),
-      }),
-    }))
-);
 
 // Terms PK is not a number but any valid string
 const makeTermsOptions = (
@@ -712,6 +700,17 @@ function ReservationUnitSettings({
     errors.reservationsMaxDaysBefore != null ||
     errors.maxReservationDuration != null ||
     errors.minReservationDuration != null;
+
+  const durationOptions = bufferTimeOptions.concat(
+    Array.from({ length: (23 - 2) * 2 + 1 })
+      .map((_v, i) => 3600 * 2 + i * 1800)
+      .map((v) => ({
+        value: v,
+        label: t("ReservationUnitEditor.durationHours", {
+          hours: (v / 3600).toLocaleString("fi"),
+        }),
+      }))
+  );
 
   return (
     <Accordion open={hasErrors} heading={t("ReservationUnitEditor.settings")}>
