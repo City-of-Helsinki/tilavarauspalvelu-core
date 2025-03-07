@@ -28,12 +28,12 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 
-type Type = "pending" | "confirmed" | "complete";
-
 const Wrapper = styled.div<{ $type: Type }>`
-  /* stylelint-disable custom-property-pattern */
+  --bg-color-complete: var(--color-silver-light);
+  --bg-color-pending: var(--color-gold-light);
   background-color: var(
-    --color-${({ $type }) => ($type === "complete" ? "silver" : "gold")}-light
+    ${({ $type }) =>
+      $type === "complete" ? "--bg-color-complete" : "--bg-color-pending"}
   );
 `;
 
@@ -60,6 +60,8 @@ const StyledLink = styled(Link)`
 const Subheading = styled.p`
   margin: 0;
 `;
+
+type Type = "pending" | "complete";
 
 type Props = {
   reservation: ReservationInfoCardFragment;
@@ -142,7 +144,7 @@ export function ReservationInfoCard({
             {name}
           </StyledLink>
         </H4>
-        {(type === "confirmed" || type === "complete") && (
+        {type === "complete" && (
           <Subheading>
             {t("reservations:reservationNumber")}:{" "}
             <span data-testid="reservation__reservation-info-card__reservationNumber">

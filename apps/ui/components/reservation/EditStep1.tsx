@@ -144,7 +144,7 @@ export function EditStep1({
     <>
       <StyledReservationInfoCard
         reservation={modifiedReservation}
-        type="confirmed"
+        type="pending"
       />
       <StyledForm
         onSubmit={(e) => {
