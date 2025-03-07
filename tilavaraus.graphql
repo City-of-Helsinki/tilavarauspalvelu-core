@@ -1804,7 +1804,7 @@ type PindoraSeriesInfoType {
   accessCodePhoneNumber: String!
   accessCodeSmsMessage: String!
   accessCodeSmsNumber: String!
-  accessCodeValidity: [PindoraSeriesValidityInfoType]!
+  accessCodeValidity: [PindoraSeriesValidityInfoType!]!
 }
 
 type PindoraSeriesValidityInfoType {

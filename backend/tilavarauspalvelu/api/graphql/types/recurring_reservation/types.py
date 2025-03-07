@@ -43,7 +43,7 @@ class PindoraSeriesInfoType(graphene.ObjectType):
     access_code_sms_number = graphene.String(required=True)
     access_code_sms_message = graphene.String(required=True)
 
-    access_code_validity = graphene.List(PindoraSeriesValidityInfoType, required=True)
+    access_code_validity = graphene.List(graphene.NonNull(PindoraSeriesValidityInfoType), required=True)
 
 
 class RecurringReservationNode(DjangoNode):
