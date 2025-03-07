@@ -1,14 +1,9 @@
-import React from "react";
-import styled from "styled-components";
+import React, { useState } from "react";
 import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "react-i18next";
 import type { ApolloQueryResult } from "@apollo/client";
 import type { PageInfo, Query } from "@gql/gql-types";
 import { Flex } from "common/styles/util";
-
-const Counts = styled.div`
-  margin-bottom: var(--spacing-m);
-`;
 
 type Props = {
   count: number;
@@ -25,7 +20,7 @@ export function More({
   fetchMore,
 }: Props): JSX.Element {
   const { t } = useTranslation();
-  const [isFetching, setIsFetching] = React.useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const handleClick = async () => {
     const endCursor = pageInfo?.endCursor;
@@ -37,13 +32,13 @@ export function More({
   return (
     <Flex $direction="row" $justifyContent="center">
       {totalCount > count ? (
-        <div style={{ textAlign: "center" }}>
-          <Counts>
+        <Flex style={{ textAlign: "center" }}>
+          <div>
             {t("paging.numResults", {
               count,
               totalCount,
             })}
-          </Counts>
+          </div>
           <Button
             variant={isFetching ? ButtonVariant.Clear : ButtonVariant.Secondary}
             iconStart={isFetching ? <LoadingSpinner small /> : undefined}
@@ -52,14 +47,14 @@ export function More({
           >
             {t("common.showMore")}
           </Button>
-        </div>
+        </Flex>
       ) : (
         count > 0 && (
-          <Counts>
+          <div>
             {t("paging.allResults", {
               totalCount,
             })}
-          </Counts>
+          </div>
         )
       )}
     </Flex>

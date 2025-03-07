@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 interface Props {
   hash: string;
@@ -6,7 +6,7 @@ interface Props {
 }
 
 const ScrollIntoView = ({ hash, children }: Props): JSX.Element => {
-  const selfRef = React.useRef<HTMLDivElement | null>(null);
+  const selfRef = useRef<HTMLDivElement | null>(null);
 
   const isMatch = hash === document.location.hash?.substring(1);
 

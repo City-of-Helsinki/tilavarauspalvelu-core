@@ -1,4 +1,10 @@
-import React, { Children, useEffect, useMemo, useState } from "react";
+import React, {
+  Children,
+  cloneElement,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   BlockingReservationFieldsFragment,
   ReservationNode,
@@ -59,7 +65,7 @@ function TouchCellWrapper({
   onSelectSlot,
 }: // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO Calendar prop typing
 any): JSX.Element {
-  return React.cloneElement(Children.only(children), {
+  return cloneElement(Children.only(children), {
     onTouchEnd: () => onSelectSlot({ action: "click", slots: [value] }),
     style: {
       className: `${children}`,

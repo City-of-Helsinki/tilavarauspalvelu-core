@@ -1,5 +1,5 @@
 import { get } from "lodash-es";
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Table, TableProps } from "hds-react";
 import { fontBold } from "common";
@@ -62,7 +62,7 @@ export function CustomTable({
   enableFrontendSorting,
   ...props
 }: Props): JSX.Element {
-  const [keyOverride, setKeyOverride] = React.useState<number>(0);
+  const [keyOverride, setKeyOverride] = useState<number>(0);
   const onSort = (order: "asc" | "desc", colKey: string) => {
     const field = order === "asc" ? colKey : `-${colKey}`;
     if (setSort) {
