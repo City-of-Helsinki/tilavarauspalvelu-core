@@ -2731,6 +2731,7 @@ type RecurringReservationNode implements Node {
   The ID of the object
   """
   id: ID!
+  isAccessCodeIsActiveCorrect: Boolean
   name: String!
   """
   Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple series, queries to Pindora are not optimized.
@@ -3251,6 +3252,7 @@ type ReservationNode implements Node {
   The ID of the object
   """
   id: ID!
+  isAccessCodeIsActiveCorrect: Boolean
   isBlocked: Boolean
   isHandled: Boolean
   name: String

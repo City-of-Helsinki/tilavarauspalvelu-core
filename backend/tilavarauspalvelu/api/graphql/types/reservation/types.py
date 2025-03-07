@@ -72,6 +72,9 @@ class ReservationNode(DjangoNode):
     )
 
     access_code_should_be_active = AnnotatedField(graphene.Boolean, expression=L("access_code_should_be_active"))
+    is_access_code_is_active_correct = AnnotatedField(
+        graphene.Boolean, expression=L("is_access_code_is_active_correct")
+    )
 
     calendar_url = graphene.String()
 
