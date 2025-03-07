@@ -32,7 +32,7 @@ const infoCss = css`
   }
 `;
 
-const StyledInfoCard = styled(ReservationInfoCard)`
+const StyledReservationInfoCard = styled(ReservationInfoCard)`
   ${infoCss}
 `;
 
@@ -105,7 +105,7 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
       {reservation.recurringReservation ? (
         <ApplicationInfoCard reservation={reservation} />
       ) : (
-        <StyledInfoCard reservation={reservation} type="confirmed" />
+        <StyledReservationInfoCard reservation={reservation} type="complete" />
       )}
       <CancellationForm
         onNext={onSubmit}

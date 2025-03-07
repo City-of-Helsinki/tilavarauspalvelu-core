@@ -57,7 +57,7 @@ function Confirmation({ apiBaseUrl, reservation }: PropsNarrowed) {
     <>
       <Breadcrumb routes={routes} />
       <ReservationPageWrapper $nRows={4}>
-        <ReservationInfoCard reservation={reservation} type="confirmed" />
+        <ReservationInfoCard reservation={reservation} type="pending" />
         <ReservationConfirmation
           apiBaseUrl={apiBaseUrl}
           reservation={reservation}
