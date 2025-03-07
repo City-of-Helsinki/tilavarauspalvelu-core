@@ -1,5 +1,5 @@
 import { Button, ButtonVariant, IconPlusCircleFill } from "hds-react";
-import React from "react";
+import React, { createRef } from "react";
 import { useTranslation } from "next-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
@@ -34,8 +34,8 @@ function SpacesResources(): JSX.Element {
   const { t } = useTranslation();
   const unitPk = Number(useParams<IProps>().unitPk);
 
-  const newSpacesButtonRef = React.createRef<HTMLButtonElement>();
-  const newResourceButtonRef = React.createRef<HTMLButtonElement>();
+  const newSpacesButtonRef = createRef<HTMLButtonElement>();
+  const newResourceButtonRef = createRef<HTMLButtonElement>();
 
   const id = base64encode(`UnitNode:${unitPk}`);
   const {

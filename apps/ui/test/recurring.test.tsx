@@ -5,8 +5,7 @@ import {
 import RecurringLander from "../pages/recurring";
 import { render } from "@testing-library/react";
 import { base64encode } from "common/src/helpers";
-import { vi, describe, test, expect, afterEach } from "vitest";
-import { beforeEach } from "vitest";
+import { vi, describe, test, expect, afterEach, beforeEach } from "vitest";
 
 function createApplicationRound({
   pk = 1,

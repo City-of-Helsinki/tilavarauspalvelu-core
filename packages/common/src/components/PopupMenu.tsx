@@ -1,8 +1,8 @@
 import { IconMenuDots } from "hds-react";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import FocusTrap from "focus-trap-react";
-import ReactDOM from "react-dom";
+import { FocusTrap } from "focus-trap-react";
+import { createPortal } from "react-dom";
 import { Flex } from "../../styles/util";
 import { toggleButtonCss } from "../../styles/buttonCss";
 import { useTranslation } from "next-i18next";
@@ -116,7 +116,7 @@ export function PopupMenu({
         <IconMenuDots />
       </ToggleButton>
       {isOpen && buttonRef.current
-        ? ReactDOM.createPortal(
+        ? createPortal(
             <PopupContent
               items={items}
               closePopup={closePopup}

@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useMemo } from "react";
+import React, {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useMemo,
+  useState,
+} from "react";
 
 type DataContextProps = {
   reservation: ReservationProps | null;
@@ -13,15 +19,15 @@ export type ReservationProps = {
   reservationUnitPk: number | null;
 };
 
-const DataContext = React.createContext<DataContextProps>({
+const DataContext = createContext<DataContextProps>({
   reservation: null,
   setReservation: async () => {},
 });
 
 type Props = { children: React.ReactNode };
 
-const DataContextProvider: React.FC<Props> = ({ children }: Props) => {
-  const [reservation, setReservation] = React.useState<ReservationProps>({
+export const DataContextProvider: React.FC<Props> = ({ children }: Props) => {
+  const [reservation, setReservation] = useState<ReservationProps>({
     pk: null,
     begin: null,
     end: null,
@@ -39,5 +45,3 @@ const DataContextProvider: React.FC<Props> = ({ children }: Props) => {
     </DataContext.Provider>
   );
 };
-
-export { DataContextProvider };

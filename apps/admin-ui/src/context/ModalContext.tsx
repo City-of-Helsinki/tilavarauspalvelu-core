@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
 type ModalContextProps = {
   modalContent: { content: JSX.Element | null };
@@ -6,7 +6,7 @@ type ModalContextProps = {
   isOpen: boolean;
 };
 
-const ModalContext = React.createContext<ModalContextProps>({
+const ModalContext = createContext<ModalContextProps>({
   modalContent: { content: null },
   setModalContent: () => undefined,
   isOpen: false,

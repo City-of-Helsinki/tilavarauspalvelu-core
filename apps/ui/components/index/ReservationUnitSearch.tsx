@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { IconSearch, TextInput } from "hds-react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
@@ -29,11 +29,11 @@ const StyledTextInput = styled(TextInput)`
   }
 `;
 
-const ReservationUnitSearch = (): JSX.Element => {
+function ReservationUnitSearch(): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleSubmit = (event: React.FormEvent | React.MouseEvent) => {
     event.preventDefault();
@@ -46,12 +46,12 @@ const ReservationUnitSearch = (): JSX.Element => {
     <form onSubmit={(e) => handleSubmit(e)}>
       <StyledTextInput
         placeholder={t("home:head.searchPlaceholder")}
-        label={<IconSearch onClick={(e) => handleSubmit(e)} aria-hidden />}
+        label={<IconSearch onClick={(e) => handleSubmit(e)} />}
         id="front-page__search--reservation-unit"
         onChange={(e) => setSearchTerm(e.target.value)}
       />
     </form>
   );
-};
+}
 
 export default ReservationUnitSearch;
