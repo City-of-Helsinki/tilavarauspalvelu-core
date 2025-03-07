@@ -145,6 +145,19 @@ export function getTranslationKeyForCustomerTypeChoice(
   return [`ReservationType.${reservationType}`, reserveeTypeTranslationKey];
 }
 
+export function translateReservationCustomerType(
+  res: ReservationType,
+  t: TFunction
+): string {
+  const [part1, part2] = getTranslationKeyForCustomerTypeChoice(
+    res.type,
+    res.reserveeType,
+    res.reserveeIsUnregisteredAssociation
+  );
+  const part2WithSpace = part2 ? ` ${t(part2)}` : "";
+  return `${t(part1)}${part2WithSpace}`;
+}
+
 export function getName(
   reservation: ReservationCommonFragment & {
     name?: string | null;

@@ -336,7 +336,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
                 // NOTE using our custom time input because HDS doesn't allow reset
                 <TimeInput
                   {...field}
-                  label={t(`ReservationDialog.startTime`)}
+                  label={t(`common.startTime`)}
                   error={translateError(errors.startTime?.message)}
                 />
               )}
@@ -349,7 +349,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
                 // NOTE using our custom time input because HDS doesn't allow reset
                 <TimeInput
                   {...field}
-                  label={t(`ReservationDialog.endTime`)}
+                  label={t(`common.endTime`)}
                   error={translateError(errors.endTime?.message)}
                 />
               )}

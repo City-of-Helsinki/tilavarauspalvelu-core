@@ -4,7 +4,7 @@ import {
   ButtonVariant,
   Dialog,
   IconAlertCircleFill,
-  IconInfoCircle,
+  IconQuestionCircle,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
 
@@ -45,7 +45,7 @@ export function ConfirmationDialog(props: Props): JSX.Element | null {
           variant === "danger" ? (
             <IconAlertCircleFill color="#b01038" />
           ) : (
-            <IconInfoCircle />
+            <IconQuestionCircle />
           )
         }
       />

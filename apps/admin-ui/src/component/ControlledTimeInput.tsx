@@ -32,7 +32,7 @@ export function ControlledTimeInput<T extends FieldValues>({
   return (
     <TimeInput
       id={id ?? `ReservationDialog.${field.name}`}
-      label={label ?? t(`ReservationDialog.${field.name}`)}
+      label={label ?? t(`common.${field.name}`)}
       hoursLabel={t("common.hoursLabel")}
       minutesLabel={t("common.minutesLabel")}
       required={required}

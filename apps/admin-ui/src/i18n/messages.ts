@@ -81,7 +81,6 @@ const translations: ITranslations = {
     allResults: ["Kaikki {{totalCount}} tulosta näytetty"],
   },
   common: {
-    week: ["Viikko"],
     showMore: ["Näytä lisää"],
     view: ["Näytä"],
     clearAllSelections: ["Tyhjennä valinnat"],
@@ -153,13 +152,13 @@ const translations: ITranslations = {
     option: ["Vaihtoehto"],
     same: ["Sama"],
     day: ["Päivä"],
+    week: ["Viikko"],
     month: ["Kuukausi"],
     year: ["Vuosi"],
     begins: ["Alkaa"],
     ends: ["Päättyy"],
     weekly: ["Viikoittain"],
     biweekly: ["Vuoroviikoittain"],
-    timeOfDay: ["Kellonaika"],
     unhandledCount: ["{{count}} käsittelemättä"],
     inspect: ["Tarkastele"],
     cityOfHelsinki: ["Helsingin kaupunki"],
@@ -167,6 +166,10 @@ const translations: ITranslations = {
     weekday: ["Viikonpäivä"],
     date: ["Päivämäärä"],
     time: ["Kellonaika"],
+    startingDate: ["Aloituspäivä"],
+    endingDate: ["Päättymispäivä"],
+    startTime: ["Aloitusaika"],
+    endTime: ["Päättymisaika"],
     and: ["ja"],
     peopleSuffixShort: ["hlö"],
     // TODO AriaLabel is not needed in the key value
@@ -1156,12 +1159,6 @@ const translations: ITranslations = {
     removeFailed: ["Tilan poistaminen ei onnistunut."],
   },
   ReservationDialog: {
-    // field names (for input controls) => should be moved (not dialog specific)
-    date: ["Päivämäärä"],
-    startingDate: ["Aloituspäivä"],
-    endingDate: ["Päättymispäivä"],
-    startTime: ["Aloitusaika"],
-    endTime: ["Päättymisaika"],
     // dialog specific
     title: ["Varaa {{reservationUnit}}"],
     accept: ["Varaa"],
@@ -2010,6 +2007,13 @@ const translations: ITranslations = {
     accessCodeRepair: ["Korjaa ovikoodi"],
     accessCodeChangedSuccess: ["Ovikoodi vaihdettu"],
     accessCodeRepairedSuccess: ["Ovikoodi korjattu"],
+    accessCodeChangeConfirm: [
+      "Uuden ovikoodin generointi nollaa aiemman ovikoodit. Haluatko varmasti generoida uuden ovikoodin?",
+    ],
+    accessCodeChangeMultiple: ["Vaihda kausivarauksen ovikoodi"],
+    accessCodeChangeConfirmMultiple: [
+      "Ovikoodi vaihtuu myös muille tähän kausivaraukseen liittyville viikkovuoroille. Haluatko varmasti vaihtaa ovikoodin?",
+    ],
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],
