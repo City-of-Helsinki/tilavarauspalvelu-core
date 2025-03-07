@@ -14,6 +14,7 @@ import {
   timeToMinutes,
   type LocalizationLanguages,
 } from "common/src/helpers";
+import { ReadonlyURLSearchParams } from "next/navigation";
 
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
@@ -120,14 +121,19 @@ export const getAddressAlt = (ru: {
 export const isTouchDevice = (): boolean =>
   isBrowser && window?.matchMedia("(any-hover: none)").matches;
 
-export function getPostLoginUrl() {
+export function getPostLoginUrl(
+  params: Readonly<URLSearchParams> = new ReadonlyURLSearchParams()
+): string | undefined {
   if (!isBrowser) {
     return undefined;
   }
   const { origin, pathname, searchParams } = new URL(window.location.href);
-  const params = new URLSearchParams(searchParams);
-  params.set("isPostLogin", "true");
-  return `${origin}${pathname}?${params.toString()}`;
+  const p = new URLSearchParams(searchParams);
+  for (const [key, value] of params) {
+    p.append(key, value);
+  }
+  p.set("isPostLogin", "true");
+  return `${origin}${pathname}?${p.toString()}`;
 }
 
 // date format should always be in finnish, but the weekday and time separator should be localized

@@ -22,6 +22,8 @@ import { useDisplayError } from "@/hooks/useDisplayError";
 import { useReservationUnitList } from "@/hooks";
 import { useSearchParams } from "next/navigation";
 import { pageSideMargins } from "common/styles/layout";
+import { LoginFragment } from "../LoginFragment";
+import { getPostLoginUrl } from "@/modules/util";
 
 const BackgroundContainer = styled.div`
   position: fixed;
@@ -60,9 +62,11 @@ type Props = {
   applicationRound: {
     reservationUnits: NodeList;
   };
+  apiBaseUrl: string;
 };
 
 export function StartApplicationBar({
+  apiBaseUrl,
   applicationRound,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
@@ -138,17 +142,23 @@ export function StartApplicationBar({
             ? t("shoppingCart:deleteSelectionsShort")
             : t("shoppingCart:deleteSelections")}
         </WhiteButton>
-        <WhiteButton
-          id="startApplicationButton"
-          variant={ButtonVariant.Supplementary}
-          size={ButtonSize.Small}
-          onClick={onNext}
-          disabled={isSaving}
-          iconEnd={<IconArrowRight />}
-          colorVariant="light"
-        >
-          {t("shoppingCart:nextShort")}
-        </WhiteButton>
+        <LoginFragment
+          returnUrl={getPostLoginUrl()}
+          apiBaseUrl={apiBaseUrl}
+          componentIfAuthenticated={
+            <WhiteButton
+              id="startApplicationButton"
+              variant={ButtonVariant.Supplementary}
+              size={ButtonSize.Small}
+              onClick={onNext}
+              disabled={isSaving}
+              iconEnd={<IconArrowRight />}
+              colorVariant="light"
+            >
+              {t("shoppingCart:nextShort")}
+            </WhiteButton>
+          }
+        />
       </InnerContainer>
     </BackgroundContainer>
   );

@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
-import { useLocalStorage } from "react-use";
 import { Stepper } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
@@ -21,6 +20,7 @@ import {
 } from "@gql/gql-types";
 import { type Inputs } from "common/src/reservation-form/types";
 import { createApolloClient } from "@/modules/apolloClient";
+import { default as NextError } from "next/error";
 import {
   getReservationPath,
   getReservationUnitPath,
@@ -29,7 +29,6 @@ import {
 import { Sanitize } from "common/src/components/Sanitize";
 import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { getCheckoutUrl } from "@/modules/reservation";
-import { ReservationProps } from "@/context/DataContext";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
@@ -51,6 +50,7 @@ import { Flex } from "common/styles/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationPageWrapper } from "@/components/reservations/styles";
 import { useDisplayError } from "@/hooks/useDisplayError";
+import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 
 const StyledReservationInfoCard = styled(ReservationInfoCard)`
   grid-column: 1 / -1;
@@ -86,18 +86,6 @@ const TitleSection = styled(Flex)`
   }
 `;
 
-/// We want to get rid of the local storage
-/// but there is still code that requires it to be used.
-/// Other pages (ex. login + book) get confused if we don't clear it here.
-const useRemoveStoredReservation = () => {
-  const [storedReservation, , removeStoredReservation] =
-    useLocalStorage<ReservationProps>("reservation");
-
-  useEffect(() => {
-    if (storedReservation) removeStoredReservation();
-  }, [storedReservation, removeStoredReservation]);
-};
-
 // NOTE back / forward buttons (browser) do NOT work properly
 // router.beforePopState could be used to handle them but it's super hackish
 // the correct solution is to create separate pages (files) for each step (then next-router does this for free)
@@ -121,15 +109,6 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
 
   const reservation = resData?.reservation ?? props.reservation;
   const reservationUnit = reservation?.reservationUnits?.find(() => true);
-
-  // it should be Created only here (SSR should have redirected)
-  if (reservation.state !== ReservationStateChoice.Created) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      "should NOT be here when reservation state is ",
-      reservation.state
-    );
-  }
 
   useRemoveStoredReservation();
 
@@ -351,6 +330,11 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       onSubmitStep1();
     }
   };
+
+  // it should be Created only here (SSR should have redirected)
+  if (reservation.state !== ReservationStateChoice.Created) {
+    return <NextError statusCode={404} />;
+  }
 
   return (
     <FormProvider {...form}>
