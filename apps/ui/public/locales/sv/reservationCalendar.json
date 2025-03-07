@@ -12,7 +12,6 @@
     "timeIndicator": "Tidsåtgång"
   },
   "selectTime": "Välj tid",
-  "loginAndReserve": "Logga in och boka",
   "loginInfo": "Logga in för att boka.",
   "showCurrentDay": "Visa denna dag",
   "showPrevious": "Visa föregående {{view}}",

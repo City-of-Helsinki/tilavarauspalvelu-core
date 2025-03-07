@@ -5,6 +5,7 @@
   "500": {
     "body": "Jotain meni pieleen"
   },
+  "search": "Tapahtui virhe haettaessa tiloja. Yritä uudelleen!",
   "deactivatedAccount": {
     "heading": "Käyttäjätunnuksesi ei ole voimassa.",
     "subHeadingA": "Ota yhteyttä asiakaspalveluun sähköpostitse",

@@ -1,58 +1,162 @@
 import { render } from "@testing-library/react";
-import { ReservationUnitCard } from "./RecurringCard";
-import { ReservationUnitCardFieldsFragment } from "@/gql/gql-types";
+import { RecurringCard } from "./RecurringCard";
+import { AccessType, ReservationUnitCardFieldsFragment } from "@/gql/gql-types";
 import { vi, describe, test, expect } from "vitest";
+import { getReservationUnitPath } from "@/modules/urls";
+import {
+  createMockReservationUnitType,
+  generateNameFragment,
+} from "@/test/testUtils";
+import userEvent from "@testing-library/user-event";
+
+describe("RecurringCard", () => {
+  test("should render recurring card", () => {
+    const input = createInput({
+      name: "foobar",
+      unitName: "Unit",
+    });
+    const view = render(<RecurringCard {...input} />);
+    // For these cards neither the title nor image are links
+    const showLink = view.getByRole("link", { name: "common:show" });
+    expect(showLink).toBeInTheDocument();
+    expect(showLink).toHaveAttribute(
+      "href",
+      getReservationUnitPath(input.reservationUnit.pk)
+    );
+    expect(
+      view.getByRole("button", { name: "common:selectReservationUnit" })
+    ).toBeInTheDocument();
+    expect(view.getAllByRole("link")).toHaveLength(1);
+    expect(view.getAllByRole("button")).toHaveLength(1);
+    expect(view.getByText("foobar FI")).toBeInTheDocument();
+    expect(view.getByText("Unit FI")).toBeInTheDocument();
+    expect(
+      view.getByText(`reservationUnit:accessTypes.${AccessType.AccessCode}`)
+    ).toBeInTheDocument();
+    expect(
+      view.getByText(/reservationUnitCard:maxPersons/)
+    ).toBeInTheDocument();
+    // unit type icon is present, can't query by aria-label since it's hidden
+    expect(
+      view.queryByTestId("reservation-unit-card__icon--home")
+    ).toBeInTheDocument();
+  });
+
+  test("should render remove button if already selected", async () => {
+    const input = createInput({
+      name: "foobar",
+      unitName: "Unit",
+    });
+    input.containsReservationUnit.mockReturnValue(true);
+    const view = render(<RecurringCard {...input} />);
+    const removeBtn = view.getByRole("button", {
+      name: "common:removeReservationUnit",
+    });
+    expect(removeBtn).toBeInTheDocument();
+    expect(
+      view.queryByRole("button", { name: "common:selectReservationUnit" })
+    ).not.toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(removeBtn);
+    expect(input.removeReservationUnit).toHaveBeenCalledTimes(1);
+  });
+
+  test("should invoke callback on select", async () => {
+    const input = createInput({
+      name: "foobar",
+      unitName: "Unit",
+    });
+    const view = render(<RecurringCard {...input} />);
+    const user = userEvent.setup();
+    const selectBtn = view.getByRole("button", {
+      name: "common:selectReservationUnit",
+    });
+    expect(selectBtn).toBeInTheDocument();
+    await user.click(selectBtn);
+    expect(input.selectReservationUnit).toHaveBeenCalledTimes(1);
+  });
+
+  test("should not have max persons if not defined", () => {
+    const input = createInput({
+      name: "foobar",
+      unitName: "Unit",
+      maxPersons: null,
+    });
+    const view = render(<RecurringCard {...input} />);
+    expect(
+      view.queryByText(/reservationUnitCard:maxPersons/)
+    ).not.toBeInTheDocument();
+  });
+
+  test("should not have typename if not defined", () => {
+    const input = createInput({
+      name: "foobar",
+      unitName: "Unit",
+      reservationUnitType: null,
+    });
+    const view = render(<RecurringCard {...input} />);
+    expect(
+      view.queryByTestId("reservation-unit-card__icon--home")
+    ).not.toBeInTheDocument();
+  });
+
+  test("should not have access type if not defined", () => {
+    const input = createInput({
+      name: "foobar",
+      unitName: "Unit",
+      currentAccessType: null,
+    });
+    const view = render(<RecurringCard {...input} />);
+    expect(
+      view.queryByText(/reservationUnit:accessTypes/)
+    ).not.toBeInTheDocument();
+  });
+});
 
 type MockReservationUnitInputs = {
   name: string;
   unitName: string;
-  reservationUnitType?: string;
+  reservationUnitType?: string | null;
+  maxPersons?: number | null;
+  currentAccessType?: AccessType | null;
 };
 
+/// uses undefined to create default values, null to create null values
 function createReservationUnit({
   name,
   unitName,
   reservationUnitType,
+  maxPersons,
+  currentAccessType,
 }: MockReservationUnitInputs): ReservationUnitCardFieldsFragment {
   return {
     id: "ReservationUnitNode:1",
     pk: 1,
     accessTypes: [],
-    reservationUnitType: createReservationUnitType({
-      name: reservationUnitType,
-    }),
-    unit: createUnit({ name: unitName }),
+    maxPersons: maxPersons !== undefined ? maxPersons : 10,
+    currentAccessType:
+      currentAccessType !== undefined
+        ? currentAccessType
+        : AccessType.AccessCode,
+    reservationUnitType:
+      reservationUnitType !== null // eslint-disable-line eqeqeq
+        ? createMockReservationUnitType({
+            name: reservationUnitType ?? "ReservationUnitType",
+          })
+        : null,
+    unit: createUnitMock({ name: unitName }),
     images: [],
     ...generateNameFragment(name),
   };
 }
 
-function createUnit({ name }: { name?: string }) {
+function createUnitMock({ name }: { name?: string }) {
   if (!name) {
     return null;
   }
   return {
     id: "UnitNode:1",
     pk: 1,
-    ...generateNameFragment(name),
-  };
-}
-
-function generateNameFragment(name: string) {
-  return {
-    nameFi: `${name} FI`,
-    nameSv: `${name} SV`,
-    nameEn: `${name} EN`,
-  };
-}
-
-function createReservationUnitType({ name }: { name?: string }) {
-  if (!name) {
-    return null;
-  }
-  return {
-    pk: 1,
-    id: name,
     ...generateNameFragment(name),
   };
 }
@@ -65,19 +169,3 @@ function createInput(props: MockReservationUnitInputs) {
     removeReservationUnit: vi.fn(),
   };
 }
-
-describe("RecurringCard", () => {
-  test("should render recurring card", () => {
-    const name = "foobar";
-    const unitName = "Unit";
-    const input = createInput({ name, unitName });
-    const view = render(<ReservationUnitCard {...input} />);
-    expect(view.getByRole("link", { name: "common:show" })).toBeInTheDocument();
-    expect(view.getAllByRole("link")).toHaveLength(1);
-    expect(view.getAllByRole("button")).toHaveLength(1);
-    expect(view.getByText(`${name} FI`)).toBeInTheDocument();
-    expect(view.getByText(`${unitName} FI`)).toBeInTheDocument();
-  });
-  // should render name, unit name, image?, typename (optional), maxPersons (optional),
-  // should have two buttons always
-});
