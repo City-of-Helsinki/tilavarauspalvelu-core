@@ -6,7 +6,6 @@ import { ThemeProvider } from "styled-components";
 import { theme } from "common";
 import PageWrapper from "../components/common/PageWrapper";
 import { ExternalScripts } from "@/components/ExternalScripts";
-import { DataContextProvider } from "@/context/DataContext";
 import { createApolloClient } from "@/modules/apolloClient";
 import { TrackingWrapper } from "@/modules/tracking";
 import "common/styles/global.scss";
@@ -80,32 +79,30 @@ function MyApp({ Component, pageProps }: AppProps) {
   const enableHotjar = hotjarEnabled && statisticsAccepted;
 
   return (
-    <DataContextProvider>
-      <CookieConsentContextProvider
-        siteSettings={sitesettings}
-        options={{
-          language,
-        }}
-        onChange={recheck}
-      >
-        <TrackingWrapper matomoEnabled={enableMatomo}>
-          {/* TODO is this ever called on the server? then the ctx is not undefined */}
-          <ApolloProvider client={client}>
-            <ThemeProvider theme={theme}>
-              <PageWrapper {...pageProps}>
-                <Component {...pageProps} />
-                <CookieBanner />
-              </PageWrapper>
-              <ToastContainer />
-            </ThemeProvider>
-          </ApolloProvider>
-        </TrackingWrapper>
-        <ExternalScripts
-          enableMatomo={enableMatomo}
-          enableHotjar={enableHotjar}
-        />
-      </CookieConsentContextProvider>
-    </DataContextProvider>
+    <CookieConsentContextProvider
+      siteSettings={sitesettings}
+      options={{
+        language,
+      }}
+      onChange={recheck}
+    >
+      <TrackingWrapper matomoEnabled={enableMatomo}>
+        {/* TODO is this ever called on the server? then the ctx is not undefined */}
+        <ApolloProvider client={client}>
+          <ThemeProvider theme={theme}>
+            <PageWrapper {...pageProps}>
+              <Component {...pageProps} />
+              <CookieBanner />
+            </PageWrapper>
+            <ToastContainer />
+          </ThemeProvider>
+        </ApolloProvider>
+      </TrackingWrapper>
+      <ExternalScripts
+        enableMatomo={enableMatomo}
+        enableHotjar={enableHotjar}
+      />
+    </CookieConsentContextProvider>
   );
 }
 
