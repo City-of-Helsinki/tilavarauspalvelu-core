@@ -16,7 +16,7 @@ import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
 import { getMainImage } from "@/modules/util";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource } from "common/src/helpers";
-import Card from "common/src/components/Card";
+import Card, { CardInfoItem } from "common/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import {
@@ -33,7 +33,7 @@ interface CardProps {
   removeReservationUnit: (reservationUnit: Node) => void;
 }
 
-export function ReservationUnitCard({
+export function RecurringCard({
   reservationUnit,
   selectReservationUnit,
   containsReservationUnit,
@@ -56,10 +56,15 @@ export function ReservationUnitCard({
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "small");
 
-  const infos = [];
+  const infos: CardInfoItem[] = [];
   if (reservationUnitTypeName) {
     infos.push({
-      icon: <IconHome size={IconSize.Small} />,
+      icon: (
+        <IconHome
+          size={IconSize.Small}
+          data-testid="reservation-unit-card__icon--home"
+        />
+      ),
       value: reservationUnitTypeName,
     });
   }
@@ -86,7 +91,7 @@ export function ReservationUnitCard({
     });
   }
 
-  const buttons = [];
+  const buttons: JSX.Element[] = [];
   if (containsReservationUnit(reservationUnit)) {
     buttons.push(
       <Button

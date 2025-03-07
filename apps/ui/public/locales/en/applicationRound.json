@@ -1,4 +1,8 @@
 {
+  "search": {
+    "title": "Search and book spaces for next season",
+    "subtitle": "Select the spaces you want to apply to be used during the next season"
+  },
   "card": {
     "applyButton": "Search",
     "displayPastButton": "Show spaces",

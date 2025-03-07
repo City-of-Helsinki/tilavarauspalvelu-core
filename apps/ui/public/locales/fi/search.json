@@ -1,8 +1,4 @@
 {
-  "recurring": {
-    "heading": "Varaa tila koko kaudeksi",
-    "text": "Valitse hakemukselle tilat, joita haluat käyttää säännöllisesti ensi kauden aikana."
-  },
   "single": {
     "heading": "Varaa tiloja ja laitteita"
   },

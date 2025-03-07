@@ -7,6 +7,12 @@ import { Flex } from "../../styles/util";
 
 type CardVariant = "default" | "vertical";
 
+export type CardInfoItem = {
+  value: string;
+  icon?: JSX.Element;
+  testId?: string;
+};
+
 export type CardProps = {
   heading: string;
   headingTestId?: string;
@@ -20,7 +26,7 @@ export type CardProps = {
   imageSrc?: string;
   imageAlt?: string;
   tags?: JSX.Element[];
-  infos?: { value: string; icon?: JSX.Element; testId?: string }[];
+  infos?: CardInfoItem[];
   buttons?: JSX.Element[];
   children?: React.ReactNode;
   className?: string;

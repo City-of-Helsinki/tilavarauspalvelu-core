@@ -1,4 +1,8 @@
 {
+  "search": {
+    "title": "Boka lokalen för hela säsongen",
+    "subtitle": "Välj lokaler till ansökningen som du vill använda regelbundet under kommande säsong."
+  },
   "card": {
     "applyButton": "Sök lokaler",
     "displayPastButton": "Visa lokalerna",

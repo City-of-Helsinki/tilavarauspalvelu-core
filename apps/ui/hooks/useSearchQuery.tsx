@@ -3,7 +3,7 @@ import {
   useSearchReservationUnitsQuery,
 } from "@/gql/gql-types";
 import { SEARCH_PAGING_LIMIT } from "@/modules/const";
-import { hash } from "common/src/helpers";
+import { hash, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -17,13 +17,9 @@ export function useSearchQuery(
   // TODO should really hydrate the ApolloClient from SSR
   const query = useSearchReservationUnitsQuery({
     variables,
-    fetchPolicy: "network-only",
-    // Why?
-    // skip: Object.keys(searchValues).length === 0,
+    // no-cache is mandatory for tests (otherwise it returns incomplete data)
+    fetchPolicy: "no-cache",
     notifyOnNetworkStatusChange: true,
-    onError: (error1) =>
-      // eslint-disable-next-line no-console
-      console.warn(error1, variables, "error in search query"),
   });
 
   const [hasMoreData, setHasMoreData] = useState(true);
@@ -44,8 +40,8 @@ export function useSearchQuery(
     }
 
     const { ref } = router.query;
-    const version = Number(ref) > 0 ? Number(ref) : 0;
-    check(variables, version);
+    const version = toNumber(ignoreMaybeArray(ref));
+    check(variables, version ?? 0);
   }, [variables, varhash, router.query]);
 
   useEffect(() => {
