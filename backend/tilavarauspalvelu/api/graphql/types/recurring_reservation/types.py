@@ -54,6 +54,9 @@ class RecurringReservationNode(DjangoNode):
         graphene.List(graphene.Enum.from_enum(AccessType)), expression=L("used_access_types")
     )
     should_have_active_access_code = AnnotatedField(graphene.Boolean, expression=L("should_have_active_access_code"))
+    is_access_code_is_active_correct = AnnotatedField(
+        graphene.Boolean, expression=L("is_access_code_is_active_correct")
+    )
 
     pindora_info = MultiField(
         PindoraSeriesInfoType,
