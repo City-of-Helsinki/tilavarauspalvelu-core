@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const useDebounce = <T,>(value: T, delay: number): T => {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  const firstDebounce = React.useRef(true);
+  const firstDebounce = useRef(true);
 
   useEffect(() => {
     if (value && firstDebounce.current) {
