@@ -372,5 +372,6 @@ AuditLogger.register(
     exclude_fields=[
         "_reservee_name",
         "_access_code_should_be_active",
+        "_is_access_code_is_active_correct",
     ],
 )
