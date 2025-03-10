@@ -114,7 +114,7 @@ class with_indices[T]:  # noqa: N801, RUF100
 
     def __iter__(self) -> Generator[tuple[int, T]]:
         i: int = 0
-        next_item: T = None
+        next_item = None
         gen = enumerate(self.seq)
         while True:
             if next_item is not None:
@@ -543,7 +543,7 @@ def _find_attribute_type_hint_path(*, depth: int) -> str:
     return f"{module_name}.{type_hint}"
 
 
-_WRAPPER_PATTERN = re.compile(r".+\[(?P<type_hint>.+)]$")
+_WRAPPER_PATTERN = re.compile(r".+\[(?P<type_hint>.+)]$")  # NOSONAR
 
 
 def _get_type_hint(frame: FrameType, source_code: list[str]) -> str:
