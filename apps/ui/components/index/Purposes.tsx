@@ -5,8 +5,8 @@ import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import styled from "styled-components";
 import type { PurposeCardFragment } from "@gql/gql-types";
-import { singleSearchPrefix } from "@/modules/urls";
-import ReservationUnitSearch from "./ReservationUnitSearch";
+import { getSingleSearchPath } from "@/modules/urls";
+import { ReservationUnitSearch } from "./ReservationUnitSearch";
 import { pixel } from "@/styles/util";
 import { breakpoints } from "common/src/common/style";
 import { H3 } from "common/src/common/typography";
@@ -84,6 +84,13 @@ export function Purposes({ purposes }: Props): JSX.Element {
     return getTranslationSafe(item, "name", lang);
   };
 
+  const getSearchLink = (purpose: PurposeCardFragment): string => {
+    const params = new URLSearchParams();
+    // next/link so it's safer to return invalid search params than empty link
+    params.set("purpose", purpose.pk?.toString() ?? "");
+    return `${getSingleSearchPath(params)}#content`;
+  };
+
   // TODO the search (the first section) doesn't belong here
   return (
     <>
@@ -101,15 +108,12 @@ export function Purposes({ purposes }: Props): JSX.Element {
         data-testid="front-page__purposes"
       >
         {purposes.map((item) => (
-          <PurposeLink
-            key={item.pk}
-            href={`${singleSearchPrefix}?purposes=${item.pk}#content`}
-          >
+          <PurposeLink key={item.pk} href={getSearchLink(item)}>
             <PurposeItem data-testid="front-page__purposes--purpose">
               <Image src={getImg(item)} alt="" aria-hidden="true" />
               <Flex $direction="row" $gap="xs" $alignItems="center">
                 <span>{getName(item)} </span>
-                <IconArrowRight size={IconSize.Small} aria-hidden="true" />
+                <IconArrowRight size={IconSize.Small} />
               </Flex>
             </PurposeItem>
           </PurposeLink>
