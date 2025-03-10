@@ -20,6 +20,7 @@ if TYPE_CHECKING:
         PaymentType,
         ReservationStateChoice,
         ReservationTypeChoice,
+        ReservationTypeStaffChoice,
     )
     from tilavarauspalvelu.models import (
         AgeGroup,
@@ -401,3 +402,50 @@ class PindoraSectionInfoData(NamedTuple):
     access_code_sms_message: str
 
     access_code_validity: list[PindoraValidityInfoData]
+
+
+class ReservationPeriod(TypedDict):
+    begin: datetime.datetime
+    end: datetime.datetime
+
+
+class ReservationDetails(TypedDict, total=False):
+    name: str
+    description: str
+    num_persons: int
+    state: ReservationStateChoice
+    type: ReservationTypeChoice | ReservationTypeStaffChoice
+    working_memo: str
+
+    buffer_time_before: datetime.timedelta
+    buffer_time_after: datetime.timedelta
+    handled_at: datetime.datetime
+    confirmed_at: datetime.datetime
+
+    applying_for_free_of_charge: bool
+    free_of_charge_reason: bool
+
+    reservee_id: str
+    reservee_first_name: str
+    reservee_last_name: str
+    reservee_email: str
+    reservee_phone: str
+    reservee_organisation_name: str
+    reservee_address_street: str
+    reservee_address_city: str
+    reservee_address_zip: str
+    reservee_is_unregistered_association: bool
+    reservee_type: CustomerTypeChoice
+
+    billing_first_name: str
+    billing_last_name: str
+    billing_email: str
+    billing_phone: str
+    billing_address_street: str
+    billing_address_city: str
+    billing_address_zip: str
+
+    user: int | User
+    purpose: int | ReservationPurpose
+    home_city: int | City
+    age_group: int | AgeGroup

@@ -7,6 +7,8 @@ from django.db import models
 from django.db.models import QuerySet
 from django.db.models.functions import Coalesce
 
+from tilavarauspalvelu.models import Unit
+
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ApplicationRound
 
@@ -36,7 +38,6 @@ class ApplicationRoundQuerySet(QuerySet):
         # This works sort of like a 'prefetch_related', since it makes another query
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
-        from tilavarauspalvelu.models import Unit
 
         items: list[ApplicationRound] = list(self)
         if not items:

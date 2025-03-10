@@ -1,48 +1,25 @@
 from __future__ import annotations
 
 import datetime
-import json
-import logging
 import uuid
 from contextlib import suppress
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from django.conf import settings
 from django.db import transaction
-from django.db.models import Prefetch, Q
-from django.db.transaction import atomic
-from django.utils.translation import gettext_lazy as _
-from easy_thumbnails.exceptions import InvalidImageFormatError
-from lookup_property import L
 
 from config.celery import app
-from tilavarauspalvelu.enums import (
-    AccessType,
-    ApplicantTypeChoice,
-    ApplicationRoundStatusChoice,
-    ApplicationStatusChoice,
-    CustomerTypeChoice,
-    HaukiResourceState,
-    OrderStatus,
-    ReservationStateChoice,
-    ReservationTypeChoice,
-    Weekday,
-)
-from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.enums import OrderStatus
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import (
     AffectingTimeSpan,
-    AllocatedTimeSlot,
     Application,
+    ApplicationRound,
     PaymentOrder,
-    PaymentProduct,
     PersonalInfoViewLog,
     RecurringReservation,
-    RequestLog,
     Reservation,
     ReservationStatistic,
-    ReservationStatisticsReservationUnit,
     ReservationUnit,
     ReservationUnitHierarchy,
     ReservationUnitImage,
@@ -53,24 +30,52 @@ from tilavarauspalvelu.models import (
     Unit,
     User,
 )
-from utils.date_utils import local_date, local_datetime, local_end_of_day, local_start_of_day
+from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from collections.abc import Collection, Iterable
+    from collections.abc import Collection
 
-    from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
-    from tilavarauspalvelu.models import Address, Organisation, Person
-    from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
     from tilavarauspalvelu.typing import QueryInfo
 
 
-logger = logging.getLogger(__name__)
+__all__ = [
+    "anonymize_old_users_task",
+    "create_missing_pindora_reservations",
+    "create_reservation_unit_thumbnails_and_urls",
+    "deactivate_old_permissions_task",
+    "delete_expired_applications",
+    "delete_pindora_reservation",
+    "generate_reservation_series_from_allocations",
+    "prune_recurring_reservations_task",
+    "prune_reservation_statistics_task",
+    "prune_reservations_task",
+    "purge_image_cache",
+    "rebuild_space_tree_hierarchy",
+    "refresh_reservation_unit_accounting",
+    "refresh_reservation_unit_product_mapping",
+    "refund_paid_reservation_task",
+    "remove_old_personal_info_view_logs",
+    "save_personal_info_view_log",
+    "save_sql_queries_from_request",
+    "send_application_handled_email_task",
+    "send_application_in_allocation_email_task",
+    "send_permission_deactivation_email_task",
+    "send_user_anonymization_email_task",
+    "update_affecting_time_spans_task",
+    "update_expired_orders_task",
+    "update_origin_hauki_resource_reservable_time_spans",
+    "update_pindora_access_code_is_active",
+    "update_reservation_unit_hierarchy_task",
+    "update_reservation_unit_pricings_tax_percentage",
+    "update_reservation_unit_search_vectors_task",
+    "update_units_from_tprek",
+]
 
 
 @app.task(name="rebuild_space_tree_hierarchy")
 def rebuild_space_tree_hierarchy() -> None:
-    with atomic():
+    with transaction.atomic():
         Space.objects.rebuild()
         ReservationUnitHierarchy.refresh()
 
@@ -113,16 +118,13 @@ def remove_old_personal_info_view_logs() -> None:
 def update_origin_hauki_resource_reservable_time_spans() -> None:
     from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 
-    logger.info("Updating OriginHaukiResource reservable time spans...")
     HaukiResourceHashUpdater().run()
 
 
 @app.task(name="prune_reservations")
 def prune_reservations_task() -> None:
-    from tilavarauspalvelu.services.pruning import prune_inactive_reservations, prune_reservation_with_inactive_payments
-
-    prune_inactive_reservations()
-    prune_reservation_with_inactive_payments()
+    Reservation.objects.delete_inactive()
+    Reservation.objects.delete_with_inactive_payments()
 
 
 @app.task(name="send_application_in_allocation_email")
@@ -144,17 +146,9 @@ def update_expired_orders_task() -> None:
     from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
     from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
 
-    older_than_minutes = settings.VERKKOKAUPPA_ORDER_EXPIRATION_MINUTES
-    expired_datetime = local_datetime() - datetime.timedelta(minutes=older_than_minutes)
-    expired_orders: Iterable[PaymentOrder] = PaymentOrder.objects.filter(
-        status=OrderStatus.DRAFT,
-        created_at__lte=expired_datetime,
-        remote_id__isnull=False,
-    ).all()
-
-    for payment_order in expired_orders:
+    for payment_order in PaymentOrder.objects.expired():
         # Do not update the PaymentOrder status if an error occurs
-        with suppress(GetPaymentError, CancelOrderError), atomic():
+        with suppress(GetPaymentError, CancelOrderError), transaction.atomic():
             payment_order.actions.refresh_order_status_from_webshop()
 
             if payment_order.status == OrderStatus.EXPIRED:
@@ -163,16 +157,12 @@ def update_expired_orders_task() -> None:
 
 @app.task(name="prune_reservation_statistics")
 def prune_reservation_statistics_task() -> None:
-    from tilavarauspalvelu.services.pruning import prune_reservation_statistics
-
-    prune_reservation_statistics()
+    ReservationStatistic.objects.delete_expired_statistics()
 
 
 @app.task(name="prune_recurring_reservations")
 def prune_recurring_reservations_task() -> None:
-    from tilavarauspalvelu.services.pruning import prune_recurring_reservations
-
-    prune_recurring_reservations()
+    RecurringReservation.objects.delete_empty_series()
 
 
 @app.task(
@@ -199,52 +189,7 @@ def update_affecting_time_spans_task(using: str | None = None) -> None:
 
 @app.task(name="create_statistics_for_reservations")
 def create_or_update_reservation_statistics(reservation_pks: list[int]) -> None:
-    new_statistics: list[ReservationStatistic] = []
-    new_statistics_units: list[ReservationStatisticsReservationUnit] = []
-
-    reservations = (
-        Reservation.objects.filter(pk__in=reservation_pks)
-        .select_related(
-            "user",
-            "recurring_reservation",
-            "recurring_reservation__ability_group",
-            "recurring_reservation__allocated_time_slot",
-            "deny_reason",
-            "cancel_reason",
-            "purpose",
-            "home_city",
-            "age_group",
-        )
-        .prefetch_related(
-            Prefetch(
-                "reservation_units",
-                queryset=ReservationUnit.objects.select_related("unit"),
-            ),
-        )
-    )
-
-    for reservation in reservations:
-        statistic = ReservationStatistic.for_reservation(reservation, save=False)
-        statistic_units = ReservationStatisticsReservationUnit.for_statistic(statistic, save=False)
-        new_statistics.append(statistic)
-        new_statistics_units.extend(statistic_units)
-
-    fields_to_update: list[str] = [
-        field.name
-        for field in ReservationStatistic._meta.get_fields()
-        # Update all fields that can be updated
-        if field.concrete and not field.many_to_many and not field.primary_key
-    ]
-
-    with transaction.atomic():
-        new_statistics = ReservationStatistic.objects.bulk_create(
-            new_statistics,
-            update_conflicts=True,
-            update_fields=fields_to_update,
-            unique_fields=["reservation"],
-        )
-        ReservationStatisticsReservationUnit.objects.filter(reservation_statistics__in=new_statistics).delete()
-        ReservationStatisticsReservationUnit.objects.bulk_create(new_statistics_units)
+    Reservation.objects.upsert_statistics(reservation_pks=reservation_pks)
 
 
 @app.task(name="update_reservation_unit_pricings_tax_percentage")
@@ -256,75 +201,37 @@ def update_reservation_unit_pricings_tax_percentage(
 ) -> None:
     SentryLogger.log_message(
         message="Task `update_reservation_unit_pricings_tax_percentage` started",
-        details=(
-            f"Task was run with "
-            f"change_date: {change_date}, "
-            f"current_tax: {current_tax}, "
-            f"future_tax: {future_tax}, "
-            f"ignored_company_codes: {ignored_company_codes}"
-        ),
+        details=f"Task was run with {change_date=}, {current_tax=}, {future_tax=}, {ignored_company_codes=}",
         level="info",
     )
 
-    change_date = datetime.date.fromisoformat(change_date)  # e.g. "2024-09-01"
+    change_date = datetime.date.fromisoformat(change_date)
     current_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(current_tax))
     future_tax_percentage, _ = TaxPercentage.objects.get_or_create(value=Decimal(future_tax))
 
-    # Last pricing for each reservation unit before the change date
-    latest_pricings = (
-        ReservationUnitPricing.objects.filter(
-            Q(begins__lte=change_date, highest_price=0)  # Ignore FREE pricings after the change date
-            | Q(highest_price__gt=0)
-        )
-        .exclude(reservation_unit__payment_accounting__company_code__in=ignored_company_codes)
-        .exclude(
-            # Use Unit's Payment Accounting, only if Reservation Unit's Payment Accounting is not set
-            reservation_unit__unit__payment_accounting__company_code__in=ignored_company_codes,
-            reservation_unit__payment_accounting__isnull=True,
-        )
-        .order_by("reservation_unit_id", "-begins")
-        .distinct("reservation_unit_id")
+    ReservationUnitPricing.actions.add_new_pricings_for_tax_percentage(
+        future_tax_percentage=future_tax_percentage,
+        current_tax_percentage=current_tax_percentage,
+        change_date=change_date,
+        ignored_company_codes=ignored_company_codes,
     )
-    for pricing in latest_pricings:
-        # Skip pricings that are FREE or have a different tax percentage
-        # We don't want to filter these away in the queryset, as that might cause us to incorrectly create new pricings
-        # in some cases. e.g. Current pricing is PAID, but the future pricing is FREE or has a different tax percentage.
-        if (
-            pricing.highest_price > 0
-            and pricing.tax_percentage == current_tax_percentage
-            # Don't create a new pricing if the reservation unit has a future pricing after the change date
-            and pricing.begins < change_date
-        ):
-            ReservationUnitPricing(
-                begins=change_date,
-                tax_percentage=future_tax_percentage,
-                price_unit=pricing.price_unit,
-                lowest_price=pricing.lowest_price,
-                highest_price=pricing.highest_price,
-                reservation_unit=pricing.reservation_unit,
-                is_activated_on_begins=True,
-            ).save()
 
     # Log any unhandled future pricings
     # PAID Pricings that begin on or after the change date
-    unhandled_future_pricings = ReservationUnitPricing.objects.filter(
-        begins__gte=change_date,
-        tax_percentage=current_tax_percentage,
-        highest_price__gt=0,
+    unhandled: list[ReservationUnitPricing] = list(
+        ReservationUnitPricing.objects.pricings_with_tax_percentage(
+            after_date=change_date,
+            tax_percentage=current_tax_percentage,
+        ).select_related("reservation_unit", "reservation_unit__unit")
     )
 
-    if not unhandled_future_pricings:
+    if not unhandled:
         return
 
-    for pricing in unhandled_future_pricings:
-        logger.info(f"Pricing should be handled manually: {pricing.id} {pricing.reservation_unit.name} {pricing}")
-
-    unhandled_future_pricings_str = ", ".join([
-        f"<{pricing.id}: {pricing.reservation_unit}: {pricing}>" for pricing in unhandled_future_pricings
-    ])
+    info_str = ", ".join(f"<{pricing.id}: {pricing.reservation_unit}: {pricing}>" for pricing in unhandled)
     SentryLogger.log_message(
         message="Task `update_reservation_unit_pricings_tax_percentage` has unhandled future pricings",
-        details=f"Task found the following unhandled future pricings: {unhandled_future_pricings_str}",
+        details=f"Task found the following unhandled future pricings: {info_str}",
         level="info",
     )
 
@@ -336,10 +243,7 @@ def update_reservation_unit_pricings_tax_percentage(
     retry_backoff=True,
 )
 def refresh_reservation_unit_product_mapping(reservation_unit_pk: int) -> None:
-    from tilavarauspalvelu.integrations.verkkokauppa.product.types import CreateProductParams
-    from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-
-    reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
+    reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
             message=f"Unable to refresh reservation unit ({reservation_unit_pk}) product mapping.",
@@ -348,27 +252,7 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk: int) -> None:
         )
         return
 
-    payment_merchant = reservation_unit.actions.get_merchant()
-
-    if reservation_unit.actions.requires_product_mapping_update():
-        params = CreateProductParams(
-            namespace=settings.VERKKOKAUPPA_NAMESPACE,
-            namespace_entity_id=reservation_unit.pk,
-            merchant_id=payment_merchant.id,
-        )
-        api_product = VerkkokauppaAPIClient.create_product(params=params)
-        payment_product, _ = PaymentProduct.objects.update_or_create(
-            id=api_product.product_id,
-            defaults={"merchant": payment_merchant},
-        )
-
-        ReservationUnit.objects.filter(pk=reservation_unit_pk).update(payment_product=payment_product)
-
-        refresh_reservation_unit_accounting.delay(reservation_unit_pk)
-
-    # Remove product mapping if merchant is removed
-    if reservation_unit.payment_product and not payment_merchant:
-        ReservationUnit.objects.filter(pk=reservation_unit_pk).update(payment_product=None)
+    reservation_unit.actions.refresh_reservation_unit_product_mapping()
 
 
 @app.task(
@@ -378,11 +262,7 @@ def refresh_reservation_unit_product_mapping(reservation_unit_pk: int) -> None:
     retry_backoff=True,
 )
 def refresh_reservation_unit_accounting(reservation_unit_pk: int) -> None:
-    from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
-    from tilavarauspalvelu.integrations.verkkokauppa.product.types import CreateOrUpdateAccountingParams
-    from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-
-    reservation_unit = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
+    reservation_unit: ReservationUnit | None = ReservationUnit.objects.filter(pk=reservation_unit_pk).first()
     if reservation_unit is None:
         SentryLogger.log_message(
             message=f"Unable to refresh reservation unit ({reservation_unit_pk}) accounting data.",
@@ -391,51 +271,17 @@ def refresh_reservation_unit_accounting(reservation_unit_pk: int) -> None:
         )
         return
 
-    accounting = reservation_unit.actions.get_accounting()
-
-    if reservation_unit.payment_product and accounting:
-        params = CreateOrUpdateAccountingParams(
-            vat_code=accounting.vat_code,
-            internal_order=accounting.internal_order,
-            profit_center=accounting.profit_center,
-            project=accounting.project,
-            operation_area=accounting.operation_area,
-            company_code=accounting.company_code,
-            main_ledger_account=accounting.main_ledger_account,
-            balance_profit_center=accounting.balance_profit_center,
-        )
-        try:
-            VerkkokauppaAPIClient.create_or_update_accounting(
-                product_uuid=reservation_unit.payment_product.id, params=params
-            )
-        except CreateOrUpdateAccountingError as err:
-            SentryLogger.log_exception(
-                err,
-                details="Unable to refresh reservation unit accounting data",
-                reservation_unit_id=reservation_unit_pk,
-            )
+    reservation_unit.actions.refresh_reservation_unit_accounting()
 
 
 @app.task(name="update_reservation_unit_image_urls")
 def create_reservation_unit_thumbnails_and_urls(pk: int | None = None) -> None:
     """Create optimized thumbnail images and update URLs to the reservation unit instances."""
-    reservation_unit_images = ReservationUnitImage.objects.filter(image__isnull=False)
+    images = ReservationUnitImage.objects.all()
     if pk is not None:
-        reservation_unit_images = reservation_unit_images.filter(pk=pk)
+        images = images.filter(pk=pk)
 
-    images: list[ReservationUnitImage] = list(reservation_unit_images)
-    if not images:
-        return
-
-    for image in images:
-        try:
-            image.large_url = image.image["large"].url
-            image.medium_url = image.image["medium"].url
-            image.small_url = image.image["small"].url
-        except InvalidImageFormatError as err:
-            SentryLogger.log_exception(err, details="Unable to update image urls", reservation_unit_image_id=image.pk)
-
-    ReservationUnitImage.objects.bulk_update(images, ["large_url", "medium_url", "small_url"])
+    images.update_thumbnail_urls()
 
 
 @app.task(name="purge_image_cache")
@@ -445,238 +291,28 @@ def purge_image_cache(image_path: str) -> None:
     purge(image_path)
 
 
-def _get_series_override_closed_time_spans(allocations: list[AllocatedTimeSlot]) -> dict[int, list[TimeSpanElement]]:
-    """
-    Find all closed opening hours for all reservation units where allocations were made.
-    Check against these and not fully normalized opening hours since allocations can be made
-    outside opening hours (as this system defines them), but should not be on explicitly
-    closed hours, like holidays.
-    """
-    from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
-    from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
-
-    closed_time_spans: dict[int, list[TimeSpanElement]] = {}
-    for allocation in allocations:
-        resource = allocation.reservation_unit_option.reservation_unit.origin_hauki_resource
-        if resource is None or resource.id in closed_time_spans:
-            continue  # Skip if already fetched
-
-        application_round = allocation.reservation_unit_option.application_section.application.application_round
-
-        # Fetch periods from Hauki API
-        date_periods = HaukiAPIClient.get_date_periods(
-            hauki_resource_id=resource.id,
-            start_date_lte=application_round.reservation_period_end.isoformat(),  # Starts before period ends
-            end_date_gte=application_round.reservation_period_begin.isoformat(),  # Ends after period begins
-        )
-
-        # Convert periods to TimeSpanElements
-        closed_time_spans[resource.id] = [
-            TimeSpanElement(
-                start_datetime=local_start_of_day(datetime.date.fromisoformat(period["start_date"])),
-                end_datetime=local_end_of_day(datetime.date.fromisoformat(period["end_date"])),
-                is_reservable=False,
-            )
-            for period in date_periods
-            # Overriding closed date periods are exceptions to the normal opening hours
-            if period["override"] and period["resource_state"] == HaukiResourceState.CLOSED.value
-        ]
-
-    return closed_time_spans
-
-
-def _get_recurring_reservation_details(recurring_reservation: RecurringReservation) -> ReservationDetails:
-    from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
-
-    application_section = recurring_reservation.allocated_time_slot.reservation_unit_option.application_section
-    application = application_section.application
-
-    reservee_type = ApplicantTypeChoice(application.applicant_type).customer_type_choice
-    contact_person: Person | None = getattr(application, "contact_person", None)
-    billing_address: Address | None = getattr(application, "billing_address", None)
-
-    reservation_details = ReservationDetails(
-        name=recurring_reservation.name,
-        type=ReservationTypeChoice.SEASONAL,
-        reservee_type=reservee_type,
-        state=ReservationStateChoice.CONFIRMED,
-        user=recurring_reservation.user,
-        handled_at=application.application_round.handled_date,
-        num_persons=application_section.num_persons,
-        buffer_time_before=datetime.timedelta(0),
-        buffer_time_after=datetime.timedelta(0),
-        reservee_first_name=getattr(contact_person, "first_name", ""),
-        reservee_last_name=getattr(contact_person, "last_name", ""),
-        reservee_email=getattr(contact_person, "email", ""),
-        reservee_phone=getattr(contact_person, "phone_number", ""),
-        billing_address_street=getattr(billing_address, "street_address", ""),
-        billing_address_city=getattr(billing_address, "city", ""),
-        billing_address_zip=getattr(billing_address, "post_code", ""),
-        purpose=application_section.purpose,
-        home_city=application.home_city,
-    )
-
-    if reservee_type == CustomerTypeChoice.INDIVIDUAL:
-        reservation_details["description"] = application.additional_information
-        reservation_details["reservee_address_street"] = reservation_details["billing_address_street"]
-        reservation_details["reservee_address_city"] = reservation_details["billing_address_city"]
-        reservation_details["reservee_address_zip"] = reservation_details["billing_address_zip"]
-
-    else:
-        organisation: Organisation | None = getattr(application, "organisation", None)
-        organisation_identifier: str = getattr(organisation, "identifier", "") or ""
-        organisation_address: Address | None = getattr(organisation, "address", None)
-
-        reservation_details["description"] = getattr(organisation, "core_business", "")
-        reservation_details["reservee_organisation_name"] = getattr(organisation, "name", "")
-        reservation_details["reservee_id"] = organisation_identifier
-        reservation_details["reservee_is_unregistered_association"] = not organisation_identifier
-        reservation_details["reservee_address_street"] = getattr(organisation_address, "street_address", "")
-        reservation_details["reservee_address_city"] = getattr(organisation_address, "city", "")
-        reservation_details["reservee_address_zip"] = getattr(organisation_address, "post_code", "")
-
-    return reservation_details
-
-
 @app.task(name="generate_reservation_series_from_allocations")
 @SentryLogger.log_if_raises("Failed to generate reservation series from allocations")
 def generate_reservation_series_from_allocations(application_round_id: int) -> None:
-    from tilavarauspalvelu.translation import translate_for_user
+    application_round: ApplicationRound | None = ApplicationRound.objects.filter(pk=application_round_id).first()
+    if application_round is None:
+        return
 
-    allocations = AllocatedTimeSlot.objects.filter(
-        reservation_unit_option__application_section__application__application_round=application_round_id,
-    ).select_related(
-        "reservation_unit_option__reservation_unit__origin_hauki_resource",
-        "reservation_unit_option__application_section__application__application_round",
-    )
-
-    closed_time_spans: dict[int, list[TimeSpanElement]] = _get_series_override_closed_time_spans(allocations)
-
-    recurring_reservations: list[RecurringReservation] = [
-        RecurringReservation(
-            name=allocation.reservation_unit_option.application_section.name,
-            description=translate_for_user(
-                _("Seasonal Booking"),
-                allocation.reservation_unit_option.application_section.application.user,
-            ),
-            begin_date=allocation.reservation_unit_option.application_section.reservations_begin_date,
-            begin_time=allocation.begin_time,
-            end_date=allocation.reservation_unit_option.application_section.reservations_end_date,
-            end_time=allocation.end_time,
-            recurrence_in_days=7,
-            weekdays=str(Weekday(allocation.day_of_the_week).as_weekday_number),
-            reservation_unit=allocation.reservation_unit_option.reservation_unit,
-            user=allocation.reservation_unit_option.application_section.application.user,
-            allocated_time_slot=allocation,
-            age_group=allocation.reservation_unit_option.application_section.age_group,
-        )
-        for allocation in allocations
-    ]
-
-    reservation_pks: set[int] = set()
-
-    with transaction.atomic():
-        recurring_reservations = RecurringReservation.objects.bulk_create(recurring_reservations)
-
-        for recurring_reservation in recurring_reservations:
-            reservation_details: ReservationDetails = _get_recurring_reservation_details(recurring_reservation)
-
-            hauki_resource_id = getattr(recurring_reservation.reservation_unit.origin_hauki_resource, "id", None)
-            slots = recurring_reservation.actions.pre_calculate_slots(
-                check_start_interval=True,
-                closed_hours=closed_time_spans.get(hauki_resource_id, []),
-            )
-
-            reservations = recurring_reservation.actions.bulk_create_reservation_for_periods(
-                periods=slots.possible,
-                reservation_details=reservation_details,
-            )
-            reservation_pks.update(reservation.pk for reservation in reservations)
-
-            recurring_reservation.actions.bulk_create_rejected_occurrences_for_periods(
-                overlapping=slots.overlapping,
-                not_reservable=slots.not_reservable,
-                invalid_start_interval=slots.invalid_start_interval,
-            )
-
-    # Must refresh the materialized view after the reservation is created.
-    if settings.UPDATE_AFFECTING_TIME_SPANS:
-        update_affecting_time_spans_task.delay()
-
-    if settings.SAVE_RESERVATION_STATISTICS:
-        create_or_update_reservation_statistics.delay(reservation_pks=list(reservation_pks))
+    application_round.actions.generate_reservations_from_allocations()
 
 
 @app.task(name="delete_expired_applications")
 def delete_expired_applications() -> None:
-    cutoff_date = local_date() - datetime.timedelta(days=settings.REMOVE_EXPIRED_APPLICATIONS_OLDER_THAN_DAYS)
-    Application.objects.filter(
-        L(status__in=[ApplicationStatusChoice.EXPIRED, ApplicationStatusChoice.CANCELLED])
-        & L(application_round__status=ApplicationRoundStatusChoice.RESULTS_SENT)
-        & Q(application_round__application_period_end__lte=cutoff_date)
-    ).delete()
+    Application.objects.delete_expired_applications()
 
 
 @app.task(name="save_sql_queries_from_request")
 def save_sql_queries_from_request(queries: list[QueryInfo], path: str, body: bytes, duration_ms: int) -> None:
-    decoded_body: str | None = None
-    if path.startswith("/graphql"):
-        with suppress(Exception):
-            decoded_body = body.decode()
-        if decoded_body:
-            data = json.loads(decoded_body)
-            decoded_body = data.get("query")
-
-    request_log = RequestLog.objects.create(
-        path=path,
-        body=decoded_body,
-        duration_ms=duration_ms,
-    )
-    sql_logs = [
-        SQLLog(
-            request_log=request_log,
-            sql=query["sql"],
-            succeeded=query["succeeded"],
-            duration_ns=query["duration_ns"],
-            stack_info=query["stack_info"],
-        )
-        for query in queries
-    ]
-    SQLLog.objects.bulk_create(sql_logs)
-
-    log_to_sentry_if_suspicious(request_log, duration_ms)
-
-
-def log_to_sentry_if_suspicious(request_log: RequestLog, duration_ms: int) -> None:
-    if duration_ms >= settings.QUERY_LOGGING_DURATION_MS_THRESHOLD:
-        msg = "Request took too suspiciously long to complete"
-        details = {
-            "request_log": request_log.request_id,
-            "duration": duration_ms,
-        }
-        SentryLogger.log_message(msg, details=details, level="warning")
-
-    if request_log.body and (body_length := len(request_log.body)) >= settings.QUERY_LOGGING_BODY_LENGTH_THRESHOLD:
-        msg = "Body of request is too suspiciously large"
-        details = {
-            "request_log": request_log.request_id,
-            "body_length": body_length,
-        }
-        SentryLogger.log_message(msg, details=details, level="warning")
-
-    if num_of_queries := request_log.sql_logs.count() >= settings.QUERY_LOGGING_QUERY_COUNT_THRESHOLD:
-        msg = "Request made suspiciously many queries"
-        details = {
-            "request_log": request_log.request_id,
-            "num_of_queries": num_of_queries,
-        }
-        SentryLogger.log_message(msg, details=details, level="warning")
+    SQLLog.actions.create_for_request(queries, path, body, duration_ms)
 
 
 @app.task(name="Update ReservationUnit Search vectors")
 def update_reservation_unit_search_vectors_task(reservation_unit_pk: int | None = None) -> None:
-    from tilavarauspalvelu.models import ReservationUnit
-
     ReservationUnit.objects.update_search_vectors(reservation_unit_pk=reservation_unit_pk)
 
 
@@ -715,7 +351,7 @@ def anonymize_old_users_task() -> None:
 def delete_pindora_reservation(reservation_uuid: str) -> None:
     """
     Task that can be used to retry a Pindora reservation deletion if it fails
-    in the endpoint. This should only be called if the access code is know to
+    in the endpoint. This should only be called if the access code is known to
     be inactive, since this task may also fail to delete the reservation if
     Pindora is down for an extended period of time.
     """
@@ -726,93 +362,13 @@ def delete_pindora_reservation(reservation_uuid: str) -> None:
 
 @app.task(name="create_missing_pindora_reservations")
 def create_missing_pindora_reservations() -> None:
-    """If a reservation failed to be created in Pindora, e.g. in the staff create endpoint, retry it here."""
-    from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-    from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraConflictError
+    from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 
-    reservations: list[Reservation] = list(
-        Reservation.objects.filter(
-            recurring_reservation=None,
-            state=ReservationStateChoice.CONFIRMED,
-            access_type=AccessType.ACCESS_CODE,
-            access_code_generated_at=None,
-            end__gt=local_datetime(),
-        )
-    )
-
-    if not reservations:
-        return
-
-    for reservation in reservations:
-        is_active = reservation.access_code_should_be_active
-
-        with suppress(ExternalServiceError):
-            try:
-                response = PindoraClient.create_reservation(reservation=reservation, is_active=is_active)
-
-            # If reservation already exists, fetch it instead.
-            except PindoraConflictError:
-                response = PindoraClient.get_reservation(reservation=reservation)
-
-            reservation.access_code_generated_at = response["access_code_generated_at"]
-            reservation.access_code_is_active = response["access_code_is_active"]
-
-            # Update reservations in loop so that in case of a timeout we have done some work.
-            reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
-
-            # Since the access code was unable to be created when the reservation was initially made,
-            # send an email with the access code to the user.
-            if reservation.access_code_is_active and reservation.access_code_generated_at:
-                EmailService.send_reservation_modified_access_code_email(reservation=reservation)
+    PindoraService.create_missing_reservations()
 
 
 @app.task(name="update_pindora_access_code_is_active")
 def update_pindora_access_code_is_active() -> None:
-    """If a reservation's access code active state failed to update in Pindora, retry the change here."""
-    from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-    from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+    from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 
-    reservations: list[Reservation] = list(
-        Reservation.objects.filter(
-            (
-                (Q(access_code_is_active=True) & L(access_code_should_be_active=False))
-                | (Q(access_code_is_active=False) & L(access_code_should_be_active=True))
-            ),
-            recurring_reservation=None,
-            access_code_generated_at__isnull=False,
-            end__gt=local_datetime(),
-        )
-    )
-
-    if not reservations:
-        return
-
-    for reservation in reservations:
-        with suppress(ExternalServiceError):
-            if reservation.access_code_should_be_active:
-                try:
-                    PindoraClient.activate_reservation_access_code(reservation=reservation)
-
-                # If we think an access code has been generated, but it's not found in Pindora,
-                # set `access_code_generated_at`. `create_missing_pindora_reservations` will
-                # then create the access code if needed.
-                except PindoraNotFoundError:
-                    reservation.access_code_generated_at = None
-
-                else:
-                    reservation.access_code_is_active = True
-
-                    # Access code was activated in Pindora, inform the user by email.
-                    if reservation.access_code_is_active and reservation.access_code_generated_at:
-                        EmailService.send_reservation_modified_access_code_email(reservation=reservation)
-            else:
-                try:
-                    PindoraClient.deactivate_reservation_access_code(reservation=reservation)
-
-                except PindoraNotFoundError:
-                    reservation.access_code_generated_at = None
-
-                reservation.access_code_is_active = False
-
-            # Update reservations in loop so that in case of a timeout we have done some work.
-            reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+    PindoraService.update_pindora_access_code_is_active()

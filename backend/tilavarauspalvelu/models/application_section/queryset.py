@@ -7,6 +7,8 @@ from django.db.models import Subquery
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
+from tilavarauspalvelu.models import ReservationUnitOption
+
 __all__ = [
     "ApplicationSectionManager",
     "ApplicationSectionQuerySet",
@@ -30,8 +32,6 @@ class ApplicationSectionQuerySet(models.QuerySet):
         return self.order_by(L("application__applicant").order_by(descending=desc))
 
     def preferred_unit_name_alias(self, *, lang: Literal["fi", "en", "sv"]) -> Self:
-        from tilavarauspalvelu.models import ReservationUnitOption
-
         return self.alias(
             **{
                 f"preferred_unit_name_{lang}": Subquery(

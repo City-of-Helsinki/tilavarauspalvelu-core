@@ -7,10 +7,14 @@ from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.enums import PriceUnit
 
+from .model import ReservationUnitPricing
+
 if TYPE_CHECKING:
     import datetime
+    from collections.abc import Collection
 
-    from .model import ReservationUnitPricing
+    from tilavarauspalvelu.models import TaxPercentage
+
 
 __all__ = [
     "ReservationUnitPricingActions",
@@ -39,3 +43,42 @@ class ReservationUnitPricingActions:
 
         price_per_minute = price / price_unit.in_minutes
         return price_per_minute * duration_minutes
+
+    @classmethod
+    def add_new_pricings_for_tax_percentage(
+        cls,
+        current_tax_percentage: TaxPercentage,
+        future_tax_percentage: TaxPercentage,
+        change_date: datetime.date,
+        ignored_company_codes: Collection[str],
+    ) -> list[ReservationUnitPricing]:
+        """Create new pricings for the current tax percentage with the future tax percentage from the given date."""
+        latest_pricings = ReservationUnitPricing.objects.latest_pricings_for_tax_update(
+            change_date=change_date,
+            ignored_company_codes=ignored_company_codes,
+        )
+
+        new_pricings: list[ReservationUnitPricing] = [
+            ReservationUnitPricing(
+                begins=change_date,
+                tax_percentage=future_tax_percentage,
+                price_unit=pricing.price_unit,
+                lowest_price=pricing.lowest_price,
+                highest_price=pricing.highest_price,
+                reservation_unit=pricing.reservation_unit,
+                is_activated_on_begins=True,
+            )
+            for pricing in latest_pricings
+            # Skip pricings that are FREE or have a different tax percentage.
+            # We don't want to filter these away in the queryset, as that might cause us to incorrectly create
+            # new pricings in some cases. e.g. Current pricing is PAID, but the future pricing is FREE or has
+            # a different tax percentage.
+            if (
+                pricing.highest_price > 0
+                and pricing.tax_percentage == current_tax_percentage
+                # Don't create a new pricing if the reservation unit has a future pricing after the change date
+                and pricing.begins < change_date
+            )
+        ]
+
+        return ReservationUnitPricing.objects.bulk_create(new_pricings)

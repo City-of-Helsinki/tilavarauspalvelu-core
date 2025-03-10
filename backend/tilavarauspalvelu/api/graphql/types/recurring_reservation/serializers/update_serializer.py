@@ -12,8 +12,7 @@ from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from utils.fields.serializer import input_only_field
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
-
+    from tilavarauspalvelu.typing import ReservationDetails
 
 __all__ = [
     "ReservationSeriesUpdateSerializer",

@@ -11,7 +11,6 @@ from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateCho
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.models import Reservation
-from tilavarauspalvelu.services.pruning import prune_reservation_with_inactive_payments
 from utils.date_utils import local_datetime
 
 from tests.factories import PaymentOrderFactory, ReservationFactory
@@ -31,7 +30,7 @@ def test_prune_reservation_with_inactive_payments__deletes():
             status=OrderStatus.CANCELLED,
         )
 
-    prune_reservation_with_inactive_payments()
+    Reservation.objects.delete_with_inactive_payments()
 
     assert not Reservation.objects.exists()
 
@@ -52,7 +51,7 @@ def test_prune_reservation_with_inactive_payments__reservations_with_fresh_payme
         status=OrderStatus.CANCELLED,
     )
 
-    prune_reservation_with_inactive_payments()
+    Reservation.objects.delete_with_inactive_payments()
 
     assert Reservation.objects.count() == 2
 
@@ -64,7 +63,7 @@ def test_prune_reservation_with_inactive_payments__reservations_with_other_state
                 continue
             PaymentOrderFactory.create(reservation__state=state, remote_id=uuid.uuid4(), status=OrderStatus.CANCELLED)
 
-    prune_reservation_with_inactive_payments()
+    Reservation.objects.delete_with_inactive_payments()
     assert Reservation.objects.count() == len(ReservationStateChoice.choices) - 1
 
 
@@ -76,7 +75,7 @@ def test_prune_reservation_with_inactive_payments__reservations_without_remote_i
             remote_id=None,
         )
 
-    prune_reservation_with_inactive_payments()
+    Reservation.objects.delete_with_inactive_payments()
 
     assert Reservation.objects.exists() is True
 
@@ -84,7 +83,7 @@ def test_prune_reservation_with_inactive_payments__reservations_without_remote_i
 def test_prune_reservation_with_inactive_payments__does_not_delete_reservations_without_order():
     ReservationFactory.create(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
 
-    prune_reservation_with_inactive_payments()
+    Reservation.objects.delete_with_inactive_payments()
 
     assert Reservation.objects.exists() is True
 
@@ -100,7 +99,7 @@ def test_prune_reservation_with_inactive_payments__delete_from_pindora():
             status=OrderStatus.CANCELLED,
         )
 
-    prune_reservation_with_inactive_payments()
+    Reservation.objects.delete_with_inactive_payments()
 
     assert Reservation.objects.exists() is False
 
@@ -118,10 +117,10 @@ def test_prune_reservation_with_inactive_payments__delete_from_pindora__call_fai
             status=OrderStatus.CANCELLED,
         )
 
-    path = "tilavarauspalvelu.services.pruning.delete_pindora_reservation.delay"
+    path = "tilavarauspalvelu.models.reservation.queryset.delete_pindora_reservation.delay"
 
     with mock.patch(path) as task:
-        prune_reservation_with_inactive_payments()
+        Reservation.objects.delete_with_inactive_payments()
 
     assert Reservation.objects.exists() is False
 

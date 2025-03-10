@@ -1,9 +1,15 @@
 from __future__ import annotations
 
 import dataclasses
-from typing import Literal
+from itertools import chain
+from typing import TYPE_CHECKING, Any, Literal
 
 from tilavarauspalvelu.enums import ADLoginAMR, ProfileLoginAMR
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from tilavarauspalvelu.typing import ReservationPeriod
 
 
 @dataclasses.dataclass
@@ -113,3 +119,40 @@ class IDToken:
     @property
     def is_strong_login(self) -> bool:
         return self.loa == "substantial"
+
+
+@dataclasses.dataclass
+class ReservationSeriesCalculationResults:
+    non_overlapping: list[ReservationPeriod] = dataclasses.field(default_factory=list)
+    overlapping: list[ReservationPeriod] = dataclasses.field(default_factory=list)
+    not_reservable: list[ReservationPeriod] = dataclasses.field(default_factory=list)
+    invalid_start_interval: list[ReservationPeriod] = dataclasses.field(default_factory=list)
+
+    def as_json(self, periods: list[ReservationPeriod]) -> list[dict[str, Any]]:
+        return [
+            {
+                "begin": period["begin"].isoformat(timespec="seconds"),
+                "end": period["end"].isoformat(timespec="seconds"),
+            }
+            for period in periods
+        ]
+
+    @property
+    def overlapping_json(self) -> list[dict[str, Any]]:
+        return self.as_json(self.overlapping)
+
+    @property
+    def not_reservable_json(self) -> list[dict[str, Any]]:
+        return self.as_json(self.not_reservable)
+
+    @property
+    def invalid_start_interval_json(self) -> list[dict[str, Any]]:
+        return self.as_json(self.invalid_start_interval)
+
+    @property
+    def possible(self) -> Iterable[ReservationPeriod]:
+        return self.non_overlapping
+
+    @property
+    def not_possible(self) -> Iterable[ReservationPeriod]:
+        return chain(self.overlapping, self.not_reservable, self.invalid_start_interval)

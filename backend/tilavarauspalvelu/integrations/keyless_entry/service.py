@@ -4,7 +4,11 @@ import datetime
 from contextlib import suppress
 from typing import TYPE_CHECKING, overload
 
+from django.db import models
+from lookup_property import L
+
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
+from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
 from tilavarauspalvelu.typing import (
     PindoraReservationInfoData,
@@ -12,7 +16,8 @@ from tilavarauspalvelu.typing import (
     PindoraSeriesInfoData,
     PindoraValidityInfoData,
 )
-from utils.date_utils import DEFAULT_TIMEZONE
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.external_service.errors import ExternalServiceError
 
 from .client import PindoraClient
 from .exceptions import PindoraClientError, PindoraConflictError, PindoraInvalidValueError, PindoraNotFoundError
@@ -406,6 +411,92 @@ class PindoraService:
             case _:
                 msg = f"Invalid sync target: {obj}"
                 raise PindoraClientError(msg)
+
+    @classmethod
+    def create_missing_reservations(cls) -> None:
+        """If a reservation failed to be created in Pindora, e.g. in the staff create endpoint, retry it here."""
+        reservations: list[Reservation] = list(
+            Reservation.objects.filter(
+                recurring_reservation=None,
+                state=ReservationStateChoice.CONFIRMED,
+                access_type=AccessType.ACCESS_CODE,
+                access_code_generated_at=None,
+                end__gt=local_datetime(),
+            )
+        )
+
+        if not reservations:
+            return
+
+        for reservation in reservations:
+            is_active = reservation.access_code_should_be_active
+
+            with suppress(ExternalServiceError):
+                try:
+                    response = PindoraClient.create_reservation(reservation=reservation, is_active=is_active)
+
+                # If reservation already exists, fetch it instead.
+                except PindoraConflictError:
+                    response = PindoraClient.get_reservation(reservation=reservation)
+
+                reservation.access_code_generated_at = response["access_code_generated_at"]
+                reservation.access_code_is_active = response["access_code_is_active"]
+
+                # Update reservations in loop so that in case of a timeout we have done some work.
+                reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+
+                # Since the access code was unable to be created when the reservation was initially made,
+                # send an email with the access code to the user.
+                if reservation.access_code_is_active and reservation.access_code_generated_at:
+                    EmailService.send_reservation_modified_access_code_email(reservation=reservation)
+
+    @classmethod
+    def update_pindora_access_code_is_active(cls) -> None:
+        """If a reservation's access code active state failed to update in Pindora, retry the change here."""
+        reservations: list[Reservation] = list(
+            Reservation.objects.filter(
+                (
+                    (models.Q(access_code_is_active=True) & L(access_code_should_be_active=False))
+                    | (models.Q(access_code_is_active=False) & L(access_code_should_be_active=True))
+                ),
+                recurring_reservation=None,
+                access_code_generated_at__isnull=False,
+                end__gt=local_datetime(),
+            )
+        )
+
+        if not reservations:
+            return
+
+        for reservation in reservations:
+            with suppress(ExternalServiceError):
+                if reservation.access_code_should_be_active:
+                    try:
+                        PindoraClient.activate_reservation_access_code(reservation=reservation)
+
+                    # If we think an access code has been generated, but it's not found in Pindora,
+                    # set `access_code_generated_at`. `create_missing_pindora_reservations` will
+                    # then create the access code if needed.
+                    except PindoraNotFoundError:
+                        reservation.access_code_generated_at = None
+
+                    else:
+                        reservation.access_code_is_active = True
+
+                        # Access code was activated in Pindora, inform the user by email.
+                        if reservation.access_code_is_active and reservation.access_code_generated_at:
+                            EmailService.send_reservation_modified_access_code_email(reservation=reservation)
+                else:
+                    try:
+                        PindoraClient.deactivate_reservation_access_code(reservation=reservation)
+
+                    except PindoraNotFoundError:
+                        reservation.access_code_generated_at = None
+
+                    reservation.access_code_is_active = False
+
+                # Update reservations in loop so that in case of a timeout we have done some work.
+                reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
 
     @classmethod
     def _sync_reservation_access_code(cls, reservation: Reservation) -> None:

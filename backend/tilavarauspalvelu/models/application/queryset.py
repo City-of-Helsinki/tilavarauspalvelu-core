@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import datetime
 from typing import TYPE_CHECKING, Literal, Self
 
+from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 from django.db.models import Subquery
@@ -10,6 +12,8 @@ from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ApplicationStatusChoice
+from tilavarauspalvelu.models import ApplicationSection, Unit
+from utils.date_utils import local_date
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Application
@@ -31,7 +35,6 @@ class ApplicationQuerySet(models.QuerySet):
     def preferred_unit_name_alias(self, *, lang: Literal["fi", "en", "sv"]) -> Self:
         # Name of the unit of the most preferred reservation unit
         # of the first event created for this application
-        from tilavarauspalvelu.models import ApplicationSection
 
         return self.alias(
             **{
@@ -77,7 +80,6 @@ class ApplicationQuerySet(models.QuerySet):
         # This works sort of like a 'prefetch_related', since it makes another query
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
-        from tilavarauspalvelu.models import Unit
 
         items: list[Application] = list(self)
         if not items:
@@ -122,6 +124,14 @@ class ApplicationQuerySet(models.QuerySet):
             results_ready_notification_sent_date__isnull=True,
             application_sections__isnull=False,
         )
+
+    def delete_expired_applications(self) -> None:
+        cutoff_date = local_date() - datetime.timedelta(days=settings.REMOVE_EXPIRED_APPLICATIONS_OLDER_THAN_DAYS)
+        self.filter(
+            L(status__in=[ApplicationStatusChoice.EXPIRED, ApplicationStatusChoice.CANCELLED])
+            & L(application_round__status=ApplicationRoundStatusChoice.RESULTS_SENT)
+            & models.Q(application_round__application_period_end__lte=cutoff_date)
+        ).delete()
 
 
 class ApplicationManager(SerializableMixin.SerializableManager.from_queryset(ApplicationQuerySet)):

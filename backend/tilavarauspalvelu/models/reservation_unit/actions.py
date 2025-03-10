@@ -5,6 +5,7 @@ import datetime
 import itertools
 from typing import TYPE_CHECKING, Any
 
+from django.conf import settings
 from django.db import models
 from lookup_property import L
 
@@ -12,7 +13,15 @@ from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice, Pa
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiTranslatedField
-from tilavarauspalvelu.models import OriginHaukiResource, Reservation
+from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
+from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
+    CreateOrUpdateAccountingParams,
+    CreateProductParams,
+)
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
+from tilavarauspalvelu.models import OriginHaukiResource, PaymentProduct, Reservation, ReservationUnit
+from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting
 from utils.date_utils import (
     DEFAULT_TIMEZONE,
     local_date,
@@ -33,7 +42,6 @@ if TYPE_CHECKING:
         Location,
         PaymentAccounting,
         PaymentMerchant,
-        ReservationUnit,
         ReservationUnitAccessType,
         ReservationUnitPricing,
     )
@@ -540,3 +548,59 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
                 output_field=models.CharField(),
             )
         )
+
+    def refresh_reservation_unit_product_mapping(self) -> None:
+        payment_merchant = self.get_merchant()
+
+        if self.requires_product_mapping_update():
+            params = CreateProductParams(
+                namespace=settings.VERKKOKAUPPA_NAMESPACE,
+                namespace_entity_id=self.reservation_unit.pk,
+                merchant_id=str(payment_merchant.id),
+            )
+            api_product = VerkkokauppaAPIClient.create_product(params=params)
+            payment_product, _ = PaymentProduct.objects.update_or_create(
+                id=api_product.product_id,
+                defaults={"merchant": payment_merchant},
+            )
+
+            # Use 'qs.update()' instead of 'model.save()' to avoid triggering signals and creating an infinite loop.
+            ReservationUnit.objects.filter(pk=self.reservation_unit.pk).update(payment_product=payment_product)
+
+            refresh_reservation_unit_accounting.delay(self.reservation_unit.pk)
+
+        # Remove product mapping if merchant is removed
+        if self.reservation_unit.payment_product and not payment_merchant:
+            # Use 'qs.update()' instead of 'model.save()' to avoid triggering signals and creating an infinite loop.
+            ReservationUnit.objects.filter(pk=self.reservation_unit.pk).update(payment_product=None)
+
+    def refresh_reservation_unit_accounting(self) -> None:
+        if not self.reservation_unit.payment_product:
+            return
+
+        accounting = self.get_accounting()
+        if not accounting:
+            return
+
+        params = CreateOrUpdateAccountingParams(
+            vat_code=accounting.vat_code,
+            internal_order=accounting.internal_order,
+            profit_center=accounting.profit_center,
+            project=accounting.project,
+            operation_area=accounting.operation_area,
+            company_code=accounting.company_code,
+            main_ledger_account=accounting.main_ledger_account,
+            balance_profit_center=accounting.balance_profit_center,
+        )
+
+        try:
+            VerkkokauppaAPIClient.create_or_update_accounting(
+                product_uuid=self.reservation_unit.payment_product.id,
+                params=params,
+            )
+        except CreateOrUpdateAccountingError as err:
+            SentryLogger.log_exception(
+                err,
+                details="Unable to refresh reservation unit accounting data",
+                reservation_unit_id=self.reservation_unit.pk,
+            )

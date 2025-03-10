@@ -9,6 +9,7 @@ from django.db import connections, models
 from django.db.models import Q, prefetch_related_objects
 from lookup_property import L
 
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from utils.date_utils import local_date
 from utils.db import ArrayUnnest, NowTT, SubqueryArray
@@ -20,7 +21,6 @@ if TYPE_CHECKING:
     from query_optimizer.validators import PaginationArgs
 
     from tilavarauspalvelu.enums import AccessType
-    from tilavarauspalvelu.models import ReservationUnit
 
 
 __all__ = [
@@ -85,8 +85,6 @@ class ReservationUnitQuerySet(models.QuerySet):
         Get a new queryset of reservation units that share a common hierarchy
         with any reservation unit in the original queryset.
         """
-        from tilavarauspalvelu.models import ReservationUnit
-
         ids = models.Subquery(self.affected_reservation_unit_ids)
         return ReservationUnit.objects.alias(ids=ids).filter(pk__in=models.F("ids"))
 
@@ -118,8 +116,6 @@ class ReservationUnitQuerySet(models.QuerySet):
         end_date: datetime.date | None = None,  # inclusive
     ) -> Self:
         """Add annotation of all access types that are used on the given date range."""
-        from tilavarauspalvelu.models import ReservationUnitAccessType
-
         period_start = models.Value(begin_date or local_date())
         period_end = models.Value(end_date or datetime.date.max)
 

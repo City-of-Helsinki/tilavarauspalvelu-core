@@ -5,16 +5,19 @@ from typing import TYPE_CHECKING, Self
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db import models
+from django.db import models, transaction
 from django.db.models.functions import Coalesce
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
+from tilavarauspalvelu.models import ReservationStatistic, ReservationStatisticsReservationUnit, ReservationUnit, Unit
+from tilavarauspalvelu.tasks import delete_pindora_reservation
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationRound, Reservation, ReservationUnit
+    from tilavarauspalvelu.models import ApplicationRound, Reservation
     from tilavarauspalvelu.typing import AnyUser
 
 
@@ -161,8 +164,6 @@ class ReservationQuerySet(models.QuerySet):
 
     def affecting_reservations(self, units: list[int] = (), reservation_units: list[int] = ()) -> Self:
         """Filter reservations that affect other reservations in the given units and/or reservation units."""
-        from tilavarauspalvelu.models import ReservationUnit
-
         qs = ReservationUnit.objects.all()
         if units:
             qs = qs.filter(unit__in=units)
@@ -194,7 +195,6 @@ class ReservationQuerySet(models.QuerySet):
         # This works sort of like a 'prefetch_related', since it makes another query
         # to fetch units and unit groups for the permission checks when the queryset is evaluated,
         # and 'joins' them to the correct model instances in python.
-        from tilavarauspalvelu.models import Unit
 
         items: list[Reservation] = list(self)
         if not items:
@@ -267,6 +267,84 @@ class ReservationQuerySet(models.QuerySet):
                 output_field=models.BooleanField(),
             ),
         )
+
+    def upsert_statistics(self, *, reservation_pks: list[int]) -> None:
+        reservations = (
+            self.filter(pk__in=reservation_pks)
+            .select_related(
+                "user",
+                "recurring_reservation",
+                "recurring_reservation__ability_group",
+                "recurring_reservation__allocated_time_slot",
+                "deny_reason",
+                "cancel_reason",
+                "purpose",
+                "home_city",
+                "age_group",
+            )
+            .prefetch_related(
+                models.Prefetch(
+                    "reservation_units",
+                    queryset=ReservationUnit.objects.select_related("unit"),
+                ),
+            )
+        )
+
+        new_statistics: list[ReservationStatistic] = []
+        new_statistics_units: list[ReservationStatisticsReservationUnit] = []
+
+        for reservation in reservations:
+            statistic = ReservationStatistic.for_reservation(reservation, save=False)
+            statistic_units = ReservationStatisticsReservationUnit.for_statistic(statistic, save=False)
+            new_statistics.append(statistic)
+            new_statistics_units.extend(statistic_units)
+
+        fields_to_update: list[str] = [
+            field.name
+            for field in ReservationStatistic._meta.get_fields()
+            # Update all fields that can be updated
+            if field.concrete and not field.many_to_many and not field.primary_key
+        ]
+
+        with transaction.atomic():
+            new_statistics = ReservationStatistic.objects.bulk_create(
+                new_statistics,
+                update_conflicts=True,
+                update_fields=fields_to_update,
+                unique_fields=["reservation"],
+            )
+            ReservationStatisticsReservationUnit.objects.filter(reservation_statistics__in=new_statistics).delete()
+            ReservationStatisticsReservationUnit.objects.bulk_create(new_statistics_units)
+
+    def delete_inactive(self) -> None:
+        """
+        Finds inactive reservations that are older than the given
+        number of minutes, and deletes them.
+        """
+        qs = self.inactive()
+
+        for reservation in qs.filter(access_code_generated_at__isnull=False):
+            try:
+                PindoraClient.delete_reservation(reservation=reservation)
+            except Exception:  # noqa: BLE001
+                delete_pindora_reservation.delay(str(reservation.ext_uuid))
+
+        qs.delete()
+
+    def delete_with_inactive_payments(self) -> None:
+        """
+        Finds reservations with order that was created given minutes ago and
+        are expired or cancelled, and deletes them.
+        """
+        qs = self.with_inactive_payments()
+
+        for reservation in qs.filter(access_code_generated_at__isnull=False):
+            try:
+                PindoraClient.delete_reservation(reservation=reservation)
+            except Exception:  # noqa: BLE001
+                delete_pindora_reservation.delay(str(reservation.ext_uuid))
+
+        qs.delete()
 
 
 class ReservationManager(SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)):

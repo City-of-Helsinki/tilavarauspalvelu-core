@@ -20,5 +20,9 @@ class ReservationStatisticQuerySet(models.QuerySet):
         remove_older_than = local_datetime() - relativedelta(years=older_than_years)
         return self.filter(reservation_created_at__lte=remove_older_than)
 
+    def delete_expired_statistics(self) -> None:
+        """Deletes expired ReservationStatistics objects."""
+        self.expired_statistics().delete()
+
 
 class ReservationStatisticManager(models.Manager.from_queryset(ReservationStatisticQuerySet)): ...

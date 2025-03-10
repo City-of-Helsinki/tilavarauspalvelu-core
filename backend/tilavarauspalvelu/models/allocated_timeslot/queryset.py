@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Self
 from django.db import models
 from lookup_property import L
 
+from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import merge_time_slots
 
 if TYPE_CHECKING:
@@ -87,8 +88,6 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
         return any(slot["end_time"] > begin_time and slot["begin_time"] < end_time for slot in merged)
 
     def affecting_allocations(self, reservation_unit: int, begin_date: datetime.date, end_date: datetime.date) -> Self:
-        from tilavarauspalvelu.models import ReservationUnit
-
         return (
             self.distinct()
             .alias(

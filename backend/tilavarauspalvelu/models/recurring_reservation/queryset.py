@@ -20,5 +20,8 @@ class RecurringReservationQuerySet(models.QuerySet):
         created_before = local_datetime() - relativedelta(days=older_than_days)
         return self.filter(created__lte=created_before, reservations__isnull=True)
 
+    def delete_empty_series(self) -> None:
+        self.old_empty_series().delete()
+
 
 class RecurringReservationManager(models.Manager.from_queryset(RecurringReservationQuerySet)): ...

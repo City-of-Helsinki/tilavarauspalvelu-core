@@ -26,9 +26,7 @@ if TYPE_CHECKING:
     import datetime
 
     from tilavarauspalvelu.models import ReservationUnit
-    from tilavarauspalvelu.models.recurring_reservation.actions import ReservationDetails
-    from tilavarauspalvelu.typing import ReservationSeriesCreateData
-
+    from tilavarauspalvelu.typing import ReservationDetails, ReservationSeriesCreateData
 
 __all__ = [
     "ReservationSeriesCreateSerializer",
