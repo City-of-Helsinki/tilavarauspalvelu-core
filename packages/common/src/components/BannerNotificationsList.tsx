@@ -2,17 +2,18 @@ import React from "react";
 import { NotificationType } from "hds-react";
 import styled from "styled-components";
 import { useLocalStorage } from "react-use";
-import { t } from "i18next";
 import NotificationWrapper from "./NotificationWrapper";
-import { getTranslation } from "../common/util";
 import { breakpoints } from "../common/style";
 import {
+  BannerNotificationLevel,
   BannerNotificationTarget,
   useBannerNotificationsListAllQuery,
   useBannerNotificationsListQuery,
   type BannerNotificationCommonFragment,
 } from "../../gql/gql-types";
 import { filterNonNullable } from "../helpers";
+import { useTranslation } from "next-i18next";
+import { convertLanguageCode, getTranslationSafe } from "../common/util";
 
 type BannerNotificationListProps = {
   target: BannerNotificationTarget;
@@ -57,22 +58,29 @@ const BannerNotificationText = styled.div`
   }
 `;
 
+function convertNotificationType(
+  level: BannerNotificationLevel
+): NotificationType {
+  switch (level) {
+    case BannerNotificationLevel.Exception:
+      return "error";
+    case BannerNotificationLevel.Warning:
+      return "alert";
+    case BannerNotificationLevel.Normal:
+      return "info";
+  }
+}
+
 function NotificationsListItem({
   notification,
   closeFn,
   closedArray,
 }: NotificationsListItemProps) {
-  let notificationType: NotificationType;
-  switch (notification.level) {
-    case "EXCEPTION":
-      notificationType = "error";
-      break;
-    case "WARNING":
-      notificationType = "alert";
-      break;
-    default:
-      notificationType = "info";
-  }
+  const { t, i18n } = useTranslation();
+  const notificationType = convertNotificationType(notification.level);
+  const lang = convertLanguageCode(i18n.language);
+  const innerHtml = getTranslationSafe(notification, "message", lang);
+
   return (
     <BannerNotificationBackground>
       <NotificationWrapper
@@ -90,9 +98,7 @@ function NotificationsListItem({
         {notification && (
           <BannerNotificationText
             dangerouslySetInnerHTML={{
-              __html: getTranslation(notification, "message", {
-                fallbackLang: "fi",
-              }),
+              __html: innerHtml,
             }}
           />
         )}

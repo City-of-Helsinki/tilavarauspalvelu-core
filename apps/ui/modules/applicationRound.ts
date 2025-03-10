@@ -1,14 +1,20 @@
 import { type ApplicationRoundNode } from "common/gql/gql-types";
-import { getTranslation } from "./util";
 import { type Maybe } from "@/gql/gql-types";
+import { getTranslationSafe } from "common/src/common/util";
+import type { LocalizationLanguages, ReadonlyDeep } from "common/src/helpers";
+
+type ApplicationRoundType =
+  | Maybe<
+      Pick<ReadonlyDeep<ApplicationRoundNode>, "nameFi" | "nameSv" | "nameEn">
+    >
+  | undefined;
 
 export function getApplicationRoundName(
-  applicationRound?:
-    | Maybe<Pick<ApplicationRoundNode, "nameFi" | "nameSv" | "nameEn">>
-    | undefined
+  applicationRound: ApplicationRoundType,
+  lang: LocalizationLanguages
 ): string {
   if (applicationRound == null) {
     return "-";
   }
-  return getTranslation(applicationRound, "name");
+  return getTranslationSafe(applicationRound, "name", lang);
 }

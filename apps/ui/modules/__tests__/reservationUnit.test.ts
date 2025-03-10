@@ -484,14 +484,14 @@ describe("getEquipmentCategories", () => {
 
 describe("getEquipmentList", () => {
   test("empty equipments list", () => {
-    expect(getEquipmentList([])).toStrictEqual([]);
+    expect(getEquipmentList([], "fi")).toStrictEqual([]);
   });
 
   test("with equipment out of predefined order", () => {
     const equipment: EquipmentNode[] = ["Item A", "Item B", "Item C"].map(
       (name) => constructEquipmentNode({ name })
     );
-    expect(getEquipmentList(equipment)).toStrictEqual([
+    expect(getEquipmentList(equipment, "fi")).toStrictEqual([
       "Item A",
       "Item B",
       "Item C",
@@ -502,7 +502,7 @@ describe("getEquipmentList", () => {
     const equipment: EquipmentNode[] = ["Item A", "Item B", "Item C"].map(
       (name) => constructEquipmentNode({ name })
     );
-    expect(getEquipmentList(equipment)).toStrictEqual([
+    expect(getEquipmentList(equipment, "fi")).toStrictEqual([
       "Item A",
       "Item B",
       "Item C",
@@ -583,7 +583,7 @@ describe("getEquipmentList", () => {
       },
     ];
 
-    expect(getEquipmentList(equipment)).toStrictEqual([
+    expect(getEquipmentList(equipment, "fi")).toStrictEqual([
       "Item ABC 1",
       "Item ABC 2",
       "Item B",

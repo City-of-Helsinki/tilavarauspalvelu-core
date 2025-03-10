@@ -1,13 +1,11 @@
 import { isSameDay, parseISO } from "date-fns";
 import { type TFunction } from "next-i18next";
-import { trim } from "lodash-es";
 import {
   toUIDate,
-  getTranslation,
   fromApiDate as fromAPIDate,
   fromUIDate,
 } from "common/src/common/util";
-import type { ImageFragment, LocationFieldsI18nFragment } from "@gql/gql-types";
+import { ImageType, type ImageFragment } from "@gql/gql-types";
 import { isBrowser } from "./const";
 import {
   formatMinutes,
@@ -18,7 +16,6 @@ import { ReadonlyURLSearchParams } from "next/navigation";
 
 export { formatDuration } from "common/src/common/util";
 export { fromAPIDate, fromUIDate };
-export { getTranslation };
 
 // TODO why? where is this used? why not use toUIDate(new Date(string))
 // TODO why return "-" instead of null or ""?
@@ -27,10 +24,6 @@ export const formatDate = (date: string, formatStr?: string): string => {
     return "-";
   }
   return toUIDate(parseISO(date), formatStr);
-};
-
-export const capitalize = (s: string): string => {
-  return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
 type ParameterType =
@@ -42,7 +35,7 @@ type ParameterType =
     }
   | { pk: number; name: string };
 
-function getLabel(
+export function getParameterLabel(
   parameter:
     | ParameterType
     | { minimum?: number | null; maximum?: number | null },
@@ -66,26 +59,13 @@ function getLabel(
   return "no label";
 }
 
-export { getLabel as getParameterLabel };
+const IMAGE_SORT_PRIORITY = [ImageType.Main, ImageType.Other];
 
-const imagePriority = ["main", "map", "ground_plan", "other"].map((n) =>
-  n.toUpperCase()
-);
-
-export const getMainImage = (ru?: {
+export function getMainImage(ru?: {
   images: ImageFragment[];
-}): ImageFragment | null => {
-  if (!ru || !ru.images || ru.images.length === 0) {
-    return null;
-  }
-  const images = [...ru.images].sort((a, b) => {
-    return (
-      imagePriority.indexOf(a.imageType) - imagePriority.indexOf(b.imageType)
-    );
-  });
-
-  return images[0] ?? null;
-};
+}): ImageFragment | null {
+  return ru?.images.find((img) => img.imageType === ImageType.Main) ?? null;
+}
 
 export function orderImages(images: ImageFragment[]): ImageFragment[] {
   if (!images || images.length === 0) {
@@ -93,30 +73,13 @@ export function orderImages(images: ImageFragment[]): ImageFragment[] {
   }
   const result = [...images].sort((a, b) => {
     return (
-      imagePriority.indexOf(a.imageType) - imagePriority.indexOf(b.imageType)
+      IMAGE_SORT_PRIORITY.indexOf(a.imageType) -
+      IMAGE_SORT_PRIORITY.indexOf(b.imageType)
     );
   });
 
   return result;
 }
-
-export const getAddressAlt = (ru: {
-  unit?: {
-    location?: LocationFieldsI18nFragment | null;
-  } | null;
-}): string | null => {
-  const { location } = ru.unit || {};
-
-  if (!location) {
-    return null;
-  }
-
-  const street =
-    getTranslation(location, "addressStreet") || location.addressStreetFi || "";
-  const city =
-    getTranslation(location, "addressCity") || location.addressCityFi || "";
-  return trim(`${street}, ${city}`, ", ");
-};
 
 export const isTouchDevice = (): boolean =>
   isBrowser && window?.matchMedia("(any-hover: none)").matches;

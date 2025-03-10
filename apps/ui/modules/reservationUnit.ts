@@ -3,7 +3,7 @@ import {
   getReservationPrice,
   getUnRoundedReservationVolume,
 } from "common";
-import { flatten, trim, uniq } from "lodash-es";
+import { trim, uniq } from "lodash-es";
 import {
   addMinutes,
   differenceInMinutes,
@@ -36,7 +36,6 @@ import {
   BlockingReservationFieldsFragment,
   type ReservationPriceFragment,
 } from "@gql/gql-types";
-import { capitalize, getTranslation } from "./util";
 import {
   type ReservableMap,
   type RoundPeriod,
@@ -47,7 +46,13 @@ import {
 import { type PricingFieldsFragment } from "common/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getIntervalMinutes } from "common/src/conversion";
-import { isPriceFree, LocalizationLanguages } from "common/src/helpers";
+import {
+  capitalize,
+  filterNonNullable,
+  isPriceFree,
+  type LocalizationLanguages,
+  type ReadonlyDeep,
+} from "common/src/helpers";
 import { type TFunction } from "i18next";
 
 function formatTimeObject(time: { h: number; m: number }): string {
@@ -87,19 +92,26 @@ const equipmentCategoryOrder = [
   "Pelikonsoli",
   "Liittimet",
   "Muu",
-];
+] as const;
 
 export function getEquipmentCategories(
-  equipment: Pick<EquipmentFieldsFragment, "category">[]
+  equipment: ReadonlyDeep<Pick<EquipmentFieldsFragment, "category">[]>
 ): string[] {
   if (!equipment || equipment.length === 0) {
     return [];
   }
-  const categories: string[] = [...equipment].map((n) =>
-    n.category?.nameFi && equipmentCategoryOrder.includes(n.category?.nameFi)
-      ? n.category?.nameFi
-      : "Muu"
-  );
+  const categories: Array<(typeof equipmentCategoryOrder)[number]> =
+    filterNonNullable(
+      equipment.map((n) => {
+        const index = equipmentCategoryOrder.findIndex(
+          (order) => order === n.category?.nameFi
+        );
+        if (index === -1) {
+          return "Muu";
+        }
+        return equipmentCategoryOrder[index];
+      })
+    );
 
   categories.sort((a, b) => {
     const left = equipmentCategoryOrder.indexOf(a);
@@ -112,37 +124,38 @@ export function getEquipmentCategories(
 
 // Why are we doing complex frontend sorting? and always in finnish?
 export function getEquipmentList(
-  equipment: EquipmentFieldsFragment[]
+  equipments: ReadonlyDeep<EquipmentFieldsFragment[]>,
+  lang: LocalizationLanguages
 ): string[] {
-  if (!equipment || equipment.length === 0) {
+  if (equipments.length === 0) {
     return [];
   }
 
-  const categories = getEquipmentCategories(equipment);
+  const categories = getEquipmentCategories(equipments);
 
-  const sortedEquipment = flatten(
-    categories.map((category) =>
-      [...equipment]
-        .filter(
-          (n) =>
-            n.category?.nameFi === category ||
-            (category === "Muu" &&
-              n.category?.nameFi &&
-              !equipmentCategoryOrder.includes(n.category?.nameFi))
-        )
-        .sort((a, b) =>
-          a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0
-        )
-    )
+  const sortedEquipment = categories.flatMap((category) =>
+    equipments
+      .filter(
+        (n) =>
+          n.category?.nameFi === category ||
+          (category === "Muu" &&
+            n.category?.nameFi &&
+            !equipmentCategoryOrder.find(
+              (order) => order === n.category.nameFi
+            ))
+      )
+      .sort((a, b) =>
+        a.nameFi && b.nameFi ? a.nameFi.localeCompare(b.nameFi) : 0
+      )
   );
 
-  return sortedEquipment.map((n) => getTranslation(n, "name"));
+  return sortedEquipment.map((n) => getTranslationSafe(n, "name", lang));
 }
 
 export function getReservationUnitName(
   // TODO use a fragment for ReservationUnitName
   reservationUnit?: Pick<
-    ReservationUnitNode,
+    ReadonlyDeep<ReservationUnitNode>,
     "nameFi" | "nameSv" | "nameEn"
   > | null,
   language: string = i18n?.language ?? "fi"
@@ -162,16 +175,16 @@ export function getReservationUnitName(
 }
 
 export function getUnitName(
-  unit?: Pick<UnitNode, "nameFi" | "nameSv" | "nameEn"> | null,
-  locale: string = i18n?.language ?? "fi"
+  unit:
+    | Pick<ReadonlyDeep<UnitNode>, "nameFi" | "nameSv" | "nameEn">
+    | null
+    | undefined,
+  locale: LocalizationLanguages
 ): string | undefined {
   if (unit == null) {
     return undefined;
   }
-  return (
-    getTranslationSafe(unit, "name", convertLanguageCode(locale ?? "")) ??
-    undefined
-  );
+  return getTranslationSafe(unit, "name", convertLanguageCode(locale));
 }
 
 function isActivePricing(pricing: PricingFieldsFragment): boolean {
@@ -182,7 +195,7 @@ function isFuturePricing(pricing: PricingFieldsFragment): boolean {
 }
 
 export function getActivePricing(reservationUnit: {
-  pricings: PricingFieldsFragment[];
+  pricings: ReadonlyDeep<PricingFieldsFragment>[];
 }): PricingFieldsFragment | undefined {
   const { pricings } = reservationUnit;
   return pricings.find((pricing) => isActivePricing(pricing));

@@ -15,8 +15,12 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { getApplicationRoundPath, seasonalPrefix } from "@/modules/urls";
-import { capitalize } from "lodash-es";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  base64encode,
+  capitalize,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
 import {
   convertLanguageCode,
   getTranslationSafe,

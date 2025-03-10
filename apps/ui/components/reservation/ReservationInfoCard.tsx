@@ -14,13 +14,11 @@ import {
 } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
 import {
-  capitalize,
   formatDateTimeRange,
   formatDuration,
   getMainImage,
-  getTranslation,
 } from "@/modules/util";
-import { base64encode, getImageSource } from "common/src/helpers";
+import { base64encode, capitalize, getImageSource } from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
 import { Flex } from "common/styles/util";
 import {
@@ -126,7 +124,7 @@ export function ReservationInfoCard({
       ? isReservationUnitPaid(reservationUnit.pricings, new Date(begin))
       : Number(reservation?.price) > 0;
 
-  const name = getTranslation(reservationUnit, "name");
+  const name = getTranslationSafe(reservationUnit, "name", lang);
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");
 

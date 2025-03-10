@@ -25,7 +25,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable, getImageSource } from "common/src/helpers";
 import { AutoGrid, CenterSpinner, Flex } from "common/styles/util";
-import { getMainImage, getTranslation } from "@/modules/util";
+import { getMainImage } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
@@ -36,6 +36,10 @@ import {
   ControlledNumberInput,
   ControlledSelect,
 } from "common/src/components/form";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 const ImageSizeWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -56,7 +60,8 @@ function ReservationUnitCard({
   handleAdd: (ru: ReservationUnitType) => void;
   handleRemove: (ru: ReservationUnitType) => void;
 }>) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
 
   const toggleSelection = () => {
     if (isSelected) {
@@ -71,10 +76,10 @@ function ReservationUnitCard({
     : t("reservationUnitModal:selectReservationUnit");
   const name = getReservationUnitName(reservationUnit);
   const reservationUnitTypeName = reservationUnit.reservationUnitType
-    ? getTranslation(reservationUnit.reservationUnitType, "name")
+    ? getTranslationSafe(reservationUnit.reservationUnitType, "name", lang)
     : undefined;
   const unitName = reservationUnit.unit
-    ? getUnitName(reservationUnit.unit)
+    ? getUnitName(reservationUnit.unit, lang)
     : undefined;
 
   const img = getMainImage(reservationUnit);
@@ -164,7 +169,8 @@ export function ReservationUnitModalContent({
   currentReservationUnits: Pick<ReservationUnitType, "pk">[];
   options: OptionsType;
 }>): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
   const form = useForm<SearchFormValues>();
   const { control, watch, setValue } = form;
   const { unitOptions, reservationUnitTypeOptions } = options;
@@ -194,7 +200,7 @@ export function ReservationUnitModalContent({
   return (
     <Flex>
       <H2 $noMargin>{t("reservationUnitModal:heading")}</H2>
-      <H3 as="p">{getApplicationRoundName(applicationRound)}</H3>
+      <H3 as="p">{getApplicationRoundName(applicationRound, lang)}</H3>
       <AutoGrid $minWidth="14rem">
         <TextInput
           id="reservationUnitSearch.search"

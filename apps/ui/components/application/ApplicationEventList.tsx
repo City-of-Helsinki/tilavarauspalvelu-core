@@ -9,7 +9,11 @@ import {
   type ApplicationSectionUiFragment,
   type ApplicationCommonFragment,
 } from "@gql/gql-types";
-import { getTranslation, toUIDate } from "common/src/common/util";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+  toUIDate,
+} from "common/src/common/util";
 import {
   ApplicationInfoContainer,
   ApplicationSection,
@@ -95,7 +99,8 @@ function SingleApplicationSection({
   primaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
   secondaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
   const reservationUnits = filterNonNullable(
     applicationEvent.reservationUnitOptions
   ).map((eru, index) => ({
@@ -150,7 +155,7 @@ function SingleApplicationSection({
     {
       key: "purpose",
       label: t("application:preview.applicationEvent.purpose"),
-      value: getTranslation(applicationEvent.purpose ?? {}, "name"),
+      value: getTranslationSafe(applicationEvent.purpose ?? {}, "name", lang),
     },
   ];
 
@@ -188,7 +193,9 @@ function SingleApplicationSection({
             </h3>
             <ol>
               {filterNonNullable(reservationUnits).map((ru) => (
-                <li key={ru.pk}>{getTranslation(ru, "name").trim()}</li>
+                <li key={ru.pk}>
+                  {getTranslationSafe(ru, "name", lang).trim()}
+                </li>
               ))}
             </ol>
           </InfoItem>

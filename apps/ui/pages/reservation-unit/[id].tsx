@@ -52,7 +52,7 @@ import {
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Map as MapComponent } from "@/components/Map";
-import { getPostLoginUrl, getTranslation } from "@/modules/util";
+import { getPostLoginUrl } from "@/modules/util";
 import {
   getFuturePricing,
   getPossibleTimesForDay,
@@ -379,7 +379,8 @@ function ReservationUnit({
   searchDate,
   searchTime,
 }: PropsNarrowed): JSX.Element | null {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
   const router = useRouter();
   useRemoveStoredReservation();
 
@@ -537,18 +538,22 @@ function ReservationUnit({
 
   const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;
 
-  const termsOfUseContent = getTranslation(reservationUnit, "termsOfUse");
+  const termsOfUseContent = getTranslationSafe(
+    reservationUnit,
+    "termsOfUse",
+    lang
+  );
   const paymentTermsContent = reservationUnit.paymentTerms
-    ? getTranslation(reservationUnit.paymentTerms, "text")
+    ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
     : undefined;
   const cancellationTermsContent = reservationUnit.cancellationTerms
-    ? getTranslation(reservationUnit.cancellationTerms, "text")
+    ? getTranslationSafe(reservationUnit.cancellationTerms, "text", lang)
     : undefined;
   const pricingTermsContent = reservationUnit.pricingTerms
-    ? getTranslation(reservationUnit.pricingTerms, "text")
+    ? getTranslationSafe(reservationUnit.pricingTerms, "text", lang)
     : undefined;
   const serviceSpecificTermsContent = reservationUnit.serviceSpecificTerms
-    ? getTranslation(reservationUnit.serviceSpecificTerms, "text")
+    ? getTranslationSafe(reservationUnit.serviceSpecificTerms, "text", lang)
     : undefined;
 
   const equipment = filterNonNullable(reservationUnit.equipments);
@@ -629,7 +634,9 @@ function ReservationUnit({
       <PageContentWrapper>
         <div data-testid="reservation-unit__description">
           <H4 as="h2">{t("reservationUnit:description")}</H4>
-          <Sanitize html={getTranslation(reservationUnit, "description")} />
+          <Sanitize
+            html={getTranslationSafe(reservationUnit, "description", lang)}
+          />
         </div>
         {equipment?.length > 0 && (
           <div data-testid="reservation-unit__equipment">
@@ -641,7 +648,7 @@ function ReservationUnit({
           <div data-testid="reservation-unit__calendar--wrapper">
             <H4 as="h2">
               {t("reservations:reservationCalendar", {
-                title: getTranslation(reservationUnit, "name"),
+                title: getTranslationSafe(reservationUnit, "name", lang),
               })}
             </H4>
             <ReservationQuotaReached
@@ -745,7 +752,11 @@ function ReservationUnit({
             <Sanitize html={serviceSpecificTermsContent} />
           )}
           <Sanitize
-            html={getTranslation(termsOfUse.genericTerms ?? {}, "text")}
+            html={getTranslationSafe(
+              termsOfUse.genericTerms ?? {},
+              "text",
+              lang
+            )}
           />
         </Accordion>
       </PageContentWrapper>
