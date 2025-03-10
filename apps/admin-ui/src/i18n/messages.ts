@@ -2014,6 +2014,9 @@ const translations: ITranslations = {
     accessCodeChangeConfirmMultiple: [
       "Ovikoodi vaihtuu myös muille tähän kausivaraukseen liittyville viikkovuoroille. Haluatko varmasti vaihtaa ovikoodin?",
     ],
+    accessCodeValidityFromNextReservation: [
+      "Voimassaoloaika seuraavasta varauksesta",
+    ],
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],

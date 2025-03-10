@@ -18,14 +18,14 @@ export const DATE_FORMAT_SHORT = "d.M.";
 /// @deprecated use format directly
 /// why convert date -> string -> date?
 export function formatDate(
-  date: string | null,
+  date: string | null | undefined,
   outputFormat = DATE_FORMAT
 ): string | null {
   return date ? format(parseISO(date), outputFormat) : null;
 }
 
 export function formatTime(
-  date: string | null,
+  date: string | null | undefined,
   outputFormat = "HH:mm"
 ): string | null {
   return date ? format(parseISO(date), outputFormat) : null;

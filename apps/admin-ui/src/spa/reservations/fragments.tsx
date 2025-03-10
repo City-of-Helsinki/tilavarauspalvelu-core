@@ -23,6 +23,16 @@ export const RESERVATION_RECURRING_FRAGMENT = gql`
       weekdays
       name
       description
+      usedAccessTypes
+      isAccessCodeIsActiveCorrect
+      pindoraInfo {
+        accessCode
+        accessCodeIsActive
+        accessCodeValidity {
+          accessCodeBeginsAt
+          accessCodeEndsAt
+        }
+      }
     }
   }
 `;

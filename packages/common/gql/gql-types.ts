@@ -1723,7 +1723,7 @@ export type PindoraSeriesInfoType = {
   accessCodePhoneNumber: Scalars["String"]["output"];
   accessCodeSmsMessage: Scalars["String"]["output"];
   accessCodeSmsNumber: Scalars["String"]["output"];
-  accessCodeValidity: Array<Maybe<PindoraSeriesValidityInfoType>>;
+  accessCodeValidity: Array<PindoraSeriesValidityInfoType>;
 };
 
 export type PindoraSeriesValidityInfoType = {
@@ -2565,6 +2565,7 @@ export type RecurringReservationNode = Node & {
   extUuid: Scalars["UUID"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
+  isAccessCodeIsActiveCorrect?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple series, queries to Pindora are not optimized. */
   pindoraInfo?: Maybe<PindoraSeriesInfoType>;
@@ -2991,6 +2992,7 @@ export type ReservationNode = Node & {
   homeCity?: Maybe<CityNode>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
+  isAccessCodeIsActiveCorrect?: Maybe<Scalars["Boolean"]["output"]>;
   isBlocked?: Maybe<Scalars["Boolean"]["output"]>;
   isHandled?: Maybe<Scalars["Boolean"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
