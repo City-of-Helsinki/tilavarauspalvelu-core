@@ -1,5 +1,5 @@
-import { getReservationApplicationFields } from "../util";
-import { CustomerTypeChoice } from "../../../gql/gql-types";
+import { getReservationApplicationFields } from "./util";
+import { CustomerTypeChoice } from "./../../gql/gql-types";
 import { describe, test, expect } from "vitest";
 
 describe("getReservationApplicationFields", () => {

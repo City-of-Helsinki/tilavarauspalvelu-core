@@ -5,7 +5,7 @@ import { BannerNotificationsList } from "common/src/components";
 import { BannerNotificationTarget } from "@gql/gql-types";
 import Footer from "./Footer";
 import Navigation from "./Navigation";
-import { InProgressReservationNotification } from "@/components/reservations/UnpaidReservationNotification";
+import { InProgressReservationNotification } from "@/components/UnpaidReservationNotification";
 import { mainStyles } from "common/styles/layout";
 
 interface PageProps {

@@ -3,7 +3,7 @@ import { get as mockGet } from "lodash-es";
 import React from "react";
 import mockTranslations from "@/public/locales/fi/dateSelector.json";
 import { configure, render, screen } from "@testing-library/react";
-import { DateRangePicker, DateRangePickerProps } from "../DateRangePicker";
+import { DateRangePicker, type DateRangePickerProps } from "./DateRangePicker";
 import {
   vi,
   test,

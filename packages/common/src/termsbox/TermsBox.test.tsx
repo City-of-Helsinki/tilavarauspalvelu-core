@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import TermsBox, { Props } from "../TermsBox";
+import TermsBox, { type TermBoxProps } from "./TermsBox";
 import { vi, describe, test, expect } from "vitest";
 
 const bodyText = `Excepteur ut veniam minim id. Veniam laboris laborum cupidatat nisi sunt est magna id voluptate. Ullamco elit do tempor et dolore. Sit dolore laborum excepteur laborum qui eiusmod. Nisi proident officia labore sunt sit labore. Non aute ut exercitation elit sint. Aute irure reprehenderit reprehenderit amet sunt velit irure voluptate.`;
@@ -20,7 +20,7 @@ const defaultProps = {
   setAccepted: vi.fn(),
 };
 
-const renderComponent = (props?: Partial<Props>) =>
+const renderComponent = (props?: Partial<TermBoxProps>) =>
   render(<TermsBox {...defaultProps} {...props} />);
 
 describe("TermsBox", () => {

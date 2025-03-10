@@ -14,7 +14,7 @@ import {
   generateReservableMap,
   isRangeReservable,
   isStartTimeValid,
-} from "../reservable";
+} from "./reservable";
 import {
   BlockingReservationFieldsFragment,
   type IsReservableFieldsFragment,

@@ -33,9 +33,9 @@ import {
   isReservationUnitPublished,
   isReservationUnitReservable,
   type GetPriceType,
-} from "../reservationUnit";
-import mockTranslations from "../../public/locales/fi/prices.json";
-import { type ReservableMap, dateToKey, type RoundPeriod } from "../reservable";
+} from "./reservationUnit";
+import mockTranslations from "./../public/locales/fi/prices.json";
+import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
 import { createMockReservationUnit, TIMERS_TO_FAKE } from "@/test/testUtils";
 import { base64encode } from "common/src/helpers";
 import { type TFunction } from "i18next";
