@@ -6,6 +6,7 @@ import { Button, IconArrowRight, ImageWithCard } from "hds-react";
 import { fontMedium, H3 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import { Flex } from "common/styles/util";
+import { seasonalPrefix } from "@/modules/urls";
 
 const StyledImageWithCard = styled(ImageWithCard)<{ cardAlignment: string }>`
   && {
@@ -96,7 +97,7 @@ export function SearchGuides(): JSX.Element {
         <Flex $marginTop="s">
           <Button
             id="browseRecurringReservationUnits"
-            onClick={() => router.push("/recurring")}
+            onClick={() => router.push(seasonalPrefix)}
             iconEnd={<IconArrowRight />}
           >
             {t("browseRecurringReservationsButton")}

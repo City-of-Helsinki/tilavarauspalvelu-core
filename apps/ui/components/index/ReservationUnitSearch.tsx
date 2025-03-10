@@ -29,7 +29,7 @@ const StyledTextInput = styled(TextInput)`
   }
 `;
 
-function ReservationUnitSearch(): JSX.Element {
+export function ReservationUnitSearch(): JSX.Element {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -53,5 +53,3 @@ function ReservationUnitSearch(): JSX.Element {
     </form>
   );
 }
-
-export default ReservationUnitSearch;
