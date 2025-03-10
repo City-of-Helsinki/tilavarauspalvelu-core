@@ -12,7 +12,7 @@ import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCar
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
-import { ReservationPageWrapper } from "@/components/reservations/styles";
+import { ReservationPageWrapper, InlineStyledLink } from "@/styles/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import {
   getReservationPath,
@@ -31,7 +31,6 @@ import { H1 } from "common/src/common/typography";
 import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
 import { Flex } from "common/styles/util";
 import { breakpoints } from "common";
-import { InlineStyledLink } from "@/styles/util";
 import { BackLinkList } from "@/components/reservation/CancelledLinkSet";
 import { Instructions } from "@/components/Instructions";
 import { gql } from "@apollo/client";

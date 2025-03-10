@@ -94,7 +94,7 @@ import { LoginFragment } from "@/components/LoginFragment";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ReservationTimePicker } from "@/components/reservation/ReservationTimePicker";
-import { ReservationUnitPageWrapper } from "@/components/reservations/styles";
+import { ReservationUnitPageWrapper, SubmitButton } from "@/styles/util";
 import {
   getReservationInProgressPath,
   getSingleSearchPath,
@@ -102,7 +102,6 @@ import {
 import { ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { Flex } from "common/styles/util";
-import { SubmitButton } from "@/styles/util";
 import { useDisplayError } from "@/hooks/useDisplayError";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 
