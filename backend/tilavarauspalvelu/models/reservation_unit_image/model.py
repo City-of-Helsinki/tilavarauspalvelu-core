@@ -48,7 +48,7 @@ class ReservationUnitImage(models.Model):
         base_manager_name = "objects"
         verbose_name = _("reservation unit image")
         verbose_name_plural = _("reservation unit images")
-        ordering = ["pk"]
+        ordering = ["image_type"]
 
     def __str__(self) -> str:
         return f"{self.reservation_unit.name} ({self.get_image_type_display()})"

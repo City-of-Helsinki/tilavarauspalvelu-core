@@ -2884,16 +2884,6 @@ msgstr "Pääkuva"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationUnitImageType"
-msgid "Ground plan"
-msgstr "Pohjapiirros"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ReservationUnitImageType"
-msgid "Map"
-msgstr "Kartta"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ReservationUnitImageType"
 msgid "Other"
 msgstr "Muu"
 

@@ -15,13 +15,13 @@ pytestmark = [
 
 
 def test_reservation_unit_image__update__regular_user(graphql):
-    reservation_unit_image = ReservationUnitImageFactory.create()
+    reservation_unit_image = ReservationUnitImageFactory.create(image_type=ReservationUnitImageType.MAIN)
 
     graphql.login_with_regular_user()
 
     data = {
         "pk": reservation_unit_image.pk,
-        "imageType": ReservationUnitImageType.MAP.value.upper(),
+        "imageType": ReservationUnitImageType.OTHER.value.upper(),
     }
     response = graphql(UPDATE_MUTATION, input_data=data)
 

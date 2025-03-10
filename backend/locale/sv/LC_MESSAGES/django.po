@@ -2808,16 +2808,6 @@ msgstr ""
 
 #: tilavarauspalvelu/enums.py
 msgctxt "ReservationUnitImageType"
-msgid "Ground plan"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ReservationUnitImageType"
-msgid "Map"
-msgstr ""
-
-#: tilavarauspalvelu/enums.py
-msgctxt "ReservationUnitImageType"
 msgid "Other"
 msgstr ""
 

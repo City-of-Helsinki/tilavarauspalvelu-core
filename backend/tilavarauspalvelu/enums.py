@@ -729,8 +729,6 @@ class AuthenticationType(models.TextChoices):
 
 class ReservationUnitImageType(models.TextChoices):
     MAIN = "main", pgettext_lazy("ReservationUnitImageType", "Main image")
-    GROUND_PLAN = "ground_plan", pgettext_lazy("ReservationUnitImageType", "Ground plan")
-    MAP = "map", pgettext_lazy("ReservationUnitImageType", "Map")
     OTHER = "other", pgettext_lazy("ReservationUnitImageType", "Other")
 
 
