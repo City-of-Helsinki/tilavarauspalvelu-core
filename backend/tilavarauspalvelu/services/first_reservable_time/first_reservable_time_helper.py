@@ -35,22 +35,22 @@ type ReservationUnitPK = int
 
 @dataclass
 class CachedReservableTime:
-    frt: datetime.datetime | None
     closed: bool
+    frt: datetime.datetime | None
     valid_until: datetime.datetime
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> CachedReservableTime:
         return cls(
-            frt=None if data["frt"] == "None" else datetime.datetime.fromisoformat(data["frt"]),
             closed=data["closed"].lower() == "true",
+            frt=None if data["frt"] == "None" else datetime.datetime.fromisoformat(data["frt"]),
             valid_until=datetime.datetime.fromisoformat(data["valid_until"]),
         )
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "frt": self.frt.isoformat() if self.frt is not None else "None",
             "closed": str(self.closed),
+            "frt": self.frt.isoformat() if self.frt is not None else "None",
             "valid_until": self.valid_until.isoformat(),
         }
 
@@ -133,10 +133,10 @@ class FirstReservableTimeHelper:
     # Contains a set of closed time spans for each ReservationUnit generated from their relevant BLOCKING Reservations
     blocking_reservation_closed_time_spans_map: dict[ReservationUnitPK, list[TimeSpanElement]]
 
-    # Contains a list of the first reservable time for each ReservationUnit.
-    first_reservable_times: dict[ReservationUnitPK, datetime]
     # Contains a list of the closed status for each ReservationUnit.
     reservation_unit_closed_statuses: dict[ReservationUnitPK, bool]
+    # Contains a list of the first reservable time for each ReservationUnit.
+    first_reservable_times: dict[ReservationUnitPK, datetime.datetime | None]
     # Contains a list of hard closed time spans that are shared by all ReservationUnits.
     shared_hard_closed_time_spans: list[TimeSpanElement]
 
@@ -249,8 +249,8 @@ class FirstReservableTimeHelper:
         # Initialise important variables #
         ##################################
 
-        self.first_reservable_times = {}
         self.reservation_unit_closed_statuses = {}
+        self.first_reservable_times = {}
         self.cached_value_validity: dict[int, datetime.datetime] = {}
 
         # Closed time spans that are shared by all ReservationUnits
@@ -265,7 +265,7 @@ class FirstReservableTimeHelper:
         # all possible filtering is already done.
         #
         # Still, we cannot simply limit the queryset here based on the input pagination args,
-        # since the reservation unit queryset can change if we used the the optional 'show_only_reservable'
+        # since the reservation unit queryset can change if we used the optional 'show_only_reservable'
         # filter to remove non-reservable reservation units, which we only know after
         # the FRT calculation is done.
         #
@@ -292,13 +292,13 @@ class FirstReservableTimeHelper:
             if cached >= self.stop_offset:
                 return
 
-            # Otherwise, we should still have valid results for the previous pages.
+            # Otherwise, we should still have valid cached results for the previous pages.
             # We can start calculating after the last cached result.
             qs = qs[len(self.first_reservable_times) :]
             # We also don't need to skip any results that are not already cached.
             self.start_offset = 0
 
-        # If we don't have valid results, and this is not the first page,
+        # If we don't have valid cached results, and this is not the first page,
         # we should fetch the current and previous pages in one chunk. The next chunk
         # will also be bigger (if needed), but likely small enough (<100) not to cause any problems.
         elif self.start_offset > 0:
@@ -391,7 +391,7 @@ class FirstReservableTimeHelper:
             ),
         )
 
-    def _get_reservation_unit_queryset_for_calculation(self) -> ReservationUnitQuerySet:
+    def _get_reservation_unit_queryset_for_calculation(self) -> ReservationUnitQuerySet | QuerySet[ReservationUnit]:
         """
         Queryset with required information for calculating first reservable time.
         - Prefetch ReservableTimeSpans and ApplicationRounds for each ReservationUnit and filter them by date range
