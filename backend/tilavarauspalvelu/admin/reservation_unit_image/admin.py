@@ -18,3 +18,6 @@ class ReservationUnitImageAdmin(admin.ModelAdmin):
         "reservation_unit",
         "image_type",
     ]
+    list_filter = [
+        "image_type",
+    ]
