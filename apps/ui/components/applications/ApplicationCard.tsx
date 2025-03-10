@@ -27,6 +27,7 @@ import Card from "common/src/components/Card";
 import { getApplicationPath } from "@/modules/urls";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 import { gql } from "@apollo/client";
+import { convertLanguageCode } from "common/src/common/util";
 
 const StyledButton = styled(Button)`
   @media (max-width: ${breakpoints.s}) {
@@ -78,7 +79,9 @@ export function ApplicationCard({
   application,
   actionCallback,
 }: Props): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
+
   const [isWaitingForDelete, setIsWaitingForDelete] = useState(false);
 
   const [mutation, { loading: isLoading }] = useCancelApplicationMutation({
@@ -142,7 +145,7 @@ export function ApplicationCard({
 
   return (
     <Card
-      heading={getApplicationRoundName(application.applicationRound)}
+      heading={getApplicationRoundName(application.applicationRound, lang)}
       headingLevel={3}
       text={getApplicant(application, t)}
       tags={tags}

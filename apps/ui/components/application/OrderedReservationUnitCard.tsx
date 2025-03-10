@@ -17,12 +17,16 @@ import {
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
-import { getMainImage, getTranslation } from "@/modules/util";
+import { getMainImage } from "@/modules/util";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { Flex } from "common/styles/util";
 import { ErrorText } from "common/src/components/ErrorText";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
 type Props = {
@@ -210,10 +214,11 @@ export function OrderedReservationUnitCard({
   onMoveDown,
   error,
 }: Readonly<Props>): JSX.Element {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
 
   const { unit } = reservationUnit;
-  const unitName = unit ? getTranslation(unit, "name") : "-";
+  const unitName = unit ? getTranslationSafe(unit, "name", lang) : "-";
 
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "medium");

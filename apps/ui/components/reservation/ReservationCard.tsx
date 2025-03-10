@@ -7,7 +7,7 @@ import {
   type ListReservationsQuery,
   ReservationStateChoice,
 } from "@gql/gql-types";
-import { capitalize, formatDateTimeRange, getMainImage } from "@/modules/util";
+import { formatDateTimeRange, getMainImage } from "@/modules/util";
 import {
   isReservationCancellable,
   getNormalizedReservationOrderStatus,
@@ -16,7 +16,7 @@ import { getPrice } from "@/modules/reservationUnit";
 import { ReservationOrderStatus } from "./ReservationOrderStatus";
 import { ReservationStatus } from "./ReservationStatus";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
-import { getImageSource } from "common/src/helpers";
+import { capitalize, getImageSource } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { getReservationPath } from "@/modules/urls";
 import {

@@ -13,7 +13,7 @@ import React, { Fragment } from "react";
 import styled from "styled-components";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import { camelCase, capitalize } from "lodash-es";
+import { camelCase } from "lodash-es";
 import { CustomerTypeChoice, MetadataSetsFragment } from "../../gql/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
@@ -22,7 +22,7 @@ import { fontMedium, fontRegular, H4, H5 } from "../common/typography";
 import type { OptionType } from "../../types/common";
 import IconPremises from "../icons/IconPremises";
 import { containsField } from "../metaFieldsHelpers";
-import { filterNonNullable } from "../helpers";
+import { capitalize, filterNonNullable } from "../helpers";
 import { AutoGrid } from "../../styles/util";
 
 type CommonProps = {

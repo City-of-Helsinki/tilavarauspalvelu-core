@@ -1,10 +1,11 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import type { EquipmentFieldsFragment } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components";
-import { getEquipmentList } from "../../modules/reservationUnit";
+import { getEquipmentList } from "@/modules/reservationUnit";
+import { convertLanguageCode } from "common/src/common/util";
 
 type Props = {
   equipment: EquipmentFieldsFragment[];
@@ -35,11 +36,9 @@ export function EquipmentList({
   equipment,
   itemsToShow = 6,
 }: Props): JSX.Element {
-  const { t } = useTranslation();
-
-  const equipmentList = useMemo(() => {
-    return getEquipmentList(equipment);
-  }, [equipment]);
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
+  const equipmentList = getEquipmentList(equipment, lang);
 
   return (
     <EquipmentContainer

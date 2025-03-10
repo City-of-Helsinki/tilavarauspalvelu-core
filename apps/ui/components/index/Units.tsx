@@ -8,9 +8,12 @@ import { H3 } from "common/src/common/typography";
 import type { UnitNode } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { singleSearchPrefix } from "@/modules/urls";
-import { getTranslation } from "@/modules/util";
 import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 import { Flex } from "common/styles/util";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 type Props = {
   units: Pick<UnitNode, "pk" | "nameFi" | "nameEn" | "nameSv">[];
@@ -53,9 +56,10 @@ const UnitItemLink = styled(Link)`
 `;
 
 export function Units({ units }: Props): JSX.Element | null {
-  const { t } = useTranslation(["home", "common"]);
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
 
-  if (units == null || units.length === 0) {
+  if (units.length === 0) {
     return null;
   }
 
@@ -72,8 +76,8 @@ export function Units({ units }: Props): JSX.Element | null {
               href={`${singleSearchPrefix}?unit=${unit.pk}#content`}
               data-testid="front-page__units--unit"
             >
-              {getTranslation(unit, "name") || unit.nameFi}
-              <IconArrowRight size={IconSize.Large} aria-hidden="true" />
+              {getTranslationSafe(unit, "name", lang) || "-"}
+              <IconArrowRight size={IconSize.Large} />
             </UnitItemLink>
           ))}
         </UnitContainer>
@@ -83,7 +87,7 @@ export function Units({ units }: Props): JSX.Element | null {
           <IconButton
             href={singleSearchPrefix}
             label={t("common:showAll")}
-            icon={<IconArrowRight aria-hidden="true" />}
+            icon={<IconArrowRight />}
             data-testid="front-page__units--more-link"
           />
         </Flex>

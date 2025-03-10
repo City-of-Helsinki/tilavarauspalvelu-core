@@ -14,12 +14,15 @@ import {
 } from "@gql/gql-types";
 import { useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
-import { getTranslation } from "@/modules/util";
 import { useOptions } from "@/hooks/useOptions";
 import { ApplicationEvent } from "./ApplicationEvent";
 import { type ApplicationPage1FormValues } from "./form";
 import { useReservationUnitList } from "@/hooks";
 import { ButtonContainer } from "common/styles/util";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 type Props = {
   applicationRound: ApplicationRoundForApplicationFragment;
@@ -27,7 +30,8 @@ type Props = {
 };
 
 export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
 
   const resUnitPks = applicationRound.reservationUnits?.map(
     (resUnit) => resUnit?.unit?.pk
@@ -38,7 +42,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
     .filter((u) => u.pk != null && unitsInApplicationRound.includes(u.pk))
     .map((u) => ({
       value: u.pk ?? 0,
-      label: getTranslation(u, "name"),
+      label: getTranslationSafe(u, "name", lang),
     }));
 
   const { options } = useOptions();

@@ -38,6 +38,7 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { gql } from "@apollo/client";
+import { convertLanguageCode } from "common/src/common/util";
 
 type SeasonalSearchProps = ReadonlyDeep<
   Pick<NarrowedProps, "applicationRound" | "options" | "apiBaseUrl">
@@ -49,6 +50,7 @@ function SeasonalSearch({
   options,
 }: Readonly<SeasonalSearchProps>): JSX.Element {
   const { t, i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
   const searchValues = useSearchParams();
 
   const {
@@ -81,7 +83,7 @@ function SeasonalSearch({
       title: t("breadcrumb:recurring"),
     },
     {
-      title: getApplicationRoundName(applicationRound),
+      title: getApplicationRoundName(applicationRound, lang),
     },
   ] as const;
 

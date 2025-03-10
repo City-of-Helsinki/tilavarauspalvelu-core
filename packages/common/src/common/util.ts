@@ -8,8 +8,8 @@ import {
   parse,
 } from "date-fns";
 import { fi } from "date-fns/locale";
-import { capitalize } from "lodash-es";
-import { type TFunction, i18n } from "next-i18next";
+import { type TFunction } from "next-i18next";
+import { capitalize } from "../helpers";
 
 export const parseDate = (date: string): Date => parseISO(date);
 
@@ -133,36 +133,8 @@ export const chunkArray = <T>(array: T[], size: number): T[][] => {
   return result;
 };
 
-/// @param options.fallbackLang - use a fallback language instead of returning an empty string
-/// @deprecated use getTranslationSafe instead this doesn't play well with SSR and useTranslation hook
-/// cause of the problem is the direct use of i18n?.language, it might or might not return the previous language
-export function getTranslation(
-  parent: Record<string, unknown>,
-  key: string,
-  options?: {
-    fallbackLang?: "fi" | "sv" | "en";
-  }
-): string {
-  const keyString = `${key}${capitalize(i18n?.language)}`;
-  if (parent && parent[keyString]) {
-    if (typeof parent[keyString] === "string") {
-      return String(parent[keyString]);
-    }
-  }
-  const fallback = options?.fallbackLang || "fi";
-  const fallbackKeyString = `${key}${capitalize(fallback)}`;
-  if (parent && parent[fallbackKeyString]) {
-    if (typeof parent[fallbackKeyString] === "string") {
-      return String(parent[fallbackKeyString]);
-    }
-  }
-
-  return "";
-}
-
 /// Find a translation from a gql query result
 /// @param lang - language to use, use useTranslation hook in get the current language inside a component
-// TODO go through all the files and replace the old getTranslation with this one
 // TODO rename to getTranslation when the other one is removed
 // TODO Records are bad, use a query result type instead?
 // TODO key should not be a string (so we don't accidentially pass "nameFi" here)
