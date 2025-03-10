@@ -321,6 +321,9 @@ function AccessCodeChangeRepairButton({
     }
   };
 
+  const isReservationEnded =
+    !reservation.recurringReservation && new Date() > new Date(reservation.end);
+
   return (
     <SingleButtonContainer
       $justifyContent="center"
@@ -338,7 +341,7 @@ function AccessCodeChangeRepairButton({
           }
         }}
         iconStart={<IconRefresh />}
-        disabled={!hasPermission}
+        disabled={!hasPermission || isReservationEnded}
       >
         {reservation.isAccessCodeIsActiveCorrect
           ? t("RequestedReservation.accessCodeChange")
