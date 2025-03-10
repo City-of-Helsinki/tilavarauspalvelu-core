@@ -32,7 +32,7 @@ import {
   PendingReservationFormSchema,
   PendingReservationFormType,
 } from "@/components/reservation-unit/schema";
-import { ReservationPageWrapper } from "@/components/reservations/styles";
+import { ReservationPageWrapper } from "@/styles/util";
 import { queryOptions } from "@/modules/queryOptions";
 import {
   isReservationEditable,

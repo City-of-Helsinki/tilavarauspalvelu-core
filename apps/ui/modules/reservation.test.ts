@@ -17,13 +17,13 @@ import {
   getDurationOptions,
   getNormalizedReservationOrderStatus,
   isReservationEditable,
-} from "../reservation";
+} from "./reservation";
 import {
   type ReservableMap,
   isSlotWithinReservationTime,
   generateReservableMap,
-} from "../reservable";
-import mockTranslations from "../../public/locales/fi/prices.json";
+} from "./reservable";
+import mockTranslations from "./../public/locales/fi/prices.json";
 import { toApiDate } from "common/src/common/util";
 import { type TFunction } from "i18next";
 import {

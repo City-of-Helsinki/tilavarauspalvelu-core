@@ -9,7 +9,7 @@ import {
   type ReservationCancelPageQuery,
 } from "@gql/gql-types";
 import { ReservationInfoCard } from "./ReservationInfoCard";
-import { ReservationPageWrapper } from "../reservations/styles";
+import { ReservationPageWrapper } from "@/styles/util";
 import {
   convertLanguageCode,
   getTranslationSafe,

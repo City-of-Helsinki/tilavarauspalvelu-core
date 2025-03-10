@@ -10,16 +10,6 @@ type LinkT = {
   text: string;
 };
 
-export type Props = {
-  id?: string;
-  heading?: string;
-  body?: string | JSX.Element;
-  links?: LinkT[];
-  acceptLabel?: string;
-  accepted?: boolean;
-  setAccepted?: (accepted: boolean) => void;
-} & React.HTMLAttributes<HTMLDivElement>;
-
 const Wrapper = styled.div`
   --background-color: var(--color-silver-light);
   --border-color: var(--color-bus);
@@ -80,6 +70,16 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
+export type TermBoxProps = {
+  id?: string;
+  heading?: string;
+  body?: string | JSX.Element;
+  links?: LinkT[];
+  acceptLabel?: string;
+  accepted?: boolean;
+  setAccepted?: (accepted: boolean) => void;
+} & React.HTMLAttributes<HTMLDivElement>;
+
 function TermsBox({
   id,
   heading,
@@ -89,7 +89,7 @@ function TermsBox({
   accepted,
   setAccepted,
   ...rest
-}: Props): JSX.Element {
+}: TermBoxProps): JSX.Element {
   const canAccept = Boolean(acceptLabel) && Boolean(setAccepted);
 
   return (
