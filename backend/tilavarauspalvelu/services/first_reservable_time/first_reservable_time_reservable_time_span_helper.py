@@ -59,7 +59,7 @@ class ReservableTimeSpanFirstReservableTimeHelper:
 
         # At this point we have removed all the closed time spans from the reservable time span.
         # Finally, try to find the first reservable time span from the left over reservable time spans.
-        first_reservable_time: datetime | None = self._find_first_reservable_time_span(
+        first_reservable_time: datetime.datetime | None = self._find_first_reservable_time_span(
             normalised_reservable_time_spans=normalised_time_spans,
             reservation_time_spans=self.parent.reservation_closed_time_spans,
         )
@@ -92,7 +92,7 @@ class ReservableTimeSpanFirstReservableTimeHelper:
         self,
         normalised_reservable_time_spans: list[TimeSpanElement],
         reservation_time_spans: list[TimeSpanElement],
-    ) -> datetime | None:
+    ) -> datetime.datetime | None:
         """
         Find the first reservable time span for the ReservationUnit.
 
