@@ -506,11 +506,9 @@ def test_reservation__staff_create__access_type__access_code(graphql):
 
 @patch_method(PindoraService.create_access_code)
 def test_reservation__staff_create__access_type__changed_to_access_code_in_the_future(graphql):
-    today = local_date()
-
     reservation_unit = ReservationUnitFactory.create(
         access_types__access_type=AccessType.ACCESS_CODE,
-        access_types__begin_date=today + datetime.timedelta(days=1),
+        access_types__begin_date=next_hour(plus_days=2),
     )
 
     graphql.login_with_superuser()
