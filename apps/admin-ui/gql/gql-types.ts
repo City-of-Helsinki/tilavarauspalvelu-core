@@ -1723,7 +1723,7 @@ export type PindoraSeriesInfoType = {
   accessCodePhoneNumber: Scalars["String"]["output"];
   accessCodeSmsMessage: Scalars["String"]["output"];
   accessCodeSmsNumber: Scalars["String"]["output"];
-  accessCodeValidity: Array<Maybe<PindoraSeriesValidityInfoType>>;
+  accessCodeValidity: Array<PindoraSeriesValidityInfoType>;
 };
 
 export type PindoraSeriesValidityInfoType = {
@@ -2565,6 +2565,7 @@ export type RecurringReservationNode = Node & {
   extUuid: Scalars["UUID"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
+  isAccessCodeIsActiveCorrect?: Maybe<Scalars["Boolean"]["output"]>;
   name: Scalars["String"]["output"];
   /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple series, queries to Pindora are not optimized. */
   pindoraInfo?: Maybe<PindoraSeriesInfoType>;
@@ -2991,6 +2992,7 @@ export type ReservationNode = Node & {
   homeCity?: Maybe<CityNode>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
+  isAccessCodeIsActiveCorrect?: Maybe<Scalars["Boolean"]["output"]>;
   isBlocked?: Maybe<Scalars["Boolean"]["output"]>;
   isHandled?: Maybe<Scalars["Boolean"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
@@ -8029,7 +8031,7 @@ export type ReservationSpecialisationFragment = {
 
 export type ReservationAccessTypeFragment = {
   accessType: AccessType;
-  accessCodeShouldBeActive?: boolean | null;
+  isAccessCodeIsActiveCorrect?: boolean | null;
   pindoraInfo?: {
     accessCode: string;
     accessCodeIsActive: boolean;
@@ -8061,7 +8063,7 @@ export type ReservationQuery = {
     taxPercentageValue?: string | null;
     handlingDetails?: string | null;
     accessType: AccessType;
-    accessCodeShouldBeActive?: boolean | null;
+    isAccessCodeIsActiveCorrect?: boolean | null;
     numPersons?: number | null;
     name?: string | null;
     description?: string | null;
@@ -8154,6 +8156,16 @@ export type ReservationQuery = {
       weekdays?: Array<number | null> | null;
       name: string;
       description: string;
+      usedAccessTypes?: Array<AccessType | null> | null;
+      isAccessCodeIsActiveCorrect?: boolean | null;
+      pindoraInfo?: {
+        accessCode: string;
+        accessCodeIsActive: boolean;
+        accessCodeValidity: Array<{
+          accessCodeBeginsAt: string;
+          accessCodeEndsAt: string;
+        }>;
+      } | null;
     } | null;
     cancelReason?: { id: string; reasonFi?: string | null } | null;
     denyReason?: { id: string; reasonFi?: string | null } | null;
@@ -8448,6 +8460,16 @@ export type ReservationRecurringFragment = {
     weekdays?: Array<number | null> | null;
     name: string;
     description: string;
+    usedAccessTypes?: Array<AccessType | null> | null;
+    isAccessCodeIsActiveCorrect?: boolean | null;
+    pindoraInfo?: {
+      accessCode: string;
+      accessCodeIsActive: boolean;
+      accessCodeValidity: Array<{
+        accessCodeBeginsAt: string;
+        accessCodeEndsAt: string;
+      }>;
+    } | null;
   } | null;
 };
 
@@ -9342,7 +9364,7 @@ export const ReservationSpecialisationFragmentDoc = gql`
 export const ReservationAccessTypeFragmentDoc = gql`
   fragment ReservationAccessType on ReservationNode {
     accessType
-    accessCodeShouldBeActive
+    isAccessCodeIsActiveCorrect
     pindoraInfo {
       accessCode
       accessCodeIsActive
@@ -9442,6 +9464,16 @@ export const ReservationRecurringFragmentDoc = gql`
       weekdays
       name
       description
+      usedAccessTypes
+      isAccessCodeIsActiveCorrect
+      pindoraInfo {
+        accessCode
+        accessCodeIsActive
+        accessCodeValidity {
+          accessCodeBeginsAt
+          accessCodeEndsAt
+        }
+      }
     }
   }
 `;

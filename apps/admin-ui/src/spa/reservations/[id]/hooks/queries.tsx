@@ -126,7 +126,7 @@ const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
 const SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT = gql`
   fragment ReservationAccessType on ReservationNode {
     accessType
-    accessCodeShouldBeActive
+    isAccessCodeIsActiveCorrect
     pindoraInfo {
       accessCode
       accessCodeIsActive

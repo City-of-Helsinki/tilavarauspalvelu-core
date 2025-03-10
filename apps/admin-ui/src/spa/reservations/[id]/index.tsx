@@ -4,7 +4,6 @@ import React, { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import {
-  AccessType,
   CustomerTypeChoice,
   type ReservationQuery,
   ReservationStateChoice,
@@ -407,12 +406,10 @@ function RequestedReservation({
           onReservationUpdated={refetch}
         />
 
-        {reservation.accessType === AccessType.AccessCode && (
-          <ReservationKeylessEntry
-            reservation={reservation}
-            onSuccess={refetch}
-          />
-        )}
+        <ReservationKeylessEntry
+          reservation={reservation}
+          onSuccess={refetch}
+        />
 
         <TimeBlock reservation={reservation} onReservationUpdated={refetch} />
 
