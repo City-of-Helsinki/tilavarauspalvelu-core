@@ -253,3 +253,18 @@ class ReservationUnitQuerySet(models.QuerySet):
 
 class ReservationUnitManager(models.Manager.from_queryset(ReservationUnitQuerySet)):
     use_in_migrations = True
+
+    # We need to redefine '__eq__' here because `use_in_migrations=True` and this manager is lazy loaded
+    # in the model class. Django's migration system thinks that the lazy loaded manager is a different
+    # class than the one in the migration history, and will therefore always try to update the manager.
+    #
+    # This implementation defers to the 'LazyModelManager.__eq__' implementation when the manager is not
+    # yet loaded, which then loads the manager and compares the actual managers there.
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return self._constructor_args == other._constructor_args  # type: ignore[attr-defined]
+
+    # Copied from 'BaseManager.__hash__'
+    def __hash__(self) -> int:
+        return id(self)

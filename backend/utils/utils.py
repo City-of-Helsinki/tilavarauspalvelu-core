@@ -448,7 +448,7 @@ class LazyModelManager(BaseManager):
         cls.__import_path__: str = kwargs.get("__import_path__") or cls.__import_path__
         """Import path to the type hint."""
 
-        cls.__attribute_class__: type[Manager] | None = None
+        cls.__manager__: Manager | None = None
         """Type hinted Manager class imported from `__import_path__`."""
 
     def contribute_to_class(self, cls: type[models.Model], name: str) -> None:
@@ -458,6 +458,11 @@ class LazyModelManager(BaseManager):
         self.model = cls
         setattr(cls, name, self)
         cls._meta.add_manager(self)  # type: ignore[arg-type]
+
+    @property
+    def use_in_migrations(self) -> bool:
+        manager = self._load_manager()
+        return manager.use_in_migrations
 
     def deconstruct(self) -> ManagerDeconstructArgs:
         # Replace the 'manager_class' argument so the actual manager class is loaded.
@@ -470,7 +475,7 @@ class LazyModelManager(BaseManager):
             kwargs=self._constructor_args[1],
         )
 
-    def __getattr__(self, item: str) -> None:
+    def __getattr__(self, item: str) -> Any:
         """Called if an attribute is not found in the class."""
         # Manager cannot be loaded until the module containing the model is loaded
         # 'model' exists if 'contribute_to_class' is called after the model is instantiated,
@@ -479,13 +484,13 @@ class LazyModelManager(BaseManager):
             msg = f"{type(self).__name__} has no attribute {item!r}"
             raise AttributeError(msg)
 
-        manager = self.__load_manager()
+        manager = self._load_manager()
 
         # If name doesn't exits, this is a call from a related manager.
         # This means we cannot replace the manager in the related model, as we don't know its name.
         # We should still add the model to the manager if missing so that all methods work as expected.
         if self.name is not None:
-            self.__replace_manager(manager, self.model)
+            self._replace_manager(manager, self.model)
         elif manager.model is None:
             manager.model = self.model
 
@@ -494,21 +499,22 @@ class LazyModelManager(BaseManager):
 
     def __get__(self, instance: models.Model | None, model: type[models.Model]) -> Any:
         """Called if accessed from Model class."""
-        manager = self.__load_manager()
-        self.__replace_manager(manager, model)
+        manager = self._load_manager()
+        self._replace_manager(manager, model)
         return getattr(model, self.name)
 
-    def __load_manager(self) -> Manager:
+    def _load_manager(self) -> Manager:
         """Get the lazy-loaded manager."""
         cls = type(self)
 
         # Import the manager class if it hasn't been imported yet.
-        if cls.__attribute_class__ is None:
-            cls.__attribute_class__ = import_string(cls.__import_path__)
+        if cls.__manager__ is None:
+            manager_class = import_string(cls.__import_path__)
+            cls.__manager__ = manager_class()
 
-        return cls.__attribute_class__()
+        return cls.__manager__
 
-    def __replace_manager(self, manager: Manager, model: type[models.Model]) -> None:
+    def _replace_manager(self, manager: Manager, model: type[models.Model]) -> None:
         """Replace this lazy manager with the actual manager in the model options manager list."""
         # Managers are immutable (due to 'django-modeltranslation'), so we need to recreate them.
         local_managers = list(model._meta.local_managers)
@@ -523,6 +529,14 @@ class LazyModelManager(BaseManager):
 
         # Make managers immutable again.
         model._meta.local_managers = model._meta.managers  # type: ignore[assignment]
+
+    def __eq__(self, other: object) -> bool:
+        manager = self._load_manager()
+        return manager == other
+
+    def __hash__(self) -> int:
+        manager = self._load_manager()
+        return hash(manager)
 
 
 def _find_attribute_type_hint_path(*, depth: int) -> str:
