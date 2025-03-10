@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import { capitalize } from "lodash-es";
 import {
   IconArrowRight,
   IconCalendar,
@@ -55,6 +54,7 @@ import {
 } from "@/modules/serverUtils";
 import {
   base64encode,
+  capitalize,
   filterNonNullable,
   ignoreMaybeArray,
   LocalizationLanguages,

@@ -1,10 +1,17 @@
 import React from "react";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { useTranslation } from "next-i18next";
-import { getTranslation } from "@/modules/util";
 import { Sanitize } from "common/src/components/Sanitize";
-import { type TermsOfUseFragment } from "@/gql/gql-types";
+import {
+  type TermsOfUseTextFieldsFragment,
+  type Maybe,
+  type TermsOfUseFragment,
+} from "@/gql/gql-types";
 import { Flex } from "common/styles/util";
+import {
+  convertLanguageCode,
+  getTranslationSafe,
+} from "common/src/common/util";
 
 export function AcceptTerms({
   reservationUnit,
@@ -19,6 +26,7 @@ export function AcceptTerms({
   setIsTermsAccepted: (key: "space" | "service", val: boolean) => void;
 }): JSX.Element {
   const { t } = useTranslation();
+
   const { cancellationTerms, paymentTerms, serviceSpecificTerms } =
     reservationUnit;
 
@@ -53,15 +61,9 @@ export function AcceptTerms({
         heading={paymentTermsHeading}
         body={
           <>
-            {cancellationTerms != null && (
-              <Sanitize html={getTranslation(cancellationTerms, "text")} />
-            )}
+            <SanitizedTerms terms={cancellationTerms} />
             <br />
-            {reservationUnit.paymentTerms != null && (
-              <Sanitize
-                html={getTranslation(reservationUnit.paymentTerms, "text")}
-              />
-            )}
+            <SanitizedTerms terms={paymentTerms} />
           </>
         }
         acceptLabel={paymentTermsAcceptLabel}
@@ -71,13 +73,7 @@ export function AcceptTerms({
       <TermsBox
         id="generic-and-service-specific-terms"
         heading={t("reservationCalendar:heading.termsOfUse")}
-        body={
-          serviceSpecificTerms != null ? (
-            <Sanitize html={getTranslation(serviceSpecificTerms, "text")} />
-          ) : (
-            <span />
-          )
-        }
+        body={<SanitizedTerms terms={serviceSpecificTerms} returnEmpty />}
         links={[
           {
             href: "/terms/booking",
@@ -90,4 +86,24 @@ export function AcceptTerms({
       />
     </Flex>
   );
+}
+
+function SanitizedTerms({
+  terms,
+  returnEmpty,
+}: {
+  terms: Maybe<TermsOfUseTextFieldsFragment> | undefined;
+  returnEmpty?: boolean;
+}): JSX.Element | null {
+  const { i18n } = useTranslation();
+  const lang = convertLanguageCode(i18n.language);
+
+  if (terms == null && returnEmpty) {
+    return <span />;
+  } else if (terms == null) {
+    return null;
+  }
+
+  const localTerms = getTranslationSafe(terms, "text", lang);
+  return <Sanitize html={localTerms} />;
 }

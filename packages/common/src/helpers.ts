@@ -24,6 +24,10 @@ export function sort<T>(arr: T[], func: SortFunc<T>): T[] {
   return [...arr].sort((a, b) => func(a, b));
 }
 
+export function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 /// Safe string -> number conversion
 /// handles the special cases of empty string and NaN with type safety
 /// @return null if the string is empty or NaN otherwise the number

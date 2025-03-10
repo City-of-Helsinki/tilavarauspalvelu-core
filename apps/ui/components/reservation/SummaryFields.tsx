@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import { type TFunction, useTranslation } from "next-i18next";
 import { getReservationApplicationFields } from "common/src/reservation-form/util";
-import { capitalize } from "@/modules/util";
 import { CustomerTypeChoice, type ReservationNode } from "@/gql/gql-types";
 import { type FieldName, containsField } from "common/src/metaFieldsHelpers";
 import { AutoGrid } from "common/styles/util";
 import { H4 } from "common";
 import { type MetaFieldsFragment } from "common/gql/gql-types";
+import { capitalize } from "common/src/helpers";
 
 type OptionType = {
   label: string;

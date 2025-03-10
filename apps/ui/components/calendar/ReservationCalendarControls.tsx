@@ -21,7 +21,7 @@ import {
 import { breakpoints } from "common/src/common/style";
 import type { ReservationUnitPageQuery } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
-import { capitalize, formatDateTimeRange } from "@/modules/util";
+import { formatDateTimeRange } from "@/modules/util";
 import {
   useController,
   type Control,
@@ -35,6 +35,7 @@ import { useMedia } from "react-use";
 import { type FocusTimeSlot } from "@/modules/reservation";
 import { ControlledDateInput } from "common/src/components/form";
 import { Flex } from "common/styles/util";
+import { capitalize } from "common/src/helpers";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type CommonProps = {
