@@ -17,7 +17,7 @@ from tilavarauspalvelu.tasks import delete_pindora_reservation
 from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationRound, Reservation
+    from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, Reservation
     from tilavarauspalvelu.typing import AnyUser
 
 
@@ -353,6 +353,23 @@ class ReservationQuerySet(models.QuerySet):
             access_type=AccessType.ACCESS_CODE,
             access_code_generated_at=None,
             end__gt=local_datetime(),
+        )
+
+    def has_incorrect_access_code_is_active(self) -> Self:
+        """Return all reservations where the access code is active when it should be inactive, or vice versa."""
+        return self.filter(
+            (
+                (models.Q(access_code_is_active=True) & L(access_code_should_be_active=False))
+                | (models.Q(access_code_is_active=False) & L(access_code_should_be_active=True))
+            ),
+            access_code_generated_at__isnull=False,
+            end__gt=local_datetime(),
+        )
+
+    def for_application_section(self, section: ApplicationSection) -> Self:
+        """Return all reservations for the given application section."""
+        return self.filter(
+            recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section
         )
 
 

@@ -371,4 +371,4 @@ def create_missing_pindora_reservations() -> None:
 def update_pindora_access_code_is_active() -> None:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 
-    PindoraService.update_pindora_access_code_is_active()
+    PindoraService.update_access_code_is_active()
