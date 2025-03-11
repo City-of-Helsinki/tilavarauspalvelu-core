@@ -364,7 +364,7 @@ def delete_pindora_reservation(reservation_uuid: str) -> None:
 def create_missing_pindora_reservations() -> None:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 
-    PindoraService.create_missing_reservations()
+    PindoraService.create_missing_access_codes()
 
 
 @app.task(name="update_pindora_access_code_is_active")
