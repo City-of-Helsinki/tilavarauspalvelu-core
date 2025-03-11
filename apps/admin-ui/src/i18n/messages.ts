@@ -172,9 +172,6 @@ const translations: ITranslations = {
     endTime: ["Päättymisaika"],
     and: ["ja"],
     peopleSuffixShort: ["hlö"],
-    // TODO AriaLabel is not needed in the key value
-    increaseByOneAriaLabel: ["Lisää yhdellä"],
-    decreaseByOneAriaLabel: ["Vähennä yhdellä"],
     openToNewTab: ["Avaa uuteen välilehteen"],
     reservationUnit: ["Varausyksikkö"],
     remove: ["Poista"],

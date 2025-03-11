@@ -56,8 +56,8 @@ export function ControlledNumberInput<T extends FieldValues>({
       required={required}
       id={name}
       label={label}
-      minusStepButtonAriaLabel={t("common.decreaseByOneAriaLabel")}
-      plusStepButtonAriaLabel={t("common.increaseByOneAriaLabel")}
+      minusStepButtonAriaLabel={t("common:subtract")}
+      plusStepButtonAriaLabel={t("common:add")}
       step={1}
       type="number"
       min={min}
