@@ -366,11 +366,9 @@ class ReservationQuerySet(models.QuerySet):
             end__gt=local_datetime(),
         )
 
-    def for_application_section(self, section: ApplicationSection) -> Self:
+    def for_application_section(self, ref: ApplicationSection | models.OuterRef) -> Self:
         """Return all reservations for the given application section."""
-        return self.filter(
-            recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=section
-        )
+        return self.filter(recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=ref)
 
 
 class ReservationManager(SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)):

@@ -269,11 +269,8 @@ class ApplicationSection(SerializableMixin, models.Model):
         from tilavarauspalvelu.models import Reservation
 
         exists = Exists(
-            queryset=Reservation.objects.filter(
+            queryset=Reservation.objects.for_application_section(models.OuterRef("pk")).filter(
                 L(access_code_should_be_active=True),
-                recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
-                    models.OuterRef("pk")
-                ),
             ),
         )
         return exists  # type: ignore[return-value]  # noqa: RET504
@@ -282,10 +279,7 @@ class ApplicationSection(SerializableMixin, models.Model):
     def _(self) -> bool:
         from tilavarauspalvelu.models import Reservation
 
-        return Reservation.objects.filter(
-            L(access_code_should_be_active=True),
-            recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=self,
-        ).exists()
+        return Reservation.objects.for_application_section(self).filter(L(access_code_should_be_active=True)).exists()
 
     @lookup_property(skip_codegen=True)
     def is_access_code_is_active_correct() -> bool:
@@ -293,11 +287,8 @@ class ApplicationSection(SerializableMixin, models.Model):
         from tilavarauspalvelu.models import Reservation
 
         exists = ~Exists(
-            queryset=Reservation.objects.filter(
+            queryset=Reservation.objects.for_application_section(models.OuterRef("pk")).filter(
                 L(is_access_code_is_active_correct=False),
-                recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
-                    models.OuterRef("pk")
-                ),
             ),
         )
         return exists  # type: ignore[return-value]  # noqa: RET504
@@ -306,7 +297,8 @@ class ApplicationSection(SerializableMixin, models.Model):
     def _(self) -> bool:
         from tilavarauspalvelu.models import Reservation
 
-        return not Reservation.objects.filter(
-            L(is_access_code_is_active_correct=False),
-            recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=self,
-        ).exists()
+        return (
+            not Reservation.objects.for_application_section(self)
+            .filter(L(is_access_code_is_active_correct=False))
+            .exists()
+        )

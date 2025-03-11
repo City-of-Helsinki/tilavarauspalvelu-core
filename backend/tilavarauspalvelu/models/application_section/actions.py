@@ -31,11 +31,8 @@ class ApplicationSectionActions:
         )
 
     def get_reservations(self) -> ReservationQuerySet:
-        return Reservation.objects.filter(
+        return Reservation.objects.for_application_section(self.application_section).filter(
             user=self.application_section.application.user,
-            recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
-                self.application_section
-            ),
         )
 
     def get_last_reservation(self) -> Reservation | None:

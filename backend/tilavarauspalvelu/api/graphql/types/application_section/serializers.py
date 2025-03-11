@@ -253,10 +253,9 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
         return data
 
     def save(self, **kwargs: Any) -> CancellationOutput:
-        future_reservations = Reservation.objects.filter(
+        future_reservations = Reservation.objects.for_application_section(self.instance).filter(
             user=self.instance.application.user,
             begin__gt=local_datetime(),
-            recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=self.instance,
         )
 
         cancellable_reservations: ReservationQuerySet = (
