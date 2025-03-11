@@ -7,12 +7,15 @@ from django.db.models import Subquery
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
-from tilavarauspalvelu.models import ReservationUnitOption
+from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
+from tilavarauspalvelu.models import Reservation, ReservationUnitOption
 
 __all__ = [
     "ApplicationSectionManager",
     "ApplicationSectionQuerySet",
 ]
+
+from utils.db import NowTT
 
 
 class ApplicationSectionQuerySet(models.QuerySet):
@@ -50,6 +53,22 @@ class ApplicationSectionQuerySet(models.QuerySet):
         return self.preferred_unit_name_alias(lang=lang).order_by(
             models.OrderBy(models.F(f"preferred_unit_name_{lang}"), descending=desc),
         )
+
+    def requiring_access_code(self) -> Self:
+        """Return all application sections that should have an access code but don't."""
+        return self.alias(
+            has_missing_access_codes=models.Exists(
+                queryset=Reservation.objects.filter(
+                    recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
+                        models.OuterRef("pk")
+                    ),
+                    state=ReservationStateChoice.CONFIRMED,
+                    access_type=AccessType.ACCESS_CODE,
+                    access_code_generated_at=None,
+                    end__gt=NowTT(),
+                ),
+            )
+        ).filter(has_missing_access_codes=True)
 
 
 class ApplicationSectionManager(SerializableMixin.SerializableManager.from_queryset(ApplicationSectionQuerySet)):

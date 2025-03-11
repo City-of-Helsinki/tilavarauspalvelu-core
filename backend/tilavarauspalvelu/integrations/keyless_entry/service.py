@@ -25,6 +25,7 @@ from .typing import PindoraAccessCodeModifyResponse, PindoraAccessCodePeriod
 
 if TYPE_CHECKING:
     import uuid
+    from collections.abc import Iterable
 
     from .typing import (
         PindoraAccessCodeValidity,
@@ -413,42 +414,11 @@ class PindoraService:
                 raise PindoraClientError(msg)
 
     @classmethod
-    def create_missing_reservations(cls) -> None:
-        """If a reservation failed to be created in Pindora, e.g. in the staff create endpoint, retry it here."""
-        reservations: list[Reservation] = list(
-            Reservation.objects.filter(
-                recurring_reservation=None,
-                state=ReservationStateChoice.CONFIRMED,
-                access_type=AccessType.ACCESS_CODE,
-                access_code_generated_at=None,
-                end__gt=local_datetime(),
-            )
-        )
-
-        if not reservations:
-            return
-
-        for reservation in reservations:
-            is_active = reservation.access_code_should_be_active
-
-            with suppress(ExternalServiceError):
-                try:
-                    response = PindoraClient.create_reservation(reservation=reservation, is_active=is_active)
-
-                # If reservation already exists, fetch it instead.
-                except PindoraConflictError:
-                    response = PindoraClient.get_reservation(reservation=reservation)
-
-                reservation.access_code_generated_at = response["access_code_generated_at"]
-                reservation.access_code_is_active = response["access_code_is_active"]
-
-                # Update reservations in loop so that in case of a timeout we have done some work.
-                reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
-
-                # Since the access code was unable to be created when the reservation was initially made,
-                # send an email with the access code to the user.
-                if reservation.access_code_is_active and reservation.access_code_generated_at:
-                    EmailService.send_reservation_modified_access_code_email(reservation=reservation)
+    def create_missing_access_codes(cls) -> None:
+        """If a reservation should have an access code but doesn't, create it."""
+        cls._create_missing_access_codes_for_reservations()
+        cls._create_missing_access_codes_for_series()
+        cls._create_missing_access_codes_for_seasonal_bookings()
 
     @classmethod
     def update_pindora_access_code_is_active(cls) -> None:
@@ -497,6 +467,83 @@ class PindoraService:
 
                 # Update reservations in loop so that in case of a timeout we have done some work.
                 reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+
+    @classmethod
+    def _create_missing_access_codes_for_reservations(cls) -> None:
+        """
+        Create access codes for reservations that are missing them.
+        Do not include reservations in series or seasonal bookings.
+        """
+        reservations: Iterable[Reservation] = Reservation.objects.requiring_access_code().filter(
+            recurring_reservation__isnull=True
+        )
+
+        for reservation in reservations:
+            is_active = reservation.access_code_should_be_active
+
+            with suppress(ExternalServiceError):
+                try:
+                    cls.create_access_code(obj=reservation, is_active=is_active)
+
+                # If reservation already exists, fetch it and update instead.
+                except PindoraConflictError:
+                    response = cls.get_access_code(obj=reservation)
+
+                    reservation.access_code_generated_at = response.access_code_generated_at
+                    reservation.access_code_is_active = response.access_code_is_active
+                    reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+
+                # Since the access code was unable to be created when the reservation was initially made,
+                # send an email with the access code to the user.
+                if reservation.access_code_is_active and reservation.access_code_generated_at:
+                    EmailService.send_reservation_modified_access_code_email(reservation=reservation)
+
+    @classmethod
+    def _create_missing_access_codes_for_series(cls) -> None:
+        """
+        Create access codes for recurring reservations that are missing them.
+        Do not include series in seasonal bookings.
+        """
+        all_series: Iterable[RecurringReservation] = RecurringReservation.objects.requiring_access_code().filter(
+            allocated_time_slot__isnull=True
+        )
+
+        for series in all_series:
+            is_active: bool = series.should_have_active_access_code  # type: ignore[attr-defined]
+
+            with suppress(ExternalServiceError):
+                try:
+                    cls.create_access_code(obj=series, is_active=is_active)
+
+                # If series already exists, fetch it and update instead.
+                except PindoraConflictError:
+                    response = cls.get_access_code(obj=series)
+
+                    series.reservations.requiring_access_code().update(
+                        access_code_generated_at=response.access_code_generated_at,
+                        access_code_is_active=response.access_code_is_active,
+                    )
+
+    @classmethod
+    def _create_missing_access_codes_for_seasonal_bookings(cls) -> None:
+        """Create access codes for application sections that are missing them."""
+        sections: Iterable[ApplicationSection] = ApplicationSection.objects.requiring_access_code()
+
+        for section in sections:
+            is_active: bool = section.should_have_active_access_code  # type: ignore[attr-defined]
+
+            with suppress(ExternalServiceError):
+                try:
+                    cls.create_access_code(obj=section, is_active=is_active)
+
+                # If seasonal booking already exists, fetch it and update instead.
+                except PindoraConflictError:
+                    response = cls.get_access_code(obj=section)
+
+                    section.actions.get_reservations().requiring_access_code().update(
+                        access_code_generated_at=response.access_code_generated_at,
+                        access_code_is_active=response.access_code_is_active,
+                    )
 
     @classmethod
     def _sync_reservation_access_code(cls, reservation: Reservation) -> None:

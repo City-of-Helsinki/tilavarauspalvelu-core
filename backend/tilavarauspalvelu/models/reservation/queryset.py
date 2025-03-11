@@ -10,7 +10,7 @@ from django.db.models.functions import Coalesce
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
 
-from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.models import ReservationStatistic, ReservationStatisticsReservationUnit, ReservationUnit, Unit
 from tilavarauspalvelu.tasks import delete_pindora_reservation
@@ -345,6 +345,15 @@ class ReservationQuerySet(models.QuerySet):
                 delete_pindora_reservation.delay(str(reservation.ext_uuid))
 
         qs.delete()
+
+    def requiring_access_code(self) -> Self:
+        """Return all reservations that should have an access code but don't."""
+        return self.filter(
+            state=ReservationStateChoice.CONFIRMED,
+            access_type=AccessType.ACCESS_CODE,
+            access_code_generated_at=None,
+            end__gt=local_datetime(),
+        )
 
 
 class ReservationManager(SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)):
