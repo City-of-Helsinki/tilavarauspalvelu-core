@@ -4,9 +4,6 @@ import datetime
 from contextlib import suppress
 from typing import TYPE_CHECKING, overload
 
-from django.db import models
-from lookup_property import L
-
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
@@ -16,7 +13,7 @@ from tilavarauspalvelu.typing import (
     PindoraSeriesInfoData,
     PindoraValidityInfoData,
 )
-from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
 
 from .client import PindoraClient
@@ -355,9 +352,7 @@ class PindoraService:
                 if obj.allocated_time_slot is None:
                     PindoraClient.delete_reservation_series(obj)
 
-                    Reservation.objects.filter(
-                        recurring_reservation=obj,
-                    ).update(access_code_generated_at=None, access_code_is_active=False)
+                    obj.reservations.update(access_code_generated_at=None, access_code_is_active=False)
 
                     return
 
@@ -415,58 +410,24 @@ class PindoraService:
 
     @classmethod
     def create_missing_access_codes(cls) -> None:
-        """If a reservation should have an access code but doesn't, create it."""
+        """
+        Check reservations, series' and seasonal bookings, and if they should have an access code but don't,
+        create access codes for them. If access codes already exist, update Varaamo's access code info.
+        """
         cls._create_missing_access_codes_for_reservations()
         cls._create_missing_access_codes_for_series()
         cls._create_missing_access_codes_for_seasonal_bookings()
 
     @classmethod
-    def update_pindora_access_code_is_active(cls) -> None:
-        """If a reservation's access code active state failed to update in Pindora, retry the change here."""
-        reservations: list[Reservation] = list(
-            Reservation.objects.filter(
-                (
-                    (models.Q(access_code_is_active=True) & L(access_code_should_be_active=False))
-                    | (models.Q(access_code_is_active=False) & L(access_code_should_be_active=True))
-                ),
-                recurring_reservation=None,
-                access_code_generated_at__isnull=False,
-                end__gt=local_datetime(),
-            )
-        )
-
-        if not reservations:
-            return
-
-        for reservation in reservations:
-            with suppress(ExternalServiceError):
-                if reservation.access_code_should_be_active:
-                    try:
-                        PindoraClient.activate_reservation_access_code(reservation=reservation)
-
-                    # If we think an access code has been generated, but it's not found in Pindora,
-                    # set `access_code_generated_at`. `create_missing_pindora_reservations` will
-                    # then create the access code if needed.
-                    except PindoraNotFoundError:
-                        reservation.access_code_generated_at = None
-
-                    else:
-                        reservation.access_code_is_active = True
-
-                        # Access code was activated in Pindora, inform the user by email.
-                        if reservation.access_code_is_active and reservation.access_code_generated_at:
-                            EmailService.send_reservation_modified_access_code_email(reservation=reservation)
-                else:
-                    try:
-                        PindoraClient.deactivate_reservation_access_code(reservation=reservation)
-
-                    except PindoraNotFoundError:
-                        reservation.access_code_generated_at = None
-
-                    reservation.access_code_is_active = False
-
-                # Update reservations in loop so that in case of a timeout we have done some work.
-                reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+    def update_access_code_is_active(cls) -> None:
+        """
+        Check reservations, series' and seasonal bookings, and if there are access codes active when they
+        should be inactive, or vice versa, update to what Varaamo thinks the active state should be.
+        If access codes are missing, set them as not generated.
+        """
+        cls._update_access_code_is_active_for_reservations()
+        cls._update_access_code_is_active_for_series()
+        cls._update_access_code_is_active_for_seasonal_bookings()
 
     @classmethod
     def _create_missing_access_codes_for_reservations(cls) -> None:
@@ -543,6 +504,73 @@ class PindoraService:
                     section.actions.get_reservations().requiring_access_code().update(
                         access_code_generated_at=response.access_code_generated_at,
                         access_code_is_active=response.access_code_is_active,
+                    )
+
+    @classmethod
+    def _update_access_code_is_active_for_reservations(cls) -> None:
+        reservations: Iterable[Reservation] = Reservation.objects.has_incorrect_access_code_is_active().filter(
+            recurring_reservation__isnull=True,
+        )
+
+        for reservation in reservations:
+            with suppress(ExternalServiceError):
+                try:
+                    if reservation.access_code_should_be_active:
+                        cls.activate_access_code(obj=reservation)
+
+                        # Access code was activated in Pindora, inform the user by email.
+                        if reservation.access_code_is_active and reservation.access_code_generated_at:
+                            EmailService.send_reservation_modified_access_code_email(reservation=reservation)
+
+                    else:
+                        cls.deactivate_access_code(obj=reservation)
+
+                # If we think an access code has been generated, but it's not found in Pindora,
+                # set access code as not generated. New access code will be created by a background task.
+                except PindoraNotFoundError:
+                    reservation.access_code_generated_at = None
+                    reservation.access_code_is_active = False
+                    reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
+
+    @classmethod
+    def _update_access_code_is_active_for_series(cls) -> None:
+        all_series: Iterable[RecurringReservation] = (
+            RecurringReservation.objects.has_incorrect_access_code_is_active().filter(
+                allocated_time_slot__isnull=True,
+            )
+        )
+
+        for series in all_series:
+            with suppress(ExternalServiceError):
+                try:
+                    if series.should_have_active_access_code:
+                        cls.activate_access_code(obj=series)
+                    else:
+                        cls.deactivate_access_code(obj=series)
+
+                # If we think an access code has been generated, but it's not found in Pindora,
+                # set access code as not generated. New access code will be created by a background task.
+                except PindoraNotFoundError:
+                    series.reservations.update(access_code_generated_at=None, access_code_is_active=False)
+
+    @classmethod
+    def _update_access_code_is_active_for_seasonal_bookings(cls) -> None:
+        sections: Iterable[ApplicationSection] = ApplicationSection.objects.has_incorrect_access_code_is_active()
+
+        for section in sections:
+            with suppress(ExternalServiceError):
+                try:
+                    if section.should_have_active_access_code:
+                        cls.activate_access_code(obj=section)
+                    else:
+                        cls.deactivate_access_code(obj=section)
+
+                # If we think an access code has been generated, but it's not found in Pindora,
+                # set access code as not generated. New access code will be created by a background task.
+                except PindoraNotFoundError:
+                    Reservation.objects.for_application_section(section).update(
+                        access_code_generated_at=None,
+                        access_code_is_active=False,
                     )
 
     @classmethod
