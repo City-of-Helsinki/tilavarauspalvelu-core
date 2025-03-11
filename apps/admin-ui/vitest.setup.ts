@@ -1,7 +1,18 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { vi, afterEach } from "vitest";
+import { afterAll, beforeAll, vi, afterEach } from "vitest";
 // TODO add vitest-axe
+
+beforeAll(() => {
+  // Workaround react-testing-library hard coding to jest.useFakeTimers
+  vi.stubGlobal("jest", {
+    advanceTimersByTime: vi.advanceTimersByTime.bind(vi),
+  });
+});
+
+afterAll(() => {
+  vi.unstubAllGlobals();
+});
 
 // react-dom tests can't automatically cleanup without vitest globals
 afterEach(() => {
