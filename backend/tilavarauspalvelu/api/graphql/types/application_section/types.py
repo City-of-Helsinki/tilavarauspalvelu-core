@@ -146,11 +146,7 @@ class ApplicationSectionNode(DjangoNode):
     @staticmethod
     def optimize_has_reservations(queryset: models.QuerySet, optimizer: QueryOptimizer) -> models.QuerySet:
         optimizer.annotations["has_reservations"] = models.Exists(
-            Reservation.objects.filter(
-                recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
-                    models.OuterRef("pk")
-                ),
-            )
+            queryset=Reservation.objects.for_application_section(models.OuterRef("pk"))
         )
 
         return queryset

@@ -59,10 +59,7 @@ class ApplicationSectionQuerySet(models.QuerySet):
         """Return all application sections that should have an access code but don't."""
         return self.alias(
             has_missing_access_codes=models.Exists(
-                queryset=Reservation.objects.filter(
-                    recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
-                        models.OuterRef("pk")
-                    ),
+                queryset=Reservation.objects.for_application_section(models.OuterRef("pk")).filter(
                     state=ReservationStateChoice.CONFIRMED,
                     access_type=AccessType.ACCESS_CODE,
                     access_code_generated_at=None,
@@ -78,16 +75,13 @@ class ApplicationSectionQuerySet(models.QuerySet):
         """
         return self.alias(
             has_incorrect_access_codes=models.Exists(
-                queryset=Reservation.objects.filter(
+                queryset=Reservation.objects.for_application_section(models.OuterRef("pk")).filter(
                     (
                         (models.Q(access_code_is_active=True) & L(access_code_should_be_active=False))
                         | (models.Q(access_code_is_active=False) & L(access_code_should_be_active=True))
                     ),
                     access_code_generated_at__isnull=False,
                     end__gt=local_datetime(),
-                    recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=(
-                        models.OuterRef("pk")
-                    ),
                 ),
             )
         ).filter(has_incorrect_access_codes=True)

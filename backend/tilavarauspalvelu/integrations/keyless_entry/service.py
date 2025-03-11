@@ -344,9 +344,10 @@ class PindoraService:
             case ApplicationSection():
                 PindoraClient.delete_seasonal_booking(obj)
 
-                Reservation.objects.filter(
-                    recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=obj,
-                ).update(access_code_generated_at=None, access_code_is_active=False)
+                Reservation.objects.for_application_section(obj).update(
+                    access_code_generated_at=None,
+                    access_code_is_active=False,
+                )
 
             case RecurringReservation():
                 if obj.allocated_time_slot is None:
