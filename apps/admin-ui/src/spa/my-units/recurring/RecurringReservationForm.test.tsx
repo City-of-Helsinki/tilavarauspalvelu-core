@@ -278,7 +278,7 @@ async function fillForm({
   expect(endTime).toBeInTheDocument();
   expect(endTime).toHaveValue("11:00");
 
-  const button = screen.getByRole("checkbox", {
+  const button = screen.getByRole("button", {
     name: `dayShort.${dayNumber}`,
   });
   expect(button).toBeInTheDocument();
