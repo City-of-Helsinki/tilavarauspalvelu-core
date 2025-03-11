@@ -1,4 +1,3 @@
-import { get as mockGet } from "lodash-es";
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
   type PaymentOrderNode,
@@ -24,7 +23,6 @@ import {
   isSlotWithinReservationTime,
   generateReservableMap,
 } from "./reservable";
-import mockTranslations from "./../public/locales/fi/prices.json";
 import { toApiDate } from "common/src/common/util";
 import { type TFunction } from "i18next";
 import {
@@ -138,16 +136,6 @@ function createMockCanUserCancelReservation({
     ],
   };
 }
-
-vi.mock("next-i18next", () => ({
-  i18n: {
-    t: (str: string) => {
-      const path = str.replace("prices:", "");
-      return mockGet(mockTranslations, path);
-    },
-    language: "fi",
-  },
-}));
 
 describe("getDurationOptions", () => {
   const mockT = ((x: string) => x) as TFunction;

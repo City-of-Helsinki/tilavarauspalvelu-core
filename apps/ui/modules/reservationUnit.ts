@@ -68,11 +68,8 @@ function formatTime(date: Date): string {
 export { formatTime as getTimeString };
 
 export function isReservationUnitPublished(
-  reservationUnit?: Pick<ReservationUnitNode, "publishingState"> | null
+  reservationUnit: Readonly<Pick<ReservationUnitNode, "publishingState">>
 ): boolean {
-  if (!reservationUnit) {
-    return false;
-  }
   const { publishingState } = reservationUnit;
 
   switch (publishingState) {
@@ -530,7 +527,7 @@ export function getPossibleTimesForDay({
 }
 
 // TODO use a fragment
-type IsReservableReservationUnitType = Pick<
+export type IsReservableReservationUnitType = Pick<
   ReservationUnitNode,
   | "reservationState"
   | "reservableTimeSpans"
@@ -544,49 +541,75 @@ type IsReservableReservationUnitType = Pick<
   MetadataSetsFragment;
 
 export function isReservationUnitReservable(
-  reservationUnit?: IsReservableReservationUnitType | null
-): [false, string] | [true] {
+  reservationUnit:
+    | ReadonlyDeep<IsReservableReservationUnitType>
+    | null
+    | undefined
+):
+  | {
+      isReservable: false;
+      reason: string;
+    }
+  | { isReservable: true; reason: null } {
   if (!reservationUnit) {
-    return [false, "reservationUnit is null"];
+    return {
+      isReservable: false,
+      reason: "reservationUnit is null",
+    };
   }
+
+  const reason = getNotReservableReason(reservationUnit);
+  const isReservable = reason == null;
+  if (isReservable) {
+    return {
+      isReservable,
+      reason: null,
+    };
+  }
+
+  return {
+    isReservable: false,
+    reason,
+  };
+}
+
+function getNotReservableReason(
+  reservationUnit: ReadonlyDeep<IsReservableReservationUnitType>
+): string | null {
   const {
-    reservationState,
     minReservationDuration,
     maxReservationDuration,
     reservationKind,
+    reservationState,
   } = reservationUnit;
 
-  switch (reservationState) {
-    case ReservationUnitReservationState.Reservable:
-    case ReservationUnitReservationState.ScheduledClosing: {
-      const resBegins = reservationUnit.reservationBegins
-        ? new Date(reservationUnit.reservationBegins)
-        : null;
-      const hasSupportedFields =
-        (reservationUnit.metadataSet?.supportedFields?.length ?? 0) > 0;
-      const hasReservableTimes =
-        (reservationUnit.reservableTimeSpans?.length ?? 0) > 0;
-      if (!hasSupportedFields) {
-        return [false, "reservationUnit has no supported fields"];
-      }
-      if (!hasReservableTimes) {
-        return [false, "reservationUnit has no reservable times"];
-      }
-      if (resBegins && resBegins > new Date()) {
-        return [false, "reservationUnit reservation begins in future"];
-      }
-      if (!minReservationDuration || !maxReservationDuration) {
-        return [false, "reservationUnit has no min/max reservation duration"];
-      }
-      if (reservationKind === ReservationKind.Season) {
-        return [
-          false,
-          "reservationUnit is only available for seasonal booking",
-        ];
-      }
-      return [true];
-    }
-    default:
-      return [false, "reservationUnit is not reservable"];
+  if (
+    reservationState !== ReservationUnitReservationState.Reservable &&
+    reservationState !== ReservationUnitReservationState.ScheduledClosing
+  ) {
+    return "reservationUnit is not reservable";
   }
+  const resBegins = reservationUnit.reservationBegins
+    ? new Date(reservationUnit.reservationBegins)
+    : null;
+  const hasSupportedFields =
+    (reservationUnit.metadataSet?.supportedFields?.length ?? 0) > 0;
+  const hasReservableTimes =
+    (reservationUnit.reservableTimeSpans?.length ?? 0) > 0;
+  if (!hasSupportedFields) {
+    return "reservationUnit has no supported fields";
+  }
+  if (!hasReservableTimes) {
+    return "reservationUnit has no reservable times";
+  }
+  if (resBegins && resBegins > new Date()) {
+    return "reservationUnit reservation begins in future";
+  }
+  if (!minReservationDuration || !maxReservationDuration) {
+    return "reservationUnit has no min/max reservation duration";
+  }
+  if (reservationKind === ReservationKind.Season) {
+    return "reservationUnit is only available for seasonal booking";
+  }
+  return null;
 }
