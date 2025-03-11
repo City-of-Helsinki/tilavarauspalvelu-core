@@ -12,6 +12,7 @@ from django.core.cache import cache
 from graphene_django_extensions.testing.utils import parametrize_helper
 
 from tilavarauspalvelu.enums import (
+    AccessType,
     ApplicationRoundStatusChoice,
     ReservationStartInterval,
     ReservationStateChoice,
@@ -19,13 +20,14 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationUnitHierarchy
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import CachedReservableTime
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import (
     ApplicationRoundFactory,
     OriginHaukiResourceFactory,
     ReservableTimeSpanFactory,
     ReservationFactory,
+    ReservationUnitAccessTypeFactory,
     ReservationUnitFactory,
     ResourceFactory,
     SpaceFactory,
@@ -48,7 +50,12 @@ reservation_units_reservable_query = partial(
     fields="isClosed firstReservableDatetime",
     calculate_first_reservable_time=True,
 )
-NEXT_YEAR = local_date().year + 1
+reservation_units_reservable_query_access_type = partial(
+    reservation_units_query,
+    fields="pk isClosed firstReservableDatetime effectiveAccessType",
+    calculate_first_reservable_time=True,
+)
+NEXT_YEAR = datetime.date.today().year + 1
 
 
 def _datetime(year=NEXT_YEAR, month=1, day=1, hour=0, minute=0) -> datetime.datetime:
@@ -75,6 +82,11 @@ def frt(response: GQLResponse, *, node: int = 0) -> str | None:
         .astimezone(DEFAULT_TIMEZONE)
         .isoformat(timespec="seconds")
     )
+
+
+def frt_access_type(response: GQLResponse, *, node: int = 0) -> bool:
+    """Get isClosed value from response"""
+    return response.node(node)["effectiveAccessType"]
 
 
 def dt(*, year: int = NEXT_YEAR, month: int = 1, day: int = 1, hour: int = 0, minute: int = 0) -> str:
@@ -2515,9 +2527,9 @@ def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql
     #  7) Count reservation units for response
     #  8) Fetch reservation units for response
     try:
-        response.assert_query_count(8)  # Locally only 8 queries are made
+        response.assert_query_count(9)  # Locally only 9 queries are made
     except BaseException:  # noqa: BLE001
-        response.assert_query_count(10)  # In CI, sometimes 10 queries are made, but we don't know why. This is fine.
+        response.assert_query_count(11)  # In CI, sometimes 11 queries are made, but we don't know why. This is fine.
 
 
 ########################################################################################################################
@@ -2577,7 +2589,7 @@ def test__reservation_unit__first_reservable_time__previous_page_cached(graphql,
     assert cached_value[str(reservation_unit.pk)]["closed"] == "False"
 
     # Check that there was no additional queries
-    response_2.assert_query_count(8)
+    response_2.assert_query_count(9)
     # ...and that we were able to skip iterating through the previous pages due to cached results.
     assert "OFFSET 1" in response_2.queries[1]
 
@@ -2628,7 +2640,7 @@ def test__reservation_unit__first_reservable_time__previous_page_not_cached(grap
     assert cached_value[str(reservation_unit.pk)]["closed"] == "False"
 
     # Check that there was no additional queries
-    response.assert_query_count(8)
+    response.assert_query_count(9)
     # We also cannot skip previous pages due to missing cached results.
     assert "OFFSET 1" not in response.queries[1]
 
@@ -2690,7 +2702,7 @@ def test__reservation_unit__first_reservable_time__different_filters_dont_share_
     assert len(cached_value) == 1
 
     # We couldn't use the cached results, so make database queries as usual.
-    response_2.assert_query_count(8)
+    response_2.assert_query_count(9)
 
 
 ########################################################################################################################
@@ -2824,8 +2836,13 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
 
     ReservableTimeSpanFactory.create(
         resource=reservation_unit.origin_hauki_resource,
-        start_datetime=_datetime(hour=10),
-        end_datetime=_datetime(hour=12),
+        start_datetime=_datetime(hour=13),
+        end_datetime=_datetime(hour=14),
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.ACCESS_CODE,
+        begin_date=NOW,
     )
 
     ReservationUnitHierarchy.refresh()
@@ -2837,26 +2854,83 @@ def test__reservation_unit__first_reservable_time__cached_results_not_valid_anym
         str(reservation_unit_2): CachedReservableTime(
             frt=None,
             closed=True,
+            access_type=None,
             valid_until=local_datetime() - datetime.timedelta(minutes=1),  # invalid
         ).to_dict(),
         # Second page
         str(reservation_unit): CachedReservableTime(
-            frt=datetime.datetime.fromisoformat("2025-01-01T10:00:00+02:00"),
+            frt=datetime.datetime.fromisoformat("2025-01-01T10:00:00+02:00"),  # re-calculation will correct this value
             closed=False,
+            access_type=None,  # re-calculation will correct this value
             valid_until=local_datetime() + datetime.timedelta(minutes=1),  # valid
         ).to_dict(),
     }
     cache_key = "Y2FsY3VsYXRlX2ZpcnN0X3Jlc2VydmFibGVfdGltZT1UcnVlLG9yZGVyX2J5PVsnbmFtZV9maSdd"
     cache.set(cache_key, json.dumps(cached_results), timeout=120)
 
-    query = reservation_units_reservable_query(order_by="nameFiAsc", first=1, offset=1)
+    # Query the second page
+    query = reservation_units_reservable_query_access_type(order_by="nameFiAsc", first=1, offset=1)
     response = graphql(query)
     assert response.has_errors is False, response
 
     assert len(response) == 1
-    assert frt(response) == dt(hour=10)
+    assert frt(response) == dt(hour=13)
+    assert frt_access_type(response) == AccessType.ACCESS_CODE
     assert is_closed(response) is False
+    assert response.node(0)["pk"] == reservation_unit.pk
 
     # Since we couldn't use all the cached results,
     # we needed to fetch data from the database for re-calculation.
-    response.assert_query_count(8)
+    response.assert_query_count(9)
+
+
+########################################################################################################################
+
+
+@freezegun.freeze_time(NOW)
+def test__reservation_unit__first_reservable_time__access_type(graphql, reservation_unit):
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=_datetime(day=1),
+        end_datetime=_datetime(day=18),
+    )
+
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.ACCESS_CODE,
+        begin_date=_date(day=5),
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.PHYSICAL_KEY,
+        begin_date=_date(day=10),
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.OPENED_BY_STAFF,
+        begin_date=_date(day=20),
+    )
+
+    # Before any AccessType has begun
+    response = graphql(reservation_units_reservable_query_access_type(reservable_date_start=_date(day=1).isoformat()))
+    assert response.has_errors is False, response
+    assert frt(response) == dt(day=1)
+    assert frt_access_type(response) is None
+
+    # Same date as new AccessType begins
+    response = graphql(reservation_units_reservable_query_access_type(reservable_date_start=_date(day=5).isoformat()))
+    assert response.has_errors is False, response
+    assert frt(response) == dt(day=5)
+    assert frt_access_type(response) == AccessType.ACCESS_CODE
+
+    # AccessType has changed
+    response = graphql(reservation_units_reservable_query_access_type(reservable_date_start=_date(day=15).isoformat()))
+    assert response.has_errors is False, response
+    assert frt(response) == dt(day=15)
+    assert frt_access_type(response) == AccessType.PHYSICAL_KEY
+
+    # Not a reservable time, but use AccessType from the filter date
+    response = graphql(reservation_units_reservable_query_access_type(reservable_date_start=_date(day=30).isoformat()))
+    assert response.has_errors is False, response
+    assert frt(response) is None
+    assert frt_access_type(response) == AccessType.OPENED_BY_STAFF
