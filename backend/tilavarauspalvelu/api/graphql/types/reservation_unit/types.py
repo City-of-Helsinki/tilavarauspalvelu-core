@@ -66,6 +66,7 @@ class ReservationUnitNode(DjangoNode):
 
     is_closed = graphene.Boolean()
     first_reservable_datetime = graphene.DateTime()
+    effective_access_type = graphene.Field(graphene.Enum.from_enum(AccessType))
 
     hauki_url = ManuallyOptimizedField(graphene.String)
 
@@ -176,7 +177,7 @@ class ReservationUnitNode(DjangoNode):
             "reservable_time_spans",
             "is_closed",
             "first_reservable_datetime",
-            # "first_reservable_time_info",
+            "effective_access_type",
             "num_active_user_reservations",
         ]
         restricted_fields = {
@@ -215,6 +216,17 @@ class ReservationUnitNode(DjangoNode):
 
         msg = (
             "Unexpected error: 'firstReservableDatetime' should have been calculated but wasn't. "
+            "Did you forget to set `calculateFirstReservableTime:true`?"
+        )
+        raise GQLCodeError(msg, code=error_codes.RESERVATION_UNIT_FIRST_RESERVABLE_DATETIME_NOT_CALCULATED)
+
+    def resolve_effective_access_type(root: ReservationUnit, info: GQLInfo) -> datetime.datetime | None:
+        # 'effective_access_type' is annotated by ReservationUnitFilterSet
+        if hasattr(root, "effective_access_type"):
+            return root.effective_access_type
+
+        msg = (
+            "Unexpected error: 'effectiveAccessType' should have been calculated but wasn't. "
             "Did you forget to set `calculateFirstReservableTime:true`?"
         )
         raise GQLCodeError(msg, code=error_codes.RESERVATION_UNIT_FIRST_RESERVABLE_DATETIME_NOT_CALCULATED)

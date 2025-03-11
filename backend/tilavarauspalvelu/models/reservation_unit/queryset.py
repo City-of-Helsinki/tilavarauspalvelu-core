@@ -10,7 +10,6 @@ from django.db.models import Q, prefetch_related_objects
 from lookup_property import L
 
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
-from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 from utils.date_utils import local_date
 from utils.db import ArrayUnnest, NowTT, SubqueryArray
 
@@ -46,6 +45,10 @@ class ReservationUnitQuerySet(models.QuerySet):
         cache_key: str = "",
     ) -> Self:
         """Annotate the queryset with `first_reservable_time` and `is_closed` for each reservation unit."""
+        from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import (
+            FirstReservableTimeHelper,
+        )
+
         helper = FirstReservableTimeHelper(
             reservation_unit_queryset=self,
             filter_date_start=filter_date_start,
