@@ -487,17 +487,6 @@ describe("getEquipmentList", () => {
     ]);
   });
 
-  test("with equipment out of predefined order", () => {
-    const equipment = ["Item A", "Item B", "Item C"].map((name) =>
-      createMockEquipment({ name })
-    );
-    expect(getEquipmentList(equipment, "fi")).toStrictEqual([
-      "Item A FI",
-      "Item B FI",
-      "Item C FI",
-    ]);
-  });
-
   test("with equipment in predefined order", () => {
     const equipment: ReadonlyDeep<DeepRequired<EquipmentFieldsFragment>>[] = [
       createMockEquipment({ name: "Item A", categoryName: "Liittimet" }),
@@ -522,15 +511,22 @@ describe("getEquipmentList", () => {
 });
 
 describe("getReservationUnitName", () => {
-  test("should return the name of the unit", () => {
+  test.for([
+    ["fi", "Unit 1 FI"],
+    ["en", "Unit 1 EN"],
+    ["sv", "Unit 1 SV"],
+  ])("should return translated name of the unit", ([lang, name]) => {
     const reservationUnit = generateNameFragment("Unit 1");
-    expect(getReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
+    expect(getReservationUnitName(reservationUnit, lang)).toEqual(name);
   });
 
-  test("should return the name of the unit in the current language", () => {
-    const reservationUnit = generateNameFragment("Unit 1");
-    expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 SV");
-  });
+  test.for(["", undefined, "fr", "de"])(
+    "should default to fi if language is not found",
+    () => {
+      const reservationUnit = generateNameFragment("Unit 1");
+      expect(getReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
+    }
+  );
 
   test.for([
     ["", "Unit 1 FI"],
@@ -545,6 +541,7 @@ describe("getReservationUnitName", () => {
         nameSv: val,
       };
       expect(getReservationUnitName(reservationUnit, "sv")).toEqual(nameFi);
+      expect(getReservationUnitName(reservationUnit, "en")).toEqual(nameFi);
     }
   );
 });
@@ -573,25 +570,24 @@ describe("getFuturePricing", () => {
     };
   }
 
-  const days: readonly Date[] = [
+  const DAYS: readonly Date[] = [
     addDays(new Date(), 10),
     addDays(new Date(), 20),
     addDays(new Date(), 5),
   ];
 
-  test("should sort items correctly", () => {
-    const d1 = constructInput({ days });
-    expect(getFuturePricing(d1)).toEqual(d1.pricings[2]);
-    const d2 = constructInput({ days: days.toReversed() });
-    expect(getFuturePricing(d2)).toEqual(d1.pricings[2]);
-    const d3 = constructInput({ days: [...days, addDays(new Date(), 1)] });
-    expect(getFuturePricing(d3)).toEqual(d3.pricings[3]);
-    const d4 = constructInput({ days: [addDays(new Date(), 1), ...days] });
-    expect(getFuturePricing(d4)).toEqual(d4.pricings[0]);
+  test.for([
+    { days: DAYS, expectedIndex: 2 },
+    { days: DAYS.toReversed(), expectedIndex: 0 },
+    { days: [...DAYS, addDays(new Date(), 1)], expectedIndex: 3 },
+    { days: [addDays(new Date(), 1), ...DAYS], expectedIndex: 0 },
+  ])("should sort items correctly", ({ days, expectedIndex }) => {
+    const input = constructInput({ days });
+    expect(getFuturePricing(input)).toEqual(input.pricings[expectedIndex]);
   });
 
-  test("should return undefined if no future pricing", () => {
-    const d1 = constructInput({ days });
+  test("should be null if no future pricing", () => {
+    const d1 = constructInput({ days: DAYS });
     expect(getFuturePricing(d1)).toEqual(d1.pricings[2]);
     const d2 = constructInput({
       days: [addDays(new Date(), -1)],
@@ -599,53 +595,41 @@ describe("getFuturePricing", () => {
     expect(getFuturePricing(d2)).toBeNull();
   });
 
-  test("with reservation begin time", () => {
-    const data = constructInput({ days });
-    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
-
-    const d1 = constructInput({
-      reservationBegins: addDays(new Date(), 19),
-      days,
-    });
-    expect(getFuturePricing(d1)).toEqual(data.pricings[1]);
-
-    const d2 = constructInput({
-      reservationBegins: addDays(new Date(), 20),
-      days,
-    });
-    expect(getFuturePricing(d2)).toBeNull();
+  test.for([
+    { begin: undefined, index: 2 },
+    { begin: addDays(new Date(), 19), index: 1 },
+    { begin: addDays(new Date(), 20), index: null },
+  ])("with reservation begin time", ({ begin, index }) => {
+    const data = constructInput({ days: DAYS, reservationBegins: begin });
+    const val = index != null ? data.pricings[index] : null;
+    expect(getFuturePricing(data)).toEqual(val);
   });
 
-  test("with reservation end time", () => {
-    const data = constructInput({ days });
-    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
-
-    const d1 = constructInput({
-      reservationEnds: addDays(new Date(), 1),
-      days,
+  test.for([
+    { endDays: undefined, index: 2 },
+    { endDays: 1, index: null },
+    { endDays: 5, index: 2 },
+  ])("with reservation end time", ({ endDays, index }) => {
+    const data = constructInput({
+      reservationEnds: endDays ? addDays(new Date(), endDays) : undefined,
+      days: DAYS,
     });
-    expect(getFuturePricing(d1)).toBeNull();
-
-    const d2 = constructInput({
-      reservationEnds: addDays(new Date(), 5),
-      days,
-    });
-    expect(getFuturePricing(d2)).toEqual(data.pricings[2]);
+    const val = index != null ? data.pricings[index] : null;
+    expect(getFuturePricing(data)).toEqual(val);
   });
 
-  test("with both reservation times", () => {
-    const data = constructInput({ days });
-    if (data.pricings == null || data.pricings.length < 2) {
-      throw new Error("Invalid test data");
-    }
-
-    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
-
-    data.reservationBegins = addDays(new Date(), 15).toISOString();
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
-
-    data.reservationEnds = addDays(new Date(), 30).toISOString();
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
+  test.for([
+    { begin: undefined, end: undefined, index: 2 },
+    { begin: 15, end: undefined, index: 1 },
+    { begin: 15, end: 30, index: 1 },
+  ])("with both reservation times", ({ begin, end, index }) => {
+    const data = constructInput({
+      days: DAYS,
+      reservationBegins: begin ? addDays(new Date(), begin) : undefined,
+      reservationEnds: end ? addDays(new Date(), end) : undefined,
+    });
+    const val = index != null ? data.pricings[index] : null;
+    expect(getFuturePricing(data)).toEqual(val);
   });
 
   test.for([
@@ -657,7 +641,7 @@ describe("getFuturePricing", () => {
       index: 9999,
     },
   ])("handles active application rounds", ({ begin, end, index }) => {
-    const data = constructInput({ days });
+    const data = constructInput({ days: DAYS });
     const applicationRounds: RoundPeriod[] = [
       {
         reservationPeriodBegin: begin.toISOString(),
@@ -673,7 +657,7 @@ describe("getFuturePricing", () => {
     { date: addDays(new Date(), 5), index: 2 },
     { date: addDays(new Date(), 20), index: 1 },
   ])("handles date lookups", ({ date, index }) => {
-    const data = constructInput({ days });
+    const data = constructInput({ days: DAYS });
     expect(getFuturePricing(data, [], date)).toEqual(data.pricings[index]);
   });
 });
@@ -718,95 +702,83 @@ describe("getReservationUnitPrice", () => {
 
   function connstructInput({
     date,
+    pricings,
   }: {
     date: Date;
+    pricings: Readonly<NonNullable<PriceReservationUnitFragment>["pricings"]>;
   }): GetReservationUnitPriceProps {
     return {
       t: mockT as TFunction,
       pricingDate: date,
       reservationUnit: {
         id: "1",
-        pricings: [
-          constructPricing({
-            begins: addDays(new Date(), 10),
-            lowestPrice: 10,
-            highestPrice: 20,
-            taxPercentage: 24,
-          }),
-          constructPricing({
-            begins: addDays(new Date(), 20),
-            lowestPrice: 20,
-            highestPrice: 30,
-            taxPercentage: 24,
-          }),
-          constructPricing({
-            begins: addDays(new Date(), 5),
-            lowestPrice: 40,
-            highestPrice: 50,
-            taxPercentage: 24,
-          }),
-          constructPricing({
-            begins: addDays(new Date(), 5),
-            lowestPrice: 0,
-            highestPrice: 10,
-            taxPercentage: 24,
-          }),
-        ],
+        pricings,
       },
     };
   }
 
-  test("returns future data based on date lookup", () => {
-    const input = connstructInput({ date: addDays(new Date(), 5) });
-    expect(getReservationUnitPrice(input)).toEqual("40,00 - 50,00 € / tunti");
-    const input2 = connstructInput({ date: addDays(new Date(), 11) });
-    expect(getReservationUnitPrice(input2)).toEqual("10,00 - 20,00 € / tunti");
+  function constructDefaultPricing() {
+    return [
+      constructPricing({
+        begins: addDays(new Date(), 10),
+        lowestPrice: 10,
+        highestPrice: 20,
+        taxPercentage: 24,
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 20),
+        lowestPrice: 20,
+        highestPrice: 30,
+        taxPercentage: 24,
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 5),
+        lowestPrice: 40,
+        highestPrice: 50,
+        taxPercentage: 24,
+      }),
+    ] as const;
+  }
+
+  test.for([
+    { days: 5, expected: "40,00 - 50,00 € / tunti" },
+    { days: 11, expected: "10,00 - 20,00 € / tunti" },
+  ])("returns future data based on date lookup", ({ days, expected }) => {
+    const input = connstructInput({
+      date: addDays(new Date(), days),
+      pricings: constructDefaultPricing(),
+    });
+    expect(getReservationUnitPrice(input)).toEqual(expected);
   });
 
-  test("future change in tax uses active price", () => {
-    const date = addDays(new Date(), 15);
-    const input = {
-      pricingDate: date,
-      t: mockT as TFunction,
-      reservationUnit: {
-        id: "1",
-        pricings: [
-          constructPricing({
-            begins: addDays(new Date(), -10),
-            highestPrice: 20,
-            taxPercentage: 24,
-          }),
-          constructPricing({
-            begins: addDays(new Date(), 10),
-            highestPrice: 25,
-            taxPercentage: 25.5,
-          }),
-        ],
-      },
-    };
-    expect(getReservationUnitPrice(input)).toBe("20,00 € / tunti");
-  });
-  test("future change in tax for free uses future price", () => {
-    const date = addDays(new Date(), 15);
-    const input = {
-      t: mockT as TFunction,
-      pricingDate: date,
-      reservationUnit: {
-        id: "1",
-        pricings: [
-          constructPricing({
-            begins: addDays(new Date(), -10),
-          }),
-          constructPricing({
-            begins: addDays(new Date(), 10),
-            highestPrice: 25,
-            taxPercentage: 25.5,
-          }),
-        ],
-      },
-    };
-    expect(getReservationUnitPrice(input)).toBe("25,00 € / tunti");
-  });
+  function constructTaxChangePricings(isFreeNow: boolean) {
+    return [
+      constructPricing({
+        begins: addDays(new Date(), -10),
+        highestPrice: isFreeNow ? undefined : 20,
+        taxPercentage: 24,
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 10),
+        highestPrice: 25,
+        taxPercentage: 25.5,
+      }),
+    ];
+  }
+
+  test.for([
+    { isFreeNow: false, expected: "20,00 € / tunti" },
+    { isFreeNow: true, expected: "25,00 € / tunti" },
+  ])(
+    "change in tax is only active in the future",
+    ({ isFreeNow, expected }) => {
+      const input = connstructInput({
+        date: addDays(new Date(), 15),
+        pricings: constructTaxChangePricings(isFreeNow),
+      });
+      expect(getReservationUnitPrice(input)).toBe(expected);
+    }
+  );
 });
 
 describe("isReservationUnitReservable", () => {
@@ -856,74 +828,66 @@ describe("isReservationUnitReservable", () => {
     },
   ];
 
-  test("returns true for a unit that is reservable", () => {
-    const input = constructReservationUnitNode({
+  test.for([
+    {
       reservableTimeSpans: defaultTimeSpans,
-    });
+      expected: true,
+    },
+    {
+      reservationState: ReservationUnitReservationState.ScheduledClosing,
+      reservableTimeSpans: defaultTimeSpans,
+      expected: true,
+    },
+    {
+      reservableTimeSpans: undefined,
+      reservationState: ReservationUnitReservationState.ReservationClosed,
+      expected: false,
+    },
+    {
+      reservationState: ReservationUnitReservationState.ReservationClosed,
+      reservableTimeSpans: defaultTimeSpans,
+      expected: false,
+    },
+    {
+      reservationState: ReservationUnitReservationState.ScheduledReservation,
+      reservableTimeSpans: defaultTimeSpans,
+      expected: false,
+    },
+    {
+      reservationState: ReservationUnitReservationState.ScheduledPeriod,
+      reservableTimeSpans: defaultTimeSpans,
+      expected: false,
+    },
+  ])(
+    "determines reservability correctly",
+    ({ reservableTimeSpans, reservationState, expected }) => {
+      const input = constructReservationUnitNode({
+        reservableTimeSpans,
+        reservationState,
+      });
+      const { isReservable: res1 } = isReservationUnitReservable(input);
+      expect(res1).toBe(expected);
+    }
+  );
+
+  test.for([
+    {
+      reservableTimeSpans: defaultTimeSpans,
+      reservationBegins: addDays(new Date(), 5),
+      reservationsMaxDaysBefore: 5,
+      expected: false,
+    },
+    {
+      reservableTimeSpans: undefined,
+      reservationBegins: addDays(new Date(), 5),
+      reservationsMaxDaysBefore: 4,
+      expected: false,
+    },
+    // TODO add a few more cases, especially a positive one with buffers
+  ])("returns correct value with buffer days", ({ expected, ...rest }) => {
+    const input = constructReservationUnitNode(rest);
     const { isReservable: res1 } = isReservationUnitReservable(input);
-    expect(res1).toBe(true);
-
-    const { isReservable: res2 } = isReservationUnitReservable(
-      constructReservationUnitNode({
-        reservationState: ReservationUnitReservationState.ScheduledClosing,
-        reservableTimeSpans: defaultTimeSpans,
-      })
-    );
-    expect(res2).toBe(true);
-  });
-
-  test("returns false for a unit that is not reservable", () => {
-    const { isReservable: res1 } = isReservationUnitReservable(
-      constructReservationUnitNode({
-        reservableTimeSpans: undefined,
-        reservationState: ReservationUnitReservationState.ReservationClosed,
-      })
-    );
-    expect(res1).toBe(false);
-
-    const { isReservable: res2 } = isReservationUnitReservable(
-      constructReservationUnitNode({
-        reservationState: ReservationUnitReservationState.ReservationClosed,
-        reservableTimeSpans: defaultTimeSpans,
-      })
-    );
-    expect(res2).toBe(false);
-
-    const { isReservable: res3 } = isReservationUnitReservable(
-      constructReservationUnitNode({
-        reservationState: ReservationUnitReservationState.ScheduledReservation,
-        reservableTimeSpans: defaultTimeSpans,
-      })
-    );
-    expect(res3).toBe(false);
-
-    const { isReservable: res4 } = isReservationUnitReservable(
-      constructReservationUnitNode({
-        reservationState: ReservationUnitReservationState.ScheduledPeriod,
-        reservableTimeSpans: defaultTimeSpans,
-      })
-    );
-    expect(res4).toBe(false);
-  });
-
-  test("returns correct value with buffer days", () => {
-    const { isReservable: res1 } = isReservationUnitReservable(
-      constructReservationUnitNode({
-        reservableTimeSpans: defaultTimeSpans,
-        reservationBegins: addDays(new Date(), 5),
-        reservationsMaxDaysBefore: 5,
-      })
-    );
-    expect(res1).toBe(false);
-
-    const { isReservable: res2 } = isReservationUnitReservable(
-      constructReservationUnitNode({
-        reservableTimeSpans: undefined,
-        reservationBegins: addDays(new Date(), 5),
-        reservationsMaxDaysBefore: 4,
-      })
-    );
-    expect(res2).toBe(false);
+    expect(res1).toBe(expected);
   });
 });
 

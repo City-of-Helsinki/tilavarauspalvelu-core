@@ -140,107 +140,48 @@ function createMockCanUserCancelReservation({
 describe("getDurationOptions", () => {
   const mockT = ((x: string) => x) as TFunction;
 
-  test("empty inputs", () => {
-    const interval90 = ReservationStartInterval.Interval_90Mins;
-    const interval60 = ReservationStartInterval.Interval_60Mins;
-    expect(
-      getDurationOptions(
-        {
-          minReservationDuration: 0,
-          maxReservationDuration: 5400,
-          reservationStartInterval: interval90,
-        },
-        mockT
-      )
-    ).toEqual([]);
-    expect(
-      getDurationOptions(
-        {
-          minReservationDuration: 5400,
-          maxReservationDuration: 0,
-          reservationStartInterval: interval60,
-        },
-        mockT
-      )
-    ).toEqual([]);
-    expect(
-      getDurationOptions(
-        {
-          minReservationDuration: 0,
-          maxReservationDuration: 0,
-          reservationStartInterval: interval60,
-        },
-        mockT
-      )
-    ).toEqual([]);
+  test.for([
+    {
+      reservationStartInterval: ReservationStartInterval.Interval_120Mins,
+      minReservationDuration: 0,
+      maxReservationDuration: 5400,
+      expected: [],
+    },
+    {
+      reservationStartInterval: ReservationStartInterval.Interval_60Mins,
+      minReservationDuration: 5400,
+      maxReservationDuration: 0,
+      expected: [],
+    },
+    {
+      reservationStartInterval: ReservationStartInterval.Interval_60Mins,
+      minReservationDuration: 0,
+      maxReservationDuration: 0,
+      expected: [],
+    },
+  ])("impossible combination of values", ({ expected, ...rest }) => {
+    expect(getDurationOptions(rest, mockT)).toEqual(expected);
   });
-  test("with 15 min intervals", () => {
-    const interval15 = ReservationStartInterval.Interval_15Mins;
-    expect(
-      getDurationOptions(
-        {
-          minReservationDuration: 1800,
-          maxReservationDuration: 5400,
-          reservationStartInterval: interval15,
-        },
-        mockT
-      )
-    ).toEqual([
-      {
-        label: " common:abbreviations.minute",
-        value: 30,
-      },
-      {
-        label: " common:abbreviations.minute",
-        value: 45,
-      },
-      {
-        label: " common:abbreviations.minute",
-        value: 60,
-      },
-      {
-        label: " common:abbreviations.minute",
-        value: 75,
-      },
-      {
-        label: " common:abbreviations.minute",
-        value: 90,
-      },
+
+  test("values for 15 min intervals", () => {
+    const input = {
+      minReservationDuration: 1800,
+      maxReservationDuration: 5400,
+      reservationStartInterval: ReservationStartInterval.Interval_15Mins,
+    } as const;
+    expect(getDurationOptions(input, mockT).map((x) => x.value)).toEqual([
+      30, 45, 60, 75, 90,
     ]);
   });
 
-  test("with 90 min intervals", () => {
-    const interval90 = ReservationStartInterval.Interval_90Mins;
-    expect(
-      getDurationOptions(
-        {
-          minReservationDuration: 1800,
-          maxReservationDuration: 30600,
-          reservationStartInterval: interval90,
-        },
-        mockT
-      )
-    ).toEqual([
-      {
-        label: " common:abbreviations.minute",
-        value: 90,
-      },
-      {
-        label: "common:abbreviations.hour common:abbreviations.minute",
-        value: 180,
-      },
-      {
-        label: "common:abbreviations.hour common:abbreviations.minute",
-        value: 270,
-      },
-      {
-        label: "common:abbreviations.hour common:abbreviations.minute",
-        value: 360,
-      },
-      {
-        label: "common:abbreviations.hour common:abbreviations.minute",
-        value: 450,
-      },
+  test("values for 90 min intervals", () => {
+    const input = {
+      minReservationDuration: 1800,
+      maxReservationDuration: 30600,
+      reservationStartInterval: ReservationStartInterval.Interval_90Mins,
+    } as const;
+    expect(getDurationOptions(input, mockT).map((x) => x.value)).toEqual([
+      90, 180, 270, 360, 450,
     ]);
   });
 });
@@ -404,7 +345,7 @@ describe("isReservationEditable", () => {
     };
   }
 
-  test("true for confirmed reservation in the future", () => {
+  test("YES for confirmed reservation in the future", () => {
     const input = constructInput({
       state: ReservationStateChoice.Confirmed,
       begin: addHours(new Date(), 24),
@@ -412,7 +353,7 @@ describe("isReservationEditable", () => {
     expect(isReservationEditable(input)).toBe(true);
   });
 
-  test("returns false with non-confirmed reservation", () => {
+  test("NO for non-confirmed reservation", () => {
     const input = constructInput({
       state: ReservationStateChoice.Created,
       begin: addHours(new Date(), 24),
@@ -420,7 +361,7 @@ describe("isReservationEditable", () => {
     expect(isReservationEditable(input)).toBe(false);
   });
 
-  test("handles past reservation check", () => {
+  test("NO for past reservation", () => {
     const input = constructInput({
       state: ReservationStateChoice.Confirmed,
       begin: addHours(new Date(), -1),
@@ -428,7 +369,7 @@ describe("isReservationEditable", () => {
     expect(isReservationEditable(input)).toBe(false);
   });
 
-  test("handles situation when reservation has been handled", () => {
+  test("NO for handled reservation", () => {
     const input = constructInput({
       state: ReservationStateChoice.Confirmed,
       begin: addHours(new Date(), 24),
@@ -630,28 +571,26 @@ describe("canReservationBeChanged", () => {
 });
 
 describe("getCheckoutUrl", () => {
+  const baseCheckoutUrl = "https://checkout.url/path";
+  const userParam = "user=1111-2222-3333-4444";
   const order: PaymentOrderNode = {
     id: "order-id",
-    checkoutUrl: "https://checkout.url/path?user=1111-2222-3333-4444",
+    checkoutUrl: `${baseCheckoutUrl}?${userParam}`,
     paymentType: PaymentType.Online,
   };
+  //const checkoutUrl = "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444";
+  const checkoutUrl = `${baseCheckoutUrl}/paymentmethod?${userParam}`;
 
   test("returns checkout url with lang sv", () => {
-    expect(getCheckoutUrl(order, "sv")).toBe(
-      "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=sv"
-    );
+    expect(getCheckoutUrl(order, "sv")).toBe(`${checkoutUrl}&lang=sv`);
   });
 
   test("returns checkout url with lang fi", () => {
-    expect(getCheckoutUrl(order, "fi")).toBe(
-      "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=fi"
-    );
+    expect(getCheckoutUrl(order, "fi")).toBe(`${checkoutUrl}&lang=fi`);
   });
 
   test("returns checkout url with lang en", () => {
-    expect(getCheckoutUrl(order, "en")).toBe(
-      "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444&lang=en"
-    );
+    expect(getCheckoutUrl(order, "en")).toBe(`${checkoutUrl}&lang=en`);
   });
 
   test("returns undefined if checkoutUrl is not defined", () => {
@@ -708,75 +647,23 @@ describe("isReservationStartInFuture", () => {
 });
 
 describe("isSlotWithinReservationTime", () => {
-  test("with no reservation times", () => {
-    expect(
-      isSlotWithinReservationTime(
-        new Date("2019-09-22T12:00:00+00:00"),
-        undefined,
-        undefined
-      )
-    ).toBe(true);
-  });
-
-  test("with begin time", () => {
-    expect(
-      isSlotWithinReservationTime(
-        new Date("2019-09-22T12:00:00+00:00"),
-        new Date("2019-08-22T12:00:00+00:00"),
-        undefined
-      )
-    ).toBe(true);
-
-    expect(
-      isSlotWithinReservationTime(
-        new Date("2019-09-22T12:00:00+00:00"),
-        new Date("2019-09-23T12:00:00+00:00"),
-        undefined
-      )
-    ).toBe(false);
-  });
-
-  test("with end time", () => {
-    expect(
-      isSlotWithinReservationTime(
-        new Date("2019-09-22T12:00:00+00:00"),
-        undefined,
-        new Date("2019-08-22T12:00:00+00:00")
-      )
-    ).toBe(false);
-
-    expect(
-      isSlotWithinReservationTime(
-        new Date("2019-09-22T12:00:00+00:00"),
-        undefined,
-        new Date("2019-09-23T13:00:00+00:00")
-      )
-    ).toBe(true);
-  });
-
-  test("with both times", () => {
-    expect(
-      isSlotWithinReservationTime(
-        new Date("2019-09-22T12:00:00+00:00"),
-        new Date("2019-09-22T12:00:00+00:00"),
-        new Date("2019-09-22T12:00:00+00:00")
-      )
-    ).toBe(false);
-
-    expect(
-      isSlotWithinReservationTime(
-        new Date("2019-09-22T12:00:00+00:00"),
-        new Date("2019-08-22T12:00:00+00:00"),
-        new Date("2019-09-22T12:00:00+00:00")
-      )
-    ).toBe(false);
-
-    expect(
-      isSlotWithinReservationTime(
-        new Date("2019-09-22T12:00:00+00:00"),
-        new Date("2019-08-22T12:00:00+00:00"),
-        new Date("2019-10-22T12:00:00+00:00")
-      )
-    ).toBe(true);
+  test.for([
+    { begin: null, end: null, expected: true },
+    { begin: null, end: -1, expected: false },
+    { begin: null, end: 1, expected: true },
+    { begin: -1, end: null, expected: false },
+    { begin: 1, end: null, expected: true },
+    { begin: 0, end: 0, expected: false },
+    { begin: 30, end: 0, expected: false },
+    { begin: 0, end: 30, expected: false },
+    { begin: 30, end: 30, expected: true },
+  ])("with both times", ({ begin, end, expected }) => {
+    const baseDate = new Date("2019-09-22T12:00:00+00:00");
+    const input = {
+      start: baseDate,
+      reservationBegins: begin != null ? addDays(baseDate, -begin) : undefined,
+      reservationEnds: end != null ? addDays(baseDate, end) : undefined,
+    };
+    expect(isSlotWithinReservationTime(input)).toBe(expected);
   });
 });

@@ -191,9 +191,11 @@ function isFuturePricing(pricing: PricingFieldsFragment): boolean {
   return new Date(pricing.begins) > new Date();
 }
 
-export function getActivePricing(reservationUnit: {
-  pricings: ReadonlyDeep<PricingFieldsFragment>[];
-}): PricingFieldsFragment | undefined {
+export function getActivePricing(
+  reservationUnit: Readonly<{
+    pricings: Readonly<ReadonlyDeep<PricingFieldsFragment>[]>;
+  }>
+): PricingFieldsFragment | undefined {
   const { pricings } = reservationUnit;
   return pricings.find((pricing) => isActivePricing(pricing));
 }
@@ -210,9 +212,11 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
 `;
 
 export function getFuturePricing(
-  reservationUnit: Maybe<PriceReservationUnitFragment> | undefined,
-  applicationRounds: RoundPeriod[] = [],
-  reservationDate?: Date
+  reservationUnit:
+    | Maybe<ReadonlyDeep<PriceReservationUnitFragment>>
+    | undefined,
+  applicationRounds: ReadonlyDeep<RoundPeriod[]> = [],
+  reservationDate?: Readonly<Date>
 ): PricingFieldsFragment | null {
   if (!reservationUnit) {
     return null;
@@ -223,15 +227,18 @@ export function getFuturePricing(
     return null;
   }
 
+  const begin = reservationBegins ? new Date(reservationBegins) : undefined;
+  const end = reservationEnds ? new Date(reservationEnds) : undefined;
+
   const futurePricings = pricings
     .filter((p) => isFuturePricing(p))
-    .filter((futurePricing) => {
-      return isSlotWithinReservationTime(
-        new Date(futurePricing.begins),
-        reservationBegins ? new Date(reservationBegins) : undefined,
-        reservationEnds ? new Date(reservationEnds) : undefined
-      );
-    })
+    .filter((fp) =>
+      isSlotWithinReservationTime({
+        start: new Date(fp.begins),
+        reservationBegins: begin,
+        reservationEnds: end,
+      })
+    )
     .filter((futurePricing) => {
       return !applicationRounds.some((applicationRound) => {
         const { reservationPeriodBegin, reservationPeriodEnd } =
@@ -308,7 +315,7 @@ export function getPriceString(props: GetPriceType): string {
 
 export type GetReservationUnitPriceProps = {
   t: TFunction;
-  reservationUnit: PriceReservationUnitFragment;
+  reservationUnit: ReadonlyDeep<PriceReservationUnitFragment>;
   pricingDate: Date;
   minutes?: number;
 };
@@ -384,14 +391,14 @@ export function getPrice(
 }
 
 export function isReservationUnitFreeOfCharge(
-  pricings: PricingFieldsFragment[],
+  pricings: Readonly<ReadonlyDeep<PricingFieldsFragment>[]>,
   date?: Date
 ): boolean {
   return !isReservationUnitPaid(pricings, date);
 }
 
 export function isReservationUnitPaid(
-  pricings: PricingFieldsFragment[],
+  pricings: Readonly<ReadonlyDeep<PricingFieldsFragment>[]>,
   date?: Date
 ): boolean {
   const active = pricings.filter((p) => isActivePricing(p));
