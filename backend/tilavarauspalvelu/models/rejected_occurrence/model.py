@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from graphene_django_extensions.fields.model import StrChoiceField
 
 from tilavarauspalvelu.enums import RejectionReadinessChoice
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime

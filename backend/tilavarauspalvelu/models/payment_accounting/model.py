@@ -8,7 +8,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.validators import is_numeric, validate_accounting_project
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import PaymentAccountingActions

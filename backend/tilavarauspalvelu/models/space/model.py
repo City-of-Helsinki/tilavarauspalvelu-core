@@ -9,7 +9,7 @@ from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
 from utils.db import SubqueryArray
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Unit

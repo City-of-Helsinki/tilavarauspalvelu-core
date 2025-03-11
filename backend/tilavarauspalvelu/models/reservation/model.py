@@ -16,7 +16,7 @@ from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from utils.date_utils import datetime_range_as_string
 from utils.decimal_utils import round_decimal
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import (

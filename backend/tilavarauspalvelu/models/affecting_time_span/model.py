@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, timedelta_to_json
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement

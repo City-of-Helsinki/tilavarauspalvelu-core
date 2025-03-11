@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from lookup_property import lookup_property
 
 from tilavarauspalvelu.enums import AccessType
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit

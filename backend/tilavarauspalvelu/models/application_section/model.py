@@ -14,7 +14,7 @@ from lookup_property import L, lookup_property
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from utils.date_utils import local_datetime
 from utils.db import NowTT, SubqueryCount
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import AgeGroup, Application, ReservationPurpose

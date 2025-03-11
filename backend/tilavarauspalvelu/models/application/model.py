@@ -16,7 +16,7 @@ from tilavarauspalvelu.enums import (
 )
 from utils.db import NowTT
 from utils.fields.model import StrChoiceField
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime

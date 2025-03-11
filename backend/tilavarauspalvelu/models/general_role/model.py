@@ -8,7 +8,7 @@ from graphene_django_extensions.fields.model import StrChoiceField
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import UserRoleChoice
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime

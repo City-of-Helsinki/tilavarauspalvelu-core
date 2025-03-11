@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from tilavarauspalvelu.enums import WeekdayChoice
 from tilavarauspalvelu.validators import validate_reservable_times
 from utils.fields.model import IntChoiceField
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit

@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import PriceUnit
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime

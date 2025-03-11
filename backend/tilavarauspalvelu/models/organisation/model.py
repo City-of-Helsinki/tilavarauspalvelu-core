@@ -11,7 +11,7 @@ from rest_framework.exceptions import ValidationError
 from tilavarauspalvelu.enums import OrganizationTypeChoice
 from utils.date_utils import local_datetime
 from utils.fields.model import StrChoiceField
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Address

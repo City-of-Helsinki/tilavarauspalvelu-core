@@ -7,7 +7,7 @@ from django.utils.translation import pgettext_lazy
 
 from config.utils.auditlog_util import AuditLogger
 from tilavarauspalvelu.enums import TermsOfUseTypeChoices
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from .actions import TermsOfUseActions

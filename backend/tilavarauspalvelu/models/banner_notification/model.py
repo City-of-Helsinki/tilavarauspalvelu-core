@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationState, BannerNotificationTarget
 from utils.date_utils import local_datetime
 from utils.fields.model import StrChoiceField
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 from .queryset import BANNER_LEVEL_SORT_ORDER, BANNER_TARGET_SORT_ORDER
 

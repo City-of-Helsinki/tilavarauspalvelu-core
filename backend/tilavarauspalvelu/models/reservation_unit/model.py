@@ -21,7 +21,7 @@ from tilavarauspalvelu.enums import (
     ReservationUnitReservationState,
 )
 from utils.db import NowTT
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from decimal import Decimal

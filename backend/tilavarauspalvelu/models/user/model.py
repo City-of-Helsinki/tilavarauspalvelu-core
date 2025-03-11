@@ -15,7 +15,8 @@ from tilavarauspalvelu.dataclasses import IDToken
 from tilavarauspalvelu.enums import ReservationNotification, UserRoleChoice
 from tilavarauspalvelu.services.permission_resolver import PermissionResolver
 from utils.date_utils import DEFAULT_TIMEZONE
-from utils.utils import LazyModelAttribute, LazyModelManager, get_jwt_payload
+from utils.lazy import LazyModelAttribute, LazyModelManager
+from utils.utils import get_jwt_payload
 
 if TYPE_CHECKING:
     import datetime

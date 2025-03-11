@@ -8,7 +8,7 @@ from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Priority, Weekday
 from utils.fields.model import StrChoiceField
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime

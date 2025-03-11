@@ -14,7 +14,7 @@ from lookup_property import L, lookup_property
 
 from tilavarauspalvelu.enums import AccessType, AccessTypeWithMultivalued, WeekdayChoice
 from utils.db import SubqueryArray
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     import datetime

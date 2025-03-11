@@ -10,7 +10,7 @@ from django.db.transaction import get_connection
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from utils.utils import LazyModelAttribute, LazyModelManager
+from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
