@@ -1,5 +1,6 @@
 import styled, { css } from "styled-components";
 import { focusStyles } from "./cssFragments";
+import { breakpoints } from "../src";
 
 export type ButtonStyleProps = {
   readonly variant?: "primary" | "secondary";
@@ -59,6 +60,9 @@ export const ButtonCss = css<ButtonStyleProps>`
     color: var(--color-focus);
     outline-offset: var(--outline-gutter);
     outline: var(--outline-width) solid var(--focus-outline-color);
+  }
+  @media (max-width: ${breakpoints.s}) {
+    width: 100%;
   }
 `;
 
