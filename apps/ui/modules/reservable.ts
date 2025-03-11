@@ -139,11 +139,15 @@ export function generateReservableMap(
   return map;
 }
 
-export function isSlotWithinReservationTime(
-  start: Date,
-  reservationBegins?: Date,
-  reservationEnds?: Date
-): boolean {
+export function isSlotWithinReservationTime({
+  start,
+  reservationBegins,
+  reservationEnds,
+}: {
+  start: Date;
+  reservationBegins?: Date;
+  reservationEnds?: Date;
+}): boolean {
   return (
     (!reservationBegins || isAfter(start, new Date(reservationBegins))) &&
     (!reservationEnds || isBefore(start, new Date(reservationEnds)))
@@ -439,7 +443,7 @@ function isSlotWithinTimeframe(
 ) {
   const isLegalTimeframe =
     isAfter(start, new Date()) &&
-    isSlotWithinReservationTime(start, reservationBegins, reservationEnds);
+    isSlotWithinReservationTime({ start, reservationBegins, reservationEnds });
   const maxDay = addDays(new Date(), maxDaysBefore);
   // if max days === 0 => latest = today
   const isBeforeMaxDaysBefore = maxDaysBefore === 0 || !isAfter(start, maxDay);
