@@ -188,7 +188,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     const previewPass = uuid === reservationUnitData.reservationUnit?.uuid;
 
-    const reservationUnit = reservationUnitData?.reservationUnit ?? undefined;
+    const { reservationUnit } = reservationUnitData;
+    if (reservationUnit == null) {
+      return notFound;
+    }
     if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
       return notFound;
     }
@@ -528,7 +531,7 @@ function ReservationUnit({
   };
 
   // store reservation unit overall reservability to use in JSX and pass to some child elements
-  const [reservationUnitIsReservable, reason] =
+  const { isReservable: reservationUnitIsReservable, reason } =
     isReservationUnitReservable(reservationUnit);
   if (!reservationUnitIsReservable) {
     // eslint-disable-next-line no-console

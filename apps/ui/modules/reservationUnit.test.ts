@@ -10,15 +10,14 @@ import {
 } from "date-fns";
 import { toApiDateUnsafe } from "common/src/common/util";
 import {
-  type EquipmentNode,
   PriceUnit,
   ReservationUnitPublishingState,
   type ReservationUnitNode,
-  Authentication,
   ReservationKind,
   ReservationStartInterval,
   ReservationUnitReservationState,
   type PriceReservationUnitFragment,
+  type EquipmentFieldsFragment,
 } from "@gql/gql-types";
 import {
   type GetReservationUnitPriceProps,
@@ -33,18 +32,19 @@ import {
   isReservationUnitPublished,
   isReservationUnitReservable,
   type GetPriceType,
+  type IsReservableReservationUnitType,
 } from "./reservationUnit";
 import mockTranslations from "./../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
-import { createMockReservationUnit, TIMERS_TO_FAKE } from "@/test/testUtils";
-import { base64encode } from "common/src/helpers";
+import {
+  createMockReservationUnit,
+  generateNameFragment,
+  TIMERS_TO_FAKE,
+} from "@/test/testUtils";
+import { base64encode, ReadonlyDeep } from "common/src/helpers";
 import { type TFunction } from "i18next";
-import { vi, describe, test, it, expect, beforeEach, afterEach } from "vitest";
-
-function mockT(str: string): ReturnType<TFunction> {
-  const path = str.replace("prices:", "");
-  return mockGet(mockTranslations, path);
-}
+import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
+import { DeepRequired } from "react-hook-form";
 
 // Turn into describe block and spec the tests
 describe("getPossibleTimesForDay", () => {
@@ -198,6 +198,11 @@ describe("getPossibleTimesForDay", () => {
     expect(end - start).toBeLessThan(20);
   });
 });
+
+function mockT(str: string): ReturnType<TFunction> {
+  const path = str.replace("prices:", "");
+  return mockGet(mockTranslations, path);
+}
 
 describe("getPriceString", () => {
   function constructInput({
@@ -374,61 +379,45 @@ describe("getPriceString", () => {
 });
 
 describe("isReservationUnitPublished", () => {
-  test("without state", () => {
+  const EnumT = ReservationUnitPublishingState;
+  test.each([
+    [EnumT.Published, true],
+    [EnumT.ScheduledHiding, true],
+    [EnumT.Archived, false],
+    [EnumT.Draft, false],
+    [EnumT.Hidden, false],
+    [EnumT.ScheduledPeriod, false],
+    [EnumT.ScheduledPublishing, false],
+  ])("%s expect %s", (state, expected) => {
+    expect(isReservationUnitPublished({ publishingState: state })).toBe(
+      expected
+    );
+  });
+
+  test("NO without state", () => {
     expect(isReservationUnitPublished({})).toBe(false);
-  });
-
-  test("with valid states", () => {
-    const input1 = {
-      publishingState: ReservationUnitPublishingState.Published,
-    };
-    expect(isReservationUnitPublished(input1)).toBe(true);
-    const input2 = {
-      publishingState: ReservationUnitPublishingState.ScheduledHiding,
-    };
-    expect(isReservationUnitPublished(input2)).toBe(true);
-  });
-
-  test("with invalid states", () => {
-    const archived = {
-      publishingState: ReservationUnitPublishingState.Archived,
-    };
-    expect(isReservationUnitPublished(archived)).toBe(false);
-
-    const draft = { publishingState: ReservationUnitPublishingState.Draft };
-    expect(isReservationUnitPublished(draft)).toBe(false);
-
-    const hidden = { publishingState: ReservationUnitPublishingState.Hidden };
-    expect(isReservationUnitPublished(hidden)).toBe(false);
-
-    const scheduled = {
-      publishingState: ReservationUnitPublishingState.ScheduledPeriod,
-    };
-    expect(isReservationUnitPublished(scheduled)).toBe(false);
-
-    const scheduled2 = {
-      publishingState: ReservationUnitPublishingState.ScheduledPublishing,
-    };
-    expect(isReservationUnitPublished(scheduled2)).toBe(false);
   });
 });
 
-function constructEquipmentNode({
+function createMockEquipment({
   name,
   categoryName,
+  pk = 1,
 }: {
   name: string;
   categoryName?: string;
-}): EquipmentNode {
+  pk?: number;
+}): ReadonlyDeep<DeepRequired<EquipmentFieldsFragment>> {
   const cat = categoryName || name;
   return {
     id: name,
-    nameFi: name,
-    name,
+    pk,
+    ...generateNameFragment(name),
     category: {
       id: cat,
+      ...generateNameFragment(cat),
+      // category name does frontend matching to known list by nameFi
       nameFi: cat,
-      name: cat,
     },
   };
 }
@@ -439,14 +428,14 @@ describe("getEquipmentCategories", () => {
   });
 
   test("with equipment out of predefined order", () => {
-    const equipment: EquipmentNode[] = ["Item A", "Item B", "Item C"].map(
-      (name) => constructEquipmentNode({ name })
+    const equipment = ["Item A", "Item B", "Item C"].map((name) =>
+      createMockEquipment({ name })
     );
     expect(getEquipmentCategories(equipment)).toStrictEqual(["Muu"]);
   });
 
   test("with equipment in predefined order", () => {
-    const equipment: EquipmentNode[] = [
+    const equipment = [
       {
         name: "Item A",
         categoryName: "Liittimet",
@@ -471,7 +460,7 @@ describe("getEquipmentCategories", () => {
         name: "Item ABC 1",
         categoryName: "Keittiö",
       },
-    ].map(constructEquipmentNode);
+    ].map(createMockEquipment);
 
     expect(getEquipmentCategories(equipment)).toStrictEqual([
       "Keittiö",
@@ -488,161 +477,73 @@ describe("getEquipmentList", () => {
   });
 
   test("with equipment out of predefined order", () => {
-    const equipment: EquipmentNode[] = ["Item A", "Item B", "Item C"].map(
-      (name) => constructEquipmentNode({ name })
+    const equipment = ["Item A", "Item B", "Item C"].map((name) =>
+      createMockEquipment({ name })
     );
     expect(getEquipmentList(equipment, "fi")).toStrictEqual([
-      "Item A",
-      "Item B",
-      "Item C",
-    ]);
-  });
-
-  test("with equipment out of predefined order", () => {
-    const equipment: EquipmentNode[] = ["Item A", "Item B", "Item C"].map(
-      (name) => constructEquipmentNode({ name })
-    );
-    expect(getEquipmentList(equipment, "fi")).toStrictEqual([
-      "Item A",
-      "Item B",
-      "Item C",
+      "Item A FI",
+      "Item B FI",
+      "Item C FI",
     ]);
   });
 
   test("with equipment in predefined order", () => {
-    const equipment: EquipmentNode[] = [
-      {
-        id: "1",
-        nameFi: "Item A",
-        name: "Item A",
-        category: {
-          id: "1",
-          nameFi: "Liittimet",
-          name: "Liittimet",
-        },
-      },
-      {
-        id: "2",
-        nameFi: "Item B",
-        name: "Item B",
-        category: {
-          id: "2",
-          nameFi: "Keittiö",
-          name: "Keittiö",
-        },
-      },
-      {
-        id: "3",
-        nameFi: "Item C 2",
-        name: "Item C 2",
-        category: {
-          id: "3",
-          nameFi: "Foobar",
-          name: "Foobar",
-        },
-      },
-      {
-        id: "4",
-        nameFi: "Item D",
-        name: "Item D",
-        category: {
-          id: "4",
-          nameFi: "Pelikonsoli",
-          name: "Pelikonsoli",
-        },
-      },
-      {
-        id: "5",
-        nameFi: "Item ABC 2",
-        name: "Item ABC 2",
-        category: {
-          id: "2",
-          nameFi: "Keittiö",
-          name: "Keittiö",
-        },
-      },
-      {
-        id: "6",
-        nameFi: "Item ABC 1",
-        name: "Item ABC 1",
-        category: {
-          id: "2",
-          nameFi: "Keittiö",
-          name: "Keittiö",
-        },
-      },
-      {
-        id: "6",
-        nameFi: "Item C 1",
-        name: "Item C 1",
-        category: {
-          id: "2",
-          nameFi: "Barfoo",
-          name: "Barfoo",
-        },
-      },
+    const equipment: ReadonlyDeep<DeepRequired<EquipmentFieldsFragment>>[] = [
+      createMockEquipment({ name: "Item A", categoryName: "Liittimet" }),
+      createMockEquipment({ name: "Item B", categoryName: "Keittiö" }),
+      createMockEquipment({ name: "Item C 2", categoryName: "Foobar" }),
+      createMockEquipment({ name: "Item D", categoryName: "Pelikonsoli" }),
+      createMockEquipment({ name: "Item ABC 2", categoryName: "Keittiö" }),
+      createMockEquipment({ name: "Item ABC 1", categoryName: "Keittiö" }),
+      createMockEquipment({ name: "Item C 1", categoryName: "Barfoo" }),
     ];
 
     expect(getEquipmentList(equipment, "fi")).toStrictEqual([
-      "Item ABC 1",
-      "Item ABC 2",
-      "Item B",
-      "Item D",
-      "Item A",
-      "Item C 1",
-      "Item C 2",
+      "Item ABC 1 FI",
+      "Item ABC 2 FI",
+      "Item B FI",
+      "Item D FI",
+      "Item A FI",
+      "Item C 1 FI",
+      "Item C 2 FI",
     ]);
   });
 });
 
 describe("getReservationUnitName", () => {
-  it("should return the name of the unit", () => {
-    const reservationUnit = {
-      nameFi: "Unit 1 FI",
-      nameEn: "Unit 1 EN",
-      nameSv: "Unit 1 SV",
-    } as ReservationUnitNode;
-
-    expect(getReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
+  test.for([
+    ["fi", "Unit 1 FI"],
+    ["en", "Unit 1 EN"],
+    ["sv", "Unit 1 SV"],
+  ])("should return translated name of the unit", ([lang, name]) => {
+    const reservationUnit = generateNameFragment("Unit 1");
+    expect(getReservationUnitName(reservationUnit, lang)).toEqual(name);
   });
 
-  it("should return the name of the unit in the current language", () => {
-    const reservationUnit = {
-      nameFi: "Unit 1 FI",
-      nameEn: "Unit 1 EN",
-      nameSv: "Unit 1 SV",
-    } as ReservationUnitNode;
+  test.for(["", undefined, "fr", "de"])(
+    "should default to fi if language is not found",
+    () => {
+      const reservationUnit = generateNameFragment("Unit 1");
+      expect(getReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
+    }
+  );
 
-    expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 SV");
-  });
-
-  it("should return the name of the unit in the default language", () => {
-    const reservationUnit = {
-      nameFi: "Unit 1 FI",
-      nameEn: "",
-      nameSv: "",
-    };
-
-    expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
-  });
-
-  it("should return the name of the unit in the default language", () => {
-    const reservationUnit = {
-      nameFi: "Unit 1 FI",
-    };
-
-    expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
-  });
-
-  it("should return the name of the unit in the default language", () => {
-    const reservationUnit = {
-      nameFi: "Unit 1 FI",
-      nameEn: null,
-      nameSv: null,
-    };
-
-    expect(getReservationUnitName(reservationUnit, "sv")).toEqual("Unit 1 FI");
-  });
+  test.for([
+    ["", "Unit 1 FI"],
+    [null, "Unit 1 FI"],
+    [undefined, "Unit 1 FI"],
+  ])(
+    "should return the name of the unit in the default language",
+    ([val, nameFi]) => {
+      const reservationUnit = {
+        nameFi,
+        nameEn: val,
+        nameSv: val,
+      };
+      expect(getReservationUnitName(reservationUnit, "sv")).toEqual(nameFi);
+      expect(getReservationUnitName(reservationUnit, "en")).toEqual(nameFi);
+    }
+  );
 });
 
 describe("getFuturePricing", () => {
@@ -669,25 +570,24 @@ describe("getFuturePricing", () => {
     };
   }
 
-  const days: readonly Date[] = [
+  const DAYS: readonly Date[] = [
     addDays(new Date(), 10),
     addDays(new Date(), 20),
     addDays(new Date(), 5),
   ];
 
-  test("should sort items correctly", () => {
-    const d1 = constructInput({ days });
-    expect(getFuturePricing(d1)).toEqual(d1.pricings[2]);
-    const d2 = constructInput({ days: days.toReversed() });
-    expect(getFuturePricing(d2)).toEqual(d1.pricings[2]);
-    const d3 = constructInput({ days: [...days, addDays(new Date(), 1)] });
-    expect(getFuturePricing(d3)).toEqual(d3.pricings[3]);
-    const d4 = constructInput({ days: [addDays(new Date(), 1), ...days] });
-    expect(getFuturePricing(d4)).toEqual(d4.pricings[0]);
+  test.for([
+    { days: DAYS, expectedIndex: 2 },
+    { days: DAYS.toReversed(), expectedIndex: 0 },
+    { days: [...DAYS, addDays(new Date(), 1)], expectedIndex: 3 },
+    { days: [addDays(new Date(), 1), ...DAYS], expectedIndex: 0 },
+  ])("should sort items correctly", ({ days, expectedIndex }) => {
+    const input = constructInput({ days });
+    expect(getFuturePricing(input)).toEqual(input.pricings[expectedIndex]);
   });
 
-  test("should return undefined if no future pricing", () => {
-    const d1 = constructInput({ days });
+  test("should be null if no future pricing", () => {
+    const d1 = constructInput({ days: DAYS });
     expect(getFuturePricing(d1)).toEqual(d1.pricings[2]);
     const d2 = constructInput({
       days: [addDays(new Date(), -1)],
@@ -695,87 +595,70 @@ describe("getFuturePricing", () => {
     expect(getFuturePricing(d2)).toBeNull();
   });
 
-  test("with reservation begin time", () => {
-    const data = constructInput({ days });
-    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
-
-    const d1 = constructInput({
-      reservationBegins: addDays(new Date(), 19),
-      days,
-    });
-    expect(getFuturePricing(d1)).toEqual(data.pricings[1]);
-
-    const d2 = constructInput({
-      reservationBegins: addDays(new Date(), 20),
-      days,
-    });
-    expect(getFuturePricing(d2)).toBeNull();
+  test.for([
+    { begin: undefined, index: 2 },
+    { begin: addDays(new Date(), 19), index: 1 },
+    { begin: addDays(new Date(), 20), index: null },
+  ])("with reservation begin time", ({ begin, index }) => {
+    const data = constructInput({ days: DAYS, reservationBegins: begin });
+    const val = index != null ? data.pricings[index] : null;
+    expect(getFuturePricing(data)).toEqual(val);
   });
 
-  test("with reservation end time", () => {
-    const data = constructInput({ days });
-    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
-
-    const d1 = constructInput({
-      reservationEnds: addDays(new Date(), 1),
-      days,
+  test.for([
+    { endDays: undefined, index: 2 },
+    { endDays: 1, index: null },
+    { endDays: 5, index: 2 },
+  ])("with reservation end time", ({ endDays, index }) => {
+    const data = constructInput({
+      reservationEnds: endDays ? addDays(new Date(), endDays) : undefined,
+      days: DAYS,
     });
-    expect(getFuturePricing(d1)).toBeNull();
+    const val = index != null ? data.pricings[index] : null;
+    expect(getFuturePricing(data)).toEqual(val);
+  });
 
-    const d2 = constructInput({
-      reservationEnds: addDays(new Date(), 5),
-      days,
+  test.for([
+    { begin: undefined, end: undefined, index: 2 },
+    { begin: 15, end: undefined, index: 1 },
+    { begin: 15, end: 30, index: 1 },
+  ])("with both reservation times", ({ begin, end, index }) => {
+    const data = constructInput({
+      days: DAYS,
+      reservationBegins: begin ? addDays(new Date(), begin) : undefined,
+      reservationEnds: end ? addDays(new Date(), end) : undefined,
     });
-    expect(getFuturePricing(d2)).toEqual(data.pricings[2]);
+    const val = index != null ? data.pricings[index] : null;
+    expect(getFuturePricing(data)).toEqual(val);
   });
 
-  test("with both reservation times", () => {
-    const data = constructInput({ days });
-    if (data.pricings == null || data.pricings.length < 2) {
-      throw new Error("Invalid test data");
-    }
-
-    expect(getFuturePricing(data)).toEqual(data.pricings[2]);
-
-    data.reservationBegins = addDays(new Date(), 15).toISOString();
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
-
-    data.reservationEnds = addDays(new Date(), 30).toISOString();
-    expect(getFuturePricing(data)).toEqual(data.pricings[1]);
+  test.for([
+    { begin: addDays(new Date(), 1), end: null, index: 2 },
+    { begin: addDays(new Date(), 1), end: addDays(new Date(), 19), index: 1 },
+    {
+      begin: addDays(new Date(), 1),
+      end: addDays(new Date(), 20),
+      index: 9999,
+    },
+  ])("handles active application rounds", ({ begin, end, index }) => {
+    const data = constructInput({ days: DAYS });
+    const applicationRounds: RoundPeriod[] = [
+      {
+        reservationPeriodBegin: begin.toISOString(),
+        reservationPeriodEnd: end?.toISOString() ?? "",
+      },
+    ];
+    const expected = data.pricings[index] ?? null;
+    expect(getFuturePricing(data, applicationRounds)).toEqual(expected);
   });
 
-  test("handles active application rounds", () => {
-    const data = constructInput({ days });
-    const applicationRounds: RoundPeriod[] = [];
-
-    expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[2]);
-
-    applicationRounds.push({
-      reservationPeriodBegin: addDays(new Date(), 1).toISOString(),
-    } as RoundPeriod);
-    expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[2]);
-
-    applicationRounds[0] = {
-      reservationPeriodBegin: addDays(new Date(), 1).toISOString(),
-      reservationPeriodEnd: addDays(new Date(), 19).toISOString(),
-    };
-    expect(getFuturePricing(data, applicationRounds)).toEqual(data.pricings[1]);
-
-    applicationRounds[0] = {
-      reservationPeriodBegin: addDays(new Date(), 1).toISOString(),
-      reservationPeriodEnd: addDays(new Date(), 20).toISOString(),
-    };
-    expect(getFuturePricing(data, applicationRounds)).toBeNull();
-  });
-
-  test("handles date lookups", () => {
-    const data = constructInput({ days });
-    const date1 = addDays(new Date(), 15);
-    expect(getFuturePricing(data, [], date1)).toEqual(data.pricings[0]);
-    const date2 = addDays(new Date(), 5);
-    expect(getFuturePricing(data, [], date2)).toEqual(data.pricings[2]);
-    const date3 = addDays(new Date(), 20);
-    expect(getFuturePricing(data, [], date3)).toEqual(data.pricings[1]);
+  test.for([
+    { date: addDays(new Date(), 15), index: 0 },
+    { date: addDays(new Date(), 5), index: 2 },
+    { date: addDays(new Date(), 20), index: 1 },
+  ])("handles date lookups", ({ date, index }) => {
+    const data = constructInput({ days: DAYS });
+    expect(getFuturePricing(data, [], date)).toEqual(data.pricings[index]);
   });
 });
 
@@ -819,95 +702,83 @@ describe("getReservationUnitPrice", () => {
 
   function connstructInput({
     date,
+    pricings,
   }: {
     date: Date;
+    pricings: Readonly<NonNullable<PriceReservationUnitFragment>["pricings"]>;
   }): GetReservationUnitPriceProps {
     return {
       t: mockT as TFunction,
       pricingDate: date,
       reservationUnit: {
         id: "1",
-        pricings: [
-          constructPricing({
-            begins: addDays(new Date(), 10),
-            lowestPrice: 10,
-            highestPrice: 20,
-            taxPercentage: 24,
-          }),
-          constructPricing({
-            begins: addDays(new Date(), 20),
-            lowestPrice: 20,
-            highestPrice: 30,
-            taxPercentage: 24,
-          }),
-          constructPricing({
-            begins: addDays(new Date(), 5),
-            lowestPrice: 40,
-            highestPrice: 50,
-            taxPercentage: 24,
-          }),
-          constructPricing({
-            begins: addDays(new Date(), 5),
-            lowestPrice: 0,
-            highestPrice: 10,
-            taxPercentage: 24,
-          }),
-        ],
+        pricings,
       },
     };
   }
 
-  test("returns future data based on date lookup", () => {
-    const input = connstructInput({ date: addDays(new Date(), 5) });
-    expect(getReservationUnitPrice(input)).toEqual("40,00 - 50,00 € / tunti");
-    const input2 = connstructInput({ date: addDays(new Date(), 11) });
-    expect(getReservationUnitPrice(input2)).toEqual("10,00 - 20,00 € / tunti");
+  function constructDefaultPricing() {
+    return [
+      constructPricing({
+        begins: addDays(new Date(), 10),
+        lowestPrice: 10,
+        highestPrice: 20,
+        taxPercentage: 24,
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 20),
+        lowestPrice: 20,
+        highestPrice: 30,
+        taxPercentage: 24,
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 5),
+        lowestPrice: 40,
+        highestPrice: 50,
+        taxPercentage: 24,
+      }),
+    ] as const;
+  }
+
+  test.for([
+    { days: 5, expected: "40,00 - 50,00 € / tunti" },
+    { days: 11, expected: "10,00 - 20,00 € / tunti" },
+  ])("returns future data based on date lookup", ({ days, expected }) => {
+    const input = connstructInput({
+      date: addDays(new Date(), days),
+      pricings: constructDefaultPricing(),
+    });
+    expect(getReservationUnitPrice(input)).toEqual(expected);
   });
 
-  test("future change in tax uses active price", () => {
-    const date = addDays(new Date(), 15);
-    const input = {
-      pricingDate: date,
-      t: mockT as TFunction,
-      reservationUnit: {
-        id: "1",
-        pricings: [
-          constructPricing({
-            begins: addDays(new Date(), -10),
-            highestPrice: 20,
-            taxPercentage: 24,
-          }),
-          constructPricing({
-            begins: addDays(new Date(), 10),
-            highestPrice: 25,
-            taxPercentage: 25.5,
-          }),
-        ],
-      },
-    };
-    expect(getReservationUnitPrice(input)).toBe("20,00 € / tunti");
-  });
-  test("future change in tax for free uses future price", () => {
-    const date = addDays(new Date(), 15);
-    const input = {
-      t: mockT as TFunction,
-      pricingDate: date,
-      reservationUnit: {
-        id: "1",
-        pricings: [
-          constructPricing({
-            begins: addDays(new Date(), -10),
-          }),
-          constructPricing({
-            begins: addDays(new Date(), 10),
-            highestPrice: 25,
-            taxPercentage: 25.5,
-          }),
-        ],
-      },
-    };
-    expect(getReservationUnitPrice(input)).toBe("25,00 € / tunti");
-  });
+  function constructTaxChangePricings(isFreeNow: boolean) {
+    return [
+      constructPricing({
+        begins: addDays(new Date(), -10),
+        highestPrice: isFreeNow ? undefined : 20,
+        taxPercentage: 24,
+      }),
+      constructPricing({
+        begins: addDays(new Date(), 10),
+        highestPrice: 25,
+        taxPercentage: 25.5,
+      }),
+    ];
+  }
+
+  test.for([
+    { isFreeNow: false, expected: "20,00 € / tunti" },
+    { isFreeNow: true, expected: "25,00 € / tunti" },
+  ])(
+    "change in tax is only active in the future",
+    ({ isFreeNow, expected }) => {
+      const input = connstructInput({
+        date: addDays(new Date(), 15),
+        pricings: constructTaxChangePricings(isFreeNow),
+      });
+      expect(getReservationUnitPrice(input)).toBe(expected);
+    }
+  );
 });
 
 describe("isReservationUnitReservable", () => {
@@ -915,53 +786,27 @@ describe("isReservationUnitReservable", () => {
     minReservationDuration = 3600,
     maxReservationDuration = 3600,
     reservationState = ReservationUnitReservationState.Reservable,
+    reservationBegins,
+    reservableTimeSpans,
+    reservationsMaxDaysBefore,
   }: {
     minReservationDuration?: number;
     maxReservationDuration?: number;
     reservationState?: ReservationUnitReservationState;
-  }) {
-    const date = new Date().toISOString().split("T")[0];
-    const reservationUnit: ReservationUnitNode = {
-      pk: 1,
+    reservationBegins?: Date;
+    reservableTimeSpans?: ReservationUnitNode["reservableTimeSpans"];
+    reservationsMaxDaysBefore?: number;
+  }): ReadonlyDeep<IsReservableReservationUnitType> {
+    return {
       id: base64encode("ReservationUnitNode:1"),
-      accessTypes: [],
-      allowReservationsWithoutOpeningHours: true,
-      applicationRoundTimeSlots: [],
-      applicationRounds: [],
-      bufferTimeAfter: 0,
-      bufferTimeBefore: 0,
-      authentication: Authentication.Strong,
-      canApplyFreeOfCharge: false,
-      searchTerms: [],
-      contactInformation: "",
-      description: "",
-      equipments: [],
-      images: [],
-      isArchived: false,
-      isDraft: false,
-      rank: 0,
-      name: "",
-      paymentTypes: [],
-      pricings: [],
-      purposes: [],
-      qualifiers: [],
-      requireAdultReservee: false,
-      requireReservationHandling: false,
-      reservationBlockWholeDay: false,
-      reservationCancelledInstructions: "",
-      reservationConfirmedInstructions: "",
       reservationKind: ReservationKind.Direct,
-      reservationPendingInstructions: "",
-      reservationStartInterval: ReservationStartInterval.Interval_15Mins,
-      resources: [],
-      spaces: [],
       maxPersons: 10,
-      uuid: "be4fa7a2-05b7-11ee-be56-0242ac120004",
       minReservationDuration,
       maxReservationDuration,
+      reservationBegins: reservationBegins?.toISOString() ?? null,
+      reservationsMaxDaysBefore,
       metadataSet: {
         id: "1234",
-        name: "metadata",
         supportedFields: [
           {
             id: "1234",
@@ -971,72 +816,82 @@ describe("isReservationUnitReservable", () => {
         requiredFields: [] as const,
       },
       reservationState,
-      reservableTimeSpans: [
-        {
-          startDatetime: `${date}T04:00:00+00:00`,
-          endDatetime: `${date}T20:00:00+00:00`,
-        },
-      ],
+      reservableTimeSpans,
     };
-    return reservationUnit;
   }
 
-  test("returns true for a unit that is reservable", () => {
-    const [res1] = isReservationUnitReservable(
-      constructReservationUnitNode({})
-    );
-    expect(res1).toBe(true);
+  const date = new Date().toISOString().split("T")[0];
+  const defaultTimeSpans = [
+    {
+      startDatetime: `${date}T04:00:00+00:00`,
+      endDatetime: `${date}T20:00:00+00:00`,
+    },
+  ];
 
-    const [res2] = isReservationUnitReservable(
-      constructReservationUnitNode({
-        reservationState: ReservationUnitReservationState.ScheduledClosing,
-      })
-    );
-    expect(res2).toBe(true);
-  });
+  test.for([{ spans: undefined }, { spans: [] }])(
+    "not reservable with no time spans",
+    ({ spans }) => {
+      const input = constructReservationUnitNode({
+        reservableTimeSpans: spans,
+        reservationState: ReservationUnitReservationState.Reservable,
+      });
+      const { isReservable } = isReservationUnitReservable(input);
+      expect(isReservable).toBe(false);
+    }
+  );
 
-  test("returns false for a unit that is not reservable", () => {
-    const [res1] = isReservationUnitReservable({
-      ...constructReservationUnitNode({}),
-      reservableTimeSpans: undefined,
+  test.for([
+    {
+      reservationState: ReservationUnitReservationState.Reservable,
+      expected: true,
+    },
+    {
+      reservationState: ReservationUnitReservationState.ScheduledClosing,
+      expected: true,
+    },
+    {
       reservationState: ReservationUnitReservationState.ReservationClosed,
-    });
-    expect(res1).toBe(false);
-
-    const [res2] = isReservationUnitReservable({
-      ...constructReservationUnitNode({}),
-      reservationState: ReservationUnitReservationState.ReservationClosed,
-    });
-    expect(res2).toBe(false);
-
-    const [res5] = isReservationUnitReservable({
-      ...constructReservationUnitNode({}),
+      expected: false,
+    },
+    {
       reservationState: ReservationUnitReservationState.ScheduledReservation,
-    });
-    expect(res5).toBe(false);
-
-    const [res6] = isReservationUnitReservable({
-      ...constructReservationUnitNode({}),
+      expected: false,
+    },
+    {
       reservationState: ReservationUnitReservationState.ScheduledPeriod,
-    });
-    expect(res6).toBe(false);
-  });
+      expected: false,
+    },
+  ])(
+    "determines reservability correctly for state $reservationState",
+    ({ reservationState, expected }) => {
+      const input = constructReservationUnitNode({
+        reservableTimeSpans: defaultTimeSpans,
+        reservationState,
+        reservationBegins: addDays(new Date(), -1),
+      });
+      const { isReservable } = isReservationUnitReservable(input);
+      expect(isReservable).toBe(expected);
+    }
+  );
 
-  test("returns correct value with buffer days", () => {
-    const [res1] = isReservationUnitReservable({
-      ...constructReservationUnitNode({}),
-      reservationBegins: addDays(new Date(), 5).toISOString(),
+  test.for([
+    {
+      reservableTimeSpans: defaultTimeSpans,
+      reservationBegins: addDays(new Date(), 5),
       reservationsMaxDaysBefore: 5,
-    });
-    expect(res1).toBe(false);
-
-    const [res2] = isReservationUnitReservable({
-      ...constructReservationUnitNode({}),
-      reservationBegins: addDays(new Date(), 5).toISOString(),
-      reservationsMaxDaysBefore: 4,
+      expected: false,
+    },
+    {
       reservableTimeSpans: undefined,
-    });
-    expect(res2).toBe(false);
+      reservationBegins: addDays(new Date(), 5),
+      reservationsMaxDaysBefore: 4,
+      expected: false,
+    },
+    // TODO add a few more cases, especially a positive one with buffers
+  ])("returns correct value with buffer days", ({ expected, ...rest }) => {
+    const input = constructReservationUnitNode(rest);
+    const { isReservable: res1 } = isReservationUnitReservable(input);
+    expect(res1).toBe(expected);
   });
 });
 

@@ -5,15 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
 import { MemoryRouter } from "react-router-dom";
 import { RecurringReservationForm } from "./RecurringReservationForm";
-import {
-  vi,
-  test,
-  expect,
-  afterAll,
-  afterEach,
-  beforeEach,
-  beforeAll,
-} from "vitest";
+import { vi, test, expect, afterEach, beforeEach } from "vitest";
 import {
   YEAR,
   createGraphQLMocks,
@@ -51,17 +43,6 @@ const getReservationUnitBtn = () => {
   expect(btn).toBeInTheDocument();
   return btn;
 };
-
-// TODO move to global mocks
-beforeAll(() => {
-  // Workaround react-testing-library hard coding to jest.useFakeTimers
-  vi.stubGlobal("jest", {
-    advanceTimersByTime: vi.advanceTimersByTime.bind(vi),
-  });
-});
-afterAll(() => {
-  vi.unstubAllGlobals();
-});
 
 // TODO these should be set in the test setup
 beforeEach(() => {

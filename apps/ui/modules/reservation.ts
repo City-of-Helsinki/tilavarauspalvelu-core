@@ -50,9 +50,9 @@ export function getDurationOptions(
   t: TFunction
 ): { label: string; value: number }[] {
   if (
-    !opts.minReservationDuration ||
-    !opts.maxReservationDuration ||
-    !opts.reservationStartInterval
+    opts.minReservationDuration == null ||
+    opts.maxReservationDuration == null ||
+    opts.reservationStartInterval == null
   ) {
     return [];
   }
