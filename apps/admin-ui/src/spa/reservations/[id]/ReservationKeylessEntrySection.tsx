@@ -183,34 +183,12 @@ function ReservationKeylessEntryRecurring({
 
   const pindoraInfo = reservation.recurringReservation.pindoraInfo;
 
-  let validityBeginsDate = null,
-    validityEndsDate = null,
-    validityBeginsTime = null,
-    validityEndsTime = null;
-  const accessCodeValidity = pindoraInfo?.accessCodeValidity;
-  if (pindoraInfo && accessCodeValidity && accessCodeValidity.length > 0) {
-    // Get the DATE value from the first and last validity dates
-    validityBeginsDate = accessCodeValidity[0].accessCodeBeginsAt;
-    validityEndsDate =
-      accessCodeValidity[accessCodeValidity.length - 1].accessCodeEndsAt;
-
-    // Get the TIME value from the next validity date
-    const now = new Date();
-    for (const validity of accessCodeValidity) {
-      if (now < new Date(validity.accessCodeEndsAt)) {
-        validityBeginsTime = validity.accessCodeBeginsAt;
-        validityEndsTime = validity.accessCodeEndsAt;
-        break;
-      }
-    }
-    if (!validityBeginsTime) {
-      // If no next validity date found, use the last one
-      validityBeginsTime =
-        accessCodeValidity[accessCodeValidity.length - 1].accessCodeBeginsAt;
-      validityEndsTime =
-        accessCodeValidity[accessCodeValidity.length - 1].accessCodeEndsAt;
-    }
-  }
+  const {
+    validityBeginsDate,
+    validityEndsDate,
+    validityBeginsTime,
+    validityEndsTime,
+  } = getRecurringReservationAccessCodeValidity(pindoraInfo);
 
   return (
     <SummaryHorizontal $isRecurring>
@@ -256,6 +234,57 @@ function ReservationKeylessEntryRecurring({
       />
     </SummaryHorizontal>
   );
+}
+
+function getRecurringReservationAccessCodeValidity(
+  pindoraInfo:
+    | {
+        accessCode: string;
+        accessCodeIsActive: boolean;
+        accessCodeValidity: Array<{
+          accessCodeBeginsAt: string;
+          accessCodeEndsAt: string;
+        }>;
+      }
+    | null
+    | undefined
+) {
+  let validityBeginsDate = null,
+    validityEndsDate = null,
+    validityBeginsTime = null,
+    validityEndsTime = null;
+
+  const accessCodeValidity = pindoraInfo?.accessCodeValidity;
+  if (pindoraInfo && accessCodeValidity && accessCodeValidity.length > 0) {
+    // Get the DATE value from the first and last validity dates
+    validityBeginsDate = accessCodeValidity[0].accessCodeBeginsAt;
+    validityEndsDate =
+      accessCodeValidity[accessCodeValidity.length - 1].accessCodeEndsAt;
+
+    // Get the TIME value from the next validity date
+    const now = new Date();
+    for (const validity of accessCodeValidity) {
+      if (now < new Date(validity.accessCodeEndsAt)) {
+        validityBeginsTime = validity.accessCodeBeginsAt;
+        validityEndsTime = validity.accessCodeEndsAt;
+        break;
+      }
+    }
+    if (!validityBeginsTime) {
+      // If no next validity date found, use the last one
+      validityBeginsTime =
+        accessCodeValidity[accessCodeValidity.length - 1].accessCodeBeginsAt;
+      validityEndsTime =
+        accessCodeValidity[accessCodeValidity.length - 1].accessCodeEndsAt;
+    }
+  }
+
+  return {
+    validityBeginsDate,
+    validityEndsDate,
+    validityBeginsTime,
+    validityEndsTime,
+  };
 }
 
 function AccessCodeChangeRepairButton({
