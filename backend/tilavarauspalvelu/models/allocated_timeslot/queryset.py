@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     import datetime
 
     from tilavarauspalvelu.enums import Weekday
-    from tilavarauspalvelu.models import ReservationUnitOption
+    from tilavarauspalvelu.models import ApplicationRound, ReservationUnitOption
     from utils.date_utils import TimeSlot
 
 
@@ -103,6 +103,9 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
                 reservation_unit_option__application_section__reservations_end_date__gte=begin_date,
             )
         )
+
+    def for_application_round(self, ref: ApplicationRound | models.OuterRef) -> Self:
+        return self.filter(reservation_unit_option__application_section__application__application_round=ref)
 
 
 class AllocatedTimeSlotManager(models.Manager.from_queryset(AllocatedTimeSlotQuerySet)): ...
