@@ -370,6 +370,18 @@ class ReservationQuerySet(models.QuerySet):
         """Return all reservations for the given application section."""
         return self.filter(recurring_reservation__allocated_time_slot__reservation_unit_option__application_section=ref)
 
+    def for_application_round(self, ref: ApplicationRound | models.OuterRef) -> Self:
+        """Return all reservations for the given application round."""
+        lookup = (
+            "recurring_reservation"  #
+            "__allocated_time_slot"
+            "__reservation_unit_option"
+            "__application_section"
+            "__application"
+            "__application_round"
+        )
+        return self.filter(**{lookup: ref})
+
 
 class ReservationManager(SerializableMixin.SerializableManager.from_queryset(ReservationQuerySet)):
     """Contains custom queryset methods and GDPR serialization."""

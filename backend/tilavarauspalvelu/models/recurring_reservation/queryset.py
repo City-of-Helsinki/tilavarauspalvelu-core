@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -11,6 +11,9 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
 from utils.db import NowTT
+
+if TYPE_CHECKING:
+    from tilavarauspalvelu.models import ApplicationRound
 
 __all__ = [
     "RecurringReservationManager",
@@ -59,6 +62,11 @@ class RecurringReservationQuerySet(models.QuerySet):
                 ),
             )
         ).filter(has_incorrect_access_codes=True)
+
+    def for_application_round(self, ref: ApplicationRound | models.OuterRef) -> Self:
+        """Return all reservations series for the given application round."""
+        lookup = "allocated_time_slot__reservation_unit_option__application_section__application__application_round"
+        return self.filter(**{lookup: ref})
 
 
 class RecurringReservationManager(models.Manager.from_queryset(RecurringReservationQuerySet)): ...

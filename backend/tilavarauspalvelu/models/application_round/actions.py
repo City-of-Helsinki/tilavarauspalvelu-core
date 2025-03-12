@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from django.conf import settings
-from django.db import models, transaction
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
+from lookup_property import L
 
 from tilavarauspalvelu.enums import (
     ApplicantTypeChoice,
@@ -18,11 +20,14 @@ from tilavarauspalvelu.enums import (
     Weekday,
 )
 from tilavarauspalvelu.exceptions import ApplicationRoundResetError
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import (
     AllocatedTimeSlot,
     Application,
+    ApplicationSection,
     RecurringReservation,
     Reservation,
     ReservationUnitOption,
@@ -53,41 +58,23 @@ class ApplicationRoundActions:
         match self.application_round.status:
             case ApplicationRoundStatusChoice.IN_ALLOCATION:
                 # Unlock all reservation unit options, and remove all allocated time slots
-                lookup = (
-                    "application_section"  #
-                    "__application"
-                    "__application_round"
-                )
-                ReservationUnitOption.objects.filter(models.Q(**{lookup: self.application_round})).update(locked=False)
-
-                lookup = (
-                    "reservation_unit_option"  #
-                    "__application_section"
-                    "__application"
-                    "__application_round"
-                )
-                AllocatedTimeSlot.objects.filter(models.Q(**{lookup: self.application_round})).delete()
+                ReservationUnitOption.objects.for_application_round(self.application_round).update(locked=False)
+                AllocatedTimeSlot.objects.for_application_round(self.application_round).delete()
 
             case ApplicationRoundStatusChoice.HANDLED:
-                # Remove all recurring reservations, and set application round back to HANDLED
-                lookup = (
-                    "recurring_reservation"  #
-                    "__allocated_time_slot"
-                    "__reservation_unit_option"
-                    "__application_section"
-                    "__application"
-                    "__application_round"
+                # Check if there are any Pindora access codes and delete them before deleting the reservations
+                sections = ApplicationSection.objects.filter(
+                    L(should_have_active_access_code=True),
+                    application__application_round=self.application_round,
                 )
-                Reservation.objects.filter(models.Q(**{lookup: self.application_round})).delete()
 
-                lookup = (
-                    "allocated_time_slot"  #
-                    "__reservation_unit_option"
-                    "__application_section"
-                    "__application"
-                    "__application_round"
-                )
-                RecurringReservation.objects.filter(models.Q(**{lookup: self.application_round})).delete()
+                for section in sections:
+                    with suppress(PindoraNotFoundError):
+                        PindoraService.delete_access_code(obj=section)
+
+                # Remove all recurring reservations, and set application round back to HANDLED
+                Reservation.objects.for_application_round(self.application_round).delete()
+                RecurringReservation.objects.for_application_round(self.application_round).delete()
 
                 self.application_round.handled_date = None
                 self.application_round.save()

@@ -2,10 +2,17 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import ApplicationRoundStatusChoice, ReservationTypeChoice
+from tilavarauspalvelu.enums import (
+    AccessType,
+    ApplicationRoundStatusChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+)
+from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import AllocatedTimeSlot, RecurringReservation, Reservation, ReservationUnitOption
 
 from tests.factories import AllocatedTimeSlotFactory, ApplicationFactory, ApplicationRoundFactory, ReservationFactory
+from tests.helpers import patch_method
 
 # Applied to all tests
 pytestmark = [
@@ -77,6 +84,35 @@ def test_reset_application_round_allocation__handled():
     assert Reservation.objects.count() == 0
     assert ReservationUnitOption.objects.filter(locked=True).count() == 1
     assert application_round.handled_date is None
+
+
+@patch_method(PindoraService.delete_access_code)
+def test_reset_application_round_allocation__handled__call_pindora_if_has_access_codes():
+    application_round = ApplicationRoundFactory.create_in_status_handled()
+
+    allocation_1 = AllocatedTimeSlotFactory.create(
+        reservation_unit_option__application_section__application__application_round=application_round,
+    )
+    allocation_2 = AllocatedTimeSlotFactory.create(
+        reservation_unit_option__locked=True,
+        reservation_unit_option__application_section__application__application_round=application_round,
+    )
+    ReservationFactory.create(
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.SEASONAL,
+        recurring_reservation__allocated_time_slot=allocation_1,
+    )
+    ReservationFactory.create(
+        access_type=AccessType.UNRESTRICTED,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.SEASONAL,
+        recurring_reservation__allocated_time_slot=allocation_2,
+    )
+
+    application_round.actions.reset_application_round_allocation()
+
+    assert PindoraService.delete_access_code.call_count == 1
 
 
 def test_reset_application_round_allocation__results_sent():
