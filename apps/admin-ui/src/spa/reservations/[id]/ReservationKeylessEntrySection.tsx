@@ -21,7 +21,7 @@ import React, { useState } from "react";
 import { Accordion, DataWrapper } from "@/spa/reservations/[id]/components";
 import styled, { css } from "styled-components";
 import { breakpoints } from "common";
-import { ButtonContainer } from "common/styles/util";
+import { ButtonContainer, Flex, NoWrap } from "common/styles/util";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { useCheckPermission } from "@/hooks";
 
@@ -75,13 +75,6 @@ const SingleButtonContainer = styled(ButtonContainer)<{
         `};
 
   justify-content: flex-end;
-`;
-
-const DataWrapperContainer = styled.div`
-  display: flex;
-  gap: var(--spacing-xs);
-  align-items: center;
-  white-space: nowrap;
 `;
 
 export function ReservationKeylessEntry({
@@ -145,7 +138,7 @@ function ReservationKeylessEntrySingle({
         {pindoraInfo?.accessCode ?? "-"}
       </DataWrapper>
 
-      <DataWrapperContainer>
+      <Flex $alignItems="center" $gap="xs" $direction="row">
         <DataWrapper label={t("RequestedReservation.accessCodeStatusLabel")}>
           {pindoraInfo?.accessCodeIsActive
             ? t("RequestedReservation.accessCodeStatusActive")
@@ -154,7 +147,7 @@ function ReservationKeylessEntrySingle({
         {!reservation.isAccessCodeIsActiveCorrect && (
           <IconAlertCircleFill color="var(--color-error)" />
         )}
-      </DataWrapperContainer>
+      </Flex>
 
       <DataWrapper label={t("RequestedReservation.accessCodeValidityLabel")}>
         {reservation.pindoraInfo
@@ -196,7 +189,7 @@ function ReservationKeylessEntryRecurring({
         {pindoraInfo?.accessCode ?? "-"}
       </DataWrapper>
 
-      <DataWrapperContainer>
+      <Flex $alignItems="center" $gap="xs" $direction="row">
         <DataWrapper label={t("RequestedReservation.accessCodeStatusLabel")}>
           {pindoraInfo?.accessCodeIsActive
             ? t("RequestedReservation.accessCodeStatusActive")
@@ -205,7 +198,7 @@ function ReservationKeylessEntryRecurring({
         {!reservation.recurringReservation.isAccessCodeIsActiveCorrect && (
           <IconAlertCircleFill color="var(--color-error)" />
         )}
-      </DataWrapperContainer>
+      </Flex>
 
       <DataWrapper label={t("common.startingDate")}>
         {formatDate(validityBeginsDate) || "-"}
@@ -214,11 +207,13 @@ function ReservationKeylessEntryRecurring({
         {formatDate(validityEndsDate) || "-"}
       </DataWrapper>
 
-      <DataWrapperContainer>
+      <Flex $alignItems="center" $gap="xs" $direction="row">
         <DataWrapper label={t("RequestedReservation.accessCodeValidityLabel")}>
-          {validityBeginsTime
-            ? `${formatTime(validityBeginsTime)}–${formatTime(validityEndsTime)}`
-            : "-"}
+          <NoWrap>
+            {validityBeginsTime
+              ? `${formatTime(validityBeginsTime)}–${formatTime(validityEndsTime)}`
+              : "-"}
+          </NoWrap>
         </DataWrapper>
         {validityBeginsTime && (
           <Tooltip placement="top">
@@ -226,7 +221,7 @@ function ReservationKeylessEntryRecurring({
             {formatDate(validityBeginsTime)})
           </Tooltip>
         )}
-      </DataWrapperContainer>
+      </Flex>
 
       <AccessCodeChangeRepairButton
         reservation={reservation}
