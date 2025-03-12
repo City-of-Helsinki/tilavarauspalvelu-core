@@ -97,12 +97,15 @@ export function ReservationKeylessEntry({
   }
 
   const isRecurring = !!reservation.recurringReservation;
+  const isAccessCodeActiveIncorrect = !(isRecurring
+    ? reservation?.recurringReservation?.isAccessCodeIsActiveCorrect
+    : reservation.isAccessCodeIsActiveCorrect);
 
   return (
     <Accordion
       id="reservation__access-type"
       heading={t("RequestedReservation.keylessEntry")}
-      initiallyOpen={false}
+      initiallyOpen={isAccessCodeActiveIncorrect}
     >
       <div>
         {isRecurring ? (
