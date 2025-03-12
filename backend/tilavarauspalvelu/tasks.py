@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import datetime
+import time
 import uuid
 from contextlib import suppress
 from decimal import Decimal
+from functools import wraps
 from typing import TYPE_CHECKING
 
+from django.core.cache import cache
 from django.db import transaction
 
 from config.celery import app
@@ -35,6 +38,8 @@ from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from collections.abc import Collection
+
+    from celery.contrib.django.task import Task
 
     from tilavarauspalvelu.typing import QueryInfo
 
@@ -71,6 +76,44 @@ __all__ = [
     "update_reservation_unit_search_vectors_task",
     "update_units_from_tprek",
 ]
+
+
+def singleton_task[**P](task: Task) -> Task:
+    """
+    Lock task execution to a single concurrent instance based on a lock set in cache.
+    Must be added on top of the `@app.task` decorator!
+
+    See: https://docs.celeryq.dev/en/stable/tutorials/task-cookbook.html#ensuring-a-task-is-only-executed-one-at-a-time
+    """
+    task_func = task.run
+
+    @wraps(task_func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> None:
+        lock_timeout = 300  # 5 mins
+        timeout_leeway = 3  # Some leeway for cache operations
+
+        timeout_at = time.monotonic() + lock_timeout - timeout_leeway
+        lock_id: str = task.name
+
+        # Assuming the operation here is atomic, or at least close enough to be safe.
+        has_lock = cache.add(lock_id, 1, lock_timeout)
+
+        if not has_lock:
+            SentryLogger.log_message(
+                message="Task skipped since another instance is already running.",
+                details={"task_name": task.name},
+            )
+            return None
+
+        try:
+            return task_func(*args, **kwargs)
+        finally:
+            # Only release lock if we didn't time out (another task may have acquired the lock)
+            if time.monotonic() < timeout_at:
+                cache.delete(lock_id)
+
+    task.run = wrapper
+    return task
 
 
 @app.task(name="rebuild_space_tree_hierarchy")
@@ -291,6 +334,7 @@ def purge_image_cache(image_path: str) -> None:
     purge(image_path)
 
 
+@singleton_task
 @app.task(name="generate_reservation_series_from_allocations")
 @SentryLogger.log_if_raises("Failed to generate reservation series from allocations")
 def generate_reservation_series_from_allocations(application_round_id: int) -> None:
@@ -299,6 +343,9 @@ def generate_reservation_series_from_allocations(application_round_id: int) -> N
         return
 
     application_round.actions.generate_reservations_from_allocations()
+
+    # Run creation of missing Pindora reservations ahead of its normal background task schedule
+    create_missing_pindora_reservations.delay()
 
 
 @app.task(name="delete_expired_applications")
@@ -360,6 +407,7 @@ def delete_pindora_reservation(reservation_uuid: str) -> None:
     PindoraClient.delete_reservation(reservation=uuid.UUID(reservation_uuid))
 
 
+@singleton_task
 @app.task(name="create_missing_pindora_reservations")
 def create_missing_pindora_reservations() -> None:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
@@ -367,6 +415,7 @@ def create_missing_pindora_reservations() -> None:
     PindoraService.create_missing_access_codes()
 
 
+@singleton_task
 @app.task(name="update_pindora_access_code_is_active")
 def update_pindora_access_code_is_active() -> None:
     from tilavarauspalvelu.integrations.keyless_entry import PindoraService
