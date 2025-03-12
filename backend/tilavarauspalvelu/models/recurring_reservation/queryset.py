@@ -44,6 +44,10 @@ class RecurringReservationQuerySet(models.QuerySet):
             )
         ).filter(has_missing_access_codes=True)
 
+    def should_have_active_access_code(self) -> Self:
+        """Return all recurring reservations should have an active access code."""
+        return self.filter(L(should_have_active_access_code=True))
+
     def has_incorrect_access_code_is_active(self) -> Self:
         """
         Return all recurring reservations where the access code is active

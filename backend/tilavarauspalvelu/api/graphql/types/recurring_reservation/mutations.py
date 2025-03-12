@@ -10,6 +10,7 @@ from utils.date_utils import local_datetime
 from .permissions import RecurringReservationPermission
 from .serializers import (
     ReservationSeriesAddReservationSerializer,
+    ReservationSeriesChangeAccessCodeSerializer,
     ReservationSeriesCreateSerializer,
     ReservationSeriesDenyInputSerializer,
     ReservationSeriesDenyOutputSerializer,
@@ -18,7 +19,7 @@ from .serializers import (
 )
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import RecurringReservation
+    from tilavarauspalvelu.models import RecurringReservation, Reservation
 
 __all__ = [
     "ReservationSeriesAddMutation",
@@ -65,4 +66,18 @@ class ReservationSeriesDenyMutation(UpdateMutation):
         return {
             "denied": future_reservations.filter(state=ReservationStateChoice.DENIED).count(),
             "future": future_reservations.count(),
+        }
+
+
+class ReservationSeriesChangeAccessCodeMutation(UpdateMutation):
+    class Meta:
+        serializer_class = ReservationSeriesChangeAccessCodeSerializer
+        permission_classes = [RecurringReservationPermission]
+
+    @classmethod
+    def get_serializer_output(cls, instance: RecurringReservation) -> dict[str, Any]:
+        last_reservation: Reservation = instance.reservations.requires_active_access_code().last()
+        return {
+            "access_code_generated_at": last_reservation.access_code_generated_at,
+            "access_code_is_active": last_reservation.access_code_is_active,
         }

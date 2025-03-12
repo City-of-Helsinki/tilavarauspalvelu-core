@@ -37,6 +37,11 @@ CANCEL_SECTION_SERIES_MUTATION = build_mutation(
     "ApplicationSectionReservationCancellationMutation",
     fields="future cancelled",
 )
+CHANGE_ACCESS_CODE_SERIES_MUTATION = build_mutation(
+    "changeReservationSeriesAccessCode",
+    "ReservationSeriesChangeAccessCodeMutation",
+    fields="accessCodeGeneratedAt accessCodeIsActive",
+)
 
 
 def get_minimal_series_data(reservation_unit: ReservationUnit, user: User, **overrides: Any) -> dict[str, Any]:

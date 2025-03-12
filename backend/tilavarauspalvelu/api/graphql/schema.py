@@ -54,6 +54,7 @@ from .mutations import (
     ReservationRefundMutation,
     ReservationRequiresHandlingMutation,
     ReservationSeriesAddMutation,
+    ReservationSeriesChangeAccessCodeMutation,
     ReservationSeriesCreateMutation,
     ReservationSeriesDenyMutation,
     ReservationSeriesRescheduleMutation,
@@ -364,16 +365,23 @@ class Mutation(graphene.ObjectType):
     require_handling_for_reservation = ReservationRequiresHandlingMutation.Field()
     update_reservation_working_memo = ReservationWorkingMemoMutation.Field()
     adjust_reservation_time = ReservationAdjustTimeMutation.Field()
+    #
+    # Staff reservations
     staff_adjust_reservation_time = ReservationStaffAdjustTimeMutation.Field()
     staff_reservation_modify = ReservationStaffModifyMutation.Field()
+    staff_change_reservation_access_code = ReservationStaffChangeAccessCodeMutation.Field()
+    staff_repair_reservation_access_code = ReservationStaffRepairAccessCodeMutation.Field()
+    #
+    # Reservation series
     create_reservation_series = ReservationSeriesCreateMutation.Field()
     update_reservation_series = ReservationSeriesUpdateMutation.Field()
     add_reservation_to_series = ReservationSeriesAddMutation.Field()
     reschedule_reservation_series = ReservationSeriesRescheduleMutation.Field()
     deny_reservation_series = ReservationSeriesDenyMutation.Field()
+    change_reservation_series_access_code = ReservationSeriesChangeAccessCodeMutation.Field()
+    #
+    # Orders
     refresh_order = RefreshOrderMutation.Field()
-    staff_change_reservation_access_code = ReservationStaffChangeAccessCodeMutation.Field()
-    staff_repair_reservation_access_code = ReservationStaffRepairAccessCodeMutation.Field()
     #
     # User
     update_current_user = CurrentUserUpdateMutation.Field()

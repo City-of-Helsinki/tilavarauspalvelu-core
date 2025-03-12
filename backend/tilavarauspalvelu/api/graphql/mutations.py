@@ -50,6 +50,7 @@ from .types.merchants.mutations import RefreshOrderMutation
 from .types.purpose.mutations import PurposeCreateMutation, PurposeUpdateMutation
 from .types.recurring_reservation.mutations import (
     ReservationSeriesAddMutation,
+    ReservationSeriesChangeAccessCodeMutation,
     ReservationSeriesCreateMutation,
     ReservationSeriesDenyMutation,
     ReservationSeriesRescheduleMutation,
@@ -124,6 +125,7 @@ __all__ = [
     "ReservationRefundMutation",
     "ReservationRequiresHandlingMutation",
     "ReservationSeriesAddMutation",
+    "ReservationSeriesChangeAccessCodeMutation",
     "ReservationSeriesCreateMutation",
     "ReservationSeriesDenyMutation",
     "ReservationSeriesRescheduleMutation",
