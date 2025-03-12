@@ -477,14 +477,15 @@ class PindoraService:
                 try:
                     cls.create_access_code(obj=series, is_active=is_active)
 
-                # If series already exists, fetch it and update instead.
+                # If series already exists, reschedule and activate/deactivate instead.
                 except PindoraConflictError:
-                    response = cls.get_access_code(obj=series)
+                    response = cls.reschedule_access_code(obj=series)
 
-                    series.reservations.requiring_access_code().update(
-                        access_code_generated_at=response.access_code_generated_at,
-                        access_code_is_active=response.access_code_is_active,
-                    )
+                    if is_active and not response["access_code_is_active"]:
+                        cls.activate_access_code(obj=series)
+
+                    elif not is_active and response["access_code_is_active"]:
+                        cls.deactivate_access_code(obj=series)
 
     @classmethod
     def _create_missing_access_codes_for_seasonal_bookings(cls) -> None:
@@ -498,14 +499,15 @@ class PindoraService:
                 try:
                     cls.create_access_code(obj=section, is_active=is_active)
 
-                # If seasonal booking already exists, fetch it and update instead.
+                # If seasonal booking already exists, reschedule and activate/deactivate instead.
                 except PindoraConflictError:
-                    response = cls.get_access_code(obj=section)
+                    response = cls.reschedule_access_code(obj=section)
 
-                    section.actions.get_reservations().requiring_access_code().update(
-                        access_code_generated_at=response.access_code_generated_at,
-                        access_code_is_active=response.access_code_is_active,
-                    )
+                    if is_active and not response["access_code_is_active"]:
+                        cls.activate_access_code(obj=section)
+
+                    elif not is_active and response["access_code_is_active"]:
+                        cls.deactivate_access_code(obj=section)
 
     @classmethod
     def _update_access_code_is_active_for_reservations(cls) -> None:
