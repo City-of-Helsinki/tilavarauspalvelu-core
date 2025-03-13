@@ -19,7 +19,7 @@ import {
   ReservationStartInterval,
   ReservationStateChoice,
 } from "@/gql/gql-types";
-import { createMockReservationUnit } from "@/test/testUtils";
+import { createMockReservationUnit } from "@/test/test.utils";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { toNumber } from "common/src/helpers";
 

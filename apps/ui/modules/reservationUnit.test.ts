@@ -40,7 +40,7 @@ import {
   createMockReservationUnit,
   generateNameFragment,
   TIMERS_TO_FAKE,
-} from "@/test/testUtils";
+} from "@/test/test.utils";
 import { base64encode, ReadonlyDeep } from "common/src/helpers";
 import { type TFunction } from "i18next";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
