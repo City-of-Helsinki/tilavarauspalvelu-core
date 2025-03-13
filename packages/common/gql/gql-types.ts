@@ -50,7 +50,6 @@ export type AbilityGroupNode = Node & {
 /** How is the reservee able to enter the space in their reservation unit? */
 export enum AccessType {
   AccessCode = "ACCESS_CODE",
-  Multivalued = "MULTIVALUED",
   OpenedByStaff = "OPENED_BY_STAFF",
   PhysicalKey = "PHYSICAL_KEY",
   Unrestricted = "UNRESTRICTED",

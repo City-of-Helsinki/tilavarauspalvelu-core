@@ -14,6 +14,13 @@ import { buildGraphQLUrl } from "common/src/urlBuilder";
 import { env } from "@/env.mjs";
 import { isBrowser } from "./const";
 import { relayStylePagination } from "@apollo/client/utilities";
+import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+
+if (process.env.NODE_ENV !== "production") {
+  // Adds messages only in a dev environment
+  loadDevMessages();
+  loadErrorMessages();
+}
 
 const authLink = new ApolloLink((operation, forward) => {
   // TODO this doesn't work with SSR (use the ui implementation when we add SSR requests)
@@ -46,7 +53,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-function createClient(apiBaseUrl: string) {
+export function createClient(apiBaseUrl: string) {
   const uri = buildGraphQLUrl(apiBaseUrl, env.ENABLE_FETCH_HACK);
   const uploadLinkOptions = {
     uri,
@@ -85,5 +92,3 @@ function createClient(apiBaseUrl: string) {
     ssrMode: !isBrowser,
   });
 }
-
-export { createClient };

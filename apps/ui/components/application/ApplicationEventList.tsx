@@ -7,7 +7,7 @@ import {
   Priority,
   ApplicationSectionStatusChoice,
   type ApplicationSectionUiFragment,
-  type ApplicationCommonFragment,
+  type ApplicationViewFragment,
 } from "@gql/gql-types";
 import {
   convertLanguageCode,
@@ -222,7 +222,7 @@ function SingleApplicationSection({
 
 // NOTE: used by Preview and View
 // No form context unlike the edit pages, use application query result
-type ApplicationT = Pick<ApplicationCommonFragment, "applicationSections">;
+type ApplicationT = Pick<ApplicationViewFragment, "applicationSections">;
 
 const filterPrimary = (n: { priority: Priority }) =>
   n.priority === Priority.Primary;

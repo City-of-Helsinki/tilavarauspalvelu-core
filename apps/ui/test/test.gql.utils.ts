@@ -1,19 +1,30 @@
 import {
+  ApplicantTypeChoice,
+  type ApplicationFormFragment,
+  ApplicationStatusChoice,
   CreateApplicationDocument,
-  CreateApplicationMutationResult,
-  CreateApplicationMutationVariables,
+  type CreateApplicationMutationResult,
+  type CreateApplicationMutationVariables,
   CurrentUserDocument,
-  CurrentUserQuery,
+  type CurrentUserQuery,
+  OrganizationTypeChoice,
+  Priority,
   ReservationKind,
   ReservationUnitOrderingChoices,
   SearchReservationUnitsDocument,
-  SearchReservationUnitsQuery,
-  SearchReservationUnitsQueryVariables,
+  type SearchReservationUnitsQuery,
+  type SearchReservationUnitsQueryVariables,
+  type TermsOfUseFieldsFragment,
+  TermsType,
+  Weekday,
 } from "@/gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { addYears } from "date-fns";
+import { addDays, addYears } from "date-fns";
 import { DocumentNode } from "graphql";
-import { createMockReservationUnitType } from "./test.utils";
+import {
+  createMockReservationUnitType,
+  generateNameFragment,
+} from "./test.utils";
 
 export type CreateGraphQLMockProps = {
   noUser?: boolean;
@@ -205,5 +216,230 @@ function createSearchVariablesMock({
     isDraft: false,
     isVisible: true,
     reservationKind: ReservationKind.Season,
+  };
+}
+
+function createMockApplicationSection({
+  page = "page0",
+}: {
+  page?: PageOptions;
+} = {}): NonNullable<ApplicationFormFragment["applicationSections"]>[number] {
+  const pk = 1;
+  // TODO parametrize so we can zero this for page0 (nothing filled yet)
+  const page1Data = {
+    // page 1 data
+    name: "foobar",
+    reservationMinDuration: 1 * 60 * 60,
+    reservationMaxDuration: 2 * 60 * 60,
+    numPersons: 1,
+    reservationsBeginDate: addDays(new Date(), 1).toISOString(),
+    reservationsEndDate: addDays(new Date(), 30 + 1).toISOString(),
+    appliedReservationsPerWeek: 1,
+    ageGroup: {
+      id: base64encode(`AgeGroupNode:1`),
+      pk: 1,
+      minimum: 1,
+      maximum: null,
+    },
+    purpose: {
+      id: base64encode(`PurposeNode:1`),
+      pk: 1,
+      ...generateNameFragment("PurposeNode"),
+    },
+    reservationUnitOptions:
+      page !== "page0"
+        ? [
+            {
+              id: base64encode(`ReservationUnitOptionNode:1`),
+              pk: 1,
+              preferredOrder: 1,
+              reservationUnit: {
+                id: base64encode(`ReservationUnitNode:1`),
+                pk: 1,
+                ...generateNameFragment("ReservationUnitNode"),
+                unit: {
+                  id: base64encode(`UnitNode:1`),
+                  pk: 1,
+                  ...generateNameFragment("UnitNode"),
+                },
+                applicationRoundTimeSlots: [
+                  {
+                    id: base64encode(`ApplicationRoundTimeSlotNode:1`),
+                    weekday: 1,
+                    closed: false,
+                    reservableTimes: [
+                      {
+                        begin: "08:00",
+                        end: "16:00",
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          ]
+        : [],
+  };
+  const page2Data = {
+    // TODO add other options
+    suitableTimeRanges:
+      page === "page0" || page === "page1"
+        ? []
+        : [
+            {
+              id: "SuitableTimeRangeNode:1",
+              pk: 1,
+              beginTime: "08:00",
+              endTime: "16:00",
+              dayOfTheWeek: Weekday.Wednesday,
+              priority: Priority.Primary,
+            },
+          ],
+  };
+
+  if (page !== "page0" && page !== "page1") {
+    if (page2Data.suitableTimeRanges.length === 0) {
+      throw new Error("SuitableTimeRanges must be filled for page2");
+    }
+    if (
+      page1Data.appliedReservationsPerWeek !==
+      page1Data.reservationUnitOptions.length
+    ) {
+      throw new Error(
+        "AppliedReservationsPerWeek must match the number of reservationUnitOptions"
+      );
+    }
+  }
+
+  return {
+    id: base64encode(`ApplicationSectionNode:${pk}`),
+    pk,
+    // status: null, // (or Unallocated)
+    ...page1Data,
+    ...page2Data,
+  };
+}
+
+export type PageOptions = "page0" | "page1" | "page2" | "page3" | "preview";
+
+export type CreateMockApplicationFragmentProps = {
+  pk?: number;
+  // completed page
+  page?: PageOptions;
+};
+export function createMockApplicationFragment({
+  pk = 1,
+  page = "page0",
+}: CreateMockApplicationFragmentProps = {}): ApplicationFormFragment {
+  const now = new Date();
+  // TODO use page to generate the form values (applicationSections)
+  // so it's filled with the correct values for that page
+  const status =
+    page === "preview"
+      ? ApplicationStatusChoice.Received
+      : ApplicationStatusChoice.Draft;
+
+  const page3Data = {
+    applicantType: ApplicantTypeChoice.Association,
+    additionalInformation: null,
+    contactPerson: {
+      id: base64encode("ContactPersonNode:1"),
+      pk: 1,
+      firstName: "Test",
+      lastName: "User",
+      email: "test@user.fi",
+      phoneNumber: "123456789",
+    },
+    organisation: {
+      id: base64encode("OrganisationNode:1"),
+      pk: 1,
+      nameFi: "Organisation FI",
+      identifier: "1234567-8",
+      organisationType: OrganizationTypeChoice.PublicAssociation,
+      coreBusinessFi: "Core business FI",
+      yearEstablished: 2020,
+      address: {
+        id: base64encode("AddressNode:1"),
+        pk: 1,
+        postCode: "00000",
+        streetAddressFi: "Street address FI",
+        cityFi: "City FI",
+      },
+    },
+    homeCity: {
+      id: base64encode("CityNode:1"),
+      pk: 1,
+      ...generateNameFragment("CityNode"),
+    },
+    billingAddress: {
+      id: base64encode("AddressNode:2"),
+      pk: 2,
+      postCode: "00000",
+      streetAddressFi: "Street address FI",
+      cityFi: "City FI",
+    },
+  };
+
+  const MockApplicationForm: Omit<ApplicationFormFragment, "applicationRound"> =
+    {
+      id: base64encode(`ApplicationNode:${pk}`),
+      pk,
+      status,
+      // TODO this can't be combined with the other Fragment
+      // colliding with the same name (spread syntax)
+      applicationSections:
+        page === "page0" ? [] : [createMockApplicationSection({ page })],
+      ...(page === "page3" || page === "preview" ? page3Data : {}),
+    };
+  const reservationUnits: ApplicationFormFragment["applicationRound"]["reservationUnits"] =
+    [
+      /* TODO
+      {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameSv?: string | null;
+        nameEn?: string | null;
+        minPersons?: number | null;
+        maxPersons?: number | null;
+        images: [],
+        unit?: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameSv?: string | null;
+          nameEn?: string | null;
+        } | null;
+        accessTypes: [],
+      }
+      */
+    ] as const;
+  return {
+    ...MockApplicationForm,
+    applicationRound: {
+      id: base64encode("ApplicationRoundNode:1"),
+      notesWhenApplyingFi: "Notes when applying FI",
+      notesWhenApplyingEn: "Notes when applying EN",
+      notesWhenApplyingSv: "Notes when applying SV",
+      reservationPeriodBegin: addDays(now, 1).toISOString(),
+      reservationPeriodEnd: addDays(now, 30 + 1).toISOString(),
+      pk: 1,
+      reservationUnits,
+      ...generateNameFragment("ApplicationRoundNode"),
+    },
+  };
+}
+
+export function createMockTermsOfUse(): TermsOfUseFieldsFragment {
+  return {
+    // TODO what is the slug on this page? or does it matter
+    // should be RecurringTerms (but not sure if it matters)
+    pk: "generic",
+    termsType: TermsType.RecurringTerms,
+    id: base64encode("TermsOfUseNode:1"),
+    ...generateNameFragment("TermsOfUseNode"),
+    textFi: "Yleiset käyttöehdot",
+    textEn: "General terms of use",
+    textSv: "Allmänna användningsvillkor",
   };
 }

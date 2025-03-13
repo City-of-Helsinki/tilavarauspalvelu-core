@@ -90,20 +90,26 @@ function Page1({
     "name",
     lang
   );
+  const { handleSubmit } = form;
+
+  const onSubmit = (values: ApplicationPage1FormValues) => {
+    saveAndNavigate(values);
+  };
 
   return (
     <FormProvider {...form}>
-      <ApplicationPageWrapper
-        subtitle={applicationRoundName}
-        translationKeyPrefix="application:Page1"
-        application={application}
-      >
-        <Page1Impl
-          applicationRound={applicationRound}
-          options={{ ...options, unitOptions }}
-          onNext={saveAndNavigate}
-        />
-      </ApplicationPageWrapper>
+      <form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <ApplicationPageWrapper
+          subtitle={applicationRoundName}
+          translationKeyPrefix="application:Page1"
+          application={application}
+        >
+          <Page1Impl
+            applicationRound={applicationRound}
+            options={{ ...options, unitOptions }}
+          />
+        </ApplicationPageWrapper>
+      </form>
     </FormProvider>
   );
 }
@@ -157,7 +163,7 @@ export default Page1;
 export const APPLICATION_PAGE1_QUERY = gql`
   query ApplicationPage1($id: ID!) {
     application(id: $id) {
-      ...ApplicationCommon
+      ...ApplicationForm
     }
   }
 `;

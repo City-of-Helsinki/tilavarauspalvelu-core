@@ -20,7 +20,6 @@ How is the reservee able to enter the space in their reservation unit?
 """
 enum AccessType {
   ACCESS_CODE
-  MULTIVALUED
   OPENED_BY_STAFF
   PHYSICAL_KEY
   UNRESTRICTED

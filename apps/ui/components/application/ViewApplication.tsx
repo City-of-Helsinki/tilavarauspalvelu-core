@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import {
-  type ApplicationCommonFragment,
   ApplicationStatusChoice,
+  type ApplicationViewFragment,
   type Maybe,
   type TermsOfUseTextFieldsFragment,
 } from "@gql/gql-types";
@@ -19,9 +19,10 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { gql } from "@apollo/client";
 
 type ViewApplicationProps = {
-  application: ApplicationCommonFragment;
+  application: ApplicationViewFragment;
   tos: Maybe<TermsOfUseTextFieldsFragment>;
   isTermsAccepted?: { general: boolean; specific: boolean };
   setIsTermsAccepted?: (key: "general" | "specific", val: boolean) => void;
@@ -90,3 +91,18 @@ export function ViewApplication({
     </>
   );
 }
+
+export const APPLICATION_VIEW_FRAGMENT = gql`
+  fragment ApplicationView on ApplicationNode {
+    ...ApplicationForm
+    applicationRound {
+      id
+      sentDate
+      status
+      termsOfUse {
+        id
+        ...TermsOfUseFields
+      }
+    }
+  }
+`;

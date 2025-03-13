@@ -231,3 +231,11 @@ export const APPLICATION_ROUND_QUERY = gql`
     }
   }
 `;
+
+export const CREATE_APPLICATION_MUTATION = gql`
+  mutation CreateApplication($input: ApplicationCreateMutationInput!) {
+    createApplication(input: $input) {
+      pk
+    }
+  }
+`;

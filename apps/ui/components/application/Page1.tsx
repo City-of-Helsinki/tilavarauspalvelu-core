@@ -18,19 +18,17 @@ import { type OptionTypes } from "./ReservationUnitList";
 
 type Props = {
   applicationRound: ApplicationRoundForApplicationFragment;
-  onNext: (formValues: ApplicationPage1FormValues) => void;
   options: OptionTypes;
 };
 
 export function Page1({
   applicationRound,
-  onNext,
   options,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
 
   const form = useFormContext<ApplicationPage1FormValues>();
-  const { setValue, register, unregister, watch, handleSubmit } = form;
+  const { setValue, register, unregister, watch } = form;
   // get the user selected defaults for reservationUnits field
   const { getReservationUnits } = useReservationUnitList(applicationRound);
 
@@ -90,17 +88,11 @@ export function Page1({
     setValue(`applicationSections.${nextIndex}.formKey`, `NEW-${nextIndex}`);
   };
 
-  const submitDisabled =
-    applicationSections == null || applicationSections.length === 0;
+  const submitDisabled = filterNonNullable(applicationSections).length === 0;
+  const openByDefault = filterNonNullable(applicationSections).length === 1;
 
-  const onSubmit = (values: ApplicationPage1FormValues) => {
-    onNext(values);
-  };
-
-  const openByDefault =
-    applicationSections?.filter((ae) => ae != null).length === 1;
   return (
-    <form noValidate onSubmit={handleSubmit(onSubmit)}>
+    <>
       {/* NOTE can't filter this because we have undefined values in the array so the index would break
        * we could use findIndex with the formKey though */}
       {applicationSections?.map((event, index) =>
@@ -136,6 +128,6 @@ export function Page1({
           {t("common:next")}
         </Button>
       </ButtonContainer>
-    </form>
+    </>
   );
 }

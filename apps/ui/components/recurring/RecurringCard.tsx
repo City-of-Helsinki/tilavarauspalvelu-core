@@ -104,7 +104,7 @@ export function RecurringCard({
   buttons.push(
     <Button
       size={ButtonSize.Small}
-      variant={isSelected ? ButtonVariant.Secondary : ButtonVariant.Primary}
+      variant={isSelected ? ButtonVariant.Primary : ButtonVariant.Secondary}
       iconEnd={isSelected ? <IconCheck /> : <IconPlus />}
       onClick={toggleSelect}
       data-testid="recurring-card__button--toggle"
