@@ -25,6 +25,7 @@ import { base64encode } from "common/src/helpers";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
+import { type DocumentNode } from "graphql";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -420,15 +421,27 @@ type CreateGraphQLMockProps = {
   noUser?: boolean;
   isSearchError?: boolean;
 };
+
+// ReturnType<typeof createGraphQLMocks>;
+export type CreateGraphQLMocksReturn = Array<{
+  request: {
+    query: DocumentNode;
+    variables?: Record<string, unknown>;
+  };
+  result: {
+    data: Record<string, unknown>;
+  };
+  error?: Error | undefined;
+}>;
 // TODO parametrize the variables
 // we need at least the following:
 // - no user
 // - query var version
 // - error version
-function createGraphQLMocks({
+export function createGraphQLMocks({
   noUser = false,
   isSearchError = false,
-}: CreateGraphQLMockProps = {}) {
+}: CreateGraphQLMockProps = {}): CreateGraphQLMocksReturn {
   // TODO this should enforce non nullable for the query
   // it can be null when the query is loading, but when we mock it it should be non nullable
   // Q: what about failed queries? (though they should have different type)

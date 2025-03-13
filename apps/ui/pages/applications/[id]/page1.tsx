@@ -13,12 +13,18 @@ import {
   transformApplicationPage1,
   convertApplicationPage1,
 } from "@/components/application/form";
-import { useReservationUnitList } from "@/hooks";
+import { useOptions, useReservationUnitList } from "@/hooks";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
-import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
+import {
+  base64encode,
+  filterNonNullable,
+  ignoreMaybeArray,
+  toNumber,
+} from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
   ApplicationPage1Document,
+  useSearchFormParamsUnitQuery,
   useUpdateApplicationMutation,
   type ApplicationPage1Query,
   type ApplicationPage1QueryVariables,
@@ -30,9 +36,11 @@ import {
 } from "common/src/common/util";
 import { gql } from "@apollo/client";
 import { useDisplayError } from "@/hooks/useDisplayError";
+import { uniq } from "lodash-es";
 
-function Page1({ application }: PropsNarrowed): JSX.Element {
-  const { applicationRound } = application;
+function Page1({
+  application,
+}: Pick<PropsNarrowed, "application">): JSX.Element {
   const router = useRouter();
   const { i18n } = useTranslation();
   const dislayError = useDisplayError();
@@ -52,6 +60,21 @@ function Page1({ application }: PropsNarrowed): JSX.Element {
     }
   };
 
+  const lang = convertLanguageCode(i18n.language);
+  const { applicationRound } = application;
+  const resUnitPks = applicationRound.reservationUnits?.map(
+    (resUnit) => resUnit?.unit?.pk
+  );
+  const unitsInApplicationRound = filterNonNullable(uniq(resUnitPks));
+  const { data } = useSearchFormParamsUnitQuery();
+  const unitOptions = filterNonNullable(data?.unitsAll)
+    .filter((u) => u.pk != null && unitsInApplicationRound.includes(u.pk))
+    .map((u) => ({
+      value: u.pk ?? 0,
+      label: getTranslationSafe(u, "name", lang),
+    }));
+  const { options } = useOptions();
+
   const { getReservationUnits } = useReservationUnitList(applicationRound);
 
   const begin = new Date(applicationRound.reservationPeriodBegin);
@@ -62,7 +85,6 @@ function Page1({ application }: PropsNarrowed): JSX.Element {
     resolver: zodResolver(ApplicationPage1SchemaRefined({ begin, end })),
   });
 
-  const lang = convertLanguageCode(i18n.language);
   const applicationRoundName = getTranslationSafe(
     applicationRound,
     "name",
@@ -72,12 +94,13 @@ function Page1({ application }: PropsNarrowed): JSX.Element {
   return (
     <FormProvider {...form}>
       <ApplicationPageWrapper
-        overrideText={applicationRoundName}
+        subtitle={applicationRoundName}
         translationKeyPrefix="application:Page1"
         application={application}
       >
         <Page1Impl
           applicationRound={applicationRound}
+          options={{ ...options, unitOptions }}
           onNext={saveAndNavigate}
         />
       </ApplicationPageWrapper>

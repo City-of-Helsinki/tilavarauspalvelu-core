@@ -36,6 +36,7 @@ import {
   ControlledNumberInput,
   ControlledSelect,
 } from "common/src/components/form";
+import { type OptionTypes } from "./ReservationUnitList";
 import {
   convertLanguageCode,
   getTranslationSafe,
@@ -55,10 +56,10 @@ function ReservationUnitCard({
   handleRemove,
   isSelected,
 }: Readonly<{
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitCardFieldsFragment;
   isSelected: boolean;
-  handleAdd: (ru: ReservationUnitType) => void;
-  handleRemove: (ru: ReservationUnitType) => void;
+  handleAdd: (ru: ReservationUnitCardFieldsFragment) => void;
+  handleRemove: (ru: ReservationUnitCardFieldsFragment) => void;
 }>) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
@@ -138,17 +139,6 @@ type AppRoundNode = Omit<
   "reservationUnits"
 >;
 
-type ReservationUnitType = ReservationUnitCardFieldsFragment;
-type OptionType = {
-  label: string;
-  value: number;
-};
-type OptionsType = {
-  purposeOptions: OptionType[];
-  reservationUnitTypeOptions: OptionType[];
-  unitOptions: OptionType[];
-};
-
 type SearchFormValues = {
   searchTerm?: string;
   reservationUnitType?: number;
@@ -164,10 +154,13 @@ export function ReservationUnitModalContent({
   options,
 }: Readonly<{
   applicationRound: AppRoundNode;
-  handleAdd: (ru: ReservationUnitType) => void;
-  handleRemove: (ru: ReservationUnitType) => void;
-  currentReservationUnits: Pick<ReservationUnitType, "pk">[];
-  options: OptionsType;
+  handleAdd: (ru: ReservationUnitCardFieldsFragment) => void;
+  handleRemove: (ru: ReservationUnitCardFieldsFragment) => void;
+  currentReservationUnits: Pick<ReservationUnitCardFieldsFragment, "pk">[];
+  options: Pick<
+    OptionTypes,
+    "purposeOptions" | "reservationUnitTypeOptions" | "unitOptions"
+  >;
 }>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);

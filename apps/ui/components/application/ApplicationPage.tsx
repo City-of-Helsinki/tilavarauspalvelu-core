@@ -2,21 +2,18 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
-import {
-  ApplicationStatusChoice,
-  Maybe,
-  type ApplicationFormFragment,
-} from "@gql/gql-types";
+import { type ApplicationFormFragment } from "@gql/gql-types";
 import { useRouter } from "next/router";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
 import { Breadcrumb } from "../common/Breadcrumb";
-import { fontBold, H1 } from "common";
+import { fontBold } from "common";
 import { Stepper as HDSStepper, StepState } from "hds-react";
 import { validateApplication } from "./form";
 import { isSent } from "./module";
-import { Flex } from "common/styles/util";
-import { ApplicationStatusLabel } from "common/src/components/statuses";
+import { ApplicationHead } from "@/components/recurring/ApplicationHead";
+import { DeepReadonly } from "next/dist/shared/lib/deep-readonly";
+import { ReadonlyDeep } from "common/src/helpers";
 
 const InnerContainer = styled.div`
   display: grid;
@@ -47,7 +44,7 @@ const StyledStepper = styled(HDSStepper)`
 `;
 
 function calculateCompletedStep(
-  application: ApplicationFormFragment
+  application: ReadonlyDeep<ApplicationFormFragment>
 ): -1 | 0 | 1 | 2 | 3 {
   const isValid = validateApplication(application);
 
@@ -80,9 +77,13 @@ function getStepState(completedStep: number, step: number) {
 }
 
 type ApplicationPageProps = {
-  application: ApplicationFormFragment;
-  translationKeyPrefix: string;
-  overrideText?: string;
+  application: DeepReadonly<ApplicationFormFragment>;
+  translationKeyPrefix:
+    | "application:Page1"
+    | "application:Page2"
+    | "application:Page3"
+    | "application:preview";
+  subtitle?: string;
   children?: React.ReactNode;
 };
 
@@ -105,7 +106,7 @@ function getStep(slug: string) {
 export function ApplicationPageWrapper({
   application,
   translationKeyPrefix,
-  overrideText,
+  subtitle,
   children,
 }: Readonly<ApplicationPageProps>): JSX.Element {
   const { t, i18n } = useTranslation();
@@ -150,7 +151,7 @@ export function ApplicationPageWrapper({
   ] as const;
 
   const title = t(`${translationKeyPrefix}.heading`);
-  const subTitle = overrideText || t(`${translationKeyPrefix}.text`);
+  const subtitle2 = subtitle || t(`${translationKeyPrefix}.text`);
 
   return (
     <>
@@ -158,7 +159,7 @@ export function ApplicationPageWrapper({
       <ApplicationHead
         status={application.status}
         title={title}
-        subTitle={subTitle}
+        subTitle={subtitle2}
       />
       {hideStepper ? null : (
         <StyledStepper
@@ -178,30 +179,5 @@ export function ApplicationPageWrapper({
         </>
       </InnerContainer>
     </>
-  );
-}
-
-export function ApplicationHead({
-  status,
-  title,
-  subTitle,
-}: {
-  status: Maybe<ApplicationStatusChoice> | undefined;
-  title: string;
-  subTitle?: string;
-}): JSX.Element {
-  return (
-    <Flex
-      $direction="row"
-      $alignItems="flex-start"
-      $justifyContent="space-between"
-      $wrap="wrap"
-    >
-      <div>
-        <H1 $noMargin>{title}</H1>
-        {subTitle && <p>{subTitle}</p>}
-      </div>
-      <ApplicationStatusLabel status={status} user="customer" />
-    </Flex>
   );
 }

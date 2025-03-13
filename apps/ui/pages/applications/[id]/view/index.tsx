@@ -5,6 +5,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ViewApplication } from "@/components/application/ViewApplication";
+import { ApplicationHead } from "@/components/recurring/ApplicationHead";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -34,7 +35,6 @@ import { useToastIfQueryParam } from "@/hooks";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
 import { applicationsPrefix } from "@/modules/urls";
-import { ApplicationHead } from "@/components/application/ApplicationPage";
 
 const TabPanel = styled(Tabs.TabPanel)`
   && {
