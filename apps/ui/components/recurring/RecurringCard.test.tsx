@@ -6,7 +6,7 @@ import { getReservationUnitPath } from "@/modules/urls";
 import {
   createMockReservationUnitType,
   generateNameFragment,
-} from "@/test/testUtils";
+} from "@/test/test.utils";
 import userEvent from "@testing-library/user-event";
 
 describe("RecurringCard", () => {

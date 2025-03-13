@@ -22,7 +22,7 @@ import {
   beforeEach,
   afterAll,
 } from "vitest";
-import { TIMERS_TO_FAKE } from "@/test/testUtils";
+import { TIMERS_TO_FAKE } from "@/test/test.utils";
 
 describe("getLastPossibleReservationDate", () => {
   beforeAll(() => {
