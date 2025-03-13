@@ -53,7 +53,6 @@ export const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
 export const APPLICATION_SECTION_UI_FRAGMENT = gql`
   fragment ApplicationSectionUI on ApplicationSectionNode {
     ...ApplicationSectionCommon
-    hasReservations
     suitableTimeRanges {
       id
       pk

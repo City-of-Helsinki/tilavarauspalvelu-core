@@ -314,9 +314,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
+export default ReservationCancelPage;
+
 // TODO remove the extra reservationUnit fields (included in the CanUserCancelReservationFragment)
 // need to do frontend mods to call the function but the query is a lot simpler for backend
-export const APPLICATION_SECTION_CANCEL = gql`
+export const APPLICATION_SECTION_CANCEL_QUERY = gql`
   query ApplicationSectionCancel($id: ID!) {
     applicationSection(id: $id) {
       pk
@@ -369,4 +371,13 @@ export const APPLICATION_SECTION_CANCEL = gql`
   }
 `;
 
-export default ReservationCancelPage;
+export const CANCEL_APPLICATION_SECTION_MUTATION = gql`
+  mutation CancelApplicationSection(
+    $input: ApplicationSectionReservationCancellationMutationInput!
+  ) {
+    cancelAllApplicationSectionReservations(input: $input) {
+      future
+      cancelled
+    }
+  }
+`;

@@ -184,7 +184,9 @@ function pickMaybeDay(
 }
 
 // Returns a Date object with the first day of the given array of Dates
-export function dayMin(days: Readonly<Array<Readonly<Date | undefined>>>): Date | undefined {
+export function dayMin(
+  days: Readonly<Array<Readonly<Date | undefined>>>
+): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return pickMaybeDay(acc, day, isBefore);
   }, undefined);

@@ -3,17 +3,12 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { breakpoints } from "common/src/common/style";
 import { type ApplicationFormFragment } from "@gql/gql-types";
-import { useRouter } from "next/router";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
-import { applicationsPrefix, getApplicationPath } from "@/modules/urls";
-import { Breadcrumb } from "../common/Breadcrumb";
-import { fontBold } from "common";
-import { Stepper as HDSStepper, StepState } from "hds-react";
-import { validateApplication } from "./form";
-import { isSent } from "./module";
+import { applicationsPrefix } from "@/modules/urls";
+import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ApplicationHead } from "@/components/recurring/ApplicationHead";
-import { DeepReadonly } from "next/dist/shared/lib/deep-readonly";
 import { ReadonlyDeep } from "common/src/helpers";
+import { ApplicationStepper } from "./ApplicationStepper";
 
 const InnerContainer = styled.div`
   display: grid;
@@ -37,47 +32,8 @@ const ChildWrapper = styled.div`
   }
 `;
 
-const StyledStepper = styled(HDSStepper)`
-  [class*="Stepper-module_selected"] {
-    ${fontBold}
-  }
-`;
-
-function calculateCompletedStep(
-  application: ReadonlyDeep<ApplicationFormFragment>
-): -1 | 0 | 1 | 2 | 3 {
-  const isValid = validateApplication(application);
-
-  if (isSent(application?.status)) {
-    return 3;
-  }
-  if (isValid.valid) {
-    return 2;
-  }
-
-  const { page } = isValid;
-  if (page === 1) {
-    return 0;
-  } else if (page === 2) {
-    return 1;
-  } else if (page === 3) {
-    return 2;
-  }
-  return -1;
-}
-
-function getStepState(completedStep: number, step: number) {
-  if (step - 1 === completedStep) {
-    return StepState.available;
-  }
-  if (completedStep >= step) {
-    return StepState.completed;
-  }
-  return StepState.disabled;
-}
-
 type ApplicationPageProps = {
-  application: DeepReadonly<ApplicationFormFragment>;
+  application: ReadonlyDeep<ApplicationFormFragment>;
   translationKeyPrefix:
     | "application:Page1"
     | "application:Page2"
@@ -87,58 +43,13 @@ type ApplicationPageProps = {
   children?: React.ReactNode;
 };
 
-// Ordered list of steps by page slug
-export const PAGES_WITH_STEPPER = [
-  "page1",
-  "page2",
-  "page3",
-  "preview",
-] as const;
-
-function getStep(slug: string) {
-  const index = PAGES_WITH_STEPPER.findIndex((x) => x === slug);
-  if (index === -1) {
-    return 0;
-  }
-  return index;
-}
-
 export function ApplicationPageWrapper({
   application,
   translationKeyPrefix,
   subtitle,
   children,
 }: Readonly<ApplicationPageProps>): JSX.Element {
-  const { t, i18n } = useTranslation();
-  const router = useRouter();
-  const { asPath, push } = router;
-
-  const hideStepper =
-    PAGES_WITH_STEPPER.filter((x) => router.asPath.match(`/${x}`)).length === 0;
-  const completedStep = calculateCompletedStep(application);
-  const steps = PAGES_WITH_STEPPER.map((x, i) => ({
-    label: t(`application:navigation.${x}`),
-    state: getStepState(completedStep, i),
-  }));
-
-  const handleStepClick = (i: number) => {
-    if (i < 0 || i > 3) {
-      return; // invalid step
-    }
-    const targetPageIndex = i + 1;
-    if (
-      targetPageIndex === 4
-        ? asPath.endsWith("preview")
-        : asPath.includes(`page${targetPageIndex}`)
-    ) {
-      return; // already on the page, so do nothing
-    }
-    if (targetPageIndex === 4) {
-      push(`${getApplicationPath(application?.pk)}preview`);
-    } else {
-      push(`${getApplicationPath(application?.pk)}page${targetPageIndex}`);
-    }
-  };
+  const { t } = useTranslation();
 
   const routes = [
     {
@@ -161,14 +72,7 @@ export function ApplicationPageWrapper({
         title={title}
         subTitle={subtitle2}
       />
-      {hideStepper ? null : (
-        <StyledStepper
-          language={i18n.language}
-          steps={steps}
-          selectedStep={getStep(asPath.split("/").pop() ?? "page1")}
-          onStepClick={(_e, i) => handleStepClick(i)}
-        />
-      )}
+      <ApplicationStepper application={application} />
       <InnerContainer>
         <>
           {/* TODO preview / view should not maybe display these notes */}
