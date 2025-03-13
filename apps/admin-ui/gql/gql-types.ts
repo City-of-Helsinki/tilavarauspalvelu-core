@@ -5455,7 +5455,6 @@ export type ApplicationSectionCommonFragment = {
 };
 
 export type ApplicationSectionUiFragment = {
-  hasReservations: boolean;
   id: string;
   pk?: number | null;
   name: string;
@@ -5849,7 +5848,6 @@ export type ApplicationAdminFragment = {
   applicationSections?: Array<{
     id: string;
     allocations?: number | null;
-    hasReservations: boolean;
     pk?: number | null;
     name: string;
     status?: ApplicationSectionStatusChoice | null;
@@ -7379,7 +7377,6 @@ export type ApplicationAdminQuery = {
     applicationSections?: Array<{
       id: string;
       allocations?: number | null;
-      hasReservations: boolean;
       pk?: number | null;
       name: string;
       status?: ApplicationSectionStatusChoice | null;
@@ -9060,7 +9057,6 @@ export const ApplicantFragmentDoc = gql`
 export const ApplicationSectionUiFragmentDoc = gql`
   fragment ApplicationSectionUI on ApplicationSectionNode {
     ...ApplicationSectionCommon
-    hasReservations
     suitableTimeRanges {
       id
       pk

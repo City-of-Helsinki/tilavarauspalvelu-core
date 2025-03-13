@@ -5423,6 +5423,131 @@ export type ApplicationRoundForApplicationFragment = {
   }>;
 };
 
+export type ApplicationSectionReservationFragment = {
+  id: string;
+  pk?: number | null;
+  name: string;
+  reservationUnitOptions: Array<{
+    id: string;
+    allocatedTimeSlots: Array<{
+      id: string;
+      dayOfTheWeek: Weekday;
+      beginTime: string;
+      endTime: string;
+      recurringReservation?: {
+        id: string;
+        pk?: number | null;
+        beginTime?: string | null;
+        endTime?: string | null;
+        weekdays?: Array<number | null> | null;
+        reservationUnit: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameEn?: string | null;
+          nameSv?: string | null;
+          reservationConfirmedInstructionsFi?: string | null;
+          reservationConfirmedInstructionsEn?: string | null;
+          reservationConfirmedInstructionsSv?: string | null;
+          unit?: {
+            id: string;
+            nameFi?: string | null;
+            nameEn?: string | null;
+            nameSv?: string | null;
+          } | null;
+        };
+        rejectedOccurrences: Array<{
+          id: string;
+          beginDatetime: string;
+          endDatetime: string;
+        }>;
+        reservations: Array<{
+          id: string;
+          pk?: number | null;
+          end: string;
+          state?: ReservationStateChoice | null;
+          begin: string;
+          reservationUnits: Array<{
+            id: string;
+            cancellationRule?: {
+              id: string;
+              canBeCancelledTimeBefore?: number | null;
+            } | null;
+          }>;
+        }>;
+      } | null;
+    }>;
+  }>;
+};
+
+export type ApplicationReservationsQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  beginDate: Scalars["Date"]["input"];
+}>;
+
+export type ApplicationReservationsQuery = {
+  application?: {
+    id: string;
+    pk?: number | null;
+    applicationSections?: Array<{
+      id: string;
+      pk?: number | null;
+      name: string;
+      reservationUnitOptions: Array<{
+        id: string;
+        allocatedTimeSlots: Array<{
+          id: string;
+          dayOfTheWeek: Weekday;
+          beginTime: string;
+          endTime: string;
+          recurringReservation?: {
+            id: string;
+            pk?: number | null;
+            beginTime?: string | null;
+            endTime?: string | null;
+            weekdays?: Array<number | null> | null;
+            reservationUnit: {
+              id: string;
+              pk?: number | null;
+              nameFi?: string | null;
+              nameEn?: string | null;
+              nameSv?: string | null;
+              reservationConfirmedInstructionsFi?: string | null;
+              reservationConfirmedInstructionsEn?: string | null;
+              reservationConfirmedInstructionsSv?: string | null;
+              unit?: {
+                id: string;
+                nameFi?: string | null;
+                nameEn?: string | null;
+                nameSv?: string | null;
+              } | null;
+            };
+            rejectedOccurrences: Array<{
+              id: string;
+              beginDatetime: string;
+              endDatetime: string;
+            }>;
+            reservations: Array<{
+              id: string;
+              pk?: number | null;
+              end: string;
+              state?: ReservationStateChoice | null;
+              begin: string;
+              reservationUnits: Array<{
+                id: string;
+                cancellationRule?: {
+                  id: string;
+                  canBeCancelledTimeBefore?: number | null;
+                } | null;
+              }>;
+            }>;
+          } | null;
+        }>;
+      }>;
+    }> | null;
+  } | null;
+};
+
 export type ApplicationReservationUnitListFragment = {
   id: string;
   pk?: number | null;
@@ -5456,6 +5581,160 @@ export type ApplicationReservationUnitListFragment = {
   }>;
 };
 
+export type ApplicationViewFragment = {
+  id: string;
+  pk?: number | null;
+  status?: ApplicationStatusChoice | null;
+  applicantType?: ApplicantTypeChoice | null;
+  additionalInformation?: string | null;
+  applicationRound: {
+    id: string;
+    sentDate?: string | null;
+    status?: ApplicationRoundStatusChoice | null;
+    notesWhenApplyingFi?: string | null;
+    notesWhenApplyingEn?: string | null;
+    notesWhenApplyingSv?: string | null;
+    reservationPeriodBegin: string;
+    reservationPeriodEnd: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameSv?: string | null;
+    nameEn?: string | null;
+    termsOfUse?: {
+      id: string;
+      pk?: string | null;
+      termsType: TermsType;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+      textFi?: string | null;
+      textEn?: string | null;
+      textSv?: string | null;
+    } | null;
+    reservationUnits: Array<{
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+      minPersons?: number | null;
+      maxPersons?: number | null;
+      images: Array<{
+        id: string;
+        imageUrl?: string | null;
+        largeUrl?: string | null;
+        mediumUrl?: string | null;
+        smallUrl?: string | null;
+        imageType: ImageType;
+      }>;
+      unit?: {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameSv?: string | null;
+        nameEn?: string | null;
+      } | null;
+      accessTypes: Array<{ id: string; accessType: AccessType }>;
+    }>;
+  };
+  applicationSections?: Array<{
+    id: string;
+    pk?: number | null;
+    name: string;
+    status?: ApplicationSectionStatusChoice | null;
+    reservationMaxDuration: number;
+    numPersons: number;
+    reservationsEndDate: string;
+    reservationsBeginDate: string;
+    appliedReservationsPerWeek: number;
+    reservationMinDuration: number;
+    suitableTimeRanges: Array<{
+      id: string;
+      pk?: number | null;
+      beginTime: string;
+      endTime: string;
+      dayOfTheWeek: Weekday;
+      priority: Priority;
+    }>;
+    purpose?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+    } | null;
+    reservationUnitOptions: Array<{
+      id: string;
+      pk?: number | null;
+      preferredOrder: number;
+      reservationUnit: {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        unit?: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameEn?: string | null;
+          nameSv?: string | null;
+        } | null;
+        applicationRoundTimeSlots: Array<{
+          id: string;
+          weekday: number;
+          closed: boolean;
+          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+        }>;
+      };
+    }>;
+    ageGroup?: {
+      id: string;
+      pk?: number | null;
+      minimum: number;
+      maximum?: number | null;
+    } | null;
+  }> | null;
+  contactPerson?: {
+    id: string;
+    pk?: number | null;
+    firstName: string;
+    lastName: string;
+    email?: string | null;
+    phoneNumber?: string | null;
+  } | null;
+  organisation?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    identifier?: string | null;
+    organisationType: OrganizationTypeChoice;
+    coreBusinessFi?: string | null;
+    yearEstablished?: number | null;
+    address?: {
+      id: string;
+      pk?: number | null;
+      postCode: string;
+      streetAddressFi?: string | null;
+      cityFi?: string | null;
+    } | null;
+  } | null;
+  homeCity?: {
+    id: string;
+    pk?: number | null;
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+  } | null;
+  billingAddress?: {
+    id: string;
+    pk?: number | null;
+    postCode: string;
+    streetAddressFi?: string | null;
+    cityFi?: string | null;
+  } | null;
+};
+
 export type ApplicationCardFragment = {
   id: string;
   pk?: number | null;
@@ -5474,6 +5753,14 @@ export type ApplicationCardFragment = {
     organisationType: OrganizationTypeChoice;
   } | null;
   contactPerson?: { id: string; lastName: string; firstName: string } | null;
+};
+
+export type CancelApplicationMutationVariables = Exact<{
+  input: ApplicationCancelMutationInput;
+}>;
+
+export type CancelApplicationMutation = {
+  cancelApplication?: { pk?: number | null } | null;
 };
 
 export type ApplicationsGroupFragment = {
@@ -5687,136 +5974,10 @@ export type OptionsQuery = {
   }> | null;
 };
 
-export type ApplicationSectionReservationFragment = {
-  id: string;
-  pk?: number | null;
-  name: string;
-  reservationUnitOptions: Array<{
-    id: string;
-    allocatedTimeSlots: Array<{
-      id: string;
-      dayOfTheWeek: Weekday;
-      beginTime: string;
-      endTime: string;
-      recurringReservation?: {
-        id: string;
-        pk?: number | null;
-        beginTime?: string | null;
-        endTime?: string | null;
-        weekdays?: Array<number | null> | null;
-        reservationUnit: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-          nameEn?: string | null;
-          nameSv?: string | null;
-          reservationConfirmedInstructionsFi?: string | null;
-          reservationConfirmedInstructionsEn?: string | null;
-          reservationConfirmedInstructionsSv?: string | null;
-          unit?: {
-            id: string;
-            nameFi?: string | null;
-            nameEn?: string | null;
-            nameSv?: string | null;
-          } | null;
-        };
-        rejectedOccurrences: Array<{
-          id: string;
-          beginDatetime: string;
-          endDatetime: string;
-        }>;
-        reservations: Array<{
-          id: string;
-          pk?: number | null;
-          end: string;
-          state?: ReservationStateChoice | null;
-          begin: string;
-          reservationUnits: Array<{
-            id: string;
-            cancellationRule?: {
-              id: string;
-              canBeCancelledTimeBefore?: number | null;
-            } | null;
-          }>;
-        }>;
-      } | null;
-    }>;
-  }>;
-};
-
-export type ApplicationReservationsQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  beginDate: Scalars["Date"]["input"];
-}>;
-
-export type ApplicationReservationsQuery = {
-  application?: {
-    id: string;
-    pk?: number | null;
-    applicationSections?: Array<{
-      id: string;
-      pk?: number | null;
-      name: string;
-      reservationUnitOptions: Array<{
-        id: string;
-        allocatedTimeSlots: Array<{
-          id: string;
-          dayOfTheWeek: Weekday;
-          beginTime: string;
-          endTime: string;
-          recurringReservation?: {
-            id: string;
-            pk?: number | null;
-            beginTime?: string | null;
-            endTime?: string | null;
-            weekdays?: Array<number | null> | null;
-            reservationUnit: {
-              id: string;
-              pk?: number | null;
-              nameFi?: string | null;
-              nameEn?: string | null;
-              nameSv?: string | null;
-              reservationConfirmedInstructionsFi?: string | null;
-              reservationConfirmedInstructionsEn?: string | null;
-              reservationConfirmedInstructionsSv?: string | null;
-              unit?: {
-                id: string;
-                nameFi?: string | null;
-                nameEn?: string | null;
-                nameSv?: string | null;
-              } | null;
-            };
-            rejectedOccurrences: Array<{
-              id: string;
-              beginDatetime: string;
-              endDatetime: string;
-            }>;
-            reservations: Array<{
-              id: string;
-              pk?: number | null;
-              end: string;
-              state?: ReservationStateChoice | null;
-              begin: string;
-              reservationUnits: Array<{
-                id: string;
-                cancellationRule?: {
-                  id: string;
-                  canBeCancelledTimeBefore?: number | null;
-                } | null;
-              }>;
-            }>;
-          } | null;
-        }>;
-      }>;
-    }> | null;
-  } | null;
-};
-
 export type ApplicationFormFragment = {
   id: string;
   pk?: number | null;
   status?: ApplicationStatusChoice | null;
-  lastModifiedDate: string;
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
   applicationRound: {
@@ -5857,7 +6018,6 @@ export type ApplicationFormFragment = {
     }>;
   };
   applicationSections?: Array<{
-    hasReservations: boolean;
     id: string;
     pk?: number | null;
     name: string;
@@ -5953,175 +6113,6 @@ export type ApplicationFormFragment = {
     streetAddressFi?: string | null;
     cityFi?: string | null;
   } | null;
-};
-
-export type ApplicationCommonFragment = {
-  id: string;
-  pk?: number | null;
-  status?: ApplicationStatusChoice | null;
-  lastModifiedDate: string;
-  applicantType?: ApplicantTypeChoice | null;
-  additionalInformation?: string | null;
-  applicationRound: {
-    id: string;
-    sentDate?: string | null;
-    applicationPeriodBegin: string;
-    applicationPeriodEnd: string;
-    status?: ApplicationRoundStatusChoice | null;
-    applicationsCount?: number | null;
-    reservationUnitCount?: number | null;
-    statusTimestamp?: string | null;
-    notesWhenApplyingFi?: string | null;
-    notesWhenApplyingEn?: string | null;
-    notesWhenApplyingSv?: string | null;
-    reservationPeriodBegin: string;
-    reservationPeriodEnd: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameSv?: string | null;
-    nameEn?: string | null;
-    termsOfUse?: {
-      id: string;
-      pk?: string | null;
-      termsType: TermsType;
-      nameFi?: string | null;
-      nameEn?: string | null;
-      nameSv?: string | null;
-      textFi?: string | null;
-      textEn?: string | null;
-      textSv?: string | null;
-    } | null;
-    reservationUnits: Array<{
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameSv?: string | null;
-      nameEn?: string | null;
-      minPersons?: number | null;
-      maxPersons?: number | null;
-      images: Array<{
-        id: string;
-        imageUrl?: string | null;
-        largeUrl?: string | null;
-        mediumUrl?: string | null;
-        smallUrl?: string | null;
-        imageType: ImageType;
-      }>;
-      unit?: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameSv?: string | null;
-        nameEn?: string | null;
-      } | null;
-      accessTypes: Array<{ id: string; accessType: AccessType }>;
-    }>;
-  };
-  applicationSections?: Array<{
-    hasReservations: boolean;
-    id: string;
-    pk?: number | null;
-    name: string;
-    status?: ApplicationSectionStatusChoice | null;
-    reservationMaxDuration: number;
-    numPersons: number;
-    reservationsEndDate: string;
-    reservationsBeginDate: string;
-    appliedReservationsPerWeek: number;
-    reservationMinDuration: number;
-    suitableTimeRanges: Array<{
-      id: string;
-      pk?: number | null;
-      beginTime: string;
-      endTime: string;
-      dayOfTheWeek: Weekday;
-      priority: Priority;
-    }>;
-    purpose?: {
-      id: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameSv?: string | null;
-      nameEn?: string | null;
-    } | null;
-    reservationUnitOptions: Array<{
-      id: string;
-      pk?: number | null;
-      preferredOrder: number;
-      reservationUnit: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-        unit?: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-          nameEn?: string | null;
-          nameSv?: string | null;
-        } | null;
-        applicationRoundTimeSlots: Array<{
-          id: string;
-          weekday: number;
-          closed: boolean;
-          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
-        }>;
-      };
-    }>;
-    ageGroup?: {
-      id: string;
-      pk?: number | null;
-      minimum: number;
-      maximum?: number | null;
-    } | null;
-  }> | null;
-  contactPerson?: {
-    id: string;
-    pk?: number | null;
-    firstName: string;
-    lastName: string;
-    email?: string | null;
-    phoneNumber?: string | null;
-  } | null;
-  organisation?: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    identifier?: string | null;
-    organisationType: OrganizationTypeChoice;
-    coreBusinessFi?: string | null;
-    yearEstablished?: number | null;
-    address?: {
-      id: string;
-      pk?: number | null;
-      postCode: string;
-      streetAddressFi?: string | null;
-      cityFi?: string | null;
-    } | null;
-  } | null;
-  homeCity?: {
-    id: string;
-    pk?: number | null;
-    nameFi?: string | null;
-    nameEn?: string | null;
-    nameSv?: string | null;
-  } | null;
-  billingAddress?: {
-    id: string;
-    pk?: number | null;
-    postCode: string;
-    streetAddressFi?: string | null;
-    cityFi?: string | null;
-  } | null;
-};
-
-export type CreateApplicationMutationVariables = Exact<{
-  input: ApplicationCreateMutationInput;
-}>;
-
-export type CreateApplicationMutation = {
-  createApplication?: { pk?: number | null } | null;
 };
 
 export type UpdateApplicationMutationVariables = Exact<{
@@ -6130,33 +6121,6 @@ export type UpdateApplicationMutationVariables = Exact<{
 
 export type UpdateApplicationMutation = {
   updateApplication?: { pk?: number | null } | null;
-};
-
-export type SendApplicationMutationVariables = Exact<{
-  input: ApplicationSendMutationInput;
-}>;
-
-export type SendApplicationMutation = {
-  sendApplication?: { pk?: number | null } | null;
-};
-
-export type CancelApplicationMutationVariables = Exact<{
-  input: ApplicationCancelMutationInput;
-}>;
-
-export type CancelApplicationMutation = {
-  cancelApplication?: { pk?: number | null } | null;
-};
-
-export type CancelApplicationSectionMutationVariables = Exact<{
-  input: ApplicationSectionReservationCancellationMutationInput;
-}>;
-
-export type CancelApplicationSectionMutation = {
-  cancelAllApplicationSectionReservations?: {
-    future?: number | null;
-    cancelled?: number | null;
-  } | null;
 };
 
 export type UnitNameFieldsI18NFragment = {
@@ -7187,7 +7151,6 @@ export type ApplicationSectionCommonFragment = {
 };
 
 export type ApplicationSectionUiFragment = {
-  hasReservations: boolean;
   id: string;
   pk?: number | null;
   name: string;
@@ -7478,18 +7441,10 @@ export type ApplicationPage1Query = {
     id: string;
     pk?: number | null;
     status?: ApplicationStatusChoice | null;
-    lastModifiedDate: string;
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
       id: string;
-      sentDate?: string | null;
-      applicationPeriodBegin: string;
-      applicationPeriodEnd: string;
-      status?: ApplicationRoundStatusChoice | null;
-      applicationsCount?: number | null;
-      reservationUnitCount?: number | null;
-      statusTimestamp?: string | null;
       notesWhenApplyingFi?: string | null;
       notesWhenApplyingEn?: string | null;
       notesWhenApplyingSv?: string | null;
@@ -7499,17 +7454,6 @@ export type ApplicationPage1Query = {
       nameFi?: string | null;
       nameSv?: string | null;
       nameEn?: string | null;
-      termsOfUse?: {
-        id: string;
-        pk?: string | null;
-        termsType: TermsType;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-        textFi?: string | null;
-        textEn?: string | null;
-        textSv?: string | null;
-      } | null;
       reservationUnits: Array<{
         id: string;
         pk?: number | null;
@@ -7537,7 +7481,6 @@ export type ApplicationPage1Query = {
       }>;
     };
     applicationSections?: Array<{
-      hasReservations: boolean;
       id: string;
       pk?: number | null;
       name: string;
@@ -7648,7 +7591,6 @@ export type ApplicationPage2Query = {
     id: string;
     pk?: number | null;
     status?: ApplicationStatusChoice | null;
-    lastModifiedDate: string;
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
@@ -7689,7 +7631,6 @@ export type ApplicationPage2Query = {
       }>;
     };
     applicationSections?: Array<{
-      hasReservations: boolean;
       id: string;
       pk?: number | null;
       name: string;
@@ -7800,7 +7741,6 @@ export type ApplicationPage3Query = {
     id: string;
     pk?: number | null;
     status?: ApplicationStatusChoice | null;
-    lastModifiedDate: string;
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
@@ -7841,7 +7781,6 @@ export type ApplicationPage3Query = {
       }>;
     };
     applicationSections?: Array<{
-      hasReservations: boolean;
       id: string;
       pk?: number | null;
       name: string;
@@ -7943,6 +7882,177 @@ export type ApplicationPage3Query = {
   } | null;
 };
 
+export type ApplicationPagePreviewQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ApplicationPagePreviewQuery = {
+  application?: {
+    id: string;
+    pk?: number | null;
+    status?: ApplicationStatusChoice | null;
+    applicantType?: ApplicantTypeChoice | null;
+    additionalInformation?: string | null;
+    applicationRound: {
+      id: string;
+      sentDate?: string | null;
+      status?: ApplicationRoundStatusChoice | null;
+      notesWhenApplyingFi?: string | null;
+      notesWhenApplyingEn?: string | null;
+      notesWhenApplyingSv?: string | null;
+      reservationPeriodBegin: string;
+      reservationPeriodEnd: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+      termsOfUse?: {
+        id: string;
+        pk?: string | null;
+        termsType: TermsType;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      reservationUnits: Array<{
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameSv?: string | null;
+        nameEn?: string | null;
+        minPersons?: number | null;
+        maxPersons?: number | null;
+        images: Array<{
+          id: string;
+          imageUrl?: string | null;
+          largeUrl?: string | null;
+          mediumUrl?: string | null;
+          smallUrl?: string | null;
+          imageType: ImageType;
+        }>;
+        unit?: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameSv?: string | null;
+          nameEn?: string | null;
+        } | null;
+        accessTypes: Array<{ id: string; accessType: AccessType }>;
+      }>;
+    };
+    applicationSections?: Array<{
+      id: string;
+      pk?: number | null;
+      name: string;
+      status?: ApplicationSectionStatusChoice | null;
+      reservationMaxDuration: number;
+      numPersons: number;
+      reservationsEndDate: string;
+      reservationsBeginDate: string;
+      appliedReservationsPerWeek: number;
+      reservationMinDuration: number;
+      suitableTimeRanges: Array<{
+        id: string;
+        pk?: number | null;
+        beginTime: string;
+        endTime: string;
+        dayOfTheWeek: Weekday;
+        priority: Priority;
+      }>;
+      purpose?: {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameSv?: string | null;
+        nameEn?: string | null;
+      } | null;
+      reservationUnitOptions: Array<{
+        id: string;
+        pk?: number | null;
+        preferredOrder: number;
+        reservationUnit: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameEn?: string | null;
+          nameSv?: string | null;
+          unit?: {
+            id: string;
+            pk?: number | null;
+            nameFi?: string | null;
+            nameEn?: string | null;
+            nameSv?: string | null;
+          } | null;
+          applicationRoundTimeSlots: Array<{
+            id: string;
+            weekday: number;
+            closed: boolean;
+            reservableTimes?: Array<{
+              begin: string;
+              end: string;
+            } | null> | null;
+          }>;
+        };
+      }>;
+      ageGroup?: {
+        id: string;
+        pk?: number | null;
+        minimum: number;
+        maximum?: number | null;
+      } | null;
+    }> | null;
+    contactPerson?: {
+      id: string;
+      pk?: number | null;
+      firstName: string;
+      lastName: string;
+      email?: string | null;
+      phoneNumber?: string | null;
+    } | null;
+    organisation?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      identifier?: string | null;
+      organisationType: OrganizationTypeChoice;
+      coreBusinessFi?: string | null;
+      yearEstablished?: number | null;
+      address?: {
+        id: string;
+        pk?: number | null;
+        postCode: string;
+        streetAddressFi?: string | null;
+        cityFi?: string | null;
+      } | null;
+    } | null;
+    homeCity?: {
+      id: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameEn?: string | null;
+      nameSv?: string | null;
+    } | null;
+    billingAddress?: {
+      id: string;
+      pk?: number | null;
+      postCode: string;
+      streetAddressFi?: string | null;
+      cityFi?: string | null;
+    } | null;
+  } | null;
+};
+
+export type SendApplicationMutationVariables = Exact<{
+  input: ApplicationSendMutationInput;
+}>;
+
+export type SendApplicationMutation = {
+  sendApplication?: { pk?: number | null } | null;
+};
+
 export type ApplicationSectionCancelQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8009,6 +8119,17 @@ export type ApplicationSectionCancelQuery = {
         reasonSv?: string | null;
       } | null;
     } | null>;
+  } | null;
+};
+
+export type CancelApplicationSectionMutationVariables = Exact<{
+  input: ApplicationSectionReservationCancellationMutationInput;
+}>;
+
+export type CancelApplicationSectionMutation = {
+  cancelAllApplicationSectionReservations?: {
+    future?: number | null;
+    cancelled?: number | null;
   } | null;
 };
 
@@ -8112,67 +8233,11 @@ export type ApplicationViewQuery = {
     id: string;
     pk?: number | null;
     status?: ApplicationStatusChoice | null;
-    lastModifiedDate: string;
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
-    applicationRound: {
-      id: string;
-      sentDate?: string | null;
-      applicationPeriodBegin: string;
-      applicationPeriodEnd: string;
-      status?: ApplicationRoundStatusChoice | null;
-      applicationsCount?: number | null;
-      reservationUnitCount?: number | null;
-      statusTimestamp?: string | null;
-      notesWhenApplyingFi?: string | null;
-      notesWhenApplyingEn?: string | null;
-      notesWhenApplyingSv?: string | null;
-      reservationPeriodBegin: string;
-      reservationPeriodEnd: string;
-      pk?: number | null;
-      nameFi?: string | null;
-      nameSv?: string | null;
-      nameEn?: string | null;
-      termsOfUse?: {
-        id: string;
-        pk?: string | null;
-        termsType: TermsType;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-        textFi?: string | null;
-        textEn?: string | null;
-        textSv?: string | null;
-      } | null;
-      reservationUnits: Array<{
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameSv?: string | null;
-        nameEn?: string | null;
-        minPersons?: number | null;
-        maxPersons?: number | null;
-        images: Array<{
-          id: string;
-          imageUrl?: string | null;
-          largeUrl?: string | null;
-          mediumUrl?: string | null;
-          smallUrl?: string | null;
-          imageType: ImageType;
-        }>;
-        unit?: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-          nameSv?: string | null;
-          nameEn?: string | null;
-        } | null;
-        accessTypes: Array<{ id: string; accessType: AccessType }>;
-      }>;
-    };
     applicationSections?: Array<{
-      hasReservations: boolean;
       id: string;
+      hasReservations: boolean;
       pk?: number | null;
       name: string;
       status?: ApplicationSectionStatusChoice | null;
@@ -8232,6 +8297,56 @@ export type ApplicationViewQuery = {
         maximum?: number | null;
       } | null;
     }> | null;
+    applicationRound: {
+      id: string;
+      sentDate?: string | null;
+      status?: ApplicationRoundStatusChoice | null;
+      notesWhenApplyingFi?: string | null;
+      notesWhenApplyingEn?: string | null;
+      notesWhenApplyingSv?: string | null;
+      reservationPeriodBegin: string;
+      reservationPeriodEnd: string;
+      pk?: number | null;
+      nameFi?: string | null;
+      nameSv?: string | null;
+      nameEn?: string | null;
+      termsOfUse?: {
+        id: string;
+        pk?: string | null;
+        termsType: TermsType;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        textFi?: string | null;
+        textEn?: string | null;
+        textSv?: string | null;
+      } | null;
+      reservationUnits: Array<{
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameSv?: string | null;
+        nameEn?: string | null;
+        minPersons?: number | null;
+        maxPersons?: number | null;
+        images: Array<{
+          id: string;
+          imageUrl?: string | null;
+          largeUrl?: string | null;
+          mediumUrl?: string | null;
+          smallUrl?: string | null;
+          imageType: ImageType;
+        }>;
+        unit?: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameSv?: string | null;
+          nameEn?: string | null;
+        } | null;
+        accessTypes: Array<{ id: string; accessType: AccessType }>;
+      }>;
+    };
     contactPerson?: {
       id: string;
       pk?: number | null;
@@ -8372,6 +8487,14 @@ export type ApplicationRoundQuery = {
     reservationPeriodEnd: string;
     reservationUnits: Array<{ id: string; pk?: number | null }>;
   } | null;
+};
+
+export type CreateApplicationMutationVariables = Exact<{
+  input: ApplicationCreateMutationInput;
+}>;
+
+export type CreateApplicationMutation = {
+  createApplication?: { pk?: number | null } | null;
 };
 
 export type ApplicationRoundFieldsFragment = {
@@ -9108,135 +9231,6 @@ export const InstructionsFragmentDoc = gql`
     }
   }
 `;
-export const ApplicationNameFragmentDoc = gql`
-  fragment ApplicationName on ApplicationNode {
-    id
-    applicantType
-    organisation {
-      id
-      nameFi
-      organisationType
-    }
-    contactPerson {
-      id
-      lastName
-      firstName
-    }
-  }
-`;
-export const ApplicationCardFragmentDoc = gql`
-  fragment ApplicationCard on ApplicationNode {
-    id
-    pk
-    ...ApplicationName
-    status
-    lastModifiedDate
-    applicationRound {
-      id
-      nameFi
-      nameEn
-      nameSv
-    }
-  }
-  ${ApplicationNameFragmentDoc}
-`;
-export const ApplicationsGroupFragmentDoc = gql`
-  fragment ApplicationsGroup on ApplicationNode {
-    ...ApplicationCard
-    sentDate
-  }
-  ${ApplicationCardFragmentDoc}
-`;
-export const PurposeCardFragmentDoc = gql`
-  fragment PurposeCard on PurposeNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
-    imageUrl
-    smallUrl
-  }
-`;
-export const PricingFieldsFragmentDoc = gql`
-  fragment PricingFields on ReservationUnitPricingNode {
-    id
-    begins
-    priceUnit
-    lowestPrice
-    highestPrice
-    taxPercentage {
-      id
-      pk
-      value
-    }
-  }
-`;
-export const PriceReservationUnitFragmentDoc = gql`
-  fragment PriceReservationUnit on ReservationUnitNode {
-    id
-    pricings {
-      ...PricingFields
-    }
-    reservationBegins
-    reservationEnds
-  }
-  ${PricingFieldsFragmentDoc}
-`;
-export const ReservationPriceFragmentDoc = gql`
-  fragment ReservationPrice on ReservationNode {
-    id
-    reservationUnits {
-      ...PriceReservationUnit
-    }
-    price
-    begin
-    end
-    applyingForFreeOfCharge
-  }
-  ${PriceReservationUnitFragmentDoc}
-`;
-export const ImageFragmentDoc = gql`
-  fragment Image on ReservationUnitImageNode {
-    id
-    imageUrl
-    largeUrl
-    mediumUrl
-    smallUrl
-    imageType
-  }
-`;
-export const ReservationInfoCardFragmentDoc = gql`
-  fragment ReservationInfoCard on ReservationNode {
-    id
-    pk
-    ...ReservationPrice
-    taxPercentageValue
-    state
-    accessType
-    pindoraInfo {
-      accessCode
-    }
-    reservationUnits {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-      images {
-        ...Image
-      }
-      unit {
-        id
-        nameFi
-        nameEn
-        nameSv
-      }
-    }
-  }
-  ${ReservationPriceFragmentDoc}
-  ${ImageFragmentDoc}
-`;
 export const CancellationRuleFieldsFragmentDoc = gql`
   fragment CancellationRuleFields on ReservationUnitNode {
     id
@@ -9356,6 +9350,16 @@ export const ApplicantFragmentDoc = gql`
     }
   }
 `;
+export const ImageFragmentDoc = gql`
+  fragment Image on ReservationUnitImageNode {
+    id
+    imageUrl
+    largeUrl
+    mediumUrl
+    smallUrl
+    imageType
+  }
+`;
 export const ApplicationReservationUnitListFragmentDoc = gql`
   fragment ApplicationReservationUnitList on ApplicationRoundNode {
     id
@@ -9432,7 +9436,6 @@ export const ApplicationSectionCommonFragmentDoc = gql`
 export const ApplicationSectionUiFragmentDoc = gql`
   fragment ApplicationSectionUI on ApplicationSectionNode {
     ...ApplicationSectionCommon
-    hasReservations
     suitableTimeRanges {
       id
       pk
@@ -9482,7 +9485,6 @@ export const ApplicationFormFragmentDoc = gql`
     id
     pk
     status
-    lastModifiedDate
     ...Applicant
     applicationRound {
       id
@@ -9525,18 +9527,13 @@ export const TermsOfUseFieldsFragmentDoc = gql`
   ${TermsOfUseNameFieldsFragmentDoc}
   ${TermsOfUseTextFieldsFragmentDoc}
 `;
-export const ApplicationCommonFragmentDoc = gql`
-  fragment ApplicationCommon on ApplicationNode {
+export const ApplicationViewFragmentDoc = gql`
+  fragment ApplicationView on ApplicationNode {
     ...ApplicationForm
     applicationRound {
       id
       sentDate
-      applicationPeriodBegin
-      applicationPeriodEnd
       status
-      applicationsCount
-      reservationUnitCount
-      statusTimestamp
       termsOfUse {
         id
         ...TermsOfUseFields
@@ -9545,6 +9542,125 @@ export const ApplicationCommonFragmentDoc = gql`
   }
   ${ApplicationFormFragmentDoc}
   ${TermsOfUseFieldsFragmentDoc}
+`;
+export const ApplicationNameFragmentDoc = gql`
+  fragment ApplicationName on ApplicationNode {
+    id
+    applicantType
+    organisation {
+      id
+      nameFi
+      organisationType
+    }
+    contactPerson {
+      id
+      lastName
+      firstName
+    }
+  }
+`;
+export const ApplicationCardFragmentDoc = gql`
+  fragment ApplicationCard on ApplicationNode {
+    id
+    pk
+    ...ApplicationName
+    status
+    lastModifiedDate
+    applicationRound {
+      id
+      nameFi
+      nameEn
+      nameSv
+    }
+  }
+  ${ApplicationNameFragmentDoc}
+`;
+export const ApplicationsGroupFragmentDoc = gql`
+  fragment ApplicationsGroup on ApplicationNode {
+    ...ApplicationCard
+    sentDate
+  }
+  ${ApplicationCardFragmentDoc}
+`;
+export const PurposeCardFragmentDoc = gql`
+  fragment PurposeCard on PurposeNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    imageUrl
+    smallUrl
+  }
+`;
+export const PricingFieldsFragmentDoc = gql`
+  fragment PricingFields on ReservationUnitPricingNode {
+    id
+    begins
+    priceUnit
+    lowestPrice
+    highestPrice
+    taxPercentage {
+      id
+      pk
+      value
+    }
+  }
+`;
+export const PriceReservationUnitFragmentDoc = gql`
+  fragment PriceReservationUnit on ReservationUnitNode {
+    id
+    pricings {
+      ...PricingFields
+    }
+    reservationBegins
+    reservationEnds
+  }
+  ${PricingFieldsFragmentDoc}
+`;
+export const ReservationPriceFragmentDoc = gql`
+  fragment ReservationPrice on ReservationNode {
+    id
+    reservationUnits {
+      ...PriceReservationUnit
+    }
+    price
+    begin
+    end
+    applyingForFreeOfCharge
+  }
+  ${PriceReservationUnitFragmentDoc}
+`;
+export const ReservationInfoCardFragmentDoc = gql`
+  fragment ReservationInfoCard on ReservationNode {
+    id
+    pk
+    ...ReservationPrice
+    taxPercentageValue
+    state
+    accessType
+    pindoraInfo {
+      accessCode
+    }
+    reservationUnits {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+      images {
+        ...Image
+      }
+      unit {
+        id
+        nameFi
+        nameEn
+        nameSv
+      }
+    }
+  }
+  ${ReservationPriceFragmentDoc}
+  ${ImageFragmentDoc}
 `;
 export const CancelReasonFieldsFragmentDoc = gql`
   fragment CancelReasonFields on ReservationCancelReasonNode {
@@ -9955,6 +10071,144 @@ export const ReservationInfoFragmentDoc = gql`
     numPersons
   }
 `;
+export const ApplicationReservationsDocument = gql`
+  query ApplicationReservations($id: ID!, $beginDate: Date!) {
+    application(id: $id) {
+      id
+      pk
+      applicationSections {
+        ...ApplicationSectionReservation
+      }
+    }
+  }
+  ${ApplicationSectionReservationFragmentDoc}
+`;
+
+/**
+ * __useApplicationReservationsQuery__
+ *
+ * To run a query within a React component, call `useApplicationReservationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationReservationsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      beginDate: // value for 'beginDate'
+ *   },
+ * });
+ */
+export function useApplicationReservationsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationReservationsQuery,
+    ApplicationReservationsQueryVariables
+  > &
+    (
+      | { variables: ApplicationReservationsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationReservationsQuery,
+    ApplicationReservationsQueryVariables
+  >(ApplicationReservationsDocument, options);
+}
+export function useApplicationReservationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationReservationsQuery,
+    ApplicationReservationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationReservationsQuery,
+    ApplicationReservationsQueryVariables
+  >(ApplicationReservationsDocument, options);
+}
+export function useApplicationReservationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationReservationsQuery,
+        ApplicationReservationsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationReservationsQuery,
+    ApplicationReservationsQueryVariables
+  >(ApplicationReservationsDocument, options);
+}
+export type ApplicationReservationsQueryHookResult = ReturnType<
+  typeof useApplicationReservationsQuery
+>;
+export type ApplicationReservationsLazyQueryHookResult = ReturnType<
+  typeof useApplicationReservationsLazyQuery
+>;
+export type ApplicationReservationsSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationReservationsSuspenseQuery
+>;
+export type ApplicationReservationsQueryResult = Apollo.QueryResult<
+  ApplicationReservationsQuery,
+  ApplicationReservationsQueryVariables
+>;
+export const CancelApplicationDocument = gql`
+  mutation CancelApplication($input: ApplicationCancelMutationInput!) {
+    cancelApplication(input: $input) {
+      pk
+    }
+  }
+`;
+export type CancelApplicationMutationFn = Apollo.MutationFunction<
+  CancelApplicationMutation,
+  CancelApplicationMutationVariables
+>;
+
+/**
+ * __useCancelApplicationMutation__
+ *
+ * To run a mutation, you first call `useCancelApplicationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelApplicationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cancelApplicationMutation, { data, loading, error }] = useCancelApplicationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCancelApplicationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CancelApplicationMutation,
+    CancelApplicationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CancelApplicationMutation,
+    CancelApplicationMutationVariables
+  >(CancelApplicationDocument, options);
+}
+export type CancelApplicationMutationHookResult = ReturnType<
+  typeof useCancelApplicationMutation
+>;
+export type CancelApplicationMutationResult =
+  Apollo.MutationResult<CancelApplicationMutation>;
+export type CancelApplicationMutationOptions = Apollo.BaseMutationOptions<
+  CancelApplicationMutation,
+  CancelApplicationMutationVariables
+>;
 export const OptionsDocument = gql`
   query Options(
     $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderingChoices]
@@ -10095,144 +10349,6 @@ export type OptionsQueryResult = Apollo.QueryResult<
   OptionsQuery,
   OptionsQueryVariables
 >;
-export const ApplicationReservationsDocument = gql`
-  query ApplicationReservations($id: ID!, $beginDate: Date!) {
-    application(id: $id) {
-      id
-      pk
-      applicationSections {
-        ...ApplicationSectionReservation
-      }
-    }
-  }
-  ${ApplicationSectionReservationFragmentDoc}
-`;
-
-/**
- * __useApplicationReservationsQuery__
- *
- * To run a query within a React component, call `useApplicationReservationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useApplicationReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useApplicationReservationsQuery({
- *   variables: {
- *      id: // value for 'id'
- *      beginDate: // value for 'beginDate'
- *   },
- * });
- */
-export function useApplicationReservationsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ApplicationReservationsQuery,
-    ApplicationReservationsQueryVariables
-  > &
-    (
-      | { variables: ApplicationReservationsQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ApplicationReservationsQuery,
-    ApplicationReservationsQueryVariables
-  >(ApplicationReservationsDocument, options);
-}
-export function useApplicationReservationsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ApplicationReservationsQuery,
-    ApplicationReservationsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ApplicationReservationsQuery,
-    ApplicationReservationsQueryVariables
-  >(ApplicationReservationsDocument, options);
-}
-export function useApplicationReservationsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ApplicationReservationsQuery,
-        ApplicationReservationsQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ApplicationReservationsQuery,
-    ApplicationReservationsQueryVariables
-  >(ApplicationReservationsDocument, options);
-}
-export type ApplicationReservationsQueryHookResult = ReturnType<
-  typeof useApplicationReservationsQuery
->;
-export type ApplicationReservationsLazyQueryHookResult = ReturnType<
-  typeof useApplicationReservationsLazyQuery
->;
-export type ApplicationReservationsSuspenseQueryHookResult = ReturnType<
-  typeof useApplicationReservationsSuspenseQuery
->;
-export type ApplicationReservationsQueryResult = Apollo.QueryResult<
-  ApplicationReservationsQuery,
-  ApplicationReservationsQueryVariables
->;
-export const CreateApplicationDocument = gql`
-  mutation CreateApplication($input: ApplicationCreateMutationInput!) {
-    createApplication(input: $input) {
-      pk
-    }
-  }
-`;
-export type CreateApplicationMutationFn = Apollo.MutationFunction<
-  CreateApplicationMutation,
-  CreateApplicationMutationVariables
->;
-
-/**
- * __useCreateApplicationMutation__
- *
- * To run a mutation, you first call `useCreateApplicationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateApplicationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createApplicationMutation, { data, loading, error }] = useCreateApplicationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateApplicationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateApplicationMutation,
-    CreateApplicationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateApplicationMutation,
-    CreateApplicationMutationVariables
-  >(CreateApplicationDocument, options);
-}
-export type CreateApplicationMutationHookResult = ReturnType<
-  typeof useCreateApplicationMutation
->;
-export type CreateApplicationMutationResult =
-  Apollo.MutationResult<CreateApplicationMutation>;
-export type CreateApplicationMutationOptions = Apollo.BaseMutationOptions<
-  CreateApplicationMutation,
-  CreateApplicationMutationVariables
->;
 export const UpdateApplicationDocument = gql`
   mutation UpdateApplication($input: ApplicationUpdateMutationInput!) {
     updateApplication(input: $input) {
@@ -10283,160 +10399,6 @@ export type UpdateApplicationMutationOptions = Apollo.BaseMutationOptions<
   UpdateApplicationMutation,
   UpdateApplicationMutationVariables
 >;
-export const SendApplicationDocument = gql`
-  mutation SendApplication($input: ApplicationSendMutationInput!) {
-    sendApplication(input: $input) {
-      pk
-    }
-  }
-`;
-export type SendApplicationMutationFn = Apollo.MutationFunction<
-  SendApplicationMutation,
-  SendApplicationMutationVariables
->;
-
-/**
- * __useSendApplicationMutation__
- *
- * To run a mutation, you first call `useSendApplicationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSendApplicationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [sendApplicationMutation, { data, loading, error }] = useSendApplicationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useSendApplicationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    SendApplicationMutation,
-    SendApplicationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    SendApplicationMutation,
-    SendApplicationMutationVariables
-  >(SendApplicationDocument, options);
-}
-export type SendApplicationMutationHookResult = ReturnType<
-  typeof useSendApplicationMutation
->;
-export type SendApplicationMutationResult =
-  Apollo.MutationResult<SendApplicationMutation>;
-export type SendApplicationMutationOptions = Apollo.BaseMutationOptions<
-  SendApplicationMutation,
-  SendApplicationMutationVariables
->;
-export const CancelApplicationDocument = gql`
-  mutation CancelApplication($input: ApplicationCancelMutationInput!) {
-    cancelApplication(input: $input) {
-      pk
-    }
-  }
-`;
-export type CancelApplicationMutationFn = Apollo.MutationFunction<
-  CancelApplicationMutation,
-  CancelApplicationMutationVariables
->;
-
-/**
- * __useCancelApplicationMutation__
- *
- * To run a mutation, you first call `useCancelApplicationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCancelApplicationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [cancelApplicationMutation, { data, loading, error }] = useCancelApplicationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCancelApplicationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CancelApplicationMutation,
-    CancelApplicationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CancelApplicationMutation,
-    CancelApplicationMutationVariables
-  >(CancelApplicationDocument, options);
-}
-export type CancelApplicationMutationHookResult = ReturnType<
-  typeof useCancelApplicationMutation
->;
-export type CancelApplicationMutationResult =
-  Apollo.MutationResult<CancelApplicationMutation>;
-export type CancelApplicationMutationOptions = Apollo.BaseMutationOptions<
-  CancelApplicationMutation,
-  CancelApplicationMutationVariables
->;
-export const CancelApplicationSectionDocument = gql`
-  mutation CancelApplicationSection(
-    $input: ApplicationSectionReservationCancellationMutationInput!
-  ) {
-    cancelAllApplicationSectionReservations(input: $input) {
-      future
-      cancelled
-    }
-  }
-`;
-export type CancelApplicationSectionMutationFn = Apollo.MutationFunction<
-  CancelApplicationSectionMutation,
-  CancelApplicationSectionMutationVariables
->;
-
-/**
- * __useCancelApplicationSectionMutation__
- *
- * To run a mutation, you first call `useCancelApplicationSectionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCancelApplicationSectionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [cancelApplicationSectionMutation, { data, loading, error }] = useCancelApplicationSectionMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCancelApplicationSectionMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CancelApplicationSectionMutation,
-    CancelApplicationSectionMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CancelApplicationSectionMutation,
-    CancelApplicationSectionMutationVariables
-  >(CancelApplicationSectionDocument, options);
-}
-export type CancelApplicationSectionMutationHookResult = ReturnType<
-  typeof useCancelApplicationSectionMutation
->;
-export type CancelApplicationSectionMutationResult =
-  Apollo.MutationResult<CancelApplicationSectionMutation>;
-export type CancelApplicationSectionMutationOptions =
-  Apollo.BaseMutationOptions<
-    CancelApplicationSectionMutation,
-    CancelApplicationSectionMutationVariables
-  >;
 export const SearchFormParamsUnitDocument = gql`
   query SearchFormParamsUnit(
     $publishedReservationUnits: Boolean
@@ -11971,10 +11933,10 @@ export type TermsOfUseQueryResult = Apollo.QueryResult<
 export const ApplicationPage1Document = gql`
   query ApplicationPage1($id: ID!) {
     application(id: $id) {
-      ...ApplicationCommon
+      ...ApplicationForm
     }
   }
-  ${ApplicationCommonFragmentDoc}
+  ${ApplicationFormFragmentDoc}
 `;
 
 /**
@@ -12217,6 +12179,139 @@ export type ApplicationPage3QueryResult = Apollo.QueryResult<
   ApplicationPage3Query,
   ApplicationPage3QueryVariables
 >;
+export const ApplicationPagePreviewDocument = gql`
+  query ApplicationPagePreview($id: ID!) {
+    application(id: $id) {
+      ...ApplicationView
+    }
+  }
+  ${ApplicationViewFragmentDoc}
+`;
+
+/**
+ * __useApplicationPagePreviewQuery__
+ *
+ * To run a query within a React component, call `useApplicationPagePreviewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationPagePreviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationPagePreviewQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useApplicationPagePreviewQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationPagePreviewQuery,
+    ApplicationPagePreviewQueryVariables
+  > &
+    (
+      | { variables: ApplicationPagePreviewQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationPagePreviewQuery,
+    ApplicationPagePreviewQueryVariables
+  >(ApplicationPagePreviewDocument, options);
+}
+export function useApplicationPagePreviewLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationPagePreviewQuery,
+    ApplicationPagePreviewQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationPagePreviewQuery,
+    ApplicationPagePreviewQueryVariables
+  >(ApplicationPagePreviewDocument, options);
+}
+export function useApplicationPagePreviewSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationPagePreviewQuery,
+        ApplicationPagePreviewQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationPagePreviewQuery,
+    ApplicationPagePreviewQueryVariables
+  >(ApplicationPagePreviewDocument, options);
+}
+export type ApplicationPagePreviewQueryHookResult = ReturnType<
+  typeof useApplicationPagePreviewQuery
+>;
+export type ApplicationPagePreviewLazyQueryHookResult = ReturnType<
+  typeof useApplicationPagePreviewLazyQuery
+>;
+export type ApplicationPagePreviewSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationPagePreviewSuspenseQuery
+>;
+export type ApplicationPagePreviewQueryResult = Apollo.QueryResult<
+  ApplicationPagePreviewQuery,
+  ApplicationPagePreviewQueryVariables
+>;
+export const SendApplicationDocument = gql`
+  mutation SendApplication($input: ApplicationSendMutationInput!) {
+    sendApplication(input: $input) {
+      pk
+    }
+  }
+`;
+export type SendApplicationMutationFn = Apollo.MutationFunction<
+  SendApplicationMutation,
+  SendApplicationMutationVariables
+>;
+
+/**
+ * __useSendApplicationMutation__
+ *
+ * To run a mutation, you first call `useSendApplicationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendApplicationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendApplicationMutation, { data, loading, error }] = useSendApplicationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSendApplicationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    SendApplicationMutation,
+    SendApplicationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    SendApplicationMutation,
+    SendApplicationMutationVariables
+  >(SendApplicationDocument, options);
+}
+export type SendApplicationMutationHookResult = ReturnType<
+  typeof useSendApplicationMutation
+>;
+export type SendApplicationMutationResult =
+  Apollo.MutationResult<SendApplicationMutation>;
+export type SendApplicationMutationOptions = Apollo.BaseMutationOptions<
+  SendApplicationMutation,
+  SendApplicationMutationVariables
+>;
 export const ApplicationSectionCancelDocument = gql`
   query ApplicationSectionCancel($id: ID!) {
     applicationSection(id: $id) {
@@ -12347,6 +12442,60 @@ export type ApplicationSectionCancelQueryResult = Apollo.QueryResult<
   ApplicationSectionCancelQuery,
   ApplicationSectionCancelQueryVariables
 >;
+export const CancelApplicationSectionDocument = gql`
+  mutation CancelApplicationSection(
+    $input: ApplicationSectionReservationCancellationMutationInput!
+  ) {
+    cancelAllApplicationSectionReservations(input: $input) {
+      future
+      cancelled
+    }
+  }
+`;
+export type CancelApplicationSectionMutationFn = Apollo.MutationFunction<
+  CancelApplicationSectionMutation,
+  CancelApplicationSectionMutationVariables
+>;
+
+/**
+ * __useCancelApplicationSectionMutation__
+ *
+ * To run a mutation, you first call `useCancelApplicationSectionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelApplicationSectionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cancelApplicationSectionMutation, { data, loading, error }] = useCancelApplicationSectionMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCancelApplicationSectionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CancelApplicationSectionMutation,
+    CancelApplicationSectionMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CancelApplicationSectionMutation,
+    CancelApplicationSectionMutationVariables
+  >(CancelApplicationSectionDocument, options);
+}
+export type CancelApplicationSectionMutationHookResult = ReturnType<
+  typeof useCancelApplicationSectionMutation
+>;
+export type CancelApplicationSectionMutationResult =
+  Apollo.MutationResult<CancelApplicationSectionMutation>;
+export type CancelApplicationSectionMutationOptions =
+  Apollo.BaseMutationOptions<
+    CancelApplicationSectionMutation,
+    CancelApplicationSectionMutationVariables
+  >;
 export const ApplicationSectionViewDocument = gql`
   query ApplicationSectionView($pk: Int!, $beginDate: Date = null) {
     applicationSections(pk: [$pk]) {
@@ -12533,10 +12682,14 @@ export type ApplicationSentPageQueryResult = Apollo.QueryResult<
 export const ApplicationViewDocument = gql`
   query ApplicationView($id: ID!) {
     application(id: $id) {
-      ...ApplicationCommon
+      ...ApplicationView
+      applicationSections {
+        id
+        hasReservations
+      }
     }
   }
-  ${ApplicationCommonFragmentDoc}
+  ${ApplicationViewFragmentDoc}
 `;
 
 /**
@@ -12972,6 +13125,56 @@ export type ApplicationRoundSuspenseQueryHookResult = ReturnType<
 export type ApplicationRoundQueryResult = Apollo.QueryResult<
   ApplicationRoundQuery,
   ApplicationRoundQueryVariables
+>;
+export const CreateApplicationDocument = gql`
+  mutation CreateApplication($input: ApplicationCreateMutationInput!) {
+    createApplication(input: $input) {
+      pk
+    }
+  }
+`;
+export type CreateApplicationMutationFn = Apollo.MutationFunction<
+  CreateApplicationMutation,
+  CreateApplicationMutationVariables
+>;
+
+/**
+ * __useCreateApplicationMutation__
+ *
+ * To run a mutation, you first call `useCreateApplicationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateApplicationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createApplicationMutation, { data, loading, error }] = useCreateApplicationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateApplicationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateApplicationMutation,
+    CreateApplicationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateApplicationMutation,
+    CreateApplicationMutationVariables
+  >(CreateApplicationDocument, options);
+}
+export type CreateApplicationMutationHookResult = ReturnType<
+  typeof useCreateApplicationMutation
+>;
+export type CreateApplicationMutationResult =
+  Apollo.MutationResult<CreateApplicationMutation>;
+export type CreateApplicationMutationOptions = Apollo.BaseMutationOptions<
+  CreateApplicationMutation,
+  CreateApplicationMutationVariables
 >;
 export const ApplicationRoundsUiDocument = gql`
   query ApplicationRoundsUi($orderBy: [ApplicationRoundOrderingChoices]) {

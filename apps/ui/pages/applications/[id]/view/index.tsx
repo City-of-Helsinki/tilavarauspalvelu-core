@@ -45,7 +45,10 @@ const TabPanel = styled(Tabs.TabPanel)`
   }
 `;
 
-function View({ application, tos }: PropsNarrowed): JSX.Element {
+function View({
+  application,
+  tos,
+}: Readonly<Pick<PropsNarrowed, "application" | "tos">>): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
 
@@ -102,10 +105,14 @@ function View({ application, tos }: PropsNarrowed): JSX.Element {
   const tab =
     searchParams.get("tab") === "application" ? "application" : "reservations";
 
-  const round = application.applicationRound;
+  const { applicationRound } = application;
   const lang = getLocalizationLang(i18n.language);
-  const applicationRoundName = getTranslationSafe(round, "name", lang);
-  const { sentDate } = application.applicationRound;
+  const applicationRoundName = getTranslationSafe(
+    applicationRound,
+    "name",
+    lang
+  );
+  const { sentDate } = applicationRound;
   const handledDate = sentDate ? new Date(sentDate) : new Date();
   const showReservations =
     application.status === ApplicationStatusChoice.ResultsSent &&
@@ -209,7 +216,11 @@ export default View;
 export const APPLICATION_VIEW_QUERY = gql`
   query ApplicationView($id: ID!) {
     application(id: $id) {
-      ...ApplicationCommon
+      ...ApplicationView
+      applicationSections {
+        id
+        hasReservations
+      }
     }
   }
 `;

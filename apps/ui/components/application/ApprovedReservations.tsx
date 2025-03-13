@@ -1,5 +1,5 @@
 import {
-  type ApplicationReservationsQuery,
+  type ApplicationSectionReservationFragment,
   useApplicationReservationsQuery,
   type ReservationUnitNode,
   ReservationStateChoice,
@@ -60,6 +60,7 @@ import { formatDateTimeStrings } from "@/modules/util";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { useSearchParams } from "next/navigation";
 import type { StatusLabelType } from "common/src/tags";
+import { gql } from "@apollo/client";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
@@ -198,13 +199,15 @@ function formatAesName(
   return `${resUnitName}, ${unitName}`;
 }
 
-function getAesReservationUnitCount(aes: ApplicationSectionT): number {
+function getAesReservationUnitCount(
+  aes: ApplicationSectionReservationFragment
+): number {
   return getAesReservationUnits(aes).length;
 }
 
 function formatNumberOfReservations(
   t: TFunction,
-  aes: ApplicationSectionT
+  aes: ApplicationSectionReservationFragment
 ): string {
   const reservations = aes.reservationUnitOptions.flatMap((ruo) =>
     ruo.allocatedTimeSlots.flatMap(
@@ -217,7 +220,7 @@ function formatNumberOfReservations(
 
 function formatReservationTimes(
   t: TFunction,
-  aes: ApplicationSectionT
+  aes: ApplicationSectionReservationFragment
 ): string {
   const atsList = filterNonNullable(
     aes.reservationUnitOptions.flatMap((ruo) =>
@@ -309,8 +312,7 @@ export function ApprovedReservations({ application }: Readonly<Props>) {
   );
 }
 
-type QueryT = NonNullable<ApplicationReservationsQuery["application"]>;
-type ApplicationSectionT = NonNullable<QueryT["applicationSections"]>[0];
+type ApplicationSectionT = ApplicationSectionReservationFragment;
 
 const OnlyForMobile = styled.span`
   display: inline;
@@ -720,7 +722,7 @@ function getReservationStatusChoice(
 
 function sectionToreservations(
   t: TFunction,
-  section: ApplicationSectionT
+  section: ApplicationSectionReservationFragment
 ): ReservationsTableElem[] {
   const recurringReservations = filterNonNullable(
     section.reservationUnitOptions.flatMap((ruo) =>
@@ -904,3 +906,71 @@ export function ApplicationSection({
     </Flex>
   );
 }
+
+export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
+  fragment ApplicationSectionReservation on ApplicationSectionNode {
+    id
+    pk
+    name
+    reservationUnitOptions {
+      id
+      allocatedTimeSlots {
+        id
+        dayOfTheWeek
+        beginTime
+        endTime
+        recurringReservation {
+          id
+          pk
+          beginTime
+          endTime
+          weekdays
+          reservationUnit {
+            id
+            pk
+            nameFi
+            nameEn
+            nameSv
+            reservationConfirmedInstructionsFi
+            reservationConfirmedInstructionsEn
+            reservationConfirmedInstructionsSv
+            unit {
+              id
+              nameFi
+              nameEn
+              nameSv
+            }
+          }
+          rejectedOccurrences {
+            id
+            beginDatetime
+            endDatetime
+          }
+          reservations(orderBy: [beginAsc], beginDate: $beginDate) {
+            id
+            pk
+            end
+            state
+            ...CanUserCancelReservation
+          }
+        }
+      }
+    }
+  }
+`;
+
+// client side query, for now take all the data needed for this Tab
+// client side because the SSR query is too complex already
+// this allows faster iteration and splitting the query if needed (based on open Accordions)
+// we can cache data on client side (when user opens Accordions)
+export const APPLICATION_RESERVATIONS_QUERY = gql`
+  query ApplicationReservations($id: ID!, $beginDate: Date!) {
+    application(id: $id) {
+      id
+      pk
+      applicationSections {
+        ...ApplicationSectionReservation
+      }
+    }
+  }
+`;

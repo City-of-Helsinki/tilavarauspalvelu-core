@@ -2,19 +2,16 @@ import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import {
-  ApplicationPage1Document,
-  type ApplicationPage1Query,
-  type ApplicationPage1QueryVariables,
+  ApplicationPagePreviewDocument,
+  type ApplicationPagePreviewQuery,
+  type ApplicationPagePreviewQueryVariables,
   useSendApplicationMutation,
 } from "@gql/gql-types";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { ViewApplication } from "@/components/application/ViewApplication";
 import { createApolloClient } from "@/modules/apolloClient";
-import {
-  ApplicationPageWrapper,
-  PAGES_WITH_STEPPER,
-} from "@/components/application/ApplicationPage";
+import { ApplicationPageWrapper } from "@/components/application/ApplicationPage";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -34,6 +31,8 @@ import { useDisplayError } from "@/hooks/useDisplayError";
 import { ErrorText } from "common/src/components/ErrorText";
 import Link from "next/link";
 import { validateApplication } from "@/components/application/form";
+import { PAGES_WITH_STEPPER } from "@/components/application/ApplicationStepper";
+import { gql } from "@apollo/client";
 
 // User has to accept the terms of service then on submit we change the application status
 // This uses separate Send mutation (not update) so no onNext like the other pages
@@ -164,11 +163,10 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   }
 
   const { data } = await apolloClient.query<
-    ApplicationPage1Query,
-    ApplicationPage1QueryVariables
+    ApplicationPagePreviewQuery,
+    ApplicationPagePreviewQueryVariables
   >({
-    // TODO replace with own page query
-    query: ApplicationPage1Document,
+    query: ApplicationPagePreviewDocument,
     variables: { id: base64encode(`ApplicationNode:${pk}`) },
   });
   const { application } = data;
@@ -187,3 +185,20 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 }
 
 export default Preview;
+
+// TODO narrow down the query fragment (if possible), need at least TermsOfUse and ApplicationForm
+export const APPLICATION_PREVIEW_QUERY = gql`
+  query ApplicationPagePreview($id: ID!) {
+    application(id: $id) {
+      ...ApplicationView
+    }
+  }
+`;
+
+export const SEND_APPLICATION_MUTATION = gql`
+  mutation SendApplication($input: ApplicationSendMutationInput!) {
+    sendApplication(input: $input) {
+      pk
+    }
+  }
+`;

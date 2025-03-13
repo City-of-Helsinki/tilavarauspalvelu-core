@@ -186,3 +186,11 @@ export const APPLICATION_CARD_FRAGMENT = gql`
     }
   }
 `;
+
+export const CANCEL_APPLICATION_MUTATION = gql`
+  mutation CancelApplication($input: ApplicationCancelMutationInput!) {
+    cancelApplication(input: $input) {
+      pk
+    }
+  }
+`;

@@ -5455,7 +5455,6 @@ export type ApplicationSectionCommonFragment = {
 };
 
 export type ApplicationSectionUiFragment = {
-  hasReservations: boolean;
   id: string;
   pk?: number | null;
   name: string;
@@ -5788,7 +5787,6 @@ export const ApplicationSectionCommonFragmentDoc = gql`
 export const ApplicationSectionUiFragmentDoc = gql`
   fragment ApplicationSectionUI on ApplicationSectionNode {
     ...ApplicationSectionCommon
-    hasReservations
     suitableTimeRanges {
       id
       pk

@@ -210,7 +210,7 @@ export function ApplicationSectionCard({
         <SchedulesList
           section={applicationSection}
           currentReservationUnit={reservationUnit}
-          eventsPerWeek={applicationSection.appliedReservationsPerWeek ?? 0}
+          eventsPerWeek={applicationSection.appliedReservationsPerWeek}
           refetch={refetch}
         />
         <StyledLink
