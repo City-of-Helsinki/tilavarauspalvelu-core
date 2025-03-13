@@ -1,31 +1,20 @@
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
-import {
-  createMockApplicationRound,
-  createMockReservationUnitType,
-} from "@/test/testUtils";
+import { createMockApplicationRound } from "@/test/test.utils";
 import { MockedProvider } from "@apollo/client/testing";
 import SeasonalSearch from "@/pages/recurring/[id]";
 import {
   type ApplicationRoundQuery,
   ApplicationRoundStatusChoice,
-  CreateApplicationDocument,
-  type CreateApplicationMutationResult,
-  type CreateApplicationMutationVariables,
-  CurrentUserDocument,
-  type CurrentUserQuery,
-  ReservationKind,
-  ReservationUnitOrderingChoices,
-  SearchReservationUnitsDocument,
-  type SearchReservationUnitsQuery,
-  type SearchReservationUnitsQueryVariables,
 } from "@/gql/gql-types";
 import { addYears } from "date-fns";
-import { base64encode } from "common/src/helpers";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
-import { type DocumentNode } from "graphql";
+import {
+  CreateGraphQLMockProps,
+  createGraphQLMocks,
+} from "@/test/test.gql.utils";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -60,7 +49,9 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-function customRender(props: CreateGraphQLMockProps = {}) {
+function customRender(
+  props: CreateGraphQLMockProps = {}
+): ReturnType<typeof render> {
   const mocks = createGraphQLMocks(props);
   const round = createApplicationRoundMock();
   const options = {
@@ -344,198 +335,4 @@ function createApplicationRoundMock(): Readonly<
     applicationPeriodBegin: begin,
     applicationPeriodEnd: end,
   });
-}
-
-function createSearchQueryNode(
-  i: number
-): NonNullable<
-  NonNullable<SearchReservationUnitsQuery["reservationUnits"]>["edges"][number]
->["node"] {
-  return {
-    id: base64encode(`ReservationUnitNode:${i}`),
-    pk: i,
-    nameFi: `ReservationUnit ${i} FI`,
-    nameEn: `ReservationUnit ${i} EN`,
-    nameSv: `ReservationUnit ${i} SV`,
-    reservationBegins: addYears(new Date(), -1 * i).toISOString(),
-    reservationEnds: addYears(new Date(), 1 * i).toISOString(),
-    isClosed: false,
-    // TODO implement though for Seasonal this doesn't matter
-    firstReservableDatetime: null,
-    currentAccessType: null,
-    maxPersons: null,
-    // TODO implement though for Seasonal this doesn't matter
-    pricings: [],
-    unit: {
-      id: base64encode(`UnitNode:${i}`),
-      pk: i,
-      nameFi: `Unit ${i} FI`,
-      nameEn: `Unit ${i} EN`,
-      nameSv: `Unit ${i} SV`,
-      location: {
-        addressStreetFi: "Address street FI",
-        addressStreetEn: "Address street EN",
-        addressStreetSv: "Address street SV",
-        addressCityFi: "Address city FI",
-        addressCityEn: "Address city EN",
-        addressCitySv: "Address city SV",
-        id: base64encode(`LocationNode:${i}`),
-        addressZip: "00000",
-      },
-    },
-    reservationUnitType: createMockReservationUnitType({
-      name: "ReservationUnitType",
-    }),
-    images: [],
-    accessTypes: [],
-  };
-}
-
-function createSearchVariablesMock({
-  textSearch = null,
-}: {
-  textSearch?: string | null;
-} = {}): SearchReservationUnitsQueryVariables {
-  return {
-    textSearch,
-    purposes: [],
-    unit: [],
-    reservationUnitType: [],
-    equipments: [],
-    accessType: [],
-    accessTypeBeginDate: "2024-02-01T00:00:00Z",
-    accessTypeEndDate: "2025-01-01T00:00:00Z",
-    applicationRound: [1],
-    first: 36,
-    orderBy: [
-      ReservationUnitOrderingChoices.NameFiAsc,
-      ReservationUnitOrderingChoices.PkAsc,
-    ],
-    isDraft: false,
-    isVisible: true,
-    reservationKind: ReservationKind.Season,
-  };
-}
-
-type CreateGraphQLMockProps = {
-  noUser?: boolean;
-  isSearchError?: boolean;
-};
-
-// ReturnType<typeof createGraphQLMocks>;
-export type CreateGraphQLMocksReturn = Array<{
-  request: {
-    query: DocumentNode;
-    variables?: Record<string, unknown>;
-  };
-  result: {
-    data: Record<string, unknown>;
-  };
-  error?: Error | undefined;
-}>;
-// TODO parametrize the variables
-// we need at least the following:
-// - no user
-// - query var version
-// - error version
-export function createGraphQLMocks({
-  noUser = false,
-  isSearchError = false,
-}: CreateGraphQLMockProps = {}): CreateGraphQLMocksReturn {
-  // TODO this should enforce non nullable for the query
-  // it can be null when the query is loading, but when we mock it it should be non nullable
-  // Q: what about failed queries? (though they should have different type)
-  const SearchReservationUnitsQueryMock: SearchReservationUnitsQuery = {
-    reservationUnits: {
-      totalCount: 10,
-      edges: Array.from({ length: 10 }, (_, i) => ({
-        node: createSearchQueryNode(i + 1),
-      })),
-      pageInfo: {
-        // TOOD how to mock this?
-        endCursor: null,
-        hasNextPage: false,
-      },
-    },
-  };
-  const SearchReservationUnitsQueryMockWithParams: SearchReservationUnitsQuery =
-    {
-      reservationUnits: {
-        totalCount: 1,
-        edges: [
-          {
-            node: createSearchQueryNode(1),
-          },
-        ],
-        pageInfo: {
-          // TOOD how to mock this?
-          endCursor: null,
-          hasNextPage: false,
-        },
-      },
-    };
-  const CurrentUserMock: CurrentUserQuery = {
-    currentUser: !noUser
-      ? {
-          id: base64encode("UserNode:1"),
-          pk: 1,
-          firstName: "Test",
-          lastName: "User",
-          email: "test@user",
-          isAdAuthenticated: false,
-        }
-      : null,
-  };
-  const CreateApplicationMutationMock: CreateApplicationMutationResult["data"] =
-    {
-      createApplication: {
-        pk: 1,
-      },
-    };
-  const CreateApplicationMutationMockVariables: CreateApplicationMutationVariables =
-    {
-      input: {
-        applicationRound: 1,
-      },
-    };
-
-  return [
-    {
-      request: {
-        query: SearchReservationUnitsDocument,
-        variables: createSearchVariablesMock(),
-      },
-      result: {
-        data: SearchReservationUnitsQueryMock,
-      },
-      // There are no different errors for this query result (just default error text)
-      error: isSearchError ? new Error("Search error") : undefined,
-    },
-    {
-      request: {
-        query: SearchReservationUnitsDocument,
-        variables: createSearchVariablesMock({ textSearch: "foobar" }),
-      },
-      result: {
-        data: SearchReservationUnitsQueryMockWithParams,
-      },
-    },
-    {
-      request: {
-        query: CreateApplicationDocument,
-        variables: CreateApplicationMutationMockVariables,
-      },
-      result: {
-        data: CreateApplicationMutationMock,
-      },
-    },
-    {
-      request: {
-        query: CurrentUserDocument,
-      },
-      result: {
-        data: CurrentUserMock,
-      },
-    },
-  ];
 }
