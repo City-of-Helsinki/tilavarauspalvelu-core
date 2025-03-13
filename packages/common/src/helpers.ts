@@ -14,7 +14,7 @@ export type ReadonlyDeep<T> = {
 };
 
 export function filterNonNullable<T>(
-  arr: Maybe<Maybe<T>[]> | undefined
+  arr: Maybe<Readonly<Array<Maybe<T | undefined>>>> | undefined
 ): NonNullable<T>[] {
   return arr?.filter((n): n is NonNullable<T> => n != null) ?? [];
 }
@@ -184,7 +184,7 @@ function pickMaybeDay(
 }
 
 // Returns a Date object with the first day of the given array of Dates
-export function dayMin(days: Array<Date | undefined>): Date | undefined {
+export function dayMin(days: Readonly<Array<Readonly<Date | undefined>>>): Date | undefined {
   return filterNonNullable(days).reduce<Date | undefined>((acc, day) => {
     return pickMaybeDay(acc, day, isBefore);
   }, undefined);
