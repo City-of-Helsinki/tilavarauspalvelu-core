@@ -7,45 +7,27 @@ import {
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import { uniq } from "lodash-es";
-import {
-  type ApplicationRoundForApplicationFragment,
-  useSearchFormParamsUnitQuery,
-} from "@gql/gql-types";
+import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
-import { useOptions } from "@/hooks/useOptions";
 import { ApplicationEvent } from "./ApplicationEvent";
 import { type ApplicationPage1FormValues } from "./form";
 import { useReservationUnitList } from "@/hooks";
 import { ButtonContainer } from "common/styles/util";
-import {
-  convertLanguageCode,
-  getTranslationSafe,
-} from "common/src/common/util";
+import { type OptionTypes } from "./ReservationUnitList";
 
 type Props = {
   applicationRound: ApplicationRoundForApplicationFragment;
   onNext: (formValues: ApplicationPage1FormValues) => void;
+  options: OptionTypes;
 };
 
-export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
-  const { t, i18n } = useTranslation();
-  const lang = convertLanguageCode(i18n.language);
-
-  const resUnitPks = applicationRound.reservationUnits?.map(
-    (resUnit) => resUnit?.unit?.pk
-  );
-  const unitsInApplicationRound = filterNonNullable(uniq(resUnitPks));
-  const { data } = useSearchFormParamsUnitQuery();
-  const unitOptions = filterNonNullable(data?.unitsAll)
-    .filter((u) => u.pk != null && unitsInApplicationRound.includes(u.pk))
-    .map((u) => ({
-      value: u.pk ?? 0,
-      label: getTranslationSafe(u, "name", lang),
-    }));
-
-  const { options } = useOptions();
+export function Page1({
+  applicationRound,
+  onNext,
+  options,
+}: Props): JSX.Element | null {
+  const { t } = useTranslation();
 
   const form = useFormContext<ApplicationPage1FormValues>();
   const { setValue, register, unregister, watch, handleSubmit } = form;
@@ -127,10 +109,7 @@ export function Page1({ applicationRound, onNext }: Props): JSX.Element | null {
             key={event.formKey}
             index={index}
             applicationRound={applicationRound}
-            optionTypes={{
-              ...options,
-              unitOptions,
-            }}
+            optionTypes={options}
             onDeleteEvent={() => handleDeleteEvent(event.formKey)}
             onToggleAccordion={() => handleToggleAccordion(event.formKey)}
             isVisible={openByDefault || isAccordionOpen(event.formKey)}

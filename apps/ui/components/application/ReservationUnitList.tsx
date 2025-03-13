@@ -26,14 +26,15 @@ import ClientOnly from "common/src/ClientOnly";
 import { ErrorText } from "common/src/components/ErrorText";
 
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
-export type OptionType = { value: number; label: string };
-export type OptionTypes = {
-  ageGroupOptions?: OptionType[];
-  purposeOptions: OptionType[];
-  reservationUnitTypeOptions: OptionType[];
-  participantCountOptions: OptionType[];
-  unitOptions: OptionType[];
-};
+export type OptionType = Readonly<{ value: number; label: string }>;
+type OptionListType = Readonly<{ value: number; label: string }[]>;
+export type OptionTypes = Readonly<{
+  ageGroupOptions?: OptionListType;
+  purposeOptions: OptionListType;
+  reservationUnitTypeOptions: OptionListType;
+  participantCountOptions: OptionListType;
+  unitOptions: OptionListType;
+}>;
 
 type Props = {
   index: number;

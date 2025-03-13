@@ -1,5 +1,9 @@
 import { startOfDay } from "date-fns";
-import { filterNonNullable, timeToMinutes } from "common/src/helpers";
+import {
+  filterNonNullable,
+  type ReadonlyDeep,
+  timeToMinutes,
+} from "common/src/helpers";
 import {
   ApplicantTypeChoice,
   type PersonNode,
@@ -9,7 +13,7 @@ import {
   type UpdateApplicationSectionForApplicationSerializerInput,
   type ApplicantFragment,
   type ApplicationPage2Query,
-  ApplicationFormFragment,
+  type ApplicationFormFragment,
   type Maybe,
 } from "@gql/gql-types";
 import { z } from "zod";
@@ -161,7 +165,7 @@ function transformApplicationSectionPage2(
 }
 
 function convertApplicationSectionPage2(
-  section: SectionTypePage2
+  section: ReadonlyDeep<SectionTypePage2>
 ): ApplicationSectionPage2FormValues {
   const reservationUnitPk =
     section.reservationUnitOptions.find(() => true)?.reservationUnit.pk ?? 0;
@@ -186,7 +190,7 @@ export const ApplicationPage2Schema = z.object({
 export type ApplicationPage2FormValues = z.infer<typeof ApplicationPage2Schema>;
 
 function convertApplicationSectionPage1(
-  section: SectionType
+  section: ReadonlyDeep<SectionType>
 ): ApplicationSectionPage1FormValues {
   const reservationUnits = filterNonNullable(
     section.reservationUnitOptions?.map(
@@ -537,7 +541,7 @@ export function transformApplicationPage1(
 }
 
 export function convertApplicationPage2(
-  app: Pick<NodePage2, "pk" | "applicationSections">
+  app: ReadonlyDeep<Pick<NodePage2, "pk" | "applicationSections">>
 ): ApplicationPage2FormValues {
   return {
     pk: app?.pk ?? 0,
@@ -546,7 +550,7 @@ export function convertApplicationPage2(
   };
 }
 export function convertApplicationPage1(
-  app: ApplicationFormFragment,
+  app: ReadonlyDeep<ApplicationFormFragment>,
   // We pass reservationUnits here so we have a default selection for a new application section
   reservationUnits: number[]
 ): ApplicationPage1FormValues {
@@ -569,7 +573,7 @@ export function convertApplicationPage1(
     begin: "",
     end: "",
     appliedReservationsPerWeek: 1,
-    reservationUnits: filterNonNullable(reservationUnits),
+    reservationUnits,
     accordionOpen: true,
   };
   return {
@@ -675,7 +679,7 @@ export function transformPage3Application(
 }
 
 export function validateApplication(
-  application: ApplicationFormFragment
+  application: ReadonlyDeep<ApplicationFormFragment>
 ): { valid: true } | { valid: false; page: 1 | 2 | 3 } {
   const { applicationRound } = application;
   const begin = new Date(applicationRound.reservationPeriodBegin);
