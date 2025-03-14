@@ -53,6 +53,7 @@ from .types.recurring_reservation.mutations import (
     ReservationSeriesChangeAccessCodeMutation,
     ReservationSeriesCreateMutation,
     ReservationSeriesDenyMutation,
+    ReservationSeriesRepairAccessCodeMutation,
     ReservationSeriesRescheduleMutation,
     ReservationSeriesUpdateMutation,
 )
@@ -128,6 +129,7 @@ __all__ = [
     "ReservationSeriesChangeAccessCodeMutation",
     "ReservationSeriesCreateMutation",
     "ReservationSeriesDenyMutation",
+    "ReservationSeriesRepairAccessCodeMutation",
     "ReservationSeriesRescheduleMutation",
     "ReservationSeriesUpdateMutation",
     "ReservationStaffAdjustTimeMutation",
