@@ -227,27 +227,19 @@ export function ApplicationEventList({
 }: {
   application: ApplicationT;
 }): JSX.Element {
-  const sections = filterNonNullable(application.applicationSections).map(
-    (applicationEvent) => {
-      const primaryTimes = filterNonNullable(
-        applicationEvent.suitableTimeRanges
-      ).filter(filterPrimary);
-      const secondaryTimes = filterNonNullable(
-        applicationEvent.suitableTimeRanges
-      ).filter(filterSecondary);
-
-      return (
+  const sections = filterNonNullable(application.applicationSections);
+  return (
+    <>
+      {sections.map((aes) => (
         <SingleApplicationSection
-          applicationEvent={applicationEvent}
-          primaryTimes={primaryTimes}
-          secondaryTimes={secondaryTimes}
-          key={applicationEvent.pk}
+          key={aes.pk}
+          applicationEvent={aes}
+          primaryTimes={aes.suitableTimeRanges.filter(filterPrimary)}
+          secondaryTimes={aes.suitableTimeRanges.filter(filterSecondary)}
         />
-      );
-    }
+      ))}
+    </>
   );
-
-  return <>{sections}</>;
 }
 
 function Weekdays({

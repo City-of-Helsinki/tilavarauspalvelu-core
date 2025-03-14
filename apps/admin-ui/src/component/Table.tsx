@@ -1,4 +1,4 @@
-import { get } from "lodash";
+import { get } from "lodash-es";
 import React from "react";
 import styled from "styled-components";
 import { Table, TableProps } from "hds-react";

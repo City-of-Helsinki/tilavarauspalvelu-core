@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { trim } from "lodash";
+import { trim } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import { gql, type ApolloQueryResult } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
@@ -107,7 +107,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
       successToast({ text: t("ResourceTable.removeSuccess") });
       setResourceWaitingForDelete(null);
       refetch();
-    } catch (error) {
+    } catch (_) {
       errorToast({ text: t("ResourceTable.removeFailed") });
     }
   };

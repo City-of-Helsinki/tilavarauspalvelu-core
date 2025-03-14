@@ -3,7 +3,7 @@ import {
   getReservationPrice,
   getUnRoundedReservationVolume,
 } from "common";
-import { flatten, trim, uniq } from "lodash";
+import { flatten, trim, uniq } from "lodash-es";
 import {
   addMinutes,
   differenceInMinutes,
@@ -190,6 +190,7 @@ export function getActivePricing(reservationUnit: {
 
 export const RESERVATION_INFO_CARD_FRAGMENT = gql`
   fragment PriceReservationUnit on ReservationUnitNode {
+    id
     pricings {
       ...PricingFields
     }
@@ -244,7 +245,7 @@ export function getFuturePricing(
     ? (futurePricings.reverse().find((n) => {
         return n.begins <= toUIDate(new Date(reservationDate), "yyyy-MM-dd");
       }) ?? null)
-    : futurePricings[0];
+    : (futurePricings[0] ?? null);
 }
 
 function formatPrice(price: number, toCurrency?: boolean): string {
@@ -255,7 +256,7 @@ function formatPrice(price: number, toCurrency?: boolean): string {
   const floatFormatter = enableDecimals ? "twoDecimal" : "strippedDecimal";
   const formatters = getFormatters("fi");
   const formatter = formatters[toCurrency ? currencyFormatter : floatFormatter];
-  return formatter.format(price);
+  return formatter?.format(price) ?? "";
 }
 
 export type GetPriceType = {

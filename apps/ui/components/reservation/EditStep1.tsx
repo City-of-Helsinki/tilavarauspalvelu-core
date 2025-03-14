@@ -1,6 +1,7 @@
 import {
   type ReservationEditPageQuery,
   type ReservationUnitPageQuery,
+  useAdjustReservationTimeMutation,
 } from "@gql/gql-types";
 import {
   Button,
@@ -27,6 +28,8 @@ import { type UseFormReturn } from "react-hook-form";
 import { convertReservationFormToApi } from "@/modules/reservation";
 import { AcceptTerms } from "./AcceptTerms";
 import { getReservationPath } from "@/modules/urls";
+import { useDisplayError } from "@/hooks/useDisplayError";
+import { useRouter } from "next/router";
 
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
@@ -37,8 +40,6 @@ type Props = {
   reservationUnit: ReservationUnitNodeT;
   options: OptionsRecord;
   onBack: () => void;
-  handleSubmit: () => void;
-  isSubmitting: boolean;
   form: UseFormReturn<PendingReservationFormType>;
 };
 
@@ -97,8 +98,6 @@ export function EditStep1({
   reservationUnit,
   options,
   onBack,
-  handleSubmit,
-  isSubmitting,
   form,
 }: Props): JSX.Element {
   const { t } = useTranslation();
@@ -130,13 +129,49 @@ export function EditStep1({
     frozenReservationUnit?.metadataSet?.supportedFields
   );
 
-  const { watch } = form;
+  const {
+    handleSubmit,
+    watch,
+    formState: { isSubmitting },
+  } = form;
+  const router = useRouter();
+  const displayError = useDisplayError();
 
   const apiValues = convertReservationFormToApi(watch());
   const modifiedReservation = {
     ...reservation,
     begin: apiValues?.begin ?? reservation.begin,
     end: apiValues?.end ?? reservation.end,
+  };
+
+  const [mutation, { loading }] = useAdjustReservationTimeMutation();
+
+  const isLoading = loading || isSubmitting;
+
+  // TODO refactor to use form submit instead of getValues
+  const onSubmit = async (formValues: PendingReservationFormType) => {
+    if (!termsAccepted) {
+      errorToast({
+        text: t("reservationCalendar:errors.termsNotAccepted"),
+      });
+      return;
+    }
+    // const formValues = getValues();
+    const times = convertReservationFormToApi(formValues);
+    if (reservation.pk == null || times == null) {
+      return;
+    }
+    try {
+      const input = { pk: reservation.pk, ...times };
+      await mutation({
+        variables: {
+          input,
+        },
+      });
+      router.push(`${getReservationPath(reservation.pk)}?timeUpdated=true`);
+    } catch (e) {
+      displayError(e);
+    }
   };
 
   const termsAccepted = isTermsAccepted.space && isTermsAccepted.service;
@@ -146,18 +181,7 @@ export function EditStep1({
         reservation={modifiedReservation}
         bgColor="gold"
       />
-      <StyledForm
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!termsAccepted) {
-            errorToast({
-              text: t("reservationCalendar:errors.termsNotAccepted"),
-            });
-          } else {
-            handleSubmit();
-          }
-        }}
-      >
+      <StyledForm onSubmit={handleSubmit(onSubmit)}>
         <GeneralFields
           supportedFields={supportedFields}
           reservation={reservation}
@@ -176,7 +200,7 @@ export function EditStep1({
         <Actions>
           <Button
             variant={ButtonVariant.Secondary}
-            iconStart={<IconArrowLeft aria-hidden="true" />}
+            iconStart={<IconArrowLeft />}
             onClick={onBack}
             data-testid="reservation-edit__button--back"
           >
@@ -187,14 +211,14 @@ export function EditStep1({
             size="large"
             data-testid="reservation-edit__button--cancel"
           >
-            <IconCross aria-hidden="true" />
+            <IconCross />
             {t("common:stop")}
           </ButtonLikeLink>
           <Button
             type="submit"
-            variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
-            iconStart={isSubmitting ? <LoadingSpinner small /> : undefined}
-            disabled={isSubmitting || !termsAccepted}
+            variant={isLoading ? ButtonVariant.Clear : ButtonVariant.Primary}
+            iconStart={isLoading ? <LoadingSpinner small /> : undefined}
+            disabled={!termsAccepted || isLoading}
             data-testid="reservation__button--continue"
           >
             {t("reservations:saveNewTime")}

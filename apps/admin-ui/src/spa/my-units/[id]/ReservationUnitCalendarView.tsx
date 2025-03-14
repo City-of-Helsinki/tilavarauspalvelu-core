@@ -26,8 +26,9 @@ export function ReservationUnitCalendarView({
 
   // Set the first reservation unit as the default
   useEffect(() => {
-    if (reservationUnitOptions.length > 0) {
-      setReservationUnitPk(reservationUnitOptions[0].value);
+    const newVal = reservationUnitOptions[0]?.value;
+    if (newVal != null) {
+      setReservationUnitPk(newVal);
     }
   }, [reservationUnitOptions]);
 

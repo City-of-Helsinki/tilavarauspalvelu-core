@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { memoize } from "lodash";
+import { memoize } from "lodash-es";
 import type { UnitsQuery } from "@gql/gql-types";
 import type { TFunction } from "i18next";
 import { truncate } from "@/helpers";
@@ -45,7 +45,8 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
       headerName: t("Units.headings.reservationUnitCount"),
       key: "reservationUnitCount",
       isSortable: true,
-      transform: (unit: UnitType) => <>{unit?.reservationUnits?.length ?? 0}</>,
+      transform: (unit: UnitType) =>
+        (unit?.reservationUnits?.length ?? 0).toString(),
       width: "25%",
     },
     {

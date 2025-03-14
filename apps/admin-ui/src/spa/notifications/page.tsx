@@ -700,7 +700,7 @@ function LoadedContent({
 /// @param pk: primary key of the notification to edit, null for new notification, NaN for error
 /// Client only: uses hooks, window, and react-router-dom
 /// We don't have proper layouts yet, so just separate the container stuff here
-function PageWrapped({ pk }: { pk?: number }) {
+function PageWrapped({ pk }: { pk?: number }): JSX.Element {
   const typename = "BannerNotificationNode";
 
   const id = base64encode(`${typename}:${pk}`);
@@ -713,14 +713,10 @@ function PageWrapped({ pk }: { pk?: number }) {
 
   const isNew = pk === 0;
 
-  return (
-    <>
-      {isLoading ? (
-        <CenterSpinner />
-      ) : (
-        <LoadedContent isNew={isNew} notification={notification} />
-      )}
-    </>
+  return isLoading ? (
+    <CenterSpinner />
+  ) : (
+    <LoadedContent isNew={isNew} notification={notification} />
   );
 }
 

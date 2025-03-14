@@ -6,7 +6,7 @@ import {
   Notification,
   Tabs,
 } from "hds-react";
-import { uniqBy } from "lodash";
+import { uniqBy } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Link, useSearchParams } from "react-router-dom";
@@ -145,7 +145,7 @@ function EndAllocation({
       await sendResults({
         variables: { pk: applicationRound.pk ?? 0 },
       });
-    } catch (err) {
+    } catch (_) {
       errorToast({ text: t("errors.errorSendingResults") });
     }
     refetch();
@@ -322,17 +322,14 @@ export function Review({
         $direction="row-reverse"
         $alignItems="center"
       >
-        {!hideAllocation && (
-          <>
-            {isAllocationEnabled ? (
-              <ButtonLikeLink to="allocation" variant="primary" size="large">
-                {t("ApplicationRound.allocate")}
-              </ButtonLikeLink>
-            ) : (
-              <Button disabled>{t("ApplicationRound.allocate")}</Button>
-            )}
-          </>
-        )}
+        {!hideAllocation &&
+          (isAllocationEnabled ? (
+            <ButtonLikeLink to="allocation" variant="primary" size="large">
+              {t("ApplicationRound.allocate")}
+            </ButtonLikeLink>
+          ) : (
+            <Button disabled>{t("ApplicationRound.allocate")}</Button>
+          ))}
         {isEndingAllowed || isHandled ? (
           <EndAllocation
             applicationRound={applicationRound}

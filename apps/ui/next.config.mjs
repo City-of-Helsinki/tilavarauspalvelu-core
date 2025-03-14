@@ -1,15 +1,14 @@
 // @ts-check
 import { join } from "node:path";
 import * as url from "node:url";
-// eslint-disable-next-line import/extensions -- removing extension breaks build
-import i18nconfig from "./next-i18next.config.js";
+import i18nconfig from "./next-i18next.config.cjs";
 import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./env.mjs";
 import { getVersion } from "./modules/baseUtils.mjs";
 
-// TODO why was this necessary?
-// This breaks tests, they work on admin-ui but not here...
-// await import ("./env.mjs");
+// NOTE required for next-i18next to find the config file (when not .js)
+// required to be cjs because they don't support esm
+process.env.I18NEXT_DEFAULT_CONFIG_PATH = "./next-i18next.config.cjs";
 
 const ROOT_PATH = url.fileURLToPath(new URL(".", import.meta.url));
 
@@ -17,7 +16,7 @@ const { i18n } = i18nconfig;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false,
+  reactStrictMode: true,
   transpilePackages: ["common"],
   // create a smaller bundle
   output: "standalone",
@@ -28,6 +27,9 @@ const nextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  sassOptions: {
+    silenceDeprecations: ["legacy-js-api"],
   },
   i18n,
   basePath: env.NEXT_PUBLIC_BASE_URL,
@@ -53,16 +55,13 @@ const nextConfig = {
       },
     ];
   },
-  sassOptions: {
-    silenceDeprecations: ["legacy-js-api"],
-  },
+  // NOTE webpack.experimental.topLevelAwait breaks middleware (it hangs forever)
   compiler: {
     styledComponents: {
       ssr: true,
       displayName: true,
     },
   },
-  // NOTE webpack.experimental.topLevelAwait breaks middleware (it hangs forever)
 };
 
 export default withSentryConfig(nextConfig, {

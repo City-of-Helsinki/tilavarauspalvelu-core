@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
-import styled, { css, FlattenSimpleInterpolation } from "styled-components";
+import styled, { css, RuleSet } from "styled-components";
 import { Flex } from "common/styles/util";
 import { truncatedText } from "common/styles/cssFragments";
 
@@ -8,7 +8,7 @@ type LegendItemT = {
   title: string;
   color?: string;
   border?: string;
-  css?: FlattenSimpleInterpolation;
+  css?: RuleSet<object>;
 };
 
 type Props = {
@@ -29,7 +29,7 @@ const Wrapper = styled(Flex).attrs({
 const LegendItem = styled.div<{
   $color?: string;
   $border?: string;
-  $inlineCss?: FlattenSimpleInterpolation;
+  $inlineCss?: RuleSet<object>;
 }>`
   &:before {
     content: "";

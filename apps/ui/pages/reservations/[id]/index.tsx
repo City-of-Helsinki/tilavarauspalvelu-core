@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import styled from "styled-components";
-import { capitalize } from "lodash";
+import { capitalize } from "lodash-es";
 import {
   IconArrowRight,
   IconCalendar,
@@ -866,6 +866,7 @@ function ReservationInfo({
 
 export const RESERVATION_INFO_FRAGMENT = gql`
   fragment ReservationInfo on ReservationNode {
+    id
     description
     purpose {
       id

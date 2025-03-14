@@ -1,6 +1,6 @@
 import { isSameDay, parseISO } from "date-fns";
 import { type TFunction } from "next-i18next";
-import { trim } from "lodash";
+import { trim } from "lodash-es";
 import {
   toUIDate,
   getTranslation,
@@ -83,7 +83,7 @@ export const getMainImage = (ru?: {
     );
   });
 
-  return images[0];
+  return images[0] ?? null;
 };
 
 export function orderImages(images: ImageFragment[]): ImageFragment[] {

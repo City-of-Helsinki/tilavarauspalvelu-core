@@ -344,7 +344,11 @@ export function TimeSelector({
   const setSelectorData = (selected: Cell[][][]) => {
     const formVals = covertCellsToTimeRange(selected);
     for (const i of formVals.keys()) {
-      setValue(`applicationSections.${i}.suitableTimeRanges`, formVals[i], {
+      const vals = formVals[i];
+      if (vals == null) {
+        continue;
+      }
+      setValue(`applicationSections.${i}.suitableTimeRanges`, vals, {
         shouldDirty: true,
         shouldValidate: true,
         shouldTouch: true,
@@ -370,7 +374,11 @@ export function TimeSelector({
   const resetCells = () => {
     const selectorData = [...getSelectorData()];
     const updated = [...selectorData];
-    updated[index] = selectorData[index].map((n) =>
+    const toChange = selectorData[index];
+    if (toChange == null) {
+      return;
+    }
+    updated[index] = toChange.map((n) =>
       n.map((nn) => ({ ...nn, state: 100 }))
     );
     setSelectorData(updated);
@@ -379,12 +387,15 @@ export function TimeSelector({
   const copyCells = () => {
     const updated = [...getSelectorData()];
     const srcCells = updated[index];
-    srcCells.forEach((day, i) => {
+    srcCells?.forEach((day, i) => {
       day.forEach((cell, j) => {
         const { state } = cell;
         for (let k = 0; k < updated.length; k += 1) {
-          if (k !== index) {
-            updated[k][i][j].state = state;
+          if (k !== index && updated[k]?.[i]?.[j] != null) {
+            const elem = updated[k]?.[i]?.[j];
+            if (elem != null) {
+              elem.state = state;
+            }
           }
         }
       });
@@ -441,7 +452,7 @@ export function TimeSelector({
             key={`day-${day}`}
             head={t(`common:weekDayLong.${fromMondayFirstUnsafe(day)}`)}
             labelHead={t(`common:weekDay.${fromMondayFirstUnsafe(day)}`)}
-            cells={cells[day]}
+            cells={cells[day] ?? []}
             setCellValue={setCellValue}
             priority={priority ?? 200}
           />

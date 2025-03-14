@@ -212,7 +212,7 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: HeaderProps) {
           icon={<IconUser />}
         >
           {!user?.isAdAuthenticated && (
-            <a href={profileLink} target="_blank" rel="noopener norreferrer">
+            <a href={profileLink} target="_blank" rel="noopener noreferrer">
               {t("navigation:profileLinkLabel")}
               <IconLinkExternal />
             </a>

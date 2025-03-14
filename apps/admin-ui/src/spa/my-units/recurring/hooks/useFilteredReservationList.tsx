@@ -80,17 +80,20 @@ function useReservationsInInterval({
   const apiStart = toApiDate(begin);
   // NOTE backend error, it returns all till 00:00 not 23:59
   const apiEnd = toApiDate(addDays(end, 1));
+  const isIntervalValid = begin < end;
+  const isValidQuery =
+    isIntervalValid &&
+    reservationUnitPk != null &&
+    reservationUnitPk > 0 &&
+    apiStart != null &&
+    apiEnd != null;
 
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   // NOTE unlike array fetches this fetches a single element with an included array
   // so it doesn't have the 100 limitation of array fetch nor does it have pagination
   const { loading, data, refetch } = useReservationTimesInReservationUnitQuery({
-    skip:
-      !reservationUnitPk ||
-      Number.isNaN(reservationUnitPk) ||
-      !apiStart ||
-      !apiEnd,
+    skip: !isValidQuery,
     variables: {
       id,
       pk: reservationUnitPk ?? 0,

@@ -13,6 +13,11 @@ export function filterNonNullable<T>(
   return arr?.filter((n): n is NonNullable<T> => n != null) ?? [];
 }
 
+type SortFunc<T> = (a: T, b: T) => number;
+export function sort<T>(arr: T[], func: SortFunc<T>): T[] {
+  return [...arr].sort((a, b) => func(a, b));
+}
+
 /// Safe string -> number conversion
 /// handles the special cases of empty string and NaN with type safety
 /// @return null if the string is empty or NaN otherwise the number
@@ -31,7 +36,6 @@ export function toNumber(filter: Maybe<string> | undefined): number | null {
   return n;
 }
 
-/* eslint-disable @typescript-eslint/prefer-reduce-type-parameter -- generic reduce requires type casting */
 export function pick<T, K extends keyof T>(
   reservation: T,
   keys: ReadonlyArray<K>
@@ -46,7 +50,6 @@ export function pick<T, K extends keyof T>(
     {} as Pick<T, K>
   );
 }
-/* eslint-enable @typescript-eslint/prefer-reduce-type-parameter */
 
 export const toMondayFirstUnsafe = (day: number) => {
   if (day < 0 || day > 6) {
@@ -185,10 +188,16 @@ export function dayMax(days: Array<Date | undefined>): Date | undefined {
 
 /// @description Convert time string "HH:MM" to minutes
 /// safe for invalid time strings but not for invalid time values
+/// removes trailing seconds if present
 /// @return 0 if time is invalid otherwise the time in minutes
 export function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(":").map(Number).filter(Number.isFinite);
-  if (hours != null && minutes != null) {
+  const [hours, minutes] = time.split(":").map(Number);
+  if (
+    hours != null &&
+    minutes != null &&
+    isFinite(hours) &&
+    isFinite(minutes)
+  ) {
     return hours * 60 + minutes;
   }
   return 0;
@@ -245,9 +254,11 @@ export function calculateMedian(numbers: number[]): number {
   if (sorted.length === 0) {
     return 0;
   } else if (sorted.length % 2 === 0) {
-    return (sorted[middle - 1] + sorted[middle]) / 2;
+    const a = sorted[middle - 1] ?? 0;
+    const b = sorted[middle] ?? 0;
+    return (a + b) / 2;
   }
-  return sorted[middle];
+  return sorted[middle] ?? 0;
 }
 
 export function constructUrl(basePath: string, page: string): string {
@@ -258,8 +269,8 @@ export function constructUrl(basePath: string, page: string): string {
   return `${basePath}${separator}${page}`;
 }
 
-export function ignoreMaybeArray<T>(value: T | T[]): T {
-  return Array.isArray(value) ? value[0] : value;
+export function ignoreMaybeArray<T>(value: T | T[]): T | null {
+  return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
 export function convertOptionToHDS(option: {

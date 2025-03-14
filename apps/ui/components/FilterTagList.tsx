@@ -92,8 +92,8 @@ export function FilterTagList({
         // but support the better array version (key=v1&key=v2&key=v3) for new code
         const isMultiSelect = multiSelectFilters.includes(key);
         if (isMultiSelect) {
-          const isOldFormat = value.length === 1 && value[0].includes(",");
-          const values = isOldFormat ? value[0].split(",") : value;
+          const isOldFormat = value.length === 1 && value[0]?.includes(",");
+          const values = isOldFormat ? (value[0]?.split(",") ?? []) : value;
           return values.map((val) => (
             <StyledTag
               id={`filter-tag__${key}-${val}`}

@@ -268,8 +268,9 @@ export function SuitableTimeCard({
   const maxDurationSeconds = applicationSection.reservationMaxDuration ?? 0;
   const selectionDurationString = formatDuration(selectionDurationMins, t);
   // TODO this should be cleaner, only pass things we need here
-  const firstSelected = selection[0];
-  const lastSelected = selection[selection.length - 1];
+  // TODO should not default to empty string (unless this is designed zero by default)
+  const firstSelected = selection[0] ?? "";
+  const lastSelected = selection[selection.length - 1] ?? "";
   const selectionBegin = decodeTimeSlot(firstSelected);
   const selectionEnd = decodeTimeSlot(lastSelected);
   // Duration checks

@@ -21,7 +21,7 @@ import {
   getReserveeName,
 } from "@/common/util";
 import { fromAPIDateTime } from "@/helpers";
-import { filterNonNullable, toNumber } from "common/src/helpers";
+import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
@@ -45,28 +45,33 @@ export function reservationPrice(
   );
 }
 
+function getBeginTime(p: PricingFieldsFragment): number {
+  return fromApiDate(p.begins)?.getTime() ?? 0;
+}
+
 /** returns reservation unit pricing at given date */
 export function getReservatinUnitPricing(
   reservationUnit: Maybe<Pick<ReservationUnitType, "pricings">> | undefined,
-  d: Date
+  from: Date
 ): PricingFieldsFragment | null {
   if (!reservationUnit?.pricings || reservationUnit.pricings.length === 0) {
     return null;
   }
 
-  reservationUnit.pricings.sort((a, b) =>
-    a?.begins && b?.begins
-      ? (fromApiDate(a.begins)?.getTime() ?? 0) -
-        (fromApiDate(b.begins)?.getTime() ?? 0)
-      : 1
+  const pricings = sort(
+    reservationUnit.pricings,
+    (a, b) => getBeginTime(a) - getBeginTime(b)
   );
 
-  return reservationUnit.pricings.reduce((prev, current) => {
-    if ((fromApiDate(current?.begins) ?? 0) < d) {
+  // Find the first pricing that is valid at the given date
+  // requires using reduce because we have no end dates => the last begin should be used
+  return pricings.reduce<(typeof pricings)[0] | null>((prev, current) => {
+    const begin = fromApiDate(current.begins);
+    if (begin != null && begin.getTime() <= from.getTime()) {
       return current;
     }
     return prev;
-  }, reservationUnit.pricings[0]);
+  }, null);
 }
 
 /// TODO refactor this to use reasonable formatting (modern i18next)
@@ -94,9 +99,9 @@ export function getReservationPriceDetails(
   return priceUnit === PriceUnit.Fixed
     ? getReservationPrice(maxPrice, t("RequestedReservation.noPrice"), false)
     : t("RequestedReservation.ApproveDialog.priceBreakdown", {
-        volume: formatters.strippedDecimal.format(volume),
+        volume: formatters.strippedDecimal?.format(volume),
         units: t(`RequestedReservation.ApproveDialog.priceUnits.${priceUnit}`),
-        vatPercent: formatters.oneDecimal.format(taxPercentage),
+        vatPercent: formatters.oneDecimal?.format(taxPercentage),
         unit: t(`RequestedReservation.ApproveDialog.priceUnit.${priceUnit}`),
         unitPrice: getReservationPrice(maxPrice, "", false),
         price: getReservationPrice(
@@ -155,7 +160,7 @@ export function translateReservationCustomerType(
     res.reserveeIsUnregisteredAssociation
   );
   const part2WithSpace = part2 ? ` ${t(part2)}` : "";
-  return `${t(part1)}${part2WithSpace}`;
+  return `${t(part1 ?? "")}${part2WithSpace}`;
 }
 
 export function getName(
@@ -185,7 +190,7 @@ export function createTagString(
       return createRecurringTagString(reservation, t);
     }
     return createSingleTagString(reservation, t);
-  } catch (e) {
+  } catch (_) {
     return "";
   }
 }

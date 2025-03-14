@@ -1,6 +1,6 @@
 import React from "react";
 import { type ApolloError } from "@apollo/client";
-import { orderBy } from "lodash";
+import { orderBy } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { H1 } from "common/src/common/typography";

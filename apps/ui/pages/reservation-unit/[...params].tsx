@@ -380,15 +380,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
               language={i18n.language}
               selectedStep={step}
               style={{ width: "100%" }}
-              onStepClick={(e) => {
-                const target = e.currentTarget;
-                const s = target
-                  .getAttribute("data-testid")
-                  ?.replace("hds-stepper-step-", "");
-                if (s) {
-                  setStep(parseInt(s, 10));
-                }
-              }}
+              onStepClick={(_, index) => setStep(index)}
               steps={steps}
             />
           )}

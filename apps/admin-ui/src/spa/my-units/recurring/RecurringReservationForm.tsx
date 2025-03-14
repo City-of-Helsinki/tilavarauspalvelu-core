@@ -7,7 +7,7 @@ import {
   type Maybe,
 } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "react-i18next";
 import {
   Button,
   TextInput,
@@ -35,7 +35,7 @@ import ReservationTypeForm, {
 } from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
-import { base64encode } from "common/src/helpers";
+import { base64encode, toNumber } from "common/src/helpers";
 import { Element } from "@/styles/util";
 import { Label } from "@/styles/layout";
 import { AutoGrid, Flex } from "common/styles/util";
@@ -85,9 +85,9 @@ function RecurringReservationFormWrapper({ reservationUnits }: Props) {
   }));
 
   const [params] = useSearchParams();
-  const reservationUnitPk = Number(params.get("reservationUnit"));
+  const reservationUnitPk = toNumber(params.get("reservationUnit"));
   const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
-  const isValid = reservationUnitPk > 0;
+  const isValid = reservationUnitPk != null && reservationUnitPk > 0;
   const { data: queryData } = useReservationUnitQuery({
     variables: { id },
     skip: !isValid,
@@ -141,6 +141,7 @@ function RecurringReservationForm({
       enableBufferTimeBefore: false,
       repeatPattern: "weekly",
     },
+    // @ts-expect-error -- schema refinement breaks typing
     resolver: zodResolver(RecurringReservationFormSchema(interval)),
   });
 
@@ -149,7 +150,6 @@ function RecurringReservationForm({
     control,
     register,
     watch,
-    getValues,
     formState: { errors, isSubmitting },
   } = form;
 
@@ -193,8 +193,8 @@ function RecurringReservationForm({
   const checkedReservations = useFilteredReservationList({
     items: newReservations,
     reservationUnitPk: reservationUnit?.pk ?? 0,
-    begin: fromUIDate(getValues("startingDate")) ?? new Date(),
-    end: fromUIDate(getValues("endingDate")) ?? new Date(),
+    begin: fromUIDate(watch("startingDate")) ?? new Date(),
+    end: fromUIDate(watch("endingDate")) ?? new Date(),
     startTime,
     endTime,
     reservationType,
@@ -233,7 +233,7 @@ function RecurringReservationForm({
     };
 
     try {
-      const recurringPk = await mutate({
+      const recurringPk = await mutate?.({
         data,
         skipDates,
         reservationUnitPk: reservationUnit.pk,
@@ -258,8 +258,8 @@ function RecurringReservationForm({
           ?.scrollIntoView();
       } else {
         const validationErrors = getValidationErrors(e);
-        if (validationErrors.length > 0) {
-          const validationError = validationErrors[0];
+        const validationError = validationErrors[0];
+        if (validationError != null) {
           errorToast({
             text: t(`errors.backendValidation.${validationError.code}`),
           });

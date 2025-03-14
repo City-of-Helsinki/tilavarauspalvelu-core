@@ -246,17 +246,17 @@ function TimeChunkSection({
     );
   }, [startingTimeOptions]);
 
+  const time = watch("time");
   // Find out which slide has the slot that reflects the selected focusSlot
-  let activeChunk = 0;
-  for (let i = 0; i < timeChunks.length; i++) {
-    if (
-      timeChunks[i].some((item) => {
-        return item === watch("time");
-      })
-    ) {
-      activeChunk = i;
+  const activeChunk: number = useMemo(() => {
+    let runner = 0;
+    for (let i = 0; i < timeChunks.length; i++) {
+      if (timeChunks[i]?.some((item) => item === time)) {
+        runner = i;
+      }
     }
-  }
+    return runner;
+  }, [timeChunks, time]);
 
   if (startingTimeOptions.length === 0) {
     return (

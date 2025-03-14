@@ -2,31 +2,31 @@
   "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "paths": {
       "@/*": ["./*"],
       "@gql/*": ["./gql/*"]
     }
   },
+  "exclude": [
+    "node_modules"
+  ],
   "include": [
     "**/*.ts",
     "**/*.tsx",
     "**/*.d.ts",
     "env.mjs",
-    "jest.config.mjs",
-    "jest.setup.mjs",
     "types/**/*.d.ts",
     "next.config.mjs",
     "next-env.d.ts",
-    "next-i18next.config.js",
-    "jest.config.mjs",
-    "jest.setup.mjs",
+    "next-i18next.config.cjs",
+    "prettier.config.mjs",
+    "vitest.config.mts",
+    "vitest.setup.ts",
     "stylelint.config.cjs",
-    "sentry.server.config.js",
-    "sentry.edge.config.js",
-    "sentry.client.config.js",
-    ".eslintrc.js"
-  ],
-  "exclude": [
-    "node_modules"
+    "sentry.server.config.ts",
+    "sentry.edge.config.ts",
+    "sentry.client.config.ts"
   ]
 }

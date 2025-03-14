@@ -1,6 +1,7 @@
+import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import * as React from "react";
 import TermsBox, { Props } from "../TermsBox";
+import { vi, describe, test, expect } from "vitest";
 
 const bodyText = `Excepteur ut veniam minim id. Veniam laboris laborum cupidatat nisi sunt est magna id voluptate. Ullamco elit do tempor et dolore. Sit dolore laborum excepteur laborum qui eiusmod. Nisi proident officia labore sunt sit labore. Non aute ut exercitation elit sint. Aute irure reprehenderit reprehenderit amet sunt velit irure voluptate.`;
 
@@ -16,7 +17,7 @@ const defaultProps = {
   acceptLabel:
     "Esse mollit reprehenderit officia cillum. Sit voluptate aliquip veniam sit labore sit proident proident velit dolore dolor velit. Minim in et esse sint esse minim est qui dolore.",
   accepted: false,
-  setAccepted: jest.fn(),
+  setAccepted: vi.fn(),
 };
 
 const renderComponent = (props?: Partial<Props>) =>
@@ -26,19 +27,19 @@ describe("TermsBox", () => {
   test("should render with default props", () => {
     renderComponent();
 
-    const link1 = screen.getByText(defaultProps.links[0].text);
-    const link2 = screen.getByText(defaultProps.links[1].text);
+    const link1 = screen.getByText(defaultProps.links[0]?.text ?? "");
+    const link2 = screen.getByText(defaultProps.links[1]?.text ?? "");
 
     expect(screen.getByText(defaultProps.heading)).toBeInTheDocument();
 
     expect(screen.getByText(bodyText)).toBeInTheDocument();
 
     expect(link1).toBeInTheDocument();
-    expect(link1).toHaveAttribute("href", defaultProps.links[0].href);
+    expect(link1).toHaveAttribute("href", defaultProps.links[0]?.href);
     expect(link1).toHaveAttribute("target", "_blank");
 
     expect(link2).toBeInTheDocument();
-    expect(link2).toHaveAttribute("href", defaultProps.links[1].href);
+    expect(link2).toHaveAttribute("href", defaultProps.links[1]?.href);
     expect(link2).toHaveAttribute("target", "_blank");
 
     expect(screen.getByText(defaultProps.acceptLabel)).toBeInTheDocument();

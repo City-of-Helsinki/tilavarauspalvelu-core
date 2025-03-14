@@ -167,7 +167,7 @@ export function ReservationInfoCard({
           {taxPercentageValue &&
             shouldDisplayTaxPercentage &&
             `(${t("common:inclTax", {
-              taxPercentage: formatters.strippedDecimal.format(
+              taxPercentage: formatters.strippedDecimal?.format(
                 parseFloat(taxPercentageValue)
               ),
             })})`}
@@ -186,6 +186,7 @@ export function ReservationInfoCard({
 
 export const RESERVATION_INFO_CARD_FRAGMENT = gql`
   fragment ReservationInfoCard on ReservationNode {
+    id
     pk
     taxPercentageValue
     begin

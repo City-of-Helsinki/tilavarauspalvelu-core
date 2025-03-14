@@ -9,9 +9,9 @@ import {
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { participantCountOptions } from "@/modules/const";
 import { useSearchModify } from "@/hooks/useSearchValues";
-import { FilterTagList } from "./FilterTagList";
+import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { BottomContainer, Filters, StyledSubmitButton } from "./styled";
+import { BottomContainer, Filters, StyledSubmitButton } from "../search/styled";
 import { mapParamToNumber } from "@/modules/search";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { type ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
@@ -57,14 +57,14 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
 
 type OptionType = { value: number; label: string };
 export function SeasonalSearchForm({
-  reservationUnitTypeOptions,
-  purposeOptions,
-  unitOptions,
   isLoading,
+  options,
 }: Readonly<{
-  reservationUnitTypeOptions: OptionType[];
-  purposeOptions: OptionType[];
-  unitOptions: OptionType[];
+  options: {
+    reservationUnitTypeOptions: OptionType[];
+    purposeOptions: OptionType[];
+    unitOptions: OptionType[];
+  };
   isLoading: boolean;
 }>): JSX.Element | null {
   const { t } = useTranslation();
@@ -84,6 +84,7 @@ export function SeasonalSearchForm({
     value,
     label: t(`reservationUnit:accessTypes.${value}`),
   }));
+  const { reservationUnitTypeOptions, purposeOptions, unitOptions } = options;
 
   const translateTag = (key: string, value: string): string | undefined => {
     switch (key) {

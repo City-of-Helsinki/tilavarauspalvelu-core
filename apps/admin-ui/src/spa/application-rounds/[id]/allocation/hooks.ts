@@ -16,6 +16,7 @@ import {
 } from "./modules/applicationRoundAllocation";
 import { errorToast, successToast } from "common/src/common/toast";
 import { getValidationErrors, ValidationError } from "common/src/apolloUtils";
+import { toNumber } from "common/src/helpers";
 
 export function useFocusApplicationEvent(): [
   number | undefined,
@@ -93,6 +94,9 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
       // with integers for each, time is in minutes from midnight?
       const selectionBegin = slots[0];
       const selectionEnd = slots[slots.length - 1];
+      if (selectionBegin == null || selectionEnd == null) {
+        return;
+      }
       const qp = new URLSearchParams(params);
       qp.set("selectionBegin", selectionBegin);
       qp.set("selectionEnd", selectionEnd);
@@ -105,16 +109,25 @@ export function useSlotSelection(): [string[], (slots: string[]) => void] {
   const generateSelection = (begin: string, end: string): string[] => {
     // current format: {day}-{hour}-{minute}
     // with minute always 00 or 30
-    const [day, beginHour, beginMinute] = begin.split("-");
-    const [_, endHour, endMinute] = end.split("-");
+    const [day, beginHour, beginMinute] = begin.split("-").map(toNumber);
+    const [_, endHour, endMinute] = end.split("-").map(toNumber);
     const slots = [];
+    if (
+      day == null ||
+      beginHour == null ||
+      beginMinute == null ||
+      endHour == null ||
+      endMinute == null
+    ) {
+      return [];
+    }
     // NOTE: parseInt returns NaN for invalid => the loop checks will fail and return []
-    for (let hour = parseInt(beginHour); hour <= parseInt(endHour); hour++) {
+    for (let hour = beginHour; hour <= endHour; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
-        if (hour === parseInt(beginHour) && minute < parseInt(beginMinute)) {
+        if (hour === beginHour && minute < beginMinute) {
           continue;
         }
-        if (hour === parseInt(endHour) && minute > parseInt(endMinute)) {
+        if (hour === endHour && minute > endMinute) {
           break;
         }
         // garbage format: hours have no leading zero, minutes have to have it
@@ -287,8 +300,8 @@ export function useAcceptSlotMutation({
       refresh();
     } catch (e) {
       const mutErrors = getValidationErrors(e);
-      if (mutErrors.length > 0) {
-        const err = mutErrors[0];
+      const err = mutErrors[0];
+      if (err != null) {
         const errMsg = getTranslatedMutationError(err);
 
         const { name } = applicationSection;

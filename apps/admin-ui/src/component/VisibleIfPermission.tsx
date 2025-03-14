@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type ReactNode } from "react";
 import { useCheckPermission } from "@/hooks";
 import {
   type ReservationUnitReservationsFragment,
@@ -19,8 +19,8 @@ function VisibleIfPermission({
 }: {
   reservation: ReservationPermissionType;
   permission: UserPermissionChoice;
-  children: React.ReactNode;
-  otherwise?: React.ReactNode;
+  children: ReactNode;
+  otherwise?: JSX.Element | null;
 }): JSX.Element | null {
   const { user } = useSession();
   const isOwner = reservation.user?.pk === user?.pk;
@@ -30,9 +30,10 @@ function VisibleIfPermission({
   });
 
   if (!isOwner && !hasPermission) {
-    return otherwise ? <>{otherwise}</> : null;
+    return otherwise ? otherwise : null;
   }
 
+  // eslint-disable-next-line react/jsx-no-useless-fragment -- return type issues
   return <>{children}</>;
 }
 

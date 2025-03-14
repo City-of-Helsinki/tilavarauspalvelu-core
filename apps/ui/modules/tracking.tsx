@@ -3,10 +3,9 @@ import { useRouter } from "next/router";
 
 const trackPageView = () => {
   try {
-    // eslint-disable-next-line
     const _paq = (window._paq = window._paq || []);
     _paq.push(["trackPageView"]);
-  } catch (e) {
+  } catch (_) {
     // ignore
   }
 };
@@ -16,10 +15,10 @@ type TrackingWrapperProps = {
   matomoEnabled: boolean;
 };
 
-export const TrackingWrapper = ({
+export function TrackingWrapper({
   children,
   matomoEnabled,
-}: TrackingWrapperProps): JSX.Element => {
+}: TrackingWrapperProps): JSX.Element {
   const router = useRouter();
 
   useEffect(() => {
@@ -29,5 +28,6 @@ export const TrackingWrapper = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // eslint-disable-next-line react/jsx-no-useless-fragment -- return type issues
   return <>{children}</>;
-};
+}

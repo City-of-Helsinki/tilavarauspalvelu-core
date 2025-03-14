@@ -4,6 +4,7 @@ import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReservationQuery } from "@gql/gql-types";
 import { type MutationInputParams, useStaffReservationMutation } from ".";
+import { vi, describe, test, expect, beforeEach } from "vitest";
 import {
   MUTATION_DATA,
   createMockRecurringReservation,
@@ -39,7 +40,7 @@ function TestComponent({
   );
 }
 
-const successCb = jest.fn(() => {});
+const successCb = vi.fn(() => {});
 
 beforeEach(() => {
   successCb.mockReset();

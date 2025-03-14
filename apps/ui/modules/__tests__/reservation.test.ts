@@ -1,4 +1,4 @@
-import { get as mockGet } from "lodash";
+import { get as mockGet } from "lodash-es";
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
   type PaymentOrderNode,
@@ -27,6 +27,15 @@ import {
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { toApiDate } from "common/src/common/util";
 import { type TFunction } from "i18next";
+import {
+  vi,
+  describe,
+  test,
+  expect,
+  beforeAll,
+  beforeEach,
+  afterAll,
+} from "vitest";
 
 function createMockReservationUnit({
   reservationsMinDaysBefore,
@@ -121,7 +130,7 @@ function createMockReservation({
   };
 }
 
-jest.mock("next-i18next", () => ({
+vi.mock("next-i18next", () => ({
   i18n: {
     t: (str: string) => {
       const path = str.replace("prices:", "");
@@ -241,12 +250,12 @@ describe("getDurationOptions", () => {
 
 describe("isReservationCancellable", () => {
   beforeAll(() => {
-    jest.useFakeTimers({
+    vi.useFakeTimers({
       now: new Date(2024, 0, 1, 9, 0, 0),
     });
   });
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   function constructInput({
@@ -344,6 +353,7 @@ describe("getNormalizedReservationOrderStatus", () => {
   test("return correct value", () => {
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.Cancelled,
         paymentOrder: [
           {
@@ -356,6 +366,7 @@ describe("getNormalizedReservationOrderStatus", () => {
 
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.Cancelled,
         paymentOrder: [
           {
@@ -368,6 +379,7 @@ describe("getNormalizedReservationOrderStatus", () => {
 
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.Confirmed,
         paymentOrder: [
           {
@@ -382,6 +394,7 @@ describe("getNormalizedReservationOrderStatus", () => {
   test("null if created", () => {
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.Created,
         paymentOrder: [
           {
@@ -396,6 +409,7 @@ describe("getNormalizedReservationOrderStatus", () => {
   test("null if Waiting for Payment", () => {
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.WaitingForPayment,
         paymentOrder: [
           {
@@ -410,6 +424,7 @@ describe("getNormalizedReservationOrderStatus", () => {
   test("null if Requires Handling", () => {
     expect(
       getNormalizedReservationOrderStatus({
+        id: "1",
         state: ReservationStateChoice.RequiresHandling,
         paymentOrder: [
           {
@@ -477,12 +492,12 @@ describe("isReservationEditable", () => {
 
 describe("canReservationBeChanged", () => {
   beforeAll(() => {
-    jest.useFakeTimers({
+    vi.useFakeTimers({
       now: new Date(2024, 0, 1, 9, 0, 0),
     });
   });
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   let mockReservableTimes: ReservableMap;
@@ -702,7 +717,7 @@ describe("getCheckoutUrl", () => {
 
   test("returns undefined if checkoutUrl is not an url", () => {
     // we are expecting console.errors => suppress
-    jest.spyOn(console, "error").mockImplementation(jest.fn());
+    vi.spyOn(console, "error").mockImplementation(vi.fn());
     expect(
       getCheckoutUrl({
         ...order,

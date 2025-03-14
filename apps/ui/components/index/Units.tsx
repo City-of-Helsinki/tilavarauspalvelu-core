@@ -55,7 +55,7 @@ const UnitItemLink = styled(Link)`
 export function Units({ units }: Props): JSX.Element | null {
   const { t } = useTranslation(["home", "common"]);
 
-  if (!units == null || units.length === 0) {
+  if (units == null || units.length === 0) {
     return null;
   }
 

@@ -1,5 +1,5 @@
 import { TextInput } from "hds-react";
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 

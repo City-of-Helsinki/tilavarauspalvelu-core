@@ -57,8 +57,10 @@ function timeRangeToCell(timeRanges: SuitableTimeRangeType[]): Cell[][] {
 
     const day = convertWeekday(dayOfTheWeek);
     for (let h = hourBegin; h < hourEnd; h += 1) {
-      const cell = cells[day][h];
-      cell.priority = priority;
+      const cell = cells[day]?.[h];
+      if (cell) {
+        cell.priority = priority;
+      }
     }
   }
 
@@ -229,7 +231,11 @@ export function TimeSelector({
     <Wrapper>
       <CalendarContainer>
         {WEEKDAYS.map((d) => (
-          <Day key={`day-${d}`} head={t(`dayLong.${d}`)} cells={cells[d]} />
+          <Day
+            key={`day-${d}`}
+            head={t(`dayLong.${d}`)}
+            cells={cells[d] ?? []}
+          />
         ))}
       </CalendarContainer>
       <Flex $direction="row" $alignItems="center">

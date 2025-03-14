@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "preinstall": "npx -y only-allow pnpm",
     "test:browser:ci": "cd apps/ui && pnpm run test:browser:ci",
@@ -17,19 +18,19 @@
     "test": "turbo test",
     "tsc:check": "turbo tsc:check",
     "tsc:clean": "turbo tsc:clean",
-    "codegen:admin": "graphql-codegen --config codegen.ts --project admin-ui",
-    "codegen:ui": "graphql-codegen --config codegen.ts --project ui",
-    "codegen:common": "graphql-codegen --config codegen.ts --project common",
+    "codegen:admin": "graphql-codegen --project admin-ui",
+    "codegen:ui": "graphql-codegen --project ui",
+    "codegen:common": "graphql-codegen --project common",
     "codegen": "pnpm codegen:admin & pnpm codegen:ui & pnpm codegen:common",
     "codegen:watch": "pnpm codegen:admin --watch & pnpm codegen:ui --watch & pnpm codegen:common --watch"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.5",
     "@graphql-codegen/schema-ast": "^4.1.0",
-    "@graphql-codegen/typescript": "^4.0.9",
-    "@graphql-codegen/typescript-operations": "^4.2.3",
+    "@graphql-codegen/typescript": "^4.1.5",
+    "@graphql-codegen/typescript-operations": "^4.5.1",
     "@graphql-codegen/typescript-react-apollo": "^4.3.2",
-    "@parcel/watcher": "^2.5.0",
+    "@parcel/watcher": "^2.5.1",
     "graphql-config": "^5.1.3",
     "npkill": "^0.12.2",
     "turbo": "^2.4.4"

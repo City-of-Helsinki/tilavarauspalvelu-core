@@ -1,9 +1,7 @@
-module.exports ={
+module.exports = {
   extends: ["stylelint-config-standard"],
   customSyntax: "postcss-styled-syntax",
-  ignore: [
-    "hooks",
-  ],
+  ignore: ["hooks"],
   rules: {
     "media-feature-range-notation": "prefix",
     // temp rules after upgrade
@@ -20,4 +18,4 @@ module.exports ={
     "custom-property-empty-line-before": null,
     // end temp rules after upgrade
   },
-}
+};

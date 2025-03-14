@@ -1,21 +1,24 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": [
+    "@tsconfig/node20/tsconfig.json"
+  ],
   "display": "Default",
   "compilerOptions": {
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+    "module": "NodeNext",
     "composite": false,
     "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "inlineSources": false,
-    "isolatedModules": true,
-    "moduleResolution": "node",
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "preserveWatchOutput": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "strictNullChecks": true
+    "declarationMap": true
   },
   "exclude": ["node_modules"]
 }

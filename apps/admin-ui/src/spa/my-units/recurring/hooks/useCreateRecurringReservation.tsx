@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import get from "lodash/get";
+import { get } from "lodash-es";
 import {
   ReservationStateChoice,
   ReservationTypeChoice,

@@ -1,4 +1,4 @@
-import { get as mockGet } from "lodash";
+import { get as mockGet } from "lodash-es";
 import {
   addDays,
   addHours,
@@ -36,32 +36,27 @@ import {
 } from "../reservationUnit";
 import mockTranslations from "../../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "../reservable";
-import { createMockReservationUnit } from "@/test/testUtils";
+import { createMockReservationUnit, TIMERS_TO_FAKE } from "@/test/testUtils";
 import { base64encode } from "common/src/helpers";
 import { type TFunction } from "i18next";
+import { vi, describe, test, it, expect, beforeEach, afterEach } from "vitest";
 
 function mockT(str: string): ReturnType<TFunction> {
   const path = str.replace("prices:", "");
   return mockGet(mockTranslations, path);
 }
-jest.mock("next-i18next", () => ({
-  i18n: {
-    t: mockT,
-    language: "fi",
-  },
-}));
 
 // Turn into describe block and spec the tests
 describe("getPossibleTimesForDay", () => {
-  beforeAll(() => {
-    jest.useFakeTimers({
-      doNotFake: ["performance"],
+  beforeEach(() => {
+    vi.useFakeTimers({
+      toFake: [...TIMERS_TO_FAKE],
       // use two numbers for hour so we don't need to pad with 0
       now: new Date(2024, 0, 1, 10, 0, 0),
     });
   });
-  afterAll(() => {
-    jest.useRealTimers();
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   function mockReservableTimes(): ReservableMap {
@@ -661,6 +656,7 @@ describe("getFuturePricing", () => {
     days: readonly Date[];
   }) {
     return {
+      id: "1",
       reservationBegins: reservationBegins?.toISOString() ?? null,
       reservationEnds: reservationEnds?.toISOString() ?? null,
       pricings: days.map((date) =>
@@ -811,14 +807,14 @@ function constructPricing({
 }
 
 describe("getReservationUnitPrice", () => {
-  beforeAll(() => {
-    jest.useFakeTimers({
-      doNotFake: ["performance"],
+  beforeEach(() => {
+    vi.useFakeTimers({
+      toFake: [...TIMERS_TO_FAKE],
       now: new Date(2024, 0, 1, 10, 0, 0),
     });
   });
-  afterAll(() => {
-    jest.useRealTimers();
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   function connstructInput({
@@ -830,6 +826,7 @@ describe("getReservationUnitPrice", () => {
       t: mockT as TFunction,
       pricingDate: date,
       reservationUnit: {
+        id: "1",
         pricings: [
           constructPricing({
             begins: addDays(new Date(), 10),
@@ -873,6 +870,7 @@ describe("getReservationUnitPrice", () => {
       pricingDate: date,
       t: mockT as TFunction,
       reservationUnit: {
+        id: "1",
         pricings: [
           constructPricing({
             begins: addDays(new Date(), -10),
@@ -895,6 +893,7 @@ describe("getReservationUnitPrice", () => {
       t: mockT as TFunction,
       pricingDate: date,
       reservationUnit: {
+        id: "1",
         pricings: [
           constructPricing({
             begins: addDays(new Date(), -10),

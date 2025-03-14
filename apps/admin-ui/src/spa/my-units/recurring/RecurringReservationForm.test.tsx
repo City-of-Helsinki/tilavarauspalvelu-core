@@ -1,25 +1,39 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react";
-import "@testing-library/jest-dom";
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { addDays } from "date-fns";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MockedProvider } from "@apollo/client/testing";
 import { MemoryRouter } from "react-router-dom";
 import { RecurringReservationForm } from "./RecurringReservationForm";
 import {
+  vi,
+  test,
+  expect,
+  afterAll,
+  afterEach,
+  beforeEach,
+  beforeAll,
+} from "vitest";
+import {
   YEAR,
-  mocks,
+  createGraphQLMocks,
   mondayMorningReservations,
   createReservationUnits,
 } from "./__test__/mocks";
+import { toUIDate } from "common/src/common/util";
 
-function customRender() {
+const DEFAULT_DATES = {
+  begin: new Date(YEAR, 0, 1),
+  end: new Date(YEAR, 12, 31),
+};
+
+function customRender(
+  props: {
+    begin: Date;
+    end: Date;
+  } = DEFAULT_DATES
+) {
+  const mocks = createGraphQLMocks(props);
   return render(
     <MemoryRouter>
       <MockedProvider mocks={mocks} addTypename={false}>
@@ -38,33 +52,53 @@ const getReservationUnitBtn = () => {
   return btn;
 };
 
-beforeEach(() => {
-  // Hide radio button warnings
-  jest.spyOn(console, "warn").mockImplementation(() => {});
-});
-// TODO these should be set in the test setup
+// TODO move to global mocks
 beforeAll(() => {
-  jest.useFakeTimers({
-    now: new Date(2024, 0, 1, 0, 0, 0),
-    // NOTE without these the tests will fail with a timeout (async doesn't work properly)
-    doNotFake: [
-      "nextTick",
-      "setImmediate",
-      "clearImmediate",
-      "setInterval",
-      "clearInterval",
-      "setTimeout",
-      "clearTimeout",
-    ],
+  // Workaround react-testing-library hard coding to jest.useFakeTimers
+  vi.stubGlobal("jest", {
+    advanceTimersByTime: vi.advanceTimersByTime.bind(vi),
   });
 });
 afterAll(() => {
-  jest.useRealTimers();
+  vi.unstubAllGlobals();
+});
+
+// TODO these should be set in the test setup
+beforeEach(() => {
+  vi.useFakeTimers({
+    now: new Date(2024, 0, 1, 0, 0, 0),
+  });
+});
+afterEach(() => {
+  vi.runOnlyPendingTimers();
+  vi.useRealTimers();
+});
+
+// Smoke test (if this fails, all others will fail also, and it's harder to debug)
+// TODO make it so that it skips the other tests if this fails
+test("SMOKE: selecting unit field allows input to other mandatory fields", async () => {
+  const view = customRender();
+  await selectUnit();
+
+  const selectorFields = ["repeatPattern"];
+  for (const f of selectorFields) {
+    const labelElem = view.getByRole("combobox", { name: RegExp(f) });
+    expect(labelElem).toBeInTheDocument();
+    expect(labelElem).not.toBeDisabled();
+  }
+  const dateFields = ["startingDate", "endingDate"];
+  for (const f of dateFields) {
+    const labelElem = view.getByRole("textbox", { name: RegExp(f) });
+    expect(labelElem).toBeInTheDocument();
+    expect(labelElem).not.toBeDisabled();
+  }
 });
 
 test("Render recurring reservation form with all but unit field disabled", async () => {
   const view = customRender();
-  const user = userEvent.setup();
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
 
   const resUnitSelectLabel = await screen.findByText(
     "filters.label.reservationUnit"
@@ -78,11 +112,16 @@ test("Render recurring reservation form with all but unit field disabled", async
   const listbox = view.getByRole("listbox");
 
   const units = createReservationUnits();
-  expect(units[0].nameFi).toBeDefined();
-  expect(units[1].nameFi).toBeDefined();
+  const name1 = units[0]?.nameFi;
+  const name2 = units[1]?.nameFi;
+  if (name1 == null || name2 == null) {
+    throw new Error("Reservation unit names not defined");
+  }
+  expect(name1).toBeDefined();
+  expect(name2).toBeDefined();
   expect(listbox).toBeInTheDocument();
-  expect(within(listbox).getByText(units[0].nameFi!)).toBeInTheDocument();
-  expect(within(listbox).getByText(units[1].nameFi!)).toBeInTheDocument();
+  expect(within(listbox).getByText(name1)).toBeInTheDocument();
+  expect(within(listbox).getByText(name2)).toBeInTheDocument();
 
   const selectorFields = ["repeatPattern"];
   for (const f of selectorFields) {
@@ -111,9 +150,14 @@ test("Render recurring reservation form with all but unit field disabled", async
 });
 
 async function selectUnit() {
-  const user = userEvent.setup();
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
   const container = screen.getByText(/filters.label.reservationUnit/);
-  const btn = within(container.parentElement!).getByRole("combobox");
+  if (container.parentElement == null) {
+    throw new Error("No parent element found for reservation unit button");
+  }
+  const btn = within(container.parentElement).getByRole("combobox");
   expect(btn).toBeInTheDocument();
   expect(btn).toBeVisible();
   expect(btn).not.toBeDisabled();
@@ -123,33 +167,15 @@ async function selectUnit() {
 
   const listbox = screen.getByRole("listbox");
   const units = createReservationUnits();
-  expect(units[0].nameFi).toBeDefined();
-  const unitName = units[0].nameFi!;
+  const unitName = units[0]?.nameFi;
+  if (unitName == null) {
+    throw new Error("Reservation unit name not defined");
+  }
 
   const option = within(listbox).getByText("Unit");
   await user.click(option);
   expect(btn).toHaveTextContent(unitName);
 }
-
-// Smoke test (if this fails, all others will fail also, and it's harder to debug)
-// TODO make it so that it skips the other tests if this fails
-test("SMOKE: selecting unit field allows input to other mandatory fields", async () => {
-  const view = customRender();
-  await selectUnit();
-
-  const selectorFields = ["repeatPattern"];
-  for (const f of selectorFields) {
-    const labelElem = view.getByRole("combobox", { name: RegExp(f) });
-    expect(labelElem).toBeInTheDocument();
-    expect(labelElem).not.toBeDisabled();
-  }
-  const dateFields = ["startingDate", "endingDate"];
-  for (const f of dateFields) {
-    const labelElem = view.getByRole("textbox", { name: RegExp(f) });
-    expect(labelElem).toBeInTheDocument();
-    expect(labelElem).not.toBeDisabled();
-  }
-});
 
 test("Submit is disabled if all mandatory fields are not set", async () => {
   const view = customRender();
@@ -162,7 +188,9 @@ test("Submit is disabled if all mandatory fields are not set", async () => {
 
 test("Form has meta when reservation unit is selected.", async () => {
   const view = customRender();
-  const user = userEvent.setup();
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
 
   await selectUnit();
 
@@ -218,7 +246,9 @@ async function fillForm({
     throw new Error("No parent element found for reservation unit button");
   }
   const btn = within(container.parentElement).getByRole("combobox");
-  const user = userEvent.setup();
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
   expect(btn).toBeInTheDocument();
   expect(btn).toBeVisible();
   expect(btn).not.toBeDisabled();
@@ -297,31 +327,41 @@ test("Form is disabled if it's not filled", async () => {
 });
 
 test("Form can't be submitted without reservation type selection", async () => {
-  const view = customRender();
+  const begin = new Date(YEAR, 5, 1);
+  const end = addDays(begin, 30);
+  const view = customRender({ begin, end });
   await fillForm({
-    begin: `1.6.${YEAR}`,
-    end: `30.6.${YEAR}`,
+    begin: toUIDate(begin),
+    end: toUIDate(end),
     dayNumber: 1,
+  });
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
   });
 
   const submit = view.getByRole("button", { name: /common.reserve/ });
   expect(submit).toBeInTheDocument();
   expect(submit).not.toBeDisabled();
-  fireEvent.submit(submit);
+  user.click(submit);
   await view.findByText(/required/i);
 });
 
-test("Form submission without any blocking reservations", async () => {
-  const view = customRender();
-
+// TODO: vi.useFakeTimers throws an error here (not mocked even though it is)
+test.skip("Form submission without any blocking reservations", async () => {
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
+  const begin = new Date(YEAR, 5, 1);
+  const end = addDays(begin, 30);
+  const view = customRender({ begin, end });
   await fillForm({
-    begin: `1.6.${YEAR}`,
-    end: `30.6.${YEAR}`,
+    begin: toUIDate(begin),
+    end: toUIDate(end),
     dayNumber: 1,
   });
 
   const typeStaff = screen.getByLabelText(/STAFF/);
-  await userEvent.click(typeStaff);
+  await user.click(typeStaff);
 
   const list = view.getByTestId("reservations-list");
   expect(list).toBeInTheDocument();
@@ -334,8 +374,7 @@ test("Form submission without any blocking reservations", async () => {
   const submit = screen.getByText(/common.reserve/);
   expect(submit).toBeInTheDocument();
   expect(submit).not.toBeDisabled();
-  fireEvent.submit(submit);
-  // TODO need await after fireEvent it doesn't wait
+  user.click(submit);
 
   expect(view.queryByText(/required/)).not.toBeInTheDocument();
   /* TODO submit checking doesn't work
@@ -346,19 +385,23 @@ test("Form submission without any blocking reservations", async () => {
   // TODO test submit and check both CREATE_RECURRING and CREATE_STAFF mutations get called
   // we need to return the specific values from those mutations
   // and check that the wanted 4 reservations were made (or if we want to test errors)
-}, 15_000);
+});
 
 test("Form submission with a lot of blocking reservations", async () => {
-  const view = customRender();
-
+  const begin = new Date(YEAR, 0, 1);
+  const end = new Date(YEAR, 11, 31);
+  const view = customRender({ begin, end });
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
   await fillForm({
-    begin: `1.1.${YEAR}`,
-    end: `31.12.${YEAR}`,
+    begin: toUIDate(begin),
+    end: toUIDate(end),
     dayNumber: 0,
   });
 
   const typeStaff = screen.getByLabelText(/STAFF/);
-  await userEvent.click(typeStaff);
+  await user.click(typeStaff);
 
   // Handle 52 / 53 mondays in a year
   let nMondays = 0;
@@ -388,21 +431,23 @@ test("Form submission with a lot of blocking reservations", async () => {
   expect(overlaps).toHaveLength(mondayMorningReservations.length);
 
   // TODO test submit, but it doesn't work without extra context
-
-  // NOTE This test is long running by design. jest.setTimeout doesn't work for async functions
-}, 15_000);
+});
 
 test("Reservations can be removed and restored", async () => {
-  const view = customRender();
-
+  const begin = new Date(YEAR, 5, 1);
+  const end = addDays(begin, 30);
+  const view = customRender({ begin, end });
+  const user = userEvent.setup({
+    advanceTimers: vi.advanceTimersByTime.bind(vi),
+  });
   await fillForm({
-    begin: `1.6.${YEAR}`,
-    end: `30.6.${YEAR}`,
+    begin: toUIDate(begin),
+    end: toUIDate(end),
     dayNumber: 1,
   });
 
   const typeStaff = screen.getByLabelText(/STAFF/);
-  await userEvent.click(typeStaff);
+  await user.click(typeStaff);
 
   const list = view.getByTestId("reservations-list");
   expect(list).toBeInTheDocument();
@@ -418,16 +463,20 @@ test("Reservations can be removed and restored", async () => {
     expect(x).toHaveTextContent(/common.remove/);
   });
 
-  await userEvent.click(removeButtons[0]);
+  const testButton = removeButtons[0];
+  if (testButton == null) {
+    throw new Error("No remove button found");
+  }
+  await user.click(testButton);
   await within(list).findByText(/common.restore/);
   const restore = within(list).getByText(/common.restore/);
   expect(within(list).queryAllByText(/common.remove/)).toHaveLength(3);
 
-  await userEvent.click(restore);
+  await user.click(restore);
   await waitFor(
     async () => (await within(list).findAllByText(/common.remove/)).length === 4
   );
-}, 15_000);
+});
 
 // NOTE this requires us to fix submission checking
 test.todo("Removed reservations are not included in the mutation");

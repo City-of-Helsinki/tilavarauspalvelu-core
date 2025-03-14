@@ -4,13 +4,14 @@ import {
 } from "../../../gql/gql-types";
 import { getEventBuffers } from "../../calendar/util";
 import { getIntervalMinutes } from "../../conversion";
+import { vi, describe, test, expect } from "vitest";
 
 const tfunction = (str: string, options: { count: number }) => {
   const countStr = options?.count > 1 ? "plural" : "singular";
   return options?.count ? `${options.count} ${countStr}` : str;
 };
 
-jest.mock("next-i18next", () => ({
+vi.mock("next-i18next", () => ({
   i18n: {
     t: (str: string, options: { count: number }) => tfunction(str, options),
   },
