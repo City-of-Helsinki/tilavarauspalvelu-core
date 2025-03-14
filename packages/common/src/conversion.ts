@@ -1,4 +1,5 @@
 import {
+  AccessType,
   type Maybe,
   ReservationStartInterval,
   ReservationTypeChoice,
@@ -111,5 +112,20 @@ export function getIntervalMinutes(
       return 360;
     case ReservationStartInterval.Interval_420Mins:
       return 420;
+  }
+}
+
+export function transformAccessTypeSafe(t: string): AccessType | null {
+  switch (t) {
+    case AccessType.AccessCode:
+      return AccessType.AccessCode;
+    case AccessType.PhysicalKey:
+      return AccessType.PhysicalKey;
+    case AccessType.OpenedByStaff:
+      return AccessType.OpenedByStaff;
+    case AccessType.Unrestricted:
+      return AccessType.Unrestricted;
+    default:
+      return null;
   }
 }

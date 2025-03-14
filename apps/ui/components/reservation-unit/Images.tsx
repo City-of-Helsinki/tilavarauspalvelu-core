@@ -7,7 +7,7 @@ import type { ImageFragment } from "@gql/gql-types";
 import Carousel from "../Carousel";
 import { getImageSource } from "common/src/helpers";
 
-const Modal = dynamic(() => import("../common/Modal"));
+const Modal = dynamic(() => import("../Modal").then((module) => module.Modal));
 type Props = {
   images: ImageFragment[];
   contextName?: string;

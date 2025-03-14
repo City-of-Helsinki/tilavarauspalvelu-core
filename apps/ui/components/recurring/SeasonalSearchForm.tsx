@@ -8,7 +8,6 @@ import {
 } from "hds-react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { participantCountOptions } from "@/modules/const";
-import { useSearchModify } from "@/hooks/useSearchValues";
 import { FilterTagList } from "../FilterTagList";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { mapParamToNumber } from "@/modules/search";
@@ -32,7 +31,7 @@ const filterOrder = [
   "accessType",
 ] as const;
 
-type FormValues = {
+export type SearchFormValues = {
   minPersons: number | null;
   maxPersons: number | null;
   unit: number[];
@@ -43,7 +42,7 @@ type FormValues = {
 };
 
 // TODO combine as much as possible with the one in single-search (move them to a common place)
-function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
+function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   return {
     purposes: mapParamToNumber(params.getAll("purposes"), 1),
     unit: mapParamToNumber(params.getAll("unit"), 1),
@@ -65,24 +64,26 @@ export type SearchFormProps = {
     purposeOptions: Readonly<OptionType[]>;
     unitOptions: Readonly<OptionType[]>;
   }>;
+  handleSearch: SubmitHandler<SearchFormValues>;
   isLoading: boolean;
 };
 
 export function SeasonalSearchForm({
   isLoading,
   options,
+  handleSearch,
 }: Readonly<SearchFormProps>): JSX.Element | null {
   const { t } = useTranslation();
 
-  const { handleSearch } = useSearchModify();
-
   const searchValues = useSearchParams();
-  const { control, register, handleSubmit } = useForm<FormValues>({
+  const { control, register, handleSubmit } = useForm<SearchFormValues>({
     values: mapQueryToForm(searchValues),
   });
 
-  const search: SubmitHandler<FormValues> = (criteria: FormValues) => {
-    handleSearch(criteria, true);
+  const onSubmit: SubmitHandler<SearchFormValues> = (
+    data: SearchFormValues
+  ) => {
+    handleSearch(data);
   };
 
   const accessTypeOptions = Object.values(AccessType).map((value) => ({
@@ -122,7 +123,18 @@ export function SeasonalSearchForm({
   ] as const;
 
   return (
-    <form noValidate onSubmit={handleSubmit(search)}>
+    <form
+      noValidate
+      onSubmit={(evt) => {
+        // React.createPortal does not stop propagation
+        // the only way to handle nested forms in React is to move Modals out of the JSX tree (and vdom)
+        // e.g. use context with a list of elements to render that moves the JSX out of the main tree
+        // portal only moves the DOM element, while propagation works on the vdom
+        evt.stopPropagation();
+        evt.preventDefault();
+        handleSubmit(onSubmit)();
+      }}
+    >
       <Filters>
         <TextInput
           id="search"
@@ -131,7 +143,7 @@ export function SeasonalSearchForm({
           placeholder={t("searchForm:searchTermPlaceholder")}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              handleSubmit(search)();
+              handleSubmit(onSubmit)();
             }
           }}
         />

@@ -1,5 +1,5 @@
-import FocusTrap from "focus-trap-react";
 import React from "react";
+import { FocusTrap } from "focus-trap-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { isBrowser } from "common/src/helpers";
@@ -79,7 +79,7 @@ type Props = {
 };
 
 /// TODO disable body scroll when modal is open
-function Modal({
+export function Modal({
   handleClose,
   show,
   children,
@@ -122,5 +122,3 @@ function Modal({
     </Overlay>
   );
 }
-
-export default Modal;
