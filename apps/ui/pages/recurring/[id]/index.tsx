@@ -20,10 +20,13 @@ import {
   base64encode,
   filterNonNullable,
   ignoreMaybeArray,
-  ReadonlyDeep,
+  type ReadonlyDeep,
   toNumber,
 } from "common/src/helpers";
-import { SeasonalSearchForm } from "@/components/recurring/SeasonalSearchForm";
+import {
+  type SearchFormValues,
+  SeasonalSearchForm,
+} from "@/components/recurring/SeasonalSearchForm";
 import { createApolloClient } from "@/modules/apolloClient";
 import { RecurringCard } from "@/components/recurring/RecurringCard";
 import { useReservationUnitList } from "@/hooks";
@@ -39,6 +42,7 @@ import { getApplicationPath, seasonalPrefix } from "@/modules/urls";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { gql } from "@apollo/client";
 import { convertLanguageCode } from "common/src/common/util";
+import { useSearchModify } from "@/hooks/useSearchValues";
 
 type SeasonalSearchProps = ReadonlyDeep<
   Pick<NarrowedProps, "applicationRound" | "options" | "apiBaseUrl">
@@ -52,6 +56,12 @@ function SeasonalSearch({
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const searchValues = useSearchParams();
+
+  const { handleSearch } = useSearchModify();
+
+  const onSearch = (criteria: SearchFormValues) => {
+    handleSearch(criteria, true);
+  };
 
   const {
     selectReservationUnit,
@@ -99,7 +109,11 @@ function SeasonalSearch({
           {t("errors:search")}
         </Notification>
       ) : null}
-      <SeasonalSearchForm options={options} isLoading={isLoading} />
+      <SeasonalSearchForm
+        options={options}
+        isLoading={isLoading}
+        handleSearch={onSearch}
+      />
       <ListWithPagination
         items={reservationUnits?.map((ru) => (
           <RecurringCard
