@@ -16,7 +16,6 @@
     "types/**/*.d.ts",
     "i18next.d.ts",
     "middleware.ts",
-    ".eslintrc.cjs",
     "stylelint.config.cjs",
     "next-i18next.config.cjs",
     "vitest.config.mts",

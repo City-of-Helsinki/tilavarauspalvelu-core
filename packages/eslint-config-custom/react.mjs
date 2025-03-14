@@ -3,6 +3,8 @@ import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import globals from "globals";
 import reactPlugin from 'eslint-plugin-react';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore -- types missing?
 import eslintPluginReactHooks from "eslint-plugin-react-hooks";
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import graphqlPlugin from '@graphql-eslint/eslint-plugin'
@@ -60,6 +62,7 @@ const myRules = {
       ignoreRestSiblings: true,
     },
   ],
+  "@typescript-eslint/no-non-null-assertion": "error",
   // for some reason this raises errors for "key" props in jsx arrays
   "react/prop-types": "off",
   "react/no-array-index-key": "error",
@@ -99,7 +102,7 @@ const myConfig = {
     },
   },
   languageOptions: {
-    ...reactPlugin.configs.flat.recommended.languageOptions,
+    ...reactPlugin.configs.flat.recommended?.languageOptions,
     ecmaVersion: 2022,
     sourceType: "module",
     parserOptions: {

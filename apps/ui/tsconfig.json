@@ -20,14 +20,13 @@
     "types/**/*.d.ts",
     "next.config.mjs",
     "next-env.d.ts",
-    "next-i18next.config.js",
+    "next-i18next.config.cjs",
     "prettier.config.mjs",
     "vitest.config.mts",
     "vitest.setup.ts",
     "stylelint.config.cjs",
     "sentry.server.config.ts",
     "sentry.edge.config.ts",
-    "sentry.client.config.ts",
-    ".eslintrc.cjs"
+    "sentry.client.config.ts"
   ]
 }

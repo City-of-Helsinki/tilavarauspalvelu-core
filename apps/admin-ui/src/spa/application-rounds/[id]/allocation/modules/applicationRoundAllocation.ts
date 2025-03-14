@@ -75,7 +75,7 @@ export function applicationEventSchedulesToCells(
 }
 
 export const timeSlotKeyToTime = (slot: string): number => {
-  const [, hours, minutes] = slot.split("-").map(Number);
+  const [, hours, minutes] = slot.split("-").map(toNumber);
   if (hours == null || minutes == null) {
     return 0;
   }
@@ -120,7 +120,7 @@ export function getTimeSlotOptions(
 type TimeSlot = { day: number; hour: number };
 
 export function decodeTimeSlot(slot: string): TimeSlot {
-  const [day, hour, min] = slot.split("-").map(Number);
+  const [day, hour, min] = slot.split("-").map(toNumber);
   return { day: day ?? 0, hour: (hour ?? 0) + (min ?? 0) / 60 };
 }
 
@@ -151,8 +151,8 @@ export function getTimeSeries(
   begin: string,
   end: string
 ): string[] {
-  const [, startHours, startMinutes] = begin.split("-").map(Number);
-  const [, endHours, endMinutes] = end.split("-").map(Number);
+  const [, startHours, startMinutes] = begin.split("-").map(toNumber);
+  const [, endHours, endMinutes] = end.split("-").map(toNumber);
   const timeSlots: string[] = [];
   if (startHours == null || startMinutes == null || endHours == null) {
     return timeSlots;
@@ -269,11 +269,11 @@ export function getRelatedTimeSlots(
     const day = convertWeekday(ts.dayOfTheWeek);
     const begin = parseApiTime(ts.beginTime);
     const end = parseApiTime(ts.endTime);
-    if (begin == null || end == null) {
+    const arr = acc[day];
+    if (begin == null || end == null || arr == null) {
       return acc;
     }
-    // @ts-expect-error -- this can't fail
-    acc[day].push({
+    arr.push({
       day,
       beginTime: begin * 60,
       endTime: end * 60,
