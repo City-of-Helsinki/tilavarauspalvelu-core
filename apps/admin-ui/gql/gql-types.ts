@@ -5454,63 +5454,69 @@ export type ApplicationSectionCommonFragment = {
   }>;
 };
 
-export type ApplicationSectionUiFragment = {
+export type SuitableTimeFragment = {
   id: string;
   pk?: number | null;
-  name: string;
-  status?: ApplicationSectionStatusChoice | null;
-  reservationMaxDuration: number;
-  numPersons: number;
-  reservationsEndDate: string;
-  reservationsBeginDate: string;
-  appliedReservationsPerWeek: number;
-  reservationMinDuration: number;
-  suitableTimeRanges: Array<{
-    id: string;
-    pk?: number | null;
-    beginTime: string;
-    endTime: string;
-    dayOfTheWeek: Weekday;
-    priority: Priority;
-  }>;
-  purpose?: {
+  beginTime: string;
+  endTime: string;
+  dayOfTheWeek: Weekday;
+  priority: Priority;
+};
+
+export type ReservationPurposeNameFragment = {
+  id: string;
+  pk?: number | null;
+  nameFi?: string | null;
+  nameSv?: string | null;
+  nameEn?: string | null;
+};
+
+export type ReservationUnitNameFragment = {
+  id: string;
+  pk?: number | null;
+  nameFi?: string | null;
+  nameEn?: string | null;
+  nameSv?: string | null;
+  unit?: {
     id: string;
     pk?: number | null;
     nameFi?: string | null;
-    nameSv?: string | null;
     nameEn?: string | null;
+    nameSv?: string | null;
   } | null;
-  reservationUnitOptions: Array<{
+};
+
+export type ApplicationRoundTimeSlotsFragment = {
+  id: string;
+  pk?: number | null;
+  weekday: number;
+  closed: boolean;
+  reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+};
+
+export type ReservationUnitOptionFragment = {
+  id: string;
+  reservationUnit: {
     id: string;
     pk?: number | null;
-    preferredOrder: number;
-    reservationUnit: {
+    nameFi?: string | null;
+    nameEn?: string | null;
+    nameSv?: string | null;
+    applicationRoundTimeSlots: Array<{
+      id: string;
+      pk?: number | null;
+      weekday: number;
+      closed: boolean;
+      reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+    }>;
+    unit?: {
       id: string;
       pk?: number | null;
       nameFi?: string | null;
       nameEn?: string | null;
       nameSv?: string | null;
-      unit?: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-      } | null;
-      applicationRoundTimeSlots: Array<{
-        id: string;
-        weekday: number;
-        closed: boolean;
-        reservableTimes?: Array<{ begin: string; end: string } | null> | null;
-      }>;
-    };
-  }>;
-  ageGroup?: {
-    id: string;
-    pk?: number | null;
-    minimum: number;
-    maximum?: number | null;
-  } | null;
+    } | null;
+  };
 };
 
 export type ApplicantFragment = {
@@ -5846,8 +5852,8 @@ export type ApplicationAdminFragment = {
   additionalInformation?: string | null;
   applicationRound: { id: string; pk?: number | null; nameFi?: string | null };
   applicationSections?: Array<{
-    id: string;
     allocations?: number | null;
+    id: string;
     pk?: number | null;
     name: string;
     status?: ApplicationSectionStatusChoice | null;
@@ -5857,33 +5863,6 @@ export type ApplicationAdminFragment = {
     reservationsBeginDate: string;
     appliedReservationsPerWeek: number;
     reservationMinDuration: number;
-    reservationUnitOptions: Array<{
-      id: string;
-      rejected: boolean;
-      pk?: number | null;
-      preferredOrder: number;
-      allocatedTimeSlots: Array<{ pk?: number | null; id: string }>;
-      reservationUnit: {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameEn?: string | null;
-        nameSv?: string | null;
-        unit?: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-          nameEn?: string | null;
-          nameSv?: string | null;
-        } | null;
-        applicationRoundTimeSlots: Array<{
-          id: string;
-          weekday: number;
-          closed: boolean;
-          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
-        }>;
-      };
-    }>;
     suitableTimeRanges: Array<{
       id: string;
       pk?: number | null;
@@ -5899,6 +5878,34 @@ export type ApplicationAdminFragment = {
       nameSv?: string | null;
       nameEn?: string | null;
     } | null;
+    reservationUnitOptions: Array<{
+      id: string;
+      rejected: boolean;
+      pk?: number | null;
+      preferredOrder: number;
+      allocatedTimeSlots: Array<{ pk?: number | null; id: string }>;
+      reservationUnit: {
+        id: string;
+        pk?: number | null;
+        nameFi?: string | null;
+        nameEn?: string | null;
+        nameSv?: string | null;
+        applicationRoundTimeSlots: Array<{
+          id: string;
+          pk?: number | null;
+          weekday: number;
+          closed: boolean;
+          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+        }>;
+        unit?: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameEn?: string | null;
+          nameSv?: string | null;
+        } | null;
+      };
+    }>;
     ageGroup?: {
       id: string;
       pk?: number | null;
@@ -6575,8 +6582,8 @@ export type ReservationUnitEditQuery = {
     applicationRoundTimeSlots: Array<{
       id: string;
       pk?: number | null;
-      closed: boolean;
       weekday: number;
+      closed: boolean;
       reservableTimes?: Array<{ begin: string; end: string } | null> | null;
     }>;
   } | null;
@@ -7375,8 +7382,8 @@ export type ApplicationAdminQuery = {
       nameFi?: string | null;
     };
     applicationSections?: Array<{
-      id: string;
       allocations?: number | null;
+      id: string;
       pk?: number | null;
       name: string;
       status?: ApplicationSectionStatusChoice | null;
@@ -7386,36 +7393,6 @@ export type ApplicationAdminQuery = {
       reservationsBeginDate: string;
       appliedReservationsPerWeek: number;
       reservationMinDuration: number;
-      reservationUnitOptions: Array<{
-        id: string;
-        rejected: boolean;
-        pk?: number | null;
-        preferredOrder: number;
-        allocatedTimeSlots: Array<{ pk?: number | null; id: string }>;
-        reservationUnit: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-          nameEn?: string | null;
-          nameSv?: string | null;
-          unit?: {
-            id: string;
-            pk?: number | null;
-            nameFi?: string | null;
-            nameEn?: string | null;
-            nameSv?: string | null;
-          } | null;
-          applicationRoundTimeSlots: Array<{
-            id: string;
-            weekday: number;
-            closed: boolean;
-            reservableTimes?: Array<{
-              begin: string;
-              end: string;
-            } | null> | null;
-          }>;
-        };
-      }>;
       suitableTimeRanges: Array<{
         id: string;
         pk?: number | null;
@@ -7431,6 +7408,37 @@ export type ApplicationAdminQuery = {
         nameSv?: string | null;
         nameEn?: string | null;
       } | null;
+      reservationUnitOptions: Array<{
+        id: string;
+        rejected: boolean;
+        pk?: number | null;
+        preferredOrder: number;
+        allocatedTimeSlots: Array<{ pk?: number | null; id: string }>;
+        reservationUnit: {
+          id: string;
+          pk?: number | null;
+          nameFi?: string | null;
+          nameEn?: string | null;
+          nameSv?: string | null;
+          applicationRoundTimeSlots: Array<{
+            id: string;
+            pk?: number | null;
+            weekday: number;
+            closed: boolean;
+            reservableTimes?: Array<{
+              begin: string;
+              end: string;
+            } | null> | null;
+          }>;
+          unit?: {
+            id: string;
+            pk?: number | null;
+            nameFi?: string | null;
+            nameEn?: string | null;
+            nameSv?: string | null;
+          } | null;
+        };
+      }>;
       ageGroup?: {
         id: string;
         pk?: number | null;
@@ -9054,52 +9062,65 @@ export const ApplicantFragmentDoc = gql`
     }
   }
 `;
-export const ApplicationSectionUiFragmentDoc = gql`
-  fragment ApplicationSectionUI on ApplicationSectionNode {
-    ...ApplicationSectionCommon
-    suitableTimeRanges {
-      id
-      pk
-      beginTime
-      endTime
-      dayOfTheWeek
-      priority
-    }
-    purpose {
+export const SuitableTimeFragmentDoc = gql`
+  fragment SuitableTime on SuitableTimeRangeNode {
+    id
+    pk
+    beginTime
+    endTime
+    dayOfTheWeek
+    priority
+  }
+`;
+export const ReservationPurposeNameFragmentDoc = gql`
+  fragment ReservationPurposeName on ReservationPurposeNode {
+    id
+    pk
+    nameFi
+    nameSv
+    nameEn
+  }
+`;
+export const ReservationUnitNameFragmentDoc = gql`
+  fragment ReservationUnitName on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    unit {
       id
       pk
       nameFi
-      nameSv
       nameEn
+      nameSv
     }
-    reservationUnitOptions {
-      id
-      reservationUnit {
-        id
-        pk
-        nameFi
-        nameEn
-        nameSv
-        unit {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-        applicationRoundTimeSlots {
-          id
-          weekday
-          closed
-          reservableTimes {
-            begin
-            end
-          }
-        }
+  }
+`;
+export const ApplicationRoundTimeSlotsFragmentDoc = gql`
+  fragment ApplicationRoundTimeSlots on ApplicationRoundTimeSlotNode {
+    id
+    pk
+    weekday
+    closed
+    reservableTimes {
+      begin
+      end
+    }
+  }
+`;
+export const ReservationUnitOptionFragmentDoc = gql`
+  fragment ReservationUnitOption on ReservationUnitOptionNode {
+    id
+    reservationUnit {
+      ...ReservationUnitName
+      applicationRoundTimeSlots {
+        ...ApplicationRoundTimeSlots
       }
     }
   }
-  ${ApplicationSectionCommonFragmentDoc}
+  ${ReservationUnitNameFragmentDoc}
+  ${ApplicationRoundTimeSlotsFragmentDoc}
 `;
 export const ApplicationAdminFragmentDoc = gql`
   fragment ApplicationAdmin on ApplicationNode {
@@ -9114,11 +9135,17 @@ export const ApplicationAdminFragmentDoc = gql`
       nameFi
     }
     applicationSections {
-      id
-      ...ApplicationSectionUI
+      ...ApplicationSectionCommon
+      suitableTimeRanges {
+        ...SuitableTime
+      }
+      purpose {
+        ...ReservationPurposeName
+      }
       allocations
       reservationUnitOptions {
         id
+        ...ReservationUnitOption
         rejected
         allocatedTimeSlots {
           pk
@@ -9128,7 +9155,10 @@ export const ApplicationAdminFragmentDoc = gql`
     }
   }
   ${ApplicantFragmentDoc}
-  ${ApplicationSectionUiFragmentDoc}
+  ${ApplicationSectionCommonFragmentDoc}
+  ${SuitableTimeFragmentDoc}
+  ${ReservationPurposeNameFragmentDoc}
+  ${ReservationUnitOptionFragmentDoc}
 `;
 export const ReservationCommonFragmentDoc = gql`
   fragment ReservationCommon on ReservationNode {
@@ -11436,19 +11466,13 @@ export const ReservationUnitEditDocument = gql`
         highestPriceNet
       }
       applicationRoundTimeSlots {
-        id
-        pk
-        closed
-        weekday
-        reservableTimes {
-          begin
-          end
-        }
+        ...ApplicationRoundTimeSlots
       }
     }
   }
   ${ImageFragmentDoc}
   ${PricingFieldsFragmentDoc}
+  ${ApplicationRoundTimeSlotsFragmentDoc}
 `;
 
 /**

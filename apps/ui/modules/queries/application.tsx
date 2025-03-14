@@ -16,7 +16,16 @@ export const APPLICATION_FORM_FRAGMENT = gql`
       notesWhenApplyingSv
     }
     applicationSections {
-      ...ApplicationSectionUI
+      ...ApplicationSectionCommon
+      suitableTimeRanges {
+        ...SuitableTime
+      }
+      purpose {
+        ...ReservationPurposeName
+      }
+      reservationUnitOptions {
+        ...ReservationUnitOption
+      }
     }
   }
 `;
