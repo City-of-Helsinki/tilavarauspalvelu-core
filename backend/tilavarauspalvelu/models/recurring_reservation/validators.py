@@ -7,12 +7,13 @@ from typing import TYPE_CHECKING
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
-from utils.date_utils import local_date
+from utils.date_utils import local_date, local_datetime
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.enums import ReservationStartInterval
-    from tilavarauspalvelu.models import RecurringReservation
+    from tilavarauspalvelu.models import RecurringReservation, Reservation
 
 __all__ = [
     "ReservationSeriesValidator",
@@ -63,3 +64,23 @@ class ReservationSeriesValidator:
         if not is_valid_start_interval:
             msg = f"Reservation start time does not match the allowed interval of {interval_minutes} minutes."
             raise ValidationError(msg, code=error_codes.RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL)
+
+    def validate_has_access_code_access_type(self) -> None:
+        if AccessType.ACCESS_CODE not in self.series.used_access_types:
+            msg = "Reservation series does not use access codes in any of its reservations."
+            raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_NOT_ACCESS_CODE)
+
+    def validate_requires_active_access_code(self) -> None:
+        if not self.series.should_have_active_access_code:
+            msg = "Reservation series should not have active access code."
+            raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_SHOULD_NOT_HAVE_ACTIVE_ACCESS_CODE)
+
+    def validate_series_has_ongoing_or_future_reservations(self) -> None:
+        reservation: Reservation | None = self.series.reservations.last()
+        if reservation is None:
+            msg = "Reservation series has no reservations."
+            raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_NO_RESERVATION)
+
+        if reservation.end < local_datetime():
+            msg = "Last reservation in the series has already ended."
+            raise ValidationError(msg, code=error_codes.RESERVATION_SERIES_HAS_ENDED)
