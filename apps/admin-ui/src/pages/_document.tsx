@@ -51,6 +51,7 @@ export default class MyDocument extends Document {
         <Head>
           <style
             data-used-styles
+            // eslint-disable-next-line react/no-danger -- this is safe
             dangerouslySetInnerHTML={{ __html: hdsCriticalRules }}
           />
           <meta name="color-scheme" content="light only" />

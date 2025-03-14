@@ -46,13 +46,11 @@ export function RecurringReservation() {
   return (
     <>
       <LinkPrev />
-      <>
-        {isError ? (
-          <RecurringErrorPage />
-        ) : (
-          <RecurringReservationInner unitId={unitPk} />
-        )}
-      </>
+      {isError ? (
+        <RecurringErrorPage />
+      ) : (
+        <RecurringReservationInner unitId={unitPk} />
+      )}
     </>
   );
 }

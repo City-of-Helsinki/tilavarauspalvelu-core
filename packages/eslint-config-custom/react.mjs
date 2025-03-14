@@ -61,7 +61,21 @@ const myRules = {
     },
   ],
   // for some reason this raises errors for "key" props in jsx arrays
-  "react/prop-types": "off"
+  "react/prop-types": "off",
+  "react/no-array-index-key": "error",
+  "react/no-danger": "error",
+  "react/no-invalid-html-attribute": "error",
+  "react/jsx-wrap-multilines": "error",
+  "react/jsx-no-useless-fragment": "error",
+  "react/jsx-no-script-url": "error",
+  "react/jsx-boolean-value": "error",
+  "react/forward-ref-uses-ref": "error",
+  "react/button-has-type": "error",
+  "react/no-this-in-sfc": "error",
+  "react/prefer-stateless-function": "error",
+  "react/void-dom-elements-no-children": "error",
+  // TODO enable in a separate commit
+  // "react/no-unstable-nested-components": "error",
   // mixing mjs with ts in nextjs causes issues
   /*
   "import/extensions": [

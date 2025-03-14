@@ -137,16 +137,18 @@ const ChildContainer = styled.div`
 `;
 
 // TODO: Replace next/link so that the link doesn't cause page reload in admin-ui
-const WrapWithLink = ({
+function WrapWithLink({
   content,
   link,
 }: {
-  content: string | JSX.Element;
+  content: JSX.Element;
   link?: string;
-}) => {
-  if (!link) return <>{content}</>;
+}): JSX.Element {
+  if (!link) {
+    return content;
+  }
   return <Link href={link}>{content}</Link>;
-};
+}
 
 /**
  * @name Card
