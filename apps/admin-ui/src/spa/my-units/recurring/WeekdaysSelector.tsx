@@ -114,7 +114,7 @@ export function WeekdaysSelector({
             onClick={() => handleDayToggle(weekday)}
             className={value.includes(weekday) ? "active" : ""}
             type="button"
-            role="checkbox"
+            aria-pressed={value.includes(weekday)}
           >
             {t(`dayShort.${weekday}`)}
           </Day>

@@ -1,10 +1,4 @@
-import {
-  IconArrowRight,
-  IconGroup,
-  IconHome,
-  IconSize,
-  IconTicket,
-} from "hds-react";
+import { IconArrowRight, IconEuroSign, IconGroup, IconHome } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
@@ -87,19 +81,13 @@ function RelatedUnitCard({
   const infos = [];
   if (reservationUnitTypeName) {
     infos.push({
-      icon: <IconHome size={IconSize.Small} />,
+      icon: <IconHome />,
       value: reservationUnitTypeName,
     });
   }
   if (reservationUnit.maxPersons) {
     infos.push({
-      icon: (
-        <IconGroup
-          aria-label={t("reservationUnitCard:maxPersons", {
-            maxPersons: reservationUnit.maxPersons,
-          })}
-        />
-      ),
+      icon: <IconGroup />,
       value: t("reservationUnitCard:maxPersons", {
         count: reservationUnit.maxPersons,
       }),
@@ -107,7 +95,12 @@ function RelatedUnitCard({
   }
   if (unitPrice) {
     infos.push({
-      icon: <IconTicket aria-label={t("prices:reservationUnitPriceLabel")} />,
+      icon: (
+        <IconEuroSign
+          aria-label={t("prices:reservationUnitPriceLabel")}
+          aria-hidden="false"
+        />
+      ),
       value: unitPrice,
     });
   }
@@ -117,7 +110,7 @@ function RelatedUnitCard({
       key={reservationUnit.pk ?? 0}
     >
       {t("common:show")}
-      <IconArrowRight aria-hidden="true" />
+      <IconArrowRight />
     </ButtonLikeLink>,
   ];
 
