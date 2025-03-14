@@ -4,7 +4,7 @@ import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { selectOption } from "@/test/test.utils";
 
-const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
+const { useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
   return {
     useRouter: () => ({
@@ -53,6 +53,7 @@ const options: SearchFormProps["options"] = {
 } as const;
 
 const props: SearchFormProps = {
+  handleSearch: vi.fn(),
   options,
   isLoading: false,
 } as const;
@@ -86,25 +87,24 @@ describe("SeasonalSearchForm", () => {
   });
 
   test("should search (update query params) on submit", async () => {
-    const view = render(<SeasonalSearchForm {...props} />);
+    const handleSearch = vi.fn();
+    const view = render(<SeasonalSearchForm {...props} handleSearch={handleSearch} />);
     const user = userEvent.setup();
     const selected = options.purposeOptions[0] ?? { label: "", value: 0 };
     await selectOption(view, "searchForm:purposesFilter", selected.label);
-    expect(mockedRouterReplace).toHaveBeenCalledTimes(0);
+    expect(handleSearch).toHaveBeenCalledTimes(0);
     const searchBtn = view.getByRole("button", {
       name: "searchForm:searchButton",
     });
     expect(searchBtn).toBeInTheDocument();
     await user.click(searchBtn);
-    expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
+    expect(handleSearch).toHaveBeenCalledTimes(1);
   });
 
   test("should disable unit select if no units are available", () => {
     const options = { ...props.options };
     options.unitOptions = [];
-    const view = render(
-      <SeasonalSearchForm options={options} isLoading={false} />
-    );
+    const view = render(<SeasonalSearchForm {...props} options={options} />);
     const btn = view.getByLabelText("searchForm:unitFilter", {
       selector: "button",
     });
@@ -116,9 +116,7 @@ describe("SeasonalSearchForm", () => {
   test("should disable purpose select if no purposes are available", () => {
     const options = { ...props.options };
     options.purposeOptions = [];
-    const view = render(
-      <SeasonalSearchForm options={options} isLoading={false} />
-    );
+    const view = render(<SeasonalSearchForm {...props} options={options} />);
     const btn = view.getByLabelText("searchForm:purposesFilter", {
       selector: "button",
     });
@@ -130,9 +128,7 @@ describe("SeasonalSearchForm", () => {
   test("should disable type select if no types are available", () => {
     const options = { ...props.options };
     options.reservationUnitTypeOptions = [];
-    const view = render(
-      <SeasonalSearchForm options={options} isLoading={false} />
-    );
+    const view = render(<SeasonalSearchForm {...props} options={options} />);
     const btn = view.getByLabelText("searchForm:typeLabel", {
       selector: "button",
     });
@@ -165,18 +161,19 @@ describe("SeasonalSearchForm", () => {
   // searchForm:typeLabel (reservationUnitTypes) - multiselect
   test("allow select reservation unit type but dont search automatically", async () => {
     const user = userEvent.setup();
-    const view = render(<SeasonalSearchForm {...props} />);
+    const handleSearch = vi.fn();
+    const view = render(<SeasonalSearchForm {...props} handleSearch={handleSearch} />);
     const listboxLabel = "searchForm:typeLabel";
     const optionLabel = "type 1";
     await selectOption(view, listboxLabel, optionLabel);
-    expect(mockedRouterReplace).toHaveBeenCalledTimes(0);
+    expect(handleSearch).toHaveBeenCalledTimes(0);
     // TODO select another option
     const searchBtn = view.getByRole("button", {
       name: "searchForm:searchButton",
     });
     expect(searchBtn).toBeInTheDocument();
     await user.click(searchBtn);
-    expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
+    expect(handleSearch).toHaveBeenCalledTimes(1);
     // TODO check that the tag is present
     // TODO check that the query param is present
   });

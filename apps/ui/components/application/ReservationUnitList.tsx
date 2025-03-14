@@ -15,15 +15,15 @@ import type {
 } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
-import Modal from "../common/Modal";
+import { Modal } from "@/components/Modal";
 import { type ApplicationPage1FormValues } from "./form";
 import { OrderedReservationUnitCard } from "./OrderedReservationUnitCard";
 import { Flex } from "common/styles/util";
 import { ReservationUnitModalContent } from "./ReservationUnitModalContent";
 import { breakpoints } from "common";
 import { gql } from "@apollo/client";
-import ClientOnly from "common/src/ClientOnly";
 import { ErrorText } from "common/src/components/ErrorText";
+import { createPortal } from "react-dom";
 
 type ReservationUnitType = ReservationUnitCardFieldsFragment;
 export type OptionType = Readonly<{ value: number; label: string }>;
@@ -153,29 +153,27 @@ export function ReservationUnitList({
       >
         {t("reservationUnitList:infoReservationUnits")}
       </Notification>
-      <ClientOnly>
-        <Flex $gap="m" $direction="column">
-          {currentReservationUnits.map((ru, i, all) => (
-            <OrderedReservationUnitCard
-              key={ru.pk}
-              error={
-                minSize != null &&
-                ru.maxPersons != null &&
-                minSize > ru.maxPersons
-                  ? t("application:validation.reservationUnitTooSmall")
-                  : undefined
-              }
-              onDelete={remove}
-              reservationUnit={ru}
-              order={i}
-              first={i === 0}
-              last={i === all.length - 1}
-              onMoveDown={moveDown}
-              onMoveUp={moveUp}
-            />
-          ))}
-        </Flex>
-      </ClientOnly>
+      <Flex $gap="m" $direction="column">
+        {currentReservationUnits.map((ru, i, all) => (
+          <OrderedReservationUnitCard
+            key={ru.pk}
+            error={
+              minSize != null &&
+              ru.maxPersons != null &&
+              minSize > ru.maxPersons
+                ? t("application:validation.reservationUnitTooSmall")
+                : undefined
+            }
+            onDelete={remove}
+            reservationUnit={ru}
+            order={i}
+            first={i === 0}
+            last={i === all.length - 1}
+            onMoveDown={moveDown}
+            onMoveUp={moveUp}
+          />
+        ))}
+      </Flex>
       <Flex $alignItems="center">
         <IconButton
           onClick={() => setShowModal(true)}
@@ -183,31 +181,34 @@ export function ReservationUnitList({
           label={t("reservationUnitList:add")}
         />
       </Flex>
-      <Modal
-        show={showModal}
-        handleClose={() => setShowModal(false)}
-        maxWidth={breakpoints.l}
-        fullHeight
-        actions={
-          <Flex $alignItems="center">
-            <Button
-              iconStart={<IconArrowUndo />}
-              onClick={() => setShowModal(false)}
-              variant={ButtonVariant.Supplementary}
-            >
-              {t("reservationUnitModal:returnToApplication")}
-            </Button>
-          </Flex>
-        }
-      >
-        <ReservationUnitModalContent
-          currentReservationUnits={currentReservationUnits}
-          applicationRound={applicationRound}
-          handleAdd={handleAdd}
-          handleRemove={remove}
-          options={options}
-        />
-      </Modal>
+      {createPortal(
+        <Modal
+          show={showModal}
+          handleClose={() => setShowModal(false)}
+          maxWidth={breakpoints.l}
+          fullHeight
+          actions={
+            <Flex $alignItems="center">
+              <Button
+                iconStart={<IconArrowUndo />}
+                onClick={() => setShowModal(false)}
+                variant={ButtonVariant.Supplementary}
+              >
+                {t("reservationUnitModal:returnToApplication")}
+              </Button>
+            </Flex>
+          }
+        >
+          <ReservationUnitModalContent
+            currentReservationUnits={currentReservationUnits}
+            applicationRound={applicationRound}
+            handleAdd={handleAdd}
+            handleRemove={remove}
+            options={options}
+          />
+        </Modal>,
+        document.body
+      )}
     </Flex>
   );
 }

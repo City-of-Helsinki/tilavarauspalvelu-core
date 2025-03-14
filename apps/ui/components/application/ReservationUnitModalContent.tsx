@@ -2,14 +2,11 @@ import {
   IconArrowRight,
   IconGroup,
   IconInfoCircle,
-  TextInput,
   IconLinkExternal,
   Button,
   ButtonVariant,
   ButtonSize,
-  LoadingSpinner,
   IconCross,
-  IconSearch,
   IconSize,
 } from "hds-react";
 import React from "react";
@@ -22,25 +19,26 @@ import {
   useSearchReservationUnitsQuery,
   type ReservationUnitCardFieldsFragment,
   type ApplicationReservationUnitListFragment,
+  SearchReservationUnitsQueryVariables,
 } from "@gql/gql-types";
 import { filterNonNullable, getImageSource } from "common/src/helpers";
-import { AutoGrid, CenterSpinner, Flex } from "common/styles/util";
+import { CenterSpinner, Flex } from "common/styles/util";
 import { getMainImage } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
-import { useForm } from "react-hook-form";
-import {
-  ControlledNumberInput,
-  ControlledSelect,
-} from "common/src/components/form";
 import { type OptionTypes } from "./ReservationUnitList";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import {
+  SearchFormValues,
+  SeasonalSearchForm,
+} from "../recurring/SeasonalSearchForm";
+import { transformAccessTypeSafe } from "common/src/conversion";
 
 const ImageSizeWrapper = styled.div`
   @media (min-width: ${breakpoints.m}) {
@@ -107,13 +105,7 @@ function ReservationUnitCard({
     </ButtonLikeLink>,
     <Button
       key="toggle"
-      iconEnd={
-        isSelected ? (
-          <IconCross aria-hidden="true" />
-        ) : (
-          <IconArrowRight aria-hidden="true" />
-        )
-      }
+      iconEnd={isSelected ? <IconCross /> : <IconArrowRight />}
       onClick={toggleSelection}
       size={ButtonSize.Small}
       variant={isSelected ? ButtonVariant.Danger : ButtonVariant.Secondary}
@@ -139,13 +131,6 @@ type AppRoundNode = Omit<
   "reservationUnits"
 >;
 
-type SearchFormValues = {
-  searchTerm?: string;
-  reservationUnitType?: number;
-  unit?: number;
-  personsAllowed?: number;
-};
-
 export function ReservationUnitModalContent({
   applicationRound,
   handleAdd,
@@ -164,27 +149,32 @@ export function ReservationUnitModalContent({
 }>): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const form = useForm<SearchFormValues>();
-  const { control, watch, setValue } = form;
-  const { unitOptions, reservationUnitTypeOptions } = options;
 
-  const reservationUnitType = watch("reservationUnitType");
-  const unit = watch("unit");
+  const baseVariables: SearchReservationUnitsQueryVariables = {
+    applicationRound: [applicationRound.pk ?? 0],
+    orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
+    isDraft: false,
+    isVisible: true,
+  };
   const { data, refetch, loading } = useSearchReservationUnitsQuery({
     skip: !applicationRound.pk,
-    variables: {
-      applicationRound: [applicationRound.pk ?? 0],
-      textSearch: watch("searchTerm"),
-      personsAllowed: watch("personsAllowed")?.toString(),
-      reservationUnitType:
-        reservationUnitType != null ? [reservationUnitType] : [],
-      unit: unit != null ? [unit] : [],
-      orderBy: [ReservationUnitOrderingChoices.NameFiAsc],
-      isDraft: false,
-      isVisible: true,
-    },
+    variables: baseVariables,
     notifyOnNetworkStatusChange: true,
   });
+
+  const onSearch = (data: SearchFormValues) => {
+    // TODO should update url query vars if possible since Tags come from the url query
+    const variables: SearchReservationUnitsQueryVariables = {
+      ...baseVariables,
+      textSearch: data.textSearch,
+      personsAllowed: data.personsAllowed?.toString(),
+      reservationUnitType: data.reservationUnitTypes,
+      unit: data.unit,
+      purposes: data.purposes,
+      accessType: data.accessType.map(transformAccessTypeSafe),
+    };
+    refetch(variables);
+  };
 
   const reservationUnits = filterNonNullable(
     data?.reservationUnits?.edges.map((n) => n?.node)
@@ -194,51 +184,11 @@ export function ReservationUnitModalContent({
     <Flex>
       <H2 $noMargin>{t("reservationUnitModal:heading")}</H2>
       <H3 as="p">{getApplicationRoundName(applicationRound, lang)}</H3>
-      <AutoGrid $minWidth="14rem">
-        <TextInput
-          id="reservationUnitSearch.search"
-          label={t("reservationUnitModal:searchTermLabel")}
-          onChange={(e) => {
-            setValue("searchTerm", e.target.value);
-          }}
-        />
-        <ControlledSelect
-          name="reservationUnitType"
-          clearable
-          control={control}
-          options={reservationUnitTypeOptions}
-          label={t("reservationUnitModal:searchReservationUnitTypeLabel")}
-        />
-        <ControlledNumberInput
-          name="personsAllowed"
-          control={control}
-          min={1}
-          label={t("reservationUnitModal:searchPersonsAllowedLabel")}
-        />
-        <ControlledSelect
-          name="unit"
-          control={control}
-          clearable
-          label={t("reservationUnitModal:searchUnitLabel")}
-          options={unitOptions}
-        />
-      </AutoGrid>
-      <Flex $alignItems="flex-end">
-        <Button
-          variant={loading ? ButtonVariant.Clear : ButtonVariant.Primary}
-          iconStart={
-            loading ? (
-              <LoadingSpinner small />
-            ) : (
-              <IconSearch aria-hidden="true" />
-            )
-          }
-          disabled={loading}
-          onClick={(_) => refetch()}
-        >
-          {t("common:search")}
-        </Button>
-      </Flex>
+      <SeasonalSearchForm
+        isLoading={loading}
+        options={options}
+        handleSearch={onSearch}
+      />
       {loading ? (
         <CenterSpinner />
       ) : reservationUnits.length === 0 ? (

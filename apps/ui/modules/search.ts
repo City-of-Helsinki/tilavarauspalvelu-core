@@ -7,7 +7,6 @@ import {
   type LocalizationLanguages,
 } from "common/src/helpers";
 import {
-  AccessType,
   EquipmentOrderingChoices,
   OptionsDocument,
   type OptionsQuery,
@@ -17,8 +16,8 @@ import {
   ReservationUnitOrderingChoices,
   ReservationUnitTypeOrderingChoices,
   SearchFormParamsUnitDocument,
-  SearchFormParamsUnitQuery,
-  SearchFormParamsUnitQueryVariables,
+  type SearchFormParamsUnitQuery,
+  type SearchFormParamsUnitQueryVariables,
   UnitOrderingChoices,
 } from "@gql/gql-types";
 import {
@@ -31,6 +30,7 @@ import { startOfDay } from "date-fns";
 import { SEARCH_PAGING_LIMIT } from "./const";
 import { type ApolloClient } from "@apollo/client";
 import { type ReadonlyURLSearchParams } from "next/navigation";
+import { transformAccessTypeSafe } from "common/src/conversion";
 
 function transformOrderByName(desc: boolean, language: LocalizationLanguages) {
   if (language === "fi") {
@@ -74,21 +74,6 @@ function transformOrderByTypeRank(
   return desc
     ? ReservationUnitOrderingChoices.TypeRankDesc
     : ReservationUnitOrderingChoices.TypeRankAsc;
-}
-
-function transformAccessTypeSafe(t: string): AccessType | null {
-  switch (t) {
-    case AccessType.AccessCode:
-      return AccessType.AccessCode;
-    case AccessType.PhysicalKey:
-      return AccessType.PhysicalKey;
-    case AccessType.OpenedByStaff:
-      return AccessType.OpenedByStaff;
-    case AccessType.Unrestricted:
-      return AccessType.Unrestricted;
-    default:
-      return null;
-  }
 }
 
 function transformOrderBy(
