@@ -357,7 +357,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
       <ReservationPageWrapper>
         <StyledReservationInfoCard
           reservation={reservation}
-          type="pending"
+          bgColor="gold"
           shouldDisplayReservationUnitPrice={shouldDisplayReservationUnitPrice}
         />
         {termsOfUse && (

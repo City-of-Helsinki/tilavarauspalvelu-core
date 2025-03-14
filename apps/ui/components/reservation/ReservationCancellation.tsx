@@ -105,7 +105,7 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
       {reservation.recurringReservation ? (
         <ApplicationInfoCard reservation={reservation} />
       ) : (
-        <StyledReservationInfoCard reservation={reservation} type="complete" />
+        <StyledReservationInfoCard reservation={reservation} />
       )}
       <CancellationForm
         onNext={onSubmit}

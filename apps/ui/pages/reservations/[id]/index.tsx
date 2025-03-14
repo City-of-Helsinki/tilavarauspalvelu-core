@@ -437,7 +437,7 @@ function Reservation({
           </SubHeading>
         </Flex>
         <div style={{ gridRowEnd: "span 3" }}>
-          <ReservationInfoCard reservation={reservation} type="complete" />
+          <ReservationInfoCard reservation={reservation} />
           <SecondaryActions>
             {reservation.state === ReservationStateChoice.Confirmed && (
               <ButtonLikeExternalLink

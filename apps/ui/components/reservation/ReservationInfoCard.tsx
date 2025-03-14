@@ -28,13 +28,12 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 
-const Wrapper = styled.div<{ $type: Type }>`
-  --bg-color-complete: var(--color-silver-light);
-  --bg-color-pending: var(--color-gold-light);
-  background-color: var(
-    ${({ $type }) =>
-      $type === "complete" ? "--bg-color-complete" : "--bg-color-pending"}
+const Wrapper = styled.div<{ $color: "gold" | "silver" }>`
+  --bg-color: var(
+    ${({ $color }) =>
+      $color === "gold" ? "--color-gold-light" : "--color-silver-light"}
   );
+  background-color: var(--bg-color);
 `;
 
 const MainImage = styled.img`
@@ -61,12 +60,12 @@ const Subheading = styled.p`
   margin: 0;
 `;
 
-type Type = "pending" | "complete";
-
 type Props = {
   reservation: ReservationInfoCardFragment;
-  type: Type;
   shouldDisplayReservationUnitPrice?: boolean;
+  // Background color of the card
+  bgColor?: "gold" | "silver";
+  // Hide the reservation unit image
   disableImage?: boolean;
   className?: string;
   style?: React.CSSProperties;
@@ -74,7 +73,7 @@ type Props = {
 
 export function ReservationInfoCard({
   reservation,
-  type,
+  bgColor = "silver",
   shouldDisplayReservationUnitPrice = false,
   disableImage = false,
   className,
@@ -116,8 +115,14 @@ export function ReservationInfoCard({
     lang,
     shouldDisplayReservationUnitPrice
   );
+
+  const { taxPercentageValue, state } = reservation;
+
+  const showReservationNumber =
+    state != null && state !== ReservationStateChoice.Created;
+
   const shouldDisplayTaxPercentage: boolean =
-    reservation.state === ReservationStateChoice.RequiresHandling
+    state === ReservationStateChoice.RequiresHandling
       ? isReservationUnitPaid(reservationUnit.pricings, new Date(begin))
       : Number(reservation?.price) > 0;
 
@@ -130,10 +135,9 @@ export function ReservationInfoCard({
       ? getTranslationSafe(reservationUnit.unit, "name", lang)
       : "-";
 
-  const { taxPercentageValue } = reservation;
   // TODO why does this not use the Card component?
   return (
-    <Wrapper $type={type} className={className} style={style}>
+    <Wrapper $color={bgColor} className={className} style={style}>
       {!disableImage && <MainImage src={imgSrc} alt={name} />}
       <Content data-testid="reservation__reservation-info-card__content">
         <H4 as="h2" $marginBottom="none">
@@ -144,7 +148,7 @@ export function ReservationInfoCard({
             {name}
           </StyledLink>
         </H4>
-        {type === "complete" && (
+        {showReservationNumber && (
           <Subheading>
             {t("reservations:reservationNumber")}:{" "}
             <span data-testid="reservation__reservation-info-card__reservationNumber">
