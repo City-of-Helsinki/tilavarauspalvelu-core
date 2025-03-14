@@ -42,6 +42,11 @@ CHANGE_ACCESS_CODE_SERIES_MUTATION = build_mutation(
     "ReservationSeriesChangeAccessCodeMutation",
     fields="accessCodeGeneratedAt accessCodeIsActive",
 )
+REPAIR_ACCESS_CODE_SERIES_MUTATION = build_mutation(
+    "repairReservationSeriesAccessCode",
+    "ReservationSeriesRepairAccessCodeMutation",
+    fields="accessCodeGeneratedAt accessCodeIsActive",
+)
 
 
 def get_minimal_series_data(reservation_unit: ReservationUnit, user: User, **overrides: Any) -> dict[str, Any]:
