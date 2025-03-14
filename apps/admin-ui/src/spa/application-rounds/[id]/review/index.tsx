@@ -322,17 +322,14 @@ export function Review({
         $direction="row-reverse"
         $alignItems="center"
       >
-        {!hideAllocation && (
-          <>
-            {isAllocationEnabled ? (
-              <ButtonLikeLink to="allocation" variant="primary" size="large">
-                {t("ApplicationRound.allocate")}
-              </ButtonLikeLink>
-            ) : (
-              <Button disabled>{t("ApplicationRound.allocate")}</Button>
-            )}
-          </>
-        )}
+        {!hideAllocation &&
+          (isAllocationEnabled ? (
+            <ButtonLikeLink to="allocation" variant="primary" size="large">
+              {t("ApplicationRound.allocate")}
+            </ButtonLikeLink>
+          ) : (
+            <Button disabled>{t("ApplicationRound.allocate")}</Button>
+          ))}
         {isEndingAllowed || isHandled ? (
           <EndAllocation
             applicationRound={applicationRound}
