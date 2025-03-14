@@ -67,16 +67,15 @@ function createInput(props: MockReservationUnitInputs) {
 
 describe("RecurringCard", () => {
   test("should render recurring card", () => {
-    const input = createInput({
-      name: "foobar",
-      unitName: "Unit",
-    });
+    const name = "foobar";
+    const unitName = "Unit";
+    const input = createInput({ name, unitName });
     const view = render(<ReservationUnitCard {...input} />);
     expect(view.getByRole("link", { name: "common:show" })).toBeInTheDocument();
     expect(view.getAllByRole("link")).toHaveLength(1);
     expect(view.getAllByRole("button")).toHaveLength(1);
-    expect(view.getByText("foobar FI")).toBeInTheDocument();
-    expect(view.getByText("Unit FI")).toBeInTheDocument();
+    expect(view.getByText(`${name} FI`)).toBeInTheDocument();
+    expect(view.getByText(`${unitName} FI`)).toBeInTheDocument();
   });
   // should render name, unit name, image?, typename (optional), maxPersons (optional),
   // should have two buttons always

@@ -1,11 +1,9 @@
 import React from "react";
 import { ModalContextProvider } from "./ModalContext";
 
-const withGlobalContext = (App: () => JSX.Element) => (): JSX.Element => (
-  <ModalContextProvider>
-    <App />
-  </ModalContextProvider>
-);
-
-export const GlobalContext = ({ children }: { children: React.ReactNode }) =>
-  children != null ? withGlobalContext(() => <>{children}</>)() : null;
+export function GlobalContext({ children }: { children: React.ReactNode }) {
+  if (children == null) {
+    return null;
+  }
+  return <ModalContextProvider>{children}</ModalContextProvider>;
+}
