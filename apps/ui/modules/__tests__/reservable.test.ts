@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- strict null checsk
-// @ts-nocheck -- disable because of missing strict null checks
 import {
   addDays,
   addHours,
@@ -23,6 +21,7 @@ import {
 } from "@/gql/gql-types";
 import { createMockReservationUnit } from "@/test/testUtils";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
+import { toNumber } from "common/src/helpers";
 
 describe("generateReservableMap", () => {
   beforeEach(() => {
@@ -50,6 +49,14 @@ describe("generateReservableMap", () => {
     };
   }
 
+  function splitDateKey(key: string): { y: number; m: number; d: number } {
+    const [y, m, d] = key.split("-").map(toNumber);
+    if (y == null || m == null || d == null || !(y > 0 && m > 0 && d > 0)) {
+      throw new Error("Invalid date");
+    }
+    return { y, m, d };
+  }
+
   // - the easy one: all ranges in the future, one week of ranges (7 days) (from today ->)
   //   all ranges are 09:00-21:00
   test("7 days single range per day", () => {
@@ -60,14 +67,16 @@ describe("generateReservableMap", () => {
     const times = generateReservableMap(data.map(toRange));
     expect(times.size).toBe(7);
     for (const [key, value] of times) {
+      const val = value[0];
       expect(value.length).toBe(1);
-      const [y, m, d] = key.split("-").map(Number);
-      // eslint-disable-next-line no-console
-      console.assert(y > 0 && m > 0 && d > 0);
+      if (val == null) {
+        throw new Error("Value is null");
+      }
+      const { y, m, d } = splitDateKey(key);
       const start = new Date(y, m - 1, d, 9, 0, 0);
       const end = new Date(y, m - 1, d, 21, 0, 0);
-      expect(value[0].start).toStrictEqual(start);
-      expect(value[0].end).toStrictEqual(end);
+      expect(val.start).toStrictEqual(start);
+      expect(val.end).toStrictEqual(end);
     }
   });
 
@@ -82,8 +91,8 @@ describe("generateReservableMap", () => {
     for (let i = 0; i < 7; i++) {
       for (let j = 0; j < startHour.length; j++) {
         data.push({
-          start: addDays(addHours(startOfToday(), startHour[j]), i),
-          end: addDays(addHours(startOfToday(), endHour[j]), i),
+          start: addDays(addHours(startOfToday(), startHour[j] ?? 0), i),
+          end: addDays(addHours(startOfToday(), endHour[j] ?? 0), i),
         });
       }
     }
@@ -91,14 +100,12 @@ describe("generateReservableMap", () => {
     expect(times.size).toBe(7);
     for (const [key, value] of times) {
       expect(value.length).toBe(startHour.length);
-      const [y, m, d] = key.split("-").map(Number);
-      // eslint-disable-next-line no-console
-      console.assert(y > 0 && m > 0 && d > 0);
+      const { y, m, d } = splitDateKey(key);
       for (let i = 0; i < startHour.length; i++) {
         const start = new Date(y, m - 1, d, startHour[i], 0, 0);
         const end = new Date(y, m - 1, d, endHour[i], 0, 0);
-        expect(value[i].start).toStrictEqual(start);
-        expect(value[i].end).toStrictEqual(end);
+        expect(value[i]?.start).toStrictEqual(start);
+        expect(value[i]?.end).toStrictEqual(end);
       }
     }
   });
@@ -111,16 +118,16 @@ describe("generateReservableMap", () => {
     expect(times.size).toBe(2);
     for (const [key, value] of times) {
       expect(value.length).toBe(1);
-      const [y, m, d] = key.split("-").map(Number);
-      // eslint-disable-next-line no-console
-      console.assert(y > 0 && m > 0 && d > 0);
+      const { y, m, d } = splitDateKey(key);
       const date = new Date(y, m - 1, d, 9, 0, 0);
       const s =
-        value[0].start.getDate() === start.getDate() ? date : startOfDay(date);
+        value[0]?.start?.getDate() === start.getDate()
+          ? date
+          : startOfDay(date);
       const e =
-        value[0].end.getDate() === start.getDate() ? endOfDay(start) : end;
-      expect(value[0].start).toStrictEqual(s);
-      expect(value[0].end).toStrictEqual(e);
+        value[0]?.end?.getDate() === start.getDate() ? endOfDay(start) : end;
+      expect(value[0]?.start).toStrictEqual(s);
+      expect(value[0]?.end).toStrictEqual(e);
     }
   });
 
@@ -133,16 +140,16 @@ describe("generateReservableMap", () => {
     expect(times.size).toBe(2);
     for (const [key, value] of times) {
       expect(value.length).toBe(1);
-      const [y, m, d] = key.split("-").map(Number);
-      // eslint-disable-next-line no-console
-      console.assert(y > 0 && m > 0 && d > 0);
+      const { y, m, d } = splitDateKey(key);
       const date = new Date(y, m - 1, d, 9, 0, 0);
       const s =
-        value[0].start.getDate() === start.getDate() ? date : startOfDay(date);
+        value[0]?.start?.getDate() === start.getDate()
+          ? date
+          : startOfDay(date);
       const e =
-        value[0].end.getDate() === start.getDate() ? endOfDay(start) : end;
-      expect(value[0].start).toStrictEqual(s);
-      expect(value[0].end).toStrictEqual(e);
+        value[0]?.end?.getDate() === start.getDate() ? endOfDay(start) : end;
+      expect(value[0]?.start).toStrictEqual(s);
+      expect(value[0]?.end).toStrictEqual(e);
     }
   });
 
@@ -154,12 +161,10 @@ describe("generateReservableMap", () => {
     expect(times.size).toBe(1);
     for (const [key, value] of times) {
       expect(value.length).toBe(1);
-      const [y, m, d] = key.split("-").map(Number);
-      // eslint-disable-next-line no-console
-      console.assert(y > 0 && m > 0 && d > 0);
+      const { y, m, d } = splitDateKey(key);
       const date = new Date(y, m - 1, d, 0, 0, 0);
-      expect(value[0].start).toStrictEqual(date);
-      expect(value[0].end).toStrictEqual(endOfDay(date));
+      expect(value[0]?.start).toStrictEqual(date);
+      expect(value[0]?.end).toStrictEqual(endOfDay(date));
     }
   });
 
@@ -171,12 +176,10 @@ describe("generateReservableMap", () => {
     expect(times.size).toBe(365);
     for (const [key, value] of times) {
       expect(value.length).toBe(1);
-      const [y, m, d] = key.split("-").map(Number);
-      // eslint-disable-next-line no-console
-      console.assert(y > 0 && m > 0 && d > 0);
+      const { y, m, d } = splitDateKey(key);
       const date = new Date(y, m - 1, d, 0, 0, 0);
-      expect(value[0].start).toStrictEqual(date);
-      expect(value[0].end).toStrictEqual(endOfDay(date));
+      expect(value[0]?.start).toStrictEqual(date);
+      expect(value[0]?.end).toStrictEqual(endOfDay(date));
     }
   });
 
@@ -188,12 +191,10 @@ describe("generateReservableMap", () => {
     expect(times.size).toBe(365);
     for (const [key, value] of times) {
       expect(value.length).toBe(1);
-      const [y, m, d] = key.split("-").map(Number);
-      // eslint-disable-next-line no-console
-      console.assert(y > 0 && m > 0 && d > 0);
+      const { y, m, d } = splitDateKey(key);
       const date = new Date(y, m - 1, d, 0, 0, 0);
-      expect(value[0].start).toStrictEqual(date);
-      expect(value[0].end).toStrictEqual(endOfDay(date));
+      expect(value[0]?.start).toStrictEqual(date);
+      expect(value[0]?.end).toStrictEqual(endOfDay(date));
     }
   });
 
@@ -206,14 +207,12 @@ describe("generateReservableMap", () => {
     expect(times.size).toBe(2);
     for (const [key, value] of times) {
       expect(value.length).toBe(1);
-      const [y, m, d] = key.split("-").map(Number);
-      // eslint-disable-next-line no-console
-      console.assert(y > 0 && m > 0 && d > 0);
+      const { y, m, d } = splitDateKey(key);
       // TODO what is the logic here and is it sound?
       const date = new Date(y, m - 1, d, 0, 0, 0);
-      const start = value[0].start;
-      const end = value[0].end;
-      if (start.getDate() === date.getDate()) {
+      const start = value[0]?.start;
+      const end = value[0]?.end;
+      if (start?.getDate() === date.getDate()) {
         expect(start).toStrictEqual(date);
         expect(end).toStrictEqual(endOfDay(date));
       } else {
@@ -231,12 +230,10 @@ describe("generateReservableMap", () => {
     expect(times.size).toBe(30);
     for (const [key, value] of times) {
       expect(value.length).toBe(1);
-      const [y, m, d] = key.split("-").map(Number);
-      // eslint-disable-next-line no-console
-      console.assert(y > 0 && m > 0 && d > 0);
+      const { y, m, d } = splitDateKey(key);
       const date = new Date(y, m - 1, d, 0, 0, 0);
-      expect(value[0].start).toStrictEqual(date);
-      expect(value[0].end).toStrictEqual(endOfDay(date));
+      expect(value[0]?.start).toStrictEqual(date);
+      expect(value[0]?.end).toStrictEqual(endOfDay(date));
     }
   });
 });

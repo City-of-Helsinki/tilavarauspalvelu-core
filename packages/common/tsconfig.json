@@ -12,9 +12,8 @@
     "styles",
     "index.ts",
     "types/**/*.d.ts",
-    ".eslintrc.cjs",
     "prettier.config.cjs",
-    "stylelint.config.js",
+    "stylelint.config.cjs",
     "vitest.setup.ts",
     "vitest.config.mts"
   ]

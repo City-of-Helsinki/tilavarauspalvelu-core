@@ -392,8 +392,10 @@ export function TimeSelector({
         const { state } = cell;
         for (let k = 0; k < updated.length; k += 1) {
           if (k !== index && updated[k]?.[i]?.[j] != null) {
-            // @ts-expect-error -- we are checking for null above
-            updated[k][i][j].state = state;
+            const elem = updated[k]?.[i]?.[j];
+            if (elem != null) {
+              elem.state = state;
+            }
           }
         }
       });

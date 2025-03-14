@@ -464,14 +464,12 @@ function CalendarDay({
       const timeSeries = [...selection, cell.key].sort((a, b) => {
         return timeSlotKeyToTime(a) - timeSlotKeyToTime(b);
       });
-      if (d == null || timeSeries.length < 2) {
+      const start = timeSeries[0];
+      const end = timeSeries[timeSeries.length - 1];
+      if (d == null || start == null || end == null) {
         return;
       }
-      const newSelection = getTimeSeries(
-        d,
-        timeSeries[0]!,
-        timeSeries[timeSeries.length - 1]!
-      );
+      const newSelection = getTimeSeries(d, start, end);
       setSelection(newSelection);
     }
   };

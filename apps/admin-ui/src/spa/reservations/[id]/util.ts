@@ -21,7 +21,7 @@ import {
   getReserveeName,
 } from "@/common/util";
 import { fromAPIDateTime } from "@/helpers";
-import { filterNonNullable, toNumber } from "common/src/helpers";
+import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
@@ -45,6 +45,10 @@ export function reservationPrice(
   );
 }
 
+function getBeginTime(p: PricingFieldsFragment): number {
+  return fromApiDate(p.begins)?.getTime() ?? 0;
+}
+
 /** returns reservation unit pricing at given date */
 export function getReservatinUnitPricing(
   reservationUnit: Maybe<Pick<ReservationUnitType, "pricings">> | undefined,
@@ -53,12 +57,10 @@ export function getReservatinUnitPricing(
   if (!reservationUnit?.pricings || reservationUnit.pricings.length === 0) {
     return null;
   }
-  const { pricings } = reservationUnit;
 
-  pricings.sort(
-    (a, b) =>
-      (fromApiDate(a.begins)?.getTime() ?? 0) -
-      (fromApiDate(b.begins)?.getTime() ?? 0)
+  const pricings = sort(
+    reservationUnit.pricings,
+    (a, b) => getBeginTime(a) - getBeginTime(b)
   );
 
   // Find the first pricing that is valid at the given date
@@ -158,7 +160,7 @@ export function translateReservationCustomerType(
     res.reserveeIsUnregisteredAssociation
   );
   const part2WithSpace = part2 ? ` ${t(part2)}` : "";
-  return `${t(part1)}${part2WithSpace}`;
+  return `${t(part1 ?? "")}${part2WithSpace}`;
 }
 
 export function getName(
