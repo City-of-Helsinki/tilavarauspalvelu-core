@@ -6,8 +6,7 @@ import {
   type Maybe,
   Priority,
   ApplicationSectionStatusChoice,
-  type ApplicationSectionUiFragment,
-  type ApplicationViewFragment,
+  type ApplicationFormFragment,
 } from "@gql/gql-types";
 import {
   convertLanguageCode,
@@ -91,51 +90,47 @@ function InfoListItem({ label, value }: { label: string; value: string }) {
 }
 
 function SingleApplicationSection({
-  applicationEvent,
+  aes,
   primaryTimes,
   secondaryTimes,
 }: {
-  applicationEvent: ApplicationSectionUiFragment;
+  aes: NonNullable<NonNullable<ApplicationT["applicationSections"]>[number]>;
   primaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
   secondaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
 }) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
-  const reservationUnits = filterNonNullable(
-    applicationEvent.reservationUnitOptions
-  ).map((eru, index) => ({
-    pk: eru.reservationUnit.pk,
-    priority: index,
-    nameFi: eru.reservationUnit.nameFi,
-    nameSv: eru.reservationUnit.nameSv,
-    nameEn: eru.reservationUnit.nameEn,
-  }));
+  const reservationUnits = filterNonNullable(aes.reservationUnitOptions).map(
+    (eru, index) => ({
+      pk: eru.reservationUnit.pk,
+      priority: index,
+      nameFi: eru.reservationUnit.nameFi,
+      nameSv: eru.reservationUnit.nameSv,
+      nameEn: eru.reservationUnit.nameEn,
+    })
+  );
   const shouldShowStatusLabel =
-    applicationEvent.status === ApplicationSectionStatusChoice.Rejected ||
-    applicationEvent.status === ApplicationSectionStatusChoice.Handled;
-  const statusProps = getLabelProps(applicationEvent.status);
+    aes.status === ApplicationSectionStatusChoice.Rejected ||
+    aes.status === ApplicationSectionStatusChoice.Handled;
+  const statusProps = getLabelProps(aes.status);
 
-  const reservationsBegin = toUIDate(
-    new Date(applicationEvent.reservationsBeginDate)
-  );
-  const reservationsEnd = toUIDate(
-    new Date(applicationEvent.reservationsEndDate)
-  );
+  const reservationsBegin = toUIDate(new Date(aes.reservationsBeginDate));
+  const reservationsEnd = toUIDate(new Date(aes.reservationsEndDate));
   const duration = formatDurationRange(
-    applicationEvent.reservationMinDuration,
-    applicationEvent.reservationMaxDuration,
+    aes.reservationMinDuration,
+    aes.reservationMaxDuration,
     t
   );
   const infos = [
     {
       key: "numPersons",
       label: t("application:preview.applicationEvent.numPersons"),
-      value: `${applicationEvent.numPersons} ${t("common:peopleSuffixShort")}`,
+      value: `${aes.numPersons} ${t("common:peopleSuffixShort")}`,
     },
     {
       key: "ageGroup",
       label: t("application:preview.applicationEvent.ageGroup"),
-      value: `${ageGroupToString(applicationEvent.ageGroup)} ${t("common:yearSuffixShort")}`,
+      value: `${ageGroupToString(aes.ageGroup)} ${t("common:yearSuffixShort")}`,
     },
     {
       key: "duration",
@@ -145,7 +140,7 @@ function SingleApplicationSection({
     {
       key: "eventsPerWeek",
       label: t("application:preview.applicationEvent.eventsPerWeek"),
-      value: `${applicationEvent.appliedReservationsPerWeek} ${t("common:amountSuffixShort")}`,
+      value: `${aes.appliedReservationsPerWeek} ${t("common:amountSuffixShort")}`,
     },
     {
       key: "period",
@@ -155,21 +150,21 @@ function SingleApplicationSection({
     {
       key: "purpose",
       label: t("application:preview.applicationEvent.purpose"),
-      value: getTranslationSafe(applicationEvent.purpose ?? {}, "name", lang),
+      value: getTranslationSafe(aes.purpose ?? {}, "name", lang),
     },
   ];
 
   return (
     <ApplicationSection>
       <ApplicationSectionHeader>
-        {applicationEvent.name}
+        {aes.name}
         {shouldShowStatusLabel && (
           <StatusLabel
             type={statusProps.type}
             icon={statusProps.icon}
             data-testid="application-section__status"
           >
-            {t(`application:applicationEventStatus.${applicationEvent.status}`)}
+            {t(`application:applicationEventStatus.${aes.status}`)}
           </StatusLabel>
         )}
       </ApplicationSectionHeader>
@@ -201,9 +196,7 @@ function SingleApplicationSection({
           </InfoItem>
         </InfoItemContainer>
         <InfoItemContainer>
-          <InfoItem
-            data-testid={`time-selector__preview-${applicationEvent.pk}`}
-          >
+          <InfoItem data-testid={`time-selector__preview-${aes.pk}`}>
             <h3 className="info-label">
               <span>{t("application:preview.applicationEvent.schedules")}</span>
               <Tooltip placement="top">
@@ -222,7 +215,7 @@ function SingleApplicationSection({
 
 // NOTE: used by Preview and View
 // No form context unlike the edit pages, use application query result
-type ApplicationT = Pick<ApplicationViewFragment, "applicationSections">;
+type ApplicationT = Pick<ApplicationFormFragment, "applicationSections">;
 
 const filterPrimary = (n: { priority: Priority }) =>
   n.priority === Priority.Primary;
@@ -240,7 +233,7 @@ export function ApplicationEventList({
       {sections.map((aes) => (
         <SingleApplicationSection
           key={aes.pk}
-          applicationEvent={aes}
+          aes={aes}
           primaryTimes={aes.suitableTimeRanges.filter(filterPrimary)}
           secondaryTimes={aes.suitableTimeRanges.filter(filterSecondary)}
         />

@@ -1,9 +1,7 @@
 import { gql } from "@apollo/client";
 import {
-  APPLICANT_FRAGMENT,
   APPLICANT_NAME_FRAGMENT,
   APPLICATION_SECTION_COMMON_FRAGMENT,
-  APPLICATION_SECTION_UI_FRAGMENT,
 } from "common/src/queries/application";
 
 export const SPACE_COMMON_FRAGMENT = gql`
@@ -111,10 +109,7 @@ export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
   }
 `;
 
-// TODO what does admin side require from UIFragment?
 export const APPLICATION_ADMIN_FRAGMENT = gql`
-  ${APPLICANT_FRAGMENT}
-  ${APPLICATION_SECTION_UI_FRAGMENT}
   fragment ApplicationAdmin on ApplicationNode {
     pk
     id
@@ -127,11 +122,17 @@ export const APPLICATION_ADMIN_FRAGMENT = gql`
       nameFi
     }
     applicationSections {
-      id
-      ...ApplicationSectionUI
+      ...ApplicationSectionCommon
+      suitableTimeRanges {
+        ...SuitableTime
+      }
+      purpose {
+        ...ReservationPurposeName
+      }
       allocations
       reservationUnitOptions {
         id
+        ...ReservationUnitOption
         rejected
         allocatedTimeSlots {
           pk
