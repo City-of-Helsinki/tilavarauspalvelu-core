@@ -17,14 +17,17 @@ from .serializers import (
     ReservationSeriesRescheduleSerializer,
     ReservationSeriesUpdateSerializer,
 )
+from .serializers.repair_access_code import ReservationSeriesRepairAccessCodeSerializer
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import RecurringReservation, Reservation
 
 __all__ = [
     "ReservationSeriesAddMutation",
+    "ReservationSeriesChangeAccessCodeMutation",
     "ReservationSeriesCreateMutation",
     "ReservationSeriesDenyMutation",
+    "ReservationSeriesRepairAccessCodeMutation",
     "ReservationSeriesRescheduleMutation",
     "ReservationSeriesUpdateMutation",
 ]
@@ -72,6 +75,20 @@ class ReservationSeriesDenyMutation(UpdateMutation):
 class ReservationSeriesChangeAccessCodeMutation(UpdateMutation):
     class Meta:
         serializer_class = ReservationSeriesChangeAccessCodeSerializer
+        permission_classes = [RecurringReservationPermission]
+
+    @classmethod
+    def get_serializer_output(cls, instance: RecurringReservation) -> dict[str, Any]:
+        last_reservation: Reservation = instance.reservations.requires_active_access_code().last()
+        return {
+            "access_code_generated_at": last_reservation.access_code_generated_at,
+            "access_code_is_active": last_reservation.access_code_is_active,
+        }
+
+
+class ReservationSeriesRepairAccessCodeMutation(UpdateMutation):
+    class Meta:
+        serializer_class = ReservationSeriesRepairAccessCodeSerializer
         permission_classes = [RecurringReservationPermission]
 
     @classmethod
