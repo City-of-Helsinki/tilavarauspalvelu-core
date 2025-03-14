@@ -88,7 +88,9 @@ describe("SeasonalSearchForm", () => {
 
   test("should search (update query params) on submit", async () => {
     const handleSearch = vi.fn();
-    const view = render(<SeasonalSearchForm {...props} handleSearch={handleSearch} />);
+    const view = render(
+      <SeasonalSearchForm {...props} handleSearch={handleSearch} />
+    );
     const user = userEvent.setup();
     const selected = options.purposeOptions[0] ?? { label: "", value: 0 };
     await selectOption(view, "searchForm:purposesFilter", selected.label);
@@ -162,7 +164,9 @@ describe("SeasonalSearchForm", () => {
   test("allow select reservation unit type but dont search automatically", async () => {
     const user = userEvent.setup();
     const handleSearch = vi.fn();
-    const view = render(<SeasonalSearchForm {...props} handleSearch={handleSearch} />);
+    const view = render(
+      <SeasonalSearchForm {...props} handleSearch={handleSearch} />
+    );
     const listboxLabel = "searchForm:typeLabel";
     const optionLabel = "type 1";
     await selectOption(view, listboxLabel, optionLabel);

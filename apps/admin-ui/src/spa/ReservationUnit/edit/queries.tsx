@@ -127,14 +127,7 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
         highestPriceNet
       }
       applicationRoundTimeSlots {
-        id
-        pk
-        closed
-        weekday
-        reservableTimes {
-          begin
-          end
-        }
+        ...ApplicationRoundTimeSlots
       }
     }
   }

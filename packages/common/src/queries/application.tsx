@@ -50,48 +50,64 @@ export const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
   }
 `;
 
-export const APPLICATION_SECTION_UI_FRAGMENT = gql`
-  fragment ApplicationSectionUI on ApplicationSectionNode {
-    ...ApplicationSectionCommon
-    suitableTimeRanges {
-      id
-      pk
-      beginTime
-      endTime
-      dayOfTheWeek
-      priority
-    }
-    purpose {
+export const SUITABLE_TIME_FRAGMENT = gql`
+  fragment SuitableTime on SuitableTimeRangeNode {
+    id
+    pk
+    beginTime
+    endTime
+    dayOfTheWeek
+    priority
+  }
+`;
+
+export const RESERVATION_PURPOSE_NAME_FRAGMENT = gql`
+  fragment ReservationPurposeName on ReservationPurposeNode {
+    id
+    pk
+    nameFi
+    nameSv
+    nameEn
+  }
+`;
+
+export const RESERVATION_UNIT_NAME_FRAGMENT = gql`
+  fragment ReservationUnitName on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    unit {
       id
       pk
       nameFi
-      nameSv
       nameEn
+      nameSv
     }
-    reservationUnitOptions {
-      id
-      reservationUnit {
-        id
-        pk
-        nameFi
-        nameEn
-        nameSv
-        unit {
-          id
-          pk
-          nameFi
-          nameEn
-          nameSv
-        }
-        applicationRoundTimeSlots {
-          id
-          weekday
-          closed
-          reservableTimes {
-            begin
-            end
-          }
-        }
+  }
+`;
+
+export const APPLICATION_ROUND_TIME_SLOTS_FRAGMENT = gql`
+  fragment ApplicationRoundTimeSlots on ApplicationRoundTimeSlotNode {
+    id
+    pk
+    weekday
+    closed
+    reservableTimes {
+      begin
+      end
+    }
+  }
+`;
+
+export const RESERVATION_UNIT_OPTION_FRAGMENT = gql`
+  fragment ReservationUnitOption on ReservationUnitOptionNode {
+    id
+    reservationUnit {
+      ...ReservationUnitName
+      applicationRoundTimeSlots {
+        ...ApplicationRoundTimeSlots
       }
     }
   }
