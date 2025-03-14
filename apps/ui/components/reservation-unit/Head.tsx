@@ -154,11 +154,7 @@ const AccessTypeTooltipWrapper = styled.div`
   }
 `;
 
-function AccessTypeTooltip({
-  accessTypes,
-}: Readonly<{ accessTypes: QueryT["accessTypes"] }>): JSX.Element {
-  /* eslint-disable react-hooks/rules-of-hooks */
-  const { t } = useTranslation();
+function addEndDate(accessTypes: QueryT["accessTypes"]) {
   const accessTypeDurations = accessTypes.map((accessType) => ({
     ...accessType,
     endDate: "",
@@ -174,11 +170,24 @@ function AccessTypeTooltip({
       const endDate = sub(new Date(end), {
         days: 1,
       });
-      accessTypeDurations[idx]!.endDate = toUIDate(endDate);
+      const dur = accessTypeDurations[idx];
+      if (dur != null) {
+        dur.endDate = toUIDate(endDate);
+      }
     }
-    accessTypeDurations[idx]!.beginDate = toUIDate(beginDate);
+    const dur = accessTypeDurations[idx];
+    if (dur != null) {
+      dur.beginDate = toUIDate(beginDate);
+    }
   }
-  /* eslint-enable react-hooks/rules-of-hooks */
+  return accessTypeDurations;
+}
+
+function AccessTypeTooltip({
+  accessTypes,
+}: Readonly<{ accessTypes: QueryT["accessTypes"] }>): JSX.Element {
+  const { t } = useTranslation();
+  const accessTypeDurations = addEndDate(accessTypes);
 
   return (
     <Tooltip>
