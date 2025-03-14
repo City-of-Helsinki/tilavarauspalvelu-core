@@ -5,7 +5,7 @@ import datetime
 from typing import TYPE_CHECKING
 
 from tilavarauspalvelu.dataclasses import ReservationSeriesCalculationResults
-from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice
+from tilavarauspalvelu.enums import AccessType, RejectionReadinessChoice, Weekday
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationSection, RejectedOccurrence, Reservation
 from tilavarauspalvelu.typing import ReservationPeriod
@@ -260,3 +260,8 @@ class RecurringReservationActions:
         return ApplicationSection.objects.filter(
             reservation_unit_options__allocated_time_slots__recurring_reservation=self.recurring_reservation
         ).first()
+
+    def get_weekdays_list(self) -> list[Weekday]:
+        """List of weekdays in the reservation series."""
+        weekdays_list = (int(val) for val in self.recurring_reservation.weekdays.split(","))
+        return [Weekday.from_week_day(val) for val in weekdays_list]

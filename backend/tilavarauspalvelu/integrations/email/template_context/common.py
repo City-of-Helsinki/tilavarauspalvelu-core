@@ -5,10 +5,9 @@ from typing import TYPE_CHECKING, Any
 from django.conf import settings
 from django.utils.translation import pgettext
 
-from tilavarauspalvelu.enums import Weekday
-from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.translation import get_attr_by_language
+from tilavarauspalvelu.typing import SeriesAccessCodeValidity
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_time_string
 from utils.utils import update_query_params
 
@@ -177,6 +176,7 @@ def get_context_for_keyless_entry(
         "access_code_is_used": access_code_is_used,
         "access_code": access_code,
         "access_code_validity_period": access_code_validity_period,
+        "access_code_validity_by_series": {},  # TODO: Implement
         "access_code_label": pgettext("Email", "Door code"),
         "access_code_validity_period_label": pgettext("Email", "Validity period of the door code"),
         "text_access_code_to_access": pgettext("Email", "You can access the space with the door code"),
@@ -258,6 +258,8 @@ def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
 
 
 def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str, Any]:
+    from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+
     if not reservation.access_code_should_be_active:
         return {
             "access_code_is_used": False,
@@ -266,9 +268,10 @@ def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str,
         }
 
     try:
-        response = PindoraClient.get_reservation(reservation=reservation)
+        response = PindoraService.get_access_code(obj=reservation)
     except PindoraNotFoundError:
         response = None  # Set as None to make mocking in tests easier
+
     if not response:
         # Reservation should have an access code, but it is not available.
         return {
@@ -277,44 +280,79 @@ def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str,
             "access_code_validity_period": "",
         }
 
-    time_str = f"{local_time_string(response['begin'].time())}-{local_time_string(response['end'].time())}"
+    begins = local_time_string(response.access_code_begins_at.time())
+    ends = local_time_string(response.access_code_ends_at.time())
+    time_str = f"{begins}-{ends}"
+
     return {
         "access_code_is_used": True,
-        "access_code": response["access_code"],
+        "access_code": response.access_code,
         "access_code_validity_period": time_str,
     }
 
 
-def params_for_access_code_reservation_series(*, reservation_series: RecurringReservation) -> dict[str, Any]:
+def params_for_access_code_section(*, application_section: ApplicationSection) -> dict[str, Any]:
+    from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+
+    access_code_series_validity: list[SeriesAccessCodeValidity] = []
+
     try:
-        response = PindoraClient.get_reservation_series(series=reservation_series)
+        response = PindoraService.get_access_code(obj=application_section)
     except PindoraNotFoundError:
         # Reservation should have an access code, but it is not available.
         return {
             "access_code_is_used": False,  # Not supported for RecurringReservations yet.
             "access_code": "",
             "access_code_validity_period": "",
+            "access_code_series_validity": access_code_series_validity,
         }
 
-    # All reservations in the series have the same TIME, so any validity period in the response is fine.
-    time_str = ""
-    validity = next(iter(response["reservation_unit_code_validity"]), None)
-    if validity:
-        time_str = f"{local_time_string(validity['begin'].time())}-{local_time_string(validity['end'].time())}"
+    validity_by_series: dict[int, SeriesAccessCodeValidity] = {}
+    qs = application_section.actions.get_reservation_series()
+    for series in qs:
+        begins = local_time_string(series.begin_time)
+        ends = local_time_string(series.end_time)
+        time_str = f"{begins}-{ends}"
+
+        weekdays_list = series.actions.get_weekdays_list()
+        weekdays = ", ".join(str(weekday.label) for weekday in weekdays_list)
+
+        validity_by_series[series.pk] = SeriesAccessCodeValidity(
+            weekday_value=weekdays,
+            time_value=time_str,
+            access_code_validity_period="",
+        )
+
+    for validity in response.access_code_validity:
+        # All reservations in the same series have the same TIME (due to how seasonal bookings work),
+        # so any validity period in the response is fine.
+        if validity.reservation_series_id in validity_by_series:
+            continue
+
+        begins = local_time_string(validity.access_code_begins_at.time())
+        ends = local_time_string(validity.access_code_ends_at.time())
+        time_str = f"{begins}-{ends}"
+        validity_by_series[validity.reservation_series_id] = time_str
+
     return {
         "access_code_is_used": True,
-        "access_code": response["access_code"],
-        "access_code_validity_period": time_str,
+        "access_code": response.access_code,
+        "access_code_validity_period": "",
+        "access_code_validity_by_series": validity_by_series,
     }
 
 
 def params_for_reservation_series_info(*, reservation_series: RecurringReservation) -> dict[str, str]:
-    weekdays = ", ".join(str(Weekday.from_week_day(int(val)).label) for val in reservation_series.weekdays.split(","))
-    start_time = reservation_series.begin_time
-    end_time = reservation_series.end_time
+    weekdays_list = reservation_series.actions.get_weekdays_list()
+    weekdays = ", ".join(str(weekday.label) for weekday in weekdays_list)
+
+    start_time = local_time_string(reservation_series.begin_time)
+    end_time = local_time_string(reservation_series.end_time)
+    time_str = f"{start_time}-{end_time}"
+
     return {
         "weekday_value": weekdays,
-        "time_value": f"{local_time_string(start_time)}-{local_time_string(end_time)}",
+        "time_value": time_str,
     }
 
 

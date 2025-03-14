@@ -548,6 +548,7 @@ class EmailService:
         application = reservation_series.allocated_time_slot.reservation_unit_option.application_section.application
         if application.status != ApplicationStatusChoice.RESULTS_SENT:
             return
+
         recipients = get_application_email_recipients(application=application)
         if not recipients:
             SentryLogger.log_message(

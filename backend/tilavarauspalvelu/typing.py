@@ -449,3 +449,9 @@ class ReservationDetails(TypedDict, total=False):
     purpose: int | ReservationPurpose
     home_city: int | City
     age_group: int | AgeGroup
+
+
+class SeriesAccessCodeValidity(TypedDict):
+    weekday_value: str
+    time_value: str
+    access_code_validity_period: str

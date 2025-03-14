@@ -20,7 +20,7 @@ from .common import (
     get_my_reservations_ext_link,
     get_staff_reservations_ext_link,
     params_for_access_code_reservation,
-    params_for_access_code_reservation_series,
+    params_for_access_code_section,
     params_for_application_section_info,
     params_for_base_info,
     params_for_price_info,
@@ -724,7 +724,7 @@ def get_context_for_seasonal_reservation_modified_series(
             "application_section_id": getattr(application_section, "id", None),
             **params_for_reservation_series_info(reservation_series=reservation_series),
             **params_for_application_section_info(application_section=application_section, language=language),
-            **params_for_access_code_reservation_series(reservation_series=reservation_series),
+            **params_for_access_code_section(application_section=application_section),
         }
 
     title = pgettext("Email", "The time of the space reservation included in your seasonal booking has changed")
@@ -733,8 +733,8 @@ def get_context_for_seasonal_reservation_modified_series(
         "text_reservation_modified": title,
         "application_section_name": data["application_section_name"],
         "application_round_name": data["application_round_name"],
-        "weekday_value": data["weekday_value"],
-        "time_value": data["time_value"],
+        # TODO: "weekday_value": data["weekday_value"],
+        # TODO: "time_value": data["time_value"],
         **get_context_for_translations(language=language, email_recipient_name=data["email_recipient_name"]),
         **get_contex_for_seasonal_reservation_check_details_url(
             language=language,
@@ -746,6 +746,7 @@ def get_context_for_seasonal_reservation_modified_series(
             access_code_is_used=data["access_code_is_used"],
             access_code=data["access_code"],
             access_code_validity_period=data["access_code_validity_period"],
+            access_code_validity_by_series=data["access_code_validity_by_series"],
         ),
     }
 

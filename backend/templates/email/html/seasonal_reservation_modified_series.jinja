@@ -3,10 +3,21 @@
 {% block content_main %}
     <mj-text>{{ text_reservation_modified | sentence | safe }}</mj-text>
     {% include "email/html/partials/application_section_name.jinja" %}
+
     <mj-spacer />
-    <mj-text>{{ weekday_label | safe }}: {{ weekday_value | safe }}</mj-text>
-    <mj-text>{{ time_label | safe }}: {{ time_value | safe }}</mj-text>
-    {% include "email/html/partials/access_code.jinja" %}
+    {% if access_code %}
+        <mj-text>{{ access_code_label | safe }}: {{ access_code }}</mj-text>
+    {% else %}
+        <mj-text>{{ text_access_code_unavailable_instructions_html | sentence }}</mj-text>
+    {% endif %}
+
+    {% for validity in access_code_validity_by_series %}
+        <mj-spacer />
+        <mj-text>{{ weekday_label | safe }}: {{ validity.weekday_value | safe }}</mj-text>
+        <mj-text>{{ time_label | safe }}: {{ validity.time_value | safe }}</mj-text>
+        <mj-text>{{ access_code_validity_period_label | safe }}: {{ validity.access_code_validity_period }}</mj-text>
+    {% endfor %}
+
     <mj-spacer />
     <mj-text>{{ check_booking_details_text | safe }}: {{ check_booking_details_url_html | safe }}</mj-text>
 {% endblock %}
@@ -16,4 +27,3 @@
 {% block content_closing %}
     {% include "email/html/partials/closing.jinja" %}
 {% endblock %}
-}}
