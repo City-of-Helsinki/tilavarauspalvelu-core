@@ -51,9 +51,9 @@ services:
       - tvp-media:/media
     entrypoint: /tvp/docker/entrypoint_dev.sh
 
-  celery:
-    container_name: tvp-celery
-    image: tvp-celery
+  worker:
+    container_name: tvp-worker
+    image: tvp-worker
     depends_on:
       backend:
         condition: service_started
@@ -69,6 +69,25 @@ services:
     environment:
       DJANGO_SETTINGS_ENVIRONMENT: Docker
     entrypoint: /tvp/docker/worker.sh
+
+  scheduler:
+    container_name: tvp-scheduler
+    image: tvp-scheduler
+    depends_on:
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    build:
+      context: backend/
+      dockerfile: docker/Dockerfile
+      args:
+        DEPS: main,admin,celery,test,lint
+    env_file:
+      - backend/.env
+    environment:
+      DJANGO_SETTINGS_ENVIRONMENT: Docker
+    entrypoint: /tvp/docker/scheduler.sh
 
 volumes:
   tvp-postgres:
