@@ -144,7 +144,7 @@ export function EditStep1({
     <>
       <StyledReservationInfoCard
         reservation={modifiedReservation}
-        type="pending"
+        bgColor="gold"
       />
       <StyledForm
         onSubmit={(e) => {

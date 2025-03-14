@@ -222,7 +222,7 @@ export function EditStep0({
     <>
       <StyledReservationInfoCard
         reservation={reservation}
-        type="pending"
+        bgColor="gold"
         disableImage
       />
       {/* TODO on mobile in the design this is after the calendar but before action buttons */}
