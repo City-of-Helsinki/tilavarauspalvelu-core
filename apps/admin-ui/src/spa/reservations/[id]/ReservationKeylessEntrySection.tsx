@@ -255,9 +255,9 @@ function getRecurringReservationAccessCodeValidity(
   const accessCodeValidity = pindoraInfo?.accessCodeValidity;
   if (pindoraInfo && accessCodeValidity && accessCodeValidity.length > 0) {
     // Get the DATE value from the first and last validity dates
-    validityBeginsDate = accessCodeValidity[0].accessCodeBeginsAt;
+    validityBeginsDate = accessCodeValidity[0]?.accessCodeBeginsAt;
     validityEndsDate =
-      accessCodeValidity[accessCodeValidity.length - 1].accessCodeEndsAt;
+      accessCodeValidity[accessCodeValidity.length - 1]?.accessCodeEndsAt;
 
     // Get the TIME value from the next validity date
     const now = new Date();
@@ -271,9 +271,9 @@ function getRecurringReservationAccessCodeValidity(
     if (!validityBeginsTime) {
       // If no next validity date found, use the last one
       validityBeginsTime =
-        accessCodeValidity[accessCodeValidity.length - 1].accessCodeBeginsAt;
+        accessCodeValidity[accessCodeValidity.length - 1]?.accessCodeBeginsAt;
       validityEndsTime =
-        accessCodeValidity[accessCodeValidity.length - 1].accessCodeEndsAt;
+        accessCodeValidity[accessCodeValidity.length - 1]?.accessCodeEndsAt;
     }
   }
 
@@ -329,16 +329,18 @@ function AccessCodeChangeRepairButton({
   const handleExecuteMutationError = (e: unknown) => {
     const validationErrors = getValidationErrors(e);
     if (validationErrors.length > 0) {
-      const code = validationErrors[0].validation_code;
+      const code = validationErrors[0]?.validation_code;
       if (code && i18n.exists(`errors.backendValidation.${code}`)) {
         errorToast({ text: t(`errors.backendValidation.${code}`) });
         return;
       }
 
-      errorToast({
-        text: validationErrors[0].message ?? validationErrors[0].code,
-      });
-      return;
+      if (validationErrors[0]?.message || validationErrors[0]?.code) {
+        errorToast({
+          text: validationErrors[0]?.message ?? validationErrors[0]?.code,
+        });
+        return;
+      }
     }
 
     if (e instanceof Error) {
