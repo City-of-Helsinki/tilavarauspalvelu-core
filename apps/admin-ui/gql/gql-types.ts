@@ -1158,12 +1158,8 @@ export type HelsinkiProfileDataNode = {
 
 /** An enumeration. */
 export enum ImageType {
-  /** Pohjapiirros */
-  GroundPlan = "GROUND_PLAN",
   /** Pääkuva */
   Main = "MAIN",
-  /** Kartta */
-  Map = "MAP",
   /** Muu */
   Other = "OTHER",
 }

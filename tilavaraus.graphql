@@ -1318,17 +1318,9 @@ An enumeration.
 """
 enum ImageType {
   """
-  Pohjapiirros
-  """
-  GROUND_PLAN
-  """
   Pääkuva
   """
   MAIN
-  """
-  Kartta
-  """
-  MAP
   """
   Muu
   """
