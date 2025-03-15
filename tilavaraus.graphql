@@ -4218,6 +4218,7 @@ type ReservationUnitNode implements Node {
   descriptionEn: String
   descriptionFi: String
   descriptionSv: String
+  effectiveAccessType: AccessType
   equipments(
     name: String
     nameEn: String
