@@ -1158,12 +1158,8 @@ export type HelsinkiProfileDataNode = {
 
 /** An enumeration. */
 export enum ImageType {
-  /** Pohjapiirros */
-  GroundPlan = "GROUND_PLAN",
   /** Pääkuva */
   Main = "MAIN",
-  /** Kartta */
-  Map = "MAP",
   /** Muu */
   Other = "OTHER",
 }
@@ -3868,6 +3864,7 @@ export type ReservationUnitNode = Node & {
   descriptionEn?: Maybe<Scalars["String"]["output"]>;
   descriptionFi?: Maybe<Scalars["String"]["output"]>;
   descriptionSv?: Maybe<Scalars["String"]["output"]>;
+  effectiveAccessType?: Maybe<AccessType>;
   equipments: Array<EquipmentNode>;
   firstReservableDatetime?: Maybe<Scalars["DateTime"]["output"]>;
   haukiUrl?: Maybe<Scalars["String"]["output"]>;
