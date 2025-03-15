@@ -180,6 +180,7 @@ export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
     }
     maxPersons
     currentAccessType
+    effectiveAccessType
     accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
       id
       accessType

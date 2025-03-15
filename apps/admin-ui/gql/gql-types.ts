@@ -3902,6 +3902,7 @@ export type ReservationUnitNode = Node & {
   descriptionEn?: Maybe<Scalars["String"]["output"]>;
   descriptionFi?: Maybe<Scalars["String"]["output"]>;
   descriptionSv?: Maybe<Scalars["String"]["output"]>;
+  effectiveAccessType?: Maybe<AccessType>;
   equipments: Array<EquipmentNode>;
   firstReservableDatetime?: Maybe<Scalars["DateTime"]["output"]>;
   haukiUrl?: Maybe<Scalars["String"]["output"]>;
