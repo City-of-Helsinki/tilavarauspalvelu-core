@@ -193,10 +193,12 @@ export function processVariables({
       ? reservationPeriodBegin
       : reservableDateStart,
     accessTypeEndDate: isSeasonal ? reservationPeriodEnd : reservableDateEnd,
-    ...(startDate != null
-      ? {
-          reservableDateStart,
-        }
+    ...(startDate != null || isSeasonal
+      ? isSeasonal
+        ? { reservableDateStart: reservationPeriodBegin } // Used to find effectiveAccessType in /recurring/[id] page
+        : {
+            reservableDateStart,
+          }
       : {}),
     ...(endDate != null
       ? {

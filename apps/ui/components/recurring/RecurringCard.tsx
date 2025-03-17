@@ -76,7 +76,7 @@ export function RecurringCard({
       }),
     });
   }
-  if (reservationUnit.currentAccessType) {
+  if (reservationUnit.effectiveAccessType) {
     infos.push({
       icon: (
         <IconLock
@@ -86,7 +86,7 @@ export function RecurringCard({
         />
       ),
       value: t(
-        `reservationUnit:accessTypes.${reservationUnit.currentAccessType}`
+        `reservationUnit:accessTypes.${reservationUnit.effectiveAccessType}`
       ),
     });
   }

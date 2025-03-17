@@ -218,6 +218,7 @@ function createSearchVariablesMock({
     accessType: [],
     accessTypeBeginDate: "2024-02-01T00:00:00Z",
     accessTypeEndDate: "2025-01-01T00:00:00Z",
+    reservableDateStart: "2024-02-01T00:00:00Z",
     applicationRound: [1],
     first: 36,
     personsAllowed: null,
