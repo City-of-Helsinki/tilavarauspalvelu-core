@@ -1203,6 +1203,7 @@ export type Mutation = {
   cancelAllApplicationSectionReservations?: Maybe<ApplicationSectionReservationCancellationMutationPayload>;
   cancelApplication?: Maybe<ApplicationCancelMutationPayload>;
   cancelReservation?: Maybe<ReservationCancellationMutationPayload>;
+  changeReservationSeriesAccessCode?: Maybe<ReservationSeriesChangeAccessCodeMutationPayload>;
   confirmReservation?: Maybe<ReservationConfirmMutationPayload>;
   createAllocatedTimeslot?: Maybe<AllocatedTimeSlotCreateMutationPayload>;
   createApplication?: Maybe<ApplicationCreateMutationPayload>;
@@ -1236,6 +1237,7 @@ export type Mutation = {
   refundReservation?: Maybe<ReservationRefundMutationPayload>;
   rejectAllApplicationOptions?: Maybe<RejectAllApplicationOptionsMutationPayload>;
   rejectAllSectionOptions?: Maybe<RejectAllSectionOptionsMutationPayload>;
+  repairReservationSeriesAccessCode?: Maybe<ReservationSeriesRepairAccessCodeMutationPayload>;
   requireHandlingForReservation?: Maybe<ReservationRequiresHandlingMutationPayload>;
   rescheduleReservationSeries?: Maybe<ReservationSeriesRescheduleMutationPayload>;
   restoreAllApplicationOptions?: Maybe<RestoreAllApplicationOptionsMutationPayload>;
@@ -1289,6 +1291,10 @@ export type MutationCancelApplicationArgs = {
 
 export type MutationCancelReservationArgs = {
   input: ReservationCancellationMutationInput;
+};
+
+export type MutationChangeReservationSeriesAccessCodeArgs = {
+  input: ReservationSeriesChangeAccessCodeMutationInput;
 };
 
 export type MutationConfirmReservationArgs = {
@@ -1413,6 +1419,10 @@ export type MutationRejectAllApplicationOptionsArgs = {
 
 export type MutationRejectAllSectionOptionsArgs = {
   input: RejectAllSectionOptionsMutationInput;
+};
+
+export type MutationRepairReservationSeriesAccessCodeArgs = {
+  input: ReservationSeriesRepairAccessCodeMutationInput;
 };
 
 export type MutationRequireHandlingForReservationArgs = {
@@ -3215,6 +3225,16 @@ export type ReservationSeriesAddMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
+export type ReservationSeriesChangeAccessCodeMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type ReservationSeriesChangeAccessCodeMutationPayload = {
+  accessCodeGeneratedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  accessCodeIsActive?: Maybe<Scalars["Boolean"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
+};
+
 export type ReservationSeriesCreateMutationInput = {
   abilityGroup?: InputMaybe<Scalars["Int"]["input"]>;
   ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
@@ -3257,6 +3277,16 @@ export type ReservationSeriesDenyMutationInput = {
 export type ReservationSeriesDenyMutationPayload = {
   denied?: Maybe<Scalars["Int"]["output"]>;
   future?: Maybe<Scalars["Int"]["output"]>;
+};
+
+export type ReservationSeriesRepairAccessCodeMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type ReservationSeriesRepairAccessCodeMutationPayload = {
+  accessCodeGeneratedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  accessCodeIsActive?: Maybe<Scalars["Boolean"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationSeriesRescheduleMutationInput = {

@@ -1388,6 +1388,9 @@ type Mutation {
   cancelReservation(
     input: ReservationCancellationMutationInput!
   ): ReservationCancellationMutationPayload
+  changeReservationSeriesAccessCode(
+    input: ReservationSeriesChangeAccessCodeMutationInput!
+  ): ReservationSeriesChangeAccessCodeMutationPayload
   confirmReservation(
     input: ReservationConfirmMutationInput!
   ): ReservationConfirmMutationPayload
@@ -1479,6 +1482,9 @@ type Mutation {
   rejectAllSectionOptions(
     input: RejectAllSectionOptionsMutationInput!
   ): RejectAllSectionOptionsMutationPayload
+  repairReservationSeriesAccessCode(
+    input: ReservationSeriesRepairAccessCodeMutationInput!
+  ): ReservationSeriesRepairAccessCodeMutationPayload
   requireHandlingForReservation(
     input: ReservationRequiresHandlingMutationInput!
   ): ReservationRequiresHandlingMutationPayload
@@ -3503,6 +3509,16 @@ type ReservationSeriesAddMutationPayload {
   pk: Int
 }
 
+input ReservationSeriesChangeAccessCodeMutationInput {
+  pk: Int!
+}
+
+type ReservationSeriesChangeAccessCodeMutationPayload {
+  accessCodeGeneratedAt: DateTime
+  accessCodeIsActive: Boolean
+  pk: Int
+}
+
 input ReservationSeriesCreateMutationInput {
   abilityGroup: Int
   ageGroup: Int
@@ -3545,6 +3561,16 @@ input ReservationSeriesDenyMutationInput {
 type ReservationSeriesDenyMutationPayload {
   denied: Int
   future: Int
+}
+
+input ReservationSeriesRepairAccessCodeMutationInput {
+  pk: Int!
+}
+
+type ReservationSeriesRepairAccessCodeMutationPayload {
+  accessCodeGeneratedAt: DateTime
+  accessCodeIsActive: Boolean
+  pk: Int
 }
 
 input ReservationSeriesRescheduleMutationInput {
