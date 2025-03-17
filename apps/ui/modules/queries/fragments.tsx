@@ -44,3 +44,38 @@ export const CANCEL_REASON_FRAGMENT = gql`
     reasonSv
   }
 `;
+
+export const PINDORA_RESERVATION_FRAGMENT = gql`
+  fragment PindoraReservation on PindoraReservationInfoType {
+    accessCode
+    accessCodeBeginsAt
+    accessCodeEndsAt
+    accessCodeIsActive
+  }
+`;
+
+export const PINDORA_SERIES_FRAGMENT = gql`
+  fragment PindoraSeries on PindoraSeriesInfoType {
+    accessCode
+    accessCodeIsActive
+    accessCodeValidity {
+      accessCodeBeginsAt
+      accessCodeEndsAt
+      reservationId
+      reservationSeriesId
+    }
+  }
+`;
+
+export const PINDORA_SECTION_FRAGMENT = gql`
+  fragment PindoraSection on PindoraSectionInfoType {
+    accessCode
+    accessCodeIsActive
+    accessCodeValidity {
+      accessCodeBeginsAt
+      accessCodeEndsAt
+      reservationSeriesId
+      reservationId
+    }
+  }
+`;

@@ -14,7 +14,6 @@ import {
   convertLanguageCode,
   formatDuration,
   getTranslationSafe,
-  toUIDate,
 } from "common/src/common/util";
 import { H1, H3 } from "common/src/common/typography";
 import { formatDateTime } from "@/modules/util";
@@ -28,12 +27,12 @@ import { Images } from "./Images";
 import {
   getActivePricing,
   getPriceString,
+  getReservationUnitAccessPeriods,
   isReservationUnitPaid,
 } from "@/modules/reservationUnit";
 import { filterNonNullable } from "common/src/helpers";
 import { Flex } from "common/styles/util";
 import { breakpoints } from "common";
-import { sub } from "date-fns";
 
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 interface HeadProps {
@@ -164,41 +163,12 @@ const AccessTypeTooltipWrapper = styled.div`
   }
 `;
 
-function addEndDate(accessTypes: QueryT["accessTypes"]) {
-  const accessTypeDurations = accessTypes.map((accessType) => ({
-    ...accessType,
-    endDate: "",
-  }));
-  for (let idx = 0; idx < accessTypeDurations.length; idx++) {
-    const b = accessTypeDurations[idx]?.beginDate;
-    if (b == null) {
-      continue;
-    }
-    const beginDate = new Date(b);
-    const end = accessTypeDurations[idx + 1]?.beginDate;
-    if (end != null) {
-      const endDate = sub(new Date(end), {
-        days: 1,
-      });
-      const dur = accessTypeDurations[idx];
-      if (dur != null) {
-        dur.endDate = toUIDate(endDate);
-      }
-    }
-    const dur = accessTypeDurations[idx];
-    if (dur != null) {
-      dur.beginDate = toUIDate(beginDate);
-    }
-  }
-  return accessTypeDurations;
-}
-
 function AccessTypeTooltip({
   accessTypes,
 }: Readonly<{ accessTypes: QueryT["accessTypes"] }>): JSX.Element {
   const { t } = useTranslation();
-  const accessTypeDurations = addEndDate(accessTypes);
 
+  const accessTypeDurations = getReservationUnitAccessPeriods(accessTypes);
   return (
     <Tooltip>
       <ul>

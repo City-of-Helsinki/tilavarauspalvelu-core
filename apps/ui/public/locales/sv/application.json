@@ -223,6 +223,7 @@
       "others": "andra",
       "reservationCountPostfix": "bokningar"
     },
+    "accessTypeWarning": "Tillträdet till utrymmet kommer att ändras. Läs detaljerna i instruktionerna för lokalen.",
     "helpLink": "Instruktioner",
     "helpLinkLong": "Hjälp för ansökan",
     "helpModal": {
