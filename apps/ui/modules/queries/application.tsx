@@ -1,5 +1,7 @@
 import { gql } from "@apollo/client";
 
+// NOTE for some reason codegen doesn't run on component files (at least some of them)
+
 // includes all the form fields for an application funnel
 // requires a lot of fields because we are doing full form validation for stepper / sending
 export const APPLICATION_FORM_FRAGMENT = gql`

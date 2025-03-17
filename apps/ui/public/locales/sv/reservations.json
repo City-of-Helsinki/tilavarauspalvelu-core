@@ -122,5 +122,6 @@
   },
   "confirmNavigation": "Om du vill lämna sidan, kommer din bokning att avbokas automatiskt.",
   "accessCodeDuration": "Dörrkoden är giltig",
+  "accessTypeChanged": "Ändringar i tillträde till utrymmet. Se instruktioner.",
   "contactSupport": "Vänligen kontakta kundtjänsten."
 }
