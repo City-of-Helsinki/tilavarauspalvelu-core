@@ -138,6 +138,10 @@ function createReservationUnit({
       currentAccessType !== undefined
         ? currentAccessType
         : AccessType.AccessCode,
+    effectiveAccessType:
+      currentAccessType !== undefined
+        ? currentAccessType // Just use the same value for effectiveAccessType
+        : AccessType.AccessCode,
     reservationUnitType:
       reservationUnitType !== null // eslint-disable-line eqeqeq
         ? createMockReservationUnitType({
