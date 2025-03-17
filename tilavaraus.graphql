@@ -293,7 +293,7 @@ type ApplicationNode implements Node {
     includePreferredOrder10OrHigher: Boolean
     name: String
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ApplicationSectionOrderingChoices]
     pk: [Int]
@@ -402,7 +402,7 @@ type ApplicationRoundNode implements Node {
     nameFi: String
     nameSv: String
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationPurposeOrderingChoices]
     pk: [Int]
@@ -441,7 +441,7 @@ type ApplicationRoundNode implements Node {
     nameSv_Istartswith: String
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
     personsAllowed: Decimal
@@ -625,7 +625,7 @@ type ApplicationSectionNode implements Node {
   reservationMinDuration: Duration!
   reservationUnitOptions(
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationUnitOptionOrderingChoices]
     pk: [Int]
@@ -639,7 +639,7 @@ type ApplicationSectionNode implements Node {
   suitableTimeRanges(
     fulfilled: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [SuitableTimeRangeOrderingChoices]
     pk: [Int]
@@ -1318,17 +1318,9 @@ An enumeration.
 """
 enum ImageType {
   """
-  Pohjapiirros
-  """
-  GROUND_PLAN
-  """
   Pääkuva
   """
   MAIN
-  """
-  Kartta
-  """
-  MAP
   """
   Muu
   """
@@ -2038,7 +2030,7 @@ type Query {
     onlyWithHandlingPermission: Boolean
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationOrderingChoices]
     orderStatus: [OrderStatusWithFree]
@@ -2078,7 +2070,7 @@ type Query {
     last: Int
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [AllocatedTimeSlotOrderingChoices]
     pk: [Int]
@@ -2107,7 +2099,7 @@ type Query {
     ongoing: Boolean
     onlyWithPermissions: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ApplicationRoundOrderingChoices]
     pk: [Int]
@@ -2135,7 +2127,7 @@ type Query {
     name: String
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ApplicationSectionOrderingChoices]
     pk: [Int]
@@ -2157,7 +2149,7 @@ type Query {
     last: Int
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ApplicationOrderingChoices]
     pk: [Int]
@@ -2182,7 +2174,7 @@ type Query {
     name: String
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [BannerNotificationOrderingChoices]
     target: BannerNotificationTarget
@@ -2213,7 +2205,7 @@ type Query {
     last: Int
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [EquipmentCategoryOrderingChoices]
     pk: [Int]
@@ -2243,7 +2235,7 @@ type Query {
     name_Istartswith: String
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [EquipmentOrderingChoices]
     pk: [Int]
@@ -2252,7 +2244,7 @@ type Query {
   ): EquipmentNodeConnection
   equipmentsAll(
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [EquipmentOrderingChoices]
   ): [EquipmentAllNode!]
@@ -2287,7 +2279,7 @@ type Query {
     nameSv: String
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [PurposeOrderingChoices]
     pk: [Int]
@@ -2302,7 +2294,7 @@ type Query {
     nameSv: String
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [QualifierOrderingChoices]
     pk: [Int]
@@ -2326,7 +2318,7 @@ type Query {
     name: String
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [RecurringReservationOrderingChoices]
     pk: [Int]
@@ -2352,7 +2344,7 @@ type Query {
     last: Int
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [RejectedOccurrenceOrderingChoices]
     pk: [Int]
@@ -2374,7 +2366,7 @@ type Query {
     last: Int
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationCancelReasonOrderingChoices]
     pk: [Int]
@@ -2387,7 +2379,7 @@ type Query {
     last: Int
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationDenyReasonOrderingChoices]
     pk: [Int]
@@ -2403,7 +2395,7 @@ type Query {
     nameSv: String
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationPurposeOrderingChoices]
     pk: [Int]
@@ -2422,7 +2414,7 @@ type Query {
     name: String
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationUnitCancellationRuleOrderingChoices]
     pk: [Int]
@@ -2443,7 +2435,7 @@ type Query {
     nameSv_Istartswith: String
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationUnitTypeOrderingChoices]
     pk: [Int]
@@ -2483,7 +2475,7 @@ type Query {
     offset: Int
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
     personsAllowed: Decimal
@@ -2524,7 +2516,7 @@ type Query {
     nameSv_Istartswith: String
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
     unit: [Int]
@@ -2545,7 +2537,7 @@ type Query {
     onlyWithHandlingPermission: Boolean
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationOrderingChoices]
     orderStatus: [OrderStatusWithFree]
@@ -2588,7 +2580,7 @@ type Query {
     offset: Int
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ResourceOrderingChoices]
     pk: [Int]
@@ -2616,7 +2608,7 @@ type Query {
     offset: Int
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [SpaceOrderingChoices]
     pk: [Int]
@@ -2628,7 +2620,7 @@ type Query {
     last: Int
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [TaxPercentageOrderingChoices]
     pk: [Int]
@@ -2641,7 +2633,7 @@ type Query {
     last: Int
     offset: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [TermsOfUseOrderingChoices]
     pk: [String]
@@ -2679,7 +2671,7 @@ type Query {
     onlySeasonalBookable: Boolean
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [UnitOrderingChoices]
     ownReservations: Boolean
@@ -2700,7 +2692,7 @@ type Query {
     onlySeasonalBookable: Boolean
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [UnitOrderingChoices]
     ownReservations: Boolean
@@ -2742,7 +2734,7 @@ type RecurringReservationNode implements Node {
   rejectedOccurrences(
     applicationRound: Int
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [RejectedOccurrenceOrderingChoices]
     pk: [Int]
@@ -2763,7 +2755,7 @@ type RecurringReservationNode implements Node {
     onlyWithHandlingPermission: Boolean
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationOrderingChoices]
     orderStatus: [OrderStatusWithFree]
@@ -3299,7 +3291,7 @@ type ReservationNode implements Node {
     nameSv_Istartswith: String
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
     personsAllowed: Decimal
@@ -4194,7 +4186,7 @@ type ReservationUnitNode implements Node {
   accessTypes(
     isActiveOrFuture: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationUnitAccessTypeOrderingChoices]
     pk: [Int]
@@ -4208,7 +4200,7 @@ type ReservationUnitNode implements Node {
     ongoing: Boolean
     onlyWithPermissions: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ApplicationRoundOrderingChoices]
     pk: [Int]
@@ -4240,7 +4232,7 @@ type ReservationUnitNode implements Node {
     name_Icontains: String
     name_Istartswith: String
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [EquipmentOrderingChoices]
     pk: [Int]
@@ -4284,7 +4276,7 @@ type ReservationUnitNode implements Node {
     nameFi: String
     nameSv: String
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [PurposeOrderingChoices]
     pk: [Int]
@@ -4294,7 +4286,7 @@ type ReservationUnitNode implements Node {
     nameFi: String
     nameSv: String
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [QualifierOrderingChoices]
     pk: [Int]
@@ -4336,7 +4328,7 @@ type ReservationUnitNode implements Node {
     onlyWithHandlingPermission: Boolean
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationOrderingChoices]
     orderStatus: [OrderStatusWithFree]
@@ -4370,7 +4362,7 @@ type ReservationUnitNode implements Node {
     nameSv_Istartswith: String
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ResourceOrderingChoices]
     pk: [Int]
@@ -4389,7 +4381,7 @@ type ReservationUnitNode implements Node {
     nameSv_Istartswith: String
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [SpaceOrderingChoices]
     pk: [Int]
@@ -4444,7 +4436,7 @@ type ReservationUnitOptionNode implements Node {
     applicationSectionStatus: [ApplicationSectionStatusChoice]
     dayOfTheWeek: [Weekday]
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [AllocatedTimeSlotOrderingChoices]
     pk: [Int]
@@ -5046,7 +5038,7 @@ type SpaceNode implements Node {
     nameSv_Istartswith: String
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [SpaceOrderingChoices]
     pk: [Int]
@@ -5075,7 +5067,7 @@ type SpaceNode implements Node {
     nameSv_Istartswith: String
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ResourceOrderingChoices]
     pk: [Int]
@@ -5393,7 +5385,7 @@ type UnitGroupNode implements Node {
     onlySeasonalBookable: Boolean
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [UnitOrderingChoices]
     ownReservations: Boolean
@@ -5476,7 +5468,7 @@ type UnitNode implements Node {
     nameSv_Istartswith: String
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
     personsAllowed: Decimal
@@ -5521,7 +5513,7 @@ type UnitNode implements Node {
     nameSv_Istartswith: String
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [SpaceOrderingChoices]
     pk: [Int]
@@ -5608,7 +5600,7 @@ type UnitRoleNode implements Node {
     onlySeasonalBookable: Boolean
     onlyWithPermission: Boolean
     """
-    Järjestys
+    Järjestä
     """
     orderBy: [UnitOrderingChoices]
     ownReservations: Boolean
