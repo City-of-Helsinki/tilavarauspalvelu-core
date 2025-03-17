@@ -4,7 +4,7 @@ import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { selectOption } from "@/test/test.utils";
 
-const { useRouter } = vi.hoisted(() => {
+const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
   return {
     useRouter: () => ({
@@ -58,15 +58,15 @@ const props: SearchFormProps = {
   isLoading: false,
 } as const;
 
+beforeEach(async () => {
+  mockedSearchParams.mockReturnValue(new URLSearchParams());
+});
+
+afterEach(() => {
+  vi.resetAllMocks();
+});
+
 describe("SeasonalSearchForm", () => {
-  beforeEach(async () => {
-    mockedSearchParams.mockReturnValue(new URLSearchParams());
-  });
-
-  afterEach(() => {
-    vi.resetAllMocks();
-  });
-
   test("should render empty search form", async () => {
     const view = render(<SeasonalSearchForm {...props} />);
     // TODO check that all selects exist and are empty
@@ -153,9 +153,24 @@ describe("SeasonalSearchForm", () => {
     expect(within(btn).getByText(minPersonSelect)).toBeInTheDocument();
   });
 
-  // TODO check tags here per field also
-  // searchForm:textSearchLabel (text search)
-  test.todo("allow input text search but dont search automatically");
+  test("allow input text search but dont search automatically", async () => {
+    const user = userEvent.setup();
+    const handleSearch = vi.fn();
+    const view = render(
+      <SeasonalSearchForm {...props} handleSearch={handleSearch} />
+    );
+    const searchLabel = "searchForm:textSearchLabel";
+    const searchValue = "foobar";
+    expect(view.getByLabelText(searchLabel)).toBeInTheDocument();
+    await user.type(view.getByLabelText(searchLabel), searchValue);
+    expect(handleSearch).toHaveBeenCalledTimes(0);
+    const searchBtn = view.getByRole("button", {
+      name: "searchForm:searchButton",
+    });
+    expect(searchBtn).toBeInTheDocument();
+    await user.click(searchBtn);
+    expect(handleSearch).toHaveBeenCalledTimes(1);
+  });
 
   // multiselects i.e. select multiple options
   // check that we get multiple params and multiple tags also
@@ -177,18 +192,131 @@ describe("SeasonalSearchForm", () => {
     });
     expect(searchBtn).toBeInTheDocument();
     await user.click(searchBtn);
+    // TODO check the selected options
     expect(handleSearch).toHaveBeenCalledTimes(1);
-    // TODO check that the tag is present
-    // TODO check that the query param is present
   });
+
   // searchForm:unitFilter (unit) - multiselect
   test.todo("allow select unit but dont search automatically");
   // searchForm:purposesFilter (purposes) - multiselect
   test.todo("allow select purpose but dont search automatically");
   test.todo("selecting participant count, waiting for refactor");
+});
 
-  // combine this test with the previous one? if we gonna check all of them individually
-  // test.todo("tags should be visible");
-  test.todo("tags should be removable");
-  test.todo("all tags should be clearable at once");
+// Tags are based on the search params, but submit search operates on a callback
+describe("Tags should modify search params", () => {
+  test("no tags should be visible by default", () => {
+    const handleSearch = vi.fn();
+    const view = render(
+      <SeasonalSearchForm {...props} handleSearch={handleSearch} />
+    );
+    const tags = view.getByTestId("search-form__filter--tags");
+    expect(tags).toBeInTheDocument();
+    expect(tags.children).toHaveLength(0);
+  });
+
+  test("tags should be visible", () => {
+    const handleSearch = vi.fn();
+    const params = new URLSearchParams();
+    const selected = options.purposeOptions[0] ?? { label: "", value: 0 };
+    params.set("purposes", selected.value.toString());
+    mockedSearchParams.mockReturnValue(params);
+    const view = render(
+      <SeasonalSearchForm {...props} handleSearch={handleSearch} />
+    );
+    const tags = view.getByTestId("search-form__filter--tags");
+    expect(tags).toBeInTheDocument();
+    // check that we have one tag + the clear all button
+    expect(tags.children).toHaveLength(2);
+    expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
+    expect(within(tags).getByText(`purpose ${selected.value}`)).toBeInTheDocument();
+  });
+
+  test("multiple tags for same option should be visible", () => {
+    const handleSearch = vi.fn();
+    const params = new URLSearchParams();
+    const selected1 = options.purposeOptions[0] ?? { label: "", value: 0 };
+    const selected2 = options.purposeOptions[1] ?? { label: "", value: 0 };
+    params.append("purposes", selected1.value.toString());
+    params.append("purposes", selected2.value.toString());
+    mockedSearchParams.mockReturnValue(params);
+    const view = render(
+      <SeasonalSearchForm {...props} handleSearch={handleSearch} />
+    );
+    const tags = view.getByTestId("search-form__filter--tags");
+    expect(tags).toBeInTheDocument();
+    // check that we have one tag + the clear all button
+    expect(tags.children).toHaveLength(3);
+    expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
+    expect(within(tags).getByText(`purpose ${selected1.value}`)).toBeInTheDocument();
+    expect(within(tags).getByText(`purpose ${selected2.value}`)).toBeInTheDocument();
+  });
+
+  test("multiple tags for different options should be visible", () => {
+    const handleSearch = vi.fn();
+    const params = new URLSearchParams();
+    const selected1 = options.purposeOptions[0] ?? { label: "", value: 0 };
+    const selected2 = options.reservationUnitTypeOptions[1] ?? { label: "", value: 0 };
+    params.append("purposes", selected1.value.toString());
+    params.append("reservationUnitTypes", selected2.value.toString());
+    mockedSearchParams.mockReturnValue(params);
+    const view = render(
+      <SeasonalSearchForm {...props} handleSearch={handleSearch} />
+    );
+    const tags = view.getByTestId("search-form__filter--tags");
+    expect(tags).toBeInTheDocument();
+    // check that we have one tag + the clear all button
+    expect(tags.children).toHaveLength(3);
+    expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
+    expect(within(tags).getByText(`purpose ${selected1.value}`)).toBeInTheDocument();
+    expect(within(tags).getByText(`type ${selected2.value}`)).toBeInTheDocument();
+  });
+
+  test("tags should be removable", async () => {
+    const user = userEvent.setup();
+    const handleSearch = vi.fn();
+    const params = new URLSearchParams();
+    const selected = options.purposeOptions[0] ?? { label: "", value: 0 };
+    params.set("purposes", selected.value.toString());
+    mockedSearchParams.mockReturnValue(params);
+    const view = render(
+      <SeasonalSearchForm {...props} handleSearch={handleSearch} />
+    );
+    const tags = view.getByTestId("search-form__filter--tags");
+    expect(tags).toBeInTheDocument();
+    // check that we have one tag + the clear all button
+    expect(tags.children).toHaveLength(2);
+    expect(within(tags).getByText("searchForm:resetForm")).toBeInTheDocument();
+    const removeBtn = within(tags).getByRole("button", {
+      // NOTE problematic because we can't search by the inner <span> but only by the aria-label
+      // the aria-label is the same for all tags because of our mocked TFunction
+      name: "searchForm:removeFilter"
+    });
+    expect(removeBtn).toBeInTheDocument();
+    expect(removeBtn).toHaveTextContent(`purpose ${selected.value}`);
+    await user.click(removeBtn);
+    expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
+    // TODO should have more values and we should expect them not to be removed
+  });
+
+  test("all tags should be clearable at once", async () => {
+    const user = userEvent.setup();
+    const handleSearch = vi.fn();
+    // TODO add more tags
+    const params = new URLSearchParams();
+    const selected = options.purposeOptions[0] ?? { label: "", value: 0 };
+    params.set("purposes", selected.value.toString());
+    mockedSearchParams.mockReturnValue(params);
+    const view = render(
+      <SeasonalSearchForm {...props} handleSearch={handleSearch} />
+    );
+    const tags = view.getByTestId("search-form__filter--tags");
+    expect(tags).toBeInTheDocument();
+    const resetBtn = within(tags).getByRole("button", {
+      name: "searchForm:resetForm",
+    });
+    expect(resetBtn).toBeInTheDocument();
+    await user.click(resetBtn);
+    expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
+  });
 });
