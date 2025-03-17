@@ -123,5 +123,6 @@
   "inclTax": "incl. VAT {{taxPercentage}} %",
   "peopleSuffixShort": "ppl",
   "yearSuffixShort": "y",
-  "amountSuffixShort": "pcs"
+  "amountSuffixShort": "pcs",
+  "validity": "Period of validity"
 }

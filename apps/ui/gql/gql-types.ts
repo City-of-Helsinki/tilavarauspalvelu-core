@@ -47,6 +47,13 @@ export type AbilityGroupNode = Node & {
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
+/** The state of the access code. */
+export enum AccessCodeState {
+  AccessCodeCreated = "ACCESS_CODE_CREATED",
+  AccessCodeNotRequired = "ACCESS_CODE_NOT_REQUIRED",
+  AccessCodePending = "ACCESS_CODE_PENDING",
+}
+
 /** How is the reservee able to enter the space in their reservation unit? */
 export enum AccessType {
   AccessCode = "ACCESS_CODE",
@@ -1980,6 +1987,7 @@ export type QueryAgeGroupsArgs = {
 };
 
 export type QueryAllocatedTimeSlotsArgs = {
+  accessCodeState?: InputMaybe<Array<InputMaybe<AccessCodeState>>>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   allocatedReservationUnit?: InputMaybe<
     Array<InputMaybe<Scalars["Int"]["input"]>>
@@ -4118,6 +4126,7 @@ export type ReservationUnitOptionNode = Node & {
 };
 
 export type ReservationUnitOptionNodeAllocatedTimeSlotsArgs = {
+  accessCodeState?: InputMaybe<Array<InputMaybe<AccessCodeState>>>;
   allocatedReservationUnit?: InputMaybe<
     Array<InputMaybe<Scalars["Int"]["input"]>>
   >;
@@ -5427,6 +5436,16 @@ export type ApplicationSectionReservationFragment = {
   id: string;
   pk?: number | null;
   name: string;
+  pindoraInfo?: {
+    accessCode: string;
+    accessCodeIsActive: boolean;
+    accessCodeValidity: Array<{
+      accessCodeBeginsAt: string;
+      accessCodeEndsAt: string;
+      reservationSeriesId: number;
+      reservationId: number;
+    } | null>;
+  } | null;
   reservationUnitOptions: Array<{
     id: string;
     allocatedTimeSlots: Array<{
@@ -5440,21 +5459,43 @@ export type ApplicationSectionReservationFragment = {
         beginTime?: string | null;
         endTime?: string | null;
         weekdays?: Array<number | null> | null;
+        accessType?: AccessTypeWithMultivalued | null;
+        usedAccessTypes?: Array<AccessType | null> | null;
+        pindoraInfo?: {
+          accessCode: string;
+          accessCodeIsActive: boolean;
+          accessCodeValidity: Array<{
+            accessCodeBeginsAt: string;
+            accessCodeEndsAt: string;
+            reservationId: number;
+            reservationSeriesId: number;
+          }>;
+        } | null;
         reservationUnit: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-          nameEn?: string | null;
-          nameSv?: string | null;
           reservationConfirmedInstructionsFi?: string | null;
           reservationConfirmedInstructionsEn?: string | null;
           reservationConfirmedInstructionsSv?: string | null;
+          nameFi?: string | null;
+          nameSv?: string | null;
+          nameEn?: string | null;
+          id: string;
+          pk?: number | null;
+          reservationCancelledInstructionsFi?: string | null;
+          reservationCancelledInstructionsSv?: string | null;
+          reservationCancelledInstructionsEn?: string | null;
+          currentAccessType?: AccessType | null;
           unit?: {
             id: string;
             nameFi?: string | null;
             nameEn?: string | null;
             nameSv?: string | null;
           } | null;
+          accessTypes: Array<{
+            id: string;
+            pk?: number | null;
+            accessType: AccessType;
+            beginDate: string;
+          }>;
         };
         rejectedOccurrences: Array<{
           id: string;
@@ -5466,7 +5507,15 @@ export type ApplicationSectionReservationFragment = {
           pk?: number | null;
           end: string;
           state?: ReservationStateChoice | null;
+          accessType: AccessType;
+          accessCodeIsActive: boolean;
           begin: string;
+          pindoraInfo?: {
+            accessCode: string;
+            accessCodeBeginsAt: string;
+            accessCodeEndsAt: string;
+            accessCodeIsActive: boolean;
+          } | null;
           reservationUnits: Array<{
             id: string;
             cancellationRule?: {
@@ -5493,6 +5542,16 @@ export type ApplicationReservationsQuery = {
       id: string;
       pk?: number | null;
       name: string;
+      pindoraInfo?: {
+        accessCode: string;
+        accessCodeIsActive: boolean;
+        accessCodeValidity: Array<{
+          accessCodeBeginsAt: string;
+          accessCodeEndsAt: string;
+          reservationSeriesId: number;
+          reservationId: number;
+        } | null>;
+      } | null;
       reservationUnitOptions: Array<{
         id: string;
         allocatedTimeSlots: Array<{
@@ -5506,21 +5565,43 @@ export type ApplicationReservationsQuery = {
             beginTime?: string | null;
             endTime?: string | null;
             weekdays?: Array<number | null> | null;
+            accessType?: AccessTypeWithMultivalued | null;
+            usedAccessTypes?: Array<AccessType | null> | null;
+            pindoraInfo?: {
+              accessCode: string;
+              accessCodeIsActive: boolean;
+              accessCodeValidity: Array<{
+                accessCodeBeginsAt: string;
+                accessCodeEndsAt: string;
+                reservationId: number;
+                reservationSeriesId: number;
+              }>;
+            } | null;
             reservationUnit: {
-              id: string;
-              pk?: number | null;
-              nameFi?: string | null;
-              nameEn?: string | null;
-              nameSv?: string | null;
               reservationConfirmedInstructionsFi?: string | null;
               reservationConfirmedInstructionsEn?: string | null;
               reservationConfirmedInstructionsSv?: string | null;
+              nameFi?: string | null;
+              nameSv?: string | null;
+              nameEn?: string | null;
+              id: string;
+              pk?: number | null;
+              reservationCancelledInstructionsFi?: string | null;
+              reservationCancelledInstructionsSv?: string | null;
+              reservationCancelledInstructionsEn?: string | null;
+              currentAccessType?: AccessType | null;
               unit?: {
                 id: string;
                 nameFi?: string | null;
                 nameEn?: string | null;
                 nameSv?: string | null;
               } | null;
+              accessTypes: Array<{
+                id: string;
+                pk?: number | null;
+                accessType: AccessType;
+                beginDate: string;
+              }>;
             };
             rejectedOccurrences: Array<{
               id: string;
@@ -5532,7 +5613,15 @@ export type ApplicationReservationsQuery = {
               pk?: number | null;
               end: string;
               state?: ReservationStateChoice | null;
+              accessType: AccessType;
+              accessCodeIsActive: boolean;
               begin: string;
+              pindoraInfo?: {
+                accessCode: string;
+                accessCodeBeginsAt: string;
+                accessCodeEndsAt: string;
+                accessCodeIsActive: boolean;
+              } | null;
               reservationUnits: Array<{
                 id: string;
                 cancellationRule?: {
@@ -5546,6 +5635,24 @@ export type ApplicationReservationsQuery = {
       }>;
     }> | null;
   } | null;
+};
+
+export type ApplicationSectionReservationUnitFragment = {
+  nameFi?: string | null;
+  nameSv?: string | null;
+  nameEn?: string | null;
+  id: string;
+  pk?: number | null;
+  reservationCancelledInstructionsFi?: string | null;
+  reservationCancelledInstructionsSv?: string | null;
+  reservationCancelledInstructionsEn?: string | null;
+  currentAccessType?: AccessType | null;
+  accessTypes: Array<{
+    id: string;
+    pk?: number | null;
+    accessType: AccessType;
+    beginDate: string;
+  }>;
 };
 
 export type ApplicationReservationUnitListFragment = {
@@ -6125,6 +6232,26 @@ export type UpdateApplicationMutation = {
   updateApplication?: { pk?: number | null } | null;
 };
 
+export type ApplicationRoundPeriodsQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type ApplicationRoundPeriodsQuery = {
+  applicationRounds?: {
+    edges: Array<{
+      node?: {
+        id: string;
+        pk?: number | null;
+        reservationPeriodBegin: string;
+        reservationPeriodEnd: string;
+        applicationPeriodBegin: string;
+        status?: ApplicationRoundStatusChoice | null;
+        reservationUnits: Array<{ id: string; pk?: number | null }>;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type UnitNameFieldsI18NFragment = {
   id: string;
   pk?: number | null;
@@ -6183,6 +6310,35 @@ export type CancelReasonFieldsFragment = {
   reasonFi?: string | null;
   reasonEn?: string | null;
   reasonSv?: string | null;
+};
+
+export type PindoraReservationFragment = {
+  accessCode: string;
+  accessCodeBeginsAt: string;
+  accessCodeEndsAt: string;
+  accessCodeIsActive: boolean;
+};
+
+export type PindoraSeriesFragment = {
+  accessCode: string;
+  accessCodeIsActive: boolean;
+  accessCodeValidity: Array<{
+    accessCodeBeginsAt: string;
+    accessCodeEndsAt: string;
+    reservationId: number;
+    reservationSeriesId: number;
+  }>;
+};
+
+export type PindoraSectionFragment = {
+  accessCode: string;
+  accessCodeIsActive: boolean;
+  accessCodeValidity: Array<{
+    accessCodeBeginsAt: string;
+    accessCodeEndsAt: string;
+    reservationSeriesId: number;
+    reservationId: number;
+  } | null>;
 };
 
 export type SearchFormParamsUnitQueryVariables = Exact<{
@@ -6568,7 +6724,12 @@ export type ReservationUnitPageFieldsFragment = {
       nameSv?: string | null;
     };
   }>;
-  accessTypes: Array<{ id: string; accessType: AccessType; beginDate: string }>;
+  accessTypes: Array<{
+    id: string;
+    pk?: number | null;
+    accessType: AccessType;
+    beginDate: string;
+  }>;
   serviceSpecificTerms?: {
     id: string;
     textFi?: string | null;
@@ -6746,6 +6907,7 @@ export type ReservationUnitPageQuery = {
     }>;
     accessTypes: Array<{
       id: string;
+      pk?: number | null;
       accessType: AccessType;
       beginDate: string;
     }>;
@@ -8169,6 +8331,16 @@ export type ApplicationSectionViewQuery = {
             nameSv?: string | null;
           };
         };
+        pindoraInfo?: {
+          accessCode: string;
+          accessCodeIsActive: boolean;
+          accessCodeValidity: Array<{
+            accessCodeBeginsAt: string;
+            accessCodeEndsAt: string;
+            reservationSeriesId: number;
+            reservationId: number;
+          } | null>;
+        } | null;
         reservationUnitOptions: Array<{
           id: string;
           allocatedTimeSlots: Array<{
@@ -8182,21 +8354,43 @@ export type ApplicationSectionViewQuery = {
               beginTime?: string | null;
               endTime?: string | null;
               weekdays?: Array<number | null> | null;
+              accessType?: AccessTypeWithMultivalued | null;
+              usedAccessTypes?: Array<AccessType | null> | null;
+              pindoraInfo?: {
+                accessCode: string;
+                accessCodeIsActive: boolean;
+                accessCodeValidity: Array<{
+                  accessCodeBeginsAt: string;
+                  accessCodeEndsAt: string;
+                  reservationId: number;
+                  reservationSeriesId: number;
+                }>;
+              } | null;
               reservationUnit: {
-                id: string;
-                pk?: number | null;
-                nameFi?: string | null;
-                nameEn?: string | null;
-                nameSv?: string | null;
                 reservationConfirmedInstructionsFi?: string | null;
                 reservationConfirmedInstructionsEn?: string | null;
                 reservationConfirmedInstructionsSv?: string | null;
+                nameFi?: string | null;
+                nameSv?: string | null;
+                nameEn?: string | null;
+                id: string;
+                pk?: number | null;
+                reservationCancelledInstructionsFi?: string | null;
+                reservationCancelledInstructionsSv?: string | null;
+                reservationCancelledInstructionsEn?: string | null;
+                currentAccessType?: AccessType | null;
                 unit?: {
                   id: string;
                   nameFi?: string | null;
                   nameEn?: string | null;
                   nameSv?: string | null;
                 } | null;
+                accessTypes: Array<{
+                  id: string;
+                  pk?: number | null;
+                  accessType: AccessType;
+                  beginDate: string;
+                }>;
               };
               rejectedOccurrences: Array<{
                 id: string;
@@ -8208,7 +8402,15 @@ export type ApplicationSectionViewQuery = {
                 pk?: number | null;
                 end: string;
                 state?: ReservationStateChoice | null;
+                accessType: AccessType;
+                accessCodeIsActive: boolean;
                 begin: string;
+                pindoraInfo?: {
+                  accessCode: string;
+                  accessCodeBeginsAt: string;
+                  accessCodeEndsAt: string;
+                  accessCodeIsActive: boolean;
+                } | null;
                 reservationUnits: Array<{
                   id: string;
                   cancellationRule?: {
@@ -9245,6 +9447,49 @@ export const InstructionsFragmentDoc = gql`
     }
   }
 `;
+export const PindoraSectionFragmentDoc = gql`
+  fragment PindoraSection on PindoraSectionInfoType {
+    accessCode
+    accessCodeIsActive
+    accessCodeValidity {
+      accessCodeBeginsAt
+      accessCodeEndsAt
+      reservationSeriesId
+      reservationId
+    }
+  }
+`;
+export const PindoraSeriesFragmentDoc = gql`
+  fragment PindoraSeries on PindoraSeriesInfoType {
+    accessCode
+    accessCodeIsActive
+    accessCodeValidity {
+      accessCodeBeginsAt
+      accessCodeEndsAt
+      reservationId
+      reservationSeriesId
+    }
+  }
+`;
+export const ApplicationSectionReservationUnitFragmentDoc = gql`
+  fragment ApplicationSectionReservationUnit on ReservationUnitNode {
+    nameFi
+    nameSv
+    nameEn
+    id
+    pk
+    reservationCancelledInstructionsFi
+    reservationCancelledInstructionsSv
+    reservationCancelledInstructionsEn
+    accessTypes {
+      id
+      pk
+      accessType
+      beginDate
+    }
+    currentAccessType
+  }
+`;
 export const CancellationRuleFieldsFragmentDoc = gql`
   fragment CancellationRuleFields on ReservationUnitNode {
     id
@@ -9266,11 +9511,22 @@ export const CanUserCancelReservationFragmentDoc = gql`
   }
   ${CancellationRuleFieldsFragmentDoc}
 `;
+export const PindoraReservationFragmentDoc = gql`
+  fragment PindoraReservation on PindoraReservationInfoType {
+    accessCode
+    accessCodeBeginsAt
+    accessCodeEndsAt
+    accessCodeIsActive
+  }
+`;
 export const ApplicationSectionReservationFragmentDoc = gql`
   fragment ApplicationSectionReservation on ApplicationSectionNode {
     id
     pk
     name
+    pindoraInfo {
+      ...PindoraSection
+    }
     reservationUnitOptions {
       id
       allocatedTimeSlots {
@@ -9284,12 +9540,13 @@ export const ApplicationSectionReservationFragmentDoc = gql`
           beginTime
           endTime
           weekdays
+          accessType
+          usedAccessTypes
+          pindoraInfo {
+            ...PindoraSeries
+          }
           reservationUnit {
-            id
-            pk
-            nameFi
-            nameEn
-            nameSv
+            ...ApplicationSectionReservationUnit
             reservationConfirmedInstructionsFi
             reservationConfirmedInstructionsEn
             reservationConfirmedInstructionsSv
@@ -9311,12 +9568,21 @@ export const ApplicationSectionReservationFragmentDoc = gql`
             end
             state
             ...CanUserCancelReservation
+            accessType
+            accessCodeIsActive
+            pindoraInfo {
+              ...PindoraReservation
+            }
           }
         }
       }
     }
   }
+  ${PindoraSectionFragmentDoc}
+  ${PindoraSeriesFragmentDoc}
+  ${ApplicationSectionReservationUnitFragmentDoc}
   ${CanUserCancelReservationFragmentDoc}
+  ${PindoraReservationFragmentDoc}
 `;
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {
@@ -9904,6 +10170,7 @@ export const ReservationUnitPageFieldsFragmentDoc = gql`
     currentAccessType
     accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
       id
+      pk
       accessType
       beginDate
     }
@@ -10438,6 +10705,96 @@ export type UpdateApplicationMutationResult =
 export type UpdateApplicationMutationOptions = Apollo.BaseMutationOptions<
   UpdateApplicationMutation,
   UpdateApplicationMutationVariables
+>;
+export const ApplicationRoundPeriodsDocument = gql`
+  query ApplicationRoundPeriods {
+    applicationRounds {
+      edges {
+        node {
+          id
+          pk
+          reservationPeriodBegin
+          reservationPeriodEnd
+          applicationPeriodBegin
+          status
+          reservationUnits {
+            id
+            pk
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useApplicationRoundPeriodsQuery__
+ *
+ * To run a query within a React component, call `useApplicationRoundPeriodsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationRoundPeriodsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationRoundPeriodsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useApplicationRoundPeriodsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ApplicationRoundPeriodsQuery,
+    ApplicationRoundPeriodsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationRoundPeriodsQuery,
+    ApplicationRoundPeriodsQueryVariables
+  >(ApplicationRoundPeriodsDocument, options);
+}
+export function useApplicationRoundPeriodsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationRoundPeriodsQuery,
+    ApplicationRoundPeriodsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationRoundPeriodsQuery,
+    ApplicationRoundPeriodsQueryVariables
+  >(ApplicationRoundPeriodsDocument, options);
+}
+export function useApplicationRoundPeriodsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationRoundPeriodsQuery,
+        ApplicationRoundPeriodsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationRoundPeriodsQuery,
+    ApplicationRoundPeriodsQueryVariables
+  >(ApplicationRoundPeriodsDocument, options);
+}
+export type ApplicationRoundPeriodsQueryHookResult = ReturnType<
+  typeof useApplicationRoundPeriodsQuery
+>;
+export type ApplicationRoundPeriodsLazyQueryHookResult = ReturnType<
+  typeof useApplicationRoundPeriodsLazyQuery
+>;
+export type ApplicationRoundPeriodsSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationRoundPeriodsSuspenseQuery
+>;
+export type ApplicationRoundPeriodsQueryResult = Apollo.QueryResult<
+  ApplicationRoundPeriodsQuery,
+  ApplicationRoundPeriodsQueryVariables
 >;
 export const SearchFormParamsUnitDocument = gql`
   query SearchFormParamsUnit(

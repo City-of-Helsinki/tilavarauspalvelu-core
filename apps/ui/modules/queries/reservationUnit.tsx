@@ -97,6 +97,7 @@ export const RESERVATION_UNIT_PAGE_FRAGMENT = gql`
     currentAccessType
     accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
       id
+      pk
       accessType
       beginDate
     }
