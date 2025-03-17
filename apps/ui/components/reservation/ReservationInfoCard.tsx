@@ -187,11 +187,9 @@ export function ReservationInfoCard({
 export const RESERVATION_INFO_CARD_FRAGMENT = gql`
   fragment ReservationInfoCard on ReservationNode {
     pk
+    ...ReservationPrice
     taxPercentageValue
-    begin
-    end
     state
-    price
     accessType
     pindoraInfo {
       accessCode
@@ -202,7 +200,6 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
       nameFi
       nameEn
       nameSv
-      ...PriceReservationUnit
       images {
         ...Image
       }
