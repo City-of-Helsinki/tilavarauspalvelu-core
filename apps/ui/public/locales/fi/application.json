@@ -225,6 +225,7 @@
       "others": "muuta",
       "reservationCountPostfix": "varausta"
     },
+    "accessTypeWarning": "Pääsy tilaan muuttuu ajankohdan mukaan. Lue lisää tilakohtaisista ohjeista.",
     "helpLink": "Ohjeet",
     "helpLinkLong": "Tilakohtaiset ohjeet",
     "helpModal": {

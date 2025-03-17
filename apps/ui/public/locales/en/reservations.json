@@ -122,5 +122,6 @@
   },
   "confirmNavigation": "If you wish to leave this page, your booking will be cancelled automatically.",
   "accessCodeDuration": "Door code valid",
+  "accessTypeChanged": "Changes in access to the space. See instructions.",
   "contactSupport": "Please contact support."
 }

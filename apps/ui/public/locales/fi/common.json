@@ -123,5 +123,6 @@
   "inclTax": "sis. alv {{taxPercentage}}%",
   "peopleSuffixShort": "hlö",
   "yearSuffixShort": "v",
-  "amountSuffixShort": "kpl"
+  "amountSuffixShort": "kpl",
+  "validity": "Voimassaoloaika"
 }

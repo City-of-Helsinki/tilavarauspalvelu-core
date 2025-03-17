@@ -118,5 +118,6 @@
   },
   "confirmNavigation": "Jos haluat poistua tältä sivulta, niin varauksesi peruuntuu automaattisesti",
   "accessCodeDuration": "Ovikoodi voimassa",
+  "accessTypeChanged": "Pääsy tilaan muuttuu. Katso ohjeet.",
   "contactSupport": "Ota yhteyttä asiakaspalveluun"
 }
