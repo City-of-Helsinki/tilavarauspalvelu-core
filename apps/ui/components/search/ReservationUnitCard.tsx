@@ -70,7 +70,7 @@ export function ReservationUnitCard({
       }),
     });
   }
-  if (reservationUnit.currentAccessType) {
+  if (reservationUnit.effectiveAccessType) {
     infos.push({
       icon: (
         <IconLock
@@ -80,7 +80,7 @@ export function ReservationUnitCard({
         />
       ),
       value: t(
-        `reservationUnit:accessTypes.${reservationUnit.currentAccessType}`
+        `reservationUnit:accessTypes.${reservationUnit.effectiveAccessType}`
       ),
     });
   }
