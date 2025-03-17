@@ -612,17 +612,17 @@ class PindoraService:
         should_be_active: bool = obj.should_have_active_access_code  # type: ignore[attr-defined]
 
         try:
+            # Reschedule first, so that if there are any reservations that didn't have an access code before,
+            # but have one after a reschedule, they will know that the access code has been generated.
+            cls.reschedule_access_code(obj=obj)
+        except PindoraNotFoundError:
+            # Reservation series and application sections always have an access code, even if it's not active.
+            cls.create_access_code(obj=obj, is_active=should_be_active)
+        else:
             if should_be_active:
                 cls.activate_access_code(obj=obj)
             else:
                 cls.deactivate_access_code(obj=obj)
-
-        except PindoraNotFoundError:
-            # Reservation series and application sections always have an access code, even if it's not active.
-            cls.create_access_code(obj=obj, is_active=should_be_active)
-
-        else:
-            cls.reschedule_access_code(obj=obj)
 
     @classmethod
     def _parse_series_validity_info(
