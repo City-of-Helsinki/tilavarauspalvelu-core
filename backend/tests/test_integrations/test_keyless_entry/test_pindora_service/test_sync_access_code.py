@@ -208,10 +208,10 @@ def test_sync_access_code__reservation__state_indicates_no_access_code(state):
     assert PindoraClient.reschedule_reservation.call_count == 0
 
 
+@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.create_access_code)
 @patch_method(PindoraService.activate_access_code)
 @patch_method(PindoraService.deactivate_access_code)
-@patch_method(PindoraService.create_access_code)
-@patch_method(PindoraService.reschedule_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__reservation__in_series(is_active):
     series = RecurringReservationFactory.create()
@@ -229,16 +229,16 @@ def test_sync_access_code__reservation__in_series(is_active):
 
     PindoraService.sync_access_code(obj=reservation)
 
+    assert PindoraService.reschedule_access_code.call_count == 1
+    assert PindoraService.create_access_code.call_count == 0
     assert PindoraService.activate_access_code.call_count == (1 if is_active else 0)
     assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
-    assert PindoraService.create_access_code.call_count == 0
-    assert PindoraService.reschedule_access_code.call_count == 1
 
 
-@patch_method(PindoraService.activate_access_code, side_effect=PindoraNotFoundError("Not found"))
-@patch_method(PindoraService.deactivate_access_code, side_effect=PindoraNotFoundError("Not found"))
+@patch_method(PindoraService.reschedule_access_code, side_effect=PindoraNotFoundError("Not found"))
 @patch_method(PindoraService.create_access_code)
-@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.activate_access_code)
+@patch_method(PindoraService.deactivate_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__reservation__in_series__not_found(is_active):
     series = RecurringReservationFactory.create()
@@ -256,17 +256,17 @@ def test_sync_access_code__reservation__in_series__not_found(is_active):
 
     PindoraService.sync_access_code(obj=reservation)
 
-    assert PindoraService.activate_access_code.call_count == (1 if is_active else 0)
-    assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
+    assert PindoraService.reschedule_access_code.call_count == 1
     assert PindoraService.create_access_code.call_count == 1
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is is_active
-    assert PindoraService.reschedule_access_code.call_count == 0
+    assert PindoraService.activate_access_code.call_count == 0
+    assert PindoraService.deactivate_access_code.call_count == 0
 
 
+@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.create_access_code)
 @patch_method(PindoraService.activate_access_code)
 @patch_method(PindoraService.deactivate_access_code)
-@patch_method(PindoraService.create_access_code)
-@patch_method(PindoraService.reschedule_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__reservation__in_series__in_seasonal_booking(is_active):
     user = UserFactory.create()
@@ -291,16 +291,16 @@ def test_sync_access_code__reservation__in_series__in_seasonal_booking(is_active
 
     PindoraService.sync_access_code(obj=reservation)
 
+    assert PindoraService.reschedule_access_code.call_count == 1
+    assert PindoraService.create_access_code.call_count == 0
     assert PindoraService.activate_access_code.call_count == (1 if is_active else 0)
     assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
-    assert PindoraService.create_access_code.call_count == 0
-    assert PindoraService.reschedule_access_code.call_count == 1
 
 
-@patch_method(PindoraService.activate_access_code, side_effect=PindoraNotFoundError("Not found"))
-@patch_method(PindoraService.deactivate_access_code, side_effect=PindoraNotFoundError("Not found"))
+@patch_method(PindoraService.reschedule_access_code, side_effect=PindoraNotFoundError("Not found"))
 @patch_method(PindoraService.create_access_code)
-@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.activate_access_code)
+@patch_method(PindoraService.deactivate_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__reservation__in_series__in_seasonal_booking__not_found(is_active):
     user = UserFactory.create()
@@ -325,17 +325,17 @@ def test_sync_access_code__reservation__in_series__in_seasonal_booking__not_foun
 
     PindoraService.sync_access_code(obj=reservation)
 
-    assert PindoraService.activate_access_code.call_count == (1 if is_active else 0)
-    assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
+    assert PindoraService.reschedule_access_code.call_count == 1
     assert PindoraService.create_access_code.call_count == 1
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is is_active
-    assert PindoraService.reschedule_access_code.call_count == 0
+    assert PindoraService.activate_access_code.call_count == 0
+    assert PindoraService.deactivate_access_code.call_count == 0
 
 
+@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.create_access_code)
 @patch_method(PindoraService.activate_access_code)
 @patch_method(PindoraService.deactivate_access_code)
-@patch_method(PindoraService.create_access_code)
-@patch_method(PindoraService.reschedule_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__series(is_active):
     series = RecurringReservationFactory.create()
@@ -353,16 +353,16 @@ def test_sync_access_code__series(is_active):
 
     PindoraService.sync_access_code(obj=series)
 
+    assert PindoraService.reschedule_access_code.call_count == 1
+    assert PindoraService.create_access_code.call_count == 0
     assert PindoraService.activate_access_code.call_count == (1 if is_active else 0)
     assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
-    assert PindoraService.create_access_code.call_count == 0
-    assert PindoraService.reschedule_access_code.call_count == 1
 
 
-@patch_method(PindoraService.activate_access_code, side_effect=PindoraNotFoundError("Not found"))
-@patch_method(PindoraService.deactivate_access_code, side_effect=PindoraNotFoundError("Not found"))
+@patch_method(PindoraService.reschedule_access_code, side_effect=PindoraNotFoundError("Not found"))
 @patch_method(PindoraService.create_access_code)
-@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.activate_access_code)
+@patch_method(PindoraService.deactivate_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__series__not_found(is_active):
     series = RecurringReservationFactory.create()
@@ -380,17 +380,17 @@ def test_sync_access_code__series__not_found(is_active):
 
     PindoraService.sync_access_code(obj=series)
 
-    assert PindoraService.activate_access_code.call_count == (1 if is_active else 0)
-    assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
+    assert PindoraService.reschedule_access_code.call_count == 1
     assert PindoraService.create_access_code.call_count == 1
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is is_active
-    assert PindoraService.reschedule_access_code.call_count == 0
+    assert PindoraService.activate_access_code.call_count == 0
+    assert PindoraService.deactivate_access_code.call_count == 0
 
 
+@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.create_access_code)
 @patch_method(PindoraService.activate_access_code)
 @patch_method(PindoraService.deactivate_access_code)
-@patch_method(PindoraService.create_access_code)
-@patch_method(PindoraService.reschedule_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__series__in_seasonal_booking(is_active):
     user = UserFactory.create()
@@ -415,16 +415,16 @@ def test_sync_access_code__series__in_seasonal_booking(is_active):
 
     PindoraService.sync_access_code(obj=series)
 
+    assert PindoraService.reschedule_access_code.call_count == 1
+    assert PindoraService.create_access_code.call_count == 0
     assert PindoraService.activate_access_code.call_count == (1 if is_active else 0)
     assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
-    assert PindoraService.create_access_code.call_count == 0
-    assert PindoraService.reschedule_access_code.call_count == 1
 
 
-@patch_method(PindoraService.activate_access_code, side_effect=PindoraNotFoundError("Not found"))
-@patch_method(PindoraService.deactivate_access_code, side_effect=PindoraNotFoundError("Not found"))
+@patch_method(PindoraService.reschedule_access_code, side_effect=PindoraNotFoundError("Not found"))
 @patch_method(PindoraService.create_access_code)
-@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.activate_access_code)
+@patch_method(PindoraService.deactivate_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__series__in_seasonal_booking__not_found(is_active):
     user = UserFactory.create()
@@ -449,17 +449,17 @@ def test_sync_access_code__series__in_seasonal_booking__not_found(is_active):
 
     PindoraService.sync_access_code(obj=series)
 
-    assert PindoraService.activate_access_code.call_count == (1 if is_active else 0)
-    assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
+    assert PindoraService.reschedule_access_code.call_count == 1
     assert PindoraService.create_access_code.call_count == 1
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is is_active
-    assert PindoraService.reschedule_access_code.call_count == 0
+    assert PindoraService.activate_access_code.call_count == 0
+    assert PindoraService.deactivate_access_code.call_count == 0
 
 
+@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.create_access_code)
 @patch_method(PindoraService.activate_access_code)
 @patch_method(PindoraService.deactivate_access_code)
-@patch_method(PindoraService.create_access_code)
-@patch_method(PindoraService.reschedule_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__seasonal_booking(is_active):
     user = UserFactory.create()
@@ -484,16 +484,16 @@ def test_sync_access_code__seasonal_booking(is_active):
 
     PindoraService.sync_access_code(obj=section)
 
+    assert PindoraService.reschedule_access_code.call_count == 1
+    assert PindoraService.create_access_code.call_count == 0
     assert PindoraService.activate_access_code.call_count == (1 if is_active else 0)
     assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
-    assert PindoraService.create_access_code.call_count == 0
-    assert PindoraService.reschedule_access_code.call_count == 1
 
 
-@patch_method(PindoraService.activate_access_code, side_effect=PindoraNotFoundError("Not found"))
-@patch_method(PindoraService.deactivate_access_code, side_effect=PindoraNotFoundError("Not found"))
+@patch_method(PindoraService.reschedule_access_code, side_effect=PindoraNotFoundError("Not found"))
 @patch_method(PindoraService.create_access_code)
-@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.activate_access_code)
+@patch_method(PindoraService.deactivate_access_code)
 @pytest.mark.parametrize("is_active", [True, False])
 def test_sync_access_code__seasonal_booking__not_found(is_active):
     user = UserFactory.create()
@@ -518,8 +518,8 @@ def test_sync_access_code__seasonal_booking__not_found(is_active):
 
     PindoraService.sync_access_code(obj=section)
 
-    assert PindoraService.activate_access_code.call_count == (1 if is_active else 0)
-    assert PindoraService.deactivate_access_code.call_count == (0 if is_active else 1)
+    assert PindoraService.reschedule_access_code.call_count == 1
     assert PindoraService.create_access_code.call_count == 1
     assert PindoraService.create_access_code.call_args.kwargs["is_active"] is is_active
-    assert PindoraService.reschedule_access_code.call_count == 0
+    assert PindoraService.activate_access_code.call_count == 0
+    assert PindoraService.deactivate_access_code.call_count == 0
