@@ -18,7 +18,6 @@ import {
   CreateMockApplicationFragmentProps,
   type CreateGraphQLMocksReturn,
 } from "@/test/test.gql.utils";
-import { PAGES_WITH_STEPPER } from "@/components/application/ApplicationStepper";
 import userEvent from "@testing-library/user-event";
 
 const { useRouter } = vi.hoisted(() => {
@@ -157,28 +156,9 @@ describe("Page1", () => {
       view.getByRole("link", { name: "breadcrumb:applications" })
     ).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
-    // TODO check stepper (should be visible on this page)
     // TODO check that no other than first step is clickable
     // TODO check notes when applying
   });
-
-  test.skip.for(
-    PAGES_WITH_STEPPER.map((x) => ({ label: x, isDisabled: x !== "page1" }))
-  )(
-    "stepper step $label should render and be disabled = $isDisabled",
-    async ({ label, isDisabled }) => {
-      const view = customRender();
-      const btn = view.getByRole("button", {
-        name: RegExp(`application:navigation.${label}`),
-      });
-      expect(btn).toBeInTheDocument();
-      if (isDisabled) {
-        expect(btn).toBeDisabled();
-      } else {
-        expect(btn).not.toBeDisabled();
-      }
-    }
-  );
 
   // special case requiring custom mocks
   // happens when application doesn't contain any sections
@@ -190,8 +170,10 @@ describe("Page1", () => {
     const submitBtn = view.getByRole("button", { name: "common:next" });
     expect(submitBtn).not.toBeDisabled();
     user.click(submitBtn);
+
     // TODO Expect errors and no redirect / mutation
   });
+
   test.todo("should allow adding new application section");
   test.todo("should not allow navigation by default");
   test.todo("should update application on submit");
