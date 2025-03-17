@@ -1203,6 +1203,7 @@ export type Mutation = {
   cancelAllApplicationSectionReservations?: Maybe<ApplicationSectionReservationCancellationMutationPayload>;
   cancelApplication?: Maybe<ApplicationCancelMutationPayload>;
   cancelReservation?: Maybe<ReservationCancellationMutationPayload>;
+  changeReservationSeriesAccessCode?: Maybe<ReservationSeriesChangeAccessCodeMutationPayload>;
   confirmReservation?: Maybe<ReservationConfirmMutationPayload>;
   createAllocatedTimeslot?: Maybe<AllocatedTimeSlotCreateMutationPayload>;
   createApplication?: Maybe<ApplicationCreateMutationPayload>;
@@ -1236,6 +1237,7 @@ export type Mutation = {
   refundReservation?: Maybe<ReservationRefundMutationPayload>;
   rejectAllApplicationOptions?: Maybe<RejectAllApplicationOptionsMutationPayload>;
   rejectAllSectionOptions?: Maybe<RejectAllSectionOptionsMutationPayload>;
+  repairReservationSeriesAccessCode?: Maybe<ReservationSeriesRepairAccessCodeMutationPayload>;
   requireHandlingForReservation?: Maybe<ReservationRequiresHandlingMutationPayload>;
   rescheduleReservationSeries?: Maybe<ReservationSeriesRescheduleMutationPayload>;
   restoreAllApplicationOptions?: Maybe<RestoreAllApplicationOptionsMutationPayload>;
@@ -1289,6 +1291,10 @@ export type MutationCancelApplicationArgs = {
 
 export type MutationCancelReservationArgs = {
   input: ReservationCancellationMutationInput;
+};
+
+export type MutationChangeReservationSeriesAccessCodeArgs = {
+  input: ReservationSeriesChangeAccessCodeMutationInput;
 };
 
 export type MutationConfirmReservationArgs = {
@@ -1413,6 +1419,10 @@ export type MutationRejectAllApplicationOptionsArgs = {
 
 export type MutationRejectAllSectionOptionsArgs = {
   input: RejectAllSectionOptionsMutationInput;
+};
+
+export type MutationRepairReservationSeriesAccessCodeArgs = {
+  input: ReservationSeriesRepairAccessCodeMutationInput;
 };
 
 export type MutationRequireHandlingForReservationArgs = {
@@ -3215,6 +3225,16 @@ export type ReservationSeriesAddMutationPayload = {
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
+export type ReservationSeriesChangeAccessCodeMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type ReservationSeriesChangeAccessCodeMutationPayload = {
+  accessCodeGeneratedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  accessCodeIsActive?: Maybe<Scalars["Boolean"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
+};
+
 export type ReservationSeriesCreateMutationInput = {
   abilityGroup?: InputMaybe<Scalars["Int"]["input"]>;
   ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
@@ -3257,6 +3277,16 @@ export type ReservationSeriesDenyMutationInput = {
 export type ReservationSeriesDenyMutationPayload = {
   denied?: Maybe<Scalars["Int"]["output"]>;
   future?: Maybe<Scalars["Int"]["output"]>;
+};
+
+export type ReservationSeriesRepairAccessCodeMutationInput = {
+  pk: Scalars["Int"]["input"];
+};
+
+export type ReservationSeriesRepairAccessCodeMutationPayload = {
+  accessCodeGeneratedAt?: Maybe<Scalars["DateTime"]["output"]>;
+  accessCodeIsActive?: Maybe<Scalars["Boolean"]["output"]>;
+  pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationSeriesRescheduleMutationInput = {
@@ -5524,11 +5554,12 @@ export type ReservationInfoCardFragment = {
   id: string;
   pk?: number | null;
   taxPercentageValue?: string | null;
+  state?: ReservationStateChoice | null;
+  accessType: AccessType;
+  price?: string | null;
   begin: string;
   end: string;
-  state?: ReservationStateChoice | null;
-  price?: string | null;
-  accessType: AccessType;
+  applyingForFreeOfCharge?: boolean | null;
   pindoraInfo?: { accessCode: string } | null;
   reservationUnits: Array<{
     id: string;
@@ -6304,11 +6335,12 @@ export type ListReservationsQuery = {
         isBlocked?: boolean | null;
         pk?: number | null;
         taxPercentageValue?: string | null;
+        state?: ReservationStateChoice | null;
+        accessType: AccessType;
+        price?: string | null;
         begin: string;
         end: string;
-        state?: ReservationStateChoice | null;
-        price?: string | null;
-        accessType: AccessType;
+        applyingForFreeOfCharge?: boolean | null;
         paymentOrder: Array<{
           id: string;
           checkoutUrl?: string | null;
@@ -7048,6 +7080,27 @@ export type PriceReservationUnitFragment = {
     lowestPrice: string;
     highestPrice: string;
     taxPercentage: { id: string; pk?: number | null; value: string };
+  }>;
+};
+
+export type ReservationPriceFragment = {
+  id: string;
+  price?: string | null;
+  begin: string;
+  end: string;
+  applyingForFreeOfCharge?: boolean | null;
+  reservationUnits: Array<{
+    id: string;
+    reservationBegins?: string | null;
+    reservationEnds?: string | null;
+    pricings: Array<{
+      id: string;
+      begins: string;
+      priceUnit: PriceUnit;
+      lowestPrice: string;
+      highestPrice: string;
+      taxPercentage: { id: string; pk?: number | null; value: string };
+    }>;
   }>;
 };
 
@@ -8404,10 +8457,7 @@ export type ReservationQuery = {
     description?: string | null;
     numPersons?: number | null;
     taxPercentageValue?: string | null;
-    begin: string;
-    end: string;
     state?: ReservationStateChoice | null;
-    price?: string | null;
     accessType: AccessType;
     reserveeFirstName?: string | null;
     reserveeLastName?: string | null;
@@ -8427,6 +8477,9 @@ export type ReservationQuery = {
     billingAddressStreet?: string | null;
     billingAddressCity?: string | null;
     billingAddressZip?: string | null;
+    price?: string | null;
+    begin: string;
+    end: string;
     paymentOrder: Array<{
       id: string;
       reservationPk?: string | null;
@@ -8543,11 +8596,12 @@ export type ReservationCancelPageQuery = {
     name?: string | null;
     pk?: number | null;
     taxPercentageValue?: string | null;
+    state?: ReservationStateChoice | null;
+    accessType: AccessType;
+    price?: string | null;
     begin: string;
     end: string;
-    state?: ReservationStateChoice | null;
-    price?: string | null;
-    accessType: AccessType;
+    applyingForFreeOfCharge?: boolean | null;
     reservationUnits: Array<{
       id: string;
       pk?: number | null;
@@ -8662,11 +8716,12 @@ export type ReservationConfirmationPageQuery = {
     description?: string | null;
     numPersons?: number | null;
     taxPercentageValue?: string | null;
+    state?: ReservationStateChoice | null;
+    accessType: AccessType;
+    price?: string | null;
     begin: string;
     end: string;
-    state?: ReservationStateChoice | null;
-    price?: string | null;
-    accessType: AccessType;
+    applyingForFreeOfCharge?: boolean | null;
     paymentOrder: Array<{
       id: string;
       reservationPk?: string | null;
@@ -8752,10 +8807,7 @@ export type ReservationEditPageQuery = {
     description?: string | null;
     numPersons?: number | null;
     taxPercentageValue?: string | null;
-    begin: string;
-    end: string;
     state?: ReservationStateChoice | null;
-    price?: string | null;
     accessType: AccessType;
     reserveeFirstName?: string | null;
     reserveeLastName?: string | null;
@@ -8775,6 +8827,9 @@ export type ReservationEditPageQuery = {
     billingAddressStreet?: string | null;
     billingAddressCity?: string | null;
     billingAddressZip?: string | null;
+    price?: string | null;
+    begin: string;
+    end: string;
     reservationUnits: Array<{
       id: string;
       pk?: number | null;
@@ -8892,11 +8947,11 @@ export type ReservationPageQuery = {
     description?: string | null;
     numPersons?: number | null;
     taxPercentageValue?: string | null;
+    state?: ReservationStateChoice | null;
+    accessType: AccessType;
+    price?: string | null;
     begin: string;
     end: string;
-    state?: ReservationStateChoice | null;
-    price?: string | null;
-    accessType: AccessType;
     paymentOrder: Array<{
       id: string;
       reservationPk?: string | null;
@@ -9129,6 +9184,19 @@ export const PriceReservationUnitFragmentDoc = gql`
   }
   ${PricingFieldsFragmentDoc}
 `;
+export const ReservationPriceFragmentDoc = gql`
+  fragment ReservationPrice on ReservationNode {
+    id
+    reservationUnits {
+      ...PriceReservationUnit
+    }
+    price
+    begin
+    end
+    applyingForFreeOfCharge
+  }
+  ${PriceReservationUnitFragmentDoc}
+`;
 export const ImageFragmentDoc = gql`
   fragment Image on ReservationUnitImageNode {
     id
@@ -9143,11 +9211,9 @@ export const ReservationInfoCardFragmentDoc = gql`
   fragment ReservationInfoCard on ReservationNode {
     id
     pk
+    ...ReservationPrice
     taxPercentageValue
-    begin
-    end
     state
-    price
     accessType
     pindoraInfo {
       accessCode
@@ -9158,7 +9224,6 @@ export const ReservationInfoCardFragmentDoc = gql`
       nameFi
       nameEn
       nameSv
-      ...PriceReservationUnit
       images {
         ...Image
       }
@@ -9170,7 +9235,7 @@ export const ReservationInfoCardFragmentDoc = gql`
       }
     }
   }
-  ${PriceReservationUnitFragmentDoc}
+  ${ReservationPriceFragmentDoc}
   ${ImageFragmentDoc}
 `;
 export const CancellationRuleFieldsFragmentDoc = gql`

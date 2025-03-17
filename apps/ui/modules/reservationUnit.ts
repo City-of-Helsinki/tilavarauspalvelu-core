@@ -30,11 +30,11 @@ import {
   ReservationUnitReservationState,
   type MetadataSetsFragment,
   ReservationKind,
-  ReservationStateChoice,
   type IsReservableFieldsFragment,
   ReservationStartInterval,
   Maybe,
   BlockingReservationFieldsFragment,
+  type ReservationPriceFragment,
 } from "@gql/gql-types";
 import { capitalize, getTranslation } from "./util";
 import {
@@ -188,7 +188,7 @@ export function getActivePricing(reservationUnit: {
   return pricings.find((pricing) => isActivePricing(pricing));
 }
 
-export const RESERVATION_INFO_CARD_FRAGMENT = gql`
+export const RESERVATION_UNIT_PRICE_FRAGMENT = gql`
   fragment PriceReservationUnit on ReservationUnitNode {
     id
     pricings {
@@ -336,17 +336,23 @@ export function getReservationUnitPrice(
   });
 }
 
-// TODO use a fragment
+export const RESERVATION_PRICE_FRAGMENT = gql`
+  fragment ReservationPrice on ReservationNode {
+    id
+    reservationUnits {
+      ...PriceReservationUnit
+    }
+    price
+    begin
+    end
+    applyingForFreeOfCharge
+  }
+`;
+
 // TODO why do we need both this and getPriceString?
 export function getPrice(
   t: TFunction,
-  reservation: {
-    reservationUnits: PriceReservationUnitFragment[];
-    price?: Maybe<string> | undefined;
-    state?: Maybe<ReservationStateChoice> | undefined;
-    begin: string;
-    end: string;
-  },
+  reservation: ReservationPriceFragment,
   lang: LocalizationLanguages,
   reservationUnitPriceOnly = false
 ): string | null {
@@ -355,8 +361,7 @@ export function getPrice(
   const end = new Date(reservation.end);
   const minutes = differenceInMinutes(end, begin);
   const showReservationUnitPrice =
-    reservationUnitPriceOnly ||
-    reservation.state === ReservationStateChoice.RequiresHandling;
+    reservationUnitPriceOnly || reservation.applyingForFreeOfCharge;
   if (showReservationUnitPrice && reservationUnit) {
     return getReservationUnitPrice({
       t,
