@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "hds-react";
 import React from "react";
-import { useTranslation } from "next-i18next";
+import { type TFunction, useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
   convertLanguageCode,
@@ -17,7 +17,7 @@ import {
   toUIDate,
 } from "common/src/common/util";
 import { fontRegular, H1, H3 } from "common/src/common/typography";
-import { formatDate, orderImages } from "@/modules/util";
+import { formatDateTime, orderImages } from "@/modules/util";
 import {
   AccessType,
   ReservationKind,
@@ -30,7 +30,6 @@ import {
   getPriceString,
   isReservationUnitPaid,
 } from "@/modules/reservationUnit";
-import { isReservationStartInFuture } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
 import { Flex } from "common/styles/util";
 import { breakpoints } from "common";
@@ -50,27 +49,39 @@ const NotificationWrapper = styled.div`
   display: inline-block;
 `;
 
-function NonReservableNotification({
-  reservationUnit,
-}: Readonly<{
-  reservationUnit: Pick<QueryT, "reservationKind" | "reservationBegins">;
-}>) {
-  const { t } = useTranslation();
+type NonReservableNotificationProps = {
+  reservationUnit: Readonly<
+    Pick<QueryT, "reservationKind" | "reservationBegins">
+  >;
+};
 
+function formatErrorMessages(
+  t: TFunction,
+  reservationUnit: NonReservableNotificationProps["reservationUnit"]
+): string {
   let returnText = t("reservationUnit:notifications.notReservable");
   if (reservationUnit.reservationKind === ReservationKind.Season) {
     returnText = t("reservationUnit:notifications.onlyRecurring");
-  } else if (isReservationStartInFuture(reservationUnit)) {
-    const futureOpeningText = t("reservationUnit:notifications.futureOpening", {
-      date: reservationUnit.reservationBegins
-        ? formatDate(reservationUnit.reservationBegins, "d.M.yyyy")
-        : "",
-      time: reservationUnit.reservationBegins
-        ? formatDate(reservationUnit.reservationBegins, "H.mm")
-        : "",
-    });
-    returnText = futureOpeningText;
+  } else if (reservationUnit.reservationBegins != null) {
+    const begin = new Date(reservationUnit.reservationBegins);
+    if (begin > new Date()) {
+      const futureOpeningText = t(
+        "reservationUnit:notifications.futureOpening",
+        {
+          date: formatDateTime(t, begin),
+        }
+      );
+      returnText = futureOpeningText;
+    }
   }
+  return returnText;
+}
+
+function NonReservableNotification({
+  reservationUnit,
+}: NonReservableNotificationProps) {
+  const { t } = useTranslation();
+  const returnText = formatErrorMessages(t, reservationUnit);
 
   return (
     <NotificationWrapper data-testid="reservation-unit--notification__reservation-start">
