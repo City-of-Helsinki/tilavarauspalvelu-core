@@ -17,7 +17,6 @@ import {
   getDurationOptions,
   getNormalizedReservationOrderStatus,
   isReservationEditable,
-  isReservationStartInFuture,
 } from "../reservation";
 import {
   type ReservableMap,
@@ -709,41 +708,6 @@ describe("getCheckoutUrl", () => {
         checkoutUrl: "checkout.url?user=1111-2222-3333-4444",
       })
     ).not.toBeDefined();
-  });
-});
-
-describe("isReservationStartInFuture", () => {
-  test("YES for a reservation that starts in the future", () => {
-    const reservationBegins = addMinutes(new Date(), 10).toISOString();
-    expect(isReservationStartInFuture({ reservationBegins })).toBe(true);
-  });
-
-  test("NO for a reservation that starts in the past", () => {
-    const reservationBegins = addMinutes(new Date(), -10).toISOString();
-    expect(isReservationStartInFuture({ reservationBegins })).toBe(false);
-  });
-
-  test("NO for a reservation that now", () => {
-    const reservationBegins = new Date().toISOString();
-    expect(isReservationStartInFuture({ reservationBegins })).toBe(false);
-    expect(isReservationStartInFuture({})).toBe(false);
-  });
-
-  // Why? the name of the function doesn't make sense here
-  test("YES if start < buffer days", () => {
-    const input = {
-      reservationBegins: addDays(new Date(), 10).toISOString(),
-      reservationsMaxDaysBefore: 9,
-    };
-    expect(isReservationStartInFuture(input)).toBe(true);
-  });
-
-  test("NO if start === buffer days", () => {
-    const input = {
-      reservationBegins: addDays(new Date(), 10).toISOString(),
-      reservationsMaxDaysBefore: 10,
-    };
-    expect(isReservationStartInFuture(input)).toBe(false);
   });
 });
 

@@ -2,7 +2,6 @@ import {
   addMinutes,
   addSeconds,
   isAfter,
-  addDays,
   roundToNearestMinutes,
   differenceInMinutes,
   set,
@@ -340,23 +339,6 @@ export function getCheckoutUrl(
     console.error(e);
   }
   return undefined;
-}
-
-export function isReservationStartInFuture(
-  reservationUnit: Pick<
-    ReservationUnitNode,
-    "reservationBegins" | "reservationsMaxDaysBefore"
-  >,
-  now = new Date()
-): boolean {
-  const { reservationBegins, reservationsMaxDaysBefore } = reservationUnit;
-  const bufferDays = reservationsMaxDaysBefore ?? 0;
-  const negativeBuffer = Math.abs(bufferDays) * -1;
-
-  return (
-    !!reservationBegins &&
-    now < addDays(new Date(reservationBegins), negativeBuffer)
-  );
 }
 
 export function getNewReservation({

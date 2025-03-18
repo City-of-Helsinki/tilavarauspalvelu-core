@@ -62,7 +62,6 @@ import {
   convertFormToFocustimeSlot,
   createDateTime,
   getDurationOptions,
-  isReservationStartInFuture,
 } from "@/modules/reservation";
 import {
   clampDuration,
@@ -603,9 +602,6 @@ function ReservationUnit({
     blockingReservations,
   });
 
-  const isUnitReservable =
-    !isReservationStartInFuture(reservationUnit) && reservationUnitIsReservable;
-
   return (
     <ReservationUnitPageWrapper>
       <Head
@@ -621,7 +617,7 @@ function ReservationUnit({
         }
       />
       <div>
-        {isUnitReservable && (
+        {reservationUnitIsReservable && (
           <QuickReservation
             reservationUnit={reservationUnit}
             reservationForm={reservationForm}
