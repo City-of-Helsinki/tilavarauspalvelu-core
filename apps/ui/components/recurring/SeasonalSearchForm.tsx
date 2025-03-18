@@ -24,32 +24,32 @@ const filterOrder = [
   "textSearch",
   "personsAllowed",
   "reservationUnitTypes",
-  "unit",
+  "units",
   "purposes",
   "accessType",
 ] as const;
 
 export type SearchFormValues = {
   personsAllowed: number | null;
-  unit: number[];
+  units: number[];
   reservationUnitTypes: number[];
   purposes: number[];
   textSearch: string;
-  accessType: string[];
+  accessTypes: string[];
 };
 
 // TODO combine as much as possible with the one in single-search (move them to a common place)
 function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   return {
     purposes: mapParamToNumber(params.getAll("purposes"), 1),
-    unit: mapParamToNumber(params.getAll("unit"), 1),
+    units: mapParamToNumber(params.getAll("units"), 1),
     reservationUnitTypes: mapParamToNumber(
       params.getAll("reservationUnitTypes"),
       1
     ),
     personsAllowed: toNumber(params.get("personsAllowed")),
     textSearch: params.get("textSearch") ?? "",
-    accessType: params.getAll("accessType"),
+    accessTypes: params.getAll("accessTypes"),
   };
 }
 
@@ -90,14 +90,14 @@ export function SeasonalSearchForm({
 
   const translateTag = (key: string, value: string): string | undefined => {
     switch (key) {
-      case "unit":
+      case "units":
         return unitOptions.find((n) => String(n.value) === value)?.label;
       case "reservationUnitTypes":
         return reservationUnitTypeOptions.find((n) => String(n.value) === value)
           ?.label;
       case "purposes":
         return purposeOptions.find((n) => String(n.value) === value)?.label;
-      case "accessType":
+      case "accessTypes":
         return accessTypeOptions.find((n) => String(n.value) === value)?.label;
       default:
         return "";
@@ -105,10 +105,10 @@ export function SeasonalSearchForm({
   };
 
   const multiSelectFilters = [
-    "unit",
+    "units",
     "reservationUnitTypes",
     "purposes",
-    "accessType",
+    "accessTypes",
   ] as const;
   const hideList = [
     "id",
@@ -134,9 +134,9 @@ export function SeasonalSearchForm({
       <Filters>
         <TextInput
           id="search"
-          label={t("searchForm:textSearchLabel")}
+          label={t("searchForm:labels.textSearch")}
           {...register("textSearch")}
-          placeholder={t("searchForm:searchTermPlaceholder")}
+          placeholder={t("searchForm:placeholders.textSearch")}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleSubmit(onSubmit)();
@@ -157,17 +157,17 @@ export function SeasonalSearchForm({
           control={control}
           options={reservationUnitTypeOptions}
           disabled={reservationUnitTypeOptions.length === 0}
-          label={t("searchForm:typeLabel")}
+          label={t("searchForm:labels.reservationUnitTypes")}
         />
         <ControlledSelect
           multiselect
           enableSearch
           clearable
-          name="unit"
+          name="units"
           control={control}
           options={unitOptions}
           disabled={unitOptions.length === 0}
-          label={t("searchForm:unitFilter")}
+          label={t("searchForm:labels.units")}
         />
         <ControlledSelect
           multiselect
@@ -177,15 +177,15 @@ export function SeasonalSearchForm({
           control={control}
           options={purposeOptions}
           disabled={purposeOptions.length === 0}
-          label={t("searchForm:purposesFilter")}
+          label={t("searchForm:labels.purposes")}
         />
         <ControlledSelect
           multiselect
           clearable
-          name="accessType"
+          name="accessTypes"
           control={control}
           options={accessTypeOptions}
-          label={t("searchForm:accessTypeFilter")}
+          label={t("searchForm:labels.accessTypes")}
         />
       </Filters>
       <SearchButtonContainer>

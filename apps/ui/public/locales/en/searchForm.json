@@ -1,21 +1,24 @@
 {
-  "textSearchLabel": "Search",
-  "searchTermPlaceholder": "Search spaces or equipment",
   "searchButton": "Search",
-  "purposeLabel": "Purpose of use",
-  "districtLabel": "District",
   "participantCountLabel": "Number of participants at least",
   "participantCountCombined": "Number of participants",
-  "typeLabel": "Type of space",
   "showMoreFilters": "Advanced search",
   "showLessFilters": "Show less options",
-  "unitFilter": "Location",
-  "purposesFilter": "Purpose of use",
-  "equipmentsFilter": "Equipment",
-  "durationFilter": "Duration",
-  "accessTypeFilter": "Access to the space",
   "beginTimeIsBeforeEndTime": "The start time must be before the end time",
   "resetForm": "Clear",
+  "placeholders": {
+    "textSearch": "Search spaces or equipment"
+  },
+  "labels": {
+    "textSearch": "Search",
+    "reservationUnitTypes": "Type of space",
+    "units": "Location",
+    "purposes": "Purpose of use",
+    "equipments": "Equipment",
+    "duration": "Duration",
+    "accessTypes": "Access to the space",
+    "showOnlyReservable": "Show only available spaces"
+  },
   "filters": {
     "applicationRound": "{{label}}",
     "textSearch": "{{value}}",
@@ -33,6 +36,5 @@
   "removeSelection": "Clear selection",
   "selectedElement": "Selection",
   "searchForValue": "Search",
-  "removeFilter": "Remove filter \"{{value}}\"",
-  "showOnlyReservableLabel": "Show only available spaces"
+  "removeFilter": "Remove filter \"{{value}}\""
 }

@@ -35,14 +35,14 @@ const StyledCheckBox = styled(Checkbox)`
   grid-column: -2 / span 1;
 `;
 
-type FormValues = {
+type SearchFormValues = {
   // TODO there is some confusion on the types of these
   // they are actually an array of pks (number) but they are encoded as val1,val2,val3 string
   purposes: number[];
-  unit: number[];
+  units: number[];
   equipments: number[];
   reservationUnitTypes: number[];
-  accessType: string[];
+  accessTypes: string[];
   timeBegin: string | null;
   timeEnd: string | null;
   startDate: string | null;
@@ -53,7 +53,7 @@ type FormValues = {
   textSearch: string;
 };
 
-function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
+function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   const dur = toNumber(params.get("duration"));
   const duration = dur != null && dur > 0 ? dur : null;
   const showOnlyReservable =
@@ -61,13 +61,13 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): FormValues {
     true;
   return {
     purposes: mapParamToNumber(params.getAll("purposes"), 1),
-    unit: mapParamToNumber(params.getAll("unit"), 1),
+    units: mapParamToNumber(params.getAll("units"), 1),
     equipments: mapParamToNumber(params.getAll("equipments"), 1),
     reservationUnitTypes: mapParamToNumber(
       params.getAll("reservationUnitTypes"),
       1
     ),
-    accessType: params.getAll("accessType"),
+    accessTypes: params.getAll("accessTypes"),
     timeBegin: params.get("timeBegin"),
     timeEnd: params.get("timeEnd"),
     startDate: params.get("startDate"),
@@ -89,17 +89,17 @@ const filterOrder = [
   "duration",
   "personsAllowed",
   "reservationUnitTypes",
-  "unit",
+  "units",
   "purposes",
   "equipments",
-  "accessType",
+  "accessTypes",
 ] as const;
 const multiSelectFilters = [
-  "unit",
+  "units",
   "reservationUnitTypes",
   "purposes",
   "equipments",
-  "accessType",
+  "accessTypes",
 ] as const;
 // we don't want to show "showOnlyReservable" as a FilterTag, as it has its own checkbox in the form
 const hideTagList = ["showOnlyReservable", "order", "sort", "ref"];
@@ -123,7 +123,7 @@ export function SingleSearchForm({
   const searchValues = useSearchParams();
   // TODO the users of this should be using watch
   const formValues = mapQueryToForm(searchValues);
-  const form = useForm<FormValues>({
+  const form = useForm<SearchFormValues>({
     values: formValues,
   });
   const accessTypeOptions = Object.values(AccessType).map((value) => ({
@@ -132,7 +132,6 @@ export function SingleSearchForm({
   }));
 
   const { handleSubmit, setValue, getValues, control, register } = form;
-  const unitTypeOptions = reservationUnitTypeOptions;
   const durationOptions = getDurationOptions(t);
 
   const translateTag = (key: string, value: string): string | undefined => {
@@ -141,17 +140,17 @@ export function SingleSearchForm({
       a != null && String(a.value) === b;
     // TODO should rework the find matcher (typing issues) (it works but it's confusing)
     switch (key) {
-      case "unit":
+      case "units":
         return unitOptions.find((n) => compFn(n, value))?.label;
       case "reservationUnitTypes":
-        return unitTypeOptions.find((n) => compFn(n, value))?.label;
+        return reservationUnitTypeOptions.find((n) => compFn(n, value))?.label;
       case "purposes":
         return purposeOptions.find((n) => compFn(n, value))?.label;
       case "equipments":
         return equipmentsOptions.find((n) => compFn(n, value))?.label;
       case "duration":
         return durationOptions.find((n) => compFn(n, value))?.label;
-      case "accessType":
+      case "accessTypes":
         return accessTypeOptions.find((n) => compFn(n, value))?.label;
       case "startDate":
       case "endDate":
@@ -163,7 +162,9 @@ export function SingleSearchForm({
     }
   };
 
-  const onSearch: SubmitHandler<FormValues> = (criteria: FormValues) => {
+  const onSearch: SubmitHandler<SearchFormValues> = (
+    criteria: SearchFormValues
+  ) => {
     handleSearch(criteria, true);
   };
 
@@ -182,16 +183,16 @@ export function SingleSearchForm({
           name="purposes"
           control={control}
           options={purposeOptions}
-          label={t("searchForm:purposesFilter")}
+          label={t("searchForm:labels.purposes")}
         />
         <ControlledSelect
           multiselect
           clearable
           enableSearch
-          name="unit"
+          name="units"
           control={control}
           options={unitOptions}
-          label={t("searchForm:unitFilter")}
+          label={t("searchForm:labels.units")}
         />
         <ControlledSelect
           multiselect
@@ -200,12 +201,12 @@ export function SingleSearchForm({
           name="equipments"
           control={control}
           options={equipmentsOptions}
-          label={t("searchForm:equipmentsFilter")}
+          label={t("searchForm:labels.equipments")}
         />
         <SingleLabelInputGroup label={t("common:dateLabel")}>
           <DateRangePicker
-            startDate={fromUIDate(String(getValues("startDate")))}
-            endDate={fromUIDate(String(getValues("endDate")))}
+            startDate={fromUIDate(getValues("startDate") ?? "")}
+            endDate={fromUIDate(getValues("endDate") ?? "")}
             onChangeStartDate={(date: Date | null) =>
               setValue("startDate", date != null ? toUIDate(date) : null)
             }
@@ -248,7 +249,7 @@ export function SingleSearchForm({
           control={control}
           clearable
           options={durationOptions}
-          label={t("searchForm:durationFilter", { duration: "" })}
+          label={t("searchForm:labels.duration", { duration: "" })}
         />
         <OptionalFilters
           showAllLabel={t("searchForm:showMoreFilters")}
@@ -267,16 +268,16 @@ export function SingleSearchForm({
             name="reservationUnitTypes"
             multiselect
             control={control}
-            options={unitTypeOptions}
+            options={reservationUnitTypeOptions}
             enableSearch
             clearable
-            label={t("searchForm:typeLabel")}
+            label={t("searchForm:labels.reservationUnitTypes")}
           />
           <TextInput
             id="search"
-            label={t("searchForm:textSearchLabel")}
+            label={t("searchForm:labels.textSearch")}
             {...register("textSearch")}
-            placeholder={t("searchForm:searchTermPlaceholder")}
+            placeholder={t("searchForm:placeholders.textSearch")}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleSubmit(onSearch)();
@@ -286,10 +287,10 @@ export function SingleSearchForm({
           <ControlledSelect
             multiselect
             clearable
-            name="accessType"
+            name="accessTypes"
             control={control}
             options={accessTypeOptions}
-            label={t("searchForm:accessTypeFilter")}
+            label={t("searchForm:labels.accessTypes")}
           />
         </OptionalFilters>
         <Controller
@@ -299,7 +300,7 @@ export function SingleSearchForm({
             <StyledCheckBox
               id="showOnlyReservable"
               name="showOnlyReservable"
-              label={t("searchForm:showOnlyReservableLabel")}
+              label={t("searchForm:labels.showOnlyReservable")}
               onChange={onChange}
               checked={value}
             />
@@ -316,13 +317,7 @@ export function SingleSearchForm({
         <StyledSubmitButton
           id="searchButton"
           type="submit"
-          iconStart={
-            isLoading ? (
-              <LoadingSpinner small />
-            ) : (
-              <IconSearch aria-hidden="true" />
-            )
-          }
+          iconStart={isLoading ? <LoadingSpinner small /> : <IconSearch />}
           disabled={isLoading}
         >
           {t("searchForm:searchButton")}

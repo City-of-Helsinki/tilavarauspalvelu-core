@@ -169,9 +169,9 @@ export function ReservationUnitModalContent({
       textSearch: data.textSearch,
       personsAllowed: data.personsAllowed?.toString(),
       reservationUnitType: data.reservationUnitTypes,
-      unit: data.unit,
+      unit: data.units,
       purposes: data.purposes,
-      accessType: data.accessType.map(transformAccessTypeSafe),
+      accessType: data.accessTypes.map(transformAccessTypeSafe),
     };
     refetch(variables);
   };

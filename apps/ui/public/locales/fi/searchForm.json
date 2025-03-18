@@ -1,21 +1,24 @@
 {
-  "textSearchLabel": "Haku",
-  "searchTermPlaceholder": "Hae tiloja tai laitetta",
   "searchButton": "Hae",
-  "purposeLabel": "Käyttötarkoitus",
-  "districtLabel": "Kaupunginosa",
   "participantCountLabel": "Henkilömäärä vähintään",
   "participantCountCombined": "Henkilömäärä",
-  "typeLabel": "Tilan tyyppi",
   "showMoreFilters": "Tarkennettu haku",
   "showLessFilters": "Näytä vähemmän vaihtoehtoja",
-  "unitFilter": "Toimipiste",
-  "purposesFilter": "Käyttötarkoitus",
-  "equipmentsFilter": "Varustelu",
-  "durationFilter": "Kesto",
-  "accessTypeFilter": "Pääsy tilaan",
   "beginTimeIsBeforeEndTime": "Alkamisajan on oltava ennen loppumisaikaa",
   "resetForm": "Tyhjennä",
+  "placeholders": {
+    "textSearch": "Hae tiloja tai laitetta"
+  },
+  "labels": {
+    "textSearch": "Haku",
+    "reservationUnitTypes": "Tilan tyyppi",
+    "units": "Toimipiste",
+    "purposes": "Käyttötarkoitus",
+    "equipments": "Varustelu",
+    "duration": "Kesto",
+    "accessTypes": "Pääsy tilaan",
+    "showOnlyReservable": "Näytä vain vapaana olevat tilat"
+  },
   "filters": {
     "applicationRound": "{{label}}",
     "textSearch": "{{value}}",
@@ -34,6 +37,5 @@
   "removeSelection": "Poista valinta",
   "selectedElement": "Valinta",
   "searchForValue": "Hae",
-  "removeFilter": "Poista hakuehto \"{{value}}\"",
-  "showOnlyReservableLabel": "Näytä vain vapaana olevat tilat"
+  "removeFilter": "Poista hakuehto \"{{value}}\""
 }
