@@ -68,6 +68,10 @@ function ApplicationEventInner({
   const periodEndDate = new Date(applicationRound.reservationPeriodEnd);
 
   const selectDefaultPeriod = (): void => {
+    clearErrors([
+      `applicationSections.${index}.begin`,
+      `applicationSections.${index}.end`,
+    ]);
     const begin = toUIDate(periodStartDate);
     const end = toUIDate(periodEndDate);
     setValue(`applicationSections.${index}.begin`, begin);
@@ -110,7 +114,11 @@ function ApplicationEventInner({
   }));
 
   return (
-    <Flex $gap="s" $marginTop="s">
+    <Flex
+      $gap="s"
+      $marginTop="s"
+      data-testid={`application__applicationSection_${index}`}
+    >
       <H4 as="h3">{t("application:Page1.basicInformationSubHeading")}</H4>
       <AutoGrid>
         <TextInput
@@ -125,7 +133,7 @@ function ApplicationEventInner({
           name={`applicationSections.${index}.numPersons`}
           label={t("application:Page1.groupSize")}
           required
-          min={0}
+          min={1}
           errorText={getTranslatedError("numPersons")}
         />
         <ControlledSelect
@@ -163,13 +171,7 @@ function ApplicationEventInner({
         label={`${t("application:Page1.defaultPeriodPrefix")} ${toUIDate(
           periodStartDate
         )} - ${toUIDate(periodEndDate)}`}
-        onChange={() => {
-          clearErrors([
-            `applicationSections.${index}.begin`,
-            `applicationSections.${index}.end`,
-          ]);
-          selectDefaultPeriod();
-        }}
+        onChange={selectDefaultPeriod}
         disabled={selectionIsDefaultPeriod}
       />
       <AutoGrid>
@@ -315,15 +317,15 @@ export function ApplicationEvent(props: Props): JSX.Element {
   const eventName = watch(`applicationSections.${index}.name`);
   watch(`applicationSections.${index}.appliedReservationsPerWeek`);
 
-  const shouldRenderInner = isVisible;
-
   // TODO requires us to use the accordion from admin-ui instead (or add force open)
   const hasErrors = errors.applicationSections?.[index] != null;
+
+  const shouldRenderInner = isVisible || hasErrors;
 
   return (
     <Accordion
       onToggle={onToggleAccordion}
-      open={isVisible || hasErrors}
+      open={shouldRenderInner}
       heading={eventName || t("application:Page1.applicationEventName")}
       theme="thin"
     >

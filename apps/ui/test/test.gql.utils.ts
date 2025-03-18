@@ -36,6 +36,7 @@ export type CreateGraphQLMocksReturn = Array<{
     query: DocumentNode;
     variables?: Record<string, unknown>;
   };
+  variableMatcher?: (variables: unknown) => true;
   result: {
     data: Record<string, unknown>;
   };
@@ -392,28 +393,20 @@ export function createMockApplicationFragment({
       ...(page === "page3" || page === "preview" ? page3Data : {}),
     };
   const reservationUnits: ApplicationFormFragment["applicationRound"]["reservationUnits"] =
-    [
-      /* TODO
-      {
-        id: string;
-        pk?: number | null;
-        nameFi?: string | null;
-        nameSv?: string | null;
-        nameEn?: string | null;
-        minPersons?: number | null;
-        maxPersons?: number | null;
-        images: [],
-        unit?: {
-          id: string;
-          pk?: number | null;
-          nameFi?: string | null;
-          nameSv?: string | null;
-          nameEn?: string | null;
-        } | null;
-        accessTypes: [],
-      }
-      */
-    ] as const;
+    Array.from({ length: 10 }, (_, i) => ({
+      id: base64encode(`ReservationUnitNode:${i}`),
+      pk: i,
+      ...generateNameFragment("ReservationUnitNode"),
+      minPersons: 1,
+      maxPersons: 10,
+      images: [],
+      unit: {
+        id: base64encode(`UnitNode:${i}`),
+        pk: i,
+        ...generateNameFragment("UnitNode"),
+      },
+      accessTypes: [],
+    }));
   return {
     ...MockApplicationForm,
     applicationRound: {
