@@ -109,8 +109,9 @@ export type ApplicationSectionPage2FormValues = z.infer<
 function lengthOfTimeRange(timeRange: SuitableTimeRangeFormValues): number {
   const begin = timeToMinutes(timeRange.beginTime);
   const end = timeToMinutes(timeRange.endTime);
+  const endChecked = end === 0 ? 24 * 60 : end;
 
-  return (end - begin) * 60;
+  return (endChecked - begin) * 60;
 }
 
 const ApplicationSectionPage2Schema = z
