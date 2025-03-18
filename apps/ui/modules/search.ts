@@ -4,6 +4,7 @@ import {
   filterNonNullable,
   getLocalizationLang,
   ignoreMaybeArray,
+  toNumber,
   type LocalizationLanguages,
 } from "common/src/helpers";
 import {
@@ -166,13 +167,13 @@ export function processVariables({
   const reservableDateEnd =
     endDate && endDate >= today ? toApiDate(endDate) : null;
 
-  const dur = Number(ignoreMaybeArray(values.getAll("duration")));
+  const dur = toNumber(ignoreMaybeArray(values.getAll("duration")));
   const duration = dur != null && dur > 0 ? dur : null;
   const isSeasonal = kind === ReservationKind.Season;
   const textSearch = ignoreMaybeArray(values.getAll("textSearch"));
   const personsAllowed = ignoreMaybeArray(values.getAll("personsAllowed"));
   const purposes = paramToIntegers(values.getAll("purposes"));
-  const unit = paramToIntegers(values.getAll("unit"));
+  const unit = paramToIntegers(values.getAll("units"));
   const reservationUnitTypes = paramToIntegers(
     values.getAll("reservationUnitTypes")
   );
@@ -191,7 +192,7 @@ export function processVariables({
       : null;
   const timeEnd = ignoreMaybeArray(values.getAll("timeEnd"));
   const timeBegin = ignoreMaybeArray(values.getAll("timeBegin"));
-  const accessType = values.getAll("accessType").map(transformAccessTypeSafe);
+  const accessType = values.getAll("accessTypes").map(transformAccessTypeSafe);
   return {
     ...(textSearch !== ""
       ? {

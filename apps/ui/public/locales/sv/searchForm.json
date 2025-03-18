@@ -1,21 +1,24 @@
 {
-  "textSearchLabel": "Sök",
-  "searchTermPlaceholder": "Sök lokaler eller utrustning",
   "searchButton": "Sök",
-  "purposeLabel": "Användningsändamål",
-  "districtLabel": "Stadsdel",
   "participantCountLabel": "Personantal minst",
   "participantCountCombined": "Personantal",
-  "typeLabel": "Lokaltyp",
   "showMoreFilters": "Detaljerad sökning",
   "showLessFilters": "Visa färre alternativ",
-  "unitFilter": "Verksamhetsställe",
-  "purposesFilter": "Användningsändamål",
-  "equipmentsFilter": "Utrustning",
-  "durationFilter": "Varaktighet",
-  "accessTypeFilter": "Tillträde till utrymmet",
   "beginTimeIsBeforeEndTime": "Sluttiden måste vara senare än starttiden",
   "resetForm": "Töm",
+  "placeholders": {
+    "textSearch": "Sök lokaler eller utrustning"
+  },
+  "labels": {
+    "textSearch": "Sök",
+    "reservationUnitTypes": "Lokaltyp",
+    "units": "Verksamhetsställe",
+    "purposes": "Användningsändamål",
+    "equipments": "Utrustning",
+    "duration": "Varaktighet",
+    "accessTypes": "Tillträde till utrymmet",
+    "showOnlyReservable": "Visa endast lediga utrymmen"
+  },
   "filters": {
     "applicationRound": "{{label}}",
     "textSearch": "{{value}}",
@@ -32,8 +35,6 @@
   "clearSelections": "Redigera",
   "removeSelection": "Redigera",
   "selectedElement": "Val",
-  "openCombobox": "Öppna kryssrutan",
   "searchForValue": "Sök",
-  "removeFilter": "Redigera \"{{value}}\"",
-  "showOnlyReservableLabel": "Visa endast lediga utrymmen"
+  "removeFilter": "Redigera \"{{value}}\""
 }
