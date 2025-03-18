@@ -134,8 +134,9 @@ export function generateNameFragment(name: string) {
   };
 }
 
+// TODO write a different version of this that selects Nth option
 export async function selectOption(
-  view: ReturnType<typeof render>,
+  view: ReturnType<typeof render> | ReturnType<typeof within>,
   listLabel: RegExp | string,
   optionLabel: RegExp | string
 ) {
@@ -147,7 +148,12 @@ export async function selectOption(
   expect(btn).not.toHaveAttribute("aria-disabled", "true");
   await user.click(btn);
   const listbox = view.getByRole("listbox");
-  const type = within(listbox).getByText(optionLabel);
-  expect(type).toBeInTheDocument();
-  await user.click(type);
+  // Hack to deal with options not having unique labels due to translation mocks
+  const opts = within(listbox).getAllByText(optionLabel);
+  const opt = opts[0];
+  if (opt == null) {
+    throw new Error("Option not found");
+  }
+  expect(opt).toBeInTheDocument();
+  await user.click(opt);
 }

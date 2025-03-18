@@ -18,21 +18,23 @@ afterEach(() => {
   cleanup();
 });
 
-vi.mock("next-i18next", () => ({
-  useTranslation: () => {
-    return {
-      t: (str: string) => str,
-      i18n: {
-        changeLanguage: () => new Promise(() => {}),
-        language: "fi",
-        exists: (str: string) => {
-          if (str.match(/failExistsOnPurpose/i)) {
-            return false;
-          }
-          return true;
+vi.mock("next-i18next", async (importOriginal) => {
+  return {
+    ...(await importOriginal()),
+    useTranslation: () => {
+      return {
+        t: (str: string) => str,
+        i18n: {
+          changeLanguage: () => new Promise(() => {}),
+          language: "fi",
+          exists: (str: string) => {
+            if (str.match(/failExistsOnPurpose/i)) {
+              return false;
+            }
+            return true;
+          },
         },
-      },
-    };
-  },
-  i18n: {},
-}));
+      };
+    },
+  };
+});
