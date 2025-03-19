@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, overload
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation
 from tilavarauspalvelu.typing import (
     PindoraReservationInfoData,
@@ -443,7 +444,7 @@ class PindoraService:
         for reservation in reservations:
             is_active = reservation.access_code_should_be_active
 
-            with suppress(ExternalServiceError):
+            try:
                 try:
                     cls.create_access_code(obj=reservation, is_active=is_active)
 
@@ -460,6 +461,9 @@ class PindoraService:
                 if reservation.access_code_is_active and reservation.access_code_generated_at:
                     EmailService.send_reservation_modified_access_code_email(reservation=reservation)
 
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation: {reservation.pk}")
+
     @classmethod
     def _create_missing_access_codes_for_series(cls) -> None:
         """
@@ -473,7 +477,7 @@ class PindoraService:
         for series in all_series:
             is_active: bool = series.should_have_active_access_code  # type: ignore[attr-defined]
 
-            with suppress(ExternalServiceError):
+            try:
                 try:
                     cls.create_access_code(obj=series, is_active=is_active)
 
@@ -487,6 +491,9 @@ class PindoraService:
                     elif not is_active and response["access_code_is_active"]:
                         cls.deactivate_access_code(obj=series)
 
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation series: {series.pk}")
+
     @classmethod
     def _create_missing_access_codes_for_seasonal_bookings(cls) -> None:
         """Create access codes for application sections that are missing them."""
@@ -495,7 +502,7 @@ class PindoraService:
         for section in sections:
             is_active: bool = section.should_have_active_access_code  # type: ignore[attr-defined]
 
-            with suppress(ExternalServiceError):
+            try:
                 try:
                     cls.create_access_code(obj=section, is_active=is_active)
 
@@ -508,6 +515,9 @@ class PindoraService:
 
                     elif not is_active and response["access_code_is_active"]:
                         cls.deactivate_access_code(obj=section)
+
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Application section: {section.pk}")
 
     @classmethod
     def _update_access_code_is_active_for_reservations(cls) -> None:
