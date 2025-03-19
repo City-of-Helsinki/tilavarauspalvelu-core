@@ -192,6 +192,7 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
         payment_type: str,
         tax_percentage: str,
         metadata_set: str,
+        access_type: str,
         **kwargs: Any,
     ) -> Self:
         self.kwargs["description"] = as_p_tags(
@@ -209,6 +210,7 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
                 f"Payment type: <b>{payment_type}</b>",
                 f"Tax percentage: <b>{tax_percentage}</b>",
                 f"Metadata set: <b>{metadata_set}</b>",
+                f"Access type: <b>{access_type}</b>",
             ],
         )
         self.kwargs["description_fi"] = self.kwargs["description"]
