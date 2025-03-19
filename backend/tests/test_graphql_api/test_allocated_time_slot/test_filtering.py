@@ -2,9 +2,24 @@ from __future__ import annotations
 
 import pytest
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
+from tilavarauspalvelu.enums import (
+    AccessCodeState,
+    AccessType,
+    ApplicantTypeChoice,
+    ApplicationSectionStatusChoice,
+    ReservationStateChoice,
+    ReservationTypeChoice,
+    Weekday,
+)
+from utils.date_utils import local_datetime
 
-from tests.factories import AllocatedTimeSlotFactory, ApplicationSectionFactory, ReservationUnitFactory
+from tests.factories import (
+    AllocatedTimeSlotFactory,
+    ApplicationSectionFactory,
+    RecurringReservationFactory,
+    ReservationFactory,
+    ReservationUnitFactory,
+)
 
 from .helpers import allocations_query
 
@@ -597,3 +612,59 @@ def test_application__filter__by_text_search__not_found(graphql):
     # - The response contains the right allocated time slot
     assert response.has_errors is False, response
     assert len(response.edges) == 0, response
+
+
+@pytest.mark.parametrize(
+    "access_code_state",
+    [
+        AccessCodeState.ACCESS_CODE_NOT_REQUIRED,
+        AccessCodeState.ACCESS_CODE_CREATED,
+        AccessCodeState.ACCESS_CODE_PENDING,
+    ],
+)
+def test_allocated_time_slot__filter__by_access_code_state(graphql, access_code_state):
+    allocation_1 = AllocatedTimeSlotFactory.create()
+    series_1 = RecurringReservationFactory.create(allocated_time_slot=allocation_1)
+    ReservationFactory.create(
+        recurring_reservation=series_1,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    allocation_2 = AllocatedTimeSlotFactory.create()
+    series_2 = RecurringReservationFactory.create(allocated_time_slot=allocation_2)
+    ReservationFactory.create(
+        recurring_reservation=series_2,
+        access_type=AccessType.UNRESTRICTED,
+        access_code_is_active=False,
+        access_code_generated_at=None,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    allocation_3 = AllocatedTimeSlotFactory.create()
+    series_3 = RecurringReservationFactory.create(allocated_time_slot=allocation_3)
+    ReservationFactory.create(
+        recurring_reservation=series_3,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_is_active=False,
+        access_code_generated_at=None,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+    )
+
+    allocation_map: dict[AccessCodeState, int] = {
+        AccessCodeState.ACCESS_CODE_CREATED: allocation_1.pk,
+        AccessCodeState.ACCESS_CODE_NOT_REQUIRED: allocation_2.pk,
+        AccessCodeState.ACCESS_CODE_PENDING: allocation_3.pk,
+    }
+
+    graphql.login_with_superuser()
+    query = allocations_query(access_code_state=access_code_state)
+    response = graphql(query)
+
+    assert len(response.edges) == 1
+    assert response.node(0) == {"pk": allocation_map[access_code_state]}

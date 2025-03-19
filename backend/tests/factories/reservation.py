@@ -66,6 +66,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     # Access information
     access_type = AccessType.UNRESTRICTED.value
     access_code_generated_at = None
+    access_code_is_active = False
 
     # Pricing details
     price = Decimal(0)
