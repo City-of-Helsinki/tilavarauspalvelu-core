@@ -363,6 +363,7 @@ class Common(Environment):
     HAUKI_EXPORTS_ENABLED = values.BooleanValue(default=False)
     HAUKI_SECRET = values.StringValue()
     HAUKI_API_KEY = values.StringValue()
+    HAUKI_DAYS_TO_FETCH = 730  # 2 years
 
     # --- Verkkokauppa settings --------------------------------------------------------------------------------------
 

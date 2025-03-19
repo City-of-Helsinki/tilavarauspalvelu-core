@@ -4,6 +4,7 @@ import datetime
 import zoneinfo
 
 import pytest
+from django.conf import settings
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import HaukiResourceState
@@ -219,7 +220,7 @@ def test__ReservableTimeSpanClient__init__latest_fetched_date_is_none(reservatio
 def test__ReservableTimeSpanClient__init__latest_fetched_date_is_defined(reservation_unit):
     today = datetime.date(2020, 1, 1)
 
-    latest_fetched_date = today + datetime.timedelta(days=ReservableTimeSpanClient.DAYS_TO_FETCH - 20)
+    latest_fetched_date = today + datetime.timedelta(days=settings.HAUKI_DAYS_TO_FETCH - 20)
     assert latest_fetched_date == datetime.date(2021, 12, 11)
 
     reservation_unit.origin_hauki_resource.latest_fetched_date = latest_fetched_date
@@ -233,7 +234,7 @@ def test__ReservableTimeSpanClient__init__latest_fetched_date_is_defined(reserva
 
 
 def test__ReservableTimeSpanClient__init__latest_fetched_date_is_defined__raise(reservation_unit):
-    latest_fetched_date = local_date() + datetime.timedelta(days=ReservableTimeSpanClient.DAYS_TO_FETCH + 31)
+    latest_fetched_date = local_date() + datetime.timedelta(days=settings.HAUKI_DAYS_TO_FETCH + 31)
     reservation_unit.origin_hauki_resource.latest_fetched_date = latest_fetched_date
 
     client = ReservableTimeSpanClient(reservation_unit.origin_hauki_resource)
