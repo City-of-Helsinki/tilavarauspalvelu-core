@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
     from django.db import models
     from django.db.models import Manager
-
+    from django.db.models.fields.related_descriptors import ManyToManyDescriptor, ReverseManyToOneDescriptor
 
 __all__ = [
     "LazyModelAttribute",
@@ -187,21 +187,54 @@ class LazyModelManager(BaseManager):
         manager = self._load_manager()
 
         # If name doesn't exits, this is a call from a related manager.
-        # This means we cannot replace the manager in the related model, as we don't know its name.
-        # We should still add the model to the manager if missing so that all methods work as expected.
-        if self.name is not None:
-            self._replace_manager(manager, self.model)
-        elif manager.model is None:
-            manager.model = self.model
+        if self.name is None:
+            manager = self._replace_related_manager(manager)
+        else:
+            self._replace_manager(manager, self.model, self.name)
 
         # Now check if the attribute exists.
         return getattr(manager, item)
 
+    def _replace_related_manager(self, manager: Manager) -> Any:
+        """Replace this related manager with a new related manager created from the lazy-loaded manager."""
+        manager_name = self.__class__.__name__
+
+        # Find the related model and related name for the manager.
+        # We can match by the name, since related managers are always created using either
+        # `django.db.models.fields.related_descriptors.create_reverse_many_to_one_manager` or
+        # `django.db.models.fields.related_descriptors.create_forward_many_to_many_manager`
+        if manager_name == "RelatedManager":
+            related_model: type[models.Model] = self.field.remote_field.model
+            related_name: str = self.field.remote_field.related_name
+
+        elif manager_name == "ManyRelatedManager":
+            related_model: type[models.Model] = self.source_field.remote_field.model
+            related_name: str = self.prefetch_cache_name
+
+        else:
+            msg = f"Unknown related manager: {manager_name}"
+            raise RuntimeError(msg)
+
+        # Get the descriptor for the many-relation.
+        descriptor: ReverseManyToOneDescriptor | ManyToManyDescriptor = getattr(related_model, related_name)
+
+        # Set required attributes to the lazy-loaded manager and replace it in the model's options.
+        manager.model = self.model
+        manager.name = self.name = self.model._default_manager.name
+        self._replace_manager(manager, self.model, self.name)
+
+        # Clear this `cached_property` (if set) to force the related manager to be recreated when descriptor is used.
+        if "related_manager_cls" in descriptor.__dict__:
+            delattr(descriptor, "related_manager_cls")
+
+        # Get the new related manager instance.
+        return descriptor.__get__(self.instance, None)
+
     def __get__(self, instance: models.Model | None, model: type[models.Model]) -> Any:
         """Called if accessed from Model class."""
         manager = self._load_manager()
-        self._replace_manager(manager, model)
-        return getattr(model, self.name)
+        self._replace_manager(manager, self.model, self.name)
+        return getattr(self.model, self.name)
 
     def _load_manager(self) -> Manager:
         """Get the lazy-loaded manager."""
@@ -214,7 +247,7 @@ class LazyModelManager(BaseManager):
 
         return cls.__manager__
 
-    def _replace_manager(self, manager: Manager, model: type[models.Model]) -> None:
+    def _replace_manager(self, manager: Manager, model: type[models.Model], name: str) -> None:
         """Replace this lazy manager with the actual manager in the model options manager list."""
         # Managers are immutable (due to 'django-modeltranslation'), so we need to recreate them.
         local_managers = list(model._meta.local_managers)
@@ -222,8 +255,8 @@ class LazyModelManager(BaseManager):
 
         # Only replace this manager with its lazy-loaded version, leave the rest as they are.
         for local_manager in local_managers:
-            if self.name == local_manager.name:
-                manager.contribute_to_class(model, self.name)
+            if name == local_manager.name:
+                manager.contribute_to_class(model, name)
             else:
                 model._meta.local_managers.append(local_manager)
 
