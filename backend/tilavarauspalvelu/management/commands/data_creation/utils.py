@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from decimal import Decimal
 
     from tilavarauspalvelu.enums import (
+        AccessType,
         ApplicantTypeChoice,
         PaymentType,
         PriceUnit,
@@ -198,6 +199,12 @@ class ReservationKindInfo:
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
+class AccessTypeInfo:
+    name: str
+    value: AccessType
+
+
+@dataclasses.dataclass(slots=True, frozen=True)
 class HandlingInfo:
     name: str
     handling_required: bool
@@ -232,6 +239,7 @@ class FreeReservationUnitData:
     start_interval_info: StartIntervalInfo
     cancellation_rule_info: CancelInfo
     handling_info: HandlingInfo
+    access_type_info: AccessTypeInfo
 
 
 @dataclasses.dataclass(slots=True, frozen=True)
@@ -249,6 +257,7 @@ class SeasonalReservationUnitData:
     duration_info: DurationInfo
     cancellation_rule_info: CancelInfo
     reservation_kind_info: ReservationKindInfo
+    access_type_info: AccessTypeInfo
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 
 from tilavarauspalvelu.enums import AccessType
-from tilavarauspalvelu.models import ReservationUnitAccessType, ReservationUnitPricing
+from tilavarauspalvelu.models import ReservationUnitAccessType
 
 from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder
 
@@ -23,5 +23,5 @@ class ReservationUnitAccessTypeFactory(GenericDjangoModelFactory[ReservationUnit
     reservation_unit = ForeignKeyFactory("tests.factories.ReservationUnitFactory")
 
 
-class ReservationUnitAccessTypeBuilder(ModelFactoryBuilder[ReservationUnitPricing]):
+class ReservationUnitAccessTypeBuilder(ModelFactoryBuilder[ReservationUnitAccessType]):
     factory = ReservationUnitAccessTypeFactory
