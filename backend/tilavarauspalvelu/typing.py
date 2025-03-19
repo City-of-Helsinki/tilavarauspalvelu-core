@@ -21,6 +21,7 @@ if TYPE_CHECKING:
         ReservationStateChoice,
         ReservationTypeChoice,
         ReservationTypeStaffChoice,
+        Weekday,
     )
     from tilavarauspalvelu.models import (
         AgeGroup,
@@ -34,6 +35,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "AffectedTimeSpan",
+    "Allocation",
     "AnyUser",
     "EmailContext",
     "ErrorList",
@@ -81,6 +83,13 @@ class TimeSpan(TypedDict):
 class TimeSlot(TypedDict):
     begin: datetime.time
     end: datetime.time
+
+
+class Allocation(TypedDict):
+    reservation_unit: ReservationUnit
+    day_of_the_week: Weekday
+    begin_time: datetime.time
+    end_time: datetime.time
 
 
 class TimeSlotDB(TypedDict):

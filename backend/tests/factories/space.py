@@ -13,9 +13,15 @@ from ._base import (
     ForeignKeyFactory,
     GenericDjangoModelFactory,
     ManyToManyFactory,
+    ModelFactoryBuilder,
     ReverseForeignKeyFactory,
     ReverseOneToOneFactory,
 )
+
+__all__ = [
+    "SpaceBuilder",
+    "SpaceFactory",
+]
 
 
 class SpaceFactory(GenericDjangoModelFactory[Space]):
@@ -51,3 +57,7 @@ class SpaceFactory(GenericDjangoModelFactory[Space]):
         kwargs["tree_id"] = 0
         kwargs["level"] = 0
         return cls.build(**kwargs)
+
+
+class SpaceBuilder(ModelFactoryBuilder[Space]):
+    factory = SpaceFactory

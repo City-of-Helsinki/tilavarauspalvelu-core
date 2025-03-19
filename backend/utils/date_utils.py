@@ -9,6 +9,8 @@ from django.utils.timezone import get_default_timezone
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+    from tilavarauspalvelu.enums import Weekday
+
 __all__ = [
     "DEFAULT_TIMEZONE",
     "combine",
@@ -31,6 +33,7 @@ __all__ = [
     "local_time_min",
     "local_time_string",
     "local_timedelta_string",
+    "next_date_matching_weekday",
     "next_hour",
     "time_as_timedelta",
     "time_difference",
@@ -560,3 +563,12 @@ def normalize_as_datetime(value: datetime.date | datetime.datetime, *, timedelta
         return value
     # Convert dates to datetimes to include timezone information
     return combine(value, datetime.time.min, tzinfo=DEFAULT_TIMEZONE) + datetime.timedelta(days=timedelta_days)
+
+
+def next_date_matching_weekday(date: datetime.date, weekday: Weekday) -> datetime.date:
+    """Return the next date from given one matching the given weekday."""
+    delta = weekday.as_weekday_number - date.weekday()
+    if delta < 0:
+        delta += 7
+
+    return date + datetime.timedelta(days=delta)

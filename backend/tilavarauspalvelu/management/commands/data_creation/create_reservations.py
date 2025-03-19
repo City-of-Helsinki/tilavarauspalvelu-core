@@ -13,6 +13,7 @@ from tilavarauspalvelu.enums import (
     ReservationKind,
     ReservationStateChoice,
     ReservationTypeChoice,
+    Weekday,
     WeekdayChoice,
 )
 from tilavarauspalvelu.models import (
@@ -25,7 +26,15 @@ from tilavarauspalvelu.models import (
     ReservationUnitPricing,
     User,
 )
-from utils.date_utils import DEFAULT_TIMEZONE, combine, get_date_range, get_periods_between, local_date, local_datetime
+from utils.date_utils import (
+    DEFAULT_TIMEZONE,
+    combine,
+    get_date_range,
+    get_periods_between,
+    local_date,
+    local_datetime,
+    next_date_matching_weekday,
+)
 
 from tests.factories import RecurringReservationFactory, RejectedOccurrenceFactory
 from tests.factories.payment_order import PaymentOrderBuilder
@@ -769,18 +778,14 @@ def _create_reservations_for_series(
     pricing: ReservationUnitPricing | None = series.reservation_unit.pricings.active().first()
     assert pricing is not None, "Reservation unit must have at least one pricing"
 
-    weekdays: list[int] = [int(val) for val in series.weekdays.split(",") if val]
+    weekdays: list[Weekday] = [Weekday.from_week_day(int(val)) for val in series.weekdays.split(",") if val]
 
     reservations: list[Reservation] = []
     reservation_reservation_units: list[models.Model] = []
     occurrences: list[RejectedOccurrence] = []
 
     for weekday in weekdays:
-        delta: int = weekday - series.begin_date.weekday()
-        if delta < 0:
-            delta += 7
-
-        begin_date = series.begin_date + datetime.timedelta(days=delta)
+        begin_date = next_date_matching_weekday(series.begin_date, weekday)
 
         periods = get_periods_between(
             start_date=begin_date,

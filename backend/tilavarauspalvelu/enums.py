@@ -787,7 +787,7 @@ class Weekday(models.TextChoices):
             case 6:
                 return Weekday.SUNDAY
 
-    @DynamicClassAttribute
+    @enum.property
     def as_iso_weekday_number(self) -> int:
         """ISO weekday number, starting from 1."""
         match self:
@@ -806,7 +806,7 @@ class Weekday(models.TextChoices):
             case Weekday.SUNDAY:
                 return 7
 
-    @DynamicClassAttribute
+    @enum.property
     def as_weekday_number(self) -> int:
         """Weekday number, starting from 0."""
         match self:

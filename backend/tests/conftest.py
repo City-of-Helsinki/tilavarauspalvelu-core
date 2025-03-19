@@ -1,17 +1,17 @@
 from __future__ import annotations
 
+from contextlib import ExitStack, nullcontext
 from typing import TYPE_CHECKING
 
 import pytest
 import stamina
 from rest_framework.test import APIClient
 
-from tilavarauspalvelu.integrations.sentry import SentryLogger
-
 from tests.factories._base import FakerEN, FakerFI, FakerSV
 from tests.helpers import GraphQLClient, patch_method
 
 if TYPE_CHECKING:
+    from _pytest.mark import Mark
     from django.core.mail import EmailMessage
 
 
@@ -31,15 +31,6 @@ def _deactivate_retries():
     stamina.set_active(False)
 
 
-@pytest.fixture(autouse=False)
-def _sentry_require_mocking(request):
-    """Raise an error if SentryHelper methods are used but not mocked during the test."""
-    with patch_method(SentryLogger.log_exception), patch_method(SentryLogger.log_message):
-        SentryLogger.log_exception.side_effect = Exception("SentryLogger.log_exception was not mocked")
-        SentryLogger.log_message.side_effect = Exception("SentryLogger.log_message was not mocked")
-        yield
-
-
 @pytest.fixture
 def outbox() -> list[EmailMessage]:
     from django.core import mail
@@ -53,3 +44,28 @@ def _reset_faker_uniqueness():
     FakerFI.clear_unique()
     FakerSV.clear_unique()
     FakerEN.clear_unique()
+
+
+@pytest.fixture(autouse=True)
+def _patch_method_marker(request: pytest.FixtureRequest):
+    """
+    Allows using the 'patch_method' in 'pytestmark' to patch methods in multiple tests at once.
+
+    Must use the 'with_args' method due how 'MarkDecorator.__call__' is implemented.
+
+    >>> pytestmark = [
+    >>>     pytest.mark.patch_method.with_args(HaukiAPIClient.get_date_periods, return_value=[]),  # type: ignore
+    >>>     pytest.mark.patch_method.with_args(PindoraClient.activate_reservation_access_code),  # type: ignore
+    >>> ]
+    """
+    markers: list[Mark] = list(request.node.iter_markers(name="patch_method"))
+    if markers:
+        with ExitStack() as stack:
+            for mark in markers:
+                patch = patch_method(*mark.args, **mark.kwargs)
+                stack.enter_context(patch)
+            yield
+
+    else:
+        with nullcontext():
+            yield

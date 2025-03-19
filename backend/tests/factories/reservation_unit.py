@@ -3,13 +3,14 @@ from __future__ import annotations
 import datetime
 import random
 import uuid
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Self
 
 import factory
 from factory import LazyAttribute
 from factory.fuzzy import FuzzyInteger
 
-from tilavarauspalvelu.enums import AuthenticationType, ReservationKind, ReservationStartInterval
+from tilavarauspalvelu.enums import AccessType, AuthenticationType, PriceUnit, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import local_start_of_day
 from utils.utils import as_p_tags
@@ -26,7 +27,7 @@ from ._base import (
 )
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import Space
+    from tilavarauspalvelu.models import Space, Unit
 
 __all__ = [
     "ReservationUnitBuilder",
@@ -215,10 +216,64 @@ class ReservationUnitBuilder(ModelFactoryBuilder[ReservationUnit]):
         self.kwargs["description_sv"] = self.kwargs["description"]
         return self
 
-    def for_space(self, space: Space) -> Self:
-        self.kwargs["name"] = space.name
-        self.kwargs["name_fi"] = space.name_fi
-        self.kwargs["name_en"] = space.name_en
-        self.kwargs["name_sv"] = space.name_sv
-        self.kwargs["unit"] = space.unit
+    def for_unit(self, unit: Unit) -> Self:
+        self.set(
+            unit=unit,
+            spaces__unit=unit,
+        )
+        if unit.origin_hauki_resource:
+            self.set(
+                origin_hauki_resource=unit.origin_hauki_resource,
+            )
+        return self
+
+    def for_space(self, space: Space, *, use_name: bool = False) -> Self:
+        self.set(
+            unit=space.unit,
+            spaces=[space],
+        )
+        if space.unit and space.unit.origin_hauki_resource:
+            self.set(
+                origin_hauki_resource=space.unit.origin_hauki_resource,
+            )
+        if use_name:
+            self.set(
+                name=space.name,
+                name_fi=space.name_fi,
+                name_en=space.name_en,
+                name_sv=space.name_sv,
+            )
+        return self
+
+    def with_free_pricing(self, *, begin_date: datetime.date | None = None) -> Self:
+        self.set(
+            pricings__price_unit=PriceUnit.PRICE_UNIT_FIXED,
+            pricings__lowest_price=Decimal(0),
+            pricings__highest_price=Decimal(0),
+            pricings__tax_percentage__value=Decimal(0),
+        )
+        if begin_date is not None:
+            self.set(
+                pricings__begins=begin_date,
+            )
+        return self
+
+    def with_unrestricted_access(self, *, begin_date: datetime.date | None = None) -> Self:
+        self.set(
+            access_types__access_type=AccessType.UNRESTRICTED,
+        )
+        if begin_date is not None:
+            self.set(
+                access_types__begin_date=begin_date,
+            )
+        return self
+
+    def with_access_code(self, *, begin_date: datetime.date | None = None) -> Self:
+        self.set(
+            access_types__access_type=AccessType.ACCESS_CODE,
+        )
+        if begin_date is not None:
+            self.set(
+                access_types__begin_date=begin_date,
+            )
         return self

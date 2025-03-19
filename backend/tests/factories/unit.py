@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Self
+
 import factory
 from factory import LazyAttribute
 
@@ -12,11 +14,13 @@ from ._base import (
     ForeignKeyFactory,
     GenericDjangoModelFactory,
     ManyToManyFactory,
+    ModelFactoryBuilder,
     ReverseForeignKeyFactory,
     ReverseOneToOneFactory,
 )
 
 __all__ = [
+    "UnitBuilder",
     "UnitFactory",
 ]
 
@@ -64,3 +68,12 @@ class UnitFactory(GenericDjangoModelFactory[Unit]):
 
     unit_roles = ManyToManyFactory("tests.factories.UnitRoleFactory")
     unit_groups = ManyToManyFactory("tests.factories.UnitGroupFactory")
+
+
+class UnitBuilder(ModelFactoryBuilder[Unit]):
+    factory = UnitFactory
+
+    def with_hauki_resource(self) -> Self:
+        return self.set(
+            origin_hauki_resource__latest_fetched_date=None,
+        )

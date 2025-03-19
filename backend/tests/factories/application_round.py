@@ -1,14 +1,21 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
 import factory
 from factory import LazyAttribute
 
 from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
-from tilavarauspalvelu.models import ApplicationRound
-from utils.date_utils import local_start_of_day
+from tilavarauspalvelu.models import (
+    AllocatedTimeSlot,
+    ApplicationRound,
+    ApplicationSection,
+    RecurringReservation,
+    Reservation,
+    ReservationUnitOption,
+)
+from utils.date_utils import get_periods_between, local_datetime, local_start_of_day, next_date_matching_weekday
 
 from ._base import (
     FakerEN,
@@ -19,6 +26,12 @@ from ._base import (
     ManyToManyFactory,
     ModelFactoryBuilder,
 )
+
+if TYPE_CHECKING:
+    from django.db import models
+
+    from tilavarauspalvelu.models import ReservationUnit, User
+    from tilavarauspalvelu.typing import Allocation
 
 __all__ = [
     "ApplicationRoundBuilder",
@@ -97,6 +110,144 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
     @classmethod
     def create_in_status_results_sent(cls, **kwargs: Any) -> ApplicationRound:
         return ApplicationRoundBuilder().results_sent().create(**kwargs)
+
+    @classmethod
+    def create_with_allocations(
+        cls,
+        *,
+        allocations: list[Allocation],
+        reservation_period_begin_date: datetime.date,
+        reservation_period_end_date: datetime.date,
+        user: User,
+        with_reservations: bool = False,
+    ) -> ApplicationRound:
+        """
+        Helper for creating a application round which has been handled and has the following allocations.
+        Creates a single application with a separate application section for each allocation.
+        """
+        from .age_group import AgeGroupFactory
+        from .allocated_time_slot import AllocatedTimeSlotFactory
+        from .application import ApplicationFactory
+        from .application_section import ApplicationSectionFactory
+        from .recurring_reservation import RecurringReservationFactory
+        from .reservation import ReservationFactory
+        from .reservation_purpose import ReservationPurposeFactory
+        from .reservation_unit_option import ReservationUnitOptionFactory
+
+        purpose = ReservationPurposeFactory.create()
+        age_group = AgeGroupFactory.create()
+
+        application_round = (
+            ApplicationRoundBuilder()
+            .handled()
+            .create(
+                reservation_period_begin=reservation_period_begin_date,
+                reservation_period_end=reservation_period_end_date,
+                purposes=[purpose],
+            )
+        )
+
+        ReservationReservationUnit: type[models.Model] = Reservation.reservation_units.through
+        ApplicationRoundReservationUnit: type[models.Model] = ApplicationRound.reservation_units.through
+
+        sections: list[ApplicationSection] = []
+        options: list[ReservationUnitOption] = []
+        allocated_time_slots: list[AllocatedTimeSlot] = []
+        allocation_series: list[RecurringReservation] = []
+        reservations: list[Reservation] = []
+        reservation_reservation_units: list[models.Model] = []
+        application_round_reservation_units: list[models.Model] = []
+        reservation_units: list[ReservationUnit] = []
+
+        application = ApplicationFactory.create(
+            application_round=application_round,
+            user=user,
+            cancelled_date=None,
+            sent_date=local_datetime(),
+            in_allocation_notification_sent_date=local_datetime(),
+        )
+
+        for allocation in allocations:
+            application_round_reservation_unit = ApplicationRoundReservationUnit(
+                applicationround=application_round,
+                reservationunit=allocation["reservation_unit"],
+            )
+            if allocation["reservation_unit"] not in reservation_units:
+                reservation_units.append(allocation["reservation_unit"])
+                application_round_reservation_units.append(application_round_reservation_unit)
+
+            section = ApplicationSectionFactory.build(
+                application=application,
+                applied_reservations_per_week=1,
+                purpose=purpose,
+                age_group=age_group,
+            )
+            sections.append(section)
+
+            option = ReservationUnitOptionFactory.build(
+                application_section=section,
+                reservation_unit=allocation["reservation_unit"],
+            )
+            options.append(option)
+
+            allocated_time_slot = AllocatedTimeSlotFactory.build(
+                day_of_the_week=allocation["day_of_the_week"],
+                begin_time=allocation["begin_time"],
+                end_time=allocation["end_time"],
+                reservation_unit_option=option,
+            )
+            allocated_time_slots.append(allocated_time_slot)
+
+            if with_reservations:
+                series = RecurringReservationFactory.build(
+                    weekdays=str(allocation["day_of_the_week"]),
+                    begin_date=reservation_period_begin_date,
+                    begin_time=allocation["begin_time"],
+                    end_date=reservation_period_end_date,
+                    end_time=allocation["begin_time"],
+                    user=user,
+                    age_group=age_group,
+                    allocated_time_slot=allocated_time_slot,
+                    reservation_unit=allocation["reservation_unit"],
+                )
+                allocation_series.append(series)
+
+                reservation_times = get_periods_between(
+                    start_date=next_date_matching_weekday(
+                        date=reservation_period_begin_date,
+                        weekday=allocation["day_of_the_week"],
+                    ),
+                    end_date=reservation_period_end_date,
+                    start_time=allocation["begin_time"],
+                    end_time=allocation["end_time"],
+                )
+
+                for begin, end in reservation_times:
+                    reservation = ReservationFactory.build(
+                        begin=begin,
+                        end=end,
+                        user=user,
+                        purpose=purpose,
+                        age_group=age_group,
+                        recurring_reservation=series,
+                    )
+                    reservations.append(reservation)
+
+                    reservation_reservation_unit = ReservationReservationUnit(
+                        reservation=reservation,
+                        reservationunit=allocation["reservation_unit"],
+                    )
+                    reservation_reservation_units.append(reservation_reservation_unit)
+
+        ApplicationSection.objects.bulk_create(sections)
+        ReservationUnitOption.objects.bulk_create(options)
+        AllocatedTimeSlot.objects.bulk_create(allocated_time_slots)
+        RecurringReservation.objects.bulk_create(allocation_series)
+        Reservation.objects.bulk_create(reservations)
+        ReservationReservationUnit.objects.bulk_create(reservation_reservation_units)
+        ApplicationRoundReservationUnit.objects.bulk_create(application_round_reservation_units)
+
+        return application_round
 
 
 class ApplicationRoundBuilder(ModelFactoryBuilder[ApplicationRound]):

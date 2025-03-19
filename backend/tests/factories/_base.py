@@ -352,10 +352,15 @@ class ManyToManyFactory[TModel: Model](_PostFactory[TModel]):
     """
 
     def generate(self, instance: Model, create: bool, models: Iterable[TModel] | None, **kwargs: Any) -> None:
-        if not models and kwargs:
-            factory = self.get_factory()
-            model = factory.create(**kwargs) if create else factory.build(**kwargs)
-            self.manager(instance).add(model)
+        if models:
+            if create:
+                for model in models or []:
+                    self.manager(instance).add(model)
 
-        for model in models or []:
-            self.manager(instance).add(model)
+        elif kwargs:
+            factory = self.get_factory()
+            if create:
+                model = factory.create(**kwargs)
+                self.manager(instance).add(model)
+            else:
+                factory.build(**kwargs)

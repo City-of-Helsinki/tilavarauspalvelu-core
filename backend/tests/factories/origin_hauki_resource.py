@@ -4,7 +4,7 @@ import factory
 
 from tilavarauspalvelu.models import OriginHaukiResource
 
-from ._base import GenericDjangoModelFactory
+from ._base import GenericDjangoModelFactory, ReverseForeignKeyFactory
 
 __all__ = [
     "OriginHaukiResourceFactory",
@@ -19,3 +19,5 @@ class OriginHaukiResourceFactory(GenericDjangoModelFactory[OriginHaukiResource])
     id = factory.Sequence(int)
     opening_hours_hash = ""
     latest_fetched_date = None
+
+    reservable_time_spans = ReverseForeignKeyFactory("tests.factories.ReservableTimeSpanFactory")

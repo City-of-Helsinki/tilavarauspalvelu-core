@@ -887,13 +887,11 @@ def _create_archived_reservation_units(
             cancellation_rules=cancellation_rules,
             hauki_resources=hauki_resources,
         )
-        .for_space(space)
+        .for_space(space, use_name=True)
         .create(
             is_archived=True,
         )
     )
-
-    reservation_unit.spaces.add(space)
 
     ReservationUnitPricingFactory.create(
         begins=datetime.date(2021, 1, 1),
@@ -946,13 +944,11 @@ def _create_single_reservation_per_user_reservation_units(
             cancellation_rules=cancellation_rules,
             hauki_resources=hauki_resources,
         )
-        .for_space(space)
+        .for_space(space, use_name=True)
         .create(
             max_reservations_per_user=1,
         )
     )
-
-    reservation_unit.spaces.add(space)
 
     ReservationUnitPricingFactory.create(
         begins=datetime.date(2021, 1, 1),
@@ -1023,7 +1019,7 @@ def _create_full_day_reservation_units(
                 cancellation_rules=cancellation_rules,
                 hauki_resources=hauki_resources,
             )
-            .for_space(space)
+            .for_space(space, use_name=True)
             .build(
                 reservation_block_whole_day=True,
             )
@@ -1106,7 +1102,7 @@ def _create_reservation_units_in_space_hierarchies(
         name_sv="Rumstavshierarki",
     )
 
-    reservation_unit_base = _get_base_reservation_unit_builder(
+    reservation_unit_base: ReservationUnitBuilder = _get_base_reservation_unit_builder(  # type: ignore[assignment]
         reservation_unit_type=reservation_unit_type,
         metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
@@ -1253,7 +1249,7 @@ def _create_reservation_units_in_space_hierarchies(
 
     # --- Create reservation units ---------------------------------------------------------------------------------
 
-    exhibition_center_unit = reservation_unit_base.for_space(exhibition_center).build()
+    exhibition_center_unit = reservation_unit_base.for_space(exhibition_center, use_name=True).build()
     reservation_units.append(exhibition_center_unit)
     pricings.append(pricing_base.build(reservation_unit=exhibition_center_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=exhibition_center_unit, space=exhibition_center))
@@ -1266,7 +1262,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    main_venue_unit = reservation_unit_base.for_space(main_venue).build()
+    main_venue_unit = reservation_unit_base.for_space(main_venue, use_name=True).build()
     reservation_units.append(main_venue_unit)
     pricings.append(pricing_base.build(reservation_unit=main_venue_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=main_venue_unit, space=main_venue))
@@ -1279,7 +1275,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    grand_hall_unit = reservation_unit_base.for_space(grand_hall).build()
+    grand_hall_unit = reservation_unit_base.for_space(grand_hall, use_name=True).build()
     reservation_units.append(grand_hall_unit)
     pricings.append(pricing_base.build(reservation_unit=grand_hall_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=grand_hall_unit, space=grand_hall))
@@ -1292,7 +1288,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    auditorium_unit = reservation_unit_base.for_space(auditorium).build()
+    auditorium_unit = reservation_unit_base.for_space(auditorium, use_name=True).build()
     reservation_units.append(auditorium_unit)
     pricings.append(pricing_base.build(reservation_unit=auditorium_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=auditorium_unit, space=auditorium))
@@ -1305,7 +1301,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    dining_hall_unit = reservation_unit_base.for_space(dining_hall).build()
+    dining_hall_unit = reservation_unit_base.for_space(dining_hall, use_name=True).build()
     reservation_units.append(dining_hall_unit)
     pricings.append(pricing_base.build(reservation_unit=dining_hall_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=dining_hall_unit, space=dining_hall))
@@ -1318,7 +1314,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    private_premises_unit = reservation_unit_base.for_space(private_premises).build()
+    private_premises_unit = reservation_unit_base.for_space(private_premises, use_name=True).build()
     reservation_units.append(private_premises_unit)
     pricings.append(pricing_base.build(reservation_unit=private_premises_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=private_premises_unit, space=private_premises))
@@ -1331,7 +1327,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    lecture_hall_unit = reservation_unit_base.for_space(lecture_hall).build()
+    lecture_hall_unit = reservation_unit_base.for_space(lecture_hall, use_name=True).build()
     reservation_units.append(lecture_hall_unit)
     pricings.append(pricing_base.build(reservation_unit=lecture_hall_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=lecture_hall_unit, space=lecture_hall))
@@ -1344,7 +1340,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    meeting_room_unit = reservation_unit_base.for_space(meeting_room).build()
+    meeting_room_unit = reservation_unit_base.for_space(meeting_room, use_name=True).build()
     reservation_units.append(meeting_room_unit)
     pricings.append(pricing_base.build(reservation_unit=meeting_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=meeting_room_unit, space=meeting_room))
@@ -1357,7 +1353,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    penthouse_unit = reservation_unit_base.for_space(penthouse).build()
+    penthouse_unit = reservation_unit_base.for_space(penthouse, use_name=True).build()
     reservation_units.append(penthouse_unit)
     pricings.append(pricing_base.build(reservation_unit=penthouse_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=penthouse_unit, space=penthouse))
@@ -1370,7 +1366,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    karaoke_room_unit = reservation_unit_base.for_space(karaoke_room).build()
+    karaoke_room_unit = reservation_unit_base.for_space(karaoke_room, use_name=True).build()
     reservation_units.append(karaoke_room_unit)
     pricings.append(pricing_base.build(reservation_unit=karaoke_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=karaoke_room_unit, space=karaoke_room))
@@ -1383,7 +1379,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    rooftop_terrace_unit = reservation_unit_base.for_space(rooftop_terrace).build()
+    rooftop_terrace_unit = reservation_unit_base.for_space(rooftop_terrace, use_name=True).build()
     reservation_units.append(rooftop_terrace_unit)
     pricings.append(pricing_base.build(reservation_unit=rooftop_terrace_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=rooftop_terrace_unit, space=rooftop_terrace))
@@ -1396,7 +1392,7 @@ def _create_reservation_units_in_space_hierarchies(
     if image is not None:
         images.append(image)
 
-    spa_unit = reservation_unit_base.for_space(spa).build()
+    spa_unit = reservation_unit_base.for_space(spa, use_name=True).build()
     reservation_units.append(spa_unit)
     pricings.append(pricing_base.build(reservation_unit=spa_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=spa_unit, space=spa))
@@ -1471,7 +1467,7 @@ def _create_reservation_units_in_resource_hierarchies(
     pricings: list[ReservationUnitPricing] = []
     images: list[ReservationUnitImage] = []
 
-    reservation_unit_base = _get_base_reservation_unit_builder(
+    reservation_unit_base: ReservationUnitBuilder = _get_base_reservation_unit_builder(  # type: ignore[assignment]
         reservation_unit_type=reservation_unit_type,
         metadata_sets=metadata_sets,
         terms_of_use=terms_of_use,
@@ -1569,7 +1565,7 @@ def _create_reservation_units_in_resource_hierarchies(
 
     # --- Create reservation units ---------------------------------------------------------------------------------
 
-    meeting_room_unit = reservation_unit_base.for_space(meeting_room).build()
+    meeting_room_unit = reservation_unit_base.for_space(meeting_room, use_name=True).build()
     reservation_units.append(meeting_room_unit)
     pricings.append(pricing_base.build(reservation_unit=meeting_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=meeting_room_unit, space=meeting_room))
@@ -1586,7 +1582,7 @@ def _create_reservation_units_in_resource_hierarchies(
     if image is not None:
         images.append(image)
 
-    break_room_unit = reservation_unit_base.for_space(break_room).build()
+    break_room_unit = reservation_unit_base.for_space(break_room, use_name=True).build()
     reservation_units.append(break_room_unit)
     pricings.append(pricing_base.build(reservation_unit=break_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=break_room_unit, space=break_room))
@@ -1603,7 +1599,7 @@ def _create_reservation_units_in_resource_hierarchies(
     if image is not None:
         images.append(image)
 
-    open_office_unit = reservation_unit_base.for_space(open_office_space).build()
+    open_office_unit = reservation_unit_base.for_space(open_office_space, use_name=True).build()
     reservation_units.append(open_office_unit)
     pricings.append(pricing_base.build(reservation_unit=open_office_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=open_office_unit, space=open_office_space))
@@ -1662,7 +1658,7 @@ def _create_reservation_unit_for_recurring_reservations(
             cancellation_rules=cancellation_rules,
             hauki_resources=hauki_resources,
         )
-        .for_space(space)
+        .for_space(space, use_name=True)
         .create()
     )
 
@@ -1696,7 +1692,7 @@ def _get_base_reservation_unit_builder(
     cancellation_rules: list[ReservationUnitCancellationRule] = (None,),
     hauki_resources: list[OriginHaukiResource] = (None,),
 ) -> ReservationUnitBuilder:
-    return ReservationUnitBuilder().set(
+    return ReservationUnitBuilder().set(  # type: ignore[return-value]
         origin_hauki_resource=random.choice(hauki_resources),
         allow_reservations_without_opening_hours=True,
         reservations_min_days_before=0,

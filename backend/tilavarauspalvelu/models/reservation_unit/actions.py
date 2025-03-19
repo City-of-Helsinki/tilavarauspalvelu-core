@@ -448,9 +448,9 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
         access_types_by_date: dict[datetime.date, AccessType] = {}
 
         access_types: list[ReservationUnitAccessType] = list(
-            self.reservation_unit.access_types.filter(
-                L(end_date__gt=begin_date) & models.Q(begin_date__lte=end_date)
-            ).order_by("begin_date")
+            self.reservation_unit.access_types.all()
+            .on_period(begin_date=begin_date, end_date=end_date)
+            .order_by("begin_date")
         )
         if not access_types:
             return access_types_by_date
