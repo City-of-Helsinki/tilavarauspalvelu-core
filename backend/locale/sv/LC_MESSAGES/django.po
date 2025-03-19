@@ -3064,6 +3064,21 @@ msgctxt "AccessType"
 msgid "multi-valued"
 msgstr ""
 
+#: tilavarauspalvelu/enums.py
+msgctxt "AccessCodeState"
+msgid "Access code not required"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "AccessCodeState"
+msgid "Access code created"
+msgstr ""
+
+#: tilavarauspalvelu/enums.py
+msgctxt "AccessCodeState"
+msgid "Access code pending"
+msgstr ""
+
 #: tilavarauspalvelu/integrations/email/template_context/application.py
 msgctxt "Email"
 msgid "'My applications' page"
@@ -3663,6 +3678,10 @@ msgstr ""
 msgid "applications"
 msgstr ""
 
+#: tilavarauspalvelu/models/application_round/actions.py
+msgid "Seasonal Booking"
+msgstr ""
+
 #: tilavarauspalvelu/models/application_round/model.py
 msgid "application round"
 msgstr ""
@@ -4189,10 +4208,6 @@ msgstr ""
 
 #: tilavarauspalvelu/models/user/model.py
 msgid "users"
-msgstr ""
-
-#: tilavarauspalvelu/tasks.py
-msgid "Seasonal Booking"
 msgstr ""
 
 #: tilavarauspalvelu/validators.py

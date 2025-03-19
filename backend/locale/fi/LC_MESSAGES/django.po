@@ -3140,6 +3140,21 @@ msgctxt "AccessType"
 msgid "multi-valued"
 msgstr "moniarvoinen"
 
+#: tilavarauspalvelu/enums.py
+msgctxt "AccessCodeState"
+msgid "Access code not required"
+msgstr "Ei tarvitse ovikoodia"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "AccessCodeState"
+msgid "Access code created"
+msgstr "Ovikoodi luotu"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "AccessCodeState"
+msgid "Access code pending"
+msgstr "Ovikoodia luodaan"
+
 #: tilavarauspalvelu/integrations/email/template_context/application.py
 msgctxt "Email"
 msgid "'My applications' page"
@@ -3738,6 +3753,10 @@ msgstr "hakemus"
 msgid "applications"
 msgstr "hakemukset"
 
+#: tilavarauspalvelu/models/application_round/actions.py
+msgid "Seasonal Booking"
+msgstr "Kausivaraus"
+
 #: tilavarauspalvelu/models/application_round/model.py
 msgid "application round"
 msgstr "kausivarauskierros"
@@ -4272,10 +4291,6 @@ msgstr "käyttäjä"
 #: tilavarauspalvelu/models/user/model.py
 msgid "users"
 msgstr "käyttäjät"
-
-#: tilavarauspalvelu/tasks.py
-msgid "Seasonal Booking"
-msgstr "Kausivaraus"
 
 #: tilavarauspalvelu/validators.py
 msgid "This field is required."

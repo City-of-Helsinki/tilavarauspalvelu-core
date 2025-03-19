@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Self
 from django.db import models
 from lookup_property import L
 
+from tilavarauspalvelu.enums import AccessCodeState, AccessType
 from tilavarauspalvelu.models import ReservationUnit
 from utils.date_utils import merge_time_slots
 
@@ -106,6 +107,22 @@ class AllocatedTimeSlotQuerySet(models.QuerySet):
 
     def for_application_round(self, ref: ApplicationRound | models.OuterRef) -> Self:
         return self.filter(reservation_unit_option__application_section__application__application_round=ref)
+
+    def has_access_code_state_in(self, states: list[str]) -> Self:
+        return self.alias(
+            access_code_state=models.Case(
+                models.When(
+                    ~L(recurring_reservation__used_access_types__contains=[AccessType.ACCESS_CODE]),
+                    then=models.Value(AccessCodeState.ACCESS_CODE_NOT_REQUIRED.value),
+                ),
+                models.When(
+                    L(recurring_reservation__is_access_code_is_active_correct=True),
+                    then=models.Value(AccessCodeState.ACCESS_CODE_CREATED.value),
+                ),
+                default=models.Value(AccessCodeState.ACCESS_CODE_PENDING.value),
+                output_field=models.CharField(),
+            ),
+        ).filter(access_code_state__in=states)
 
 
 class AllocatedTimeSlotManager(models.Manager.from_queryset(AllocatedTimeSlotQuerySet)): ...

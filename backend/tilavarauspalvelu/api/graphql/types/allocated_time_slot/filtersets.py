@@ -7,7 +7,7 @@ from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
 
-from tilavarauspalvelu.enums import ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
+from tilavarauspalvelu.enums import AccessCodeState, ApplicantTypeChoice, ApplicationSectionStatusChoice, Weekday
 from tilavarauspalvelu.models import AllocatedTimeSlot
 from utils.db import text_search
 from utils.utils import log_text_search
@@ -39,6 +39,11 @@ class AllocatedTimeSlotFilterSet(ModelFilterSet):
     allocated_unit = IntMultipleChoiceFilter(field_name="reservation_unit_option__reservation_unit__unit")
     allocated_reservation_unit = IntMultipleChoiceFilter(field_name="reservation_unit_option__reservation_unit")
 
+    access_code_state = EnumMultipleChoiceFilter(
+        method="filter_by_access_code_state",
+        enum=AccessCodeState,
+    )
+
     text_search = django_filters.CharFilter(method="filter_text_search")
 
     class Meta:
@@ -64,6 +69,10 @@ class AllocatedTimeSlotFilterSet(ModelFilterSet):
     @staticmethod
     def filter_by_section_status(qs: AllocatedTimeSlotQuerySet, name: str, value: list[str]) -> models.QuerySet:
         return qs.has_section_status_in(value)
+
+    @staticmethod
+    def filter_by_access_code_state(qs: AllocatedTimeSlotQuerySet, name: str, value: list[str]) -> models.QuerySet:
+        return qs.has_access_code_state_in(value)
 
     def filter_text_search(self, qs: AllocatedTimeSlotQuerySet, name: str, value: str) -> models.QuerySet:
         fields = (
