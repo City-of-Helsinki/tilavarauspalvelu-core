@@ -24,8 +24,6 @@ if TYPE_CHECKING:
 
 
 class ReservableTimeSpanClient:
-    DAYS_TO_FETCH = 730  # 2 years
-
     origin_hauki_resource: OriginHaukiResource
     start_date: datetime.date
     end_date: datetime.date
@@ -74,7 +72,7 @@ class ReservableTimeSpanClient:
             # Since we don't have any previous data, start fetching from today.
             self.start_date = today
 
-        self.end_date = today + datetime.timedelta(days=self.DAYS_TO_FETCH)
+        self.end_date = today + datetime.timedelta(days=settings.HAUKI_DAYS_TO_FETCH)
         # Round the date to the last day of the month (e.g. 2023-01-05 -> 2023-01-31)
         self.end_date = self.end_date.replace(day=calendar.monthrange(self.end_date.year, self.end_date.month)[1])
 

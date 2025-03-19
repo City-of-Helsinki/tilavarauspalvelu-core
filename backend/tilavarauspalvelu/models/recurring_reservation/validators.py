@@ -4,11 +4,11 @@ import dataclasses
 import datetime
 from typing import TYPE_CHECKING
 
+from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType
-from tilavarauspalvelu.integrations.opening_hours.reservable_time_span_client import ReservableTimeSpanClient
 from utils.date_utils import local_date, local_datetime
 
 if TYPE_CHECKING:
@@ -42,7 +42,7 @@ class ReservationSeriesValidator:
             msg = "Begin date cannot be after end date."
             raise ValidationError(msg, code=error_codes.RESERVATION_BEGIN_DATE_AFTER_END_DATE)
 
-        if end_date > local_date() + datetime.timedelta(days=ReservableTimeSpanClient.DAYS_TO_FETCH):
+        if end_date > local_date() + datetime.timedelta(days=settings.HAUKI_DAYS_TO_FETCH):
             msg = "Cannot create reservations for more than 2 years in the future."
             raise ValidationError(msg, code=error_codes.RESERVATION_END_DATE_TOO_FAR)
 
