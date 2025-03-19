@@ -67,7 +67,7 @@ class ReservableTimeSpanClient:
 
     def _init_date_range(self) -> None:
         today = local_date()
-        if self.origin_hauki_resource.latest_fetched_date:
+        if self.origin_hauki_resource.latest_fetched_date is not None:
             # Start fetching from the next day after the latest fetched date.
             self.start_date = self.origin_hauki_resource.latest_fetched_date + datetime.timedelta(days=1)
         else:
@@ -155,8 +155,3 @@ class ReservableTimeSpanClient:
         ]
 
         return ReservableTimeSpan.objects.bulk_create(reservable_time_spans)
-
-    def _merge_overlapping_closed_time_spans(self, parsed_time_spans: list[TimeSpanElement]) -> list[TimeSpanElement]:
-        return merge_overlapping_time_span_elements(
-            timespan for timespan in parsed_time_spans if not timespan.is_reservable
-        )
