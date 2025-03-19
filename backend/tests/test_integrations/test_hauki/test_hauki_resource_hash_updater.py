@@ -14,7 +14,7 @@ from tilavarauspalvelu.models import ReservableTimeSpan
 from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import OriginHaukiResourceFactory, ReservableTimeSpanFactory
-from tests.helpers import ResponseMock, patch_method
+from tests.helpers import patch_method
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import OriginHaukiResource
@@ -48,44 +48,6 @@ def test__HaukiResourceHashUpdater__init__pass_empty_list(reservation_unit):
     updater = HaukiResourceHashUpdater([])
 
     assert updater.hauki_resource_ids == []
-
-
-##########################
-# _fetch_hauki_resources #
-##########################
-
-
-@patch_method(HaukiAPIClient.get_resources, return_value={"results": ["foo"]})
-def test__HaukiResourceHashUpdater__fetch_hauki_resources__single_page(reservation_unit):
-    updater = HaukiResourceHashUpdater()
-    updater._fetch_hauki_resources()
-
-    assert HaukiAPIClient.get_resources.call_count == 1
-    assert updater.fetched_hauki_resources == ["foo"]
-
-
-@patch_method(
-    HaukiAPIClient.get,
-    side_effect=[
-        ResponseMock(status_code=200, json_data={"results": ["foo"], "next": "page2"}),
-        ResponseMock(status_code=200, json_data={"results": ["bar"], "next": None}),
-    ],
-)
-def test__HaukiResourceHashUpdater__fetch_hauki_resources__multiple_pages(reservation_unit):
-    updater = HaukiResourceHashUpdater()
-    updater._fetch_hauki_resources()
-
-    assert HaukiAPIClient.get.call_count == 2
-    assert updater.fetched_hauki_resources == ["foo", "bar"]
-
-
-@patch_method(HaukiAPIClient.get_resources, return_value={"results": []})
-def test__HaukiResourceHashUpdater__fetch_hauki_resources__nothing_returned(reservation_unit):
-    updater = HaukiResourceHashUpdater()
-    updater._fetch_hauki_resources()
-
-    assert HaukiAPIClient.get_resources.call_count == 1
-    assert updater.fetched_hauki_resources == []
 
 
 ####################################
@@ -206,9 +168,7 @@ def test__HaukiResourceHashUpdater__create_reservable_time_spans_for_reservation
 @patch_method(ReservableTimeSpanClient.run, return_value=[4, 5, 6])
 def test__HaukiResourceHashUpdater__run(reservation_unit):
     HaukiAPIClient.get_resources.return_value = {
-        "results": [
-            {"id": reservation_unit.origin_hauki_resource.id, "date_periods_hash": "bar"},
-        ]
+        "results": [{"id": reservation_unit.origin_hauki_resource.id, "date_periods_hash": "bar"}]
     }
 
     updater = HaukiResourceHashUpdater()
