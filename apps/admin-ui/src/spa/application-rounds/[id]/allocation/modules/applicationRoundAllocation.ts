@@ -131,19 +131,11 @@ export function encodeTimeSlot(day: number, hour: number): string {
 }
 
 function constructTimeSlot(day: number, begin: string): TimeSlot | null {
-  const time = parseApiTime(begin);
+  const time = timeToMinutes(begin) / 60;
   if (time == null) {
     return null;
   }
   return { day, hour: time };
-}
-
-/// Convert python time string to hours
-/// @return time in hours
-/// @param from a python time string: "HH:MM:SS"
-export function parseApiTime(time: string): number | null {
-  const mins = timeToMinutes(time);
-  return mins / 60;
 }
 
 export function getTimeSeries(
@@ -267,16 +259,16 @@ export function getRelatedTimeSlots(
     RelatedSlot[][]
   >((acc, ts) => {
     const day = convertWeekday(ts.dayOfTheWeek);
-    const begin = parseApiTime(ts.beginTime);
-    const end = parseApiTime(ts.endTime);
     const arr = acc[day];
-    if (begin == null || end == null || arr == null) {
+    if (arr == null) {
       return acc;
     }
+    const beginTime = timeToMinutes(ts.beginTime);
+    const endTime = timeToMinutes(ts.endTime);
     arr.push({
       day,
-      beginTime: begin * 60,
-      endTime: end * 60,
+      beginTime,
+      endTime,
     });
     return acc;
   }, dayArray);
@@ -332,8 +324,8 @@ export function isInsideCell(
     return false;
   }
   // NOTE if the end time is 00:00 swap it to 24:00 (24h)
-  const begin = parseApiTime(beginTime);
-  const end = parseApiTime(endTime);
+  const begin = timeToMinutes(beginTime) / 60;
+  const end = timeToMinutes(endTime) / 60;
   if (begin == null || end == null) {
     return false;
   }

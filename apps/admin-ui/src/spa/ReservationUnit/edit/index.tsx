@@ -41,6 +41,7 @@ import {
   useUpdateReservationUnitMutation,
   useReservationUnitEditQuery,
   EquipmentOrderingChoices,
+  ReservationKind,
 } from "@gql/gql-types";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
@@ -1686,7 +1687,7 @@ function ReservationUnitEditor({
     }
   };
 
-  const handleArchiveButtonClick = async () => {
+  const handleArchiveButtonClick = () => {
     if (reservationUnit != null) {
       setModalContent(
         <ArchiveDialog
@@ -1714,12 +1715,11 @@ function ReservationUnitEditor({
     }
   };
 
+  const kind = watch("reservationKind");
   const isDirect =
-    watch("reservationKind") === "DIRECT" ||
-    watch("reservationKind") === "DIRECT_AND_SEASON";
+    kind === ReservationKind.Direct || kind === ReservationKind.DirectAndSeason;
   const isSeasonal =
-    watch("reservationKind") === "SEASON" ||
-    watch("reservationKind") === "DIRECT_AND_SEASON";
+    kind === ReservationKind.Season || kind === ReservationKind.DirectAndSeason;
 
   const previewDisabled =
     isSaving ||

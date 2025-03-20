@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import React from "react";
 
 // "&& > *" needed to position the checkbox and label correctly in the grid block
-// eslint-disable no-duplicate-selectors
 const CenteredCheckbox = styled(Checkbox)`
   display: grid;
   height: 84px;
@@ -13,7 +12,6 @@ const CenteredCheckbox = styled(Checkbox)`
     top: var(--spacing-m);
   }
 `;
-// eslint-enable no-duplicate-selectors
 
 export function CheckboxFilter({ name }: { name: string }) {
   const [searchParams, setParams] = useSearchParams();

@@ -38,7 +38,7 @@ import {
   useRestoreAllSectionOptionsMutation,
   useRejectAllSectionOptionsMutation,
   useApplicationAdminQuery,
-  ApplicationAdminQuery,
+  type ApplicationAdminQuery,
   useRejectRestMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
@@ -262,7 +262,7 @@ function RejectOptionButton({
   const updateOption = async (
     pk: Maybe<number> | undefined,
     rejected: boolean
-  ) => {
+  ): Promise<void> => {
     if (pk == null) {
       return;
     }
@@ -300,12 +300,12 @@ function RejectOptionButton({
     }
   };
 
-  const handleReject = async () => {
-    updateOption(option.pk, true);
+  const handleReject = () => {
+    return updateOption(option.pk, true);
   };
 
-  const handleRevert = async () => {
-    updateOption(option.pk, false);
+  const handleRevert = () => {
+    return updateOption(option.pk, false);
   };
 
   const isRejected = option.rejected;
@@ -376,7 +376,10 @@ function RejectAllOptionsButton({
 
   const isLoading = rejectLoading || restoreLoading;
 
-  const mutate = async (pk: Maybe<number> | undefined, restore: boolean) => {
+  const mutate = async (
+    pk: Maybe<number> | undefined,
+    restore: boolean
+  ): Promise<void> => {
     if (pk == null) {
       // TODO this is an error
       return;
@@ -418,12 +421,12 @@ function RejectAllOptionsButton({
     }
   };
 
-  const handleRejectAll = async () => {
-    mutate(section.pk, false);
+  const handleRejectAll = () => {
+    return mutate(section.pk, false);
   };
 
-  const handleRestoreAll = async () => {
-    mutate(section.pk, true);
+  const handleRestoreAll = () => {
+    return mutate(section.pk, true);
   };
 
   // codegen types allow undefined so have to do this for debugging
@@ -659,7 +662,7 @@ function RejectApplicationButton({
   const updateApplication = async (
     pk: Maybe<number> | undefined,
     shouldReject: boolean
-  ) => {
+  ): Promise<void> => {
     if (pk == null) {
       return;
     }
@@ -711,12 +714,12 @@ function RejectApplicationButton({
     return null;
   }
 
-  const handleRejectAll = async () => {
-    updateApplication(application.pk, true);
+  const handleRejectAll = () => {
+    return updateApplication(application.pk, true);
   };
 
-  const handleRestoreAll = async () => {
-    updateApplication(application.pk, false);
+  const handleRestoreAll = () => {
+    return updateApplication(application.pk, false);
   };
 
   // codegen types allow undefined so have to do this for debugging

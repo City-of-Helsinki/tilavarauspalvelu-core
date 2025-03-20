@@ -18,7 +18,7 @@ import { HR } from "@/component/Table";
 import { useReservationEditData } from "./hooks";
 import { useStaffReservationMutation } from "../hooks";
 import { errorToast } from "common/src/common/toast";
-import { ButtonContainer, CenterSpinner } from "common/styles/util";
+import { ButtonContainer, CenterSpinner, Flex } from "common/styles/util";
 import { createTagString } from "./util";
 import ReservationTitleSection from "./ReservationTitleSection";
 import { LinkPrev } from "@/component/LinkPrev";
@@ -39,12 +39,6 @@ const noSeparateBillingDefined = (reservation: ReservationType): boolean =>
 const InnerTextInput = styled(TextInput)`
   grid-column: 1 / -1;
   max-width: var(--prose-width);
-`;
-
-const Form = styled.form`
-  display: flex;
-  gap: 1rem;
-  flex-direction: column;
 `;
 
 function EditReservation({
@@ -115,7 +109,7 @@ function EditReservation({
     onSuccess,
   });
 
-  const onSubmit = async (values: FormValueType) => {
+  const onSubmit = (values: FormValueType) => {
     if (!reservationUnit.pk) {
       errorToast({ text: "ERROR: Can't update without reservation unit" });
       return;
@@ -147,7 +141,7 @@ function EditReservation({
 
   return (
     <FormProvider {...form}>
-      <Form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <Flex as="form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <ReservationTypeForm
           reservationUnit={reservationUnit}
           disableBufferToggle
@@ -184,7 +178,7 @@ function EditReservation({
             {t("Reservation.EditPage.save")}
           </Button>
         </ButtonContainer>
-      </Form>
+      </Flex>
     </FormProvider>
   );
 }

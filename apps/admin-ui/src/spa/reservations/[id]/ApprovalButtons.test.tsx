@@ -21,7 +21,7 @@ const wrappedRender = (reservation: ReservationNode) => {
 };
 
 describe("State change rules", () => {
-  test("Return and Deny are enabled for future Confirmed events", async () => {
+  test("Return and Deny are enabled for future Confirmed events", () => {
     const res = {
       state: ReservationStateChoice.Confirmed,
       end: addDays(new Date(), 2).toISOString(),
@@ -40,7 +40,7 @@ describe("State change rules", () => {
     ).toBeInTheDocument();
   });
 
-  test("Approve and deny are enabled for future RequiresHandling", async () => {
+  test("Approve and deny are enabled for future RequiresHandling", () => {
     const res = {
       state: ReservationStateChoice.RequiresHandling,
       end: addDays(new Date(), 2).toISOString(),
@@ -57,7 +57,7 @@ describe("State change rules", () => {
     ).toBeInTheDocument();
   });
 
-  test("Only Return to Handling is enabled if Denied", async () => {
+  test("Only Return to Handling is enabled if Denied", () => {
     const res = {
       state: ReservationStateChoice.Denied,
       end: addDays(new Date(), 2).toISOString(),
@@ -74,7 +74,7 @@ describe("State change rules", () => {
     ).toBeInTheDocument();
   });
 
-  test("Past Confirmed all buttons are disabled", async () => {
+  test("Past Confirmed all buttons are disabled", () => {
     const res = {
       state: ReservationStateChoice.Confirmed,
       end: addDays(new Date(), -2).toISOString(),
@@ -84,7 +84,7 @@ describe("State change rules", () => {
     expect(view.queryAllByRole("button")).toHaveLength(0);
   });
 
-  test("Past Denied all buttons are disabled", async () => {
+  test("Past Denied all buttons are disabled", () => {
     const res = {
       state: ReservationStateChoice.Denied,
       end: addDays(new Date(), -2).toISOString(),
@@ -94,7 +94,7 @@ describe("State change rules", () => {
     expect(view.queryAllByRole("button")).toHaveLength(0);
   });
 
-  test("Past RequiresHandling can be Denied", async () => {
+  test("Past RequiresHandling can be Denied", () => {
     const res = {
       state: ReservationStateChoice.RequiresHandling,
       end: addDays(new Date(), -2).toISOString(),
@@ -111,7 +111,7 @@ describe("State change rules", () => {
 });
 
 describe("Editing allowed", () => {
-  test("Editing is allowed for future Confirmed events", async () => {
+  test("Editing is allowed for future Confirmed events", () => {
     const res = {
       state: ReservationStateChoice.Confirmed,
       end: addDays(new Date(), 2).toISOString(),
@@ -125,7 +125,7 @@ describe("Editing allowed", () => {
     ).toBeInTheDocument();
   });
 
-  test("No editing if the event isn't Confirmed", async () => {
+  test("No editing if the event isn't Confirmed", () => {
     const res = {
       state: ReservationStateChoice.RequiresHandling,
       end: addDays(new Date(), 2).toISOString(),
@@ -160,7 +160,7 @@ describe("Editing allowed", () => {
     expect(view5.queryAllByRole("link")).toHaveLength(0);
   });
 
-  test("Past Confirmed has a one hour edit window", async () => {
+  test("Past Confirmed has a one hour edit window", () => {
     const res = {
       state: ReservationStateChoice.Confirmed,
       end: addMinutes(new Date(), -45).toISOString(),

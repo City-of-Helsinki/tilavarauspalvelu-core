@@ -156,7 +156,7 @@ export function ImageEditor({
     }
   };
 
-  const setAsMainImage = async (pk: number) => {
+  const setAsMainImage = (pk: number) => {
     setImages(
       images.map((image) => ({
         ...image,

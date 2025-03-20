@@ -62,7 +62,7 @@ export function createApolloClient(
     ? getServerCookie(ctx?.req?.headers, "csrftoken")
     : getCookie("csrftoken");
 
-  const enchancedFetch = async (url: RequestInfo | URL, init?: RequestInit) => {
+  const enchancedFetch = (url: RequestInfo | URL, init?: RequestInit) => {
     const headers = new Headers({
       ...(init?.headers != null ? init.headers : {}),
       // TODO missing csrf token is a non recoverable error

@@ -64,6 +64,13 @@ const myRules = {
     },
   ],
   "@typescript-eslint/no-non-null-assertion": "error",
+  // this only catches await errors if there is a single await that is missing
+  // more complex rules:
+  // - no-misused-promises
+  // - no-floating-promises
+  // both in typescript-eslint/recommended-type-checked
+  // but out type generation is broken (so only recommended works)
+  "require-await": "error",
   // for some reason this raises errors for "key" props in jsx arrays
   "react/prop-types": "off",
   "react/no-array-index-key": "error",

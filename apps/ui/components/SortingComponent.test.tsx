@@ -34,8 +34,8 @@ vi.mock("next/router", () => ({
 
 // everything should respond to query params
 // -> separate tests for fetching (they are based only on query params)
-describe("SortingComponent", async () => {
-  beforeEach(async () => {
+describe("SortingComponent", () => {
+  beforeEach(() => {
     mockedSearchParams.mockReturnValue(new URLSearchParams());
   });
 
@@ -43,13 +43,13 @@ describe("SortingComponent", async () => {
     vi.resetAllMocks();
   });
 
-  test("should render sorting component", async () => {
+  test("should render sorting component", () => {
     const view = render(<SortingComponent />);
     const btnLabel = view.getByText("searchResultList:sortButtonLabel");
     expect(btnLabel).toBeInTheDocument();
   });
 
-  test("sort component should default to by name", async () => {
+  test("sort component should default to by name", () => {
     const view = render(<SortingComponent />);
     const nameLabel = /sorting.label.name/;
     expect(view.getByText(nameLabel)).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe("SortingComponent", async () => {
     expect(mockedRouterReplace).toHaveBeenCalledTimes(1);
   });
 
-  test("should order by query param", async () => {
+  test("should order by query param", () => {
     const params = new URLSearchParams();
     params.set("order", "desc");
     mockedSearchParams.mockReturnValue(params);
@@ -80,7 +80,7 @@ describe("SortingComponent", async () => {
 
   test.for(SORTING_OPTIONS)(
     "should select sort by query param $value",
-    async ({ value, label }) => {
+    ({ value, label }) => {
       const params = new URLSearchParams();
       params.set("sort", value);
       mockedSearchParams.mockReturnValue(params);

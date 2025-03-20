@@ -8,19 +8,19 @@ const pastDate = endOfYesterday().toISOString();
 const today = new Date().toISOString();
 const futureDate = endOfTomorrow().toISOString();
 
-test("Past times ok", async () => {
-  const component = render(
+test("Past times ok", () => {
+  const view = render(
     <TimeframeStatus
       applicationPeriodBegin={pastDate}
       applicationPeriodEnd={pastDate}
     />
   );
 
-  expect(component.getByText("Application.timeframePast")).toBeTruthy();
+  expect(view.getByText("Application.timeframePast")).toBeInTheDocument();
 });
 
-test("Today ending time ok", async () => {
-  const component = render(
+test("Today ending time ok", () => {
+  const view = render(
     <TimeframeStatus
       applicationPeriodBegin={pastDate}
       applicationPeriodEnd={today}
@@ -28,12 +28,12 @@ test("Today ending time ok", async () => {
   );
 
   expect(
-    component.getByText("Application.timeframePast (common.today)")
-  ).toBeTruthy();
+    view.getByText("Application.timeframePast (common.today)")
+  ).toBeInTheDocument();
 });
 
-test("Future times ok", async () => {
-  const component = render(
+test("Future times ok", () => {
+  const view = render(
     <TimeframeStatus
       applicationPeriodBegin={futureDate}
       applicationPeriodEnd={futureDate}
@@ -41,11 +41,11 @@ test("Future times ok", async () => {
     />
   );
 
-  expect(component.getByText("Application.timeframeFuture")).toBeTruthy();
+  expect(view.getByText("Application.timeframeFuture")).toBeInTheDocument();
 });
 
-test("Resolution done", async () => {
-  const component = render(
+test("Resolution done", () => {
+  const view = render(
     <TimeframeStatus
       applicationPeriodBegin={futureDate}
       applicationPeriodEnd={futureDate}
@@ -54,5 +54,5 @@ test("Resolution done", async () => {
     />
   );
 
-  expect(component.getByText("ApplicationRound.resolutionDate")).toBeTruthy();
+  expect(view.getByText("ApplicationRound.resolutionDate")).toBeInTheDocument();
 });

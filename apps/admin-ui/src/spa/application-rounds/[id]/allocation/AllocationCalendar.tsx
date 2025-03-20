@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
 import { fontMedium } from "common/src/common/typography";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, timeToMinutes } from "common/src/helpers";
 import {
   ApplicationSectionStatusChoice,
   type SuitableTimeRangeNode,
@@ -18,7 +18,6 @@ import {
   getTimeSeries,
   timeSlotKeyToTime,
   type Cell,
-  parseApiTime,
   encodeTimeSlot,
   type RelatedSlot,
   isInsideCell,
@@ -228,13 +227,9 @@ function addTimeSlotToArray(
   allocated: boolean
 ) {
   const { beginTime, endTime } = slot;
-  const begin = parseApiTime(beginTime);
-  const end = parseApiTime(endTime);
-  if (!begin || !end) {
-    return;
-  }
-  const beginMinutes = begin * 60;
-  const endMinutes = end * 60;
+
+  const beginMinutes = timeToMinutes(beginTime);
+  const endMinutes = timeToMinutes(endTime);
   for (let i = beginMinutes; i < endMinutes; i += 30) {
     const cell = i / 60;
     const key = encodeTimeSlot(day, cell);

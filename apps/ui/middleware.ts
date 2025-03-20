@@ -26,7 +26,7 @@ type QqlQuery = {
 /// @param query - Query object with query and variables
 /// @returns Promise<Response>
 /// custom function so we don't have to import apollo client in middleware
-async function gqlQueryFetch(req: NextRequest, query: QqlQuery) {
+function gqlQueryFetch(req: NextRequest, query: QqlQuery) {
   const { cookies, headers } = req;
   // TODO this is copy to the createApolloClient function but different header types
   // NextRequest vs. RequestInit

@@ -106,7 +106,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
     }
   };
 
-  const onSubmit = async (values: CancelFormValues) => {
+  const onSubmit = (values: CancelFormValues) => {
     if (!applicationSection.pk || !values.reason) {
       return;
     }

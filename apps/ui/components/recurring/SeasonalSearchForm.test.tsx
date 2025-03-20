@@ -58,7 +58,7 @@ const props: SearchFormProps = {
   isLoading: false,
 } as const;
 
-beforeEach(async () => {
+beforeEach(() => {
   mockedSearchParams.mockReturnValue(new URLSearchParams());
 });
 
