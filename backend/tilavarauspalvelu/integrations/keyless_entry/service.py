@@ -18,7 +18,7 @@ from utils.date_utils import DEFAULT_TIMEZONE
 from utils.external_service.errors import ExternalServiceError
 
 from .client import PindoraClient
-from .exceptions import PindoraClientError, PindoraConflictError, PindoraInvalidValueError, PindoraNotFoundError
+from .exceptions import PindoraAPIError, PindoraClientError, PindoraConflictError, PindoraNotFoundError
 from .typing import PindoraAccessCodeModifyResponse, PindoraAccessCodePeriod
 
 if TYPE_CHECKING:
@@ -133,7 +133,8 @@ class PindoraService:
                 validity = next(next_valid, None)
 
                 if validity is None:
-                    raise PindoraInvalidValueError(entity="reservation", error="Access code not found")
+                    msg = "Access code is not valid for this reservation"
+                    raise PindoraAPIError(msg)
 
                 return PindoraReservationInfoData(
                     access_code=series_data.access_code,
