@@ -2,14 +2,22 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
-from functools import wraps
+from functools import cache, wraps
 from typing import TYPE_CHECKING
 
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
+from import_export.admin import ExportMixin
+from import_export.declarative import ModelDeclarativeMetaclass
+from import_export.resources import ModelResource
+from import_export.widgets import DateTimeWidget, TimeWidget
+
+from tilavarauspalvelu.models import ReservationStatistic
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from import_export.fields import Field as ImportExportField
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -130,3 +138,24 @@ def parse_datetime(request: WSGIRequest, param: str) -> datetime.datetime | None
     except (ValueError, TypeError) as error:
         msg = f"'{param}' should be ISO datetime strings."
         raise ValidationError(msg) from error
+
+
+@cache
+def create_exporter() -> ExportMixin:
+    class ReservationStatisticResource(ModelResource, metaclass=ModelDeclarativeMetaclass):
+        class Meta:
+            model = ReservationStatistic
+            exclude = ["id", "reservation"]
+
+    field: ImportExportField
+    for field in ReservationStatisticResource.fields.values():
+        match field.widget:
+            case DateTimeWidget():
+                field.widget.formats = ["%Y-%m-%dT%H:%M:%S%:z"]
+            case TimeWidget():
+                field.widget.formats = ["%H:%M:%S%:z"]
+
+    exporter = ExportMixin()
+    exporter.model = ReservationStatistic
+    exporter.resource_classes = [ReservationStatisticResource]
+    return exporter
