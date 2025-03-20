@@ -42,34 +42,10 @@ class ReservationUnitParams:
 
     @classmethod
     def from_request(cls, request: WSGIRequest) -> ReservationUnitParams:
-        try:
-            reservation_units = [int(pk) for pk in request.GET.get("only", "").split(",") if pk]
-        except (ValueError, TypeError) as error:
-            msg = "'only' should be a comma separated list of reservation unit ids."
-            raise ValidationError(msg) from error
-
+        reservation_units = parse_list_of_pks(request, "only")
+        updated_after = parse_datetime(request, "updated_after")
+        updated_before = parse_datetime(request, "updated_before")
         tprek_id: str = str(request.GET.get("tprek_id", ""))
-
-        # "+" is an escape char in URL params for a space, so replace it with "+" for the timezone info
-        updated_after_str: str = request.GET.get("updated_after", "").replace(" ", "+")
-        updated_before_str: str = request.GET.get("updated_before", "").replace(" ", "+")
-
-        updated_after: datetime.datetime | None = None
-        updated_before: datetime.datetime | None = None
-
-        if updated_after_str:
-            try:
-                updated_after = datetime.datetime.fromisoformat(updated_after_str)
-            except (ValueError, TypeError) as error:
-                msg = "'updated_after' should be ISO datetime strings."
-                raise ValidationError(msg) from error
-
-        if updated_before_str:
-            try:
-                updated_before = datetime.datetime.fromisoformat(updated_before_str)
-            except (ValueError, TypeError) as error:
-                msg = "'updated_before' should be ISO datetime strings."
-                raise ValidationError(msg) from error
 
         return cls(
             reservation_units=reservation_units,
@@ -88,33 +64,9 @@ class StatisticsParams:
 
     @classmethod
     def from_request(cls, request: WSGIRequest) -> StatisticsParams:
-        try:
-            reservations: list[int] = [int(pk) for pk in request.GET.get("only", "").split(",") if pk]
-        except (ValueError, TypeError) as error:
-            msg = "'only' should be a comma separated list of reservation ids."
-            raise ValidationError(msg) from error
-
-        # "+" is an escape char in URL params for a space, so replace it with "+" for the timezone info
-        begins_after_str: str = request.GET.get("begins_after", "").replace(" ", "+")
-        begins_before_str: str = request.GET.get("begins_before", "").replace(" ", "+")
-
-        begins_after: datetime.datetime | None = None
-        begins_before: datetime.datetime | None = None
-
-        if begins_after_str:
-            try:
-                begins_after = datetime.datetime.fromisoformat(begins_after_str)
-            except (ValueError, TypeError) as error:
-                msg = "'begins_after' should be a ISO datetime string."
-                raise ValidationError(msg) from error
-
-        if begins_before_str:
-            try:
-                begins_before = datetime.datetime.fromisoformat(begins_before_str)
-            except (ValueError, TypeError) as error:
-                msg = "'begins_before' should be a ISO datetime string."
-                raise ValidationError(msg) from error
-
+        reservations = parse_list_of_pks(request, "only")
+        begins_after = parse_datetime(request, "begins_after")
+        begins_before = parse_datetime(request, "begins_before")
         tprek_id: str = str(request.GET.get("tprek_id", ""))
 
         return cls(
@@ -129,17 +81,8 @@ def validate_pagination(request: WSGIRequest) -> tuple[int, int]:
     # Set max page size to avoid timeouts
     max_page_size = 100
 
-    try:
-        start = int(request.GET.get("start", 0))
-    except (ValueError, TypeError) as error:
-        msg = "'start' should be a number."
-        raise ValidationError(msg) from error
-
-    try:
-        stop = int(request.GET.get("stop", start + max_page_size))
-    except (ValueError, TypeError) as error:
-        msg = "'stop' should be a number."
-        raise ValidationError(msg) from error
+    start = parse_int(request, "start", default=0)
+    stop = parse_int(request, "stop", default=start + max_page_size)
 
     if start >= stop:
         msg = "'start' should be less than 'stop'."
@@ -150,3 +93,34 @@ def validate_pagination(request: WSGIRequest) -> tuple[int, int]:
         raise ValidationError(msg)
 
     return start, stop
+
+
+def parse_int(request: WSGIRequest, param: str, *, default: int) -> int:
+    try:
+        return int(request.GET.get(param, default))
+    except (ValueError, TypeError) as error:
+        msg = f"'{param}' should be an integer."
+        raise ValidationError(msg) from error
+
+
+def parse_list_of_pks(request: WSGIRequest, param: str) -> list[int]:
+    try:
+        return [int(pk) for pk in request.GET.get(param, "").split(",") if pk]
+    except (ValueError, TypeError) as error:
+        msg = f"'{param}' should be a comma separated list of integers."
+        raise ValidationError(msg) from error
+
+
+def parse_datetime(request: WSGIRequest, param: str) -> datetime.datetime | None:
+    """Parse datetime from string"""
+    # "+" is an escape char in URL params for a space, so replace it with "+" for the timezone info
+    string_value: str = request.GET.get(param, "").replace(" ", "+")
+
+    if not string_value:
+        return None
+
+    try:
+        return datetime.datetime.fromisoformat(string_value)
+    except (ValueError, TypeError) as error:
+        msg = f"'{param}' should be ISO datetime strings."
+        raise ValidationError(msg) from error
