@@ -13,7 +13,7 @@ from import_export.declarative import ModelDeclarativeMetaclass
 from import_export.resources import ModelResource
 from import_export.widgets import DateTimeWidget, TimeWidget
 
-from tilavarauspalvelu.models import ReservationStatistic
+from tilavarauspalvelu.models import ReservableTimeSpan, ReservationStatistic
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -92,6 +92,31 @@ class StatisticsParams:
         )
 
 
+@dataclasses.dataclass
+class ReservableTimeSpansParams:
+    reservation_units: list[int]
+    tprek_id: str
+    hauki_resource: list[int]
+    after: datetime.datetime | None
+    before: datetime.datetime | None
+
+    @classmethod
+    def from_request(cls, request: WSGIRequest) -> ReservableTimeSpansParams:
+        reservation_units = parse_list_of_pks(request, "only")
+        tprek_id = str(request.GET.get("tprek_id", ""))
+        hauki_resource = parse_list_of_pks(request, "hauki_resource")
+        after = parse_datetime(request, "after")
+        before = parse_datetime(request, "before")
+
+        return cls(
+            reservation_units=reservation_units,
+            tprek_id=tprek_id,
+            hauki_resource=hauki_resource,
+            after=after,
+            before=before,
+        )
+
+
 def validate_pagination(request: WSGIRequest) -> tuple[int, int]:
     # Set max page size to avoid timeouts
     max_page_size = 100
@@ -150,21 +175,40 @@ def parse_datetime(request: WSGIRequest, param: str) -> datetime.datetime | None
 
 
 @cache
-def create_exporter() -> ExportMixin:
+def create_statistics_exporter() -> ExportMixin:
     class ReservationStatisticResource(ModelResource, metaclass=ModelDeclarativeMetaclass):
         class Meta:
             model = ReservationStatistic
             exclude = ["id", "reservation"]
 
-    field: ImportExportField
-    for field in ReservationStatisticResource.fields.values():
-        match field.widget:
-            case DateTimeWidget():
-                field.widget.formats = ["%Y-%m-%dT%H:%M:%S%:z"]
-            case TimeWidget():
-                field.widget.formats = ["%H:%M:%S%:z"]
+    fix_field_datetime_formats(ReservationStatisticResource)
 
     exporter = ExportMixin()
     exporter.model = ReservationStatistic
     exporter.resource_classes = [ReservationStatisticResource]
     return exporter
+
+
+@cache
+def create_reservable_time_spans_exporter() -> ExportMixin:
+    class ReservableTimeSpanResource(ModelResource, metaclass=ModelDeclarativeMetaclass):
+        class Meta:
+            model = ReservableTimeSpan
+            exclude = ["id"]
+
+    fix_field_datetime_formats(ReservableTimeSpanResource)
+
+    exporter = ExportMixin()
+    exporter.model = ReservableTimeSpan
+    exporter.resource_classes = [ReservableTimeSpanResource]
+    return exporter
+
+
+def fix_field_datetime_formats(resource: ModelDeclarativeMetaclass) -> None:
+    field: ImportExportField
+    for field in resource.fields.values():
+        match field.widget:
+            case DateTimeWidget():
+                field.widget.formats = ["%Y-%m-%dT%H:%M:%S%:z"]
+            case TimeWidget():
+                field.widget.formats = ["%H:%M:%S%:z"]
