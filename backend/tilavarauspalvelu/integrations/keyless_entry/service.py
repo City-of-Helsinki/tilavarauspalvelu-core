@@ -526,7 +526,7 @@ class PindoraService:
         )
 
         for reservation in reservations:
-            with suppress(ExternalServiceError):
+            try:
                 try:
                     if reservation.access_code_should_be_active:
                         cls.activate_access_code(obj=reservation)
@@ -545,6 +545,9 @@ class PindoraService:
                     reservation.access_code_is_active = False
                     reservation.save(update_fields=["access_code_generated_at", "access_code_is_active"])
 
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation: {reservation.pk}")
+
     @classmethod
     def _update_access_code_is_active_for_series(cls) -> None:
         all_series: Iterable[RecurringReservation] = (
@@ -554,7 +557,7 @@ class PindoraService:
         )
 
         for series in all_series:
-            with suppress(ExternalServiceError):
+            try:
                 try:
                     if series.should_have_active_access_code:
                         cls.activate_access_code(obj=series)
@@ -566,12 +569,15 @@ class PindoraService:
                 except PindoraNotFoundError:
                     series.reservations.update(access_code_generated_at=None, access_code_is_active=False)
 
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation series: {series.pk}")
+
     @classmethod
     def _update_access_code_is_active_for_seasonal_bookings(cls) -> None:
         sections: Iterable[ApplicationSection] = ApplicationSection.objects.has_incorrect_access_code_is_active()
 
         for section in sections:
-            with suppress(ExternalServiceError):
+            try:
                 try:
                     if section.should_have_active_access_code:
                         cls.activate_access_code(obj=section)
@@ -585,6 +591,9 @@ class PindoraService:
                         access_code_generated_at=None,
                         access_code_is_active=False,
                     )
+
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Application section: {section.pk}")
 
     @classmethod
     def _sync_reservation_access_code(cls, reservation: Reservation) -> None:
