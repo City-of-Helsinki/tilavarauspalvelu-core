@@ -90,6 +90,7 @@ class ReservationUnit(models.Model):
     max_reservation_duration: datetime.timedelta | None = models.DurationField(null=True, blank=True)
     buffer_time_before: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
     buffer_time_after: datetime.timedelta = models.DurationField(default=datetime.timedelta(), blank=True)
+    updated_at: datetime.datetime = models.DateTimeField(auto_now=True, db_index=True)
 
     # Booleans
 
