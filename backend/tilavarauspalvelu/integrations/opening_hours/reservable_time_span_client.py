@@ -74,6 +74,8 @@ class ReservableTimeSpanClient:
 
         self.end_date = today + datetime.timedelta(days=settings.HAUKI_DAYS_TO_FETCH)
         # Round the date to the last day of the month (e.g. 2023-01-05 -> 2023-01-31)
+        # This means we will fetch the whole month's data at once, and the data will need to be updated once a month,
+        # instead of every day.
         self.end_date = self.end_date.replace(day=calendar.monthrange(self.end_date.year, self.end_date.month)[1])
 
         if self.start_date >= self.end_date:
