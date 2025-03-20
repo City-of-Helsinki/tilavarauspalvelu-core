@@ -4,7 +4,6 @@ import pytest
 import requests
 from graphene_django_extensions.testing import parametrize_helper
 from rest_framework.status import (
-    HTTP_200_OK,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
@@ -19,7 +18,6 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraAPIError,
     PindoraBadRequestError,
-    PindoraClientError,
     PindoraConflictError,
     PindoraNotFoundError,
     PindoraPermissionError,
@@ -216,11 +214,14 @@ def test_pindora_client__create_reservation_series__errors(status_code, exceptio
 def test_pindora_client__create_reservation_series__no_reservations():
     series = RecurringReservationFactory.create()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
+    data = default_reservation_series_response(reservation_unit_code_validity=[])
 
-    msg = f"No reservations require an access code in reservation series '{series.ext_uuid}'."
-    with patch, pytest.raises(PindoraClientError, match=exact(msg)):
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
+
+    with patch as mock:
         PindoraClient.create_reservation_series(series)
+
+    assert mock.call_args.kwargs["json"]["series"] == []
 
 
 @pytest.mark.django_db
@@ -233,11 +234,14 @@ def test_pindora_client__create_reservation_series__no_confirmed_reservations():
         access_type=AccessType.ACCESS_CODE,
     )
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
+    data = default_reservation_series_response(reservation_unit_code_validity=[])
 
-    msg = f"No reservations require an access code in reservation series '{series.ext_uuid}'."
-    with patch, pytest.raises(PindoraClientError, match=exact(msg)):
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
+
+    with patch as mock:
         PindoraClient.create_reservation_series(series)
+
+    assert mock.call_args.kwargs["json"]["series"] == []
 
 
 @pytest.mark.django_db
@@ -298,11 +302,14 @@ def test_pindora_client__reschedule_reservation_series__errors(status_code, exce
 def test_pindora_client__reschedule_reservation_series__no_reservations():
     series = RecurringReservationFactory.create()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
+    data = default_access_code_modify_response()
 
-    msg = f"No confirmed reservations in reservation series '{series.ext_uuid}'."
-    with patch, pytest.raises(PindoraClientError, match=exact(msg)):
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
+
+    with patch as mock:
         PindoraClient.reschedule_reservation_series(series)
+
+    assert mock.call_args.kwargs["json"]["series"] == []
 
 
 @pytest.mark.django_db
@@ -315,11 +322,14 @@ def test_pindora_client__reschedule_reservation_series__no_confirmed_reservation
         access_type=AccessType.ACCESS_CODE,
     )
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
+    data = default_access_code_modify_response()
 
-    msg = f"No confirmed reservations in reservation series '{series.ext_uuid}'."
-    with patch, pytest.raises(PindoraClientError, match=exact(msg)):
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
+
+    with patch as mock:
         PindoraClient.reschedule_reservation_series(series)
+
+    assert mock.call_args.kwargs["json"]["series"] == []
 
 
 def test_pindora_client__delete_reservation_series():

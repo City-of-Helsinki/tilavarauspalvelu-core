@@ -4,7 +4,6 @@ import pytest
 import requests
 from graphene_django_extensions.testing import parametrize_helper
 from rest_framework.status import (
-    HTTP_200_OK,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
     HTTP_403_FORBIDDEN,
@@ -18,7 +17,6 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, Reservat
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import (
     PindoraBadRequestError,
-    PindoraClientError,
     PindoraConflictError,
     PindoraNotFoundError,
     PindoraPermissionError,
@@ -204,11 +202,13 @@ def test_pindora_client__create_seasonal_booking__errors(status_code, exception,
 def test_pindora_client__create_seasonal_booking__no_reservations():
     application_section = ApplicationSectionFactory.create()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
+    data = default_seasonal_booking_response()
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
 
-    msg = f"No reservations require an access code in seasonal booking '{application_section.ext_uuid}'."
-    with patch, pytest.raises(PindoraClientError, match=exact(msg)):
+    with patch as mock:
         PindoraClient.create_seasonal_booking(application_section)
+
+    assert mock.call_args.kwargs["json"]["series"] == []
 
 
 @pytest.mark.django_db
@@ -225,11 +225,13 @@ def test_pindora_client__create_seasonal_booking__no_confirmed_reservations():
         state=ReservationStateChoice.DENIED,
     )
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
+    data = default_seasonal_booking_response()
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
 
-    msg = f"No reservations require an access code in seasonal booking '{application_section.ext_uuid}'."
-    with patch, pytest.raises(PindoraClientError, match=exact(msg)):
+    with patch as mock:
         PindoraClient.create_seasonal_booking(application_section)
+
+    assert mock.call_args.kwargs["json"]["series"] == []
 
 
 @pytest.mark.django_db
@@ -302,11 +304,13 @@ def test_pindora_client__reschedule_seasonal_booking__errors(status_code, except
 def test_pindora_client__reschedule_seasonal_booking__no_reservations():
     application_section = ApplicationSectionFactory.create()
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
+    data = default_access_code_modify_response()
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
 
-    msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
-    with patch, pytest.raises(PindoraClientError, match=exact(msg)):
+    with patch as mock:
         PindoraClient.reschedule_seasonal_booking(application_section)
+
+    assert mock.call_args.kwargs["json"]["series"] == []
 
 
 @pytest.mark.django_db
@@ -323,11 +327,13 @@ def test_pindora_client__reschedule_seasonal_booking__no_confirmed_reservations(
         state=ReservationStateChoice.DENIED,
     )
 
-    patch = patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_200_OK))
+    data = default_access_code_modify_response()
+    patch = patch_method(PindoraClient.request, return_value=ResponseMock(json_data=data))
 
-    msg = f"No confirmed reservations in seasonal booking '{application_section.ext_uuid}'."
-    with patch, pytest.raises(PindoraClientError, match=exact(msg)):
+    with patch as mock:
         PindoraClient.reschedule_seasonal_booking(application_section)
+
+    assert mock.call_args.kwargs["json"]["series"] == []
 
 
 def test_pindora_client__delete_seasonal_booking():

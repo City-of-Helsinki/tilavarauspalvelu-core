@@ -22,7 +22,6 @@ from utils.external_service.base_external_service_client import BaseExternalServ
 from .exceptions import (
     PindoraBadRequestError,
     PindoraClientConfigurationError,
-    PindoraClientError,
     PindoraConflictError,
     PindoraInvalidValueError,
     PindoraMissingKeyError,
@@ -482,10 +481,6 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             .select_related("recurring_reservation__reservation_unit")
         )
 
-        if not reservations:
-            msg = f"No reservations require an access code in seasonal booking '{section.ext_uuid}'."
-            raise PindoraClientError(msg)
-
         data = PindoraSeasonalBookingCreateData(
             seasonal_booking_id=str(section.ext_uuid),
             series=[
@@ -522,10 +517,6 @@ class PindoraSeasonalBookingClient(BasePindoraClient):
             .requires_active_access_code()
             .select_related("recurring_reservation__reservation_unit")
         )
-
-        if not reservations:
-            msg = f"No confirmed reservations in seasonal booking '{section.ext_uuid}'."
-            raise PindoraClientError(msg)
 
         data = PindoraSeasonalBookingRescheduleData(
             series=[
@@ -747,10 +738,6 @@ class PindoraReservationSeriesClient(BasePindoraClient):
 
         reservations: list[Reservation] = list(series.reservations.requires_active_access_code())
 
-        if not reservations:
-            msg = f"No reservations require an access code in reservation series '{series.ext_uuid}'."
-            raise PindoraClientError(msg)
-
         data = PindoraReservationSeriesCreateData(
             reservation_series_id=str(series.ext_uuid),
             reservation_unit_id=str(series.reservation_unit.uuid),
@@ -783,10 +770,6 @@ class PindoraReservationSeriesClient(BasePindoraClient):
 
         # This only selects confirmed non-blocking reservations.
         reservations: list[Reservation] = list(series.reservations.requires_active_access_code())
-
-        if not reservations:
-            msg = f"No confirmed reservations in reservation series '{series.ext_uuid}'."
-            raise PindoraClientError(msg)
 
         data = PindoraReservationSeriesRescheduleData(
             series=[
