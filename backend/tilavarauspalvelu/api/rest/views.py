@@ -183,6 +183,10 @@ def reservation_unit_export(request: WSGIRequest) -> HttpResponse:
         queryset = queryset.filter(pk__in=params.reservation_units)
     if params.tprek_id:
         queryset = queryset.filter(unit__tprek_id=params.tprek_id)
+    if params.updated_after:
+        queryset = queryset.filter(updated_at__gte=params.updated_after)
+    if params.updated_before:
+        queryset = queryset.filter(updated_at__lt=params.updated_before)
 
     total_count = queryset.count()
     queryset = queryset[start:stop]

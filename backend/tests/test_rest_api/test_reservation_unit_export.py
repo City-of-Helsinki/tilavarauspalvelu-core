@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import freezegun
 import pytest
 from django.urls import reverse
+
+from utils.date_utils import local_datetime
 
 from tests.factories import ReservationUnitFactory
 
@@ -204,3 +207,57 @@ def test_reservation_unit_export__stop(api_client, settings):
     data = response.json()
     assert len(data) == 1
     assert data[0]["reservation_unit_id"] == reservation_unit.pk
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_unit_export__updated_after(api_client, settings):
+    reservation_unit = ReservationUnitFactory.create()
+
+    url = reverse("reservation_unit_export") + "?updated_after=2024-01-01T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["reservation_unit_id"] == reservation_unit.pk
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_unit_export__updated_after__not_in_range(api_client, settings):
+    ReservationUnitFactory.create()
+
+    url = reverse("reservation_unit_export") + "?updated_after=2024-01-02T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert len(data) == 0
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_unit_export__updated_before(api_client, settings):
+    reservation_unit = ReservationUnitFactory.create()
+
+    url = reverse("reservation_unit_export") + "?updated_before=2024-01-02T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["reservation_unit_id"] == reservation_unit.pk
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_unit_export__updated_before__not_in_range(api_client, settings):
+    ReservationUnitFactory.create()
+
+    url = reverse("reservation_unit_export") + "?updated_before=2024-01-01T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert len(data) == 0
