@@ -7,16 +7,10 @@ import { H4 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
 import { type ApplicationSectionPage1FormValues } from "./form";
 import { Flex } from "common/styles/util";
-import { IconWithText } from "../common/IconWithText";
+import { IconWithText } from "@/components/common/IconWithText";
 
 const Message = styled.p`
-  margin-top: 0;
-`;
-
-const SubHeadLine = styled(H4).attrs({
-  as: "h3",
-})`
-  margin-top: var(--spacing-layout-m);
+  margin: 0;
 `;
 
 const Box = styled(Flex).attrs({
@@ -26,15 +20,12 @@ const Box = styled(Flex).attrs({
   padding: var(--spacing-l) var(--spacing-m);
 `;
 
-function numHours(
-  startDate: string | undefined,
-  endDate: string | undefined,
+function getHours(
+  startDate: string,
+  endDate: string,
   eventsPerWeek: number,
   minDurationMinutes: number
 ) {
-  if (!startDate || !endDate) {
-    return 0;
-  }
   const sd = fromUIDate(startDate);
   const ed = fromUIDate(endDate);
   if (!sd || !ed) {
@@ -60,7 +51,7 @@ function displayDuration(duration: number, t: TFunction) {
 }
 
 type Props = {
-  applicationSection?: SectionFormValues;
+  applicationSection: SectionFormValues | undefined;
   name: string;
 };
 type SectionFormValues = Pick<
@@ -92,26 +83,26 @@ export function ApplicationEventSummary({
     numPersons,
   } = applicationSection;
 
-  const hours = numHours(
+  if (!begin || !end || !minDuration || !maxDuration) {
+    return null;
+  }
+
+  const hours = getHours(
     begin,
     end,
     appliedReservationsPerWeek,
     minDuration / 60
   );
 
-  if (!begin || !end || !minDuration) {
-    return null;
-  }
-
   const icons = [
     {
-      icon: <IconGroup aria-hidden="true" style={{ flexShrink: 0 }} />,
+      icon: <IconGroup style={{ flexShrink: 0 }} />,
       text: t("applicationEventSummary:numPersons", {
         count: numPersons ?? 0,
       }),
     },
     {
-      icon: <IconClock aria-hidden="true" style={{ flexShrink: 0 }} />,
+      icon: <IconClock style={{ flexShrink: 0 }} />,
       text: t(
         `applicationEventSummary:${
           minDuration === maxDuration ? "minDuration" : "durations"
@@ -123,7 +114,7 @@ export function ApplicationEventSummary({
       ),
     },
     {
-      icon: <IconCalendar aria-hidden="true" style={{ flexShrink: 0 }} />,
+      icon: <IconCalendar style={{ flexShrink: 0 }} />,
       text: t("applicationEventSummary:eventsPerWeek", {
         count: appliedReservationsPerWeek,
       }),
@@ -132,17 +123,23 @@ export function ApplicationEventSummary({
 
   return (
     <>
-      <SubHeadLine>
-        {t("application:Page1.applicationEventSummary")}
-      </SubHeadLine>
+      <H4 as="h3">{t("application:Page1.applicationEventSummary")}</H4>
       <Box>
         <Message>
           <Trans
             i18nKey="applicationEventSummary:message"
-            defaults="Olet tekemässä varausta {{ name }} kaudeksi  <bold>{{startDate}} - {{endDate}}</bold>.<br />Varausten yhteenlaskettu kesto on vähintään  <bold>{{hours}} tuntia</bold>."
+            defaults="Olet tekemässä varausta {{ name }} kaudeksi <bold>{{startDate}}–{{endDate}}</bold>."
+            values={{ name, startDate: begin, endDate: end }}
+            components={{ bold: <strong /> }}
+          />
+        </Message>
+        <Message>
+          <Trans
+            i18nKey="applicationEventSummary:time_summary"
+            defaults="Varausten yhteenlaskettu kesto on vähintään <bold>{{hours}} tuntia</bold>."
             count={hours}
-            values={{ name, startDate: begin, endDate: end, hours }}
-            components={{ bold: <strong />, br: <br /> }}
+            values={{ hours }}
+            components={{ bold: <strong /> }}
           />
         </Message>
         {icons.map((icon) => (
