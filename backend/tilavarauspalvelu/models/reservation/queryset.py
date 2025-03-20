@@ -268,6 +268,22 @@ class ReservationQuerySet(models.QuerySet):
             ),
         )
 
+    def update_access_code_is_active(self) -> None:
+        """
+        Sets access code info to reservations in the queryset so that reservation that should have
+        active access codes get the given values, and the rest get empty values.
+        """
+        self.update(
+            access_code_is_active=models.Case(
+                models.When(
+                    L(access_code_should_be_active=True),
+                    then=models.Value(True),  # noqa: FBT003
+                ),
+                default=models.Value(False),  # noqa: FBT003
+                output_field=models.BooleanField(),
+            ),
+        )
+
     def upsert_statistics(self, *, reservation_pks: list[int]) -> None:
         reservations = (
             self.filter(pk__in=reservation_pks)

@@ -282,12 +282,12 @@ class PindoraService:
         match obj:
             case ApplicationSection():
                 PindoraClient.activate_seasonal_booking_access_code(obj)
-                obj.actions.get_reservations().requires_active_access_code().update(access_code_is_active=True)
+                obj.actions.get_reservations().update_access_code_is_active()
 
             case RecurringReservation():
                 if obj.allocated_time_slot is None:
                     PindoraClient.activate_reservation_series_access_code(obj)
-                    obj.reservations.requires_active_access_code().update(access_code_is_active=True)
+                    obj.reservations.update_access_code_is_active()
                     return
 
                 section = obj.allocated_time_slot.reservation_unit_option.application_section
@@ -313,12 +313,12 @@ class PindoraService:
         match obj:
             case ApplicationSection():
                 PindoraClient.deactivate_seasonal_booking_access_code(obj)
-                obj.actions.get_reservations().requires_active_access_code().update(access_code_is_active=False)
+                obj.actions.get_reservations().update_access_code_is_active()
 
             case RecurringReservation():
                 if obj.allocated_time_slot is None:
                     PindoraClient.deactivate_reservation_series_access_code(obj)
-                    obj.reservations.requires_active_access_code().update(access_code_is_active=False)
+                    obj.reservations.update_access_code_is_active()
                     return
 
                 section = obj.allocated_time_slot.reservation_unit_option.application_section

@@ -61,6 +61,17 @@ def test_activate_access_code__reservation__in_series():
         access_code_is_active=False,
         access_code_generated_at=local_datetime(),
     )
+    reservation_3 = ReservationFactory.create(
+        reservation_units=[series.reservation_unit],
+        recurring_reservation=series,
+        begin=local_datetime(2024, 1, 1, 16),
+        end=local_datetime(2024, 1, 1, 17),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
+    )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
         PindoraService.activate_access_code(obj=reservation_1)
@@ -70,6 +81,9 @@ def test_activate_access_code__reservation__in_series():
 
     reservation_2.refresh_from_db()
     assert reservation_2.access_code_is_active is True
+
+    reservation_3.refresh_from_db()
+    assert reservation_3.access_code_is_active is False
 
 
 def test_activate_access_code__reservation__in_series__in_seasonal_booking():
@@ -104,6 +118,18 @@ def test_activate_access_code__reservation__in_series__in_seasonal_booking():
         access_code_is_active=False,
         access_code_generated_at=local_datetime(),
     )
+    reservation_3 = ReservationFactory.create(
+        user=user,
+        reservation_units=[series.reservation_unit],
+        recurring_reservation=series,
+        begin=local_datetime(2024, 1, 1, 16),
+        end=local_datetime(2024, 1, 1, 17),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
+    )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
         PindoraService.activate_access_code(obj=reservation_1)
@@ -113,6 +139,9 @@ def test_activate_access_code__reservation__in_series__in_seasonal_booking():
 
     reservation_2.refresh_from_db()
     assert reservation_2.access_code_is_active is True
+
+    reservation_3.refresh_from_db()
+    assert reservation_3.access_code_is_active is False
 
 
 def test_activate_access_code__series():
@@ -139,6 +168,17 @@ def test_activate_access_code__series():
         access_code_is_active=False,
         access_code_generated_at=local_datetime(),
     )
+    reservation_3 = ReservationFactory.create(
+        reservation_units=[series.reservation_unit],
+        recurring_reservation=series,
+        begin=local_datetime(2024, 1, 1, 14),
+        end=local_datetime(2024, 1, 1, 15),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
+    )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
         PindoraService.activate_access_code(obj=series)
@@ -148,6 +188,9 @@ def test_activate_access_code__series():
 
     reservation_2.refresh_from_db()
     assert reservation_2.access_code_is_active is True
+
+    reservation_3.refresh_from_db()
+    assert reservation_3.access_code_is_active is False
 
 
 def test_activate_access_code__series__in_seasonal_booking():
@@ -182,6 +225,18 @@ def test_activate_access_code__series__in_seasonal_booking():
         access_code_is_active=False,
         access_code_generated_at=local_datetime(),
     )
+    reservation_3 = ReservationFactory.create(
+        user=user,
+        reservation_units=[series.reservation_unit],
+        recurring_reservation=series,
+        begin=local_datetime(2024, 1, 1, 14),
+        end=local_datetime(2024, 1, 1, 15),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
+    )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
         PindoraService.activate_access_code(obj=series)
@@ -191,6 +246,9 @@ def test_activate_access_code__series__in_seasonal_booking():
 
     reservation_2.refresh_from_db()
     assert reservation_2.access_code_is_active is True
+
+    reservation_3.refresh_from_db()
+    assert reservation_3.access_code_is_active is False
 
 
 def test_activate_access_code__seasonal_booking():
@@ -225,6 +283,18 @@ def test_activate_access_code__seasonal_booking():
         access_code_is_active=False,
         access_code_generated_at=local_datetime(),
     )
+    reservation_3 = ReservationFactory.create(
+        user=user,
+        reservation_units=[series.reservation_unit],
+        recurring_reservation=series,
+        begin=local_datetime(2024, 1, 1, 14),
+        end=local_datetime(2024, 1, 1, 15),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.BLOCKED,
+        access_code_is_active=True,
+        access_code_generated_at=local_datetime(),
+    )
 
     with patch_method(PindoraClient.request, return_value=ResponseMock(status_code=HTTP_204_NO_CONTENT)):
         PindoraService.activate_access_code(obj=section)
@@ -234,3 +304,6 @@ def test_activate_access_code__seasonal_booking():
 
     reservation_2.refresh_from_db()
     assert reservation_2.access_code_is_active is True
+
+    reservation_3.refresh_from_db()
+    assert reservation_3.access_code_is_active is False
