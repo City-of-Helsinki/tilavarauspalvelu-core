@@ -245,6 +245,10 @@ def reservation_statistics_export(request: WSGIRequest) -> HttpResponse:
         queryset = queryset.filter(begin__gte=params.begins_after)
     if params.begins_before:
         queryset = queryset.filter(begin__lt=params.begins_before)
+    if params.updated_after:
+        queryset = queryset.filter(updated_at__gte=params.updated_after)
+    if params.updated_before:
+        queryset = queryset.filter(updated_at__lt=params.updated_before)
 
     total_count = queryset.count()
     queryset = queryset[start:stop]

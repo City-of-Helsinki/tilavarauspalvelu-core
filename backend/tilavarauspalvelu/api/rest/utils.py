@@ -61,6 +61,8 @@ class StatisticsParams:
     begins_before: datetime.datetime | None
     reservations: list[int]
     tprek_id: str
+    updated_after: datetime.datetime | None
+    updated_before: datetime.datetime | None
 
     @classmethod
     def from_request(cls, request: WSGIRequest) -> StatisticsParams:
@@ -68,12 +70,16 @@ class StatisticsParams:
         begins_after = parse_datetime(request, "begins_after")
         begins_before = parse_datetime(request, "begins_before")
         tprek_id: str = str(request.GET.get("tprek_id", ""))
+        updated_after = parse_datetime(request, "updated_after")
+        updated_before = parse_datetime(request, "updated_before")
 
         return cls(
             begins_after=begins_after,
             begins_before=begins_before,
             reservations=reservations,
             tprek_id=tprek_id,
+            updated_after=updated_after,
+            updated_before=updated_before,
         )
 
 

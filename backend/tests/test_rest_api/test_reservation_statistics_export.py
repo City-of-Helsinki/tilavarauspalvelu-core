@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 
+import freezegun
 import pytest
 from django.urls import reverse
 
@@ -237,3 +238,65 @@ def test_reservation_statistics_export__stop(api_client, settings):
     data = response.json()
     assert len(data) == 1
     assert data[0]["reservation"] == reservation.pk
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_statistics_export__updated_after(api_client, settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    reservation = ReservationFactory.create()
+
+    url = reverse("reservation_statistics_export") + "?updated_after=2024-01-01T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200, response.json()
+
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["reservation"] == reservation.pk
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_statistics_export__updated_after__not_in_range(api_client, settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    ReservationFactory.create()
+
+    url = reverse("reservation_statistics_export") + "?updated_after=2024-01-02T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200, response.json()
+
+    data = response.json()
+    assert len(data) == 0
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_statistics_export__updated_before(api_client, settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    reservation = ReservationFactory.create()
+
+    url = reverse("reservation_statistics_export") + "?updated_before=2024-01-02T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200, response.json()
+
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["reservation"] == reservation.pk
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_statistics_export__updated_before__not_in_range(api_client, settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    ReservationFactory.create()
+
+    url = reverse("reservation_statistics_export") + "?updated_before=2024-01-01T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200, response.json()
+
+    data = response.json()
+    assert len(data) == 0
