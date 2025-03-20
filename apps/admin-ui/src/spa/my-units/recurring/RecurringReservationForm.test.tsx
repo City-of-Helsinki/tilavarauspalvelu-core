@@ -327,8 +327,7 @@ test("Form can't be submitted without reservation type selection", async () => {
   await view.findByText(/required/i);
 });
 
-// TODO: vi.useFakeTimers throws an error here (not mocked even though it is)
-test.skip("Form submission without any blocking reservations", async () => {
+test("Form submission without any blocking reservations", async () => {
   const user = userEvent.setup({
     advanceTimers: vi.advanceTimersByTime.bind(vi),
   });
@@ -355,7 +354,7 @@ test.skip("Form submission without any blocking reservations", async () => {
   const submit = screen.getByText(/common.reserve/);
   expect(submit).toBeInTheDocument();
   expect(submit).not.toBeDisabled();
-  user.click(submit);
+  await user.click(submit);
 
   expect(view.queryByText(/required/)).not.toBeInTheDocument();
   /* TODO submit checking doesn't work
