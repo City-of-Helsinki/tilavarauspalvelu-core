@@ -276,7 +276,7 @@ Note that in order for development settings to work correctly, you need to set t
 
 ### Development environment
 
-It's recommended to set up [ruff-lsp] to enable Ruff linting and formatting support in your editor.
+It's recommended to set up [Ruff] linting and formatting support in your editor.
 
 ### Image cache
 
@@ -319,7 +319,7 @@ In settings there are four configurations:
 [purge task]: https://github.com/City-of-Helsinki/tilavarauspalvelu-core/blob/main/reservation_units/tasks.py#L143C2-L143C2
 [Redis]: https://redis.io/
 [reservation platform]: https://tilavaraus.hel.fi/
-[ruff-lsp]: https://github.com/astral-sh/ruff-lsp
+[Ruff]: https://docs.astral.sh/ruff/editors/setup/
 [tilavarauspalvelu-ui]: https://github.com/City-of-Helsinki/tilavarauspalvelu-ui
 [Toimipaikkarekisteri]: https://www.hel.fi/palvelukarttaws/restpages/ver4.html#_unit
 [Tunnistamo]: https://github.com/City-of-Helsinki/tunnistamo

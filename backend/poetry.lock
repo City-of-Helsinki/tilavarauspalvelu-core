@@ -58,26 +58,6 @@ files = [
 ]
 
 [[package]]
-name = "attrs"
-version = "25.1.0"
-description = "Classes Without Boilerplate"
-optional = false
-python-versions = ">=3.8"
-groups = ["lint"]
-files = [
-    {file = "attrs-25.1.0-py3-none-any.whl", hash = "sha256:c75a69e28a550a7e93789579c22aa26b0f5b83b75dc4e08fe092980051e1090a"},
-    {file = "attrs-25.1.0.tar.gz", hash = "sha256:1c97078a80c814273a76b2a298a932eb681c87415c11dee0a6921de7f1b02c3e"},
-]
-
-[package.extras]
-benchmark = ["cloudpickle ; platform_python_implementation == \"CPython\"", "hypothesis", "mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pympler", "pytest (>=4.3.0)", "pytest-codspeed", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-xdist[psutil]"]
-cov = ["cloudpickle ; platform_python_implementation == \"CPython\"", "coverage[toml] (>=5.3)", "hypothesis", "mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-xdist[psutil]"]
-dev = ["cloudpickle ; platform_python_implementation == \"CPython\"", "hypothesis", "mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pre-commit-uv", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-xdist[psutil]"]
-docs = ["cogapp", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier (<24.7)"]
-tests = ["cloudpickle ; platform_python_implementation == \"CPython\"", "hypothesis", "mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-xdist[psutil]"]
-tests-mypy = ["mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\""]
-
-[[package]]
 name = "authlib"
 version = "1.5.1"
 description = "The ultimate Python library in building OAuth and OpenID Connect servers and clients."
@@ -115,31 +95,6 @@ files = [
     {file = "cachetools-5.5.2-py3-none-any.whl", hash = "sha256:d26a22bcc62eb95c3beabd9f1ee5e820d3d2704fe2967cbe350e20c8ffcd3f0a"},
     {file = "cachetools-5.5.2.tar.gz", hash = "sha256:1a661caa9175d26759571b2e19580f9d6393969e5dfca11fdb1f947a23e640d4"},
 ]
-
-[[package]]
-name = "cattrs"
-version = "24.1.2"
-description = "Composable complex class support for attrs and dataclasses."
-optional = false
-python-versions = ">=3.8"
-groups = ["lint"]
-files = [
-    {file = "cattrs-24.1.2-py3-none-any.whl", hash = "sha256:67c7495b760168d931a10233f979b28dc04daf853b30752246f4f8471c6d68d0"},
-    {file = "cattrs-24.1.2.tar.gz", hash = "sha256:8028cfe1ff5382df59dd36474a86e02d817b06eaf8af84555441bac915d2ef85"},
-]
-
-[package.dependencies]
-attrs = ">=23.1.0"
-
-[package.extras]
-bson = ["pymongo (>=4.4.0)"]
-cbor2 = ["cbor2 (>=5.4.6)"]
-msgpack = ["msgpack (>=1.0.5)"]
-msgspec = ["msgspec (>=0.18.5) ; implementation_name == \"cpython\""]
-orjson = ["orjson (>=3.9.2) ; implementation_name == \"cpython\""]
-pyyaml = ["pyyaml (>=6.0)"]
-tomlkit = ["tomlkit (>=0.11.8)"]
-ujson = ["ujson (>=5.7.0)"]
 
 [[package]]
 name = "celery"
@@ -1759,22 +1714,6 @@ yaml = ["PyYAML (>=3.10)"]
 zookeeper = ["kazoo (>=2.8.0)"]
 
 [[package]]
-name = "lsprotocol"
-version = "2023.0.1"
-description = "Python implementation of the Language Server Protocol."
-optional = false
-python-versions = ">=3.7"
-groups = ["lint"]
-files = [
-    {file = "lsprotocol-2023.0.1-py3-none-any.whl", hash = "sha256:c75223c9e4af2f24272b14c6375787438279369236cd568f596d4951052a60f2"},
-    {file = "lsprotocol-2023.0.1.tar.gz", hash = "sha256:cc5c15130d2403c18b734304339e51242d3018a05c4f7d0f198ad6e0cd21861d"},
-]
-
-[package.dependencies]
-attrs = ">=21.3.0"
-cattrs = "!=23.2.1"
-
-[[package]]
 name = "lxml"
 version = "5.3.1"
 description = "Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API."
@@ -2066,7 +2005,7 @@ version = "24.2"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
-groups = ["main", "lint", "test"]
+groups = ["main", "test"]
 files = [
     {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
     {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
@@ -2300,25 +2239,6 @@ files = [
     {file = "pycparser-2.22-py3-none-any.whl", hash = "sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc"},
     {file = "pycparser-2.22.tar.gz", hash = "sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6"},
 ]
-
-[[package]]
-name = "pygls"
-version = "1.3.1"
-description = "A pythonic generic language server (pronounced like 'pie glass')"
-optional = false
-python-versions = ">=3.8"
-groups = ["lint"]
-files = [
-    {file = "pygls-1.3.1-py3-none-any.whl", hash = "sha256:6e00f11efc56321bdeb6eac04f6d86131f654c7d49124344a9ebb968da3dd91e"},
-    {file = "pygls-1.3.1.tar.gz", hash = "sha256:140edceefa0da0e9b3c533547c892a42a7d2fd9217ae848c330c53d266a55018"},
-]
-
-[package.dependencies]
-cattrs = ">=23.1.2"
-lsprotocol = "2023.0.1"
-
-[package.extras]
-ws = ["websockets (>=11.0.3)"]
 
 [[package]]
 name = "pyhanko"
@@ -3031,28 +2951,6 @@ files = [
 ]
 
 [[package]]
-name = "ruff-lsp"
-version = "0.0.62"
-description = "A Language Server Protocol implementation for Ruff."
-optional = false
-python-versions = ">=3.7"
-groups = ["lint"]
-files = [
-    {file = "ruff_lsp-0.0.62-py3-none-any.whl", hash = "sha256:fb6c04a0cb09bb3ae316121b084ff09497edd01df58b36fa431f14515c63029e"},
-    {file = "ruff_lsp-0.0.62.tar.gz", hash = "sha256:6db2a39375973ecb16c64d3c8dc37e23e1e191dcb7aebcf525b1f85ebd338c0d"},
-]
-
-[package.dependencies]
-lsprotocol = ">=2023.0.0"
-packaging = ">=23.1"
-pygls = ">=1.1.0"
-ruff = ">=0.0.274"
-typing-extensions = "*"
-
-[package.extras]
-dev = ["mypy (==1.4.1)", "pip-tools (>=6.13.0,<7.0.0)", "pytest (>=7.3.1,<8.0.0)", "pytest-asyncio (==0.21.2)", "python-lsp-jsonrpc (==1.0.0)"]
-
-[[package]]
 name = "sentry-sdk"
 version = "2.22.0"
 description = "Python client for Sentry (https://sentry.io)"
@@ -3298,7 +3196,7 @@ version = "4.12.2"
 description = "Backported and Experimental Type Hints for Python 3.8+"
 optional = false
 python-versions = ">=3.8"
-groups = ["main", "lint", "test"]
+groups = ["main", "test"]
 files = [
     {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
     {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
@@ -3482,4 +3380,4 @@ test = ["coverage (>=5.3)", "tomli (>=2.0.1) ; python_version < \"3.11\"", "tox"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "829e304ce70e1872e7332ccb97d391f8387ac8a5a3271285a712f24d4213c7ec"
+content-hash = "e93380cdf657464330e7b1b1f9a2234045e22d063e367c74a3a667469f830b76"
