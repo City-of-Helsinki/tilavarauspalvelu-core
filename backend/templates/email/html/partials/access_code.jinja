@@ -4,6 +4,6 @@
 <mj-text>{{ access_code_label | safe }}: {{ access_code }}</mj-text>
 <mj-text>{{ access_code_validity_period_label | safe }}: {{ access_code_validity_period }}</mj-text>
 {% else %}
-<mj-text>{{ text_access_code_unavailable_instructions_html | sentence }}</mj-text>
+<mj-text>{{ text_access_code_unavailable_instructions_html | sentence | safe }}</mj-text>
 {% endif %}
 {% endif %}
