@@ -22,9 +22,9 @@ class Missing:
 
     def _delete(self, data: dict[str, Any]) -> None:
         for deleted in self.deleted:
-            if deleted in data:
-                del data[deleted]
-            else:
+            deleted_data = data.pop(deleted, None)
+
+            if deleted_data is None:
                 for key in list(data.keys()):
                     if key.startswith(deleted):
                         del data[key]

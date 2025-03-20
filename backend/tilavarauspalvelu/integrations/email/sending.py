@@ -39,7 +39,7 @@ def send_emails_in_batches_task(email_data: EmailData) -> None:
     for attachment in email_data.attachments:
         email_message.attach(**attachment)
 
-    for batch in batched(email_data.recipients, settings.EMAIL_MAX_RECIPIENTS):
+    for batch in batched(email_data.recipients, settings.EMAIL_MAX_RECIPIENTS, strict=False):
         email_message_copy = copy(email_message)
         email_message_copy.bcc = list(batch)
         email_message_copy.send(fail_silently=False)
