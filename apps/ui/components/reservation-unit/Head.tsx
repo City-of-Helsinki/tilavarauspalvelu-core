@@ -279,7 +279,8 @@ function IconList({
         }
       : null,
     reservationUnit.currentAccessType &&
-    reservationUnit.currentAccessType !== AccessType.Unrestricted
+    (reservationUnit.currentAccessType !== AccessType.Unrestricted ||
+      reservationUnit.accessTypes.length > 1)
       ? {
           key: "accessType",
           icon: (

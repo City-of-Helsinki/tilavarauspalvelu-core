@@ -1318,17 +1318,9 @@ An enumeration.
 """
 enum ImageType {
   """
-  Pohjapiirros
-  """
-  GROUND_PLAN
-  """
   Pääkuva
   """
   MAIN
-  """
-  Kartta
-  """
-  MAP
   """
   Muu
   """
@@ -4226,6 +4218,7 @@ type ReservationUnitNode implements Node {
   descriptionEn: String
   descriptionFi: String
   descriptionSv: String
+  effectiveAccessType: AccessType
   equipments(
     name: String
     nameEn: String

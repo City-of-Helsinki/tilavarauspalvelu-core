@@ -12,6 +12,7 @@ from tilavarauspalvelu.services.first_reservable_time.utils import ReservableTim
 from utils.date_utils import local_datetime, local_datetime_max, local_datetime_min, local_start_of_day
 
 if TYPE_CHECKING:
+    from tilavarauspalvelu.enums import AccessType
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_helper import FirstReservableTimeHelper
 
@@ -128,6 +129,22 @@ class ReservationUnitFirstReservableTimeHelper:
                 self.soft_closed_time_spans = []
 
         return ReservableTimeOutput(is_closed=self.is_reservation_unit_closed, first_reservable_time=None)
+
+    def get_access_type_for_date(
+        self,
+        is_closed: bool,  # noqa: FBT001
+        first_reservable_time: datetime.datetime | None,
+    ) -> AccessType | None:
+        if is_closed or first_reservable_time is None:
+            access_type_date = self.parent.filter_date_start
+        else:
+            access_type_date = first_reservable_time.date()
+
+        # Find the access type active at the first reservable time (These are sorted in reverse order in the QuerySet)
+        for access_type in self.reservation_unit.access_types.all():
+            if access_type.begin_date <= access_type_date:
+                return access_type.access_type
+        return None
 
     def _get_hard_closed_time_spans(self) -> list[TimeSpanElement]:
         """

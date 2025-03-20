@@ -11,11 +11,11 @@ from graphene_django.settings import graphene_settings
 from lookup_property import L
 from query_optimizer.utils import calculate_queryset_slice
 
-from tilavarauspalvelu.enums import ApplicationRoundStatusChoice
+from tilavarauspalvelu.enums import AccessType, ApplicationRoundStatusChoice
 from tilavarauspalvelu.exceptions import FirstReservableTimeError
 from tilavarauspalvelu.integrations.opening_hours.time_span_element import TimeSpanElement
 from tilavarauspalvelu.integrations.opening_hours.time_span_element_utils import merge_overlapping_time_span_elements
-from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationRound, ReservableTimeSpan
+from tilavarauspalvelu.models import AffectingTimeSpan, ApplicationRound, ReservableTimeSpan, ReservationUnitAccessType
 from tilavarauspalvelu.services.first_reservable_time.first_reservable_time_reservation_unit_helper import (
     ReservationUnitFirstReservableTimeHelper,
 )
@@ -35,22 +35,25 @@ type ReservationUnitPK = int
 
 @dataclass
 class CachedReservableTime:
-    frt: datetime.datetime | None
     closed: bool
+    frt: datetime.datetime | None
+    access_type: AccessType | None
     valid_until: datetime.datetime
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> CachedReservableTime:
         return cls(
-            frt=None if data["frt"] == "None" else datetime.datetime.fromisoformat(data["frt"]),
             closed=data["closed"].lower() == "true",
+            frt=None if data["frt"] == "None" else datetime.datetime.fromisoformat(data["frt"]),
+            access_type=None if data["access_type"] == "None" else AccessType(data["access_type"]),
             valid_until=datetime.datetime.fromisoformat(data["valid_until"]),
         )
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "frt": self.frt.isoformat() if self.frt is not None else "None",
             "closed": str(self.closed),
+            "frt": self.frt.isoformat() if self.frt is not None else "None",
+            "access_type": AccessType(self.access_type) if self.access_type is not None else "None",
             "valid_until": self.valid_until.isoformat(),
         }
 
@@ -133,10 +136,11 @@ class FirstReservableTimeHelper:
     # Contains a set of closed time spans for each ReservationUnit generated from their relevant BLOCKING Reservations
     blocking_reservation_closed_time_spans_map: dict[ReservationUnitPK, list[TimeSpanElement]]
 
-    # Contains a list of the first reservable time for each ReservationUnit.
-    first_reservable_times: dict[ReservationUnitPK, datetime]
     # Contains a list of the closed status for each ReservationUnit.
     reservation_unit_closed_statuses: dict[ReservationUnitPK, bool]
+    # Contains a list of the first reservable time for each ReservationUnit.
+    first_reservable_times: dict[ReservationUnitPK, datetime.datetime | None]
+    first_reservable_times_access_type: dict[ReservationUnitPK, AccessType]
     # Contains a list of hard closed time spans that are shared by all ReservationUnits.
     shared_hard_closed_time_spans: list[TimeSpanElement]
 
@@ -249,8 +253,9 @@ class FirstReservableTimeHelper:
         # Initialise important variables #
         ##################################
 
-        self.first_reservable_times = {}
         self.reservation_unit_closed_statuses = {}
+        self.first_reservable_times = {}
+        self.first_reservable_times_access_type = {}
         self.cached_value_validity: dict[int, datetime.datetime] = {}
 
         # Closed time spans that are shared by all ReservationUnits
@@ -265,7 +270,7 @@ class FirstReservableTimeHelper:
         # all possible filtering is already done.
         #
         # Still, we cannot simply limit the queryset here based on the input pagination args,
-        # since the reservation unit queryset can change if we used the the optional 'show_only_reservable'
+        # since the reservation unit queryset can change if we used the optional 'show_only_reservable'
         # filter to remove non-reservable reservation units, which we only know after
         # the FRT calculation is done.
         #
@@ -292,13 +297,13 @@ class FirstReservableTimeHelper:
             if cached >= self.stop_offset:
                 return
 
-            # Otherwise, we should still have valid results for the previous pages.
+            # Otherwise, we should still have valid cached results for the previous pages.
             # We can start calculating after the last cached result.
             qs = qs[len(self.first_reservable_times) :]
             # We also don't need to skip any results that are not already cached.
             self.start_offset = 0
 
-        # If we don't have valid results, and this is not the first page,
+        # If we don't have valid cached results, and this is not the first page,
         # we should fetch the current and previous pages in one chunk. The next chunk
         # will also be bigger (if needed), but likely small enough (<100) not to cause any problems.
         elif self.start_offset > 0:
@@ -308,9 +313,11 @@ class FirstReservableTimeHelper:
         for reservation_unit in qs.hooked_iterator(self._get_affecting_time_spans, chunk_size=self.chunk_size):
             helper = ReservationUnitFirstReservableTimeHelper(parent=self, reservation_unit=reservation_unit)
             is_closed, first_reservable_time = helper.calculate_first_reservable_time()
+            frt_access_type = helper.get_access_type_for_date(is_closed, first_reservable_time)
 
             self.reservation_unit_closed_statuses[reservation_unit.pk] = is_closed
             self.first_reservable_times[reservation_unit.pk] = first_reservable_time
+            self.first_reservable_times_access_type[reservation_unit.pk] = frt_access_type
 
             # If we should only show reservable reservation units, then we should count the result for the
             # current page only if there is a first reservable time.
@@ -345,10 +352,12 @@ class FirstReservableTimeHelper:
             if cached_result.valid_until < self.now:
                 self.reservation_unit_closed_statuses.clear()
                 self.first_reservable_times.clear()
+                self.first_reservable_times_access_type.clear()
                 return False
 
             self.reservation_unit_closed_statuses[int(pk)] = cached_result.closed
             self.first_reservable_times[int(pk)] = cached_result.frt
+            self.first_reservable_times_access_type[int(pk)] = cached_result.access_type
             self.cached_value_validity[int(pk)] = cached_result.valid_until
 
         return has_valid_results_for_previous_pages
@@ -360,9 +369,12 @@ class FirstReservableTimeHelper:
 
         for pk, frt in self.first_reservable_times.items():
             is_closed = self.reservation_unit_closed_statuses[pk]
+            access_type = self.first_reservable_times_access_type[pk]
             # If FRT was not calculated in this request, use the previous 'valid_until' value.
             valid_until = self.cached_value_validity.get(pk, new_valid_until)
-            cached_data[str(pk)] = CachedReservableTime(frt=frt, closed=is_closed, valid_until=valid_until).to_dict()
+            cached_data[str(pk)] = CachedReservableTime(
+                frt=frt, closed=is_closed, valid_until=valid_until, access_type=access_type
+            ).to_dict()
 
         cache.set(self.cache_key, json.dumps(cached_data), timeout=120)
 
@@ -372,10 +384,17 @@ class FirstReservableTimeHelper:
         is_closed_whens: list[When] = [
             models.When(pk=pk, then=models.Value(is_closed))
             for pk, is_closed in self.reservation_unit_closed_statuses.items()
+            if is_closed is False  # Don't add a case for True, since it's the default value
         ]
         first_reservable_time_whens: list[When] = [
             models.When(pk=pk, then=models.Value(start_datetime))
             for pk, start_datetime in self.first_reservable_times.items()
+            if start_datetime is not None  # Don't add a case for None, since it's the default value
+        ]
+        effective_access_type_whens: list[When] = [
+            models.When(pk=pk, then=models.Value(access_type))
+            for pk, access_type in self.first_reservable_times_access_type.items()
+            if access_type is not None  # # Don't add a case for None, since it's the default value
         ]
 
         return self.original_reservation_unit_queryset.annotate(
@@ -389,9 +408,14 @@ class FirstReservableTimeHelper:
                 default=None,
                 output_field=models.DateTimeField(),
             ),
+            effective_access_type=models.Case(
+                *effective_access_type_whens,
+                default=None,
+                output_field=models.CharField(null=True),
+            ),
         )
 
-    def _get_reservation_unit_queryset_for_calculation(self) -> ReservationUnitQuerySet:
+    def _get_reservation_unit_queryset_for_calculation(self) -> ReservationUnitQuerySet | QuerySet[ReservationUnit]:
         """
         Queryset with required information for calculating first reservable time.
         - Prefetch ReservableTimeSpans and ApplicationRounds for each ReservationUnit and filter them by date range
@@ -421,6 +445,13 @@ class FirstReservableTimeHelper:
                         reservation_period_begin__lte=self.filter_date_end,
                         reservation_period_end__gte=self.filter_date_start,
                     ).exclude(L(status=ApplicationRoundStatusChoice.RESULTS_SENT.value)),
+                ),
+                models.Prefetch(
+                    "access_types",
+                    ReservationUnitAccessType.objects.filter(
+                        models.Q(begin_date__lte=self.filter_date_end)  #
+                        & L(end_date__gt=self.filter_date_start),
+                    ).order_by("begin_date"),  # REVERSE order is needed to find the access type active at the FRT
                 ),
             )
         )

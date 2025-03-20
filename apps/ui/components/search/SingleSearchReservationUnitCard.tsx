@@ -157,7 +157,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
       }),
     });
   }
-  if (reservationUnit.currentAccessType) {
+  if (reservationUnit.effectiveAccessType) {
     infos.push({
       icon: (
         <IconLock
@@ -167,7 +167,7 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
         />
       ),
       value: t(
-        `reservationUnit:accessTypes.${reservationUnit.currentAccessType}`
+        `reservationUnit:accessTypes.${reservationUnit.effectiveAccessType}`
       ),
     });
   }

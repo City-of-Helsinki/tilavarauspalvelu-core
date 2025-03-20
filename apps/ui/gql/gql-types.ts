@@ -1158,12 +1158,8 @@ export type HelsinkiProfileDataNode = {
 
 /** An enumeration. */
 export enum ImageType {
-  /** Pohjapiirros */
-  GroundPlan = "GROUND_PLAN",
   /** Pääkuva */
   Main = "MAIN",
-  /** Kartta */
-  Map = "MAP",
   /** Muu */
   Other = "OTHER",
 }
@@ -3868,6 +3864,7 @@ export type ReservationUnitNode = Node & {
   descriptionEn?: Maybe<Scalars["String"]["output"]>;
   descriptionFi?: Maybe<Scalars["String"]["output"]>;
   descriptionSv?: Maybe<Scalars["String"]["output"]>;
+  effectiveAccessType?: Maybe<AccessType>;
   equipments: Array<EquipmentNode>;
   firstReservableDatetime?: Maybe<Scalars["DateTime"]["output"]>;
   haukiUrl?: Maybe<Scalars["String"]["output"]>;
@@ -6909,6 +6906,7 @@ export type ReservationUnitPageQuery = {
 export type ReservationUnitCardFieldsFragment = {
   maxPersons?: number | null;
   currentAccessType?: AccessType | null;
+  effectiveAccessType?: AccessType | null;
   id: string;
   pk?: number | null;
   nameFi?: string | null;
@@ -7011,6 +7009,7 @@ export type SearchReservationUnitsQuery = {
         firstReservableDatetime?: string | null;
         currentAccessType?: AccessType | null;
         maxPersons?: number | null;
+        effectiveAccessType?: AccessType | null;
         id: string;
         pk?: number | null;
         nameFi?: string | null;
@@ -9689,6 +9688,7 @@ export const ReservationUnitCardFieldsFragmentDoc = gql`
     }
     maxPersons
     currentAccessType
+    effectiveAccessType
     accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
       id
       accessType
