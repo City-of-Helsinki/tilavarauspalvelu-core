@@ -12,25 +12,23 @@ from django.http import FileResponse, HttpResponseForbidden, HttpResponseRedirec
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
-from import_export.admin import ExportMixin
 from import_export.formats.base_formats import JSON
-from import_export.resources import modelresource_factory
-from import_export.widgets import DateTimeWidget, TimeWidget
 
-from tilavarauspalvelu.api.rest.utils import (
-    ReservationUnitParams,
-    StatisticsParams,
-    validate_pagination,
-    validation_error_as_response,
-)
 from tilavarauspalvelu.models import Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
 from utils.utils import ical_hmac_signature
 
+from .utils import (
+    ReservationUnitParams,
+    StatisticsParams,
+    create_exporter,
+    validate_pagination,
+    validation_error_as_response,
+)
+
 if TYPE_CHECKING:
     from django.http import HttpResponse
-    from import_export.fields import Field as ImportExportField
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -255,20 +253,7 @@ def reservation_statistics_export(request: WSGIRequest) -> HttpResponse:
 
     # --- Export -----------------------------------------------------------------------------------------------------
 
-    exporter = ExportMixin()
-    exporter.model = ReservationStatistic
-    resource_class = modelresource_factory(ReservationStatistic)
-
-    field: ImportExportField
-    for field in resource_class.fields.values():
-        match field.widget:
-            case DateTimeWidget():
-                field.widget.formats = ["%Y-%m-%dT%H:%M:%S%:z"]
-            case TimeWidget():
-                field.widget.formats = ["%H:%M:%S%:z"]
-
-    exporter.resource_classes = [resource_class]
-
+    exporter = create_exporter()
     data_for_export = exporter.get_data_for_export(request, queryset)
     export_data: str = JSON().export_data(data_for_export)
 
