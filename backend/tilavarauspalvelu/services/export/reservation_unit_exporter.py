@@ -102,7 +102,7 @@ class ReservationUnitExporter(BaseCSVExporter):
         *,
         datetime_format: Literal["ISO", "local"] = "local",
     ) -> None:
-        self._queryset: ReservationUnitQuerySet = queryset or ReservationUnit.objects.all()
+        self._queryset: ReservationUnitQuerySet = queryset if queryset is not None else ReservationUnit.objects.all()
         super().__init__(datetime_format=datetime_format)
 
     @property
