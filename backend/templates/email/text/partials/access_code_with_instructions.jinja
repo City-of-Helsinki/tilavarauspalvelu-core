@@ -1,7 +1,7 @@
 {% if access_code_is_used %}{% if access_code %}
-{{ text_access_code_to_access | sentence }}
+{{ text_access_code_to_access | sentence | safe }}
 {{ access_code_label | safe }}: {{ access_code }}
 {{ access_code_validity_period_label | safe }}: {{ access_code_validity_period }}
 {% else %}
-{{ text_access_code_unavailable_instructions | safe | sentence }}
+{{ text_access_code_unavailable_instructions | sentence | safe }}
 {% endif %}{% endif %}
