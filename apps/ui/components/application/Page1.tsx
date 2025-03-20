@@ -10,7 +10,7 @@ import { useTranslation } from "next-i18next";
 import { type ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { useFormContext } from "react-hook-form";
 import { filterNonNullable } from "common/src/helpers";
-import { ApplicationEvent } from "./ApplicationEvent";
+import { ApplicationSection } from "./ApplicationSection";
 import { type ApplicationPage1FormValues } from "./form";
 import { useReservationUnitList } from "@/hooks";
 import { ButtonContainer } from "common/styles/util";
@@ -97,7 +97,7 @@ export function Page1({
        * we could use findIndex with the formKey though */}
       {applicationSections?.map((event, index) =>
         event != null ? (
-          <ApplicationEvent
+          <ApplicationSection
             key={event.formKey}
             index={index}
             applicationRound={applicationRound}

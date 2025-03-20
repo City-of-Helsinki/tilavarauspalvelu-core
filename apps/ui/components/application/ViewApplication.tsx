@@ -12,7 +12,7 @@ import {
   ApplicationSectionHeader,
   StyledNotification,
 } from "./styled";
-import { ApplicationEventList } from "./ApplicationEventList";
+import { ApplicationSectionList } from "./ApplicationSectionList";
 import { Sanitize } from "common/src/components/Sanitize";
 import TermsBox from "common/src/termsbox/TermsBox";
 import {
@@ -50,7 +50,7 @@ export function ViewApplication({
           </ApplicationSectionHeader>
           <ApplicantInfoPreview application={application} />
         </ApplicationSection>
-        <ApplicationEventList application={application} />
+        <ApplicationSectionList application={application} />
       </div>
       {tos && (
         <TermsBox

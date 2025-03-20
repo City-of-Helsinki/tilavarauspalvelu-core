@@ -64,7 +64,7 @@ type SectionFormValues = Pick<
   | "numPersons"
 >;
 
-export function ApplicationEventSummary({
+export function ApplicationSectionSummary({
   applicationSection,
   name,
 }: Props): JSX.Element | null {
