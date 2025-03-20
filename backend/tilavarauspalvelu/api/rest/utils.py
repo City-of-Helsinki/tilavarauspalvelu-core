@@ -37,6 +37,8 @@ def validation_error_as_response[R, **P](func: Callable[P, R]) -> Callable[P, R]
 class ReservationUnitParams:
     reservation_units: list[int]
     tprek_id: str
+    updated_after: datetime.datetime | None
+    updated_before: datetime.datetime | None
 
     @classmethod
     def from_request(cls, request: WSGIRequest) -> ReservationUnitParams:
@@ -48,9 +50,32 @@ class ReservationUnitParams:
 
         tprek_id: str = str(request.GET.get("tprek_id", ""))
 
+        # "+" is an escape char in URL params for a space, so replace it with "+" for the timezone info
+        updated_after_str: str = request.GET.get("updated_after", "").replace(" ", "+")
+        updated_before_str: str = request.GET.get("updated_before", "").replace(" ", "+")
+
+        updated_after: datetime.datetime | None = None
+        updated_before: datetime.datetime | None = None
+
+        if updated_after_str:
+            try:
+                updated_after = datetime.datetime.fromisoformat(updated_after_str)
+            except (ValueError, TypeError) as error:
+                msg = "'updated_after' should be ISO datetime strings."
+                raise ValidationError(msg) from error
+
+        if updated_before_str:
+            try:
+                updated_before = datetime.datetime.fromisoformat(updated_before_str)
+            except (ValueError, TypeError) as error:
+                msg = "'updated_before' should be ISO datetime strings."
+                raise ValidationError(msg) from error
+
         return cls(
             reservation_units=reservation_units,
             tprek_id=tprek_id,
+            updated_after=updated_after,
+            updated_before=updated_before,
         )
 
 
@@ -72,6 +97,7 @@ class StatisticsParams:
         # "+" is an escape char in URL params for a space, so replace it with "+" for the timezone info
         begins_after_str: str = request.GET.get("begins_after", "").replace(" ", "+")
         begins_before_str: str = request.GET.get("begins_before", "").replace(" ", "+")
+
         begins_after: datetime.datetime | None = None
         begins_before: datetime.datetime | None = None
 
