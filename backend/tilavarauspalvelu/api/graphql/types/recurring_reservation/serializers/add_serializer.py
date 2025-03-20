@@ -93,6 +93,7 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         reservation: Reservation = instance.reservations.last()
 
         # A little trick for making a copy of an existing instance
+        # See: https://docs.djangoproject.com/en/dev/topics/db/queries/#copying-model-instances
         reservation._state.adding = True  # noqa: SLF001
         reservation.id = None
 
@@ -101,6 +102,9 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
         reservation.buffer_time_before = validated_data["buffer_time_before"]
         reservation.buffer_time_after = validated_data["buffer_time_after"]
         reservation.access_type = validated_data["access_type"]
+        # Will be updated by rescheduling below if has access code.
+        reservation.access_code_is_active = False
+        reservation.access_code_generated_at = None
 
         reservation.ext_uuid = uuid.uuid4()
         reservation.state = ReservationStateChoice.CONFIRMED
@@ -114,7 +118,7 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
             reservation.save()
             reservation.reservation_units.set([instance.reservation_unit])
 
-        # # Reschedule Pindora series or seasonal booking if new reservation uses access code
+        # Reschedule Pindora series or seasonal booking if new reservation uses access code
         if validated_data["access_type"] == AccessType.ACCESS_CODE:
             try:
                 PindoraService.reschedule_access_code(instance)
