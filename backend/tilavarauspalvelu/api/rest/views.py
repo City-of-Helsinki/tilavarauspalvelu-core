@@ -236,7 +236,7 @@ def reservation_statistics_export(request: WSGIRequest) -> HttpResponse:
     queryset = ReservationStatistic.objects.order_by("id")
 
     if params.reservations:
-        queryset = queryset.filter(reservation__in=params.reservations)
+        queryset = queryset.filter(reservation__ext_uuid__in=params.reservations)
     if params.tprek_id:
         queryset = queryset.filter(primary_reservation_unit__unit__tprek_id=params.tprek_id)
     if params.begins_after:

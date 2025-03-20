@@ -125,7 +125,7 @@ def test_reservation_statistics_export__only_one(api_client, settings):
     reservation = ReservationFactory.create()
     ReservationFactory.create()
 
-    url = reverse("reservation_statistics_export") + f"?only={reservation.pk}"
+    url = reverse("reservation_statistics_export") + f"?only={reservation.ext_uuid}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
 
     assert response.status_code == 200, response.json()
@@ -141,7 +141,7 @@ def test_reservation_statistics_export__only_two(api_client, settings):
     reservation_1 = ReservationFactory.create()
     reservation_2 = ReservationFactory.create()
 
-    url = reverse("reservation_statistics_export") + f"?only={reservation_1.pk},{reservation_2.pk}"
+    url = reverse("reservation_statistics_export") + f"?only={reservation_1.ext_uuid},{reservation_2.ext_uuid}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
 
     assert response.status_code == 200, response.json()
