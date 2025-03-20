@@ -162,7 +162,7 @@ def test_reservation_unit_export__only_incorrect(api_client, settings):
 
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "'only' should be a comma separated list of reservation unit ids.",
+        "detail": "'only' should be a comma separated list of integers.",
         "code": "",
     }
 
