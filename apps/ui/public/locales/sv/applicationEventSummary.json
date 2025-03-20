@@ -1,6 +1,7 @@
 {
-  "message_one": "Du håller på att göra en bokning {{name}} för säsongen <bold>{{startDate}} - {{endDate}}</bold>. Bokningarnas sammanlagda varaktighet är minst <bold>{{hours}} timme</bold>.",
-  "message_other": "Du håller på att göra en bokning {{name}} för säsongen <bold>{{startDate}} - {{endDate}}</bold>. Bokningarnas sammanlagda varaktighet är minst <bold>{{hours}} timmar</bold>.",
+  "message": "Du håller på att göra en bokning {{name}} för säsongen <bold>{{startDate}}–{{endDate}}</bold>.",
+  "time_summary_one": "Bokningarnas sammanlagda varaktighet är minst <bold>{{hours}} timme</bold>.",
+  "time_summary_other": "Bokningarnas sammanlagda varaktighet är minst <bold>{{hours}} timmar</bold>.",
   "numPersons_one": "Gruppens storlek är {{count}} person",
   "numPersons_other": "Gruppens storlek är {{count}} personer",
   "minDuration": "En boknings varaktighet är minst {{minDuration}}",
