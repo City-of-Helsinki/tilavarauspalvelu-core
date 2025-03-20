@@ -33,6 +33,7 @@ const nextConfig = {
   },
   i18n,
   basePath: env.NEXT_PUBLIC_BASE_URL,
+  // eslint-disable-next-line require-await
   async rewrites() {
     return [
       {

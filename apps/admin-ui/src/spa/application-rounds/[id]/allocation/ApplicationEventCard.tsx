@@ -305,7 +305,7 @@ function SchedulesList({
   const updateOption = async (
     pk: Maybe<number> | undefined,
     locked: boolean
-  ) => {
+  ): Promise<void> => {
     if (loading) {
       return;
     }
@@ -327,12 +327,12 @@ function SchedulesList({
     }
   };
 
-  const handleLock = async () => {
-    updateOption(thisOption?.pk, true);
+  const handleLock = () => {
+    return updateOption(thisOption?.pk, true);
   };
 
-  const handleUnlock = async () => {
-    updateOption(thisOption?.pk, false);
+  const handleUnlock = () => {
+    return updateOption(thisOption?.pk, false);
   };
 
   const nToAllocate = eventsPerWeek - allocatedSchedules.length;

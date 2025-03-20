@@ -8,7 +8,7 @@ import {
   Priority,
   type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, timeToMinutes } from "common/src/helpers";
 import { convertWeekday } from "common/src/conversion";
 import { SemiBold } from "common";
 import { formatDuration } from "@/common/util";
@@ -16,7 +16,6 @@ import { Accordion } from "@/component/Accordion";
 import {
   formatTime,
   formatTimeRangeList,
-  parseApiTime,
   createDurationString,
   decodeTimeSlot,
   type SectionNodeT,
@@ -130,23 +129,11 @@ export function AllocatedCard({
       refresh,
     });
 
-  const handleChangeSlot = async () => {
-    // eslint-disable-next-line no-console
-    console.warn("TODO: implement");
-  };
-
-  const allocationBegin =
-    allocatedTimeSlot?.beginTime != null
-      ? (parseApiTime(allocatedTimeSlot.beginTime) ?? 0)
-      : 0;
-
-  const allocationEnd = allocatedTimeSlot?.endTime
-    ? (parseApiTime(allocatedTimeSlot.endTime) ?? 0)
-    : 0;
-
+  const allocationBeginMins = timeToMinutes(allocatedTimeSlot.beginTime) ?? 0;
+  const allocationEndMins = timeToMinutes(allocatedTimeSlot.endTime) ?? 0;
   const minDurationSeconds = applicationSection.reservationMinDuration ?? 0;
   const maxDurationSeconds = applicationSection.reservationMaxDuration ?? 0;
-  const allocatedDurationMins = (allocationEnd - allocationBegin) * 60;
+  const allocatedDurationMins = allocationEndMins - allocationBeginMins;
   const durationIsInvalid =
     allocatedDurationMins < minDurationSeconds / 60 ||
     allocatedDurationMins > maxDurationSeconds / 60;
@@ -196,9 +183,6 @@ export function AllocatedCard({
         >
           {t("Allocation.removeAllocation")}
         </Button>
-        <Button size={ButtonSize.Small} disabled onClick={handleChangeSlot}>
-          {t("Allocation.changeSlot")}
-        </Button>
       </Flex>
     </Wrapper>
   );
@@ -213,8 +197,8 @@ function isOutsideOfRequestedTimes(
   if (time?.beginTime == null || time.endTime == null) {
     return true;
   }
-  const beginTime = parseApiTime(time.beginTime);
-  const endTime = parseApiTime(time.endTime);
+  const beginTime = timeToMinutes(time.beginTime) / 60;
+  const endTime = timeToMinutes(time.endTime) / 60;
   if (beginTime == null || endTime == null) {
     return true;
   }
@@ -328,8 +312,8 @@ export function SuitableTimeCard({
 }
 
 function getDurationFromApiTimeInHours(begin: string, end: string) {
-  const bh = parseApiTime(begin);
-  const eh = parseApiTime(end);
+  const bh = timeToMinutes(begin) / 60;
+  const eh = timeToMinutes(end) / 60;
   if (bh == null || eh == null) {
     return undefined;
   }

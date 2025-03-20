@@ -19,7 +19,7 @@ function LogoutPage({ redirectUrl }: Props) {
   return null;
 }
 
-export async function getServerSideProps() {
+export function getServerSideProps() {
   return {
     props: {
       redirectUrl: "/",

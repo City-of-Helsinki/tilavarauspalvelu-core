@@ -18,7 +18,7 @@ export default function Index({ version }: Props) {
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 
-export async function getServerSideProps() {
+export function getServerSideProps() {
   return {
     props: {
       version: getVersion(),

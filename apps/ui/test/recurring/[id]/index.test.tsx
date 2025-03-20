@@ -83,7 +83,7 @@ function customRender(
 
 // TODO these require mocking the backend response for useSearchQuery
 describe("Page: SeasonalSearch", () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     mockedSearchParams.mockReturnValue(new URLSearchParams());
   });
 

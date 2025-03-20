@@ -47,7 +47,7 @@ describe("Stepper when starting application", () => {
     PAGES_WITH_STEPPER.map((x) => ({ label: x, isDisabled: x !== "page1" }))
   )(
     "stepper step $label should render and be disabled = $isDisabled",
-    async ({ label, isDisabled }) => {
+    ({ label, isDisabled }) => {
       const application = createMockApplicationFragment({ page: "page0" });
       const view = render(<ApplicationStepper application={application} />);
       checkStepperStep(view, label, isDisabled);
@@ -63,7 +63,7 @@ describe("Stepper when page 1 is valid", () => {
     }))
   )(
     "stepper step $label should render and be disabled = $isDisabled",
-    async ({ label, isDisabled }) => {
+    ({ label, isDisabled }) => {
       const application = createMockApplicationFragment({ page: "page1" });
       const view = render(<ApplicationStepper application={application} />);
       checkStepperStep(view, label, isDisabled);
@@ -79,7 +79,7 @@ describe("Stepper when page 2 is valid", () => {
     }))
   )(
     "stepper step $label should render and be disabled = $isDisabled",
-    async ({ label, isDisabled }) => {
+    ({ label, isDisabled }) => {
       const application = createMockApplicationFragment({ page: "page2" });
       const view = render(<ApplicationStepper application={application} />);
       checkStepperStep(view, label, isDisabled);
@@ -90,7 +90,7 @@ describe("Stepper when page 2 is valid", () => {
 describe("Stepper when page 3 is valid", () => {
   test.for(PAGES_WITH_STEPPER.map((x) => ({ label: x, isDisabled: false })))(
     "stepper step $label should render and be disabled = $isDisabled",
-    async ({ label, isDisabled }) => {
+    ({ label, isDisabled }) => {
       const application = createMockApplicationFragment({ page: "page3" });
       const view = render(<ApplicationStepper application={application} />);
       checkStepperStep(view, label, isDisabled);
@@ -102,7 +102,7 @@ describe("Stepper when page 3 is valid", () => {
 describe("Stepper when application has been sent", () => {
   test.for(PAGES_WITH_STEPPER.map((x) => ({ label: x, isDisabled: false })))(
     "stepper step $label should render and be disabled = $isDisabled",
-    async ({ label, isDisabled }) => {
+    ({ label, isDisabled }) => {
       const application = createMockApplicationFragment({
         page: "preview",
       });

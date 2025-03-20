@@ -294,7 +294,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   };
 
   // NOTE: only navigate away from the page if the reservation is cancelled the confirmation hook handles delete
-  const cancelReservation = useCallback(async () => {
+  const cancelReservation = useCallback(() => {
     router.push(getReservationUnitPath(reservationUnit?.pk));
   }, [router, reservationUnit?.pk]);
 

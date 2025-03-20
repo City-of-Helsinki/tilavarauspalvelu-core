@@ -55,8 +55,6 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-// Smoke test (if this fails, all others will fail also, and it's harder to debug)
-// TODO make it so that it skips the other tests if this fails
 test("SMOKE: selecting unit field allows input to other mandatory fields", async () => {
   const view = customRender();
   await selectUnit();
@@ -198,7 +196,7 @@ test("Form has meta when reservation unit is selected.", async () => {
   expect(emailInput).toBeInTheDocument();
 });
 
-test("Form doesn't have meta without a reservation unit.", async () => {
+test("Form doesn't have meta without a reservation unit.", () => {
   customRender();
 
   // TODO check that there is no type of reservation
@@ -243,18 +241,11 @@ async function fillForm({
   // to check the selected value we have to read the button text not check options
   const option = within(listbox).getByText("Unit");
   await user.click(option);
-  // make sure that the form is active and can be filled before continuing
-  await waitFor(async () => {
-    const startDateLabel = screen.getByRole("textbox", {
-      name: /common.startingDate/,
-    });
-
-    return expect(startDateLabel).not.toBeDisabled();
-  });
 
   const startDateLabel = screen.getByRole("textbox", {
     name: /common.startingDate/,
   });
+  expect(startDateLabel).not.toBeDisabled();
   await user.click(startDateLabel);
   await user.keyboard(begin);
   expect(startDateLabel).toHaveValue(begin);
@@ -300,7 +291,7 @@ async function fillForm({
   expect(button.getAttribute("class")).toContain("active");
 }
 
-test("Form is disabled if it's not filled", async () => {
+test("Form is disabled if it's not filled", () => {
   const view = customRender();
   const submit = view.getByRole("button", { name: /common.reserve/ });
   expect(submit).toBeInTheDocument();
@@ -323,8 +314,8 @@ test("Form can't be submitted without reservation type selection", async () => {
   const submit = view.getByRole("button", { name: /common.reserve/ });
   expect(submit).toBeInTheDocument();
   expect(submit).not.toBeDisabled();
-  user.click(submit);
-  await view.findByText(/required/i);
+  await user.click(submit);
+  await expect.poll(() => view.queryByText(/required/i)).toBeInTheDocument();
 });
 
 test("Form submission without any blocking reservations", async () => {
