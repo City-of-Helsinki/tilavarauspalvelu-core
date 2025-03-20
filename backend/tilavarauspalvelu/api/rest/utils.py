@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
+import uuid
 from functools import cache, wraps
 from typing import TYPE_CHECKING
 
@@ -67,14 +68,14 @@ class ReservationUnitParams:
 class StatisticsParams:
     begins_after: datetime.datetime | None
     begins_before: datetime.datetime | None
-    reservations: list[int]
+    reservations: list[uuid.UUID]
     tprek_id: str
     updated_after: datetime.datetime | None
     updated_before: datetime.datetime | None
 
     @classmethod
     def from_request(cls, request: WSGIRequest) -> StatisticsParams:
-        reservations = parse_list_of_pks(request, "only")
+        reservations = parse_list_of_uuids(request, "only")
         begins_after = parse_datetime(request, "begins_after")
         begins_before = parse_datetime(request, "begins_before")
         tprek_id: str = str(request.GET.get("tprek_id", ""))
@@ -122,6 +123,14 @@ def parse_list_of_pks(request: WSGIRequest, param: str) -> list[int]:
         return [int(pk) for pk in request.GET.get(param, "").split(",") if pk]
     except (ValueError, TypeError) as error:
         msg = f"'{param}' should be a comma separated list of integers."
+        raise ValidationError(msg) from error
+
+
+def parse_list_of_uuids(request: WSGIRequest, param: str) -> list[uuid.UUID]:
+    try:
+        return [uuid.UUID(pk) for pk in request.GET.get(param, "").split(",") if pk]
+    except (ValueError, TypeError) as error:
+        msg = f"'{param}' should be a comma separated list of UUIDs (v4)."
         raise ValidationError(msg) from error
 
 
