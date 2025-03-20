@@ -240,7 +240,7 @@ def test__find_first_reservable_time_span_for_reservation_unit__different_buffer
     ]
 
     parent = SimpleNamespace(reservation_unit=reservation_unit, minimum_duration_minutes=30)
-    parent = cast(ReservationUnitFirstReservableTimeHelper, parent)
+    parent = cast("ReservationUnitFirstReservableTimeHelper", parent)
     helper = ReservableTimeSpanFirstReservableTimeHelper(parent, original_reservable_time_span)
     result = helper._find_first_reservable_time_span(
         normalised_reservable_time_spans=reservable_time_spans,
@@ -293,7 +293,7 @@ def test__find_first_reservable_time_span_for_reservation_unit__buffer_goes_thro
     ]
 
     parent = SimpleNamespace(reservation_unit=reservation_unit, minimum_duration_minutes=30)
-    parent = cast(ReservationUnitFirstReservableTimeHelper, parent)
+    parent = cast("ReservationUnitFirstReservableTimeHelper", parent)
     helper = ReservableTimeSpanFirstReservableTimeHelper(parent, original_reservable_time_span)
     result = helper._find_first_reservable_time_span(
         normalised_reservable_time_spans=reservable_time_spans,
