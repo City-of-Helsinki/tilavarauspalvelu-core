@@ -85,6 +85,11 @@ def test_reservation__refund__invalid_state__ends_in_the_future(graphql):
 @freeze_time("2022-01-01 12:00:00")
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)
 def test_reservation__refund__correct_state__ends_in_the_future(graphql):
+    """
+    Reservations that end in the future can be refunded.
+    This was previously not allowed, but the restriction was removed in TILA-3881.
+    This test is kept as a regression test.
+    """
     now = local_datetime()
 
     reservation = ReservationFactory.create_for_refund(
@@ -99,12 +104,11 @@ def test_reservation__refund__correct_state__ends_in_the_future(graphql):
     input_data = get_refund_data(reservation)
     response = graphql(REFUND_MUTATION, input_data=input_data)
 
-    assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages() == ["Only past reservation can be refunded."]
+    assert response.has_errors is False, response.errors
 
-    assert VerkkokauppaAPIClient.refund_order.called is False
+    VerkkokauppaAPIClient.refund_order.assert_called_with(order_uuid=payment_order.remote_id)
     payment_order.refresh_from_db()
-    assert payment_order.refund_id is None
+    assert payment_order.refund_id == REFUND.refund_id
 
 
 @patch_method(VerkkokauppaAPIClient.refund_order, return_value=REFUND)

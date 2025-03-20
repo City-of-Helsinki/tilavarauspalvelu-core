@@ -154,10 +154,6 @@ class ReservationValidator:
             msg = "Reservation cannot be refunded based on its state"
             raise ValidationError(msg, code=error_codes.REFUND_NOT_ALLOWED)
 
-        if local_datetime() <= self.reservation.end.astimezone(DEFAULT_TIMEZONE):
-            msg = "Only past reservation can be refunded."
-            raise ValidationError(msg, code=error_codes.REFUND_NOT_ALLOWED)
-
     def validate_reservation_state_allows_staff_edit(self) -> None:
         if self.reservation.state not in ReservationStateChoice.states_that_can_be_edited_by_staff:
             msg = "Reservation cannot be edited by staff members based on its state"
