@@ -82,7 +82,7 @@ pytest-xdist = "3.6.1"
 [tool.poetry.group.lint.dependencies]
 # Dependencies only required for linting.
 pre-commit = "4.1.0"
-ruff = "0.9.9"
+ruff = "0.11.1"
 ruff-lsp = "0.0.62"
 
 [project.entry-points.pytest11]
