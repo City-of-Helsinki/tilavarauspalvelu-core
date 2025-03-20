@@ -28,6 +28,8 @@ import { AllocatedCard, SuitableTimeCard } from "./AllocationCard";
 import { useSlotSelection } from "./hooks";
 import {
   convertOptionToHDS,
+  filterNonNullable,
+  formatTimeRange,
   timeToMinutes,
   toNumber,
 } from "common/src/helpers";
@@ -103,12 +105,10 @@ function getTimeLabel(selection: string[], t: TFunction): string {
   if (!selectionStart || !selectionEnd) {
     return "";
   }
-  const [startDay, startHour, startMinute] = selectionStart
-    .split("-")
-    .map(toNumber);
+  const [day, startHour, startMinute] = selectionStart.split("-").map(toNumber);
   const [, endHour, endMinute] = selectionEnd.split("-").map(toNumber);
   if (
-    startDay == null ||
+    day == null ||
     startHour == null ||
     startMinute == null ||
     endHour == null ||
@@ -117,12 +117,13 @@ function getTimeLabel(selection: string[], t: TFunction): string {
     return "";
   }
 
-  const dayString = `${t(`dayLong.${startDay}`)}`;
-  const beginString = `${startHour}:${startMinute}`;
-  const endH = endHour === 0 ? 24 : endHour;
-  const endString = `${endH}:${endMinute}`;
+  const dayString = `${t(`dayLong.${day}`)}`;
 
-  return `${dayString} ${beginString}–${endString}`;
+  const beginMinutes = startHour * 60 + startMinute;
+  // since all slots are 30 minutes, we add 30 minutes to the end time
+  const endMinutes = endHour * 60 + endMinute + 30;
+  const timeString = formatTimeRange(beginMinutes, endMinutes, true);
+  return `${dayString} ${timeString}`;
 }
 
 function deserializeSlot(
@@ -410,8 +411,8 @@ export function AllocationColumn({
     allocatedSections.length === 0 && !doesCollideToOtherAllocations;
   const canAllocate = hasSelection && canAllocateSelection && isRoundAllocable;
 
-  const allocatedData = allocatedSections
-    .map((as) => {
+  const allocatedData = filterNonNullable(
+    allocatedSections.map((as) => {
       const allocatedTimeSlot = getAllocatedTimeSlot(as, {
         day,
         startHour,
@@ -426,10 +427,10 @@ export function AllocationColumn({
       }
       return null;
     })
-    .filter((as): as is NonNullable<typeof as> => as != null);
+  );
 
-  const suitableData = timeslots
-    .map((as) => {
+  const suitableData = filterNonNullable(
+    timeslots.map((as) => {
       const timeSlot = getSuitableTimeSlot(as, { day, startHour, endHour });
       if (timeSlot != null) {
         const reservationUnitOptionPk =
@@ -445,7 +446,7 @@ export function AllocationColumn({
       }
       return null;
     })
-    .filter((as): as is NonNullable<typeof as> => as != null);
+  );
 
   // TODO empty state when no selection (current is ok placeholder), don't remove from DOM
   return (

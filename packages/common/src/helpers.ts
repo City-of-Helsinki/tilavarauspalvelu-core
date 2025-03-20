@@ -216,6 +216,14 @@ export function formatMinutes(
   return `${hours}`;
 }
 
+export function formatTimeRange(
+  begin: number,
+  end: number,
+  trailingMinutes = false
+): string {
+  return `${formatMinutes(begin, trailingMinutes)}–${formatMinutes(end, trailingMinutes)}`;
+}
+
 export function formatApiTimeInterval({
   beginTime,
   endTime,
