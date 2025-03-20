@@ -165,7 +165,6 @@ extend-select = [
     "B901",     # return-in-generator
     "B903",     # class-as-data-structure
     "B909",     # loop-iterator-mutation
-    "C420",     # unnecessary-dict-comprehension-for-iterable
     "FURB110",  # if-exp-instead-of-or-operator
     "FURB113",  # repeated-append
     "FURB131",  # delete-full-slice
@@ -175,12 +174,10 @@ extend-select = [
     "FURB148",  # unnecessary-enumerate
     "FURB157",  # verbose-decimal-constructor
     "FURB171",  # single-item-membership-test
-    "FURB188",  # slice-to-remove-prefix-or-suffix
     "FURB189",  # subclass-builtin
     "FURB192",  # sorted-min-max
     "LOG004",   # log-exception-outside-except-handler
     "LOG014",   # exc-info-outside-except-handler
-    "PLC1802",  # len-test
     "PLC1901",  # compare-to-empty-string
     "PLC2701",  # import-private-name
     "PLC2801",  # unnecessary-dunder-call
@@ -201,12 +198,8 @@ extend-select = [
     "RUF027",   # missing-f-string-syntax
     "RUF028",   # invalid-formatter-suppression-comment
     "RUF031",   # incorrectly-parenthesized-tuple-in-subscript
-    "RUF035",   # unsafe-markup-use
     "RUF036",   # none-not-at-end-of-union
-    "RUF040",   # invalid-assert-message-literal-argument
-    "RUF041",   # unnecessary-nested-literal
     "RUF045",   # implicit-class-var-in-dataclass
-    "RUF046",   # unnecessary-cast-to-int
     "RUF047",   # needless-else
     "RUF053",   # class-with-mixed-type-vars
     "RUF055",   # unnecessary-regular-expression
@@ -214,7 +207,6 @@ extend-select = [
     "RUF057",   # unnecessary-round
     "TC008",    # quoted-type-alias
     "UP042",    # replace-str-enum
-    "UP044",    # non-pep646-unpack
     "UP045",    # non-pep604-annotation-optional
     "UP046",    # non-pep695-generic-class
     "UP047",    # non-pep695-generic-function
