@@ -13,7 +13,7 @@ import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
 import { H4 } from "common/src/common/typography";
 import { getLocalizationLang } from "common/src/helpers";
 import { type OptionTypes, ReservationUnitList } from "./ReservationUnitList";
-import { ApplicationEventSummary } from "./ApplicationEventSummary";
+import { ApplicationSectionSummary } from "./ApplicationSectionSummary";
 import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
@@ -35,7 +35,7 @@ type Props = {
   onDeleteEvent: () => void;
 };
 
-function ApplicationEventInner({
+function ApplicationSectionInner({
   index,
   applicationRound,
   optionTypes,
@@ -205,9 +205,9 @@ function ApplicationEventInner({
           errorText={getTranslatedError("appliedReservationsPerWeek")}
         />
       </AutoGrid>
-      <ApplicationEventSummary
+      <ApplicationSectionSummary
         applicationSection={getValues(`applicationSections.${index}`)}
-        name={watch(`applicationSections.${index}.name`) ?? ""}
+        name={watch(`applicationSections.${index}.name`)}
       />
       <Button
         variant={ButtonVariant.Secondary}
@@ -303,7 +303,7 @@ function ApplicationDateRangePicker({
   );
 }
 
-export function ApplicationEvent(props: Props): JSX.Element {
+export function ApplicationSection(props: Props): JSX.Element {
   const { index, isVisible, onDeleteEvent, onToggleAccordion } = props;
 
   const { t } = useTranslation();
@@ -331,7 +331,7 @@ export function ApplicationEvent(props: Props): JSX.Element {
     >
       {/* Accordion doesn't remove from DOM on hide, but this is too slow if it's visible */}
       {shouldRenderInner && (
-        <ApplicationEventInner {...props} del={onDeleteEvent} />
+        <ApplicationSectionInner {...props} del={onDeleteEvent} />
       )}
     </Accordion>
   );

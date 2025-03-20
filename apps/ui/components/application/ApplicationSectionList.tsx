@@ -222,7 +222,7 @@ const filterPrimary = (n: { priority: Priority }) =>
 const filterSecondary = (n: { priority: Priority }) =>
   n.priority === Priority.Secondary;
 
-export function ApplicationEventList({
+export function ApplicationSectionList({
   application,
 }: {
   application: ApplicationT;
