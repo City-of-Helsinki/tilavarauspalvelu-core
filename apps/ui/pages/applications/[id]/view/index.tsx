@@ -5,7 +5,7 @@ import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createApolloClient } from "@/modules/apolloClient";
 import { ViewApplication } from "@/components/application/ViewApplication";
-import { ApplicationHead } from "@/components/recurring/ApplicationHead";
+import { ApplicationHead } from "@/components/application/ApplicationHead";
 import {
   getCommonServerSideProps,
   getGenericTerms,

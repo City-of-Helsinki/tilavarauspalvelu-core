@@ -2,7 +2,7 @@ import { ApplicationRoundStatusChoice } from "@/gql/gql-types";
 import RecurringLander from "@/pages/recurring";
 import { render } from "@testing-library/react";
 import { vi, describe, test, expect, afterEach, beforeEach } from "vitest";
-import { createMockApplicationRound as createApplicationRound } from "@/test/test.utils";
+import { createMockApplicationRound } from "@/test/test.gql.utils";
 
 beforeEach(() => {
   vi.useFakeTimers({
@@ -41,19 +41,19 @@ describe("RecurringLander", () => {
   // - only active rounds (a few)
   test("should render recurring lander with only active roudns", () => {
     const rounds = [
-      createApplicationRound({
+      createMockApplicationRound({
         pk: 1,
         status: ApplicationRoundStatusChoice.Open,
         applicationPeriodBegin: new Date("2024-04-01"),
         applicationPeriodEnd: new Date("2024-05-01"),
       }),
-      createApplicationRound({
+      createMockApplicationRound({
         pk: 2,
         status: ApplicationRoundStatusChoice.Open,
         applicationPeriodBegin: new Date("2024-01-01"),
         applicationPeriodEnd: new Date("2024-02-01"),
       }),
-      createApplicationRound({
+      createMockApplicationRound({
         pk: 3,
         status: ApplicationRoundStatusChoice.Open,
         applicationPeriodBegin: new Date("2024-02-01"),
@@ -93,19 +93,19 @@ describe("RecurringLander", () => {
 
   test("should render recurring lander with one of each status", () => {
     const rounds = [
-      createApplicationRound({
+      createMockApplicationRound({
         pk: 1,
         status: ApplicationRoundStatusChoice.Upcoming,
         applicationPeriodBegin: new Date("2024-04-01"),
         applicationPeriodEnd: new Date("2024-05-01"),
       }),
-      createApplicationRound({
+      createMockApplicationRound({
         pk: 2,
         status: ApplicationRoundStatusChoice.Handled,
         applicationPeriodBegin: new Date("2024-01-01"),
         applicationPeriodEnd: new Date("2024-02-01"),
       }),
-      createApplicationRound({
+      createMockApplicationRound({
         pk: 3,
         status: ApplicationRoundStatusChoice.Open,
         applicationPeriodBegin: new Date("2024-02-01"),

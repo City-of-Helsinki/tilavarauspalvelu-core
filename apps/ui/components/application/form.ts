@@ -389,7 +389,6 @@ export function ApplicationPage1SchemaRefined(round: {
   end: Date;
 }) {
   return ApplicationPage1Schema.superRefine((val, ctx) => {
-    // TODO return error if no sections
     if (
       val.applicationSections == null ||
       val.applicationSections.length === 0
@@ -696,7 +695,6 @@ export function validateApplication(
   const end = new Date(applicationRound.reservationPeriodEnd);
   const schema = ApplicationPage1SchemaRefined({ begin, end });
   const page1 = schema.safeParse(convertApplicationPage1(application, []));
-  // console.log("page1 validation: ", JSON.stringify(page1, null, 2));
   if (!page1.success) {
     return { valid: false, page: 1 };
   }

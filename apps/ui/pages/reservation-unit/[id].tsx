@@ -94,7 +94,8 @@ import { LoginFragment } from "@/components/LoginFragment";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ReservationTimePicker } from "@/components/reservation/ReservationTimePicker";
-import { ReservationUnitPageWrapper, SubmitButton } from "@/styles/util";
+import { SubmitButton } from "@/styled/util";
+import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import {
   getReservationInProgressPath,
   getSingleSearchPath,

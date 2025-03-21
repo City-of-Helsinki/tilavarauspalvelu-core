@@ -39,12 +39,12 @@ import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
 import {
   createMockReservationUnit,
   generateNameFragment,
-  TIMERS_TO_FAKE,
-} from "@/test/test.utils";
+} from "@/test/test.gql.utils";
+import { TIMERS_TO_FAKE } from "@/test/test.utils";
 import { base64encode, ReadonlyDeep } from "common/src/helpers";
 import { type TFunction } from "i18next";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
-import { DeepRequired } from "react-hook-form";
+import { type DeepRequired } from "react-hook-form";
 
 // Turn into describe block and spec the tests
 describe("getPossibleTimesForDay", () => {

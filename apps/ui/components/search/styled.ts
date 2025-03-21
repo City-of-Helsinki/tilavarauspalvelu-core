@@ -5,7 +5,7 @@ import {
   type ShowAllContainerProps,
 } from "common/src/components";
 import { Flex } from "common/styles/util";
-import { SubmitButton } from "@/styles/util";
+import { SubmitButton } from "@/styled/util";
 
 /// Filter container using responsive grid
 export const Filters = styled.div`

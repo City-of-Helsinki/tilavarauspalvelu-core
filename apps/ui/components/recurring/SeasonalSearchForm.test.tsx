@@ -31,12 +31,6 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-// - changes search params when form is submitted
-// - does nothing if form is not submitted
-// - preselects based on query params
-//
-// so need query selectors for HDS components that are present in the search form
-// - we are only concerned with the form part of the search form
 const options: SearchFormProps["options"] = {
   reservationUnitTypeOptions: [1, 2, 3, 4, 5, 6].map((i) => ({
     value: i,
@@ -109,7 +103,8 @@ describe("SeasonalSearchForm", () => {
   ] as const)(
     "should disable unit select if no units are available",
     ({ key }) => {
-      const options = { ...props.options, [`${key.slice(0, -1)}Options`]: [] };
+      const optionKey = `${key.slice(0, -1)}Options`;
+      const options = { ...props.options, [optionKey]: [] };
       const view = render(<SeasonalSearchForm {...props} options={options} />);
       const btn = view.getByLabelText(`searchForm:labels.${key}`, {
         selector: "button",
@@ -152,8 +147,6 @@ describe("SeasonalSearchForm", () => {
     expect(handleSearch).toHaveBeenCalledTimes(1);
   });
 
-  // multiselects i.e. select multiple options
-  // check that we get multiple params and multiple tags also
   test("allow select reservation unit type but dont search automatically", async () => {
     const user = userEvent.setup();
     const handleSearch = vi.fn();
@@ -164,13 +157,11 @@ describe("SeasonalSearchForm", () => {
     const optionLabel = "reservationUnitTypes 1";
     await selectOption(view, listboxLabel, optionLabel);
     expect(handleSearch).toHaveBeenCalledTimes(0);
-    // TODO select another option
     const searchBtn = view.getByRole("button", {
       name: "searchForm:searchButton",
     });
     expect(searchBtn).toBeInTheDocument();
     await user.click(searchBtn);
-    // TODO check the selected options
     expect(handleSearch).toHaveBeenCalledTimes(1);
   });
 
@@ -189,7 +180,7 @@ describe("Tags should modify search params", () => {
     expect(tags.children).toHaveLength(0);
   });
 
-  test("tags should be visible", () => {
+  test("query params should be shown as tags", () => {
     const handleSearch = vi.fn();
     const params = new URLSearchParams();
     const selected = options.purposeOptions[0] ?? { label: "", value: 0 };

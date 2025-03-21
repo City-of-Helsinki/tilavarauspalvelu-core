@@ -66,7 +66,7 @@ import {
   ButtonLikeLink,
   ButtonLikeExternalLink,
 } from "@/components/common/ButtonLikeLink";
-import { ReservationPageWrapper } from "@/styles/util";
+import { ReservationPageWrapper } from "@/styled/reservation";
 import {
   getApplicationPath,
   getFeedbackUrl,

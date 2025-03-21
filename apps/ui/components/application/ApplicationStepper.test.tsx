@@ -98,7 +98,6 @@ describe("Stepper when page 3 is valid", () => {
   );
 });
 
-// TODO should check the style to be completed for all steps
 describe("Stepper when application has been sent", () => {
   test.for(PAGES_WITH_STEPPER.map((x) => ({ label: x, isDisabled: false })))(
     "stepper step $label should render and be disabled = $isDisabled",

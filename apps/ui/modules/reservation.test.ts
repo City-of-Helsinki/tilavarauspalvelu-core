@@ -577,7 +577,6 @@ describe("getCheckoutUrl", () => {
     checkoutUrl: `${baseCheckoutUrl}?${userParam}`,
     paymentType: PaymentType.Online,
   };
-  //const checkoutUrl = "https://checkout.url/path/paymentmethod?user=1111-2222-3333-4444";
   const checkoutUrl = `${baseCheckoutUrl}/paymentmethod?${userParam}`;
 
   test("returns checkout url with lang sv", () => {
@@ -621,7 +620,7 @@ describe("isSlotWithinReservationTime", () => {
     { begin: 30, end: 0, expected: false },
     { begin: 0, end: 30, expected: false },
     { begin: 30, end: 30, expected: true },
-  ])("with both times", ({ begin, end, expected }) => {
+  ])("from $begin to $end -> $expected", ({ begin, end, expected }) => {
     const baseDate = new Date("2019-09-22T12:00:00+00:00");
     const input = {
       start: baseDate,

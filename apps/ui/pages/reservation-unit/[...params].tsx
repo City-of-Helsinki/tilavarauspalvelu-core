@@ -48,7 +48,7 @@ import { gql } from "@apollo/client";
 import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
 import { Flex } from "common/styles/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ReservationPageWrapper } from "@/styles/util";
+import { ReservationPageWrapper } from "@/styled/reservation";
 import { useDisplayError } from "@/hooks/useDisplayError";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 

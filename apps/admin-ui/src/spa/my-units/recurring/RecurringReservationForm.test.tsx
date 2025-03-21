@@ -44,7 +44,6 @@ const getReservationUnitBtn = () => {
   return btn;
 };
 
-// TODO these should be set in the test setup
 beforeEach(() => {
   vi.useFakeTimers({
     now: new Date(2024, 0, 1, 0, 0, 0),
