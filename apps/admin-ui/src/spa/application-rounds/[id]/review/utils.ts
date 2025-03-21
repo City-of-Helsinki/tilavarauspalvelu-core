@@ -6,6 +6,7 @@ import {
   ApplicationStatusChoice,
   ApplicationSectionStatusChoice,
   ApplicationSectionNode,
+  AccessCodeState,
 } from "@gql/gql-types";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import { formatNumber } from "@/common/util";
@@ -74,6 +75,23 @@ export function transformApplicantType(
       }
     })
     .filter((at): at is NonNullable<typeof at> => at != null);
+}
+
+export function transformAccessCodeState(filters: string[]): AccessCodeState[] {
+  return filters
+    .map((f) => {
+      switch (f) {
+        case AccessCodeState.AccessCodeCreated:
+          return AccessCodeState.AccessCodeCreated;
+        case AccessCodeState.AccessCodePending:
+          return AccessCodeState.AccessCodePending;
+        case AccessCodeState.AccessCodeNotRequired:
+          return AccessCodeState.AccessCodeNotRequired;
+        default:
+          return undefined;
+      }
+    })
+    .filter((act): act is NonNullable<typeof act> => act != null);
 }
 
 const formatters = getFormatters("fi");

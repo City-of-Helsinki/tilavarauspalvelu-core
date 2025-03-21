@@ -11,7 +11,11 @@ import { LIST_PAGE_SIZE } from "@/common/const";
 import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import { getFilteredUnits, transformApplicantType } from "./utils";
+import {
+  getFilteredUnits,
+  transformAccessCodeState,
+  transformApplicantType,
+} from "./utils";
 import { useSearchParams } from "react-router-dom";
 import { AllocatedEventsTable, SORT_KEYS } from "./AllocatedEventsTable";
 import { transformWeekday, type Day } from "common/src/conversion";
@@ -36,6 +40,7 @@ export function TimeSlotDataLoader({
   const nameFilter = searchParams.get("search");
   const weekDayFilter = searchParams.getAll("weekday");
   const reservationUnitFilter = searchParams.getAll("reservationUnit");
+  const accessCodeState = searchParams.getAll("accessCodeState");
 
   const query = useAllocatedTimeSlotsQuery({
     skip: !applicationRoundPk,
@@ -55,6 +60,7 @@ export function TimeSlotDataLoader({
       allocatedReservationUnit: reservationUnitFilter
         .map(Number)
         .filter(Number.isFinite),
+      accessCodeState: transformAccessCodeState(accessCodeState),
       textSearch: nameFilter,
       first: LIST_PAGE_SIZE,
       orderBy: transformOrderBy(orderBy),
