@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import itertools
 import random
+import uuid
 from decimal import Decimal
 from inspect import cleandoc
 from typing import TYPE_CHECKING
@@ -42,6 +43,7 @@ from tests.factories import (
     UnitFactory,
 )
 from tests.factories.reservation_unit import ReservationUnitBuilder
+from tests.factories.reservation_unit_access_type import ReservationUnitAccessTypeBuilder
 from tests.factories.reservation_unit_pricing import ReservationUnitPricingBuilder
 
 from .create_reservation_related_things import (
@@ -55,6 +57,7 @@ from .create_reservation_related_things import (
 )
 from .create_seasonal_booking import _create_application_round_time_slots
 from .utils import (
+    AccessTypeInfo,
     BufferInfo,
     CancelInfo,
     DurationInfo,
@@ -248,6 +251,19 @@ def _create_free_reservation_units(
         HandlingInfo(name="no", handling_required=False),
         HandlingInfo(name="yes", handling_required=True),
     ]
+    access_type_choices: list[AccessTypeInfo] = [
+        AccessTypeInfo(name="unrestricted", value=AccessType.UNRESTRICTED),
+        AccessTypeInfo(name="access type", value=AccessType.ACCESS_CODE),
+    ]
+
+    # These are pre-set in Pindora ("Varaamon lokaali testidata #1 - #5")
+    pindora_reservation_unit_uuids: set[uuid.UUID] = {
+        uuid.UUID("2a74d5f0-1cc6-440d-a986-8306ff277008"),
+        uuid.UUID("829c40cd-1331-45f2-bdcc-a8eacd2a2bbf"),
+        uuid.UUID("d874f89a-79aa-41a1-9062-856b7bf74f00"),
+        uuid.UUID("c8fd3e3f-7a02-44d5-baa7-077e61e72396"),
+        uuid.UUID("10f76e0b-d751-44e2-896c-09c32bc8865d"),
+    }
 
     ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
 
@@ -255,7 +271,7 @@ def _create_free_reservation_units(
     reservation_units: list[ReservationUnit] = []
     reservation_unit_spaces: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
-    access_types: list[ReservationUnitAccessType] = []
+    reservation_unit_access_types: list[ReservationUnitAccessType] = []
     images: list[ReservationUnitImage] = []
 
     reservation_unit_type = ReservationUnitTypeFactory.create(
@@ -285,6 +301,7 @@ def _create_free_reservation_units(
             start_interval_choices,
             cancellation_rule_choices,
             handling_info_choices,
+            access_type_choices,
         ],
         output_type=FreeReservationUnitData,
     ):
@@ -292,6 +309,22 @@ def _create_free_reservation_units(
         reservation_kind = ReservationKind.DIRECT
         authentication = AuthenticationType.WEAK
         number = next(unit_counter)
+
+        access_type = data.access_type_info.value
+        access_type_label = data.access_type_info.name
+
+        if access_type == AccessType.ACCESS_CODE:
+            # Use access code for as long as we have predefined Pindora configurations
+            if pindora_reservation_unit_uuids:
+                reservation_uuid = pindora_reservation_unit_uuids.pop()
+
+            # Otherwise use switch to unrestricted
+            else:
+                access_type = AccessType.UNRESTRICTED
+                access_type_label = "unrestricted"
+                reservation_uuid = uuid.uuid4()
+        else:
+            reservation_uuid = uuid.uuid4()
 
         space = SpaceFactory.build_for_bulk_create(
             name=f"Toimistokoppi #{number}",
@@ -310,6 +343,7 @@ def _create_free_reservation_units(
                 name_en=f"Drab office cubicle #{number}",
                 name_sv=f"Dyster kontorsbås #{number}",
                 unit=unit,
+                uuid=reservation_uuid,
                 origin_hauki_resource=random.choice(hauki_resources),
                 allow_reservations_without_opening_hours=True,
                 reservations_min_days_before=data.reservable_window_info.minimum,
@@ -348,6 +382,7 @@ def _create_free_reservation_units(
                 tax_percentage="0%",
                 metadata_set=set_name.value,
                 can_apply_free_of_charge="no need",
+                access_type=access_type_label,
             )
             .build()
         )
@@ -370,12 +405,12 @@ def _create_free_reservation_units(
         )
         pricings.append(pricing)
 
-        access_type = ReservationUnitAccessTypeFactory.build(
+        reservation_unit_access_type = ReservationUnitAccessTypeFactory.build(
             reservation_unit=reservation_unit,
             begin_date=datetime.date(2021, 1, 1),
-            access_type=AccessType.UNRESTRICTED,
+            access_type=access_type,
         )
-        access_types.append(access_type)
+        reservation_unit_access_types.append(reservation_unit_access_type)
 
         image = _fetch_and_build_reservation_unit_image(
             reservation_unit=reservation_unit,
@@ -389,7 +424,7 @@ def _create_free_reservation_units(
     ReservationUnit.objects.bulk_create(reservation_units)
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ReservationUnitPricing.objects.bulk_create(pricings)
-    ReservationUnitAccessType.objects.bulk_create(access_types)
+    ReservationUnitAccessType.objects.bulk_create(reservation_unit_access_types)
     ReservationUnitImage.objects.bulk_create(images)
 
 
@@ -472,7 +507,7 @@ def _create_paid_reservation_units(
     reservation_unit_spaces: list[models.Model] = []
     reservation_unit_payment_types: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
-    access_types: list[ReservationUnitAccessType] = []
+    reservation_unit_access_types: list[ReservationUnitAccessType] = []
     payment_products: list[PaymentProduct] = []
     images: list[ReservationUnitImage] = []
 
@@ -577,6 +612,7 @@ def _create_paid_reservation_units(
                 payment_type=data.payment_type_info.payment_type.name,
                 tax_percentage=data.tax_percentage_info.name,
                 metadata_set=set_name.value,
+                access_type="physical key",
             )
             .build()
         )
@@ -606,12 +642,12 @@ def _create_paid_reservation_units(
         )
         pricings.append(pricing)
 
-        access_type = ReservationUnitAccessTypeFactory.build(
+        reservation_unit_access_type = ReservationUnitAccessTypeFactory.build(
             reservation_unit=reservation_unit,
             begin_date=datetime.date(2021, 1, 1),
             access_type=AccessType.PHYSICAL_KEY,
         )
-        access_types.append(access_type)
+        reservation_unit_access_types.append(reservation_unit_access_type)
 
         image = _fetch_and_build_reservation_unit_image(
             reservation_unit=reservation_unit,
@@ -661,6 +697,20 @@ def _create_seasonal_bookable_reservation_units(
         ReservationKindInfo(name="seasonal", value=ReservationKind.SEASON),
         ReservationKindInfo(name="direct and seasonal", value=ReservationKind.DIRECT_AND_SEASON),
     ]
+    access_type_choices: list[AccessTypeInfo] = [
+        AccessTypeInfo(name="unrestricted", value=AccessType.UNRESTRICTED),
+        AccessTypeInfo(name="physical key", value=AccessType.PHYSICAL_KEY),
+        AccessTypeInfo(name="access code", value=AccessType.ACCESS_CODE),
+    ]
+
+    # These are pre-set in Pindora ("Varaamon lokaali testidata #6 - #10")
+    pindora_reservation_unit_uuids: set[uuid.UUID] = {
+        uuid.UUID("b1290007-675f-4e83-928a-84f8990853ff"),
+        uuid.UUID("14e27576-cbd4-4245-b05d-1e2bece25f8a"),
+        uuid.UUID("69a24054-40f8-4711-87ef-b10b0e1217b2"),
+        uuid.UUID("c8cd38d2-febf-4a19-8e07-e8fa3187382f"),
+        uuid.UUID("c2dadb1c-4538-4d53-a3a9-1b0d704e6634"),
+    }
 
     ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
 
@@ -669,6 +719,7 @@ def _create_seasonal_bookable_reservation_units(
     spaces: list[Space] = []
     reservation_unit_spaces: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    reservation_unit_access_types: list[ReservationUnitAccessType] = []
     images: list[ReservationUnitImage] = []
 
     unit_counter = itertools.count(start=1)
@@ -685,14 +736,30 @@ def _create_seasonal_bookable_reservation_units(
             reservation_time_choices,
             cancellation_rule_choices,
             reservation_kind_choices,
+            access_type_choices,
         ],
         output_type=SeasonalReservationUnitData,
-        multiplier=3,
     ):
         set_name: SetName = random.choice(SetName.non_free_of_charge_applying())
         authentication = AuthenticationType.WEAK
         reservation_start_interval = ReservationStartInterval.INTERVAL_30_MINUTES
         number = next(unit_counter)
+
+        access_type = data.access_type_info.value
+        access_type_label = data.access_type_info.name
+
+        if access_type == AccessType.ACCESS_CODE:
+            # Use access code for as long as we have predefined Pindora configurations
+            if pindora_reservation_unit_uuids:
+                reservation_uuid = pindora_reservation_unit_uuids.pop()
+
+            # Otherwise use switch to physical key
+            else:
+                access_type = AccessType.PHYSICAL_KEY
+                access_type_label = "physical key"
+                reservation_uuid = uuid.uuid4()
+        else:
+            reservation_uuid = uuid.uuid4()
 
         unit = UnitFactory.build(
             name=f"Harrastushalli #{number}",
@@ -720,6 +787,7 @@ def _create_seasonal_bookable_reservation_units(
                 name_fi=f"Kausivarattava kerhohuone #{number}",
                 name_en=f"Seasonal club room #{number}",
                 name_sv=f"Säsongsöppet klubbrum #{number}",
+                uuid=reservation_uuid,
                 unit=unit,
                 origin_hauki_resource=random.choice(hauki_resources),
                 allow_reservations_without_opening_hours=True,
@@ -758,6 +826,7 @@ def _create_seasonal_bookable_reservation_units(
                 payment_type="none",
                 tax_percentage="0%",
                 metadata_set=set_name.value,
+                access_type=access_type_label,
             )
             .build()
         )
@@ -780,11 +849,19 @@ def _create_seasonal_bookable_reservation_units(
         )
         pricings.append(pricing)
 
+        reservation_unit_access_type = ReservationUnitAccessTypeFactory.build(
+            reservation_unit=reservation_unit,
+            begin_date=datetime.date(2021, 1, 1),
+            access_type=access_type,
+        )
+        reservation_unit_access_types.append(reservation_unit_access_type)
+
     Unit.objects.bulk_create(units)
     Space.objects.bulk_create(spaces)
     ReservationUnit.objects.bulk_create(reservation_units)
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitAccessType.objects.bulk_create(reservation_unit_access_types)
     ReservationUnitImage.objects.bulk_create(images)
 
     _create_application_round_time_slots(reservation_units)
@@ -835,6 +912,12 @@ def _create_empty_reservation_units(
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
         tax_percentage=tax_percentages["0"],
+    )
+
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2021, 1, 1),
     )
 
     image = _fetch_and_build_reservation_unit_image(
@@ -902,6 +985,12 @@ def _create_archived_reservation_units(
         tax_percentage=tax_percentages["0"],
     )
 
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2021, 1, 1),
+    )
+
 
 @with_logs
 def _create_single_reservation_per_user_reservation_units(
@@ -959,6 +1048,12 @@ def _create_single_reservation_per_user_reservation_units(
         tax_percentage=tax_percentages["0"],
     )
 
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2021, 1, 1),
+    )
+
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=reservation_unit,
         image_url="https://images.unsplash.com/photo-1543359032-4fd9e3b0b32a",
@@ -999,6 +1094,7 @@ def _create_full_day_reservation_units(
     spaces: list[Space] = []
     reservation_unit_spaces: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    reservation_unit_access_types: list[ReservationUnitAccessType] = []
     images: list[ReservationUnitImage] = []
 
     for i in range(1, 11):
@@ -1043,6 +1139,13 @@ def _create_full_day_reservation_units(
         )
         pricings.append(pricing)
 
+        reservation_unit_access_type = ReservationUnitAccessTypeFactory.build(
+            reservation_unit=reservation_unit,
+            begin_date=datetime.date(2021, 1, 1),
+            access_type=AccessType.UNRESTRICTED,
+        )
+        reservation_unit_access_types.append(reservation_unit_access_type)
+
         image = _fetch_and_build_reservation_unit_image(
             reservation_unit=reservation_unit,
             image_url="https://images.unsplash.com/photo-1707760457564-4a5bc08be1cc",
@@ -1055,6 +1158,7 @@ def _create_full_day_reservation_units(
     ReservationUnit.objects.bulk_create(reservation_units)
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitAccessType.objects.bulk_create(reservation_unit_access_types)
     ReservationUnitImage.objects.bulk_create(images)
 
 
@@ -1093,6 +1197,7 @@ def _create_reservation_units_in_space_hierarchies(
     reservation_units: list[ReservationUnit] = []
     reservation_unit_spaces: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    reservation_unit_access_types: list[ReservationUnitAccessType] = []
     images: list[ReservationUnitImage] = []
 
     reservation_unit_type = ReservationUnitTypeFactory.create(
@@ -1133,6 +1238,11 @@ def _create_reservation_units_in_space_hierarchies(
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         tax_percentage=tax_percentages["0"],
+    )
+
+    reservation_unit_access_type = ReservationUnitAccessTypeBuilder().set(
+        begin_date=datetime.date(2021, 1, 1),
+        access_type=AccessType.UNRESTRICTED,
     )
 
     # --- Create common unit ---------------------------------------------------------------------------------------
@@ -1252,6 +1362,7 @@ def _create_reservation_units_in_space_hierarchies(
     exhibition_center_unit = reservation_unit_base.for_space(exhibition_center, use_name=True).build()
     reservation_units.append(exhibition_center_unit)
     pricings.append(pricing_base.build(reservation_unit=exhibition_center_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=exhibition_center_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=exhibition_center_unit, space=exhibition_center))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1265,6 +1376,7 @@ def _create_reservation_units_in_space_hierarchies(
     main_venue_unit = reservation_unit_base.for_space(main_venue, use_name=True).build()
     reservation_units.append(main_venue_unit)
     pricings.append(pricing_base.build(reservation_unit=main_venue_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=main_venue_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=main_venue_unit, space=main_venue))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1278,6 +1390,7 @@ def _create_reservation_units_in_space_hierarchies(
     grand_hall_unit = reservation_unit_base.for_space(grand_hall, use_name=True).build()
     reservation_units.append(grand_hall_unit)
     pricings.append(pricing_base.build(reservation_unit=grand_hall_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=grand_hall_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=grand_hall_unit, space=grand_hall))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1291,6 +1404,7 @@ def _create_reservation_units_in_space_hierarchies(
     auditorium_unit = reservation_unit_base.for_space(auditorium, use_name=True).build()
     reservation_units.append(auditorium_unit)
     pricings.append(pricing_base.build(reservation_unit=auditorium_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=auditorium_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=auditorium_unit, space=auditorium))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1304,6 +1418,7 @@ def _create_reservation_units_in_space_hierarchies(
     dining_hall_unit = reservation_unit_base.for_space(dining_hall, use_name=True).build()
     reservation_units.append(dining_hall_unit)
     pricings.append(pricing_base.build(reservation_unit=dining_hall_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=dining_hall_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=dining_hall_unit, space=dining_hall))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1317,6 +1432,7 @@ def _create_reservation_units_in_space_hierarchies(
     private_premises_unit = reservation_unit_base.for_space(private_premises, use_name=True).build()
     reservation_units.append(private_premises_unit)
     pricings.append(pricing_base.build(reservation_unit=private_premises_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=private_premises_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=private_premises_unit, space=private_premises))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1330,6 +1446,7 @@ def _create_reservation_units_in_space_hierarchies(
     lecture_hall_unit = reservation_unit_base.for_space(lecture_hall, use_name=True).build()
     reservation_units.append(lecture_hall_unit)
     pricings.append(pricing_base.build(reservation_unit=lecture_hall_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=lecture_hall_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=lecture_hall_unit, space=lecture_hall))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1343,6 +1460,7 @@ def _create_reservation_units_in_space_hierarchies(
     meeting_room_unit = reservation_unit_base.for_space(meeting_room, use_name=True).build()
     reservation_units.append(meeting_room_unit)
     pricings.append(pricing_base.build(reservation_unit=meeting_room_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=meeting_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=meeting_room_unit, space=meeting_room))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1356,6 +1474,7 @@ def _create_reservation_units_in_space_hierarchies(
     penthouse_unit = reservation_unit_base.for_space(penthouse, use_name=True).build()
     reservation_units.append(penthouse_unit)
     pricings.append(pricing_base.build(reservation_unit=penthouse_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=penthouse_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=penthouse_unit, space=penthouse))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1369,6 +1488,7 @@ def _create_reservation_units_in_space_hierarchies(
     karaoke_room_unit = reservation_unit_base.for_space(karaoke_room, use_name=True).build()
     reservation_units.append(karaoke_room_unit)
     pricings.append(pricing_base.build(reservation_unit=karaoke_room_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=karaoke_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=karaoke_room_unit, space=karaoke_room))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1382,6 +1502,7 @@ def _create_reservation_units_in_space_hierarchies(
     rooftop_terrace_unit = reservation_unit_base.for_space(rooftop_terrace, use_name=True).build()
     reservation_units.append(rooftop_terrace_unit)
     pricings.append(pricing_base.build(reservation_unit=rooftop_terrace_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=rooftop_terrace_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=rooftop_terrace_unit, space=rooftop_terrace))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1395,6 +1516,7 @@ def _create_reservation_units_in_space_hierarchies(
     spa_unit = reservation_unit_base.for_space(spa, use_name=True).build()
     reservation_units.append(spa_unit)
     pricings.append(pricing_base.build(reservation_unit=spa_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=spa_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=spa_unit, space=spa))
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1408,6 +1530,7 @@ def _create_reservation_units_in_space_hierarchies(
     ReservationUnit.objects.bulk_create(reservation_units)
     SpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitAccessType.objects.bulk_create(reservation_unit_access_types)
     ReservationUnitImage.objects.bulk_create(images)
 
 
@@ -1465,6 +1588,7 @@ def _create_reservation_units_in_resource_hierarchies(
     reservation_unit_spaces: list[models.Model] = []
     reservation_unit_resources: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
+    reservation_unit_access_types: list[ReservationUnitAccessType] = []
     images: list[ReservationUnitImage] = []
 
     reservation_unit_base: ReservationUnitBuilder = _get_base_reservation_unit_builder(  # type: ignore[assignment]
@@ -1497,6 +1621,11 @@ def _create_reservation_units_in_resource_hierarchies(
         lowest_price=Decimal(0),
         highest_price=Decimal(0),
         tax_percentage=tax_percentages["0"],
+    )
+
+    reservation_unit_access_type = ReservationUnitAccessTypeBuilder().set(
+        begin_date=datetime.date(2021, 1, 1),
+        access_type=AccessType.UNRESTRICTED,
     )
 
     # --- Create unit ---------------------------------------------------------------------------------------------
@@ -1568,6 +1697,7 @@ def _create_reservation_units_in_resource_hierarchies(
     meeting_room_unit = reservation_unit_base.for_space(meeting_room, use_name=True).build()
     reservation_units.append(meeting_room_unit)
     pricings.append(pricing_base.build(reservation_unit=meeting_room_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=meeting_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=meeting_room_unit, space=meeting_room))
     reservation_unit_resources.extend((
         ResourceThoughModel(reservationunit=meeting_room_unit, resource=coffee_machine),
@@ -1585,6 +1715,7 @@ def _create_reservation_units_in_resource_hierarchies(
     break_room_unit = reservation_unit_base.for_space(break_room, use_name=True).build()
     reservation_units.append(break_room_unit)
     pricings.append(pricing_base.build(reservation_unit=break_room_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=break_room_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=break_room_unit, space=break_room))
     reservation_unit_resources.extend((
         ResourceThoughModel(reservationunit=break_room_unit, resource=coffee_machine),
@@ -1602,6 +1733,7 @@ def _create_reservation_units_in_resource_hierarchies(
     open_office_unit = reservation_unit_base.for_space(open_office_space, use_name=True).build()
     reservation_units.append(open_office_unit)
     pricings.append(pricing_base.build(reservation_unit=open_office_unit))
+    reservation_unit_access_types.append(reservation_unit_access_type.build(reservation_unit=open_office_unit))
     reservation_unit_spaces.append(SpacesThoughModel(reservationunit=open_office_unit, space=open_office_space))
     reservation_unit_resources.append(ResourceThoughModel(reservationunit=open_office_unit, resource=printer))
 
@@ -1617,6 +1749,7 @@ def _create_reservation_units_in_resource_hierarchies(
     SpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
     ResourceThoughModel.objects.bulk_create(reservation_unit_resources)
     ReservationUnitPricing.objects.bulk_create(pricings)
+    ReservationUnitAccessType.objects.bulk_create(reservation_unit_access_types)
     ReservationUnitImage.objects.bulk_create(images)
 
 
@@ -1671,6 +1804,12 @@ def _create_reservation_unit_for_recurring_reservations(
         highest_price=Decimal(0),
         reservation_unit=reservation_unit,
         tax_percentage=tax_percentage,
+    )
+
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=reservation_unit,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2021, 1, 1),
     )
 
     image = _fetch_and_build_reservation_unit_image(

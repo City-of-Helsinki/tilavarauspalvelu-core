@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 
 from tilavarauspalvelu.enums import (
+    AccessType,
     AuthenticationType,
     PriceUnit,
     ReservationKind,
@@ -22,6 +23,7 @@ from tests.factories import (
     PaymentProductFactory,
     QualifierFactory,
     ReservableTimeSpanFactory,
+    ReservationUnitAccessTypeFactory,
     ReservationUnitCancellationRuleFactory,
     ReservationUnitFactory,
     ReservationUnitPaymentTypeFactory,
@@ -754,6 +756,11 @@ def _create_caisa() -> None:
         highest_price=40.0,
         tax_percentage=tax_percentage_255,
     )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=aina_kasiteltava_kellarikerros,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2023, 1, 1),
+    )
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=aina_kasiteltava_kellarikerros,
@@ -844,6 +851,11 @@ def _create_caisa() -> None:
         lowest_price=0.0,
         highest_price=0.0,
         tax_percentage=tax_percentage_0,
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=maksuton_mankeli,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2023, 1, 1),
     )
 
     image = _fetch_and_build_reservation_unit_image(
@@ -969,6 +981,11 @@ def _create_caisa() -> None:
         highest_price=40.0,
         tax_percentage=tax_percentage_255,
     )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=aina_maksullinen_aitio,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2023, 1, 1),
+    )
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=aina_maksullinen_aitio,
@@ -1076,6 +1093,11 @@ def _create_caisa() -> None:
         highest_price=30.0,
         tax_percentage=tax_percentage_255,
     )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=alennuskelpoinen_aula,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2023, 1, 1),
+    )
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=alennuskelpoinen_aula,
@@ -1158,6 +1180,11 @@ def _create_caisa() -> None:
         lowest_price=0.0,
         highest_price=0.0,
         tax_percentage=tax_percentage_0,
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=perumiskelvoton_parveke,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2023, 1, 1),
     )
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1252,6 +1279,11 @@ def _create_caisa() -> None:
         lowest_price=0.0,
         highest_price=30.0,
         tax_percentage=tax_percentage_255,
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=perumiskelvoton_patio,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2023, 1, 1),
     )
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1353,6 +1385,11 @@ def _create_caisa() -> None:
         highest_price=0.0,
         tax_percentage=tax_percentage_0,
     )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=toistuvien_varausten_toimisto,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2023, 1, 1),
+    )
 
     image = _fetch_and_build_reservation_unit_image(
         reservation_unit=toistuvien_varausten_toimisto,
@@ -1439,6 +1476,11 @@ def _create_caisa() -> None:
         lowest_price=0.0,
         highest_price=0.0,
         tax_percentage=tax_percentage_0,
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=tauotettu_takkahuone,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2023, 1, 1),
     )
 
     image = _fetch_and_build_reservation_unit_image(
@@ -1538,6 +1580,11 @@ def _create_caisa() -> None:
         lowest_price=0.0,
         highest_price=0.0,
         tax_percentage=tax_percentage_0,
+    )
+    ReservationUnitAccessTypeFactory.create(
+        reservation_unit=aina_kasiteltava_kammio,
+        access_type=AccessType.UNRESTRICTED,
+        begin_date=datetime.date(2023, 1, 1),
     )
 
     image = _fetch_and_build_reservation_unit_image(
