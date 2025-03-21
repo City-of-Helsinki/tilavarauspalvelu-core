@@ -16,8 +16,8 @@ import {
   getTranslationSafe,
   toUIDate,
 } from "common/src/common/util";
-import { fontRegular, H1, H3 } from "common/src/common/typography";
-import { formatDateTime, orderImages } from "@/modules/util";
+import { H1, H3 } from "common/src/common/typography";
+import { formatDateTime } from "@/modules/util";
 import {
   AccessType,
   ReservationKind,
@@ -128,7 +128,7 @@ export function Head({
         )}
       </Flex>
       <Images
-        images={orderImages(reservationUnit.images)}
+        images={reservationUnit.images}
         contextName={reservationUnitName}
       />
     </Wrapper>
@@ -141,7 +141,6 @@ const IconListWrapper = styled.div`
   }
   width: 100%;
 
-  ${fontRegular};
   font-size: var(--fontsize-body-s);
   display: grid;
   gap: var(--spacing-m) var(--spacing-s);
