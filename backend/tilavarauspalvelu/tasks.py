@@ -359,8 +359,8 @@ def save_sql_queries_from_request(queries: list[QueryInfo], path: str, body: byt
 
 
 @app.task(name="Update ReservationUnit Search vectors")
-def update_reservation_unit_search_vectors_task(reservation_unit_pk: int | None = None) -> None:
-    ReservationUnit.objects.update_search_vectors(reservation_unit_pk=reservation_unit_pk)
+def update_reservation_unit_search_vectors_task(pks: list[int] | None = None) -> None:
+    ReservationUnit.objects.update_search_vectors(pks=pks)
 
 
 @app.task(name="deactivate_old_permissions")

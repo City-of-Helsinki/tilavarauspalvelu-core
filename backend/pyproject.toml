@@ -258,6 +258,9 @@ task-tags = ["TODO", "FIXME", "XXX", "type"]
 "tilavarauspalvelu/models/*/actions.py" = [
     "B903",     # Don't complain about converting ModelActions to a dataclass
 ]
+"tilavarauspalvelu/signals.py" = [
+    "ARG001",   # Signals can have unused "sender" argument.
+]
 "tilavarauspalvelu/management/commands/data_creation/*.py" = [
     "PLR0913",  # Can take as many arguments as needed.
     "PLR0915",  # Can have as many statements as needed.

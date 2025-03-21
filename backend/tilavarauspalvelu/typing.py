@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal, NamedTuple, NotRequired, Protoco
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.handlers import wsgi
+from django.db import models
 from graphql import GraphQLResolveInfo
 from rest_framework.exceptions import ValidationError
 
@@ -458,3 +459,39 @@ class ReservationDetails(TypedDict, total=False):
     purpose: int | ReservationPurpose
     home_city: int | City
     age_group: int | AgeGroup
+
+
+class PreSaveKwargs[TModel: models.Model](TypedDict):
+    instance: TModel
+    raw: bool
+    using: str | None
+    update_fields: list[str] | None
+
+
+class PostSaveKwargs[TModel: models.Model](TypedDict):
+    instance: TModel
+    created: bool
+    raw: bool
+    using: str | None
+    update_fields: list[str] | None
+
+
+class PreDeleteKwargs[TModel: models.Model](TypedDict):
+    instance: TModel
+    using: str | None
+    origin: TModel | models.QuerySet[TModel] | None
+
+
+class PostDeleteKwargs[TModel: models.Model](TypedDict):
+    instance: TModel
+    using: str | None
+    origin: TModel | models.QuerySet[TModel] | None
+
+
+class M2MChangedKwargs[TModel: models.Model](TypedDict):
+    action: M2MAction
+    instance: TModel
+    reverse: bool
+    model: type[TModel]
+    pk_set: set[int] | None
+    using: str | None

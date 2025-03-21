@@ -164,7 +164,7 @@ class ReservationUnitQuerySet(models.QuerySet):
     def hidden(self) -> Self:
         return self.published().exclude(self._is_visible)
 
-    def update_search_vectors(self, reservation_unit_pk: int | None = None) -> None:
+    def update_search_vectors(self, pks: list[int] | None = None) -> None:
         qs = self.select_related(
             "unit",
             "reservation_unit_type",
@@ -174,8 +174,8 @@ class ReservationUnitQuerySet(models.QuerySet):
             "purposes",
             "equipments",
         )
-        if reservation_unit_pk is not None:
-            qs = qs.filter(pk=reservation_unit_pk)
+        if pks is not None:
+            qs = qs.filter(pk__in=pks)
 
         reservation_units: list[ReservationUnit] = list(qs)
 
