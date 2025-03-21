@@ -1112,3 +1112,11 @@ class AccessTypeWithMultivalued(models.TextChoices):
     def model_choices(cls) -> list[tuple[str, str]]:
         """Don't allow 'MULTIVALUED' to be set to models."""
         return [(value, label) for value, label in cls.choices if value != cls.MULTIVALUED.value]
+
+
+class AccessCodeState(models.TextChoices):
+    """The state of the access code."""
+
+    ACCESS_CODE_NOT_REQUIRED = "ACCESS_CODE_NOT_REQUIRED", pgettext_lazy("AccessCodeState", "Access code not required")
+    ACCESS_CODE_CREATED = "ACCESS_CODE_CREATED", pgettext_lazy("AccessCodeState", "Access code created")
+    ACCESS_CODE_PENDING = "ACCESS_CODE_PENDING", pgettext_lazy("AccessCodeState", "Access code pending")
