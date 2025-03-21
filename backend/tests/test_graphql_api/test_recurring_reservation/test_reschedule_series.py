@@ -11,7 +11,6 @@ from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.keyless_entry.service import PindoraService
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationStatistic, ReservationUnitHierarchy
-from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_time
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
@@ -658,7 +657,7 @@ def test_recurring_reservations__reschedule_series__create_statistics(graphql, s
 
     recurring_reservation = create_reservation_series()
 
-    create_or_update_reservation_statistics(recurring_reservation.reservations.values_list("pk", flat=True))
+    recurring_reservation.reservations.upsert_statistics()
 
     # We have 9 reservations, so there should be 9 reservation statistics.
     assert ReservationStatistic.objects.count() == 9
@@ -686,7 +685,7 @@ def test_recurring_reservations__reschedule_series__create_statistics__partial(g
 
     recurring_reservation = create_reservation_series()
 
-    create_or_update_reservation_statistics(recurring_reservation.reservations.values_list("pk", flat=True))
+    recurring_reservation.reservations.upsert_statistics()
 
     # We have 9 reservations, so there should be 9 reservation statistics.
     assert ReservationStatistic.objects.count() == 9

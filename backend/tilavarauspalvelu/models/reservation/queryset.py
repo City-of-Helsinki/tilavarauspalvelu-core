@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Self
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.db.models.functions import Coalesce
 from helsinki_gdpr.models import SerializableMixin
 from lookup_property import L
@@ -284,34 +284,30 @@ class ReservationQuerySet(models.QuerySet):
             ),
         )
 
-    def upsert_statistics(self, *, reservation_pks: list[int]) -> None:
-        reservations = (
-            self.filter(pk__in=reservation_pks)
-            .select_related(
-                "user",
-                "recurring_reservation",
-                "recurring_reservation__ability_group",
-                "recurring_reservation__allocated_time_slot",
-                "deny_reason",
-                "cancel_reason",
-                "purpose",
-                "home_city",
-                "age_group",
-            )
-            .prefetch_related(
-                models.Prefetch(
-                    "reservation_units",
-                    queryset=ReservationUnit.objects.select_related("unit"),
-                ),
-            )
+    def upsert_statistics(self) -> None:
+        reservations = self.select_related(
+            "user",
+            "recurring_reservation",
+            "recurring_reservation__ability_group",
+            "recurring_reservation__allocated_time_slot",
+            "deny_reason",
+            "cancel_reason",
+            "purpose",
+            "home_city",
+            "age_group",
+        ).prefetch_related(
+            models.Prefetch(
+                "reservation_units",
+                queryset=ReservationUnit.objects.select_related("unit"),
+            ),
         )
 
         new_statistics: list[ReservationStatistic] = []
         new_statistics_units: list[ReservationStatisticsReservationUnit] = []
 
         for reservation in reservations:
-            statistic = ReservationStatistic.for_reservation(reservation, save=False)
-            statistic_units = ReservationStatisticsReservationUnit.for_statistic(statistic, save=False)
+            statistic = ReservationStatistic.for_reservation(reservation)
+            statistic_units = ReservationStatisticsReservationUnit.for_statistic(statistic)
             new_statistics.append(statistic)
             new_statistics_units.extend(statistic_units)
 
@@ -322,15 +318,24 @@ class ReservationQuerySet(models.QuerySet):
             if field.concrete and not field.many_to_many and not field.primary_key
         ]
 
-        with transaction.atomic():
-            new_statistics = ReservationStatistic.objects.bulk_create(
-                new_statistics,
-                update_conflicts=True,
-                update_fields=fields_to_update,
-                unique_fields=["reservation"],
-            )
-            ReservationStatisticsReservationUnit.objects.filter(reservation_statistics__in=new_statistics).delete()
-            ReservationStatisticsReservationUnit.objects.bulk_create(new_statistics_units)
+        try:
+            with transaction.atomic():
+                new_statistics = ReservationStatistic.objects.bulk_create(
+                    new_statistics,
+                    update_conflicts=True,
+                    update_fields=fields_to_update,
+                    unique_fields=["reservation"],
+                )
+                ReservationStatisticsReservationUnit.objects.filter(reservation_statistics__in=new_statistics).delete()
+                ReservationStatisticsReservationUnit.objects.bulk_create(new_statistics_units)
+
+        except IntegrityError as error:
+            # Avoid logging errors in Sentry for situations where the reservation is deleted
+            # between the moment a statistic is constructed to when it's created.
+            # Background tasks will try to create the statistics again after a while.
+            reservation_missing = 'is not present in table "reservation".'
+            if reservation_missing not in str(error):
+                raise
 
     def delete_inactive(self) -> None:
         """

@@ -88,7 +88,7 @@ def _reservation_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Reservat
     using = kwargs["using"]
 
     if settings.SAVE_RESERVATION_STATISTICS:
-        create_or_update_reservation_statistics.delay([instance.pk])
+        create_or_update_reservation_statistics.delay(reservation_pks=[instance.pk])
 
     if settings.UPDATE_AFFECTING_TIME_SPANS:
         update_affecting_time_spans_task.delay(using=using)
@@ -168,7 +168,7 @@ def _reservation_reservation_units_m2m(sender: Any, **kwargs: Unpack[M2MChangedK
     using = kwargs["using"]
 
     if action == "post_add" and not reverse and settings.SAVE_RESERVATION_STATISTICS:
-        create_or_update_reservation_statistics.delay([instance.pk])
+        create_or_update_reservation_statistics.delay(reservation_pks=[instance.pk])
 
     if settings.UPDATE_AFFECTING_TIME_SPANS:
         update_affecting_time_spans_task.delay(using=using)
