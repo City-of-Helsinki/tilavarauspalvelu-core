@@ -34,7 +34,7 @@ type ApplicationScheduleView = {
   allocatedReservationUnitName?: string;
   time: string;
   link: string;
-  isAccessCodeActiveCorrect?: boolean;
+  accessCodeActiveAlert?: string;
 };
 
 function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
@@ -60,6 +60,10 @@ function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
   const applicationPk = application.pk ?? 0;
   const reservationPk = slot.recurringReservation?.reservations[0]?.pk ?? null;
   const link = getReservationUrl(reservationPk);
+  const accessCodeActiveAlert = slot.recurringReservation
+    ?.isAccessCodeIsActiveCorrect
+    ? ""
+    : t("RequestedReservation.accessCodesNotActive");
   return {
     key: `${applicationPk}-${slot.pk}`,
     applicationPk,
@@ -70,6 +74,7 @@ function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
     time: timeString,
     name,
     link,
+    accessCodeActiveAlert,
   };
 }
 
@@ -124,13 +129,13 @@ const COLS = [
     key: "allocated_reservation_unit_name_fi",
     transform: ({
       allocatedReservationUnitName,
-      isAccessCodeActiveCorrect,
+      accessCodeActiveAlert,
     }: ApplicationScheduleView) => {
       return (
         <span style={{ position: "relative" }}>
           {truncate(allocatedReservationUnitName ?? "-", unitsTruncateLen)}
-          {isAccessCodeActiveCorrect && (
-            <TranslatedTooltip tKey="RequestedReservation.accessCodesNotActive" />
+          {accessCodeActiveAlert !== "" && (
+            <StyledTooltip>{accessCodeActiveAlert}</StyledTooltip>
           )}
         </span>
       );
