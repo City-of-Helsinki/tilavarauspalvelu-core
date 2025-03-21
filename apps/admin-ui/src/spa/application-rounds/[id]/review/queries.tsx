@@ -173,6 +173,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
           recurringReservation {
             id
             pk
+            isAccessCodeIsActiveCorrect
             reservations {
               id
               pk
