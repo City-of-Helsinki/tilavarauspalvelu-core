@@ -73,6 +73,7 @@ class ApplicationRoundActions:
                         PindoraService.delete_access_code(obj=section)
 
                 # Remove all recurring reservations, and set application round back to HANDLED
+                # NOTE: This triggers _a lot_ of `post_delete` signals fo reservations.
                 Reservation.objects.for_application_round(self.application_round).delete()
                 RecurringReservation.objects.for_application_round(self.application_round).delete()
 

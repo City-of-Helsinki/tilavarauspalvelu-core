@@ -161,7 +161,7 @@ class ReservationStatistic(models.Model):
         return f"{self.reservee_uuid} - {self.begin} - {self.end}"
 
     @classmethod
-    def for_reservation(cls, reservation: Reservation, *, save: bool = True) -> ReservationStatistic:  # noqa: PLR0915
+    def for_reservation(cls, reservation: Reservation, *, save: bool = False) -> ReservationStatistic:  # noqa: PLR0915
         recurring_reservation = getattr(reservation, "recurring_reservation", None)
         ability_group = getattr(recurring_reservation, "ability_group", None)
         allocated_time_slot = getattr(recurring_reservation, "allocated_time_slot", None)
@@ -170,10 +170,9 @@ class ReservationStatistic(models.Model):
         requires_org_id = not reservation.reservee_is_unregistered_association and requires_org_name
         by_profile_user = bool(getattr(reservation.user, "profile_id", ""))
 
-        statistic = (  #
-            ReservationStatistic.objects.filter(reservation=reservation).first()
-            or ReservationStatistic(reservation=reservation)
-        )
+        # Don't care about existing statistics, we can use `bulk_create` with `update_conflicts=True`
+        # to upsert the statistic based on which reservation it belongs to.
+        statistic = ReservationStatistic(reservation=reservation)
 
         statistic.ability_group = ability_group
         statistic.access_code_generated_at = reservation.access_code_generated_at
