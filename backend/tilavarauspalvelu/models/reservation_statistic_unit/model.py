@@ -56,7 +56,7 @@ class ReservationStatisticsReservationUnit(models.Model):
         cls,
         statistic: ReservationStatistic,
         *,
-        save: bool = True,
+        save: bool = False,
     ) -> list[ReservationStatisticsReservationUnit]:
         to_save: list[ReservationStatisticsReservationUnit] = []
         for reservation_unit in statistic.reservation.reservation_units.all():

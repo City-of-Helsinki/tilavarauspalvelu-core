@@ -17,7 +17,6 @@ from tilavarauspalvelu.models.bug_report.model import (
     BugReportTargetChoice,
     BugReportUserChoice,
 )
-from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from utils.date_utils import local_datetime
 
 from tests import factories
@@ -66,7 +65,7 @@ def create_all_models():
             found_at=local_datetime(),
         )
 
-        create_or_update_reservation_statistics(Reservation.objects.values_list("pk", flat=True))
+        Reservation.objects.all().upsert_statistics()
 
 
 @patch_method(

@@ -232,7 +232,7 @@ def update_affecting_time_spans_task(using: str | None = None) -> None:
 
 @app.task(name="create_statistics_for_reservations")
 def create_or_update_reservation_statistics(reservation_pks: list[int]) -> None:
-    Reservation.objects.upsert_statistics(reservation_pks=reservation_pks)
+    Reservation.objects.filter(pk__in=reservation_pks).upsert_statistics()
 
 
 @app.task(name="update_reservation_unit_pricings_tax_percentage")
