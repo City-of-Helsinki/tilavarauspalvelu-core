@@ -229,6 +229,7 @@
       "others": "others",
       "reservationCountPostfix": "bookings"
     },
+    "accessTypeWarning": "Access to the space is subject to change. Read more in the space instructions.",
     "helpLink": "Instructions",
     "helpLinkLong": "Space Instructions",
     "helpModal": {

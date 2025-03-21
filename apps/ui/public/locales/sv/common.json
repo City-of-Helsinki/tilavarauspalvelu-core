@@ -123,5 +123,6 @@
   "inclTax": "inkl. moms {{taxPercentage}} %",
   "peopleSuffixShort": "pers",
   "yearSuffixShort": "år",
-  "amountSuffixShort": "st"
+  "amountSuffixShort": "st",
+  "validity": "Giltlighetstid"
 }
