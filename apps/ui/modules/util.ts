@@ -59,26 +59,10 @@ export function getParameterLabel(
   return "no label";
 }
 
-const IMAGE_SORT_PRIORITY = [ImageType.Main, ImageType.Other];
-
 export function getMainImage(ru?: {
   images: ImageFragment[];
 }): ImageFragment | null {
   return ru?.images.find((img) => img.imageType === ImageType.Main) ?? null;
-}
-
-export function orderImages(images: ImageFragment[]): ImageFragment[] {
-  if (!images || images.length === 0) {
-    return [];
-  }
-  const result = [...images].sort((a, b) => {
-    return (
-      IMAGE_SORT_PRIORITY.indexOf(a.imageType) -
-      IMAGE_SORT_PRIORITY.indexOf(b.imageType)
-    );
-  });
-
-  return result;
 }
 
 export const isTouchDevice = (): boolean =>
