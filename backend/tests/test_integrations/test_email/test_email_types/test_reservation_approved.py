@@ -470,10 +470,9 @@ def test_render_reservation_approved__access_code_error__html():
     text_content = html_email_to_text(html_content)
 
     access_code_text = (
-        "You can see the door code on the "
-        "<a href=\"https://fake.varaamo.hel.fi/en/reservations\">'My bookings' page</a> at Varaamo. "
-        "If the code is not visible in your booking details, please contact "
-        '<a href="https://fake.varaamo.hel.fi/feedback?lang=en">Varaamo customer service</a>.'
+        "You can see the door code on the ['My bookings' page](https://fake.varaamo.hel.fi/en/reservations) at "
+        "Varaamo. If the code is not visible in your booking details, "
+        "please contact [Varaamo customer service](https://fake.varaamo.hel.fi/feedback?lang=en)."
     )
 
     assert text_content == cleandoc(
