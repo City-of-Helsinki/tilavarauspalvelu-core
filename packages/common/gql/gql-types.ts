@@ -47,6 +47,13 @@ export type AbilityGroupNode = Node & {
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
+/** The state of the access code. */
+export enum AccessCodeState {
+  AccessCodeCreated = "ACCESS_CODE_CREATED",
+  AccessCodeNotRequired = "ACCESS_CODE_NOT_REQUIRED",
+  AccessCodePending = "ACCESS_CODE_PENDING",
+}
+
 /** How is the reservee able to enter the space in their reservation unit? */
 export enum AccessType {
   AccessCode = "ACCESS_CODE",
@@ -1980,6 +1987,7 @@ export type QueryAgeGroupsArgs = {
 };
 
 export type QueryAllocatedTimeSlotsArgs = {
+  accessCodeState?: InputMaybe<Array<InputMaybe<AccessCodeState>>>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   allocatedReservationUnit?: InputMaybe<
     Array<InputMaybe<Scalars["Int"]["input"]>>
@@ -4118,6 +4126,7 @@ export type ReservationUnitOptionNode = Node & {
 };
 
 export type ReservationUnitOptionNodeAllocatedTimeSlotsArgs = {
+  accessCodeState?: InputMaybe<Array<InputMaybe<AccessCodeState>>>;
   allocatedReservationUnit?: InputMaybe<
     Array<InputMaybe<Scalars["Int"]["input"]>>
   >;

@@ -16,6 +16,15 @@ type AbilityGroupNode implements Node {
 }
 
 """
+The state of the access code.
+"""
+enum AccessCodeState {
+  ACCESS_CODE_CREATED
+  ACCESS_CODE_NOT_REQUIRED
+  ACCESS_CODE_PENDING
+}
+
+"""
 How is the reservee able to enter the space in their reservation unit?
 """
 enum AccessType {
@@ -2064,6 +2073,7 @@ type Query {
     offset: Int
   ): AgeGroupNodeConnection
   allocatedTimeSlots(
+    accessCodeState: [AccessCodeState]
     after: String
     allocatedReservationUnit: [Int]
     allocatedUnit: [Int]
@@ -4455,6 +4465,7 @@ input ReservationUnitOptionApplicantSerializerInput {
 
 type ReservationUnitOptionNode implements Node {
   allocatedTimeSlots(
+    accessCodeState: [AccessCodeState]
     allocatedReservationUnit: [Int]
     allocatedUnit: [Int]
     applicantType: [ApplicantTypeChoice]

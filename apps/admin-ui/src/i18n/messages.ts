@@ -1721,6 +1721,11 @@ const translations: ITranslations = {
     CANCELLED: ["Peruutettu"],
     FREE: ["Maksuton"],
   },
+  accessCodeState: {
+    ACCESS_CODE_CREATED: ["Ovikoodi luotu"],
+    ACCESS_CODE_PENDING: ["Ovikoodia luodaan"],
+    ACCESS_CODE_NOT_REQUIRED: ["Ei tarvitse ovikoodia"],
+  },
   reservationStartInterval: {
     INTERVAL_15_MINS: ["15 min välein"],
     INTERVAL_30_MINS: ["30 min välein"],
@@ -1868,6 +1873,7 @@ const translations: ITranslations = {
       recurring: ["Toistuva varaus"],
       onlyRecurring: ["Vain toistuvat"],
       onlyNotRecurring: ["Vain yksittäiset"],
+      accessCodeState: ["Ovikoodin tila"],
     },
     placeholder: {
       unit: ["Valitse toimipiste"],
@@ -1900,6 +1906,7 @@ const translations: ITranslations = {
       maxPersonsLte: ["Enintään"],
       surfaceAreaLte: ["Enintään"],
       surfaceAreaGte: ["Vähintään"],
+      accessCodeState: ["Valitse ovikoodin tila"],
     },
     tag: {
       minPrice: ["Vähintään {{price}} €"],

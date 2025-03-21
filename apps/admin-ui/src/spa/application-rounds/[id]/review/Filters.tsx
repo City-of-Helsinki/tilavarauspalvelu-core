@@ -4,6 +4,7 @@ import { AutoGrid } from "common/styles/util";
 import { SearchTags } from "@/component/SearchTags";
 import { VALID_ALLOCATION_APPLICATION_STATUSES } from "@/common/const";
 import {
+  AccessCodeState,
   ApplicantTypeChoice,
   ApplicationSectionStatusChoice,
 } from "@gql/gql-types";
@@ -22,6 +23,7 @@ type Props = {
   enableWeekday?: boolean;
   enableReservationUnit?: boolean;
   reservationUnits?: UnitPkName[];
+  enableAccessCodeState?: boolean;
 };
 
 export function Filters({
@@ -31,6 +33,7 @@ export function Filters({
   enableWeekday = false,
   enableReservationUnit = false,
   reservationUnits = [],
+  enableAccessCodeState = false,
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
@@ -51,6 +54,11 @@ export function Filters({
     })
   );
 
+  const accessCodeOptions = Object.values(AccessCodeState).map((s) => ({
+    value: s,
+    label: t(`accessCodeState.${s}`),
+  }));
+
   const translateTag = (key: string, value: string) => {
     switch (key) {
       case "unit":
@@ -67,6 +75,8 @@ export function Filters({
         );
       case "eventStatus":
         return t(`ApplicationSectionStatusChoice.${value}`);
+      case "accessCodeState":
+        return t(`accessCodeState.${value}`);
       default:
         return value;
     }
@@ -126,6 +136,12 @@ export function Filters({
           <MultiSelectFilter
             name="reservationUnit"
             options={reservationUnitOptions}
+          />
+        )}
+        {enableAccessCodeState && (
+          <MultiSelectFilter
+            name="accessCodeState"
+            options={accessCodeOptions}
           />
         )}
         <SearchFilter name="search" />
