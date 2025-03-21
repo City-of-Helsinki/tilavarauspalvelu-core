@@ -44,7 +44,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@happy-dom/jest-environment": "^17.1.8",
+    "@happy-dom/jest-environment": "^17.4.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
