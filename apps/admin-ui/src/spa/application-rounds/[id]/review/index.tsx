@@ -385,6 +385,7 @@ export function Review({
                 enableApplicant
                 enableWeekday
                 enableReservationUnit
+                enableAccessCodeState
                 statusOption="eventShort"
               />
               <TimeSlotDataLoader

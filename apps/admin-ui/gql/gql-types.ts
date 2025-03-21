@@ -47,6 +47,13 @@ export type AbilityGroupNode = Node & {
   pk?: Maybe<Scalars["Int"]["output"]>;
 };
 
+/** The state of the access code. */
+export enum AccessCodeState {
+  AccessCodeCreated = "ACCESS_CODE_CREATED",
+  AccessCodeNotRequired = "ACCESS_CODE_NOT_REQUIRED",
+  AccessCodePending = "ACCESS_CODE_PENDING",
+}
+
 /** How is the reservee able to enter the space in their reservation unit? */
 export enum AccessType {
   AccessCode = "ACCESS_CODE",
@@ -1980,6 +1987,7 @@ export type QueryAgeGroupsArgs = {
 };
 
 export type QueryAllocatedTimeSlotsArgs = {
+  accessCodeState?: InputMaybe<Array<InputMaybe<AccessCodeState>>>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   allocatedReservationUnit?: InputMaybe<
     Array<InputMaybe<Scalars["Int"]["input"]>>
@@ -4118,6 +4126,7 @@ export type ReservationUnitOptionNode = Node & {
 };
 
 export type ReservationUnitOptionNodeAllocatedTimeSlotsArgs = {
+  accessCodeState?: InputMaybe<Array<InputMaybe<AccessCodeState>>>;
   allocatedReservationUnit?: InputMaybe<
     Array<InputMaybe<Scalars["Int"]["input"]>>
   >;
@@ -7231,6 +7240,9 @@ export type AllocatedTimeSlotsQueryVariables = Exact<{
   >;
   after?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
+  accessCodeState?: InputMaybe<
+    Array<InputMaybe<AccessCodeState>> | InputMaybe<AccessCodeState>
+  >;
 }>;
 
 export type AllocatedTimeSlotsQuery = {
@@ -13166,6 +13178,7 @@ export const AllocatedTimeSlotsDocument = gql`
     $orderBy: [AllocatedTimeSlotOrderingChoices]
     $after: String
     $first: Int
+    $accessCodeState: [AccessCodeState]
   ) {
     allocatedTimeSlots(
       after: $after
@@ -13177,6 +13190,7 @@ export const AllocatedTimeSlotsDocument = gql`
       allocatedReservationUnit: $allocatedReservationUnit
       dayOfTheWeek: $dayOfTheWeek
       textSearch: $textSearch
+      accessCodeState: $accessCodeState
       orderBy: $orderBy
     ) {
       edges {
@@ -13256,6 +13270,7 @@ export const AllocatedTimeSlotsDocument = gql`
  *      orderBy: // value for 'orderBy'
  *      after: // value for 'after'
  *      first: // value for 'first'
+ *      accessCodeState: // value for 'accessCodeState'
  *   },
  * });
  */

@@ -150,6 +150,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
     $orderBy: [AllocatedTimeSlotOrderingChoices]
     $after: String
     $first: Int
+    $accessCodeState: [AccessCodeState]
   ) {
     allocatedTimeSlots(
       after: $after
@@ -161,6 +162,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
       allocatedReservationUnit: $allocatedReservationUnit
       dayOfTheWeek: $dayOfTheWeek
       textSearch: $textSearch
+      accessCodeState: $accessCodeState
       orderBy: $orderBy
     ) {
       edges {
