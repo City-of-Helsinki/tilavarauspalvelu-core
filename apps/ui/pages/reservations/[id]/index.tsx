@@ -83,6 +83,7 @@ import { Instructions } from "@/components/Instructions";
 import { gql } from "@apollo/client";
 import StatusLabel from "common/src/components/StatusLabel";
 import IconButton from "common/src/components/IconButton";
+import { isBefore, sub } from "date-fns";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -321,10 +322,12 @@ function Reservation({
   feedbackUrl,
 }: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const isAccessCodeReservation =
+  const shouldShowAccessCode =
+    isBefore(sub(new Date(), { days: 1 }), new Date(reservation.end)) &&
+    reservation.state === ReservationStateChoice.Confirmed &&
     reservation.accessType === AccessType.AccessCode;
   const { data: accessCodeData } = useAccessCodeQuery({
-    skip: !reservation || !isAccessCodeReservation,
+    skip: !reservation || !shouldShowAccessCode,
     variables: {
       id: base64encode(`ReservationNode:${reservation.pk}`),
     },
@@ -410,7 +413,7 @@ function Reservation({
                   testId="reservation__payment-status"
                 />
               )}
-              {isAccessCodeReservation && (
+              {shouldShowAccessCode && (
                 <StatusLabel
                   type="info"
                   icon={
@@ -513,7 +516,7 @@ function Reservation({
             reservation={reservation}
             supportedFields={supportedFields}
           />
-          {isAccessCodeReservation && (
+          {shouldShowAccessCode && (
             <AccessCodeInfo
               pindoraInfo={pindoraInfo}
               feedbackUrl={feedbackUrl}
