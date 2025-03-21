@@ -38,17 +38,12 @@ const ActionButtons = styled(Dialog.ActionButtons)`
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
   reservation: ReservationType;
-  isFree: boolean;
   onClose: () => void;
   onAccept: () => void;
+  isFree?: boolean;
 };
 
-const DialogContent = ({
-  reservation,
-  isFree: isReservationUnitFree,
-  onClose,
-  onAccept,
-}: Props) => {
+const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
   const { t, i18n } = useTranslation();
 
   const [mutation] = useApproveReservationMutation();
@@ -95,11 +90,6 @@ const DialogContent = ({
     });
   };
 
-  // the reservation has a price and the reservation unit is paid
-  // might be extrenous checks (the reservation price is what is important here)
-  // a free reservation should never be allowed to be approved with a price
-  const shouldDisplayPrice = !isReservationUnitFree && hasPrice;
-
   return (
     <>
       <Dialog.Content>
@@ -117,10 +107,6 @@ const DialogContent = ({
               <Notification>
                 {getReservationPriceDetails(reservation, t)}
               </Notification>
-            </>
-          )}
-          {shouldDisplayPrice && (
-            <>
               <Checkbox
                 label={t("RequestedReservation.ApproveDialog.clearPrice")}
                 id="clearPrice"
@@ -217,7 +203,6 @@ const ApproveDialog = ({
           }
         />
         <DialogContent
-          isFree={isFree}
           reservation={reservation}
           onAccept={onAccept}
           onClose={onClose}
