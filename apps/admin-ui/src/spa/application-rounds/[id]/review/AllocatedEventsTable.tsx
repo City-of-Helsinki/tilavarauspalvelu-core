@@ -2,13 +2,14 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { memoize } from "lodash-es";
-import { IconLinkExternal, IconSize } from "hds-react";
+import { IconLinkExternal, IconSize, Tooltip } from "hds-react";
 import type { AllocatedTimeSlotsQuery } from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { getApplicantName, truncate } from "@/helpers";
 import { getApplicationUrl, getReservationUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
 import { ExternalTableLink, TableLink } from "@/styles/util";
+import styled from "styled-components";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -33,6 +34,7 @@ type ApplicationScheduleView = {
   allocatedReservationUnitName?: string;
   time: string;
   link: string;
+  accessCodeActiveAlert?: string;
 };
 
 function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
@@ -51,13 +53,17 @@ function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
   const begin = slot?.beginTime ?? "";
   const end = slot?.endTime ?? "";
   const timeString = isAllocated
-    ? `${t(`dayShort.${day}`)} ${begin.slice(0, 5)} - ${end.slice(0, 5)}`
+    ? `${t("dayShort." + day)} ${begin.slice(0, 5)} - ${end.slice(0, 5)}`
     : "-";
   const name = slot.reservationUnitOption.applicationSection.name ?? "-";
 
   const applicationPk = application.pk ?? 0;
   const reservationPk = slot.recurringReservation?.reservations[0]?.pk ?? null;
   const link = getReservationUrl(reservationPk);
+  const accessCodeActiveAlert = slot.recurringReservation
+    ?.isAccessCodeIsActiveCorrect
+    ? ""
+    : t("RequestedReservation.accessCodesNotActive");
   return {
     key: `${applicationPk}-${slot.pk}`,
     applicationPk,
@@ -68,8 +74,15 @@ function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
     time: timeString,
     name,
     link,
+    accessCodeActiveAlert,
   };
 }
+
+const StyledTooltip = styled(Tooltip)`
+  position: absolute;
+  left: calc(var(--spacing-l) * -1);
+  top: 0;
+`;
 
 const COLS = [
   {
@@ -114,10 +127,16 @@ const COLS = [
     headerTKey: "ApplicationEventSchedules.headings.reservationUnit",
     isSortable: true,
     key: "allocated_reservation_unit_name_fi",
-    transform: ({ allocatedReservationUnitName }: ApplicationScheduleView) => {
+    transform: ({
+      allocatedReservationUnitName,
+      accessCodeActiveAlert,
+    }: ApplicationScheduleView) => {
       return (
-        <span>
+        <span style={{ position: "relative" }}>
           {truncate(allocatedReservationUnitName ?? "-", unitsTruncateLen)}
+          {accessCodeActiveAlert !== "" && (
+            <StyledTooltip>{accessCodeActiveAlert}</StyledTooltip>
+          )}
         </span>
       );
     },
@@ -147,7 +166,7 @@ export function AllocatedEventsTable({
   sortChanged: onSortChanged,
   schedules,
   isLoading,
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
 
   const views = schedules.map((aes) => timeSlotMapper(t, aes));

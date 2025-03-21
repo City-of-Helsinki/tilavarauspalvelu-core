@@ -7255,6 +7255,7 @@ export type AllocatedTimeSlotsQuery = {
         recurringReservation?: {
           id: string;
           pk?: number | null;
+          isAccessCodeIsActiveCorrect?: boolean | null;
           reservations: Array<{ id: string; pk?: number | null }>;
         } | null;
         reservationUnitOption: {
@@ -13198,6 +13199,7 @@ export const AllocatedTimeSlotsDocument = gql`
           recurringReservation {
             id
             pk
+            isAccessCodeIsActiveCorrect
             reservations {
               id
               pk

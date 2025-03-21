@@ -2021,6 +2021,7 @@ const translations: ITranslations = {
     accessCodeValidityFromNextReservation: [
       "Voimassaoloaika seuraavasta varauksesta",
     ],
+    accessCodesNotActive: ["Ovikoodia luodaan"],
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],
