@@ -259,7 +259,7 @@ export function SingleSearchForm({
           initiallyOpen={showOptionalFilters}
         >
           <ControlledNumberInput
-            label={t("searchForm:participantCountCombined")}
+            label={t("searchForm:labels.personsAllowed")}
             name="personsAllowed"
             control={control}
             min={1}

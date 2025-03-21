@@ -198,8 +198,14 @@ function createSearchVariablesMock({
   textSearch = null,
 }: {
   textSearch?: string | null;
-} = {}): SearchReservationUnitsQueryVariables {
+  // TODO return type issues because all of them are optional (by backend)
+  // we'd need to match them to a Required return type that we actully use
+  // so what happens:
+  // a new query param is added but that is not reflected in the mock
+  // -> this is not a lint / type error but a runtime error in the tests
+} = {}): Readonly<SearchReservationUnitsQueryVariables> {
   return {
+    personsAllowed: null,
     textSearch,
     purposes: [],
     unit: [],
@@ -217,7 +223,7 @@ function createSearchVariablesMock({
     isDraft: false,
     isVisible: true,
     reservationKind: ReservationKind.Season,
-  };
+  } as const;
 }
 
 function createMockApplicationSection({

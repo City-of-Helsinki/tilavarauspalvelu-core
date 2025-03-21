@@ -1,7 +1,5 @@
 {
   "searchButton": "Hae",
-  "participantCountLabel": "Henkilömäärä vähintään",
-  "participantCountCombined": "Henkilömäärä",
   "showMoreFilters": "Tarkennettu haku",
   "showLessFilters": "Näytä vähemmän vaihtoehtoja",
   "beginTimeIsBeforeEndTime": "Alkamisajan on oltava ennen loppumisaikaa",
@@ -11,6 +9,7 @@
   },
   "labels": {
     "textSearch": "Haku",
+    "personsAllowed": "Henkilömäärä",
     "reservationUnitTypes": "Tilan tyyppi",
     "units": "Toimipiste",
     "purposes": "Käyttötarkoitus",

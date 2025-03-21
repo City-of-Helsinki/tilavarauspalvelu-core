@@ -1,7 +1,5 @@
 {
   "searchButton": "Search",
-  "participantCountLabel": "Number of participants at least",
-  "participantCountCombined": "Number of participants",
   "showMoreFilters": "Advanced search",
   "showLessFilters": "Show less options",
   "beginTimeIsBeforeEndTime": "The start time must be before the end time",
@@ -11,6 +9,7 @@
   },
   "labels": {
     "textSearch": "Search",
+    "personsAllowed": "Number of participants",
     "reservationUnitTypes": "Type of space",
     "units": "Location",
     "purposes": "Purpose of use",
