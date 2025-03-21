@@ -16,13 +16,9 @@ import {
   getTranslationSafe,
   toUIDate,
 } from "common/src/common/util";
+import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
 import { H1, H3 } from "common/src/common/typography";
 import { formatDateTime } from "@/modules/util";
-import {
-  AccessType,
-  ReservationKind,
-  type ReservationUnitPageQuery,
-} from "@gql/gql-types";
 import { IconWithText } from "../common/IconWithText";
 import { Images } from "./Images";
 import {
@@ -311,8 +307,7 @@ function IconList({
           ),
         }
       : null,
-    reservationUnit.currentAccessType &&
-    reservationUnit.currentAccessType !== AccessType.Unrestricted
+    reservationUnit.currentAccessType
       ? {
           key: "accessType",
           icon: (
