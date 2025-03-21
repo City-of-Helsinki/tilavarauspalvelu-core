@@ -87,6 +87,9 @@ ruff = "0.11.1"
 [project.entry-points.pytest11]
 tilavarauspalvelu = "tests.plugins"
 
+[project.entry-points."celery.beat_schedulers"]
+django-tvp = "config.celery.beat.VaraamoDatabaseScheduler"
+
 [tool.ruff]
 fix = true
 unsafe-fixes = true
