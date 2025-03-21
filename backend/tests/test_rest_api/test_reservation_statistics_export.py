@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 
+import freezegun
 import pytest
 from django.urls import reverse
 
@@ -50,7 +51,6 @@ def test_reservation_statistics_export(api_client, settings):
         "home_city",
         "home_city_municipality_code",
         "home_city_name",
-        "id",
         "is_applied",
         "is_recurring",
         "is_subsidised",
@@ -70,7 +70,6 @@ def test_reservation_statistics_export(api_client, settings):
         "recurrence_begin_date",
         "recurrence_end_date",
         "recurrence_uuid",
-        "reservation",
         "reservation_confirmed_at",
         "reservation_created_at",
         "reservation_handled_at",
@@ -88,8 +87,8 @@ def test_reservation_statistics_export(api_client, settings):
         "tax_percentage_value",
         "updated_at",
     ]
-    assert data[0]["reservation"] == reservation_1.pk
-    assert data[1]["reservation"] == reservation_2.pk
+    assert data[0]["reservation_uuid"] == str(reservation_1.ext_uuid)
+    assert data[1]["reservation_uuid"] == str(reservation_2.ext_uuid)
 
 
 def test_reservation_statistics_export__missing_auth(api_client, settings):
@@ -126,14 +125,14 @@ def test_reservation_statistics_export__only_one(api_client, settings):
     reservation = ReservationFactory.create()
     ReservationFactory.create()
 
-    url = reverse("reservation_statistics_export") + f"?only={reservation.pk}"
+    url = reverse("reservation_statistics_export") + f"?only={reservation.ext_uuid}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
 
     assert response.status_code == 200, response.json()
 
     data = response.json()
     assert len(data) == 1
-    assert data[0]["reservation"] == reservation.pk
+    assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
 def test_reservation_statistics_export__only_two(api_client, settings):
@@ -142,15 +141,15 @@ def test_reservation_statistics_export__only_two(api_client, settings):
     reservation_1 = ReservationFactory.create()
     reservation_2 = ReservationFactory.create()
 
-    url = reverse("reservation_statistics_export") + f"?only={reservation_1.pk},{reservation_2.pk}"
+    url = reverse("reservation_statistics_export") + f"?only={reservation_1.ext_uuid},{reservation_2.ext_uuid}"
     response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
 
     assert response.status_code == 200, response.json()
 
     data = response.json()
     assert len(data) == 2
-    assert data[0]["reservation"] == reservation_1.pk
-    assert data[1]["reservation"] == reservation_2.pk
+    assert data[0]["reservation_uuid"] == str(reservation_1.ext_uuid)
+    assert data[1]["reservation_uuid"] == str(reservation_2.ext_uuid)
 
 
 def test_reservation_statistics_export__tprek_id(api_client, settings):
@@ -166,7 +165,7 @@ def test_reservation_statistics_export__tprek_id(api_client, settings):
 
     data = response.json()
     assert len(data) == 1
-    assert data[0]["reservation"] == reservation.pk
+    assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
 def test_reservation_statistics_export__begins_after(api_client, settings):
@@ -185,7 +184,7 @@ def test_reservation_statistics_export__begins_after(api_client, settings):
 
     data = response.json()
     assert len(data) == 1
-    assert data[0]["reservation"] == reservation.pk
+    assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
 def test_reservation_statistics_export__begins_before(api_client, settings):
@@ -204,7 +203,7 @@ def test_reservation_statistics_export__begins_before(api_client, settings):
 
     data = response.json()
     assert len(data) == 1
-    assert data[0]["reservation"] == reservation.pk
+    assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
 def test_reservation_statistics_export__start(api_client, settings):
@@ -220,7 +219,7 @@ def test_reservation_statistics_export__start(api_client, settings):
 
     data = response.json()
     assert len(data) == 1
-    assert data[0]["reservation"] == reservation.pk
+    assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
 
 
 def test_reservation_statistics_export__stop(api_client, settings):
@@ -236,4 +235,66 @@ def test_reservation_statistics_export__stop(api_client, settings):
 
     data = response.json()
     assert len(data) == 1
-    assert data[0]["reservation"] == reservation.pk
+    assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_statistics_export__updated_after(api_client, settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    reservation = ReservationFactory.create()
+
+    url = reverse("reservation_statistics_export") + "?updated_after=2024-01-01T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200, response.json()
+
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_statistics_export__updated_after__not_in_range(api_client, settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    ReservationFactory.create()
+
+    url = reverse("reservation_statistics_export") + "?updated_after=2024-01-02T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200, response.json()
+
+    data = response.json()
+    assert len(data) == 0
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_statistics_export__updated_before(api_client, settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    reservation = ReservationFactory.create()
+
+    url = reverse("reservation_statistics_export") + "?updated_before=2024-01-02T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200, response.json()
+
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["reservation_uuid"] == str(reservation.ext_uuid)
+
+
+@freezegun.freeze_time(local_datetime(2024, 1, 1, 12))
+def test_reservation_statistics_export__updated_before__not_in_range(api_client, settings):
+    settings.SAVE_RESERVATION_STATISTICS = True
+
+    ReservationFactory.create()
+
+    url = reverse("reservation_statistics_export") + "?updated_before=2024-01-01T00:00:00+02:00"
+    response = api_client.get(url, headers={"Authorization": settings.EXPORT_AUTHORIZATION_TOKEN})
+
+    assert response.status_code == 200, response.json()
+
+    data = response.json()
+    assert len(data) == 0

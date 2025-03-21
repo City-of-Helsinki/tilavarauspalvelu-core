@@ -12,6 +12,7 @@ from tilavarauspalvelu.api.rest.views import (
     csrf_view,
     liveness_check,
     readiness_check,
+    reservable_time_spans_export,
     reservation_ical,
     reservation_statistics_export,
     reservation_unit_export,
@@ -59,6 +60,7 @@ urlpatterns = [
     path("monitoring/readiness/", readiness_check, name="readiness_check"),
     path("v1/reports/reservation-units/", reservation_unit_export, name="reservation_unit_export"),
     path("v1/reports/reservation-statistics/", reservation_statistics_export, name="reservation_statistics_export"),
+    path("v1/reports/reservable-time-spans/", reservable_time_spans_export, name="reservable_time_spans_export"),
 ]
 
 if settings.MOCK_VERKKOKAUPPA_API_ENABLED:

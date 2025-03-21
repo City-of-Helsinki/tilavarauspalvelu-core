@@ -2,14 +2,23 @@ from __future__ import annotations
 
 import dataclasses
 import datetime
-from functools import wraps
+import uuid
+from functools import cache, wraps
 from typing import TYPE_CHECKING
 
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
+from import_export.admin import ExportMixin
+from import_export.declarative import ModelDeclarativeMetaclass
+from import_export.resources import ModelResource
+from import_export.widgets import DateTimeWidget, TimeWidget
+
+from tilavarauspalvelu.models import ReservableTimeSpan, ReservationStatistic
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from import_export.fields import Field as ImportExportField
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -37,20 +46,21 @@ def validation_error_as_response[R, **P](func: Callable[P, R]) -> Callable[P, R]
 class ReservationUnitParams:
     reservation_units: list[int]
     tprek_id: str
+    updated_after: datetime.datetime | None
+    updated_before: datetime.datetime | None
 
     @classmethod
     def from_request(cls, request: WSGIRequest) -> ReservationUnitParams:
-        try:
-            reservation_units = [int(pk) for pk in request.GET.get("only", "").split(",") if pk]
-        except (ValueError, TypeError) as error:
-            msg = "'only' should be a comma separated list of reservation unit ids."
-            raise ValidationError(msg) from error
-
+        reservation_units = parse_list_of_pks(request, "only")
+        updated_after = parse_datetime(request, "updated_after")
+        updated_before = parse_datetime(request, "updated_before")
         tprek_id: str = str(request.GET.get("tprek_id", ""))
 
         return cls(
             reservation_units=reservation_units,
             tprek_id=tprek_id,
+            updated_after=updated_after,
+            updated_before=updated_before,
         )
 
 
@@ -58,44 +68,52 @@ class ReservationUnitParams:
 class StatisticsParams:
     begins_after: datetime.datetime | None
     begins_before: datetime.datetime | None
-    reservations: list[int]
+    reservations: list[uuid.UUID]
     tprek_id: str
+    updated_after: datetime.datetime | None
+    updated_before: datetime.datetime | None
 
     @classmethod
     def from_request(cls, request: WSGIRequest) -> StatisticsParams:
-        try:
-            reservations: list[int] = [int(pk) for pk in request.GET.get("only", "").split(",") if pk]
-        except (ValueError, TypeError) as error:
-            msg = "'only' should be a comma separated list of reservation ids."
-            raise ValidationError(msg) from error
-
-        # "+" is an escape char in URL params for a space, so replace it with "+" for the timezone info
-        begins_after_str: str = request.GET.get("begins_after", "").replace(" ", "+")
-        begins_before_str: str = request.GET.get("begins_before", "").replace(" ", "+")
-        begins_after: datetime.datetime | None = None
-        begins_before: datetime.datetime | None = None
-
-        if begins_after_str:
-            try:
-                begins_after = datetime.datetime.fromisoformat(begins_after_str)
-            except (ValueError, TypeError) as error:
-                msg = "'begins_after' should be a ISO datetime string."
-                raise ValidationError(msg) from error
-
-        if begins_before_str:
-            try:
-                begins_before = datetime.datetime.fromisoformat(begins_before_str)
-            except (ValueError, TypeError) as error:
-                msg = "'begins_before' should be a ISO datetime string."
-                raise ValidationError(msg) from error
-
+        reservations = parse_list_of_uuids(request, "only")
+        begins_after = parse_datetime(request, "begins_after")
+        begins_before = parse_datetime(request, "begins_before")
         tprek_id: str = str(request.GET.get("tprek_id", ""))
+        updated_after = parse_datetime(request, "updated_after")
+        updated_before = parse_datetime(request, "updated_before")
 
         return cls(
             begins_after=begins_after,
             begins_before=begins_before,
             reservations=reservations,
             tprek_id=tprek_id,
+            updated_after=updated_after,
+            updated_before=updated_before,
+        )
+
+
+@dataclasses.dataclass
+class ReservableTimeSpansParams:
+    reservation_units: list[int]
+    tprek_id: str
+    hauki_resource: list[int]
+    after: datetime.datetime | None
+    before: datetime.datetime | None
+
+    @classmethod
+    def from_request(cls, request: WSGIRequest) -> ReservableTimeSpansParams:
+        reservation_units = parse_list_of_pks(request, "only")
+        tprek_id = str(request.GET.get("tprek_id", ""))
+        hauki_resource = parse_list_of_pks(request, "hauki_resource")
+        after = parse_datetime(request, "after")
+        before = parse_datetime(request, "before")
+
+        return cls(
+            reservation_units=reservation_units,
+            tprek_id=tprek_id,
+            hauki_resource=hauki_resource,
+            after=after,
+            before=before,
         )
 
 
@@ -103,17 +121,8 @@ def validate_pagination(request: WSGIRequest) -> tuple[int, int]:
     # Set max page size to avoid timeouts
     max_page_size = 100
 
-    try:
-        start = int(request.GET.get("start", 0))
-    except (ValueError, TypeError) as error:
-        msg = "'start' should be a number."
-        raise ValidationError(msg) from error
-
-    try:
-        stop = int(request.GET.get("stop", start + max_page_size))
-    except (ValueError, TypeError) as error:
-        msg = "'stop' should be a number."
-        raise ValidationError(msg) from error
+    start = parse_int(request, "start", default=0)
+    stop = parse_int(request, "stop", default=start + max_page_size)
 
     if start >= stop:
         msg = "'start' should be less than 'stop'."
@@ -124,3 +133,82 @@ def validate_pagination(request: WSGIRequest) -> tuple[int, int]:
         raise ValidationError(msg)
 
     return start, stop
+
+
+def parse_int(request: WSGIRequest, param: str, *, default: int) -> int:
+    try:
+        return int(request.GET.get(param, default))
+    except (ValueError, TypeError) as error:
+        msg = f"'{param}' should be an integer."
+        raise ValidationError(msg) from error
+
+
+def parse_list_of_pks(request: WSGIRequest, param: str) -> list[int]:
+    try:
+        return [int(pk) for pk in request.GET.get(param, "").split(",") if pk]
+    except (ValueError, TypeError) as error:
+        msg = f"'{param}' should be a comma separated list of integers."
+        raise ValidationError(msg) from error
+
+
+def parse_list_of_uuids(request: WSGIRequest, param: str) -> list[uuid.UUID]:
+    try:
+        return [uuid.UUID(pk) for pk in request.GET.get(param, "").split(",") if pk]
+    except (ValueError, TypeError) as error:
+        msg = f"'{param}' should be a comma separated list of UUIDs (v4)."
+        raise ValidationError(msg) from error
+
+
+def parse_datetime(request: WSGIRequest, param: str) -> datetime.datetime | None:
+    """Parse datetime from string"""
+    # "+" is an escape char in URL params for a space, so replace it with "+" for the timezone info
+    string_value: str = request.GET.get(param, "").replace(" ", "+")
+
+    if not string_value:
+        return None
+
+    try:
+        return datetime.datetime.fromisoformat(string_value)
+    except (ValueError, TypeError) as error:
+        msg = f"'{param}' should be ISO datetime strings."
+        raise ValidationError(msg) from error
+
+
+@cache
+def create_statistics_exporter() -> ExportMixin:
+    class ReservationStatisticResource(ModelResource, metaclass=ModelDeclarativeMetaclass):
+        class Meta:
+            model = ReservationStatistic
+            exclude = ["id", "reservation"]
+
+    fix_field_datetime_formats(ReservationStatisticResource)
+
+    exporter = ExportMixin()
+    exporter.model = ReservationStatistic
+    exporter.resource_classes = [ReservationStatisticResource]
+    return exporter
+
+
+@cache
+def create_reservable_time_spans_exporter() -> ExportMixin:
+    class ReservableTimeSpanResource(ModelResource, metaclass=ModelDeclarativeMetaclass):
+        class Meta:
+            model = ReservableTimeSpan
+            exclude = ["id"]
+
+    fix_field_datetime_formats(ReservableTimeSpanResource)
+
+    exporter = ExportMixin()
+    exporter.model = ReservableTimeSpan
+    exporter.resource_classes = [ReservableTimeSpanResource]
+    return exporter
+
+
+def fix_field_datetime_formats(resource: ModelDeclarativeMetaclass) -> None:
+    field: ImportExportField
+    for field in resource.fields.values():
+        match field.widget:
+            case DateTimeWidget():
+                field.widget.formats = ["%Y-%m-%dT%H:%M:%S%:z"]
+            case TimeWidget():
+                field.widget.formats = ["%H:%M:%S%:z"]

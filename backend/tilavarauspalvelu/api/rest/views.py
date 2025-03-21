@@ -12,25 +12,25 @@ from django.http import FileResponse, HttpResponseForbidden, HttpResponseRedirec
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
-from import_export.admin import ExportMixin
 from import_export.formats.base_formats import JSON
-from import_export.resources import modelresource_factory
-from import_export.widgets import DateTimeWidget, TimeWidget
 
-from tilavarauspalvelu.api.rest.utils import (
-    ReservationUnitParams,
-    StatisticsParams,
-    validate_pagination,
-    validation_error_as_response,
-)
-from tilavarauspalvelu.models import Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
+from tilavarauspalvelu.models import ReservableTimeSpan, Reservation, ReservationStatistic, ReservationUnit, TermsOfUse
 from tilavarauspalvelu.services.export import ReservationUnitExporter
 from tilavarauspalvelu.services.pdf import render_to_pdf
 from utils.utils import ical_hmac_signature
 
+from .utils import (
+    ReservableTimeSpansParams,
+    ReservationUnitParams,
+    StatisticsParams,
+    create_reservable_time_spans_exporter,
+    create_statistics_exporter,
+    validate_pagination,
+    validation_error_as_response,
+)
+
 if TYPE_CHECKING:
     from django.http import HttpResponse
-    from import_export.fields import Field as ImportExportField
 
     from tilavarauspalvelu.typing import WSGIRequest
 
@@ -38,7 +38,10 @@ __all__ = [
     "csrf_view",
     "liveness_check",
     "readiness_check",
+    "reservable_time_spans_export",
     "reservation_ical",
+    "reservation_statistics_export",
+    "reservation_unit_export",
     "terms_of_use_pdf",
 ]
 
@@ -183,6 +186,10 @@ def reservation_unit_export(request: WSGIRequest) -> HttpResponse:
         queryset = queryset.filter(pk__in=params.reservation_units)
     if params.tprek_id:
         queryset = queryset.filter(unit__tprek_id=params.tprek_id)
+    if params.updated_after:
+        queryset = queryset.filter(updated_at__gte=params.updated_after)
+    if params.updated_before:
+        queryset = queryset.filter(updated_at__lt=params.updated_before)
 
     total_count = queryset.count()
     queryset = queryset[start:stop]
@@ -234,33 +241,85 @@ def reservation_statistics_export(request: WSGIRequest) -> HttpResponse:
     queryset = ReservationStatistic.objects.order_by("id")
 
     if params.reservations:
-        queryset = queryset.filter(reservation__in=params.reservations)
+        queryset = queryset.filter(reservation__ext_uuid__in=params.reservations)
     if params.tprek_id:
         queryset = queryset.filter(primary_reservation_unit__unit__tprek_id=params.tprek_id)
     if params.begins_after:
         queryset = queryset.filter(begin__gte=params.begins_after)
     if params.begins_before:
         queryset = queryset.filter(begin__lt=params.begins_before)
+    if params.updated_after:
+        queryset = queryset.filter(updated_at__gte=params.updated_after)
+    if params.updated_before:
+        queryset = queryset.filter(updated_at__lt=params.updated_before)
 
     total_count = queryset.count()
     queryset = queryset[start:stop]
 
     # --- Export -----------------------------------------------------------------------------------------------------
 
-    exporter = ExportMixin()
-    exporter.model = ReservationStatistic
-    resource_class = modelresource_factory(ReservationStatistic)
+    exporter = create_statistics_exporter()
+    data_for_export = exporter.get_data_for_export(request, queryset)
+    export_data: str = JSON().export_data(data_for_export)
 
-    field: ImportExportField
-    for field in resource_class.fields.values():
-        match field.widget:
-            case DateTimeWidget():
-                field.widget.formats = ["%Y-%m-%dT%H:%M:%S%:z"]
-            case TimeWidget():
-                field.widget.formats = ["%H:%M:%S%:z"]
+    # --- Response ---------------------------------------------------------------------------------------------------
 
-    exporter.resource_classes = [resource_class]
+    headers: dict[str, str] = {
+        "Varaamo-Pagination-Total-Count": str(total_count),
+        "Varaamo-Pagination-Start": str(queryset.query.low_mark),
+        "Varaamo-Pagination-Stop": str(queryset.query.high_mark),
+    }
 
+    return JsonResponse(
+        json.loads(export_data),
+        safe=False,
+        status=200,
+        headers=headers,
+        json_dumps_params={"sort_keys": True},
+    )
+
+
+@require_GET
+@csrf_exempt  # NOSONAR
+@validation_error_as_response
+def reservable_time_spans_export(request: WSGIRequest) -> HttpResponse:
+    """Export reservable time spans to JSON."""
+    # --- Authorization ----------------------------------------------------------------------------------------------
+
+    authorization = request.META.get("HTTP_AUTHORIZATION", "")
+    if authorization != settings.EXPORT_AUTHORIZATION_TOKEN:
+        msg = "Not authorized to export reservable time spans."
+        return HttpResponseForbidden(msg)
+
+    # --- Parsing ----------------------------------------------------------------------------------------------------
+
+    params = ReservableTimeSpansParams.from_request(request)
+
+    # --- Pagination -------------------------------------------------------------------------------------------------
+
+    start, stop = validate_pagination(request)
+
+    # --- Filtering --------------------------------------------------------------------------------------------------
+
+    queryset = ReservableTimeSpan.objects.all()
+
+    if params.reservation_units:
+        queryset = queryset.filter(resource__reservation_units__in=params.reservation_units).distinct()
+    if params.tprek_id:
+        queryset = queryset.filter(resource__reservation_units__unit__tprek_id=params.tprek_id).distinct()
+    if params.hauki_resource:
+        queryset = queryset.filter(resource__in=params.hauki_resource)
+    if params.after:
+        queryset = queryset.filter(end_datetime__gt=params.after)
+    if params.before:
+        queryset = queryset.filter(start_datetime__lte=params.before)
+
+    total_count = queryset.count()
+    queryset = queryset[start:stop]
+
+    # --- Export -----------------------------------------------------------------------------------------------------
+
+    exporter = create_reservable_time_spans_exporter()
     data_for_export = exporter.get_data_for_export(request, queryset)
     export_data: str = JSON().export_data(data_for_export)
 
