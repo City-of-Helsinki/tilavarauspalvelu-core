@@ -6,7 +6,7 @@ import { type ApplicationFormFragment } from "@gql/gql-types";
 import NotesWhenApplying from "@/components/application/NotesWhenApplying";
 import { applicationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ApplicationHead } from "@/components/recurring/ApplicationHead";
+import { ApplicationHead } from "./ApplicationHead";
 import { ReadonlyDeep } from "common/src/helpers";
 import { ApplicationStepper } from "./ApplicationStepper";
 

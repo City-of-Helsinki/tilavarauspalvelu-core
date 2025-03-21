@@ -12,7 +12,8 @@ import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCar
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { createApolloClient } from "@/modules/apolloClient";
-import { ReservationPageWrapper, InlineStyledLink } from "@/styles/util";
+import { InlineStyledLink } from "@/styled/util";
+import { ReservationPageWrapper } from "@/styled/reservation";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import {
   getReservationPath,

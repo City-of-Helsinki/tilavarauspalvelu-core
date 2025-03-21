@@ -11,7 +11,7 @@ import {
   type CancelFormValues,
   CancellationForm,
 } from "@/components/CancellationForm";
-import { ReservationPageWrapper } from "@/styles/util";
+import { ReservationPageWrapper } from "@/styled/reservation";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import {

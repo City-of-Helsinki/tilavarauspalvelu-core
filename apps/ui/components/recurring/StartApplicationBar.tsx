@@ -116,8 +116,6 @@ export function StartApplicationBar({
   };
 
   const count = getReservationUnits().length;
-  // This breaks SSR because the server knowns nothing about client side stores
-  // we can't fix it with CSS since it doesn't update properly
 
   return (
     <BackgroundContainer>

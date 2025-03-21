@@ -7,7 +7,7 @@ import styled from "styled-components";
 import type { PurposeCardFragment } from "@gql/gql-types";
 import { getSingleSearchPath } from "@/modules/urls";
 import { ReservationUnitSearch } from "./ReservationUnitSearch";
-import { pixel } from "@/styles/util";
+import { pixel } from "@/styled/util";
 import { breakpoints } from "common/src/common/style";
 import { H3 } from "common/src/common/typography";
 import { ShowAllContainer } from "common/src/components";

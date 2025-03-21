@@ -1,6 +1,10 @@
 import { describe, test, expect, vi, afterEach, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
-import { createMockApplicationRound } from "@/test/test.utils";
+import {
+  createMockApplicationRound,
+  CreateGraphQLMockProps,
+  createGraphQLMocks,
+} from "@/test/test.gql.utils";
 import { MockedProvider } from "@apollo/client/testing";
 import SeasonalSearch from "@/pages/recurring/[id]";
 import {
@@ -11,10 +15,6 @@ import { addYears } from "date-fns";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 import userEvent from "@testing-library/user-event";
 import { getApplicationPath } from "@/modules/urls";
-import {
-  CreateGraphQLMockProps,
-  createGraphQLMocks,
-} from "@/test/test.gql.utils";
 
 const { mockedRouterReplace, useRouter } = vi.hoisted(() => {
   const mockedRouterReplace = vi.fn();
@@ -71,17 +71,6 @@ function customRender(
   );
 }
 
-// TODO what we need to test?
-// - page framing (breadcrumbs / layout / title)
-// - query (backend) errors -> displayed as error component
-// - ordering component -> changes query params
-//  - this contains the search results. is this correct?
-// - start application bar
-//  - filters the full data based on search params
-// - we check the results from query params (not the pagination / query itself)
-//  - this will become a separate test for
-
-// TODO these require mocking the backend response for useSearchQuery
 describe("Page: SeasonalSearch", () => {
   beforeEach(() => {
     mockedSearchParams.mockReturnValue(new URLSearchParams());
@@ -99,7 +88,6 @@ describe("Page: SeasonalSearch", () => {
     expect(title).toBeInTheDocument();
     const subtitle = view.getByText("applicationRound:search.subtitle");
     expect(subtitle).toBeInTheDocument();
-    // breadcrumb check (could move to separate test with two variations)
     expect(
       view.getByRole("link", { name: "breadcrumb:frontpage" })
     ).toBeInTheDocument();
@@ -122,16 +110,9 @@ describe("Page: SeasonalSearch", () => {
     expect(
       view.queryByRole("button", { name: "shoppingCart:nextShort" })
     ).not.toBeInTheDocument();
-    // expect(view.getByRole("heading", { name: "ReservationUnit 1 FI" })).toBeInTheDocument();
-    // no pagination
-    // disabled because there is a bug in the useSearchQuery hook
-    // might be related to search params so if we mock them it might pass
-    // otherwise we need to write tests for the hook
-    // const showMore = view.queryByRole("button", { name: "common:showMore" });
-    // expect(showMore).not.toBeInTheDocument();
   });
 
-  test("selecting should set query params", async () => {
+  test("selecting card should set query params", async () => {
     const view = customRender();
     await waitForSearchButton(view);
     const user = userEvent.setup();
@@ -158,7 +139,7 @@ describe("Page: SeasonalSearch", () => {
     );
   });
 
-  test("selecting another shouldd add to query params", async () => {
+  test("selecting another card should add to query params", async () => {
     const params = new URLSearchParams();
     params.set("id", "1");
     params.set(SEASONAL_SELECTED_PARAM_KEY, "1");
@@ -297,6 +278,8 @@ describe("Page: SeasonalSearch", () => {
     ).toBeInTheDocument();
     expect(view.getByText("errors:search")).toBeInTheDocument();
   });
+
+  test.todo("pagination should work");
 });
 
 // TODO SSR tests are complicated because we need to mock the http response for Apollo client

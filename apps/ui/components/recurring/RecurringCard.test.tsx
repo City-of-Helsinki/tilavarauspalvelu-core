@@ -6,7 +6,7 @@ import { getReservationUnitPath } from "@/modules/urls";
 import {
   createMockReservationUnitType,
   generateNameFragment,
-} from "@/test/test.utils";
+} from "@/test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
 
 describe("RecurringCard", () => {

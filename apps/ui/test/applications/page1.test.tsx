@@ -15,13 +15,14 @@ import { vi, expect, test, describe } from "vitest";
 import {
   createMockApplicationFragment,
   CreateMockApplicationFragmentProps,
+  createOptionQueryMock,
+  mockAgeGroupOptions,
+  mockDurationOptions,
+  mockReservationPurposesOptions,
   type CreateGraphQLMocksReturn,
 } from "@/test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
 import { selectOption } from "../test.utils";
-import { getDurationOptions } from "@/modules/const";
-import { type TFunction } from "next-i18next";
-import { base64encode } from "common/src/helpers";
 import { SEASONAL_SELECTED_PARAM_KEY } from "@/hooks/useReservationUnitList";
 
 const { mockedRouterPush, useRouter } = vi.hoisted(() => {
@@ -64,7 +65,6 @@ vi.mock("next/router", () => ({
   useRouter,
 }));
 
-// TODO add gql mock params (for mutations / option queries)
 function customRender(
   props: CreateMockApplicationFragmentProps = {}
 ): ReturnType<typeof render> {
@@ -76,20 +76,6 @@ function customRender(
     </MockedProvider>
   );
 }
-
-// Option mocks
-// TODO should move to test.utils.ts
-// TODO improve mockT so that we pull through the duration value (not just the minutes / hours)
-const mockT: TFunction = ((key: string) => key) as TFunction;
-const durationOptions = getDurationOptions(mockT);
-const reservationPurposesOptions = Array.from({ length: 5 }, (_, i) => ({
-  pk: i + 1,
-})).map(({ pk }) => ({ value: pk, label: `Reservation Purpose ${pk}` }));
-const ageGroupOptions = Array.from({ length: 5 }, (_, i) => i + 1).map((v) => ({
-  pk: v,
-  maximum: v,
-  minimum: v,
-}));
 
 type CreateGraphQLMockProps = never;
 function createGraphQLMocks(
@@ -105,42 +91,7 @@ function createGraphQLMocks(
     unitsAll: [],
   };
 
-  const OptionsMock: OptionsQuery = {
-    reservationPurposes: {
-      edges: reservationPurposesOptions
-        .map(({ value, label }) => ({
-          id: base64encode(`ReservationPurposeNode:${value}`),
-          pk: value,
-          nameFi: label,
-          nameSv: label,
-          nameEn: label,
-        }))
-        .map((node) => ({ node })),
-    },
-    ageGroups: {
-      edges: ageGroupOptions
-        .map(({ pk, maximum, minimum }) => ({
-          id: base64encode(`ReservationPurposeNode:${pk}`),
-          pk,
-          minimum,
-          maximum,
-        }))
-        .map((node) => ({ node })),
-    },
-    // NOT defining these atm because Seasonal Form doesn't use them
-    // but the query requires matching keys
-    reservationUnitTypes: {
-      edges: [],
-    },
-    purposes: {
-      edges: [],
-    },
-    cities: {
-      edges: [],
-    },
-    equipmentsAll: [],
-    unitsAll: [],
-  };
+  const OptionsMock: OptionsQuery = createOptionQueryMock();
 
   return [
     {
@@ -189,7 +140,6 @@ describe("Page1", () => {
       view.getByRole("link", { name: "breadcrumb:applications" })
     ).toBeInTheDocument();
     expect(view.getByText("breadcrumb:application")).toBeInTheDocument();
-    // TODO check that no other than first step is clickable
     // TODO check notes when applying
   });
 
@@ -243,6 +193,9 @@ describe("Page1", () => {
     ).toHaveLength(0);
   });
 
+  // clicking should fill the
+  // "application:Page1.periodEndDate" and "application:Page1.periodStartDate"
+  // checking these here is not necessary -> should write separate tests for these
   test.todo("checking default period should fill the dates");
   test.todo("changing dates should remove default period check");
 
@@ -259,7 +212,7 @@ describe("Page1", () => {
     const name = within(section).getByLabelText(/application:Page1.name/);
     expect(name).toBeInTheDocument();
     await user.type(name, "Test section name");
-    const ageGroupOpt = ageGroupOptions[0];
+    const ageGroupOpt = mockAgeGroupOptions[0];
     if (ageGroupOpt == null) {
       throw new Error("expected age group option");
     }
@@ -269,7 +222,7 @@ describe("Page1", () => {
       /application:Page1.ageGroup/,
       ageGroupOptLabel
     );
-    const purposeOpt = reservationPurposesOptions[0];
+    const purposeOpt = mockReservationPurposesOptions[0];
     if (purposeOpt == null) {
       throw new Error("expected purpose option");
     }
@@ -285,19 +238,14 @@ describe("Page1", () => {
     );
     expect(groupSize).toBeInTheDocument();
     await user.type(groupSize, "1");
-    // TODO how to fill ReservationUnitList? can we just supply some query params here to have it prefilled
-    // write a separate test for ReservationUnitList (using a fake form context to check)
 
     const checkDefaultPeriod = within(section).getByRole("checkbox", {
       name: /application:Page1.defaultPeriodPrefix/,
     });
     expect(checkDefaultPeriod).toBeInTheDocument();
     await user.click(checkDefaultPeriod);
-    // clicking should fill the
-    // "application:Page1.periodEndDate" and "application:Page1.periodStartDate"
-    // checking these here is not necessary -> should write separate tests for these
 
-    const dur = durationOptions[0];
+    const dur = mockDurationOptions[0];
     if (dur == null) {
       throw new Error("expected duration option");
     }
@@ -340,7 +288,7 @@ describe("Page1", () => {
     ).toHaveLength(1);
   });
 
-  // TODO should these be schema tests instead?
+  // TODO should these be schema tests
   test.todo("applied events less than 1 should be invalid");
 
   // it's an error not to select all fields, but what if we have no options?
