@@ -111,23 +111,6 @@ function transformSortString(
   return [transformed, sec];
 }
 
-// known issue this can send invalid values to backend (i.e. -1 or 0, or a pk that has been deleted)
-function paramToIntegers(param: string | string[]): number[] {
-  // Multiple params are arrays (i.e. key=value1&key=value2)
-  if (Array.isArray(param)) {
-    return param.map(Number).filter(Number.isInteger);
-  }
-  // Handle old string encoded values (i.e. key=value1,value2)
-  if (param.includes(",")) {
-    return param.split(",").map(Number).filter(Number.isInteger);
-  }
-  // Nextjs query converter makes single values into strings
-  // versus using URLSearchParams with getAll (which would return an array of one).
-  // and JS is silly about empty strings getting coerced to 0 and not NaN
-  const num = param !== "" ? Number(param) : Number.NaN;
-  return Number.isInteger(num) ? [num] : [];
-}
-
 type ProcessVariablesParams =
   | {
       values: ReadonlyURLSearchParams;
@@ -170,14 +153,15 @@ export function processVariables({
   const dur = toNumber(ignoreMaybeArray(values.getAll("duration")));
   const duration = dur != null && dur > 0 ? dur : null;
   const isSeasonal = kind === ReservationKind.Season;
-  const textSearch = ignoreMaybeArray(values.getAll("textSearch"));
-  const personsAllowed = ignoreMaybeArray(values.getAll("personsAllowed"));
-  const purposes = paramToIntegers(values.getAll("purposes"));
-  const unit = paramToIntegers(values.getAll("units"));
-  const reservationUnitTypes = paramToIntegers(
-    values.getAll("reservationUnitTypes")
+  const textSearch = values.get("textSearch");
+  const personsAllowed = toNumber(values.get("personsAllowed"))?.toString();
+  const purposes = mapParamToNumber(values.getAll("purposes"), 1);
+  const unit = mapParamToNumber(values.getAll("units"), 1);
+  const reservationUnitTypes = mapParamToNumber(
+    values.getAll("reservationUnitTypes"),
+    1
   );
-  const equipments = paramToIntegers(values.getAll("equipments"));
+  const equipments = mapParamToNumber(values.getAll("equipments"), 1);
   const showOnlyReservable =
     ignoreMaybeArray(values.getAll("showOnlyReservable")) !== "false";
   const applicationRound =
