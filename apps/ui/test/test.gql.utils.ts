@@ -210,7 +210,6 @@ function createSearchVariablesMock({
   // -> this is not a lint / type error but a runtime error in the tests
 } = {}): Readonly<SearchReservationUnitsQueryVariables> {
   return {
-    personsAllowed: null,
     textSearch,
     purposes: [],
     unit: [],
