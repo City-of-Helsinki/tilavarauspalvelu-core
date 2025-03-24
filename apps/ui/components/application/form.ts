@@ -302,7 +302,7 @@ const convertOrganisation = (o: Organisation): OrganisationFormValues => ({
   identifier: o?.identifier ?? "",
   yearEstablished: o?.yearEstablished ?? 0,
   coreBusiness: o?.coreBusinessFi ?? "",
-  address: convertAddress(o?.address),
+  address: convertAddress(o?.address ?? null),
 });
 
 const ApplicantTypeSchema = z.enum([

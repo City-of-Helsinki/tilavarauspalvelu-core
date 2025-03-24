@@ -12,7 +12,7 @@ import {
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
+import type { RecurringCardFragment } from "@gql/gql-types";
 import { getMainImage } from "@/modules/util";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource } from "common/src/helpers";
@@ -23,14 +23,14 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { gql } from "@apollo/client";
 
-type Node = ReservationUnitCardFieldsFragment;
 interface CardProps {
-  reservationUnit: Node;
+  reservationUnit: RecurringCardFragment;
   // TODO all of these are accessible from a hook but does that make testing more difficult?
-  selectReservationUnit: (reservationUnit: Node) => void;
-  containsReservationUnit: (reservationUnit: Node) => boolean;
-  removeReservationUnit: (reservationUnit: Node) => void;
+  selectReservationUnit: (reservationUnit: RecurringCardFragment) => void;
+  containsReservationUnit: (reservationUnit: RecurringCardFragment) => boolean;
+  removeReservationUnit: (reservationUnit: RecurringCardFragment) => void;
 }
 
 export function RecurringCard({
@@ -138,3 +138,18 @@ export function RecurringCard({
     />
   );
 }
+
+export const RECURRING_CARD_FRAGMENT = gql`
+  fragment RecurringCard on ReservationUnitNode {
+    ...OrderedReservationUnitCard
+    reservationUnitType {
+      id
+      nameFi
+      nameSv
+      nameEn
+    }
+    maxPersons
+    currentAccessType
+    effectiveAccessType
+  }
+`;

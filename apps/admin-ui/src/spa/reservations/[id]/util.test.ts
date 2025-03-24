@@ -1,16 +1,14 @@
 import type { TFunction } from "i18next";
 import {
-  AccessType,
-  Authentication,
+  type CreateTagStringFragment,
   PriceUnit,
-  ReservationQuery,
-  ReservationStartInterval,
-  ReservationStateChoice,
+  type ReservationQuery,
 } from "@gql/gql-types";
 import { createTagString, getReservatinUnitPricing } from "./util";
 import { addHours, addMonths } from "date-fns";
 import { toApiDate } from "common/src/common/util";
 import { describe, test, expect } from "vitest";
+import { base64encode } from "common/src/helpers";
 
 type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitNodeT = NonNullable<
@@ -58,29 +56,37 @@ function constructPaidPricing(): PricingNodeT {
   });
 }
 
-function constructReservation(
-  begin: string,
-  end: string,
-  pricings: PricingNodeT[]
-): ReservationNodeT {
+function constructReservation({
+  begin,
+  end,
+  enableRecurrence,
+}: {
+  begin: Date;
+  end: Date;
+  enableRecurrence?: boolean;
+}): CreateTagStringFragment {
   return {
-    begin,
-    end,
-    id: "1",
-    bufferTimeBefore: 0,
-    bufferTimeAfter: 0,
-    state: ReservationStateChoice.Confirmed,
-    accessType: AccessType.Unrestricted,
-    paymentOrder: [],
+    id: base64encode("ReservationNode:1"),
+    begin: begin.toISOString(),
+    end: end.toISOString(),
+    recurringReservation: enableRecurrence
+      ? {
+          id: base64encode("RecurringReservationNode:1"),
+          beginTime: "12:00",
+          endTime: "14:00",
+          beginDate: toApiDate(begin),
+          endDate: toApiDate(addMonths(end, 3)),
+          weekdays: [0, 1, 3],
+        }
+      : null,
     reservationUnits: [
       {
-        bufferTimeAfter: 0,
-        bufferTimeBefore: 0,
-        authentication: Authentication.Weak,
-        reservationStartInterval: ReservationStartInterval.Interval_15Mins,
-        id: "1",
-        nameFi: "Foobar",
-        pricings,
+        id: base64encode("ReservationUnitNode:1"),
+        nameFi: "Reservation unit 1",
+        unit: {
+          id: base64encode("UnitNode:1"),
+          nameFi: "Unit 1",
+        },
       },
     ],
   };
@@ -107,42 +113,29 @@ describe("getReservatinUnitPricing", () => {
 
 describe("createTag", () => {
   test("recurring has a tag with a date range and multiple weekdays days", () => {
-    const start = new Date("2023-04-01T09:00:00Z");
-    const end = addHours(start, 2);
-    const res: ReservationNodeT = {
-      ...constructReservation(start.toISOString(), end.toISOString(), []),
-      recurringReservation: {
-        id: "1",
-        name: "Foobar",
-        description: "Foobar",
-        beginTime: "12:00",
-        endTime: "14:00",
-        beginDate: toApiDate(start),
-        endDate: toApiDate(addMonths(end, 3)),
-        weekdays: [0, 1, 3],
-      },
-    };
+    const begin = new Date("2023-04-01T09:00:00Z");
+    const end = addHours(begin, 2);
+    const input = constructReservation({ begin, end, enableRecurrence: true });
 
-    const tag = createTagString(res, mockT);
+    const tag = createTagString(input, mockT);
     expect(tag).toContain(
       "dayShort.0, dayShort.1, dayShort.3 12:00–14:00, common:abbreviations.hour"
     );
     expect(tag).toContain("1.4.2023–1.7.2023");
-    expect(tag).toContain("Foobar");
+    expect(tag).toContain("Reservation unit 1");
   });
 
   test("no recurring defaults to reservation tag", () => {
-    const res: ReservationNodeT = constructReservation(
-      "2023-04-01T09:00:00Z",
-      "2023-04-01T11:00:00Z",
-      []
-    );
+    const input = constructReservation({
+      begin: new Date("2023-04-01T09:00:00Z"),
+      end: new Date("2023-04-01T11:00:00Z"),
+    });
 
-    const tag = createTagString(res, mockT);
+    const tag = createTagString(input, mockT);
     expect(tag).not.toContain("dayShort.0, dayShort.1, dayShort.3");
     expect(tag).toContain("1.4.2023");
     expect(tag).toContain("12:00–14:00, common:abbreviations.hour");
     expect(tag).toContain("dayShort.5");
-    expect(tag).toContain("Foobar");
+    expect(tag).toContain("Reservation unit 1");
   });
 });

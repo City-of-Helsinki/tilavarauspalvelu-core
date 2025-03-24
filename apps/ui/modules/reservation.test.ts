@@ -4,7 +4,6 @@ import {
   ReservationStateChoice,
   ReservationStartInterval,
   OrderStatus,
-  PaymentType,
   type ReservationOrderStatusFragment,
   type CanUserCancelReservationFragment,
 } from "@gql/gql-types";
@@ -61,7 +60,10 @@ function createMockReservationUnit({
     reservationStartInterval: ReservationStartInterval.Interval_15Mins,
     reservationBegins: addDays(new Date(), -1).toISOString(),
     reservationsMinDaysBefore,
-    reservationEnds: reservationEnds?.toISOString() ?? undefined,
+    reservationsMaxDaysBefore: null,
+    minReservationDuration: null,
+    maxReservationDuration: null,
+    reservationEnds: reservationEnds?.toISOString() ?? null,
     reservableTimeSpans: Array.from(Array(100)).map((_val, index) => {
       return {
         startDatetime: `${toApiDate(addDays(new Date(), index))}T07:00:00+00:00`,
@@ -76,7 +78,7 @@ function createMockReservation({
   price,
   state,
   reservationUnit,
-  isHandled,
+  isHandled = null,
   canBeCancelledTimeBefore,
   reservationsMinDaysBefore,
   reservationEnds,
@@ -86,7 +88,7 @@ function createMockReservation({
   state?: ReservationStateChoice;
   reservationUnit?: CanReservationBeChangedProps["reservationUnit"] &
     CanUserCancelReservationFragment["reservationUnits"][0];
-  isHandled?: boolean;
+  isHandled?: boolean | null;
   canBeCancelledTimeBefore?: number;
   reservationsMinDaysBefore?: number;
   reservationEnds?: Date;
@@ -411,6 +413,7 @@ describe("canReservationBeChanged", () => {
     reservationEnds,
     state,
     cancellationBuffer,
+    activeApplicationRounds = [],
   }: {
     begin: Date;
     oldBegin?: Date;
@@ -420,6 +423,7 @@ describe("canReservationBeChanged", () => {
     reservationEnds?: Date;
     state?: ReservationStateChoice;
     cancellationBuffer?: number;
+    activeApplicationRounds?: CanReservationBeChangedProps["activeApplicationRounds"];
   }): CanReservationBeChangedProps {
     const baseReservation = createMockReservation({
       canBeCancelledTimeBefore: cancellationBuffer ?? 0,
@@ -440,7 +444,7 @@ describe("canReservationBeChanged", () => {
       },
       // @ts-expect-error -- need to refactor the function inputs so we don't have conflicting reservationUnit types
       reservationUnit: baseReservation.reservationUnits[0],
-      activeApplicationRounds: [],
+      activeApplicationRounds,
       blockingReservations: [],
     };
   }
@@ -501,12 +505,10 @@ describe("canReservationBeChanged", () => {
   });
 
   test("NO when the reservation unit has been closed for reservations", () => {
-    const input = {
-      ...constructInput({
-        begin: addHours(new Date(), 24),
-        reservationEnds: addDays(new Date(), -1),
-      }),
-    };
+    const input = constructInput({
+      begin: addHours(new Date(), 24),
+      reservationEnds: addDays(new Date(), -1),
+    });
     expect(canReservationTimeBeChanged(input)).toBe(false);
   });
 
@@ -554,17 +556,15 @@ describe("canReservationBeChanged", () => {
   });
 
   test("NO with conflicting application round", () => {
-    const input = {
-      ...constructInput({
-        begin: addHours(new Date(), 24),
-      }),
+    const input = constructInput({
+      begin: addHours(new Date(), 24),
       activeApplicationRounds: [
         {
           reservationPeriodBegin: addHours(new Date(), 1).toISOString(),
           reservationPeriodEnd: addHours(new Date(), 20).toISOString(),
         },
       ],
-    };
+    });
     expect(canReservationTimeBeChanged(input)).toBe(false);
   });
 });
@@ -572,10 +572,8 @@ describe("canReservationBeChanged", () => {
 describe("getCheckoutUrl", () => {
   const baseCheckoutUrl = "https://checkout.url/path";
   const userParam = "user=1111-2222-3333-4444";
-  const order: PaymentOrderNode = {
-    id: "order-id",
+  const order: Pick<PaymentOrderNode, "checkoutUrl"> = {
     checkoutUrl: `${baseCheckoutUrl}?${userParam}`,
-    paymentType: PaymentType.Online,
   };
   const checkoutUrl = `${baseCheckoutUrl}/paymentmethod?${userParam}`;
 
@@ -592,9 +590,7 @@ describe("getCheckoutUrl", () => {
   });
 
   test("returns undefined if checkoutUrl is not defined", () => {
-    expect(
-      getCheckoutUrl({ ...order, checkoutUrl: undefined })
-    ).not.toBeDefined();
+    expect(getCheckoutUrl({ ...order, checkoutUrl: null })).toBeNull();
   });
 
   test("returns undefined if checkoutUrl is not an url", () => {
@@ -605,7 +601,7 @@ describe("getCheckoutUrl", () => {
         ...order,
         checkoutUrl: "checkout.url?user=1111-2222-3333-4444",
       })
-    ).not.toBeDefined();
+    ).toBeNull();
   });
 });
 

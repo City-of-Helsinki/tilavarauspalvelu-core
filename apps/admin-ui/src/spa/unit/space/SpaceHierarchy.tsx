@@ -5,7 +5,7 @@ import { fontMedium } from "common";
 
 type Node = SpaceQuery["space"];
 type Props = {
-  space: Node;
+  space: Node | undefined;
 };
 
 const Tree = styled.div`
@@ -17,7 +17,7 @@ const Tree = styled.div`
 type SpaceNode = Pick<NonNullable<Node>, "pk" | "nameFi" | "parent">;
 
 function getParents(
-  root?: SpaceNode | null | undefined,
+  root: SpaceNode | null | undefined,
   spaces?: SpaceNode[],
   hierarchy: SpaceNode[] = []
 ) {
@@ -34,7 +34,8 @@ function getParents(
 
 // TODO this is a huge problem because we cant do a recursive query, would require backend support
 export function SpaceHierarchy({ space }: Props): JSX.Element {
-  const unitSpaces = space?.unit?.spaces;
+  const unitSpaces = space?.unit?.spaces ?? [];
+  // @ts-expect-error -- FIXME this wasn't working before either, the tree raversal is broken
   const tree = getParents(space, unitSpaces, []).reverse();
 
   return (

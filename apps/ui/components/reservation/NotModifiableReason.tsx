@@ -1,10 +1,10 @@
+import React from "react";
+import { type CanReservationBeChangedFragment } from "@/gql/gql-types";
 import {
-  CanReservationBeChangedProps,
   getWhyReservationCantBeChanged,
   isReservationCancellable,
 } from "@/modules/reservation";
 import { useTranslation } from "next-i18next";
-import React from "react";
 import styled from "styled-components";
 
 const Reasons = styled.p`
@@ -15,15 +15,14 @@ const Reasons = styled.p`
   color: var(--color-black-70);
 `;
 
-export function NotModifiableReason({
-  reservation,
-}: Pick<
-  Required<CanReservationBeChangedProps>,
-  "reservation"
->): JSX.Element | null {
+export function NotModifiableReason(
+  props: Readonly<CanReservationBeChangedFragment>
+): JSX.Element | null {
   const { t } = useTranslation();
-  const modifyTimeReason = getWhyReservationCantBeChanged({ reservation });
-  const isCancellationAllowed = isReservationCancellable(reservation);
+  const modifyTimeReason = getWhyReservationCantBeChanged({
+    reservation: props,
+  });
+  const isCancellationAllowed = isReservationCancellable(props);
 
   if (modifyTimeReason == null) {
     return null;

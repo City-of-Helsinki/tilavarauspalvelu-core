@@ -27,6 +27,7 @@ import {
   OrderStatus,
   useAccessCodeQuery,
   AccessType,
+  type AccessCodeQuery,
 } from "@gql/gql-types";
 import Link from "next/link";
 import { createApolloClient } from "@/modules/apolloClient";
@@ -332,7 +333,7 @@ function Reservation({
       id: base64encode(`ReservationNode:${reservation.pk}`),
     },
   });
-  const { pindoraInfo } = accessCodeData?.reservation ?? {};
+  const pindoraInfo = accessCodeData?.reservation?.pindoraInfo ?? null;
 
   // NOTE typescript can't type array off index
   const order = reservation.paymentOrder.find(() => true);
@@ -367,7 +368,8 @@ function Reservation({
     reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
 
-  const checkoutUrl = getCheckoutUrl(order, i18n.language);
+  const lang = convertLanguageCode(i18n.language);
+  const checkoutUrl = getCheckoutUrl(order, lang);
 
   const hasCheckoutUrl = !!checkoutUrl;
   const isWaitingForPayment =
@@ -434,7 +436,7 @@ function Reservation({
               data-testid="reservation__reservation-unit"
               href={getReservationUnitPath(reservationUnit?.pk)}
             >
-              {getReservationUnitName(reservationUnit)}
+              {getReservationUnitName(reservationUnit, lang) ?? "-"}
             </Link>
             <NoWrap data-testid="reservation__time">{timeString}</NoWrap>
           </SubHeading>
@@ -450,18 +452,18 @@ function Reservation({
                 href={reservation.calendarUrl ?? ""}
               >
                 {t("reservations:saveToCalendar")}
-                <IconCalendar aria-hidden="true" />
+                <IconCalendar />
               </ButtonLikeExternalLink>
             )}
             {hasReceipt && (
               <ButtonLikeExternalLink
                 size="large"
                 data-testid="reservation__confirmation--button__receipt-link"
-                href={`${order.receiptUrl}&lang=${i18n.language}`}
+                href={`${order.receiptUrl}&lang=${lang}`}
                 target="_blank"
               >
                 {t("reservations:downloadReceipt")}
-                <IconLinkExternal aria-hidden="true" />
+                <IconLinkExternal />
               </ButtonLikeExternalLink>
             )}
           </SecondaryActions>
@@ -476,7 +478,7 @@ function Reservation({
                 data-testid="reservation-detail__button--checkout"
               >
                 {t("reservations:payReservation")}
-                <IconArrowRight aria-hidden="true" />
+                <IconArrowRight />
               </ButtonLikeLink>
             )}
             {canTimeBeModified && (
@@ -486,7 +488,7 @@ function Reservation({
                 data-testid="reservation-detail__button--edit"
               >
                 {t("reservations:modifyReservationTime")}
-                <IconCalendar aria-hidden="true" />
+                <IconCalendar />
               </ButtonLikeLink>
             )}
             {isCancellable && (
@@ -500,11 +502,11 @@ function Reservation({
                     isBeingHandled ? "application" : "reservation"
                   }`
                 )}
-                <IconCross aria-hidden="true" />
+                <IconCross />
               </ButtonLikeLink>
             )}
           </Actions>
-          <NotModifiableReason reservation={reservation} />
+          <NotModifiableReason {...reservation} />
         </div>
         <Flex>
           <Instructions reservation={reservation} />
@@ -524,7 +526,7 @@ function Reservation({
           )}
           <TermsInfo reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
-            title={getReservationUnitName(reservationUnit) ?? "-"}
+            title={getReservationUnitName(reservationUnit, lang) ?? "-"}
             unit={reservationUnit?.unit}
           />
         </Flex>
@@ -630,18 +632,10 @@ function TermsInfo({
 function AccessCodeInfo({
   pindoraInfo,
   feedbackUrl,
-}: Readonly<{
-  pindoraInfo:
-    | {
-        accessCode: string | null;
-        accessCodeBeginsAt: string;
-        accessCodeEndsAt: string;
-        accessCodeIsActive: boolean;
-      }
-    | null
-    | undefined;
-  feedbackUrl: string;
-}>): JSX.Element {
+}: Readonly<
+  Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> &
+    Pick<PropsNarrowed, "feedbackUrl">
+>): JSX.Element {
   const { t, i18n } = useTranslation();
   return (
     <div>
@@ -771,6 +765,7 @@ export const GET_APPLICATION_RECURRING_RESERVATION_QUERY = gql`
     }
   }
 `;
+
 export const GET_RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     reservation(id: $id) {
@@ -781,6 +776,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
       ...ReservationInfo
       ...ReservationInfoCard
       ...Instructions
+      ...CanReservationBeChanged
       applyingForFreeOfCharge
       calendarUrl
       paymentOrder {
@@ -797,7 +793,6 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
           ...UnitNameFieldsI18N
         }
         canApplyFreeOfCharge
-        ...CancellationRuleFields
         ...MetadataSets
         ...TermsOfUse
       }

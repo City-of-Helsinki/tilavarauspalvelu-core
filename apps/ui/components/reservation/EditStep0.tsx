@@ -151,12 +151,12 @@ export function EditStep0({
       end: end.toISOString(),
       price: isFree
         ? "0"
-        : (getReservationUnitPrice({
+        : getReservationUnitPrice({
             t,
             reservationUnit,
             pricingDate: start,
             minutes: 0,
-          }) ?? undefined),
+          }),
     };
 
     const isNewReservationValid = canReservationTimeBeChanged({

@@ -1,7 +1,6 @@
 import { addDays, addHours, nextMonday, set } from "date-fns";
 import {
   Authentication,
-  ReservationKind,
   ReservationStartInterval,
   TermsType,
   ReservationTypeChoice,
@@ -12,7 +11,7 @@ import {
   type ReservationUnitQuery,
   CreateReservationSeriesDocument,
   type ReservationUnitFragment,
-  ReservationsInIntervalFragment,
+  type ReservationsInIntervalFragment,
   CurrentUserDocument,
   type CurrentUserQuery,
   OptionsDocument,
@@ -26,59 +25,10 @@ import { base64encode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { toApiDateUnsafe } from "common/src/common/util";
 
-const unitCommon = {
-  allowReservationsWithoutOpeningHours: true,
-  authentication: Authentication.Weak,
-  bufferTimeAfter: 0,
-  bufferTimeBefore: 0,
-  canApplyFreeOfCharge: false,
-  contactInformation: "",
-  description: "",
-  isArchived: false,
-  isDraft: false,
-  reservationStartInterval: ReservationStartInterval.Interval_15Mins,
-  reservationBlockWholeDay: false,
-  requireIntroduction: false,
-  requireReservationHandling: false,
-  reservationKind: ReservationKind.Direct,
-  reservationCancelledInstructions: "",
-  reservationConfirmedInstructions: "",
-  reservationPendingInstructions: "",
-  maxPersons: 10,
-  uuid: "be4fa7a2-05b7-11ee-be56-0242ac120004",
-  __typename: "ReservationUnitNode",
-} as const;
-
-const arrays = {
-  applicationRoundTimeSlots: [],
-  applicationRounds: [],
-  paymentTypes: [],
-  pricings: [],
-  purposes: [],
-  qualifiers: [],
-  equipments: [],
-  images: [],
-  resources: [],
-  services: [],
-  spaces: [],
-};
-
 export function createReservationUnits(): ReservationUnitFragment[] {
   return [
-    {
-      ...unitCommon,
-      ...arrays,
-      pk: 1,
-      id: base64encode(`ReservationUnitNode:1`),
-      nameFi: "Unit",
-    },
-    {
-      ...unitCommon,
-      ...arrays,
-      pk: 2,
-      id: base64encode(`ReservationUnitNode:2`),
-      nameFi: "Absolute",
-    },
+    createReservationUnitFragment({ pk: 1, nameFi: "Unit" }),
+    createReservationUnitFragment({ pk: 2, nameFi: "Absolute" }),
   ];
 }
 
@@ -133,13 +83,18 @@ const requiredFields = [
   "purpose",
 ];
 
-export function createUnitFragment(): ReservationUnitFragment {
+function createReservationUnitFragment({
+  pk,
+  nameFi,
+}: {
+  pk: number;
+  nameFi: string;
+}): ReservationUnitFragment {
   return {
-    ...unitCommon,
-    ...arrays,
-    nameFi: "Studiohuone 1 + soittimet",
-    pk: 1,
-    id: base64encode(`ReservationUnitNode:1`),
+    authentication: Authentication.Weak,
+    nameFi,
+    pk,
+    id: base64encode(`ReservationUnitNode:${pk}`),
     minPersons: null,
     maxPersons: null,
     bufferTimeBefore: 0,
@@ -223,6 +178,7 @@ const reservationsByUnitResponse: ReservationsInIntervalFragment[] =
       bufferTimeAfter: 0,
       type: ReservationTypeChoice.Normal,
       affectedReservationUnits: [],
+      recurringReservation: null,
     }));
 
 const AdminUserMock: CurrentUserQuery = {
@@ -355,7 +311,10 @@ export function createGraphQLMocks({ begin, end }: { begin: Date; end: Date }) {
 
 function createReservationUnitResponse(): ReservationUnitQuery {
   return {
-    reservationUnit: createUnitFragment(),
+    reservationUnit: createReservationUnitFragment({
+      pk: 1,
+      nameFi: "Studiohuone 1 + soittimet",
+    }),
   };
 }
 

@@ -118,6 +118,9 @@ function createGraphQLMocks(
           reservationUnitTypesOrderBy:
             ReservationUnitTypeOrderingChoices.RankAsc,
           reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
+          unitsOrderBy: [],
+          equipmentsOrderBy: [],
+          purposesOrderBy: [],
         },
       },
       result: {

@@ -63,7 +63,7 @@ function Page1({
   const lang = convertLanguageCode(i18n.language);
   const { applicationRound } = application;
   const resUnitPks = applicationRound.reservationUnits?.map(
-    (resUnit) => resUnit?.unit?.pk
+    (resUnit) => resUnit.unit?.pk
   );
   const unitsInApplicationRound = filterNonNullable(uniq(resUnitPks));
   const { data } = useSearchFormParamsUnitQuery();
