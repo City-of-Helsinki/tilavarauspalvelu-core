@@ -279,7 +279,8 @@ def test_reservation__cancel__delete_from_pindora__call_fails(graphql):
     data = get_cancel_data(reservation)
     response = graphql(CANCEL_MUTATION, input_data=data)
 
-    assert response.error_message() == "Pindora API error"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora API error"]
 
     assert PindoraService.delete_access_code.called is True
 

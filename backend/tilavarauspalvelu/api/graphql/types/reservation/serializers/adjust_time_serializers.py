@@ -7,11 +7,13 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.fields import IntegerField
 
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import DEFAULT_TIMEZONE
+from utils.external_service.errors import external_service_errors_as_validation_errors
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -90,7 +92,8 @@ class ReservationAdjustTimeSerializer(NestingModelSerializer):
             instance = super().update(instance=instance, validated_data=validated_data)
 
             if was_access_code or instance.access_type == AccessType.ACCESS_CODE:
-                PindoraService.sync_access_code(obj=instance)
+                with external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR):
+                    PindoraService.sync_access_code(obj=instance)
 
         EmailService.send_reservation_modified_email(reservation=instance)
 

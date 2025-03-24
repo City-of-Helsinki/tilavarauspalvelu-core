@@ -1152,7 +1152,7 @@ def test_reservation__create__access_type__changes_to_access_code_in_the_future(
     assert PindoraService.create_access_code.call_count == 0
 
 
-@patch_method(PindoraService.create_access_code, side_effect=PindoraAPIError())
+@patch_method(PindoraService.create_access_code, side_effect=PindoraAPIError("Pindora Error"))
 def test_reservation__create__access_type__access_code__no_reservation_on_pindora_failure(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now(
         access_types__access_type=AccessType.ACCESS_CODE,
@@ -1164,6 +1164,7 @@ def test_reservation__create__access_type__access_code__no_reservation_on_pindor
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.has_errors is True
-    assert response.error_message() == "Pindora client error"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora Error"]
 
     assert Reservation.objects.exists() is False

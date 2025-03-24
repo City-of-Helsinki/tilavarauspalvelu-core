@@ -227,7 +227,7 @@ def test_reservation__deny__delete_from_pindora__call_success(graphql):
     assert reservation.state == ReservationStateChoice.DENIED
 
 
-@patch_method(PindoraService.delete_access_code, side_effect=PindoraAPIError("Pindora API error"))
+@patch_method(PindoraService.delete_access_code, side_effect=PindoraAPIError("Pindora Error"))
 def test_reservation__deny__delete_from_pindora__call_fails(graphql):
     reservation = ReservationFactory.create_for_deny(
         access_type=AccessType.ACCESS_CODE,
@@ -239,7 +239,8 @@ def test_reservation__deny__delete_from_pindora__call_fails(graphql):
     input_data = get_deny_data(reservation)
     response = graphql(DENY_MUTATION, input_data=input_data)
 
-    assert response.error_message() == "Pindora API error"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora Error"]
 
     assert PindoraService.delete_access_code.called is True
 

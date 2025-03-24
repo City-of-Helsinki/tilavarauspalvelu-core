@@ -16,7 +16,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE
-from utils.external_service.errors import ExternalServiceError
+from utils.external_service.errors import ExternalServiceError, external_service_errors_as_validation_errors
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
@@ -127,6 +127,7 @@ class ReservationCreateSerializer(NestingModelSerializer):
 
         # Pindora request must succeed, or the reservation is not created.
         if reservation.access_type == AccessType.ACCESS_CODE:
-            PindoraService.create_access_code(obj=reservation)
+            with external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR):
+                PindoraService.create_access_code(obj=reservation)
 
         return reservation

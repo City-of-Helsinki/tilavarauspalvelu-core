@@ -7,6 +7,7 @@ import pytest
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from utils.date_utils import local_datetime
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
@@ -139,3 +140,28 @@ def test_staff_repair_access_code__has_ended(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["Reservation has already ended."]
+
+
+@patch_method(PindoraService.sync_access_code, side_effect=PindoraAPIError("Pindora Error"))
+def test_staff_repair_access_code__pindora_call_fails(graphql):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_generated_at=local_datetime(),
+        access_code_is_active=True,
+        begin=local_datetime() + datetime.timedelta(hours=1),
+        end=local_datetime() + datetime.timedelta(hours=2),
+    )
+
+    data = {
+        "pk": reservation.pk,
+    }
+
+    graphql.login_with_superuser()
+    response = graphql(REPAIR_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora Error"]
+
+    assert PindoraService.sync_access_code.call_count == 1

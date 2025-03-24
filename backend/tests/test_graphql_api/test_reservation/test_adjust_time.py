@@ -10,6 +10,7 @@ from django.test import override_settings
 from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
@@ -595,5 +596,24 @@ def test_reservation__adjust_time__change_from_access_code(graphql):
     response = graphql(ADJUST_MUTATION, input_data=data)
 
     assert response.has_errors is False, response.errors
+
+    assert PindoraService.sync_access_code.call_count == 1
+
+
+@patch_method(PindoraService.sync_access_code, side_effect=PindoraAPIError("Pindora Error"))
+def test_reservation__adjust_time__pindora_call_fails(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment(
+        access_type=AccessType.ACCESS_CODE,
+        reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
+        access_code_generated_at=datetime.datetime(2025, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        access_code_is_active=True,
+    )
+
+    graphql.login_with_superuser()
+    data = get_adjust_data(reservation)
+    response = graphql(ADJUST_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora Error"]
 
     assert PindoraService.sync_access_code.call_count == 1

@@ -280,3 +280,28 @@ def test_change_reservation_series_access_code__not_requiring_active_access_code
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == ["Reservation series should not have active access code."]
+
+
+@patch_method(PindoraService.change_access_code, side_effect=PindoraAPIError("Pindora Error"))
+@freezegun.freeze_time(local_datetime(2024, 1, 1))
+def test_change_reservation_series_access_code__pindora_call_fails(graphql):
+    series = RecurringReservationFactory.create()
+    ReservationFactory.create(
+        reservation_units=[series.reservation_unit],
+        recurring_reservation=series,
+        begin=local_datetime(2024, 1, 1, 12),
+        end=local_datetime(2024, 1, 1, 13),
+        access_type=AccessType.ACCESS_CODE,
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_code_is_active=True,
+        access_code_generated_at=local_datetime(2024, 1, 1),
+    )
+
+    graphql.login_with_superuser()
+    response = graphql(CHANGE_ACCESS_CODE_SERIES_MUTATION, input_data={"pk": series.pk})
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora Error"]
+
+    assert PindoraService.change_access_code.call_count == 1

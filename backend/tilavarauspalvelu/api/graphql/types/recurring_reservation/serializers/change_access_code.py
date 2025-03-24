@@ -3,8 +3,10 @@ from __future__ import annotations
 from typing import Any
 
 from graphene_django_extensions import NestingModelSerializer
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import BooleanField, DateTimeField, IntegerField
 
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
@@ -56,6 +58,9 @@ class ReservationSeriesChangeAccessCodeSerializer(NestingModelSerializer):
                 access_code_is_active=False,
             )
             return instance
+
+        except ExternalServiceError as error:
+            raise ValidationError(str(error), code=error_codes.PINDORA_ERROR) from error
 
         if not response["access_code_is_active"]:
             try:

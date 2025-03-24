@@ -8,12 +8,14 @@ from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
 from rest_framework.fields import CharField, IntegerField
 
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import Reservation, ReservationDenyReason
 from utils.date_utils import local_datetime
+from utils.external_service.errors import external_service_errors_as_validation_errors
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import ReservationDenyData
@@ -63,7 +65,10 @@ class ReservationDenySerializer(NestingModelSerializer):
             instance = super().update(instance=instance, validated_data=validated_data)
 
             if instance.access_type == AccessType.ACCESS_CODE:
-                with suppress(PindoraNotFoundError):
+                with (
+                    external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR),
+                    suppress(PindoraNotFoundError),
+                ):
                     PindoraService.delete_access_code(obj=instance)
 
         EmailService.send_reservation_rejected_email(reservation=instance)

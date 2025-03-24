@@ -5,9 +5,11 @@ from typing import Any
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework.fields import BooleanField, DateTimeField, IntegerField
 
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import RecurringReservation
+from utils.external_service.errors import external_service_errors_as_validation_errors
 
 __all__ = [
     "ReservationSeriesRepairAccessCodeSerializer",
@@ -42,7 +44,8 @@ class ReservationSeriesRepairAccessCodeSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: RecurringReservation, validated_data: dict[str, Any]) -> RecurringReservation:  # noqa: ARG002
-        PindoraService.sync_access_code(obj=instance)
+        with external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR):
+            PindoraService.sync_access_code(obj=instance)
 
         if instance.allocated_time_slot is not None:
             # Send email to all reservation series in the same application section where the access code is active.

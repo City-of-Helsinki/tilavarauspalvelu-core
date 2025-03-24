@@ -281,7 +281,7 @@ def test_staff_change_access_code__already_ended(graphql):
     assert response.field_error_messages() == ["Reservation has already ended."]
 
 
-@patch_method(PindoraService.change_access_code, side_effect=PindoraAPIError())
+@patch_method(PindoraService.change_access_code, side_effect=PindoraAPIError("Pindora Error"))
 @patch_method(PindoraService.activate_access_code)
 def test_staff_change_access_code__pindora_error(graphql):
     reservation = ReservationFactory.create(
@@ -301,7 +301,8 @@ def test_staff_change_access_code__pindora_error(graphql):
     graphql.login_with_superuser()
     response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Pindora client error"
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora Error"]
 
 
 @patch_method(PindoraService.change_access_code, side_effect=PindoraNotFoundError("Not found"))
