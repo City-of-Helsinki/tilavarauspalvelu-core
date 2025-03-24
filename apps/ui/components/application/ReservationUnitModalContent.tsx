@@ -17,9 +17,9 @@ import { breakpoints } from "common/src/common/style";
 import {
   ReservationUnitOrderingChoices,
   useSearchReservationUnitsQuery,
-  type ReservationUnitCardFieldsFragment,
   type ApplicationReservationUnitListFragment,
-  SearchReservationUnitsQueryVariables,
+  type SearchReservationUnitsQueryVariables,
+  type RecurringCardFragment,
 } from "@gql/gql-types";
 import { filterNonNullable, getImageSource } from "common/src/helpers";
 import { CenterSpinner, Flex } from "common/styles/util";
@@ -54,10 +54,10 @@ function ReservationUnitCard({
   handleRemove,
   isSelected,
 }: Readonly<{
-  reservationUnit: ReservationUnitCardFieldsFragment;
+  reservationUnit: RecurringCardFragment;
   isSelected: boolean;
-  handleAdd: (ru: ReservationUnitCardFieldsFragment) => void;
-  handleRemove: (ru: ReservationUnitCardFieldsFragment) => void;
+  handleAdd: (ru: RecurringCardFragment) => void;
+  handleRemove: (ru: RecurringCardFragment) => void;
 }>) {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
@@ -139,9 +139,9 @@ export function ReservationUnitModalContent({
   options,
 }: Readonly<{
   applicationRound: AppRoundNode;
-  handleAdd: (ru: ReservationUnitCardFieldsFragment) => void;
-  handleRemove: (ru: ReservationUnitCardFieldsFragment) => void;
-  currentReservationUnits: Pick<ReservationUnitCardFieldsFragment, "pk">[];
+  handleAdd: (ru: RecurringCardFragment) => void;
+  handleRemove: (ru: RecurringCardFragment) => void;
+  currentReservationUnits: Pick<RecurringCardFragment, "pk">[];
   options: Pick<
     OptionTypes,
     "purposeOptions" | "reservationUnitTypeOptions" | "unitOptions"

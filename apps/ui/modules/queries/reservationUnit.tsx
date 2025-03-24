@@ -150,7 +150,7 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
   ) {
     reservationUnit(id: $id) {
       ...ReservationUnitPageFields
-      ...IsReservableFields
+      ...AvailableTimesReservationUnitFields
     }
     affectingReservations(
       forReservationUnits: [$pk]
@@ -164,24 +164,8 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
 `;
 
 export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
-  ${IMAGE_FRAGMENT}
-  ${UNIT_NAME_FRAGMENT_I18N}
-  ${RESERVATION_UNIT_TYPE_FRAGMENT}
-  ${RESERVATION_UNIT_NAME_FRAGMENT}
   fragment ReservationUnitCardFields on ReservationUnitNode {
-    ...ReservationUnitNameFields
-    unit {
-      ...UnitNameFieldsI18N
-    }
-    reservationUnitType {
-      ...ReservationUnitTypeFields
-    }
-    images {
-      ...Image
-    }
-    maxPersons
-    currentAccessType
-    effectiveAccessType
+    ...RecurringCard
     accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
       id
       accessType
@@ -192,8 +176,6 @@ export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
 // TODO why is ids remapped to pk here? that breaks all queries that use it
 // TODO why isDraft and isVisible are options here?
 export const SEARCH_RESERVATION_UNITS = gql`
-  ${PRICING_FRAGMENT}
-  ${RESERVATION_UNIT_CARD_FRAGMENT}
   query SearchReservationUnits(
     $textSearch: String
     $pk: [Int]

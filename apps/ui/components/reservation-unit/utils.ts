@@ -7,9 +7,9 @@ import {
   startOfDay,
 } from "date-fns";
 import type {
+  AvailableTimesReservationUnitFieldsFragment,
   BlockingReservationFieldsFragment,
   ReservationUnitNode,
-  ReservationUnitPageQuery,
 } from "@gql/gql-types";
 import { getPossibleTimesForDay } from "@/modules/reservationUnit";
 import {
@@ -19,15 +19,16 @@ import {
   isRangeReservable,
 } from "@/modules/reservable";
 import { dayMax, dayMin, timeToMinutes } from "common/src/helpers";
+import { gql } from "@apollo/client";
 
-type LastPossibleReservationDateProps = Pick<
+export type LastPossibleReservationDateProps = Pick<
   ReservationUnitNode,
   "reservationsMaxDaysBefore" | "reservableTimeSpans" | "reservationEnds"
 >;
 
 // Returns the last possible reservation date for the given reservation unit
 export function getLastPossibleReservationDate(
-  reservationUnit?: LastPossibleReservationDateProps
+  reservationUnit: LastPossibleReservationDateProps
 ): Date | null {
   if (!reservationUnit) {
     return null;
@@ -57,11 +58,18 @@ export function getLastPossibleReservationDate(
   );
 }
 
-type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
-type AvailableTimesProps = {
+export const AVILABLE_TIMES_RESERVATION_UNIT_FRAGMENT = gql`
+  fragment AvailableTimesReservationUnitFields on ReservationUnitNode {
+    ...IsReservableFields
+    reservationsMinDaysBefore
+    reservationsMaxDaysBefore
+  }
+`;
+
+export type AvailableTimesProps = {
   start: Date;
   duration: number;
-  reservationUnit: QueryT;
+  reservationUnit: AvailableTimesReservationUnitFieldsFragment;
   reservableTimes: ReservableMap;
   activeApplicationRounds: readonly RoundPeriod[];
   blockingReservations: readonly BlockingReservationFieldsFragment[];

@@ -8,10 +8,10 @@ import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { getApplicationRoundPath } from "@/modules/urls";
 
 function createApplicationRoundCard({
-  status,
+  status = null,
   name = "Test",
 }: {
-  status?: ApplicationRoundStatusChoice;
+  status?: ApplicationRoundStatusChoice | null;
   name: string;
 }): ApplicationRoundCardFragment {
   return {
