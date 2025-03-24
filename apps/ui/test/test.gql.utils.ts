@@ -220,6 +220,7 @@ function createSearchVariablesMock({
     accessTypeEndDate: "2025-01-01T00:00:00Z",
     applicationRound: [1],
     first: 36,
+    personsAllowed: null,
     orderBy: [
       ReservationUnitOrderingChoices.NameFiAsc,
       ReservationUnitOrderingChoices.PkAsc,

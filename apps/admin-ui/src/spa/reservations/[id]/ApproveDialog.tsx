@@ -90,7 +90,7 @@ const DialogContent = ({
     }
     approveReservation({
       pk: reservation.pk,
-      price: price.toString(),
+      price,
       handlingDetails,
     });
   };

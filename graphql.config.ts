@@ -3,7 +3,14 @@ import type { IGraphQLConfig } from "graphql-config";
 const scalars = {
   DateTime: "string",
   Date: "string",
-  Decimal: "string",
+  // Python decimal is a string but it allows numbers also for mutations
+  // using number in mutation has two benefits:
+  // - we don't have to toNumber(val).toString() for all values
+  // - removes server errors from passing "" as a value (which can't be type checked on client)
+  Decimal: {
+    output: "string",
+    input: "number",
+  },
   Duration: "number",
   JSON: "string",
   Long: "number",
@@ -32,6 +39,7 @@ const gqlConfig = {
   // experimentalFragmentVariables: true,
   skipTypename: true,
   defaultScalarType: "unknown",
+  strictScalars: true,
   scalars,
 };
 

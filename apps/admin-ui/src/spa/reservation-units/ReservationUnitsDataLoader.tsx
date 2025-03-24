@@ -84,14 +84,10 @@ export function ReservationUnitsDataReader(): JSX.Element {
 
   const searchFilter = searchParams.get("search");
   // it's typed string but it's actually a number (python Decimal)
-  const maxPersonsLte = toNumber(searchParams.get("maxPersonsLte"))?.toString();
-  const maxPersonsGte = toNumber(searchParams.get("maxPersonsGte"))?.toString();
-  const surfaceAreaLte = toNumber(
-    searchParams.get("surfaceAreaLte")
-  )?.toString();
-  const surfaceAreaGte = toNumber(
-    searchParams.get("surfaceAreaGte")
-  )?.toString();
+  const maxPersonsLte = toNumber(searchParams.get("maxPersonsLte"));
+  const maxPersonsGte = toNumber(searchParams.get("maxPersonsGte"));
+  const surfaceAreaLte = toNumber(searchParams.get("surfaceAreaLte"));
+  const surfaceAreaGte = toNumber(searchParams.get("surfaceAreaGte"));
 
   function convertToReservationUnitState(
     state: string
