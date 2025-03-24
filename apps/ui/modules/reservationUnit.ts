@@ -35,6 +35,7 @@ import {
   Maybe,
   BlockingReservationFieldsFragment,
   type ReservationPriceFragment,
+  ReservationStateChoice,
 } from "@gql/gql-types";
 import {
   type ReservableMap,
@@ -361,6 +362,7 @@ export const RESERVATION_PRICE_FRAGMENT = gql`
     }
     price
     begin
+    state
     end
     applyingForFreeOfCharge
   }
@@ -377,8 +379,11 @@ export function getPrice(
   const begin = new Date(reservation.begin);
   const end = new Date(reservation.end);
   const minutes = differenceInMinutes(end, begin);
+
+  const subventionState = getSubventionState(reservation);
   const showReservationUnitPrice =
-    reservationUnitPriceOnly || reservation.applyingForFreeOfCharge;
+    reservationUnitPriceOnly || subventionState === "pending";
+
   if (showReservationUnitPrice && reservationUnit) {
     return getReservationUnitPrice({
       t,
@@ -393,6 +398,24 @@ export function getPrice(
     true,
     lang
   );
+}
+
+function getSubventionState(
+  reservation: Pick<
+    ReservationPriceFragment,
+    "applyingForFreeOfCharge" | "state"
+  >
+): "pending" | "none" | "done" {
+  if (
+    reservation.applyingForFreeOfCharge &&
+    reservation.state === ReservationStateChoice.RequiresHandling
+  ) {
+    return "pending";
+  }
+  if (!reservation.applyingForFreeOfCharge) {
+    return "none";
+  }
+  return "done";
 }
 
 export function isReservationUnitFreeOfCharge(

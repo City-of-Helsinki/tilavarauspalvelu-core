@@ -145,7 +145,6 @@ function Actions({
       {order?.receiptUrl && (
         <Button
           data-testid="reservation__confirmation--button__receipt-link"
-          // TODO should be a link
           onClick={() =>
             window.open(`${order.receiptUrl}&lang=${i18n.language}`, "_blank")
           }
