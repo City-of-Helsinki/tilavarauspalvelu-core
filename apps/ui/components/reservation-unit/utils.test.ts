@@ -6,12 +6,12 @@ import {
   set,
   startOfDay,
 } from "date-fns";
-import { getLastPossibleReservationDate, getNextAvailableTime } from "./utils";
 import {
-  ReservationKind,
-  ReservationStartInterval,
-} from "common/gql/gql-types";
-import { AccessType, ReservationUnitPageQuery } from "@/gql/gql-types";
+  type AvailableTimesProps,
+  getLastPossibleReservationDate,
+  getNextAvailableTime,
+  type LastPossibleReservationDateProps,
+} from "./utils";
 import { dateToKey, ReservableMap, RoundPeriod } from "@/modules/reservable";
 import {
   vi,
@@ -23,6 +23,7 @@ import {
   afterAll,
 } from "vitest";
 import { TIMERS_TO_FAKE } from "@/test/test.utils";
+import { ReservationStartInterval } from "@/gql/gql-types";
 
 describe("getLastPossibleReservationDate", () => {
   beforeAll(() => {
@@ -35,30 +36,26 @@ describe("getLastPossibleReservationDate", () => {
   });
 
   function createInput({
-    reservationsMaxDaysBefore,
-    reservableTimeSpans,
+    reservationsMaxDaysBefore = null,
+    reservableTimeSpans = [],
     reservationEnds,
   }: {
-    reservationsMaxDaysBefore?: number;
+    reservationsMaxDaysBefore?: number | null;
     reservableTimeSpans?: {
       begin: Date;
       end: Date;
     }[];
     reservationEnds?: Date;
-  }) {
+  }): LastPossibleReservationDateProps {
     return {
       reservationsMaxDaysBefore,
       reservableTimeSpans: reservableTimeSpans?.map(({ begin, end }) => ({
         startDatetime: begin.toISOString(),
         endDatetime: end.toISOString(),
       })),
-      reservationEnds: reservationEnds?.toISOString(),
+      reservationEnds: reservationEnds?.toISOString() ?? null,
     };
   }
-
-  test("returns null if no reservationUnit is given", () => {
-    expect(getLastPossibleReservationDate()).toBeNull();
-  });
 
   test("returns null without reservableTimeSpans", () => {
     const input = createInput({
@@ -191,52 +188,37 @@ describe("getNextAvailableTime", () => {
   function createInput({
     start,
     duration,
-    reservationsMinDaysBefore,
-    reservationsMaxDaysBefore,
-    activeApplicationRounds,
+    reservationsMinDaysBefore = null,
+    reservationsMaxDaysBefore = null,
+    activeApplicationRounds = [],
   }: {
     start: Date;
     duration: number;
-    reservationsMinDaysBefore?: number;
-    reservationsMaxDaysBefore?: number;
+    reservationsMinDaysBefore?: number | null;
+    reservationsMaxDaysBefore?: number | null;
     activeApplicationRounds?: RoundPeriod[];
-  }) {
-    const reservationUnit: NonNullable<
-      ReservationUnitPageQuery["reservationUnit"]
-    > = {
+  }): AvailableTimesProps {
+    const reservationUnit: AvailableTimesProps["reservationUnit"] = {
       id: "123",
-      pk: 123,
-      isDraft: false,
-      reservationKind: ReservationKind.Direct,
       bufferTimeBefore: 0,
       bufferTimeAfter: 0,
-      requireReservationHandling: false,
-      canApplyFreeOfCharge: false,
       reservationStartInterval: ReservationStartInterval.Interval_30Mins,
-      uuid: "123",
-      images: [],
-      applicationRoundTimeSlots: [],
-      applicationRounds: [],
-      equipments: [],
-      pricings: [],
-      accessTypes: [
-        {
-          id: "123",
-          accessType: AccessType.Unrestricted,
-          beginDate: new Date().toISOString(),
-        },
-      ],
+      reservationsMinDaysBefore,
+      reservationsMaxDaysBefore,
+      maxReservationDuration: null,
+      minReservationDuration: null,
+      reservationBegins: null,
+      reservationEnds: null,
+      reservableTimeSpans: [],
     };
     return {
       start,
       duration,
       reservationUnit: {
         ...reservationUnit,
-        reservationsMinDaysBefore,
-        reservationsMaxDaysBefore,
       },
       reservableTimes,
-      activeApplicationRounds: activeApplicationRounds ?? [],
+      activeApplicationRounds,
       blockingReservations: [],
     };
   }

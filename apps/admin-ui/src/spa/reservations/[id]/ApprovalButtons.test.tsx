@@ -20,15 +20,24 @@ const wrappedRender = (reservation: ReservationNode) => {
   );
 };
 
+function createInput({
+  state,
+  end = addDays(new Date(), 2),
+}: {
+  state: ReservationStateChoice;
+  end?: Date;
+}): ReservationNode {
+  return {
+    state,
+    end: end.toISOString(),
+    recurringReservation: null,
+  } as ReservationNode;
+}
+
 describe("State change rules", () => {
   test("Return and Deny are enabled for future Confirmed events", () => {
-    const res = {
-      state: ReservationStateChoice.Confirmed,
-      end: addDays(new Date(), 2).toISOString(),
-      recurringReservation: undefined,
-    } as ReservationNode;
-
-    const view = wrappedRender(res);
+    const input = createInput({ state: ReservationStateChoice.Confirmed });
+    const view = wrappedRender(input);
 
     expect(
       view.getByRole("button", { name: "RequestedReservation.reject" })
@@ -41,13 +50,10 @@ describe("State change rules", () => {
   });
 
   test("Approve and deny are enabled for future RequiresHandling", () => {
-    const res = {
+    const input = createInput({
       state: ReservationStateChoice.RequiresHandling,
-      end: addDays(new Date(), 2).toISOString(),
-      recurringReservation: undefined,
-    } as ReservationNode;
-
-    const view = wrappedRender(res);
+    });
+    const view = wrappedRender(input);
 
     expect(
       view.getByRole("button", { name: "RequestedReservation.reject" })
@@ -58,13 +64,8 @@ describe("State change rules", () => {
   });
 
   test("Only Return to Handling is enabled if Denied", () => {
-    const res = {
-      state: ReservationStateChoice.Denied,
-      end: addDays(new Date(), 2).toISOString(),
-      recurringReservation: undefined,
-    } as ReservationNode;
-
-    const view = wrappedRender(res);
+    const input = createInput({ state: ReservationStateChoice.Denied });
+    const view = wrappedRender(input);
 
     expect(view.queryAllByRole("button")).toHaveLength(1);
     expect(
@@ -75,33 +76,29 @@ describe("State change rules", () => {
   });
 
   test("Past Confirmed all buttons are disabled", () => {
-    const res = {
+    const input = createInput({
       state: ReservationStateChoice.Confirmed,
-      end: addDays(new Date(), -2).toISOString(),
-      recurringReservation: undefined,
-    } as ReservationNode;
-    const view = wrappedRender(res);
+      end: addDays(new Date(), -2),
+    });
+    const view = wrappedRender(input);
     expect(view.queryAllByRole("button")).toHaveLength(0);
   });
 
   test("Past Denied all buttons are disabled", () => {
-    const res = {
+    const input = createInput({
       state: ReservationStateChoice.Denied,
-      end: addDays(new Date(), -2).toISOString(),
-      recurringReservation: undefined,
-    } as ReservationNode;
-    const view = wrappedRender(res);
+      end: addDays(new Date(), -2),
+    });
+    const view = wrappedRender(input);
     expect(view.queryAllByRole("button")).toHaveLength(0);
   });
 
   test("Past RequiresHandling can be Denied", () => {
-    const res = {
+    const input = createInput({
       state: ReservationStateChoice.RequiresHandling,
-      end: addDays(new Date(), -2).toISOString(),
-      recurringReservation: undefined,
-    } as ReservationNode;
-
-    const view = wrappedRender(res);
+      end: addDays(new Date(), -2),
+    });
+    const view = wrappedRender(input);
 
     expect(view.queryAllByRole("button")).toHaveLength(1);
     expect(
@@ -112,13 +109,8 @@ describe("State change rules", () => {
 
 describe("Editing allowed", () => {
   test("Editing is allowed for future Confirmed events", () => {
-    const res = {
-      state: ReservationStateChoice.Confirmed,
-      end: addDays(new Date(), 2).toISOString(),
-      recurringReservation: undefined,
-    } as ReservationNode;
-
-    const view = wrappedRender(res);
+    const input = createInput({ state: ReservationStateChoice.Confirmed });
+    const view = wrappedRender(input);
 
     expect(
       view.getByRole("link", { name: "ApprovalButtons.edit" })
@@ -126,47 +118,43 @@ describe("Editing allowed", () => {
   });
 
   test("No editing if the event isn't Confirmed", () => {
-    const res = {
+    const input = createInput({
       state: ReservationStateChoice.RequiresHandling,
-      end: addDays(new Date(), 2).toISOString(),
-      recurringReservation: undefined,
-    } as ReservationNode;
-
-    const view = wrappedRender(res);
+    });
+    const view = wrappedRender(input);
     expect(view.queryAllByRole("link")).toHaveLength(0);
 
     const view2 = wrappedRender({
-      ...res,
+      ...input,
       state: ReservationStateChoice.Denied,
     });
     expect(view2.queryAllByRole("link")).toHaveLength(0);
 
     const view3 = wrappedRender({
-      ...res,
+      ...input,
       state: ReservationStateChoice.Cancelled,
     });
     expect(view3.queryAllByRole("link")).toHaveLength(0);
 
     const view4 = wrappedRender({
-      ...res,
+      ...input,
       state: ReservationStateChoice.WaitingForPayment,
     });
     expect(view4.queryAllByRole("link")).toHaveLength(0);
 
     const view5 = wrappedRender({
-      ...res,
+      ...input,
       state: ReservationStateChoice.Created,
     });
     expect(view5.queryAllByRole("link")).toHaveLength(0);
   });
 
   test("Past Confirmed has a one hour edit window", () => {
-    const res = {
+    const input = createInput({
       state: ReservationStateChoice.Confirmed,
-      end: addMinutes(new Date(), -45).toISOString(),
-      recurringReservation: undefined,
-    } as ReservationNode;
-    const view = wrappedRender(res);
+      end: addMinutes(new Date(), -45),
+    });
+    const view = wrappedRender(input);
     expect(
       view.getByRole("link", { name: "ApprovalButtons.edit" })
     ).toBeInTheDocument();

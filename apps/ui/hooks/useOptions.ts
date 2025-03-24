@@ -3,6 +3,7 @@ import { useTranslation } from "next-i18next";
 import {
   type Maybe,
   type OptionsQuery,
+  OptionsQueryVariables,
   ReservationPurposeOrderingChoices,
   ReservationUnitTypeOrderingChoices,
   useOptionsQuery,
@@ -138,11 +139,15 @@ function sortAgeGroups(ageGroups: AgeGroup[]): AgeGroup[] {
 export function useOptions() {
   const { i18n } = useTranslation();
 
+  const variables: OptionsQueryVariables = {
+    reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
+    reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
+    unitsOrderBy: [],
+    equipmentsOrderBy: [],
+    purposesOrderBy: [],
+  };
   const { data, loading: isLoading } = useOptionsQuery({
-    variables: {
-      reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
-      reservationPurposesOrderBy: ReservationPurposeOrderingChoices.RankAsc,
-    },
+    variables,
   });
   const ageGroups = filterNonNullable(
     data?.ageGroups?.edges?.map((edge) => edge?.node)

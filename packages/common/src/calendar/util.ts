@@ -8,6 +8,7 @@ export type ReservationEventType = {
   bufferTimeBefore?: number;
   bufferTimeAfter?: number;
 };
+
 export function getEventBuffers(
   events: ReservationEventType[]
 ): CalendarEventBuffer[] {

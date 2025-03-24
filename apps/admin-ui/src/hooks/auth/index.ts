@@ -5,14 +5,14 @@ import {
 
 export function useSession() {
   const { data, error } = useCurrentUserQuery();
-  const user = data?.currentUser ?? undefined;
+  const user = data?.currentUser ?? null;
 
   return { isAuthenticated: user != null, user, error };
 }
 
 export function useSessionSuspense() {
   const { data, error } = useCurrentUserSuspenseQuery();
-  const user = data?.currentUser ?? undefined;
+  const user = data?.currentUser ?? null;
 
   return { isAuthenticated: user != null, user, error };
 }

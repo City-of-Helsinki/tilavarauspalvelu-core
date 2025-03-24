@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { RecurringCard } from "./RecurringCard";
-import { AccessType, ReservationUnitCardFieldsFragment } from "@/gql/gql-types";
+import { AccessType, type RecurringCardFragment } from "@/gql/gql-types";
 import { vi, describe, test, expect } from "vitest";
 import { getReservationUnitPath } from "@/modules/urls";
 import {
@@ -8,6 +8,7 @@ import {
   generateNameFragment,
 } from "@/test/test.gql.utils";
 import userEvent from "@testing-library/user-event";
+import { base64encode } from "common/src/helpers";
 
 describe("RecurringCard", () => {
   test("should render recurring card", () => {
@@ -128,11 +129,10 @@ function createReservationUnit({
   reservationUnitType,
   maxPersons,
   currentAccessType,
-}: MockReservationUnitInputs): ReservationUnitCardFieldsFragment {
+}: MockReservationUnitInputs): RecurringCardFragment {
   return {
     id: "ReservationUnitNode:1",
     pk: 1,
-    accessTypes: [],
     maxPersons: maxPersons !== undefined ? maxPersons : 10,
     currentAccessType:
       currentAccessType !== undefined
@@ -154,13 +154,16 @@ function createReservationUnit({
   };
 }
 
-function createUnitMock({ name }: { name?: string }) {
+function createUnitMock({
+  name,
+}: {
+  name?: string;
+}): RecurringCardFragment["unit"] {
   if (!name) {
     return null;
   }
   return {
-    id: "UnitNode:1",
-    pk: 1,
+    id: base64encode("UnitNode:1"),
     ...generateNameFragment(name),
   };
 }

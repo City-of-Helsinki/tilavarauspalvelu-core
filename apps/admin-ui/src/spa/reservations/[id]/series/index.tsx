@@ -109,7 +109,10 @@ function SeriesPageInner({ pk }: { pk: number }) {
     variables: { id: base64encode(`ReservationNode:${pk}`) },
   });
   const { reservation } = data ?? {};
-  const { recurringReservation } = reservation ?? {};
+  const recurringReservation =
+    reservation?.recurringReservation != null
+      ? reservation.recurringReservation
+      : null;
 
   const [mutate] = useRescheduleReservationSeriesMutation();
 

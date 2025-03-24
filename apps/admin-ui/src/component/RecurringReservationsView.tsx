@@ -95,6 +95,7 @@ export function RecurringReservationsView({
   const handleRemove = (res: (typeof reservations)[0]) => {
     setModalContent(
       <DenyDialog
+        // @ts-expect-error -- FIXME make a separate version of DenyDialog for recurring reservations
         reservation={res}
         onReject={() => {
           refetch();

@@ -644,7 +644,7 @@ function AllocationWrapper({
 
   return (
     <ApplicationRoundAllocation
-      applicationRound={applicationRound ?? undefined}
+      applicationRound={applicationRound ?? null}
       applicationRoundPk={applicationRoundPk}
       units={filteredUnits}
       reservationUnits={resUnits}
