@@ -7052,6 +7052,7 @@ export type ReservationPriceFragment = {
   id: string;
   price?: string | null;
   begin: string;
+  state?: ReservationStateChoice | null;
   end: string;
   applyingForFreeOfCharge?: boolean | null;
   reservationUnits: Array<{
@@ -9664,6 +9665,7 @@ export const ReservationPriceFragmentDoc = gql`
     }
     price
     begin
+    state
     end
     applyingForFreeOfCharge
   }
