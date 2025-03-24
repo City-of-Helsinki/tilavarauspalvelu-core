@@ -154,7 +154,7 @@ export function processVariables({
   const duration = dur != null && dur > 0 ? dur : null;
   const isSeasonal = kind === ReservationKind.Season;
   const textSearch = values.get("textSearch");
-  const personsAllowed = toNumber(values.get("personsAllowed"))?.toString();
+  const personsAllowed = toNumber(values.get("personsAllowed"));
   const purposes = mapParamToNumber(values.getAll("purposes"), 1);
   const unit = mapParamToNumber(values.getAll("units"), 1);
   const reservationUnitTypes = mapParamToNumber(
@@ -215,7 +215,7 @@ export function processVariables({
       : {}),
     ...(duration != null
       ? {
-          reservableMinimumDurationMinutes: duration.toString(),
+          reservableMinimumDurationMinutes: duration,
         }
       : {}),
     ...(!isSeasonal && showOnlyReservable

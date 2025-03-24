@@ -1014,8 +1014,8 @@ function transformPricing(
   return {
     ...(p.taxPercentage > 0 ? { taxPercentage: p.taxPercentage } : {}),
     begins: toApiDate(begins) ?? "",
-    highestPrice: p.isPaid ? p.highestPrice.toString() : "0",
-    lowestPrice: p.isPaid ? p.lowestPrice.toString() : "0",
+    highestPrice: p.isPaid ? p.highestPrice : 0,
+    lowestPrice: p.isPaid ? p.lowestPrice : 0,
     ...(p.pk > 0 ? { pk: p.pk } : {}),
     ...(p.priceUnit != null ? { priceUnit: p.priceUnit } : {}),
   };
