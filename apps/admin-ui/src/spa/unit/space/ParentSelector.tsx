@@ -10,7 +10,10 @@ import {
   toNumber,
 } from "common/src/helpers";
 
-function spacesAsHierarchy(unit: UnitSpacesQuery["unit"], paddingChar: string) {
+function spacesAsHierarchy(
+  unit: UnitSpacesQuery["unit"] | undefined,
+  paddingChar: string
+) {
   const allSpaces = filterNonNullable(unit?.spaces);
   type SpaceNode = (typeof allSpaces)[0];
 

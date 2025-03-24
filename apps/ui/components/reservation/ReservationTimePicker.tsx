@@ -189,6 +189,7 @@ function useCalendarEventChange({
           state: "INITIAL",
           bufferTimeBefore,
           bufferTimeAfter,
+          price: null,
         }
       : null;
 

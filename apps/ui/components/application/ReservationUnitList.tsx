@@ -11,7 +11,7 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import type {
   ApplicationReservationUnitListFragment,
-  ReservationUnitCardFieldsFragment,
+  OrderedReservationUnitCardFragment,
 } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { filterNonNullable } from "common/src/helpers";
@@ -25,7 +25,7 @@ import { gql } from "@apollo/client";
 import { ErrorText } from "common/src/components/ErrorText";
 import { createPortal } from "react-dom";
 
-type ReservationUnitType = ReservationUnitCardFieldsFragment;
+type ReservationUnitType = OrderedReservationUnitCardFragment;
 export type OptionType = Readonly<{ value: number; label: string }>;
 type OptionListType = Readonly<{ value: number; label: string }[]>;
 export type OptionTypes = Readonly<{
@@ -221,26 +221,12 @@ export const APPLICATION_RESERVATION_UNIT_LIST_FRAGMENT = gql`
     nameSv
     nameEn
     reservationUnits {
-      id
-      pk
-      nameFi
-      nameSv
-      nameEn
+      ...OrderedReservationUnitCard
       minPersons
       maxPersons
-      images {
-        ...Image
-      }
       unit {
         id
         pk
-        nameFi
-        nameSv
-        nameEn
-      }
-      accessTypes {
-        id
-        accessType
       }
     }
   }

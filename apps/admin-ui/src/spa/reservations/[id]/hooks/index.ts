@@ -4,56 +4,43 @@ import {
   ReservationTypeChoice,
   useReservationQuery,
   useReservationsByReservationUnitQuery,
-  ReservationUnitNode,
-  ReservationNode,
-  type ReservationQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { toApiDate } from "common/src/common/util";
 import { errorToast } from "common/src/common/toast";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { useRecurringReservations } from "@/hooks";
-import { CalendarEvent } from "common/src/calendar/Calendar";
+import { type CalendarEventType } from "../eventStyleGetter";
 
-type ReservationType = Omit<
-  NonNullable<ReservationQuery["reservation"]>,
-  "user"
->;
-type CalendarEventType = CalendarEvent<ReservationType>;
-
-const getEventName = (
+function getEventName(
   eventType?: ReservationTypeChoice | null,
   title?: string,
   blockedName?: string
-) =>
-  eventType === ReservationTypeChoice.Blocked ? blockedName : title?.trim();
+) {
+  return eventType === ReservationTypeChoice.Blocked
+    ? blockedName
+    : title?.trim();
+}
 
-const getReservationTitle = (r: CalendarReservationFragment) =>
-  r.reserveeName ?? "";
+function getReservationTitle(r: CalendarReservationFragment) {
+  return r.reserveeName ?? "";
+}
 
 function convertReservationToCalendarEvent(
   // NOTE funky because we are converting affectedReservations also and they don't have reservationUnit
   // but these are passed to event handlers that allow changing the reservation that requires a reservationUnit
   // affected don't have event handlers so empty reservationUnit is fine
-  r: CalendarReservationFragment & {
-    reservationUnits?: ReservationUnitNode[];
-  } & Partial<Pick<ReservationNode, "paymentOrder">>,
+  r: CalendarReservationFragment,
   blockedName: string
 ): CalendarEventType {
   const title = getEventName(r.type, getReservationTitle(r), blockedName);
 
-  const reservationUnits =
-    "reservationUnits" in r && r.reservationUnits != null
-      ? r.reservationUnits
-      : [];
-  const paymentOrder = "paymentOrder" in r ? (r.paymentOrder ?? []) : [];
   return {
     title,
     event: {
       ...r,
       name: r.name?.trim() !== "" ? r.name : "No name",
-      reservationUnits,
-      paymentOrder,
+      recurringReservation: null,
     },
     // TODO use zod for datetime conversions
     start: new Date(r.begin),
@@ -63,13 +50,16 @@ function convertReservationToCalendarEvent(
 
 // TODO This would be better if we combined two GQL queries, one for the reservation itself
 // and other that includes the states (now we are fetching a lot of things we don't need)
-const shouldBeShownInTheCalendar = (
+function shouldBeShownInTheCalendar(
   r: CalendarReservationFragment,
   ownPk?: number
-) =>
-  r.state === ReservationStateChoice.Confirmed ||
-  r.state === ReservationStateChoice.RequiresHandling ||
-  r.pk === ownPk;
+) {
+  return (
+    r.state === ReservationStateChoice.Confirmed ||
+    r.state === ReservationStateChoice.RequiresHandling ||
+    r.pk === ownPk
+  );
+}
 
 // TODO there is an issue here with denied "Blocked" reservations shown in the Calendar as regular "Blocked" reservations
 // so it looks confusing. It works properly if we want to show the reservation itself even if it's denied, but there should
@@ -84,8 +74,7 @@ export function useReservationData(
 
   const today = new Date();
 
-  const typename = "ReservationUnitNode";
-  const id = base64encode(`${typename}:${reservationUnitPk}`);
+  const id = base64encode(`ReservationUnitNode:${reservationUnitPk}`);
   const { data, ...rest } = useReservationsByReservationUnitQuery({
     fetchPolicy: "no-cache",
     skip: !reservationUnitPk,

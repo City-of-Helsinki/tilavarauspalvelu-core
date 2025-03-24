@@ -13,6 +13,7 @@ import {
   type ReservationCommonFragment,
   type PricingFieldsFragment,
   type ReservationQuery,
+  type CreateTagStringFragment,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import {
@@ -22,12 +23,13 @@ import {
 } from "@/common/util";
 import { fromAPIDateTime } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
+import { gql } from "@apollo/client";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
 
 function reservationUnitName(
-  reservationUnit: Maybe<ReservationUnitType>
+  reservationUnit: Maybe<CreateTagStringFragment["reservationUnits"][0]>
 ): string {
   return reservationUnit
     ? `${reservationUnit.nameFi}, ${reservationUnit.unit?.nameFi || ""}`
@@ -182,7 +184,7 @@ export function getName(
 // recurring format: {weekday(s)} {time}, {duration} | {startDate}-{endDate} | {unit}
 // single format   : {weekday} {date} {time}, {duration} | {unit}
 export function createTagString(
-  reservation: ReservationType,
+  reservation: CreateTagStringFragment,
   t: TFunction
 ): string {
   try {
@@ -196,7 +198,7 @@ export function createTagString(
 }
 
 function createSingleTagString(
-  reservation: ReservationType,
+  reservation: CreateTagStringFragment,
   t: TFunction
 ): string {
   const begin = new Date(reservation.begin);
@@ -215,7 +217,7 @@ function createSingleTagString(
 }
 
 function createRecurringTagString(
-  reservation: ReservationType,
+  reservation: CreateTagStringFragment,
   t: TFunction
 ): string {
   const { recurringReservation } = reservation;
@@ -260,3 +262,27 @@ function createRecurringTagString(
     recurringTag.length > 0 ? " | " : ""
   } ${recurringTag} | ${unitTag}`;
 }
+
+export const CREATE_TAG_STRING_FRAGMENT = gql`
+  fragment CreateTagString on ReservationNode {
+    id
+    begin
+    end
+    reservationUnits {
+      id
+      nameFi
+      unit {
+        id
+        nameFi
+      }
+    }
+    recurringReservation {
+      id
+      beginDate
+      beginTime
+      endDate
+      endTime
+      weekdays
+    }
+  }
+`;

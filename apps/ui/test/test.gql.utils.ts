@@ -171,25 +171,15 @@ function createSearchQueryNode(
     // TODO implement though for Seasonal this doesn't matter
     firstReservableDatetime: null,
     currentAccessType: null,
+    effectiveAccessType: null,
     maxPersons: null,
     // TODO implement though for Seasonal this doesn't matter
     pricings: [],
     unit: {
       id: base64encode(`UnitNode:${i}`),
-      pk: i,
       nameFi: `Unit ${i} FI`,
       nameEn: `Unit ${i} EN`,
       nameSv: `Unit ${i} SV`,
-      location: {
-        addressStreetFi: "Address street FI",
-        addressStreetEn: "Address street EN",
-        addressStreetSv: "Address street SV",
-        addressCityFi: "Address city FI",
-        addressCityEn: "Address city EN",
-        addressCitySv: "Address city SV",
-        id: base64encode(`LocationNode:${i}`),
-        addressZip: "00000",
-      },
     },
     reservationUnitType: createMockReservationUnitType({
       name: "ReservationUnitType",
@@ -240,7 +230,46 @@ function createMockApplicationSection({
 } = {}): NonNullable<ApplicationFormFragment["applicationSections"]>[number] {
   const pk = 1;
   // TODO parametrize so we can zero this for page0 (nothing filled yet)
-  const page1Data = {
+
+  const opt1: NonNullable<
+    ApplicationFormFragment["applicationSections"]
+  >[number]["reservationUnitOptions"][number] = {
+    id: base64encode(`ReservationUnitOptionNode:1`),
+    pk: 1,
+    preferredOrder: 1,
+    reservationUnit: {
+      id: base64encode(`ReservationUnitNode:1`),
+      pk: 1,
+      ...generateNameFragment("ReservationUnitNode"),
+      unit: {
+        id: base64encode(`UnitNode:1`),
+        pk: 1,
+        ...generateNameFragment("UnitNode"),
+      },
+      applicationRoundTimeSlots: [
+        {
+          id: base64encode(`ApplicationRoundTimeSlotNode:1`),
+          pk: 1,
+          weekday: 1,
+          closed: false,
+          reservableTimes: [
+            {
+              begin: "08:00",
+              end: "16:00",
+            },
+          ],
+        },
+      ],
+    },
+  };
+  const reservationUnitOptions: NonNullable<
+    ApplicationFormFragment["applicationSections"]
+  >[number]["reservationUnitOptions"] = page !== "page0" ? [opt1] : [];
+
+  const page1Data: Omit<
+    NonNullable<ApplicationFormFragment["applicationSections"]>[number],
+    "status" | "suitableTimeRanges" | "id" | "pk"
+  > = {
     // page 1 data
     name: "foobar",
     reservationMinDuration: 1 * 60 * 60,
@@ -260,39 +289,7 @@ function createMockApplicationSection({
       pk: 1,
       ...generateNameFragment("PurposeNode"),
     },
-    reservationUnitOptions:
-      page !== "page0"
-        ? [
-            {
-              id: base64encode(`ReservationUnitOptionNode:1`),
-              pk: 1,
-              preferredOrder: 1,
-              reservationUnit: {
-                id: base64encode(`ReservationUnitNode:1`),
-                pk: 1,
-                ...generateNameFragment("ReservationUnitNode"),
-                unit: {
-                  id: base64encode(`UnitNode:1`),
-                  pk: 1,
-                  ...generateNameFragment("UnitNode"),
-                },
-                applicationRoundTimeSlots: [
-                  {
-                    id: base64encode(`ApplicationRoundTimeSlotNode:1`),
-                    weekday: 1,
-                    closed: false,
-                    reservableTimes: [
-                      {
-                        begin: "08:00",
-                        end: "16:00",
-                      },
-                    ],
-                  },
-                ],
-              },
-            },
-          ]
-        : [],
+    reservationUnitOptions,
   };
   const page2Data = {
     // TODO add other options
@@ -328,7 +325,7 @@ function createMockApplicationSection({
   return {
     id: base64encode(`ApplicationSectionNode:${pk}`),
     pk,
-    // status: null, // (or Unallocated)
+    status: null, // (or Unallocated)
     ...page1Data,
     ...page2Data,
   };
@@ -403,7 +400,16 @@ export function createMockApplicationFragment({
       // colliding with the same name (spread syntax)
       applicationSections:
         page === "page0" ? [] : [createMockApplicationSection({ page })],
-      ...(page === "page3" || page === "preview" ? page3Data : {}),
+      ...(page === "page3" || page === "preview"
+        ? page3Data
+        : {
+            applicantType: null,
+            billingAddress: null,
+            additionalInformation: null,
+            contactPerson: null,
+            organisation: null,
+            homeCity: null,
+          }),
     };
   const reservationUnits: ApplicationFormFragment["applicationRound"]["reservationUnits"] =
     Array.from({ length: 10 }, (_, i) => ({
@@ -573,6 +579,12 @@ export function createMockApplicationRound({
     publicDisplayEnd: "2025-01-01T00:00:00Z",
     applicationPeriodBegin: applicationPeriodBegin.toISOString(),
     applicationPeriodEnd: applicationPeriodEnd.toISOString(),
+    criteriaFi: null,
+    criteriaEn: null,
+    criteriaSv: null,
+    notesWhenApplyingFi: null,
+    notesWhenApplyingEn: null,
+    notesWhenApplyingSv: null,
     reservationUnits: [1, 2, 3].map((pk) => ({
       id: base64encode(`ReservationUnitNode:${pk}`),
       pk,

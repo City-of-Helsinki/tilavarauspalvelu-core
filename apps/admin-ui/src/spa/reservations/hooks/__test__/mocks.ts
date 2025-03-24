@@ -1,11 +1,9 @@
 import { GraphQLError } from "graphql";
 import { addDays, addHours, startOfDay } from "date-fns";
 import {
-  AccessType,
   CustomerTypeChoice,
   RecurringReservationDocument,
   type RecurringReservationQuery,
-  ReservationQuery,
   ReservationStateChoice,
   ReservationTypeChoice,
   UpdateRecurringReservationDocument,
@@ -59,29 +57,56 @@ function getValidInterval(daysToAdd: number) {
   return [begin.toISOString(), addHours(begin, 1).toISOString()];
 }
 
-function createReservationEdge({
-  startingPk,
-  recurringPk,
-  state = ReservationStateChoice.Confirmed,
-}: {
+type ReservationEdgeProps = {
   startingPk: number;
   recurringPk: number;
   state?: ReservationStateChoice;
+};
+
+function createReservation({
+  pk,
+  recurringPk,
+  begin,
+  end,
+  state = ReservationStateChoice.Confirmed,
+}: {
+  pk: number;
+  recurringPk: number;
+  begin: string;
+  end: string;
+  state?: ReservationStateChoice;
 }): NonNullable<
   RecurringReservationQuery["recurringReservation"]
->["reservations"] {
-  const params = {
+>["reservations"][number] {
+  return {
     bufferTimeAfter: 0,
     bufferTimeBefore: 0,
     paymentOrder: [],
     reservationUnits: [],
+    type: ReservationTypeChoice.Behalf,
     recurringReservation: {
       id: base64encode(`RecurringReservationNode:${recurringPk}`),
       pk: recurringPk,
+      // TODO these should not be empty
+      weekdays: [],
+      beginDate: "",
+      endDate: "",
     },
     state,
+    id: base64encode(`ReservationNode:${pk}`),
+    pk,
+    begin,
+    end,
   };
+}
 
+function createReservationEdge({
+  startingPk,
+  recurringPk,
+  state = ReservationStateChoice.Confirmed,
+}: ReservationEdgeProps): NonNullable<
+  RecurringReservationQuery["recurringReservation"]
+>["reservations"] {
   const begin1 = getValidInterval(0)[0];
   const end1 = getValidInterval(0)[1];
   const begin2 = getValidInterval(7)[0];
@@ -90,20 +115,20 @@ function createReservationEdge({
     throw new Error("Invalid dates");
   }
   return [
-    {
-      ...params,
+    createReservation({
+      pk: startingPk,
+      recurringPk,
+      state,
       begin: begin1,
       end: end1,
-      pk: startingPk,
-      id: base64encode(`ReservationNode:${startingPk}`),
-    },
-    {
-      ...params,
-      begin: begin2,
-      end: end2,
+    }),
+    createReservation({
       pk: startingPk + 1,
-      id: base64encode(`ReservationNode:${startingPk + 1}`),
-    },
+      recurringPk,
+      state,
+      begin: begin1,
+      end: end1,
+    }),
   ];
 }
 
@@ -291,37 +316,4 @@ export function createMocks() {
     ...correctRecurringReservationQueryResult(41, 3, { allDenied: true }),
     ...correctRecurringReservationQueryResult(51, 4, { shouldFailAll: true }),
   ];
-}
-
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
-export const mockReservation: ReservationType = {
-  pk: 1,
-  begin: "2024-01-01T10:00:00+00:00",
-  end: "2024-01-01T14:00:00+00:00",
-  bufferTimeAfter: 0,
-  bufferTimeBefore: 0,
-  state: ReservationStateChoice.Confirmed,
-  id: base64encode("ReservationNode:1"),
-  reservationUnits: [],
-  paymentOrder: [],
-  workingMemo: "empty",
-  handlingDetails: "",
-  accessType: AccessType.Unrestricted,
-};
-
-export function createMockRecurringReservation(props: {
-  pk: number;
-  recurringPk: number;
-}): ReservationType {
-  return {
-    ...mockReservation,
-    pk: props.pk,
-    id: base64encode(`ReservationNode:${props.pk}`),
-    recurringReservation: {
-      pk: props.recurringPk,
-      description: "",
-      id: base64encode(`RecurringReservationNode:${props.recurringPk}`),
-      name: "recurring",
-    },
-  };
 }

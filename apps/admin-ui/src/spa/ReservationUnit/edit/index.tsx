@@ -538,7 +538,7 @@ function BasicSection({
   unit,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  unit: UnitWithSpacesAndResourcesQuery["unit"];
+  unit: UnitWithSpacesAndResourcesQuery["unit"] | undefined;
 }) {
   const { t } = useTranslation();
   const { control, formState, register, watch, setValue } = form;
@@ -1317,10 +1317,12 @@ function DescriptionSection({
   reservationUnitTypes,
 }: Readonly<{
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  equipments: ReservationUnitEditorParametersQuery["equipmentsAll"];
-  purposes: ReservationUnitEditorParametersQuery["purposes"];
-  qualifiers: ReservationUnitEditorParametersQuery["qualifiers"];
-  reservationUnitTypes: ReservationUnitEditorParametersQuery["reservationUnitTypes"];
+  equipments: ReservationUnitEditorParametersQuery["equipmentsAll"] | undefined;
+  purposes: ReservationUnitEditorParametersQuery["purposes"] | undefined;
+  qualifiers: ReservationUnitEditorParametersQuery["qualifiers"] | undefined;
+  reservationUnitTypes:
+    | ReservationUnitEditorParametersQuery["reservationUnitTypes"]
+    | undefined;
 }>) {
   const { t } = useTranslation();
   const { control, formState } = form;

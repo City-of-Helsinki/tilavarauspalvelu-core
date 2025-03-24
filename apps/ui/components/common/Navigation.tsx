@@ -277,7 +277,7 @@ function Navigation({ apiBaseUrl, profileLink }: HeaderProps) {
           profileLink={profileLink}
           languageOptions={languageOptions}
         />
-        <NavigationMenu user={user} />
+        <NavigationMenu user={user ?? null} />
       </Header>
     </Wrapper>
   );
