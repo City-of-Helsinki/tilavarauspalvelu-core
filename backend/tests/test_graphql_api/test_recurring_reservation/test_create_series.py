@@ -653,15 +653,18 @@ def test_recurring_reservations__create_series__access_type_access_code__pindora
 
     response = graphql(CREATE_SERIES_MUTATION, input_data=data)
 
-    assert response.error_message() == "Pindora Error"
+    # Mutation didn't fail even if Pindora call failed.
+    # Access codes will be created later in a background task.
+    assert response.has_errors is False, response.errors
 
     assert PindoraService.create_access_code.called is True
 
-    # Reservation series is still created, but access codes hae not been generated.
     recurring_reservation: RecurringReservation | None = RecurringReservation.objects.first()
     assert recurring_reservation is not None
+
     reservations: list[Reservation] = list(recurring_reservation.reservations.all())
     assert len(reservations) == 1
+
     assert reservations[0].access_type == AccessType.ACCESS_CODE
     assert reservations[0].access_code_generated_at is None
     assert reservations[0].access_code_is_active is False

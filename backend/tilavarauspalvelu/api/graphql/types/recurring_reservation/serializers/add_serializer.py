@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from django.db import transaction
@@ -13,6 +14,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import RecurringReservation
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Reservation
@@ -120,9 +122,11 @@ class ReservationSeriesAddReservationSerializer(NestingModelSerializer):
 
         # Reschedule Pindora series or seasonal booking if new reservation uses access code
         if validated_data["access_type"] == AccessType.ACCESS_CODE:
-            try:
-                PindoraService.reschedule_access_code(instance)
-            except PindoraNotFoundError:
-                PindoraService.create_access_code(instance, is_active=True)
+            # Allow mutation to succeed if Pindora request fails.
+            with suppress(ExternalServiceError):
+                try:
+                    PindoraService.reschedule_access_code(instance)
+                except PindoraNotFoundError:
+                    PindoraService.create_access_code(instance, is_active=True)
 
         return instance

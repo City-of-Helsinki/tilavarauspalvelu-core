@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from django.db import transaction
@@ -12,6 +13,7 @@ from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationS
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
@@ -158,9 +160,10 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             reservation: Reservation = super().create(validated_data)
             reservation.reservation_units.set([reservation_unit])
 
-        # Don't fail reservation creation if Pindora request fails, but return an error in the response.
         if reservation.access_type == AccessType.ACCESS_CODE:
             is_active = reservation.type != ReservationTypeChoice.BLOCKED
-            PindoraService.create_access_code(obj=reservation, is_active=is_active)
+            # Allow mutation to succeed if Pindora request fails.
+            with suppress(ExternalServiceError):
+                PindoraService.create_access_code(obj=reservation, is_active=is_active)
 
         return reservation

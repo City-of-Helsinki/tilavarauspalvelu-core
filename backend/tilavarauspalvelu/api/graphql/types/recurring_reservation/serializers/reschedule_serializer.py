@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -19,6 +20,7 @@ from tilavarauspalvelu.models import RecurringReservation, ReservationStatistic
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_datetime
+from utils.external_service.errors import ExternalServiceError
 from utils.fields.serializer import input_only_field
 
 if TYPE_CHECKING:
@@ -143,6 +145,18 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
 
         has_access_codes = instance.reservations.requires_active_access_code().exists()
 
+        # If any reservation had access codes before reschedule, or has access codes after reschedule,
+        # reschedule the series to make sure its up to date.
+        if had_access_codes or has_access_codes:
+            # Allow mutation to succeed if Pindora request fails.
+            with suppress(ExternalServiceError):
+                try:
+                    PindoraService.reschedule_access_code(instance)
+                except PindoraNotFoundError:
+                    # If no series was found, create a new one if there are access codes still in the series.
+                    if has_access_codes:
+                        PindoraService.create_access_code(instance, is_active=True)
+
         # Must refresh the materialized view since reservations changed time.
         if settings.UPDATE_AFFECTING_TIME_SPANS:
             update_affecting_time_spans_task.delay()
@@ -153,13 +167,6 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
             )
 
         EmailService.send_seasonal_reservation_modified_series_email(instance)
-
-        if had_access_codes or has_access_codes:
-            try:
-                PindoraService.reschedule_access_code(instance)
-            except PindoraNotFoundError:
-                if has_access_codes:
-                    PindoraService.create_access_code(instance, is_active=True)
 
         return instance
 

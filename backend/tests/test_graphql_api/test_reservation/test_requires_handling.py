@@ -114,7 +114,9 @@ def test_reservation__requires_handling__pindora_api__call_fails(graphql):
     input_data = get_require_handling_data(reservation)
     response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
 
-    assert response.error_message() == "Pindora API error"
+    # Mutation didn't fail even if Pindora call failed.
+    # Access code will be deactivated later in a background task.
+    assert response.has_errors is False, response.errors
 
     assert PindoraService.deactivate_access_code.call_count == 1
 

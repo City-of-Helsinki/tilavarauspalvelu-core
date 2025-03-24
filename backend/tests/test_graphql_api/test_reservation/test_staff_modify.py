@@ -177,7 +177,9 @@ def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__c
     data = get_staff_modify_data(reservation, type=ReservationTypeChoice.STAFF)
     response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Pindora API error"
+    # Mutation didn't fail even if Pindora call failed.
+    # Access code will be activated later in a background task.
+    assert response.has_errors is False, response.errors
 
     assert PindoraService.activate_access_code.call_count == 1
 
@@ -255,7 +257,9 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
     data = get_staff_modify_data(reservation, type=ReservationTypeChoice.BLOCKED)
     response = graphql(UPDATE_STAFF_MUTATION, input_data=data)
 
-    assert response.error_message() == "Pindora API error"
+    # Mutation didn't fail even if Pindora call failed.
+    # Access code will be deactivated later in a background task.
+    assert response.has_errors is False, response.errors
 
     assert PindoraService.deactivate_access_code.call_count == 1
 

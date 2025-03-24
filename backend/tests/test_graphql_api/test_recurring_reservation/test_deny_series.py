@@ -1,17 +1,25 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationDenyReasonFactory
 from tests.helpers import patch_method
 
 from .helpers import DENY_SERIES_MUTATION, create_reservation_series
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from tilavarauspalvelu.models import Reservation
 
 # Applied to all tests
 pytestmark = [
@@ -40,8 +48,8 @@ def test_recurring_reservations__deny_series(graphql):
     assert response.first_query_object == {"denied": 5, "future": 5}
     assert reservation_series.reservations.count() == 9
 
-    future_reservations = reservation_series.reservations.filter(begin__gt=local_datetime())
-    past_reservations = reservation_series.reservations.filter(begin__lte=local_datetime())
+    future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begin__gt=local_datetime())
+    past_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begin__lte=local_datetime())
 
     assert all(reservation.state == ReservationStateChoice.DENIED for reservation in future_reservations)
     assert all(reservation.deny_reason == reason for reservation in future_reservations)
@@ -136,6 +144,33 @@ def test_recurring_reservations__deny_series__has_access_codes(graphql):
     graphql.login_with_superuser()
     response = graphql(DENY_SERIES_MUTATION, input_data=data)
 
+    assert response.has_errors is False, response.errors
+
+    assert EmailService.send_seasonal_reservation_rejected_series_email.called is True
+    assert PindoraService.reschedule_access_code.called is True
+
+
+@patch_method(PindoraService.reschedule_access_code, side_effect=PindoraAPIError("Failed"))
+@patch_method(EmailService.send_seasonal_reservation_rejected_series_email)
+@freeze_time(local_datetime(year=2024, month=1, day=1))
+def test_recurring_reservations__deny_series__has_access_codes__pindora_call_fails(graphql):
+    reason = ReservationDenyReasonFactory.create()
+
+    reservation_series = create_reservation_series(
+        reservations__access_type=AccessType.ACCESS_CODE,
+    )
+
+    data = {
+        "pk": reservation_series.pk,
+        "denyReason": reason.pk,
+        "handlingDetails": "Handling details",
+    }
+
+    graphql.login_with_superuser()
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
+
+    # Mutation didn't fail even if Pindora call failed.
+    # Access codes will be rescheduled later in a background task.
     assert response.has_errors is False, response.errors
 
     assert EmailService.send_seasonal_reservation_rejected_series_email.called is True

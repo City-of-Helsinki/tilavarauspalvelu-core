@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -14,6 +15,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import RecurringReservation, ReservationDenyReason
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from utils.date_utils import local_datetime
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
@@ -66,6 +68,13 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
             handled_at=now,
         )
 
+        # If any reservations had access codes, reschedule the series to remove all denied reservations.
+        # This might remove leave an empty series, which is fine.
+        if has_access_code:
+            # Allow mutation to succeed if Pindora request fails.
+            with suppress(ExternalServiceError):
+                PindoraService.reschedule_access_code(instance)
+
         # Must refresh the materialized view since reservations state changed to 'DENIED'
         if settings.UPDATE_AFFECTING_TIME_SPANS:
             update_affecting_time_spans_task.delay()
@@ -76,11 +85,6 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
             )
 
         EmailService.send_seasonal_reservation_rejected_series_email(reservation_series=instance)
-
-        if has_access_code:
-            # Reschedule the reservation series to remove all denied reservations.
-            # This might remove leave an empty series, which is fine.
-            PindoraService.reschedule_access_code(instance)
 
         return instance
 

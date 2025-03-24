@@ -10,8 +10,8 @@ from rest_framework.fields import IntegerField
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import Reservation
+from utils.external_service.errors import ExternalServiceError
 
 __all__ = [
     "ReservationRequiresHandlingSerializer",
@@ -54,8 +54,8 @@ class ReservationRequiresHandlingSerializer(NestingModelSerializer):
 
         # Denied reservations shouldn't have an access code. It will be regenerated if the reservation is approved.
         if instance.access_type == AccessType.ACCESS_CODE:
-            # Allow reservation modification to succeed if reservation doesn't exist in Pindora.
-            with suppress(PindoraNotFoundError):
+            # Allow mutation to succeed if Pindora request fails.
+            with suppress(ExternalServiceError):
                 PindoraService.deactivate_access_code(obj=instance)
 
         EmailService.send_reservation_requires_handling_email(reservation=instance)

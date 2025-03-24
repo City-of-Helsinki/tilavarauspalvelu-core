@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -20,6 +21,7 @@ from tilavarauspalvelu.enums import (
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import RecurringReservation, Reservation
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
+from utils.external_service.errors import ExternalServiceError
 from utils.fields.serializer import CurrentUserDefaultNullable, input_only_field
 
 if TYPE_CHECKING:
@@ -197,6 +199,12 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
                 check_opening_hours=check_opening_hours,
             )
 
+        # Create any access codes if any reservations require them.
+        if instance.reservations.requires_active_access_code().exists():
+            # Allow mutation to succeed if Pindora request fails.
+            with suppress(ExternalServiceError):
+                PindoraService.create_access_code(instance, is_active=True)
+
         # Must refresh the materialized view since new reservations are created.
         if settings.UPDATE_AFFECTING_TIME_SPANS:
             update_affecting_time_spans_task.delay()
@@ -205,11 +213,6 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
             create_or_update_reservation_statistics.delay(
                 reservation_pks=[reservation.pk for reservation in reservations],
             )
-
-        # Lastly, create any access codes without suppressing errors if they cannot be created,
-        # but don't fail creating the reservation series itself.
-        if instance.reservations.requires_active_access_code().exists():
-            PindoraService.create_access_code(instance, is_active=True)
 
         return instance
 

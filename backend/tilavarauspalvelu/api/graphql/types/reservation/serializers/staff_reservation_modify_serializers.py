@@ -9,8 +9,8 @@ from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.typing import StaffReservationData
@@ -138,8 +138,8 @@ class StaffReservationModifySerializer(NestingModelSerializer):
         instance = super().update(instance=instance, validated_data=validated_data)
 
         if instance.access_type == AccessType.ACCESS_CODE and changed_with_blocked:
-            # Allow reservation modification to succeed if reservation doesn't exist in Pindora.
-            with suppress(PindoraNotFoundError):
+            # Allow mutation to succeed even if Pindora request fails.
+            with suppress(ExternalServiceError):
                 if type_after == ReservationTypeChoice.BLOCKED:
                     PindoraService.deactivate_access_code(obj=instance)
                 else:

@@ -572,7 +572,7 @@ def test_reservation__staff_create__access_type__access_code__blocked(graphql):
 
 
 @patch_method(PindoraService.create_access_code, side_effect=PindoraAPIError())
-def test_reservation__staff_create__access_type__access_code__create_reservation_on_pindora_failure(graphql):
+def test_reservation__staff_create__access_type__access_code__pindora_failure(graphql):
     reservation_unit = ReservationUnitFactory.create(
         access_types__access_type=AccessType.ACCESS_CODE,
     )
@@ -581,10 +581,13 @@ def test_reservation__staff_create__access_type__access_code__create_reservation
     data = get_staff_create_data(reservation_unit)
     response = graphql(CREATE_STAFF_MUTATION, input_data=data)
 
-    assert response.has_errors is True
-    assert response.error_message() == "Pindora client error"
+    # Reservation is is created, even if Pindora call failed.
+    # Access code will be created later in a background task.
+    assert response.has_errors is False, response.errors
 
-    # Reservation is still created, but it doesn't know an access code was generated.
     reservation: Reservation | None = Reservation.objects.first()
     assert reservation is not None
+
     assert reservation.access_type == AccessType.ACCESS_CODE
+    assert reservation.access_code_is_active is False
+    assert reservation.access_code_generated_at is None
