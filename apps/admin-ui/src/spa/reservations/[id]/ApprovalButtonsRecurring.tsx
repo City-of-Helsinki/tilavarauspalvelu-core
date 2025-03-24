@@ -54,7 +54,8 @@ export function ApprovalButtonsRecurring({
     }
     setModalContent(
       <DenyDialogSeries
-        reservation={reservation}
+        // FIXME need to query this
+        initialHandlingDetails=""
         recurringReservation={recurringReservation}
         onReject={handleReject}
         onClose={handleClose}

@@ -30,6 +30,7 @@ type SpaceT = NonNullable<UnitQuery["unit"]>["spaces"][0];
 
 function countSubSpaces(space: Pick<SpaceT, "pk" | "children">): number {
   return (space.children || []).reduce(
+    // @ts-expect-error -- FIXME the recursive type is broken
     (p, c) => p + 1 + (c ? countSubSpaces(c) : 0),
     0
   );

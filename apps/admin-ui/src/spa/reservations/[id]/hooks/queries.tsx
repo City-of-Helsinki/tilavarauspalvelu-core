@@ -148,6 +148,7 @@ export const SINGLE_RESERVATION_QUERY = gql`
   ${SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT}
   query Reservation($id: ID!) {
     reservation(id: $id) {
+      ...CreateTagString
       ...ReservationCommon
       ...ReservationRecurring
       ...ReservationSpecialisation

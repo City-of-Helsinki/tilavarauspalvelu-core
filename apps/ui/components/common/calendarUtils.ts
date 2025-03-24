@@ -18,7 +18,7 @@ const eventStyleGetter = (
   } as Record<string, string>;
   let className = "";
 
-  const eventPk = event != null && "pk" in event ? event.pk : Number(event?.id);
+  const eventPk = event?.pk;
   const isOwn =
     eventPk != null &&
     !Number.isNaN(eventPk) &&

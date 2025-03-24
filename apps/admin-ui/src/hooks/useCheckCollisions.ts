@@ -67,7 +67,12 @@ export function useCheckCollisions({
 
   const collisions = reservations
     .filter((x) => x?.pk !== reservationPk)
-    .map((x) => reservationToInterval(x, reservationType))
+    .map((x) =>
+      reservationToInterval(
+        { ...x, recurringReservation: null },
+        reservationType
+      )
+    )
     .filter((x) => {
       if (x == null) {
         return false;

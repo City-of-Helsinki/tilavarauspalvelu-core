@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import CommonCalendar, { CalendarEvent } from "common/src/calendar/Calendar";
+import CommonCalendar from "common/src/calendar/Calendar";
 import { Toolbar, ToolbarBtn } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -16,7 +16,13 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import eventStyleGetter, { legend } from "./eventStyleGetter";
+import {
+  eventStyleGetter,
+  legend,
+  type ReservationType,
+  type CalendarEventType,
+  type EventType,
+} from "./eventStyleGetter";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
@@ -31,20 +37,6 @@ import { RecurringReservationsView } from "@/component/RecurringReservationsView
 import { useReservationData } from "./hooks";
 import { Accordion } from "./components";
 
-// TODO fragment
-type ReservationType = Omit<
-  NonNullable<ReservationQuery["reservation"]>,
-  "user"
->;
-type CalendarEventType = CalendarEvent<ReservationType>;
-
-type Props = {
-  reservation: ReservationType;
-  refetch: (focusDate?: Date) => void;
-  focusDate: Date;
-  events: Array<CalendarEventType>;
-};
-
 const Container = styled.div`
   .rbc-calendar {
     display: grid;
@@ -57,12 +49,19 @@ const Container = styled.div`
 
 type WeekOptions = "day" | "week" | "month";
 
+type CalendarProps = {
+  reservation: ReservationType;
+  refetch: (focusDate?: Date) => void;
+  focusDate: Date;
+  events: Array<CalendarEventType>;
+};
+
 /// @param reservation the current reservation to show in calendar
 /// @param selected (for recurring only) different styling
 /// @param focusDate date to show in the calendar
 // TODO combine with the one in my-unit/ReservationUnitCalendar (without the time change button)
 const Calendar = forwardRef(function Calendar(
-  { reservation, refetch, focusDate, events: eventsAll }: Props,
+  { reservation, refetch, focusDate, events: eventsAll }: CalendarProps,
   ref: Ref<HTMLDivElement>
 ): JSX.Element {
   const { t } = useTranslation();
@@ -111,7 +110,7 @@ const Calendar = forwardRef(function Calendar(
 
   return (
     <Container ref={ref}>
-      <CommonCalendar<ReservationType>
+      <CommonCalendar<EventType>
         events={[...events, ...eventBuffers]}
         toolbarComponent={(props) => (
           <Toolbar {...props}>
