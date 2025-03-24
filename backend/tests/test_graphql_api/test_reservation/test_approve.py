@@ -5,6 +5,7 @@ import pytest
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory, ReservationUnitFactory
@@ -135,6 +136,7 @@ def test_reservation__approve__succeeds__pindora_api__call_succeeds(graphql):
 
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Error"))
 @patch_method(PindoraService.create_access_code)
+@patch_method(SentryLogger.log_exception)
 def test_reservation__approve__succeeds__pindora_api__call_fails(graphql):
     reservation = ReservationFactory.create(
         reservation_units__access_types__access_type=AccessType.ACCESS_CODE,
@@ -157,3 +159,5 @@ def test_reservation__approve__succeeds__pindora_api__call_fails(graphql):
 
     assert PindoraService.activate_access_code.called is True
     assert PindoraService.create_access_code.called is False
+
+    assert SentryLogger.log_exception.called is True

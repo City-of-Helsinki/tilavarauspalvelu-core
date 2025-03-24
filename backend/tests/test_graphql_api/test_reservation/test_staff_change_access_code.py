@@ -8,6 +8,7 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, Reservat
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 from tests.factories import RecurringReservationFactory, ReservationFactory
@@ -74,6 +75,37 @@ def test_staff_change_access_code__not_active(graphql):
     assert PindoraService.change_access_code.call_count == 1
     assert PindoraService.activate_access_code.call_count == 1
     assert EmailService.send_reservation_modified_access_code_email.call_count == 1
+
+
+@patch_method(PindoraService.change_access_code)
+@patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Pindora Error"))
+@patch_method(EmailService.send_reservation_modified_access_code_email)
+@patch_method(SentryLogger.log_exception)
+def test_staff_change_access_code__not_active__pindora_call_fails(graphql):
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.CONFIRMED,
+        type=ReservationTypeChoice.NORMAL,
+        access_type=AccessType.ACCESS_CODE,
+        access_code_generated_at=datetime.datetime(2024, 1, 1, tzinfo=DEFAULT_TIMEZONE),
+        access_code_is_active=False,
+        begin=local_datetime() + datetime.timedelta(hours=1),
+        end=local_datetime() + datetime.timedelta(hours=2),
+    )
+
+    data = {
+        "pk": reservation.pk,
+    }
+
+    graphql.login_with_superuser()
+    response = graphql(CHANGE_ACCESS_CODE_STAFF_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert PindoraService.change_access_code.call_count == 1
+    assert PindoraService.activate_access_code.call_count == 1
+    assert EmailService.send_reservation_modified_access_code_email.call_count == 1
+
+    assert SentryLogger.log_exception.called is True
 
 
 @patch_method(PindoraService.change_access_code)

@@ -13,6 +13,7 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import AffectingTimeSpan, RecurringReservation, Reservation, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_end_of_day, local_start_of_day
 
@@ -644,6 +645,7 @@ def test_recurring_reservations__create_series__access_type_access_code__only_so
 
 
 @patch_method(PindoraService.create_access_code, side_effect=PindoraAPIError("Pindora Error"))
+@patch_method(SentryLogger.log_exception)
 def test_recurring_reservations__create_series__access_type_access_code__pindora_call_fails(graphql):
     reservation_unit = ReservationUnitFactory.create(access_types__access_type=AccessType.ACCESS_CODE)
     user = graphql.login_with_superuser()
@@ -658,6 +660,8 @@ def test_recurring_reservations__create_series__access_type_access_code__pindora
     assert response.has_errors is False, response.errors
 
     assert PindoraService.create_access_code.called is True
+
+    assert SentryLogger.log_exception.called is True
 
     recurring_reservation: RecurringReservation | None = RecurringReservation.objects.first()
     assert recurring_reservation is not None

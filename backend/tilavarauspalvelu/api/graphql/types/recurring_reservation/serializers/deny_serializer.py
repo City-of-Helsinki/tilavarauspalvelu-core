@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -12,6 +11,7 @@ from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import RecurringReservation, ReservationDenyReason
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from utils.date_utils import local_datetime
@@ -72,8 +72,10 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
         # This might remove leave an empty series, which is fine.
         if has_access_code:
             # Allow mutation to succeed if Pindora request fails.
-            with suppress(ExternalServiceError):
+            try:
                 PindoraService.reschedule_access_code(instance)
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation series: {instance.pk}")
 
         # Must refresh the materialized view since reservations state changed to 'DENIED'
         if settings.UPDATE_AFFECTING_TIME_SPANS:

@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from tilavarauspalvelu.integrations.keyless_entry.service import PindoraService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
 from tests.factories import ReservationUnitAccessTypeFactory
@@ -156,6 +157,7 @@ def test_recurring_reservations__add_reservation__access_code__create_if_not_fou
 @freeze_time(local_datetime(2024, 1, 1))
 @patch_method(PindoraService.reschedule_access_code, side_effect=PindoraAPIError("Failed"))
 @patch_method(PindoraService.create_access_code)
+@patch_method(SentryLogger.log_exception)
 def test_recurring_reservations__add_reservation__access_code__failed_pindora_call(graphql):
     series = create_reservation_series(
         reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
@@ -188,6 +190,9 @@ def test_recurring_reservations__add_reservation__access_code__failed_pindora_ca
     # Since rescheduling failed unexpectedly, we don't call create_access_code, but don't fail either.
     assert PindoraService.reschedule_access_code.called is True
     assert PindoraService.create_access_code.called is False
+
+    # We log the error to Sentry.
+    assert SentryLogger.log_exception.called is True
 
 
 @freeze_time(local_datetime(2024, 1, 1))

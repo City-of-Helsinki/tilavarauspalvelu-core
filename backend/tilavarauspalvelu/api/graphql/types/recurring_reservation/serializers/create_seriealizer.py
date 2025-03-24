@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -19,6 +18,7 @@ from tilavarauspalvelu.enums import (
     WeekdayChoice,
 )
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import RecurringReservation, Reservation
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from utils.external_service.errors import ExternalServiceError
@@ -202,8 +202,10 @@ class ReservationSeriesCreateSerializer(NestingModelSerializer):
         # Create any access codes if any reservations require them.
         if instance.reservations.requires_active_access_code().exists():
             # Allow mutation to succeed if Pindora request fails.
-            with suppress(ExternalServiceError):
+            try:
                 PindoraService.create_access_code(instance, is_active=True)
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation series: {instance.pk}")
 
         # Must refresh the materialized view since new reservations are created.
         if settings.UPDATE_AFFECTING_TIME_SPANS:

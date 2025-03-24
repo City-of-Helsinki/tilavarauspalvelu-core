@@ -7,6 +7,7 @@ import pytest
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime, next_hour
 
 from tests.factories import ReservationFactory
@@ -166,6 +167,7 @@ def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__c
 
 
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Pindora API error"))
+@patch_method(SentryLogger.log_exception)
 def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__call_fails(graphql):
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.BLOCKED,
@@ -182,6 +184,8 @@ def test_reservation__staff_modify__blocked_reservation_to_staff__pindora_api__c
     assert response.has_errors is False, response.errors
 
     assert PindoraService.activate_access_code.call_count == 1
+
+    assert SentryLogger.log_exception.called is True
 
 
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraNotFoundError("Error"))
@@ -245,6 +249,7 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
 
 
 @patch_method(PindoraService.deactivate_access_code, side_effect=PindoraAPIError("Pindora API error"))
+@patch_method(SentryLogger.log_exception)
 def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__call_fails(graphql):
     reservation = ReservationFactory.create_for_staff_update(
         type=ReservationTypeChoice.STAFF,
@@ -262,6 +267,8 @@ def test_reservation__staff_modify__staff_reservation_to_blocked__pindora_api__c
     assert response.has_errors is False, response.errors
 
     assert PindoraService.deactivate_access_code.call_count == 1
+
+    assert SentryLogger.log_exception.called is True
 
 
 @patch_method(PindoraService.deactivate_access_code, side_effect=PindoraNotFoundError("Error"))

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import Any
 
 from graphene_django_extensions import NestingModelSerializer
@@ -9,6 +8,7 @@ from rest_framework.fields import BooleanField, DateTimeField, IntegerField
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import RecurringReservation, Reservation
 from utils.external_service.errors import ExternalServiceError
 
@@ -58,8 +58,10 @@ class ReservationSeriesChangeAccessCodeSerializer(NestingModelSerializer):
             return instance
 
         if not response["access_code_is_active"]:
-            with suppress(ExternalServiceError):
+            try:
                 PindoraService.activate_access_code(obj=instance)
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation series: {instance.pk}")
 
         if instance.allocated_time_slot is not None:
             # Send email to all reservation series in the same application section where the access code is active.

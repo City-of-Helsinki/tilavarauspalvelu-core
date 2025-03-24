@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -16,6 +15,7 @@ from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateCh
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import RecurringReservation, ReservationStatistic
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from tilavarauspalvelu.typing import ReservationDetails
@@ -149,13 +149,15 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
         # reschedule the series to make sure its up to date.
         if had_access_codes or has_access_codes:
             # Allow mutation to succeed if Pindora request fails.
-            with suppress(ExternalServiceError):
+            try:
                 try:
                     PindoraService.reschedule_access_code(instance)
                 except PindoraNotFoundError:
                     # If no series was found, create a new one if there are access codes still in the series.
                     if has_access_codes:
                         PindoraService.create_access_code(instance, is_active=True)
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation series: {instance.pk}")
 
         # Must refresh the materialized view since reservations changed time.
         if settings.UPDATE_AFFECTING_TIME_SPANS:

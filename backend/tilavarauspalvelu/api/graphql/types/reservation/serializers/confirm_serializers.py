@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -90,8 +89,10 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         if instance.state == ReservationStateChoice.CONFIRMED:
             if instance.access_type == AccessType.ACCESS_CODE:
                 # Allow activation in Pindora to fail, will be handled by a background task.
-                with suppress(ExternalServiceError):
+                try:
                     PindoraService.activate_access_code(obj=instance)
+                except ExternalServiceError as error:
+                    SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
 
             EmailService.send_reservation_confirmed_email(reservation=instance)
             EmailService.send_staff_notification_reservation_made_email(reservation=instance)

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
@@ -9,6 +8,7 @@ from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import AgeGroup, City, Reservation, ReservationPurpose
 from utils.external_service.errors import ExternalServiceError
 
@@ -139,10 +139,12 @@ class StaffReservationModifySerializer(NestingModelSerializer):
 
         if instance.access_type == AccessType.ACCESS_CODE and changed_with_blocked:
             # Allow mutation to succeed even if Pindora request fails.
-            with suppress(ExternalServiceError):
+            try:
                 if type_after == ReservationTypeChoice.BLOCKED:
                     PindoraService.deactivate_access_code(obj=instance)
                 else:
                     PindoraService.activate_access_code(obj=instance)
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
 
         return instance

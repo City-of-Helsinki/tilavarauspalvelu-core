@@ -10,6 +10,7 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, Weekday,
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from tilavarauspalvelu.integrations.keyless_entry.service import PindoraService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationStatistic, ReservationUnitHierarchy
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_time
@@ -861,6 +862,7 @@ def test_recurring_reservations__reschedule_series__changed_to_access_code__crea
 @freeze_time(local_datetime(year=2023, month=12, day=1))
 @patch_method(PindoraService.reschedule_access_code, side_effect=PindoraAPIError("Not found"))
 @patch_method(PindoraService.create_access_code)
+@patch_method(SentryLogger.log_exception)
 def test_recurring_reservations__reschedule_series__pindora_call_fails(graphql):
     recurring_reservation = create_reservation_series(
         reservations__access_type=AccessType.ACCESS_CODE,
@@ -878,3 +880,5 @@ def test_recurring_reservations__reschedule_series__pindora_call_fails(graphql):
 
     assert PindoraService.reschedule_access_code.called is True
     assert PindoraService.create_access_code.called is False
+
+    assert SentryLogger.log_exception.called is True

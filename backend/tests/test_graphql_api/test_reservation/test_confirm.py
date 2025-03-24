@@ -504,6 +504,7 @@ def test_reservation__confirm__pindora_api__call_succeeds(graphql):
     ),
 )
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Error"))
+@patch_method(SentryLogger.log_exception)
 def test_reservation__confirm__pindora_api__call_fails(graphql):
     reservation = ReservationFactory.create_for_confirmation(
         access_type=AccessType.ACCESS_CODE,
@@ -522,3 +523,5 @@ def test_reservation__confirm__pindora_api__call_fails(graphql):
     assert reservation.access_code_is_active is False
 
     assert PindoraService.activate_access_code.call_count == 1
+
+    assert SentryLogger.log_exception.called is True

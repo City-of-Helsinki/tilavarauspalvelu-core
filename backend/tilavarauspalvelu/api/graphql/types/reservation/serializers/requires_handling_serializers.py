@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import Any, NotRequired, TypedDict
 
 from graphene_django_extensions import NestingModelSerializer
@@ -10,6 +9,7 @@ from rest_framework.fields import IntegerField
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
 from utils.external_service.errors import ExternalServiceError
 
@@ -55,8 +55,10 @@ class ReservationRequiresHandlingSerializer(NestingModelSerializer):
         # Denied reservations shouldn't have an access code. It will be regenerated if the reservation is approved.
         if instance.access_type == AccessType.ACCESS_CODE:
             # Allow mutation to succeed if Pindora request fails.
-            with suppress(ExternalServiceError):
+            try:
                 PindoraService.deactivate_access_code(obj=instance)
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
 
         EmailService.send_reservation_requires_handling_email(reservation=instance)
         return instance

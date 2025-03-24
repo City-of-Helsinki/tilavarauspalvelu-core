@@ -9,6 +9,7 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationDenyReasonFactory
@@ -153,6 +154,7 @@ def test_recurring_reservations__deny_series__has_access_codes(graphql):
 @patch_method(PindoraService.reschedule_access_code, side_effect=PindoraAPIError("Failed"))
 @patch_method(EmailService.send_seasonal_reservation_rejected_series_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
+@patch_method(SentryLogger.log_exception)
 def test_recurring_reservations__deny_series__has_access_codes__pindora_call_fails(graphql):
     reason = ReservationDenyReasonFactory.create()
 
@@ -175,3 +177,5 @@ def test_recurring_reservations__deny_series__has_access_codes__pindora_call_fai
 
     assert EmailService.send_seasonal_reservation_rejected_series_email.called is True
     assert PindoraService.reschedule_access_code.called is True
+
+    assert SentryLogger.log_exception.called is True

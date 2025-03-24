@@ -8,6 +8,7 @@ import pytest
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, next_hour
 
@@ -572,6 +573,7 @@ def test_reservation__staff_create__access_type__access_code__blocked(graphql):
 
 
 @patch_method(PindoraService.create_access_code, side_effect=PindoraAPIError())
+@patch_method(SentryLogger.log_exception)
 def test_reservation__staff_create__access_type__access_code__pindora_failure(graphql):
     reservation_unit = ReservationUnitFactory.create(
         access_types__access_type=AccessType.ACCESS_CODE,
@@ -584,6 +586,8 @@ def test_reservation__staff_create__access_type__access_code__pindora_failure(gr
     # Reservation is is created, even if Pindora call failed.
     # Access code will be created later in a background task.
     assert response.has_errors is False, response.errors
+
+    assert SentryLogger.log_exception.called is True
 
     reservation: Reservation | None = Reservation.objects.first()
     assert reservation is not None

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from graphene_django_extensions import NestingModelSerializer
@@ -11,6 +10,7 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
@@ -62,13 +62,16 @@ class ReservationApproveSerializer(NestingModelSerializer):
 
         if instance.access_type == AccessType.ACCESS_CODE:
             # Allow activation in Pindora to fail, will be handled by a background task.
-            with suppress(ExternalServiceError):
+            try:
                 try:
                     PindoraService.activate_access_code(instance)
                 except PindoraNotFoundError:
                     # If access code has not been generated (e.g. returned to handling after a deny and then approved),
                     # create a new active access code in Pindora.
                     PindoraService.create_access_code(instance, is_active=True)
+
+            except ExternalServiceError as error:
+                SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
 
         EmailService.send_reservation_approved_email(reservation=instance)
         EmailService.send_staff_notification_reservation_made_email(reservation=instance)

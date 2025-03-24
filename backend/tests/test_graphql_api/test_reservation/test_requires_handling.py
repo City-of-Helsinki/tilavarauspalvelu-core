@@ -6,6 +6,7 @@ from django.test import override_settings
 from tilavarauspalvelu.enums import AccessType, ReservationNotification, ReservationStateChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
 from tests.factories import ReservationFactory, UserFactory
@@ -122,6 +123,7 @@ def test_reservation__requires_handling__pindora_api__call_fails(graphql):
 
 
 @patch_method(PindoraService.deactivate_access_code, side_effect=PindoraNotFoundError("Error"))
+@patch_method(SentryLogger.log_exception)
 def test_reservation__requires_handling__pindora_api__call_fails__404(graphql):
     reservation = ReservationFactory.create_for_requires_handling(
         state=ReservationStateChoice.CONFIRMED,
@@ -142,3 +144,5 @@ def test_reservation__requires_handling__pindora_api__call_fails__404(graphql):
     assert reservation.access_code_is_active is True
 
     assert PindoraService.deactivate_access_code.call_count == 1
+
+    assert SentryLogger.log_exception.called is True

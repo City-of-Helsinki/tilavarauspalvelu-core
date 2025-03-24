@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import suppress
 from typing import Any
 
 from graphene_django_extensions import NestingModelSerializer
@@ -9,13 +8,13 @@ from rest_framework.fields import IntegerField
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation
+from utils.external_service.errors import ExternalServiceError
 
 __all__ = [
     "StaffChangeReservationAccessCodeSerializer",
 ]
-
-from utils.external_service.errors import ExternalServiceError
 
 
 class StaffChangeReservationAccessCodeSerializer(NestingModelSerializer):
@@ -57,8 +56,10 @@ class StaffChangeReservationAccessCodeSerializer(NestingModelSerializer):
 
         if instance.access_code_should_be_active:
             if not instance.access_code_is_active:
-                with suppress(ExternalServiceError):
+                try:
                     PindoraService.activate_access_code(obj=instance)
+                except ExternalServiceError as error:
+                    SentryLogger.log_exception(error, details=f"Reservation: {instance.pk}")
 
             EmailService.send_reservation_modified_access_code_email(reservation=instance)
 
