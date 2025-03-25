@@ -31,6 +31,7 @@ from .reservation_metadata_set.admin import ReservationMetadataSetAdmin
 from .reservation_purpose.admin import ReservationPurposeAdmin
 from .reservation_statistic.admin import ReservationStatisticAdmin
 from .reservation_unit.admin import ReservationUnitAdmin
+from .reservation_unit_access_type.admin import ReservationUnitAccessTypeAdmin
 from .reservation_unit_cancellation_rule.admin import ReservationUnitCancellationRuleAdmin
 from .reservation_unit_image.admin import ReservationUnitImageAdmin
 from .reservation_unit_pricing.admin import ReservationUnitPricingAdmin
@@ -76,6 +77,7 @@ __all__ = [
     "ReservationMetadataSetAdmin",
     "ReservationPurposeAdmin",
     "ReservationStatisticAdmin",
+    "ReservationUnitAccessTypeAdmin",
     "ReservationUnitAdmin",
     "ReservationUnitCancellationRuleAdmin",
     "ReservationUnitImageAdmin",

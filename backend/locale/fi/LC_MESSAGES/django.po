@@ -1269,6 +1269,7 @@ msgstr ""
 "tässä toistuvassa varauksessa"
 
 #: tilavarauspalvelu/admin/recurring_reservation/form.py
+#: tilavarauspalvelu/admin/reservation_unit_access_type/admin.py
 msgid "Begin date"
 msgstr "Aloituspäivä"
 
