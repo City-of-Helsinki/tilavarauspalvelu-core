@@ -38,6 +38,7 @@ class UnitRoleAdmin(admin.ModelAdmin):
         "unit_names",
         "unit_group_names",
         "role_active",
+        "is_from_ad_group",
     ]
     list_filter = [
         "role",
