@@ -7,13 +7,14 @@ from admin_extra_buttons.mixins import ExtraButtonsMixin
 from django import forms
 from django.contrib import admin
 from django.db.models import Count
+from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.admin.reservable_time_span.admin import ReservableTimeSpanInline
-from tilavarauspalvelu.admin.reservation_unit.admin import ReservationUnitInline
 from tilavarauspalvelu.constants import NEVER_ANY_OPENING_HOURS_HASH
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
-from tilavarauspalvelu.models import OriginHaukiResource
+from tilavarauspalvelu.models import OriginHaukiResource, ReservationUnit
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -23,6 +24,22 @@ if TYPE_CHECKING:
 __all__ = [
     "OriginHaukiResourceAdmin",
 ]
+
+
+class ReservationUnitInline(admin.TabularInline):
+    model = ReservationUnit
+    fields = ["id", "reservation_unit_link"]
+    readonly_fields = fields
+    can_delete = False
+    extra = 0
+
+    def has_add_permission(self, request, obj=None) -> bool:
+        return False
+
+    def reservation_unit_link(self, obj) -> str:
+        url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=(obj.pk,))
+
+        return format_html(f"<a href={url}>{obj.name_fi}</a>")
 
 
 class OriginHaukiResourceAdminForm(forms.ModelForm):

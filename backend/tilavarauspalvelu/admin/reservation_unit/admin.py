@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING, Any
 
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin, messages
-from django.urls import reverse
-from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 from modeltranslation.admin import TabbedTranslationAdmin
@@ -13,7 +11,7 @@ from modeltranslation.admin import TabbedTranslationAdmin
 from tilavarauspalvelu.admin.application_round_time_slot.admin import ApplicationRoundTimeSlotInline
 from tilavarauspalvelu.admin.reservation_unit_image.admin import ReservationUnitImageInline
 from tilavarauspalvelu.admin.reservation_unit_pricing.admin import ReservationUnitPricingInline
-from tilavarauspalvelu.enums import ReservationKind
+from tilavarauspalvelu.enums import AccessType, ReservationKind
 from tilavarauspalvelu.integrations.opening_hours.hauki_resource_hash_updater import HaukiResourceHashUpdater
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType
@@ -24,26 +22,11 @@ from .form import ReservationUnitAccessTypeForm, ReservationUnitAccessTypeFormSe
 if TYPE_CHECKING:
     from django import forms
     from django.db import models
+    from django.db.models import QuerySet
     from django.http import FileResponse
 
     from tilavarauspalvelu.models.reservation_unit.queryset import ReservationUnitQuerySet
     from tilavarauspalvelu.typing import WSGIRequest
-
-
-class ReservationUnitInline(admin.TabularInline):
-    model = ReservationUnit
-    fields = ["id", "reservation_unit_link"]
-    readonly_fields = fields
-    can_delete = False
-    extra = 0
-
-    def has_add_permission(self, request, obj=None) -> bool:
-        return False
-
-    def reservation_unit_link(self, obj) -> str:
-        url = reverse("admin:tilavarauspalvelu_reservationunit_change", args=(obj.pk,))
-
-        return format_html(f"<a href={url}>{obj.name_fi}</a>")
 
 
 class ReservationUnitAccessTypeInline(admin.TabularInline):
@@ -51,6 +34,20 @@ class ReservationUnitAccessTypeInline(admin.TabularInline):
     form = ReservationUnitAccessTypeForm
     formset = ReservationUnitAccessTypeFormSet
     extra = 0
+
+
+class CurrentAccessTypeFilter(admin.SimpleListFilter):
+    title = _("Current access type")
+    parameter_name = "current_access_type"
+
+    def lookups(self, *args: Any) -> list[tuple[str, str]]:
+        return AccessType.choices
+
+    def queryset(self, request: WSGIRequest, queryset: ReservationUnitQuerySet) -> QuerySet:
+        value = self.value()
+        if value is None:
+            return queryset
+        return queryset.filter(L(current_access_type=value))
 
 
 @admin.register(ReservationUnit)
@@ -72,10 +69,16 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         "origin_hauki_resource",
         "publishing_state",
         "reservation_state",
+        "payment_merchant",
+        "payment_accounting",
     ]
     list_filter = [
         "is_archived",
         "is_draft",
+        "reservation_kind",
+        CurrentAccessTypeFilter,
+        "payment_merchant",
+        "payment_accounting",
     ]
     ordering = ["rank"]
 
@@ -108,6 +111,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
                     "is_archived",
                     "publishing_state",
                     "reservation_state",
+                    "current_access_type",
                 ],
             },
         ],
@@ -209,6 +213,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
         "payment_product",
         "publishing_state",
         "reservation_state",
+        "current_access_type",
     ]
     inlines = [
         ReservationUnitImageInline,
@@ -225,6 +230,10 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
     def reservation_state(self, obj: ReservationUnit) -> str:
         return obj.reservation_state
 
+    @admin.display(description=_("Current access type"), ordering=L("current_access_type"))
+    def current_access_type(self, obj: ReservationUnit) -> AccessType | None:
+        return obj.current_access_type  #  type: ignore[return-value]
+
     def get_queryset(self, request: WSGIRequest) -> models.QuerySet[ReservationUnit]:
         return (
             super()
@@ -232,6 +241,7 @@ class ReservationUnitAdmin(SortableAdminMixin, TabbedTranslationAdmin):
             .annotate(
                 publishing_state=L("publishing_state"),
                 reservation_state=L("reservation_state"),
+                current_access_type=L("current_access_type"),
             )
             .select_related("unit", "origin_hauki_resource")
         )

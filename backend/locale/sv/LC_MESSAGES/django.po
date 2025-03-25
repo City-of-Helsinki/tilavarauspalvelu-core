@@ -1763,6 +1763,10 @@ msgid "Required fields must be a subset of supported fields"
 msgstr ""
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Current access type"
+msgstr ""
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Search by ID, name or unit name"
 msgstr ""
 

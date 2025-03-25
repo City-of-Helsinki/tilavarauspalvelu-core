@@ -1811,6 +1811,10 @@ msgid "Required fields must be a subset of supported fields"
 msgstr "Vaadittujen kenttien täytyy olla tuettujen kenttien alijoukko"
 
 #: tilavarauspalvelu/admin/reservation_unit/admin.py
+msgid "Current access type"
+msgstr "Nykyinen kulkutapa"
+
+#: tilavarauspalvelu/admin/reservation_unit/admin.py
 msgid "Search by ID, name or unit name"
 msgstr "Etsi ID:llä, nimellä tai toimipisteen nimellä"
 
