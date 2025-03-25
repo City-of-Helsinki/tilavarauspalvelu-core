@@ -235,8 +235,8 @@ importers:
         specifier: ^15.4.2
         version: 15.4.2(i18next@23.16.8)(next@15.2.4(@babel/core@7.26.9)(@opentelemetry/api@1.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(sass@1.81.0))(react-i18next@15.4.1(i18next@23.16.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       nuka-carousel:
-        specifier: ^7.0.0
-        version: 7.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^8.2.0
+        version: 8.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -4854,9 +4854,8 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
-  nuka-carousel@7.0.0:
-    resolution: {integrity: sha512-KE0WV1MuE4Gq6ynL8P3qJH2rGq/DkJ0ej+ezo0IuZp4oklV8WNqu6P6O1utJqihHLGoEuFppq5wlHSHfhdCHXA==}
-    engines: {node: '>=12.0.0'}
+  nuka-carousel@8.2.0:
+    resolution: {integrity: sha512-Wt6rAlSKnhQyZQETfdb5HGSzNc1hcnWls2pA+WpHqi6xq+F44k+oaldFEaSTxvSuVMz2Fo8LhDFGInlYlXepeQ==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -11728,7 +11727,7 @@ snapshots:
       open-file-explorer: 1.0.2
       rxjs: 7.8.1
 
-  nuka-carousel@7.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  nuka-carousel@8.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
