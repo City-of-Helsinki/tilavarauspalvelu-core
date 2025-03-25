@@ -8,9 +8,8 @@ from freezegun import freeze_time
 
 from tilavarauspalvelu.enums import AccessType, ReservationStateChoice, Weekday, WeekdayChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.keyless_entry.service import PindoraService
-from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import AffectingTimeSpan, ReservationStatistic, ReservationUnitHierarchy
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_time
@@ -766,7 +765,7 @@ def test_recurring_reservations__reschedule_series__same_day_future_reservation(
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
-@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.sync_access_code)
 def test_recurring_reservations__reschedule_series__is_access_code(graphql):
     recurring_reservation = create_reservation_series(
         reservations__access_type=AccessType.ACCESS_CODE,
@@ -780,11 +779,11 @@ def test_recurring_reservations__reschedule_series__is_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.reschedule_access_code.called is True
+    assert PindoraService.sync_access_code.called is True
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
-@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.sync_access_code)
 def test_recurring_reservations__reschedule_series__was_access_code(graphql):
     recurring_reservation = create_reservation_series(
         reservations__access_type=AccessType.ACCESS_CODE,
@@ -798,31 +797,11 @@ def test_recurring_reservations__reschedule_series__was_access_code(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.reschedule_access_code.called is True
+    assert PindoraService.sync_access_code.called is True
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
-@patch_method(PindoraService.reschedule_access_code, side_effect=PindoraNotFoundError("Not found"))
-@patch_method(PindoraService.create_access_code)
-def test_recurring_reservations__reschedule_series__was_access_code__dont_create_if_missing(graphql):
-    recurring_reservation = create_reservation_series(
-        reservations__access_type=AccessType.ACCESS_CODE,
-        reservation_unit__access_types__access_type=AccessType.UNRESTRICTED,
-    )
-
-    data = get_minimal_reschedule_data(recurring_reservation)
-
-    graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    assert PindoraService.reschedule_access_code.called is True
-    assert PindoraService.create_access_code.called is False
-
-
-@freeze_time(local_datetime(year=2023, month=12, day=1))
-@patch_method(PindoraService.reschedule_access_code)
+@patch_method(PindoraService.sync_access_code)
 def test_recurring_reservations__reschedule_series__changed_to_access_code(graphql):
     recurring_reservation = create_reservation_series(
         reservations__access_type=AccessType.UNRESTRICTED,
@@ -836,33 +815,11 @@ def test_recurring_reservations__reschedule_series__changed_to_access_code(graph
 
     assert response.has_errors is False, response.errors
 
-    assert PindoraService.reschedule_access_code.called is True
+    assert PindoraService.sync_access_code.called is True
 
 
 @freeze_time(local_datetime(year=2023, month=12, day=1))
-@patch_method(PindoraService.reschedule_access_code, side_effect=PindoraNotFoundError("Not found"))
-@patch_method(PindoraService.create_access_code)
-def test_recurring_reservations__reschedule_series__changed_to_access_code__create_if_missing(graphql):
-    recurring_reservation = create_reservation_series(
-        reservations__access_type=AccessType.UNRESTRICTED,
-        reservation_unit__access_types__access_type=AccessType.ACCESS_CODE,
-    )
-
-    data = get_minimal_reschedule_data(recurring_reservation)
-
-    graphql.login_with_superuser()
-    response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
-
-    assert response.has_errors is False, response.errors
-
-    assert PindoraService.reschedule_access_code.called is True
-    assert PindoraService.create_access_code.called is True
-
-
-@freeze_time(local_datetime(year=2023, month=12, day=1))
-@patch_method(PindoraService.reschedule_access_code, side_effect=PindoraAPIError("Not found"))
-@patch_method(PindoraService.create_access_code)
-@patch_method(SentryLogger.log_exception)
+@patch_method(PindoraService.sync_access_code, side_effect=PindoraAPIError("Pindora Error"))
 def test_recurring_reservations__reschedule_series__pindora_call_fails(graphql):
     recurring_reservation = create_reservation_series(
         reservations__access_type=AccessType.ACCESS_CODE,
@@ -874,11 +831,8 @@ def test_recurring_reservations__reschedule_series__pindora_call_fails(graphql):
     graphql.login_with_superuser()
     response = graphql(RESCHEDULE_SERIES_MUTATION, input_data=data)
 
-    # Mutation didn't fail even if Pindora call failed.
-    # Access codes will be rescheduled later in a background task.
-    assert response.has_errors is False, response.errors
+    # Mutation failed due to unexpected Pindora error.
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Pindora Error"]
 
-    assert PindoraService.reschedule_access_code.called is True
-    assert PindoraService.create_access_code.called is False
-
-    assert SentryLogger.log_exception.called is True
+    assert PindoraService.sync_access_code.called is True

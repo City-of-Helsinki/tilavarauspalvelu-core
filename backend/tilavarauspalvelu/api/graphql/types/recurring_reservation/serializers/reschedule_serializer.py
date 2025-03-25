@@ -14,13 +14,11 @@ from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStartInterval, ReservationStateChoice, WeekdayChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
-from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import RecurringReservation, ReservationStatistic
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from tilavarauspalvelu.typing import ReservationDetails
 from utils.date_utils import DEFAULT_TIMEZONE, combine, local_datetime
-from utils.external_service.errors import ExternalServiceError
+from utils.external_service.errors import external_service_errors_as_validation_errors
 from utils.fields.serializer import input_only_field
 
 if TYPE_CHECKING:
@@ -143,21 +141,11 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
                 skip_dates=skip_dates,
             )
 
-        has_access_codes = instance.reservations.requires_active_access_code().exists()
+            has_access_codes = instance.reservations.requires_active_access_code().exists()
 
-        # If any reservation had access codes before reschedule, or has access codes after reschedule,
-        # reschedule the series to make sure its up to date.
-        if had_access_codes or has_access_codes:
-            # Allow mutation to succeed if Pindora request fails.
-            try:
-                try:
-                    PindoraService.reschedule_access_code(instance)
-                except PindoraNotFoundError:
-                    # If no series was found, create a new one if there are access codes still in the series.
-                    if has_access_codes:
-                        PindoraService.create_access_code(instance, is_active=True)
-            except ExternalServiceError as error:
-                SentryLogger.log_exception(error, details=f"Reservation series: {instance.pk}")
+            if had_access_codes or has_access_codes:
+                with external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR):
+                    PindoraService.sync_access_code(obj=instance)
 
         # Must refresh the materialized view since reservations changed time.
         if settings.UPDATE_AFFECTING_TIME_SPANS:
