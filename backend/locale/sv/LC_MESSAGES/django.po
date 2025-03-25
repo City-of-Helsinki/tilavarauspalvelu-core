@@ -1162,9 +1162,18 @@ msgid "Available only when order has been refunded"
 msgstr ""
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#: tilavarauspalvelu/models/reservation_unit/model.py
+msgid "reservation unit"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
 msgid ""
 "Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
 "name, or Reservation Unit name"
+msgstr ""
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "processed at"
 msgstr ""
 
 #: tilavarauspalvelu/admin/person/admin.py
@@ -4042,10 +4051,6 @@ msgstr ""
 
 #: tilavarauspalvelu/models/reservation_statistic_unit/model.py
 msgid "reservation statistics reservation units"
-msgstr ""
-
-#: tilavarauspalvelu/models/reservation_unit/model.py
-msgid "reservation unit"
 msgstr ""
 
 #: tilavarauspalvelu/models/reservation_unit/model.py

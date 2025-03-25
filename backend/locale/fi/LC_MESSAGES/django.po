@@ -1202,12 +1202,21 @@ msgid "Available only when order has been refunded"
 msgstr "Saatavilla vain, kun maksu on palautettu"
 
 #: tilavarauspalvelu/admin/payment_order/admin.py
+#: tilavarauspalvelu/models/reservation_unit/model.py
+msgid "reservation unit"
+msgstr "varausyksikkö"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
 msgid ""
 "Search by Payment Order ID, Reservation ID, Remote Order ID, Reservation "
 "name, or Reservation Unit name"
 msgstr ""
 "Etsi maksutunnuksella, varauksen tunnuksella, verkkokaupan tunnuksella, "
 "varauksen nimellä tai varausyksikön nimellä"
+
+#: tilavarauspalvelu/admin/payment_order/admin.py
+msgid "processed at"
+msgstr "käsitelty alkaen"
 
 #: tilavarauspalvelu/admin/person/admin.py
 msgid "First name"
@@ -4125,10 +4134,6 @@ msgstr "varausstatistiikan varausyksikkö"
 #: tilavarauspalvelu/models/reservation_statistic_unit/model.py
 msgid "reservation statistics reservation units"
 msgstr "varausstatistiikkojen varausyksiköt"
-
-#: tilavarauspalvelu/models/reservation_unit/model.py
-msgid "reservation unit"
-msgstr "varausyksikkö"
 
 #: tilavarauspalvelu/models/reservation_unit/model.py
 msgid "reservation units"

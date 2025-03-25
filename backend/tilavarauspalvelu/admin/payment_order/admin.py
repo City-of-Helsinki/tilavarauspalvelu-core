@@ -6,12 +6,15 @@ from typing import TYPE_CHECKING, Any
 from django import forms
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from rangefilter.filters import DateRangeFilterBuilder
 
-from tilavarauspalvelu.models import PaymentOrder
+from tilavarauspalvelu.models import PaymentOrder, ReservationUnit
 
 if TYPE_CHECKING:
     from django.db import models
+    from django.db.models import QuerySet
 
+    from tilavarauspalvelu.models.payment_order.queryset import PaymentOrderQuerySet
     from tilavarauspalvelu.typing import WSGIRequest
 
 __all__ = [
@@ -72,6 +75,25 @@ class PaymentOrderForm(forms.ModelForm):
             )
 
 
+class ReservationUnitFilter(admin.SimpleListFilter):
+    title = _("reservation unit")
+    parameter_name = "reservation_unit"
+
+    def lookups(self, *args: Any) -> list[tuple[int, str]]:
+        return (
+            ReservationUnit.objects.filter(pricings__lowest_price__gt=0)
+            .distinct()
+            .order_by("unit__name", "name")
+            .values_list("id", "name")
+        )
+
+    def queryset(self, request: WSGIRequest, queryset: PaymentOrderQuerySet) -> QuerySet:
+        value: str | None = self.value()
+        if value is None:
+            return queryset
+        return queryset.filter(reservation__reservation_units__pk=value).distinct()
+
+
 @admin.register(PaymentOrder)
 class PaymentOrderAdmin(admin.ModelAdmin):
     # Functions
@@ -101,10 +123,15 @@ class PaymentOrderAdmin(admin.ModelAdmin):
     list_filter = [
         "status",
         "payment_type",
+        ("processed_at", DateRangeFilterBuilder(title=_("processed at"))),
+        ReservationUnitFilter,
     ]
 
     # Form
     form = PaymentOrderForm
+
+    def get_queryset(self, request: WSGIRequest) -> QuerySet:
+        return super().get_queryset(request).select_related("reservation")
 
     def reservation_unit(self, obj: PaymentOrder) -> str:
         return obj.reservation.reservation_units.first() if obj.reservation else ""
