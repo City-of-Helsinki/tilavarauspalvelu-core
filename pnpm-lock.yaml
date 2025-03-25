@@ -69,11 +69,11 @@ importers:
         specifier: ^16.10.0
         version: 16.10.0
       hds-core:
-        specifier: ^4.2.0
-        version: 4.2.0
+        specifier: ^4.3.0
+        version: 4.3.0
       hds-react:
-        specifier: ^4.2.0
-        version: 4.2.0(@types/react@18.2.7)(eslint@9.21.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.5.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
+        specifier: ^4.3.0
+        version: 4.3.0(@types/react@18.2.7)(eslint@9.21.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.5.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
       i18next:
         specifier: ^23.15.1
         version: 23.16.8
@@ -214,11 +214,11 @@ importers:
         specifier: ^16.10.0
         version: 16.10.0
       hds-core:
-        specifier: ^4.2.0
-        version: 4.2.0
+        specifier: ^4.3.0
+        version: 4.3.0
       hds-react:
-        specifier: ^4.2.0
-        version: 4.2.0(@types/react@18.2.7)(eslint@9.21.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.5.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
+        specifier: ^4.3.0
+        version: 4.3.0(@types/react@18.2.7)(eslint@9.21.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.5.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
       i18next:
         specifier: ^23.15.1
         version: 23.16.8
@@ -341,8 +341,8 @@ importers:
         specifier: ^16.10.0
         version: 16.10.0
       hds-react:
-        specifier: ^4.2.0
-        version: 4.2.0(@types/react@18.2.7)(eslint@9.21.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.5.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
+        specifier: ^4.3.0
+        version: 4.3.0(@types/react@18.2.7)(eslint@9.21.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.5.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
       i18next:
         specifier: ^23.15.1
         version: 23.16.8
@@ -870,6 +870,10 @@ packages:
 
   '@babel/runtime@7.26.9':
     resolution: {integrity: sha512-aA63XwOkcl4xxQa3HjPMqOP6LiK0ZDv3mUPYEFXkpHbaFjtGggE1A61FjFzJnB+p7/oy2gA8E+rcBNl/zC1tMg==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/runtime@7.27.0':
+    resolution: {integrity: sha512-VtPOkrdPHZsKc/clNqyi9WUA8TINkZ4cGk63UUE3u4pmB2k+ZMQRDuIOagv8UVd6j7k0T3+RRIb7beKTebNbcw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.25.0':
@@ -2100,8 +2104,8 @@ packages:
   '@reach/observe-rect@1.2.0':
     resolution: {integrity: sha512-Ba7HmkFgfQxZqqaeIWWkNK0rEhpxVQHIoVyW1YDSkGsGIXzcaW4deC8B0pZrNSSyLTdIk7y+5olKt5+g0GmFIQ==}
 
-  '@react-aria/interactions@3.23.0':
-    resolution: {integrity: sha512-0qR1atBIWrb7FzQ+Tmr3s8uH5mQdyRH78n0krYaG8tng9+u1JlSi8DGRSaC9ezKyNB84m7vHT207xnHXGeJ3Fg==}
+  '@react-aria/interactions@3.24.1':
+    resolution: {integrity: sha512-OWEcIC6UQfWq4Td5Ptuh4PZQ4LHLJr/JL2jGYvuNL6EgL3bWvzPrRYIF/R64YbfVxIC7FeZpPSkS07sZ93/NoA==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
@@ -2112,8 +2116,8 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@react-aria/utils@3.27.0':
-    resolution: {integrity: sha512-p681OtApnKOdbeN8ITfnnYqfdHS0z7GE+4l8EXlfLnr70Rp/9xicBO6d2rU+V/B3JujDw2gPWxYKEnEeh0CGCw==}
+  '@react-aria/utils@3.28.1':
+    resolution: {integrity: sha512-mnHFF4YOVu9BRFQ1SZSKfPhg3z+lBRYoW5mLcYTQihbKhz48+I1sqRkP7ahMITr8ANH3nb34YaMME4XWmK2Mgg==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
@@ -2150,13 +2154,16 @@ packages:
       react: ^16.8.0  || ^17.0.0
       react-dom: ^16.8.0  || ^17.0.0
 
+  '@react-stately/flags@3.1.0':
+    resolution: {integrity: sha512-KSHOCxTFpBtxhIRcKwsD1YDTaNxFtCYuAUb0KEihc16QwqZViq4hasgPBs2gYm7fHRbw7WYzWKf6ZSo/+YsFlg==}
+
   '@react-stately/utils@3.10.5':
     resolution: {integrity: sha512-iMQSGcpaecghDIh3mZEpZfoFH3ExBwTtuBEcvZ2XnGzCgQjeYXcMdIUwAfVQLXFTdHUHGF6Gu6/dFrYsCzySBQ==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@react-types/shared@3.27.0':
-    resolution: {integrity: sha512-gvznmLhi6JPEf0bsq7SwRYTHAKKq/wcmKqFez9sRdbED+SPMUmK5omfZ6w3EwUFQHbYUa4zPBYedQ7Knv70RMw==}
+  '@react-types/shared@3.28.0':
+    resolution: {integrity: sha512-9oMEYIDc3sk0G5rysnYvdNrkSg7B04yTKl50HHSZVbokeHpnU0yRmsDaWb9B/5RprcKj8XszEk5guBO8Sa/Q+Q==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
@@ -4126,11 +4133,11 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hds-core@4.2.0:
-    resolution: {integrity: sha512-D9GqQ/CdIrJp2ypQRB2FEbkfT/D4s/ehjwSWVQ/7pc5bZ8plOEvUTaIf2Kfl46/7U8QrQ6+N9BUd8nSl9TE0hA==}
+  hds-core@4.3.0:
+    resolution: {integrity: sha512-FCZ/KLZXeU1Qh6Mc1S5FshikWsYrYI0n6WVlr1TOizDOrrFKGEaIFR5EF/BndGWcJ2+KLv+NdNidgadlJ9UJ1Q==}
 
-  hds-react@4.2.0:
-    resolution: {integrity: sha512-Tj1TzAb2Ov+JO/WSllcEvD3vlxEkSjJznTBcF1ScrAV/ZNwPDsIix+cs7bVFY/uNB8Kl2qoESf9vcd88cN0HSQ==}
+  hds-react@4.3.0:
+    resolution: {integrity: sha512-AXOo3KFbFSRxhRjCBiLveTzCAnMMAMtiVWffccpLlyl6AdA18uPPDAkrlzDaACZIqJBgI5S1OpKkY/ukmrWYmw==}
     peerDependencies:
       postcss: ^8.4.21
       react: ^16.8.0 || ^17
@@ -5920,8 +5927,8 @@ packages:
     resolution: {integrity: sha512-IUWnUK7ADYR5Sl1fZlO1INDUhVhatWl7BtJWsIhwJ0UAK7ilzzIa8uIqOO/aYVWHZPJkKbEL+362wrzoeRF7bw==}
     engines: {node: '>=18'}
 
-  ts-api-utils@1.3.0:
-    resolution: {integrity: sha512-UQMIo7pb8WRomKR1/+MFVLTroIvDVtMX3K6OUir8ynLyzB8Jeriont2bTAtmNPa1ekAgN7YPDyf6V+ygrdU+eQ==}
+  ts-api-utils@1.4.3:
+    resolution: {integrity: sha512-i3eMG77UTMD0hZhgRS562pv83RC6ukSAC2GMNWc+9dieh/+jDM5u5YG+NHX6VNDRHQcHwmsTHctP9LhbC3WxVw==}
     engines: {node: '>=16'}
     peerDependencies:
       typescript: '>=4.2.0'
@@ -6452,7 +6459,7 @@ snapshots:
       '@babel/core': 7.26.9
       '@babel/generator': 7.26.9
       '@babel/parser': 7.26.9
-      '@babel/runtime': 7.26.9
+      '@babel/runtime': 7.27.0
       '@babel/traverse': 7.26.9
       '@babel/types': 7.26.9
       babel-preset-fbjs: 3.4.0(@babel/core@7.26.9)
@@ -6475,7 +6482,7 @@ snapshots:
     dependencies:
       '@babel/generator': 7.26.9
       '@babel/parser': 7.26.9
-      '@babel/runtime': 7.26.9
+      '@babel/runtime': 7.27.0
       chalk: 4.1.2
       fb-watchman: 2.0.2
       graphql: 16.10.0
@@ -6906,6 +6913,10 @@ snapshots:
       regenerator-runtime: 0.14.1
 
   '@babel/runtime@7.26.9':
+    dependencies:
+      regenerator-runtime: 0.14.1
+
+  '@babel/runtime@7.27.0':
     dependencies:
       regenerator-runtime: 0.14.1
 
@@ -8412,11 +8423,12 @@ snapshots:
 
   '@reach/observe-rect@1.2.0': {}
 
-  '@react-aria/interactions@3.23.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@react-aria/interactions@3.24.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@react-aria/ssr': 3.9.7(react@18.3.1)
-      '@react-aria/utils': 3.27.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@react-types/shared': 3.27.0(react@18.3.1)
+      '@react-aria/utils': 3.28.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-stately/flags': 3.1.0
+      '@react-types/shared': 3.28.0(react@18.3.1)
       '@swc/helpers': 0.5.15
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -8426,11 +8438,12 @@ snapshots:
       '@swc/helpers': 0.5.15
       react: 18.3.1
 
-  '@react-aria/utils@3.27.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@react-aria/utils@3.28.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@react-aria/ssr': 3.9.7(react@18.3.1)
+      '@react-stately/flags': 3.1.0
       '@react-stately/utils': 3.10.5(react@18.3.1)
-      '@react-types/shared': 3.27.0(react@18.3.1)
+      '@react-types/shared': 3.28.0(react@18.3.1)
       '@swc/helpers': 0.5.15
       clsx: 2.1.1
       react: 18.3.1
@@ -8438,9 +8451,9 @@ snapshots:
 
   '@react-aria/visually-hidden@3.8.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@react-aria/interactions': 3.23.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@react-aria/utils': 3.27.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@react-types/shared': 3.27.0(react@18.3.1)
+      '@react-aria/interactions': 3.24.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/utils': 3.28.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-types/shared': 3.28.0(react@18.3.1)
       '@swc/helpers': 0.5.15
       react: 18.3.1
     transitivePeerDependencies:
@@ -8478,12 +8491,16 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
+  '@react-stately/flags@3.1.0':
+    dependencies:
+      '@swc/helpers': 0.5.15
+
   '@react-stately/utils@3.10.5(react@18.3.1)':
     dependencies:
       '@swc/helpers': 0.5.15
       react: 18.3.1
 
-  '@react-types/shared@3.27.0(react@18.3.1)':
+  '@react-types/shared@3.28.0(react@18.3.1)':
     dependencies:
       react: 18.3.1
 
@@ -9103,7 +9120,7 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.3
       semver: 7.7.1
-      ts-api-utils: 1.3.0(typescript@5.7.3)
+      ts-api-utils: 1.4.3(typescript@5.7.3)
     optionalDependencies:
       typescript: 5.7.3
     transitivePeerDependencies:
@@ -10071,7 +10088,7 @@ snapshots:
 
   dom-helpers@5.2.1:
     dependencies:
-      '@babel/runtime': 7.26.9
+      '@babel/runtime': 7.27.0
       csstype: 3.1.3
 
   dom-serializer@2.0.0:
@@ -10103,7 +10120,7 @@ snapshots:
 
   downshift@6.0.6(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.26.9
+      '@babel/runtime': 7.27.0
       compute-scroll-into-view: 1.0.20
       prop-types: 15.8.1
       react: 18.3.1
@@ -10896,9 +10913,9 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hds-core@4.2.0: {}
+  hds-core@4.3.0: {}
 
-  hds-react@4.2.0(@types/react@18.2.7)(eslint@9.21.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.5.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3):
+  hds-react@4.3.0(@types/react@18.2.7)(eslint@9.21.0(jiti@2.4.2))(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(postcss@8.5.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3):
     dependencies:
       '@apollo/client': 3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@babel/runtime': 7.17.9
@@ -10916,7 +10933,7 @@ snapshots:
       date-fns: 2.16.1
       downshift: 6.0.6(react@18.3.1)
       graphql: 16.10.0
-      hds-core: 4.2.0
+      hds-core: 4.3.0
       jwt-decode: 3.1.2
       kashe: 1.0.4
       lodash: 4.17.21
@@ -12131,7 +12148,7 @@ snapshots:
 
   react-overlays@5.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.26.9
+      '@babel/runtime': 7.27.0
       '@popperjs/core': 2.11.8
       '@restart/hooks': 0.4.16(react@18.3.1)
       '@types/warning': 3.0.3
@@ -12286,7 +12303,7 @@ snapshots:
 
   relay-runtime@12.0.0:
     dependencies:
-      '@babel/runtime': 7.26.9
+      '@babel/runtime': 7.27.0
       fbjs: 3.0.5
       invariant: 2.2.4
     transitivePeerDependencies:
@@ -12383,7 +12400,7 @@ snapshots:
 
   rtl-css-js@1.16.1:
     dependencies:
-      '@babel/runtime': 7.26.9
+      '@babel/runtime': 7.27.0
 
   run-async@2.4.1: {}
 
@@ -12956,7 +12973,7 @@ snapshots:
       punycode: 2.3.1
     optional: true
 
-  ts-api-utils@1.3.0(typescript@5.7.3):
+  ts-api-utils@1.4.3(typescript@5.7.3):
     dependencies:
       typescript: 5.7.3
 
@@ -13085,7 +13102,7 @@ snapshots:
 
   uncontrollable@7.2.1(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.26.9
+      '@babel/runtime': 7.27.0
       '@types/react': 18.2.7
       invariant: 2.2.4
       react: 18.3.1
