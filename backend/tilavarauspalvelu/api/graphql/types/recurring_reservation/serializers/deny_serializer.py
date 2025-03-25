@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
+from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -11,11 +13,11 @@ from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
 from tilavarauspalvelu.models import RecurringReservation, ReservationDenyReason
 from tilavarauspalvelu.tasks import create_or_update_reservation_statistics, update_affecting_time_spans_task
 from utils.date_utils import local_datetime
-from utils.external_service.errors import ExternalServiceError
+from utils.external_service.errors import external_service_errors_as_validation_errors
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
@@ -61,21 +63,22 @@ class ReservationSeriesDenyInputSerializer(NestingModelSerializer):
 
         has_access_code = reservations.requires_active_access_code().exists()
 
-        reservations.update(
-            state=ReservationStateChoice.DENIED,
-            deny_reason=validated_data["deny_reason"],
-            handling_details=validated_data.get("handling_details", ""),
-            handled_at=now,
-        )
+        with transaction.atomic():
+            reservations.update(
+                state=ReservationStateChoice.DENIED,
+                deny_reason=validated_data["deny_reason"],
+                handling_details=validated_data.get("handling_details", ""),
+                handled_at=now,
+            )
 
-        # If any reservations had access codes, reschedule the series to remove all denied reservations.
-        # This might remove leave an empty series, which is fine.
-        if has_access_code:
-            # Allow mutation to succeed if Pindora request fails.
-            try:
-                PindoraService.reschedule_access_code(instance)
-            except ExternalServiceError as error:
-                SentryLogger.log_exception(error, details=f"Reservation series: {instance.pk}")
+            # If any reservations had access codes, reschedule the series to remove all denied reservations.
+            # This might leave an empty series, which is fine.
+            if has_access_code:
+                with (
+                    external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR),
+                    suppress(PindoraNotFoundError),
+                ):
+                    PindoraService.reschedule_access_code(instance)
 
         # Must refresh the materialized view since reservations state changed to 'DENIED'
         if settings.UPDATE_AFFECTING_TIME_SPANS:
