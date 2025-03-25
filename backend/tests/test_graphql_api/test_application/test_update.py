@@ -400,7 +400,7 @@ def test_update_application__application_sections__too_many(graphql, settings):
     response = graphql(UPDATE_MUTATION, input_data=input_data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("applicationSections") == [
+    assert response.field_error_messages() == [
         "Cannot create more than 0 application sections in one application",
     ]
 

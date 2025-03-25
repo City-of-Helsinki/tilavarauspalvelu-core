@@ -98,7 +98,7 @@ def test_application__create__with_application_sections__too_many(graphql, setti
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("applicationSections") == [
+    assert response.field_error_messages() == [
         "Cannot create more than 0 application sections in one application",
     ]
 
@@ -146,7 +146,7 @@ def test_application__create__is_under_age(graphql):
     response = graphql(CREATE_MUTATION, input_data=input_data)
 
     assert response.error_message() == "Mutation was unsuccessful."
-    assert response.field_error_messages("user") == ["Application can only be created by an adult reservee"]
+    assert response.field_error_messages() == ["User is not of age"]
 
 
 def test_application__create__sent_date(graphql):
@@ -160,3 +160,25 @@ def test_application__create__sent_date(graphql):
 
     # Sent date cannot be updated, must use specific mutation for it.
     assert response.has_schema_errors is True, response
+
+
+def test_application__create__before_application_period(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_upcoming()
+    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
+
+    input_data = get_application_create_data(application_round)
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Application round is not open for applications"]
+
+
+def test_application__create__after_application_period(graphql):
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation()
+    graphql.login_with_superuser(date_of_birth=local_datetime(2006, 1, 1))
+
+    input_data = get_application_create_data(application_round)
+    response = graphql(CREATE_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Application round is not open for applications"]

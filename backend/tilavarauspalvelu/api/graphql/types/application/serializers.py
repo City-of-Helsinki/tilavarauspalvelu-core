@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any
 
-from django.conf import settings
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import IntegerPrimaryKeyField
 from rest_framework import serializers
@@ -23,7 +22,7 @@ from utils.date_utils import TimeSlot, local_datetime, local_timedelta_string, m
 from utils.fields.serializer import CurrentUserDefaultNullable
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import ApplicationSection, Organisation, User
+    from tilavarauspalvelu.models import ApplicationRound, ApplicationSection, Organisation, User
     from tilavarauspalvelu.typing import ErrorList
 
 
@@ -76,21 +75,17 @@ class ApplicationCreateSerializer(NestingModelSerializer):
             "sent_date": {"read_only": True},
         }
 
-    def validate_user(self, user: User) -> User:
-        if user.actions.is_ad_user or user.actions.is_of_age:
-            return user
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        user: User = data["user"]
+        user.validators.validate_is_of_age()
 
-        msg = "Application can only be created by an adult reservee"
-        raise ValidationError(msg, code=error_codes.APPLICATION_ADULT_RESERVEE_REQUIRED)
+        application_round: ApplicationRound = data["application_round"]
+        application_round.validators.validate_open_for_applications()
 
-    def validate_application_sections(self, sections: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        if len(sections) > settings.MAXIMUM_SECTIONS_PER_APPLICATION:
-            msg = (
-                f"Cannot create more than {settings.MAXIMUM_SECTIONS_PER_APPLICATION} "
-                f"application sections in one application"
-            )
-            raise ValidationError(msg, code=error_codes.APPLICATION_SECTIONS_MAXIMUM_EXCEEDED)
-        return sections
+        section_count = len(data.get("application_sections", []))
+        Application.validators.validate_not_too_many_sections(section_count)
+
+        return data
 
 
 class ApplicationUpdateSerializer(ApplicationCreateSerializer):
@@ -103,6 +98,15 @@ class ApplicationUpdateSerializer(ApplicationCreateSerializer):
             **ApplicationCreateSerializer.Meta.extra_kwargs,
             "application_round": {"read_only": True},
         }
+
+    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+        application_round = self.instance.application_round
+        application_round.validators.validate_open_for_applications()
+
+        section_count = len(data.get("application_sections", []))
+        Application.validators.validate_not_too_many_sections(section_count)
+
+        return data
 
     def update(self, instance: Application, validated_data: dict[str, Any]) -> Application:
         # If a sent application is updated, it needs to be sent and validated again
