@@ -70,12 +70,13 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
         return data
 
     def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:
-        was_access_code = instance.access_type == AccessType.ACCESS_CODE
+        had_access_code = instance.access_type == AccessType.ACCESS_CODE
 
         with transaction.atomic():
             instance = super().update(instance=instance, validated_data=validated_data)
+            has_access_codes = instance.access_type == AccessType.ACCESS_CODE
 
-            if was_access_code or instance.access_type == AccessType.ACCESS_CODE:
+            if had_access_code or has_access_codes:
                 with external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR):
                     PindoraService.sync_access_code(obj=instance)
 

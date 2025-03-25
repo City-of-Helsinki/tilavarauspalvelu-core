@@ -297,7 +297,7 @@ class ApplicationSectionReservationCancellationInputSerializer(NestingModelSeria
 
             if has_access_code:
                 # Reschedule the seasonal booking to remove all cancelled reservations.
-                # This might remove leave behind empty series', which is fine.
+                # This might leave behind empty series', which is fine.
                 PindoraService.reschedule_access_code(self.instance)
 
         return data

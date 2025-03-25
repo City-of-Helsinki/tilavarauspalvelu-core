@@ -145,7 +145,7 @@ def test_recurring_reservations__add_reservation__access_code__create_if_not_fou
 
     assert new_reservation.access_type == AccessType.ACCESS_CODE
 
-    # These are the default, will be updated in the background task, since the rescheduling failed.
+    # These are the default, would be updated by create_access_code, but we mocked it out.
     assert new_reservation.access_code_is_active is False
     assert new_reservation.access_code_generated_at is None
 
