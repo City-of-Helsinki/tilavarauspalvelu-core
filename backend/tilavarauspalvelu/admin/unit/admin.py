@@ -39,10 +39,12 @@ class UnitAdmin(SortableAdminMixin, ExtraButtonsMixin, TabbedTranslationAdmin):
         "payment_merchant",
         "payment_accounting",
         "tprek_id",
+        "allow_permissions_from_ad_groups",
     ]
     list_filter = [
         "payment_merchant",
         "payment_accounting",
+        "allow_permissions_from_ad_groups",
     ]
     ordering = ["rank"]
 
