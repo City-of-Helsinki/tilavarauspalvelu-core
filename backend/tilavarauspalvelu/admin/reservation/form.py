@@ -4,11 +4,12 @@ import json
 from typing import Any
 
 from django import forms
+from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.enums import AccessType
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.models import PaymentOrder, Reservation
 from utils.external_service.errors import ExternalServiceError
 
 
@@ -173,3 +174,17 @@ class ReservationAdminForm(forms.ModelForm):
             return str(error)
 
         return json.dumps(response._asdict(), default=str, indent=2)
+
+
+class PaymentOrderInline(admin.TabularInline):
+    model = PaymentOrder
+    extra = 0
+    show_change_link = True
+    can_delete = False
+    fields = [
+        "id",
+        "payment_type",
+        "status",
+        "price_total",
+    ]
+    readonly_fields = fields

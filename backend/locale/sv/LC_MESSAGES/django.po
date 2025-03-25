@@ -1437,6 +1437,10 @@ msgstr ""
 msgid "Paid reservation"
 msgstr ""
 
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "access code generated"
+msgstr ""
+
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "SKU"

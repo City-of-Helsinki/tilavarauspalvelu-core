@@ -8,17 +8,22 @@ from django.template.response import TemplateResponse
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 from more_admin_filters import MultiSelectFilter
-from more_admin_filters.filters import MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
 from tilavarauspalvelu.enums import OrderStatus, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
-from tilavarauspalvelu.models import PaymentOrder, Reservation, ReservationDenyReason
+from tilavarauspalvelu.models import Reservation, ReservationDenyReason
 from tilavarauspalvelu.tasks import refund_paid_reservation_task
 from utils.date_utils import local_datetime
 
-from .filters import PaidReservationListFilter, RecurringReservationListFilter
-from .form import ReservationAdminForm
+from .filters import (
+    AccessCodeGeneratedFilter,
+    PaidReservationListFilter,
+    RecurringReservationListFilter,
+    ReservationUnitFilter,
+    UnitFilter,
+)
+from .form import PaymentOrderInline, ReservationAdminForm
 
 if TYPE_CHECKING:
     from decimal import Decimal
@@ -26,20 +31,6 @@ if TYPE_CHECKING:
     from django.db.models import QuerySet
 
     from tilavarauspalvelu.typing import WSGIRequest
-
-
-class PaymentOrderInline(admin.TabularInline):
-    model = PaymentOrder
-    extra = 0
-    show_change_link = True
-    can_delete = False
-    fields = [
-        "id",
-        "payment_type",
-        "status",
-        "price_total",
-    ]
-    readonly_fields = fields
 
 
 @admin.register(Reservation)
@@ -63,6 +54,9 @@ class ReservationAdmin(admin.ModelAdmin):
         "state",
         "begin",
         "reservation_units_admin",
+        "access_type",
+        "access_code_is_active",
+        "access_code_generated_at",
     ]
     list_filter = [
         ("created_at", DateRangeFilterBuilder(title=_("Created at"))),
@@ -71,9 +65,11 @@ class ReservationAdmin(admin.ModelAdmin):
         ("state", MultiSelectFilter),
         RecurringReservationListFilter,
         PaidReservationListFilter,
-        ("reservation_units__unit", MultiSelectRelatedOnlyDropdownFilter),
-        ("reservation_units", MultiSelectRelatedOnlyDropdownFilter),
+        ("reservation_units__unit", UnitFilter),
+        ("reservation_units", ReservationUnitFilter),
         "access_type",
+        "access_code_is_active",
+        AccessCodeGeneratedFilter,
     ]
 
     # Form

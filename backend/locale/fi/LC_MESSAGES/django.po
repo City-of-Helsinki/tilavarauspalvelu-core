@@ -1485,6 +1485,10 @@ msgstr "Toistuva varaus"
 msgid "Paid reservation"
 msgstr "Maksullinen varaus"
 
+#: tilavarauspalvelu/admin/reservation/filters.py
+msgid "access code generated"
+msgstr "ovikoodi generoitu"
+
 #: tilavarauspalvelu/admin/reservation/form.py
 #: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "SKU"
