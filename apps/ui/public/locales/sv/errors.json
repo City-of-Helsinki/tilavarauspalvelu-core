@@ -1,9 +1,24 @@
 {
+  "general": {
+    "heading": "Jokin meni vikaan",
+    "body": "Pahoittelut, emme valitettavasti pysty näyttämään sivua juuri nyt.",
+    "body2": "Yritä myöhemmin uudelleen!"
+  },
+  "403": {
+    "heading": "403 - Ei käyttöoikeuksia sivulle",
+    "body": "Voit nähdä sivun sisällön, jos kirjaudut sisään ja sinulla on riittävät käyttö-oikeudet.",
+    "body2": "Esihenkilö tai toimipisteesi pääkäyttäjä voi pyytää sinulle käyttöoikeudet Varaamon asiakaspalvelusta."
+  },
   "404": {
-    "body": "Sidan kan inte hittas"
+    "heading": "404 - Sidan kan inte hittas",
+    "body": "Tarkista, että sivun osoite on kirjoitettu oikein. Olemme myös saattaneet poistaa tai siirtää sivun."
   },
   "500": {
     "body": "Något oväntat hände"
+  },
+  "503": {
+    "heading": "Vi är snart tillbaka! ",
+    "body": "Vi uppdaterar tjänsten Varaamo. Tack för ditt tålamod!"
   },
   "search": "Ett fel uppstod när lokaler söktes",
   "deactivatedAccount": {
