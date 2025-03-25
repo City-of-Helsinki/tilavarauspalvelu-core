@@ -7,11 +7,10 @@ from django.contrib.admin import EmptyFieldListFilter
 from django.utils.translation import gettext_lazy as _
 from lookup_property import L
 
-from tilavarauspalvelu.admin.reservation.admin import ReservationInline
 from tilavarauspalvelu.models import RecurringReservation
 
 from .filters import ShouldHaveActiveAccessCodeFilter
-from .form import ReservationSeriesAdminForm
+from .form import ReservationInline, ReservationSeriesAdminForm
 
 if TYPE_CHECKING:
     from django.db import models

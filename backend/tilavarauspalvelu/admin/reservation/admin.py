@@ -28,26 +28,6 @@ if TYPE_CHECKING:
     from tilavarauspalvelu.typing import WSGIRequest
 
 
-class ReservationInline(admin.TabularInline):
-    model = Reservation
-    extra = 0
-    max_num = 0
-    show_change_link = True
-    can_delete = False
-    fields = [
-        "id",
-        "name",
-        "begin",
-        "end",
-        "state",
-        "type",
-        "price",
-        "price_net",
-        "unit_price",
-    ]
-    readonly_fields = fields
-
-
 class PaymentOrderInline(admin.TabularInline):
     model = PaymentOrder
     extra = 0

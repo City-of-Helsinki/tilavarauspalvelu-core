@@ -4,10 +4,11 @@ import json
 from typing import Any
 
 from django import forms
+from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
-from tilavarauspalvelu.models import RecurringReservation
+from tilavarauspalvelu.models import RecurringReservation, Reservation
 from utils.external_service.errors import ExternalServiceError
 
 
@@ -91,3 +92,24 @@ class ReservationSeriesAdminForm(forms.ModelForm):
             return str(error)
 
         return json.dumps(response._asdict(), default=str, indent=2)
+
+
+class ReservationInline(admin.TabularInline):
+    model = Reservation
+    extra = 0
+    max_num = 0
+    show_change_link = True
+    can_delete = False
+    fields = [
+        "id",
+        "name",
+        "begin",
+        "end",
+        "state",
+        "type",
+        "price",
+        "price_net",
+        "unit_price",
+        "access_type",
+    ]
+    readonly_fields = fields
