@@ -4,6 +4,8 @@ import {
   type ReservationQuery,
   useChangeReservationAccessCodeSingleMutation,
   useRepairReservationAccessCodeSingleMutation,
+  useChangeReservationAccessCodeSeriesMutation,
+  useRepairReservationAccessCodeSeriesMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
@@ -296,10 +298,15 @@ function AccessCodeChangeRepairButton({
   const { t, i18n } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [changeAccessCodeMutation] =
+  const [changeAccessCodeMutationSingle] =
     useChangeReservationAccessCodeSingleMutation();
-  const [repairAccessCodeMutation] =
+  const [repairAccessCodeMutationSingle] =
     useRepairReservationAccessCodeSingleMutation();
+
+  const [changeAccessCodeMutationSeries] =
+    useChangeReservationAccessCodeSeriesMutation();
+  const [repairAccessCodeMutationSeries] =
+    useRepairReservationAccessCodeSeriesMutation();
 
   const { hasPermission } = useCheckPermission({
     units: [reservation.reservationUnits?.[0]?.unit?.pk ?? 0],
@@ -307,16 +314,29 @@ function AccessCodeChangeRepairButton({
   });
 
   const handleExecuteMutation = async () => {
-    const payload = { variables: { input: { pk: reservation.pk ?? 0 } } };
+    const instance = reservation.recurringReservation || reservation;
+    const payload = { variables: { input: { pk: instance.pk ?? 0 } } };
+
+    const isAccessCodeIsActiveCorrect = reservation.recurringReservation
+      ? reservation.recurringReservation.isAccessCodeIsActiveCorrect
+      : reservation.isAccessCodeIsActiveCorrect;
 
     try {
-      if (!reservation.isAccessCodeIsActiveCorrect) {
-        await repairAccessCodeMutation(payload);
+      if (!isAccessCodeIsActiveCorrect) {
+        const repairMutation = reservation.recurringReservation
+          ? repairAccessCodeMutationSeries
+          : repairAccessCodeMutationSingle;
+
+        await repairMutation(payload);
         successToast({
           text: t("RequestedReservation.accessCodeRepairedSuccess"),
         });
       } else {
-        await changeAccessCodeMutation(payload);
+        const changeMutation = reservation.recurringReservation
+          ? changeAccessCodeMutationSeries
+          : changeAccessCodeMutationSingle;
+
+        await changeMutation(payload);
         successToast({
           text: t("RequestedReservation.accessCodeChangedSuccess"),
         });
@@ -353,8 +373,8 @@ function AccessCodeChangeRepairButton({
     }
   };
 
-  const isReservationEnded =
-    !reservation.recurringReservation && new Date() > new Date(reservation.end);
+  const endDate = reservation.recurringReservation?.endDate || reservation.end;
+  const isReservationEnded = new Date() > new Date(endDate);
 
   return (
     <SingleButtonContainer
