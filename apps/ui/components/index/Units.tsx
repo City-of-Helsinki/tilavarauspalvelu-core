@@ -66,14 +66,14 @@ export function Units({ units }: Props): JSX.Element | null {
   return (
     <>
       <H3 as="h2" $noMargin>
-        {t("unitsHeading")}
+        {t("home:unitsHeading")}
       </H3>
       <Flex $gap="none">
         <UnitContainer>
           {units.slice(0, ITEM_LIMIT).map((unit) => (
             <UnitItemLink
               key={unit.pk}
-              href={`${singleSearchPrefix}?unit=${unit.pk}#content`}
+              href={`${singleSearchPrefix}?units=${unit.pk}#content`}
               data-testid="front-page__units--unit"
             >
               {getTranslationSafe(unit, "name", lang) || "-"}

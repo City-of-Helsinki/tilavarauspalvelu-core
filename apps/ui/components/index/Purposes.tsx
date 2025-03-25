@@ -87,7 +87,7 @@ export function Purposes({ purposes }: Props): JSX.Element {
   const getSearchLink = (purpose: PurposeCardFragment): string => {
     const params = new URLSearchParams();
     // next/link so it's safer to return invalid search params than empty link
-    params.set("purpose", purpose.pk?.toString() ?? "");
+    params.set("purposes", purpose.pk?.toString() ?? "");
     return `${getSingleSearchPath(params)}#content`;
   };
 
