@@ -1,9 +1,29 @@
 {
+  "generic": {
+    "heading": "Something went wrong",
+    "body": "Sorry, we are unable to display the page right now.",
+    "body2": "Try again later!"
+  },
+  "403": {
+    "heading": "You don't have permission to view this page",
+    "body": "You can see the content of the page if you log in and have sufficient access rights",
+    "body2": "Your supervisor or the administrator of your office can request access rights for you from Varaamo's customer service."
+  },
   "404": {
-    "body": "Page not found"
+    "heading": "Page not found",
+    "body": "Please check that the page address is spelled correctly. We may have also deleted or moved the page."
   },
   "500": {
-    "body": "Something unexpected happened"
+    "heading": "Something unexpected happened",
+    "body": "Sorry, we are unable to display the page right now."
+  },
+  "503": {
+    "heading": "We'll be right back!",
+    "body": "We're updating the Varaamo service. Thank you for your patience!"
+  },
+  "buttons": {
+    "backToHome": "Go to Varaamo's homepage",
+    "giveFeedback": "Give feedback"
   },
   "search": "Error occurred when searching for spaces. Please try again!",
   "deactivatedAccount": {

@@ -1,9 +1,29 @@
 {
+  "generic": {
+    "heading": "Något gick fel",
+    "body": "Tyvärr kan sidan inte visas just nu.",
+    "body2": "Försök igen senare!"
+  },
+  "403": {
+    "heading": "Förbjudet att visa sidan",
+    "body": "Du kan se innehållet på sidan om du loggar in och har tillräckliga åtkomsträttigheter.",
+    "body2": "Din arbetsledare eller administratören på ditt kontor kan begära åtkomsträttigheter åt dig från Varaamos kundtjänst."
+  },
   "404": {
-    "body": "Sidan kan inte hittas"
+    "heading": "Sidan kan inte hittas",
+    "body": "Vänligen kontrollera att sidans adress är rättstavat. Vi kan också ha tagit bort eller flyttat sidan."
   },
   "500": {
-    "body": "Något oväntat hände"
+    "heading": "Något oväntat hände",
+    "body": "Tyvärr kan vi inte visa sidan just nu."
+  },
+  "503": {
+    "heading": "Vi är snart tillbaka! ",
+    "body": "Vi uppdaterar Varaamo. Tack för ditt tålamod!"
+  },
+  "buttons": {
+    "backToHome": "Gå till Varaamos hemsida",
+    "giveFeedback": "Ge feedback"
   },
   "search": "Ett fel uppstod när lokaler söktes",
   "deactivatedAccount": {
