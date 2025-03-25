@@ -2,8 +2,8 @@ import { useTranslation } from "react-i18next";
 import {
   AccessType,
   type ReservationQuery,
-  useChangeReservationAccessCodeMutation,
-  useRepairReservationAccessCodeMutation,
+  useChangeReservationAccessCodeSingleMutation,
+  useRepairReservationAccessCodeSingleMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
@@ -24,6 +24,7 @@ import { breakpoints } from "common";
 import { ButtonContainer, Flex, NoWrap } from "common/styles/util";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { useCheckPermission } from "@/hooks";
+import { gql } from "@apollo/client";
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 
@@ -295,8 +296,10 @@ function AccessCodeChangeRepairButton({
   const { t, i18n } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [changeAccessCodeMutation] = useChangeReservationAccessCodeMutation();
-  const [repairAccessCodeMutation] = useRepairReservationAccessCodeMutation();
+  const [changeAccessCodeMutation] =
+    useChangeReservationAccessCodeSingleMutation();
+  const [repairAccessCodeMutation] =
+    useRepairReservationAccessCodeSingleMutation();
 
   const { hasPermission } = useCheckPermission({
     units: [reservation.reservationUnits?.[0]?.unit?.pk ?? 0],
@@ -397,3 +400,51 @@ function AccessCodeChangeRepairButton({
     </SingleButtonContainer>
   );
 }
+
+export const CHANGE_RESERVATION_ACCESS_CODE_SINGLE = gql`
+  mutation ChangeReservationAccessCodeSingle(
+    $input: ReservationStaffChangeAccessCodeMutationInput!
+  ) {
+    staffChangeReservationAccessCode(input: $input) {
+      pk
+      accessCodeIsActive
+      accessCodeGeneratedAt
+    }
+  }
+`;
+
+export const REPAIR_RESERVATION_ACCESS_CODE_SINGLE = gql`
+  mutation RepairReservationAccessCodeSingle(
+    $input: ReservationStaffRepairAccessCodeMutationInput!
+  ) {
+    staffRepairReservationAccessCode(input: $input) {
+      pk
+      accessCodeIsActive
+      accessCodeGeneratedAt
+    }
+  }
+`;
+
+export const CHANGE_RESERVATION_ACCESS_CODE_SERIES = gql`
+  mutation ChangeReservationAccessCodeSeries(
+    $input: ReservationSeriesChangeAccessCodeMutationInput!
+  ) {
+    changeReservationSeriesAccessCode(input: $input) {
+      pk
+      accessCodeIsActive
+      accessCodeGeneratedAt
+    }
+  }
+`;
+
+export const REPAIR_RESERVATION_ACCESS_CODE_SERIES = gql`
+  mutation RepairReservationAccessCodeSeries(
+    $input: ReservationSeriesRepairAccessCodeMutationInput!
+  ) {
+    repairReservationSeriesAccessCode(input: $input) {
+      pk
+      accessCodeIsActive
+      accessCodeGeneratedAt
+    }
+  }
+`;
