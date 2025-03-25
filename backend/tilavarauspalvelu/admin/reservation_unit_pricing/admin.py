@@ -1,16 +1,18 @@
 from __future__ import annotations
 
+from typing import Any
+
 from django.contrib import admin
+from more_admin_filters.filters import MultiSelectRelatedOnlyDropdownFilter
 from rangefilter.filters import DateRangeFilterBuilder
 
 from tilavarauspalvelu.models import ReservationUnitPricing
 from utils.decimal_utils import round_decimal
 
 
-class ReservationUnitPricingInline(admin.TabularInline):
-    model = ReservationUnitPricing
-    show_change_link = True
-    extra = 0
+class ReservationUnitFilter(MultiSelectRelatedOnlyDropdownFilter):
+    def field_admin_ordering(self, *args: Any, **kwargs: Any) -> list[str]:
+        return ["unit__name", "name"]
 
 
 @admin.register(ReservationUnitPricing)
@@ -20,16 +22,17 @@ class ReservationUnitPricingAdmin(admin.ModelAdmin):
         "id",
         "reservation_unit",
         "begins",
-        "is_activated_on_begins",
         "lowest_price",
         "highest_price",
         "tax_percentage",
         "price_unit",
+        "is_activated_on_begins",
     ]
     list_filter = [
         ("begins", DateRangeFilterBuilder()),
         "tax_percentage",
         "is_activated_on_begins",
+        ("reservation_unit", ReservationUnitFilter),
     ]
     ordering = ["-begins"]
 

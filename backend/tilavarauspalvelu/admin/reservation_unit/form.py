@@ -5,6 +5,7 @@ import json
 from typing import Any
 
 from django import forms
+from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms.formsets import DELETION_FIELD_NAME
@@ -16,7 +17,7 @@ from tinymce.widgets import TinyMCE
 from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, TermsOfUseTypeChoices
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient
-from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, TermsOfUse
+from tilavarauspalvelu.models import ReservationUnit, ReservationUnitAccessType, ReservationUnitPricing, TermsOfUse
 from utils.date_utils import local_date
 from utils.external_service.errors import ExternalServiceError
 from utils.utils import only_django_validation_errors
@@ -326,3 +327,9 @@ class ReservationUnitAdminForm(forms.ModelForm):
             return None
 
         return json.dumps(response, default=str, indent=2)
+
+
+class ReservationUnitPricingInline(admin.TabularInline):
+    model = ReservationUnitPricing
+    show_change_link = True
+    extra = 0
