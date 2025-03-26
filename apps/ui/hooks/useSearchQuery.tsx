@@ -14,11 +14,9 @@ import { useEffect, useState } from "react";
 export function useSearchQuery(
   variables: SearchReservationUnitsQueryVariables
 ) {
-  // TODO should really hydrate the ApolloClient from SSR
   const query = useSearchReservationUnitsQuery({
     variables,
-    // no-cache is mandatory for tests (otherwise it returns incomplete data)
-    fetchPolicy: "no-cache",
+    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   });
 
