@@ -116,10 +116,10 @@ export function ReservationUnitsDataReader(): JSX.Element {
     variables: {
       orderBy,
       first: LARGE_LIST_PAGE_SIZE,
-      maxPersonsLte,
-      maxPersonsGte,
-      surfaceAreaLte,
-      surfaceAreaGte,
+      maxPersonsLte: maxPersonsLte?.toString(),
+      maxPersonsGte: maxPersonsGte?.toString(),
+      surfaceAreaLte: surfaceAreaLte?.toString(),
+      surfaceAreaGte: surfaceAreaGte?.toString(),
       textSearch: searchFilter,
       unit,
       publishingState: reservationUnitStates.map((state) =>
