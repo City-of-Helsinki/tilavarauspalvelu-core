@@ -3,6 +3,7 @@ import {
   type CreateTagStringFragment,
   PriceUnit,
   type ReservationQuery,
+  ReservationUnitPricingFieldsFragment,
 } from "@gql/gql-types";
 import { createTagString, getReservatinUnitPricing } from "./util";
 import { addHours, addMonths } from "date-fns";
@@ -94,7 +95,8 @@ function constructReservation({
 
 describe("getReservatinUnitPricing", () => {
   test("returns correct pricing based on reservation date", () => {
-    const input = {
+    const input: ReservationUnitPricingFieldsFragment = {
+      id: "1",
       pricings: [constructFreePricing(), constructPaidPricing()],
     };
 

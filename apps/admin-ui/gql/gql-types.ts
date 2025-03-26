@@ -5967,7 +5967,12 @@ export type ReservationCommonFragment = {
   bufferTimeBefore: number;
   bufferTimeAfter: number;
   paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-  user: { id: string; firstName: string; lastName: string } | null;
+  user: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  } | null;
 };
 
 export type ReservationUnitReservationsFragment = {
@@ -5995,14 +6000,14 @@ export type ReservationUnitReservationsFragment = {
     bufferTimeAfter: number;
     unit: { id: string; pk: number | null } | null;
   }>;
+  paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
   user: {
     id: string;
+    email: string;
     firstName: string;
     lastName: string;
-    email: string;
     pk: number | null;
   } | null;
-  paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
 };
 
 export type ReservationUnitFragment = {
@@ -6017,7 +6022,7 @@ export type ReservationUnitFragment = {
   termsOfUseFi: string | null;
   minPersons: number | null;
   unit: { id: string; pk: number | null; nameFi: string | null } | null;
-  cancellationTerms: {
+  serviceSpecificTerms: {
     id: string;
     textFi: string | null;
     nameFi: string | null;
@@ -6032,7 +6037,7 @@ export type ReservationUnitFragment = {
     textFi: string | null;
     nameFi: string | null;
   } | null;
-  serviceSpecificTerms: {
+  cancellationTerms: {
     id: string;
     textFi: string | null;
     nameFi: string | null;
@@ -6245,6 +6250,17 @@ export type ApplicationDateOfBirthQuery = {
   } | null;
 };
 
+export type DenyDialogFieldsFragment = {
+  pk: number | null;
+  handlingDetails: string | null;
+  price: string | null;
+  paymentOrder: Array<{
+    orderUuid: string | null;
+    status: OrderStatus | null;
+    refundUuid: string | null;
+  }>;
+};
+
 export type DenyReservationMutationVariables = Exact<{
   input: ReservationDenyMutationInput;
 }>;
@@ -6318,6 +6334,45 @@ export type ChangeReservationTimeFragment = {
     bufferTimeAfter: number;
     reservationStartInterval: ReservationStartInterval;
   }>;
+};
+
+export type ReservationTypeFormFieldsFragment = {
+  authentication: Authentication;
+  bufferTimeBefore: number;
+  bufferTimeAfter: number;
+  id: string;
+  minPersons: number | null;
+  maxPersons: number | null;
+  serviceSpecificTerms: {
+    id: string;
+    textFi: string | null;
+    nameFi: string | null;
+  } | null;
+  paymentTerms: {
+    id: string;
+    textFi: string | null;
+    nameFi: string | null;
+  } | null;
+  pricingTerms: {
+    id: string;
+    textFi: string | null;
+    nameFi: string | null;
+  } | null;
+  cancellationTerms: {
+    id: string;
+    textFi: string | null;
+    nameFi: string | null;
+  } | null;
+  metadataSet: {
+    id: string;
+    requiredFields: Array<{ id: string; fieldName: string }>;
+    supportedFields: Array<{ id: string; fieldName: string }>;
+  } | null;
+};
+
+export type VisibleIfPermissionFieldsFragment = {
+  user: { pk: number | null } | null;
+  reservationUnits: Array<{ unit: { pk: number | null } | null }>;
 };
 
 export type UpdateReservationWorkingMemoMutationVariables = Exact<{
@@ -7588,14 +7643,14 @@ export type ReservationUnitsByUnitQuery = {
       bufferTimeAfter: number;
       unit: { id: string; pk: number | null } | null;
     }>;
+    paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
     user: {
       id: string;
+      email: string;
       firstName: string;
       lastName: string;
-      email: string;
       pk: number | null;
     } | null;
-    paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
   }> | null;
 };
 
@@ -7616,7 +7671,7 @@ export type ReservationUnitQuery = {
     termsOfUseFi: string | null;
     minPersons: number | null;
     unit: { id: string; pk: number | null; nameFi: string | null } | null;
-    cancellationTerms: {
+    serviceSpecificTerms: {
       id: string;
       textFi: string | null;
       nameFi: string | null;
@@ -7631,7 +7686,7 @@ export type ReservationUnitQuery = {
       textFi: string | null;
       nameFi: string | null;
     } | null;
-    serviceSpecificTerms: {
+    cancellationTerms: {
       id: string;
       textFi: string | null;
       nameFi: string | null;
@@ -7704,14 +7759,14 @@ export type ReservationUnitCalendarQuery = {
         bufferTimeAfter: number;
         unit: { id: string; pk: number | null } | null;
       }>;
+      paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
       user: {
         id: string;
+        email: string;
         firstName: string;
         lastName: string;
-        email: string;
         pk: number | null;
       } | null;
-      paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
     }> | null;
   } | null;
   affectingReservations: Array<{
@@ -7739,14 +7794,14 @@ export type ReservationUnitCalendarQuery = {
       bufferTimeAfter: number;
       unit: { id: string; pk: number | null } | null;
     }>;
+    paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
     user: {
       id: string;
+      email: string;
       firstName: string;
       lastName: string;
-      email: string;
       pk: number | null;
     } | null;
-    paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
   }> | null;
 };
 
@@ -7876,6 +7931,28 @@ export type SearchReservationUnitsQuery = {
   } | null;
 };
 
+export type ApprovalDialogFieldsFragment = {
+  pk: number | null;
+  price: string | null;
+  handlingDetails: string | null;
+  applyingForFreeOfCharge: boolean | null;
+  freeOfChargeReason: string | null;
+  id: string;
+  begin: string;
+  end: string;
+  reservationUnits: Array<{
+    id: string;
+    pricings: Array<{
+      id: string;
+      begins: string;
+      priceUnit: PriceUnit;
+      lowestPrice: string;
+      highestPrice: string;
+      taxPercentage: { id: string; pk: number | null; value: string };
+    }>;
+  }>;
+};
+
 export type ReservationApplicationLinkQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -7896,6 +7973,111 @@ export type ReservationApplicationLinkQuery = {
         };
       };
     } | null;
+  } | null;
+};
+
+export type ReservationEditPageQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationEditPageQuery = {
+  reservation: {
+    id: string;
+    pk: number | null;
+    begin: string;
+    end: string;
+    createdAt: string | null;
+    state: ReservationStateChoice | null;
+    type: ReservationTypeChoice | null;
+    isBlocked: boolean | null;
+    workingMemo: string | null;
+    reserveeName: string | null;
+    bufferTimeBefore: number;
+    bufferTimeAfter: number;
+    numPersons: number | null;
+    name: string | null;
+    description: string | null;
+    freeOfChargeReason: string | null;
+    applyingForFreeOfCharge: boolean | null;
+    reserveeFirstName: string | null;
+    reserveeLastName: string | null;
+    reserveeEmail: string | null;
+    reserveePhone: string | null;
+    reserveeType: CustomerTypeChoice | null;
+    reserveeOrganisationName: string | null;
+    reserveeId: string | null;
+    reserveeIsUnregisteredAssociation: boolean | null;
+    reserveeAddressStreet: string | null;
+    reserveeAddressCity: string | null;
+    reserveeAddressZip: string | null;
+    billingFirstName: string | null;
+    billingLastName: string | null;
+    billingPhone: string | null;
+    billingEmail: string | null;
+    billingAddressStreet: string | null;
+    billingAddressCity: string | null;
+    billingAddressZip: string | null;
+    recurringReservation: {
+      id: string;
+      pk: number | null;
+      name: string;
+      beginDate: string | null;
+      beginTime: string | null;
+      endDate: string | null;
+      endTime: string | null;
+      weekdays: Array<number | null> | null;
+    } | null;
+    reservationUnits: Array<{
+      id: string;
+      pk: number | null;
+      nameFi: string | null;
+      authentication: Authentication;
+      bufferTimeBefore: number;
+      bufferTimeAfter: number;
+      minPersons: number | null;
+      maxPersons: number | null;
+      unit: { id: string; nameFi: string | null } | null;
+      serviceSpecificTerms: {
+        id: string;
+        textFi: string | null;
+        nameFi: string | null;
+      } | null;
+      paymentTerms: {
+        id: string;
+        textFi: string | null;
+        nameFi: string | null;
+      } | null;
+      pricingTerms: {
+        id: string;
+        textFi: string | null;
+        nameFi: string | null;
+      } | null;
+      cancellationTerms: {
+        id: string;
+        textFi: string | null;
+        nameFi: string | null;
+      } | null;
+      metadataSet: {
+        id: string;
+        requiredFields: Array<{ id: string; fieldName: string }>;
+        supportedFields: Array<{ id: string; fieldName: string }>;
+      } | null;
+    }>;
+    paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
+    user: {
+      id: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+    } | null;
+    ageGroup: {
+      id: string;
+      minimum: number;
+      maximum: number | null;
+      pk: number | null;
+    } | null;
+    purpose: { id: string; nameFi: string | null; pk: number | null } | null;
+    homeCity: { id: string; nameFi: string | null; pk: number | null } | null;
   } | null;
 };
 
@@ -8033,6 +8215,27 @@ export type ReservationAccessTypeFragment = {
   } | null;
 };
 
+export type ReservationRecurringFieldsFragment = {
+  pk: number | null;
+  beginDate: string | null;
+  beginTime: string | null;
+  endDate: string | null;
+  endTime: string | null;
+  weekdays: Array<number | null> | null;
+  name: string;
+  description: string;
+  usedAccessTypes: Array<AccessType | null> | null;
+  isAccessCodeIsActiveCorrect: boolean | null;
+  pindoraInfo: {
+    accessCode: string;
+    accessCodeIsActive: boolean;
+    accessCodeValidity: Array<{
+      accessCodeBeginsAt: string;
+      accessCodeEndsAt: string;
+    }>;
+  } | null;
+};
+
 export type ReservationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8051,17 +8254,15 @@ export type ReservationQuery = {
     reserveeName: string | null;
     bufferTimeBefore: number;
     bufferTimeAfter: number;
-    calendarUrl: string | null;
-    price: string | null;
-    taxPercentageValue: string | null;
-    handlingDetails: string | null;
     accessType: AccessType;
     isAccessCodeIsActiveCorrect: boolean | null;
+    handlingDetails: string | null;
+    price: string | null;
+    applyingForFreeOfCharge: boolean | null;
+    freeOfChargeReason: string | null;
     numPersons: number | null;
     name: string | null;
     description: string | null;
-    freeOfChargeReason: string | null;
-    applyingForFreeOfCharge: boolean | null;
     reserveeFirstName: string | null;
     reserveeLastName: string | null;
     reserveeEmail: string | null;
@@ -8080,52 +8281,6 @@ export type ReservationQuery = {
     billingAddressStreet: string | null;
     billingAddressCity: string | null;
     billingAddressZip: string | null;
-    reservationUnits: Array<{
-      id: string;
-      nameFi: string | null;
-      pk: number | null;
-      maxPersons: number | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      reservationStartInterval: ReservationStartInterval;
-      authentication: Authentication;
-      termsOfUseFi: string | null;
-      minPersons: number | null;
-      unit: { id: string; nameFi: string | null; pk: number | null } | null;
-      cancellationTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
-      } | null;
-      paymentTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
-      } | null;
-      pricingTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
-      } | null;
-      serviceSpecificTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
-      } | null;
-      pricings: Array<{
-        id: string;
-        begins: string;
-        priceUnit: PriceUnit;
-        lowestPrice: string;
-        highestPrice: string;
-        taxPercentage: { id: string; pk: number | null; value: string };
-      }>;
-      metadataSet: {
-        id: string;
-        requiredFields: Array<{ id: string; fieldName: string }>;
-        supportedFields: Array<{ id: string; fieldName: string }>;
-      } | null;
-    }>;
     recurringReservation: {
       id: string;
       beginDate: string | null;
@@ -8147,6 +8302,53 @@ export type ReservationQuery = {
         }>;
       } | null;
     } | null;
+    cancelReason: { id: string; reasonFi: string | null } | null;
+    denyReason: { id: string; reasonFi: string | null } | null;
+    reservationUnits: Array<{
+      id: string;
+      pk: number | null;
+      reservationStartInterval: ReservationStartInterval;
+      nameFi: string | null;
+      bufferTimeBefore: number;
+      bufferTimeAfter: number;
+      authentication: Authentication;
+      minPersons: number | null;
+      maxPersons: number | null;
+      unit: { id: string; nameFi: string | null; pk: number | null } | null;
+      serviceSpecificTerms: {
+        id: string;
+        textFi: string | null;
+        nameFi: string | null;
+      } | null;
+      paymentTerms: {
+        id: string;
+        textFi: string | null;
+        nameFi: string | null;
+      } | null;
+      pricingTerms: {
+        id: string;
+        textFi: string | null;
+        nameFi: string | null;
+      } | null;
+      cancellationTerms: {
+        id: string;
+        textFi: string | null;
+        nameFi: string | null;
+      } | null;
+      pricings: Array<{
+        id: string;
+        begins: string;
+        priceUnit: PriceUnit;
+        lowestPrice: string;
+        highestPrice: string;
+        taxPercentage: { id: string; pk: number | null; value: string };
+      }>;
+      metadataSet: {
+        id: string;
+        requiredFields: Array<{ id: string; fieldName: string }>;
+        supportedFields: Array<{ id: string; fieldName: string }>;
+      } | null;
+    }>;
     paymentOrder: Array<{
       id: string;
       status: OrderStatus | null;
@@ -8155,13 +8357,11 @@ export type ReservationQuery = {
     }>;
     user: {
       id: string;
+      email: string;
       firstName: string;
       lastName: string;
-      email: string;
       pk: number | null;
     } | null;
-    cancelReason: { id: string; reasonFi: string | null } | null;
-    denyReason: { id: string; reasonFi: string | null } | null;
     pindoraInfo: {
       accessCode: string;
       accessCodeIsActive: boolean;
@@ -8427,6 +8627,35 @@ export type RescheduleReservationSeriesMutation = {
   rescheduleReservationSeries: { pk: number | null } | null;
 };
 
+export type ReservationUnitPricingFieldsFragment = {
+  id: string;
+  pricings: Array<{
+    id: string;
+    begins: string;
+    priceUnit: PriceUnit;
+    lowestPrice: string;
+    highestPrice: string;
+    taxPercentage: { id: string; pk: number | null; value: string };
+  }>;
+};
+
+export type ReservationPriceDetailsFieldsFragment = {
+  id: string;
+  begin: string;
+  end: string;
+  reservationUnits: Array<{
+    id: string;
+    pricings: Array<{
+      id: string;
+      begins: string;
+      priceUnit: PriceUnit;
+      lowestPrice: string;
+      highestPrice: string;
+      taxPercentage: { id: string; pk: number | null; value: string };
+    }>;
+  }>;
+};
+
 export type CreateTagStringFragment = {
   id: string;
   begin: string;
@@ -8443,43 +8672,6 @@ export type CreateTagStringFragment = {
     endDate: string | null;
     endTime: string | null;
     weekdays: Array<number | null> | null;
-  } | null;
-};
-
-export type ReservationUnitPricingFragment = {
-  id: string;
-  pricings: Array<{
-    id: string;
-    begins: string;
-    priceUnit: PriceUnit;
-    lowestPrice: string;
-    highestPrice: string;
-    taxPercentage: { id: string; pk: number | null; value: string };
-  }>;
-};
-
-export type ReservationRecurringFragment = {
-  id: string;
-  recurringReservation: {
-    id: string;
-    pk: number | null;
-    beginDate: string | null;
-    beginTime: string | null;
-    endDate: string | null;
-    endTime: string | null;
-    weekdays: Array<number | null> | null;
-    name: string;
-    description: string;
-    usedAccessTypes: Array<AccessType | null> | null;
-    isAccessCodeIsActiveCorrect: boolean | null;
-    pindoraInfo: {
-      accessCode: string;
-      accessCodeIsActive: boolean;
-      accessCodeValidity: Array<{
-        accessCodeBeginsAt: string;
-        accessCodeEndsAt: string;
-      }>;
-    } | null;
   } | null;
 };
 
@@ -8565,7 +8757,12 @@ export type ReservationsQuery = {
           unit: { id: string; nameFi: string | null } | null;
         }>;
         paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-        user: { id: string; firstName: string; lastName: string } | null;
+        user: {
+          id: string;
+          email: string;
+          firstName: string;
+          lastName: string;
+        } | null;
       } | null;
     } | null>;
     pageInfo: { endCursor: string | null; hasNextPage: boolean };
@@ -9141,6 +9338,7 @@ export const ReservationCommonFragmentDoc = gql`
     }
     user {
       id
+      email
       firstName
       lastName
     }
@@ -9148,9 +9346,22 @@ export const ReservationCommonFragmentDoc = gql`
     bufferTimeAfter
   }
 `;
+export const VisibleIfPermissionFieldsFragmentDoc = gql`
+  fragment VisibleIfPermissionFields on ReservationNode {
+    user {
+      pk
+    }
+    reservationUnits {
+      unit {
+        pk
+      }
+    }
+  }
+`;
 export const ReservationUnitReservationsFragmentDoc = gql`
   fragment ReservationUnitReservations on ReservationNode {
     ...ReservationCommon
+    ...VisibleIfPermissionFields
     name
     numPersons
     calendarUrl
@@ -9165,16 +9376,10 @@ export const ReservationUnitReservationsFragmentDoc = gql`
         pk
       }
     }
-    user {
-      id
-      firstName
-      lastName
-      email
-      pk
-    }
     affectedReservationUnits
   }
   ${ReservationCommonFragmentDoc}
+  ${VisibleIfPermissionFieldsFragmentDoc}
 `;
 export const UnitNameFieldsFragmentDoc = gql`
   fragment UnitNameFields on UnitNode {
@@ -9201,21 +9406,13 @@ export const MetadataSetsFragmentDoc = gql`
     }
   }
 `;
-export const ReservationUnitFragmentDoc = gql`
-  fragment ReservationUnit on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    maxPersons
+export const ReservationTypeFormFieldsFragmentDoc = gql`
+  fragment ReservationTypeFormFields on ReservationUnitNode {
+    ...MetadataSets
+    authentication
     bufferTimeBefore
     bufferTimeAfter
-    reservationStartInterval
-    authentication
-    unit {
-      ...UnitNameFields
-    }
-    ...MetadataSets
-    cancellationTerms {
+    serviceSpecificTerms {
       id
       textFi
       nameFi
@@ -9230,15 +9427,32 @@ export const ReservationUnitFragmentDoc = gql`
       textFi
       nameFi
     }
-    termsOfUseFi
-    serviceSpecificTerms {
+    cancellationTerms {
       id
       textFi
       nameFi
     }
   }
-  ${UnitNameFieldsFragmentDoc}
   ${MetadataSetsFragmentDoc}
+`;
+export const ReservationUnitFragmentDoc = gql`
+  fragment ReservationUnit on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    maxPersons
+    bufferTimeBefore
+    bufferTimeAfter
+    reservationStartInterval
+    authentication
+    unit {
+      ...UnitNameFields
+    }
+    ...ReservationTypeFormFields
+    termsOfUseFi
+  }
+  ${UnitNameFieldsFragmentDoc}
+  ${ReservationTypeFormFieldsFragmentDoc}
 `;
 export const BannerNotificationCommonFragmentDoc = gql`
   fragment BannerNotificationCommon on BannerNotificationNode {
@@ -9262,6 +9476,18 @@ export const BannerNotificationsAdminFragmentDoc = gql`
     state
   }
   ${BannerNotificationCommonFragmentDoc}
+`;
+export const DenyDialogFieldsFragmentDoc = gql`
+  fragment DenyDialogFields on ReservationNode {
+    pk
+    handlingDetails
+    price
+    paymentOrder {
+      orderUuid
+      status
+      refundUuid
+    }
+  }
 `;
 export const AllocatedTimeSlotFragmentDoc = gql`
   fragment AllocatedTimeSlot on AllocatedTimeSlotNode {
@@ -9314,6 +9540,52 @@ export const ReservationsInIntervalFragmentDoc = gql`
       pk
     }
   }
+`;
+export const PricingFieldsFragmentDoc = gql`
+  fragment PricingFields on ReservationUnitPricingNode {
+    id
+    begins
+    priceUnit
+    lowestPrice
+    highestPrice
+    taxPercentage {
+      id
+      pk
+      value
+    }
+  }
+`;
+export const ReservationUnitPricingFieldsFragmentDoc = gql`
+  fragment ReservationUnitPricingFields on ReservationUnitNode {
+    id
+    pricings {
+      id
+      ...PricingFields
+    }
+  }
+  ${PricingFieldsFragmentDoc}
+`;
+export const ReservationPriceDetailsFieldsFragmentDoc = gql`
+  fragment ReservationPriceDetailsFields on ReservationNode {
+    id
+    begin
+    end
+    reservationUnits {
+      ...ReservationUnitPricingFields
+    }
+  }
+  ${ReservationUnitPricingFieldsFragmentDoc}
+`;
+export const ApprovalDialogFieldsFragmentDoc = gql`
+  fragment ApprovalDialogFields on ReservationNode {
+    pk
+    price
+    handlingDetails
+    applyingForFreeOfCharge
+    freeOfChargeReason
+    ...ReservationPriceDetailsFields
+  }
+  ${ReservationPriceDetailsFieldsFragmentDoc}
 `;
 export const ReservationMetaFieldsFragmentDoc = gql`
   fragment ReservationMetaFields on ReservationNode {
@@ -9408,6 +9680,28 @@ export const ReservationAccessTypeFragmentDoc = gql`
     }
   }
 `;
+export const ReservationRecurringFieldsFragmentDoc = gql`
+  fragment ReservationRecurringFields on RecurringReservationNode {
+    pk
+    beginDate
+    beginTime
+    endDate
+    endTime
+    weekdays
+    name
+    description
+    usedAccessTypes
+    isAccessCodeIsActiveCorrect
+    pindoraInfo {
+      accessCode
+      accessCodeIsActive
+      accessCodeValidity {
+        accessCodeBeginsAt
+        accessCodeEndsAt
+      }
+    }
+  }
+`;
 export const ChangeReservationTimeFragmentDoc = gql`
   fragment ChangeReservationTime on ReservationNode {
     id
@@ -9484,56 +9778,6 @@ export const CreateTagStringFragmentDoc = gql`
       endDate
       endTime
       weekdays
-    }
-  }
-`;
-export const PricingFieldsFragmentDoc = gql`
-  fragment PricingFields on ReservationUnitPricingNode {
-    id
-    begins
-    priceUnit
-    lowestPrice
-    highestPrice
-    taxPercentage {
-      id
-      pk
-      value
-    }
-  }
-`;
-export const ReservationUnitPricingFragmentDoc = gql`
-  fragment ReservationUnitPricing on ReservationUnitNode {
-    id
-    pricings {
-      id
-      ...PricingFields
-    }
-  }
-  ${PricingFieldsFragmentDoc}
-`;
-export const ReservationRecurringFragmentDoc = gql`
-  fragment ReservationRecurring on ReservationNode {
-    id
-    recurringReservation {
-      id
-      pk
-      beginDate
-      beginTime
-      endDate
-      endTime
-      weekdays
-      name
-      description
-      usedAccessTypes
-      isAccessCodeIsActiveCorrect
-      pindoraInfo {
-        accessCode
-        accessCodeIsActive
-        accessCodeValidity {
-          accessCodeBeginsAt
-          accessCodeEndsAt
-        }
-      }
     }
   }
 `;
@@ -14953,6 +15197,106 @@ export type ReservationApplicationLinkQueryResult = Apollo.QueryResult<
   ReservationApplicationLinkQuery,
   ReservationApplicationLinkQueryVariables
 >;
+export const ReservationEditPageDocument = gql`
+  query ReservationEditPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      ...CreateTagString
+      ...ReservationCommon
+      ...ReservationMetaFields
+      recurringReservation {
+        id
+        pk
+        name
+      }
+      reservationUnits {
+        id
+        pk
+        ...ReservationTypeFormFields
+      }
+    }
+  }
+  ${CreateTagStringFragmentDoc}
+  ${ReservationCommonFragmentDoc}
+  ${ReservationMetaFieldsFragmentDoc}
+  ${ReservationTypeFormFieldsFragmentDoc}
+`;
+
+/**
+ * __useReservationEditPageQuery__
+ *
+ * To run a query within a React component, call `useReservationEditPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationEditPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationEditPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationEditPageQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationEditPageQuery,
+    ReservationEditPageQueryVariables
+  > &
+    (
+      | { variables: ReservationEditPageQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationEditPageQuery,
+    ReservationEditPageQueryVariables
+  >(ReservationEditPageDocument, options);
+}
+export function useReservationEditPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationEditPageQuery,
+    ReservationEditPageQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationEditPageQuery,
+    ReservationEditPageQueryVariables
+  >(ReservationEditPageDocument, options);
+}
+export function useReservationEditPageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationEditPageQuery,
+        ReservationEditPageQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationEditPageQuery,
+    ReservationEditPageQueryVariables
+  >(ReservationEditPageDocument, options);
+}
+export type ReservationEditPageQueryHookResult = ReturnType<
+  typeof useReservationEditPageQuery
+>;
+export type ReservationEditPageLazyQueryHookResult = ReturnType<
+  typeof useReservationEditPageLazyQuery
+>;
+export type ReservationEditPageSuspenseQueryHookResult = ReturnType<
+  typeof useReservationEditPageSuspenseQuery
+>;
+export type ReservationEditPageQueryResult = Apollo.QueryResult<
+  ReservationEditPageQuery,
+  ReservationEditPageQueryVariables
+>;
 export const ReservationsByReservationUnitDocument = gql`
   query ReservationsByReservationUnit(
     $id: ID!
@@ -15063,25 +15407,44 @@ export type ReservationsByReservationUnitQueryResult = Apollo.QueryResult<
 export const ReservationDocument = gql`
   query Reservation($id: ID!) {
     reservation(id: $id) {
+      id
       ...CreateTagString
       ...ReservationCommon
-      ...ReservationRecurring
-      ...ReservationSpecialisation
+      ...ChangeReservationTime
+      recurringReservation {
+        id
+        ...ReservationRecurringFields
+      }
       ...ReservationAccessType
+      ...VisibleIfPermissionFields
+      ...DenyDialogFields
+      ...ApprovalDialogFields
+      cancelReason {
+        id
+        reasonFi
+      }
+      denyReason {
+        id
+        reasonFi
+      }
       reservationUnits {
-        ...ReservationUnit
-        ...ReservationUnitPricing
+        id
+        pk
+        reservationStartInterval
+        ...ReservationTypeFormFields
       }
       ...ReservationMetaFields
     }
   }
   ${CreateTagStringFragmentDoc}
   ${ReservationCommonFragmentDoc}
-  ${ReservationRecurringFragmentDoc}
-  ${ReservationSpecialisationFragmentDoc}
+  ${ChangeReservationTimeFragmentDoc}
+  ${ReservationRecurringFieldsFragmentDoc}
   ${ReservationAccessTypeFragmentDoc}
-  ${ReservationUnitFragmentDoc}
-  ${ReservationUnitPricingFragmentDoc}
+  ${VisibleIfPermissionFieldsFragmentDoc}
+  ${DenyDialogFieldsFragmentDoc}
+  ${ApprovalDialogFieldsFragmentDoc}
+  ${ReservationTypeFormFieldsFragmentDoc}
   ${ReservationMetaFieldsFragmentDoc}
 `;
 

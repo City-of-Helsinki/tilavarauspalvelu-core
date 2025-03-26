@@ -25,7 +25,11 @@ export function useStaffReservationMutation({
   reservation,
   onSuccess,
 }: {
-  reservation: Pick<ReservationType, "pk" | "recurringReservation">;
+  reservation: Pick<ReservationType, "pk"> & {
+    recurringReservation: Maybe<
+      Pick<NonNullable<ReservationType["recurringReservation"]>, "pk">
+    >;
+  };
   onSuccess: () => void;
 }) {
   const { t } = useTranslation();

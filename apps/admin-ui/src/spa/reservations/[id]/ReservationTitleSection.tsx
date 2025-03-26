@@ -26,14 +26,6 @@ import { ExternalLink } from "@/component/ExternalLink";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
-type Props = {
-  reservation: ReservationType;
-  tagline: string;
-  overrideTitle?: string;
-  noMargin?: boolean;
-};
-
 export const APPLICATION_LINK_QUERY = gql`
   query ReservationApplicationLink($id: ID!) {
     recurringReservation(id: $id) {
@@ -98,6 +90,25 @@ function getReservationStateLabelProps(s?: Maybe<ReservationStateChoice>): {
       };
   }
 }
+
+type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type Props = {
+  reservation: Pick<
+    ReservationType,
+    "createdAt" | "state" | "type" | "name" | "pk" | "reserveeName"
+  > & {
+    recurringReservation: Maybe<
+      Pick<NonNullable<ReservationType["recurringReservation"]>, "id">
+    >;
+    paymentOrder: Pick<
+      NonNullable<ReservationType["paymentOrder"][number]>,
+      "status"
+    >[];
+  };
+  tagline: string;
+  overrideTitle?: string;
+  noMargin?: boolean;
+};
 
 const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
   ({ reservation, tagline, overrideTitle, noMargin }: Props, ref) => {
