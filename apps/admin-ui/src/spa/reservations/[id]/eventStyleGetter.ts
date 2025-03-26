@@ -2,7 +2,7 @@ import type { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   ReservationStateChoice,
   ReservationTypeChoice,
-  type ReservationQuery,
+  type ReservationPageQuery,
 } from "@gql/gql-types";
 import {
   COMMON_LEGEND,
@@ -39,7 +39,7 @@ export const legend = [
 ];
 
 // TODO fragment
-export type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+export type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 export type EventBufferType = Pick<
   ReservationType,
   "begin" | "end" | "bufferTimeAfter" | "bufferTimeBefore"

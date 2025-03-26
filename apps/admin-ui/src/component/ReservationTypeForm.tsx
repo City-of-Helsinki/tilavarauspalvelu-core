@@ -3,9 +3,8 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
 import {
   Authentication,
-  type MetadataSetsFragment,
   ReservationTypeChoice,
-  type ReservationQuery,
+  type ReservationTypeFormFieldsFragment,
 } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -19,13 +18,7 @@ import { BufferToggles } from "./BufferToggles";
 import ShowTOS from "./ShowTOS";
 import { HR } from "@/component/Table";
 import { Element } from "@/styles/util";
-
-// TODO use a fragment
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
-type ReservationUnitType = Omit<
-  NonNullable<ReservationType["reservationUnits"]>[0],
-  "pricings"
->;
+import { gql } from "@apollo/client";
 
 const CommentsTextArea = styled(TextArea)`
   grid-column: 1 / -1;
@@ -88,17 +81,7 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
   );
 }
 
-export type TypeFormReservationUnit = MetadataSetsFragment &
-  Pick<
-    ReservationUnitType,
-    | "authentication"
-    | "bufferTimeBefore"
-    | "bufferTimeAfter"
-    | "serviceSpecificTerms"
-    | "paymentTerms"
-    | "pricingTerms"
-    | "cancellationTerms"
-  >;
+type TypeFormReservationUnit = ReservationTypeFormFieldsFragment;
 
 // TODO are buffers in different places for Recurring and Single reservations? Check the UI spec
 function ReservationTypeForm({
@@ -185,3 +168,32 @@ function ReservationTypeForm({
 }
 
 export default ReservationTypeForm;
+
+export const RESERVATION_TYPE_FORM_FRAGMENT = gql`
+  fragment ReservationTypeFormFields on ReservationUnitNode {
+    ...MetadataSets
+    authentication
+    bufferTimeBefore
+    bufferTimeAfter
+    serviceSpecificTerms {
+      id
+      textFi
+      nameFi
+    }
+    paymentTerms {
+      id
+      textFi
+      nameFi
+    }
+    pricingTerms {
+      id
+      textFi
+      nameFi
+    }
+    cancellationTerms {
+      id
+      textFi
+      nameFi
+    }
+  }
+`;

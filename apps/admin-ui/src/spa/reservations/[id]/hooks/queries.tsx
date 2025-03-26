@@ -1,20 +1,6 @@
 import { gql } from "@apollo/client";
-import {
-  RESERVATION_RECURRING_FRAGMENT,
-  RESERVATION_UNIT_PRICING_FRAGMENT,
-} from "../../fragments";
-import {
-  RESERVATION_COMMON_FRAGMENT,
-  RESERVATION_UNIT_FRAGMENT,
-} from "@/common/fragments";
-import {
-  RESERVEE_BILLING_FRAGMENT,
-  RESERVEE_NAME_FRAGMENT,
-} from "common/src/queries/fragments";
 
-const RESERVATION_META_FRAGMENT = gql`
-  ${RESERVEE_NAME_FRAGMENT}
-  ${RESERVEE_BILLING_FRAGMENT}
+export const RESERVATION_META_FRAGMENT = gql`
   fragment ReservationMetaFields on ReservationNode {
     ageGroup {
       id
@@ -42,7 +28,7 @@ const RESERVATION_META_FRAGMENT = gql`
   }
 `;
 
-const CALENDAR_RESERVATION_FRAGMENT = gql`
+export const CALENDAR_RESERVATION_FRAGMENT = gql`
   fragment CalendarReservation on ReservationNode {
     id
     user {
@@ -66,7 +52,6 @@ const CALENDAR_RESERVATION_FRAGMENT = gql`
 // TODO there is two versions of this query.
 // This is used in the hooks (collision checks).
 export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
-  ${CALENDAR_RESERVATION_FRAGMENT}
   query ReservationsByReservationUnit(
     $id: ID!
     $pk: Int!
@@ -91,40 +76,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   }
 `;
 
-// Possible optmisation: this fragment is only required for some queries.
-const SPECIALISED_SINGLE_RESERVATION_FRAGMENT = gql`
-  fragment ReservationSpecialisation on ReservationNode {
-    id
-    calendarUrl
-    price
-    taxPercentageValue
-    paymentOrder {
-      id
-      orderUuid
-      refundUuid
-    }
-    cancelReason {
-      id
-      reasonFi
-    }
-    denyReason {
-      id
-      reasonFi
-    }
-    handlingDetails
-    user {
-      id
-      firstName
-      lastName
-      email
-      pk
-    }
-    bufferTimeBefore
-    bufferTimeAfter
-  }
-`;
-
-const SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT = gql`
+export const SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT = gql`
   fragment ReservationAccessType on ReservationNode {
     id
     accessType
@@ -138,26 +90,26 @@ const SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT = gql`
   }
 `;
 
-export const SINGLE_RESERVATION_QUERY = gql`
-  ${RESERVATION_META_FRAGMENT}
-  ${RESERVATION_UNIT_FRAGMENT}
-  ${RESERVATION_UNIT_PRICING_FRAGMENT}
-  ${RESERVATION_COMMON_FRAGMENT}
-  ${RESERVATION_RECURRING_FRAGMENT}
-  ${SPECIALISED_SINGLE_RESERVATION_FRAGMENT}
-  ${SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT}
-  query Reservation($id: ID!) {
-    reservation(id: $id) {
-      ...CreateTagString
-      ...ReservationCommon
-      ...ReservationRecurring
-      ...ReservationSpecialisation
-      ...ReservationAccessType
-      reservationUnits {
-        ...ReservationUnit
-        ...ReservationUnitPricing
+export const RESERVATION_RECURRING_FRAGMENT = gql`
+  fragment ReservationRecurringFields on RecurringReservationNode {
+    id
+    pk
+    beginDate
+    beginTime
+    endDate
+    endTime
+    weekdays
+    name
+    description
+    usedAccessTypes
+    isAccessCodeIsActiveCorrect
+    pindoraInfo {
+      accessCode
+      accessCodeIsActive
+      accessCodeValidity {
+        accessCodeBeginsAt
+        accessCodeEndsAt
       }
-      ...ReservationMetaFields
     }
   }
 `;

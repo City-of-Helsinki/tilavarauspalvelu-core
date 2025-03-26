@@ -15,10 +15,10 @@ import {
   type ReservationRefundMutationInput,
   useDenyReservationMutation,
   useRefundReservationMutation,
-  type ReservationQuery,
   type ReservationSeriesDenyMutationInput,
   useDenyReservationSeriesMutation,
   OrderStatus,
+  type DenyDialogFieldsFragment,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { CenterSpinner, Flex } from "common/styles/util";
@@ -32,13 +32,6 @@ import { convertOptionToHDS, toNumber } from "common/src/helpers";
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
 `;
-
-// TODO use a fragment
-type QueryT = NonNullable<ReservationQuery["reservation"]>;
-type ReservationType = Pick<
-  QueryT,
-  "pk" | "handlingDetails" | "price" | "paymentOrder"
->;
 
 type ReturnAllowedState =
   // state selection
@@ -65,12 +58,8 @@ function isPriceReturnable(x: {
   );
 }
 
-function findPrice(reservation: Pick<ReservationType, "price">): number {
-  return toNumber(reservation.price) ?? 0;
-}
-
 function convertToReturnState(
-  reservation: Pick<ReservationType, "price" | "paymentOrder">
+  reservation: Pick<DenyDialogFieldsFragment, "price" | "paymentOrder">
 ): ReturnAllowedState {
   const { price, paymentOrder } = reservation;
   const order = paymentOrder[0] ?? null;
@@ -266,7 +255,7 @@ export function DenyDialog({
   onReject,
   title,
 }: {
-  reservation: ReservationType;
+  reservation: DenyDialogFieldsFragment;
   onClose: () => void;
   onReject: () => void;
   title?: string;
@@ -353,7 +342,7 @@ export function DenyDialog({
         <ReturnMoney
           state={returnState}
           onChange={setReturnState}
-          price={findPrice(reservation)}
+          price={toNumber(reservation.price) ?? 0}
         />
       </DialogContent>
     </DenyDialogWrapper>
@@ -371,7 +360,7 @@ export function DenyDialogSeries({
   onClose: () => void;
   onReject: () => void;
   initialHandlingDetails: string;
-  recurringReservation: NonNullable<QueryT["recurringReservation"]>;
+  recurringReservation: { pk: number | null };
 }): JSX.Element {
   const { t } = useTranslation();
   const [denyMutation] = useDenyReservationSeriesMutation();
@@ -424,6 +413,21 @@ export function DenyDialogSeries({
     </DenyDialogWrapper>
   );
 }
+
+export const DENY_DIALOG_FRAGMENT = gql`
+  fragment DenyDialogFields on ReservationNode {
+    id
+    pk
+    handlingDetails
+    price
+    paymentOrder {
+      id
+      orderUuid
+      status
+      refundUuid
+    }
+  }
+`;
 
 export const DENY_RESERVATION = gql`
   mutation DenyReservation($input: ReservationDenyMutationInput!) {

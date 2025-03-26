@@ -126,7 +126,7 @@ export function getTranslatedError(
 }
 
 export function getReserveeName(
-  reservation: ReservationCommonFragment,
+  reservation: Pick<ReservationCommonFragment, "reserveeName" | "type">,
   t: TFunction,
   length = 50
 ): string {

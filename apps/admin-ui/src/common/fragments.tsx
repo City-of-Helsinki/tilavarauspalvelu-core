@@ -161,6 +161,7 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     }
     user {
       id
+      email
       firstName
       lastName
     }
@@ -176,6 +177,7 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
   ${RESERVATION_COMMON_FRAGMENT}
   fragment ReservationUnitReservations on ReservationNode {
     ...ReservationCommon
+    ...VisibleIfPermissionFields
     name
     numPersons
     calendarUrl
@@ -189,13 +191,6 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
         id
         pk
       }
-    }
-    user {
-      id
-      firstName
-      lastName
-      email
-      pk
     }
     affectedReservationUnits
   }
@@ -215,27 +210,7 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     unit {
       ...UnitNameFields
     }
-    ...MetadataSets
-    cancellationTerms {
-      id
-      textFi
-      nameFi
-    }
-    paymentTerms {
-      id
-      textFi
-      nameFi
-    }
-    pricingTerms {
-      id
-      textFi
-      nameFi
-    }
+    ...ReservationTypeFormFields
     termsOfUseFi
-    serviceSpecificTerms {
-      id
-      textFi
-      nameFi
-    }
   }
 `;

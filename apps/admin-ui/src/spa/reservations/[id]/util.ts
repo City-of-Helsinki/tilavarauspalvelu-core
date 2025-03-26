@@ -10,10 +10,12 @@ import {
   CustomerTypeChoice,
   PriceUnit,
   ReservationTypeChoice,
-  type ReservationCommonFragment,
   type PricingFieldsFragment,
-  type ReservationQuery,
+  type ReservationPageQuery,
   type CreateTagStringFragment,
+  type ReservationNode,
+  ReservationUnitPricingFieldsFragment,
+  ReservationPriceDetailsFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration, fromApiDate } from "common/src/common/util";
 import {
@@ -25,8 +27,7 @@ import { fromAPIDateTime } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
-type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
 function reservationUnitName(
   reservationUnit: Maybe<CreateTagStringFragment["reservationUnits"][0]>
@@ -53,10 +54,10 @@ function getBeginTime(p: PricingFieldsFragment): number {
 
 /** returns reservation unit pricing at given date */
 export function getReservatinUnitPricing(
-  reservationUnit: Maybe<Pick<ReservationUnitType, "pricings">> | undefined,
+  reservationUnit: ReservationUnitPricingFieldsFragment,
   from: Date
 ): PricingFieldsFragment | null {
-  if (!reservationUnit?.pricings || reservationUnit.pricings.length === 0) {
+  if (reservationUnit.pricings.length === 0) {
     return null;
   }
 
@@ -76,16 +77,37 @@ export function getReservatinUnitPricing(
   }, null);
 }
 
+export const RESERVATION_UNIT_PRICING_FRAGMENT = gql`
+  fragment ReservationUnitPricingFields on ReservationUnitNode {
+    id
+    pricings {
+      id
+      ...PricingFields
+    }
+  }
+`;
+
+export const RESERVATION_PRICE_DETAILS_FRAGMENT = gql`
+  fragment ReservationPriceDetailsFields on ReservationNode {
+    id
+    begin
+    end
+    reservationUnits {
+      ...ReservationUnitPricingFields
+    }
+  }
+`;
+
 /// TODO refactor this to use reasonable formatting (modern i18next)
 export function getReservationPriceDetails(
-  reservation: ReservationType,
+  reservation: ReservationPriceDetailsFieldsFragment,
   t: TFunction
 ): string {
   const begin = new Date(reservation.begin);
   const end = new Date(reservation.end);
-  const resUnit = reservation.reservationUnits?.[0];
+  const resUnit = reservation.reservationUnits?.[0] ?? null;
   const durationMinutes = differenceInMinutes(end, begin);
-  const pricing = getReservatinUnitPricing(resUnit, begin);
+  const pricing = resUnit ? getReservatinUnitPricing(resUnit, begin) : null;
 
   if (pricing == null) {
     return "???";
@@ -153,7 +175,10 @@ export function getTranslationKeyForCustomerTypeChoice(
 }
 
 export function translateReservationCustomerType(
-  res: ReservationType,
+  res: Pick<
+    ReservationType,
+    "type" | "reserveeType" | "reserveeIsUnregisteredAssociation"
+  >,
   t: TFunction
 ): string {
   const [part1, part2] = getTranslationKeyForCustomerTypeChoice(
@@ -166,9 +191,7 @@ export function translateReservationCustomerType(
 }
 
 export function getName(
-  reservation: ReservationCommonFragment & {
-    name?: string | null;
-  },
+  reservation: Pick<ReservationNode, "name" | "pk" | "type" | "reserveeName">,
   t: TFunction
 ): string {
   if (reservation.name) {
