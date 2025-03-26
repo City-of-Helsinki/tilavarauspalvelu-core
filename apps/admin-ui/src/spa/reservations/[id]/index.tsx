@@ -1,13 +1,13 @@
 import React, { useRef } from "react";
-import { type ApolloQueryResult } from "@apollo/client";
+import { gql, type ApolloQueryResult } from "@apollo/client";
 import { trim } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import {
   CustomerTypeChoice,
-  type ReservationQuery,
+  type ReservationPageQuery,
   ReservationStateChoice,
-  useReservationQuery,
+  useReservationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
@@ -35,7 +35,7 @@ import { Accordion, DataWrapper } from "./components";
 import { ReservationKeylessEntry } from "./ReservationKeylessEntrySection";
 import { TimeBlock } from "./ReservationTimeBlockSection";
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
 function ApprovalButtonsWithPermChecks({
   reservation,
@@ -351,18 +351,18 @@ function RequestedReservation({
   reservation,
   refetch,
 }: {
-  reservation: NonNullable<ReservationQuery["reservation"]>;
-  refetch: () => Promise<ApolloQueryResult<ReservationQuery>>;
+  reservation: NonNullable<ReservationPageQuery["reservation"]>;
+  refetch: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
 }): JSX.Element | null {
   const { t } = useTranslation();
 
   const ref = useRef<HTMLHeadingElement>(null);
 
   const resUnit = reservation?.reservationUnits?.[0];
-  const pricing = getReservatinUnitPricing(
-    resUnit,
-    new Date(reservation.begin)
-  );
+  const pricing =
+    resUnit != null
+      ? getReservatinUnitPricing(resUnit, new Date(reservation.begin))
+      : null;
 
   const isNonFree = pricing != null ? !isPriceFree(pricing) : false;
 
@@ -433,7 +433,7 @@ export function ReservationPage() {
   const typename = "ReservationNode";
   const isPkValid = Number(pk) > 0;
   const id = base64encode(`${typename}:${pk}`);
-  const { data, loading, refetch, error } = useReservationQuery({
+  const { data, loading, refetch, error } = useReservationPageQuery({
     skip: !isPkValid,
     // NOTE have to be no-cache because we have some key collisions (tag line disappears if cached)
     fetchPolicy: "no-cache",
@@ -466,3 +466,38 @@ export function ReservationPage() {
     </VisibleIfPermission>
   );
 }
+
+export const RESERVATION_PAGE_QUERY = gql`
+  query ReservationPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      ...CreateTagString
+      ...ReservationCommon
+      ...ChangeReservationTime
+      ...ReservationTitleSectionFields
+      recurringReservation {
+        id
+        ...ReservationRecurringFields
+      }
+      ...ReservationAccessType
+      ...VisibleIfPermissionFields
+      ...DenyDialogFields
+      ...ApprovalDialogFields
+      cancelReason {
+        id
+        reasonFi
+      }
+      denyReason {
+        id
+        reasonFi
+      }
+      reservationUnits {
+        id
+        pk
+        reservationStartInterval
+        ...ReservationTypeFormFields
+      }
+      ...ReservationMetaFields
+    }
+  }
+`;

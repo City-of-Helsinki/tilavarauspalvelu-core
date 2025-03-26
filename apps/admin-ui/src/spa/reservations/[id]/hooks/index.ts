@@ -2,7 +2,7 @@ import {
   type CalendarReservationFragment,
   ReservationStateChoice,
   ReservationTypeChoice,
-  useReservationQuery,
+  useReservationPageQuery,
   useReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
@@ -131,7 +131,7 @@ export function useReservationData(
 export const useReservationEditData = (pk?: string) => {
   const typename = "ReservationNode";
   const id = base64encode(`${typename}:${pk}`);
-  const { data, loading, refetch } = useReservationQuery({
+  const { data, loading, refetch } = useReservationPageQuery({
     skip: !pk,
     fetchPolicy: "no-cache",
     variables: { id },
@@ -152,7 +152,7 @@ export const useReservationEditData = (pk?: string) => {
     `${typename}:${possibleReservations?.at(0)?.pk ?? 0}`
   );
   const { data: nextRecurrance, loading: nextReservationLoading } =
-    useReservationQuery({
+    useReservationPageQuery({
       skip: !possibleReservations?.at(0)?.pk,
       fetchPolicy: "no-cache",
       variables: {

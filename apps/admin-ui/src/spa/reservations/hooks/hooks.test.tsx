@@ -2,12 +2,12 @@ import React from "react";
 import { MockedProvider } from "@apollo/client/testing";
 import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { type ReservationQuery } from "@gql/gql-types";
+import { type ReservationPageQuery } from "@gql/gql-types";
 import { type MutationInputParams, useStaffReservationMutation } from ".";
 import { vi, describe, test, expect, beforeEach } from "vitest";
 import { MUTATION_DATA, createMocks } from "./__test__/mocks";
 
-type ReservationQueryT = NonNullable<ReservationQuery["reservation"]>;
+type ReservationQueryT = NonNullable<ReservationPageQuery["reservation"]>;
 type ReservationType = Pick<ReservationQueryT, "pk" | "recurringReservation">;
 export function createMockReservation({ pk }: { pk: number }): ReservationType {
   return {

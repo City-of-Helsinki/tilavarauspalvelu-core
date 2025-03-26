@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
-  type ReservationQuery,
+  type ReservationPageQuery,
   ReservationStateChoice,
   useRecurringReservationQuery,
   UserPermissionChoice,
@@ -28,11 +28,11 @@ import { CenterSpinner } from "common/styles/util";
 type Props = {
   recurringPk: number;
   onSelect?: (selected: number) => void;
-  onChange?: () => Promise<ApolloQueryResult<ReservationQuery>>;
+  onChange?: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
   onReservationUpdated?: () => void;
   // optional reservation to copy when creating a new reservation
   // contains a lot more information than the RecurringReservationQuery
-  reservationToCopy?: ReservationQuery["reservation"];
+  reservationToCopy?: ReservationPageQuery["reservation"];
 };
 
 export function RecurringReservationsView({
