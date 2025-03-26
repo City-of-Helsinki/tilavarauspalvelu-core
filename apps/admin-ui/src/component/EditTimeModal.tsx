@@ -15,7 +15,7 @@ import {
   type ChangeReservationTimeFragment,
   ReservationTypeChoice,
   useStaffAdjustReservationTimeMutation,
-  type ReservationQuery,
+  type ReservationPageQuery,
   type ReservationSeriesAddMutationInput,
   useAddReservationToSeriesMutation,
 } from "@gql/gql-types";
@@ -312,7 +312,7 @@ function DialogContent({
 }
 
 type ReservationToCopyT = Pick<
-  NonNullable<ReservationQuery["reservation"]>,
+  NonNullable<ReservationPageQuery["reservation"]>,
   "type" | "reservationUnits" | "recurringReservation"
 >;
 export type NewReservationModalProps = CommonProps & {

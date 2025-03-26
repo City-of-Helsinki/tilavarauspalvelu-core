@@ -12,15 +12,16 @@ import {
   TextArea,
 } from "hds-react";
 import {
+  type ApprovalDialogFieldsFragment,
   useApproveReservationMutation,
   type ReservationApproveMutationInput,
-  type ReservationQuery,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { Flex } from "common/styles/util";
 import { getReservationPriceDetails } from "./util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { toNumber } from "common/src/helpers";
+import { gql } from "@apollo/client";
 
 const Label = styled.p`
   color: var(--color-black-70);
@@ -34,10 +35,8 @@ const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
 `;
 
-// TODO use a fragment for the reservation type
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type Props = {
-  reservation: ReservationType;
+  reservation: ApprovalDialogFieldsFragment;
   onClose: () => void;
   onAccept: () => void;
   isFree?: boolean;
@@ -213,3 +212,14 @@ const ApproveDialog = ({
 };
 
 export default ApproveDialog;
+
+export const APPROVAL_DIALOG_FRAGMENT = gql`
+  fragment ApprovalDialogFields on ReservationNode {
+    pk
+    price
+    handlingDetails
+    applyingForFreeOfCharge
+    freeOfChargeReason
+    ...ReservationPriceDetailsFields
+  }
+`;
