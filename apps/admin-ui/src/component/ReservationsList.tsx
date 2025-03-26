@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
   RejectionReadinessChoice,
-  ReservationQuery,
+  ReservationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
@@ -155,7 +155,7 @@ function StatusElement({ item }: { item: NewReservationListItem }) {
 }
 
 type AddNewReservationButtonProps = {
-  reservationToCopy: ReservationQuery["reservation"];
+  reservationToCopy: ReservationPageQuery["reservation"];
   refetch: () => void;
 };
 

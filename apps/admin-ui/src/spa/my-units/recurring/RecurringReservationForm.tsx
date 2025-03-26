@@ -5,6 +5,7 @@ import {
   type ReservationUnitQuery,
   useReservationUnitQuery,
   type Maybe,
+  ReservationTypeFormFieldsFragment,
 } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -30,9 +31,7 @@ import {
   useFilteredReservationList,
   useMultipleReservation,
 } from "./hooks";
-import ReservationTypeForm, {
-  type TypeFormReservationUnit,
-} from "@/component/ReservationTypeForm";
+import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { base64encode, toNumber } from "common/src/helpers";
@@ -118,7 +117,7 @@ function RecurringReservationFormWrapper({ reservationUnits }: Props) {
 export { RecurringReservationFormWrapper as RecurringReservationForm };
 
 type QueryT = NonNullable<NonNullable<ReservationUnitQuery>["reservationUnit"]>;
-type ReservationUnitType = TypeFormReservationUnit &
+type ReservationUnitType = ReservationTypeFormFieldsFragment &
   Pick<QueryT, "pk" | "reservationStartInterval">;
 
 type FormValues = RecurringReservationFormT & ReservationFormMeta;
