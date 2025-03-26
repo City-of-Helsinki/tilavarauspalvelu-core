@@ -121,13 +121,7 @@ export function Step0({
         <Button
           type="submit"
           variant={isSubmitting ? ButtonVariant.Clear : ButtonVariant.Primary}
-          iconEnd={
-            isSubmitting ? (
-              <LoadingSpinner small />
-            ) : (
-              <IconArrowRight aria-hidden="true" />
-            )
-          }
+          iconEnd={isSubmitting ? <LoadingSpinner small /> : <IconArrowRight />}
           disabled={submitDisabled || isSubmitting}
           data-testid="reservation__button--continue"
         >

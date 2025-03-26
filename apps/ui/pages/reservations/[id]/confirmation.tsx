@@ -140,7 +140,7 @@ function Actions({
         href={reservation.calendarUrl ?? ""}
       >
         {t("reservations:saveToCalendar")}
-        <IconCalendar aria-hidden />
+        <IconCalendar />
       </ButtonLikeExternalLink>
       {order?.receiptUrl && (
         <Button
@@ -149,7 +149,7 @@ function Actions({
             window.open(`${order.receiptUrl}&lang=${i18n.language}`, "_blank")
           }
           variant={ButtonVariant.Secondary}
-          iconEnd={<IconLinkExternal aria-hidden="true" />}
+          iconEnd={<IconLinkExternal />}
         >
           {t("reservations:downloadReceipt")}
         </Button>
