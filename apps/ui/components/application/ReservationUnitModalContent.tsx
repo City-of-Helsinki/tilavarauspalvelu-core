@@ -167,7 +167,7 @@ export function ReservationUnitModalContent({
     const variables: SearchReservationUnitsQueryVariables = {
       ...baseVariables,
       textSearch: data.textSearch,
-      personsAllowed: data.personsAllowed,
+      personsAllowed: data.personsAllowed?.toString(),
       reservationUnitType: data.reservationUnitTypes,
       unit: data.units,
       purposes: data.purposes,

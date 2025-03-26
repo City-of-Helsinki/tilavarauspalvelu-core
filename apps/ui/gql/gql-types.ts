@@ -30,7 +30,7 @@ export type Scalars = {
   Float: { input: number; output: number };
   Date: { input: string; output: string };
   DateTime: { input: string; output: string };
-  Decimal: { input: number; output: string };
+  Decimal: { input: string; output: string };
   Duration: { input: number; output: number };
   Time: { input: string; output: string };
   UUID: { input: string; output: string };

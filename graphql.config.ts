@@ -7,10 +7,7 @@ const scalars = {
   // using number in mutation has two benefits:
   // - we don't have to toNumber(val).toString() for all values
   // - removes server errors from passing "" as a value (which can't be type checked on client)
-  Decimal: {
-    output: "string",
-    input: "number",
-  },
+  Decimal: "string",
   Duration: "number",
   JSON: "string",
   Long: "number",
