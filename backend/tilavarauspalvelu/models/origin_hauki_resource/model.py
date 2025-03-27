@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from utils.date_utils import local_date, local_start_of_day
+from utils.date_utils import local_date
 from utils.lazy import LazyModelAttribute, LazyModelManager
 
 if TYPE_CHECKING:
@@ -51,23 +51,3 @@ class OriginHaukiResource(models.Model):
             or self.latest_fetched_date is None
             or self.latest_fetched_date < (local_date() + datetime.timedelta(days=settings.HAUKI_DAYS_TO_FETCH))
         )
-
-    def update_opening_hours_hash(self, new_date_periods_hash: str) -> None:
-        """
-        Update the opening hours hash and clear all future ReservableTimeSpans.
-
-        When the hash has changed in HAUKI, it means that the rules for generating reservable times have changed,
-        meaning all future ReservableTimeSpans are now invalid and should be deleted and be recreated.
-        """
-        self.opening_hours_hash = new_date_periods_hash
-        self.latest_fetched_date = None  # Set to None, to clarify that all future data is missing
-        self.save()
-
-        cutoff_date = local_date()  # All ReservableTimeSpans that start after this date will be deleted.
-
-        # Old time spans are not deleted, as they are kept for archival purposes.
-        self.reservable_time_spans.filter(start_datetime__gte=cutoff_date).delete()
-
-        # If the cutoff_date is during a ReservableTimeSpan, end it at the cutoff date.
-        # This way we can keep past data intact, and have the new data start from the cutoff date.
-        self.reservable_time_spans.filter(end_datetime__gte=cutoff_date).update(end_datetime=local_start_of_day())

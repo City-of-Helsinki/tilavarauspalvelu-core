@@ -74,7 +74,7 @@ class HaukiResourceHashUpdater:
 
         with transaction.atomic():
             if origin_hauki_resource.opening_hours_hash != resource["date_periods_hash"]:
-                origin_hauki_resource.update_opening_hours_hash(resource["date_periods_hash"])
+                origin_hauki_resource.actions.update_opening_hours_hash(resource["date_periods_hash"])
 
             self._create_reservable_time_spans(origin_hauki_resource)
 
