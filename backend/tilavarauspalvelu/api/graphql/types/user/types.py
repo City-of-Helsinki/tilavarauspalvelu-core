@@ -8,6 +8,7 @@ from django.db.models.functions import Concat, Trim
 from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
+from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.models import User
 from tilavarauspalvelu.tasks import save_personal_info_view_log
 
@@ -47,7 +48,7 @@ class UserNode(DjangoNode):
 
     is_ad_authenticated = graphene.Boolean()
     is_strongly_authenticated = graphene.Boolean()
-    reservation_notification = graphene.String()
+    reservation_notification = graphene.Field(graphene.Enum.from_enum(ReservationNotification))
 
     class Meta:
         model = User
