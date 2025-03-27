@@ -83,10 +83,10 @@ class HaukiResourceHashUpdater:
     def _create_reservable_time_spans(self, origin_hauki_resource: OriginHaukiResource) -> None:
         try:
             client = ReservableTimeSpanClient(origin_hauki_resource)
+            num_created_time_spans = len(client.run())
         except (ReservableTimeSpanClientValueError, ReservableTimeSpanClientNothingToDoError):
             return
 
-        num_created_time_spans = len(client.run())
         logger.info(f"Created {num_created_time_spans} reservable time spans for resource {origin_hauki_resource.id}.")
 
         self.total_time_spans_created += num_created_time_spans
