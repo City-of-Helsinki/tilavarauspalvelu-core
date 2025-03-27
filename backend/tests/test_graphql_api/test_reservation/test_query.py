@@ -103,7 +103,6 @@ def test_reservation__query__all_fields(graphql):
         reserveeOrganisationName
         reserveePhone
         reserveeType
-        staffEvent
         state
         taxPercentageValue
         type
@@ -168,7 +167,6 @@ def test_reservation__query__all_fields(graphql):
         "reserveeOrganisationName": reservation.reservee_organisation_name,
         "reserveePhone": reservation.reservee_phone,
         "reserveeType": reservation.reservee_type,
-        "staffEvent": False,
         "state": reservation.state,
         "taxPercentageValue": f"{reservation.tax_percentage_value:.2f}",
         "type": reservation.type,
