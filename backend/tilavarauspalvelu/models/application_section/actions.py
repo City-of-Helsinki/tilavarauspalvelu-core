@@ -30,9 +30,7 @@ class ApplicationSectionActions:
         )
 
     def get_reservations(self) -> ReservationQuerySet:
-        return Reservation.objects.for_application_section(self.application_section).filter(
-            user=self.application_section.application.user,
-        )
+        return Reservation.objects.for_application_section(self.application_section)
 
     def get_last_reservation(self) -> Reservation | None:
         return self.get_reservations().last()
