@@ -156,7 +156,9 @@ class ReservationSeriesRescheduleSerializer(NestingModelSerializer):
                 reservation_pks=[reservation.pk for reservation in reservations],
             )
 
-        EmailService.send_seasonal_reservation_modified_series_email(instance)
+        if instance.allocated_time_slot is not None:
+            section = instance.allocated_time_slot.reservation_unit_option.application_section
+            EmailService.send_seasonal_reservation_modified_series_email(section)
 
         return instance
 

@@ -80,6 +80,21 @@ def get_mock_params(language: Lang, **kwargs: Any) -> EmailContext | datetime | 
         "access_code_validity_period": (
             kwargs.get("access_code_validity_period", "11:00-15:00") if access_code_is_used else ""
         ),
+        "allocations": kwargs.get(
+            "allocations",
+            [
+                {
+                    "weekday_value": str(WeekdayChoice.MONDAY.label),
+                    "time_value": "13:00-15:00",
+                    "access_code_validity_period": "11:00-15:00" if access_code_is_used else "",
+                },
+                {
+                    "weekday_value": str(WeekdayChoice.TUESDAY.label),
+                    "time_value": "21:00-22:00",
+                    "access_code_validity_period": "20:45-22:05" if access_code_is_used else "",
+                },
+            ],
+        ),
         "language": language,
     }
 

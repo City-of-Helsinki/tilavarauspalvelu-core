@@ -4,9 +4,7 @@
 {{ reason_label | safe }}: {{ rejection_reason }}
 
 {% include "email/text/partials/application_section_name.jinja" %}
-
-{{ weekday_label | safe }}: {{ weekday_value | safe }}
-{{ time_label | safe }}: {{ time_value | safe }}
+{% include "email/text/partials/access_code_section.jinja" %}
 
 {{ check_booking_details_text | safe }}: {{ check_booking_details_url  }}
 

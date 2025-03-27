@@ -16,6 +16,7 @@ from tilavarauspalvelu.integrations.email.typing import EmailType
 if TYPE_CHECKING:
     from django.utils.safestring import SafeString
 
+    from tilavarauspalvelu.integrations.email.typing import EmailTemplateType
     from tilavarauspalvelu.typing import Lang, WSGIRequest
 
 
@@ -67,7 +68,7 @@ def email_templates_admin_list_view(request: WSGIRequest, **kwargs: Any) -> Tabl
 
 def email_type_admin_view(request: WSGIRequest, email_type: str) -> HttpResponse:
     try:
-        email_type = EmailType.get(email_type)
+        email_template_type = EmailType.get(email_type)
     except ValueError:
         return HttpResponse("Invalid email type")
 
@@ -76,13 +77,13 @@ def email_type_admin_view(request: WSGIRequest, email_type: str) -> HttpResponse
     if language not in {"fi", "en", "sv"}:
         language = "fi"
 
-    content = render_with_mock_data(email_type=email_type, language=language, as_html=as_html)
+    content = render_with_mock_data(email_type=email_template_type, language=language, as_html=as_html)
     if content is None:
-        return HttpResponse(f"Email type '{email_type}' template not implemented.")
+        return HttpResponse(f"Email type '{email_template_type}' template not implemented.")
     return HttpResponse(content)
 
 
-def render_with_mock_data(*, email_type: type[EmailType], language: Lang, as_html: bool) -> str | None:
+def render_with_mock_data(*, email_type: EmailTemplateType, language: Lang, as_html: bool) -> str | None:
     context = get_mock_data(email_type=email_type, language=language)
 
     if as_html:

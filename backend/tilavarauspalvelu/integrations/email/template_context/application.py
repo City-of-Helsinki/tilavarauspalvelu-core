@@ -129,7 +129,7 @@ def get_context_for_application_section_cancelled(
             "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language),
             "application_id": getattr(application_section, "application_id", None),
             "application_section_id": getattr(application_section, "id", None),
-            **params_for_application_section_info(application_section=application_section, language=language),
+            **params_for_application_section_info(section=application_section, language=language),
         }
 
     return {
@@ -176,7 +176,7 @@ def get_context_for_staff_notification_application_section_cancelled(
     if application_section is not None:
         reservation_series_data = [
             {
-                **params_for_reservation_series_info(reservation_series=series),
+                **params_for_reservation_series_info(series=series),
                 "reservation_url": get_staff_reservations_ext_link(
                     reservation_id=series.reservations.values_list("pk", flat=True).last()
                 ),
@@ -188,7 +188,7 @@ def get_context_for_staff_notification_application_section_cancelled(
         data: dict[str, Any] = {
             "cancel_reason": get_attr_by_language(reservation.cancel_reason, "reason", language),
             "cancelled_reservation_series": reservation_series_data,
-            **params_for_application_section_info(application_section=application_section, language=language),
+            **params_for_application_section_info(section=application_section, language=language),
         }
 
     return {

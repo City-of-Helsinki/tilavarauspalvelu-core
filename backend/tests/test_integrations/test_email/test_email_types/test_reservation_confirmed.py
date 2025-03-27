@@ -127,6 +127,8 @@ def test_get_context__reservation_confirmed__instance(email_reservation):
         access_code="123456",
         begin=datetime.datetime(2024, 1, 1, 11),
         end=datetime.datetime(2024, 1, 1, 15),
+        access_code_valid_minutes_before=0,
+        access_code_valid_minutes_after=0,
     ),
 )
 @pytest.mark.django_db

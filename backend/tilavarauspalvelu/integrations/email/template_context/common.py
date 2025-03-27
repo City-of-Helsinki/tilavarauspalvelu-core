@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import datetime
+from collections import defaultdict
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
@@ -13,7 +16,7 @@ from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, local_time_string
 from utils.utils import update_query_params
 
 if TYPE_CHECKING:
-    import datetime
+    import uuid
     from decimal import Decimal
 
     from tilavarauspalvelu.models import ApplicationSection, RecurringReservation, Reservation, ReservationUnit
@@ -277,7 +280,16 @@ def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str,
             "access_code_validity_period": "",
         }
 
-    time_str = f"{local_time_string(response['begin'].time())}-{local_time_string(response['end'].time())}"
+    valid_before = response["access_code_valid_minutes_before"]
+    valid_after = response["access_code_valid_minutes_after"]
+
+    begin = response["begin"] - datetime.timedelta(minutes=valid_before)
+    end = response["end"] + datetime.timedelta(minutes=valid_after)
+
+    begin_time = local_time_string(begin.time())
+    end_time = local_time_string(end.time())
+
+    time_str = f"{begin_time}-{end_time}"
     return {
         "access_code_is_used": True,
         "access_code": response["access_code"],
@@ -285,45 +297,90 @@ def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str,
     }
 
 
-def params_for_access_code_reservation_series(*, reservation_series: RecurringReservation) -> dict[str, Any]:
-    try:
-        response = PindoraClient.get_reservation_series(series=reservation_series)
-    except PindoraNotFoundError:
-        # Reservation should have an access code, but it is not available.
-        return {
-            "access_code_is_used": False,  # Not supported for RecurringReservations yet.
-            "access_code": "",
-            "access_code_validity_period": "",
-        }
-
-    # All reservations in the series have the same TIME, so any validity period in the response is fine.
-    time_str = ""
-    validity = next(iter(response["reservation_unit_code_validity"]), None)
-    if validity:
-        time_str = f"{local_time_string(validity['begin'].time())}-{local_time_string(validity['end'].time())}"
-    return {
-        "access_code_is_used": True,
-        "access_code": response["access_code"],
-        "access_code_validity_period": time_str,
-    }
-
-
-def params_for_reservation_series_info(*, reservation_series: RecurringReservation) -> dict[str, str]:
-    weekdays = ", ".join(str(Weekday.from_week_day(int(val)).label) for val in reservation_series.weekdays.split(","))
-    start_time = reservation_series.begin_time
-    end_time = reservation_series.end_time
+def params_for_reservation_series_info(*, series: RecurringReservation) -> dict[str, str]:
+    weekdays = ", ".join(str(Weekday.from_week_day(int(val)).label) for val in series.weekdays.split(","))
+    start_time = series.begin_time
+    end_time = series.end_time
     return {
         "weekday_value": weekdays,
         "time_value": f"{local_time_string(start_time)}-{local_time_string(end_time)}",
     }
 
 
-def params_for_application_section_info(*, application_section: ApplicationSection, language: Lang) -> dict[str, str]:
+def params_for_application_section_info(
+    *,
+    section: ApplicationSection,
+    language: Lang,
+    get_access_code: bool = False,
+) -> dict[str, Any]:
+    # Use map to be able to add access codes to correct time slots if needed.
+    allocations_map: defaultdict[uuid.UUID, dict[Weekday, dict[str, str]]] = defaultdict(dict)
+
+    series: RecurringReservation
+    for series in section.actions.get_reservation_series():
+        reservation_unit_uuid = series.reservation_unit.uuid
+
+        for weekday_int in series.weekdays.split(","):
+            if not weekday_int.isdigit():
+                continue
+
+            weekday_int = int(weekday_int)
+            weekday = Weekday.from_week_day(weekday_int)
+            begin_time = local_time_string(series.begin_time)
+            end_time = local_time_string(series.end_time)
+            allocation = {
+                "time_value": f"{begin_time}-{end_time}",
+                "access_code_validity_period": "",  # Filled later if needed
+            }
+            allocations_map[reservation_unit_uuid][weekday] = allocation
+
+    access_code = ""
+    access_code_is_used = False
+
+    if get_access_code and section.should_have_active_access_code:
+        with suppress(PindoraNotFoundError):
+            response = PindoraClient.get_seasonal_booking(section=section)
+
+            access_code = response["access_code"]
+            access_code_is_used = True
+
+            for validity in response["reservation_unit_code_validity"]:
+                reservation_unit_uuid = validity["reservation_unit_id"]
+                weekday = Weekday.from_week_day(validity["begin"].weekday())
+
+                info = allocations_map[reservation_unit_uuid].get(weekday)
+                if info is None:
+                    continue
+
+                valid_before = validity["access_code_valid_minutes_before"]
+                valid_after = validity["access_code_valid_minutes_after"]
+
+                begin = validity["begin"] - datetime.timedelta(minutes=valid_before)
+                end = validity["end"] + datetime.timedelta(minutes=valid_after)
+
+                begin_time = local_time_string(begin.time())
+                end_time = local_time_string(end.time())
+
+                info["access_code_validity_period"] = f"{begin_time}-{end_time}"
+
+    allocations = [
+        {
+            "weekday_value": str(weekday.label),
+            "time_value": allocation["time_value"],
+            "access_code_validity_period": allocation["access_code_validity_period"],
+        }
+        for weekday_map in allocations_map.values()
+        for weekday, allocation in weekday_map.items()
+    ]
+
+    application_round = section.application.application_round
+
     return {
-        "application_section_name": application_section.name,
-        "application_round_name": get_attr_by_language(
-            application_section.application.application_round, "name", language=language
-        ),
+        "application_section_name": section.name,
+        "application_round_name": get_attr_by_language(application_round, "name", language=language),
+        "access_code_is_used": access_code_is_used,
+        "access_code": access_code,
+        "allocations": allocations,
     }
 
 

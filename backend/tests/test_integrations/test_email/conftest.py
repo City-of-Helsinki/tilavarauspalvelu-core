@@ -76,6 +76,7 @@ def email_reservation() -> Reservation:
     ReservationFactory.create_for_reservation_unit(
         reservation_unit=reservation_unit,
         user=application_section.application.user,
+        state=ReservationStateChoice.CONFIRMED,
         reservee_first_name="[SÄHKÖPOSTIN VASTAANOTTAJAN NIMI]",
         reservee_last_name="",
         cancel_reason__reason_en="[PERUUTUKSEN SYY]",

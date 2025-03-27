@@ -11,7 +11,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationDenyReasonFactory
+from tests.factories import AllocatedTimeSlotFactory, ReservationDenyReasonFactory
 from tests.helpers import patch_method
 
 from .helpers import DENY_SERIES_MUTATION, create_reservation_series
@@ -61,7 +61,7 @@ def test_recurring_reservations__deny_series(graphql):
     assert all(reservation.handling_details != "Handling details" for reservation in past_reservations)
     assert all(reservation.handled_at is None for reservation in past_reservations)
 
-    assert EmailService.send_seasonal_reservation_rejected_series_email.called is True
+    assert EmailService.send_seasonal_reservation_rejected_series_email.called is False
 
 
 @freeze_time(local_datetime(year=2024, month=1, day=1))
@@ -126,7 +126,6 @@ def test_recurring_reservations__deny_series__only_deny_certain_states(graphql):
 
 
 @patch_method(PindoraService.reschedule_access_code)
-@patch_method(EmailService.send_seasonal_reservation_rejected_series_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__deny_series__has_access_codes(graphql):
     reason = ReservationDenyReasonFactory.create()
@@ -146,12 +145,10 @@ def test_recurring_reservations__deny_series__has_access_codes(graphql):
 
     assert response.has_errors is False, response.errors
 
-    assert EmailService.send_seasonal_reservation_rejected_series_email.called is True
     assert PindoraService.reschedule_access_code.called is True
 
 
 @patch_method(PindoraService.reschedule_access_code, side_effect=PindoraNotFoundError("Not Found"))
-@patch_method(EmailService.send_seasonal_reservation_rejected_series_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__deny_series__has_access_codes__pindora_not_found(graphql):
     reason = ReservationDenyReasonFactory.create()
@@ -173,7 +170,6 @@ def test_recurring_reservations__deny_series__has_access_codes__pindora_not_foun
     assert response.has_errors is False, response.errors
 
     assert PindoraService.reschedule_access_code.called is True
-    assert EmailService.send_seasonal_reservation_rejected_series_email.called is True
 
     # Future reservations were still denied.
     future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begin__gt=local_datetime())
@@ -181,7 +177,6 @@ def test_recurring_reservations__deny_series__has_access_codes__pindora_not_foun
 
 
 @patch_method(PindoraService.reschedule_access_code, side_effect=PindoraAPIError("Failed"))
-@patch_method(EmailService.send_seasonal_reservation_rejected_series_email)
 @freeze_time(local_datetime(year=2024, month=1, day=1))
 def test_recurring_reservations__deny_series__has_access_codes__pindora_call_fails(graphql):
     reason = ReservationDenyReasonFactory.create()
@@ -205,8 +200,29 @@ def test_recurring_reservations__deny_series__has_access_codes__pindora_call_fai
     assert response.field_error_messages() == ["Failed"]
 
     assert PindoraService.reschedule_access_code.called is True
-    assert EmailService.send_seasonal_reservation_rejected_series_email.called is False
 
     # Future reservation were not denied.
     future_reservations: Iterable[Reservation] = reservation_series.reservations.filter(begin__gt=local_datetime())
     assert all(reservation.state != ReservationStateChoice.DENIED for reservation in future_reservations)
+
+
+@patch_method(EmailService.send_seasonal_reservation_rejected_series_email)
+@freeze_time(local_datetime(year=2024, month=1, day=1))
+def test_recurring_reservations__deny_series__in_seasonal_booking(graphql):
+    reason = ReservationDenyReasonFactory.create()
+
+    allocation = AllocatedTimeSlotFactory.create()
+    reservation_series = create_reservation_series(allocated_time_slot=allocation)
+
+    data = {
+        "pk": reservation_series.pk,
+        "denyReason": reason.pk,
+        "handlingDetails": "Handling details",
+    }
+
+    graphql.login_with_superuser()
+    response = graphql(DENY_SERIES_MUTATION, input_data=data)
+
+    assert response.has_errors is False, response.errors
+
+    assert EmailService.send_seasonal_reservation_rejected_series_email.called is True

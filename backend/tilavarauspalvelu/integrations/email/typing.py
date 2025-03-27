@@ -36,7 +36,7 @@ from tilavarauspalvelu.integrations.email.template_context.reservation import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
 
     from tilavarauspalvelu.typing import EmailAttachment, EmailContext
 
@@ -84,7 +84,7 @@ class EmailData:
 class EmailTemplateType:
     label: str
     value: str = dataclasses.field(init=False)
-    get_email_context: callable
+    get_email_context: Callable
     context_variables: list[str]
 
     def __set_name__(self, owner: Any, name: str) -> None:
@@ -317,6 +317,11 @@ class EmailType(_EmailTypeOptions):
             "instructions_confirmed",
         ],
     )
+
+    # Reservation series
+
+    # Seasonal reservation
+
     SEASONAL_RESERVATION_CANCELLED_SINGLE = EmailTemplateType(
         # User cancels one of their seasonal reservations
         label=pgettext_lazy("EmailType", "Seasonal reservation cancelled single"),
@@ -341,15 +346,13 @@ class EmailType(_EmailTypeOptions):
         context_variables=[
             "language",
             "email_recipient_name",
-            "weekday_value",
-            "time_value",
             "application_section_name",
             "application_round_name",
             "application_id",
             "application_section_id",
             "access_code_is_used",
             "access_code",
-            "access_code_validity_period",
+            "allocations",
         ],
     )
     SEASONAL_RESERVATION_MODIFIED_SERIES_ACCESS_CODE = EmailTemplateType(
@@ -359,15 +362,13 @@ class EmailType(_EmailTypeOptions):
         context_variables=[
             "language",
             "email_recipient_name",
-            "weekday_value",
-            "time_value",
             "application_section_name",
             "application_round_name",
             "application_id",
             "application_section_id",
             "access_code_is_used",
             "access_code",
-            "access_code_validity_period",
+            "allocations",
         ],
     )
     SEASONAL_RESERVATION_MODIFIED_SINGLE = EmailTemplateType(
@@ -394,12 +395,11 @@ class EmailType(_EmailTypeOptions):
             "language",
             "rejection_reason",
             "email_recipient_name",
-            "weekday_value",
-            "time_value",
             "application_section_name",
             "application_round_name",
             "application_id",
             "application_section_id",
+            "allocations",
         ],
     )
     SEASONAL_RESERVATION_REJECTED_SINGLE = EmailTemplateType(

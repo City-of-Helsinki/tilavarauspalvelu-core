@@ -1,0 +1,15 @@
+{% if access_code %}
+<mj-spacer />
+<mj-text>{{ access_code_label | safe }}: {{ access_code }}</mj-text>
+{% elif access_code_is_used %}
+<mj-spacer />
+<mj-text>{{ text_access_code_unavailable_instructions_html | sentence }}</mj-text>
+{% endif %}
+{% for allocation in allocations %}
+<mj-spacer />
+<mj-text>{{ weekday_label | safe }}: {{ allocation.weekday_value | safe }}</mj-text>
+<mj-text>{{ time_label | safe }}: {{ allocation.time_value | safe }}</mj-text>
+{% if access_code_is_used %}
+<mj-text>{{ access_code_validity_period_label | safe }}: {{ allocation.access_code_validity_period }}</mj-text>
+{% endif %}
+{% endfor %}

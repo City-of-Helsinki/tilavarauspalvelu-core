@@ -474,6 +474,8 @@ def test_reservation__confirm__without_price_and_with_free_pricing_does_not_requ
         access_code="123456",
         begin=datetime.datetime(2024, 1, 1, 11),
         end=datetime.datetime(2024, 1, 1, 15),
+        access_code_valid_minutes_before=0,
+        access_code_valid_minutes_after=0,
     ),
 )
 @patch_method(PindoraService.activate_access_code)
@@ -501,6 +503,8 @@ def test_reservation__confirm__pindora_api__call_succeeds(graphql):
         access_code="123456",
         begin=datetime.datetime(2024, 1, 1, 11),
         end=datetime.datetime(2024, 1, 1, 15),
+        access_code_valid_minutes_before=0,
+        access_code_valid_minutes_after=0,
     ),
 )
 @patch_method(PindoraService.activate_access_code, side_effect=PindoraAPIError("Error"))
