@@ -15,8 +15,8 @@ if TYPE_CHECKING:
 
 
 class ReservationUnitPricingNode(DjangoNode):
-    lowest_price_net = graphene.Decimal()
-    highest_price_net = graphene.Decimal()
+    lowest_price_net = graphene.Decimal(required=True)
+    highest_price_net = graphene.Decimal(required=True)
 
     class Meta:
         model = ReservationUnitPricing

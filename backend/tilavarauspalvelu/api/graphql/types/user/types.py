@@ -44,10 +44,14 @@ _FIELDS = [
 
 
 class UserNode(DjangoNode):
-    name = AnnotatedField(graphene.String, expression=Trim(Concat("first_name", Value(" "), "last_name")))
+    name = AnnotatedField(
+        graphene.String,
+        expression=Trim(Concat("first_name", Value(" "), "last_name")),
+        required=True,
+    )
 
-    is_ad_authenticated = graphene.Boolean()
-    is_strongly_authenticated = graphene.Boolean()
+    is_ad_authenticated = graphene.Boolean(required=True)
+    is_strongly_authenticated = graphene.Boolean(required=True)
     reservation_notification = graphene.Field(graphene.Enum.from_enum(ReservationNotification))
 
     class Meta:

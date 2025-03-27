@@ -11,7 +11,10 @@ from .permissions import ResourcePermission
 
 
 class ResourceNode(DjangoNode):
-    location_type = graphene.Field(graphene.Enum.from_enum(ResourceLocationType))
+    location_type = graphene.Field(
+        graphene.Enum.from_enum(ResourceLocationType),
+        required=True,
+    )
 
     class Meta:
         model = Resource
