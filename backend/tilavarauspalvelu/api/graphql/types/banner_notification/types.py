@@ -21,7 +21,7 @@ __all__ = [
 
 
 class BannerNotificationNode(DjangoNode):
-    state = graphene.Field(graphene.Enum.from_enum(BannerNotificationState))
+    state = graphene.Field(graphene.Enum.from_enum(BannerNotificationState), required=True)
 
     class Meta:
         model = BannerNotification

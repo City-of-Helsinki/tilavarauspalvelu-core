@@ -24,7 +24,10 @@ __all__ = [
 
 
 class GeneralRoleNode(DjangoNode):
-    permissions = graphene.List(graphene.Enum.from_enum(UserPermissionChoice))
+    permissions = graphene.List(
+        graphene.NonNull(graphene.Enum.from_enum(UserPermissionChoice)),
+        required=True,
+    )
 
     class Meta:
         model = GeneralRole
@@ -45,7 +48,10 @@ class GeneralRoleNode(DjangoNode):
 
 
 class UnitRoleNode(DjangoNode):
-    permissions = ManuallyOptimizedField(graphene.List(graphene.Enum.from_enum(UserPermissionChoice)))
+    permissions = ManuallyOptimizedField(
+        graphene.List(graphene.NonNull(graphene.Enum.from_enum(UserPermissionChoice))),
+        required=True,
+    )
 
     class Meta:
         model = UnitRole
@@ -101,7 +107,7 @@ class UnitRoleNode(DjangoNode):
 
 
 class PermissionCheckerType(ObjectType):
-    has_permission = graphene.Field(graphene.NonNull(graphene.Boolean))
+    has_permission = graphene.Boolean(required=True)
 
     @classmethod
     def run(

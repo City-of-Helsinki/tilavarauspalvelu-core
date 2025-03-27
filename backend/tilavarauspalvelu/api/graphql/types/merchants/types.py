@@ -23,7 +23,7 @@ __all__ = [
 
 
 class PaymentMerchantNode(DjangoNode):
-    pk = graphene.UUID()
+    pk = graphene.UUID(required=True)
 
     class Meta:
         model = PaymentMerchant
@@ -34,7 +34,7 @@ class PaymentMerchantNode(DjangoNode):
 
 
 class PaymentProductNode(DjangoNode):
-    pk = graphene.UUID()
+    pk = graphene.UUID(required=True)
 
     class Meta:
         model = PaymentProduct
@@ -48,8 +48,8 @@ class PaymentOrderNode(DjangoNode):
     order_uuid = MultiField(graphene.UUID, fields=["remote_id"])
     refund_uuid = MultiField(graphene.UUID, fields=["refund_id"])
 
-    payment_type = graphene.Field(graphene.NonNull(graphene.Enum.from_enum(PaymentType)))
-    status = graphene.Field(graphene.Enum.from_enum(OrderStatus))  # TODO: NonNull, requires frontend changes
+    payment_type = graphene.Field(graphene.Enum.from_enum(PaymentType), required=True)
+    status = graphene.Field(graphene.Enum.from_enum(OrderStatus), required=True)
 
     checkout_url = MultiField(graphene.String, fields=["checkout_url", "status", "created_at"])
     receipt_url = graphene.String()

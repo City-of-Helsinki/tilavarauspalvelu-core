@@ -12,7 +12,7 @@ from .filtersets import SuitableTimeRangeFilterSet
 
 
 class SuitableTimeRangeNode(DjangoNode):
-    fulfilled = AnnotatedField(graphene.Boolean, expression=L("fulfilled"))
+    fulfilled = AnnotatedField(graphene.Boolean, expression=L("fulfilled"), required=True)
 
     class Meta:
         model = SuitableTimeRange

@@ -24,6 +24,7 @@ class ApplicationRoundNode(DjangoNode):
     status = AnnotatedField(
         graphene.Enum.from_enum(ApplicationRoundStatusChoice),
         expression=L("status"),
+        required=True,
     )
     status_timestamp = AnnotatedField(
         graphene.DateTime,
@@ -32,10 +33,12 @@ class ApplicationRoundNode(DjangoNode):
     reservation_creation_status = AnnotatedField(
         graphene.Enum.from_enum(ApplicationRoundReservationCreationStatusChoice),
         expression=L("reservation_creation_status"),
+        required=True,
     )
     is_setting_handled_allowed = AnnotatedField(
         graphene.Boolean,
         expression=L("is_setting_handled_allowed"),
+        required=True,
     )
     applications_count = AnnotatedField(
         graphene.Int,
@@ -46,6 +49,7 @@ class ApplicationRoundNode(DjangoNode):
                 sent_date__isnull=False,
             ),
         ),
+        required=True,
     )
     reservation_unit_count = AnnotatedField(
         graphene.Int,
@@ -54,6 +58,7 @@ class ApplicationRoundNode(DjangoNode):
                 application_rounds=models.OuterRef("pk"),
             ),
         ),
+        required=True,
     )
 
     class Meta:

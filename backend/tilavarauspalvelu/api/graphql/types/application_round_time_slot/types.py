@@ -19,7 +19,7 @@ class TimeSlot(TypedDict):
 
 
 class ApplicationRoundTimeSlotNode(DjangoNode):
-    reservable_times = TypedDictListField(TimeSlot)
+    reservable_times = TypedDictListField(TimeSlot, required=True)
 
     class Meta:
         model = ApplicationRoundTimeSlot
