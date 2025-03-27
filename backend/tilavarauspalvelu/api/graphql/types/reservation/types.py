@@ -65,12 +65,6 @@ class ReservationNode(DjangoNode):
     is_blocked = AnnotatedField(graphene.Boolean, expression=models.Q(type=ReservationTypeChoice.BLOCKED.value))
     is_handled = AnnotatedField(graphene.Boolean, expression=models.Q(handled_at__isnull=False))
 
-    staff_event = AnnotatedField(
-        graphene.Boolean,
-        expression=models.Q(type=ReservationTypeChoice.STAFF.value),
-        deprecation_reason="Please use to 'type' instead.",
-    )
-
     access_code_should_be_active = AnnotatedField(graphene.Boolean, expression=L("access_code_should_be_active"))
     is_access_code_is_active_correct = AnnotatedField(
         graphene.Boolean, expression=L("is_access_code_is_active_correct")
@@ -212,7 +206,6 @@ class ReservationNode(DjangoNode):
             "is_handled",
             "order",
             "payment_order",
-            "staff_event",
             "calendar_url",
         ]
         restricted_fields = {
@@ -225,7 +218,6 @@ class ReservationNode(DjangoNode):
                     "handling_details",
                     "working_memo",
                     "handled_at",
-                    "staff_event",
                 }
                 # FIELDS ARE PRIVATE BY DEFAULT
                 else private_field_check

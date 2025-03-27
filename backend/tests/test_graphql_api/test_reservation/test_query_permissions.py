@@ -192,7 +192,6 @@ def test_reservation__query__fields_requiring_staff_permissions__superuser(graph
 
     fields = """
         pk
-        staffEvent
         type
         workingMemo
         handlingDetails
@@ -206,7 +205,6 @@ def test_reservation__query__fields_requiring_staff_permissions__superuser(graph
     assert len(response.edges) == 1
     assert response.node(0) == {
         "pk": reservation.pk,
-        "staffEvent": True,
         "type": ReservationTypeChoice.STAFF.value,
         "workingMemo": reservation.working_memo,
         "handlingDetails": reservation.handling_details,
@@ -224,7 +222,6 @@ def test_reservation__query__fields_requiring_staff_permissions__regular_user(gr
 
     fields = """
         pk
-        staffEvent
         type
         workingMemo
         handlingDetails
@@ -238,7 +235,6 @@ def test_reservation__query__fields_requiring_staff_permissions__regular_user(gr
     assert len(response.edges) == 1
     assert response.node(0) == {
         "pk": reservation.pk,
-        "staffEvent": None,
         "type": None,
         "workingMemo": None,
         "handlingDetails": None,
