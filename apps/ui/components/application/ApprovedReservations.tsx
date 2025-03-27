@@ -28,6 +28,7 @@ import {
   formatApiTimeInterval,
   fromMondayFirst,
   getLocalizationLang,
+  sort,
   toNumber,
   type LocalizationLanguages,
 } from "common/src/helpers";
@@ -351,9 +352,9 @@ type ReservationSeriesTableElem = {
   dateOfWeek: string;
   // same for this actual end / start times or a combined string
   time: string;
-  accessType?: AccessTypeWithMultivalued | null;
-  usedAccessTypes?: (AccessType | null)[] | null;
-  pindoraInfo?: PindoraSectionFragment | null;
+  accessType: AccessTypeWithMultivalued | null;
+  usedAccessTypes: Readonly<AccessType[]> | null;
+  pindoraInfo: PindoraSectionFragment | null;
 };
 
 /// Have to asign min-height on desktop otherwise the table rows are too small
@@ -532,7 +533,9 @@ function ReservationUnitAccessTypeList({
   reservationUnits,
   pk,
 }: Readonly<{
-  accessTypes: Omit<ReservationUnitAccessTypeNode, "reservationUnit">[];
+  accessTypes: Readonly<
+    Pick<ReservationUnitAccessTypeNode, "pk" | "beginDate" | "accessType">[]
+  >;
   reservationUnits: ReservationSeriesTableElem[];
   pk: number | null | undefined;
 }>) {
@@ -1020,8 +1023,7 @@ function sectionToReservationUnits(
         };
       })
   );
-  reservationUnitsByDay.sort((a, b) => a.day - b.day);
-  return reservationUnitsByDay.map((x) => {
+  return sort(reservationUnitsByDay, (a, b) => a.day - b.day).map((x) => {
     const { reservationUnit, day, time, recurringReservation } = x;
     return {
       reservationUnit,
@@ -1029,7 +1031,7 @@ function sectionToReservationUnits(
       dateOfWeek: t(`weekDayLong.${fromMondayFirst(day)}`),
       time,
       accessType: recurringReservation.accessType,
-      usedAccessTypes: recurringReservation.usedAccessTypes,
+      usedAccessTypes: filterNonNullable(recurringReservation.usedAccessTypes),
       pindoraInfo: recurringReservation.pindoraInfo,
     };
   });

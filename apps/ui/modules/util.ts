@@ -60,7 +60,7 @@ export function getParameterLabel(
 }
 
 export function getMainImage(ru?: {
-  images: ImageFragment[];
+  images: Readonly<ImageFragment[]>;
 }): ImageFragment | null {
   return ru?.images.find((img) => img.imageType === ImageType.Main) ?? null;
 }

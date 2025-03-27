@@ -20,7 +20,7 @@ export function filterNonNullable<T>(
 }
 
 type SortFunc<T> = (a: T, b: T) => number;
-export function sort<T>(arr: T[], func: SortFunc<T>): T[] {
+export function sort<T>(arr: Readonly<T[]>, func: SortFunc<T>): T[] {
   return [...arr].sort((a, b) => func(a, b));
 }
 
