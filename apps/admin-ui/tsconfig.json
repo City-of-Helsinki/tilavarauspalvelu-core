@@ -21,6 +21,7 @@
     "vitest.config.mts",
     "vitest.setup.ts",
     "__mocks__",
+    "gql-plug.mjs",
     "next.config.mjs",
     "next-env.d.ts"
   ]
