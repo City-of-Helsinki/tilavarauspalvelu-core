@@ -92,7 +92,7 @@ function getReservationStateLabelProps(s?: Maybe<ReservationStateChoice>): {
 }
 
 type ReservationType = NonNullable<ReservationQuery["reservation"]>;
-type Props = {
+type Props = Readonly<{
   reservation: Pick<
     ReservationType,
     "createdAt" | "state" | "type" | "name" | "pk" | "reserveeName"
@@ -100,15 +100,14 @@ type Props = {
     recurringReservation: Maybe<
       Pick<NonNullable<ReservationType["recurringReservation"]>, "id">
     >;
-    paymentOrder: Pick<
-      NonNullable<ReservationType["paymentOrder"][number]>,
-      "status"
-    >[];
+    paymentOrder: Readonly<
+      Pick<NonNullable<ReservationType["paymentOrder"][number]>, "status">[]
+    >;
   };
   tagline: string;
   overrideTitle?: string;
   noMargin?: boolean;
-};
+}>;
 
 const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
   ({ reservation, tagline, overrideTitle, noMargin }: Props, ref) => {

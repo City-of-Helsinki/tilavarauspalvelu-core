@@ -33,6 +33,7 @@ const gqlConfig = {
     object: false,
     defaultValue: false,
   },
+  immutableTypes: true,
   // TODO this would improve linting fragments but it causes some issues in type generation
   // experimentalFragmentVariables: true,
   skipTypename: true,

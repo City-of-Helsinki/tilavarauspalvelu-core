@@ -9,7 +9,7 @@ import { getImageSource } from "common/src/helpers";
 
 const Modal = dynamic(() => import("../Modal").then((module) => module.Modal));
 type Props = {
-  images: ImageFragment[];
+  images: Readonly<ImageFragment[]>;
   contextName?: string;
 };
 

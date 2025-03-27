@@ -261,10 +261,9 @@ function createRecurringTagString(
     ?.map(reservationUnitName)
     .join(", ");
 
-  const weekDayTag = reservation.recurringReservation?.weekdays
-    ?.sort()
-    ?.map((x) => t(`dayShort.${x}`))
-    ?.reduce((agv, x) => `${agv}${agv.length > 0 ? "," : ""} ${x}`, "");
+  const weekDayTag = sort(filterNonNullable(weekdays), (a, b) => a - b)
+    .map((x) => t(`dayShort.${x}`))
+    .reduce((agv, x) => `${agv}${agv.length > 0 ? "," : ""} ${x}`, "");
 
   const begin = fromAPIDateTime(beginDate, beginTime);
   const end = fromAPIDateTime(endDate, endTime);
