@@ -28,6 +28,9 @@
 **/build
 **/out
 
+# graphql query pluck
+gql-pluck-output/
+
 # local config
 **/.env.local
 **/.local
