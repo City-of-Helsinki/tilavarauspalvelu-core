@@ -3368,12 +3368,6 @@ msgstr ""
 "Här är dina bokningsuppgifter och dörrkoden för enkel åtkomst till utrymmet"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "The door code has changed"
-msgstr "Dörrkoden har ändrats"
-
-#: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
 msgid "You can check your booking details at"
 msgstr "Du kan kontrollera dina bokningsuppgifter på"
@@ -3451,6 +3445,11 @@ msgstr "Du har gjort en ny bokning"
 msgctxt "Email"
 msgid "Your booking has been updated"
 msgstr "Din bokning har uppdaterats"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "The door code of your booking has changed"
+msgstr "Dörrkoden för din bokning har ändrats"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"

@@ -63,8 +63,8 @@ COMMON_CONTEXT = {
 }
 LANGUAGE_CONTEXT = {
     "en": {
-        "title": "The door code has changed",
-        "text_reservation_modified": "The door code has changed",
+        "title": "The door code of your booking has changed",
+        "text_reservation_modified": "The door code of your booking has changed",
         "allocations": [
             {"weekday_value": "Monday", "time_value": "13:00-15:00", "access_code_validity_period": "11:00-15:00"},
             {"weekday_value": "Tuesday", "time_value": "21:00-22:00", "access_code_validity_period": "20:45-22:05"},
@@ -77,8 +77,8 @@ LANGUAGE_CONTEXT = {
         "access_code_validity_period": "",
     },
     "fi": {
-        "title": "Ovikoodi on vaihtunut",
-        "text_reservation_modified": "Ovikoodi on vaihtunut",
+        "title": "Varauksesi ovikoodi on vaihtunut",
+        "text_reservation_modified": "Varauksesi ovikoodi on vaihtunut",
         "allocations": [
             {"weekday_value": "Maanantai", "time_value": "13:00-15:00", "access_code_validity_period": "11:00-15:00"},
             {"weekday_value": "Tiistai", "time_value": "21:00-22:00", "access_code_validity_period": "20:45-22:05"},
@@ -91,8 +91,8 @@ LANGUAGE_CONTEXT = {
         "access_code_validity_period": "",
     },
     "sv": {
-        "title": "Dörrkoden har ändrats",
-        "text_reservation_modified": "Dörrkoden har ändrats",
+        "title": "Dörrkoden för din bokning har ändrats",
+        "text_reservation_modified": "Dörrkoden för din bokning har ändrats",
         "allocations": [
             {"weekday_value": "Måndag", "time_value": "13:00-15:00", "access_code_validity_period": "11:00-15:00"},
             {"weekday_value": "Tisdag", "time_value": "21:00-22:00", "access_code_validity_period": "20:45-22:05"},
@@ -261,7 +261,7 @@ def test_render_seasonal_reservation_modified_series_access_code__text():
         f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
-        The door code has changed.
+        The door code of your booking has changed.
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
 
@@ -298,7 +298,7 @@ def test_render_seasonal_reservation_modified_series_access_code__html():
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
-        The door code has changed.
+        The door code of your booking has changed.
 
         Seasonal Booking: [HAKEMUKSEN OSAN NIMI], [KAUSIVARAUSKIERROKSEN NIMI]
         Door code: 123456
@@ -359,7 +359,7 @@ def test_email_service__send_seasonal_reservation_modified_series_access_code(ou
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "The door code has changed"
+    assert outbox[0].subject == "The door code of your booking has changed"
     assert sorted(outbox[0].bcc) == ["contact@email.com", "user@email.com"]
 
 
