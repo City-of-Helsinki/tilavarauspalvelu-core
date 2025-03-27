@@ -2,20 +2,14 @@ import type { TFunction } from "i18next";
 import {
   type CreateTagStringFragment,
   PriceUnit,
-  type ReservationQuery,
-  ReservationUnitPricingFieldsFragment,
+  type PricingFieldsFragment,
+  type ReservationUnitPricingFieldsFragment,
 } from "@gql/gql-types";
 import { createTagString, getReservatinUnitPricing } from "./util";
 import { addHours, addMonths } from "date-fns";
 import { toApiDate } from "common/src/common/util";
 import { describe, test, expect } from "vitest";
 import { base64encode } from "common/src/helpers";
-
-type ReservationNodeT = NonNullable<ReservationQuery["reservation"]>;
-type ReservationUnitNodeT = NonNullable<
-  ReservationNodeT["reservationUnits"]
->[0];
-type PricingNodeT = ReservationUnitNodeT["pricings"][0];
 
 const mockT = ((x: string) => x) as TFunction;
 
@@ -27,7 +21,7 @@ function constructPricing({
   lowestPrice: number;
   highestPrice: number;
   begin: Date;
-}) {
+}): PricingFieldsFragment {
   return {
     begins: toApiDate(begin) ?? "",
     id: "1",
@@ -42,14 +36,14 @@ function constructPricing({
   };
 }
 
-function constructFreePricing(): PricingNodeT {
+function constructFreePricing(): PricingFieldsFragment {
   return constructPricing({
     lowestPrice: 0,
     highestPrice: 0,
     begin: new Date("2021-01-01"),
   });
 }
-function constructPaidPricing(): PricingNodeT {
+function constructPaidPricing(): PricingFieldsFragment {
   return constructPricing({
     lowestPrice: 120,
     highestPrice: 120,

@@ -33,21 +33,6 @@ const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
 `;
 
-export const DENY_DIALOG_FRAGMENT = gql`
-  fragment DenyDialogFields on ReservationNode {
-    id
-    pk
-    handlingDetails
-    price
-    paymentOrder {
-      id
-      orderUuid
-      status
-      refundUuid
-    }
-  }
-`;
-
 type ReturnAllowedState =
   // state selection
   | "refund"
@@ -428,6 +413,21 @@ export function DenyDialogSeries({
     </DenyDialogWrapper>
   );
 }
+
+export const DENY_DIALOG_FRAGMENT = gql`
+  fragment DenyDialogFields on ReservationNode {
+    id
+    pk
+    handlingDetails
+    price
+    paymentOrder {
+      id
+      orderUuid
+      status
+      refundUuid
+    }
+  }
+`;
 
 export const DENY_RESERVATION = gql`
   mutation DenyReservation($input: ReservationDenyMutationInput!) {

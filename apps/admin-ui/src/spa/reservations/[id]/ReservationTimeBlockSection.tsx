@@ -10,7 +10,7 @@ import { Toolbar, ToolbarBtn } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
-  type ReservationQuery,
+  type ReservationPageQuery,
   ReservationStateChoice,
   ReservationTypeChoice,
   UserPermissionChoice,
@@ -160,7 +160,7 @@ export function TimeBlock({
   onReservationUpdated,
 }: Readonly<{
   reservation: ReservationType;
-  onReservationUpdated: () => Promise<ApolloQueryResult<ReservationQuery>>;
+  onReservationUpdated: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
 }>): JSX.Element {
   const { t } = useTranslation();
 
@@ -224,7 +224,7 @@ export function TimeBlock({
   }, [reservation, calendarRefetch]);
 
   const handleChanged = async (): Promise<
-    ApolloQueryResult<ReservationQuery>
+    ApolloQueryResult<ReservationPageQuery>
   > => {
     // TODO use allSettled
     await calendarRefetch();

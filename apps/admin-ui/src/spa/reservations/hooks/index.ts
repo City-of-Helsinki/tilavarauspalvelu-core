@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import {
-  type ReservationQuery,
+  type ReservationPageQuery,
   useUpdateRecurringReservationMutation,
   useUpdateStaffReservationMutation,
   type ReservationSeriesUpdateMutationInput,
@@ -18,7 +18,7 @@ type ExtraParamsT = { seriesName?: string };
 export type MutationInputParams = Omit<InputT, "pk"> &
   Omit<MemoT, "pk"> &
   ExtraParamsT;
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
 /// Combines regular and recurring reservation change mutation
 export function useStaffReservationMutation({

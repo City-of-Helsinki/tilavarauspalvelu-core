@@ -1,5 +1,10 @@
 import React from "react";
-import { ReservationStateChoice, type ReservationQuery } from "@gql/gql-types";
+import {
+  ApprovalDialogFieldsFragment,
+  DenyDialogFieldsFragment,
+  ReservationStateChoice,
+  type ReservationPageQuery,
+} from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -14,7 +19,10 @@ import {
   isPossibleToReturn,
 } from "@/modules/reservationModificationRules";
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type QueryT = NonNullable<ReservationPageQuery["reservation"]>;
+type ReservationType = DenyDialogFieldsFragment &
+  ApprovalDialogFieldsFragment &
+  Pick<QueryT, "recurringReservation">;
 type Props = {
   reservation: ReservationType;
   state: ReservationStateChoice;
@@ -24,14 +32,14 @@ type Props = {
   disableNonEssentialButtons?: boolean;
 };
 
-const ApprovalButtons = ({
+function ApprovalButtons({
   state,
   isFree,
   reservation,
   handleClose,
   handleAccept,
   disableNonEssentialButtons,
-}: Props) => {
+}: Props) {
   const { setModalContent } = useModal();
   const { t } = useTranslation();
 
@@ -114,6 +122,6 @@ const ApprovalButtons = ({
       )}
     </>
   );
-};
+}
 
 export default ApprovalButtons;

@@ -6691,10 +6691,12 @@ export type ApplicationDateOfBirthQuery = {
 };
 
 export type DenyDialogFieldsFragment = {
+  readonly id: string;
   readonly pk: number | null;
   readonly handlingDetails: string | null;
   readonly price: string | null;
   readonly paymentOrder: ReadonlyArray<{
+    readonly id: string;
     readonly orderUuid: string | null;
     readonly status: OrderStatus | null;
     readonly refundUuid: string | null;
@@ -6817,9 +6819,11 @@ export type ReservationTypeFormFieldsFragment = {
 };
 
 export type VisibleIfPermissionFieldsFragment = {
-  readonly user: { readonly pk: number | null } | null;
+  readonly id: string;
+  readonly user: { readonly id: string; readonly pk: number | null } | null;
   readonly reservationUnits: ReadonlyArray<{
-    readonly unit: { readonly pk: number | null } | null;
+    readonly id: string;
+    readonly unit: { readonly id: string; readonly pk: number | null } | null;
   }>;
 };
 
@@ -8660,6 +8664,21 @@ export type ReservationApplicationLinkQuery = {
   } | null;
 };
 
+export type ReservationTitleSectionFieldsFragment = {
+  readonly id: string;
+  readonly createdAt: string | null;
+  readonly state: ReservationStateChoice | null;
+  readonly type: ReservationTypeChoice | null;
+  readonly name: string | null;
+  readonly pk: number | null;
+  readonly reserveeName: string | null;
+  readonly recurringReservation: { readonly id: string } | null;
+  readonly paymentOrder: ReadonlyArray<{
+    readonly id: string;
+    readonly status: OrderStatus | null;
+  }>;
+};
+
 export type ReservationEditPageQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8891,36 +8910,6 @@ export type ReservationsByReservationUnitQuery = {
   }> | null;
 };
 
-export type ReservationSpecialisationFragment = {
-  readonly id: string;
-  readonly calendarUrl: string | null;
-  readonly price: string | null;
-  readonly taxPercentageValue: string | null;
-  readonly handlingDetails: string | null;
-  readonly bufferTimeBefore: number;
-  readonly bufferTimeAfter: number;
-  readonly paymentOrder: ReadonlyArray<{
-    readonly id: string;
-    readonly orderUuid: string | null;
-    readonly refundUuid: string | null;
-  }>;
-  readonly cancelReason: {
-    readonly id: string;
-    readonly reasonFi: string | null;
-  } | null;
-  readonly denyReason: {
-    readonly id: string;
-    readonly reasonFi: string | null;
-  } | null;
-  readonly user: {
-    readonly id: string;
-    readonly firstName: string;
-    readonly lastName: string;
-    readonly email: string;
-    readonly pk: number | null;
-  } | null;
-};
-
 export type ReservationAccessTypeFragment = {
   readonly id: string;
   readonly accessType: AccessType;
@@ -8934,6 +8923,7 @@ export type ReservationAccessTypeFragment = {
 };
 
 export type ReservationRecurringFieldsFragment = {
+  readonly id: string;
   readonly pk: number | null;
   readonly beginDate: string | null;
   readonly beginTime: string | null;
@@ -8954,11 +8944,106 @@ export type ReservationRecurringFieldsFragment = {
   } | null;
 };
 
-export type ReservationQueryVariables = Exact<{
+export type RecurringReservationFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly weekdays: ReadonlyArray<number | null> | null;
+  readonly beginDate: string | null;
+  readonly endDate: string | null;
+  readonly rejectedOccurrences: ReadonlyArray<{
+    readonly id: string;
+    readonly beginDatetime: string;
+    readonly endDatetime: string;
+    readonly rejectionReason: RejectionReadinessChoice;
+  }>;
+  readonly reservations: ReadonlyArray<{
+    readonly state: ReservationStateChoice | null;
+    readonly id: string;
+    readonly pk: number | null;
+    readonly begin: string;
+    readonly end: string;
+    readonly type: ReservationTypeChoice | null;
+    readonly bufferTimeAfter: number;
+    readonly bufferTimeBefore: number;
+    readonly paymentOrder: ReadonlyArray<{
+      readonly id: string;
+      readonly status: OrderStatus | null;
+    }>;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly reservationStartInterval: ReservationStartInterval;
+      readonly unit: { readonly id: string; readonly pk: number | null } | null;
+    }>;
+    readonly recurringReservation: {
+      readonly pk: number | null;
+      readonly id: string;
+      readonly weekdays: ReadonlyArray<number | null> | null;
+      readonly beginDate: string | null;
+      readonly endDate: string | null;
+    } | null;
+  }>;
+};
+
+export type RecurringReservationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
 
-export type ReservationQuery = {
+export type RecurringReservationQuery = {
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly weekdays: ReadonlyArray<number | null> | null;
+    readonly beginDate: string | null;
+    readonly endDate: string | null;
+    readonly rejectedOccurrences: ReadonlyArray<{
+      readonly id: string;
+      readonly beginDatetime: string;
+      readonly endDatetime: string;
+      readonly rejectionReason: RejectionReadinessChoice;
+    }>;
+    readonly reservations: ReadonlyArray<{
+      readonly state: ReservationStateChoice | null;
+      readonly id: string;
+      readonly pk: number | null;
+      readonly begin: string;
+      readonly end: string;
+      readonly type: ReservationTypeChoice | null;
+      readonly bufferTimeAfter: number;
+      readonly bufferTimeBefore: number;
+      readonly paymentOrder: ReadonlyArray<{
+        readonly id: string;
+        readonly status: OrderStatus | null;
+      }>;
+      readonly reservationUnits: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly bufferTimeBefore: number;
+        readonly bufferTimeAfter: number;
+        readonly reservationStartInterval: ReservationStartInterval;
+        readonly unit: {
+          readonly id: string;
+          readonly pk: number | null;
+        } | null;
+      }>;
+      readonly recurringReservation: {
+        readonly pk: number | null;
+        readonly id: string;
+        readonly weekdays: ReadonlyArray<number | null> | null;
+        readonly beginDate: string | null;
+        readonly endDate: string | null;
+      } | null;
+    }>;
+  } | null;
+};
+
+export type ReservationPageQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationPageQuery = {
   readonly reservation: {
     readonly id: string;
     readonly begin: string;
@@ -8972,6 +9057,7 @@ export type ReservationQuery = {
     readonly reserveeName: string | null;
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
+    readonly name: string | null;
     readonly accessType: AccessType;
     readonly isAccessCodeIsActiveCorrect: boolean | null;
     readonly handlingDetails: string | null;
@@ -8979,7 +9065,6 @@ export type ReservationQuery = {
     readonly applyingForFreeOfCharge: boolean | null;
     readonly freeOfChargeReason: string | null;
     readonly numPersons: number | null;
-    readonly name: string | null;
     readonly description: string | null;
     readonly reserveeFirstName: string | null;
     readonly reserveeLastName: string | null;
@@ -9122,101 +9207,6 @@ export type ReservationQuery = {
       readonly nameFi: string | null;
       readonly pk: number | null;
     } | null;
-  } | null;
-};
-
-export type RecurringReservationFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly weekdays: ReadonlyArray<number | null> | null;
-  readonly beginDate: string | null;
-  readonly endDate: string | null;
-  readonly rejectedOccurrences: ReadonlyArray<{
-    readonly id: string;
-    readonly beginDatetime: string;
-    readonly endDatetime: string;
-    readonly rejectionReason: RejectionReadinessChoice;
-  }>;
-  readonly reservations: ReadonlyArray<{
-    readonly state: ReservationStateChoice | null;
-    readonly id: string;
-    readonly pk: number | null;
-    readonly begin: string;
-    readonly end: string;
-    readonly type: ReservationTypeChoice | null;
-    readonly bufferTimeAfter: number;
-    readonly bufferTimeBefore: number;
-    readonly paymentOrder: ReadonlyArray<{
-      readonly id: string;
-      readonly status: OrderStatus | null;
-    }>;
-    readonly reservationUnits: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly bufferTimeBefore: number;
-      readonly bufferTimeAfter: number;
-      readonly reservationStartInterval: ReservationStartInterval;
-      readonly unit: { readonly id: string; readonly pk: number | null } | null;
-    }>;
-    readonly recurringReservation: {
-      readonly pk: number | null;
-      readonly id: string;
-      readonly weekdays: ReadonlyArray<number | null> | null;
-      readonly beginDate: string | null;
-      readonly endDate: string | null;
-    } | null;
-  }>;
-};
-
-export type RecurringReservationQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type RecurringReservationQuery = {
-  readonly recurringReservation: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly weekdays: ReadonlyArray<number | null> | null;
-    readonly beginDate: string | null;
-    readonly endDate: string | null;
-    readonly rejectedOccurrences: ReadonlyArray<{
-      readonly id: string;
-      readonly beginDatetime: string;
-      readonly endDatetime: string;
-      readonly rejectionReason: RejectionReadinessChoice;
-    }>;
-    readonly reservations: ReadonlyArray<{
-      readonly state: ReservationStateChoice | null;
-      readonly id: string;
-      readonly pk: number | null;
-      readonly begin: string;
-      readonly end: string;
-      readonly type: ReservationTypeChoice | null;
-      readonly bufferTimeAfter: number;
-      readonly bufferTimeBefore: number;
-      readonly paymentOrder: ReadonlyArray<{
-        readonly id: string;
-        readonly status: OrderStatus | null;
-      }>;
-      readonly reservationUnits: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly bufferTimeBefore: number;
-        readonly bufferTimeAfter: number;
-        readonly reservationStartInterval: ReservationStartInterval;
-        readonly unit: {
-          readonly id: string;
-          readonly pk: number | null;
-        } | null;
-      }>;
-      readonly recurringReservation: {
-        readonly pk: number | null;
-        readonly id: string;
-        readonly weekdays: ReadonlyArray<number | null> | null;
-        readonly beginDate: string | null;
-        readonly endDate: string | null;
-      } | null;
-    }>;
   } | null;
 };
 
@@ -10163,11 +10153,15 @@ export const ReservationCommonFragmentDoc = gql`
 `;
 export const VisibleIfPermissionFieldsFragmentDoc = gql`
   fragment VisibleIfPermissionFields on ReservationNode {
+    id
     user {
+      id
       pk
     }
     reservationUnits {
+      id
       unit {
+        id
         pk
       }
     }
@@ -10294,10 +10288,12 @@ export const BannerNotificationsAdminFragmentDoc = gql`
 `;
 export const DenyDialogFieldsFragmentDoc = gql`
   fragment DenyDialogFields on ReservationNode {
+    id
     pk
     handlingDetails
     price
     paymentOrder {
+      id
       orderUuid
       status
       refundUuid
@@ -10402,6 +10398,24 @@ export const ApprovalDialogFieldsFragmentDoc = gql`
   }
   ${ReservationPriceDetailsFieldsFragmentDoc}
 `;
+export const ReservationTitleSectionFieldsFragmentDoc = gql`
+  fragment ReservationTitleSectionFields on ReservationNode {
+    id
+    createdAt
+    state
+    type
+    name
+    pk
+    reserveeName
+    recurringReservation {
+      id
+    }
+    paymentOrder {
+      id
+      status
+    }
+  }
+`;
 export const ReservationMetaFieldsFragmentDoc = gql`
   fragment ReservationMetaFields on ReservationNode {
     ageGroup {
@@ -10451,37 +10465,6 @@ export const CalendarReservationFragmentDoc = gql`
     accessType
   }
 `;
-export const ReservationSpecialisationFragmentDoc = gql`
-  fragment ReservationSpecialisation on ReservationNode {
-    id
-    calendarUrl
-    price
-    taxPercentageValue
-    paymentOrder {
-      id
-      orderUuid
-      refundUuid
-    }
-    cancelReason {
-      id
-      reasonFi
-    }
-    denyReason {
-      id
-      reasonFi
-    }
-    handlingDetails
-    user {
-      id
-      firstName
-      lastName
-      email
-      pk
-    }
-    bufferTimeBefore
-    bufferTimeAfter
-  }
-`;
 export const ReservationAccessTypeFragmentDoc = gql`
   fragment ReservationAccessType on ReservationNode {
     id
@@ -10497,6 +10480,7 @@ export const ReservationAccessTypeFragmentDoc = gql`
 `;
 export const ReservationRecurringFieldsFragmentDoc = gql`
   fragment ReservationRecurringFields on RecurringReservationNode {
+    id
     pk
     beginDate
     beginTime
@@ -16020,6 +16004,7 @@ export const ReservationEditPageDocument = gql`
       ...CreateTagString
       ...ReservationCommon
       ...ReservationMetaFields
+      ...ReservationTitleSectionFields
       recurringReservation {
         id
         pk
@@ -16035,6 +16020,7 @@ export const ReservationEditPageDocument = gql`
   ${CreateTagStringFragmentDoc}
   ${ReservationCommonFragmentDoc}
   ${ReservationMetaFieldsFragmentDoc}
+  ${ReservationTitleSectionFieldsFragmentDoc}
   ${ReservationTypeFormFieldsFragmentDoc}
 `;
 
@@ -16219,122 +16205,6 @@ export type ReservationsByReservationUnitQueryResult = Apollo.QueryResult<
   ReservationsByReservationUnitQuery,
   ReservationsByReservationUnitQueryVariables
 >;
-export const ReservationDocument = gql`
-  query Reservation($id: ID!) {
-    reservation(id: $id) {
-      id
-      ...CreateTagString
-      ...ReservationCommon
-      ...ChangeReservationTime
-      recurringReservation {
-        id
-        ...ReservationRecurringFields
-      }
-      ...ReservationAccessType
-      ...VisibleIfPermissionFields
-      ...DenyDialogFields
-      ...ApprovalDialogFields
-      cancelReason {
-        id
-        reasonFi
-      }
-      denyReason {
-        id
-        reasonFi
-      }
-      reservationUnits {
-        id
-        pk
-        reservationStartInterval
-        ...ReservationTypeFormFields
-      }
-      ...ReservationMetaFields
-    }
-  }
-  ${CreateTagStringFragmentDoc}
-  ${ReservationCommonFragmentDoc}
-  ${ChangeReservationTimeFragmentDoc}
-  ${ReservationRecurringFieldsFragmentDoc}
-  ${ReservationAccessTypeFragmentDoc}
-  ${VisibleIfPermissionFieldsFragmentDoc}
-  ${DenyDialogFieldsFragmentDoc}
-  ${ApprovalDialogFieldsFragmentDoc}
-  ${ReservationTypeFormFieldsFragmentDoc}
-  ${ReservationMetaFieldsFragmentDoc}
-`;
-
-/**
- * __useReservationQuery__
- *
- * To run a query within a React component, call `useReservationQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useReservationQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationQuery,
-    ReservationQueryVariables
-  > &
-    (
-      | { variables: ReservationQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options
-  );
-}
-export function useReservationLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationQuery,
-    ReservationQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options
-  );
-}
-export function useReservationSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationQuery,
-        ReservationQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<ReservationQuery, ReservationQueryVariables>(
-    ReservationDocument,
-    options
-  );
-}
-export type ReservationQueryHookResult = ReturnType<typeof useReservationQuery>;
-export type ReservationLazyQueryHookResult = ReturnType<
-  typeof useReservationLazyQuery
->;
-export type ReservationSuspenseQueryHookResult = ReturnType<
-  typeof useReservationSuspenseQuery
->;
-export type ReservationQueryResult = Apollo.QueryResult<
-  ReservationQuery,
-  ReservationQueryVariables
->;
 export const RecurringReservationDocument = gql`
   query RecurringReservation($id: ID!) {
     recurringReservation(id: $id) {
@@ -16417,6 +16287,126 @@ export type RecurringReservationSuspenseQueryHookResult = ReturnType<
 export type RecurringReservationQueryResult = Apollo.QueryResult<
   RecurringReservationQuery,
   RecurringReservationQueryVariables
+>;
+export const ReservationPageDocument = gql`
+  query ReservationPage($id: ID!) {
+    reservation(id: $id) {
+      id
+      ...CreateTagString
+      ...ReservationCommon
+      ...ChangeReservationTime
+      ...ReservationTitleSectionFields
+      recurringReservation {
+        id
+        ...ReservationRecurringFields
+      }
+      ...ReservationAccessType
+      ...VisibleIfPermissionFields
+      ...DenyDialogFields
+      ...ApprovalDialogFields
+      cancelReason {
+        id
+        reasonFi
+      }
+      denyReason {
+        id
+        reasonFi
+      }
+      reservationUnits {
+        id
+        pk
+        reservationStartInterval
+        ...ReservationTypeFormFields
+      }
+      ...ReservationMetaFields
+    }
+  }
+  ${CreateTagStringFragmentDoc}
+  ${ReservationCommonFragmentDoc}
+  ${ChangeReservationTimeFragmentDoc}
+  ${ReservationTitleSectionFieldsFragmentDoc}
+  ${ReservationRecurringFieldsFragmentDoc}
+  ${ReservationAccessTypeFragmentDoc}
+  ${VisibleIfPermissionFieldsFragmentDoc}
+  ${DenyDialogFieldsFragmentDoc}
+  ${ApprovalDialogFieldsFragmentDoc}
+  ${ReservationTypeFormFieldsFragmentDoc}
+  ${ReservationMetaFieldsFragmentDoc}
+`;
+
+/**
+ * __useReservationPageQuery__
+ *
+ * To run a query within a React component, call `useReservationPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationPageQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationPageQuery,
+    ReservationPageQueryVariables
+  > &
+    (
+      | { variables: ReservationPageQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ReservationPageQuery, ReservationPageQueryVariables>(
+    ReservationPageDocument,
+    options
+  );
+}
+export function useReservationPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationPageQuery,
+    ReservationPageQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationPageQuery,
+    ReservationPageQueryVariables
+  >(ReservationPageDocument, options);
+}
+export function useReservationPageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationPageQuery,
+        ReservationPageQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationPageQuery,
+    ReservationPageQueryVariables
+  >(ReservationPageDocument, options);
+}
+export type ReservationPageQueryHookResult = ReturnType<
+  typeof useReservationPageQuery
+>;
+export type ReservationPageLazyQueryHookResult = ReturnType<
+  typeof useReservationPageLazyQuery
+>;
+export type ReservationPageSuspenseQueryHookResult = ReturnType<
+  typeof useReservationPageSuspenseQuery
+>;
+export type ReservationPageQueryResult = Apollo.QueryResult<
+  ReservationPageQuery,
+  ReservationPageQueryVariables
 >;
 export const ApproveReservationDocument = gql`
   mutation ApproveReservation($input: ReservationApproveMutationInput!) {

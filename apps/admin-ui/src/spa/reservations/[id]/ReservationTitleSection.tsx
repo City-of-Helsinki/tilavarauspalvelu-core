@@ -13,8 +13,8 @@ import { H1 } from "common/src/common/typography";
 import {
   type Maybe,
   OrderStatus,
-  type ReservationQuery,
   ReservationStateChoice,
+  type ReservationTitleSectionFieldsFragment,
   useReservationApplicationLinkQuery,
 } from "@gql/gql-types";
 import { getName } from "./util";
@@ -25,30 +25,6 @@ import { gql } from "@apollo/client";
 import { ExternalLink } from "@/component/ExternalLink";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
-
-export const APPLICATION_LINK_QUERY = gql`
-  query ReservationApplicationLink($id: ID!) {
-    recurringReservation(id: $id) {
-      id
-      allocatedTimeSlot {
-        id
-        pk
-        reservationUnitOption {
-          id
-          pk
-          applicationSection {
-            id
-            pk
-            application {
-              id
-              pk
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 function getStatusLabelType(s?: Maybe<OrderStatus>): StatusLabelType {
   switch (s) {
@@ -91,19 +67,8 @@ function getReservationStateLabelProps(s?: Maybe<ReservationStateChoice>): {
   }
 }
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
 type Props = Readonly<{
-  reservation: Pick<
-    ReservationType,
-    "createdAt" | "state" | "type" | "name" | "pk" | "reserveeName"
-  > & {
-    recurringReservation: Maybe<
-      Pick<NonNullable<ReservationType["recurringReservation"]>, "id">
-    >;
-    paymentOrder: Readonly<
-      Pick<NonNullable<ReservationType["paymentOrder"][number]>, "status">[]
-    >;
-  };
+  reservation: ReservationTitleSectionFieldsFragment;
   tagline: string;
   overrideTitle?: string;
   noMargin?: boolean;
@@ -172,3 +137,46 @@ const ReservationTitleSection = forwardRef<HTMLDivElement, Props>(
 );
 
 export default ReservationTitleSection;
+
+export const APPLICATION_LINK_QUERY = gql`
+  query ReservationApplicationLink($id: ID!) {
+    recurringReservation(id: $id) {
+      id
+      allocatedTimeSlot {
+        id
+        pk
+        reservationUnitOption {
+          id
+          pk
+          applicationSection {
+            id
+            pk
+            application {
+              id
+              pk
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const RESERVATION_TITLE_SECTION_FRAGMENT = gql`
+  fragment ReservationTitleSectionFields on ReservationNode {
+    id
+    createdAt
+    state
+    type
+    name
+    pk
+    reserveeName
+    recurringReservation {
+      id
+    }
+    paymentOrder {
+      id
+      status
+    }
+  }
+`;

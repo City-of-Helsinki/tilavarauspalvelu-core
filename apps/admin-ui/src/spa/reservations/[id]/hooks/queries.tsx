@@ -114,40 +114,6 @@ export const RESERVATION_RECURRING_FRAGMENT = gql`
   }
 `;
 
-export const SINGLE_RESERVATION_QUERY = gql`
-  query Reservation($id: ID!) {
-    reservation(id: $id) {
-      id
-      ...CreateTagString
-      ...ReservationCommon
-      ...ChangeReservationTime
-      recurringReservation {
-        id
-        ...ReservationRecurringFields
-      }
-      ...ReservationAccessType
-      ...VisibleIfPermissionFields
-      ...DenyDialogFields
-      ...ApprovalDialogFields
-      cancelReason {
-        id
-        reasonFi
-      }
-      denyReason {
-        id
-        reasonFi
-      }
-      reservationUnits {
-        id
-        pk
-        reservationStartInterval
-        ...ReservationTypeFormFields
-      }
-      ...ReservationMetaFields
-    }
-  }
-`;
-
 export const RECURRING_RESERVATION_FRAGMENT = gql`
   fragment RecurringReservation on RecurringReservationNode {
     id

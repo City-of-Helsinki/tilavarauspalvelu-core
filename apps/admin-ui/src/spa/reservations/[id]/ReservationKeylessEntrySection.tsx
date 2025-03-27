@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import {
   AccessType,
-  type ReservationQuery,
+  type ReservationPageQuery,
   useChangeReservationAccessCodeMutation,
   useRepairReservationAccessCodeMutation,
   UserPermissionChoice,
@@ -25,7 +25,7 @@ import { ButtonContainer, Flex, NoWrap } from "common/styles/util";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { useCheckPermission } from "@/hooks";
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
 const SummaryHorizontal = styled.div<{
   $isRecurring?: boolean;

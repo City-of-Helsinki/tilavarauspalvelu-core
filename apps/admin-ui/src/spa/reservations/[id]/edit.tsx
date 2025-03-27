@@ -6,7 +6,7 @@ import {
   type ReservationEditPageQuery,
   ReservationStateChoice,
   useReservationEditPageQuery,
-  useReservationQuery,
+  useReservationPageQuery,
 } from "@gql/gql-types";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -290,7 +290,7 @@ const useReservationEditData = (pk?: string) => {
     `${typename}:${possibleReservations?.at(0)?.pk ?? 0}`
   );
   const { data: nextRecurrance, loading: nextReservationLoading } =
-    useReservationQuery({
+    useReservationPageQuery({
       skip: !possibleReservations?.at(0)?.pk,
       fetchPolicy: "no-cache",
       variables: {
@@ -320,6 +320,7 @@ export const RESERVATION_EDIT_PAGE_QUERY = gql`
       ...CreateTagString
       ...ReservationCommon
       ...ReservationMetaFields
+      ...ReservationTitleSectionFields
       recurringReservation {
         id
         pk

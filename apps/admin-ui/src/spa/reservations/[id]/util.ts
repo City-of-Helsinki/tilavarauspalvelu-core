@@ -11,7 +11,7 @@ import {
   PriceUnit,
   ReservationTypeChoice,
   type PricingFieldsFragment,
-  type ReservationQuery,
+  type ReservationPageQuery,
   type CreateTagStringFragment,
   type ReservationNode,
   ReservationUnitPricingFieldsFragment,
@@ -27,7 +27,7 @@ import { fromAPIDateTime } from "@/helpers";
 import { filterNonNullable, sort, toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
 function reservationUnitName(
   reservationUnit: Maybe<CreateTagStringFragment["reservationUnits"][0]>
