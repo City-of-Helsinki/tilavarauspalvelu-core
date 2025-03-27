@@ -245,7 +245,7 @@ def test_query_current_user__reservation_notification(graphql):
     assert response.has_errors is False, response
     assert response.first_query_object == {
         "pk": user.pk,
-        "reservationNotification": user.reservation_notification,
+        "reservationNotification": user.reservation_notification.value.upper(),
     }
 
 
