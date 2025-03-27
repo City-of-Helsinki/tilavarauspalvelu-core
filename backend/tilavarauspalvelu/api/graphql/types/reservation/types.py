@@ -12,7 +12,6 @@ from query_optimizer import AnnotatedField, MultiField
 from query_optimizer.optimizer import QueryOptimizer
 from rest_framework.reverse import reverse
 
-from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation, ReservationUnit, User
@@ -24,7 +23,6 @@ from .filtersets import ReservationFilterSet
 from .permissions import ReservationPermission
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import PaymentOrder
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import AnyUser, GQLInfo, PindoraReservationInfoData
 
@@ -58,8 +56,6 @@ def staff_field_check(user: AnyUser, reservation: Reservation) -> bool | None:
 
 
 class ReservationNode(DjangoNode):
-    order = PaymentOrderNode.Field(deprecation_reason="Please use to 'paymentOrder' instead.")
-
     reservee_name = AnnotatedField(graphene.String, expression=L("reservee_name"))
 
     is_blocked = AnnotatedField(graphene.Boolean, expression=models.Q(type=ReservationTypeChoice.BLOCKED.value))
@@ -204,7 +200,6 @@ class ReservationNode(DjangoNode):
             #
             "is_blocked",
             "is_handled",
-            "order",
             "payment_order",
             "calendar_url",
         ]
@@ -256,11 +251,6 @@ class ReservationNode(DjangoNode):
         )
         user_optimizer.only_fields.append("id")
         return queryset
-
-    def resolve_order(root: Reservation, info: GQLInfo) -> PaymentOrder | None:
-        # TODO: This should be removed, since it breaks optimization.
-        #  Should use 'payment_order' instead.
-        return root.payment_order.first()
 
     def resolve_calendar_url(root: Reservation, info: GQLInfo) -> str:
         scheme = info.context.scheme

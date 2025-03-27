@@ -85,7 +85,7 @@ def test_reservation__query__all_fields(graphql):
         isHandled
         name
         numPersons
-        order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
+        paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
         price
         priceNet
         purpose { nameFi }
@@ -149,7 +149,7 @@ def test_reservation__query__all_fields(graphql):
         "isHandled": False,
         "name": reservation.name,
         "numPersons": reservation.num_persons,
-        "order": None,
+        "paymentOrder": [],
         "price": f"{reservation.price:.2f}",
         "priceNet": f"{reservation.price_net:.2f}",
         "purpose": None,
@@ -385,7 +385,9 @@ def test_reservation__query__order__all_fields(graphql):
         remote_id="b3fef99e-6c18-422e-943d-cf00702af53e",
     )
 
-    fields = "order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }"
+    fields = (
+        "paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }"
+    )
     query = reservations_query(fields=fields)
 
     graphql.login_with_superuser()
@@ -393,16 +395,18 @@ def test_reservation__query__order__all_fields(graphql):
 
     assert response.has_errors is False, response
     assert response.node(0) == {
-        "order": {
-            "reservationPk": str(reservation.pk),
-            "checkoutUrl": None,
-            "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
-            "paymentType": "INVOICE",
-            "receiptUrl": None,
-            "refundUuid": None,
-            "status": "DRAFT",
-            "expiresInMinutes": 5,
-        }
+        "paymentOrder": [
+            {
+                "reservationPk": str(reservation.pk),
+                "checkoutUrl": None,
+                "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
+                "paymentType": "INVOICE",
+                "receiptUrl": None,
+                "refundUuid": None,
+                "status": "DRAFT",
+                "expiresInMinutes": 5,
+            },
+        ],
     }
 
 
