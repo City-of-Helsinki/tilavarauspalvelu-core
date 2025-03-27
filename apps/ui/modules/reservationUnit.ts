@@ -35,9 +35,9 @@ import {
   ReservationStartInterval,
   Maybe,
   BlockingReservationFieldsFragment,
-  AccessType,
   type ReservationPriceFragment,
   ReservationStateChoice,
+  ReservationUnitAccessTypeNode,
 } from "@gql/gql-types";
 import {
   type ReservableMap,
@@ -652,20 +652,20 @@ function getNotReservableReason(
   return null;
 }
 
-type AccessTypeDurations = {
-  accessType: AccessType;
-  beginDate: string;
-  endDate?: string | null;
-  id: string;
-  pk?: number | null;
+type AccessTypeDurations = Pick<
+  ReservationUnitAccessTypeNode,
+  "beginDate" | "accessType" | "pk"
+>;
+type AccessTypeDurationsExtended = AccessTypeDurations & {
+  endDate: string | null;
 };
 
 export function getReservationUnitAccessPeriods(
-  accessTypes: AccessTypeDurations[]
-) {
+  accessTypes: Readonly<AccessTypeDurations[]>
+): Readonly<AccessTypeDurationsExtended[]> {
   type nextEndDateIterator = {
     nextEndDate: string | null;
-    array: AccessTypeDurations[];
+    array: AccessTypeDurationsExtended[];
   };
   return accessTypes.reduceRight<nextEndDateIterator>(
     (acc, aT) => {

@@ -39,12 +39,12 @@ export type Scalars = {
 
 export type AbilityGroupNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** The state of the access code. */
@@ -77,107 +77,107 @@ export enum AccessTypeWithMultivalued {
 }
 
 export type AddressNode = Node & {
-  city: Scalars["String"]["output"];
-  cityEn: Maybe<Scalars["String"]["output"]>;
-  cityFi: Maybe<Scalars["String"]["output"]>;
-  citySv: Maybe<Scalars["String"]["output"]>;
+  readonly city: Scalars["String"]["output"];
+  readonly cityEn: Maybe<Scalars["String"]["output"]>;
+  readonly cityFi: Maybe<Scalars["String"]["output"]>;
+  readonly citySv: Maybe<Scalars["String"]["output"]>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  postCode: Scalars["String"]["output"];
-  streetAddress: Scalars["String"]["output"];
-  streetAddressEn: Maybe<Scalars["String"]["output"]>;
-  streetAddressFi: Maybe<Scalars["String"]["output"]>;
-  streetAddressSv: Maybe<Scalars["String"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly postCode: Scalars["String"]["output"];
+  readonly streetAddress: Scalars["String"]["output"];
+  readonly streetAddressEn: Maybe<Scalars["String"]["output"]>;
+  readonly streetAddressFi: Maybe<Scalars["String"]["output"]>;
+  readonly streetAddressSv: Maybe<Scalars["String"]["output"]>;
 };
 
 export type AddressSerializerInput = {
-  city: Scalars["String"]["input"];
-  cityEn?: InputMaybe<Scalars["String"]["input"]>;
-  cityFi?: InputMaybe<Scalars["String"]["input"]>;
-  citySv?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  postCode: Scalars["String"]["input"];
-  streetAddress: Scalars["String"]["input"];
-  streetAddressEn?: InputMaybe<Scalars["String"]["input"]>;
-  streetAddressFi?: InputMaybe<Scalars["String"]["input"]>;
-  streetAddressSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly city: Scalars["String"]["input"];
+  readonly cityEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly cityFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly citySv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly postCode: Scalars["String"]["input"];
+  readonly streetAddress: Scalars["String"]["input"];
+  readonly streetAddressEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly streetAddressFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly streetAddressSv?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type AgeGroupNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  maximum: Maybe<Scalars["Int"]["output"]>;
-  minimum: Scalars["Int"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly maximum: Maybe<Scalars["Int"]["output"]>;
+  readonly minimum: Scalars["Int"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type AgeGroupNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<AgeGroupNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<AgeGroupNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `AgeGroupNode` and its cursor. */
 export type AgeGroupNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<AgeGroupNode>;
+  readonly node: Maybe<AgeGroupNode>;
 };
 
 export type AllocatedTimeSlotCreateMutationInput = {
-  beginTime: Scalars["Time"]["input"];
-  dayOfTheWeek: Weekday;
-  endTime: Scalars["Time"]["input"];
-  force?: InputMaybe<Scalars["Boolean"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnitOption: Scalars["Int"]["input"];
+  readonly beginTime: Scalars["Time"]["input"];
+  readonly dayOfTheWeek: Weekday;
+  readonly endTime: Scalars["Time"]["input"];
+  readonly force?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationUnitOption: Scalars["Int"]["input"];
 };
 
 export type AllocatedTimeSlotCreateMutationPayload = {
-  beginTime: Maybe<Scalars["Time"]["output"]>;
-  dayOfTheWeek: Maybe<Weekday>;
-  endTime: Maybe<Scalars["Time"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  reservationUnitOption: Maybe<Scalars["Int"]["output"]>;
+  readonly beginTime: Maybe<Scalars["Time"]["output"]>;
+  readonly dayOfTheWeek: Maybe<Weekday>;
+  readonly endTime: Maybe<Scalars["Time"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationUnitOption: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type AllocatedTimeSlotDeleteMutationInput = {
-  pk: Scalars["ID"]["input"];
+  readonly pk: Scalars["ID"]["input"];
 };
 
 export type AllocatedTimeSlotDeleteMutationPayload = {
-  deleted: Maybe<Scalars["Boolean"]["output"]>;
+  readonly deleted: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type AllocatedTimeSlotNode = Node & {
-  beginTime: Scalars["Time"]["output"];
-  dayOfTheWeek: Weekday;
-  endTime: Scalars["Time"]["output"];
+  readonly beginTime: Scalars["Time"]["output"];
+  readonly dayOfTheWeek: Weekday;
+  readonly endTime: Scalars["Time"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  recurringReservation: Maybe<RecurringReservationNode>;
-  reservationUnitOption: ReservationUnitOptionNode;
+  readonly id: Scalars["ID"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly recurringReservation: Maybe<RecurringReservationNode>;
+  readonly reservationUnitOption: ReservationUnitOptionNode;
 };
 
 export type AllocatedTimeSlotNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<AllocatedTimeSlotNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<AllocatedTimeSlotNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `AllocatedTimeSlotNode` and its cursor. */
 export type AllocatedTimeSlotNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<AllocatedTimeSlotNode>;
+  readonly node: Maybe<AllocatedTimeSlotNode>;
 };
 
 /** Ordering fields for the 'AllocatedTimeSlot' model. */
@@ -215,24 +215,24 @@ export enum AllocatedTimeSlotOrderingChoices {
 }
 
 export type ApplicantNode = Node & {
-  dateOfBirth: Maybe<Scalars["Date"]["output"]>;
-  email: Scalars["String"]["output"];
-  firstName: Scalars["String"]["output"];
-  generalRoles: Array<GeneralRoleNode>;
+  readonly dateOfBirth: Maybe<Scalars["Date"]["output"]>;
+  readonly email: Scalars["String"]["output"];
+  readonly firstName: Scalars["String"]["output"];
+  readonly generalRoles: ReadonlyArray<GeneralRoleNode>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  isAdAuthenticated: Maybe<Scalars["Boolean"]["output"]>;
-  isStronglyAuthenticated: Maybe<Scalars["Boolean"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly isAdAuthenticated: Maybe<Scalars["Boolean"]["output"]>;
+  readonly isStronglyAuthenticated: Maybe<Scalars["Boolean"]["output"]>;
   /** Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella. */
-  isSuperuser: Scalars["Boolean"]["output"];
-  lastName: Scalars["String"]["output"];
-  name: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  reservationNotification: Maybe<Scalars["String"]["output"]>;
-  unitRoles: Array<UnitRoleNode>;
+  readonly isSuperuser: Scalars["Boolean"]["output"];
+  readonly lastName: Scalars["String"]["output"];
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationNotification: Maybe<Scalars["String"]["output"]>;
+  readonly unitRoles: ReadonlyArray<UnitRoleNode>;
   /** Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja. */
-  username: Scalars["String"]["output"];
-  uuid: Scalars["UUID"]["output"];
+  readonly username: Scalars["String"]["output"];
+  readonly uuid: Scalars["UUID"]["output"];
 };
 
 /** An enumeration. */
@@ -244,102 +244,114 @@ export enum ApplicantTypeChoice {
 }
 
 export type ApplicationCancelMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ApplicationCancelMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ApplicationCreateMutationInput = {
-  additionalInformation?: InputMaybe<Scalars["String"]["input"]>;
-  applicantType?: InputMaybe<ApplicantTypeChoice>;
-  applicationRound: Scalars["Int"]["input"];
-  applicationSections?: InputMaybe<
-    Array<InputMaybe<ApplicationSectionForApplicationSerializerInput>>
+  readonly additionalInformation?: InputMaybe<Scalars["String"]["input"]>;
+  readonly applicantType?: InputMaybe<ApplicantTypeChoice>;
+  readonly applicationRound: Scalars["Int"]["input"];
+  readonly applicationSections?: InputMaybe<
+    ReadonlyArray<InputMaybe<ApplicationSectionForApplicationSerializerInput>>
   >;
-  billingAddress?: InputMaybe<AddressSerializerInput>;
-  contactPerson?: InputMaybe<PersonSerializerInput>;
-  homeCity?: InputMaybe<Scalars["Int"]["input"]>;
-  organisation?: InputMaybe<OrganisationSerializerInput>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly billingAddress?: InputMaybe<AddressSerializerInput>;
+  readonly contactPerson?: InputMaybe<PersonSerializerInput>;
+  readonly homeCity?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly organisation?: InputMaybe<OrganisationSerializerInput>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ApplicationCreateMutationPayload = {
-  additionalInformation: Maybe<Scalars["String"]["output"]>;
-  applicantType: Maybe<ApplicantTypeChoice>;
-  applicationRound: Maybe<Scalars["Int"]["output"]>;
-  applicationSections: Maybe<Array<Maybe<ApplicationSectionNode>>>;
-  billingAddress: Maybe<AddressNode>;
-  cancelledDate: Maybe<Scalars["DateTime"]["output"]>;
-  contactPerson: Maybe<PersonNode>;
-  createdDate: Maybe<Scalars["DateTime"]["output"]>;
-  homeCity: Maybe<Scalars["Int"]["output"]>;
-  lastModifiedDate: Maybe<Scalars["DateTime"]["output"]>;
-  organisation: Maybe<OrganisationNode>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  sentDate: Maybe<Scalars["DateTime"]["output"]>;
-  status: Maybe<Status>;
+  readonly additionalInformation: Maybe<Scalars["String"]["output"]>;
+  readonly applicantType: Maybe<ApplicantTypeChoice>;
+  readonly applicationRound: Maybe<Scalars["Int"]["output"]>;
+  readonly applicationSections: Maybe<
+    ReadonlyArray<Maybe<ApplicationSectionNode>>
+  >;
+  readonly billingAddress: Maybe<AddressNode>;
+  readonly cancelledDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly contactPerson: Maybe<PersonNode>;
+  readonly createdDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly homeCity: Maybe<Scalars["Int"]["output"]>;
+  readonly lastModifiedDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly organisation: Maybe<OrganisationNode>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly sentDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly status: Maybe<Status>;
 };
 
 export type ApplicationNode = Node & {
-  additionalInformation: Maybe<Scalars["String"]["output"]>;
-  applicantType: Maybe<ApplicantTypeChoice>;
-  applicationRound: ApplicationRoundNode;
-  applicationSections: Maybe<Array<ApplicationSectionNode>>;
-  billingAddress: Maybe<AddressNode>;
-  cancelledDate: Maybe<Scalars["DateTime"]["output"]>;
-  contactPerson: Maybe<PersonNode>;
-  createdDate: Scalars["DateTime"]["output"];
-  homeCity: Maybe<CityNode>;
+  readonly additionalInformation: Maybe<Scalars["String"]["output"]>;
+  readonly applicantType: Maybe<ApplicantTypeChoice>;
+  readonly applicationRound: ApplicationRoundNode;
+  readonly applicationSections: Maybe<ReadonlyArray<ApplicationSectionNode>>;
+  readonly billingAddress: Maybe<AddressNode>;
+  readonly cancelledDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly contactPerson: Maybe<PersonNode>;
+  readonly createdDate: Scalars["DateTime"]["output"];
+  readonly homeCity: Maybe<CityNode>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  lastModifiedDate: Scalars["DateTime"]["output"];
-  organisation: Maybe<OrganisationNode>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  sentDate: Maybe<Scalars["DateTime"]["output"]>;
-  status: Maybe<ApplicationStatusChoice>;
-  user: Maybe<ApplicantNode>;
-  workingMemo: Scalars["String"]["output"];
+  readonly id: Scalars["ID"]["output"];
+  readonly lastModifiedDate: Scalars["DateTime"]["output"];
+  readonly organisation: Maybe<OrganisationNode>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly sentDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly status: Maybe<ApplicationStatusChoice>;
+  readonly user: Maybe<ApplicantNode>;
+  readonly workingMemo: Scalars["String"]["output"];
 };
 
 export type ApplicationNodeApplicationSectionsArgs = {
-  ageGroup?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  applicantType?: InputMaybe<Array<InputMaybe<ApplicantTypeChoice>>>;
+  ageGroup?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  applicantType?: InputMaybe<ReadonlyArray<InputMaybe<ApplicantTypeChoice>>>;
   application?: InputMaybe<Scalars["Int"]["input"]>;
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
-  applicationStatus?: InputMaybe<Array<InputMaybe<ApplicationStatusChoice>>>;
+  applicationStatus?: InputMaybe<
+    ReadonlyArray<InputMaybe<ApplicationStatusChoice>>
+  >;
   extUuid?: InputMaybe<Scalars["UUID"]["input"]>;
   hasAllocations?: InputMaybe<Scalars["Boolean"]["input"]>;
-  homeCity?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  homeCity?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   includePreferredOrder10OrHigher?: InputMaybe<Scalars["Boolean"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ApplicationSectionOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  preferredOrder?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  priority?: InputMaybe<Array<InputMaybe<Priority>>>;
-  purpose?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  status?: InputMaybe<Array<InputMaybe<ApplicationSectionStatusChoice>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ApplicationSectionOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  preferredOrder?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  priority?: InputMaybe<ReadonlyArray<InputMaybe<Priority>>>;
+  purpose?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnit?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  status?: InputMaybe<
+    ReadonlyArray<InputMaybe<ApplicationSectionStatusChoice>>
+  >;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   user?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ApplicationNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ApplicationNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ApplicationNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ApplicationNode` and its cursor. */
 export type ApplicationNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ApplicationNode>;
+  readonly node: Maybe<ApplicationNode>;
 };
 
 /** Ordering fields for the 'Application' model. */
@@ -363,53 +375,57 @@ export enum ApplicationOrderingChoices {
 }
 
 export type ApplicationRoundNode = Node & {
-  applicationPeriodBegin: Scalars["DateTime"]["output"];
-  applicationPeriodEnd: Scalars["DateTime"]["output"];
-  applicationsCount: Maybe<Scalars["Int"]["output"]>;
-  criteria: Scalars["String"]["output"];
-  criteriaEn: Maybe<Scalars["String"]["output"]>;
-  criteriaFi: Maybe<Scalars["String"]["output"]>;
-  criteriaSv: Maybe<Scalars["String"]["output"]>;
-  handledDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly applicationPeriodBegin: Scalars["DateTime"]["output"];
+  readonly applicationPeriodEnd: Scalars["DateTime"]["output"];
+  readonly applicationsCount: Maybe<Scalars["Int"]["output"]>;
+  readonly criteria: Scalars["String"]["output"];
+  readonly criteriaEn: Maybe<Scalars["String"]["output"]>;
+  readonly criteriaFi: Maybe<Scalars["String"]["output"]>;
+  readonly criteriaSv: Maybe<Scalars["String"]["output"]>;
+  readonly handledDate: Maybe<Scalars["DateTime"]["output"]>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  isSettingHandledAllowed: Maybe<Scalars["Boolean"]["output"]>;
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  notesWhenApplying: Scalars["String"]["output"];
-  notesWhenApplyingEn: Maybe<Scalars["String"]["output"]>;
-  notesWhenApplyingFi: Maybe<Scalars["String"]["output"]>;
-  notesWhenApplyingSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  publicDisplayBegin: Scalars["DateTime"]["output"];
-  publicDisplayEnd: Scalars["DateTime"]["output"];
-  purposes: Array<ReservationPurposeNode>;
-  reservationCreationStatus: Maybe<ApplicationRoundReservationCreationStatusChoice>;
-  reservationPeriodBegin: Scalars["Date"]["output"];
-  reservationPeriodEnd: Scalars["Date"]["output"];
-  reservationUnitCount: Maybe<Scalars["Int"]["output"]>;
-  reservationUnits: Array<ReservationUnitNode>;
-  sentDate: Maybe<Scalars["DateTime"]["output"]>;
-  status: Maybe<ApplicationRoundStatusChoice>;
-  statusTimestamp: Maybe<Scalars["DateTime"]["output"]>;
-  termsOfUse: Maybe<TermsOfUseNode>;
+  readonly id: Scalars["ID"]["output"];
+  readonly isSettingHandledAllowed: Maybe<Scalars["Boolean"]["output"]>;
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly notesWhenApplying: Scalars["String"]["output"];
+  readonly notesWhenApplyingEn: Maybe<Scalars["String"]["output"]>;
+  readonly notesWhenApplyingFi: Maybe<Scalars["String"]["output"]>;
+  readonly notesWhenApplyingSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly publicDisplayBegin: Scalars["DateTime"]["output"];
+  readonly publicDisplayEnd: Scalars["DateTime"]["output"];
+  readonly purposes: ReadonlyArray<ReservationPurposeNode>;
+  readonly reservationCreationStatus: Maybe<ApplicationRoundReservationCreationStatusChoice>;
+  readonly reservationPeriodBegin: Scalars["Date"]["output"];
+  readonly reservationPeriodEnd: Scalars["Date"]["output"];
+  readonly reservationUnitCount: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationUnits: ReadonlyArray<ReservationUnitNode>;
+  readonly sentDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly status: Maybe<ApplicationRoundStatusChoice>;
+  readonly statusTimestamp: Maybe<Scalars["DateTime"]["output"]>;
+  readonly termsOfUse: Maybe<TermsOfUseNode>;
 };
 
 export type ApplicationRoundNodePurposesArgs = {
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameFi?: InputMaybe<Scalars["String"]["input"]>;
   nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationPurposeOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationPurposeOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type ApplicationRoundNodeReservationUnitsArgs = {
-  accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessType?: InputMaybe<ReadonlyArray<InputMaybe<AccessType>>>;
   accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
   accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  applicationRound?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
   descriptionEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
@@ -417,7 +433,7 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   descriptionFi_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   descriptionSv?: InputMaybe<Scalars["String"]["input"]>;
   descriptionSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
-  equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  equipments?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
   maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -434,14 +450,16 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  publishingState?: InputMaybe<
-    Array<InputMaybe<ReservationUnitPublishingState>>
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitOrderingChoices>>
   >;
-  purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  publishingState?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitPublishingState>>
+  >;
+  purposes?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  qualifiers?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
@@ -451,9 +469,11 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
   reservationState?: InputMaybe<
-    Array<InputMaybe<ReservationUnitReservationState>>
+    ReadonlyArray<InputMaybe<ReservationUnitReservationState>>
   >;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnitType?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -462,24 +482,24 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
 export type ApplicationRoundNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ApplicationRoundNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ApplicationRoundNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ApplicationRoundNode` and its cursor. */
 export type ApplicationRoundNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ApplicationRoundNode>;
+  readonly node: Maybe<ApplicationRoundNode>;
 };
 
 /** Ordering fields for the 'ApplicationRound' model. */
@@ -505,132 +525,150 @@ export enum ApplicationRoundStatusChoice {
 }
 
 export type ApplicationRoundTimeSlotNode = Node & {
-  closed: Scalars["Boolean"]["output"];
+  readonly closed: Scalars["Boolean"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  reservableTimes: Maybe<Array<Maybe<TimeSlotType>>>;
-  weekday: Scalars["Int"]["output"];
+  readonly id: Scalars["ID"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reservableTimes: Maybe<ReadonlyArray<Maybe<TimeSlotType>>>;
+  readonly weekday: Scalars["Int"]["output"];
 };
 
 export type ApplicationRoundTimeSlotSerializerInput = {
-  closed?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservableTimes?: InputMaybe<Array<InputMaybe<TimeSlotSerializerInput>>>;
-  weekday: Scalars["Int"]["input"];
+  readonly closed?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly reservableTimes?: InputMaybe<
+    ReadonlyArray<InputMaybe<TimeSlotSerializerInput>>
+  >;
+  readonly weekday: Scalars["Int"]["input"];
 };
 
 export type ApplicationSectionCreateMutationInput = {
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  application: Scalars["Int"]["input"];
-  appliedReservationsPerWeek: Scalars["Int"]["input"];
-  name: Scalars["String"]["input"];
-  numPersons: Scalars["Int"]["input"];
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  purpose?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationMaxDuration: Scalars["Duration"]["input"];
-  reservationMinDuration: Scalars["Duration"]["input"];
-  reservationUnitOptions: Array<
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly application: Scalars["Int"]["input"];
+  readonly appliedReservationsPerWeek: Scalars["Int"]["input"];
+  readonly name: Scalars["String"]["input"];
+  readonly numPersons: Scalars["Int"]["input"];
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationMaxDuration: Scalars["Duration"]["input"];
+  readonly reservationMinDuration: Scalars["Duration"]["input"];
+  readonly reservationUnitOptions: ReadonlyArray<
     InputMaybe<ReservationUnitOptionApplicantSerializerInput>
   >;
-  reservationsBeginDate: Scalars["Date"]["input"];
-  reservationsEndDate: Scalars["Date"]["input"];
-  suitableTimeRanges: Array<InputMaybe<SuitableTimeRangeSerializerInput>>;
+  readonly reservationsBeginDate: Scalars["Date"]["input"];
+  readonly reservationsEndDate: Scalars["Date"]["input"];
+  readonly suitableTimeRanges: ReadonlyArray<
+    InputMaybe<SuitableTimeRangeSerializerInput>
+  >;
 };
 
 export type ApplicationSectionCreateMutationPayload = {
-  ageGroup: Maybe<Scalars["Int"]["output"]>;
-  application: Maybe<Scalars["Int"]["output"]>;
-  appliedReservationsPerWeek: Maybe<Scalars["Int"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  numPersons: Maybe<Scalars["Int"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  purpose: Maybe<Scalars["Int"]["output"]>;
-  reservationMaxDuration: Maybe<Scalars["Duration"]["output"]>;
-  reservationMinDuration: Maybe<Scalars["Duration"]["output"]>;
-  reservationUnitOptions: Maybe<Array<Maybe<ReservationUnitOptionNode>>>;
-  reservationsBeginDate: Maybe<Scalars["Date"]["output"]>;
-  reservationsEndDate: Maybe<Scalars["Date"]["output"]>;
-  suitableTimeRanges: Maybe<Array<Maybe<SuitableTimeRangeNode>>>;
+  readonly ageGroup: Maybe<Scalars["Int"]["output"]>;
+  readonly application: Maybe<Scalars["Int"]["output"]>;
+  readonly appliedReservationsPerWeek: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly numPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly purpose: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationMaxDuration: Maybe<Scalars["Duration"]["output"]>;
+  readonly reservationMinDuration: Maybe<Scalars["Duration"]["output"]>;
+  readonly reservationUnitOptions: Maybe<
+    ReadonlyArray<Maybe<ReservationUnitOptionNode>>
+  >;
+  readonly reservationsBeginDate: Maybe<Scalars["Date"]["output"]>;
+  readonly reservationsEndDate: Maybe<Scalars["Date"]["output"]>;
+  readonly suitableTimeRanges: Maybe<
+    ReadonlyArray<Maybe<SuitableTimeRangeNode>>
+  >;
 };
 
 export type ApplicationSectionDeleteMutationInput = {
-  pk: Scalars["ID"]["input"];
+  readonly pk: Scalars["ID"]["input"];
 };
 
 export type ApplicationSectionDeleteMutationPayload = {
-  deleted: Maybe<Scalars["Boolean"]["output"]>;
+  readonly deleted: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type ApplicationSectionForApplicationSerializerInput = {
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  appliedReservationsPerWeek: Scalars["Int"]["input"];
-  name: Scalars["String"]["input"];
-  numPersons: Scalars["Int"]["input"];
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  purpose?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationMaxDuration: Scalars["Duration"]["input"];
-  reservationMinDuration: Scalars["Duration"]["input"];
-  reservationUnitOptions: Array<
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly appliedReservationsPerWeek: Scalars["Int"]["input"];
+  readonly name: Scalars["String"]["input"];
+  readonly numPersons: Scalars["Int"]["input"];
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationMaxDuration: Scalars["Duration"]["input"];
+  readonly reservationMinDuration: Scalars["Duration"]["input"];
+  readonly reservationUnitOptions: ReadonlyArray<
     InputMaybe<ReservationUnitOptionApplicantSerializerInput>
   >;
-  reservationsBeginDate: Scalars["Date"]["input"];
-  reservationsEndDate: Scalars["Date"]["input"];
-  suitableTimeRanges: Array<InputMaybe<SuitableTimeRangeSerializerInput>>;
+  readonly reservationsBeginDate: Scalars["Date"]["input"];
+  readonly reservationsEndDate: Scalars["Date"]["input"];
+  readonly suitableTimeRanges: ReadonlyArray<
+    InputMaybe<SuitableTimeRangeSerializerInput>
+  >;
 };
 
 export type ApplicationSectionNode = Node & {
-  ageGroup: Maybe<AgeGroupNode>;
-  allocations: Maybe<Scalars["Int"]["output"]>;
-  application: ApplicationNode;
-  appliedReservationsPerWeek: Scalars["Int"]["output"];
-  extUuid: Scalars["UUID"]["output"];
-  hasReservations: Scalars["Boolean"]["output"];
+  readonly ageGroup: Maybe<AgeGroupNode>;
+  readonly allocations: Maybe<Scalars["Int"]["output"]>;
+  readonly application: ApplicationNode;
+  readonly appliedReservationsPerWeek: Scalars["Int"]["output"];
+  readonly extUuid: Scalars["UUID"]["output"];
+  readonly hasReservations: Scalars["Boolean"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  numPersons: Scalars["Int"]["output"];
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly numPersons: Scalars["Int"]["output"];
   /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple sections, queries to Pindora are not optimized. */
-  pindoraInfo: Maybe<PindoraSectionInfoType>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  purpose: Maybe<ReservationPurposeNode>;
-  reservationMaxDuration: Scalars["Duration"]["output"];
-  reservationMinDuration: Scalars["Duration"]["output"];
-  reservationUnitOptions: Array<ReservationUnitOptionNode>;
-  reservationsBeginDate: Scalars["Date"]["output"];
-  reservationsEndDate: Scalars["Date"]["output"];
-  shouldHaveActiveAccessCode: Maybe<Scalars["Boolean"]["output"]>;
-  status: Maybe<ApplicationSectionStatusChoice>;
-  suitableTimeRanges: Array<SuitableTimeRangeNode>;
+  readonly pindoraInfo: Maybe<PindoraSectionInfoType>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly purpose: Maybe<ReservationPurposeNode>;
+  readonly reservationMaxDuration: Scalars["Duration"]["output"];
+  readonly reservationMinDuration: Scalars["Duration"]["output"];
+  readonly reservationUnitOptions: ReadonlyArray<ReservationUnitOptionNode>;
+  readonly reservationsBeginDate: Scalars["Date"]["output"];
+  readonly reservationsEndDate: Scalars["Date"]["output"];
+  readonly shouldHaveActiveAccessCode: Maybe<Scalars["Boolean"]["output"]>;
+  readonly status: Maybe<ApplicationSectionStatusChoice>;
+  readonly suitableTimeRanges: ReadonlyArray<SuitableTimeRangeNode>;
 };
 
 export type ApplicationSectionNodeReservationUnitOptionsArgs = {
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOptionOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  preferredOrder?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitOptionOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  preferredOrder?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  reservationUnit?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
 };
 
 export type ApplicationSectionNodeSuitableTimeRangesArgs = {
   fulfilled?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<SuitableTimeRangeOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  priority?: InputMaybe<Array<InputMaybe<Priority>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<SuitableTimeRangeOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  priority?: InputMaybe<ReadonlyArray<InputMaybe<Priority>>>;
 };
 
 export type ApplicationSectionNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ApplicationSectionNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ApplicationSectionNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ApplicationSectionNode` and its cursor. */
 export type ApplicationSectionNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ApplicationSectionNode>;
+  readonly node: Maybe<ApplicationSectionNode>;
 };
 
 /** Ordering fields for the 'ApplicationSection' model. */
@@ -660,14 +698,14 @@ export enum ApplicationSectionOrderingChoices {
 }
 
 export type ApplicationSectionReservationCancellationMutationInput = {
-  cancelDetails?: InputMaybe<Scalars["String"]["input"]>;
-  cancelReason: Scalars["Int"]["input"];
-  pk: Scalars["Int"]["input"];
+  readonly cancelDetails?: InputMaybe<Scalars["String"]["input"]>;
+  readonly cancelReason: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ApplicationSectionReservationCancellationMutationPayload = {
-  cancelled: Maybe<Scalars["Int"]["output"]>;
-  future: Maybe<Scalars["Int"]["output"]>;
+  readonly cancelled: Maybe<Scalars["Int"]["output"]>;
+  readonly future: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** An enumeration. */
@@ -679,47 +717,53 @@ export enum ApplicationSectionStatusChoice {
 }
 
 export type ApplicationSectionUpdateMutationInput = {
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  application?: InputMaybe<Scalars["Int"]["input"]>;
-  appliedReservationsPerWeek?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  numPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  purpose?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationMaxDuration?: InputMaybe<Scalars["Duration"]["input"]>;
-  reservationMinDuration?: InputMaybe<Scalars["Duration"]["input"]>;
-  reservationUnitOptions?: InputMaybe<
-    Array<InputMaybe<UpdateReservationUnitOptionApplicantSerializerInput>>
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly application?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly appliedReservationsPerWeek?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly numPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationMaxDuration?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly reservationMinDuration?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly reservationUnitOptions?: InputMaybe<
+    ReadonlyArray<
+      InputMaybe<UpdateReservationUnitOptionApplicantSerializerInput>
+    >
   >;
-  reservationsBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  reservationsEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  suitableTimeRanges?: InputMaybe<
-    Array<InputMaybe<UpdateSuitableTimeRangeSerializerInput>>
+  readonly reservationsBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  readonly reservationsEndDate?: InputMaybe<Scalars["Date"]["input"]>;
+  readonly suitableTimeRanges?: InputMaybe<
+    ReadonlyArray<InputMaybe<UpdateSuitableTimeRangeSerializerInput>>
   >;
 };
 
 export type ApplicationSectionUpdateMutationPayload = {
-  ageGroup: Maybe<Scalars["Int"]["output"]>;
-  application: Maybe<Scalars["Int"]["output"]>;
-  appliedReservationsPerWeek: Maybe<Scalars["Int"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  numPersons: Maybe<Scalars["Int"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  purpose: Maybe<Scalars["Int"]["output"]>;
-  reservationMaxDuration: Maybe<Scalars["Duration"]["output"]>;
-  reservationMinDuration: Maybe<Scalars["Duration"]["output"]>;
-  reservationUnitOptions: Maybe<Array<Maybe<ReservationUnitOptionNode>>>;
-  reservationsBeginDate: Maybe<Scalars["Date"]["output"]>;
-  reservationsEndDate: Maybe<Scalars["Date"]["output"]>;
-  suitableTimeRanges: Maybe<Array<Maybe<SuitableTimeRangeNode>>>;
+  readonly ageGroup: Maybe<Scalars["Int"]["output"]>;
+  readonly application: Maybe<Scalars["Int"]["output"]>;
+  readonly appliedReservationsPerWeek: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly numPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly purpose: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationMaxDuration: Maybe<Scalars["Duration"]["output"]>;
+  readonly reservationMinDuration: Maybe<Scalars["Duration"]["output"]>;
+  readonly reservationUnitOptions: Maybe<
+    ReadonlyArray<Maybe<ReservationUnitOptionNode>>
+  >;
+  readonly reservationsBeginDate: Maybe<Scalars["Date"]["output"]>;
+  readonly reservationsEndDate: Maybe<Scalars["Date"]["output"]>;
+  readonly suitableTimeRanges: Maybe<
+    ReadonlyArray<Maybe<SuitableTimeRangeNode>>
+  >;
 };
 
 export type ApplicationSendMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ApplicationSendMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** An enumeration. */
@@ -734,44 +778,48 @@ export enum ApplicationStatusChoice {
 }
 
 export type ApplicationUpdateMutationInput = {
-  additionalInformation?: InputMaybe<Scalars["String"]["input"]>;
-  applicantType?: InputMaybe<ApplicantTypeChoice>;
-  applicationSections?: InputMaybe<
-    Array<InputMaybe<UpdateApplicationSectionForApplicationSerializerInput>>
+  readonly additionalInformation?: InputMaybe<Scalars["String"]["input"]>;
+  readonly applicantType?: InputMaybe<ApplicantTypeChoice>;
+  readonly applicationSections?: InputMaybe<
+    ReadonlyArray<
+      InputMaybe<UpdateApplicationSectionForApplicationSerializerInput>
+    >
   >;
-  billingAddress?: InputMaybe<UpdateAddressSerializerInput>;
-  contactPerson?: InputMaybe<UpdatePersonSerializerInput>;
-  homeCity?: InputMaybe<Scalars["Int"]["input"]>;
-  organisation?: InputMaybe<UpdateOrganisationSerializerInput>;
-  pk: Scalars["Int"]["input"];
+  readonly billingAddress?: InputMaybe<UpdateAddressSerializerInput>;
+  readonly contactPerson?: InputMaybe<UpdatePersonSerializerInput>;
+  readonly homeCity?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly organisation?: InputMaybe<UpdateOrganisationSerializerInput>;
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ApplicationUpdateMutationPayload = {
-  additionalInformation: Maybe<Scalars["String"]["output"]>;
-  applicantType: Maybe<ApplicantTypeChoice>;
-  applicationRound: Maybe<Scalars["ID"]["output"]>;
-  applicationSections: Maybe<Array<Maybe<ApplicationSectionNode>>>;
-  billingAddress: Maybe<AddressNode>;
-  cancelledDate: Maybe<Scalars["DateTime"]["output"]>;
-  contactPerson: Maybe<PersonNode>;
-  createdDate: Maybe<Scalars["DateTime"]["output"]>;
-  homeCity: Maybe<Scalars["Int"]["output"]>;
-  lastModifiedDate: Maybe<Scalars["DateTime"]["output"]>;
-  organisation: Maybe<OrganisationNode>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  sentDate: Maybe<Scalars["DateTime"]["output"]>;
-  status: Maybe<Status>;
-  user: Maybe<Scalars["ID"]["output"]>;
+  readonly additionalInformation: Maybe<Scalars["String"]["output"]>;
+  readonly applicantType: Maybe<ApplicantTypeChoice>;
+  readonly applicationRound: Maybe<Scalars["ID"]["output"]>;
+  readonly applicationSections: Maybe<
+    ReadonlyArray<Maybe<ApplicationSectionNode>>
+  >;
+  readonly billingAddress: Maybe<AddressNode>;
+  readonly cancelledDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly contactPerson: Maybe<PersonNode>;
+  readonly createdDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly homeCity: Maybe<Scalars["Int"]["output"]>;
+  readonly lastModifiedDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly organisation: Maybe<OrganisationNode>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly sentDate: Maybe<Scalars["DateTime"]["output"]>;
+  readonly status: Maybe<Status>;
+  readonly user: Maybe<Scalars["ID"]["output"]>;
 };
 
 export type ApplicationWorkingMemoMutationInput = {
-  pk: Scalars["Int"]["input"];
-  workingMemo?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly workingMemo?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type ApplicationWorkingMemoMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
-  workingMemo: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly workingMemo: Maybe<Scalars["String"]["output"]>;
 };
 
 /** An enumeration. */
@@ -783,39 +831,39 @@ export enum Authentication {
 }
 
 export type BannerNotificationCreateMutationInput = {
-  activeFrom?: InputMaybe<Scalars["DateTime"]["input"]>;
-  activeUntil?: InputMaybe<Scalars["DateTime"]["input"]>;
-  draft?: InputMaybe<Scalars["Boolean"]["input"]>;
-  level: BannerNotificationLevel;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  messageEn?: InputMaybe<Scalars["String"]["input"]>;
-  messageFi?: InputMaybe<Scalars["String"]["input"]>;
-  messageSv?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  target: BannerNotificationTarget;
+  readonly activeFrom?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly activeUntil?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly draft?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly level: BannerNotificationLevel;
+  readonly message?: InputMaybe<Scalars["String"]["input"]>;
+  readonly messageEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly messageFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly messageSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly name: Scalars["String"]["input"];
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly target: BannerNotificationTarget;
 };
 
 export type BannerNotificationCreateMutationPayload = {
-  activeFrom: Maybe<Scalars["DateTime"]["output"]>;
-  activeUntil: Maybe<Scalars["DateTime"]["output"]>;
-  draft: Maybe<Scalars["Boolean"]["output"]>;
-  level: Maybe<BannerNotificationLevel>;
-  message: Maybe<Scalars["String"]["output"]>;
-  messageEn: Maybe<Scalars["String"]["output"]>;
-  messageFi: Maybe<Scalars["String"]["output"]>;
-  messageSv: Maybe<Scalars["String"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  target: Maybe<BannerNotificationTarget>;
+  readonly activeFrom: Maybe<Scalars["DateTime"]["output"]>;
+  readonly activeUntil: Maybe<Scalars["DateTime"]["output"]>;
+  readonly draft: Maybe<Scalars["Boolean"]["output"]>;
+  readonly level: Maybe<BannerNotificationLevel>;
+  readonly message: Maybe<Scalars["String"]["output"]>;
+  readonly messageEn: Maybe<Scalars["String"]["output"]>;
+  readonly messageFi: Maybe<Scalars["String"]["output"]>;
+  readonly messageSv: Maybe<Scalars["String"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly target: Maybe<BannerNotificationTarget>;
 };
 
 export type BannerNotificationDeleteMutationInput = {
-  pk: Scalars["ID"]["input"];
+  readonly pk: Scalars["ID"]["input"];
 };
 
 export type BannerNotificationDeleteMutationPayload = {
-  deleted: Maybe<Scalars["Boolean"]["output"]>;
+  readonly deleted: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 /** An enumeration. */
@@ -829,36 +877,36 @@ export enum BannerNotificationLevel {
 }
 
 export type BannerNotificationNode = Node & {
-  activeFrom: Maybe<Scalars["DateTime"]["output"]>;
-  activeUntil: Maybe<Scalars["DateTime"]["output"]>;
-  draft: Scalars["Boolean"]["output"];
+  readonly activeFrom: Maybe<Scalars["DateTime"]["output"]>;
+  readonly activeUntil: Maybe<Scalars["DateTime"]["output"]>;
+  readonly draft: Scalars["Boolean"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  level: BannerNotificationLevel;
-  message: Scalars["String"]["output"];
-  messageEn: Maybe<Scalars["String"]["output"]>;
-  messageFi: Maybe<Scalars["String"]["output"]>;
-  messageSv: Maybe<Scalars["String"]["output"]>;
-  name: Scalars["String"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  state: Maybe<BannerNotificationState>;
-  target: BannerNotificationTarget;
+  readonly id: Scalars["ID"]["output"];
+  readonly level: BannerNotificationLevel;
+  readonly message: Scalars["String"]["output"];
+  readonly messageEn: Maybe<Scalars["String"]["output"]>;
+  readonly messageFi: Maybe<Scalars["String"]["output"]>;
+  readonly messageSv: Maybe<Scalars["String"]["output"]>;
+  readonly name: Scalars["String"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly state: Maybe<BannerNotificationState>;
+  readonly target: BannerNotificationTarget;
 };
 
 export type BannerNotificationNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<BannerNotificationNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<BannerNotificationNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `BannerNotificationNode` and its cursor. */
 export type BannerNotificationNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<BannerNotificationNode>;
+  readonly node: Maybe<BannerNotificationNode>;
 };
 
 /** Ordering fields for the 'BannerNotification' model. */
@@ -897,67 +945,67 @@ export enum BannerNotificationTarget {
 }
 
 export type BannerNotificationUpdateMutationInput = {
-  activeFrom?: InputMaybe<Scalars["DateTime"]["input"]>;
-  activeUntil?: InputMaybe<Scalars["DateTime"]["input"]>;
-  draft?: InputMaybe<Scalars["Boolean"]["input"]>;
-  level?: InputMaybe<BannerNotificationLevel>;
-  message?: InputMaybe<Scalars["String"]["input"]>;
-  messageEn?: InputMaybe<Scalars["String"]["input"]>;
-  messageFi?: InputMaybe<Scalars["String"]["input"]>;
-  messageSv?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  target?: InputMaybe<BannerNotificationTarget>;
+  readonly activeFrom?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly activeUntil?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly draft?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly level?: InputMaybe<BannerNotificationLevel>;
+  readonly message?: InputMaybe<Scalars["String"]["input"]>;
+  readonly messageEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly messageFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly messageSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly target?: InputMaybe<BannerNotificationTarget>;
 };
 
 export type BannerNotificationUpdateMutationPayload = {
-  activeFrom: Maybe<Scalars["DateTime"]["output"]>;
-  activeUntil: Maybe<Scalars["DateTime"]["output"]>;
-  draft: Maybe<Scalars["Boolean"]["output"]>;
-  level: Maybe<BannerNotificationLevel>;
-  message: Maybe<Scalars["String"]["output"]>;
-  messageEn: Maybe<Scalars["String"]["output"]>;
-  messageFi: Maybe<Scalars["String"]["output"]>;
-  messageSv: Maybe<Scalars["String"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  target: Maybe<BannerNotificationTarget>;
+  readonly activeFrom: Maybe<Scalars["DateTime"]["output"]>;
+  readonly activeUntil: Maybe<Scalars["DateTime"]["output"]>;
+  readonly draft: Maybe<Scalars["Boolean"]["output"]>;
+  readonly level: Maybe<BannerNotificationLevel>;
+  readonly message: Maybe<Scalars["String"]["output"]>;
+  readonly messageEn: Maybe<Scalars["String"]["output"]>;
+  readonly messageFi: Maybe<Scalars["String"]["output"]>;
+  readonly messageSv: Maybe<Scalars["String"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly target: Maybe<BannerNotificationTarget>;
 };
 
 export type CityNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  municipalityCode: Scalars["String"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly municipalityCode: Scalars["String"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type CityNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<CityNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<CityNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `CityNode` and its cursor. */
 export type CityNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<CityNode>;
+  readonly node: Maybe<CityNode>;
 };
 
 export type CurrentUserUpdateMutationInput = {
-  preferredLanguage?: InputMaybe<PreferredLanguage>;
+  readonly preferredLanguage?: InputMaybe<PreferredLanguage>;
 };
 
 export type CurrentUserUpdateMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
-  preferredLanguage: Maybe<PreferredLanguage>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly preferredLanguage: Maybe<PreferredLanguage>;
 };
 
 /** An enumeration. */
@@ -970,62 +1018,62 @@ export enum CustomerTypeChoice {
 /** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
 export type EquipmentAllNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type EquipmentCategoryCreateMutationInput = {
-  name: Scalars["String"]["input"];
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name: Scalars["String"]["input"];
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type EquipmentCategoryCreateMutationPayload = {
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type EquipmentCategoryDeleteMutationInput = {
-  pk: Scalars["ID"]["input"];
+  readonly pk: Scalars["ID"]["input"];
 };
 
 export type EquipmentCategoryDeleteMutationPayload = {
-  deleted: Maybe<Scalars["Boolean"]["output"]>;
+  readonly deleted: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type EquipmentCategoryNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type EquipmentCategoryNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<EquipmentCategoryNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<EquipmentCategoryNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `EquipmentCategoryNode` and its cursor. */
 export type EquipmentCategoryNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<EquipmentCategoryNode>;
+  readonly node: Maybe<EquipmentCategoryNode>;
 };
 
 /** Ordering fields for the 'EquipmentCategory' model. */
@@ -1035,72 +1083,72 @@ export enum EquipmentCategoryOrderingChoices {
 }
 
 export type EquipmentCategoryUpdateMutationInput = {
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  pk: Scalars["Int"]["input"];
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type EquipmentCategoryUpdateMutationPayload = {
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type EquipmentCreateMutationInput = {
-  category: Scalars["Int"]["input"];
-  name: Scalars["String"]["input"];
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly category: Scalars["Int"]["input"];
+  readonly name: Scalars["String"]["input"];
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type EquipmentCreateMutationPayload = {
-  category: Maybe<Scalars["Int"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly category: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type EquipmentDeleteMutationInput = {
-  pk: Scalars["ID"]["input"];
+  readonly pk: Scalars["ID"]["input"];
 };
 
 export type EquipmentDeleteMutationPayload = {
-  deleted: Maybe<Scalars["Boolean"]["output"]>;
+  readonly deleted: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type EquipmentNode = Node & {
-  category: EquipmentCategoryNode;
+  readonly category: EquipmentCategoryNode;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type EquipmentNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<EquipmentNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<EquipmentNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `EquipmentNode` and its cursor. */
 export type EquipmentNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<EquipmentNode>;
+  readonly node: Maybe<EquipmentNode>;
 };
 
 /** Ordering fields for the 'Equipment' model. */
@@ -1118,49 +1166,49 @@ export enum EquipmentOrderingChoices {
 }
 
 export type EquipmentUpdateMutationInput = {
-  category?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  pk: Scalars["Int"]["input"];
+  readonly category?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type EquipmentUpdateMutationPayload = {
-  category: Maybe<Scalars["Int"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly category: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type GeneralRoleNode = Node & {
-  assigner: Maybe<UserNode>;
-  created: Scalars["DateTime"]["output"];
+  readonly assigner: Maybe<UserNode>;
+  readonly created: Scalars["DateTime"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  modified: Scalars["DateTime"]["output"];
-  permissions: Maybe<Array<Maybe<UserPermissionChoice>>>;
-  role: UserRoleChoice;
-  user: UserNode;
+  readonly id: Scalars["ID"]["output"];
+  readonly modified: Scalars["DateTime"]["output"];
+  readonly permissions: Maybe<ReadonlyArray<Maybe<UserPermissionChoice>>>;
+  readonly role: UserRoleChoice;
+  readonly user: UserNode;
 };
 
 export type HelsinkiProfileDataNode = {
-  birthday: Maybe<Scalars["Date"]["output"]>;
-  city: Maybe<Scalars["String"]["output"]>;
-  email: Maybe<Scalars["String"]["output"]>;
-  firstName: Maybe<Scalars["String"]["output"]>;
-  isStrongLogin: Scalars["Boolean"]["output"];
-  lastName: Maybe<Scalars["String"]["output"]>;
-  loginMethod: Maybe<LoginMethod>;
-  municipalityCode: Maybe<Scalars["String"]["output"]>;
-  municipalityName: Maybe<Scalars["String"]["output"]>;
-  phone: Maybe<Scalars["String"]["output"]>;
-  pk: Scalars["Int"]["output"];
-  postalCode: Maybe<Scalars["String"]["output"]>;
-  ssn: Maybe<Scalars["String"]["output"]>;
-  streetAddress: Maybe<Scalars["String"]["output"]>;
+  readonly birthday: Maybe<Scalars["Date"]["output"]>;
+  readonly city: Maybe<Scalars["String"]["output"]>;
+  readonly email: Maybe<Scalars["String"]["output"]>;
+  readonly firstName: Maybe<Scalars["String"]["output"]>;
+  readonly isStrongLogin: Scalars["Boolean"]["output"];
+  readonly lastName: Maybe<Scalars["String"]["output"]>;
+  readonly loginMethod: Maybe<LoginMethod>;
+  readonly municipalityCode: Maybe<Scalars["String"]["output"]>;
+  readonly municipalityName: Maybe<Scalars["String"]["output"]>;
+  readonly phone: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Scalars["Int"]["output"];
+  readonly postalCode: Maybe<Scalars["String"]["output"]>;
+  readonly ssn: Maybe<Scalars["String"]["output"]>;
+  readonly streetAddress: Maybe<Scalars["String"]["output"]>;
 };
 
 /** An enumeration. */
@@ -1172,20 +1220,20 @@ export enum ImageType {
 }
 
 export type LocationNode = Node & {
-  addressCity: Scalars["String"]["output"];
-  addressCityEn: Maybe<Scalars["String"]["output"]>;
-  addressCityFi: Maybe<Scalars["String"]["output"]>;
-  addressCitySv: Maybe<Scalars["String"]["output"]>;
-  addressStreet: Scalars["String"]["output"];
-  addressStreetEn: Maybe<Scalars["String"]["output"]>;
-  addressStreetFi: Maybe<Scalars["String"]["output"]>;
-  addressStreetSv: Maybe<Scalars["String"]["output"]>;
-  addressZip: Scalars["String"]["output"];
+  readonly addressCity: Scalars["String"]["output"];
+  readonly addressCityEn: Maybe<Scalars["String"]["output"]>;
+  readonly addressCityFi: Maybe<Scalars["String"]["output"]>;
+  readonly addressCitySv: Maybe<Scalars["String"]["output"]>;
+  readonly addressStreet: Scalars["String"]["output"];
+  readonly addressStreetEn: Maybe<Scalars["String"]["output"]>;
+  readonly addressStreetFi: Maybe<Scalars["String"]["output"]>;
+  readonly addressStreetSv: Maybe<Scalars["String"]["output"]>;
+  readonly addressZip: Scalars["String"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  latitude: Maybe<Scalars["String"]["output"]>;
-  longitude: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly latitude: Maybe<Scalars["String"]["output"]>;
+  readonly longitude: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** An enumeration. */
@@ -1204,76 +1252,76 @@ export enum LoginMethod {
 }
 
 export type Mutation = {
-  addReservationToSeries: Maybe<ReservationSeriesAddMutationPayload>;
-  adjustReservationTime: Maybe<ReservationAdjustTimeMutationPayload>;
-  approveReservation: Maybe<ReservationApproveMutationPayload>;
-  cancelAllApplicationSectionReservations: Maybe<ApplicationSectionReservationCancellationMutationPayload>;
-  cancelApplication: Maybe<ApplicationCancelMutationPayload>;
-  cancelReservation: Maybe<ReservationCancellationMutationPayload>;
-  changeReservationSeriesAccessCode: Maybe<ReservationSeriesChangeAccessCodeMutationPayload>;
-  confirmReservation: Maybe<ReservationConfirmMutationPayload>;
-  createAllocatedTimeslot: Maybe<AllocatedTimeSlotCreateMutationPayload>;
-  createApplication: Maybe<ApplicationCreateMutationPayload>;
-  createApplicationSection: Maybe<ApplicationSectionCreateMutationPayload>;
-  createBannerNotification: Maybe<BannerNotificationCreateMutationPayload>;
-  createEquipment: Maybe<EquipmentCreateMutationPayload>;
-  createEquipmentCategory: Maybe<EquipmentCategoryCreateMutationPayload>;
-  createPurpose: Maybe<PurposeCreateMutationPayload>;
-  createReservation: Maybe<ReservationCreateMutationPayload>;
-  createReservationSeries: Maybe<ReservationSeriesCreateMutationPayload>;
-  createReservationUnit: Maybe<ReservationUnitCreateMutationPayload>;
-  createReservationUnitImage: Maybe<ReservationUnitImageCreateMutationPayload>;
-  createResource: Maybe<ResourceCreateMutationPayload>;
-  createSpace: Maybe<SpaceCreateMutationPayload>;
-  createStaffReservation: Maybe<ReservationStaffCreateMutationPayload>;
-  deleteAllocatedTimeslot: Maybe<AllocatedTimeSlotDeleteMutationPayload>;
-  deleteApplicationSection: Maybe<ApplicationSectionDeleteMutationPayload>;
-  deleteBannerNotification: Maybe<BannerNotificationDeleteMutationPayload>;
-  deleteEquipment: Maybe<EquipmentDeleteMutationPayload>;
-  deleteEquipmentCategory: Maybe<EquipmentCategoryDeleteMutationPayload>;
+  readonly addReservationToSeries: Maybe<ReservationSeriesAddMutationPayload>;
+  readonly adjustReservationTime: Maybe<ReservationAdjustTimeMutationPayload>;
+  readonly approveReservation: Maybe<ReservationApproveMutationPayload>;
+  readonly cancelAllApplicationSectionReservations: Maybe<ApplicationSectionReservationCancellationMutationPayload>;
+  readonly cancelApplication: Maybe<ApplicationCancelMutationPayload>;
+  readonly cancelReservation: Maybe<ReservationCancellationMutationPayload>;
+  readonly changeReservationSeriesAccessCode: Maybe<ReservationSeriesChangeAccessCodeMutationPayload>;
+  readonly confirmReservation: Maybe<ReservationConfirmMutationPayload>;
+  readonly createAllocatedTimeslot: Maybe<AllocatedTimeSlotCreateMutationPayload>;
+  readonly createApplication: Maybe<ApplicationCreateMutationPayload>;
+  readonly createApplicationSection: Maybe<ApplicationSectionCreateMutationPayload>;
+  readonly createBannerNotification: Maybe<BannerNotificationCreateMutationPayload>;
+  readonly createEquipment: Maybe<EquipmentCreateMutationPayload>;
+  readonly createEquipmentCategory: Maybe<EquipmentCategoryCreateMutationPayload>;
+  readonly createPurpose: Maybe<PurposeCreateMutationPayload>;
+  readonly createReservation: Maybe<ReservationCreateMutationPayload>;
+  readonly createReservationSeries: Maybe<ReservationSeriesCreateMutationPayload>;
+  readonly createReservationUnit: Maybe<ReservationUnitCreateMutationPayload>;
+  readonly createReservationUnitImage: Maybe<ReservationUnitImageCreateMutationPayload>;
+  readonly createResource: Maybe<ResourceCreateMutationPayload>;
+  readonly createSpace: Maybe<SpaceCreateMutationPayload>;
+  readonly createStaffReservation: Maybe<ReservationStaffCreateMutationPayload>;
+  readonly deleteAllocatedTimeslot: Maybe<AllocatedTimeSlotDeleteMutationPayload>;
+  readonly deleteApplicationSection: Maybe<ApplicationSectionDeleteMutationPayload>;
+  readonly deleteBannerNotification: Maybe<BannerNotificationDeleteMutationPayload>;
+  readonly deleteEquipment: Maybe<EquipmentDeleteMutationPayload>;
+  readonly deleteEquipmentCategory: Maybe<EquipmentCategoryDeleteMutationPayload>;
   /** @deprecated Renamed to 'deleteTentativeReservation'. */
-  deleteReservation: Maybe<ReservationDeleteMutationPayload>;
-  deleteReservationUnitImage: Maybe<ReservationUnitImageDeleteMutationPayload>;
-  deleteResource: Maybe<ResourceDeleteMutationPayload>;
-  deleteSpace: Maybe<SpaceDeleteMutationPayload>;
+  readonly deleteReservation: Maybe<ReservationDeleteMutationPayload>;
+  readonly deleteReservationUnitImage: Maybe<ReservationUnitImageDeleteMutationPayload>;
+  readonly deleteResource: Maybe<ResourceDeleteMutationPayload>;
+  readonly deleteSpace: Maybe<SpaceDeleteMutationPayload>;
   /** Used only for deleting a reservation before it is confirmed. */
-  deleteTentativeReservation: Maybe<ReservationDeleteTentativeMutationPayload>;
-  denyReservation: Maybe<ReservationDenyMutationPayload>;
-  denyReservationSeries: Maybe<ReservationSeriesDenyMutationPayload>;
-  refreshOrder: Maybe<RefreshOrderMutationPayload>;
-  refundReservation: Maybe<ReservationRefundMutationPayload>;
-  rejectAllApplicationOptions: Maybe<RejectAllApplicationOptionsMutationPayload>;
-  rejectAllSectionOptions: Maybe<RejectAllSectionOptionsMutationPayload>;
-  repairReservationSeriesAccessCode: Maybe<ReservationSeriesRepairAccessCodeMutationPayload>;
-  requireHandlingForReservation: Maybe<ReservationRequiresHandlingMutationPayload>;
-  rescheduleReservationSeries: Maybe<ReservationSeriesRescheduleMutationPayload>;
-  restoreAllApplicationOptions: Maybe<RestoreAllApplicationOptionsMutationPayload>;
-  restoreAllSectionOptions: Maybe<RestoreAllSectionOptionsMutationPayload>;
-  sendApplication: Maybe<ApplicationSendMutationPayload>;
-  setApplicationRoundHandled: Maybe<SetApplicationRoundHandledMutationPayload>;
-  setApplicationRoundResultsSent: Maybe<SetApplicationRoundResultsSentMutationPayload>;
-  staffAdjustReservationTime: Maybe<ReservationStaffAdjustTimeMutationPayload>;
-  staffChangeReservationAccessCode: Maybe<ReservationStaffChangeAccessCodeMutationPayload>;
-  staffRepairReservationAccessCode: Maybe<ReservationStaffRepairAccessCodeMutationPayload>;
-  staffReservationModify: Maybe<ReservationStaffModifyMutationPayload>;
-  updateApplication: Maybe<ApplicationUpdateMutationPayload>;
-  updateApplicationSection: Maybe<ApplicationSectionUpdateMutationPayload>;
-  updateApplicationWorkingMemo: Maybe<ApplicationWorkingMemoMutationPayload>;
-  updateBannerNotification: Maybe<BannerNotificationUpdateMutationPayload>;
-  updateCurrentUser: Maybe<CurrentUserUpdateMutationPayload>;
-  updateEquipment: Maybe<EquipmentUpdateMutationPayload>;
-  updateEquipmentCategory: Maybe<EquipmentCategoryUpdateMutationPayload>;
-  updatePurpose: Maybe<PurposeUpdateMutationPayload>;
-  updateReservation: Maybe<ReservationUpdateMutationPayload>;
-  updateReservationSeries: Maybe<ReservationSeriesUpdateMutationPayload>;
-  updateReservationUnit: Maybe<ReservationUnitUpdateMutationPayload>;
-  updateReservationUnitImage: Maybe<ReservationUnitImageUpdateMutationPayload>;
-  updateReservationUnitOption: Maybe<ReservationUnitOptionUpdateMutationPayload>;
-  updateReservationWorkingMemo: Maybe<ReservationWorkingMemoMutationPayload>;
-  updateResource: Maybe<ResourceUpdateMutationPayload>;
-  updateSpace: Maybe<SpaceUpdateMutationPayload>;
-  updateStaffUser: Maybe<UserStaffUpdateMutationPayload>;
-  updateUnit: Maybe<UnitUpdateMutationPayload>;
+  readonly deleteTentativeReservation: Maybe<ReservationDeleteTentativeMutationPayload>;
+  readonly denyReservation: Maybe<ReservationDenyMutationPayload>;
+  readonly denyReservationSeries: Maybe<ReservationSeriesDenyMutationPayload>;
+  readonly refreshOrder: Maybe<RefreshOrderMutationPayload>;
+  readonly refundReservation: Maybe<ReservationRefundMutationPayload>;
+  readonly rejectAllApplicationOptions: Maybe<RejectAllApplicationOptionsMutationPayload>;
+  readonly rejectAllSectionOptions: Maybe<RejectAllSectionOptionsMutationPayload>;
+  readonly repairReservationSeriesAccessCode: Maybe<ReservationSeriesRepairAccessCodeMutationPayload>;
+  readonly requireHandlingForReservation: Maybe<ReservationRequiresHandlingMutationPayload>;
+  readonly rescheduleReservationSeries: Maybe<ReservationSeriesRescheduleMutationPayload>;
+  readonly restoreAllApplicationOptions: Maybe<RestoreAllApplicationOptionsMutationPayload>;
+  readonly restoreAllSectionOptions: Maybe<RestoreAllSectionOptionsMutationPayload>;
+  readonly sendApplication: Maybe<ApplicationSendMutationPayload>;
+  readonly setApplicationRoundHandled: Maybe<SetApplicationRoundHandledMutationPayload>;
+  readonly setApplicationRoundResultsSent: Maybe<SetApplicationRoundResultsSentMutationPayload>;
+  readonly staffAdjustReservationTime: Maybe<ReservationStaffAdjustTimeMutationPayload>;
+  readonly staffChangeReservationAccessCode: Maybe<ReservationStaffChangeAccessCodeMutationPayload>;
+  readonly staffRepairReservationAccessCode: Maybe<ReservationStaffRepairAccessCodeMutationPayload>;
+  readonly staffReservationModify: Maybe<ReservationStaffModifyMutationPayload>;
+  readonly updateApplication: Maybe<ApplicationUpdateMutationPayload>;
+  readonly updateApplicationSection: Maybe<ApplicationSectionUpdateMutationPayload>;
+  readonly updateApplicationWorkingMemo: Maybe<ApplicationWorkingMemoMutationPayload>;
+  readonly updateBannerNotification: Maybe<BannerNotificationUpdateMutationPayload>;
+  readonly updateCurrentUser: Maybe<CurrentUserUpdateMutationPayload>;
+  readonly updateEquipment: Maybe<EquipmentUpdateMutationPayload>;
+  readonly updateEquipmentCategory: Maybe<EquipmentCategoryUpdateMutationPayload>;
+  readonly updatePurpose: Maybe<PurposeUpdateMutationPayload>;
+  readonly updateReservation: Maybe<ReservationUpdateMutationPayload>;
+  readonly updateReservationSeries: Maybe<ReservationSeriesUpdateMutationPayload>;
+  readonly updateReservationUnit: Maybe<ReservationUnitUpdateMutationPayload>;
+  readonly updateReservationUnitImage: Maybe<ReservationUnitImageUpdateMutationPayload>;
+  readonly updateReservationUnitOption: Maybe<ReservationUnitOptionUpdateMutationPayload>;
+  readonly updateReservationWorkingMemo: Maybe<ReservationWorkingMemoMutationPayload>;
+  readonly updateResource: Maybe<ResourceUpdateMutationPayload>;
+  readonly updateSpace: Maybe<SpaceUpdateMutationPayload>;
+  readonly updateStaffUser: Maybe<UserStaffUpdateMutationPayload>;
+  readonly updateUnit: Maybe<UnitUpdateMutationPayload>;
 };
 
 export type MutationAddReservationToSeriesArgs = {
@@ -1551,7 +1599,7 @@ export type MutationUpdateUnitArgs = {
 /** An object with an ID */
 export type Node = {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
+  readonly id: Scalars["ID"]["output"];
 };
 
 /** An enumeration. */
@@ -1576,41 +1624,41 @@ export enum OrderStatusWithFree {
 }
 
 export type OrganisationNode = Node & {
-  activeMembers: Maybe<Scalars["Int"]["output"]>;
-  address: Maybe<AddressNode>;
-  coreBusiness: Scalars["String"]["output"];
-  coreBusinessEn: Maybe<Scalars["String"]["output"]>;
-  coreBusinessFi: Maybe<Scalars["String"]["output"]>;
-  coreBusinessSv: Maybe<Scalars["String"]["output"]>;
-  email: Scalars["String"]["output"];
+  readonly activeMembers: Maybe<Scalars["Int"]["output"]>;
+  readonly address: Maybe<AddressNode>;
+  readonly coreBusiness: Scalars["String"]["output"];
+  readonly coreBusinessEn: Maybe<Scalars["String"]["output"]>;
+  readonly coreBusinessFi: Maybe<Scalars["String"]["output"]>;
+  readonly coreBusinessSv: Maybe<Scalars["String"]["output"]>;
+  readonly email: Scalars["String"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  identifier: Maybe<Scalars["String"]["output"]>;
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  organisationType: OrganizationTypeChoice;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  yearEstablished: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly identifier: Maybe<Scalars["String"]["output"]>;
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly organisationType: OrganizationTypeChoice;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly yearEstablished: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type OrganisationSerializerInput = {
-  activeMembers?: InputMaybe<Scalars["Int"]["input"]>;
-  address: AddressSerializerInput;
-  coreBusiness?: InputMaybe<Scalars["String"]["input"]>;
-  coreBusinessEn?: InputMaybe<Scalars["String"]["input"]>;
-  coreBusinessFi?: InputMaybe<Scalars["String"]["input"]>;
-  coreBusinessSv?: InputMaybe<Scalars["String"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  identifier?: InputMaybe<Scalars["String"]["input"]>;
-  name: Scalars["String"]["input"];
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  organisationType?: InputMaybe<OrganizationTypeChoice>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  yearEstablished?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly activeMembers?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly address: AddressSerializerInput;
+  readonly coreBusiness?: InputMaybe<Scalars["String"]["input"]>;
+  readonly coreBusinessEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly coreBusinessFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly coreBusinessSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly email?: InputMaybe<Scalars["String"]["input"]>;
+  readonly identifier?: InputMaybe<Scalars["String"]["input"]>;
+  readonly name: Scalars["String"]["input"];
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly organisationType?: InputMaybe<OrganizationTypeChoice>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly yearEstablished?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 /** An enumeration. */
@@ -1632,41 +1680,41 @@ export enum OrganizationTypeChoice {
 /** The Relay compliant `PageInfo` type, containing data necessary to paginate this connection. */
 export type PageInfo = {
   /** When paginating forwards, the cursor to continue. */
-  endCursor: Maybe<Scalars["String"]["output"]>;
+  readonly endCursor: Maybe<Scalars["String"]["output"]>;
   /** When paginating forwards, are there more items? */
-  hasNextPage: Scalars["Boolean"]["output"];
+  readonly hasNextPage: Scalars["Boolean"]["output"];
   /** When paginating backwards, are there more items? */
-  hasPreviousPage: Scalars["Boolean"]["output"];
+  readonly hasPreviousPage: Scalars["Boolean"]["output"];
   /** When paginating backwards, the cursor to continue. */
-  startCursor: Maybe<Scalars["String"]["output"]>;
+  readonly startCursor: Maybe<Scalars["String"]["output"]>;
 };
 
 export type PaymentMerchantNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  pk: Maybe<Scalars["UUID"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly pk: Maybe<Scalars["UUID"]["output"]>;
 };
 
 export type PaymentOrderNode = Node & {
-  checkoutUrl: Maybe<Scalars["String"]["output"]>;
-  expiresInMinutes: Maybe<Scalars["Int"]["output"]>;
+  readonly checkoutUrl: Maybe<Scalars["String"]["output"]>;
+  readonly expiresInMinutes: Maybe<Scalars["Int"]["output"]>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  orderUuid: Maybe<Scalars["UUID"]["output"]>;
-  paymentType: PaymentType;
-  processedAt: Maybe<Scalars["DateTime"]["output"]>;
-  receiptUrl: Maybe<Scalars["String"]["output"]>;
-  refundUuid: Maybe<Scalars["UUID"]["output"]>;
-  reservationPk: Maybe<Scalars["String"]["output"]>;
-  status: Maybe<OrderStatus>;
+  readonly id: Scalars["ID"]["output"];
+  readonly orderUuid: Maybe<Scalars["UUID"]["output"]>;
+  readonly paymentType: PaymentType;
+  readonly processedAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly receiptUrl: Maybe<Scalars["String"]["output"]>;
+  readonly refundUuid: Maybe<Scalars["UUID"]["output"]>;
+  readonly reservationPk: Maybe<Scalars["String"]["output"]>;
+  readonly status: Maybe<OrderStatus>;
 };
 
 export type PaymentProductNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  merchant: Maybe<PaymentMerchantNode>;
-  pk: Maybe<Scalars["UUID"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly merchant: Maybe<PaymentMerchantNode>;
+  readonly pk: Maybe<Scalars["UUID"]["output"]>;
 };
 
 /** An enumeration. */
@@ -1677,73 +1725,75 @@ export enum PaymentType {
 }
 
 export type PermissionCheckerType = {
-  hasPermission: Scalars["Boolean"]["output"];
+  readonly hasPermission: Scalars["Boolean"]["output"];
 };
 
 export type PersonNode = Node & {
-  email: Maybe<Scalars["String"]["output"]>;
-  firstName: Scalars["String"]["output"];
+  readonly email: Maybe<Scalars["String"]["output"]>;
+  readonly firstName: Scalars["String"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  lastName: Scalars["String"]["output"];
-  phoneNumber: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly lastName: Scalars["String"]["output"];
+  readonly phoneNumber: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type PersonSerializerInput = {
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  firstName: Scalars["String"]["input"];
-  lastName: Scalars["String"]["input"];
-  phoneNumber?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly email?: InputMaybe<Scalars["String"]["input"]>;
+  readonly firstName: Scalars["String"]["input"];
+  readonly lastName: Scalars["String"]["input"];
+  readonly phoneNumber?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type PindoraReservationInfoType = {
-  accessCode: Scalars["String"]["output"];
-  accessCodeBeginsAt: Scalars["DateTime"]["output"];
-  accessCodeEndsAt: Scalars["DateTime"]["output"];
-  accessCodeGeneratedAt: Scalars["DateTime"]["output"];
-  accessCodeIsActive: Scalars["Boolean"]["output"];
-  accessCodeKeypadUrl: Scalars["String"]["output"];
-  accessCodePhoneNumber: Scalars["String"]["output"];
-  accessCodeSmsMessage: Scalars["String"]["output"];
-  accessCodeSmsNumber: Scalars["String"]["output"];
+  readonly accessCode: Scalars["String"]["output"];
+  readonly accessCodeBeginsAt: Scalars["DateTime"]["output"];
+  readonly accessCodeEndsAt: Scalars["DateTime"]["output"];
+  readonly accessCodeGeneratedAt: Scalars["DateTime"]["output"];
+  readonly accessCodeIsActive: Scalars["Boolean"]["output"];
+  readonly accessCodeKeypadUrl: Scalars["String"]["output"];
+  readonly accessCodePhoneNumber: Scalars["String"]["output"];
+  readonly accessCodeSmsMessage: Scalars["String"]["output"];
+  readonly accessCodeSmsNumber: Scalars["String"]["output"];
 };
 
 export type PindoraSectionInfoType = {
-  accessCode: Scalars["String"]["output"];
-  accessCodeGeneratedAt: Scalars["DateTime"]["output"];
-  accessCodeIsActive: Scalars["Boolean"]["output"];
-  accessCodeKeypadUrl: Scalars["String"]["output"];
-  accessCodePhoneNumber: Scalars["String"]["output"];
-  accessCodeSmsMessage: Scalars["String"]["output"];
-  accessCodeSmsNumber: Scalars["String"]["output"];
-  accessCodeValidity: Array<Maybe<PindoraSectionValidityInfoType>>;
+  readonly accessCode: Scalars["String"]["output"];
+  readonly accessCodeGeneratedAt: Scalars["DateTime"]["output"];
+  readonly accessCodeIsActive: Scalars["Boolean"]["output"];
+  readonly accessCodeKeypadUrl: Scalars["String"]["output"];
+  readonly accessCodePhoneNumber: Scalars["String"]["output"];
+  readonly accessCodeSmsMessage: Scalars["String"]["output"];
+  readonly accessCodeSmsNumber: Scalars["String"]["output"];
+  readonly accessCodeValidity: ReadonlyArray<
+    Maybe<PindoraSectionValidityInfoType>
+  >;
 };
 
 export type PindoraSectionValidityInfoType = {
-  accessCodeBeginsAt: Scalars["DateTime"]["output"];
-  accessCodeEndsAt: Scalars["DateTime"]["output"];
-  reservationId: Scalars["Int"]["output"];
-  reservationSeriesId: Scalars["Int"]["output"];
+  readonly accessCodeBeginsAt: Scalars["DateTime"]["output"];
+  readonly accessCodeEndsAt: Scalars["DateTime"]["output"];
+  readonly reservationId: Scalars["Int"]["output"];
+  readonly reservationSeriesId: Scalars["Int"]["output"];
 };
 
 export type PindoraSeriesInfoType = {
-  accessCode: Scalars["String"]["output"];
-  accessCodeGeneratedAt: Scalars["DateTime"]["output"];
-  accessCodeIsActive: Scalars["Boolean"]["output"];
-  accessCodeKeypadUrl: Scalars["String"]["output"];
-  accessCodePhoneNumber: Scalars["String"]["output"];
-  accessCodeSmsMessage: Scalars["String"]["output"];
-  accessCodeSmsNumber: Scalars["String"]["output"];
-  accessCodeValidity: Array<PindoraSeriesValidityInfoType>;
+  readonly accessCode: Scalars["String"]["output"];
+  readonly accessCodeGeneratedAt: Scalars["DateTime"]["output"];
+  readonly accessCodeIsActive: Scalars["Boolean"]["output"];
+  readonly accessCodeKeypadUrl: Scalars["String"]["output"];
+  readonly accessCodePhoneNumber: Scalars["String"]["output"];
+  readonly accessCodeSmsMessage: Scalars["String"]["output"];
+  readonly accessCodeSmsNumber: Scalars["String"]["output"];
+  readonly accessCodeValidity: ReadonlyArray<PindoraSeriesValidityInfoType>;
 };
 
 export type PindoraSeriesValidityInfoType = {
-  accessCodeBeginsAt: Scalars["DateTime"]["output"];
-  accessCodeEndsAt: Scalars["DateTime"]["output"];
-  reservationId: Scalars["Int"]["output"];
-  reservationSeriesId: Scalars["Int"]["output"];
+  readonly accessCodeBeginsAt: Scalars["DateTime"]["output"];
+  readonly accessCodeEndsAt: Scalars["DateTime"]["output"];
+  readonly reservationId: Scalars["Int"]["output"];
+  readonly reservationSeriesId: Scalars["Int"]["output"];
 };
 
 /** An enumeration. */
@@ -1781,48 +1831,48 @@ export enum Priority {
 }
 
 export type PurposeCreateMutationInput = {
-  name: Scalars["String"]["input"];
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name: Scalars["String"]["input"];
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type PurposeCreateMutationPayload = {
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type PurposeNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  imageUrl: Maybe<Scalars["String"]["output"]>;
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  rank: Scalars["Int"]["output"];
-  smallUrl: Maybe<Scalars["String"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly imageUrl: Maybe<Scalars["String"]["output"]>;
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly rank: Scalars["Int"]["output"];
+  readonly smallUrl: Maybe<Scalars["String"]["output"]>;
 };
 
 export type PurposeNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<PurposeNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<PurposeNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `PurposeNode` and its cursor. */
 export type PurposeNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<PurposeNode>;
+  readonly node: Maybe<PurposeNode>;
 };
 
 /** Ordering fields for the 'Purpose' model. */
@@ -1838,45 +1888,45 @@ export enum PurposeOrderingChoices {
 }
 
 export type PurposeUpdateMutationInput = {
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  pk: Scalars["Int"]["input"];
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type PurposeUpdateMutationPayload = {
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type QualifierNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type QualifierNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<QualifierNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<QualifierNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `QualifierNode` and its cursor. */
 export type QualifierNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<QualifierNode>;
+  readonly node: Maybe<QualifierNode>;
 };
 
 /** Ordering fields for the 'Qualifier' model. */
@@ -1887,58 +1937,60 @@ export enum QualifierOrderingChoices {
 
 export type Query = {
   /** Return all allocations that affect allocations for given reservation unit (through space hierarchy or common resource) during the given time period. */
-  affectingAllocatedTimeSlots: Maybe<Array<AllocatedTimeSlotNode>>;
+  readonly affectingAllocatedTimeSlots: Maybe<
+    ReadonlyArray<AllocatedTimeSlotNode>
+  >;
   /** Find all reservations that affect other reservations through the space hierarchy or a common resource. */
-  affectingReservations: Maybe<Array<ReservationNode>>;
-  ageGroups: Maybe<AgeGroupNodeConnection>;
-  allocatedTimeSlots: Maybe<AllocatedTimeSlotNodeConnection>;
-  application: Maybe<ApplicationNode>;
-  applicationRound: Maybe<ApplicationRoundNode>;
-  applicationRounds: Maybe<ApplicationRoundNodeConnection>;
-  applicationSection: Maybe<ApplicationSectionNode>;
-  applicationSections: Maybe<ApplicationSectionNodeConnection>;
-  applications: Maybe<ApplicationNodeConnection>;
-  bannerNotification: Maybe<BannerNotificationNode>;
-  bannerNotifications: Maybe<BannerNotificationNodeConnection>;
-  checkPermissions: Maybe<PermissionCheckerType>;
-  cities: Maybe<CityNodeConnection>;
-  currentUser: Maybe<UserNode>;
-  equipment: Maybe<EquipmentNode>;
-  equipmentCategories: Maybe<EquipmentCategoryNodeConnection>;
-  equipmentCategory: Maybe<EquipmentCategoryNode>;
-  equipments: Maybe<EquipmentNodeConnection>;
-  equipmentsAll: Maybe<Array<EquipmentAllNode>>;
-  metadataSets: Maybe<ReservationMetadataSetNodeConnection>;
-  order: Maybe<PaymentOrderNode>;
+  readonly affectingReservations: Maybe<ReadonlyArray<ReservationNode>>;
+  readonly ageGroups: Maybe<AgeGroupNodeConnection>;
+  readonly allocatedTimeSlots: Maybe<AllocatedTimeSlotNodeConnection>;
+  readonly application: Maybe<ApplicationNode>;
+  readonly applicationRound: Maybe<ApplicationRoundNode>;
+  readonly applicationRounds: Maybe<ApplicationRoundNodeConnection>;
+  readonly applicationSection: Maybe<ApplicationSectionNode>;
+  readonly applicationSections: Maybe<ApplicationSectionNodeConnection>;
+  readonly applications: Maybe<ApplicationNodeConnection>;
+  readonly bannerNotification: Maybe<BannerNotificationNode>;
+  readonly bannerNotifications: Maybe<BannerNotificationNodeConnection>;
+  readonly checkPermissions: Maybe<PermissionCheckerType>;
+  readonly cities: Maybe<CityNodeConnection>;
+  readonly currentUser: Maybe<UserNode>;
+  readonly equipment: Maybe<EquipmentNode>;
+  readonly equipmentCategories: Maybe<EquipmentCategoryNodeConnection>;
+  readonly equipmentCategory: Maybe<EquipmentCategoryNode>;
+  readonly equipments: Maybe<EquipmentNodeConnection>;
+  readonly equipmentsAll: Maybe<ReadonlyArray<EquipmentAllNode>>;
+  readonly metadataSets: Maybe<ReservationMetadataSetNodeConnection>;
+  readonly order: Maybe<PaymentOrderNode>;
   /** Get information about a user from Helsinki profile. If user is not a profile user, still return data stored in our database, e.g. first and last name. Use only one of 'reservation_id' or 'application_id' to select the user. This determines the required permissions to view the user's data. */
-  profileData: Maybe<HelsinkiProfileDataNode>;
-  purposes: Maybe<PurposeNodeConnection>;
-  qualifiers: Maybe<QualifierNodeConnection>;
-  recurringReservation: Maybe<RecurringReservationNode>;
-  recurringReservations: Maybe<RecurringReservationNodeConnection>;
-  rejectedOccurrence: Maybe<RejectedOccurrenceNode>;
-  rejectedOccurrences: Maybe<RejectedOccurrenceNodeConnection>;
-  reservation: Maybe<ReservationNode>;
-  reservationCancelReasons: Maybe<ReservationCancelReasonNodeConnection>;
-  reservationDenyReasons: Maybe<ReservationDenyReasonNodeConnection>;
-  reservationPurposes: Maybe<ReservationPurposeNodeConnection>;
-  reservationUnit: Maybe<ReservationUnitNode>;
-  reservationUnitCancellationRules: Maybe<ReservationUnitCancellationRuleNodeConnection>;
-  reservationUnitTypes: Maybe<ReservationUnitTypeNodeConnection>;
-  reservationUnits: Maybe<ReservationUnitNodeConnection>;
-  reservationUnitsAll: Maybe<Array<ReservationUnitAllNode>>;
-  reservations: Maybe<ReservationNodeConnection>;
-  resource: Maybe<ResourceNode>;
-  resources: Maybe<ResourceNodeConnection>;
-  space: Maybe<SpaceNode>;
-  spaces: Maybe<SpaceNodeConnection>;
-  taxPercentages: Maybe<TaxPercentageNodeConnection>;
-  termsOfUse: Maybe<TermsOfUseNodeConnection>;
-  unit: Maybe<UnitNode>;
-  unitGroups: Maybe<UnitGroupNodeConnection>;
-  units: Maybe<UnitNodeConnection>;
-  unitsAll: Maybe<Array<UnitAllNode>>;
-  user: Maybe<UserNode>;
+  readonly profileData: Maybe<HelsinkiProfileDataNode>;
+  readonly purposes: Maybe<PurposeNodeConnection>;
+  readonly qualifiers: Maybe<QualifierNodeConnection>;
+  readonly recurringReservation: Maybe<RecurringReservationNode>;
+  readonly recurringReservations: Maybe<RecurringReservationNodeConnection>;
+  readonly rejectedOccurrence: Maybe<RejectedOccurrenceNode>;
+  readonly rejectedOccurrences: Maybe<RejectedOccurrenceNodeConnection>;
+  readonly reservation: Maybe<ReservationNode>;
+  readonly reservationCancelReasons: Maybe<ReservationCancelReasonNodeConnection>;
+  readonly reservationDenyReasons: Maybe<ReservationDenyReasonNodeConnection>;
+  readonly reservationPurposes: Maybe<ReservationPurposeNodeConnection>;
+  readonly reservationUnit: Maybe<ReservationUnitNode>;
+  readonly reservationUnitCancellationRules: Maybe<ReservationUnitCancellationRuleNodeConnection>;
+  readonly reservationUnitTypes: Maybe<ReservationUnitTypeNodeConnection>;
+  readonly reservationUnits: Maybe<ReservationUnitNodeConnection>;
+  readonly reservationUnitsAll: Maybe<ReadonlyArray<ReservationUnitAllNode>>;
+  readonly reservations: Maybe<ReservationNodeConnection>;
+  readonly resource: Maybe<ResourceNode>;
+  readonly resources: Maybe<ResourceNodeConnection>;
+  readonly space: Maybe<SpaceNode>;
+  readonly spaces: Maybe<SpaceNodeConnection>;
+  readonly taxPercentages: Maybe<TaxPercentageNodeConnection>;
+  readonly termsOfUse: Maybe<TermsOfUseNodeConnection>;
+  readonly unit: Maybe<UnitNode>;
+  readonly unitGroups: Maybe<UnitGroupNodeConnection>;
+  readonly units: Maybe<UnitNodeConnection>;
+  readonly unitsAll: Maybe<ReadonlyArray<UnitAllNode>>;
+  readonly user: Maybe<UserNode>;
 };
 
 export type QueryAffectingAllocatedTimeSlotsArgs = {
@@ -1954,28 +2006,38 @@ export type QueryAffectingReservationsArgs = {
   createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
   extUuid?: InputMaybe<Scalars["UUID"]["input"]>;
-  forReservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  forUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  forReservationUnits?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  forUnits?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithHandlingPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
-  orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<ReservationOrderingChoices>>>;
+  orderStatus?: InputMaybe<ReadonlyArray<InputMaybe<OrderStatusWithFree>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  recurringReservation?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
+  reservationType?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationTypeChoice>>
+  >;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
+  reservationUnitType?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  reservationUnits?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  state?: InputMaybe<ReadonlyArray<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  user?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  user?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryAgeGroupsArgs = {
@@ -1987,24 +2049,28 @@ export type QueryAgeGroupsArgs = {
 };
 
 export type QueryAllocatedTimeSlotsArgs = {
-  accessCodeState?: InputMaybe<Array<InputMaybe<AccessCodeState>>>;
+  accessCodeState?: InputMaybe<ReadonlyArray<InputMaybe<AccessCodeState>>>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   allocatedReservationUnit?: InputMaybe<
-    Array<InputMaybe<Scalars["Int"]["input"]>>
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
   >;
-  allocatedUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  applicantType?: InputMaybe<Array<InputMaybe<ApplicantTypeChoice>>>;
+  allocatedUnit?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  applicantType?: InputMaybe<ReadonlyArray<InputMaybe<ApplicantTypeChoice>>>;
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   applicationSectionStatus?: InputMaybe<
-    Array<InputMaybe<ApplicationSectionStatusChoice>>
+    ReadonlyArray<InputMaybe<ApplicationSectionStatusChoice>>
   >;
   before?: InputMaybe<Scalars["String"]["input"]>;
-  dayOfTheWeek?: InputMaybe<Array<InputMaybe<Weekday>>>;
+  dayOfTheWeek?: InputMaybe<ReadonlyArray<InputMaybe<Weekday>>>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<AllocatedTimeSlotOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<AllocatedTimeSlotOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -2026,8 +2092,10 @@ export type QueryApplicationRoundsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   ongoing?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermissions?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ApplicationRoundOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ApplicationRoundOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryApplicationSectionArgs = {
@@ -2036,45 +2104,55 @@ export type QueryApplicationSectionArgs = {
 
 export type QueryApplicationSectionsArgs = {
   after?: InputMaybe<Scalars["String"]["input"]>;
-  ageGroup?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  applicantType?: InputMaybe<Array<InputMaybe<ApplicantTypeChoice>>>;
+  ageGroup?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  applicantType?: InputMaybe<ReadonlyArray<InputMaybe<ApplicantTypeChoice>>>;
   application?: InputMaybe<Scalars["Int"]["input"]>;
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
-  applicationStatus?: InputMaybe<Array<InputMaybe<ApplicationStatusChoice>>>;
+  applicationStatus?: InputMaybe<
+    ReadonlyArray<InputMaybe<ApplicationStatusChoice>>
+  >;
   before?: InputMaybe<Scalars["String"]["input"]>;
   extUuid?: InputMaybe<Scalars["UUID"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   hasAllocations?: InputMaybe<Scalars["Boolean"]["input"]>;
-  homeCity?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  homeCity?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   includePreferredOrder10OrHigher?: InputMaybe<Scalars["Boolean"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ApplicationSectionOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  preferredOrder?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  priority?: InputMaybe<Array<InputMaybe<Priority>>>;
-  purpose?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  status?: InputMaybe<Array<InputMaybe<ApplicationSectionStatusChoice>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ApplicationSectionOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  preferredOrder?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  priority?: InputMaybe<ReadonlyArray<InputMaybe<Priority>>>;
+  purpose?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnit?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  status?: InputMaybe<
+    ReadonlyArray<InputMaybe<ApplicationSectionStatusChoice>>
+  >;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   user?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type QueryApplicationsArgs = {
   after?: InputMaybe<Scalars["String"]["input"]>;
-  applicantType?: InputMaybe<Array<InputMaybe<ApplicantTypeChoice>>>;
+  applicantType?: InputMaybe<ReadonlyArray<InputMaybe<ApplicantTypeChoice>>>;
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   before?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ApplicationOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  status?: InputMaybe<Array<InputMaybe<ApplicationStatusChoice>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<ApplicationOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  status?: InputMaybe<ReadonlyArray<InputMaybe<ApplicationStatusChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   user?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
@@ -2091,14 +2169,16 @@ export type QueryBannerNotificationsArgs = {
   last?: InputMaybe<Scalars["Int"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<BannerNotificationOrderingChoices>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<BannerNotificationOrderingChoices>>
+  >;
   target?: InputMaybe<BannerNotificationTarget>;
 };
 
 export type QueryCheckPermissionsArgs = {
   permission: UserPermissionChoice;
   requireAll?: InputMaybe<Scalars["Boolean"]["input"]>;
-  units?: InputMaybe<Array<Scalars["Int"]["input"]>>;
+  units?: InputMaybe<ReadonlyArray<Scalars["Int"]["input"]>>;
 };
 
 export type QueryCitiesArgs = {
@@ -2119,8 +2199,10 @@ export type QueryEquipmentCategoriesArgs = {
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<EquipmentCategoryOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<EquipmentCategoryOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryEquipmentCategoryArgs = {
@@ -2145,14 +2227,14 @@ export type QueryEquipmentsArgs = {
   name_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   name_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<EquipmentOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<EquipmentOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
 };
 
 export type QueryEquipmentsAllArgs = {
-  orderBy?: InputMaybe<Array<InputMaybe<EquipmentOrderingChoices>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<EquipmentOrderingChoices>>>;
 };
 
 export type QueryMetadataSetsArgs = {
@@ -2181,8 +2263,8 @@ export type QueryPurposesArgs = {
   nameFi?: InputMaybe<Scalars["String"]["input"]>;
   nameSv?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<PurposeOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<PurposeOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryQualifiersArgs = {
@@ -2194,8 +2276,8 @@ export type QueryQualifiersArgs = {
   nameFi?: InputMaybe<Scalars["String"]["input"]>;
   nameSv?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<QualifierOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<QualifierOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryRecurringReservationArgs = {
@@ -2214,14 +2296,20 @@ export type QueryRecurringReservationsArgs = {
   last?: InputMaybe<Scalars["Int"]["input"]>;
   name?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<RecurringReservationOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<RecurringReservationOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnit?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["ID"]["input"]>>
+  >;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["ID"]["input"]>>>;
+  reservationUnitType?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["ID"]["input"]>>
+  >;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["ID"]["input"]>>>;
   user?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
@@ -2236,12 +2324,16 @@ export type QueryRejectedOccurrencesArgs = {
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<RejectedOccurrenceOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<RejectedOccurrenceOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   recurringReservation?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnit?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryReservationArgs = {
@@ -2255,9 +2347,9 @@ export type QueryReservationCancelReasonsArgs = {
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   orderBy?: InputMaybe<
-    Array<InputMaybe<ReservationCancelReasonOrderingChoices>>
+    ReadonlyArray<InputMaybe<ReservationCancelReasonOrderingChoices>>
   >;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   reason?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -2267,8 +2359,10 @@ export type QueryReservationDenyReasonsArgs = {
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationDenyReasonOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationDenyReasonOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   reason?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -2281,8 +2375,10 @@ export type QueryReservationPurposesArgs = {
   nameFi?: InputMaybe<Scalars["String"]["input"]>;
   nameSv?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationPurposeOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationPurposeOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryReservationUnitArgs = {
@@ -2297,9 +2393,9 @@ export type QueryReservationUnitCancellationRulesArgs = {
   name?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   orderBy?: InputMaybe<
-    Array<InputMaybe<ReservationUnitCancellationRuleOrderingChoices>>
+    ReadonlyArray<InputMaybe<ReservationUnitCancellationRuleOrderingChoices>>
   >;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryReservationUnitTypesArgs = {
@@ -2317,16 +2413,20 @@ export type QueryReservationUnitTypesArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitTypeOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitTypeOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryReservationUnitsArgs = {
-  accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessType?: InputMaybe<ReadonlyArray<InputMaybe<AccessType>>>;
   accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
   accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
-  applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  applicationRound?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   before?: InputMaybe<Scalars["String"]["input"]>;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
@@ -2335,7 +2435,7 @@ export type QueryReservationUnitsArgs = {
   descriptionFi_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   descriptionSv?: InputMaybe<Scalars["String"]["input"]>;
   descriptionSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
-  equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  equipments?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -2355,14 +2455,16 @@ export type QueryReservationUnitsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  publishingState?: InputMaybe<
-    Array<InputMaybe<ReservationUnitPublishingState>>
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitOrderingChoices>>
   >;
-  purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  publishingState?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitPublishingState>>
+  >;
+  purposes?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  qualifiers?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
@@ -2372,9 +2474,11 @@ export type QueryReservationUnitsArgs = {
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
   reservationState?: InputMaybe<
-    Array<InputMaybe<ReservationUnitReservationState>>
+    ReadonlyArray<InputMaybe<ReservationUnitReservationState>>
   >;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnitType?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -2383,7 +2487,7 @@ export type QueryReservationUnitsArgs = {
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
@@ -2398,8 +2502,10 @@ export type QueryReservationUnitsAllArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitOrderingChoices>>
+  >;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryReservationsArgs = {
@@ -2417,23 +2523,31 @@ export type QueryReservationsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   onlyWithHandlingPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
-  orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<ReservationOrderingChoices>>>;
+  orderStatus?: InputMaybe<ReadonlyArray<InputMaybe<OrderStatusWithFree>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  recurringReservation?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
+  reservationType?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationTypeChoice>>
+  >;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
+  reservationUnitType?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  reservationUnits?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  state?: InputMaybe<ReadonlyArray<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  user?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  user?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryResourceArgs = {
@@ -2456,8 +2570,8 @@ export type QueryResourcesArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ResourceOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<ResourceOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QuerySpaceArgs = {
@@ -2480,8 +2594,8 @@ export type QuerySpacesArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<SpaceOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<SpaceOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryTaxPercentagesArgs = {
@@ -2490,8 +2604,8 @@ export type QueryTaxPercentagesArgs = {
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<TaxPercentageOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<TaxPercentageOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   value?: InputMaybe<Scalars["Decimal"]["input"]>;
 };
 
@@ -2501,8 +2615,8 @@ export type QueryTermsOfUseArgs = {
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   offset?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<TermsOfUseOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<TermsOfUseOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["String"]["input"]>>>;
   termsType?: InputMaybe<TermsType>;
 };
 
@@ -2536,9 +2650,9 @@ export type QueryUnitsArgs = {
   onlyDirectBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlySeasonalBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<UnitOrderingChoices>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<UnitOrderingChoices>>>;
   ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
@@ -2555,10 +2669,10 @@ export type QueryUnitsAllArgs = {
   onlyDirectBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlySeasonalBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<UnitOrderingChoices>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<UnitOrderingChoices>>>;
   ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type QueryUserArgs = {
@@ -2566,42 +2680,46 @@ export type QueryUserArgs = {
 };
 
 export type RecurringReservationNode = Node & {
-  abilityGroup: Maybe<AbilityGroupNode>;
-  accessType: Maybe<AccessTypeWithMultivalued>;
-  ageGroup: Maybe<AgeGroupNode>;
-  allocatedTimeSlot: Maybe<AllocatedTimeSlotNode>;
-  beginDate: Maybe<Scalars["Date"]["output"]>;
-  beginTime: Maybe<Scalars["Time"]["output"]>;
-  created: Scalars["DateTime"]["output"];
-  description: Scalars["String"]["output"];
-  endDate: Maybe<Scalars["Date"]["output"]>;
-  endTime: Maybe<Scalars["Time"]["output"]>;
-  extUuid: Scalars["UUID"]["output"];
+  readonly abilityGroup: Maybe<AbilityGroupNode>;
+  readonly accessType: Maybe<AccessTypeWithMultivalued>;
+  readonly ageGroup: Maybe<AgeGroupNode>;
+  readonly allocatedTimeSlot: Maybe<AllocatedTimeSlotNode>;
+  readonly beginDate: Maybe<Scalars["Date"]["output"]>;
+  readonly beginTime: Maybe<Scalars["Time"]["output"]>;
+  readonly created: Scalars["DateTime"]["output"];
+  readonly description: Scalars["String"]["output"];
+  readonly endDate: Maybe<Scalars["Date"]["output"]>;
+  readonly endTime: Maybe<Scalars["Time"]["output"]>;
+  readonly extUuid: Scalars["UUID"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  isAccessCodeIsActiveCorrect: Maybe<Scalars["Boolean"]["output"]>;
-  name: Scalars["String"]["output"];
+  readonly id: Scalars["ID"]["output"];
+  readonly isAccessCodeIsActiveCorrect: Maybe<Scalars["Boolean"]["output"]>;
+  readonly name: Scalars["String"]["output"];
   /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple series, queries to Pindora are not optimized. */
-  pindoraInfo: Maybe<PindoraSeriesInfoType>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  recurrenceInDays: Maybe<Scalars["Int"]["output"]>;
-  rejectedOccurrences: Array<RejectedOccurrenceNode>;
-  reservationUnit: ReservationUnitNode;
-  reservations: Array<ReservationNode>;
-  shouldHaveActiveAccessCode: Maybe<Scalars["Boolean"]["output"]>;
-  usedAccessTypes: Maybe<Array<Maybe<AccessType>>>;
-  user: Maybe<UserNode>;
-  weekdays: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  readonly pindoraInfo: Maybe<PindoraSeriesInfoType>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly recurrenceInDays: Maybe<Scalars["Int"]["output"]>;
+  readonly rejectedOccurrences: ReadonlyArray<RejectedOccurrenceNode>;
+  readonly reservationUnit: ReservationUnitNode;
+  readonly reservations: ReadonlyArray<ReservationNode>;
+  readonly shouldHaveActiveAccessCode: Maybe<Scalars["Boolean"]["output"]>;
+  readonly usedAccessTypes: Maybe<ReadonlyArray<Maybe<AccessType>>>;
+  readonly user: Maybe<UserNode>;
+  readonly weekdays: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
 };
 
 export type RecurringReservationNodeRejectedOccurrencesArgs = {
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<RejectedOccurrenceOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<RejectedOccurrenceOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   recurringReservation?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnit?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type RecurringReservationNodeReservationsArgs = {
@@ -2614,39 +2732,47 @@ export type RecurringReservationNodeReservationsArgs = {
   isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithHandlingPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
-  orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<ReservationOrderingChoices>>>;
+  orderStatus?: InputMaybe<ReadonlyArray<InputMaybe<OrderStatusWithFree>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  recurringReservation?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
+  reservationType?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationTypeChoice>>
+  >;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
+  reservationUnitType?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  reservationUnits?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  state?: InputMaybe<ReadonlyArray<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  user?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  user?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type RecurringReservationNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<RecurringReservationNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<RecurringReservationNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `RecurringReservationNode` and its cursor. */
 export type RecurringReservationNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<RecurringReservationNode>;
+  readonly node: Maybe<RecurringReservationNode>;
 };
 
 /** Ordering fields for the 'RecurringReservation' model. */
@@ -2680,56 +2806,56 @@ export enum RecurringReservationOrderingChoices {
 }
 
 export type RefreshOrderMutationInput = {
-  orderUuid: Scalars["String"]["input"];
+  readonly orderUuid: Scalars["String"]["input"];
 };
 
 export type RefreshOrderMutationPayload = {
-  orderUuid: Maybe<Scalars["String"]["output"]>;
-  reservationPk: Maybe<Scalars["Int"]["output"]>;
-  status: Maybe<Scalars["String"]["output"]>;
+  readonly orderUuid: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPk: Maybe<Scalars["Int"]["output"]>;
+  readonly status: Maybe<Scalars["String"]["output"]>;
 };
 
 export type RejectAllApplicationOptionsMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type RejectAllApplicationOptionsMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type RejectAllSectionOptionsMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type RejectAllSectionOptionsMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type RejectedOccurrenceNode = Node & {
-  beginDatetime: Scalars["DateTime"]["output"];
-  createdAt: Scalars["DateTime"]["output"];
-  endDatetime: Scalars["DateTime"]["output"];
+  readonly beginDatetime: Scalars["DateTime"]["output"];
+  readonly createdAt: Scalars["DateTime"]["output"];
+  readonly endDatetime: Scalars["DateTime"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  recurringReservation: RecurringReservationNode;
-  rejectionReason: RejectionReadinessChoice;
+  readonly id: Scalars["ID"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly recurringReservation: RecurringReservationNode;
+  readonly rejectionReason: RejectionReadinessChoice;
 };
 
 export type RejectedOccurrenceNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<RejectedOccurrenceNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<RejectedOccurrenceNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `RejectedOccurrenceNode` and its cursor. */
 export type RejectedOccurrenceNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<RejectedOccurrenceNode>;
+  readonly node: Maybe<RejectedOccurrenceNode>;
 };
 
 /** Ordering fields for the 'RejectedOccurrence' model. */
@@ -2771,61 +2897,61 @@ export enum RejectionReadinessChoice {
 }
 
 export type ReservableTimeSpanType = {
-  endDatetime: Maybe<Scalars["DateTime"]["output"]>;
-  startDatetime: Maybe<Scalars["DateTime"]["output"]>;
+  readonly endDatetime: Maybe<Scalars["DateTime"]["output"]>;
+  readonly startDatetime: Maybe<Scalars["DateTime"]["output"]>;
 };
 
 export type ReservationAdjustTimeMutationInput = {
-  begin: Scalars["DateTime"]["input"];
-  end: Scalars["DateTime"]["input"];
-  pk: Scalars["Int"]["input"];
+  readonly begin: Scalars["DateTime"]["input"];
+  readonly end: Scalars["DateTime"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationAdjustTimeMutationPayload = {
-  begin: Maybe<Scalars["DateTime"]["output"]>;
-  end: Maybe<Scalars["DateTime"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  state: Maybe<ReservationStateChoice>;
+  readonly begin: Maybe<Scalars["DateTime"]["output"]>;
+  readonly end: Maybe<Scalars["DateTime"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly state: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationApproveMutationInput = {
-  handlingDetails: Scalars["String"]["input"];
-  pk: Scalars["Int"]["input"];
-  price: Scalars["Decimal"]["input"];
+  readonly handlingDetails: Scalars["String"]["input"];
+  readonly pk: Scalars["Int"]["input"];
+  readonly price: Scalars["Decimal"]["input"];
 };
 
 export type ReservationApproveMutationPayload = {
-  handledAt: Maybe<Scalars["DateTime"]["output"]>;
-  handlingDetails: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  price: Maybe<Scalars["Decimal"]["output"]>;
-  state: Maybe<ReservationStateChoice>;
+  readonly handledAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly handlingDetails: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly price: Maybe<Scalars["Decimal"]["output"]>;
+  readonly state: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationCancelReasonNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  reason: Scalars["String"]["output"];
-  reasonEn: Maybe<Scalars["String"]["output"]>;
-  reasonFi: Maybe<Scalars["String"]["output"]>;
-  reasonSv: Maybe<Scalars["String"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reason: Scalars["String"]["output"];
+  readonly reasonEn: Maybe<Scalars["String"]["output"]>;
+  readonly reasonFi: Maybe<Scalars["String"]["output"]>;
+  readonly reasonSv: Maybe<Scalars["String"]["output"]>;
 };
 
 export type ReservationCancelReasonNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationCancelReasonNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ReservationCancelReasonNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ReservationCancelReasonNode` and its cursor. */
 export type ReservationCancelReasonNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ReservationCancelReasonNode>;
+  readonly node: Maybe<ReservationCancelReasonNode>;
 };
 
 /** Ordering fields for the 'ReservationCancelReason' model. */
@@ -2835,94 +2961,94 @@ export enum ReservationCancelReasonOrderingChoices {
 }
 
 export type ReservationCancellationMutationInput = {
-  cancelDetails?: InputMaybe<Scalars["String"]["input"]>;
-  cancelReason: Scalars["Int"]["input"];
-  pk: Scalars["Int"]["input"];
+  readonly cancelDetails?: InputMaybe<Scalars["String"]["input"]>;
+  readonly cancelReason: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationCancellationMutationPayload = {
-  cancelDetails: Maybe<Scalars["String"]["output"]>;
-  cancelReason: Maybe<Scalars["Int"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  state: Maybe<ReservationStateChoice>;
+  readonly cancelDetails: Maybe<Scalars["String"]["output"]>;
+  readonly cancelReason: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly state: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationConfirmMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationConfirmMutationPayload = {
-  order: Maybe<PaymentOrderNode>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  state: Maybe<ReservationStateChoice>;
+  readonly order: Maybe<PaymentOrderNode>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly state: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationCreateMutationInput = {
-  begin: Scalars["DateTime"]["input"];
-  end: Scalars["DateTime"]["input"];
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit: Scalars["Int"]["input"];
+  readonly begin: Scalars["DateTime"]["input"];
+  readonly end: Scalars["DateTime"]["input"];
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationUnit: Scalars["Int"]["input"];
 };
 
 export type ReservationCreateMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationDeleteMutationInput = {
-  pk: Scalars["ID"]["input"];
+  readonly pk: Scalars["ID"]["input"];
 };
 
 export type ReservationDeleteMutationPayload = {
-  deleted: Maybe<Scalars["Boolean"]["output"]>;
+  readonly deleted: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type ReservationDeleteTentativeMutationInput = {
-  pk: Scalars["ID"]["input"];
+  readonly pk: Scalars["ID"]["input"];
 };
 
 /** Used only for deleting a reservation before it is confirmed. */
 export type ReservationDeleteTentativeMutationPayload = {
-  deleted: Maybe<Scalars["Boolean"]["output"]>;
+  readonly deleted: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type ReservationDenyMutationInput = {
-  denyReason: Scalars["Int"]["input"];
-  handlingDetails: Scalars["String"]["input"];
-  pk: Scalars["Int"]["input"];
+  readonly denyReason: Scalars["Int"]["input"];
+  readonly handlingDetails: Scalars["String"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationDenyMutationPayload = {
-  denyReason: Maybe<Scalars["Int"]["output"]>;
-  handledAt: Maybe<Scalars["DateTime"]["output"]>;
-  handlingDetails: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  state: Maybe<ReservationStateChoice>;
+  readonly denyReason: Maybe<Scalars["Int"]["output"]>;
+  readonly handledAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly handlingDetails: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly state: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationDenyReasonNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  reason: Scalars["String"]["output"];
-  reasonEn: Maybe<Scalars["String"]["output"]>;
-  reasonFi: Maybe<Scalars["String"]["output"]>;
-  reasonSv: Maybe<Scalars["String"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reason: Scalars["String"]["output"];
+  readonly reasonEn: Maybe<Scalars["String"]["output"]>;
+  readonly reasonFi: Maybe<Scalars["String"]["output"]>;
+  readonly reasonSv: Maybe<Scalars["String"]["output"]>;
 };
 
 export type ReservationDenyReasonNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationDenyReasonNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ReservationDenyReasonNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ReservationDenyReasonNode` and its cursor. */
 export type ReservationDenyReasonNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ReservationDenyReasonNode>;
+  readonly node: Maybe<ReservationDenyReasonNode>;
 };
 
 /** Ordering fields for the 'ReservationDenyReason' model. */
@@ -2942,113 +3068,119 @@ export enum ReservationKind {
 }
 
 export type ReservationMetadataFieldNode = Node & {
-  fieldName: Scalars["String"]["output"];
+  readonly fieldName: Scalars["String"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationMetadataSetNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  requiredFields: Array<ReservationMetadataFieldNode>;
-  supportedFields: Array<ReservationMetadataFieldNode>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly requiredFields: ReadonlyArray<ReservationMetadataFieldNode>;
+  readonly supportedFields: ReadonlyArray<ReservationMetadataFieldNode>;
 };
 
 export type ReservationMetadataSetNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationMetadataSetNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ReservationMetadataSetNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ReservationMetadataSetNode` and its cursor. */
 export type ReservationMetadataSetNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ReservationMetadataSetNode>;
+  readonly node: Maybe<ReservationMetadataSetNode>;
 };
 
 export type ReservationNode = Node & {
-  accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
-  accessCodeIsActive: Scalars["Boolean"]["output"];
-  accessCodeShouldBeActive: Maybe<Scalars["Boolean"]["output"]>;
-  accessType: AccessType;
+  readonly accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly accessCodeIsActive: Scalars["Boolean"]["output"];
+  readonly accessCodeShouldBeActive: Maybe<Scalars["Boolean"]["output"]>;
+  readonly accessType: AccessType;
   /** Which reservation units' reserveability is affected by this reservation? */
-  affectedReservationUnits: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  ageGroup: Maybe<AgeGroupNode>;
-  applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
-  begin: Scalars["DateTime"]["output"];
-  billingAddressCity: Maybe<Scalars["String"]["output"]>;
-  billingAddressStreet: Maybe<Scalars["String"]["output"]>;
-  billingAddressZip: Maybe<Scalars["String"]["output"]>;
-  billingEmail: Maybe<Scalars["String"]["output"]>;
-  billingFirstName: Maybe<Scalars["String"]["output"]>;
-  billingLastName: Maybe<Scalars["String"]["output"]>;
-  billingPhone: Maybe<Scalars["String"]["output"]>;
-  bufferTimeAfter: Scalars["Duration"]["output"];
-  bufferTimeBefore: Scalars["Duration"]["output"];
-  calendarUrl: Maybe<Scalars["String"]["output"]>;
-  cancelDetails: Maybe<Scalars["String"]["output"]>;
-  cancelReason: Maybe<ReservationCancelReasonNode>;
-  createdAt: Maybe<Scalars["DateTime"]["output"]>;
-  denyReason: Maybe<ReservationDenyReasonNode>;
-  description: Maybe<Scalars["String"]["output"]>;
-  end: Scalars["DateTime"]["output"];
-  extUuid: Scalars["UUID"]["output"];
-  freeOfChargeReason: Maybe<Scalars["String"]["output"]>;
-  handledAt: Maybe<Scalars["DateTime"]["output"]>;
-  handlingDetails: Maybe<Scalars["String"]["output"]>;
-  homeCity: Maybe<CityNode>;
+  readonly affectedReservationUnits: Maybe<
+    ReadonlyArray<Maybe<Scalars["Int"]["output"]>>
+  >;
+  readonly ageGroup: Maybe<AgeGroupNode>;
+  readonly applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
+  readonly begin: Scalars["DateTime"]["output"];
+  readonly billingAddressCity: Maybe<Scalars["String"]["output"]>;
+  readonly billingAddressStreet: Maybe<Scalars["String"]["output"]>;
+  readonly billingAddressZip: Maybe<Scalars["String"]["output"]>;
+  readonly billingEmail: Maybe<Scalars["String"]["output"]>;
+  readonly billingFirstName: Maybe<Scalars["String"]["output"]>;
+  readonly billingLastName: Maybe<Scalars["String"]["output"]>;
+  readonly billingPhone: Maybe<Scalars["String"]["output"]>;
+  readonly bufferTimeAfter: Scalars["Duration"]["output"];
+  readonly bufferTimeBefore: Scalars["Duration"]["output"];
+  readonly calendarUrl: Maybe<Scalars["String"]["output"]>;
+  readonly cancelDetails: Maybe<Scalars["String"]["output"]>;
+  readonly cancelReason: Maybe<ReservationCancelReasonNode>;
+  readonly createdAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly denyReason: Maybe<ReservationDenyReasonNode>;
+  readonly description: Maybe<Scalars["String"]["output"]>;
+  readonly end: Scalars["DateTime"]["output"];
+  readonly extUuid: Scalars["UUID"]["output"];
+  readonly freeOfChargeReason: Maybe<Scalars["String"]["output"]>;
+  readonly handledAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly handlingDetails: Maybe<Scalars["String"]["output"]>;
+  readonly homeCity: Maybe<CityNode>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  isAccessCodeIsActiveCorrect: Maybe<Scalars["Boolean"]["output"]>;
-  isBlocked: Maybe<Scalars["Boolean"]["output"]>;
-  isHandled: Maybe<Scalars["Boolean"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  numPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly isAccessCodeIsActiveCorrect: Maybe<Scalars["Boolean"]["output"]>;
+  readonly isBlocked: Maybe<Scalars["Boolean"]["output"]>;
+  readonly isHandled: Maybe<Scalars["Boolean"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly numPersons: Maybe<Scalars["Int"]["output"]>;
   /** @deprecated Please use to 'paymentOrder' instead. */
-  order: Maybe<PaymentOrderNode>;
-  paymentOrder: Array<PaymentOrderNode>;
+  readonly order: Maybe<PaymentOrderNode>;
+  readonly paymentOrder: ReadonlyArray<PaymentOrderNode>;
   /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized. */
-  pindoraInfo: Maybe<PindoraReservationInfoType>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  price: Maybe<Scalars["Decimal"]["output"]>;
-  priceNet: Maybe<Scalars["Decimal"]["output"]>;
-  purpose: Maybe<ReservationPurposeNode>;
-  recurringReservation: Maybe<RecurringReservationNode>;
-  reservationUnits: Array<ReservationUnitNode>;
-  reserveeAddressCity: Maybe<Scalars["String"]["output"]>;
-  reserveeAddressStreet: Maybe<Scalars["String"]["output"]>;
-  reserveeAddressZip: Maybe<Scalars["String"]["output"]>;
-  reserveeEmail: Maybe<Scalars["String"]["output"]>;
-  reserveeFirstName: Maybe<Scalars["String"]["output"]>;
-  reserveeId: Maybe<Scalars["String"]["output"]>;
-  reserveeIsUnregisteredAssociation: Maybe<Scalars["Boolean"]["output"]>;
-  reserveeLastName: Maybe<Scalars["String"]["output"]>;
-  reserveeName: Maybe<Scalars["String"]["output"]>;
-  reserveeOrganisationName: Maybe<Scalars["String"]["output"]>;
-  reserveePhone: Maybe<Scalars["String"]["output"]>;
-  reserveeType: Maybe<CustomerTypeChoice>;
+  readonly pindoraInfo: Maybe<PindoraReservationInfoType>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly price: Maybe<Scalars["Decimal"]["output"]>;
+  readonly priceNet: Maybe<Scalars["Decimal"]["output"]>;
+  readonly purpose: Maybe<ReservationPurposeNode>;
+  readonly recurringReservation: Maybe<RecurringReservationNode>;
+  readonly reservationUnits: ReadonlyArray<ReservationUnitNode>;
+  readonly reserveeAddressCity: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeAddressStreet: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeAddressZip: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeEmail: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeFirstName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeId: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeIsUnregisteredAssociation: Maybe<
+    Scalars["Boolean"]["output"]
+  >;
+  readonly reserveeLastName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeOrganisationName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveePhone: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeType: Maybe<CustomerTypeChoice>;
   /** @deprecated Please use to 'type' instead. */
-  staffEvent: Maybe<Scalars["Boolean"]["output"]>;
-  state: Maybe<ReservationStateChoice>;
-  taxPercentageValue: Maybe<Scalars["Decimal"]["output"]>;
-  type: Maybe<ReservationTypeChoice>;
-  unitPrice: Maybe<Scalars["Decimal"]["output"]>;
-  user: Maybe<UserNode>;
-  workingMemo: Maybe<Scalars["String"]["output"]>;
+  readonly staffEvent: Maybe<Scalars["Boolean"]["output"]>;
+  readonly state: Maybe<ReservationStateChoice>;
+  readonly taxPercentageValue: Maybe<Scalars["Decimal"]["output"]>;
+  readonly type: Maybe<ReservationTypeChoice>;
+  readonly unitPrice: Maybe<Scalars["Decimal"]["output"]>;
+  readonly user: Maybe<UserNode>;
+  readonly workingMemo: Maybe<Scalars["String"]["output"]>;
 };
 
 export type ReservationNodeReservationUnitsArgs = {
-  accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessType?: InputMaybe<ReadonlyArray<InputMaybe<AccessType>>>;
   accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
   accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  applicationRound?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
   descriptionEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
@@ -3056,7 +3188,7 @@ export type ReservationNodeReservationUnitsArgs = {
   descriptionFi_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   descriptionSv?: InputMaybe<Scalars["String"]["input"]>;
   descriptionSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
-  equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  equipments?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
   maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -3073,14 +3205,16 @@ export type ReservationNodeReservationUnitsArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  publishingState?: InputMaybe<
-    Array<InputMaybe<ReservationUnitPublishingState>>
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitOrderingChoices>>
   >;
-  purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  publishingState?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitPublishingState>>
+  >;
+  purposes?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  qualifiers?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
@@ -3090,9 +3224,11 @@ export type ReservationNodeReservationUnitsArgs = {
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
   reservationState?: InputMaybe<
-    Array<InputMaybe<ReservationUnitReservationState>>
+    ReadonlyArray<InputMaybe<ReservationUnitReservationState>>
   >;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnitType?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -3101,24 +3237,24 @@ export type ReservationNodeReservationUnitsArgs = {
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
 export type ReservationNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ReservationNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ReservationNode` and its cursor. */
 export type ReservationNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ReservationNode>;
+  readonly node: Maybe<ReservationNode>;
 };
 
 /** An enumeration. */
@@ -3167,29 +3303,29 @@ export enum ReservationOrderingChoices {
 
 export type ReservationPurposeNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  rank: Scalars["Int"]["output"];
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly rank: Scalars["Int"]["output"];
 };
 
 export type ReservationPurposeNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationPurposeNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ReservationPurposeNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ReservationPurposeNode` and its cursor. */
 export type ReservationPurposeNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ReservationPurposeNode>;
+  readonly node: Maybe<ReservationPurposeNode>;
 };
 
 /** Ordering fields for the 'ReservationPurpose' model. */
@@ -3205,357 +3341,375 @@ export enum ReservationPurposeOrderingChoices {
 }
 
 export type ReservationRefundMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationRefundMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationRequiresHandlingMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationRequiresHandlingMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
-  state: Maybe<ReservationStateChoice>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly state: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationSeriesAddMutationInput = {
-  begin: Scalars["DateTime"]["input"];
-  bufferTimeAfter?: InputMaybe<Scalars["String"]["input"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["String"]["input"]>;
-  end: Scalars["DateTime"]["input"];
-  pk: Scalars["Int"]["input"];
+  readonly begin: Scalars["DateTime"]["input"];
+  readonly bufferTimeAfter?: InputMaybe<Scalars["String"]["input"]>;
+  readonly bufferTimeBefore?: InputMaybe<Scalars["String"]["input"]>;
+  readonly end: Scalars["DateTime"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationSeriesAddMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationSeriesChangeAccessCodeMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationSeriesChangeAccessCodeMutationPayload = {
-  accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
-  accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationSeriesCreateMutationInput = {
-  abilityGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  beginDate: Scalars["Date"]["input"];
-  beginTime: Scalars["Time"]["input"];
-  checkOpeningHours?: InputMaybe<Scalars["Boolean"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  endDate: Scalars["Date"]["input"];
-  endTime: Scalars["Time"]["input"];
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  recurrenceInDays: Scalars["Int"]["input"];
-  reservationDetails: ReservationSeriesReservationCreateSerializerInput;
-  reservationUnit: Scalars["Int"]["input"];
-  skipDates?: InputMaybe<Array<InputMaybe<Scalars["Date"]["input"]>>>;
-  weekdays: Array<InputMaybe<Scalars["Int"]["input"]>>;
+  readonly abilityGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly beginDate: Scalars["Date"]["input"];
+  readonly beginTime: Scalars["Time"]["input"];
+  readonly checkOpeningHours?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly description?: InputMaybe<Scalars["String"]["input"]>;
+  readonly endDate: Scalars["Date"]["input"];
+  readonly endTime: Scalars["Time"]["input"];
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly recurrenceInDays: Scalars["Int"]["input"];
+  readonly reservationDetails: ReservationSeriesReservationCreateSerializerInput;
+  readonly reservationUnit: Scalars["Int"]["input"];
+  readonly skipDates?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Date"]["input"]>>
+  >;
+  readonly weekdays: ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>;
 };
 
 export type ReservationSeriesCreateMutationPayload = {
-  abilityGroup: Maybe<Scalars["Int"]["output"]>;
-  ageGroup: Maybe<Scalars["Int"]["output"]>;
-  beginDate: Maybe<Scalars["Date"]["output"]>;
-  beginTime: Maybe<Scalars["Time"]["output"]>;
-  description: Maybe<Scalars["String"]["output"]>;
-  endDate: Maybe<Scalars["Date"]["output"]>;
-  endTime: Maybe<Scalars["Time"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  recurrenceInDays: Maybe<Scalars["Int"]["output"]>;
-  reservationUnit: Maybe<Scalars["Int"]["output"]>;
-  weekdays: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  readonly abilityGroup: Maybe<Scalars["Int"]["output"]>;
+  readonly ageGroup: Maybe<Scalars["Int"]["output"]>;
+  readonly beginDate: Maybe<Scalars["Date"]["output"]>;
+  readonly beginTime: Maybe<Scalars["Time"]["output"]>;
+  readonly description: Maybe<Scalars["String"]["output"]>;
+  readonly endDate: Maybe<Scalars["Date"]["output"]>;
+  readonly endTime: Maybe<Scalars["Time"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly recurrenceInDays: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationUnit: Maybe<Scalars["Int"]["output"]>;
+  readonly weekdays: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
 };
 
 export type ReservationSeriesDenyMutationInput = {
-  denyReason: Scalars["Int"]["input"];
-  handlingDetails?: InputMaybe<Scalars["String"]["input"]>;
-  pk: Scalars["Int"]["input"];
+  readonly denyReason: Scalars["Int"]["input"];
+  readonly handlingDetails?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationSeriesDenyMutationPayload = {
-  denied: Maybe<Scalars["Int"]["output"]>;
-  future: Maybe<Scalars["Int"]["output"]>;
+  readonly denied: Maybe<Scalars["Int"]["output"]>;
+  readonly future: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationSeriesRepairAccessCodeMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationSeriesRepairAccessCodeMutationPayload = {
-  accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
-  accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationSeriesRescheduleMutationInput = {
-  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  beginTime?: InputMaybe<Scalars["Time"]["input"]>;
-  bufferTimeAfter?: InputMaybe<Scalars["String"]["input"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["String"]["input"]>;
-  endDate?: InputMaybe<Scalars["Date"]["input"]>;
-  endTime?: InputMaybe<Scalars["Time"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  skipDates?: InputMaybe<Array<InputMaybe<Scalars["Date"]["input"]>>>;
-  weekdays?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  readonly beginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  readonly beginTime?: InputMaybe<Scalars["Time"]["input"]>;
+  readonly bufferTimeAfter?: InputMaybe<Scalars["String"]["input"]>;
+  readonly bufferTimeBefore?: InputMaybe<Scalars["String"]["input"]>;
+  readonly endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  readonly endTime?: InputMaybe<Scalars["Time"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly skipDates?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Date"]["input"]>>
+  >;
+  readonly weekdays?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
 };
 
 export type ReservationSeriesRescheduleMutationPayload = {
-  beginDate: Maybe<Scalars["Date"]["output"]>;
-  beginTime: Maybe<Scalars["Time"]["output"]>;
-  endDate: Maybe<Scalars["Date"]["output"]>;
-  endTime: Maybe<Scalars["Time"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  weekdays: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  readonly beginDate: Maybe<Scalars["Date"]["output"]>;
+  readonly beginTime: Maybe<Scalars["Time"]["output"]>;
+  readonly endDate: Maybe<Scalars["Date"]["output"]>;
+  readonly endTime: Maybe<Scalars["Time"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly weekdays: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
 };
 
 export type ReservationSeriesReservationCreateSerializerInput = {
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
-  billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
-  billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
-  billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
-  billingEmail?: InputMaybe<Scalars["String"]["input"]>;
-  billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
-  billingLastName?: InputMaybe<Scalars["String"]["input"]>;
-  billingPhone?: InputMaybe<Scalars["String"]["input"]>;
-  bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
-  confirmedAt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
-  handledAt?: InputMaybe<Scalars["DateTime"]["input"]>;
-  homeCity?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  numPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  purpose?: InputMaybe<Scalars["Int"]["input"]>;
-  reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeId?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeType?: InputMaybe<ReserveeType>;
-  state?: InputMaybe<ReservationStateChoice>;
-  type: ReservationTypeStaffChoice;
-  user: Scalars["Int"]["input"];
-  workingMemo?: InputMaybe<Scalars["String"]["input"]>;
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingEmail?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingLastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingPhone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly confirmedAt?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly description?: InputMaybe<Scalars["String"]["input"]>;
+  readonly freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
+  readonly handledAt?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly homeCity?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly numPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeId?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeIsUnregisteredAssociation?: InputMaybe<
+    Scalars["Boolean"]["input"]
+  >;
+  readonly reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeType?: InputMaybe<ReserveeType>;
+  readonly state?: InputMaybe<ReservationStateChoice>;
+  readonly type: ReservationTypeStaffChoice;
+  readonly user: Scalars["Int"]["input"];
+  readonly workingMemo?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type ReservationSeriesUpdateMutationInput = {
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  reservationDetails?: InputMaybe<UpdateReservationSeriesReservationUpdateSerializerInput>;
-  skipReservations?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly description?: InputMaybe<Scalars["String"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly reservationDetails?: InputMaybe<UpdateReservationSeriesReservationUpdateSerializerInput>;
+  readonly skipReservations?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
 };
 
 export type ReservationSeriesUpdateMutationPayload = {
-  ageGroup: Maybe<Scalars["Int"]["output"]>;
-  description: Maybe<Scalars["String"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly ageGroup: Maybe<Scalars["Int"]["output"]>;
+  readonly description: Maybe<Scalars["String"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationStaffAdjustTimeMutationInput = {
-  begin?: InputMaybe<Scalars["DateTime"]["input"]>;
-  bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
-  end?: InputMaybe<Scalars["DateTime"]["input"]>;
-  pk: Scalars["Int"]["input"];
+  readonly begin?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly end?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationStaffAdjustTimeMutationPayload = {
-  begin: Maybe<Scalars["DateTime"]["output"]>;
-  bufferTimeAfter: Maybe<Scalars["Duration"]["output"]>;
-  bufferTimeBefore: Maybe<Scalars["Duration"]["output"]>;
-  end: Maybe<Scalars["DateTime"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  state: Maybe<ReservationStateChoice>;
+  readonly begin: Maybe<Scalars["DateTime"]["output"]>;
+  readonly bufferTimeAfter: Maybe<Scalars["Duration"]["output"]>;
+  readonly bufferTimeBefore: Maybe<Scalars["Duration"]["output"]>;
+  readonly end: Maybe<Scalars["DateTime"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly state: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationStaffChangeAccessCodeMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationStaffChangeAccessCodeMutationPayload = {
-  accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
-  accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationStaffCreateMutationInput = {
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
-  begin: Scalars["DateTime"]["input"];
-  billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
-  billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
-  billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
-  billingEmail?: InputMaybe<Scalars["String"]["input"]>;
-  billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
-  billingLastName?: InputMaybe<Scalars["String"]["input"]>;
-  billingPhone?: InputMaybe<Scalars["String"]["input"]>;
-  bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  end: Scalars["DateTime"]["input"];
-  freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
-  homeCity?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  numPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  purpose?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit: Scalars["Int"]["input"];
-  reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeId?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeType?: InputMaybe<CustomerTypeChoice>;
-  type: ReservationTypeChoice;
-  workingMemo?: InputMaybe<Scalars["String"]["input"]>;
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly begin: Scalars["DateTime"]["input"];
+  readonly billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingEmail?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingLastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingPhone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly description?: InputMaybe<Scalars["String"]["input"]>;
+  readonly end: Scalars["DateTime"]["input"];
+  readonly freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
+  readonly homeCity?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly numPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationUnit: Scalars["Int"]["input"];
+  readonly reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeId?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeIsUnregisteredAssociation?: InputMaybe<
+    Scalars["Boolean"]["input"]
+  >;
+  readonly reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeType?: InputMaybe<CustomerTypeChoice>;
+  readonly type: ReservationTypeChoice;
+  readonly workingMemo?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type ReservationStaffCreateMutationPayload = {
-  ageGroup: Maybe<Scalars["Int"]["output"]>;
-  applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
-  begin: Maybe<Scalars["DateTime"]["output"]>;
-  billingAddressCity: Maybe<Scalars["String"]["output"]>;
-  billingAddressStreet: Maybe<Scalars["String"]["output"]>;
-  billingAddressZip: Maybe<Scalars["String"]["output"]>;
-  billingEmail: Maybe<Scalars["String"]["output"]>;
-  billingFirstName: Maybe<Scalars["String"]["output"]>;
-  billingLastName: Maybe<Scalars["String"]["output"]>;
-  billingPhone: Maybe<Scalars["String"]["output"]>;
-  bufferTimeAfter: Maybe<Scalars["Duration"]["output"]>;
-  bufferTimeBefore: Maybe<Scalars["Duration"]["output"]>;
-  confirmedAt: Maybe<Scalars["DateTime"]["output"]>;
-  description: Maybe<Scalars["String"]["output"]>;
-  end: Maybe<Scalars["DateTime"]["output"]>;
-  freeOfChargeReason: Maybe<Scalars["String"]["output"]>;
-  handledAt: Maybe<Scalars["DateTime"]["output"]>;
-  homeCity: Maybe<Scalars["Int"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  numPersons: Maybe<Scalars["Int"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  purpose: Maybe<Scalars["Int"]["output"]>;
-  reserveeAddressCity: Maybe<Scalars["String"]["output"]>;
-  reserveeAddressStreet: Maybe<Scalars["String"]["output"]>;
-  reserveeAddressZip: Maybe<Scalars["String"]["output"]>;
-  reserveeEmail: Maybe<Scalars["String"]["output"]>;
-  reserveeFirstName: Maybe<Scalars["String"]["output"]>;
-  reserveeId: Maybe<Scalars["String"]["output"]>;
-  reserveeIsUnregisteredAssociation: Maybe<Scalars["Boolean"]["output"]>;
-  reserveeLastName: Maybe<Scalars["String"]["output"]>;
-  reserveeOrganisationName: Maybe<Scalars["String"]["output"]>;
-  reserveePhone: Maybe<Scalars["String"]["output"]>;
-  reserveeType: Maybe<CustomerTypeChoice>;
-  state: Maybe<ReservationStateChoice>;
-  type: Maybe<ReservationTypeChoice>;
-  workingMemo: Maybe<Scalars["String"]["output"]>;
+  readonly ageGroup: Maybe<Scalars["Int"]["output"]>;
+  readonly applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
+  readonly begin: Maybe<Scalars["DateTime"]["output"]>;
+  readonly billingAddressCity: Maybe<Scalars["String"]["output"]>;
+  readonly billingAddressStreet: Maybe<Scalars["String"]["output"]>;
+  readonly billingAddressZip: Maybe<Scalars["String"]["output"]>;
+  readonly billingEmail: Maybe<Scalars["String"]["output"]>;
+  readonly billingFirstName: Maybe<Scalars["String"]["output"]>;
+  readonly billingLastName: Maybe<Scalars["String"]["output"]>;
+  readonly billingPhone: Maybe<Scalars["String"]["output"]>;
+  readonly bufferTimeAfter: Maybe<Scalars["Duration"]["output"]>;
+  readonly bufferTimeBefore: Maybe<Scalars["Duration"]["output"]>;
+  readonly confirmedAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly description: Maybe<Scalars["String"]["output"]>;
+  readonly end: Maybe<Scalars["DateTime"]["output"]>;
+  readonly freeOfChargeReason: Maybe<Scalars["String"]["output"]>;
+  readonly handledAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly homeCity: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly numPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly purpose: Maybe<Scalars["Int"]["output"]>;
+  readonly reserveeAddressCity: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeAddressStreet: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeAddressZip: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeEmail: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeFirstName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeId: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeIsUnregisteredAssociation: Maybe<
+    Scalars["Boolean"]["output"]
+  >;
+  readonly reserveeLastName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeOrganisationName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveePhone: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeType: Maybe<CustomerTypeChoice>;
+  readonly state: Maybe<ReservationStateChoice>;
+  readonly type: Maybe<ReservationTypeChoice>;
+  readonly workingMemo: Maybe<Scalars["String"]["output"]>;
 };
 
 export type ReservationStaffModifyMutationInput = {
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
-  billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
-  billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
-  billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
-  billingEmail?: InputMaybe<Scalars["String"]["input"]>;
-  billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
-  billingLastName?: InputMaybe<Scalars["String"]["input"]>;
-  billingPhone?: InputMaybe<Scalars["String"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
-  homeCity?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  numPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  purpose?: InputMaybe<Scalars["Int"]["input"]>;
-  reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeId?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeType?: InputMaybe<CustomerTypeChoice>;
-  type?: InputMaybe<ReservationTypeChoice>;
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingEmail?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingLastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingPhone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly description?: InputMaybe<Scalars["String"]["input"]>;
+  readonly freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
+  readonly homeCity?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly numPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeId?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeIsUnregisteredAssociation?: InputMaybe<
+    Scalars["Boolean"]["input"]
+  >;
+  readonly reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeType?: InputMaybe<CustomerTypeChoice>;
+  readonly type?: InputMaybe<ReservationTypeChoice>;
 };
 
 export type ReservationStaffModifyMutationPayload = {
-  ageGroup: Maybe<Scalars["Int"]["output"]>;
-  applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
-  begin: Maybe<Scalars["DateTime"]["output"]>;
-  billingAddressCity: Maybe<Scalars["String"]["output"]>;
-  billingAddressStreet: Maybe<Scalars["String"]["output"]>;
-  billingAddressZip: Maybe<Scalars["String"]["output"]>;
-  billingEmail: Maybe<Scalars["String"]["output"]>;
-  billingFirstName: Maybe<Scalars["String"]["output"]>;
-  billingLastName: Maybe<Scalars["String"]["output"]>;
-  billingPhone: Maybe<Scalars["String"]["output"]>;
-  bufferTimeAfter: Maybe<Scalars["Duration"]["output"]>;
-  bufferTimeBefore: Maybe<Scalars["Duration"]["output"]>;
-  confirmedAt: Maybe<Scalars["DateTime"]["output"]>;
-  description: Maybe<Scalars["String"]["output"]>;
-  end: Maybe<Scalars["DateTime"]["output"]>;
-  freeOfChargeReason: Maybe<Scalars["String"]["output"]>;
-  homeCity: Maybe<Scalars["Int"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  nonSubsidisedPrice: Maybe<Scalars["Decimal"]["output"]>;
-  nonSubsidisedPriceNet: Maybe<Scalars["String"]["output"]>;
-  numPersons: Maybe<Scalars["Int"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  price: Maybe<Scalars["Decimal"]["output"]>;
-  priceNet: Maybe<Scalars["String"]["output"]>;
-  purpose: Maybe<Scalars["Int"]["output"]>;
-  reserveeAddressCity: Maybe<Scalars["String"]["output"]>;
-  reserveeAddressStreet: Maybe<Scalars["String"]["output"]>;
-  reserveeAddressZip: Maybe<Scalars["String"]["output"]>;
-  reserveeEmail: Maybe<Scalars["String"]["output"]>;
-  reserveeFirstName: Maybe<Scalars["String"]["output"]>;
-  reserveeId: Maybe<Scalars["String"]["output"]>;
-  reserveeIsUnregisteredAssociation: Maybe<Scalars["Boolean"]["output"]>;
-  reserveeLastName: Maybe<Scalars["String"]["output"]>;
-  reserveeOrganisationName: Maybe<Scalars["String"]["output"]>;
-  reserveePhone: Maybe<Scalars["String"]["output"]>;
-  reserveeType: Maybe<CustomerTypeChoice>;
-  state: Maybe<ReservationStateChoice>;
-  taxPercentageValue: Maybe<Scalars["Decimal"]["output"]>;
-  type: Maybe<ReservationTypeChoice>;
-  unitPrice: Maybe<Scalars["Decimal"]["output"]>;
+  readonly ageGroup: Maybe<Scalars["Int"]["output"]>;
+  readonly applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
+  readonly begin: Maybe<Scalars["DateTime"]["output"]>;
+  readonly billingAddressCity: Maybe<Scalars["String"]["output"]>;
+  readonly billingAddressStreet: Maybe<Scalars["String"]["output"]>;
+  readonly billingAddressZip: Maybe<Scalars["String"]["output"]>;
+  readonly billingEmail: Maybe<Scalars["String"]["output"]>;
+  readonly billingFirstName: Maybe<Scalars["String"]["output"]>;
+  readonly billingLastName: Maybe<Scalars["String"]["output"]>;
+  readonly billingPhone: Maybe<Scalars["String"]["output"]>;
+  readonly bufferTimeAfter: Maybe<Scalars["Duration"]["output"]>;
+  readonly bufferTimeBefore: Maybe<Scalars["Duration"]["output"]>;
+  readonly confirmedAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly description: Maybe<Scalars["String"]["output"]>;
+  readonly end: Maybe<Scalars["DateTime"]["output"]>;
+  readonly freeOfChargeReason: Maybe<Scalars["String"]["output"]>;
+  readonly homeCity: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nonSubsidisedPrice: Maybe<Scalars["Decimal"]["output"]>;
+  readonly nonSubsidisedPriceNet: Maybe<Scalars["String"]["output"]>;
+  readonly numPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly price: Maybe<Scalars["Decimal"]["output"]>;
+  readonly priceNet: Maybe<Scalars["String"]["output"]>;
+  readonly purpose: Maybe<Scalars["Int"]["output"]>;
+  readonly reserveeAddressCity: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeAddressStreet: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeAddressZip: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeEmail: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeFirstName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeId: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeIsUnregisteredAssociation: Maybe<
+    Scalars["Boolean"]["output"]
+  >;
+  readonly reserveeLastName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeOrganisationName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveePhone: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeType: Maybe<CustomerTypeChoice>;
+  readonly state: Maybe<ReservationStateChoice>;
+  readonly taxPercentageValue: Maybe<Scalars["Decimal"]["output"]>;
+  readonly type: Maybe<ReservationTypeChoice>;
+  readonly unitPrice: Maybe<Scalars["Decimal"]["output"]>;
 };
 
 export type ReservationStaffRepairAccessCodeMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationStaffRepairAccessCodeMutationPayload = {
-  accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
-  accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
+  readonly accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** An enumeration. */
@@ -3612,12 +3766,12 @@ export enum ReservationTypeStaffChoice {
 }
 
 export type ReservationUnitAccessTypeNode = Node & {
-  accessType: AccessType;
-  beginDate: Scalars["Date"]["output"];
+  readonly accessType: AccessType;
+  readonly beginDate: Scalars["Date"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  reservationUnit: ReservationUnitNode;
+  readonly id: Scalars["ID"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationUnit: ReservationUnitNode;
 };
 
 /** Ordering fields for the 'ReservationUnitAccessType' model. */
@@ -3629,47 +3783,47 @@ export enum ReservationUnitAccessTypeOrderingChoices {
 }
 
 export type ReservationUnitAccessTypeSerializerInput = {
-  accessType?: InputMaybe<AccessType>;
-  beginDate: Scalars["Date"]["input"];
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly accessType?: InputMaybe<AccessType>;
+  readonly beginDate: Scalars["Date"]["input"];
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 /** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
 export type ReservationUnitAllNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationUnitCancellationRuleNode = Node & {
-  canBeCancelledTimeBefore: Maybe<Scalars["Duration"]["output"]>;
+  readonly canBeCancelledTimeBefore: Maybe<Scalars["Duration"]["output"]>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationUnitCancellationRuleNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationUnitCancellationRuleNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ReservationUnitCancellationRuleNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ReservationUnitCancellationRuleNode` and its cursor. */
 export type ReservationUnitCancellationRuleNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ReservationUnitCancellationRuleNode>;
+  readonly node: Maybe<ReservationUnitCancellationRuleNode>;
 };
 
 /** Ordering fields for the 'ReservationUnitCancellationRule' model. */
@@ -3679,309 +3833,385 @@ export enum ReservationUnitCancellationRuleOrderingChoices {
 }
 
 export type ReservationUnitCreateMutationInput = {
-  accessTypes?: InputMaybe<
-    Array<InputMaybe<ReservationUnitAccessTypeSerializerInput>>
+  readonly accessTypes?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitAccessTypeSerializerInput>>
   >;
-  allowReservationsWithoutOpeningHours?: InputMaybe<
+  readonly allowReservationsWithoutOpeningHours?: InputMaybe<
     Scalars["Boolean"]["input"]
   >;
-  applicationRoundTimeSlots?: InputMaybe<
-    Array<InputMaybe<ApplicationRoundTimeSlotSerializerInput>>
+  readonly applicationRoundTimeSlots?: InputMaybe<
+    ReadonlyArray<InputMaybe<ApplicationRoundTimeSlotSerializerInput>>
   >;
-  authentication?: InputMaybe<Authentication>;
-  bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
-  canApplyFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
-  cancellationRule?: InputMaybe<Scalars["Int"]["input"]>;
-  cancellationTerms?: InputMaybe<Scalars["String"]["input"]>;
-  contactInformation?: InputMaybe<Scalars["String"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
-  descriptionFi?: InputMaybe<Scalars["String"]["input"]>;
-  descriptionSv?: InputMaybe<Scalars["String"]["input"]>;
-  equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  images?: InputMaybe<
-    Array<InputMaybe<ReservationUnitImageFieldSerializerInput>>
+  readonly authentication?: InputMaybe<Authentication>;
+  readonly bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly canApplyFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly cancellationRule?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly cancellationTerms?: InputMaybe<Scalars["String"]["input"]>;
+  readonly contactInformation?: InputMaybe<Scalars["String"]["input"]>;
+  readonly description?: InputMaybe<Scalars["String"]["input"]>;
+  readonly descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly descriptionFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly descriptionSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly equipments?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
   >;
-  isArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
-  isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
-  maxPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  maxReservationDuration?: InputMaybe<Scalars["Duration"]["input"]>;
-  maxReservationsPerUser?: InputMaybe<Scalars["Int"]["input"]>;
-  metadataSet?: InputMaybe<Scalars["Int"]["input"]>;
-  minPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  minReservationDuration?: InputMaybe<Scalars["Duration"]["input"]>;
-  name: Scalars["String"]["input"];
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  paymentTerms?: InputMaybe<Scalars["String"]["input"]>;
-  paymentTypes?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  pricingTerms?: InputMaybe<Scalars["String"]["input"]>;
-  pricings?: InputMaybe<
-    Array<InputMaybe<ReservationUnitPricingSerializerInput>>
+  readonly images?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitImageFieldSerializerInput>>
   >;
-  publishBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
-  publishEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
-  purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  requireAdultReservee?: InputMaybe<Scalars["Boolean"]["input"]>;
-  requireReservationHandling?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
-  reservationBlockWholeDay?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationCancelledInstructions?: InputMaybe<Scalars["String"]["input"]>;
-  reservationCancelledInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
-  reservationCancelledInstructionsFi?: InputMaybe<Scalars["String"]["input"]>;
-  reservationCancelledInstructionsSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationConfirmedInstructions?: InputMaybe<Scalars["String"]["input"]>;
-  reservationConfirmedInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
-  reservationConfirmedInstructionsFi?: InputMaybe<Scalars["String"]["input"]>;
-  reservationConfirmedInstructionsSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
-  reservationKind?: InputMaybe<ReservationKind>;
-  reservationPendingInstructions?: InputMaybe<Scalars["String"]["input"]>;
-  reservationPendingInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
-  reservationPendingInstructionsFi?: InputMaybe<Scalars["String"]["input"]>;
-  reservationPendingInstructionsSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationStartInterval?: InputMaybe<ReservationStartInterval>;
-  reservationUnitType?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationsMaxDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
-  resources?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  searchTerms?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
-  serviceSpecificTerms?: InputMaybe<Scalars["String"]["input"]>;
-  spaces?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
-  termsOfUse?: InputMaybe<Scalars["String"]["input"]>;
-  termsOfUseEn?: InputMaybe<Scalars["String"]["input"]>;
-  termsOfUseFi?: InputMaybe<Scalars["String"]["input"]>;
-  termsOfUseSv?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly isArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly maxPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly maxReservationDuration?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly maxReservationsPerUser?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly metadataSet?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly minPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly minReservationDuration?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly name: Scalars["String"]["input"];
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly paymentTerms?: InputMaybe<Scalars["String"]["input"]>;
+  readonly paymentTypes?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["String"]["input"]>>
+  >;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly pricingTerms?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pricings?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitPricingSerializerInput>>
+  >;
+  readonly publishBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly publishEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly purposes?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  readonly qualifiers?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  readonly requireAdultReservee?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly requireReservationHandling?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly reservationBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly reservationBlockWholeDay?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly reservationCancelledInstructions?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationCancelledInstructionsEn?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationCancelledInstructionsFi?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationCancelledInstructionsSv?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationConfirmedInstructions?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationConfirmedInstructionsEn?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationConfirmedInstructionsFi?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationConfirmedInstructionsSv?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly reservationKind?: InputMaybe<ReservationKind>;
+  readonly reservationPendingInstructions?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationPendingInstructionsEn?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationPendingInstructionsFi?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationPendingInstructionsSv?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationStartInterval?: InputMaybe<ReservationStartInterval>;
+  readonly reservationUnitType?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationsMaxDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly resources?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  readonly searchTerms?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["String"]["input"]>>
+  >;
+  readonly serviceSpecificTerms?: InputMaybe<Scalars["String"]["input"]>;
+  readonly spaces?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  readonly surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly termsOfUse?: InputMaybe<Scalars["String"]["input"]>;
+  readonly termsOfUseEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly termsOfUseFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly termsOfUseSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly unit?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ReservationUnitCreateMutationPayload = {
-  accessTypes: Maybe<Array<Maybe<ReservationUnitAccessTypeNode>>>;
-  allowReservationsWithoutOpeningHours: Maybe<Scalars["Boolean"]["output"]>;
-  applicationRoundTimeSlots: Maybe<Array<Maybe<ApplicationRoundTimeSlotNode>>>;
-  authentication: Maybe<Authentication>;
-  bufferTimeAfter: Maybe<Scalars["Duration"]["output"]>;
-  bufferTimeBefore: Maybe<Scalars["Duration"]["output"]>;
-  canApplyFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
-  cancellationRule: Maybe<Scalars["Int"]["output"]>;
-  cancellationTerms: Maybe<Scalars["String"]["output"]>;
-  contactInformation: Maybe<Scalars["String"]["output"]>;
-  description: Maybe<Scalars["String"]["output"]>;
-  descriptionEn: Maybe<Scalars["String"]["output"]>;
-  descriptionFi: Maybe<Scalars["String"]["output"]>;
-  descriptionSv: Maybe<Scalars["String"]["output"]>;
-  equipments: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  images: Maybe<Array<Maybe<ReservationUnitImageNode>>>;
-  isArchived: Maybe<Scalars["Boolean"]["output"]>;
-  isDraft: Maybe<Scalars["Boolean"]["output"]>;
-  maxPersons: Maybe<Scalars["Int"]["output"]>;
-  maxReservationDuration: Maybe<Scalars["Duration"]["output"]>;
-  maxReservationsPerUser: Maybe<Scalars["Int"]["output"]>;
-  metadataSet: Maybe<Scalars["Int"]["output"]>;
-  minPersons: Maybe<Scalars["Int"]["output"]>;
-  minReservationDuration: Maybe<Scalars["Duration"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  paymentTerms: Maybe<Scalars["String"]["output"]>;
-  paymentTypes: Maybe<Array<Maybe<Scalars["String"]["output"]>>>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  pricingTerms: Maybe<Scalars["String"]["output"]>;
-  pricings: Maybe<Array<Maybe<ReservationUnitPricingNode>>>;
-  publishBegins: Maybe<Scalars["DateTime"]["output"]>;
-  publishEnds: Maybe<Scalars["DateTime"]["output"]>;
-  publishingState: Maybe<Scalars["String"]["output"]>;
-  purposes: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  qualifiers: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  requireAdultReservee: Maybe<Scalars["Boolean"]["output"]>;
-  requireReservationHandling: Maybe<Scalars["Boolean"]["output"]>;
-  reservationBegins: Maybe<Scalars["DateTime"]["output"]>;
-  reservationBlockWholeDay: Maybe<Scalars["Boolean"]["output"]>;
-  reservationCancelledInstructions: Maybe<Scalars["String"]["output"]>;
-  reservationCancelledInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  reservationCancelledInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  reservationCancelledInstructionsSv: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructions: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsSv: Maybe<Scalars["String"]["output"]>;
-  reservationEnds: Maybe<Scalars["DateTime"]["output"]>;
-  reservationKind: Maybe<ReservationKind>;
-  reservationPendingInstructions: Maybe<Scalars["String"]["output"]>;
-  reservationPendingInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  reservationPendingInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  reservationPendingInstructionsSv: Maybe<Scalars["String"]["output"]>;
-  reservationStartInterval: Maybe<ReservationStartInterval>;
-  reservationUnitType: Maybe<Scalars["Int"]["output"]>;
-  reservationsMaxDaysBefore: Maybe<Scalars["Int"]["output"]>;
-  reservationsMinDaysBefore: Maybe<Scalars["Int"]["output"]>;
-  resources: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  searchTerms: Maybe<Array<Maybe<Scalars["String"]["output"]>>>;
-  serviceSpecificTerms: Maybe<Scalars["String"]["output"]>;
-  spaces: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  surfaceArea: Maybe<Scalars["Int"]["output"]>;
-  termsOfUse: Maybe<Scalars["String"]["output"]>;
-  termsOfUseEn: Maybe<Scalars["String"]["output"]>;
-  termsOfUseFi: Maybe<Scalars["String"]["output"]>;
-  termsOfUseSv: Maybe<Scalars["String"]["output"]>;
-  unit: Maybe<Scalars["Int"]["output"]>;
-  uuid: Maybe<Scalars["String"]["output"]>;
+  readonly accessTypes: Maybe<
+    ReadonlyArray<Maybe<ReservationUnitAccessTypeNode>>
+  >;
+  readonly allowReservationsWithoutOpeningHours: Maybe<
+    Scalars["Boolean"]["output"]
+  >;
+  readonly applicationRoundTimeSlots: Maybe<
+    ReadonlyArray<Maybe<ApplicationRoundTimeSlotNode>>
+  >;
+  readonly authentication: Maybe<Authentication>;
+  readonly bufferTimeAfter: Maybe<Scalars["Duration"]["output"]>;
+  readonly bufferTimeBefore: Maybe<Scalars["Duration"]["output"]>;
+  readonly canApplyFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
+  readonly cancellationRule: Maybe<Scalars["Int"]["output"]>;
+  readonly cancellationTerms: Maybe<Scalars["String"]["output"]>;
+  readonly contactInformation: Maybe<Scalars["String"]["output"]>;
+  readonly description: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly equipments: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
+  readonly images: Maybe<ReadonlyArray<Maybe<ReservationUnitImageNode>>>;
+  readonly isArchived: Maybe<Scalars["Boolean"]["output"]>;
+  readonly isDraft: Maybe<Scalars["Boolean"]["output"]>;
+  readonly maxPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly maxReservationDuration: Maybe<Scalars["Duration"]["output"]>;
+  readonly maxReservationsPerUser: Maybe<Scalars["Int"]["output"]>;
+  readonly metadataSet: Maybe<Scalars["Int"]["output"]>;
+  readonly minPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly minReservationDuration: Maybe<Scalars["Duration"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly paymentTerms: Maybe<Scalars["String"]["output"]>;
+  readonly paymentTypes: Maybe<
+    ReadonlyArray<Maybe<Scalars["String"]["output"]>>
+  >;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pricingTerms: Maybe<Scalars["String"]["output"]>;
+  readonly pricings: Maybe<ReadonlyArray<Maybe<ReservationUnitPricingNode>>>;
+  readonly publishBegins: Maybe<Scalars["DateTime"]["output"]>;
+  readonly publishEnds: Maybe<Scalars["DateTime"]["output"]>;
+  readonly publishingState: Maybe<Scalars["String"]["output"]>;
+  readonly purposes: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
+  readonly qualifiers: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
+  readonly requireAdultReservee: Maybe<Scalars["Boolean"]["output"]>;
+  readonly requireReservationHandling: Maybe<Scalars["Boolean"]["output"]>;
+  readonly reservationBegins: Maybe<Scalars["DateTime"]["output"]>;
+  readonly reservationBlockWholeDay: Maybe<Scalars["Boolean"]["output"]>;
+  readonly reservationCancelledInstructions: Maybe<Scalars["String"]["output"]>;
+  readonly reservationCancelledInstructionsEn: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationCancelledInstructionsFi: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationCancelledInstructionsSv: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationConfirmedInstructions: Maybe<Scalars["String"]["output"]>;
+  readonly reservationConfirmedInstructionsEn: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationConfirmedInstructionsFi: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationConfirmedInstructionsSv: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationEnds: Maybe<Scalars["DateTime"]["output"]>;
+  readonly reservationKind: Maybe<ReservationKind>;
+  readonly reservationPendingInstructions: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPendingInstructionsEn: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPendingInstructionsFi: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPendingInstructionsSv: Maybe<Scalars["String"]["output"]>;
+  readonly reservationStartInterval: Maybe<ReservationStartInterval>;
+  readonly reservationUnitType: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationsMaxDaysBefore: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationsMinDaysBefore: Maybe<Scalars["Int"]["output"]>;
+  readonly resources: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
+  readonly searchTerms: Maybe<
+    ReadonlyArray<Maybe<Scalars["String"]["output"]>>
+  >;
+  readonly serviceSpecificTerms: Maybe<Scalars["String"]["output"]>;
+  readonly spaces: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
+  readonly surfaceArea: Maybe<Scalars["Int"]["output"]>;
+  readonly termsOfUse: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseEn: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseFi: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseSv: Maybe<Scalars["String"]["output"]>;
+  readonly unit: Maybe<Scalars["Int"]["output"]>;
+  readonly uuid: Maybe<Scalars["String"]["output"]>;
 };
 
 export type ReservationUnitImageCreateMutationInput = {
-  image: Scalars["Upload"]["input"];
-  imageType: ImageType;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit: Scalars["Int"]["input"];
+  readonly image: Scalars["Upload"]["input"];
+  readonly imageType: ImageType;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationUnit: Scalars["Int"]["input"];
 };
 
 export type ReservationUnitImageCreateMutationPayload = {
-  imageType: Maybe<ImageType>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  reservationUnit: Maybe<Scalars["Int"]["output"]>;
+  readonly imageType: Maybe<ImageType>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationUnit: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationUnitImageDeleteMutationInput = {
-  pk: Scalars["ID"]["input"];
+  readonly pk: Scalars["ID"]["input"];
 };
 
 export type ReservationUnitImageDeleteMutationPayload = {
-  deleted: Maybe<Scalars["Boolean"]["output"]>;
+  readonly deleted: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type ReservationUnitImageFieldSerializerInput = {
-  imageType: ImageType;
-  imageUrl: Scalars["Upload"]["input"];
-  largeUrl?: InputMaybe<Scalars["String"]["input"]>;
-  mediumUrl?: InputMaybe<Scalars["String"]["input"]>;
-  smallUrl?: InputMaybe<Scalars["String"]["input"]>;
+  readonly imageType: ImageType;
+  readonly imageUrl: Scalars["Upload"]["input"];
+  readonly largeUrl?: InputMaybe<Scalars["String"]["input"]>;
+  readonly mediumUrl?: InputMaybe<Scalars["String"]["input"]>;
+  readonly smallUrl?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type ReservationUnitImageNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  imageType: ImageType;
-  imageUrl: Maybe<Scalars["String"]["output"]>;
-  largeUrl: Maybe<Scalars["String"]["output"]>;
-  mediumUrl: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  smallUrl: Maybe<Scalars["String"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly imageType: ImageType;
+  readonly imageUrl: Maybe<Scalars["String"]["output"]>;
+  readonly largeUrl: Maybe<Scalars["String"]["output"]>;
+  readonly mediumUrl: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly smallUrl: Maybe<Scalars["String"]["output"]>;
 };
 
 export type ReservationUnitImageUpdateMutationInput = {
-  imageType?: InputMaybe<ImageType>;
-  pk: Scalars["Int"]["input"];
+  readonly imageType?: InputMaybe<ImageType>;
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type ReservationUnitImageUpdateMutationPayload = {
-  imageType: Maybe<ImageType>;
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly imageType: Maybe<ImageType>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ReservationUnitNode = Node & {
-  accessTypes: Array<ReservationUnitAccessTypeNode>;
-  allowReservationsWithoutOpeningHours: Scalars["Boolean"]["output"];
-  applicationRoundTimeSlots: Array<ApplicationRoundTimeSlotNode>;
-  applicationRounds: Array<ApplicationRoundNode>;
-  authentication: Authentication;
-  bufferTimeAfter: Scalars["Duration"]["output"];
-  bufferTimeBefore: Scalars["Duration"]["output"];
-  calculatedSurfaceArea: Maybe<Scalars["Int"]["output"]>;
-  canApplyFreeOfCharge: Scalars["Boolean"]["output"];
-  cancellationRule: Maybe<ReservationUnitCancellationRuleNode>;
-  cancellationTerms: Maybe<TermsOfUseNode>;
-  contactInformation: Scalars["String"]["output"];
-  currentAccessType: Maybe<AccessType>;
-  description: Scalars["String"]["output"];
-  descriptionEn: Maybe<Scalars["String"]["output"]>;
-  descriptionFi: Maybe<Scalars["String"]["output"]>;
-  descriptionSv: Maybe<Scalars["String"]["output"]>;
-  effectiveAccessType: Maybe<AccessType>;
-  equipments: Array<EquipmentNode>;
-  firstReservableDatetime: Maybe<Scalars["DateTime"]["output"]>;
-  haukiUrl: Maybe<Scalars["String"]["output"]>;
+  readonly accessTypes: ReadonlyArray<ReservationUnitAccessTypeNode>;
+  readonly allowReservationsWithoutOpeningHours: Scalars["Boolean"]["output"];
+  readonly applicationRoundTimeSlots: ReadonlyArray<ApplicationRoundTimeSlotNode>;
+  readonly applicationRounds: ReadonlyArray<ApplicationRoundNode>;
+  readonly authentication: Authentication;
+  readonly bufferTimeAfter: Scalars["Duration"]["output"];
+  readonly bufferTimeBefore: Scalars["Duration"]["output"];
+  readonly calculatedSurfaceArea: Maybe<Scalars["Int"]["output"]>;
+  readonly canApplyFreeOfCharge: Scalars["Boolean"]["output"];
+  readonly cancellationRule: Maybe<ReservationUnitCancellationRuleNode>;
+  readonly cancellationTerms: Maybe<TermsOfUseNode>;
+  readonly contactInformation: Scalars["String"]["output"];
+  readonly currentAccessType: Maybe<AccessType>;
+  readonly description: Scalars["String"]["output"];
+  readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly effectiveAccessType: Maybe<AccessType>;
+  readonly equipments: ReadonlyArray<EquipmentNode>;
+  readonly firstReservableDatetime: Maybe<Scalars["DateTime"]["output"]>;
+  readonly haukiUrl: Maybe<Scalars["String"]["output"]>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  images: Array<ReservationUnitImageNode>;
-  isArchived: Scalars["Boolean"]["output"];
-  isClosed: Maybe<Scalars["Boolean"]["output"]>;
-  isDraft: Scalars["Boolean"]["output"];
-  location: Maybe<LocationNode>;
-  maxPersons: Maybe<Scalars["Int"]["output"]>;
-  maxReservationDuration: Maybe<Scalars["Duration"]["output"]>;
-  maxReservationsPerUser: Maybe<Scalars["Int"]["output"]>;
-  metadataSet: Maybe<ReservationMetadataSetNode>;
-  minPersons: Maybe<Scalars["Int"]["output"]>;
-  minReservationDuration: Maybe<Scalars["Duration"]["output"]>;
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  numActiveUserReservations: Maybe<Scalars["Int"]["output"]>;
-  paymentMerchant: Maybe<PaymentMerchantNode>;
-  paymentProduct: Maybe<PaymentProductNode>;
-  paymentTerms: Maybe<TermsOfUseNode>;
-  paymentTypes: Array<ReservationUnitPaymentTypeNode>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  pricingTerms: Maybe<TermsOfUseNode>;
-  pricings: Array<ReservationUnitPricingNode>;
-  publishBegins: Maybe<Scalars["DateTime"]["output"]>;
-  publishEnds: Maybe<Scalars["DateTime"]["output"]>;
-  publishingState: Maybe<ReservationUnitPublishingState>;
-  purposes: Array<PurposeNode>;
-  qualifiers: Array<QualifierNode>;
-  rank: Scalars["Int"]["output"];
-  requireAdultReservee: Scalars["Boolean"]["output"];
-  requireReservationHandling: Scalars["Boolean"]["output"];
-  reservableTimeSpans: Maybe<Array<Maybe<ReservableTimeSpanType>>>;
-  reservationBegins: Maybe<Scalars["DateTime"]["output"]>;
-  reservationBlockWholeDay: Scalars["Boolean"]["output"];
-  reservationCancelledInstructions: Scalars["String"]["output"];
-  reservationCancelledInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  reservationCancelledInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  reservationCancelledInstructionsSv: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructions: Scalars["String"]["output"];
-  reservationConfirmedInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsSv: Maybe<Scalars["String"]["output"]>;
-  reservationEnds: Maybe<Scalars["DateTime"]["output"]>;
-  reservationKind: ReservationKind;
-  reservationPendingInstructions: Scalars["String"]["output"];
-  reservationPendingInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  reservationPendingInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  reservationPendingInstructionsSv: Maybe<Scalars["String"]["output"]>;
-  reservationStartInterval: ReservationStartInterval;
-  reservationState: Maybe<ReservationUnitReservationState>;
-  reservationUnitType: Maybe<ReservationUnitTypeNode>;
-  reservations: Maybe<Array<ReservationNode>>;
-  reservationsMaxDaysBefore: Maybe<Scalars["Int"]["output"]>;
-  reservationsMinDaysBefore: Maybe<Scalars["Int"]["output"]>;
-  resources: Array<ResourceNode>;
-  searchTerms: Array<Scalars["String"]["output"]>;
-  serviceSpecificTerms: Maybe<TermsOfUseNode>;
-  spaces: Array<SpaceNode>;
-  surfaceArea: Maybe<Scalars["Int"]["output"]>;
-  termsOfUse: Maybe<Scalars["String"]["output"]>;
-  termsOfUseEn: Maybe<Scalars["String"]["output"]>;
-  termsOfUseFi: Maybe<Scalars["String"]["output"]>;
-  termsOfUseSv: Maybe<Scalars["String"]["output"]>;
-  unit: Maybe<UnitNode>;
-  uuid: Scalars["UUID"]["output"];
+  readonly id: Scalars["ID"]["output"];
+  readonly images: ReadonlyArray<ReservationUnitImageNode>;
+  readonly isArchived: Scalars["Boolean"]["output"];
+  readonly isClosed: Maybe<Scalars["Boolean"]["output"]>;
+  readonly isDraft: Scalars["Boolean"]["output"];
+  readonly location: Maybe<LocationNode>;
+  readonly maxPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly maxReservationDuration: Maybe<Scalars["Duration"]["output"]>;
+  readonly maxReservationsPerUser: Maybe<Scalars["Int"]["output"]>;
+  readonly metadataSet: Maybe<ReservationMetadataSetNode>;
+  readonly minPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly minReservationDuration: Maybe<Scalars["Duration"]["output"]>;
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly numActiveUserReservations: Maybe<Scalars["Int"]["output"]>;
+  readonly paymentMerchant: Maybe<PaymentMerchantNode>;
+  readonly paymentProduct: Maybe<PaymentProductNode>;
+  readonly paymentTerms: Maybe<TermsOfUseNode>;
+  readonly paymentTypes: ReadonlyArray<ReservationUnitPaymentTypeNode>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pricingTerms: Maybe<TermsOfUseNode>;
+  readonly pricings: ReadonlyArray<ReservationUnitPricingNode>;
+  readonly publishBegins: Maybe<Scalars["DateTime"]["output"]>;
+  readonly publishEnds: Maybe<Scalars["DateTime"]["output"]>;
+  readonly publishingState: Maybe<ReservationUnitPublishingState>;
+  readonly purposes: ReadonlyArray<PurposeNode>;
+  readonly qualifiers: ReadonlyArray<QualifierNode>;
+  readonly rank: Scalars["Int"]["output"];
+  readonly requireAdultReservee: Scalars["Boolean"]["output"];
+  readonly requireReservationHandling: Scalars["Boolean"]["output"];
+  readonly reservableTimeSpans: Maybe<
+    ReadonlyArray<Maybe<ReservableTimeSpanType>>
+  >;
+  readonly reservationBegins: Maybe<Scalars["DateTime"]["output"]>;
+  readonly reservationBlockWholeDay: Scalars["Boolean"]["output"];
+  readonly reservationCancelledInstructions: Scalars["String"]["output"];
+  readonly reservationCancelledInstructionsEn: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationCancelledInstructionsFi: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationCancelledInstructionsSv: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationConfirmedInstructions: Scalars["String"]["output"];
+  readonly reservationConfirmedInstructionsEn: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationConfirmedInstructionsFi: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationConfirmedInstructionsSv: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationEnds: Maybe<Scalars["DateTime"]["output"]>;
+  readonly reservationKind: ReservationKind;
+  readonly reservationPendingInstructions: Scalars["String"]["output"];
+  readonly reservationPendingInstructionsEn: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPendingInstructionsFi: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPendingInstructionsSv: Maybe<Scalars["String"]["output"]>;
+  readonly reservationStartInterval: ReservationStartInterval;
+  readonly reservationState: Maybe<ReservationUnitReservationState>;
+  readonly reservationUnitType: Maybe<ReservationUnitTypeNode>;
+  readonly reservations: Maybe<ReadonlyArray<ReservationNode>>;
+  readonly reservationsMaxDaysBefore: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationsMinDaysBefore: Maybe<Scalars["Int"]["output"]>;
+  readonly resources: ReadonlyArray<ResourceNode>;
+  readonly searchTerms: ReadonlyArray<Scalars["String"]["output"]>;
+  readonly serviceSpecificTerms: Maybe<TermsOfUseNode>;
+  readonly spaces: ReadonlyArray<SpaceNode>;
+  readonly surfaceArea: Maybe<Scalars["Int"]["output"]>;
+  readonly termsOfUse: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseEn: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseFi: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseSv: Maybe<Scalars["String"]["output"]>;
+  readonly unit: Maybe<UnitNode>;
+  readonly uuid: Scalars["UUID"]["output"];
 };
 
 export type ReservationUnitNodeAccessTypesArgs = {
   isActiveOrFuture?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<
-    Array<InputMaybe<ReservationUnitAccessTypeOrderingChoices>>
+    ReadonlyArray<InputMaybe<ReservationUnitAccessTypeOrderingChoices>>
   >;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnit?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
 };
 
 export type ReservationUnitNodeApplicationRoundsArgs = {
@@ -3989,8 +4219,10 @@ export type ReservationUnitNodeApplicationRoundsArgs = {
   name?: InputMaybe<Scalars["String"]["input"]>;
   ongoing?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermissions?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ApplicationRoundOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ApplicationRoundOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type ReservationUnitNodeEquipmentsArgs = {
@@ -4006,8 +4238,8 @@ export type ReservationUnitNodeEquipmentsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   name_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   name_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<EquipmentOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<EquipmentOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
 };
@@ -4016,16 +4248,16 @@ export type ReservationUnitNodePurposesArgs = {
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameFi?: InputMaybe<Scalars["String"]["input"]>;
   nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<PurposeOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<PurposeOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type ReservationUnitNodeQualifiersArgs = {
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameFi?: InputMaybe<Scalars["String"]["input"]>;
   nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<QualifierOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<QualifierOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type ReservationUnitNodeReservableTimeSpansArgs = {
@@ -4043,23 +4275,31 @@ export type ReservationUnitNodeReservationsArgs = {
   isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithHandlingPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationOrderingChoices>>>;
-  orderStatus?: InputMaybe<Array<InputMaybe<OrderStatusWithFree>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<ReservationOrderingChoices>>>;
+  orderStatus?: InputMaybe<ReadonlyArray<InputMaybe<OrderStatusWithFree>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  recurringReservation?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  recurringReservation?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   requested?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationType?: InputMaybe<Array<InputMaybe<ReservationTypeChoice>>>;
+  reservationType?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationTypeChoice>>
+  >;
   reservationUnitNameEn?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameFi?: InputMaybe<Scalars["String"]["input"]>;
   reservationUnitNameSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnits?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  state?: InputMaybe<Array<InputMaybe<ReservationStateChoice>>>;
+  reservationUnitType?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  reservationUnits?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  state?: InputMaybe<ReadonlyArray<InputMaybe<ReservationStateChoice>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  user?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  user?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type ReservationUnitNodeResourcesArgs = {
@@ -4073,8 +4313,8 @@ export type ReservationUnitNodeResourcesArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ResourceOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<ResourceOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type ReservationUnitNodeSpacesArgs = {
@@ -4088,58 +4328,62 @@ export type ReservationUnitNodeSpacesArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<SpaceOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<SpaceOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type ReservationUnitNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationUnitNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ReservationUnitNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ReservationUnitNode` and its cursor. */
 export type ReservationUnitNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ReservationUnitNode>;
+  readonly node: Maybe<ReservationUnitNode>;
 };
 
 export type ReservationUnitOptionApplicantSerializerInput = {
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  preferredOrder: Scalars["Int"]["input"];
-  reservationUnit: Scalars["Int"]["input"];
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly preferredOrder: Scalars["Int"]["input"];
+  readonly reservationUnit: Scalars["Int"]["input"];
 };
 
 export type ReservationUnitOptionNode = Node & {
-  allocatedTimeSlots: Array<AllocatedTimeSlotNode>;
-  applicationSection: ApplicationSectionNode;
+  readonly allocatedTimeSlots: ReadonlyArray<AllocatedTimeSlotNode>;
+  readonly applicationSection: ApplicationSectionNode;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  locked: Scalars["Boolean"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  preferredOrder: Scalars["Int"]["output"];
-  rejected: Scalars["Boolean"]["output"];
-  reservationUnit: ReservationUnitNode;
+  readonly id: Scalars["ID"]["output"];
+  readonly locked: Scalars["Boolean"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly preferredOrder: Scalars["Int"]["output"];
+  readonly rejected: Scalars["Boolean"]["output"];
+  readonly reservationUnit: ReservationUnitNode;
 };
 
 export type ReservationUnitOptionNodeAllocatedTimeSlotsArgs = {
-  accessCodeState?: InputMaybe<Array<InputMaybe<AccessCodeState>>>;
+  accessCodeState?: InputMaybe<ReadonlyArray<InputMaybe<AccessCodeState>>>;
   allocatedReservationUnit?: InputMaybe<
-    Array<InputMaybe<Scalars["Int"]["input"]>>
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
   >;
-  allocatedUnit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  applicantType?: InputMaybe<Array<InputMaybe<ApplicantTypeChoice>>>;
+  allocatedUnit?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  applicantType?: InputMaybe<ReadonlyArray<InputMaybe<ApplicantTypeChoice>>>;
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   applicationSectionStatus?: InputMaybe<
-    Array<InputMaybe<ApplicationSectionStatusChoice>>
+    ReadonlyArray<InputMaybe<ApplicationSectionStatusChoice>>
   >;
-  dayOfTheWeek?: InputMaybe<Array<InputMaybe<Weekday>>>;
-  orderBy?: InputMaybe<Array<InputMaybe<AllocatedTimeSlotOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  dayOfTheWeek?: InputMaybe<ReadonlyArray<InputMaybe<Weekday>>>;
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<AllocatedTimeSlotOrderingChoices>>
+  >;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -4150,15 +4394,15 @@ export enum ReservationUnitOptionOrderingChoices {
 }
 
 export type ReservationUnitOptionUpdateMutationInput = {
-  locked?: InputMaybe<Scalars["Boolean"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  rejected?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly locked?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly rejected?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type ReservationUnitOptionUpdateMutationPayload = {
-  locked: Maybe<Scalars["Boolean"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  rejected: Maybe<Scalars["Boolean"]["output"]>;
+  readonly locked: Maybe<Scalars["Boolean"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly rejected: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 /** Ordering fields for the 'ReservationUnit' model. */
@@ -4194,34 +4438,34 @@ export enum ReservationUnitOrderingChoices {
 }
 
 export type ReservationUnitPaymentTypeNode = Node & {
-  code: Scalars["String"]["output"];
+  readonly code: Scalars["String"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
+  readonly id: Scalars["ID"]["output"];
 };
 
 export type ReservationUnitPricingNode = Node & {
-  begins: Scalars["Date"]["output"];
-  highestPrice: Scalars["Decimal"]["output"];
-  highestPriceNet: Maybe<Scalars["Decimal"]["output"]>;
+  readonly begins: Scalars["Date"]["output"];
+  readonly highestPrice: Scalars["Decimal"]["output"];
+  readonly highestPriceNet: Maybe<Scalars["Decimal"]["output"]>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  lowestPrice: Scalars["Decimal"]["output"];
-  lowestPriceNet: Maybe<Scalars["Decimal"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  priceUnit: PriceUnit;
-  taxPercentage: TaxPercentageNode;
+  readonly id: Scalars["ID"]["output"];
+  readonly lowestPrice: Scalars["Decimal"]["output"];
+  readonly lowestPriceNet: Maybe<Scalars["Decimal"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly priceUnit: PriceUnit;
+  readonly taxPercentage: TaxPercentageNode;
 };
 
 export type ReservationUnitPricingSerializerInput = {
-  begins: Scalars["Date"]["input"];
-  highestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
-  highestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
-  isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
-  lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
-  lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  priceUnit?: InputMaybe<PriceUnit>;
-  taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly begins: Scalars["Date"]["input"];
+  readonly highestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
+  readonly highestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
+  readonly lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly priceUnit?: InputMaybe<PriceUnit>;
+  readonly taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 /** An enumeration. */
@@ -4246,29 +4490,29 @@ export enum ReservationUnitReservationState {
 
 export type ReservationUnitTypeNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  rank: Scalars["Int"]["output"];
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly rank: Scalars["Int"]["output"];
 };
 
 export type ReservationUnitTypeNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ReservationUnitTypeNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ReservationUnitTypeNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ReservationUnitTypeNode` and its cursor. */
 export type ReservationUnitTypeNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ReservationUnitTypeNode>;
+  readonly node: Maybe<ReservationUnitTypeNode>;
 };
 
 /** Ordering fields for the 'ReservationUnitType' model. */
@@ -4284,230 +4528,294 @@ export enum ReservationUnitTypeOrderingChoices {
 }
 
 export type ReservationUnitUpdateMutationInput = {
-  accessTypes?: InputMaybe<
-    Array<InputMaybe<UpdateReservationUnitAccessTypeSerializerInput>>
+  readonly accessTypes?: InputMaybe<
+    ReadonlyArray<InputMaybe<UpdateReservationUnitAccessTypeSerializerInput>>
   >;
-  allowReservationsWithoutOpeningHours?: InputMaybe<
+  readonly allowReservationsWithoutOpeningHours?: InputMaybe<
     Scalars["Boolean"]["input"]
   >;
-  applicationRoundTimeSlots?: InputMaybe<
-    Array<InputMaybe<UpdateApplicationRoundTimeSlotSerializerInput>>
+  readonly applicationRoundTimeSlots?: InputMaybe<
+    ReadonlyArray<InputMaybe<UpdateApplicationRoundTimeSlotSerializerInput>>
   >;
-  authentication?: InputMaybe<Authentication>;
-  bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
-  bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
-  canApplyFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
-  cancellationRule?: InputMaybe<Scalars["Int"]["input"]>;
-  cancellationTerms?: InputMaybe<Scalars["String"]["input"]>;
-  contactInformation?: InputMaybe<Scalars["String"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
-  descriptionFi?: InputMaybe<Scalars["String"]["input"]>;
-  descriptionSv?: InputMaybe<Scalars["String"]["input"]>;
-  equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  images?: InputMaybe<
-    Array<InputMaybe<UpdateReservationUnitImageFieldSerializerInput>>
+  readonly authentication?: InputMaybe<Authentication>;
+  readonly bufferTimeAfter?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly bufferTimeBefore?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly canApplyFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly cancellationRule?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly cancellationTerms?: InputMaybe<Scalars["String"]["input"]>;
+  readonly contactInformation?: InputMaybe<Scalars["String"]["input"]>;
+  readonly description?: InputMaybe<Scalars["String"]["input"]>;
+  readonly descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly descriptionFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly descriptionSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly equipments?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
   >;
-  isArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
-  isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
-  maxPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  maxReservationDuration?: InputMaybe<Scalars["Duration"]["input"]>;
-  maxReservationsPerUser?: InputMaybe<Scalars["Int"]["input"]>;
-  metadataSet?: InputMaybe<Scalars["Int"]["input"]>;
-  minPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  minReservationDuration?: InputMaybe<Scalars["Duration"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  paymentTerms?: InputMaybe<Scalars["String"]["input"]>;
-  paymentTypes?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
-  pk: Scalars["Int"]["input"];
-  pricingTerms?: InputMaybe<Scalars["String"]["input"]>;
-  pricings?: InputMaybe<
-    Array<InputMaybe<UpdateReservationUnitPricingSerializerInput>>
+  readonly images?: InputMaybe<
+    ReadonlyArray<InputMaybe<UpdateReservationUnitImageFieldSerializerInput>>
   >;
-  publishBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
-  publishEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
-  purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  requireAdultReservee?: InputMaybe<Scalars["Boolean"]["input"]>;
-  requireReservationHandling?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
-  reservationBlockWholeDay?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationCancelledInstructions?: InputMaybe<Scalars["String"]["input"]>;
-  reservationCancelledInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
-  reservationCancelledInstructionsFi?: InputMaybe<Scalars["String"]["input"]>;
-  reservationCancelledInstructionsSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationConfirmedInstructions?: InputMaybe<Scalars["String"]["input"]>;
-  reservationConfirmedInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
-  reservationConfirmedInstructionsFi?: InputMaybe<Scalars["String"]["input"]>;
-  reservationConfirmedInstructionsSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
-  reservationKind?: InputMaybe<ReservationKind>;
-  reservationPendingInstructions?: InputMaybe<Scalars["String"]["input"]>;
-  reservationPendingInstructionsEn?: InputMaybe<Scalars["String"]["input"]>;
-  reservationPendingInstructionsFi?: InputMaybe<Scalars["String"]["input"]>;
-  reservationPendingInstructionsSv?: InputMaybe<Scalars["String"]["input"]>;
-  reservationStartInterval?: InputMaybe<ReservationStartInterval>;
-  reservationUnitType?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationsMaxDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
-  resources?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  searchTerms?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
-  serviceSpecificTerms?: InputMaybe<Scalars["String"]["input"]>;
-  spaces?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
-  termsOfUse?: InputMaybe<Scalars["String"]["input"]>;
-  termsOfUseEn?: InputMaybe<Scalars["String"]["input"]>;
-  termsOfUseFi?: InputMaybe<Scalars["String"]["input"]>;
-  termsOfUseSv?: InputMaybe<Scalars["String"]["input"]>;
-  unit?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly isArchived?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly maxPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly maxReservationDuration?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly maxReservationsPerUser?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly metadataSet?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly minPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly minReservationDuration?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly paymentTerms?: InputMaybe<Scalars["String"]["input"]>;
+  readonly paymentTypes?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["String"]["input"]>>
+  >;
+  readonly pk: Scalars["Int"]["input"];
+  readonly pricingTerms?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pricings?: InputMaybe<
+    ReadonlyArray<InputMaybe<UpdateReservationUnitPricingSerializerInput>>
+  >;
+  readonly publishBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly publishEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly purposes?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  readonly qualifiers?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  readonly requireAdultReservee?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly requireReservationHandling?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly reservationBegins?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly reservationBlockWholeDay?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly reservationCancelledInstructions?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationCancelledInstructionsEn?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationCancelledInstructionsFi?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationCancelledInstructionsSv?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationConfirmedInstructions?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationConfirmedInstructionsEn?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationConfirmedInstructionsFi?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationConfirmedInstructionsSv?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationEnds?: InputMaybe<Scalars["DateTime"]["input"]>;
+  readonly reservationKind?: InputMaybe<ReservationKind>;
+  readonly reservationPendingInstructions?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationPendingInstructionsEn?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationPendingInstructionsFi?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationPendingInstructionsSv?: InputMaybe<
+    Scalars["String"]["input"]
+  >;
+  readonly reservationStartInterval?: InputMaybe<ReservationStartInterval>;
+  readonly reservationUnitType?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationsMaxDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationsMinDaysBefore?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly resources?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  readonly searchTerms?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["String"]["input"]>>
+  >;
+  readonly serviceSpecificTerms?: InputMaybe<Scalars["String"]["input"]>;
+  readonly spaces?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
+  readonly surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly termsOfUse?: InputMaybe<Scalars["String"]["input"]>;
+  readonly termsOfUseEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly termsOfUseFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly termsOfUseSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly unit?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ReservationUnitUpdateMutationPayload = {
-  accessTypes: Maybe<Array<Maybe<ReservationUnitAccessTypeNode>>>;
-  allowReservationsWithoutOpeningHours: Maybe<Scalars["Boolean"]["output"]>;
-  applicationRoundTimeSlots: Maybe<Array<Maybe<ApplicationRoundTimeSlotNode>>>;
-  authentication: Maybe<Authentication>;
-  bufferTimeAfter: Maybe<Scalars["Duration"]["output"]>;
-  bufferTimeBefore: Maybe<Scalars["Duration"]["output"]>;
-  canApplyFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
-  cancellationRule: Maybe<Scalars["Int"]["output"]>;
-  cancellationTerms: Maybe<Scalars["String"]["output"]>;
-  contactInformation: Maybe<Scalars["String"]["output"]>;
-  description: Maybe<Scalars["String"]["output"]>;
-  descriptionEn: Maybe<Scalars["String"]["output"]>;
-  descriptionFi: Maybe<Scalars["String"]["output"]>;
-  descriptionSv: Maybe<Scalars["String"]["output"]>;
-  equipments: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  images: Maybe<Array<Maybe<ReservationUnitImageNode>>>;
-  isArchived: Maybe<Scalars["Boolean"]["output"]>;
-  isDraft: Maybe<Scalars["Boolean"]["output"]>;
-  maxPersons: Maybe<Scalars["Int"]["output"]>;
-  maxReservationDuration: Maybe<Scalars["Duration"]["output"]>;
-  maxReservationsPerUser: Maybe<Scalars["Int"]["output"]>;
-  metadataSet: Maybe<Scalars["Int"]["output"]>;
-  minPersons: Maybe<Scalars["Int"]["output"]>;
-  minReservationDuration: Maybe<Scalars["Duration"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  paymentTerms: Maybe<Scalars["String"]["output"]>;
-  paymentTypes: Maybe<Array<Maybe<Scalars["String"]["output"]>>>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  pricingTerms: Maybe<Scalars["String"]["output"]>;
-  pricings: Maybe<Array<Maybe<ReservationUnitPricingNode>>>;
-  publishBegins: Maybe<Scalars["DateTime"]["output"]>;
-  publishEnds: Maybe<Scalars["DateTime"]["output"]>;
-  publishingState: Maybe<Scalars["String"]["output"]>;
-  purposes: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  qualifiers: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  requireAdultReservee: Maybe<Scalars["Boolean"]["output"]>;
-  requireReservationHandling: Maybe<Scalars["Boolean"]["output"]>;
-  reservationBegins: Maybe<Scalars["DateTime"]["output"]>;
-  reservationBlockWholeDay: Maybe<Scalars["Boolean"]["output"]>;
-  reservationCancelledInstructions: Maybe<Scalars["String"]["output"]>;
-  reservationCancelledInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  reservationCancelledInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  reservationCancelledInstructionsSv: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructions: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  reservationConfirmedInstructionsSv: Maybe<Scalars["String"]["output"]>;
-  reservationEnds: Maybe<Scalars["DateTime"]["output"]>;
-  reservationKind: Maybe<ReservationKind>;
-  reservationPendingInstructions: Maybe<Scalars["String"]["output"]>;
-  reservationPendingInstructionsEn: Maybe<Scalars["String"]["output"]>;
-  reservationPendingInstructionsFi: Maybe<Scalars["String"]["output"]>;
-  reservationPendingInstructionsSv: Maybe<Scalars["String"]["output"]>;
-  reservationStartInterval: Maybe<ReservationStartInterval>;
-  reservationUnitType: Maybe<Scalars["Int"]["output"]>;
-  reservationsMaxDaysBefore: Maybe<Scalars["Int"]["output"]>;
-  reservationsMinDaysBefore: Maybe<Scalars["Int"]["output"]>;
-  resources: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  searchTerms: Maybe<Array<Maybe<Scalars["String"]["output"]>>>;
-  serviceSpecificTerms: Maybe<Scalars["String"]["output"]>;
-  spaces: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
-  surfaceArea: Maybe<Scalars["Int"]["output"]>;
-  termsOfUse: Maybe<Scalars["String"]["output"]>;
-  termsOfUseEn: Maybe<Scalars["String"]["output"]>;
-  termsOfUseFi: Maybe<Scalars["String"]["output"]>;
-  termsOfUseSv: Maybe<Scalars["String"]["output"]>;
-  unit: Maybe<Scalars["Int"]["output"]>;
-  uuid: Maybe<Scalars["String"]["output"]>;
+  readonly accessTypes: Maybe<
+    ReadonlyArray<Maybe<ReservationUnitAccessTypeNode>>
+  >;
+  readonly allowReservationsWithoutOpeningHours: Maybe<
+    Scalars["Boolean"]["output"]
+  >;
+  readonly applicationRoundTimeSlots: Maybe<
+    ReadonlyArray<Maybe<ApplicationRoundTimeSlotNode>>
+  >;
+  readonly authentication: Maybe<Authentication>;
+  readonly bufferTimeAfter: Maybe<Scalars["Duration"]["output"]>;
+  readonly bufferTimeBefore: Maybe<Scalars["Duration"]["output"]>;
+  readonly canApplyFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
+  readonly cancellationRule: Maybe<Scalars["Int"]["output"]>;
+  readonly cancellationTerms: Maybe<Scalars["String"]["output"]>;
+  readonly contactInformation: Maybe<Scalars["String"]["output"]>;
+  readonly description: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly equipments: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
+  readonly images: Maybe<ReadonlyArray<Maybe<ReservationUnitImageNode>>>;
+  readonly isArchived: Maybe<Scalars["Boolean"]["output"]>;
+  readonly isDraft: Maybe<Scalars["Boolean"]["output"]>;
+  readonly maxPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly maxReservationDuration: Maybe<Scalars["Duration"]["output"]>;
+  readonly maxReservationsPerUser: Maybe<Scalars["Int"]["output"]>;
+  readonly metadataSet: Maybe<Scalars["Int"]["output"]>;
+  readonly minPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly minReservationDuration: Maybe<Scalars["Duration"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly paymentTerms: Maybe<Scalars["String"]["output"]>;
+  readonly paymentTypes: Maybe<
+    ReadonlyArray<Maybe<Scalars["String"]["output"]>>
+  >;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pricingTerms: Maybe<Scalars["String"]["output"]>;
+  readonly pricings: Maybe<ReadonlyArray<Maybe<ReservationUnitPricingNode>>>;
+  readonly publishBegins: Maybe<Scalars["DateTime"]["output"]>;
+  readonly publishEnds: Maybe<Scalars["DateTime"]["output"]>;
+  readonly publishingState: Maybe<Scalars["String"]["output"]>;
+  readonly purposes: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
+  readonly qualifiers: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
+  readonly requireAdultReservee: Maybe<Scalars["Boolean"]["output"]>;
+  readonly requireReservationHandling: Maybe<Scalars["Boolean"]["output"]>;
+  readonly reservationBegins: Maybe<Scalars["DateTime"]["output"]>;
+  readonly reservationBlockWholeDay: Maybe<Scalars["Boolean"]["output"]>;
+  readonly reservationCancelledInstructions: Maybe<Scalars["String"]["output"]>;
+  readonly reservationCancelledInstructionsEn: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationCancelledInstructionsFi: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationCancelledInstructionsSv: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationConfirmedInstructions: Maybe<Scalars["String"]["output"]>;
+  readonly reservationConfirmedInstructionsEn: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationConfirmedInstructionsFi: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationConfirmedInstructionsSv: Maybe<
+    Scalars["String"]["output"]
+  >;
+  readonly reservationEnds: Maybe<Scalars["DateTime"]["output"]>;
+  readonly reservationKind: Maybe<ReservationKind>;
+  readonly reservationPendingInstructions: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPendingInstructionsEn: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPendingInstructionsFi: Maybe<Scalars["String"]["output"]>;
+  readonly reservationPendingInstructionsSv: Maybe<Scalars["String"]["output"]>;
+  readonly reservationStartInterval: Maybe<ReservationStartInterval>;
+  readonly reservationUnitType: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationsMaxDaysBefore: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationsMinDaysBefore: Maybe<Scalars["Int"]["output"]>;
+  readonly resources: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
+  readonly searchTerms: Maybe<
+    ReadonlyArray<Maybe<Scalars["String"]["output"]>>
+  >;
+  readonly serviceSpecificTerms: Maybe<Scalars["String"]["output"]>;
+  readonly spaces: Maybe<ReadonlyArray<Maybe<Scalars["Int"]["output"]>>>;
+  readonly surfaceArea: Maybe<Scalars["Int"]["output"]>;
+  readonly termsOfUse: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseEn: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseFi: Maybe<Scalars["String"]["output"]>;
+  readonly termsOfUseSv: Maybe<Scalars["String"]["output"]>;
+  readonly unit: Maybe<Scalars["Int"]["output"]>;
+  readonly uuid: Maybe<Scalars["String"]["output"]>;
 };
 
 export type ReservationUpdateMutationInput = {
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
-  billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
-  billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
-  billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
-  billingEmail?: InputMaybe<Scalars["String"]["input"]>;
-  billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
-  billingLastName?: InputMaybe<Scalars["String"]["input"]>;
-  billingPhone?: InputMaybe<Scalars["String"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
-  homeCity?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  numPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  purpose?: InputMaybe<Scalars["Int"]["input"]>;
-  reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeId?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeType?: InputMaybe<CustomerTypeChoice>;
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingEmail?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingLastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingPhone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly description?: InputMaybe<Scalars["String"]["input"]>;
+  readonly freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
+  readonly homeCity?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly numPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeId?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeIsUnregisteredAssociation?: InputMaybe<
+    Scalars["Boolean"]["input"]
+  >;
+  readonly reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeType?: InputMaybe<CustomerTypeChoice>;
 };
 
 export type ReservationUpdateMutationPayload = {
-  ageGroup: Maybe<Scalars["Int"]["output"]>;
-  applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
-  billingAddressCity: Maybe<Scalars["String"]["output"]>;
-  billingAddressStreet: Maybe<Scalars["String"]["output"]>;
-  billingAddressZip: Maybe<Scalars["String"]["output"]>;
-  billingEmail: Maybe<Scalars["String"]["output"]>;
-  billingFirstName: Maybe<Scalars["String"]["output"]>;
-  billingLastName: Maybe<Scalars["String"]["output"]>;
-  billingPhone: Maybe<Scalars["String"]["output"]>;
-  description: Maybe<Scalars["String"]["output"]>;
-  freeOfChargeReason: Maybe<Scalars["String"]["output"]>;
-  homeCity: Maybe<Scalars["Int"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  numPersons: Maybe<Scalars["Int"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  purpose: Maybe<Scalars["Int"]["output"]>;
-  reserveeAddressCity: Maybe<Scalars["String"]["output"]>;
-  reserveeAddressStreet: Maybe<Scalars["String"]["output"]>;
-  reserveeAddressZip: Maybe<Scalars["String"]["output"]>;
-  reserveeEmail: Maybe<Scalars["String"]["output"]>;
-  reserveeFirstName: Maybe<Scalars["String"]["output"]>;
-  reserveeId: Maybe<Scalars["String"]["output"]>;
-  reserveeIsUnregisteredAssociation: Maybe<Scalars["Boolean"]["output"]>;
-  reserveeLastName: Maybe<Scalars["String"]["output"]>;
-  reserveeOrganisationName: Maybe<Scalars["String"]["output"]>;
-  reserveePhone: Maybe<Scalars["String"]["output"]>;
-  reserveeType: Maybe<CustomerTypeChoice>;
-  state: Maybe<ReservationStateChoice>;
+  readonly ageGroup: Maybe<Scalars["Int"]["output"]>;
+  readonly applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
+  readonly billingAddressCity: Maybe<Scalars["String"]["output"]>;
+  readonly billingAddressStreet: Maybe<Scalars["String"]["output"]>;
+  readonly billingAddressZip: Maybe<Scalars["String"]["output"]>;
+  readonly billingEmail: Maybe<Scalars["String"]["output"]>;
+  readonly billingFirstName: Maybe<Scalars["String"]["output"]>;
+  readonly billingLastName: Maybe<Scalars["String"]["output"]>;
+  readonly billingPhone: Maybe<Scalars["String"]["output"]>;
+  readonly description: Maybe<Scalars["String"]["output"]>;
+  readonly freeOfChargeReason: Maybe<Scalars["String"]["output"]>;
+  readonly homeCity: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly numPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly purpose: Maybe<Scalars["Int"]["output"]>;
+  readonly reserveeAddressCity: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeAddressStreet: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeAddressZip: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeEmail: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeFirstName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeId: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeIsUnregisteredAssociation: Maybe<
+    Scalars["Boolean"]["output"]
+  >;
+  readonly reserveeLastName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeOrganisationName: Maybe<Scalars["String"]["output"]>;
+  readonly reserveePhone: Maybe<Scalars["String"]["output"]>;
+  readonly reserveeType: Maybe<CustomerTypeChoice>;
+  readonly state: Maybe<ReservationStateChoice>;
 };
 
 export type ReservationWorkingMemoMutationInput = {
-  pk: Scalars["Int"]["input"];
-  workingMemo: Scalars["String"]["input"];
+  readonly pk: Scalars["Int"]["input"];
+  readonly workingMemo: Scalars["String"]["input"];
 };
 
 export type ReservationWorkingMemoMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
-  workingMemo: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly workingMemo: Maybe<Scalars["String"]["output"]>;
 };
 
 /** An enumeration. */
@@ -4521,31 +4829,31 @@ export enum ReserveeType {
 }
 
 export type ResourceCreateMutationInput = {
-  locationType?: InputMaybe<LocationType>;
-  name: Scalars["String"]["input"];
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  space?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly locationType?: InputMaybe<LocationType>;
+  readonly name: Scalars["String"]["input"];
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly space?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ResourceCreateMutationPayload = {
-  locationType: Maybe<LocationType>;
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  space: Maybe<Scalars["Int"]["output"]>;
+  readonly locationType: Maybe<LocationType>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly space: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type ResourceDeleteMutationInput = {
-  pk: Scalars["ID"]["input"];
+  readonly pk: Scalars["ID"]["input"];
 };
 
 export type ResourceDeleteMutationPayload = {
-  deleted: Maybe<Scalars["Boolean"]["output"]>;
+  readonly deleted: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 /** An enumeration. */
@@ -4556,30 +4864,30 @@ export enum ResourceLocationType {
 
 export type ResourceNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  locationType: Maybe<ResourceLocationType>;
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  space: Maybe<SpaceNode>;
+  readonly id: Scalars["ID"]["output"];
+  readonly locationType: Maybe<ResourceLocationType>;
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly space: Maybe<SpaceNode>;
 };
 
 export type ResourceNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<ResourceNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<ResourceNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `ResourceNode` and its cursor. */
 export type ResourceNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<ResourceNode>;
+  readonly node: Maybe<ResourceNode>;
 };
 
 /** Ordering fields for the 'Resource' model. */
@@ -4589,106 +4897,106 @@ export enum ResourceOrderingChoices {
 }
 
 export type ResourceUpdateMutationInput = {
-  locationType?: InputMaybe<LocationType>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  space?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly locationType?: InputMaybe<LocationType>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly space?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ResourceUpdateMutationPayload = {
-  locationType: Maybe<LocationType>;
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  space: Maybe<Scalars["Int"]["output"]>;
+  readonly locationType: Maybe<LocationType>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly space: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type RestoreAllApplicationOptionsMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type RestoreAllApplicationOptionsMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type RestoreAllSectionOptionsMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type RestoreAllSectionOptionsMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type SetApplicationRoundHandledMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type SetApplicationRoundHandledMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type SetApplicationRoundResultsSentMutationInput = {
-  pk: Scalars["Int"]["input"];
+  readonly pk: Scalars["Int"]["input"];
 };
 
 export type SetApplicationRoundResultsSentMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type SpaceCreateMutationInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  maxPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  name: Scalars["String"]["input"];
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  parent?: InputMaybe<Scalars["Int"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
-  unit?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly code?: InputMaybe<Scalars["String"]["input"]>;
+  readonly maxPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name: Scalars["String"]["input"];
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly parent?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly unit?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type SpaceCreateMutationPayload = {
-  code: Maybe<Scalars["String"]["output"]>;
-  maxPersons: Maybe<Scalars["Int"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  parent: Maybe<Scalars["Int"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  surfaceArea: Maybe<Scalars["Int"]["output"]>;
-  unit: Maybe<Scalars["Int"]["output"]>;
+  readonly code: Maybe<Scalars["String"]["output"]>;
+  readonly maxPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly parent: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly surfaceArea: Maybe<Scalars["Int"]["output"]>;
+  readonly unit: Maybe<Scalars["Int"]["output"]>;
 };
 
 export type SpaceDeleteMutationInput = {
-  pk: Scalars["ID"]["input"];
+  readonly pk: Scalars["ID"]["input"];
 };
 
 export type SpaceDeleteMutationPayload = {
-  deleted: Maybe<Scalars["Boolean"]["output"]>;
+  readonly deleted: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type SpaceNode = Node & {
-  children: Maybe<Array<SpaceNode>>;
-  code: Scalars["String"]["output"];
+  readonly children: Maybe<ReadonlyArray<SpaceNode>>;
+  readonly code: Scalars["String"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  maxPersons: Maybe<Scalars["Int"]["output"]>;
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  parent: Maybe<SpaceNode>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  resources: Array<ResourceNode>;
-  surfaceArea: Maybe<Scalars["Int"]["output"]>;
-  unit: Maybe<UnitNode>;
+  readonly id: Scalars["ID"]["output"];
+  readonly maxPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly parent: Maybe<SpaceNode>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly resources: ReadonlyArray<ResourceNode>;
+  readonly surfaceArea: Maybe<Scalars["Int"]["output"]>;
+  readonly unit: Maybe<UnitNode>;
 };
 
 export type SpaceNodeChildrenArgs = {
@@ -4702,8 +5010,8 @@ export type SpaceNodeChildrenArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<SpaceOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<SpaceOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type SpaceNodeResourcesArgs = {
@@ -4717,24 +5025,24 @@ export type SpaceNodeResourcesArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ResourceOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<ResourceOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type SpaceNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<SpaceNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<SpaceNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `SpaceNode` and its cursor. */
 export type SpaceNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<SpaceNode>;
+  readonly node: Maybe<SpaceNode>;
 };
 
 /** Ordering fields for the 'Space' model. */
@@ -4744,29 +5052,29 @@ export enum SpaceOrderingChoices {
 }
 
 export type SpaceUpdateMutationInput = {
-  code?: InputMaybe<Scalars["String"]["input"]>;
-  maxPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  parent?: InputMaybe<Scalars["Int"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
-  unit?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly code?: InputMaybe<Scalars["String"]["input"]>;
+  readonly maxPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly parent?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly surfaceArea?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly unit?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type SpaceUpdateMutationPayload = {
-  code: Maybe<Scalars["String"]["output"]>;
-  maxPersons: Maybe<Scalars["Int"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  parent: Maybe<Scalars["Int"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  surfaceArea: Maybe<Scalars["Int"]["output"]>;
-  unit: Maybe<Scalars["Int"]["output"]>;
+  readonly code: Maybe<Scalars["String"]["output"]>;
+  readonly maxPersons: Maybe<Scalars["Int"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly parent: Maybe<Scalars["Int"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly surfaceArea: Maybe<Scalars["Int"]["output"]>;
+  readonly unit: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** An enumeration. */
@@ -4788,15 +5096,15 @@ export enum Status {
 }
 
 export type SuitableTimeRangeNode = Node & {
-  applicationSection: ApplicationSectionNode;
-  beginTime: Scalars["Time"]["output"];
-  dayOfTheWeek: Weekday;
-  endTime: Scalars["Time"]["output"];
-  fulfilled: Maybe<Scalars["Boolean"]["output"]>;
+  readonly applicationSection: ApplicationSectionNode;
+  readonly beginTime: Scalars["Time"]["output"];
+  readonly dayOfTheWeek: Weekday;
+  readonly endTime: Scalars["Time"]["output"];
+  readonly fulfilled: Maybe<Scalars["Boolean"]["output"]>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  priority: Priority;
+  readonly id: Scalars["ID"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly priority: Priority;
 };
 
 /** Ordering fields for the 'SuitableTimeRange' model. */
@@ -4806,34 +5114,34 @@ export enum SuitableTimeRangeOrderingChoices {
 }
 
 export type SuitableTimeRangeSerializerInput = {
-  beginTime: Scalars["Time"]["input"];
-  dayOfTheWeek: Weekday;
-  endTime: Scalars["Time"]["input"];
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  priority: Priority;
+  readonly beginTime: Scalars["Time"]["input"];
+  readonly dayOfTheWeek: Weekday;
+  readonly endTime: Scalars["Time"]["input"];
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly priority: Priority;
 };
 
 export type TaxPercentageNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  value: Scalars["Decimal"]["output"];
+  readonly id: Scalars["ID"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly value: Scalars["Decimal"]["output"];
 };
 
 export type TaxPercentageNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<TaxPercentageNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<TaxPercentageNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `TaxPercentageNode` and its cursor. */
 export type TaxPercentageNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<TaxPercentageNode>;
+  readonly node: Maybe<TaxPercentageNode>;
 };
 
 /** Ordering fields for the 'TaxPercentage' model. */
@@ -4844,33 +5152,33 @@ export enum TaxPercentageOrderingChoices {
 
 export type TermsOfUseNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["String"]["output"]>;
-  termsType: TermsType;
-  text: Scalars["String"]["output"];
-  textEn: Maybe<Scalars["String"]["output"]>;
-  textFi: Maybe<Scalars["String"]["output"]>;
-  textSv: Maybe<Scalars["String"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["String"]["output"]>;
+  readonly termsType: TermsType;
+  readonly text: Scalars["String"]["output"];
+  readonly textEn: Maybe<Scalars["String"]["output"]>;
+  readonly textFi: Maybe<Scalars["String"]["output"]>;
+  readonly textSv: Maybe<Scalars["String"]["output"]>;
 };
 
 export type TermsOfUseNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<TermsOfUseNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<TermsOfUseNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `TermsOfUseNode` and its cursor. */
 export type TermsOfUseNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<TermsOfUseNode>;
+  readonly node: Maybe<TermsOfUseNode>;
 };
 
 /** Ordering fields for the 'TermsOfUse' model. */
@@ -4896,36 +5204,36 @@ export enum TermsType {
 }
 
 export type TimeSlotSerializerInput = {
-  begin: Scalars["Time"]["input"];
-  end: Scalars["Time"]["input"];
+  readonly begin: Scalars["Time"]["input"];
+  readonly end: Scalars["Time"]["input"];
 };
 
 export type TimeSlotType = {
-  begin: Scalars["Time"]["output"];
-  end: Scalars["Time"]["output"];
+  readonly begin: Scalars["Time"]["output"];
+  readonly end: Scalars["Time"]["output"];
 };
 
 /** This Node should be kept to the bare minimum and never expose any relations to avoid performance issues. */
 export type UnitAllNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  tprekId: Maybe<Scalars["String"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly tprekId: Maybe<Scalars["String"]["output"]>;
 };
 
 export type UnitGroupNode = Node & {
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  units: Array<UnitNode>;
+  readonly id: Scalars["ID"]["output"];
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly units: ReadonlyArray<UnitNode>;
 };
 
 export type UnitGroupNodeUnitsArgs = {
@@ -4941,60 +5249,62 @@ export type UnitGroupNodeUnitsArgs = {
   onlyDirectBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlySeasonalBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<UnitOrderingChoices>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<UnitOrderingChoices>>>;
   ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type UnitGroupNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<UnitGroupNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<UnitGroupNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `UnitGroupNode` and its cursor. */
 export type UnitGroupNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<UnitGroupNode>;
+  readonly node: Maybe<UnitGroupNode>;
 };
 
 export type UnitNode = Node & {
-  description: Scalars["String"]["output"];
-  descriptionEn: Maybe<Scalars["String"]["output"]>;
-  descriptionFi: Maybe<Scalars["String"]["output"]>;
-  descriptionSv: Maybe<Scalars["String"]["output"]>;
-  email: Scalars["String"]["output"];
+  readonly description: Scalars["String"]["output"];
+  readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly email: Scalars["String"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  location: Maybe<LocationNode>;
-  name: Scalars["String"]["output"];
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  paymentMerchant: Maybe<PaymentMerchantNode>;
-  phone: Scalars["String"]["output"];
-  pk: Maybe<Scalars["Int"]["output"]>;
-  reservationUnits: Array<ReservationUnitNode>;
-  shortDescription: Scalars["String"]["output"];
-  shortDescriptionEn: Maybe<Scalars["String"]["output"]>;
-  shortDescriptionFi: Maybe<Scalars["String"]["output"]>;
-  shortDescriptionSv: Maybe<Scalars["String"]["output"]>;
-  spaces: Array<SpaceNode>;
-  tprekId: Maybe<Scalars["String"]["output"]>;
-  unitGroups: Array<UnitGroupNode>;
-  webPage: Scalars["String"]["output"];
+  readonly id: Scalars["ID"]["output"];
+  readonly location: Maybe<LocationNode>;
+  readonly name: Scalars["String"]["output"];
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly paymentMerchant: Maybe<PaymentMerchantNode>;
+  readonly phone: Scalars["String"]["output"];
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationUnits: ReadonlyArray<ReservationUnitNode>;
+  readonly shortDescription: Scalars["String"]["output"];
+  readonly shortDescriptionEn: Maybe<Scalars["String"]["output"]>;
+  readonly shortDescriptionFi: Maybe<Scalars["String"]["output"]>;
+  readonly shortDescriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly spaces: ReadonlyArray<SpaceNode>;
+  readonly tprekId: Maybe<Scalars["String"]["output"]>;
+  readonly unitGroups: ReadonlyArray<UnitGroupNode>;
+  readonly webPage: Scalars["String"]["output"];
 };
 
 export type UnitNodeReservationUnitsArgs = {
-  accessType?: InputMaybe<Array<InputMaybe<AccessType>>>;
+  accessType?: InputMaybe<ReadonlyArray<InputMaybe<AccessType>>>;
   accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
   accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  applicationRound?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  applicationRound?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   calculateFirstReservableTime?: InputMaybe<Scalars["Boolean"]["input"]>;
   descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
   descriptionEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
@@ -5002,7 +5312,7 @@ export type UnitNodeReservationUnitsArgs = {
   descriptionFi_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   descriptionSv?: InputMaybe<Scalars["String"]["input"]>;
   descriptionSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
-  equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  equipments?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
   maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -5019,14 +5329,16 @@ export type UnitNodeReservationUnitsArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  publishingState?: InputMaybe<
-    Array<InputMaybe<ReservationUnitPublishingState>>
+  orderBy?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitOrderingChoices>>
   >;
-  purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  publishingState?: InputMaybe<
+    ReadonlyArray<InputMaybe<ReservationUnitPublishingState>>
+  >;
+  purposes?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
+  qualifiers?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
@@ -5036,9 +5348,11 @@ export type UnitNodeReservationUnitsArgs = {
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
   reservationState?: InputMaybe<
-    Array<InputMaybe<ReservationUnitReservationState>>
+    ReadonlyArray<InputMaybe<ReservationUnitReservationState>>
   >;
-  reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  reservationUnitType?: InputMaybe<
+    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+  >;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -5047,7 +5361,7 @@ export type UnitNodeReservationUnitsArgs = {
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
   typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  unit?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
@@ -5062,24 +5376,24 @@ export type UnitNodeSpacesArgs = {
   nameSv_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<SpaceOrderingChoices>>>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<SpaceOrderingChoices>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
 };
 
 export type UnitNodeConnection = {
   /** Contains the nodes in this connection. */
-  edges: Array<Maybe<UnitNodeEdge>>;
+  readonly edges: ReadonlyArray<Maybe<UnitNodeEdge>>;
   /** Pagination data for this connection. */
-  pageInfo: PageInfo;
-  totalCount: Maybe<Scalars["Int"]["output"]>;
+  readonly pageInfo: PageInfo;
+  readonly totalCount: Maybe<Scalars["Int"]["output"]>;
 };
 
 /** A Relay edge containing a `UnitNode` and its cursor. */
 export type UnitNodeEdge = {
   /** A cursor for use in pagination */
-  cursor: Scalars["String"]["output"];
+  readonly cursor: Scalars["String"]["output"];
   /** The item at the end of the edge */
-  node: Maybe<UnitNode>;
+  readonly node: Maybe<UnitNode>;
 };
 
 /** Ordering fields for the 'Unit' model. */
@@ -5107,16 +5421,16 @@ export enum UnitOrderingChoices {
 }
 
 export type UnitRoleNode = Node & {
-  assigner: Maybe<UserNode>;
-  created: Scalars["DateTime"]["output"];
+  readonly assigner: Maybe<UserNode>;
+  readonly created: Scalars["DateTime"]["output"];
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  modified: Scalars["DateTime"]["output"];
-  permissions: Maybe<Array<Maybe<UserPermissionChoice>>>;
-  role: UserRoleChoice;
-  unitGroups: Array<UnitGroupNode>;
-  units: Array<UnitNode>;
-  user: UserNode;
+  readonly id: Scalars["ID"]["output"];
+  readonly modified: Scalars["DateTime"]["output"];
+  readonly permissions: Maybe<ReadonlyArray<Maybe<UserPermissionChoice>>>;
+  readonly role: UserRoleChoice;
+  readonly unitGroups: ReadonlyArray<UnitGroupNode>;
+  readonly units: ReadonlyArray<UnitNode>;
+  readonly user: UserNode;
 };
 
 export type UnitRoleNodeUnitsArgs = {
@@ -5132,205 +5446,211 @@ export type UnitRoleNodeUnitsArgs = {
   onlyDirectBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlySeasonalBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<Array<InputMaybe<UnitOrderingChoices>>>;
+  orderBy?: InputMaybe<ReadonlyArray<InputMaybe<UnitOrderingChoices>>>;
   ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
-  pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
   publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type UnitUpdateMutationInput = {
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
-  descriptionFi?: InputMaybe<Scalars["String"]["input"]>;
-  descriptionSv?: InputMaybe<Scalars["String"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  phone?: InputMaybe<Scalars["String"]["input"]>;
-  pk: Scalars["Int"]["input"];
-  shortDescription?: InputMaybe<Scalars["String"]["input"]>;
-  shortDescriptionEn?: InputMaybe<Scalars["String"]["input"]>;
-  shortDescriptionFi?: InputMaybe<Scalars["String"]["input"]>;
-  shortDescriptionSv?: InputMaybe<Scalars["String"]["input"]>;
-  tprekId?: InputMaybe<Scalars["String"]["input"]>;
-  webPage?: InputMaybe<Scalars["String"]["input"]>;
+  readonly description?: InputMaybe<Scalars["String"]["input"]>;
+  readonly descriptionEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly descriptionFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly descriptionSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly email?: InputMaybe<Scalars["String"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly phone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly shortDescription?: InputMaybe<Scalars["String"]["input"]>;
+  readonly shortDescriptionEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly shortDescriptionFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly shortDescriptionSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly tprekId?: InputMaybe<Scalars["String"]["input"]>;
+  readonly webPage?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UnitUpdateMutationPayload = {
-  description: Maybe<Scalars["String"]["output"]>;
-  descriptionEn: Maybe<Scalars["String"]["output"]>;
-  descriptionFi: Maybe<Scalars["String"]["output"]>;
-  descriptionSv: Maybe<Scalars["String"]["output"]>;
-  email: Maybe<Scalars["String"]["output"]>;
-  name: Maybe<Scalars["String"]["output"]>;
-  nameEn: Maybe<Scalars["String"]["output"]>;
-  nameFi: Maybe<Scalars["String"]["output"]>;
-  nameSv: Maybe<Scalars["String"]["output"]>;
-  phone: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  shortDescription: Maybe<Scalars["String"]["output"]>;
-  shortDescriptionEn: Maybe<Scalars["String"]["output"]>;
-  shortDescriptionFi: Maybe<Scalars["String"]["output"]>;
-  shortDescriptionSv: Maybe<Scalars["String"]["output"]>;
-  tprekId: Maybe<Scalars["String"]["output"]>;
-  webPage: Maybe<Scalars["String"]["output"]>;
+  readonly description: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionEn: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionFi: Maybe<Scalars["String"]["output"]>;
+  readonly descriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly email: Maybe<Scalars["String"]["output"]>;
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly nameEn: Maybe<Scalars["String"]["output"]>;
+  readonly nameFi: Maybe<Scalars["String"]["output"]>;
+  readonly nameSv: Maybe<Scalars["String"]["output"]>;
+  readonly phone: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly shortDescription: Maybe<Scalars["String"]["output"]>;
+  readonly shortDescriptionEn: Maybe<Scalars["String"]["output"]>;
+  readonly shortDescriptionFi: Maybe<Scalars["String"]["output"]>;
+  readonly shortDescriptionSv: Maybe<Scalars["String"]["output"]>;
+  readonly tprekId: Maybe<Scalars["String"]["output"]>;
+  readonly webPage: Maybe<Scalars["String"]["output"]>;
 };
 
 export type UpdateAddressSerializerInput = {
-  city?: InputMaybe<Scalars["String"]["input"]>;
-  cityEn?: InputMaybe<Scalars["String"]["input"]>;
-  cityFi?: InputMaybe<Scalars["String"]["input"]>;
-  citySv?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  postCode?: InputMaybe<Scalars["String"]["input"]>;
-  streetAddress?: InputMaybe<Scalars["String"]["input"]>;
-  streetAddressEn?: InputMaybe<Scalars["String"]["input"]>;
-  streetAddressFi?: InputMaybe<Scalars["String"]["input"]>;
-  streetAddressSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly city?: InputMaybe<Scalars["String"]["input"]>;
+  readonly cityEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly cityFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly citySv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly postCode?: InputMaybe<Scalars["String"]["input"]>;
+  readonly streetAddress?: InputMaybe<Scalars["String"]["input"]>;
+  readonly streetAddressEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly streetAddressFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly streetAddressSv?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UpdateApplicationRoundTimeSlotSerializerInput = {
-  closed?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservableTimes?: InputMaybe<Array<InputMaybe<TimeSlotSerializerInput>>>;
-  weekday: Scalars["Int"]["input"];
+  readonly closed?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly reservableTimes?: InputMaybe<
+    ReadonlyArray<InputMaybe<TimeSlotSerializerInput>>
+  >;
+  readonly weekday: Scalars["Int"]["input"];
 };
 
 export type UpdateApplicationSectionForApplicationSerializerInput = {
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  appliedReservationsPerWeek?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  numPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  purpose?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationMaxDuration?: InputMaybe<Scalars["Duration"]["input"]>;
-  reservationMinDuration?: InputMaybe<Scalars["Duration"]["input"]>;
-  reservationUnitOptions?: InputMaybe<
-    Array<InputMaybe<UpdateReservationUnitOptionApplicantSerializerInput>>
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly appliedReservationsPerWeek?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly numPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationMaxDuration?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly reservationMinDuration?: InputMaybe<Scalars["Duration"]["input"]>;
+  readonly reservationUnitOptions?: InputMaybe<
+    ReadonlyArray<
+      InputMaybe<UpdateReservationUnitOptionApplicantSerializerInput>
+    >
   >;
-  reservationsBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  reservationsEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  suitableTimeRanges?: InputMaybe<
-    Array<InputMaybe<UpdateSuitableTimeRangeSerializerInput>>
+  readonly reservationsBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  readonly reservationsEndDate?: InputMaybe<Scalars["Date"]["input"]>;
+  readonly suitableTimeRanges?: InputMaybe<
+    ReadonlyArray<InputMaybe<UpdateSuitableTimeRangeSerializerInput>>
   >;
 };
 
 export type UpdateOrganisationSerializerInput = {
-  activeMembers?: InputMaybe<Scalars["Int"]["input"]>;
-  address?: InputMaybe<UpdateAddressSerializerInput>;
-  coreBusiness?: InputMaybe<Scalars["String"]["input"]>;
-  coreBusinessEn?: InputMaybe<Scalars["String"]["input"]>;
-  coreBusinessFi?: InputMaybe<Scalars["String"]["input"]>;
-  coreBusinessSv?: InputMaybe<Scalars["String"]["input"]>;
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  identifier?: InputMaybe<Scalars["String"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  nameEn?: InputMaybe<Scalars["String"]["input"]>;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-  nameSv?: InputMaybe<Scalars["String"]["input"]>;
-  organisationType?: InputMaybe<OrganizationTypeChoice>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  yearEstablished?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly activeMembers?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly address?: InputMaybe<UpdateAddressSerializerInput>;
+  readonly coreBusiness?: InputMaybe<Scalars["String"]["input"]>;
+  readonly coreBusinessEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly coreBusinessFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly coreBusinessSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly email?: InputMaybe<Scalars["String"]["input"]>;
+  readonly identifier?: InputMaybe<Scalars["String"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameEn?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameFi?: InputMaybe<Scalars["String"]["input"]>;
+  readonly nameSv?: InputMaybe<Scalars["String"]["input"]>;
+  readonly organisationType?: InputMaybe<OrganizationTypeChoice>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly yearEstablished?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type UpdatePersonSerializerInput = {
-  email?: InputMaybe<Scalars["String"]["input"]>;
-  firstName?: InputMaybe<Scalars["String"]["input"]>;
-  lastName?: InputMaybe<Scalars["String"]["input"]>;
-  phoneNumber?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly email?: InputMaybe<Scalars["String"]["input"]>;
+  readonly firstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly lastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly phoneNumber?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type UpdateReservationSeriesReservationUpdateSerializerInput = {
-  ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
-  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
-  billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
-  billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
-  billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
-  billingEmail?: InputMaybe<Scalars["String"]["input"]>;
-  billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
-  billingLastName?: InputMaybe<Scalars["String"]["input"]>;
-  billingPhone?: InputMaybe<Scalars["String"]["input"]>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
-  freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
-  homeCity?: InputMaybe<Scalars["Int"]["input"]>;
-  name?: InputMaybe<Scalars["String"]["input"]>;
-  numPersons?: InputMaybe<Scalars["Int"]["input"]>;
-  purpose?: InputMaybe<Scalars["Int"]["input"]>;
-  reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeId?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeIsUnregisteredAssociation?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
-  reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
-  reserveeType?: InputMaybe<ReserveeType>;
-  workingMemo?: InputMaybe<Scalars["String"]["input"]>;
+  readonly ageGroup?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly billingAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingEmail?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingLastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly billingPhone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly description?: InputMaybe<Scalars["String"]["input"]>;
+  readonly freeOfChargeReason?: InputMaybe<Scalars["String"]["input"]>;
+  readonly homeCity?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly name?: InputMaybe<Scalars["String"]["input"]>;
+  readonly numPersons?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly purpose?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reserveeAddressCity?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeAddressStreet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeAddressZip?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeEmail?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeFirstName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeId?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeIsUnregisteredAssociation?: InputMaybe<
+    Scalars["Boolean"]["input"]
+  >;
+  readonly reserveeLastName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeOrganisationName?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveePhone?: InputMaybe<Scalars["String"]["input"]>;
+  readonly reserveeType?: InputMaybe<ReserveeType>;
+  readonly workingMemo?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UpdateReservationUnitAccessTypeSerializerInput = {
-  accessType?: InputMaybe<AccessType>;
-  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly accessType?: InputMaybe<AccessType>;
+  readonly beginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type UpdateReservationUnitImageFieldSerializerInput = {
-  imageType?: InputMaybe<ImageType>;
-  imageUrl: Scalars["Upload"]["input"];
-  largeUrl?: InputMaybe<Scalars["String"]["input"]>;
-  mediumUrl?: InputMaybe<Scalars["String"]["input"]>;
-  smallUrl?: InputMaybe<Scalars["String"]["input"]>;
+  readonly imageType?: InputMaybe<ImageType>;
+  readonly imageUrl: Scalars["Upload"]["input"];
+  readonly largeUrl?: InputMaybe<Scalars["String"]["input"]>;
+  readonly mediumUrl?: InputMaybe<Scalars["String"]["input"]>;
+  readonly smallUrl?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UpdateReservationUnitOptionApplicantSerializerInput = {
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  preferredOrder?: InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly preferredOrder?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly reservationUnit?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type UpdateReservationUnitPricingSerializerInput = {
-  begins?: InputMaybe<Scalars["Date"]["input"]>;
-  highestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
-  highestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
-  isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
-  lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
-  lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  priceUnit?: InputMaybe<PriceUnit>;
-  taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly begins?: InputMaybe<Scalars["Date"]["input"]>;
+  readonly highestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
+  readonly highestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly isActivatedOnBegins?: InputMaybe<Scalars["Boolean"]["input"]>;
+  readonly lowestPrice?: InputMaybe<Scalars["Decimal"]["input"]>;
+  readonly lowestPriceNet?: InputMaybe<Scalars["String"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly priceUnit?: InputMaybe<PriceUnit>;
+  readonly taxPercentage?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type UpdateSuitableTimeRangeSerializerInput = {
-  beginTime?: InputMaybe<Scalars["Time"]["input"]>;
-  dayOfTheWeek?: InputMaybe<Weekday>;
-  endTime?: InputMaybe<Scalars["Time"]["input"]>;
-  pk?: InputMaybe<Scalars["Int"]["input"]>;
-  priority?: InputMaybe<Priority>;
+  readonly beginTime?: InputMaybe<Scalars["Time"]["input"]>;
+  readonly dayOfTheWeek?: InputMaybe<Weekday>;
+  readonly endTime?: InputMaybe<Scalars["Time"]["input"]>;
+  readonly pk?: InputMaybe<Scalars["Int"]["input"]>;
+  readonly priority?: InputMaybe<Priority>;
 };
 
 export type UserNode = Node & {
-  dateOfBirth: Maybe<Scalars["Date"]["output"]>;
-  email: Scalars["String"]["output"];
-  firstName: Scalars["String"]["output"];
-  generalRoles: Array<GeneralRoleNode>;
+  readonly dateOfBirth: Maybe<Scalars["Date"]["output"]>;
+  readonly email: Scalars["String"]["output"];
+  readonly firstName: Scalars["String"]["output"];
+  readonly generalRoles: ReadonlyArray<GeneralRoleNode>;
   /** The ID of the object */
-  id: Scalars["ID"]["output"];
-  isAdAuthenticated: Maybe<Scalars["Boolean"]["output"]>;
-  isStronglyAuthenticated: Maybe<Scalars["Boolean"]["output"]>;
+  readonly id: Scalars["ID"]["output"];
+  readonly isAdAuthenticated: Maybe<Scalars["Boolean"]["output"]>;
+  readonly isStronglyAuthenticated: Maybe<Scalars["Boolean"]["output"]>;
   /** Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella. */
-  isSuperuser: Scalars["Boolean"]["output"];
-  lastName: Scalars["String"]["output"];
-  name: Maybe<Scalars["String"]["output"]>;
-  pk: Maybe<Scalars["Int"]["output"]>;
-  reservationNotification: Maybe<Scalars["String"]["output"]>;
-  unitRoles: Array<UnitRoleNode>;
+  readonly isSuperuser: Scalars["Boolean"]["output"];
+  readonly lastName: Scalars["String"]["output"];
+  readonly name: Maybe<Scalars["String"]["output"]>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationNotification: Maybe<Scalars["String"]["output"]>;
+  readonly unitRoles: ReadonlyArray<UnitRoleNode>;
   /** Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja. */
-  username: Scalars["String"]["output"];
-  uuid: Scalars["UUID"]["output"];
+  readonly username: Scalars["String"]["output"];
+  readonly uuid: Scalars["UUID"]["output"];
 };
 
 /** An enumeration. */
@@ -5361,13 +5681,13 @@ export enum UserRoleChoice {
 }
 
 export type UserStaffUpdateMutationInput = {
-  pk: Scalars["Int"]["input"];
-  reservationNotification?: InputMaybe<ReservationNotification>;
+  readonly pk: Scalars["Int"]["input"];
+  readonly reservationNotification?: InputMaybe<ReservationNotification>;
 };
 
 export type UserStaffUpdateMutationPayload = {
-  pk: Maybe<Scalars["Int"]["output"]>;
-  reservationNotification: Maybe<ReservationNotification>;
+  readonly pk: Maybe<Scalars["Int"]["output"]>;
+  readonly reservationNotification: Maybe<ReservationNotification>;
 };
 
 /** An enumeration. */
@@ -5386,16 +5706,16 @@ export type BannerNotificationsListAllQueryVariables = Exact<{
 }>;
 
 export type BannerNotificationsListAllQuery = {
-  bannerNotifications: {
-    edges: Array<{
-      node: {
-        id: string;
-        level: BannerNotificationLevel;
-        activeFrom: string | null;
-        message: string;
-        messageEn: string | null;
-        messageFi: string | null;
-        messageSv: string | null;
+  readonly bannerNotifications: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly level: BannerNotificationLevel;
+        readonly activeFrom: string | null;
+        readonly message: string;
+        readonly messageEn: string | null;
+        readonly messageFi: string | null;
+        readonly messageSv: string | null;
       } | null;
     } | null>;
   } | null;
@@ -5406,327 +5726,347 @@ export type BannerNotificationsListQueryVariables = Exact<{
 }>;
 
 export type BannerNotificationsListQuery = {
-  bannerNotifications: {
-    edges: Array<{
-      node: {
-        id: string;
-        level: BannerNotificationLevel;
-        activeFrom: string | null;
-        message: string;
-        messageEn: string | null;
-        messageFi: string | null;
-        messageSv: string | null;
+  readonly bannerNotifications: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly level: BannerNotificationLevel;
+        readonly activeFrom: string | null;
+        readonly message: string;
+        readonly messageEn: string | null;
+        readonly messageFi: string | null;
+        readonly messageSv: string | null;
       } | null;
     } | null>;
   } | null;
 };
 
 export type ApplicationNameFragment = {
-  id: string;
-  applicantType: ApplicantTypeChoice | null;
-  organisation: {
-    id: string;
-    nameFi: string | null;
-    organisationType: OrganizationTypeChoice;
+  readonly id: string;
+  readonly applicantType: ApplicantTypeChoice | null;
+  readonly organisation: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly organisationType: OrganizationTypeChoice;
   } | null;
-  contactPerson: { id: string; lastName: string; firstName: string } | null;
+  readonly contactPerson: {
+    readonly id: string;
+    readonly lastName: string;
+    readonly firstName: string;
+  } | null;
 };
 
 export type ApplicationSectionDurationFragment = {
-  id: string;
-  reservationsEndDate: string;
-  reservationsBeginDate: string;
-  appliedReservationsPerWeek: number;
-  reservationMinDuration: number;
+  readonly id: string;
+  readonly reservationsEndDate: string;
+  readonly reservationsBeginDate: string;
+  readonly appliedReservationsPerWeek: number;
+  readonly reservationMinDuration: number;
 };
 
 export type ApplicationSectionCommonFragment = {
-  id: string;
-  pk: number | null;
-  name: string;
-  status: ApplicationSectionStatusChoice | null;
-  reservationMaxDuration: number;
-  numPersons: number;
-  reservationsEndDate: string;
-  reservationsBeginDate: string;
-  appliedReservationsPerWeek: number;
-  reservationMinDuration: number;
-  ageGroup: {
-    id: string;
-    pk: number | null;
-    minimum: number;
-    maximum: number | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly name: string;
+  readonly status: ApplicationSectionStatusChoice | null;
+  readonly reservationMaxDuration: number;
+  readonly numPersons: number;
+  readonly reservationsEndDate: string;
+  readonly reservationsBeginDate: string;
+  readonly appliedReservationsPerWeek: number;
+  readonly reservationMinDuration: number;
+  readonly ageGroup: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly minimum: number;
+    readonly maximum: number | null;
   } | null;
-  reservationUnitOptions: Array<{
-    id: string;
-    pk: number | null;
-    preferredOrder: number;
+  readonly reservationUnitOptions: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly preferredOrder: number;
   }>;
 };
 
 export type SuitableTimeFragment = {
-  id: string;
-  pk: number | null;
-  beginTime: string;
-  endTime: string;
-  dayOfTheWeek: Weekday;
-  priority: Priority;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly beginTime: string;
+  readonly endTime: string;
+  readonly dayOfTheWeek: Weekday;
+  readonly priority: Priority;
 };
 
 export type ReservationPurposeNameFragment = {
-  id: string;
-  pk: number | null;
-  nameFi: string | null;
-  nameSv: string | null;
-  nameEn: string | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly nameSv: string | null;
+  readonly nameEn: string | null;
 };
 
 export type ReservationUnitNameFragment = {
-  id: string;
-  pk: number | null;
-  nameFi: string | null;
-  nameEn: string | null;
-  nameSv: string | null;
-  unit: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    nameEn: string | null;
-    nameSv: string | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly nameEn: string | null;
+  readonly nameSv: string | null;
+  readonly unit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
   } | null;
 };
 
 export type ApplicationRoundTimeSlotsFragment = {
-  id: string;
-  pk: number | null;
-  weekday: number;
-  closed: boolean;
-  reservableTimes: Array<{ begin: string; end: string } | null> | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly weekday: number;
+  readonly closed: boolean;
+  readonly reservableTimes: ReadonlyArray<{
+    readonly begin: string;
+    readonly end: string;
+  } | null> | null;
 };
 
 export type ReservationUnitOptionFragment = {
-  id: string;
-  reservationUnit: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    nameEn: string | null;
-    nameSv: string | null;
-    applicationRoundTimeSlots: Array<{
-      id: string;
-      pk: number | null;
-      weekday: number;
-      closed: boolean;
-      reservableTimes: Array<{ begin: string; end: string } | null> | null;
+  readonly id: string;
+  readonly reservationUnit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+    readonly applicationRoundTimeSlots: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly weekday: number;
+      readonly closed: boolean;
+      readonly reservableTimes: ReadonlyArray<{
+        readonly begin: string;
+        readonly end: string;
+      } | null> | null;
     }>;
-    unit: {
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      nameEn: string | null;
-      nameSv: string | null;
+    readonly unit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
     } | null;
   };
 };
 
 export type ApplicantFragment = {
-  id: string;
-  pk: number | null;
-  applicantType: ApplicantTypeChoice | null;
-  additionalInformation: string | null;
-  contactPerson: {
-    id: string;
-    pk: number | null;
-    firstName: string;
-    lastName: string;
-    email: string | null;
-    phoneNumber: string | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly applicantType: ApplicantTypeChoice | null;
+  readonly additionalInformation: string | null;
+  readonly contactPerson: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly email: string | null;
+    readonly phoneNumber: string | null;
   } | null;
-  organisation: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    identifier: string | null;
-    organisationType: OrganizationTypeChoice;
-    coreBusinessFi: string | null;
-    yearEstablished: number | null;
-    address: {
-      id: string;
-      pk: number | null;
-      postCode: string;
-      streetAddressFi: string | null;
-      cityFi: string | null;
+  readonly organisation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly identifier: string | null;
+    readonly organisationType: OrganizationTypeChoice;
+    readonly coreBusinessFi: string | null;
+    readonly yearEstablished: number | null;
+    readonly address: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly postCode: string;
+      readonly streetAddressFi: string | null;
+      readonly cityFi: string | null;
     } | null;
   } | null;
-  homeCity: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    nameEn: string | null;
-    nameSv: string | null;
+  readonly homeCity: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
   } | null;
-  billingAddress: {
-    id: string;
-    pk: number | null;
-    postCode: string;
-    streetAddressFi: string | null;
-    cityFi: string | null;
+  readonly billingAddress: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly postCode: string;
+    readonly streetAddressFi: string | null;
+    readonly cityFi: string | null;
   } | null;
 };
 
 export type ReserveeNameFieldsFragment = {
-  id: string;
-  reserveeFirstName: string | null;
-  reserveeLastName: string | null;
-  reserveeEmail: string | null;
-  reserveePhone: string | null;
-  reserveeType: CustomerTypeChoice | null;
-  reserveeOrganisationName: string | null;
-  reserveeId: string | null;
+  readonly id: string;
+  readonly reserveeFirstName: string | null;
+  readonly reserveeLastName: string | null;
+  readonly reserveeEmail: string | null;
+  readonly reserveePhone: string | null;
+  readonly reserveeType: CustomerTypeChoice | null;
+  readonly reserveeOrganisationName: string | null;
+  readonly reserveeId: string | null;
 };
 
 export type ReserveeBillingFieldsFragment = {
-  id: string;
-  reserveeId: string | null;
-  reserveeIsUnregisteredAssociation: boolean | null;
-  reserveeAddressStreet: string | null;
-  reserveeAddressCity: string | null;
-  reserveeAddressZip: string | null;
-  billingFirstName: string | null;
-  billingLastName: string | null;
-  billingPhone: string | null;
-  billingEmail: string | null;
-  billingAddressStreet: string | null;
-  billingAddressCity: string | null;
-  billingAddressZip: string | null;
+  readonly id: string;
+  readonly reserveeId: string | null;
+  readonly reserveeIsUnregisteredAssociation: boolean | null;
+  readonly reserveeAddressStreet: string | null;
+  readonly reserveeAddressCity: string | null;
+  readonly reserveeAddressZip: string | null;
+  readonly billingFirstName: string | null;
+  readonly billingLastName: string | null;
+  readonly billingPhone: string | null;
+  readonly billingEmail: string | null;
+  readonly billingAddressStreet: string | null;
+  readonly billingAddressCity: string | null;
+  readonly billingAddressZip: string | null;
 };
 
 export type MetaFieldsFragment = {
-  applyingForFreeOfCharge: boolean | null;
-  freeOfChargeReason: string | null;
-  description: string | null;
-  numPersons: number | null;
-  id: string;
-  reserveeFirstName: string | null;
-  reserveeLastName: string | null;
-  reserveeEmail: string | null;
-  reserveePhone: string | null;
-  reserveeType: CustomerTypeChoice | null;
-  reserveeOrganisationName: string | null;
-  reserveeId: string | null;
-  reserveeIsUnregisteredAssociation: boolean | null;
-  reserveeAddressStreet: string | null;
-  reserveeAddressCity: string | null;
-  reserveeAddressZip: string | null;
-  billingFirstName: string | null;
-  billingLastName: string | null;
-  billingPhone: string | null;
-  billingEmail: string | null;
-  billingAddressStreet: string | null;
-  billingAddressCity: string | null;
-  billingAddressZip: string | null;
-  ageGroup: {
-    id: string;
-    pk: number | null;
-    maximum: number | null;
-    minimum: number;
+  readonly applyingForFreeOfCharge: boolean | null;
+  readonly freeOfChargeReason: string | null;
+  readonly description: string | null;
+  readonly numPersons: number | null;
+  readonly id: string;
+  readonly reserveeFirstName: string | null;
+  readonly reserveeLastName: string | null;
+  readonly reserveeEmail: string | null;
+  readonly reserveePhone: string | null;
+  readonly reserveeType: CustomerTypeChoice | null;
+  readonly reserveeOrganisationName: string | null;
+  readonly reserveeId: string | null;
+  readonly reserveeIsUnregisteredAssociation: boolean | null;
+  readonly reserveeAddressStreet: string | null;
+  readonly reserveeAddressCity: string | null;
+  readonly reserveeAddressZip: string | null;
+  readonly billingFirstName: string | null;
+  readonly billingLastName: string | null;
+  readonly billingPhone: string | null;
+  readonly billingEmail: string | null;
+  readonly billingAddressStreet: string | null;
+  readonly billingAddressCity: string | null;
+  readonly billingAddressZip: string | null;
+  readonly ageGroup: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly maximum: number | null;
+    readonly minimum: number;
   } | null;
-  purpose: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    nameEn: string | null;
-    nameSv: string | null;
+  readonly purpose: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
   } | null;
-  homeCity: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    nameSv: string | null;
-    nameEn: string | null;
+  readonly homeCity: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
   } | null;
 };
 
 export type TermsOfUseNameFieldsFragment = {
-  id: string;
-  nameFi: string | null;
-  nameEn: string | null;
-  nameSv: string | null;
+  readonly id: string;
+  readonly nameFi: string | null;
+  readonly nameEn: string | null;
+  readonly nameSv: string | null;
 };
 
 export type TermsOfUseTextFieldsFragment = {
-  id: string;
-  textFi: string | null;
-  textEn: string | null;
-  textSv: string | null;
+  readonly id: string;
+  readonly textFi: string | null;
+  readonly textEn: string | null;
+  readonly textSv: string | null;
 };
 
 export type TermsOfUseFieldsFragment = {
-  pk: string | null;
-  termsType: TermsType;
-  id: string;
-  nameFi: string | null;
-  nameEn: string | null;
-  nameSv: string | null;
-  textFi: string | null;
-  textEn: string | null;
-  textSv: string | null;
+  readonly pk: string | null;
+  readonly termsType: TermsType;
+  readonly id: string;
+  readonly nameFi: string | null;
+  readonly nameEn: string | null;
+  readonly nameSv: string | null;
+  readonly textFi: string | null;
+  readonly textEn: string | null;
+  readonly textSv: string | null;
 };
 
 export type PricingFieldsFragment = {
-  id: string;
-  begins: string;
-  priceUnit: PriceUnit;
-  lowestPrice: string;
-  highestPrice: string;
-  taxPercentage: { id: string; pk: number | null; value: string };
+  readonly id: string;
+  readonly begins: string;
+  readonly priceUnit: PriceUnit;
+  readonly lowestPrice: string;
+  readonly highestPrice: string;
+  readonly taxPercentage: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly value: string;
+  };
 };
 
 export type ImageFragment = {
-  id: string;
-  imageUrl: string | null;
-  largeUrl: string | null;
-  mediumUrl: string | null;
-  smallUrl: string | null;
-  imageType: ImageType;
+  readonly id: string;
+  readonly imageUrl: string | null;
+  readonly largeUrl: string | null;
+  readonly mediumUrl: string | null;
+  readonly smallUrl: string | null;
+  readonly imageType: ImageType;
 };
 
 export type LocationFieldsFragment = {
-  id: string;
-  addressStreetFi: string | null;
-  addressZip: string;
-  addressCityFi: string | null;
+  readonly id: string;
+  readonly addressStreetFi: string | null;
+  readonly addressZip: string;
+  readonly addressCityFi: string | null;
 };
 
 export type LocationFieldsI18nFragment = {
-  addressStreetEn: string | null;
-  addressStreetSv: string | null;
-  addressCityEn: string | null;
-  addressCitySv: string | null;
-  id: string;
-  addressStreetFi: string | null;
-  addressZip: string;
-  addressCityFi: string | null;
+  readonly addressStreetEn: string | null;
+  readonly addressStreetSv: string | null;
+  readonly addressCityEn: string | null;
+  readonly addressCitySv: string | null;
+  readonly id: string;
+  readonly addressStreetFi: string | null;
+  readonly addressZip: string;
+  readonly addressCityFi: string | null;
 };
 
 export type BannerNotificationCommonFragment = {
-  id: string;
-  level: BannerNotificationLevel;
-  activeFrom: string | null;
-  message: string;
-  messageEn: string | null;
-  messageFi: string | null;
-  messageSv: string | null;
+  readonly id: string;
+  readonly level: BannerNotificationLevel;
+  readonly activeFrom: string | null;
+  readonly message: string;
+  readonly messageEn: string | null;
+  readonly messageFi: string | null;
+  readonly messageSv: string | null;
 };
 
 export type MetadataSetsFragment = {
-  id: string;
-  minPersons: number | null;
-  maxPersons: number | null;
-  metadataSet: {
-    id: string;
-    requiredFields: Array<{ id: string; fieldName: string }>;
-    supportedFields: Array<{ id: string; fieldName: string }>;
+  readonly id: string;
+  readonly minPersons: number | null;
+  readonly maxPersons: number | null;
+  readonly metadataSet: {
+    readonly id: string;
+    readonly requiredFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
+    readonly supportedFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
   } | null;
 };
 
@@ -5735,327 +6075,387 @@ export type TermsOfUseQueryVariables = Exact<{
 }>;
 
 export type TermsOfUseQuery = {
-  termsOfUse: {
-    edges: Array<{
-      node: {
-        id: string;
-        pk: string | null;
-        termsType: TermsType;
-        nameFi: string | null;
-        nameEn: string | null;
-        nameSv: string | null;
-        textFi: string | null;
-        textEn: string | null;
-        textSv: string | null;
+  readonly termsOfUse: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: string | null;
+        readonly termsType: TermsType;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+        readonly textFi: string | null;
+        readonly textEn: string | null;
+        readonly textSv: string | null;
       } | null;
     } | null>;
   } | null;
 };
 
 export type SpaceCommonFieldsFragment = {
-  id: string;
-  pk: number | null;
-  nameFi: string | null;
-  surfaceArea: number | null;
-  maxPersons: number | null;
-  parent: { id: string; pk: number | null; nameFi: string | null } | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly surfaceArea: number | null;
+  readonly maxPersons: number | null;
+  readonly parent: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+  } | null;
 };
 
 export type ResourceFieldsFragment = {
-  id: string;
-  pk: number | null;
-  nameFi: string | null;
-  locationType: ResourceLocationType | null;
-  space: {
-    id: string;
-    nameFi: string | null;
-    unit: { id: string; nameFi: string | null; pk: number | null } | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly locationType: ResourceLocationType | null;
+  readonly space: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly unit: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly pk: number | null;
+    } | null;
   } | null;
 };
 
 export type SpaceFieldsFragment = {
-  code: string;
-  id: string;
-  pk: number | null;
-  nameFi: string | null;
-  surfaceArea: number | null;
-  maxPersons: number | null;
-  resources: Array<{
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    locationType: ResourceLocationType | null;
-    space: {
-      id: string;
-      nameFi: string | null;
-      unit: { id: string; nameFi: string | null; pk: number | null } | null;
+  readonly code: string;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly surfaceArea: number | null;
+  readonly maxPersons: number | null;
+  readonly resources: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly locationType: ResourceLocationType | null;
+    readonly space: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly unit: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly pk: number | null;
+      } | null;
     } | null;
   }>;
-  children: Array<{ id: string; pk: number | null }> | null;
-  parent: { id: string; pk: number | null; nameFi: string | null } | null;
+  readonly children: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+  }> | null;
+  readonly parent: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+  } | null;
 };
 
 export type ReservationUnitCommonFieldsFragment = {
-  id: string;
-  pk: number | null;
-  nameFi: string | null;
-  maxPersons: number | null;
-  surfaceArea: number | null;
-  reservationUnitType: { id: string; nameFi: string | null } | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly maxPersons: number | null;
+  readonly surfaceArea: number | null;
+  readonly reservationUnitType: {
+    readonly id: string;
+    readonly nameFi: string | null;
+  } | null;
 };
 
 export type UnitNameFieldsFragment = {
-  id: string;
-  pk: number | null;
-  nameFi: string | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
 };
 
 export type ApplicationSectionFragment = {
-  id: string;
-  pk: number | null;
-  name: string;
-  status: ApplicationSectionStatusChoice | null;
-  reservationMaxDuration: number;
-  numPersons: number;
-  reservationsEndDate: string;
-  reservationsBeginDate: string;
-  appliedReservationsPerWeek: number;
-  reservationMinDuration: number;
-  purpose: { id: string; pk: number | null; nameFi: string | null } | null;
-  application: {
-    id: string;
-    pk: number | null;
-    status: ApplicationStatusChoice | null;
-    applicantType: ApplicantTypeChoice | null;
-    organisation: {
-      id: string;
-      nameFi: string | null;
-      organisationType: OrganizationTypeChoice;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly name: string;
+  readonly status: ApplicationSectionStatusChoice | null;
+  readonly reservationMaxDuration: number;
+  readonly numPersons: number;
+  readonly reservationsEndDate: string;
+  readonly reservationsBeginDate: string;
+  readonly appliedReservationsPerWeek: number;
+  readonly reservationMinDuration: number;
+  readonly purpose: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+  } | null;
+  readonly application: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly status: ApplicationStatusChoice | null;
+    readonly applicantType: ApplicantTypeChoice | null;
+    readonly organisation: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly organisationType: OrganizationTypeChoice;
     } | null;
-    contactPerson: { id: string; lastName: string; firstName: string } | null;
+    readonly contactPerson: {
+      readonly id: string;
+      readonly lastName: string;
+      readonly firstName: string;
+    } | null;
   };
-  reservationUnitOptions: Array<{
-    id: string;
-    pk: number | null;
-    preferredOrder: number;
-    reservationUnit: {
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      unit: { id: string; pk: number | null; nameFi: string | null } | null;
+  readonly reservationUnitOptions: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly preferredOrder: number;
+    readonly reservationUnit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly unit: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
     };
   }>;
-  ageGroup: {
-    id: string;
-    pk: number | null;
-    minimum: number;
-    maximum: number | null;
+  readonly ageGroup: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly minimum: number;
+    readonly maximum: number | null;
   } | null;
 };
 
 export type ApplicationAdminFragment = {
-  pk: number | null;
-  id: string;
-  status: ApplicationStatusChoice | null;
-  lastModifiedDate: string;
-  applicantType: ApplicantTypeChoice | null;
-  additionalInformation: string | null;
-  applicationRound: { id: string; pk: number | null; nameFi: string | null };
-  applicationSections: Array<{
-    allocations: number | null;
-    id: string;
-    pk: number | null;
-    name: string;
-    status: ApplicationSectionStatusChoice | null;
-    reservationMaxDuration: number;
-    numPersons: number;
-    reservationsEndDate: string;
-    reservationsBeginDate: string;
-    appliedReservationsPerWeek: number;
-    reservationMinDuration: number;
-    suitableTimeRanges: Array<{
-      id: string;
-      pk: number | null;
-      beginTime: string;
-      endTime: string;
-      dayOfTheWeek: Weekday;
-      priority: Priority;
+  readonly pk: number | null;
+  readonly id: string;
+  readonly status: ApplicationStatusChoice | null;
+  readonly lastModifiedDate: string;
+  readonly applicantType: ApplicantTypeChoice | null;
+  readonly additionalInformation: string | null;
+  readonly applicationRound: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+  };
+  readonly applicationSections: ReadonlyArray<{
+    readonly allocations: number | null;
+    readonly id: string;
+    readonly pk: number | null;
+    readonly name: string;
+    readonly status: ApplicationSectionStatusChoice | null;
+    readonly reservationMaxDuration: number;
+    readonly numPersons: number;
+    readonly reservationsEndDate: string;
+    readonly reservationsBeginDate: string;
+    readonly appliedReservationsPerWeek: number;
+    readonly reservationMinDuration: number;
+    readonly suitableTimeRanges: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly beginTime: string;
+      readonly endTime: string;
+      readonly dayOfTheWeek: Weekday;
+      readonly priority: Priority;
     }>;
-    purpose: {
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      nameSv: string | null;
-      nameEn: string | null;
+    readonly purpose: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameSv: string | null;
+      readonly nameEn: string | null;
     } | null;
-    reservationUnitOptions: Array<{
-      id: string;
-      rejected: boolean;
-      pk: number | null;
-      preferredOrder: number;
-      allocatedTimeSlots: Array<{ pk: number | null; id: string }>;
-      reservationUnit: {
-        id: string;
-        pk: number | null;
-        nameFi: string | null;
-        nameEn: string | null;
-        nameSv: string | null;
-        applicationRoundTimeSlots: Array<{
-          id: string;
-          pk: number | null;
-          weekday: number;
-          closed: boolean;
-          reservableTimes: Array<{ begin: string; end: string } | null> | null;
+    readonly reservationUnitOptions: ReadonlyArray<{
+      readonly id: string;
+      readonly rejected: boolean;
+      readonly pk: number | null;
+      readonly preferredOrder: number;
+      readonly allocatedTimeSlots: ReadonlyArray<{
+        readonly pk: number | null;
+        readonly id: string;
+      }>;
+      readonly reservationUnit: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+        readonly applicationRoundTimeSlots: ReadonlyArray<{
+          readonly id: string;
+          readonly pk: number | null;
+          readonly weekday: number;
+          readonly closed: boolean;
+          readonly reservableTimes: ReadonlyArray<{
+            readonly begin: string;
+            readonly end: string;
+          } | null> | null;
         }>;
-        unit: {
-          id: string;
-          pk: number | null;
-          nameFi: string | null;
-          nameEn: string | null;
-          nameSv: string | null;
+        readonly unit: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly nameFi: string | null;
+          readonly nameEn: string | null;
+          readonly nameSv: string | null;
         } | null;
       };
     }>;
-    ageGroup: {
-      id: string;
-      pk: number | null;
-      minimum: number;
-      maximum: number | null;
+    readonly ageGroup: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly minimum: number;
+      readonly maximum: number | null;
     } | null;
   }> | null;
-  contactPerson: {
-    id: string;
-    pk: number | null;
-    firstName: string;
-    lastName: string;
-    email: string | null;
-    phoneNumber: string | null;
+  readonly contactPerson: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly email: string | null;
+    readonly phoneNumber: string | null;
   } | null;
-  organisation: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    identifier: string | null;
-    organisationType: OrganizationTypeChoice;
-    coreBusinessFi: string | null;
-    yearEstablished: number | null;
-    address: {
-      id: string;
-      pk: number | null;
-      postCode: string;
-      streetAddressFi: string | null;
-      cityFi: string | null;
+  readonly organisation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly identifier: string | null;
+    readonly organisationType: OrganizationTypeChoice;
+    readonly coreBusinessFi: string | null;
+    readonly yearEstablished: number | null;
+    readonly address: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly postCode: string;
+      readonly streetAddressFi: string | null;
+      readonly cityFi: string | null;
     } | null;
   } | null;
-  homeCity: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    nameEn: string | null;
-    nameSv: string | null;
+  readonly homeCity: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
   } | null;
-  billingAddress: {
-    id: string;
-    pk: number | null;
-    postCode: string;
-    streetAddressFi: string | null;
-    cityFi: string | null;
+  readonly billingAddress: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly postCode: string;
+    readonly streetAddressFi: string | null;
+    readonly cityFi: string | null;
   } | null;
 };
 
 export type ReservationCommonFragment = {
-  id: string;
-  pk: number | null;
-  begin: string;
-  end: string;
-  createdAt: string | null;
-  state: ReservationStateChoice | null;
-  type: ReservationTypeChoice | null;
-  isBlocked: boolean | null;
-  workingMemo: string | null;
-  reserveeName: string | null;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly createdAt: string | null;
+  readonly state: ReservationStateChoice | null;
+  readonly type: ReservationTypeChoice | null;
+  readonly isBlocked: boolean | null;
+  readonly workingMemo: string | null;
+  readonly reserveeName: string | null;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly paymentOrder: ReadonlyArray<{
+    readonly id: string;
+    readonly status: OrderStatus | null;
+  }>;
+  readonly user: {
+    readonly id: string;
+    readonly email: string;
+    readonly firstName: string;
+    readonly lastName: string;
   } | null;
 };
 
 export type ReservationUnitReservationsFragment = {
-  name: string | null;
-  numPersons: number | null;
-  calendarUrl: string | null;
-  affectedReservationUnits: Array<number | null> | null;
-  id: string;
-  pk: number | null;
-  begin: string;
-  end: string;
-  createdAt: string | null;
-  state: ReservationStateChoice | null;
-  type: ReservationTypeChoice | null;
-  isBlocked: boolean | null;
-  workingMemo: string | null;
-  reserveeName: string | null;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  reservationUnits: Array<{
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    unit: { id: string; pk: number | null } | null;
+  readonly name: string | null;
+  readonly numPersons: number | null;
+  readonly calendarUrl: string | null;
+  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly createdAt: string | null;
+  readonly state: ReservationStateChoice | null;
+  readonly type: ReservationTypeChoice | null;
+  readonly isBlocked: boolean | null;
+  readonly workingMemo: string | null;
+  readonly reserveeName: string | null;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly unit: { readonly id: string; readonly pk: number | null } | null;
   }>;
-  paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    pk: number | null;
+  readonly paymentOrder: ReadonlyArray<{
+    readonly id: string;
+    readonly status: OrderStatus | null;
+  }>;
+  readonly user: {
+    readonly id: string;
+    readonly email: string;
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly pk: number | null;
   } | null;
 };
 
 export type ReservationUnitFragment = {
-  id: string;
-  pk: number | null;
-  nameFi: string | null;
-  maxPersons: number | null;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  reservationStartInterval: ReservationStartInterval;
-  authentication: Authentication;
-  termsOfUseFi: string | null;
-  minPersons: number | null;
-  unit: { id: string; pk: number | null; nameFi: string | null } | null;
-  serviceSpecificTerms: {
-    id: string;
-    textFi: string | null;
-    nameFi: string | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly maxPersons: number | null;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly reservationStartInterval: ReservationStartInterval;
+  readonly authentication: Authentication;
+  readonly termsOfUseFi: string | null;
+  readonly minPersons: number | null;
+  readonly unit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
   } | null;
-  paymentTerms: {
-    id: string;
-    textFi: string | null;
-    nameFi: string | null;
+  readonly serviceSpecificTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
   } | null;
-  pricingTerms: {
-    id: string;
-    textFi: string | null;
-    nameFi: string | null;
+  readonly paymentTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
   } | null;
-  cancellationTerms: {
-    id: string;
-    textFi: string | null;
-    nameFi: string | null;
+  readonly pricingTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
   } | null;
-  metadataSet: {
-    id: string;
-    requiredFields: Array<{ id: string; fieldName: string }>;
-    supportedFields: Array<{ id: string; fieldName: string }>;
+  readonly cancellationTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
+  } | null;
+  readonly metadataSet: {
+    readonly id: string;
+    readonly requiredFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
+    readonly supportedFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
   } | null;
 };
 
@@ -6064,57 +6464,78 @@ export type UnitQueryVariables = Exact<{
 }>;
 
 export type UnitQuery = {
-  unit: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    tprekId: string | null;
-    shortDescriptionFi: string | null;
-    reservationUnits: Array<{
-      isDraft: boolean;
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      maxPersons: number | null;
-      surfaceArea: number | null;
-      resources: Array<{ id: string; pk: number | null }>;
-      purposes: Array<{ id: string; pk: number | null; nameFi: string | null }>;
-      images: Array<{
-        id: string;
-        imageUrl: string | null;
-        largeUrl: string | null;
-        mediumUrl: string | null;
-        smallUrl: string | null;
-        imageType: ImageType;
+  readonly unit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly tprekId: string | null;
+    readonly shortDescriptionFi: string | null;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly isDraft: boolean;
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly maxPersons: number | null;
+      readonly surfaceArea: number | null;
+      readonly resources: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
       }>;
-      reservationUnitType: { id: string; nameFi: string | null } | null;
+      readonly purposes: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      }>;
+      readonly images: ReadonlyArray<{
+        readonly id: string;
+        readonly imageUrl: string | null;
+        readonly largeUrl: string | null;
+        readonly mediumUrl: string | null;
+        readonly smallUrl: string | null;
+        readonly imageType: ImageType;
+      }>;
+      readonly reservationUnitType: {
+        readonly id: string;
+        readonly nameFi: string | null;
+      } | null;
     }>;
-    spaces: Array<{
-      code: string;
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      surfaceArea: number | null;
-      maxPersons: number | null;
-      resources: Array<{
-        id: string;
-        pk: number | null;
-        nameFi: string | null;
-        locationType: ResourceLocationType | null;
-        space: {
-          id: string;
-          nameFi: string | null;
-          unit: { id: string; nameFi: string | null; pk: number | null } | null;
+    readonly spaces: ReadonlyArray<{
+      readonly code: string;
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly surfaceArea: number | null;
+      readonly maxPersons: number | null;
+      readonly resources: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly locationType: ResourceLocationType | null;
+        readonly space: {
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly unit: {
+            readonly id: string;
+            readonly nameFi: string | null;
+            readonly pk: number | null;
+          } | null;
         } | null;
       }>;
-      children: Array<{ id: string; pk: number | null }> | null;
-      parent: { id: string; pk: number | null; nameFi: string | null } | null;
+      readonly children: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+      }> | null;
+      readonly parent: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
     }>;
-    location: {
-      id: string;
-      addressStreetFi: string | null;
-      addressZip: string;
-      addressCityFi: string | null;
+    readonly location: {
+      readonly id: string;
+      readonly addressStreetFi: string | null;
+      readonly addressZip: string;
+      readonly addressCityFi: string | null;
     } | null;
   } | null;
 };
@@ -6124,28 +6545,32 @@ export type UnitWithSpacesAndResourcesQueryVariables = Exact<{
 }>;
 
 export type UnitWithSpacesAndResourcesQuery = {
-  unit: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    spaces: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      surfaceArea: number | null;
-      maxPersons: number | null;
-      resources: Array<{
-        id: string;
-        pk: number | null;
-        nameFi: string | null;
+  readonly unit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly spaces: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly surfaceArea: number | null;
+      readonly maxPersons: number | null;
+      readonly resources: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
       }>;
-      parent: { id: string; pk: number | null; nameFi: string | null } | null;
+      readonly parent: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
     }>;
-    location: {
-      id: string;
-      addressStreetFi: string | null;
-      addressZip: string;
-      addressCityFi: string | null;
+    readonly location: {
+      readonly id: string;
+      readonly addressStreetFi: string | null;
+      readonly addressZip: string;
+      readonly addressCityFi: string | null;
     } | null;
   } | null;
 };
@@ -6153,34 +6578,38 @@ export type UnitWithSpacesAndResourcesQuery = {
 export type HandlingDataQueryVariables = Exact<{
   beginDate: Scalars["Date"]["input"];
   state:
-    | Array<InputMaybe<ReservationStateChoice>>
+    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
     | InputMaybe<ReservationStateChoice>;
 }>;
 
 export type HandlingDataQuery = {
-  reservations: {
-    edges: Array<{ node: { id: string; pk: number | null } | null } | null>;
+  readonly reservations: {
+    readonly edges: ReadonlyArray<{
+      readonly node: { readonly id: string; readonly pk: number | null } | null;
+    } | null>;
   } | null;
-  units: {
-    totalCount: number | null;
-    edges: Array<{ node: { id: string; pk: number | null } | null } | null>;
+  readonly units: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: { readonly id: string; readonly pk: number | null } | null;
+    } | null>;
   } | null;
 };
 
 export type BannerNotificationsAdminFragment = {
-  pk: number | null;
-  name: string;
-  target: BannerNotificationTarget;
-  activeUntil: string | null;
-  draft: boolean;
-  state: BannerNotificationState | null;
-  id: string;
-  level: BannerNotificationLevel;
-  activeFrom: string | null;
-  message: string;
-  messageEn: string | null;
-  messageFi: string | null;
-  messageSv: string | null;
+  readonly pk: number | null;
+  readonly name: string;
+  readonly target: BannerNotificationTarget;
+  readonly activeUntil: string | null;
+  readonly draft: boolean;
+  readonly state: BannerNotificationState | null;
+  readonly id: string;
+  readonly level: BannerNotificationLevel;
+  readonly activeFrom: string | null;
+  readonly message: string;
+  readonly messageEn: string | null;
+  readonly messageFi: string | null;
+  readonly messageSv: string | null;
 };
 
 export type BannerNotificationsAdminQueryVariables = Exact<{
@@ -6188,20 +6617,20 @@ export type BannerNotificationsAdminQueryVariables = Exact<{
 }>;
 
 export type BannerNotificationsAdminQuery = {
-  bannerNotification: {
-    pk: number | null;
-    name: string;
-    target: BannerNotificationTarget;
-    activeUntil: string | null;
-    draft: boolean;
-    state: BannerNotificationState | null;
-    id: string;
-    level: BannerNotificationLevel;
-    activeFrom: string | null;
-    message: string;
-    messageEn: string | null;
-    messageFi: string | null;
-    messageSv: string | null;
+  readonly bannerNotification: {
+    readonly pk: number | null;
+    readonly name: string;
+    readonly target: BannerNotificationTarget;
+    readonly activeUntil: string | null;
+    readonly draft: boolean;
+    readonly state: BannerNotificationState | null;
+    readonly id: string;
+    readonly level: BannerNotificationLevel;
+    readonly activeFrom: string | null;
+    readonly message: string;
+    readonly messageEn: string | null;
+    readonly messageFi: string | null;
+    readonly messageSv: string | null;
   } | null;
 };
 
@@ -6209,32 +6638,35 @@ export type BannerNotificationsAdminListQueryVariables = Exact<{
   first?: InputMaybe<Scalars["Int"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   orderBy?: InputMaybe<
-    | Array<InputMaybe<BannerNotificationOrderingChoices>>
+    | ReadonlyArray<InputMaybe<BannerNotificationOrderingChoices>>
     | InputMaybe<BannerNotificationOrderingChoices>
   >;
 }>;
 
 export type BannerNotificationsAdminListQuery = {
-  bannerNotifications: {
-    totalCount: number | null;
-    edges: Array<{
-      node: {
-        pk: number | null;
-        name: string;
-        target: BannerNotificationTarget;
-        activeUntil: string | null;
-        draft: boolean;
-        state: BannerNotificationState | null;
-        id: string;
-        level: BannerNotificationLevel;
-        activeFrom: string | null;
-        message: string;
-        messageEn: string | null;
-        messageFi: string | null;
-        messageSv: string | null;
+  readonly bannerNotifications: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly pk: number | null;
+        readonly name: string;
+        readonly target: BannerNotificationTarget;
+        readonly activeUntil: string | null;
+        readonly draft: boolean;
+        readonly state: BannerNotificationState | null;
+        readonly id: string;
+        readonly level: BannerNotificationLevel;
+        readonly activeFrom: string | null;
+        readonly message: string;
+        readonly messageEn: string | null;
+        readonly messageFi: string | null;
+        readonly messageSv: string | null;
       } | null;
     } | null>;
-    pageInfo: { endCursor: string | null; hasNextPage: boolean };
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
   } | null;
 };
 
@@ -6243,9 +6675,13 @@ export type ReservationDateOfBirthQueryVariables = Exact<{
 }>;
 
 export type ReservationDateOfBirthQuery = {
-  reservation: {
-    id: string;
-    user: { id: string; pk: number | null; dateOfBirth: string | null } | null;
+  readonly reservation: {
+    readonly id: string;
+    readonly user: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly dateOfBirth: string | null;
+    } | null;
   } | null;
 };
 
@@ -6254,22 +6690,26 @@ export type ApplicationDateOfBirthQueryVariables = Exact<{
 }>;
 
 export type ApplicationDateOfBirthQuery = {
-  application: {
-    id: string;
-    user: { id: string; pk: number | null; dateOfBirth: string | null } | null;
+  readonly application: {
+    readonly id: string;
+    readonly user: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly dateOfBirth: string | null;
+    } | null;
   } | null;
 };
 
 export type DenyDialogFieldsFragment = {
-  id: string;
-  pk: number | null;
-  handlingDetails: string | null;
-  price: string | null;
-  paymentOrder: Array<{
-    id: string;
-    orderUuid: string | null;
-    status: OrderStatus | null;
-    refundUuid: string | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly handlingDetails: string | null;
+  readonly price: string | null;
+  readonly paymentOrder: ReadonlyArray<{
+    readonly id: string;
+    readonly orderUuid: string | null;
+    readonly status: OrderStatus | null;
+    readonly refundUuid: string | null;
   }>;
 };
 
@@ -6278,9 +6718,9 @@ export type DenyReservationMutationVariables = Exact<{
 }>;
 
 export type DenyReservationMutation = {
-  denyReservation: {
-    pk: number | null;
-    state: ReservationStateChoice | null;
+  readonly denyReservation: {
+    readonly pk: number | null;
+    readonly state: ReservationStateChoice | null;
   } | null;
 };
 
@@ -6289,9 +6729,9 @@ export type DenyReservationSeriesMutationVariables = Exact<{
 }>;
 
 export type DenyReservationSeriesMutation = {
-  denyReservationSeries: {
-    denied: number | null;
-    future: number | null;
+  readonly denyReservationSeries: {
+    readonly denied: number | null;
+    readonly future: number | null;
   } | null;
 };
 
@@ -6300,7 +6740,7 @@ export type RefundReservationMutationVariables = Exact<{
 }>;
 
 export type RefundReservationMutation = {
-  refundReservation: { pk: number | null } | null;
+  readonly refundReservation: { readonly pk: number | null } | null;
 };
 
 export type StaffAdjustReservationTimeMutationVariables = Exact<{
@@ -6308,11 +6748,11 @@ export type StaffAdjustReservationTimeMutationVariables = Exact<{
 }>;
 
 export type StaffAdjustReservationTimeMutation = {
-  staffAdjustReservationTime: {
-    pk: number | null;
-    begin: string | null;
-    end: string | null;
-    state: ReservationStateChoice | null;
+  readonly staffAdjustReservationTime: {
+    readonly pk: number | null;
+    readonly begin: string | null;
+    readonly end: string | null;
+    readonly state: ReservationStateChoice | null;
   } | null;
 };
 
@@ -6321,73 +6761,79 @@ export type AddReservationToSeriesMutationVariables = Exact<{
 }>;
 
 export type AddReservationToSeriesMutation = {
-  addReservationToSeries: { pk: number | null } | null;
+  readonly addReservationToSeries: { readonly pk: number | null } | null;
 };
 
 export type ChangeReservationTimeFragment = {
-  id: string;
-  pk: number | null;
-  begin: string;
-  end: string;
-  type: ReservationTypeChoice | null;
-  bufferTimeAfter: number;
-  bufferTimeBefore: number;
-  recurringReservation: {
-    pk: number | null;
-    id: string;
-    weekdays: Array<number | null> | null;
-    beginDate: string | null;
-    endDate: string | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly type: ReservationTypeChoice | null;
+  readonly bufferTimeAfter: number;
+  readonly bufferTimeBefore: number;
+  readonly recurringReservation: {
+    readonly pk: number | null;
+    readonly id: string;
+    readonly weekdays: ReadonlyArray<number | null> | null;
+    readonly beginDate: string | null;
+    readonly endDate: string | null;
   } | null;
-  reservationUnits: Array<{
-    id: string;
-    pk: number | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    reservationStartInterval: ReservationStartInterval;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly reservationStartInterval: ReservationStartInterval;
   }>;
 };
 
 export type ReservationTypeFormFieldsFragment = {
-  authentication: Authentication;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  id: string;
-  minPersons: number | null;
-  maxPersons: number | null;
-  serviceSpecificTerms: {
-    id: string;
-    textFi: string | null;
-    nameFi: string | null;
+  readonly authentication: Authentication;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly id: string;
+  readonly minPersons: number | null;
+  readonly maxPersons: number | null;
+  readonly serviceSpecificTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
   } | null;
-  paymentTerms: {
-    id: string;
-    textFi: string | null;
-    nameFi: string | null;
+  readonly paymentTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
   } | null;
-  pricingTerms: {
-    id: string;
-    textFi: string | null;
-    nameFi: string | null;
+  readonly pricingTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
   } | null;
-  cancellationTerms: {
-    id: string;
-    textFi: string | null;
-    nameFi: string | null;
+  readonly cancellationTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
   } | null;
-  metadataSet: {
-    id: string;
-    requiredFields: Array<{ id: string; fieldName: string }>;
-    supportedFields: Array<{ id: string; fieldName: string }>;
+  readonly metadataSet: {
+    readonly id: string;
+    readonly requiredFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
+    readonly supportedFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
   } | null;
 };
 
 export type VisibleIfPermissionFieldsFragment = {
-  id: string;
-  user: { id: string; pk: number | null } | null;
-  reservationUnits: Array<{
-    id: string;
-    unit: { id: string; pk: number | null } | null;
+  readonly id: string;
+  readonly user: { readonly id: string; readonly pk: number | null } | null;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly unit: { readonly id: string; readonly pk: number | null } | null;
   }>;
 };
 
@@ -6397,9 +6843,9 @@ export type UpdateReservationWorkingMemoMutationVariables = Exact<{
 }>;
 
 export type UpdateReservationWorkingMemoMutation = {
-  updateReservationWorkingMemo: {
-    pk: number | null;
-    workingMemo: string | null;
+  readonly updateReservationWorkingMemo: {
+    readonly pk: number | null;
+    readonly workingMemo: string | null;
   } | null;
 };
 
@@ -6409,112 +6855,130 @@ export type UpdateApplicationWorkingMemoMutationVariables = Exact<{
 }>;
 
 export type UpdateApplicationWorkingMemoMutation = {
-  updateApplicationWorkingMemo: {
-    pk: number | null;
-    workingMemo: string | null;
+  readonly updateApplicationWorkingMemo: {
+    readonly pk: number | null;
+    readonly workingMemo: string | null;
   } | null;
 };
 
 export type CheckPermissionsQueryVariables = Exact<{
   permission: UserPermissionChoice;
-  units?: InputMaybe<Array<Scalars["Int"]["input"]> | Scalars["Int"]["input"]>;
+  units?: InputMaybe<
+    ReadonlyArray<Scalars["Int"]["input"]> | Scalars["Int"]["input"]
+  >;
   requireAll?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type CheckPermissionsQuery = {
-  checkPermissions: { hasPermission: boolean } | null;
+  readonly checkPermissions: { readonly hasPermission: boolean } | null;
 };
 
 export type ReservationDenyReasonsQueryVariables = Exact<{
   orderBy?: InputMaybe<
-    | Array<InputMaybe<ReservationDenyReasonOrderingChoices>>
+    | ReadonlyArray<InputMaybe<ReservationDenyReasonOrderingChoices>>
     | InputMaybe<ReservationDenyReasonOrderingChoices>
   >;
 }>;
 
 export type ReservationDenyReasonsQuery = {
-  reservationDenyReasons: {
-    edges: Array<{
-      node: { id: string; pk: number | null; reasonFi: string | null } | null;
+  readonly reservationDenyReasons: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly reasonFi: string | null;
+      } | null;
     } | null>;
   } | null;
 };
 
 export type ReservationUnitsFilterParamsQueryVariables = Exact<{
   unit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   orderBy?: InputMaybe<
-    | Array<InputMaybe<ReservationUnitOrderingChoices>>
+    | ReadonlyArray<InputMaybe<ReservationUnitOrderingChoices>>
     | InputMaybe<ReservationUnitOrderingChoices>
   >;
 }>;
 
 export type ReservationUnitsFilterParamsQuery = {
-  reservationUnitsAll: Array<{
-    id: string;
-    nameFi: string | null;
-    pk: number | null;
+  readonly reservationUnitsAll: ReadonlyArray<{
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly pk: number | null;
   }> | null;
 };
 
 export type ReservationUnitTypesFilterQueryVariables = Exact<{
   after?: InputMaybe<Scalars["String"]["input"]>;
   orderBy?: InputMaybe<
-    | Array<InputMaybe<ReservationUnitTypeOrderingChoices>>
+    | ReadonlyArray<InputMaybe<ReservationUnitTypeOrderingChoices>>
     | InputMaybe<ReservationUnitTypeOrderingChoices>
   >;
 }>;
 
 export type ReservationUnitTypesFilterQuery = {
-  reservationUnitTypes: {
-    totalCount: number | null;
-    edges: Array<{
-      node: { id: string; pk: number | null; nameFi: string | null } | null;
+  readonly reservationUnitTypes: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
     } | null>;
   } | null;
 };
 
 export type UnitsFilterQueryVariables = Exact<{
   orderBy?: InputMaybe<
-    Array<InputMaybe<UnitOrderingChoices>> | InputMaybe<UnitOrderingChoices>
+    | ReadonlyArray<InputMaybe<UnitOrderingChoices>>
+    | InputMaybe<UnitOrderingChoices>
   >;
 }>;
 
 export type UnitsFilterQuery = {
-  unitsAll: Array<{
-    id: string;
-    nameFi: string | null;
-    pk: number | null;
+  readonly unitsAll: ReadonlyArray<{
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly pk: number | null;
   }> | null;
 };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = {
-  currentUser: {
-    id: string;
-    username: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    isSuperuser: boolean;
-    pk: number | null;
-    unitRoles: Array<{
-      id: string;
-      permissions: Array<UserPermissionChoice | null> | null;
-      role: UserRoleChoice;
-      units: Array<{ id: string; pk: number | null; nameFi: string | null }>;
-      unitGroups: Array<{
-        id: string;
-        units: Array<{ id: string; pk: number | null }>;
+  readonly currentUser: {
+    readonly id: string;
+    readonly username: string;
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly email: string;
+    readonly isSuperuser: boolean;
+    readonly pk: number | null;
+    readonly unitRoles: ReadonlyArray<{
+      readonly id: string;
+      readonly permissions: ReadonlyArray<UserPermissionChoice | null> | null;
+      readonly role: UserRoleChoice;
+      readonly units: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      }>;
+      readonly unitGroups: ReadonlyArray<{
+        readonly id: string;
+        readonly units: ReadonlyArray<{
+          readonly id: string;
+          readonly pk: number | null;
+        }>;
       }>;
     }>;
-    generalRoles: Array<{
-      id: string;
-      permissions: Array<UserPermissionChoice | null> | null;
-      role: UserRoleChoice;
+    readonly generalRoles: ReadonlyArray<{
+      readonly id: string;
+      readonly permissions: ReadonlyArray<UserPermissionChoice | null> | null;
+      readonly role: UserRoleChoice;
     }>;
   } | null;
 };
@@ -6524,98 +6988,150 @@ export type ReservationUnitEditQueryVariables = Exact<{
 }>;
 
 export type ReservationUnitEditQuery = {
-  reservationUnit: {
-    id: string;
-    pk: number | null;
-    publishingState: ReservationUnitPublishingState | null;
-    reservationState: ReservationUnitReservationState | null;
-    haukiUrl: string | null;
-    requireReservationHandling: boolean;
-    nameFi: string | null;
-    nameSv: string | null;
-    nameEn: string | null;
-    isDraft: boolean;
-    authentication: Authentication;
-    uuid: string;
-    requireAdultReservee: boolean;
-    termsOfUseFi: string | null;
-    termsOfUseSv: string | null;
-    termsOfUseEn: string | null;
-    reservationKind: ReservationKind;
-    reservationPendingInstructionsFi: string | null;
-    reservationPendingInstructionsSv: string | null;
-    reservationPendingInstructionsEn: string | null;
-    reservationConfirmedInstructionsFi: string | null;
-    reservationConfirmedInstructionsSv: string | null;
-    reservationConfirmedInstructionsEn: string | null;
-    reservationCancelledInstructionsFi: string | null;
-    reservationCancelledInstructionsSv: string | null;
-    reservationCancelledInstructionsEn: string | null;
-    maxReservationDuration: number | null;
-    minReservationDuration: number | null;
-    reservationStartInterval: ReservationStartInterval;
-    canApplyFreeOfCharge: boolean;
-    reservationsMinDaysBefore: number | null;
-    reservationsMaxDaysBefore: number | null;
-    minPersons: number | null;
-    maxPersons: number | null;
-    surfaceArea: number | null;
-    descriptionFi: string | null;
-    descriptionSv: string | null;
-    descriptionEn: string | null;
-    reservationBlockWholeDay: boolean;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    reservationBegins: string | null;
-    contactInformation: string;
-    reservationEnds: string | null;
-    publishBegins: string | null;
-    publishEnds: string | null;
-    maxReservationsPerUser: number | null;
-    images: Array<{
-      pk: number | null;
-      id: string;
-      imageUrl: string | null;
-      largeUrl: string | null;
-      mediumUrl: string | null;
-      smallUrl: string | null;
-      imageType: ImageType;
+  readonly reservationUnit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly publishingState: ReservationUnitPublishingState | null;
+    readonly reservationState: ReservationUnitReservationState | null;
+    readonly haukiUrl: string | null;
+    readonly requireReservationHandling: boolean;
+    readonly nameFi: string | null;
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
+    readonly isDraft: boolean;
+    readonly authentication: Authentication;
+    readonly uuid: string;
+    readonly requireAdultReservee: boolean;
+    readonly termsOfUseFi: string | null;
+    readonly termsOfUseSv: string | null;
+    readonly termsOfUseEn: string | null;
+    readonly reservationKind: ReservationKind;
+    readonly reservationPendingInstructionsFi: string | null;
+    readonly reservationPendingInstructionsSv: string | null;
+    readonly reservationPendingInstructionsEn: string | null;
+    readonly reservationConfirmedInstructionsFi: string | null;
+    readonly reservationConfirmedInstructionsSv: string | null;
+    readonly reservationConfirmedInstructionsEn: string | null;
+    readonly reservationCancelledInstructionsFi: string | null;
+    readonly reservationCancelledInstructionsSv: string | null;
+    readonly reservationCancelledInstructionsEn: string | null;
+    readonly maxReservationDuration: number | null;
+    readonly minReservationDuration: number | null;
+    readonly reservationStartInterval: ReservationStartInterval;
+    readonly canApplyFreeOfCharge: boolean;
+    readonly reservationsMinDaysBefore: number | null;
+    readonly reservationsMaxDaysBefore: number | null;
+    readonly minPersons: number | null;
+    readonly maxPersons: number | null;
+    readonly surfaceArea: number | null;
+    readonly descriptionFi: string | null;
+    readonly descriptionSv: string | null;
+    readonly descriptionEn: string | null;
+    readonly reservationBlockWholeDay: boolean;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly reservationBegins: string | null;
+    readonly contactInformation: string;
+    readonly reservationEnds: string | null;
+    readonly publishBegins: string | null;
+    readonly publishEnds: string | null;
+    readonly maxReservationsPerUser: number | null;
+    readonly images: ReadonlyArray<{
+      readonly pk: number | null;
+      readonly id: string;
+      readonly imageUrl: string | null;
+      readonly largeUrl: string | null;
+      readonly mediumUrl: string | null;
+      readonly smallUrl: string | null;
+      readonly imageType: ImageType;
     }>;
-    cancellationRule: { id: string; pk: number | null } | null;
-    spaces: Array<{ id: string; pk: number | null; nameFi: string | null }>;
-    resources: Array<{ id: string; pk: number | null; nameFi: string | null }>;
-    purposes: Array<{ id: string; pk: number | null; nameFi: string | null }>;
-    paymentTypes: Array<{ id: string; code: string }>;
-    pricingTerms: { id: string; pk: string | null } | null;
-    reservationUnitType: {
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
+    readonly cancellationRule: {
+      readonly id: string;
+      readonly pk: number | null;
     } | null;
-    equipments: Array<{ id: string; pk: number | null; nameFi: string | null }>;
-    qualifiers: Array<{ id: string; pk: number | null; nameFi: string | null }>;
-    unit: { id: string; pk: number | null; nameFi: string | null } | null;
-    paymentTerms: { id: string; pk: string | null } | null;
-    cancellationTerms: { id: string; pk: string | null } | null;
-    serviceSpecificTerms: { id: string; pk: string | null } | null;
-    metadataSet: { id: string; pk: number | null } | null;
-    pricings: Array<{
-      pk: number | null;
-      lowestPriceNet: string | null;
-      highestPriceNet: string | null;
-      id: string;
-      begins: string;
-      priceUnit: PriceUnit;
-      lowestPrice: string;
-      highestPrice: string;
-      taxPercentage: { id: string; pk: number | null; value: string };
+    readonly spaces: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
     }>;
-    applicationRoundTimeSlots: Array<{
-      id: string;
-      pk: number | null;
-      weekday: number;
-      closed: boolean;
-      reservableTimes: Array<{ begin: string; end: string } | null> | null;
+    readonly resources: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    }>;
+    readonly purposes: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    }>;
+    readonly paymentTypes: ReadonlyArray<{
+      readonly id: string;
+      readonly code: string;
+    }>;
+    readonly pricingTerms: {
+      readonly id: string;
+      readonly pk: string | null;
+    } | null;
+    readonly reservationUnitType: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    } | null;
+    readonly equipments: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    }>;
+    readonly qualifiers: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    }>;
+    readonly unit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    } | null;
+    readonly paymentTerms: {
+      readonly id: string;
+      readonly pk: string | null;
+    } | null;
+    readonly cancellationTerms: {
+      readonly id: string;
+      readonly pk: string | null;
+    } | null;
+    readonly serviceSpecificTerms: {
+      readonly id: string;
+      readonly pk: string | null;
+    } | null;
+    readonly metadataSet: {
+      readonly id: string;
+      readonly pk: number | null;
+    } | null;
+    readonly pricings: ReadonlyArray<{
+      readonly pk: number | null;
+      readonly lowestPriceNet: string | null;
+      readonly highestPriceNet: string | null;
+      readonly id: string;
+      readonly begins: string;
+      readonly priceUnit: PriceUnit;
+      readonly lowestPrice: string;
+      readonly highestPrice: string;
+      readonly taxPercentage: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly value: string;
+      };
+    }>;
+    readonly applicationRoundTimeSlots: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly weekday: number;
+      readonly closed: boolean;
+      readonly reservableTimes: ReadonlyArray<{
+        readonly begin: string;
+        readonly end: string;
+      } | null> | null;
     }>;
   } | null;
 };
@@ -6625,7 +7141,7 @@ export type UpdateReservationUnitMutationVariables = Exact<{
 }>;
 
 export type UpdateReservationUnitMutation = {
-  updateReservationUnit: { pk: number | null } | null;
+  readonly updateReservationUnit: { readonly pk: number | null } | null;
 };
 
 export type CreateReservationUnitMutationVariables = Exact<{
@@ -6633,7 +7149,7 @@ export type CreateReservationUnitMutationVariables = Exact<{
 }>;
 
 export type CreateReservationUnitMutation = {
-  createReservationUnit: { pk: number | null } | null;
+  readonly createReservationUnit: { readonly pk: number | null } | null;
 };
 
 export type CreateImageMutationVariables = Exact<{
@@ -6643,7 +7159,7 @@ export type CreateImageMutationVariables = Exact<{
 }>;
 
 export type CreateImageMutation = {
-  createReservationUnitImage: { pk: number | null } | null;
+  readonly createReservationUnitImage: { readonly pk: number | null } | null;
 };
 
 export type DeleteImageMutationVariables = Exact<{
@@ -6651,7 +7167,9 @@ export type DeleteImageMutationVariables = Exact<{
 }>;
 
 export type DeleteImageMutation = {
-  deleteReservationUnitImage: { deleted: boolean | null } | null;
+  readonly deleteReservationUnitImage: {
+    readonly deleted: boolean | null;
+  } | null;
 };
 
 export type UpdateImageMutationVariables = Exact<{
@@ -6660,7 +7178,7 @@ export type UpdateImageMutationVariables = Exact<{
 }>;
 
 export type UpdateImageMutation = {
-  updateReservationUnitImage: { pk: number | null } | null;
+  readonly updateReservationUnitImage: { readonly pk: number | null } | null;
 };
 
 export type ReservationUnitEditorParametersQueryVariables = Exact<{
@@ -6668,50 +7186,74 @@ export type ReservationUnitEditorParametersQueryVariables = Exact<{
 }>;
 
 export type ReservationUnitEditorParametersQuery = {
-  equipmentsAll: Array<{
-    id: string;
-    name: string;
-    nameFi: string | null;
-    pk: number | null;
+  readonly equipmentsAll: ReadonlyArray<{
+    readonly id: string;
+    readonly name: string;
+    readonly nameFi: string | null;
+    readonly pk: number | null;
   }> | null;
-  taxPercentages: {
-    edges: Array<{
-      node: { id: string; pk: number | null; value: string } | null;
-    } | null>;
-  } | null;
-  purposes: {
-    edges: Array<{
-      node: { id: string; pk: number | null; nameFi: string | null } | null;
-    } | null>;
-  } | null;
-  reservationUnitTypes: {
-    edges: Array<{
-      node: { id: string; nameFi: string | null; pk: number | null } | null;
-    } | null>;
-  } | null;
-  termsOfUse: {
-    edges: Array<{
-      node: {
-        id: string;
-        pk: string | null;
-        nameFi: string | null;
-        termsType: TermsType;
+  readonly taxPercentages: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly value: string;
       } | null;
     } | null>;
   } | null;
-  reservationUnitCancellationRules: {
-    edges: Array<{
-      node: { id: string; nameFi: string | null; pk: number | null } | null;
+  readonly purposes: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
     } | null>;
   } | null;
-  metadataSets: {
-    edges: Array<{
-      node: { id: string; name: string; pk: number | null } | null;
+  readonly reservationUnitTypes: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly pk: number | null;
+      } | null;
     } | null>;
   } | null;
-  qualifiers: {
-    edges: Array<{
-      node: { id: string; nameFi: string | null; pk: number | null } | null;
+  readonly termsOfUse: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: string | null;
+        readonly nameFi: string | null;
+        readonly termsType: TermsType;
+      } | null;
+    } | null>;
+  } | null;
+  readonly reservationUnitCancellationRules: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly pk: number | null;
+      } | null;
+    } | null>;
+  } | null;
+  readonly metadataSets: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly name: string;
+        readonly pk: number | null;
+      } | null;
+    } | null>;
+  } | null;
+  readonly qualifiers: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly pk: number | null;
+      } | null;
     } | null>;
   } | null;
 };
@@ -6721,17 +7263,21 @@ export type ApplicationRoundFilterQueryVariables = Exact<{
 }>;
 
 export type ApplicationRoundFilterQuery = {
-  applicationRound: {
-    id: string;
-    nameFi: string | null;
-    status: ApplicationRoundStatusChoice | null;
-    reservationPeriodBegin: string;
-    reservationPeriodEnd: string;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      unit: { id: string; pk: number | null; nameFi: string | null } | null;
+  readonly applicationRound: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly status: ApplicationRoundStatusChoice | null;
+    readonly reservationPeriodBegin: string;
+    readonly reservationPeriodEnd: string;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly unit: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
     }>;
   } | null;
 };
@@ -6739,28 +7285,28 @@ export type ApplicationRoundFilterQuery = {
 export type AllApplicationEventsQueryVariables = Exact<{
   applicationRound: Scalars["Int"]["input"];
   applicationStatus:
-    | Array<InputMaybe<ApplicationStatusChoice>>
+    | ReadonlyArray<InputMaybe<ApplicationStatusChoice>>
     | InputMaybe<ApplicationStatusChoice>;
   unit:
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>;
   reservationUnit:
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
 export type AllApplicationEventsQuery = {
-  applicationSections: {
-    totalCount: number | null;
-    edges: Array<{
-      node: {
-        id: string;
-        reservationUnitOptions: Array<{
-          id: string;
-          reservationUnit: {
-            id: string;
-            pk: number | null;
-            nameFi: string | null;
+  readonly applicationSections: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly reservationUnitOptions: ReadonlyArray<{
+          readonly id: string;
+          readonly reservationUnit: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly nameFi: string | null;
           };
         }>;
       } | null;
@@ -6773,12 +7319,12 @@ export type CreateAllocatedTimeSlotMutationVariables = Exact<{
 }>;
 
 export type CreateAllocatedTimeSlotMutation = {
-  createAllocatedTimeslot: {
-    beginTime: string | null;
-    dayOfTheWeek: Weekday | null;
-    endTime: string | null;
-    pk: number | null;
-    reservationUnitOption: number | null;
+  readonly createAllocatedTimeslot: {
+    readonly beginTime: string | null;
+    readonly dayOfTheWeek: Weekday | null;
+    readonly endTime: string | null;
+    readonly pk: number | null;
+    readonly reservationUnitOption: number | null;
   } | null;
 };
 
@@ -6787,47 +7333,50 @@ export type DeleteAllocatedTimeSlotMutationVariables = Exact<{
 }>;
 
 export type DeleteAllocatedTimeSlotMutation = {
-  deleteAllocatedTimeslot: { deleted: boolean | null } | null;
+  readonly deleteAllocatedTimeslot: { readonly deleted: boolean | null } | null;
 };
 
 export type AllocatedTimeSlotFragment = {
-  id: string;
-  beginTime: string;
-  endTime: string;
-  dayOfTheWeek: Weekday;
+  readonly id: string;
+  readonly beginTime: string;
+  readonly endTime: string;
+  readonly dayOfTheWeek: Weekday;
 };
 
 export type ApplicationSectionAllocationsQueryVariables = Exact<{
   applicationRound: Scalars["Int"]["input"];
   applicationStatus:
-    | Array<InputMaybe<ApplicationStatusChoice>>
+    | ReadonlyArray<InputMaybe<ApplicationStatusChoice>>
     | InputMaybe<ApplicationStatusChoice>;
   status?: InputMaybe<
-    | Array<InputMaybe<ApplicationSectionStatusChoice>>
+    | ReadonlyArray<InputMaybe<ApplicationSectionStatusChoice>>
     | InputMaybe<ApplicationSectionStatusChoice>
   >;
   applicantType?: InputMaybe<
-    Array<InputMaybe<ApplicantTypeChoice>> | InputMaybe<ApplicantTypeChoice>
+    | ReadonlyArray<InputMaybe<ApplicantTypeChoice>>
+    | InputMaybe<ApplicantTypeChoice>
   >;
   preferredOrder?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  priority?: InputMaybe<Array<InputMaybe<Priority>> | InputMaybe<Priority>>;
+  priority?: InputMaybe<
+    ReadonlyArray<InputMaybe<Priority>> | InputMaybe<Priority>
+  >;
   purpose?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   reservationUnit: Scalars["Int"]["input"];
   beginDate: Scalars["Date"]["input"];
   endDate: Scalars["Date"]["input"];
   ageGroup?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   homeCity?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   includePreferredOrder10OrHigher?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -6835,94 +7384,100 @@ export type ApplicationSectionAllocationsQueryVariables = Exact<{
 }>;
 
 export type ApplicationSectionAllocationsQuery = {
-  applicationSections: {
-    totalCount: number | null;
-    edges: Array<{
-      node: {
-        allocations: number | null;
-        id: string;
-        pk: number | null;
-        name: string;
-        status: ApplicationSectionStatusChoice | null;
-        reservationMaxDuration: number;
-        numPersons: number;
-        reservationsEndDate: string;
-        reservationsBeginDate: string;
-        appliedReservationsPerWeek: number;
-        reservationMinDuration: number;
-        suitableTimeRanges: Array<{
-          id: string;
-          beginTime: string;
-          endTime: string;
-          dayOfTheWeek: Weekday;
-          priority: Priority;
-          fulfilled: boolean | null;
+  readonly applicationSections: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly allocations: number | null;
+        readonly id: string;
+        readonly pk: number | null;
+        readonly name: string;
+        readonly status: ApplicationSectionStatusChoice | null;
+        readonly reservationMaxDuration: number;
+        readonly numPersons: number;
+        readonly reservationsEndDate: string;
+        readonly reservationsBeginDate: string;
+        readonly appliedReservationsPerWeek: number;
+        readonly reservationMinDuration: number;
+        readonly suitableTimeRanges: ReadonlyArray<{
+          readonly id: string;
+          readonly beginTime: string;
+          readonly endTime: string;
+          readonly dayOfTheWeek: Weekday;
+          readonly priority: Priority;
+          readonly fulfilled: boolean | null;
         }>;
-        reservationUnitOptions: Array<{
-          id: string;
-          pk: number | null;
-          locked: boolean;
-          rejected: boolean;
-          preferredOrder: number;
-          allocatedTimeSlots: Array<{
-            pk: number | null;
-            id: string;
-            beginTime: string;
-            endTime: string;
-            dayOfTheWeek: Weekday;
-            reservationUnitOption: {
-              id: string;
-              pk: number | null;
-              applicationSection: { id: string; pk: number | null };
+        readonly reservationUnitOptions: ReadonlyArray<{
+          readonly id: string;
+          readonly pk: number | null;
+          readonly locked: boolean;
+          readonly rejected: boolean;
+          readonly preferredOrder: number;
+          readonly allocatedTimeSlots: ReadonlyArray<{
+            readonly pk: number | null;
+            readonly id: string;
+            readonly beginTime: string;
+            readonly endTime: string;
+            readonly dayOfTheWeek: Weekday;
+            readonly reservationUnitOption: {
+              readonly id: string;
+              readonly pk: number | null;
+              readonly applicationSection: {
+                readonly id: string;
+                readonly pk: number | null;
+              };
             };
           }>;
-          reservationUnit: {
-            id: string;
-            pk: number | null;
-            nameFi: string | null;
-            unit: {
-              id: string;
-              pk: number | null;
-              nameFi: string | null;
+          readonly reservationUnit: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly nameFi: string | null;
+            readonly unit: {
+              readonly id: string;
+              readonly pk: number | null;
+              readonly nameFi: string | null;
             } | null;
           };
         }>;
-        purpose: {
-          id: string;
-          pk: number | null;
-          nameFi: string | null;
+        readonly purpose: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly nameFi: string | null;
         } | null;
-        application: {
-          id: string;
-          pk: number | null;
-          status: ApplicationStatusChoice | null;
-          applicantType: ApplicantTypeChoice | null;
-          organisation: {
-            id: string;
-            nameFi: string | null;
-            organisationType: OrganizationTypeChoice;
+        readonly application: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly status: ApplicationStatusChoice | null;
+          readonly applicantType: ApplicantTypeChoice | null;
+          readonly organisation: {
+            readonly id: string;
+            readonly nameFi: string | null;
+            readonly organisationType: OrganizationTypeChoice;
           } | null;
-          contactPerson: {
-            id: string;
-            lastName: string;
-            firstName: string;
+          readonly contactPerson: {
+            readonly id: string;
+            readonly lastName: string;
+            readonly firstName: string;
           } | null;
         };
-        ageGroup: {
-          id: string;
-          pk: number | null;
-          minimum: number;
-          maximum: number | null;
+        readonly ageGroup: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly minimum: number;
+          readonly maximum: number | null;
         } | null;
       } | null;
     } | null>;
-    pageInfo: { endCursor: string | null; hasNextPage: boolean };
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
   } | null;
-  affectingAllocatedTimeSlots: Array<{
-    id: string;
-    beginTime: string;
-    endTime: string;
-    dayOfTheWeek: Weekday;
+  readonly affectingAllocatedTimeSlots: ReadonlyArray<{
+    readonly id: string;
+    readonly beginTime: string;
+    readonly endTime: string;
+    readonly dayOfTheWeek: Weekday;
   }> | null;
 };
 
@@ -6931,10 +7486,10 @@ export type RejectRestMutationVariables = Exact<{
 }>;
 
 export type RejectRestMutation = {
-  updateReservationUnitOption: {
-    pk: number | null;
-    rejected: boolean | null;
-    locked: boolean | null;
+  readonly updateReservationUnitOption: {
+    readonly pk: number | null;
+    readonly rejected: boolean | null;
+    readonly locked: boolean | null;
   } | null;
 };
 
@@ -6943,21 +7498,27 @@ export type ApplicationRoundCriteriaQueryVariables = Exact<{
 }>;
 
 export type ApplicationRoundCriteriaQuery = {
-  applicationRound: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    reservationUnitCount: number | null;
-    applicationPeriodBegin: string;
-    applicationPeriodEnd: string;
-    reservationPeriodBegin: string;
-    reservationPeriodEnd: string;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      spaces: Array<{ id: string; nameFi: string | null }>;
-      unit: { id: string; nameFi: string | null } | null;
+  readonly applicationRound: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly reservationUnitCount: number | null;
+    readonly applicationPeriodBegin: string;
+    readonly applicationPeriodEnd: string;
+    readonly reservationPeriodBegin: string;
+    readonly reservationPeriodEnd: string;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly spaces: ReadonlyArray<{
+        readonly id: string;
+        readonly nameFi: string | null;
+      }>;
+      readonly unit: {
+        readonly id: string;
+        readonly nameFi: string | null;
+      } | null;
     }>;
   } | null;
 };
@@ -6965,15 +7526,15 @@ export type ApplicationRoundCriteriaQuery = {
 export type RejectedOccurrencesQueryVariables = Exact<{
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   reservationUnit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   orderBy?: InputMaybe<
-    | Array<InputMaybe<RejectedOccurrenceOrderingChoices>>
+    | ReadonlyArray<InputMaybe<RejectedOccurrenceOrderingChoices>>
     | InputMaybe<RejectedOccurrenceOrderingChoices>
   >;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
@@ -6982,50 +7543,62 @@ export type RejectedOccurrencesQueryVariables = Exact<{
 }>;
 
 export type RejectedOccurrencesQuery = {
-  rejectedOccurrences: {
-    totalCount: number | null;
-    pageInfo: { hasNextPage: boolean; endCursor: string | null };
-    edges: Array<{
-      node: {
-        id: string;
-        pk: number | null;
-        beginDatetime: string;
-        endDatetime: string;
-        rejectionReason: RejectionReadinessChoice;
-        recurringReservation: {
-          id: string;
-          allocatedTimeSlot: {
-            id: string;
-            pk: number | null;
-            dayOfTheWeek: Weekday;
-            beginTime: string;
-            endTime: string;
-            reservationUnitOption: {
-              id: string;
-              applicationSection: {
-                id: string;
-                name: string;
-                application: {
-                  id: string;
-                  pk: number | null;
-                  applicantType: ApplicantTypeChoice | null;
-                  contactPerson: {
-                    id: string;
-                    firstName: string;
-                    lastName: string;
+  readonly rejectedOccurrences: {
+    readonly totalCount: number | null;
+    readonly pageInfo: {
+      readonly hasNextPage: boolean;
+      readonly endCursor: string | null;
+    };
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly beginDatetime: string;
+        readonly endDatetime: string;
+        readonly rejectionReason: RejectionReadinessChoice;
+        readonly recurringReservation: {
+          readonly id: string;
+          readonly allocatedTimeSlot: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly dayOfTheWeek: Weekday;
+            readonly beginTime: string;
+            readonly endTime: string;
+            readonly reservationUnitOption: {
+              readonly id: string;
+              readonly applicationSection: {
+                readonly id: string;
+                readonly name: string;
+                readonly application: {
+                  readonly id: string;
+                  readonly pk: number | null;
+                  readonly applicantType: ApplicantTypeChoice | null;
+                  readonly contactPerson: {
+                    readonly id: string;
+                    readonly firstName: string;
+                    readonly lastName: string;
                   } | null;
-                  organisation: { id: string; nameFi: string | null } | null;
+                  readonly organisation: {
+                    readonly id: string;
+                    readonly nameFi: string | null;
+                  } | null;
                 };
               };
-              reservationUnit: {
-                id: string;
-                nameFi: string | null;
-                pk: number | null;
-                unit: { id: string; nameFi: string | null } | null;
+              readonly reservationUnit: {
+                readonly id: string;
+                readonly nameFi: string | null;
+                readonly pk: number | null;
+                readonly unit: {
+                  readonly id: string;
+                  readonly nameFi: string | null;
+                } | null;
               };
             };
           } | null;
-          reservations: Array<{ id: string; pk: number | null }>;
+          readonly reservations: ReadonlyArray<{
+            readonly id: string;
+            readonly pk: number | null;
+          }>;
         };
       } | null;
     } | null>;
@@ -7037,7 +7610,7 @@ export type EndAllocationMutationVariables = Exact<{
 }>;
 
 export type EndAllocationMutation = {
-  setApplicationRoundHandled: { pk: number | null } | null;
+  readonly setApplicationRoundHandled: { readonly pk: number | null } | null;
 };
 
 export type SendResultsMutationVariables = Exact<{
@@ -7045,24 +7618,27 @@ export type SendResultsMutationVariables = Exact<{
 }>;
 
 export type SendResultsMutation = {
-  setApplicationRoundResultsSent: { pk: number | null } | null;
+  readonly setApplicationRoundResultsSent: {
+    readonly pk: number | null;
+  } | null;
 };
 
 export type ApplicationsQueryVariables = Exact<{
   applicationRound: Scalars["Int"]["input"];
   unit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   applicantType?: InputMaybe<
-    Array<InputMaybe<ApplicantTypeChoice>> | InputMaybe<ApplicantTypeChoice>
+    | ReadonlyArray<InputMaybe<ApplicantTypeChoice>>
+    | InputMaybe<ApplicantTypeChoice>
   >;
   status:
-    | Array<InputMaybe<ApplicationStatusChoice>>
+    | ReadonlyArray<InputMaybe<ApplicationStatusChoice>>
     | InputMaybe<ApplicationStatusChoice>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   orderBy?: InputMaybe<
-    | Array<InputMaybe<ApplicationOrderingChoices>>
+    | ReadonlyArray<InputMaybe<ApplicationOrderingChoices>>
     | InputMaybe<ApplicationOrderingChoices>
   >;
   first?: InputMaybe<Scalars["Int"]["input"]>;
@@ -7070,92 +7646,98 @@ export type ApplicationsQueryVariables = Exact<{
 }>;
 
 export type ApplicationsQuery = {
-  applications: {
-    totalCount: number | null;
-    edges: Array<{
-      node: {
-        id: string;
-        pk: number | null;
-        status: ApplicationStatusChoice | null;
-        applicantType: ApplicantTypeChoice | null;
-        applicationSections: Array<{
-          id: string;
-          pk: number | null;
-          name: string;
-          reservationsEndDate: string;
-          reservationsBeginDate: string;
-          appliedReservationsPerWeek: number;
-          reservationMinDuration: number;
-          reservationUnitOptions: Array<{
-            id: string;
-            preferredOrder: number;
-            reservationUnit: {
-              id: string;
-              unit: {
-                id: string;
-                pk: number | null;
-                nameFi: string | null;
+  readonly applications: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly status: ApplicationStatusChoice | null;
+        readonly applicantType: ApplicantTypeChoice | null;
+        readonly applicationSections: ReadonlyArray<{
+          readonly id: string;
+          readonly pk: number | null;
+          readonly name: string;
+          readonly reservationsEndDate: string;
+          readonly reservationsBeginDate: string;
+          readonly appliedReservationsPerWeek: number;
+          readonly reservationMinDuration: number;
+          readonly reservationUnitOptions: ReadonlyArray<{
+            readonly id: string;
+            readonly preferredOrder: number;
+            readonly reservationUnit: {
+              readonly id: string;
+              readonly unit: {
+                readonly id: string;
+                readonly pk: number | null;
+                readonly nameFi: string | null;
               } | null;
             };
           }>;
         }> | null;
-        organisation: {
-          id: string;
-          nameFi: string | null;
-          organisationType: OrganizationTypeChoice;
+        readonly organisation: {
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly organisationType: OrganizationTypeChoice;
         } | null;
-        contactPerson: {
-          id: string;
-          lastName: string;
-          firstName: string;
+        readonly contactPerson: {
+          readonly id: string;
+          readonly lastName: string;
+          readonly firstName: string;
         } | null;
       } | null;
     } | null>;
-    pageInfo: { endCursor: string | null; hasNextPage: boolean };
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
   } | null;
 };
 
 export type ApplicationSectionsQueryVariables = Exact<{
   applicationRound: Scalars["Int"]["input"];
   applicationStatus:
-    | Array<InputMaybe<ApplicationStatusChoice>>
+    | ReadonlyArray<InputMaybe<ApplicationStatusChoice>>
     | InputMaybe<ApplicationStatusChoice>;
   status?: InputMaybe<
-    | Array<InputMaybe<ApplicationSectionStatusChoice>>
+    | ReadonlyArray<InputMaybe<ApplicationSectionStatusChoice>>
     | InputMaybe<ApplicationSectionStatusChoice>
   >;
   unit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   applicantType?: InputMaybe<
-    Array<InputMaybe<ApplicantTypeChoice>> | InputMaybe<ApplicantTypeChoice>
+    | ReadonlyArray<InputMaybe<ApplicantTypeChoice>>
+    | InputMaybe<ApplicantTypeChoice>
   >;
   preferredOrder?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  priority?: InputMaybe<Array<InputMaybe<Priority>> | InputMaybe<Priority>>;
+  priority?: InputMaybe<
+    ReadonlyArray<InputMaybe<Priority>> | InputMaybe<Priority>
+  >;
   purpose?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   reservationUnit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   ageGroup?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   homeCity?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   includePreferredOrder10OrHigher?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<
-    | Array<InputMaybe<ApplicationSectionOrderingChoices>>
+    | ReadonlyArray<InputMaybe<ApplicationSectionOrderingChoices>>
     | InputMaybe<ApplicationSectionOrderingChoices>
   >;
   first?: InputMaybe<Scalars["Int"]["input"]>;
@@ -7163,104 +7745,113 @@ export type ApplicationSectionsQueryVariables = Exact<{
 }>;
 
 export type ApplicationSectionsQuery = {
-  applicationSections: {
-    totalCount: number | null;
-    edges: Array<{
-      node: {
-        allocations: number | null;
-        id: string;
-        pk: number | null;
-        name: string;
-        status: ApplicationSectionStatusChoice | null;
-        reservationMaxDuration: number;
-        numPersons: number;
-        reservationsEndDate: string;
-        reservationsBeginDate: string;
-        appliedReservationsPerWeek: number;
-        reservationMinDuration: number;
-        reservationUnitOptions: Array<{
-          id: string;
-          pk: number | null;
-          preferredOrder: number;
-          allocatedTimeSlots: Array<{
-            id: string;
-            pk: number | null;
-            dayOfTheWeek: Weekday;
-            beginTime: string;
-            endTime: string;
-            reservationUnitOption: {
-              id: string;
-              applicationSection: { id: string; pk: number | null };
+  readonly applicationSections: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly allocations: number | null;
+        readonly id: string;
+        readonly pk: number | null;
+        readonly name: string;
+        readonly status: ApplicationSectionStatusChoice | null;
+        readonly reservationMaxDuration: number;
+        readonly numPersons: number;
+        readonly reservationsEndDate: string;
+        readonly reservationsBeginDate: string;
+        readonly appliedReservationsPerWeek: number;
+        readonly reservationMinDuration: number;
+        readonly reservationUnitOptions: ReadonlyArray<{
+          readonly id: string;
+          readonly pk: number | null;
+          readonly preferredOrder: number;
+          readonly allocatedTimeSlots: ReadonlyArray<{
+            readonly id: string;
+            readonly pk: number | null;
+            readonly dayOfTheWeek: Weekday;
+            readonly beginTime: string;
+            readonly endTime: string;
+            readonly reservationUnitOption: {
+              readonly id: string;
+              readonly applicationSection: {
+                readonly id: string;
+                readonly pk: number | null;
+              };
             };
           }>;
-          reservationUnit: {
-            id: string;
-            pk: number | null;
-            nameFi: string | null;
-            unit: {
-              id: string;
-              pk: number | null;
-              nameFi: string | null;
+          readonly reservationUnit: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly nameFi: string | null;
+            readonly unit: {
+              readonly id: string;
+              readonly pk: number | null;
+              readonly nameFi: string | null;
             } | null;
           };
         }>;
-        purpose: {
-          id: string;
-          pk: number | null;
-          nameFi: string | null;
+        readonly purpose: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly nameFi: string | null;
         } | null;
-        application: {
-          id: string;
-          pk: number | null;
-          status: ApplicationStatusChoice | null;
-          applicantType: ApplicantTypeChoice | null;
-          organisation: {
-            id: string;
-            nameFi: string | null;
-            organisationType: OrganizationTypeChoice;
+        readonly application: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly status: ApplicationStatusChoice | null;
+          readonly applicantType: ApplicantTypeChoice | null;
+          readonly organisation: {
+            readonly id: string;
+            readonly nameFi: string | null;
+            readonly organisationType: OrganizationTypeChoice;
           } | null;
-          contactPerson: {
-            id: string;
-            lastName: string;
-            firstName: string;
+          readonly contactPerson: {
+            readonly id: string;
+            readonly lastName: string;
+            readonly firstName: string;
           } | null;
         };
-        ageGroup: {
-          id: string;
-          pk: number | null;
-          minimum: number;
-          maximum: number | null;
+        readonly ageGroup: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly minimum: number;
+          readonly maximum: number | null;
         } | null;
       } | null;
     } | null>;
-    pageInfo: { endCursor: string | null; hasNextPage: boolean };
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
   } | null;
 };
 
 export type AllocatedTimeSlotsQueryVariables = Exact<{
   applicationRound: Scalars["Int"]["input"];
   allocatedUnit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   applicantType?: InputMaybe<
-    Array<InputMaybe<ApplicantTypeChoice>> | InputMaybe<ApplicantTypeChoice>
+    | ReadonlyArray<InputMaybe<ApplicantTypeChoice>>
+    | InputMaybe<ApplicantTypeChoice>
   >;
   applicationSectionStatus?: InputMaybe<
-    | Array<InputMaybe<ApplicationSectionStatusChoice>>
+    | ReadonlyArray<InputMaybe<ApplicationSectionStatusChoice>>
     | InputMaybe<ApplicationSectionStatusChoice>
   >;
   allocatedReservationUnit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
-  dayOfTheWeek?: InputMaybe<Array<InputMaybe<Weekday>> | InputMaybe<Weekday>>;
+  dayOfTheWeek?: InputMaybe<
+    ReadonlyArray<InputMaybe<Weekday>> | InputMaybe<Weekday>
+  >;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   accessCodeState?: InputMaybe<
-    Array<InputMaybe<AccessCodeState>> | InputMaybe<AccessCodeState>
+    ReadonlyArray<InputMaybe<AccessCodeState>> | InputMaybe<AccessCodeState>
   >;
   orderBy?: InputMaybe<
-    | Array<InputMaybe<AllocatedTimeSlotOrderingChoices>>
+    | ReadonlyArray<InputMaybe<AllocatedTimeSlotOrderingChoices>>
     | InputMaybe<AllocatedTimeSlotOrderingChoices>
   >;
   after?: InputMaybe<Scalars["String"]["input"]>;
@@ -7268,109 +7859,122 @@ export type AllocatedTimeSlotsQueryVariables = Exact<{
 }>;
 
 export type AllocatedTimeSlotsQuery = {
-  allocatedTimeSlots: {
-    totalCount: number | null;
-    edges: Array<{
-      node: {
-        id: string;
-        pk: number | null;
-        dayOfTheWeek: Weekday;
-        endTime: string;
-        beginTime: string;
-        recurringReservation: {
-          id: string;
-          pk: number | null;
-          shouldHaveActiveAccessCode: boolean | null;
-          isAccessCodeIsActiveCorrect: boolean | null;
-          reservations: Array<{ id: string; pk: number | null }>;
+  readonly allocatedTimeSlots: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly dayOfTheWeek: Weekday;
+        readonly endTime: string;
+        readonly beginTime: string;
+        readonly recurringReservation: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly shouldHaveActiveAccessCode: boolean | null;
+          readonly isAccessCodeIsActiveCorrect: boolean | null;
+          readonly reservations: ReadonlyArray<{
+            readonly id: string;
+            readonly pk: number | null;
+          }>;
         } | null;
-        reservationUnitOption: {
-          id: string;
-          rejected: boolean;
-          locked: boolean;
-          preferredOrder: number;
-          applicationSection: {
-            id: string;
-            pk: number | null;
-            name: string;
-            reservationsEndDate: string;
-            reservationsBeginDate: string;
-            reservationMinDuration: number;
-            reservationMaxDuration: number;
-            application: {
-              pk: number | null;
-              id: string;
-              applicantType: ApplicantTypeChoice | null;
-              organisation: {
-                id: string;
-                nameFi: string | null;
-                organisationType: OrganizationTypeChoice;
+        readonly reservationUnitOption: {
+          readonly id: string;
+          readonly rejected: boolean;
+          readonly locked: boolean;
+          readonly preferredOrder: number;
+          readonly applicationSection: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly name: string;
+            readonly reservationsEndDate: string;
+            readonly reservationsBeginDate: string;
+            readonly reservationMinDuration: number;
+            readonly reservationMaxDuration: number;
+            readonly application: {
+              readonly pk: number | null;
+              readonly id: string;
+              readonly applicantType: ApplicantTypeChoice | null;
+              readonly organisation: {
+                readonly id: string;
+                readonly nameFi: string | null;
+                readonly organisationType: OrganizationTypeChoice;
               } | null;
-              contactPerson: {
-                id: string;
-                lastName: string;
-                firstName: string;
+              readonly contactPerson: {
+                readonly id: string;
+                readonly lastName: string;
+                readonly firstName: string;
               } | null;
             };
           };
-          reservationUnit: {
-            id: string;
-            nameFi: string | null;
-            unit: { id: string; nameFi: string | null } | null;
+          readonly reservationUnit: {
+            readonly id: string;
+            readonly nameFi: string | null;
+            readonly unit: {
+              readonly id: string;
+              readonly nameFi: string | null;
+            } | null;
           };
         };
       } | null;
     } | null>;
-    pageInfo: { endCursor: string | null; hasNextPage: boolean };
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
   } | null;
 };
 
 export type ApplicationRoundBaseFragment = {
-  id: string;
-  pk: number | null;
-  nameFi: string | null;
-  status: ApplicationRoundStatusChoice | null;
-  applicationPeriodBegin: string;
-  applicationPeriodEnd: string;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly status: ApplicationRoundStatusChoice | null;
+  readonly applicationPeriodBegin: string;
+  readonly applicationPeriodEnd: string;
 };
 
 export type ApplicationRoundsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ApplicationRoundsQuery = {
-  applicationRounds: {
-    edges: Array<{
-      node: {
-        reservationPeriodBegin: string;
-        reservationPeriodEnd: string;
-        applicationsCount: number | null;
-        reservationUnitCount: number | null;
-        statusTimestamp: string | null;
-        id: string;
-        pk: number | null;
-        nameFi: string | null;
-        status: ApplicationRoundStatusChoice | null;
-        applicationPeriodBegin: string;
-        applicationPeriodEnd: string;
+  readonly applicationRounds: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly reservationPeriodBegin: string;
+        readonly reservationPeriodEnd: string;
+        readonly applicationsCount: number | null;
+        readonly reservationUnitCount: number | null;
+        readonly statusTimestamp: string | null;
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly status: ApplicationRoundStatusChoice | null;
+        readonly applicationPeriodBegin: string;
+        readonly applicationPeriodEnd: string;
       } | null;
     } | null>;
   } | null;
 };
 
 export type ApplicationRoundAdminFragment = {
-  applicationsCount: number | null;
-  isSettingHandledAllowed: boolean | null;
-  reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice | null;
-  id: string;
-  pk: number | null;
-  nameFi: string | null;
-  status: ApplicationRoundStatusChoice | null;
-  applicationPeriodBegin: string;
-  applicationPeriodEnd: string;
-  reservationUnits: Array<{
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    unit: { id: string; pk: number | null; nameFi: string | null } | null;
+  readonly applicationsCount: number | null;
+  readonly isSettingHandledAllowed: boolean | null;
+  readonly reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly status: ApplicationRoundStatusChoice | null;
+  readonly applicationPeriodBegin: string;
+  readonly applicationPeriodEnd: string;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly unit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    } | null;
   }>;
 };
 
@@ -7379,21 +7983,25 @@ export type ApplicationRoundQueryVariables = Exact<{
 }>;
 
 export type ApplicationRoundQuery = {
-  applicationRound: {
-    applicationsCount: number | null;
-    isSettingHandledAllowed: boolean | null;
-    reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice | null;
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    status: ApplicationRoundStatusChoice | null;
-    applicationPeriodBegin: string;
-    applicationPeriodEnd: string;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      unit: { id: string; pk: number | null; nameFi: string | null } | null;
+  readonly applicationRound: {
+    readonly applicationsCount: number | null;
+    readonly isSettingHandledAllowed: boolean | null;
+    readonly reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice | null;
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly status: ApplicationRoundStatusChoice | null;
+    readonly applicationPeriodBegin: string;
+    readonly applicationPeriodEnd: string;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly unit: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
     }>;
   } | null;
 };
@@ -7403,118 +8011,125 @@ export type ApplicationAdminQueryVariables = Exact<{
 }>;
 
 export type ApplicationAdminQuery = {
-  application: {
-    workingMemo: string;
-    pk: number | null;
-    id: string;
-    status: ApplicationStatusChoice | null;
-    lastModifiedDate: string;
-    applicantType: ApplicantTypeChoice | null;
-    additionalInformation: string | null;
-    user: { id: string; email: string } | null;
-    applicationRound: { id: string; pk: number | null; nameFi: string | null };
-    applicationSections: Array<{
-      allocations: number | null;
-      id: string;
-      pk: number | null;
-      name: string;
-      status: ApplicationSectionStatusChoice | null;
-      reservationMaxDuration: number;
-      numPersons: number;
-      reservationsEndDate: string;
-      reservationsBeginDate: string;
-      appliedReservationsPerWeek: number;
-      reservationMinDuration: number;
-      suitableTimeRanges: Array<{
-        id: string;
-        pk: number | null;
-        beginTime: string;
-        endTime: string;
-        dayOfTheWeek: Weekday;
-        priority: Priority;
+  readonly application: {
+    readonly workingMemo: string;
+    readonly pk: number | null;
+    readonly id: string;
+    readonly status: ApplicationStatusChoice | null;
+    readonly lastModifiedDate: string;
+    readonly applicantType: ApplicantTypeChoice | null;
+    readonly additionalInformation: string | null;
+    readonly user: { readonly id: string; readonly email: string } | null;
+    readonly applicationRound: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    };
+    readonly applicationSections: ReadonlyArray<{
+      readonly allocations: number | null;
+      readonly id: string;
+      readonly pk: number | null;
+      readonly name: string;
+      readonly status: ApplicationSectionStatusChoice | null;
+      readonly reservationMaxDuration: number;
+      readonly numPersons: number;
+      readonly reservationsEndDate: string;
+      readonly reservationsBeginDate: string;
+      readonly appliedReservationsPerWeek: number;
+      readonly reservationMinDuration: number;
+      readonly suitableTimeRanges: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly beginTime: string;
+        readonly endTime: string;
+        readonly dayOfTheWeek: Weekday;
+        readonly priority: Priority;
       }>;
-      purpose: {
-        id: string;
-        pk: number | null;
-        nameFi: string | null;
-        nameSv: string | null;
-        nameEn: string | null;
+      readonly purpose: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly nameSv: string | null;
+        readonly nameEn: string | null;
       } | null;
-      reservationUnitOptions: Array<{
-        id: string;
-        rejected: boolean;
-        pk: number | null;
-        preferredOrder: number;
-        allocatedTimeSlots: Array<{ pk: number | null; id: string }>;
-        reservationUnit: {
-          id: string;
-          pk: number | null;
-          nameFi: string | null;
-          nameEn: string | null;
-          nameSv: string | null;
-          applicationRoundTimeSlots: Array<{
-            id: string;
-            pk: number | null;
-            weekday: number;
-            closed: boolean;
-            reservableTimes: Array<{
-              begin: string;
-              end: string;
+      readonly reservationUnitOptions: ReadonlyArray<{
+        readonly id: string;
+        readonly rejected: boolean;
+        readonly pk: number | null;
+        readonly preferredOrder: number;
+        readonly allocatedTimeSlots: ReadonlyArray<{
+          readonly pk: number | null;
+          readonly id: string;
+        }>;
+        readonly reservationUnit: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly nameFi: string | null;
+          readonly nameEn: string | null;
+          readonly nameSv: string | null;
+          readonly applicationRoundTimeSlots: ReadonlyArray<{
+            readonly id: string;
+            readonly pk: number | null;
+            readonly weekday: number;
+            readonly closed: boolean;
+            readonly reservableTimes: ReadonlyArray<{
+              readonly begin: string;
+              readonly end: string;
             } | null> | null;
           }>;
-          unit: {
-            id: string;
-            pk: number | null;
-            nameFi: string | null;
-            nameEn: string | null;
-            nameSv: string | null;
+          readonly unit: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly nameFi: string | null;
+            readonly nameEn: string | null;
+            readonly nameSv: string | null;
           } | null;
         };
       }>;
-      ageGroup: {
-        id: string;
-        pk: number | null;
-        minimum: number;
-        maximum: number | null;
+      readonly ageGroup: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly minimum: number;
+        readonly maximum: number | null;
       } | null;
     }> | null;
-    contactPerson: {
-      id: string;
-      pk: number | null;
-      firstName: string;
-      lastName: string;
-      email: string | null;
-      phoneNumber: string | null;
+    readonly contactPerson: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly firstName: string;
+      readonly lastName: string;
+      readonly email: string | null;
+      readonly phoneNumber: string | null;
     } | null;
-    organisation: {
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      identifier: string | null;
-      organisationType: OrganizationTypeChoice;
-      coreBusinessFi: string | null;
-      yearEstablished: number | null;
-      address: {
-        id: string;
-        pk: number | null;
-        postCode: string;
-        streetAddressFi: string | null;
-        cityFi: string | null;
+    readonly organisation: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly identifier: string | null;
+      readonly organisationType: OrganizationTypeChoice;
+      readonly coreBusinessFi: string | null;
+      readonly yearEstablished: number | null;
+      readonly address: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly postCode: string;
+        readonly streetAddressFi: string | null;
+        readonly cityFi: string | null;
       } | null;
     } | null;
-    homeCity: {
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      nameEn: string | null;
-      nameSv: string | null;
+    readonly homeCity: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
     } | null;
-    billingAddress: {
-      id: string;
-      pk: number | null;
-      postCode: string;
-      streetAddressFi: string | null;
-      cityFi: string | null;
+    readonly billingAddress: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly postCode: string;
+      readonly streetAddressFi: string | null;
+      readonly cityFi: string | null;
     } | null;
   } | null;
 };
@@ -7524,7 +8139,7 @@ export type RejectAllSectionOptionsMutationVariables = Exact<{
 }>;
 
 export type RejectAllSectionOptionsMutation = {
-  rejectAllSectionOptions: { pk: number | null } | null;
+  readonly rejectAllSectionOptions: { readonly pk: number | null } | null;
 };
 
 export type RestoreAllSectionOptionsMutationVariables = Exact<{
@@ -7532,7 +8147,7 @@ export type RestoreAllSectionOptionsMutationVariables = Exact<{
 }>;
 
 export type RestoreAllSectionOptionsMutation = {
-  restoreAllSectionOptions: { pk: number | null } | null;
+  readonly restoreAllSectionOptions: { readonly pk: number | null } | null;
 };
 
 export type RejectAllApplicationOptionsMutationVariables = Exact<{
@@ -7540,7 +8155,7 @@ export type RejectAllApplicationOptionsMutationVariables = Exact<{
 }>;
 
 export type RejectAllApplicationOptionsMutation = {
-  rejectAllApplicationOptions: { pk: number | null } | null;
+  readonly rejectAllApplicationOptions: { readonly pk: number | null } | null;
 };
 
 export type RestoreAllApplicationOptionsMutationVariables = Exact<{
@@ -7548,7 +8163,7 @@ export type RestoreAllApplicationOptionsMutationVariables = Exact<{
 }>;
 
 export type RestoreAllApplicationOptionsMutation = {
-  restoreAllApplicationOptions: { pk: number | null } | null;
+  readonly restoreAllApplicationOptions: { readonly pk: number | null } | null;
 };
 
 export type CreateStaffReservationMutationVariables = Exact<{
@@ -7556,35 +8171,43 @@ export type CreateStaffReservationMutationVariables = Exact<{
 }>;
 
 export type CreateStaffReservationMutation = {
-  createStaffReservation: { pk: number | null } | null;
+  readonly createStaffReservation: { readonly pk: number | null } | null;
 };
 
 export type OptionsQueryVariables = Exact<{
   reservationPurposesOrderBy?: InputMaybe<
-    | Array<InputMaybe<ReservationPurposeOrderingChoices>>
+    | ReadonlyArray<InputMaybe<ReservationPurposeOrderingChoices>>
     | InputMaybe<ReservationPurposeOrderingChoices>
   >;
 }>;
 
 export type OptionsQuery = {
-  reservationPurposes: {
-    edges: Array<{
-      node: { id: string; pk: number | null; nameFi: string | null } | null;
-    } | null>;
-  } | null;
-  ageGroups: {
-    edges: Array<{
-      node: {
-        id: string;
-        pk: number | null;
-        minimum: number;
-        maximum: number | null;
+  readonly reservationPurposes: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
       } | null;
     } | null>;
   } | null;
-  cities: {
-    edges: Array<{
-      node: { id: string; nameFi: string | null; pk: number | null } | null;
+  readonly ageGroups: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly minimum: number;
+        readonly maximum: number | null;
+      } | null;
+    } | null>;
+  } | null;
+  readonly cities: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly pk: number | null;
+      } | null;
     } | null>;
   } | null;
 };
@@ -7594,21 +8217,24 @@ export type UnitViewQueryVariables = Exact<{
 }>;
 
 export type UnitViewQuery = {
-  unit: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    location: {
-      id: string;
-      addressStreetFi: string | null;
-      addressZip: string;
-      addressCityFi: string | null;
+  readonly unit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly location: {
+      readonly id: string;
+      readonly addressStreetFi: string | null;
+      readonly addressZip: string;
+      readonly addressCityFi: string | null;
     } | null;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      spaces: Array<{ id: string; pk: number | null }>;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly spaces: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+      }>;
     }>;
   } | null;
 };
@@ -7617,7 +8243,7 @@ export type ReservationUnitsByUnitQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   pk: Scalars["Int"]["input"];
   state?: InputMaybe<
-    | Array<InputMaybe<ReservationStateChoice>>
+    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
     | InputMaybe<ReservationStateChoice>
   >;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
@@ -7625,52 +8251,61 @@ export type ReservationUnitsByUnitQueryVariables = Exact<{
 }>;
 
 export type ReservationUnitsByUnitQuery = {
-  unit: {
-    id: string;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      isDraft: boolean;
-      authentication: Authentication;
-      spaces: Array<{ id: string; pk: number | null }>;
-      reservationUnitType: { id: string; pk: number | null } | null;
+  readonly unit: {
+    readonly id: string;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly isDraft: boolean;
+      readonly authentication: Authentication;
+      readonly spaces: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+      }>;
+      readonly reservationUnitType: {
+        readonly id: string;
+        readonly pk: number | null;
+      } | null;
     }>;
   } | null;
-  affectingReservations: Array<{
-    name: string | null;
-    numPersons: number | null;
-    calendarUrl: string | null;
-    affectedReservationUnits: Array<number | null> | null;
-    id: string;
-    pk: number | null;
-    begin: string;
-    end: string;
-    createdAt: string | null;
-    state: ReservationStateChoice | null;
-    type: ReservationTypeChoice | null;
-    isBlocked: boolean | null;
-    workingMemo: string | null;
-    reserveeName: string | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      unit: { id: string; pk: number | null } | null;
+  readonly affectingReservations: ReadonlyArray<{
+    readonly name: string | null;
+    readonly numPersons: number | null;
+    readonly calendarUrl: string | null;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+    readonly id: string;
+    readonly pk: number | null;
+    readonly begin: string;
+    readonly end: string;
+    readonly createdAt: string | null;
+    readonly state: ReservationStateChoice | null;
+    readonly type: ReservationTypeChoice | null;
+    readonly isBlocked: boolean | null;
+    readonly workingMemo: string | null;
+    readonly reserveeName: string | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly unit: { readonly id: string; readonly pk: number | null } | null;
     }>;
-    paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-    user: {
-      id: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-      pk: number | null;
+    readonly paymentOrder: ReadonlyArray<{
+      readonly id: string;
+      readonly status: OrderStatus | null;
+    }>;
+    readonly user: {
+      readonly id: string;
+      readonly email: string;
+      readonly firstName: string;
+      readonly lastName: string;
+      readonly pk: number | null;
     } | null;
   }> | null;
 };
@@ -7680,42 +8315,52 @@ export type ReservationUnitQueryVariables = Exact<{
 }>;
 
 export type ReservationUnitQuery = {
-  reservationUnit: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    maxPersons: number | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    reservationStartInterval: ReservationStartInterval;
-    authentication: Authentication;
-    termsOfUseFi: string | null;
-    minPersons: number | null;
-    unit: { id: string; pk: number | null; nameFi: string | null } | null;
-    serviceSpecificTerms: {
-      id: string;
-      textFi: string | null;
-      nameFi: string | null;
+  readonly reservationUnit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly maxPersons: number | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly reservationStartInterval: ReservationStartInterval;
+    readonly authentication: Authentication;
+    readonly termsOfUseFi: string | null;
+    readonly minPersons: number | null;
+    readonly unit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
     } | null;
-    paymentTerms: {
-      id: string;
-      textFi: string | null;
-      nameFi: string | null;
+    readonly serviceSpecificTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly nameFi: string | null;
     } | null;
-    pricingTerms: {
-      id: string;
-      textFi: string | null;
-      nameFi: string | null;
+    readonly paymentTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly nameFi: string | null;
     } | null;
-    cancellationTerms: {
-      id: string;
-      textFi: string | null;
-      nameFi: string | null;
+    readonly pricingTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly nameFi: string | null;
     } | null;
-    metadataSet: {
-      id: string;
-      requiredFields: Array<{ id: string; fieldName: string }>;
-      supportedFields: Array<{ id: string; fieldName: string }>;
+    readonly cancellationTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly nameFi: string | null;
+    } | null;
+    readonly metadataSet: {
+      readonly id: string;
+      readonly requiredFields: ReadonlyArray<{
+        readonly id: string;
+        readonly fieldName: string;
+      }>;
+      readonly supportedFields: ReadonlyArray<{
+        readonly id: string;
+        readonly fieldName: string;
+      }>;
     } | null;
   } | null;
 };
@@ -7725,17 +8370,17 @@ export type RecurringReservationUnitQueryVariables = Exact<{
 }>;
 
 export type RecurringReservationUnitQuery = {
-  unit: {
-    id: string;
-    nameFi: string | null;
-    pk: number | null;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      reservationStartInterval: ReservationStartInterval;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
+  readonly unit: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly pk: number | null;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly reservationStartInterval: ReservationStartInterval;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
     }>;
   } | null;
 };
@@ -7744,7 +8389,7 @@ export type ReservationUnitCalendarQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   pk: Scalars["Int"]["input"];
   state?: InputMaybe<
-    | Array<InputMaybe<ReservationStateChoice>>
+    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
     | InputMaybe<ReservationStateChoice>
   >;
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
@@ -7752,76 +8397,85 @@ export type ReservationUnitCalendarQueryVariables = Exact<{
 }>;
 
 export type ReservationUnitCalendarQuery = {
-  reservationUnit: {
-    id: string;
-    pk: number | null;
-    reservations: Array<{
-      name: string | null;
-      numPersons: number | null;
-      calendarUrl: string | null;
-      affectedReservationUnits: Array<number | null> | null;
-      id: string;
-      pk: number | null;
-      begin: string;
-      end: string;
-      createdAt: string | null;
-      state: ReservationStateChoice | null;
-      type: ReservationTypeChoice | null;
-      isBlocked: boolean | null;
-      workingMemo: string | null;
-      reserveeName: string | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      reservationUnits: Array<{
-        id: string;
-        pk: number | null;
-        nameFi: string | null;
-        bufferTimeBefore: number;
-        bufferTimeAfter: number;
-        unit: { id: string; pk: number | null } | null;
+  readonly reservationUnit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly reservations: ReadonlyArray<{
+      readonly name: string | null;
+      readonly numPersons: number | null;
+      readonly calendarUrl: string | null;
+      readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+      readonly id: string;
+      readonly pk: number | null;
+      readonly begin: string;
+      readonly end: string;
+      readonly createdAt: string | null;
+      readonly state: ReservationStateChoice | null;
+      readonly type: ReservationTypeChoice | null;
+      readonly isBlocked: boolean | null;
+      readonly workingMemo: string | null;
+      readonly reserveeName: string | null;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly reservationUnits: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly bufferTimeBefore: number;
+        readonly bufferTimeAfter: number;
+        readonly unit: {
+          readonly id: string;
+          readonly pk: number | null;
+        } | null;
       }>;
-      paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-      user: {
-        id: string;
-        email: string;
-        firstName: string;
-        lastName: string;
-        pk: number | null;
+      readonly paymentOrder: ReadonlyArray<{
+        readonly id: string;
+        readonly status: OrderStatus | null;
+      }>;
+      readonly user: {
+        readonly id: string;
+        readonly email: string;
+        readonly firstName: string;
+        readonly lastName: string;
+        readonly pk: number | null;
       } | null;
     }> | null;
   } | null;
-  affectingReservations: Array<{
-    name: string | null;
-    numPersons: number | null;
-    calendarUrl: string | null;
-    affectedReservationUnits: Array<number | null> | null;
-    id: string;
-    pk: number | null;
-    begin: string;
-    end: string;
-    createdAt: string | null;
-    state: ReservationStateChoice | null;
-    type: ReservationTypeChoice | null;
-    isBlocked: boolean | null;
-    workingMemo: string | null;
-    reserveeName: string | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      unit: { id: string; pk: number | null } | null;
+  readonly affectingReservations: ReadonlyArray<{
+    readonly name: string | null;
+    readonly numPersons: number | null;
+    readonly calendarUrl: string | null;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+    readonly id: string;
+    readonly pk: number | null;
+    readonly begin: string;
+    readonly end: string;
+    readonly createdAt: string | null;
+    readonly state: ReservationStateChoice | null;
+    readonly type: ReservationTypeChoice | null;
+    readonly isBlocked: boolean | null;
+    readonly workingMemo: string | null;
+    readonly reserveeName: string | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly unit: { readonly id: string; readonly pk: number | null } | null;
     }>;
-    paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-    user: {
-      id: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-      pk: number | null;
+    readonly paymentOrder: ReadonlyArray<{
+      readonly id: string;
+      readonly status: OrderStatus | null;
+    }>;
+    readonly user: {
+      readonly id: string;
+      readonly email: string;
+      readonly firstName: string;
+      readonly lastName: string;
+      readonly pk: number | null;
     } | null;
   }> | null;
 };
@@ -7831,18 +8485,21 @@ export type CreateReservationSeriesMutationVariables = Exact<{
 }>;
 
 export type CreateReservationSeriesMutation = {
-  createReservationSeries: { pk: number | null } | null;
+  readonly createReservationSeries: { readonly pk: number | null } | null;
 };
 
 export type ReservationsInIntervalFragment = {
-  id: string;
-  begin: string;
-  end: string;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  type: ReservationTypeChoice | null;
-  affectedReservationUnits: Array<number | null> | null;
-  recurringReservation: { id: string; pk: number | null } | null;
+  readonly id: string;
+  readonly begin: string;
+  readonly end: string;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly type: ReservationTypeChoice | null;
+  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+  } | null;
 };
 
 export type ReservationTimesInReservationUnitQueryVariables = Exact<{
@@ -7851,34 +8508,40 @@ export type ReservationTimesInReservationUnitQueryVariables = Exact<{
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
   state?: InputMaybe<
-    | Array<InputMaybe<ReservationStateChoice>>
+    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
     | InputMaybe<ReservationStateChoice>
   >;
 }>;
 
 export type ReservationTimesInReservationUnitQuery = {
-  reservationUnit: {
-    id: string;
-    reservations: Array<{
-      id: string;
-      begin: string;
-      end: string;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      type: ReservationTypeChoice | null;
-      affectedReservationUnits: Array<number | null> | null;
-      recurringReservation: { id: string; pk: number | null } | null;
+  readonly reservationUnit: {
+    readonly id: string;
+    readonly reservations: ReadonlyArray<{
+      readonly id: string;
+      readonly begin: string;
+      readonly end: string;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly type: ReservationTypeChoice | null;
+      readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+      readonly recurringReservation: {
+        readonly id: string;
+        readonly pk: number | null;
+      } | null;
     }> | null;
   } | null;
-  affectingReservations: Array<{
-    id: string;
-    begin: string;
-    end: string;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    type: ReservationTypeChoice | null;
-    affectedReservationUnits: Array<number | null> | null;
-    recurringReservation: { id: string; pk: number | null } | null;
+  readonly affectingReservations: ReadonlyArray<{
+    readonly id: string;
+    readonly begin: string;
+    readonly end: string;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly type: ReservationTypeChoice | null;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+    readonly recurringReservation: {
+      readonly id: string;
+      readonly pk: number | null;
+    } | null;
   }> | null;
 };
 
@@ -7887,7 +8550,7 @@ export type BannerNotificationCreateMutationVariables = Exact<{
 }>;
 
 export type BannerNotificationCreateMutation = {
-  createBannerNotification: { pk: number | null } | null;
+  readonly createBannerNotification: { readonly pk: number | null } | null;
 };
 
 export type BannerNotificationUpdateMutationVariables = Exact<{
@@ -7895,7 +8558,7 @@ export type BannerNotificationUpdateMutationVariables = Exact<{
 }>;
 
 export type BannerNotificationUpdateMutation = {
-  updateBannerNotification: { pk: number | null } | null;
+  readonly updateBannerNotification: { readonly pk: number | null } | null;
 };
 
 export type BannerNotificationDeleteMutationVariables = Exact<{
@@ -7903,7 +8566,9 @@ export type BannerNotificationDeleteMutationVariables = Exact<{
 }>;
 
 export type BannerNotificationDeleteMutation = {
-  deleteBannerNotification: { deleted: boolean | null } | null;
+  readonly deleteBannerNotification: {
+    readonly deleted: boolean | null;
+  } | null;
 };
 
 export type SearchReservationUnitsQueryVariables = Exact<{
@@ -7915,61 +8580,75 @@ export type SearchReservationUnitsQueryVariables = Exact<{
   surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
   surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
   unit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   reservationUnitType?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   orderBy?: InputMaybe<
-    | Array<InputMaybe<ReservationUnitOrderingChoices>>
+    | ReadonlyArray<InputMaybe<ReservationUnitOrderingChoices>>
     | InputMaybe<ReservationUnitOrderingChoices>
   >;
   publishingState?: InputMaybe<
-    | Array<InputMaybe<ReservationUnitPublishingState>>
+    | ReadonlyArray<InputMaybe<ReservationUnitPublishingState>>
     | InputMaybe<ReservationUnitPublishingState>
   >;
 }>;
 
 export type SearchReservationUnitsQuery = {
-  reservationUnits: {
-    totalCount: number | null;
-    edges: Array<{
-      node: {
-        id: string;
-        pk: number | null;
-        nameFi: string | null;
-        maxPersons: number | null;
-        surfaceArea: number | null;
-        publishingState: ReservationUnitPublishingState | null;
-        reservationState: ReservationUnitReservationState | null;
-        unit: { id: string; nameFi: string | null; pk: number | null } | null;
-        reservationUnitType: { id: string; nameFi: string | null } | null;
+  readonly reservationUnits: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly maxPersons: number | null;
+        readonly surfaceArea: number | null;
+        readonly publishingState: ReservationUnitPublishingState | null;
+        readonly reservationState: ReservationUnitReservationState | null;
+        readonly unit: {
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly pk: number | null;
+        } | null;
+        readonly reservationUnitType: {
+          readonly id: string;
+          readonly nameFi: string | null;
+        } | null;
       } | null;
     } | null>;
-    pageInfo: { hasNextPage: boolean; endCursor: string | null };
+    readonly pageInfo: {
+      readonly hasNextPage: boolean;
+      readonly endCursor: string | null;
+    };
   } | null;
 };
 
 export type ApprovalDialogFieldsFragment = {
-  pk: number | null;
-  price: string | null;
-  handlingDetails: string | null;
-  applyingForFreeOfCharge: boolean | null;
-  freeOfChargeReason: string | null;
-  id: string;
-  begin: string;
-  end: string;
-  reservationUnits: Array<{
-    id: string;
-    pricings: Array<{
-      id: string;
-      begins: string;
-      priceUnit: PriceUnit;
-      lowestPrice: string;
-      highestPrice: string;
-      taxPercentage: { id: string; pk: number | null; value: string };
+  readonly pk: number | null;
+  readonly price: string | null;
+  readonly handlingDetails: string | null;
+  readonly applyingForFreeOfCharge: boolean | null;
+  readonly freeOfChargeReason: string | null;
+  readonly id: string;
+  readonly begin: string;
+  readonly end: string;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly pricings: ReadonlyArray<{
+      readonly id: string;
+      readonly begins: string;
+      readonly priceUnit: PriceUnit;
+      readonly lowestPrice: string;
+      readonly highestPrice: string;
+      readonly taxPercentage: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly value: string;
+      };
     }>;
   }>;
 };
@@ -7979,10 +8658,10 @@ export type ChangeReservationAccessCodeSingleMutationVariables = Exact<{
 }>;
 
 export type ChangeReservationAccessCodeSingleMutation = {
-  staffChangeReservationAccessCode: {
-    pk: number | null;
-    accessCodeIsActive: boolean | null;
-    accessCodeGeneratedAt: string | null;
+  readonly staffChangeReservationAccessCode: {
+    readonly pk: number | null;
+    readonly accessCodeIsActive: boolean | null;
+    readonly accessCodeGeneratedAt: string | null;
   } | null;
 };
 
@@ -7991,10 +8670,10 @@ export type RepairReservationAccessCodeSingleMutationVariables = Exact<{
 }>;
 
 export type RepairReservationAccessCodeSingleMutation = {
-  staffRepairReservationAccessCode: {
-    pk: number | null;
-    accessCodeIsActive: boolean | null;
-    accessCodeGeneratedAt: string | null;
+  readonly staffRepairReservationAccessCode: {
+    readonly pk: number | null;
+    readonly accessCodeIsActive: boolean | null;
+    readonly accessCodeGeneratedAt: string | null;
   } | null;
 };
 
@@ -8003,10 +8682,10 @@ export type ChangeReservationAccessCodeSeriesMutationVariables = Exact<{
 }>;
 
 export type ChangeReservationAccessCodeSeriesMutation = {
-  changeReservationSeriesAccessCode: {
-    pk: number | null;
-    accessCodeIsActive: boolean | null;
-    accessCodeGeneratedAt: string | null;
+  readonly changeReservationSeriesAccessCode: {
+    readonly pk: number | null;
+    readonly accessCodeIsActive: boolean | null;
+    readonly accessCodeGeneratedAt: string | null;
   } | null;
 };
 
@@ -8015,10 +8694,10 @@ export type RepairReservationAccessCodeSeriesMutationVariables = Exact<{
 }>;
 
 export type RepairReservationAccessCodeSeriesMutation = {
-  repairReservationSeriesAccessCode: {
-    pk: number | null;
-    accessCodeIsActive: boolean | null;
-    accessCodeGeneratedAt: string | null;
+  readonly repairReservationSeriesAccessCode: {
+    readonly pk: number | null;
+    readonly accessCodeIsActive: boolean | null;
+    readonly accessCodeGeneratedAt: string | null;
   } | null;
 };
 
@@ -8027,18 +8706,21 @@ export type ReservationApplicationLinkQueryVariables = Exact<{
 }>;
 
 export type ReservationApplicationLinkQuery = {
-  recurringReservation: {
-    id: string;
-    allocatedTimeSlot: {
-      id: string;
-      pk: number | null;
-      reservationUnitOption: {
-        id: string;
-        pk: number | null;
-        applicationSection: {
-          id: string;
-          pk: number | null;
-          application: { id: string; pk: number | null };
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly allocatedTimeSlot: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly reservationUnitOption: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly applicationSection: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly application: {
+            readonly id: string;
+            readonly pk: number | null;
+          };
         };
       };
     } | null;
@@ -8046,15 +8728,18 @@ export type ReservationApplicationLinkQuery = {
 };
 
 export type ReservationTitleSectionFieldsFragment = {
-  id: string;
-  createdAt: string | null;
-  state: ReservationStateChoice | null;
-  type: ReservationTypeChoice | null;
-  name: string | null;
-  pk: number | null;
-  reserveeName: string | null;
-  recurringReservation: { id: string } | null;
-  paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
+  readonly id: string;
+  readonly createdAt: string | null;
+  readonly state: ReservationStateChoice | null;
+  readonly type: ReservationTypeChoice | null;
+  readonly name: string | null;
+  readonly pk: number | null;
+  readonly reserveeName: string | null;
+  readonly recurringReservation: { readonly id: string } | null;
+  readonly paymentOrder: ReadonlyArray<{
+    readonly id: string;
+    readonly status: OrderStatus | null;
+  }>;
 };
 
 export type ReservationEditPageQueryVariables = Exact<{
@@ -8062,155 +8747,183 @@ export type ReservationEditPageQueryVariables = Exact<{
 }>;
 
 export type ReservationEditPageQuery = {
-  reservation: {
-    id: string;
-    pk: number | null;
-    begin: string;
-    end: string;
-    createdAt: string | null;
-    state: ReservationStateChoice | null;
-    type: ReservationTypeChoice | null;
-    isBlocked: boolean | null;
-    workingMemo: string | null;
-    reserveeName: string | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    numPersons: number | null;
-    name: string | null;
-    description: string | null;
-    freeOfChargeReason: string | null;
-    applyingForFreeOfCharge: boolean | null;
-    reserveeFirstName: string | null;
-    reserveeLastName: string | null;
-    reserveeEmail: string | null;
-    reserveePhone: string | null;
-    reserveeType: CustomerTypeChoice | null;
-    reserveeOrganisationName: string | null;
-    reserveeId: string | null;
-    reserveeIsUnregisteredAssociation: boolean | null;
-    reserveeAddressStreet: string | null;
-    reserveeAddressCity: string | null;
-    reserveeAddressZip: string | null;
-    billingFirstName: string | null;
-    billingLastName: string | null;
-    billingPhone: string | null;
-    billingEmail: string | null;
-    billingAddressStreet: string | null;
-    billingAddressCity: string | null;
-    billingAddressZip: string | null;
-    recurringReservation: {
-      id: string;
-      pk: number | null;
-      name: string;
-      beginDate: string | null;
-      beginTime: string | null;
-      endDate: string | null;
-      endTime: string | null;
-      weekdays: Array<number | null> | null;
+  readonly reservation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly begin: string;
+    readonly end: string;
+    readonly createdAt: string | null;
+    readonly state: ReservationStateChoice | null;
+    readonly type: ReservationTypeChoice | null;
+    readonly isBlocked: boolean | null;
+    readonly workingMemo: string | null;
+    readonly reserveeName: string | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly numPersons: number | null;
+    readonly name: string | null;
+    readonly description: string | null;
+    readonly freeOfChargeReason: string | null;
+    readonly applyingForFreeOfCharge: boolean | null;
+    readonly reserveeFirstName: string | null;
+    readonly reserveeLastName: string | null;
+    readonly reserveeEmail: string | null;
+    readonly reserveePhone: string | null;
+    readonly reserveeType: CustomerTypeChoice | null;
+    readonly reserveeOrganisationName: string | null;
+    readonly reserveeId: string | null;
+    readonly reserveeIsUnregisteredAssociation: boolean | null;
+    readonly reserveeAddressStreet: string | null;
+    readonly reserveeAddressCity: string | null;
+    readonly reserveeAddressZip: string | null;
+    readonly billingFirstName: string | null;
+    readonly billingLastName: string | null;
+    readonly billingPhone: string | null;
+    readonly billingEmail: string | null;
+    readonly billingAddressStreet: string | null;
+    readonly billingAddressCity: string | null;
+    readonly billingAddressZip: string | null;
+    readonly recurringReservation: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly name: string;
+      readonly beginDate: string | null;
+      readonly beginTime: string | null;
+      readonly endDate: string | null;
+      readonly endTime: string | null;
+      readonly weekdays: ReadonlyArray<number | null> | null;
     } | null;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      authentication: Authentication;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      minPersons: number | null;
-      maxPersons: number | null;
-      unit: { id: string; nameFi: string | null } | null;
-      serviceSpecificTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly authentication: Authentication;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly minPersons: number | null;
+      readonly maxPersons: number | null;
+      readonly unit: {
+        readonly id: string;
+        readonly nameFi: string | null;
       } | null;
-      paymentTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
+      readonly serviceSpecificTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly nameFi: string | null;
       } | null;
-      pricingTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
+      readonly paymentTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly nameFi: string | null;
       } | null;
-      cancellationTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
+      readonly pricingTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly nameFi: string | null;
       } | null;
-      metadataSet: {
-        id: string;
-        requiredFields: Array<{ id: string; fieldName: string }>;
-        supportedFields: Array<{ id: string; fieldName: string }>;
+      readonly cancellationTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly nameFi: string | null;
+      } | null;
+      readonly metadataSet: {
+        readonly id: string;
+        readonly requiredFields: ReadonlyArray<{
+          readonly id: string;
+          readonly fieldName: string;
+        }>;
+        readonly supportedFields: ReadonlyArray<{
+          readonly id: string;
+          readonly fieldName: string;
+        }>;
       } | null;
     }>;
-    paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-    user: {
-      id: string;
-      email: string;
-      firstName: string;
-      lastName: string;
+    readonly paymentOrder: ReadonlyArray<{
+      readonly id: string;
+      readonly status: OrderStatus | null;
+    }>;
+    readonly user: {
+      readonly id: string;
+      readonly email: string;
+      readonly firstName: string;
+      readonly lastName: string;
     } | null;
-    ageGroup: {
-      id: string;
-      minimum: number;
-      maximum: number | null;
-      pk: number | null;
+    readonly ageGroup: {
+      readonly id: string;
+      readonly minimum: number;
+      readonly maximum: number | null;
+      readonly pk: number | null;
     } | null;
-    purpose: { id: string; nameFi: string | null; pk: number | null } | null;
-    homeCity: { id: string; nameFi: string | null; pk: number | null } | null;
+    readonly purpose: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly pk: number | null;
+    } | null;
+    readonly homeCity: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly pk: number | null;
+    } | null;
   } | null;
 };
 
 export type ReservationMetaFieldsFragment = {
-  numPersons: number | null;
-  name: string | null;
-  description: string | null;
-  freeOfChargeReason: string | null;
-  applyingForFreeOfCharge: boolean | null;
-  id: string;
-  reserveeFirstName: string | null;
-  reserveeLastName: string | null;
-  reserveeEmail: string | null;
-  reserveePhone: string | null;
-  reserveeType: CustomerTypeChoice | null;
-  reserveeOrganisationName: string | null;
-  reserveeId: string | null;
-  reserveeIsUnregisteredAssociation: boolean | null;
-  reserveeAddressStreet: string | null;
-  reserveeAddressCity: string | null;
-  reserveeAddressZip: string | null;
-  billingFirstName: string | null;
-  billingLastName: string | null;
-  billingPhone: string | null;
-  billingEmail: string | null;
-  billingAddressStreet: string | null;
-  billingAddressCity: string | null;
-  billingAddressZip: string | null;
-  ageGroup: {
-    id: string;
-    minimum: number;
-    maximum: number | null;
-    pk: number | null;
+  readonly numPersons: number | null;
+  readonly name: string | null;
+  readonly description: string | null;
+  readonly freeOfChargeReason: string | null;
+  readonly applyingForFreeOfCharge: boolean | null;
+  readonly id: string;
+  readonly reserveeFirstName: string | null;
+  readonly reserveeLastName: string | null;
+  readonly reserveeEmail: string | null;
+  readonly reserveePhone: string | null;
+  readonly reserveeType: CustomerTypeChoice | null;
+  readonly reserveeOrganisationName: string | null;
+  readonly reserveeId: string | null;
+  readonly reserveeIsUnregisteredAssociation: boolean | null;
+  readonly reserveeAddressStreet: string | null;
+  readonly reserveeAddressCity: string | null;
+  readonly reserveeAddressZip: string | null;
+  readonly billingFirstName: string | null;
+  readonly billingLastName: string | null;
+  readonly billingPhone: string | null;
+  readonly billingEmail: string | null;
+  readonly billingAddressStreet: string | null;
+  readonly billingAddressCity: string | null;
+  readonly billingAddressZip: string | null;
+  readonly ageGroup: {
+    readonly id: string;
+    readonly minimum: number;
+    readonly maximum: number | null;
+    readonly pk: number | null;
   } | null;
-  purpose: { id: string; nameFi: string | null; pk: number | null } | null;
-  homeCity: { id: string; nameFi: string | null; pk: number | null } | null;
+  readonly purpose: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly pk: number | null;
+  } | null;
+  readonly homeCity: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly pk: number | null;
+  } | null;
 };
 
 export type CalendarReservationFragment = {
-  id: string;
-  name: string | null;
-  reserveeName: string | null;
-  pk: number | null;
-  begin: string;
-  end: string;
-  state: ReservationStateChoice | null;
-  type: ReservationTypeChoice | null;
-  bufferTimeBefore: number;
-  bufferTimeAfter: number;
-  affectedReservationUnits: Array<number | null> | null;
-  accessType: AccessType;
-  user: { id: string; email: string } | null;
+  readonly id: string;
+  readonly name: string | null;
+  readonly reserveeName: string | null;
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly state: ReservationStateChoice | null;
+  readonly type: ReservationTypeChoice | null;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+  readonly accessType: AccessType;
+  readonly user: { readonly id: string; readonly email: string } | null;
 };
 
 export type ReservationsByReservationUnitQueryVariables = Exact<{
@@ -8219,117 +8932,120 @@ export type ReservationsByReservationUnitQueryVariables = Exact<{
   beginDate?: InputMaybe<Scalars["Date"]["input"]>;
   endDate?: InputMaybe<Scalars["Date"]["input"]>;
   state?: InputMaybe<
-    | Array<InputMaybe<ReservationStateChoice>>
+    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
     | InputMaybe<ReservationStateChoice>
   >;
 }>;
 
 export type ReservationsByReservationUnitQuery = {
-  reservationUnit: {
-    id: string;
-    reservations: Array<{
-      id: string;
-      name: string | null;
-      reserveeName: string | null;
-      pk: number | null;
-      begin: string;
-      end: string;
-      state: ReservationStateChoice | null;
-      type: ReservationTypeChoice | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      affectedReservationUnits: Array<number | null> | null;
-      accessType: AccessType;
-      user: { id: string; email: string } | null;
+  readonly reservationUnit: {
+    readonly id: string;
+    readonly reservations: ReadonlyArray<{
+      readonly id: string;
+      readonly name: string | null;
+      readonly reserveeName: string | null;
+      readonly pk: number | null;
+      readonly begin: string;
+      readonly end: string;
+      readonly state: ReservationStateChoice | null;
+      readonly type: ReservationTypeChoice | null;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+      readonly accessType: AccessType;
+      readonly user: { readonly id: string; readonly email: string } | null;
     }> | null;
   } | null;
-  affectingReservations: Array<{
-    id: string;
-    name: string | null;
-    reserveeName: string | null;
-    pk: number | null;
-    begin: string;
-    end: string;
-    state: ReservationStateChoice | null;
-    type: ReservationTypeChoice | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    affectedReservationUnits: Array<number | null> | null;
-    accessType: AccessType;
-    user: { id: string; email: string } | null;
+  readonly affectingReservations: ReadonlyArray<{
+    readonly id: string;
+    readonly name: string | null;
+    readonly reserveeName: string | null;
+    readonly pk: number | null;
+    readonly begin: string;
+    readonly end: string;
+    readonly state: ReservationStateChoice | null;
+    readonly type: ReservationTypeChoice | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+    readonly accessType: AccessType;
+    readonly user: { readonly id: string; readonly email: string } | null;
   }> | null;
 };
 
 export type ReservationAccessTypeFragment = {
-  id: string;
-  accessType: AccessType;
-  isAccessCodeIsActiveCorrect: boolean | null;
-  pindoraInfo: {
-    accessCode: string;
-    accessCodeIsActive: boolean;
-    accessCodeBeginsAt: string;
-    accessCodeEndsAt: string;
+  readonly id: string;
+  readonly accessType: AccessType;
+  readonly isAccessCodeIsActiveCorrect: boolean | null;
+  readonly pindoraInfo: {
+    readonly accessCode: string;
+    readonly accessCodeIsActive: boolean;
+    readonly accessCodeBeginsAt: string;
+    readonly accessCodeEndsAt: string;
   } | null;
 };
 
 export type ReservationRecurringFieldsFragment = {
-  id: string;
-  pk: number | null;
-  beginDate: string | null;
-  beginTime: string | null;
-  endDate: string | null;
-  endTime: string | null;
-  weekdays: Array<number | null> | null;
-  name: string;
-  description: string;
-  usedAccessTypes: Array<AccessType | null> | null;
-  isAccessCodeIsActiveCorrect: boolean | null;
-  pindoraInfo: {
-    accessCode: string;
-    accessCodeIsActive: boolean;
-    accessCodeValidity: Array<{
-      accessCodeBeginsAt: string;
-      accessCodeEndsAt: string;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly beginDate: string | null;
+  readonly beginTime: string | null;
+  readonly endDate: string | null;
+  readonly endTime: string | null;
+  readonly weekdays: ReadonlyArray<number | null> | null;
+  readonly name: string;
+  readonly description: string;
+  readonly usedAccessTypes: ReadonlyArray<AccessType | null> | null;
+  readonly isAccessCodeIsActiveCorrect: boolean | null;
+  readonly pindoraInfo: {
+    readonly accessCode: string;
+    readonly accessCodeIsActive: boolean;
+    readonly accessCodeValidity: ReadonlyArray<{
+      readonly accessCodeBeginsAt: string;
+      readonly accessCodeEndsAt: string;
     }>;
   } | null;
 };
 
 export type RecurringReservationFragment = {
-  id: string;
-  pk: number | null;
-  weekdays: Array<number | null> | null;
-  beginDate: string | null;
-  endDate: string | null;
-  rejectedOccurrences: Array<{
-    id: string;
-    beginDatetime: string;
-    endDatetime: string;
-    rejectionReason: RejectionReadinessChoice;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly weekdays: ReadonlyArray<number | null> | null;
+  readonly beginDate: string | null;
+  readonly endDate: string | null;
+  readonly rejectedOccurrences: ReadonlyArray<{
+    readonly id: string;
+    readonly beginDatetime: string;
+    readonly endDatetime: string;
+    readonly rejectionReason: RejectionReadinessChoice;
   }>;
-  reservations: Array<{
-    state: ReservationStateChoice | null;
-    id: string;
-    pk: number | null;
-    begin: string;
-    end: string;
-    type: ReservationTypeChoice | null;
-    bufferTimeAfter: number;
-    bufferTimeBefore: number;
-    paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      reservationStartInterval: ReservationStartInterval;
-      unit: { id: string; pk: number | null } | null;
+  readonly reservations: ReadonlyArray<{
+    readonly state: ReservationStateChoice | null;
+    readonly id: string;
+    readonly pk: number | null;
+    readonly begin: string;
+    readonly end: string;
+    readonly type: ReservationTypeChoice | null;
+    readonly bufferTimeAfter: number;
+    readonly bufferTimeBefore: number;
+    readonly paymentOrder: ReadonlyArray<{
+      readonly id: string;
+      readonly status: OrderStatus | null;
     }>;
-    recurringReservation: {
-      pk: number | null;
-      id: string;
-      weekdays: Array<number | null> | null;
-      beginDate: string | null;
-      endDate: string | null;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly reservationStartInterval: ReservationStartInterval;
+      readonly unit: { readonly id: string; readonly pk: number | null } | null;
+    }>;
+    readonly recurringReservation: {
+      readonly pk: number | null;
+      readonly id: string;
+      readonly weekdays: ReadonlyArray<number | null> | null;
+      readonly beginDate: string | null;
+      readonly endDate: string | null;
     } | null;
   }>;
 };
@@ -8339,42 +9055,48 @@ export type RecurringReservationQueryVariables = Exact<{
 }>;
 
 export type RecurringReservationQuery = {
-  recurringReservation: {
-    id: string;
-    pk: number | null;
-    weekdays: Array<number | null> | null;
-    beginDate: string | null;
-    endDate: string | null;
-    rejectedOccurrences: Array<{
-      id: string;
-      beginDatetime: string;
-      endDatetime: string;
-      rejectionReason: RejectionReadinessChoice;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly weekdays: ReadonlyArray<number | null> | null;
+    readonly beginDate: string | null;
+    readonly endDate: string | null;
+    readonly rejectedOccurrences: ReadonlyArray<{
+      readonly id: string;
+      readonly beginDatetime: string;
+      readonly endDatetime: string;
+      readonly rejectionReason: RejectionReadinessChoice;
     }>;
-    reservations: Array<{
-      state: ReservationStateChoice | null;
-      id: string;
-      pk: number | null;
-      begin: string;
-      end: string;
-      type: ReservationTypeChoice | null;
-      bufferTimeAfter: number;
-      bufferTimeBefore: number;
-      paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-      reservationUnits: Array<{
-        id: string;
-        pk: number | null;
-        bufferTimeBefore: number;
-        bufferTimeAfter: number;
-        reservationStartInterval: ReservationStartInterval;
-        unit: { id: string; pk: number | null } | null;
+    readonly reservations: ReadonlyArray<{
+      readonly state: ReservationStateChoice | null;
+      readonly id: string;
+      readonly pk: number | null;
+      readonly begin: string;
+      readonly end: string;
+      readonly type: ReservationTypeChoice | null;
+      readonly bufferTimeAfter: number;
+      readonly bufferTimeBefore: number;
+      readonly paymentOrder: ReadonlyArray<{
+        readonly id: string;
+        readonly status: OrderStatus | null;
       }>;
-      recurringReservation: {
-        pk: number | null;
-        id: string;
-        weekdays: Array<number | null> | null;
-        beginDate: string | null;
-        endDate: string | null;
+      readonly reservationUnits: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly bufferTimeBefore: number;
+        readonly bufferTimeAfter: number;
+        readonly reservationStartInterval: ReservationStartInterval;
+        readonly unit: {
+          readonly id: string;
+          readonly pk: number | null;
+        } | null;
+      }>;
+      readonly recurringReservation: {
+        readonly pk: number | null;
+        readonly id: string;
+        readonly weekdays: ReadonlyArray<number | null> | null;
+        readonly beginDate: string | null;
+        readonly endDate: string | null;
       } | null;
     }>;
   } | null;
@@ -8385,141 +9107,169 @@ export type ReservationPageQueryVariables = Exact<{
 }>;
 
 export type ReservationPageQuery = {
-  reservation: {
-    id: string;
-    begin: string;
-    end: string;
-    pk: number | null;
-    createdAt: string | null;
-    state: ReservationStateChoice | null;
-    type: ReservationTypeChoice | null;
-    isBlocked: boolean | null;
-    workingMemo: string | null;
-    reserveeName: string | null;
-    bufferTimeBefore: number;
-    bufferTimeAfter: number;
-    name: string | null;
-    accessType: AccessType;
-    isAccessCodeIsActiveCorrect: boolean | null;
-    handlingDetails: string | null;
-    price: string | null;
-    applyingForFreeOfCharge: boolean | null;
-    freeOfChargeReason: string | null;
-    numPersons: number | null;
-    description: string | null;
-    reserveeFirstName: string | null;
-    reserveeLastName: string | null;
-    reserveeEmail: string | null;
-    reserveePhone: string | null;
-    reserveeType: CustomerTypeChoice | null;
-    reserveeOrganisationName: string | null;
-    reserveeId: string | null;
-    reserveeIsUnregisteredAssociation: boolean | null;
-    reserveeAddressStreet: string | null;
-    reserveeAddressCity: string | null;
-    reserveeAddressZip: string | null;
-    billingFirstName: string | null;
-    billingLastName: string | null;
-    billingPhone: string | null;
-    billingEmail: string | null;
-    billingAddressStreet: string | null;
-    billingAddressCity: string | null;
-    billingAddressZip: string | null;
-    recurringReservation: {
-      id: string;
-      beginDate: string | null;
-      beginTime: string | null;
-      endDate: string | null;
-      endTime: string | null;
-      weekdays: Array<number | null> | null;
-      pk: number | null;
-      name: string;
-      description: string;
-      usedAccessTypes: Array<AccessType | null> | null;
-      isAccessCodeIsActiveCorrect: boolean | null;
-      pindoraInfo: {
-        accessCode: string;
-        accessCodeIsActive: boolean;
-        accessCodeValidity: Array<{
-          accessCodeBeginsAt: string;
-          accessCodeEndsAt: string;
+  readonly reservation: {
+    readonly id: string;
+    readonly begin: string;
+    readonly end: string;
+    readonly pk: number | null;
+    readonly createdAt: string | null;
+    readonly state: ReservationStateChoice | null;
+    readonly type: ReservationTypeChoice | null;
+    readonly isBlocked: boolean | null;
+    readonly workingMemo: string | null;
+    readonly reserveeName: string | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly name: string | null;
+    readonly accessType: AccessType;
+    readonly isAccessCodeIsActiveCorrect: boolean | null;
+    readonly handlingDetails: string | null;
+    readonly price: string | null;
+    readonly applyingForFreeOfCharge: boolean | null;
+    readonly freeOfChargeReason: string | null;
+    readonly numPersons: number | null;
+    readonly description: string | null;
+    readonly reserveeFirstName: string | null;
+    readonly reserveeLastName: string | null;
+    readonly reserveeEmail: string | null;
+    readonly reserveePhone: string | null;
+    readonly reserveeType: CustomerTypeChoice | null;
+    readonly reserveeOrganisationName: string | null;
+    readonly reserveeId: string | null;
+    readonly reserveeIsUnregisteredAssociation: boolean | null;
+    readonly reserveeAddressStreet: string | null;
+    readonly reserveeAddressCity: string | null;
+    readonly reserveeAddressZip: string | null;
+    readonly billingFirstName: string | null;
+    readonly billingLastName: string | null;
+    readonly billingPhone: string | null;
+    readonly billingEmail: string | null;
+    readonly billingAddressStreet: string | null;
+    readonly billingAddressCity: string | null;
+    readonly billingAddressZip: string | null;
+    readonly recurringReservation: {
+      readonly id: string;
+      readonly beginDate: string | null;
+      readonly beginTime: string | null;
+      readonly endDate: string | null;
+      readonly endTime: string | null;
+      readonly weekdays: ReadonlyArray<number | null> | null;
+      readonly pk: number | null;
+      readonly name: string;
+      readonly description: string;
+      readonly usedAccessTypes: ReadonlyArray<AccessType | null> | null;
+      readonly isAccessCodeIsActiveCorrect: boolean | null;
+      readonly pindoraInfo: {
+        readonly accessCode: string;
+        readonly accessCodeIsActive: boolean;
+        readonly accessCodeValidity: ReadonlyArray<{
+          readonly accessCodeBeginsAt: string;
+          readonly accessCodeEndsAt: string;
         }>;
       } | null;
     } | null;
-    cancelReason: { id: string; reasonFi: string | null } | null;
-    denyReason: { id: string; reasonFi: string | null } | null;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      reservationStartInterval: ReservationStartInterval;
-      nameFi: string | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      authentication: Authentication;
-      minPersons: number | null;
-      maxPersons: number | null;
-      unit: { id: string; nameFi: string | null; pk: number | null } | null;
-      serviceSpecificTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
+    readonly cancelReason: {
+      readonly id: string;
+      readonly reasonFi: string | null;
+    } | null;
+    readonly denyReason: {
+      readonly id: string;
+      readonly reasonFi: string | null;
+    } | null;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly reservationStartInterval: ReservationStartInterval;
+      readonly nameFi: string | null;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly authentication: Authentication;
+      readonly minPersons: number | null;
+      readonly maxPersons: number | null;
+      readonly unit: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly pk: number | null;
       } | null;
-      paymentTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
+      readonly serviceSpecificTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly nameFi: string | null;
       } | null;
-      pricingTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
+      readonly paymentTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly nameFi: string | null;
       } | null;
-      cancellationTerms: {
-        id: string;
-        textFi: string | null;
-        nameFi: string | null;
+      readonly pricingTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly nameFi: string | null;
       } | null;
-      pricings: Array<{
-        id: string;
-        begins: string;
-        priceUnit: PriceUnit;
-        lowestPrice: string;
-        highestPrice: string;
-        taxPercentage: { id: string; pk: number | null; value: string };
+      readonly cancellationTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly nameFi: string | null;
+      } | null;
+      readonly pricings: ReadonlyArray<{
+        readonly id: string;
+        readonly begins: string;
+        readonly priceUnit: PriceUnit;
+        readonly lowestPrice: string;
+        readonly highestPrice: string;
+        readonly taxPercentage: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly value: string;
+        };
       }>;
-      metadataSet: {
-        id: string;
-        requiredFields: Array<{ id: string; fieldName: string }>;
-        supportedFields: Array<{ id: string; fieldName: string }>;
+      readonly metadataSet: {
+        readonly id: string;
+        readonly requiredFields: ReadonlyArray<{
+          readonly id: string;
+          readonly fieldName: string;
+        }>;
+        readonly supportedFields: ReadonlyArray<{
+          readonly id: string;
+          readonly fieldName: string;
+        }>;
       } | null;
     }>;
-    paymentOrder: Array<{
-      id: string;
-      status: OrderStatus | null;
-      orderUuid: string | null;
-      refundUuid: string | null;
+    readonly paymentOrder: ReadonlyArray<{
+      readonly id: string;
+      readonly status: OrderStatus | null;
+      readonly orderUuid: string | null;
+      readonly refundUuid: string | null;
     }>;
-    user: {
-      id: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-      pk: number | null;
+    readonly user: {
+      readonly id: string;
+      readonly email: string;
+      readonly firstName: string;
+      readonly lastName: string;
+      readonly pk: number | null;
     } | null;
-    pindoraInfo: {
-      accessCode: string;
-      accessCodeIsActive: boolean;
-      accessCodeBeginsAt: string;
-      accessCodeEndsAt: string;
+    readonly pindoraInfo: {
+      readonly accessCode: string;
+      readonly accessCodeIsActive: boolean;
+      readonly accessCodeBeginsAt: string;
+      readonly accessCodeEndsAt: string;
     } | null;
-    ageGroup: {
-      id: string;
-      minimum: number;
-      maximum: number | null;
-      pk: number | null;
+    readonly ageGroup: {
+      readonly id: string;
+      readonly minimum: number;
+      readonly maximum: number | null;
+      readonly pk: number | null;
     } | null;
-    purpose: { id: string; nameFi: string | null; pk: number | null } | null;
-    homeCity: { id: string; nameFi: string | null; pk: number | null } | null;
+    readonly purpose: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly pk: number | null;
+    } | null;
+    readonly homeCity: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly pk: number | null;
+    } | null;
   } | null;
 };
 
@@ -8528,9 +9278,9 @@ export type ApproveReservationMutationVariables = Exact<{
 }>;
 
 export type ApproveReservationMutation = {
-  approveReservation: {
-    pk: number | null;
-    state: ReservationStateChoice | null;
+  readonly approveReservation: {
+    readonly pk: number | null;
+    readonly state: ReservationStateChoice | null;
   } | null;
 };
 
@@ -8539,9 +9289,9 @@ export type RequireHandlingMutationVariables = Exact<{
 }>;
 
 export type RequireHandlingMutation = {
-  requireHandlingForReservation: {
-    pk: number | null;
-    state: ReservationStateChoice | null;
+  readonly requireHandlingForReservation: {
+    readonly pk: number | null;
+    readonly state: ReservationStateChoice | null;
   } | null;
 };
 
@@ -8550,59 +9300,65 @@ export type SeriesPageQueryVariables = Exact<{
 }>;
 
 export type SeriesPageQuery = {
-  reservation: {
-    id: string;
-    pk: number | null;
-    type: ReservationTypeChoice | null;
-    recurringReservation: {
-      recurrenceInDays: number | null;
-      endTime: string | null;
-      beginTime: string | null;
-      id: string;
-      pk: number | null;
-      weekdays: Array<number | null> | null;
-      beginDate: string | null;
-      endDate: string | null;
-      rejectedOccurrences: Array<{
-        id: string;
-        beginDatetime: string;
-        endDatetime: string;
-        rejectionReason: RejectionReadinessChoice;
+  readonly reservation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly type: ReservationTypeChoice | null;
+    readonly recurringReservation: {
+      readonly recurrenceInDays: number | null;
+      readonly endTime: string | null;
+      readonly beginTime: string | null;
+      readonly id: string;
+      readonly pk: number | null;
+      readonly weekdays: ReadonlyArray<number | null> | null;
+      readonly beginDate: string | null;
+      readonly endDate: string | null;
+      readonly rejectedOccurrences: ReadonlyArray<{
+        readonly id: string;
+        readonly beginDatetime: string;
+        readonly endDatetime: string;
+        readonly rejectionReason: RejectionReadinessChoice;
       }>;
-      reservations: Array<{
-        state: ReservationStateChoice | null;
-        id: string;
-        pk: number | null;
-        begin: string;
-        end: string;
-        type: ReservationTypeChoice | null;
-        bufferTimeAfter: number;
-        bufferTimeBefore: number;
-        paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-        reservationUnits: Array<{
-          id: string;
-          pk: number | null;
-          bufferTimeBefore: number;
-          bufferTimeAfter: number;
-          reservationStartInterval: ReservationStartInterval;
-          unit: { id: string; pk: number | null } | null;
+      readonly reservations: ReadonlyArray<{
+        readonly state: ReservationStateChoice | null;
+        readonly id: string;
+        readonly pk: number | null;
+        readonly begin: string;
+        readonly end: string;
+        readonly type: ReservationTypeChoice | null;
+        readonly bufferTimeAfter: number;
+        readonly bufferTimeBefore: number;
+        readonly paymentOrder: ReadonlyArray<{
+          readonly id: string;
+          readonly status: OrderStatus | null;
         }>;
-        recurringReservation: {
-          pk: number | null;
-          id: string;
-          weekdays: Array<number | null> | null;
-          beginDate: string | null;
-          endDate: string | null;
+        readonly reservationUnits: ReadonlyArray<{
+          readonly id: string;
+          readonly pk: number | null;
+          readonly bufferTimeBefore: number;
+          readonly bufferTimeAfter: number;
+          readonly reservationStartInterval: ReservationStartInterval;
+          readonly unit: {
+            readonly id: string;
+            readonly pk: number | null;
+          } | null;
+        }>;
+        readonly recurringReservation: {
+          readonly pk: number | null;
+          readonly id: string;
+          readonly weekdays: ReadonlyArray<number | null> | null;
+          readonly beginDate: string | null;
+          readonly endDate: string | null;
         } | null;
       }>;
     } | null;
-    reservationUnits: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      bufferTimeBefore: number;
-      bufferTimeAfter: number;
-      reservationStartInterval: ReservationStartInterval;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly reservationStartInterval: ReservationStartInterval;
     }>;
   } | null;
 };
@@ -8612,42 +9368,48 @@ export type ReservationSeriesQueryVariables = Exact<{
 }>;
 
 export type ReservationSeriesQuery = {
-  recurringReservation: {
-    id: string;
-    pk: number | null;
-    weekdays: Array<number | null> | null;
-    beginDate: string | null;
-    endDate: string | null;
-    rejectedOccurrences: Array<{
-      id: string;
-      beginDatetime: string;
-      endDatetime: string;
-      rejectionReason: RejectionReadinessChoice;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly weekdays: ReadonlyArray<number | null> | null;
+    readonly beginDate: string | null;
+    readonly endDate: string | null;
+    readonly rejectedOccurrences: ReadonlyArray<{
+      readonly id: string;
+      readonly beginDatetime: string;
+      readonly endDatetime: string;
+      readonly rejectionReason: RejectionReadinessChoice;
     }>;
-    reservations: Array<{
-      state: ReservationStateChoice | null;
-      id: string;
-      pk: number | null;
-      begin: string;
-      end: string;
-      type: ReservationTypeChoice | null;
-      bufferTimeAfter: number;
-      bufferTimeBefore: number;
-      paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-      reservationUnits: Array<{
-        id: string;
-        pk: number | null;
-        bufferTimeBefore: number;
-        bufferTimeAfter: number;
-        reservationStartInterval: ReservationStartInterval;
-        unit: { id: string; pk: number | null } | null;
+    readonly reservations: ReadonlyArray<{
+      readonly state: ReservationStateChoice | null;
+      readonly id: string;
+      readonly pk: number | null;
+      readonly begin: string;
+      readonly end: string;
+      readonly type: ReservationTypeChoice | null;
+      readonly bufferTimeAfter: number;
+      readonly bufferTimeBefore: number;
+      readonly paymentOrder: ReadonlyArray<{
+        readonly id: string;
+        readonly status: OrderStatus | null;
       }>;
-      recurringReservation: {
-        pk: number | null;
-        id: string;
-        weekdays: Array<number | null> | null;
-        beginDate: string | null;
-        endDate: string | null;
+      readonly reservationUnits: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly bufferTimeBefore: number;
+        readonly bufferTimeAfter: number;
+        readonly reservationStartInterval: ReservationStartInterval;
+        readonly unit: {
+          readonly id: string;
+          readonly pk: number | null;
+        } | null;
+      }>;
+      readonly recurringReservation: {
+        readonly pk: number | null;
+        readonly id: string;
+        readonly weekdays: ReadonlyArray<number | null> | null;
+        readonly beginDate: string | null;
+        readonly endDate: string | null;
       } | null;
     }>;
   } | null;
@@ -8658,54 +9420,65 @@ export type RescheduleReservationSeriesMutationVariables = Exact<{
 }>;
 
 export type RescheduleReservationSeriesMutation = {
-  rescheduleReservationSeries: { pk: number | null } | null;
+  readonly rescheduleReservationSeries: { readonly pk: number | null } | null;
 };
 
 export type ReservationUnitPricingFieldsFragment = {
-  id: string;
-  pricings: Array<{
-    id: string;
-    begins: string;
-    priceUnit: PriceUnit;
-    lowestPrice: string;
-    highestPrice: string;
-    taxPercentage: { id: string; pk: number | null; value: string };
+  readonly id: string;
+  readonly pricings: ReadonlyArray<{
+    readonly id: string;
+    readonly begins: string;
+    readonly priceUnit: PriceUnit;
+    readonly lowestPrice: string;
+    readonly highestPrice: string;
+    readonly taxPercentage: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly value: string;
+    };
   }>;
 };
 
 export type ReservationPriceDetailsFieldsFragment = {
-  id: string;
-  begin: string;
-  end: string;
-  reservationUnits: Array<{
-    id: string;
-    pricings: Array<{
-      id: string;
-      begins: string;
-      priceUnit: PriceUnit;
-      lowestPrice: string;
-      highestPrice: string;
-      taxPercentage: { id: string; pk: number | null; value: string };
+  readonly id: string;
+  readonly begin: string;
+  readonly end: string;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly pricings: ReadonlyArray<{
+      readonly id: string;
+      readonly begins: string;
+      readonly priceUnit: PriceUnit;
+      readonly lowestPrice: string;
+      readonly highestPrice: string;
+      readonly taxPercentage: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly value: string;
+      };
     }>;
   }>;
 };
 
 export type CreateTagStringFragment = {
-  id: string;
-  begin: string;
-  end: string;
-  reservationUnits: Array<{
-    id: string;
-    nameFi: string | null;
-    unit: { id: string; nameFi: string | null } | null;
+  readonly id: string;
+  readonly begin: string;
+  readonly end: string;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly unit: {
+      readonly id: string;
+      readonly nameFi: string | null;
+    } | null;
   }>;
-  recurringReservation: {
-    id: string;
-    beginDate: string | null;
-    beginTime: string | null;
-    endDate: string | null;
-    endTime: string | null;
-    weekdays: Array<number | null> | null;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly beginDate: string | null;
+    readonly beginTime: string | null;
+    readonly endDate: string | null;
+    readonly endTime: string | null;
+    readonly weekdays: ReadonlyArray<number | null> | null;
   } | null;
 };
 
@@ -8715,8 +9488,10 @@ export type UpdateStaffReservationMutationVariables = Exact<{
 }>;
 
 export type UpdateStaffReservationMutation = {
-  staffReservationModify: { pk: number | null } | null;
-  updateReservationWorkingMemo: { workingMemo: string | null } | null;
+  readonly staffReservationModify: { readonly pk: number | null } | null;
+  readonly updateReservationWorkingMemo: {
+    readonly workingMemo: string | null;
+  } | null;
 };
 
 export type UpdateRecurringReservationMutationVariables = Exact<{
@@ -8724,37 +9499,39 @@ export type UpdateRecurringReservationMutationVariables = Exact<{
 }>;
 
 export type UpdateRecurringReservationMutation = {
-  updateReservationSeries: { pk: number | null } | null;
+  readonly updateReservationSeries: { readonly pk: number | null } | null;
 };
 
 export type ReservationsQueryVariables = Exact<{
   first?: InputMaybe<Scalars["Int"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   orderBy?: InputMaybe<
-    | Array<InputMaybe<ReservationOrderingChoices>>
+    | ReadonlyArray<InputMaybe<ReservationOrderingChoices>>
     | InputMaybe<ReservationOrderingChoices>
   >;
   unit?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   reservationUnits?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   reservationUnitType?: InputMaybe<
-    | Array<InputMaybe<Scalars["Int"]["input"]>>
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
   reservationType?: InputMaybe<
-    Array<InputMaybe<ReservationTypeChoice>> | InputMaybe<ReservationTypeChoice>
+    | ReadonlyArray<InputMaybe<ReservationTypeChoice>>
+    | InputMaybe<ReservationTypeChoice>
   >;
   state?: InputMaybe<
-    | Array<InputMaybe<ReservationStateChoice>>
+    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
     | InputMaybe<ReservationStateChoice>
   >;
   orderStatus?: InputMaybe<
-    Array<InputMaybe<OrderStatusWithFree>> | InputMaybe<OrderStatusWithFree>
+    | ReadonlyArray<InputMaybe<OrderStatusWithFree>>
+    | InputMaybe<OrderStatusWithFree>
   >;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
@@ -8768,38 +9545,47 @@ export type ReservationsQueryVariables = Exact<{
 }>;
 
 export type ReservationsQuery = {
-  reservations: {
-    totalCount: number | null;
-    edges: Array<{
-      node: {
-        name: string | null;
-        id: string;
-        pk: number | null;
-        begin: string;
-        end: string;
-        createdAt: string | null;
-        state: ReservationStateChoice | null;
-        type: ReservationTypeChoice | null;
-        isBlocked: boolean | null;
-        workingMemo: string | null;
-        reserveeName: string | null;
-        bufferTimeBefore: number;
-        bufferTimeAfter: number;
-        reservationUnits: Array<{
-          id: string;
-          nameFi: string | null;
-          unit: { id: string; nameFi: string | null } | null;
+  readonly reservations: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly name: string | null;
+        readonly id: string;
+        readonly pk: number | null;
+        readonly begin: string;
+        readonly end: string;
+        readonly createdAt: string | null;
+        readonly state: ReservationStateChoice | null;
+        readonly type: ReservationTypeChoice | null;
+        readonly isBlocked: boolean | null;
+        readonly workingMemo: string | null;
+        readonly reserveeName: string | null;
+        readonly bufferTimeBefore: number;
+        readonly bufferTimeAfter: number;
+        readonly reservationUnits: ReadonlyArray<{
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly unit: {
+            readonly id: string;
+            readonly nameFi: string | null;
+          } | null;
         }>;
-        paymentOrder: Array<{ id: string; status: OrderStatus | null }>;
-        user: {
-          id: string;
-          email: string;
-          firstName: string;
-          lastName: string;
+        readonly paymentOrder: ReadonlyArray<{
+          readonly id: string;
+          readonly status: OrderStatus | null;
+        }>;
+        readonly user: {
+          readonly id: string;
+          readonly email: string;
+          readonly firstName: string;
+          readonly lastName: string;
         } | null;
       } | null;
     } | null>;
-    pageInfo: { endCursor: string | null; hasNextPage: boolean };
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
   } | null;
 };
 
@@ -8808,11 +9594,11 @@ export type ReservationPermissionsQueryVariables = Exact<{
 }>;
 
 export type ReservationPermissionsQuery = {
-  reservation: {
-    id: string;
-    reservationUnits: Array<{
-      id: string;
-      unit: { id: string; pk: number | null } | null;
+  readonly reservation: {
+    readonly id: string;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly unit: { readonly id: string; readonly pk: number | null } | null;
     }>;
   } | null;
 };
@@ -8822,7 +9608,7 @@ export type DeleteResourceMutationVariables = Exact<{
 }>;
 
 export type DeleteResourceMutation = {
-  deleteResource: { deleted: boolean | null } | null;
+  readonly deleteResource: { readonly deleted: boolean | null } | null;
 };
 
 export type DeleteSpaceMutationVariables = Exact<{
@@ -8830,31 +9616,41 @@ export type DeleteSpaceMutationVariables = Exact<{
 }>;
 
 export type DeleteSpaceMutation = {
-  deleteSpace: { deleted: boolean | null } | null;
+  readonly deleteSpace: { readonly deleted: boolean | null } | null;
 };
 
 export type UnitsQueryVariables = Exact<{
   first?: InputMaybe<Scalars["Int"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   orderBy?: InputMaybe<
-    Array<InputMaybe<UnitOrderingChoices>> | InputMaybe<UnitOrderingChoices>
+    | ReadonlyArray<InputMaybe<UnitOrderingChoices>>
+    | InputMaybe<UnitOrderingChoices>
   >;
   nameFi?: InputMaybe<Scalars["String"]["input"]>;
 }>;
 
 export type UnitsQuery = {
-  units: {
-    totalCount: number | null;
-    edges: Array<{
-      node: {
-        id: string;
-        nameFi: string | null;
-        pk: number | null;
-        unitGroups: Array<{ id: string; nameFi: string | null }>;
-        reservationUnits: Array<{ id: string; pk: number | null }>;
+  readonly units: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly pk: number | null;
+        readonly unitGroups: ReadonlyArray<{
+          readonly id: string;
+          readonly nameFi: string | null;
+        }>;
+        readonly reservationUnits: ReadonlyArray<{
+          readonly id: string;
+          readonly pk: number | null;
+        }>;
       } | null;
     } | null>;
-    pageInfo: { endCursor: string | null; hasNextPage: boolean };
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
   } | null;
 };
 
@@ -8863,7 +9659,7 @@ export type CreateResourceMutationVariables = Exact<{
 }>;
 
 export type CreateResourceMutation = {
-  createResource: { pk: number | null } | null;
+  readonly createResource: { readonly pk: number | null } | null;
 };
 
 export type UpdateResourceMutationVariables = Exact<{
@@ -8871,7 +9667,7 @@ export type UpdateResourceMutationVariables = Exact<{
 }>;
 
 export type UpdateResourceMutation = {
-  updateResource: { pk: number | null } | null;
+  readonly updateResource: { readonly pk: number | null } | null;
 };
 
 export type ResourceQueryVariables = Exact<{
@@ -8879,13 +9675,13 @@ export type ResourceQueryVariables = Exact<{
 }>;
 
 export type ResourceQuery = {
-  resource: {
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    nameSv: string | null;
-    nameEn: string | null;
-    space: { id: string; pk: number | null } | null;
+  readonly resource: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
+    readonly space: { readonly id: string; readonly pk: number | null } | null;
   } | null;
 };
 
@@ -8893,26 +9689,33 @@ export type CreateSpaceMutationVariables = Exact<{
   input: SpaceCreateMutationInput;
 }>;
 
-export type CreateSpaceMutation = { createSpace: { pk: number | null } | null };
+export type CreateSpaceMutation = {
+  readonly createSpace: { readonly pk: number | null } | null;
+};
 
 export type UpdateSpaceMutationVariables = Exact<{
   input: SpaceUpdateMutationInput;
 }>;
 
-export type UpdateSpaceMutation = { updateSpace: { pk: number | null } | null };
+export type UpdateSpaceMutation = {
+  readonly updateSpace: { readonly pk: number | null } | null;
+};
 
 export type UnitSpacesQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
 
 export type UnitSpacesQuery = {
-  unit: {
-    id: string;
-    spaces: Array<{
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      parent: { id: string; pk: number | null } | null;
+  readonly unit: {
+    readonly id: string;
+    readonly spaces: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly parent: {
+        readonly id: string;
+        readonly pk: number | null;
+      } | null;
     }>;
   } | null;
 };
@@ -8922,36 +9725,43 @@ export type SpaceQueryVariables = Exact<{
 }>;
 
 export type SpaceQuery = {
-  space: {
-    nameSv: string | null;
-    nameEn: string | null;
-    code: string;
-    id: string;
-    pk: number | null;
-    nameFi: string | null;
-    surfaceArea: number | null;
-    maxPersons: number | null;
-    unit: {
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      descriptionFi: string | null;
-      location: {
-        id: string;
-        addressStreetFi: string | null;
-        addressZip: string;
-        addressCityFi: string | null;
+  readonly space: {
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
+    readonly code: string;
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly surfaceArea: number | null;
+    readonly maxPersons: number | null;
+    readonly unit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly descriptionFi: string | null;
+      readonly location: {
+        readonly id: string;
+        readonly addressStreetFi: string | null;
+        readonly addressZip: string;
+        readonly addressCityFi: string | null;
       } | null;
-      spaces: Array<{ id: string; pk: number | null; nameFi: string | null }>;
+      readonly spaces: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      }>;
     } | null;
-    parent: {
-      id: string;
-      pk: number | null;
-      nameFi: string | null;
-      parent: {
-        id: string;
-        nameFi: string | null;
-        parent: { id: string; nameFi: string | null } | null;
+    readonly parent: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly parent: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly parent: {
+          readonly id: string;
+          readonly nameFi: string | null;
+        } | null;
       } | null;
     } | null;
   } | null;
