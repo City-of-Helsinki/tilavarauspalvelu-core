@@ -63,9 +63,8 @@ class HaukiResourceHashUpdater:
             return
 
         should_update_resource = (
-            force_refetch
-            or origin_hauki_resource.opening_hours_hash != resource["date_periods_hash"]
-            or origin_hauki_resource.should_update_opening_hours
+            force_refetch  #
+            or origin_hauki_resource.actions.should_update_opening_hours(resource["date_periods_hash"])
         )
         if not should_update_resource:
             return
