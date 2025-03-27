@@ -239,14 +239,16 @@ function ReservationKeylessEntryRecurring({
 
 function getRecurringReservationAccessCodeValidity(
   pindoraInfo:
-    | {
+    | Readonly<{
         accessCode: string;
         accessCodeIsActive: boolean;
-        accessCodeValidity: Array<{
-          accessCodeBeginsAt: string;
-          accessCodeEndsAt: string;
-        }>;
-      }
+        accessCodeValidity: Readonly<
+          Array<{
+            accessCodeBeginsAt: string;
+            accessCodeEndsAt: string;
+          }>
+        >;
+      }>
     | null
     | undefined
 ) {
