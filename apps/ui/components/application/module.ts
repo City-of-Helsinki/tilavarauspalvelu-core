@@ -36,7 +36,7 @@ type Timespan = {
 
 export function aesToCells(
   schedule: Readonly<SuitableTimeRangeFormValues[]>,
-  openingHours: Readonly<DailyOpeningHours>
+  openingHours: DailyOpeningHours
 ): Cell[][] {
   const firstSlotStart = 7;
   const lastSlotStart = 23;

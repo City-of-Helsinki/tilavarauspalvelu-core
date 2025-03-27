@@ -31,7 +31,7 @@ import {
   ReservationKind,
   type IsReservableFieldsFragment,
   ReservationStartInterval,
-  ReservationUnitAccessTypeNode,
+  type ReservationUnitAccessTypeNode,
   type BlockingReservationFieldsFragment,
   ReservationStateChoice,
   type NotReservableFieldsFragment,
