@@ -56,20 +56,34 @@ def staff_field_check(user: AnyUser, reservation: Reservation) -> bool | None:
 
 
 class ReservationNode(DjangoNode):
-    reservee_name = AnnotatedField(graphene.String, expression=L("reservee_name"))
-
-    is_blocked = AnnotatedField(graphene.Boolean, expression=models.Q(type=ReservationTypeChoice.BLOCKED.value))
-    is_handled = AnnotatedField(graphene.Boolean, expression=models.Q(handled_at__isnull=False))
-
-    access_code_should_be_active = AnnotatedField(graphene.Boolean, expression=L("access_code_should_be_active"))
-    is_access_code_is_active_correct = AnnotatedField(
-        graphene.Boolean, expression=L("is_access_code_is_active_correct")
+    reservee_name = AnnotatedField(
+        graphene.String,
+        expression=L("reservee_name"),
     )
 
-    calendar_url = graphene.String()
+    is_blocked = AnnotatedField(
+        graphene.Boolean,
+        expression=models.Q(type=ReservationTypeChoice.BLOCKED.value),
+        required=True,
+    )
+    is_handled = AnnotatedField(
+        graphene.Boolean,
+        expression=models.Q(handled_at__isnull=False),
+    )
+    access_code_should_be_active = AnnotatedField(
+        graphene.Boolean,
+        expression=L("access_code_should_be_active"),
+    )
+    is_access_code_is_active_correct = AnnotatedField(
+        graphene.Boolean,
+        expression=L("is_access_code_is_active_correct"),
+        required=True,
+    )
+
+    calendar_url = graphene.String(required=True)
 
     affected_reservation_units = AnnotatedField(
-        graphene.List(graphene.Int),
+        graphene.List(graphene.Int, required=True),
         description="Which reservation units' reserveability is affected by this reservation?",
         expression=(
             SubqueryArray(
@@ -78,6 +92,7 @@ class ReservationNode(DjangoNode):
                 distinct=True,
             )
         ),
+        required=True,
     )
 
     pindora_info = MultiField(

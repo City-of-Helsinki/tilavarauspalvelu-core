@@ -29,7 +29,7 @@ __all__ = [
 
 
 class ApplicationNode(DjangoNode):
-    status = AnnotatedField(graphene.Enum.from_enum(ApplicationStatusChoice), expression=L("status"))
+    status = AnnotatedField(graphene.Enum.from_enum(ApplicationStatusChoice), expression=L("status"), required=True)
 
     application_sections = ApplicationSectionNode.ListField()
     user = ApplicantNode.RelatedField()
