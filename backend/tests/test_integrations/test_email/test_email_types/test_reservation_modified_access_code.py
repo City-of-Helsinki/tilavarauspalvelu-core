@@ -62,8 +62,8 @@ COMMON_CONTEXT = {
 }
 LANGUAGE_CONTEXT = {
     "en": {
-        "title": "The door code has changed",
-        "text_reservation_modified": "The door code has changed",
+        "title": "The door code of your booking has changed",
+        "text_reservation_modified": "The door code of your booking has changed",
         **BASE_TEMPLATE_CONTEXT_EN,
         **RESERVATION_BASIC_INFO_CONTEXT_EN,
         **RESERVATION_PRICE_INFO_CONTEXT_EN,
@@ -73,8 +73,8 @@ LANGUAGE_CONTEXT = {
         **COMMON_CONTEXT,
     },
     "fi": {
-        "title": "Ovikoodi on vaihtunut",
-        "text_reservation_modified": "Ovikoodi on vaihtunut",
+        "title": "Varauksesi ovikoodi on vaihtunut",
+        "text_reservation_modified": "Varauksesi ovikoodi on vaihtunut",
         **BASE_TEMPLATE_CONTEXT_FI,
         **RESERVATION_BASIC_INFO_CONTEXT_FI,
         **RESERVATION_PRICE_INFO_CONTEXT_FI,
@@ -84,8 +84,8 @@ LANGUAGE_CONTEXT = {
         **COMMON_CONTEXT,
     },
     "sv": {
-        "title": "Dörrkoden har ändrats",
-        "text_reservation_modified": "Dörrkoden har ändrats",
+        "title": "Dörrkoden för din bokning har ändrats",
+        "text_reservation_modified": "Dörrkoden för din bokning har ändrats",
         **BASE_TEMPLATE_CONTEXT_SV,
         **RESERVATION_BASIC_INFO_CONTEXT_SV,
         **RESERVATION_PRICE_INFO_CONTEXT_SV,
@@ -202,7 +202,7 @@ def test_render_reservation_modified_access_code__text():
         f"""
         Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],
 
-        The door code has changed.
+        The door code of your booking has changed.
 
         [VARAUSYKSIKÖN NIMI]
         [TOIMIPISTEEN NIMI]
@@ -247,7 +247,7 @@ def test_render_reservation_modified_access_code__html():
 
         **Hi [SÄHKÖPOSTIN VASTAANOTTAJAN NIMI],**
 
-        The door code has changed.
+        The door code of your booking has changed.
 
         **[VARAUSYKSIKÖN NIMI]**
         [TOIMIPISTEEN NIMI]
@@ -290,7 +290,7 @@ def test_email_service__send_reservation_modified_access_code_email(outbox):
 
     assert len(outbox) == 1
 
-    assert outbox[0].subject == "The door code has changed"
+    assert outbox[0].subject == "The door code of your booking has changed"
     assert sorted(outbox[0].bcc) == ["reservee@email.com", "user@email.com"]
 
     assert len(outbox[0].attachments) == 1
