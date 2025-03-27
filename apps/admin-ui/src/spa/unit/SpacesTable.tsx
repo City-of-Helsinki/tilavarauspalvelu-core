@@ -207,6 +207,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     <>
       <CustomTable
         indexKey="pk"
+        // @ts-expect-error -- Table expects mutable rows
         rows={rows}
         cols={cols}
         // no sort on purpose

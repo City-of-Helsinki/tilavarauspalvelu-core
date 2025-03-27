@@ -122,11 +122,13 @@ type IsWithinCancellationPeriodReservationT = Pick<
   ReservationNodeT,
   "begin"
 > & {
-  reservationUnits?: Maybe<Array<CancellationRuleFieldsFragment>> | undefined;
+  reservationUnits?: Readonly<
+    Maybe<Array<CancellationRuleFieldsFragment>> | undefined
+  >;
 };
 
 function isTooCloseToCancel(
-  reservation: IsWithinCancellationPeriodReservationT
+  reservation: Readonly<IsWithinCancellationPeriodReservationT>
 ): boolean {
   const reservationUnit = reservation.reservationUnits?.[0];
   const begin = new Date(reservation.begin);
