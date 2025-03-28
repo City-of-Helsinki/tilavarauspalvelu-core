@@ -22,7 +22,7 @@ __all__ = [
 
 
 @get_translated
-def get_mock_params(language: Lang, **kwargs: Any) -> EmailContext | datetime | bool:
+def get_mock_params(*, language: Lang, **kwargs: Any) -> EmailContext | datetime | bool:
     """
     Return mock parameters that can be used for creating ANY email template context.
 

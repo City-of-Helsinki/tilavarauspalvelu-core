@@ -10,7 +10,7 @@ from django.test import override_settings
 from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraService
-from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
+from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
 
@@ -505,7 +505,7 @@ def test_reservation__adjust_time__update_reservation_buffer_on_adjust(graphql):
     assert reservation.buffer_time_after == datetime.timedelta(hours=2)
 
 
-@patch_method(PindoraClient.get_reservation)  # Called by email sending
+@patch_method(PindoraClient.get_reservation, side_effect=PindoraNotFoundError("Not found"))  # Called by email sending
 @patch_method(PindoraService.sync_access_code)
 def test_reservation__adjust_time__same_access_type(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(
@@ -546,7 +546,7 @@ def test_reservation__adjust_time__same_access_type__requires_handling(graphql):
     assert PindoraService.sync_access_code.call_count == 1
 
 
-@patch_method(PindoraClient.get_reservation)  # Called by email sending
+@patch_method(PindoraClient.get_reservation, side_effect=PindoraNotFoundError("Not found"))  # Called by email sending
 @patch_method(PindoraService.sync_access_code)
 def test_reservation__adjust_time__change_to_access_code(graphql):
     reservation = ReservationFactory.create_for_time_adjustment(

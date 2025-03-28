@@ -261,24 +261,25 @@ def params_for_price_range_info(*, reservation: Reservation) -> dict[str, Any]:
 
 
 def params_for_access_code_reservation(*, reservation: Reservation) -> dict[str, Any]:
+    empty_response = {
+        "access_code_is_used": False,
+        "access_code": "",
+        "access_code_validity_period": "",
+    }
+
     if not reservation.access_code_should_be_active:
-        return {
-            "access_code_is_used": False,
-            "access_code": "",
-            "access_code_validity_period": "",
-        }
+        return empty_response
+
+    empty_response["access_code_is_used"] = True
 
     try:
         response = PindoraClient.get_reservation(reservation=reservation)
     except PindoraNotFoundError:
-        response = None  # Set as None to make mocking in tests easier
-    if not response:
-        # Reservation should have an access code, but it is not available.
-        return {
-            "access_code_is_used": True,
-            "access_code": "",
-            "access_code_validity_period": "",
-        }
+        return empty_response
+
+    # If access code is not actually active, even when we think it should be, don't show it in emails
+    if not response["access_code_is_active"]:
+        return empty_response
 
     valid_before = response["access_code_valid_minutes_before"]
     valid_after = response["access_code_valid_minutes_after"]
@@ -338,11 +339,18 @@ def params_for_application_section_info(
     access_code_is_used = False
 
     if get_access_code and section.should_have_active_access_code:
+        access_code_is_used = True
+
         with suppress(PindoraNotFoundError):
             response = PindoraClient.get_seasonal_booking(section=section)
 
+            # If access code is not actually active, even when we think it should be, don't show it in emails
+            if not response["access_code_is_active"]:
+                # NOTE: This just exists the 'suppress' block!
+                msg = "Access code is not active"
+                raise PindoraNotFoundError(msg)
+
             access_code = response["access_code"]
-            access_code_is_used = True
 
             for validity in response["reservation_unit_code_validity"]:
                 reservation_unit_uuid = validity["reservation_unit_id"]

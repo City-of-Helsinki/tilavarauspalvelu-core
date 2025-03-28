@@ -30,6 +30,7 @@ from tests.test_integrations.test_email.helpers import (
     EMAIL_CLOSING_TEXT_EN,
     EMAIL_LOGO_HTML,
     KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT,
+    KEYLESS_ENTRY_ACCESS_CODE_NOT_USED_CONTEXT,
     KEYLESS_ENTRY_CONTEXT_EN,
     KEYLESS_ENTRY_CONTEXT_FI,
     KEYLESS_ENTRY_CONTEXT_SV,
@@ -119,6 +120,7 @@ def test_get_context__reservation_modified_access_code(lang: Lang):
     PindoraClient.get_reservation,
     return_value=PindoraReservationResponse(
         access_code="123456",
+        access_code_is_active=True,
         begin=datetime.datetime(2024, 1, 1, 11),
         end=datetime.datetime(2024, 1, 1, 15),
         access_code_valid_minutes_before=0,
@@ -137,6 +139,42 @@ def test_get_context__reservation_modified__access_code_access_code(email_reserv
     params = {
         **KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT,
         "reservation_id": email_reservation.id,
+    }
+    with TranslationsFromPOFiles():
+        assert get_context_for_reservation_modified_access_code(**get_mock_params(**params, language="en")) == expected
+
+    email_reservation.access_type = AccessType.ACCESS_CODE
+    email_reservation.save()
+    with TranslationsFromPOFiles():
+        context = get_context_for_reservation_modified_access_code(reservation=email_reservation, language="en")
+        assert context == expected
+
+
+@patch_method(
+    PindoraClient.get_reservation,
+    return_value=PindoraReservationResponse(
+        access_code="123456",
+        access_code_is_active=False,
+        begin=datetime.datetime(2024, 1, 1, 11),
+        end=datetime.datetime(2024, 1, 1, 15),
+        access_code_valid_minutes_before=0,
+        access_code_valid_minutes_after=0,
+    ),
+)
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+def test_get_context__reservation_modified__access_code_access_code__inactive(email_reservation):
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        **KEYLESS_ENTRY_ACCESS_CODE_NOT_USED_CONTEXT,
+        "reservation_id": f"{email_reservation.id}",
+        "access_code_is_used": True,
+    }
+
+    params = {
+        **KEYLESS_ENTRY_ACCESS_CODE_NOT_USED_CONTEXT,
+        "reservation_id": email_reservation.id,
+        "access_code_is_used": True,
     }
     with TranslationsFromPOFiles():
         assert get_context_for_reservation_modified_access_code(**get_mock_params(**params, language="en")) == expected

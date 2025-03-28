@@ -203,6 +203,12 @@ KEYLESS_ENTRY_ACCESS_CODE_IS_USED_CONTEXT = {
     "access_code": "123456",
     "access_code_validity_period": "11:00-15:00",
 }
+KEYLESS_ENTRY_ACCESS_CODE_NOT_USED_CONTEXT = {
+    "access_code_is_used": False,
+    "access_code": "",
+    "access_code_validity_period": "",
+}
+
 
 KEYLESS_ENTRY_CONTEXT_EN = {
     "access_code_is_used": False,

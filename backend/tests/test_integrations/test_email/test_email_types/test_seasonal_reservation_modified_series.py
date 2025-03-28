@@ -143,7 +143,7 @@ def test_get_context_for_seasonal_reservation_modified_series__instance(email_re
 @pytest.mark.django_db
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(PindoraClient.get_seasonal_booking)
-def test_get_context_for_seasonal_reservation_modified_series__instance__access_code_is_used(email_reservation):
+def test_get_context_for_seasonal_reservation_modified_series__instance__access_code(email_reservation):
     section = email_reservation.actions.get_application_section()
 
     section.actions.get_reservations().update(access_type=AccessType.ACCESS_CODE)
@@ -154,6 +154,7 @@ def test_get_context_for_seasonal_reservation_modified_series__instance__access_
 
     PindoraClient.get_seasonal_booking.return_value = PindoraSeasonalBookingResponse(
         access_code="123456",
+        access_code_is_active=True,
         reservation_unit_code_validity=[
             PindoraSeasonalBookingAccessCodeValidity(
                 reservation_unit_id=reservation_unit_1.uuid,
@@ -187,6 +188,71 @@ def test_get_context_for_seasonal_reservation_modified_series__instance__access_
         "application_id": section.application_id,
         "application_section_id": section.id,
         "access_code_is_used": True,
+    }
+    with TranslationsFromPOFiles():
+        context = get_context_for_seasonal_reservation_modified_series(**get_mock_params(**params, language="en"))
+        assert context == expected
+
+    with TranslationsFromPOFiles():
+        allocation = email_reservation.recurring_reservation.allocated_time_slot
+        section = allocation.reservation_unit_option.application_section
+        context = get_context_for_seasonal_reservation_modified_series(section, language="en")
+        assert context == expected
+
+
+@pytest.mark.django_db
+@freeze_time("2024-01-01 12:00:00+02:00")
+@patch_method(PindoraClient.get_seasonal_booking)
+def test_get_context_for_seasonal_reservation_modified_series__instance__access_code__inactive(email_reservation):
+    section = email_reservation.actions.get_application_section()
+
+    section.actions.get_reservations().update(access_type=AccessType.ACCESS_CODE)
+
+    all_series = section.actions.get_reservation_series()
+    reservation_unit_1 = all_series[0].reservation_unit
+    reservation_unit_2 = all_series[1].reservation_unit
+
+    PindoraClient.get_seasonal_booking.return_value = PindoraSeasonalBookingResponse(
+        access_code="123456",
+        access_code_is_active=False,
+        reservation_unit_code_validity=[
+            PindoraSeasonalBookingAccessCodeValidity(
+                reservation_unit_id=reservation_unit_1.uuid,
+                begin=datetime.datetime(2024, 1, 1, 11),
+                end=datetime.datetime(2024, 1, 1, 15),
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+            ),
+            PindoraSeasonalBookingAccessCodeValidity(
+                reservation_unit_id=reservation_unit_2.uuid,
+                begin=datetime.datetime(2024, 1, 2, 20, 45),
+                end=datetime.datetime(2024, 1, 2, 22, 5),
+                access_code_valid_minutes_before=0,
+                access_code_valid_minutes_after=0,
+            ),
+        ],
+    )
+
+    expected = {
+        **LANGUAGE_CONTEXT["en"],
+        **get_application_details_urls(section),
+        "access_code": "",
+        "access_code_is_used": True,
+        "allocations": [
+            {"weekday_value": "Monday", "time_value": "13:00-15:00", "access_code_validity_period": ""},
+            {"weekday_value": "Tuesday", "time_value": "21:00-22:00", "access_code_validity_period": ""},
+        ],
+    }
+
+    params = {
+        "application_id": section.application_id,
+        "application_section_id": section.id,
+        "access_code_is_used": True,
+        "access_code": "",
+        "allocations": [
+            {"weekday_value": "Monday", "time_value": "13:00-15:00", "access_code_validity_period": ""},
+            {"weekday_value": "Tuesday", "time_value": "21:00-22:00", "access_code_validity_period": ""},
+        ],
     }
     with TranslationsFromPOFiles():
         context = get_context_for_seasonal_reservation_modified_series(**get_mock_params(**params, language="en"))
