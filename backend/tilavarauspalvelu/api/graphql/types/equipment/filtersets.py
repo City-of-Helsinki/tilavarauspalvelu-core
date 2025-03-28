@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import django_filters
-from graphene_django_extensions.filters import IntMultipleChoiceFilter, ModelFilterSet
+from graphene_django_extensions.filters import IntChoiceFilter, IntMultipleChoiceFilter, ModelFilterSet
 
 from tilavarauspalvelu.models import Equipment
 
@@ -13,8 +12,8 @@ __all__ = [
 
 class EquipmentFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
-    rank_gte = django_filters.NumberFilter(field_name="category__rank", lookup_expr="gte")
-    rank_lte = django_filters.NumberFilter(field_name="category__rank", lookup_expr="lte")
+    rank_gte = IntChoiceFilter(field_name="category__rank", lookup_expr="gte")
+    rank_lte = IntChoiceFilter(field_name="category__rank", lookup_expr="lte")
 
     class Meta:
         model = Equipment
