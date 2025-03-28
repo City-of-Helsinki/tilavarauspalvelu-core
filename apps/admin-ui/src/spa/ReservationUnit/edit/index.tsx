@@ -134,7 +134,7 @@ const SubAccordion = styled(Accordion)`
     flex-direction: row;
     > div {
       font-size: var(--fontsize-heading-xxs);
-      ${fontMedium}
+      ${fontMedium};
       color: var(--color-bus);
       line-height: 1.5;
     }
@@ -183,7 +183,7 @@ const ButtonsStripe = styled.div`
   z-index: var(--tilavaraus-admin-stack-button-stripe);
 
   padding: var(--spacing-s) 0;
-  ${pageSideMargins}
+  ${pageSideMargins};
 
   /* back button should be left aligned */
   gap: var(--spacing-m);
