@@ -1,22 +1,28 @@
+import React, { useState } from "react";
 import {
   type ApplicationSectionReservationFragment,
   useApplicationReservationsQuery,
-  type ReservationUnitNode,
   ReservationStateChoice,
+  AccessType,
+  ReservationUnitNode,
   type ApplicationNode,
+  ApplicationSectionReservationUnitFragment,
+  AccessTypeWithMultivalued,
+  PindoraSectionFragment,
+  PindoraReservationFragment,
+  ReservationUnitAccessTypeNode,
 } from "@/gql/gql-types";
 import {
   getApplicationReservationPath,
   getApplicationSectionPath,
   getReservationUnitPath,
 } from "@/modules/urls";
-import { breakpoints, fontMedium, fontRegular, H5 } from "common";
+import { breakpoints, fontBold, fontMedium, fontRegular, H5 } from "common";
 import {
   getTranslationSafe,
   toApiDate,
   toUIDate,
 } from "common/src/common/util";
-import { IconButton, StatusLabel } from "common/src/components";
 import {
   filterNonNullable,
   formatApiTimeInterval,
@@ -38,12 +44,10 @@ import {
   IconLocation,
   IconPen,
   Table,
+  Tooltip,
 } from "hds-react";
-import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { Sanitize } from "common/src/components/Sanitize";
-import { LinkLikeButton } from "common/styles/buttonCss";
 import { type TFunction } from "i18next";
 import { convertWeekday } from "common/src/conversion";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
@@ -59,8 +63,12 @@ import {
 import { formatDateTimeStrings } from "@/modules/util";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { useSearchParams } from "next/navigation";
+import { IconButton, StatusLabel } from "common/src/components";
 import type { StatusLabelType } from "common/src/tags";
 import { gql } from "@apollo/client";
+import { LinkLikeButton } from "common/styles/buttonCss";
+import { Sanitize } from "common/src/components/Sanitize";
+import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
@@ -322,6 +330,7 @@ const OnlyForMobile = styled.span`
 `;
 
 const IconTextWrapper = styled.span`
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-3-xs);
@@ -338,20 +347,13 @@ const IconTextWrapper = styled.span`
 `;
 
 type ReservationUnitTableElem = {
-  reservationUnit: Pick<
-    ReservationUnitNode,
-    | "id"
-    | "pk"
-    | "reservationConfirmedInstructionsFi"
-    | "reservationConfirmedInstructionsSv"
-    | "reservationConfirmedInstructionsEn"
-    | "nameFi"
-    | "nameSv"
-    | "nameEn"
-  >;
+  reservationUnit: ApplicationSectionReservationUnitFragment;
   dateOfWeek: string;
   // same for this actual end / start times or a combined string
   time: string;
+  accessType?: AccessTypeWithMultivalued | null;
+  usedAccessTypes?: (AccessType | null)[] | null;
+  pindoraInfo?: PindoraSectionFragment | null;
 };
 
 /// Have to asign min-height on desktop otherwise the table rows are too small
@@ -359,6 +361,15 @@ type ReservationUnitTableElem = {
 const StyledLinkLikeButton = styled(LinkLikeButton)`
   @media (min-width: ${BREAKPOINT}) {
     min-height: 44px;
+  }
+`;
+
+const TooltipIconWrapper = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-3-xs);
+  > div {
+    justify-self: center;
   }
 `;
 
@@ -406,6 +417,20 @@ function ReservationUnitTable({
           <OnlyForMobile>{dateOfWeek}</OnlyForMobile>
           {time}
         </IconTextWrapper>
+      ),
+    },
+    {
+      key: "accessTypes",
+      headerName: t("reservationUnit:accessType"),
+      isSortable: false,
+      transform: (elem: ReservationUnitTableElem) => (
+        <TooltipIconWrapper>
+          {getReservationUnitAccessText(elem, t)}
+          {elem.accessType === AccessTypeWithMultivalued.Multivalued && (
+            <Tooltip>{t("application:view.accessTypeWarning")}</Tooltip>
+          )}
+          {/* TODO?: do we want to show a tooltip if there's no accessCode to show (== no elem.pindoraInfo.accessCode)? */}
+        </TooltipIconWrapper>
       ),
     },
     {
@@ -462,6 +487,16 @@ function ReservationUnitTable({
           <Sanitize
             html={getTranslation(modal, "reservationConfirmedInstructions")}
           />
+          {modal?.accessTypes.some(
+            (aT: { accessType: AccessType }) =>
+              aT.accessType !== AccessType.Unrestricted
+          ) && (
+            <ReservationUnitAccessTypeList
+              accessTypes={modal.accessTypes}
+              reservationUnits={reservationUnits}
+              pk={modal?.pk}
+            />
+          )}
         </Dialog.Content>
         <Dialog.ActionButtons>
           <Button onClick={() => setModal(null)}>{t("common:close")}</Button>
@@ -471,14 +506,110 @@ function ReservationUnitTable({
   );
 }
 
+const ModalAccessInfo = styled.div`
+  margin: var(--spacing-m) 0 0;
+  padding: var(--spacing-m);
+  background-color: var(--color-silver);
+`;
+
+const AccessTypeList = styled.ul`
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  li {
+    display: flex;
+    span {
+      width: 50%;
+    }
+    &:first-child {
+      ${fontBold}
+    }
+  }
+`;
+
+function ReservationUnitAccessTypeList({
+  accessTypes,
+  reservationUnits,
+  pk,
+}: Readonly<{
+  accessTypes: Omit<ReservationUnitAccessTypeNode, "reservationUnit">[];
+  reservationUnits: ReservationUnitTableElem[];
+  pk: number | null | undefined;
+}>) {
+  const { t } = useTranslation();
+  if (!accessTypes || accessTypes.length === 0 || !pk) {
+    return null;
+  }
+  const reservationUnit = reservationUnits.find(
+    (rU) => rU.reservationUnit.pk === pk
+  );
+  const accessPeriods = getReservationUnitAccessPeriods(accessTypes);
+  return (
+    <ModalAccessInfo>
+      <AccessTypeList>
+        <li>
+          <span>{`${t("reservationUnit:accessType")}:`}</span>
+          <span>{`${t("common:validity")}:`}</span>
+        </li>
+        {accessPeriods.map((period) => (
+          <li key={period.pk}>
+            <span>
+              {t(`reservationUnit:accessTypes.${period.accessType}`) +
+                (reservationUnit?.accessType ===
+                AccessTypeWithMultivalued.AccessCode
+                  ? ` (${reservationUnit?.pindoraInfo?.accessCode})`
+                  : "")}
+            </span>
+            <span>
+              {period.endDate !== ""
+                ? `${period.beginDate} – ${period.endDate}`
+                : t("common:dateGte", { value: period.beginDate })}
+            </span>
+          </li>
+        ))}
+      </AccessTypeList>
+    </ModalAccessInfo>
+  );
+}
+
+function getReservationUnitAccessText(
+  reservationUnit: ReservationUnitTableElem,
+  t: TFunction
+) {
+  const { accessType, usedAccessTypes, pindoraInfo } = reservationUnit;
+  if (usedAccessTypes == null || usedAccessTypes.length === 0) {
+    return "";
+  }
+  switch (accessType) {
+    case AccessTypeWithMultivalued.Multivalued:
+      return usedAccessTypes
+        .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
+        .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
+        .join(" / ");
+    case AccessTypeWithMultivalued.AccessCode:
+      return (
+        t(`reservationUnit:accessTypes.${accessType}`) +
+        (pindoraInfo?.accessCode ? `: ${pindoraInfo.accessCode}` : "")
+      );
+    default:
+      return t(`reservationUnit:accessTypes.${accessType}`);
+  }
+}
+
 type ReservationsTableElem = {
   date: Date;
   dayOfWeek: string;
   time: string;
-  reservationUnit: Pick<
-    ReservationUnitNode,
-    "nameSv" | "nameFi" | "nameEn" | "id" | "pk"
+  reservationUnit: Omit<
+    ApplicationSectionReservationUnitFragment,
+    | "reservationCancelledInstructionsFi"
+    | "reservationCancelledInstructionsEn"
+    | "reservationCancelledInstructionsSv"
   >;
+  accessType?: AccessType;
+  accessTypeChanged?: boolean;
+  accessCodeTime?: string | null;
+  pindoraInfo?: PindoraReservationFragment | null;
   status: "" | "rejected" | "modified" | "cancelled";
   isCancellableReason: ReservationCancellableReason;
   pk: number;
@@ -557,6 +688,12 @@ function getStatusLabelProps(status: string): {
   }
 }
 
+const StyledTooltip = styled(Tooltip)`
+  position: absolute;
+  top: 0;
+  right: calc(var(--spacing-l) * -1);
+`;
+
 function ReservationsTable({
   reservations,
   application,
@@ -601,7 +738,10 @@ function ReservationsTable({
             $justifyContent="space-between"
             $width="full"
           >
-            <span aria-label={t("common:dateLabel")}>
+            <span
+              style={{ position: "relative" }}
+              aria-label={t("common:dateLabel")}
+            >
               <span>{toUIDate(date)}</span>
               <OnlyForMobile>
                 {/* span removes whitespace */}
@@ -609,12 +749,12 @@ function ReservationsTable({
                 <span>{dayOfWeek}</span>
               </OnlyForMobile>
             </span>
-            {!isDisabled ? (
+            {!isDisabled && (
               <PopupMenu
                 items={items}
                 className="popover-menu-toggle hide-on-desktop"
               />
-            ) : null}
+            )}
           </Flex>
         );
       },
@@ -633,11 +773,20 @@ function ReservationsTable({
       key: "time",
       headerName: t("common:timeLabel"),
       isSortable: false,
-      transform: ({ dayOfWeek, time }: ReservationsTableElem) => (
+      transform: ({
+        dayOfWeek,
+        time,
+        accessCodeTime,
+      }: ReservationsTableElem) => (
         <IconTextWrapper aria-label={t("common:timeLabel")}>
           <IconClock />
           <OnlyForMobile>{dayOfWeek}</OnlyForMobile>
           {time}
+          {accessCodeTime && time !== accessCodeTime && (
+            <StyledTooltip>
+              {`${t("reservations:accessCodeDuration")}: ${accessCodeTime}`}
+            </StyledTooltip>
+          )}
         </IconTextWrapper>
       ),
     },
@@ -657,6 +806,28 @@ function ReservationsTable({
           })}
         </IconTextWrapper>
       ),
+    },
+    {
+      key: "accessTypes",
+      headerName: reservations.some((r) => r.accessType != null)
+        ? t("reservationUnit:accessType")
+        : "",
+      isSortable: false,
+      transform: (elem: ReservationsTableElem) => {
+        if (elem.accessType == null) {
+          return "";
+        }
+        return (
+          <IconTextWrapper>
+            {t(`reservationUnit:accessTypes.${elem.accessType}`)}
+            {elem.accessTypeChanged && (
+              <StyledTooltip>
+                {t("reservations:accessTypeChanged")}
+              </StyledTooltip>
+            )}
+          </IconTextWrapper>
+        );
+      },
     },
     {
       key: "status",
@@ -757,26 +928,50 @@ function sectionToreservations(
     });
   }
 
+  function getAccessCodeValidThru(
+    pindoraInfo: PindoraReservationFragment | undefined | null
+  ) {
+    if (!pindoraInfo) {
+      return null;
+    }
+    return {
+      begin: pindoraInfo.accessCodeBeginsAt,
+      end: pindoraInfo.accessCodeEndsAt,
+    };
+  }
+
   function getReservations(
     r: (typeof recurringReservations)[0]
   ): ReservationsTableElem[] {
-    return r.reservations.map((res) => {
-      const { isModified, ...rest } = formatDateTimeStrings(
-        t,
-        res,
-        r.allocatedTimeSlot
-      );
-
-      const status = getReservationStatusChoice(res.state, isModified);
-
-      return {
-        ...rest,
-        reservationUnit: r.reservationUnit,
-        status,
-        isCancellableReason: isReservationCancellableReason(res),
-        pk: res.pk ?? 0,
-      };
-    });
+    return r.reservations.reduce<ReservationsTableElem[]>(
+      (acc, res, idx, ar) => {
+        const { isModified, ...rest } = formatDateTimeStrings(
+          t,
+          res,
+          r.allocatedTimeSlot
+        );
+        const status = getReservationStatusChoice(res.state, isModified);
+        const accessTypeChanged =
+          idx !== 0 && res.accessType !== ar[idx - 1]?.accessType;
+        const accessCodeValidThru = getAccessCodeValidThru(res.pindoraInfo);
+        const accessCodeTime =
+          accessCodeValidThru != null
+            ? formatDateTimeStrings(t, accessCodeValidThru).time
+            : null;
+        const reservationTableElem: ReservationsTableElem = {
+          ...rest,
+          reservationUnit: r.reservationUnit,
+          status,
+          isCancellableReason: isReservationCancellableReason(res),
+          pk: res.pk ?? 0,
+          accessType: res.accessType,
+          accessTypeChanged,
+          accessCodeTime,
+        };
+        return [...acc, reservationTableElem];
+      },
+      []
+    );
   }
 
   return (
@@ -817,12 +1012,15 @@ function sectionToReservationUnits(
   );
   reservationUnitsByDay.sort((a, b) => a.day - b.day);
   return reservationUnitsByDay.map((x) => {
-    const { reservationUnit, day, time } = x;
+    const { reservationUnit, day, time, recurringReservation } = x;
     return {
       reservationUnit,
       // NOTE our translations are sunday first
       dateOfWeek: t(`weekDayLong.${fromMondayFirst(day)}`),
       time,
+      accessType: recurringReservation.accessType,
+      usedAccessTypes: recurringReservation.usedAccessTypes,
+      pindoraInfo: recurringReservation.pindoraInfo,
     };
   });
 }
@@ -912,6 +1110,9 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
     id
     pk
     name
+    pindoraInfo {
+      ...PindoraSection
+    }
     reservationUnitOptions {
       id
       allocatedTimeSlots {
@@ -925,12 +1126,13 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
           beginTime
           endTime
           weekdays
+          accessType
+          usedAccessTypes
+          pindoraInfo {
+            ...PindoraSeries
+          }
           reservationUnit {
-            id
-            pk
-            nameFi
-            nameEn
-            nameSv
+            ...ApplicationSectionReservationUnit
             reservationConfirmedInstructionsFi
             reservationConfirmedInstructionsEn
             reservationConfirmedInstructionsSv
@@ -952,6 +1154,11 @@ export const APPLICATION_SECTION_RESERVATION_FRAGMENT = gql`
             end
             state
             ...CanUserCancelReservation
+            accessType
+            accessCodeIsActive
+            pindoraInfo {
+              ...PindoraReservation
+            }
           }
         }
       }
@@ -972,5 +1179,25 @@ export const APPLICATION_RESERVATIONS_QUERY = gql`
         ...ApplicationSectionReservation
       }
     }
+  }
+`;
+
+export const APPLICATION_SECTION_RESERVATION_UNIT_FRAGMENT = gql`
+  fragment ApplicationSectionReservationUnit on ReservationUnitNode {
+    nameFi
+    nameSv
+    nameEn
+    id
+    pk
+    reservationCancelledInstructionsFi
+    reservationCancelledInstructionsSv
+    reservationCancelledInstructionsEn
+    accessTypes {
+      id
+      pk
+      accessType
+      beginDate
+    }
+    currentAccessType
   }
 `;

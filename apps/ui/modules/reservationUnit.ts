@@ -13,6 +13,7 @@ import {
   isBefore,
   isSameDay,
   set,
+  sub,
 } from "date-fns";
 import { i18n } from "next-i18next";
 import {
@@ -34,6 +35,7 @@ import {
   ReservationStartInterval,
   Maybe,
   BlockingReservationFieldsFragment,
+  AccessType,
   type ReservationPriceFragment,
   ReservationStateChoice,
 } from "@gql/gql-types";
@@ -648,4 +650,33 @@ function getNotReservableReason(
     return "reservationUnit is only available for seasonal booking";
   }
   return null;
+}
+
+type AccessTypeDurations = {
+  accessType: AccessType;
+  beginDate: string;
+  endDate?: string | null;
+  id: string;
+  pk?: number | null;
+};
+
+export function getReservationUnitAccessPeriods(
+  accessTypes: AccessTypeDurations[]
+) {
+  type nextEndDateIterator = {
+    nextEndDate: string | null;
+    array: AccessTypeDurations[];
+  };
+  return accessTypes.reduceRight<nextEndDateIterator>(
+    (acc, aT) => {
+      const endDate = acc.nextEndDate
+        ? toUIDate(sub(new Date(acc.nextEndDate), { days: 1 }))
+        : null;
+      const accessTypeWithEndDate = { ...aT, endDate };
+      acc.nextEndDate = aT.beginDate;
+      acc.array.unshift(accessTypeWithEndDate);
+      return { nextEndDate: acc.nextEndDate, array: acc.array };
+    },
+    { nextEndDate: null, array: [] }
+  ).array;
 }
