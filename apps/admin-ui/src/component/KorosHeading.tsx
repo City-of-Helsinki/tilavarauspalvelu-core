@@ -22,7 +22,7 @@ const Wrapper = styled.div<{ $image?: string }>`
   --fill-color: var(--color-bus-dark);
   --background-color: var(--color-white);
 
-  ${overdrawCss}
+  ${overdrawCss};
   display: flex;
   flex-direction: column;
 

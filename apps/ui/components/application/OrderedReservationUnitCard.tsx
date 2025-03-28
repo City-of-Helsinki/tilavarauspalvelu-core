@@ -127,7 +127,7 @@ const DeleteContainer = styled(Flex).attrs({ $justifyContent: "center" })`
 const DeleteButton = styled(Button)`
   color: var(--color-black-90) !important;
   && {
-    ${fontBold}
+    ${fontBold};
     --padding-horizontal: var(--spacing-s);
     --padding-vertical: var(--spacing-xs);
   }
