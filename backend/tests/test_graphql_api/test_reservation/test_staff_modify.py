@@ -45,7 +45,7 @@ def test_reservation__staff_modify__wrong_state(graphql):
 
 
 def test_reservation__staff_modify__end_date_passed(graphql):
-    end = next_hour(plus_hours=-1, plus_days=-1)
+    end = next_hour(plus_hours=-1, plus_days=-2)
     begin = end - datetime.timedelta(hours=1)
 
     reservation = ReservationFactory.create_for_staff_update(begin=begin, end=end)
