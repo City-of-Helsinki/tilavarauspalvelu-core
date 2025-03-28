@@ -7234,6 +7234,9 @@ export type AllocatedTimeSlotsQueryVariables = Exact<{
   >;
   dayOfTheWeek?: InputMaybe<Array<InputMaybe<Weekday>> | InputMaybe<Weekday>>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  accessCodeState?: InputMaybe<
+    Array<InputMaybe<AccessCodeState>> | InputMaybe<AccessCodeState>
+  >;
   orderBy?: InputMaybe<
     | Array<InputMaybe<AllocatedTimeSlotOrderingChoices>>
     | InputMaybe<AllocatedTimeSlotOrderingChoices>
@@ -13173,6 +13176,7 @@ export const AllocatedTimeSlotsDocument = gql`
     $allocatedReservationUnit: [Int]
     $dayOfTheWeek: [Weekday]
     $textSearch: String
+    $accessCodeState: [AccessCodeState]
     $orderBy: [AllocatedTimeSlotOrderingChoices]
     $after: String
     $first: Int
@@ -13185,6 +13189,7 @@ export const AllocatedTimeSlotsDocument = gql`
       applicantType: $applicantType
       applicationSectionStatus: $applicationSectionStatus
       allocatedReservationUnit: $allocatedReservationUnit
+      accessCodeState: $accessCodeState
       dayOfTheWeek: $dayOfTheWeek
       textSearch: $textSearch
       orderBy: $orderBy
@@ -13264,6 +13269,7 @@ export const AllocatedTimeSlotsDocument = gql`
  *      allocatedReservationUnit: // value for 'allocatedReservationUnit'
  *      dayOfTheWeek: // value for 'dayOfTheWeek'
  *      textSearch: // value for 'textSearch'
+ *      accessCodeState: // value for 'accessCodeState'
  *      orderBy: // value for 'orderBy'
  *      after: // value for 'after'
  *      first: // value for 'first'

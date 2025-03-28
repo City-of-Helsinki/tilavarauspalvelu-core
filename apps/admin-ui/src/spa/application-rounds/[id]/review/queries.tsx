@@ -138,7 +138,6 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
 `;
 
 export const ALLOCATED_TIME_SLOTS_QUERY = gql`
-  ${APPLICANT_NAME_FRAGMENT}
   query AllocatedTimeSlots(
     $applicationRound: Int!
     $allocatedUnit: [Int]
@@ -147,6 +146,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
     $allocatedReservationUnit: [Int]
     $dayOfTheWeek: [Weekday]
     $textSearch: String
+    $accessCodeState: [AccessCodeState]
     $orderBy: [AllocatedTimeSlotOrderingChoices]
     $after: String
     $first: Int
@@ -159,6 +159,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
       applicantType: $applicantType
       applicationSectionStatus: $applicationSectionStatus
       allocatedReservationUnit: $allocatedReservationUnit
+      accessCodeState: $accessCodeState
       dayOfTheWeek: $dayOfTheWeek
       textSearch: $textSearch
       orderBy: $orderBy
