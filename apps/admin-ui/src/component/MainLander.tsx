@@ -16,7 +16,7 @@ const LoginBtn = styled(Button)`
   --color-hover: var(--color-white);
   --color-focus: var(--color-white);
 
-  ${fontBold}
+  ${fontBold};
 
   transform: scale(1.2);
   @media (min-width: ${breakpoints.s}) {

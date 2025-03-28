@@ -81,7 +81,7 @@ export const Value = styled.div<{ $isSummary?: boolean }>`
   ${({ $isSummary }) =>
     $isSummary
       ? css`
-          ${fontMedium}
+          ${fontMedium};
           white-space: pre-wrap;
           display: inline-block;
         `
