@@ -3442,12 +3442,6 @@ msgid ""
 msgstr "Tässä ovat varauksesi tiedot ja ovikoodi, jolla pääset tilaan helposti"
 
 #: tilavarauspalvelu/integrations/email/template_context/common.py
-#: tilavarauspalvelu/integrations/email/template_context/reservation.py
-msgctxt "Email"
-msgid "The door code has changed"
-msgstr "Ovikoodi on vaihtunut"
-
-#: tilavarauspalvelu/integrations/email/template_context/common.py
 msgctxt "Email"
 msgid "You can check your booking details at"
 msgstr "Voit käydä tarkistamassa varauksesi tiedot osoitteessa"
@@ -3524,6 +3518,11 @@ msgstr "Olet tehnyt uuden varauksen"
 msgctxt "Email"
 msgid "Your booking has been updated"
 msgstr "Varaustasi on muutettu"
+
+#: tilavarauspalvelu/integrations/email/template_context/reservation.py
+msgctxt "Email"
+msgid "The door code of your booking has changed"
+msgstr "Varauksesi ovikoodi on vaihtunut"
 
 #: tilavarauspalvelu/integrations/email/template_context/reservation.py
 msgctxt "Email"

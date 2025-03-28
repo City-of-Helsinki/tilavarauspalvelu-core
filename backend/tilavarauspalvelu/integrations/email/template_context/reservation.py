@@ -400,7 +400,7 @@ def get_context_for_reservation_modified_access_code(
     else:
         data = get_context_for_reservation_modified(**data, language=language)
 
-    title = pgettext("Email", "The door code has changed")
+    title = pgettext("Email", "The door code of your booking has changed")
     return {
         **data,
         "title": title,
@@ -777,7 +777,7 @@ def get_context_for_seasonal_reservation_modified_series_access_code(
     else:
         data = get_context_for_seasonal_reservation_modified_series(**data, language=language)
 
-    title = pgettext("Email", "The door code has changed")
+    title = pgettext("Email", "The door code of your booking has changed")
     return {
         **data,
         "title": title,

@@ -186,7 +186,6 @@ def get_context_for_keyless_entry(
         "text_access_code_confirmed": pgettext(
             "Email", "Here are your booking details and the door code for easy access to the space"
         ),
-        "text_access_code_modified": pgettext("Email", "The door code has changed"),
         "text_access_code_unavailable_instructions_html": unavailable_instructions
         % {
             "my_reservations": create_anchor_tag(link=my_reservations_link, text=my_reservations_text),

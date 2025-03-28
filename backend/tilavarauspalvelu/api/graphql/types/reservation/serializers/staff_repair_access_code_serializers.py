@@ -49,5 +49,5 @@ class StaffRepairReservationAccessCodeSerializer(NestingModelSerializer):
             PindoraService.sync_access_code(obj=instance)
 
         if instance.access_code_should_be_active:
-            EmailService.send_reservation_modified_access_code_email(reservation=instance)
+            EmailService.send_reservation_modified_email(reservation=instance)
         return instance
