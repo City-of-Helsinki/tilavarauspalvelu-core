@@ -108,10 +108,26 @@ def test_reservation_unit__create__access_types__published(graphql):
     assert access_type[0].access_type == AccessType.UNRESTRICTED
 
 
-@pytest.mark.skip("Add back later once frontend is updated")  # TODO: Add back later
-def test_reservation_unit__create__access_types__published__no_active_access_type(graphql):
+def test_reservation_unit__create__access_types__published__no_access_types(graphql):
     data = get_create_non_draft_input_data()
     data["accessTypes"] = []
+
+    graphql.login_with_superuser()
+    response = graphql(CREATE_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["At least one active access type is required."]
+
+
+@freeze_time(local_datetime(2024, 1, 1))
+def test_reservation_unit__create__access_types__published__no_active_access_type(graphql):
+    data = get_create_non_draft_input_data()
+    data["accessTypes"] = [
+        {
+            "beginDate": local_date(2024, 1, 2).isoformat(),
+            "accessType": AccessType.PHYSICAL_KEY.value,
+        },
+    ]
 
     graphql.login_with_superuser()
     response = graphql(CREATE_MUTATION, input_data=data)
