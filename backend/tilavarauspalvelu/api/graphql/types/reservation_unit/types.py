@@ -56,31 +56,33 @@ class ReservationUnitNode(DjangoNode):
     publishing_state = AnnotatedField(
         graphene.Enum.from_enum(ReservationUnitPublishingState),
         expression=L("publishing_state"),
+        required=True,
     )
     reservation_state = AnnotatedField(
         graphene.Enum.from_enum(ReservationUnitReservationState),
         expression=L("reservation_state"),
+        required=True,
     )
 
     location = ManuallyOptimizedField(LocationNode)
 
-    is_closed = graphene.Boolean()
+    is_closed = graphene.Boolean(required=True)
     first_reservable_datetime = graphene.DateTime()
     effective_access_type = graphene.Field(graphene.Enum.from_enum(AccessType))
 
     hauki_url = ManuallyOptimizedField(graphene.String)
 
     reservable_time_spans = graphene.List(
-        ReservableTimeSpanType,
+        graphene.NonNull(ReservableTimeSpanType),
         start_date=graphene.Date(required=True),
         end_date=graphene.Date(required=True),
     )
 
     reservations = DjangoListField(ReservationNode)
 
-    num_active_user_reservations = ManuallyOptimizedField(graphene.Int)
+    num_active_user_reservations = ManuallyOptimizedField(graphene.Int, required=True)
 
-    calculated_surface_area = AnnotatedField(graphene.Int, expression=Sum("surface_area"))
+    calculated_surface_area = AnnotatedField(graphene.Int, expression=Sum("surface_area"), required=True)
 
     current_access_type = AnnotatedField(graphene.Enum.from_enum(AccessType), expression=L("current_access_type"))
 

@@ -72,6 +72,9 @@ function constructReservation(
     state: ReservationStateChoice.Confirmed,
     accessType: AccessType.Unrestricted,
     paymentOrder: [],
+    calendarUrl: "",
+    isAccessCodeIsActiveCorrect: false,
+    isBlocked: false,
     reservationUnits: [
       {
         bufferTimeAfter: 0,
@@ -120,6 +123,8 @@ describe("createTag", () => {
         beginDate: toApiDate(start),
         endDate: toApiDate(addMonths(end, 3)),
         weekdays: [0, 1, 3],
+        isAccessCodeIsActiveCorrect: false,
+        usedAccessTypes: [],
       },
     };
 

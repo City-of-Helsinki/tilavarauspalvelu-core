@@ -59,6 +59,39 @@ function getValidInterval(daysToAdd: number) {
   return [begin.toISOString(), addHours(begin, 1).toISOString()];
 }
 
+function createReservation({
+  begin,
+  end,
+  pk,
+  recurringPk,
+  state = ReservationStateChoice.Confirmed,
+}: {
+  begin: string;
+  end: string;
+  pk: number;
+  recurringPk: number;
+  state?: ReservationStateChoice;
+}): NonNullable<
+  RecurringReservationQuery["recurringReservation"]
+>["reservations"][0] {
+  return {
+    begin,
+    end,
+    pk,
+    id: base64encode(`ReservationNode:${pk}`),
+    bufferTimeAfter: 0,
+    bufferTimeBefore: 0,
+    paymentOrder: [],
+    reservationUnits: [],
+    recurringReservation: {
+      id: base64encode(`RecurringReservationNode:${recurringPk}`),
+      pk: recurringPk,
+      weekdays: [],
+    },
+    state,
+  } as const;
+}
+
 function createReservationEdge({
   startingPk,
   recurringPk,
@@ -70,18 +103,6 @@ function createReservationEdge({
 }): NonNullable<
   RecurringReservationQuery["recurringReservation"]
 >["reservations"] {
-  const params = {
-    bufferTimeAfter: 0,
-    bufferTimeBefore: 0,
-    paymentOrder: [],
-    reservationUnits: [],
-    recurringReservation: {
-      id: base64encode(`RecurringReservationNode:${recurringPk}`),
-      pk: recurringPk,
-    },
-    state,
-  };
-
   const begin1 = getValidInterval(0)[0];
   const end1 = getValidInterval(0)[1];
   const begin2 = getValidInterval(7)[0];
@@ -90,20 +111,20 @@ function createReservationEdge({
     throw new Error("Invalid dates");
   }
   return [
-    {
-      ...params,
+    createReservation({
       begin: begin1,
       end: end1,
       pk: startingPk,
-      id: base64encode(`ReservationNode:${startingPk}`),
-    },
-    {
-      ...params,
+      recurringPk,
+      state,
+    }),
+    createReservation({
       begin: begin2,
       end: end2,
       pk: startingPk + 1,
-      id: base64encode(`ReservationNode:${startingPk + 1}`),
-    },
+      recurringPk,
+      state,
+    }),
   ];
 }
 
@@ -307,6 +328,9 @@ export const mockReservation: ReservationType = {
   workingMemo: "empty",
   handlingDetails: "",
   accessType: AccessType.Unrestricted,
+  calendarUrl: "",
+  isBlocked: false,
+  isAccessCodeIsActiveCorrect: false,
 };
 
 export function createMockRecurringReservation(props: {
@@ -322,6 +346,9 @@ export function createMockRecurringReservation(props: {
       description: "",
       id: base64encode(`RecurringReservationNode:${props.recurringPk}`),
       name: "recurring",
+      weekdays: [],
+      usedAccessTypes: [],
+      isAccessCodeIsActiveCorrect: false,
     },
   };
 }

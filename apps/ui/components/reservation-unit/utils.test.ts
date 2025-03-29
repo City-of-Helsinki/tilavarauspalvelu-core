@@ -6,13 +6,18 @@ import {
   set,
   startOfDay,
 } from "date-fns";
-import { getLastPossibleReservationDate, getNextAvailableTime } from "./utils";
 import {
-  ReservationKind,
-  ReservationStartInterval,
-} from "common/gql/gql-types";
-import { AccessType, ReservationUnitPageQuery } from "@/gql/gql-types";
-import { dateToKey, ReservableMap, RoundPeriod } from "@/modules/reservable";
+  type AvailableTimesProps,
+  getLastPossibleReservationDate,
+  getNextAvailableTime,
+  type LastPossibleReservationDateProps,
+} from "./utils";
+import { ReservationStartInterval } from "common/gql/gql-types";
+import {
+  dateToKey,
+  ReservableMap,
+  type RoundPeriod,
+} from "@/modules/reservable";
 import {
   vi,
   describe,
@@ -23,6 +28,7 @@ import {
   afterAll,
 } from "vitest";
 import { TIMERS_TO_FAKE } from "@/test/test.utils";
+import { base64encode } from "common/src/helpers";
 
 describe("getLastPossibleReservationDate", () => {
   beforeAll(() => {
@@ -45,7 +51,7 @@ describe("getLastPossibleReservationDate", () => {
       end: Date;
     }[];
     reservationEnds?: Date;
-  }) {
+  }): LastPossibleReservationDateProps {
     return {
       reservationsMaxDaysBefore,
       reservableTimeSpans: reservableTimeSpans?.map(({ begin, end }) => ({
@@ -200,45 +206,22 @@ describe("getNextAvailableTime", () => {
     reservationsMinDaysBefore?: number;
     reservationsMaxDaysBefore?: number;
     activeApplicationRounds?: RoundPeriod[];
-  }) {
-    const reservationUnit: NonNullable<
-      ReservationUnitPageQuery["reservationUnit"]
-    > = {
-      id: "123",
-      pk: 123,
-      isDraft: false,
-      reservationKind: ReservationKind.Direct,
-      bufferTimeBefore: 0,
-      bufferTimeAfter: 0,
-      requireReservationHandling: false,
-      canApplyFreeOfCharge: false,
-      reservationStartInterval: ReservationStartInterval.Interval_30Mins,
-      uuid: "123",
-      images: [],
-      applicationRoundTimeSlots: [],
-      applicationRounds: [],
-      equipments: [],
-      pricings: [],
-      accessTypes: [
-        {
-          id: "123",
-          accessType: AccessType.Unrestricted,
-          beginDate: new Date().toISOString(),
-        },
-      ],
-    };
+  }): Readonly<AvailableTimesProps> {
     return {
       start,
       duration,
       reservationUnit: {
-        ...reservationUnit,
+        id: base64encode("ReservationUnit:1"),
         reservationsMinDaysBefore,
         reservationsMaxDaysBefore,
+        bufferTimeBefore: 0,
+        bufferTimeAfter: 0,
+        reservationStartInterval: ReservationStartInterval.Interval_30Mins,
       },
-      reservableTimes,
       activeApplicationRounds: activeApplicationRounds ?? [],
       blockingReservations: [],
-    };
+      reservableTimes,
+    } as const;
   }
 
   test("finds the next available time for today", () => {

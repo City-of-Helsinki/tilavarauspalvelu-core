@@ -47,15 +47,27 @@ class PindoraSeriesInfoType(graphene.ObjectType):
 
 
 class RecurringReservationNode(DjangoNode):
-    weekdays = graphene.List(graphene.Int)
+    weekdays = graphene.List(graphene.NonNull(graphene.Int), required=True)
 
-    access_type = AnnotatedField(graphene.Enum.from_enum(AccessTypeWithMultivalued), expression=L("access_type"))
-    used_access_types = AnnotatedField(
-        graphene.List(graphene.Enum.from_enum(AccessType)), expression=L("used_access_types")
+    access_type = AnnotatedField(
+        graphene.Enum.from_enum(AccessTypeWithMultivalued),
+        expression=L("access_type"),
+        required=True,
     )
-    should_have_active_access_code = AnnotatedField(graphene.Boolean, expression=L("should_have_active_access_code"))
+    used_access_types = AnnotatedField(
+        graphene.List(graphene.Enum.from_enum(AccessType)),
+        expression=L("used_access_types"),
+        required=True,
+    )
+    should_have_active_access_code = AnnotatedField(
+        graphene.Boolean,
+        expression=L("should_have_active_access_code"),
+        required=True,
+    )
     is_access_code_is_active_correct = AnnotatedField(
-        graphene.Boolean, expression=L("is_access_code_is_active_correct")
+        graphene.Boolean,
+        expression=L("is_access_code_is_active_correct"),
+        required=True,
     )
 
     pindora_info = MultiField(

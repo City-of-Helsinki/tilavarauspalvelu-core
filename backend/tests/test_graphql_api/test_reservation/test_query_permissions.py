@@ -122,7 +122,6 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         description
         reserveeId
         cancelDetails
-        order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
         homeCity { nameFi }
         reserveeType
         reserveeIsUnregisteredAssociation
@@ -160,7 +159,6 @@ def test_reservation__query__regular_user_cannot_see_personal_information_from_o
         "isHandled": None,
         "name": None,
         "numPersons": None,
-        "order": None,
         "price": None,
         "priceNet": None,
         "purpose": None,
@@ -192,7 +190,6 @@ def test_reservation__query__fields_requiring_staff_permissions__superuser(graph
 
     fields = """
         pk
-        staffEvent
         type
         workingMemo
         handlingDetails
@@ -206,7 +203,6 @@ def test_reservation__query__fields_requiring_staff_permissions__superuser(graph
     assert len(response.edges) == 1
     assert response.node(0) == {
         "pk": reservation.pk,
-        "staffEvent": True,
         "type": ReservationTypeChoice.STAFF.value,
         "workingMemo": reservation.working_memo,
         "handlingDetails": reservation.handling_details,
@@ -224,7 +220,6 @@ def test_reservation__query__fields_requiring_staff_permissions__regular_user(gr
 
     fields = """
         pk
-        staffEvent
         type
         workingMemo
         handlingDetails
@@ -238,7 +233,6 @@ def test_reservation__query__fields_requiring_staff_permissions__regular_user(gr
     assert len(response.edges) == 1
     assert response.node(0) == {
         "pk": reservation.pk,
-        "staffEvent": None,
         "type": None,
         "workingMemo": None,
         "handlingDetails": None,
@@ -305,7 +299,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
         isHandled
         name
         numPersons
-        order { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
+        paymentOrder { orderUuid status paymentType receiptUrl checkoutUrl reservationPk refundUuid expiresInMinutes }
         price
         priceNet
         purpose { nameFi }
@@ -348,7 +342,7 @@ def test_reservation__query__reservation_owner_can_see_personal_information_from
     assert response.node(0)["isHandled"] is not None, "field not found"
     assert response.node(0)["name"] is not None, "field not found"
     assert response.node(0)["numPersons"] is not None, "field not found"
-    assert response.node(0)["order"] is not None, "field not found"
+    assert response.node(0)["paymentOrder"] is not None, "field not found"
     assert response.node(0)["price"] is not None, "field not found"
     assert response.node(0)["priceNet"] is not None, "field not found"
     assert response.node(0)["purpose"] is not None, "field not found"

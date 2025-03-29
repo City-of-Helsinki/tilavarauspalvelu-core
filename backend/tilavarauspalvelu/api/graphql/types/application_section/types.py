@@ -45,16 +45,28 @@ class PindoraSectionInfoType(graphene.ObjectType):
     access_code_sms_number = graphene.String(required=True)
     access_code_sms_message = graphene.String(required=True)
 
-    access_code_validity = graphene.List(PindoraSectionValidityInfoType, required=True)
+    access_code_validity = graphene.List(graphene.NonNull(PindoraSectionValidityInfoType), required=True)
 
 
 class ApplicationSectionNode(DjangoNode):
-    status = AnnotatedField(graphene.Enum.from_enum(ApplicationSectionStatusChoice), expression=L("status"))
-    allocations = AnnotatedField(graphene.Int, expression=L("allocations"))
+    status = AnnotatedField(
+        graphene.Enum.from_enum(ApplicationSectionStatusChoice),
+        expression=L("status"),
+        required=True,
+    )
+    allocations = AnnotatedField(
+        graphene.Int,
+        expression=L("allocations"),
+        required=True,
+    )
 
     has_reservations = ManuallyOptimizedField(graphene.Boolean, required=True)
 
-    should_have_active_access_code = AnnotatedField(graphene.Boolean, expression=L("should_have_active_access_code"))
+    should_have_active_access_code = AnnotatedField(
+        graphene.Boolean,
+        expression=L("should_have_active_access_code"),
+        required=True,
+    )
 
     pindora_info = MultiField(
         PindoraSectionInfoType,

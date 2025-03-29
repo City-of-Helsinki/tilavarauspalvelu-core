@@ -221,14 +221,14 @@ export type ApplicantNode = Node & {
   generalRoles: Array<GeneralRoleNode>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  isAdAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
-  isStronglyAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
+  isAdAuthenticated: Scalars["Boolean"]["output"];
+  isStronglyAuthenticated: Scalars["Boolean"]["output"];
   /** Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella. */
   isSuperuser: Scalars["Boolean"]["output"];
   lastName: Scalars["String"]["output"];
-  name?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  reservationNotification?: Maybe<Scalars["String"]["output"]>;
+  reservationNotification?: Maybe<ReservationNotification>;
   unitRoles: Array<UnitRoleNode>;
   /** Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja. */
   username: Scalars["String"]["output"];
@@ -298,7 +298,7 @@ export type ApplicationNode = Node & {
   organisation?: Maybe<OrganisationNode>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   sentDate?: Maybe<Scalars["DateTime"]["output"]>;
-  status?: Maybe<ApplicationStatusChoice>;
+  status: ApplicationStatusChoice;
   user?: Maybe<ApplicantNode>;
   workingMemo: Scalars["String"]["output"];
 };
@@ -365,7 +365,7 @@ export enum ApplicationOrderingChoices {
 export type ApplicationRoundNode = Node & {
   applicationPeriodBegin: Scalars["DateTime"]["output"];
   applicationPeriodEnd: Scalars["DateTime"]["output"];
-  applicationsCount?: Maybe<Scalars["Int"]["output"]>;
+  applicationsCount: Scalars["Int"]["output"];
   criteria: Scalars["String"]["output"];
   criteriaEn?: Maybe<Scalars["String"]["output"]>;
   criteriaFi?: Maybe<Scalars["String"]["output"]>;
@@ -373,7 +373,7 @@ export type ApplicationRoundNode = Node & {
   handledDate?: Maybe<Scalars["DateTime"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  isSettingHandledAllowed?: Maybe<Scalars["Boolean"]["output"]>;
+  isSettingHandledAllowed: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
@@ -386,13 +386,13 @@ export type ApplicationRoundNode = Node & {
   publicDisplayBegin: Scalars["DateTime"]["output"];
   publicDisplayEnd: Scalars["DateTime"]["output"];
   purposes: Array<ReservationPurposeNode>;
-  reservationCreationStatus?: Maybe<ApplicationRoundReservationCreationStatusChoice>;
+  reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice;
   reservationPeriodBegin: Scalars["Date"]["output"];
   reservationPeriodEnd: Scalars["Date"]["output"];
-  reservationUnitCount?: Maybe<Scalars["Int"]["output"]>;
+  reservationUnitCount: Scalars["Int"]["output"];
   reservationUnits: Array<ReservationUnitNode>;
   sentDate?: Maybe<Scalars["DateTime"]["output"]>;
-  status?: Maybe<ApplicationRoundStatusChoice>;
+  status: ApplicationRoundStatusChoice;
   statusTimestamp?: Maybe<Scalars["DateTime"]["output"]>;
   termsOfUse?: Maybe<TermsOfUseNode>;
 };
@@ -420,10 +420,10 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  maxPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  maxPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -435,18 +435,18 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  personsAllowed?: InputMaybe<Scalars["Int"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
   >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
   reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Int"]["input"]>;
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
@@ -455,13 +455,13 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  surfaceAreaGte?: InputMaybe<Scalars["Int"]["input"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Int"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
-  typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  typeRankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  typeRankLte?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
@@ -509,7 +509,7 @@ export type ApplicationRoundTimeSlotNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  reservableTimes?: Maybe<Array<Maybe<TimeSlotType>>>;
+  reservableTimes: Array<Maybe<TimeSlotType>>;
   weekday: Scalars["Int"]["output"];
 };
 
@@ -580,7 +580,7 @@ export type ApplicationSectionForApplicationSerializerInput = {
 
 export type ApplicationSectionNode = Node & {
   ageGroup?: Maybe<AgeGroupNode>;
-  allocations?: Maybe<Scalars["Int"]["output"]>;
+  allocations: Scalars["Int"]["output"];
   application: ApplicationNode;
   appliedReservationsPerWeek: Scalars["Int"]["output"];
   extUuid: Scalars["UUID"]["output"];
@@ -598,8 +598,8 @@ export type ApplicationSectionNode = Node & {
   reservationUnitOptions: Array<ReservationUnitOptionNode>;
   reservationsBeginDate: Scalars["Date"]["output"];
   reservationsEndDate: Scalars["Date"]["output"];
-  shouldHaveActiveAccessCode?: Maybe<Scalars["Boolean"]["output"]>;
-  status?: Maybe<ApplicationSectionStatusChoice>;
+  shouldHaveActiveAccessCode: Scalars["Boolean"]["output"];
+  status: ApplicationSectionStatusChoice;
   suitableTimeRanges: Array<SuitableTimeRangeNode>;
 };
 
@@ -841,7 +841,7 @@ export type BannerNotificationNode = Node & {
   messageSv?: Maybe<Scalars["String"]["output"]>;
   name: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  state?: Maybe<BannerNotificationState>;
+  state: BannerNotificationState;
   target: BannerNotificationTarget;
 };
 
@@ -1141,7 +1141,7 @@ export type GeneralRoleNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   modified: Scalars["DateTime"]["output"];
-  permissions?: Maybe<Array<Maybe<UserPermissionChoice>>>;
+  permissions: Array<UserPermissionChoice>;
   role: UserRoleChoice;
   user: UserNode;
 };
@@ -1153,7 +1153,7 @@ export type HelsinkiProfileDataNode = {
   firstName?: Maybe<Scalars["String"]["output"]>;
   isStrongLogin: Scalars["Boolean"]["output"];
   lastName?: Maybe<Scalars["String"]["output"]>;
-  loginMethod?: Maybe<LoginMethod>;
+  loginMethod: LoginMethod;
   municipalityCode?: Maybe<Scalars["String"]["output"]>;
   municipalityName?: Maybe<Scalars["String"]["output"]>;
   phone?: Maybe<Scalars["String"]["output"]>;
@@ -1645,7 +1645,7 @@ export type PaymentMerchantNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
-  pk?: Maybe<Scalars["UUID"]["output"]>;
+  pk: Scalars["UUID"]["output"];
 };
 
 export type PaymentOrderNode = Node & {
@@ -1659,14 +1659,14 @@ export type PaymentOrderNode = Node & {
   receiptUrl?: Maybe<Scalars["String"]["output"]>;
   refundUuid?: Maybe<Scalars["UUID"]["output"]>;
   reservationPk?: Maybe<Scalars["String"]["output"]>;
-  status?: Maybe<OrderStatus>;
+  status: OrderStatus;
 };
 
 export type PaymentProductNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   merchant?: Maybe<PaymentMerchantNode>;
-  pk?: Maybe<Scalars["UUID"]["output"]>;
+  pk: Scalars["UUID"]["output"];
 };
 
 /** An enumeration. */
@@ -1718,7 +1718,7 @@ export type PindoraSectionInfoType = {
   accessCodePhoneNumber: Scalars["String"]["output"];
   accessCodeSmsMessage: Scalars["String"]["output"];
   accessCodeSmsNumber: Scalars["String"]["output"];
-  accessCodeValidity: Array<Maybe<PindoraSectionValidityInfoType>>;
+  accessCodeValidity: Array<PindoraSectionValidityInfoType>;
 };
 
 export type PindoraSectionValidityInfoType = {
@@ -2147,8 +2147,8 @@ export type QueryEquipmentsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<EquipmentOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type QueryEquipmentsAllArgs = {
@@ -2340,10 +2340,10 @@ export type QueryReservationUnitsArgs = {
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  maxPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  maxPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -2356,18 +2356,18 @@ export type QueryReservationUnitsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  personsAllowed?: InputMaybe<Scalars["Int"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
   >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
   reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Int"]["input"]>;
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
@@ -2376,13 +2376,13 @@ export type QueryReservationUnitsArgs = {
   >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  surfaceAreaGte?: InputMaybe<Scalars["Int"]["input"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Int"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
-  typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  typeRankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  typeRankLte?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
@@ -2567,7 +2567,7 @@ export type QueryUserArgs = {
 
 export type RecurringReservationNode = Node & {
   abilityGroup?: Maybe<AbilityGroupNode>;
-  accessType?: Maybe<AccessTypeWithMultivalued>;
+  accessType: AccessTypeWithMultivalued;
   ageGroup?: Maybe<AgeGroupNode>;
   allocatedTimeSlot?: Maybe<AllocatedTimeSlotNode>;
   beginDate?: Maybe<Scalars["Date"]["output"]>;
@@ -2579,7 +2579,7 @@ export type RecurringReservationNode = Node & {
   extUuid: Scalars["UUID"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  isAccessCodeIsActiveCorrect?: Maybe<Scalars["Boolean"]["output"]>;
+  isAccessCodeIsActiveCorrect: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple series, queries to Pindora are not optimized. */
   pindoraInfo?: Maybe<PindoraSeriesInfoType>;
@@ -2588,10 +2588,10 @@ export type RecurringReservationNode = Node & {
   rejectedOccurrences: Array<RejectedOccurrenceNode>;
   reservationUnit: ReservationUnitNode;
   reservations: Array<ReservationNode>;
-  shouldHaveActiveAccessCode?: Maybe<Scalars["Boolean"]["output"]>;
-  usedAccessTypes?: Maybe<Array<Maybe<AccessType>>>;
+  shouldHaveActiveAccessCode: Scalars["Boolean"]["output"];
+  usedAccessTypes: Array<Maybe<AccessType>>;
   user?: Maybe<UserNode>;
-  weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  weekdays: Array<Scalars["Int"]["output"]>;
 };
 
 export type RecurringReservationNodeRejectedOccurrencesArgs = {
@@ -2979,7 +2979,7 @@ export type ReservationNode = Node & {
   accessCodeShouldBeActive?: Maybe<Scalars["Boolean"]["output"]>;
   accessType: AccessType;
   /** Which reservation units' reserveability is affected by this reservation? */
-  affectedReservationUnits?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  affectedReservationUnits: Array<Maybe<Scalars["Int"]["output"]>>;
   ageGroup?: Maybe<AgeGroupNode>;
   applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]["output"]>;
   begin: Scalars["DateTime"]["output"];
@@ -2992,7 +2992,7 @@ export type ReservationNode = Node & {
   billingPhone?: Maybe<Scalars["String"]["output"]>;
   bufferTimeAfter: Scalars["Duration"]["output"];
   bufferTimeBefore: Scalars["Duration"]["output"];
-  calendarUrl?: Maybe<Scalars["String"]["output"]>;
+  calendarUrl: Scalars["String"]["output"];
   cancelDetails?: Maybe<Scalars["String"]["output"]>;
   cancelReason?: Maybe<ReservationCancelReasonNode>;
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
@@ -3006,13 +3006,11 @@ export type ReservationNode = Node & {
   homeCity?: Maybe<CityNode>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  isAccessCodeIsActiveCorrect?: Maybe<Scalars["Boolean"]["output"]>;
-  isBlocked?: Maybe<Scalars["Boolean"]["output"]>;
+  isAccessCodeIsActiveCorrect: Scalars["Boolean"]["output"];
+  isBlocked: Scalars["Boolean"]["output"];
   isHandled?: Maybe<Scalars["Boolean"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
-  /** @deprecated Please use to 'paymentOrder' instead. */
-  order?: Maybe<PaymentOrderNode>;
   paymentOrder: Array<PaymentOrderNode>;
   /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized. */
   pindoraInfo?: Maybe<PindoraReservationInfoType>;
@@ -3034,8 +3032,6 @@ export type ReservationNode = Node & {
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
   reserveeType?: Maybe<CustomerTypeChoice>;
-  /** @deprecated Please use to 'type' instead. */
-  staffEvent?: Maybe<Scalars["Boolean"]["output"]>;
   state?: Maybe<ReservationStateChoice>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
   type?: Maybe<ReservationTypeChoice>;
@@ -3059,10 +3055,10 @@ export type ReservationNodeReservationUnitsArgs = {
   equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  maxPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  maxPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -3074,18 +3070,18 @@ export type ReservationNodeReservationUnitsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  personsAllowed?: InputMaybe<Scalars["Int"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
   >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
   reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Int"]["input"]>;
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
@@ -3094,13 +3090,13 @@ export type ReservationNodeReservationUnitsArgs = {
   >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  surfaceAreaGte?: InputMaybe<Scalars["Int"]["input"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Int"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
-  typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  typeRankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  typeRankLte?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
@@ -3121,13 +3117,10 @@ export type ReservationNodeEdge = {
   node?: Maybe<ReservationNode>;
 };
 
-/** An enumeration. */
+/** When user wants to receive reservation notification emails. */
 export enum ReservationNotification {
-  /** All */
   All = "ALL",
-  /** None */
   None = "NONE",
-  /** Only Handling Required */
   OnlyHandlingRequired = "ONLY_HANDLING_REQUIRED",
 }
 
@@ -3892,7 +3885,7 @@ export type ReservationUnitNode = Node & {
   authentication: Authentication;
   bufferTimeAfter: Scalars["Duration"]["output"];
   bufferTimeBefore: Scalars["Duration"]["output"];
-  calculatedSurfaceArea?: Maybe<Scalars["Int"]["output"]>;
+  calculatedSurfaceArea: Scalars["Int"]["output"];
   canApplyFreeOfCharge: Scalars["Boolean"]["output"];
   cancellationRule?: Maybe<ReservationUnitCancellationRuleNode>;
   cancellationTerms?: Maybe<TermsOfUseNode>;
@@ -3910,7 +3903,7 @@ export type ReservationUnitNode = Node & {
   id: Scalars["ID"]["output"];
   images: Array<ReservationUnitImageNode>;
   isArchived: Scalars["Boolean"]["output"];
-  isClosed?: Maybe<Scalars["Boolean"]["output"]>;
+  isClosed: Scalars["Boolean"]["output"];
   isDraft: Scalars["Boolean"]["output"];
   location?: Maybe<LocationNode>;
   maxPersons?: Maybe<Scalars["Int"]["output"]>;
@@ -3923,7 +3916,7 @@ export type ReservationUnitNode = Node & {
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
-  numActiveUserReservations?: Maybe<Scalars["Int"]["output"]>;
+  numActiveUserReservations: Scalars["Int"]["output"];
   paymentMerchant?: Maybe<PaymentMerchantNode>;
   paymentProduct?: Maybe<PaymentProductNode>;
   paymentTerms?: Maybe<TermsOfUseNode>;
@@ -3933,13 +3926,13 @@ export type ReservationUnitNode = Node & {
   pricings: Array<ReservationUnitPricingNode>;
   publishBegins?: Maybe<Scalars["DateTime"]["output"]>;
   publishEnds?: Maybe<Scalars["DateTime"]["output"]>;
-  publishingState?: Maybe<ReservationUnitPublishingState>;
+  publishingState: ReservationUnitPublishingState;
   purposes: Array<PurposeNode>;
   qualifiers: Array<QualifierNode>;
   rank: Scalars["Int"]["output"];
   requireAdultReservee: Scalars["Boolean"]["output"];
   requireReservationHandling: Scalars["Boolean"]["output"];
-  reservableTimeSpans?: Maybe<Array<Maybe<ReservableTimeSpanType>>>;
+  reservableTimeSpans?: Maybe<Array<ReservableTimeSpanType>>;
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
   reservationBlockWholeDay: Scalars["Boolean"]["output"];
   reservationCancelledInstructions: Scalars["String"]["output"];
@@ -3957,7 +3950,7 @@ export type ReservationUnitNode = Node & {
   reservationPendingInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationPendingInstructionsSv?: Maybe<Scalars["String"]["output"]>;
   reservationStartInterval: ReservationStartInterval;
-  reservationState?: Maybe<ReservationUnitReservationState>;
+  reservationState: ReservationUnitReservationState;
   reservationUnitType?: Maybe<ReservationUnitTypeNode>;
   reservations?: Maybe<Array<ReservationNode>>;
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
@@ -4008,8 +4001,8 @@ export type ReservationUnitNodeEquipmentsArgs = {
   name_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<EquipmentOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ReservationUnitNodePurposesArgs = {
@@ -4202,11 +4195,11 @@ export type ReservationUnitPaymentTypeNode = Node & {
 export type ReservationUnitPricingNode = Node & {
   begins: Scalars["Date"]["output"];
   highestPrice: Scalars["Decimal"]["output"];
-  highestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  highestPriceNet: Scalars["Decimal"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   lowestPrice: Scalars["Decimal"]["output"];
-  lowestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  lowestPriceNet: Scalars["Decimal"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
   priceUnit: PriceUnit;
   taxPercentage: TaxPercentageNode;
@@ -4557,7 +4550,7 @@ export enum ResourceLocationType {
 export type ResourceNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  locationType?: Maybe<ResourceLocationType>;
+  locationType: ResourceLocationType;
   name: Scalars["String"]["output"];
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
@@ -4792,7 +4785,7 @@ export type SuitableTimeRangeNode = Node & {
   beginTime: Scalars["Time"]["output"];
   dayOfTheWeek: Weekday;
   endTime: Scalars["Time"]["output"];
-  fulfilled?: Maybe<Scalars["Boolean"]["output"]>;
+  fulfilled: Scalars["Boolean"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -5005,10 +4998,10 @@ export type UnitNodeReservationUnitsArgs = {
   equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  maxPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  maxPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -5020,18 +5013,18 @@ export type UnitNodeReservationUnitsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  personsAllowed?: InputMaybe<Scalars["Int"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
   >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
   reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Int"]["input"]>;
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
@@ -5040,13 +5033,13 @@ export type UnitNodeReservationUnitsArgs = {
   >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  surfaceAreaGte?: InputMaybe<Scalars["Int"]["input"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Int"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
-  typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  typeRankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  typeRankLte?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
@@ -5112,7 +5105,7 @@ export type UnitRoleNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   modified: Scalars["DateTime"]["output"];
-  permissions?: Maybe<Array<Maybe<UserPermissionChoice>>>;
+  permissions: Array<UserPermissionChoice>;
   role: UserRoleChoice;
   unitGroups: Array<UnitGroupNode>;
   units: Array<UnitNode>;
@@ -5319,14 +5312,14 @@ export type UserNode = Node & {
   generalRoles: Array<GeneralRoleNode>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  isAdAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
-  isStronglyAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
+  isAdAuthenticated: Scalars["Boolean"]["output"];
+  isStronglyAuthenticated: Scalars["Boolean"]["output"];
   /** Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella. */
   isSuperuser: Scalars["Boolean"]["output"];
   lastName: Scalars["String"]["output"];
-  name?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  reservationNotification?: Maybe<Scalars["String"]["output"]>;
+  reservationNotification?: Maybe<ReservationNotification>;
   unitRoles: Array<UnitRoleNode>;
   /** Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja. */
   username: Scalars["String"]["output"];
@@ -5449,7 +5442,7 @@ export type ApplicationSectionReservationFragment = {
         pk?: number | null;
         beginTime?: string | null;
         endTime?: string | null;
-        weekdays?: Array<number | null> | null;
+        weekdays: Array<number>;
         reservationUnit: {
           id: string;
           pk?: number | null;
@@ -5515,7 +5508,7 @@ export type ApplicationReservationsQuery = {
             pk?: number | null;
             beginTime?: string | null;
             endTime?: string | null;
-            weekdays?: Array<number | null> | null;
+            weekdays: Array<number>;
             reservationUnit: {
               id: string;
               pk?: number | null;
@@ -5594,13 +5587,13 @@ export type ApplicationReservationUnitListFragment = {
 export type ApplicationViewFragment = {
   id: string;
   pk?: number | null;
-  status?: ApplicationStatusChoice | null;
+  status: ApplicationStatusChoice;
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
   applicationRound: {
     id: string;
     sentDate?: string | null;
-    status?: ApplicationRoundStatusChoice | null;
+    status: ApplicationRoundStatusChoice;
     notesWhenApplyingFi?: string | null;
     notesWhenApplyingEn?: string | null;
     notesWhenApplyingSv?: string | null;
@@ -5651,7 +5644,7 @@ export type ApplicationViewFragment = {
     id: string;
     pk?: number | null;
     name: string;
-    status?: ApplicationSectionStatusChoice | null;
+    status: ApplicationSectionStatusChoice;
     reservationMaxDuration: number;
     numPersons: number;
     reservationsEndDate: string;
@@ -5688,7 +5681,7 @@ export type ApplicationViewFragment = {
           pk?: number | null;
           weekday: number;
           closed: boolean;
-          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+          reservableTimes: Array<{ begin: string; end: string } | null>;
         }>;
         unit?: {
           id: string;
@@ -5749,7 +5742,7 @@ export type ApplicationViewFragment = {
 export type ApplicationCardFragment = {
   id: string;
   pk?: number | null;
-  status?: ApplicationStatusChoice | null;
+  status: ApplicationStatusChoice;
   lastModifiedDate: string;
   applicantType?: ApplicantTypeChoice | null;
   applicationRound: {
@@ -5778,7 +5771,7 @@ export type ApplicationsGroupFragment = {
   sentDate?: string | null;
   id: string;
   pk?: number | null;
-  status?: ApplicationStatusChoice | null;
+  status: ApplicationStatusChoice;
   lastModifiedDate: string;
   applicantType?: ApplicantTypeChoice | null;
   applicationRound: {
@@ -5815,7 +5808,7 @@ export type ApplicationRoundCardFragment = {
   reservationPeriodEnd: string;
   applicationPeriodBegin: string;
   applicationPeriodEnd: string;
-  status?: ApplicationRoundStatusChoice | null;
+  status: ApplicationRoundStatusChoice;
 };
 
 export type AddressFieldsFragment = {
@@ -5988,7 +5981,7 @@ export type OptionsQuery = {
 export type ApplicationFormFragment = {
   id: string;
   pk?: number | null;
-  status?: ApplicationStatusChoice | null;
+  status: ApplicationStatusChoice;
   applicantType?: ApplicantTypeChoice | null;
   additionalInformation?: string | null;
   applicationRound: {
@@ -6032,7 +6025,7 @@ export type ApplicationFormFragment = {
     id: string;
     pk?: number | null;
     name: string;
-    status?: ApplicationSectionStatusChoice | null;
+    status: ApplicationSectionStatusChoice;
     reservationMaxDuration: number;
     numPersons: number;
     reservationsEndDate: string;
@@ -6069,7 +6062,7 @@ export type ApplicationFormFragment = {
           pk?: number | null;
           weekday: number;
           closed: boolean;
-          reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+          reservableTimes: Array<{ begin: string; end: string } | null>;
         }>;
         unit?: {
           id: string;
@@ -6273,7 +6266,7 @@ export type CancellationRuleFieldsFragment = {
 export type ReservationOrderStatusFragment = {
   id: string;
   state?: ReservationStateChoice | null;
-  paymentOrder: Array<{ id: string; status?: OrderStatus | null }>;
+  paymentOrder: Array<{ id: string; status: OrderStatus }>;
 };
 
 export type ListReservationsQueryVariables = Exact<{
@@ -6308,7 +6301,7 @@ export type ListReservationsQuery = {
         name?: string | null;
         bufferTimeBefore: number;
         bufferTimeAfter: number;
-        isBlocked?: boolean | null;
+        isBlocked: boolean;
         pk?: number | null;
         taxPercentageValue?: string | null;
         state?: ReservationStateChoice | null;
@@ -6321,7 +6314,7 @@ export type ListReservationsQuery = {
           id: string;
           checkoutUrl?: string | null;
           expiresInMinutes?: number | null;
-          status?: OrderStatus | null;
+          status: OrderStatus;
         }>;
         reservationUnits: Array<{
           id: string;
@@ -6367,7 +6360,7 @@ export type ListReservationsQuery = {
 export type OrderFieldsFragment = {
   id: string;
   reservationPk?: string | null;
-  status?: OrderStatus | null;
+  status: OrderStatus;
   paymentType: PaymentType;
   receiptUrl?: string | null;
   checkoutUrl?: string | null;
@@ -6419,7 +6412,7 @@ export type OrderQuery = {
   order?: {
     id: string;
     reservationPk?: string | null;
-    status?: OrderStatus | null;
+    status: OrderStatus;
     paymentType: PaymentType;
     receiptUrl?: string | null;
     checkoutUrl?: string | null;
@@ -6496,9 +6489,9 @@ export type ReservationUnitPageFieldsFragment = {
   bufferTimeAfter: number;
   reservationStartInterval: ReservationStartInterval;
   canApplyFreeOfCharge: boolean;
-  publishingState?: ReservationUnitPublishingState | null;
-  reservationState?: ReservationUnitReservationState | null;
-  numActiveUserReservations?: number | null;
+  publishingState: ReservationUnitPublishingState;
+  reservationState: ReservationUnitReservationState;
+  numActiveUserReservations: number;
   requireReservationHandling: boolean;
   currentAccessType?: AccessType | null;
   termsOfUseFi?: string | null;
@@ -6551,7 +6544,7 @@ export type ReservationUnitPageFieldsFragment = {
     id: string;
     closed: boolean;
     weekday: number;
-    reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+    reservableTimes: Array<{ begin: string; end: string } | null>;
   }>;
   applicationRounds: Array<{
     id: string;
@@ -6617,14 +6610,14 @@ export type BlockingReservationFieldsFragment = {
   pk?: number | null;
   id: string;
   state?: ReservationStateChoice | null;
-  isBlocked?: boolean | null;
+  isBlocked: boolean;
   begin: string;
   end: string;
   numPersons?: number | null;
-  calendarUrl?: string | null;
+  calendarUrl: string;
   bufferTimeBefore: number;
   bufferTimeAfter: number;
-  affectedReservationUnits?: Array<number | null> | null;
+  affectedReservationUnits: Array<number | null>;
 };
 
 export type IsReservableFieldsFragment = {
@@ -6641,7 +6634,7 @@ export type IsReservableFieldsFragment = {
   reservableTimeSpans?: Array<{
     startDatetime?: string | null;
     endDatetime?: string | null;
-  } | null> | null;
+  }> | null;
 };
 
 export type ReservationUnitPageQueryVariables = Exact<{
@@ -6672,9 +6665,9 @@ export type ReservationUnitPageQuery = {
     bufferTimeAfter: number;
     reservationStartInterval: ReservationStartInterval;
     canApplyFreeOfCharge: boolean;
-    publishingState?: ReservationUnitPublishingState | null;
-    reservationState?: ReservationUnitReservationState | null;
-    numActiveUserReservations?: number | null;
+    publishingState: ReservationUnitPublishingState;
+    reservationState: ReservationUnitReservationState;
+    numActiveUserReservations: number;
     requireReservationHandling: boolean;
     currentAccessType?: AccessType | null;
     maxReservationDuration?: number | null;
@@ -6727,7 +6720,7 @@ export type ReservationUnitPageQuery = {
       id: string;
       closed: boolean;
       weekday: number;
-      reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+      reservableTimes: Array<{ begin: string; end: string } | null>;
     }>;
     applicationRounds: Array<{
       id: string;
@@ -6762,7 +6755,7 @@ export type ReservationUnitPageQuery = {
     reservableTimeSpans?: Array<{
       startDatetime?: string | null;
       endDatetime?: string | null;
-    } | null> | null;
+    }> | null;
     serviceSpecificTerms?: {
       id: string;
       textFi?: string | null;
@@ -6800,14 +6793,14 @@ export type ReservationUnitPageQuery = {
     pk?: number | null;
     id: string;
     state?: ReservationStateChoice | null;
-    isBlocked?: boolean | null;
+    isBlocked: boolean;
     begin: string;
     end: string;
     numPersons?: number | null;
-    calendarUrl?: string | null;
+    calendarUrl: string;
     bufferTimeBefore: number;
     bufferTimeAfter: number;
-    affectedReservationUnits?: Array<number | null> | null;
+    affectedReservationUnits: Array<number | null>;
   }> | null;
 };
 
@@ -6865,7 +6858,7 @@ export type SearchReservationUnitsQueryVariables = Exact<{
     | Array<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  personsAllowed?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<
     | Array<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
@@ -6891,7 +6884,7 @@ export type SearchReservationUnitsQueryVariables = Exact<{
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
-  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Int"]["input"]>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
   before?: InputMaybe<Scalars["String"]["input"]>;
@@ -6912,7 +6905,7 @@ export type SearchReservationUnitsQuery = {
       node?: {
         reservationBegins?: string | null;
         reservationEnds?: string | null;
-        isClosed?: boolean | null;
+        isClosed: boolean;
         firstReservableDatetime?: string | null;
         currentAccessType?: AccessType | null;
         maxPersons?: number | null;
@@ -7042,7 +7035,7 @@ export type CurrentUserQuery = {
     firstName: string;
     lastName: string;
     email: string;
-    isAdAuthenticated?: boolean | null;
+    isAdAuthenticated: boolean;
   } | null;
 };
 
@@ -7145,7 +7138,7 @@ export type ApplicationSectionCommonFragment = {
   id: string;
   pk?: number | null;
   name: string;
-  status?: ApplicationSectionStatusChoice | null;
+  status: ApplicationSectionStatusChoice;
   reservationMaxDuration: number;
   numPersons: number;
   reservationsEndDate: string;
@@ -7202,7 +7195,7 @@ export type ApplicationRoundTimeSlotsFragment = {
   pk?: number | null;
   weekday: number;
   closed: boolean;
-  reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+  reservableTimes: Array<{ begin: string; end: string } | null>;
 };
 
 export type ReservationUnitOptionFragment = {
@@ -7218,7 +7211,7 @@ export type ReservationUnitOptionFragment = {
       pk?: number | null;
       weekday: number;
       closed: boolean;
-      reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+      reservableTimes: Array<{ begin: string; end: string } | null>;
     }>;
     unit?: {
       id: string;
@@ -7461,7 +7454,7 @@ export type ApplicationPage1Query = {
   application?: {
     id: string;
     pk?: number | null;
-    status?: ApplicationStatusChoice | null;
+    status: ApplicationStatusChoice;
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
@@ -7505,7 +7498,7 @@ export type ApplicationPage1Query = {
       id: string;
       pk?: number | null;
       name: string;
-      status?: ApplicationSectionStatusChoice | null;
+      status: ApplicationSectionStatusChoice;
       reservationMaxDuration: number;
       numPersons: number;
       reservationsEndDate: string;
@@ -7542,10 +7535,7 @@ export type ApplicationPage1Query = {
             pk?: number | null;
             weekday: number;
             closed: boolean;
-            reservableTimes?: Array<{
-              begin: string;
-              end: string;
-            } | null> | null;
+            reservableTimes: Array<{ begin: string; end: string } | null>;
           }>;
           unit?: {
             id: string;
@@ -7612,7 +7602,7 @@ export type ApplicationPage2Query = {
   application?: {
     id: string;
     pk?: number | null;
-    status?: ApplicationStatusChoice | null;
+    status: ApplicationStatusChoice;
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
@@ -7656,7 +7646,7 @@ export type ApplicationPage2Query = {
       id: string;
       pk?: number | null;
       name: string;
-      status?: ApplicationSectionStatusChoice | null;
+      status: ApplicationSectionStatusChoice;
       reservationMaxDuration: number;
       numPersons: number;
       reservationsEndDate: string;
@@ -7693,10 +7683,7 @@ export type ApplicationPage2Query = {
             pk?: number | null;
             weekday: number;
             closed: boolean;
-            reservableTimes?: Array<{
-              begin: string;
-              end: string;
-            } | null> | null;
+            reservableTimes: Array<{ begin: string; end: string } | null>;
           }>;
           unit?: {
             id: string;
@@ -7763,7 +7750,7 @@ export type ApplicationPage3Query = {
   application?: {
     id: string;
     pk?: number | null;
-    status?: ApplicationStatusChoice | null;
+    status: ApplicationStatusChoice;
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
@@ -7807,7 +7794,7 @@ export type ApplicationPage3Query = {
       id: string;
       pk?: number | null;
       name: string;
-      status?: ApplicationSectionStatusChoice | null;
+      status: ApplicationSectionStatusChoice;
       reservationMaxDuration: number;
       numPersons: number;
       reservationsEndDate: string;
@@ -7844,10 +7831,7 @@ export type ApplicationPage3Query = {
             pk?: number | null;
             weekday: number;
             closed: boolean;
-            reservableTimes?: Array<{
-              begin: string;
-              end: string;
-            } | null> | null;
+            reservableTimes: Array<{ begin: string; end: string } | null>;
           }>;
           unit?: {
             id: string;
@@ -7914,13 +7898,13 @@ export type ApplicationPagePreviewQuery = {
   application?: {
     id: string;
     pk?: number | null;
-    status?: ApplicationStatusChoice | null;
+    status: ApplicationStatusChoice;
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationRound: {
       id: string;
       sentDate?: string | null;
-      status?: ApplicationRoundStatusChoice | null;
+      status: ApplicationRoundStatusChoice;
       notesWhenApplyingFi?: string | null;
       notesWhenApplyingEn?: string | null;
       notesWhenApplyingSv?: string | null;
@@ -7971,7 +7955,7 @@ export type ApplicationPagePreviewQuery = {
       id: string;
       pk?: number | null;
       name: string;
-      status?: ApplicationSectionStatusChoice | null;
+      status: ApplicationSectionStatusChoice;
       reservationMaxDuration: number;
       numPersons: number;
       reservationsEndDate: string;
@@ -8008,10 +7992,7 @@ export type ApplicationPagePreviewQuery = {
             pk?: number | null;
             weekday: number;
             closed: boolean;
-            reservableTimes?: Array<{
-              begin: string;
-              end: string;
-            } | null> | null;
+            reservableTimes: Array<{ begin: string; end: string } | null>;
           }>;
           unit?: {
             id: string;
@@ -8173,7 +8154,7 @@ export type ApplicationSectionViewQuery = {
         application: {
           id: string;
           pk?: number | null;
-          status?: ApplicationStatusChoice | null;
+          status: ApplicationStatusChoice;
           applicationRound: {
             id: string;
             nameEn?: string | null;
@@ -8193,7 +8174,7 @@ export type ApplicationSectionViewQuery = {
               pk?: number | null;
               beginTime?: string | null;
               endTime?: string | null;
-              weekdays?: Array<number | null> | null;
+              weekdays: Array<number>;
               reservationUnit: {
                 id: string;
                 pk?: number | null;
@@ -8245,7 +8226,7 @@ export type ApplicationSentPageQuery = {
   application?: {
     id: string;
     pk?: number | null;
-    status?: ApplicationStatusChoice | null;
+    status: ApplicationStatusChoice;
   } | null;
 };
 
@@ -8257,7 +8238,7 @@ export type ApplicationViewQuery = {
   application?: {
     id: string;
     pk?: number | null;
-    status?: ApplicationStatusChoice | null;
+    status: ApplicationStatusChoice;
     applicantType?: ApplicantTypeChoice | null;
     additionalInformation?: string | null;
     applicationSections?: Array<{
@@ -8265,7 +8246,7 @@ export type ApplicationViewQuery = {
       hasReservations: boolean;
       pk?: number | null;
       name: string;
-      status?: ApplicationSectionStatusChoice | null;
+      status: ApplicationSectionStatusChoice;
       reservationMaxDuration: number;
       numPersons: number;
       reservationsEndDate: string;
@@ -8302,10 +8283,7 @@ export type ApplicationViewQuery = {
             pk?: number | null;
             weekday: number;
             closed: boolean;
-            reservableTimes?: Array<{
-              begin: string;
-              end: string;
-            } | null> | null;
+            reservableTimes: Array<{ begin: string; end: string } | null>;
           }>;
           unit?: {
             id: string;
@@ -8326,7 +8304,7 @@ export type ApplicationViewQuery = {
     applicationRound: {
       id: string;
       sentDate?: string | null;
-      status?: ApplicationRoundStatusChoice | null;
+      status: ApplicationRoundStatusChoice;
       notesWhenApplyingFi?: string | null;
       notesWhenApplyingEn?: string | null;
       notesWhenApplyingSv?: string | null;
@@ -8431,7 +8409,7 @@ export type ApplicationsQuery = {
         sentDate?: string | null;
         id: string;
         pk?: number | null;
-        status?: ApplicationStatusChoice | null;
+        status: ApplicationStatusChoice;
         lastModifiedDate: string;
         applicantType?: ApplicantTypeChoice | null;
         applicationRound: {
@@ -8541,7 +8519,7 @@ export type ApplicationRoundFieldsFragment = {
   reservationPeriodEnd: string;
   applicationPeriodBegin: string;
   applicationPeriodEnd: string;
-  status?: ApplicationRoundStatusChoice | null;
+  status: ApplicationRoundStatusChoice;
   reservationUnits: Array<{
     id: string;
     pk?: number | null;
@@ -8577,7 +8555,7 @@ export type ApplicationRoundsUiQuery = {
         reservationPeriodEnd: string;
         applicationPeriodBegin: string;
         applicationPeriodEnd: string;
-        status?: ApplicationRoundStatusChoice | null;
+        status: ApplicationRoundStatusChoice;
         reservationUnits: Array<{
           id: string;
           pk?: number | null;
@@ -8599,7 +8577,7 @@ export type ReservationQuery = {
     name?: string | null;
     bufferTimeBefore: number;
     bufferTimeAfter: number;
-    calendarUrl?: string | null;
+    calendarUrl: string;
     applyingForFreeOfCharge?: boolean | null;
     freeOfChargeReason?: string | null;
     description?: string | null;
@@ -8631,7 +8609,7 @@ export type ReservationQuery = {
     paymentOrder: Array<{
       id: string;
       reservationPk?: string | null;
-      status?: OrderStatus | null;
+      status: OrderStatus;
       paymentType: PaymentType;
       receiptUrl?: string | null;
       checkoutUrl?: string | null;
@@ -8842,7 +8820,7 @@ export type ReservationConfirmationPageQuery = {
     id: string;
     pk?: number | null;
     name?: string | null;
-    calendarUrl?: string | null;
+    calendarUrl: string;
     reserveeFirstName?: string | null;
     reserveeLastName?: string | null;
     reserveeEmail?: string | null;
@@ -8873,7 +8851,7 @@ export type ReservationConfirmationPageQuery = {
     paymentOrder: Array<{
       id: string;
       reservationPk?: string | null;
-      status?: OrderStatus | null;
+      status: OrderStatus;
       paymentType: PaymentType;
       receiptUrl?: string | null;
       checkoutUrl?: string | null;
@@ -9073,7 +9051,7 @@ export type ReservationPageQuery = {
     id: string;
     pk?: number | null;
     applyingForFreeOfCharge?: boolean | null;
-    calendarUrl?: string | null;
+    calendarUrl: string;
     reserveeFirstName?: string | null;
     reserveeLastName?: string | null;
     reserveeEmail?: string | null;
@@ -9103,7 +9081,7 @@ export type ReservationPageQuery = {
     paymentOrder: Array<{
       id: string;
       reservationPk?: string | null;
-      status?: OrderStatus | null;
+      status: OrderStatus;
       paymentType: PaymentType;
       receiptUrl?: string | null;
       checkoutUrl?: string | null;
@@ -11378,7 +11356,7 @@ export const SearchReservationUnitsDocument = gql`
     $textSearch: String
     $pk: [Int]
     $applicationRound: [Int]
-    $personsAllowed: Decimal
+    $personsAllowed: Int
     $unit: [Int]
     $reservationUnitType: [Int]
     $purposes: [Int]
@@ -11390,7 +11368,7 @@ export const SearchReservationUnitsDocument = gql`
     $reservableDateEnd: Date
     $reservableTimeStart: Time
     $reservableTimeEnd: Time
-    $reservableMinimumDurationMinutes: Decimal
+    $reservableMinimumDurationMinutes: Int
     $showOnlyReservable: Boolean
     $first: Int
     $before: String

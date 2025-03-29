@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import CommonCalendar, { CalendarEvent } from "common/src/calendar/Calendar";
+import CommonCalendar from "common/src/calendar/Calendar";
 import { Toolbar, ToolbarBtn } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
@@ -16,7 +16,11 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import eventStyleGetter, { legend } from "./eventStyleGetter";
+import eventStyleGetter, {
+  type CalendarEventType,
+  type ReservationType,
+  legend,
+} from "./eventStyleGetter";
 import { Legend, LegendsWrapper } from "@/component/Legend";
 import { EditTimeModal } from "@/component/EditTimeModal";
 import { isPossibleToEdit } from "@/modules/reservationModificationRules";
@@ -30,13 +34,6 @@ import { add, startOfISOWeek } from "date-fns";
 import { RecurringReservationsView } from "@/component/RecurringReservationsView";
 import { useReservationData } from "./hooks";
 import { Accordion } from "./components";
-
-// TODO fragment
-type ReservationType = Omit<
-  NonNullable<ReservationQuery["reservation"]>,
-  "user"
->;
-type CalendarEventType = CalendarEvent<ReservationType>;
 
 type Props = {
   reservation: ReservationType;
