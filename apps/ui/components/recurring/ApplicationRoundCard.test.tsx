@@ -8,7 +8,7 @@ import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { getApplicationRoundPath } from "@/modules/urls";
 
 function createApplicationRoundCard({
-  status,
+  status = ApplicationRoundStatusChoice.Open,
   name = "Test",
 }: {
   status?: ApplicationRoundStatusChoice;

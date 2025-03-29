@@ -11,6 +11,7 @@ import { type ApolloQueryResult } from "@apollo/client";
 import {
   NewReservationListItem,
   ReservationList,
+  type ReservationToCopyT,
 } from "@/component/ReservationsList";
 import { ReservationListButton } from "@/component/ReservationListButton";
 import { DenyDialog } from "@/component/DenyDialog";
@@ -32,7 +33,7 @@ type Props = {
   onReservationUpdated?: () => void;
   // optional reservation to copy when creating a new reservation
   // contains a lot more information than the RecurringReservationQuery
-  reservationToCopy?: ReservationQuery["reservation"];
+  reservationToCopy?: ReservationToCopyT;
 };
 
 export function RecurringReservationsView({

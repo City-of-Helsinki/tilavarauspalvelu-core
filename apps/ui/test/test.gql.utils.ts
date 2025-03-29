@@ -3,6 +3,7 @@ import {
   type ApplicationFormFragment,
   ApplicationRoundFieldsFragment,
   ApplicationRoundStatusChoice,
+  ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
   CreateApplicationDocument,
   type CreateApplicationMutationResult,
@@ -327,7 +328,7 @@ function createMockApplicationSection({
   return {
     id: base64encode(`ApplicationSectionNode:${pk}`),
     pk,
-    // status: null, // (or Unallocated)
+    status: ApplicationSectionStatusChoice.Unallocated,
     ...page1Data,
     ...page2Data,
   };

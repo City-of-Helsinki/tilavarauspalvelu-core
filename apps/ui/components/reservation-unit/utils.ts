@@ -20,7 +20,7 @@ import {
 } from "@/modules/reservable";
 import { dayMax, dayMin, timeToMinutes } from "common/src/helpers";
 
-type LastPossibleReservationDateProps = Pick<
+export type LastPossibleReservationDateProps = Pick<
   ReservationUnitNode,
   "reservationsMaxDaysBefore" | "reservableTimeSpans" | "reservationEnds"
 >;
@@ -57,8 +57,16 @@ export function getLastPossibleReservationDate(
   );
 }
 
-type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
-type AvailableTimesProps = {
+type QueryT = Pick<
+  NonNullable<ReservationUnitPageQuery["reservationUnit"]>,
+  | "reservationStartInterval"
+  | "id"
+  | "bufferTimeBefore"
+  | "bufferTimeAfter"
+  | "reservationsMinDaysBefore"
+  | "reservationsMaxDaysBefore"
+>;
+export type AvailableTimesProps = {
   start: Date;
   duration: number;
   reservationUnit: QueryT;

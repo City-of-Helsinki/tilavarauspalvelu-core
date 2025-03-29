@@ -393,10 +393,6 @@ describe("isReservationUnitPublished", () => {
       expected
     );
   });
-
-  test("NO without state", () => {
-    expect(isReservationUnitPublished({})).toBe(false);
-  });
 });
 
 function createMockEquipment({

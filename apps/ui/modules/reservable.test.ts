@@ -8,13 +8,14 @@ import {
 } from "date-fns";
 import {
   type ReservableMap,
+  type ReservationUnitReservableProps,
   type RoundPeriod,
   generateReservableMap,
   isRangeReservable,
   isStartTimeValid,
 } from "./reservable";
 import {
-  BlockingReservationFieldsFragment,
+  type BlockingReservationFieldsFragment,
   type IsReservableFieldsFragment,
   ReservationStartInterval,
   ReservationStateChoice,
@@ -473,10 +474,10 @@ describe("isRangeReservable", () => {
     function createMockReservation({
       start,
       end,
-      state,
-      bufferTimeAfter,
-      bufferTimeBefore,
-      isBlocked,
+      state = ReservationStateChoice.Confirmed,
+      bufferTimeAfter = 0,
+      bufferTimeBefore = 0,
+      isBlocked = false,
     }: {
       start: Date;
       end: Date;
@@ -484,17 +485,19 @@ describe("isRangeReservable", () => {
       bufferTimeAfter?: number;
       bufferTimeBefore?: number;
       isBlocked?: boolean;
-    }) {
+    }): ReservationUnitReservableProps["blockingReservations"][0] {
       return {
         pk: 1,
         id: "1",
-        bufferTimeAfter: 60 * 60 * (bufferTimeAfter ?? 0),
-        bufferTimeBefore: 60 * 60 * (bufferTimeBefore ?? 0),
-        state: state ?? ReservationStateChoice.Confirmed,
+        bufferTimeAfter: 60 * 60 * bufferTimeAfter,
+        bufferTimeBefore: 60 * 60 * bufferTimeBefore,
+        state,
         begin: start.toISOString(),
         end: end.toISOString(),
-        isBlocked: isBlocked ?? false,
-      };
+        isBlocked,
+        affectedReservationUnits: [],
+        calendarUrl: "",
+      } as const;
     }
 
     test("NO if there is a collision with another reservation", () => {
