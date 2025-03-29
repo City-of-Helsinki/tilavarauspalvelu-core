@@ -14,7 +14,7 @@ import {
   isStartTimeValid,
 } from "./reservable";
 import {
-  BlockingReservationFieldsFragment,
+  type BlockingReservationFieldsFragment,
   type IsReservableFieldsFragment,
   ReservationStartInterval,
   ReservationStateChoice,
@@ -474,8 +474,8 @@ describe("isRangeReservable", () => {
       start,
       end,
       state = ReservationStateChoice.Confirmed,
-      bufferTimeAfter,
-      bufferTimeBefore,
+      bufferTimeAfter = 0,
+      bufferTimeBefore = 0,
       isBlocked = false,
     }: {
       start: Date;
@@ -488,14 +488,14 @@ describe("isRangeReservable", () => {
       return {
         id: base64encode("ReservationNode:1"),
         pk: 1,
-        bufferTimeAfter: 60 * 60 * (bufferTimeAfter ?? 0),
-        bufferTimeBefore: 60 * 60 * (bufferTimeBefore ?? 0),
+        bufferTimeAfter: 60 * 60 * bufferTimeAfter,
+        bufferTimeBefore: 60 * 60 * bufferTimeBefore,
         state,
         begin: start.toISOString(),
         end: end.toISOString(),
         isBlocked,
         numPersons: null,
-        calendarUrl: null,
+        calendarUrl: "",
         affectedReservationUnits: [],
       };
     }

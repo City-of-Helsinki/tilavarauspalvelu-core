@@ -3,8 +3,9 @@ import { toUIDate } from "common/src/common/util";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
+  type Maybe,
   RejectionReadinessChoice,
-  ReservationPageQuery,
+  type ReservationPageQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
@@ -154,8 +155,12 @@ function StatusElement({ item }: { item: NewReservationListItem }) {
   );
 }
 
+type QueryT = NonNullable<ReservationPageQuery["reservation"]>;
+export type ReservationToCopyT =
+  | Maybe<Pick<QueryT, "type" | "recurringReservation" | "reservationUnits">>
+  | undefined;
 type AddNewReservationButtonProps = {
-  reservationToCopy: ReservationPageQuery["reservation"];
+  reservationToCopy: ReservationToCopyT;
   refetch: () => void;
 };
 

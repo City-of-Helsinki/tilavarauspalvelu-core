@@ -12,7 +12,12 @@ import {
   getNextAvailableTime,
   type LastPossibleReservationDateProps,
 } from "./utils";
-import { dateToKey, ReservableMap, RoundPeriod } from "@/modules/reservable";
+import { ReservationStartInterval } from "common/gql/gql-types";
+import {
+  dateToKey,
+  ReservableMap,
+  type RoundPeriod,
+} from "@/modules/reservable";
 import {
   vi,
   describe,
@@ -23,7 +28,7 @@ import {
   afterAll,
 } from "vitest";
 import { TIMERS_TO_FAKE } from "@/test/test.utils";
-import { ReservationStartInterval } from "@/gql/gql-types";
+import { base64encode } from "common/src/helpers";
 
 describe("getLastPossibleReservationDate", () => {
   beforeAll(() => {
@@ -197,30 +202,27 @@ describe("getNextAvailableTime", () => {
     reservationsMinDaysBefore?: number | null;
     reservationsMaxDaysBefore?: number | null;
     activeApplicationRounds?: RoundPeriod[];
-  }): AvailableTimesProps {
-    const reservationUnit: AvailableTimesProps["reservationUnit"] = {
-      id: "123",
-      bufferTimeBefore: 0,
-      bufferTimeAfter: 0,
-      reservationStartInterval: ReservationStartInterval.Interval_30Mins,
-      reservationsMinDaysBefore,
-      reservationsMaxDaysBefore,
-      maxReservationDuration: null,
-      minReservationDuration: null,
-      reservationBegins: null,
-      reservationEnds: null,
-      reservableTimeSpans: [],
-    };
+  }): Readonly<AvailableTimesProps> {
     return {
       start,
       duration,
       reservationUnit: {
-        ...reservationUnit,
+        id: base64encode("ReservationUnit:1"),
+        reservationsMinDaysBefore,
+        reservationsMaxDaysBefore,
+        bufferTimeBefore: 0,
+        bufferTimeAfter: 0,
+        reservationStartInterval: ReservationStartInterval.Interval_30Mins,
+        maxReservationDuration: null,
+        minReservationDuration: null,
+        reservationBegins: null,
+        reservationEnds: null,
+        reservableTimeSpans: [],
       },
-      reservableTimes,
       activeApplicationRounds,
       blockingReservations: [],
-    };
+      reservableTimes,
+    } as const;
   }
 
   test("finds the next available time for today", () => {

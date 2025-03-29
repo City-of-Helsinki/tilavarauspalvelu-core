@@ -1,12 +1,12 @@
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
-  type PaymentOrderNode,
   ReservationStateChoice,
   ReservationStartInterval,
   OrderStatus,
   type ReservationOrderStatusFragment,
   type CanUserCancelReservationFragment,
   type IsReservableFieldsFragment,
+  type PaymentOrderNode,
 } from "@gql/gql-types";
 import {
   isUserAllowedToMoveReservationHere,

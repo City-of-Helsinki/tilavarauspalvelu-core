@@ -38,8 +38,8 @@ export const legend = [
   },
 ];
 
-// TODO fragment
 export type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
+export type CalendarEventType = CalendarEvent<EventType>;
 export type EventBufferType = Pick<
   ReservationType,
   "begin" | "end" | "bufferTimeAfter" | "bufferTimeBefore"
@@ -49,7 +49,6 @@ export type EventType = EventBufferType &
     ReservationType,
     "pk" | "type" | "state" | "name" | "recurringReservation"
   >;
-export type CalendarEventType = CalendarEvent<EventType>;
 
 // TODO combine with the eventStyleGetter in my-units/eventStyleGetter.ts
 const eventStyleGetter =

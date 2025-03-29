@@ -3,6 +3,7 @@ import {
   type ApplicationFormFragment,
   ApplicationRoundFieldsFragment,
   ApplicationRoundStatusChoice,
+  ApplicationSectionStatusChoice,
   ApplicationStatusChoice,
   CreateApplicationDocument,
   type CreateApplicationMutationResult,
@@ -210,6 +211,7 @@ function createSearchVariablesMock({
     accessTypeEndDate: "2025-01-01T00:00:00Z",
     reservableDateStart: "2024-02-01T00:00:00Z",
     applicationRound: [1],
+    personsAllowed: null,
     first: 36,
     orderBy: [
       ReservationUnitOrderingChoices.NameFiAsc,
@@ -329,7 +331,7 @@ function createMockApplicationSection({
   return {
     id: base64encode(`ApplicationSectionNode:${pk}`),
     pk,
-    status: null, // (or Unallocated)
+    status: ApplicationSectionStatusChoice.Unallocated,
     ...page1Data,
     ...page2Data,
   };
