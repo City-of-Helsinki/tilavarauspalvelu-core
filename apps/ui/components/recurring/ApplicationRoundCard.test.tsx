@@ -8,10 +8,10 @@ import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { getApplicationRoundPath } from "@/modules/urls";
 
 function createApplicationRoundCard({
-  status = null,
+  status = ApplicationRoundStatusChoice.Open,
   name = "Test",
 }: {
-  status?: ApplicationRoundStatusChoice | null;
+  status?: ApplicationRoundStatusChoice;
   name: string;
 }): ApplicationRoundCardFragment {
   return {
@@ -41,7 +41,6 @@ describe("ApplicationRoundCard Open Round", () => {
   test("should render both links", () => {
     const card = createApplicationRoundCard({
       name: "Test",
-      status: ApplicationRoundStatusChoice.Open,
     });
     const view = render(<ApplicationRoundCard applicationRound={card} />);
     const startLink = view.getByRole("link", {

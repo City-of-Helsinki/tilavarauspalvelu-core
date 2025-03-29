@@ -15,7 +15,6 @@ import {
   type ChangeReservationTimeFragment,
   ReservationTypeChoice,
   useStaffAdjustReservationTimeMutation,
-  type ReservationPageQuery,
   type ReservationSeriesAddMutationInput,
   useAddReservationToSeriesMutation,
 } from "@gql/gql-types";
@@ -39,6 +38,7 @@ import { formatDateTimeRange } from "@/common/util";
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
 import { errorToast, successToast } from "common/src/common/toast";
+import { type ReservationToCopyT } from "./ReservationsList";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);
@@ -311,10 +311,6 @@ function DialogContent({
   );
 }
 
-type ReservationToCopyT = Pick<
-  NonNullable<ReservationPageQuery["reservation"]>,
-  "type" | "reservationUnits" | "recurringReservation"
->;
 export type NewReservationModalProps = CommonProps & {
   reservationToCopy: ReservationToCopyT;
   onAccept: () => void;

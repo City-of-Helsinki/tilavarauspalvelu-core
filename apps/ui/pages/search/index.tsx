@@ -128,7 +128,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $textSearch: String
     $pk: [Int]
     $applicationRound: [Int]
-    $personsAllowed: Decimal
+    $personsAllowed: Int
     $unit: [Int]
     $reservationUnitType: [Int]
     $purposes: [Int]
@@ -140,7 +140,7 @@ export const SEARCH_RESERVATION_UNITS = gql`
     $reservableDateEnd: Date
     $reservableTimeStart: Time
     $reservableTimeEnd: Time
-    $reservableMinimumDurationMinutes: Decimal
+    $reservableMinimumDurationMinutes: Int
     $showOnlyReservable: Boolean
     $first: Int
     $before: String
