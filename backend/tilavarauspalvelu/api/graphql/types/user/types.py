@@ -8,6 +8,7 @@ from django.db.models.functions import Concat, Trim
 from graphene_django_extensions import DjangoNode
 from query_optimizer import AnnotatedField
 
+from tilavarauspalvelu.enums import ReservationNotification
 from tilavarauspalvelu.models import User
 from tilavarauspalvelu.tasks import save_personal_info_view_log
 
@@ -43,11 +44,15 @@ _FIELDS = [
 
 
 class UserNode(DjangoNode):
-    name = AnnotatedField(graphene.String, expression=Trim(Concat("first_name", Value(" "), "last_name")))
+    name = AnnotatedField(
+        graphene.String,
+        expression=Trim(Concat("first_name", Value(" "), "last_name")),
+        required=True,
+    )
 
-    is_ad_authenticated = graphene.Boolean()
-    is_strongly_authenticated = graphene.Boolean()
-    reservation_notification = graphene.String()
+    is_ad_authenticated = graphene.Boolean(required=True)
+    is_strongly_authenticated = graphene.Boolean(required=True)
+    reservation_notification = graphene.Field(graphene.Enum.from_enum(ReservationNotification))
 
     class Meta:
         model = User

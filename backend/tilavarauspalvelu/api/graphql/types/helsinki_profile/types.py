@@ -37,7 +37,7 @@ class HelsinkiProfileDataNode(graphene.ObjectType):
     city = graphene.String()
     municipality_code = graphene.String()
     municipality_name = graphene.String()
-    login_method = graphene.Field(graphene.Enum.from_enum(LoginMethod))
+    login_method = graphene.Field(graphene.Enum.from_enum(LoginMethod), required=True)
     is_strong_login = graphene.Boolean(required=True)
 
     @classmethod

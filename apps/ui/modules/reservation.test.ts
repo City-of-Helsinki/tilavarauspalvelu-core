@@ -1,10 +1,8 @@
 import { addDays, addHours, addMinutes, startOfToday } from "date-fns";
 import {
-  type PaymentOrderNode,
   ReservationStateChoice,
   ReservationStartInterval,
   OrderStatus,
-  PaymentType,
   type ReservationOrderStatusFragment,
   type CanUserCancelReservationFragment,
 } from "@gql/gql-types";
@@ -572,10 +570,8 @@ describe("canReservationBeChanged", () => {
 describe("getCheckoutUrl", () => {
   const baseCheckoutUrl = "https://checkout.url/path";
   const userParam = "user=1111-2222-3333-4444";
-  const order: PaymentOrderNode = {
-    id: "order-id",
+  const order = {
     checkoutUrl: `${baseCheckoutUrl}?${userParam}`,
-    paymentType: PaymentType.Online,
   };
   const checkoutUrl = `${baseCheckoutUrl}/paymentmethod?${userParam}`;
 

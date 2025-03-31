@@ -12,7 +12,6 @@ from query_optimizer import AnnotatedField, MultiField
 from query_optimizer.optimizer import QueryOptimizer
 from rest_framework.reverse import reverse
 
-from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation, ReservationUnit, User
@@ -24,7 +23,6 @@ from .filtersets import ReservationFilterSet
 from .permissions import ReservationPermission
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.models import PaymentOrder
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import AnyUser, GQLInfo, PindoraReservationInfoData
 
@@ -58,28 +56,34 @@ def staff_field_check(user: AnyUser, reservation: Reservation) -> bool | None:
 
 
 class ReservationNode(DjangoNode):
-    order = PaymentOrderNode.Field(deprecation_reason="Please use to 'paymentOrder' instead.")
+    reservee_name = AnnotatedField(
+        graphene.String,
+        expression=L("reservee_name"),
+    )
 
-    reservee_name = AnnotatedField(graphene.String, expression=L("reservee_name"))
-
-    is_blocked = AnnotatedField(graphene.Boolean, expression=models.Q(type=ReservationTypeChoice.BLOCKED.value))
-    is_handled = AnnotatedField(graphene.Boolean, expression=models.Q(handled_at__isnull=False))
-
-    staff_event = AnnotatedField(
+    is_blocked = AnnotatedField(
         graphene.Boolean,
-        expression=models.Q(type=ReservationTypeChoice.STAFF.value),
-        deprecation_reason="Please use to 'type' instead.",
+        expression=models.Q(type=ReservationTypeChoice.BLOCKED.value),
+        required=True,
     )
-
-    access_code_should_be_active = AnnotatedField(graphene.Boolean, expression=L("access_code_should_be_active"))
+    is_handled = AnnotatedField(
+        graphene.Boolean,
+        expression=models.Q(handled_at__isnull=False),
+    )
+    access_code_should_be_active = AnnotatedField(
+        graphene.Boolean,
+        expression=L("access_code_should_be_active"),
+    )
     is_access_code_is_active_correct = AnnotatedField(
-        graphene.Boolean, expression=L("is_access_code_is_active_correct")
+        graphene.Boolean,
+        expression=L("is_access_code_is_active_correct"),
+        required=True,
     )
 
-    calendar_url = graphene.String()
+    calendar_url = graphene.String(required=True)
 
     affected_reservation_units = AnnotatedField(
-        graphene.List(graphene.Int),
+        graphene.List(graphene.Int, required=True),
         description="Which reservation units' reserveability is affected by this reservation?",
         expression=(
             SubqueryArray(
@@ -88,6 +92,7 @@ class ReservationNode(DjangoNode):
                 distinct=True,
             )
         ),
+        required=True,
     )
 
     pindora_info = MultiField(
@@ -210,9 +215,7 @@ class ReservationNode(DjangoNode):
             #
             "is_blocked",
             "is_handled",
-            "order",
             "payment_order",
-            "staff_event",
             "calendar_url",
         ]
         restricted_fields = {
@@ -225,7 +228,6 @@ class ReservationNode(DjangoNode):
                     "handling_details",
                     "working_memo",
                     "handled_at",
-                    "staff_event",
                     "access_code_generated_at",
                     "access_code_is_active",
                     "access_code_should_be_active",
@@ -267,11 +269,6 @@ class ReservationNode(DjangoNode):
         )
         user_optimizer.only_fields.append("id")
         return queryset
-
-    def resolve_order(root: Reservation, info: GQLInfo) -> PaymentOrder | None:
-        # TODO: This should be removed, since it breaks optimization.
-        #  Should use 'payment_order' instead.
-        return root.payment_order.first()
 
     def resolve_calendar_url(root: Reservation, info: GQLInfo) -> str:
         scheme = info.context.scheme

@@ -38,7 +38,12 @@ export const legend = [
   },
 ];
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+export type ReservationType = Omit<
+  NonNullable<ReservationQuery["reservation"]>,
+  "user" | "isBlocked" | "calendarUrl" | "isAccessCodeIsActiveCorrect"
+>;
+export type CalendarEventType = CalendarEvent<ReservationType>;
+
 // TODO combine with the eventStyleGetter in my-units/eventStyleGetter.ts
 const eventStyleGetter =
   (

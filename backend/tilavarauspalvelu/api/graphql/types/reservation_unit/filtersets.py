@@ -8,7 +8,7 @@ from django.contrib.postgres.search import SearchQuery
 from django.db import models
 from django.db.models import Q
 from graphene_django_extensions import ModelFilterSet
-from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntMultipleChoiceFilter
+from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
 
 from tilavarauspalvelu.enums import (
     AccessType,
@@ -65,11 +65,11 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     unit = IntMultipleChoiceFilter()
     reservation_unit_type = IntMultipleChoiceFilter()
 
-    min_persons_gte = django_filters.NumberFilter(field_name="min_persons", method="get_min_persons_gte")
-    min_persons_lte = django_filters.NumberFilter(field_name="min_persons", method="get_min_persons_lte")
-    max_persons_gte = django_filters.NumberFilter(field_name="max_persons", method="get_max_persons_gte")
-    max_persons_lte = django_filters.NumberFilter(field_name="max_persons", method="get_max_persons_lte")
-    persons_allowed = django_filters.NumberFilter(method="get_persons_allowed")
+    min_persons_gte = IntChoiceFilter(field_name="min_persons", method="get_min_persons_gte")
+    min_persons_lte = IntChoiceFilter(field_name="min_persons", method="get_min_persons_lte")
+    max_persons_gte = IntChoiceFilter(field_name="max_persons", method="get_max_persons_gte")
+    max_persons_lte = IntChoiceFilter(field_name="max_persons", method="get_max_persons_lte")
+    persons_allowed = IntChoiceFilter(method="get_persons_allowed")
 
     text_search = django_filters.CharFilter(method="get_text_search")
 
@@ -86,14 +86,14 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     name_en = django_filters.CharFilter(field_name="name_en", lookup_expr="istartswith")
     name_sv = django_filters.CharFilter(field_name="name_sv", lookup_expr="istartswith")
 
-    surface_area_gte = django_filters.NumberFilter(field_name="surface_area", lookup_expr="gte")
-    surface_area_lte = django_filters.NumberFilter(field_name="surface_area", lookup_expr="lte")
+    surface_area_gte = IntChoiceFilter(field_name="surface_area", lookup_expr="gte")
+    surface_area_lte = IntChoiceFilter(field_name="surface_area", lookup_expr="lte")
 
-    rank_gte = django_filters.NumberFilter(field_name="rank", lookup_expr="gte")
-    rank_lte = django_filters.NumberFilter(field_name="rank", lookup_expr="lte")
+    rank_gte = IntChoiceFilter(field_name="rank", lookup_expr="gte")
+    rank_lte = IntChoiceFilter(field_name="rank", lookup_expr="lte")
 
-    type_rank_gte = django_filters.NumberFilter(field_name="reservation_unit_type__rank", lookup_expr="gte")
-    type_rank_lte = django_filters.NumberFilter(field_name="reservation_unit_type__rank", lookup_expr="lte")
+    type_rank_gte = IntChoiceFilter(field_name="reservation_unit_type__rank", lookup_expr="gte")
+    type_rank_lte = IntChoiceFilter(field_name="reservation_unit_type__rank", lookup_expr="lte")
 
     reservation_kind = django_filters.CharFilter(field_name="reservation_kind", method="get_reservation_kind")
 
@@ -116,7 +116,7 @@ class ReservationUnitFilterSet(ModelFilterSet, ReservationUnitFilterSetMixin):
     reservable_date_end = django_filters.DateFilter(method="get_filter_reservable")
     reservable_time_start = django_filters.TimeFilter(method="get_filter_reservable")
     reservable_time_end = django_filters.TimeFilter(method="get_filter_reservable")
-    reservable_minimum_duration_minutes = django_filters.NumberFilter(method="get_filter_reservable")
+    reservable_minimum_duration_minutes = IntChoiceFilter(method="get_filter_reservable")
     show_only_reservable = django_filters.BooleanFilter(method="get_filter_reservable")
     calculate_first_reservable_time = django_filters.BooleanFilter(method="get_filter_reservable")
 

@@ -133,7 +133,7 @@ class ApplicationRound(models.Model):
         return ApplicationRoundStatusChoice.IN_ALLOCATION
 
     @lookup_property(skip_codegen=True)
-    def status_timestamp() -> datetime.datetime:
+    def status_timestamp() -> datetime.datetime | None:
         return models.Case(  # type: ignore[return-value]
             models.When(
                 models.Q(sent_date__isnull=False),  # RESULTS_SENT
@@ -156,7 +156,7 @@ class ApplicationRound(models.Model):
         )
 
     @status_timestamp.override
-    def _(self) -> datetime.datetime:
+    def _(self) -> datetime.datetime | None:
         match self.status:
             case ApplicationRoundStatusChoice.UPCOMING:
                 return self.public_display_begin

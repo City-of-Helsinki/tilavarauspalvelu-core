@@ -221,16 +221,16 @@ type ApplicantNode implements Node {
   The ID of the object
   """
   id: ID!
-  isAdAuthenticated: Boolean
-  isStronglyAuthenticated: Boolean
+  isAdAuthenticated: Boolean!
+  isStronglyAuthenticated: Boolean!
   """
   Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella.
   """
   isSuperuser: Boolean!
   lastName: String!
-  name: String
+  name: String!
   pk: Int
-  reservationNotification: String
+  reservationNotification: ReservationNotification
   unitRoles: [UnitRoleNode!]!
   """
   Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja.
@@ -328,7 +328,7 @@ type ApplicationNode implements Node {
   organisation: OrganisationNode
   pk: Int
   sentDate: DateTime
-  status: ApplicationStatusChoice
+  status: ApplicationStatusChoice!
   user: ApplicantNode
   workingMemo: String!
 }
@@ -384,7 +384,7 @@ enum ApplicationOrderingChoices {
 type ApplicationRoundNode implements Node {
   applicationPeriodBegin: DateTime!
   applicationPeriodEnd: DateTime!
-  applicationsCount: Int
+  applicationsCount: Int!
   criteria: String!
   criteriaEn: String
   criteriaFi: String
@@ -394,7 +394,7 @@ type ApplicationRoundNode implements Node {
   The ID of the object
   """
   id: ID!
-  isSettingHandledAllowed: Boolean
+  isSettingHandledAllowed: Boolean!
   name: String!
   nameEn: String
   nameFi: String
@@ -416,10 +416,10 @@ type ApplicationRoundNode implements Node {
     orderBy: [ReservationPurposeOrderingChoices]
     pk: [Int]
   ): [ReservationPurposeNode!]!
-  reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice
+  reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice!
   reservationPeriodBegin: Date!
   reservationPeriodEnd: Date!
-  reservationUnitCount: Int
+  reservationUnitCount: Int!
   reservationUnits(
     accessType: [AccessType]
     accessTypeBeginDate: Date
@@ -435,10 +435,10 @@ type ApplicationRoundNode implements Node {
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
-    maxPersonsGte: Decimal
-    maxPersonsLte: Decimal
-    minPersonsGte: Decimal
-    minPersonsLte: Decimal
+    maxPersonsGte: Int
+    maxPersonsLte: Int
+    minPersonsGte: Int
+    minPersonsLte: Int
     nameEn: String
     nameEn_Icontains: String
     nameEn_Istartswith: String
@@ -453,34 +453,34 @@ type ApplicationRoundNode implements Node {
     Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
-    personsAllowed: Decimal
+    personsAllowed: Int
     pk: [Int]
     publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
     qualifiers: [Int]
-    rankGte: Decimal
-    rankLte: Decimal
+    rankGte: Int
+    rankLte: Int
     reservableDateEnd: Date
     reservableDateStart: Date
-    reservableMinimumDurationMinutes: Decimal
+    reservableMinimumDurationMinutes: Int
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
     reservationState: [ReservationUnitReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    surfaceAreaGte: Decimal
-    surfaceAreaLte: Decimal
+    surfaceAreaGte: Int
+    surfaceAreaLte: Int
     textSearch: String
     tprekDepartmentId: String
     tprekId: String
-    typeRankGte: Decimal
-    typeRankLte: Decimal
+    typeRankGte: Int
+    typeRankLte: Int
     unit: [Int]
     uuid: UUID
   ): [ReservationUnitNode!]!
   sentDate: DateTime
-  status: ApplicationRoundStatusChoice
+  status: ApplicationRoundStatusChoice!
   statusTimestamp: DateTime
   termsOfUse: TermsOfUseNode
 }
@@ -546,7 +546,7 @@ type ApplicationRoundTimeSlotNode implements Node {
   """
   id: ID!
   pk: Int
-  reservableTimes: [TimeSlotType]
+  reservableTimes: [TimeSlotType]!
   weekday: Int!
 }
 
@@ -613,7 +613,7 @@ input ApplicationSectionForApplicationSerializerInput {
 
 type ApplicationSectionNode implements Node {
   ageGroup: AgeGroupNode
-  allocations: Int
+  allocations: Int!
   application: ApplicationNode!
   appliedReservationsPerWeek: Int!
   extUuid: UUID!
@@ -643,8 +643,8 @@ type ApplicationSectionNode implements Node {
   ): [ReservationUnitOptionNode!]!
   reservationsBeginDate: Date!
   reservationsEndDate: Date!
-  shouldHaveActiveAccessCode: Boolean
-  status: ApplicationSectionStatusChoice
+  shouldHaveActiveAccessCode: Boolean!
+  status: ApplicationSectionStatusChoice!
   suitableTimeRanges(
     fulfilled: Boolean
     """
@@ -906,7 +906,7 @@ type BannerNotificationNode implements Node {
   messageSv: String
   name: String!
   pk: Int
-  state: BannerNotificationState
+  state: BannerNotificationState!
   target: BannerNotificationTarget!
 }
 
@@ -1300,7 +1300,7 @@ type GeneralRoleNode implements Node {
   """
   id: ID!
   modified: DateTime!
-  permissions: [UserPermissionChoice]
+  permissions: [UserPermissionChoice!]!
   role: UserRoleChoice!
   user: UserNode!
 }
@@ -1312,7 +1312,7 @@ type HelsinkiProfileDataNode {
   firstName: String
   isStrongLogin: Boolean!
   lastName: String
-  loginMethod: LoginMethod
+  loginMethod: LoginMethod!
   municipalityCode: String
   municipalityName: String
   phone: String
@@ -1712,7 +1712,7 @@ type PaymentMerchantNode implements Node {
   """
   id: ID!
   name: String!
-  pk: UUID
+  pk: UUID!
 }
 
 type PaymentOrderNode implements Node {
@@ -1728,7 +1728,7 @@ type PaymentOrderNode implements Node {
   receiptUrl: String
   refundUuid: UUID
   reservationPk: String
-  status: OrderStatus
+  status: OrderStatus!
 }
 
 type PaymentProductNode implements Node {
@@ -1737,7 +1737,7 @@ type PaymentProductNode implements Node {
   """
   id: ID!
   merchant: PaymentMerchantNode
-  pk: UUID
+  pk: UUID!
 }
 
 """
@@ -1793,7 +1793,7 @@ type PindoraSectionInfoType {
   accessCodePhoneNumber: String!
   accessCodeSmsMessage: String!
   accessCodeSmsNumber: String!
-  accessCodeValidity: [PindoraSectionValidityInfoType]!
+  accessCodeValidity: [PindoraSectionValidityInfoType!]!
 }
 
 type PindoraSectionValidityInfoType {
@@ -2255,8 +2255,8 @@ type Query {
     """
     orderBy: [EquipmentOrderingChoices]
     pk: [Int]
-    rankGte: Decimal
-    rankLte: Decimal
+    rankGte: Int
+    rankLte: Int
   ): EquipmentNodeConnection
   equipmentsAll(
     """
@@ -2475,10 +2475,10 @@ type Query {
     isDraft: Boolean
     isVisible: Boolean
     last: Int
-    maxPersonsGte: Decimal
-    maxPersonsLte: Decimal
-    minPersonsGte: Decimal
-    minPersonsLte: Decimal
+    maxPersonsGte: Int
+    maxPersonsLte: Int
+    minPersonsGte: Int
+    minPersonsLte: Int
     nameEn: String
     nameEn_Icontains: String
     nameEn_Istartswith: String
@@ -2494,29 +2494,29 @@ type Query {
     Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
-    personsAllowed: Decimal
+    personsAllowed: Int
     pk: [Int]
     publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
     qualifiers: [Int]
-    rankGte: Decimal
-    rankLte: Decimal
+    rankGte: Int
+    rankLte: Int
     reservableDateEnd: Date
     reservableDateStart: Date
-    reservableMinimumDurationMinutes: Decimal
+    reservableMinimumDurationMinutes: Int
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
     reservationState: [ReservationUnitReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    surfaceAreaGte: Decimal
-    surfaceAreaLte: Decimal
+    surfaceAreaGte: Int
+    surfaceAreaLte: Int
     textSearch: String
     tprekDepartmentId: String
     tprekId: String
-    typeRankGte: Decimal
-    typeRankLte: Decimal
+    typeRankGte: Int
+    typeRankLte: Int
     unit: [Int]
     uuid: UUID
   ): ReservationUnitNodeConnection
@@ -2725,7 +2725,7 @@ type Query {
 
 type RecurringReservationNode implements Node {
   abilityGroup: AbilityGroupNode
-  accessType: AccessTypeWithMultivalued
+  accessType: AccessTypeWithMultivalued!
   ageGroup: AgeGroupNode
   allocatedTimeSlot: AllocatedTimeSlotNode
   beginDate: Date
@@ -2739,7 +2739,7 @@ type RecurringReservationNode implements Node {
   The ID of the object
   """
   id: ID!
-  isAccessCodeIsActiveCorrect: Boolean
+  isAccessCodeIsActiveCorrect: Boolean!
   name: String!
   """
   Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple series, queries to Pindora are not optimized.
@@ -2791,10 +2791,10 @@ type RecurringReservationNode implements Node {
     unit: [Int]
     user: [Int]
   ): [ReservationNode!]!
-  shouldHaveActiveAccessCode: Boolean
-  usedAccessTypes: [AccessType]
+  shouldHaveActiveAccessCode: Boolean!
+  usedAccessTypes: [AccessType]!
   user: UserNode
-  weekdays: [Int]
+  weekdays: [Int!]!
 }
 
 type RecurringReservationNodeConnection {
@@ -3231,7 +3231,7 @@ type ReservationNode implements Node {
   """
   Which reservation units' reserveability is affected by this reservation?
   """
-  affectedReservationUnits: [Int]
+  affectedReservationUnits: [Int]!
   ageGroup: AgeGroupNode
   applyingForFreeOfCharge: Boolean
   begin: DateTime!
@@ -3244,7 +3244,7 @@ type ReservationNode implements Node {
   billingPhone: String
   bufferTimeAfter: Duration!
   bufferTimeBefore: Duration!
-  calendarUrl: String
+  calendarUrl: String!
   cancelDetails: String
   cancelReason: ReservationCancelReasonNode
   createdAt: DateTime
@@ -3260,13 +3260,11 @@ type ReservationNode implements Node {
   The ID of the object
   """
   id: ID!
-  isAccessCodeIsActiveCorrect: Boolean
-  isBlocked: Boolean
+  isAccessCodeIsActiveCorrect: Boolean!
+  isBlocked: Boolean!
   isHandled: Boolean
   name: String
   numPersons: Int
-  order: PaymentOrderNode
-    @deprecated(reason: "Please use to 'paymentOrder' instead.")
   paymentOrder: [PaymentOrderNode!]!
   """
   Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized.
@@ -3292,10 +3290,10 @@ type ReservationNode implements Node {
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
-    maxPersonsGte: Decimal
-    maxPersonsLte: Decimal
-    minPersonsGte: Decimal
-    minPersonsLte: Decimal
+    maxPersonsGte: Int
+    maxPersonsLte: Int
+    minPersonsGte: Int
+    minPersonsLte: Int
     nameEn: String
     nameEn_Icontains: String
     nameEn_Istartswith: String
@@ -3310,29 +3308,29 @@ type ReservationNode implements Node {
     Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
-    personsAllowed: Decimal
+    personsAllowed: Int
     pk: [Int]
     publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
     qualifiers: [Int]
-    rankGte: Decimal
-    rankLte: Decimal
+    rankGte: Int
+    rankLte: Int
     reservableDateEnd: Date
     reservableDateStart: Date
-    reservableMinimumDurationMinutes: Decimal
+    reservableMinimumDurationMinutes: Int
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
     reservationState: [ReservationUnitReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    surfaceAreaGte: Decimal
-    surfaceAreaLte: Decimal
+    surfaceAreaGte: Int
+    surfaceAreaLte: Int
     textSearch: String
     tprekDepartmentId: String
     tprekId: String
-    typeRankGte: Decimal
-    typeRankLte: Decimal
+    typeRankGte: Int
+    typeRankLte: Int
     unit: [Int]
     uuid: UUID
   ): [ReservationUnitNode!]!
@@ -3348,7 +3346,6 @@ type ReservationNode implements Node {
   reserveeOrganisationName: String
   reserveePhone: String
   reserveeType: CustomerTypeChoice
-  staffEvent: Boolean @deprecated(reason: "Please use to 'type' instead.")
   state: ReservationStateChoice
   taxPercentageValue: Decimal
   type: ReservationTypeChoice
@@ -3384,20 +3381,11 @@ type ReservationNodeEdge {
 }
 
 """
-An enumeration.
+When user wants to receive reservation notification emails.
 """
 enum ReservationNotification {
-  """
-  All
-  """
   ALL
-  """
-  None
-  """
   NONE
-  """
-  Only Handling Required
-  """
   ONLY_HANDLING_REQUIRED
 }
 
@@ -4244,7 +4232,7 @@ type ReservationUnitNode implements Node {
   authentication: Authentication!
   bufferTimeAfter: Duration!
   bufferTimeBefore: Duration!
-  calculatedSurfaceArea: Int
+  calculatedSurfaceArea: Int!
   canApplyFreeOfCharge: Boolean!
   cancellationRule: ReservationUnitCancellationRuleNode
   cancellationTerms: TermsOfUseNode
@@ -4273,8 +4261,8 @@ type ReservationUnitNode implements Node {
     """
     orderBy: [EquipmentOrderingChoices]
     pk: [Int]
-    rankGte: Decimal
-    rankLte: Decimal
+    rankGte: Int
+    rankLte: Int
   ): [EquipmentNode!]!
   firstReservableDatetime: DateTime
   haukiUrl: String
@@ -4284,7 +4272,7 @@ type ReservationUnitNode implements Node {
   id: ID!
   images: [ReservationUnitImageNode!]!
   isArchived: Boolean!
-  isClosed: Boolean
+  isClosed: Boolean!
   isDraft: Boolean!
   location: LocationNode
   maxPersons: Int
@@ -4297,7 +4285,7 @@ type ReservationUnitNode implements Node {
   nameEn: String
   nameFi: String
   nameSv: String
-  numActiveUserReservations: Int
+  numActiveUserReservations: Int!
   paymentMerchant: PaymentMerchantNode
   paymentProduct: PaymentProductNode
   paymentTerms: TermsOfUseNode
@@ -4307,7 +4295,7 @@ type ReservationUnitNode implements Node {
   pricings: [ReservationUnitPricingNode!]!
   publishBegins: DateTime
   publishEnds: DateTime
-  publishingState: ReservationUnitPublishingState
+  publishingState: ReservationUnitPublishingState!
   purposes(
     nameEn: String
     nameFi: String
@@ -4334,7 +4322,7 @@ type ReservationUnitNode implements Node {
   reservableTimeSpans(
     endDate: Date!
     startDate: Date!
-  ): [ReservableTimeSpanType]
+  ): [ReservableTimeSpanType!]
   reservationBegins: DateTime
   reservationBlockWholeDay: Boolean!
   reservationCancelledInstructions: String!
@@ -4352,7 +4340,7 @@ type ReservationUnitNode implements Node {
   reservationPendingInstructionsFi: String
   reservationPendingInstructionsSv: String
   reservationStartInterval: ReservationStartInterval!
-  reservationState: ReservationUnitReservationState
+  reservationState: ReservationUnitReservationState!
   reservationUnitType: ReservationUnitTypeNode
   reservations(
     applyingForFreeOfCharge: Boolean
@@ -4557,13 +4545,13 @@ type ReservationUnitPaymentTypeNode implements Node {
 type ReservationUnitPricingNode implements Node {
   begins: Date!
   highestPrice: Decimal!
-  highestPriceNet: Decimal
+  highestPriceNet: Decimal!
   """
   The ID of the object
   """
   id: ID!
   lowestPrice: Decimal!
-  lowestPriceNet: Decimal
+  lowestPriceNet: Decimal!
   pk: Int
   priceUnit: PriceUnit!
   taxPercentage: TaxPercentageNode!
@@ -4934,7 +4922,7 @@ type ResourceNode implements Node {
   The ID of the object
   """
   id: ID!
-  locationType: ResourceLocationType
+  locationType: ResourceLocationType!
   name: String!
   nameEn: String
   nameFi: String
@@ -5213,7 +5201,7 @@ type SuitableTimeRangeNode implements Node {
   beginTime: Time!
   dayOfTheWeek: Weekday!
   endTime: Time!
-  fulfilled: Boolean
+  fulfilled: Boolean!
   """
   The ID of the object
   """
@@ -5491,10 +5479,10 @@ type UnitNode implements Node {
     equipments: [Int]
     isDraft: Boolean
     isVisible: Boolean
-    maxPersonsGte: Decimal
-    maxPersonsLte: Decimal
-    minPersonsGte: Decimal
-    minPersonsLte: Decimal
+    maxPersonsGte: Int
+    maxPersonsLte: Int
+    minPersonsGte: Int
+    minPersonsLte: Int
     nameEn: String
     nameEn_Icontains: String
     nameEn_Istartswith: String
@@ -5509,29 +5497,29 @@ type UnitNode implements Node {
     Järjestä
     """
     orderBy: [ReservationUnitOrderingChoices]
-    personsAllowed: Decimal
+    personsAllowed: Int
     pk: [Int]
     publishingState: [ReservationUnitPublishingState]
     purposes: [Int]
     qualifiers: [Int]
-    rankGte: Decimal
-    rankLte: Decimal
+    rankGte: Int
+    rankLte: Int
     reservableDateEnd: Date
     reservableDateStart: Date
-    reservableMinimumDurationMinutes: Decimal
+    reservableMinimumDurationMinutes: Int
     reservableTimeEnd: Time
     reservableTimeStart: Time
     reservationKind: String
     reservationState: [ReservationUnitReservationState]
     reservationUnitType: [Int]
     showOnlyReservable: Boolean
-    surfaceAreaGte: Decimal
-    surfaceAreaLte: Decimal
+    surfaceAreaGte: Int
+    surfaceAreaLte: Int
     textSearch: String
     tprekDepartmentId: String
     tprekId: String
-    typeRankGte: Decimal
-    typeRankLte: Decimal
+    typeRankGte: Int
+    typeRankLte: Int
     unit: [Int]
     uuid: UUID
   ): [ReservationUnitNode!]!
@@ -5621,7 +5609,7 @@ type UnitRoleNode implements Node {
   """
   id: ID!
   modified: DateTime!
-  permissions: [UserPermissionChoice]
+  permissions: [UserPermissionChoice!]!
   role: UserRoleChoice!
   unitGroups: [UnitGroupNode!]!
   units(
@@ -5832,16 +5820,16 @@ type UserNode implements Node {
   The ID of the object
   """
   id: ID!
-  isAdAuthenticated: Boolean
-  isStronglyAuthenticated: Boolean
+  isAdAuthenticated: Boolean!
+  isStronglyAuthenticated: Boolean!
   """
   Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella.
   """
   isSuperuser: Boolean!
   lastName: String!
-  name: String
+  name: String!
   pk: Int
-  reservationNotification: String
+  reservationNotification: ReservationNotification
   unitRoles: [UnitRoleNode!]!
   """
   Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja.

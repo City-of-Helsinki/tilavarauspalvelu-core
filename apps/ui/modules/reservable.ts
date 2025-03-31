@@ -154,7 +154,7 @@ export function isSlotWithinReservationTime({
   );
 }
 
-type ReservationUnitReservableProps = {
+export type ReservationUnitReservableProps = {
   range: {
     start: Date;
     end: Date;

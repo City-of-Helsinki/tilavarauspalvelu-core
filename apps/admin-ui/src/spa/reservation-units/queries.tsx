@@ -5,10 +5,10 @@ export const SEARCH_RESERVATION_UNITS_QUERY = gql`
     $after: String
     $first: Int
     $textSearch: String
-    $maxPersonsGte: Decimal
-    $maxPersonsLte: Decimal
-    $surfaceAreaGte: Decimal
-    $surfaceAreaLte: Decimal
+    $maxPersonsGte: Int
+    $maxPersonsLte: Int
+    $surfaceAreaGte: Int
+    $surfaceAreaLte: Int
     $unit: [Int]
     $reservationUnitType: [Int]
     $orderBy: [ReservationUnitOrderingChoices]

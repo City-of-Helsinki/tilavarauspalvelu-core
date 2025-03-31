@@ -221,14 +221,14 @@ export type ApplicantNode = Node & {
   generalRoles: Array<GeneralRoleNode>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  isAdAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
-  isStronglyAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
+  isAdAuthenticated: Scalars["Boolean"]["output"];
+  isStronglyAuthenticated: Scalars["Boolean"]["output"];
   /** Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella. */
   isSuperuser: Scalars["Boolean"]["output"];
   lastName: Scalars["String"]["output"];
-  name?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  reservationNotification?: Maybe<Scalars["String"]["output"]>;
+  reservationNotification?: Maybe<ReservationNotification>;
   unitRoles: Array<UnitRoleNode>;
   /** Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja. */
   username: Scalars["String"]["output"];
@@ -298,7 +298,7 @@ export type ApplicationNode = Node & {
   organisation?: Maybe<OrganisationNode>;
   pk?: Maybe<Scalars["Int"]["output"]>;
   sentDate?: Maybe<Scalars["DateTime"]["output"]>;
-  status?: Maybe<ApplicationStatusChoice>;
+  status: ApplicationStatusChoice;
   user?: Maybe<ApplicantNode>;
   workingMemo: Scalars["String"]["output"];
 };
@@ -365,7 +365,7 @@ export enum ApplicationOrderingChoices {
 export type ApplicationRoundNode = Node & {
   applicationPeriodBegin: Scalars["DateTime"]["output"];
   applicationPeriodEnd: Scalars["DateTime"]["output"];
-  applicationsCount?: Maybe<Scalars["Int"]["output"]>;
+  applicationsCount: Scalars["Int"]["output"];
   criteria: Scalars["String"]["output"];
   criteriaEn?: Maybe<Scalars["String"]["output"]>;
   criteriaFi?: Maybe<Scalars["String"]["output"]>;
@@ -373,7 +373,7 @@ export type ApplicationRoundNode = Node & {
   handledDate?: Maybe<Scalars["DateTime"]["output"]>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  isSettingHandledAllowed?: Maybe<Scalars["Boolean"]["output"]>;
+  isSettingHandledAllowed: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
@@ -386,13 +386,13 @@ export type ApplicationRoundNode = Node & {
   publicDisplayBegin: Scalars["DateTime"]["output"];
   publicDisplayEnd: Scalars["DateTime"]["output"];
   purposes: Array<ReservationPurposeNode>;
-  reservationCreationStatus?: Maybe<ApplicationRoundReservationCreationStatusChoice>;
+  reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice;
   reservationPeriodBegin: Scalars["Date"]["output"];
   reservationPeriodEnd: Scalars["Date"]["output"];
-  reservationUnitCount?: Maybe<Scalars["Int"]["output"]>;
+  reservationUnitCount: Scalars["Int"]["output"];
   reservationUnits: Array<ReservationUnitNode>;
   sentDate?: Maybe<Scalars["DateTime"]["output"]>;
-  status?: Maybe<ApplicationRoundStatusChoice>;
+  status: ApplicationRoundStatusChoice;
   statusTimestamp?: Maybe<Scalars["DateTime"]["output"]>;
   termsOfUse?: Maybe<TermsOfUseNode>;
 };
@@ -420,10 +420,10 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  maxPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  maxPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -435,18 +435,18 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  personsAllowed?: InputMaybe<Scalars["Int"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
   >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
   reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Int"]["input"]>;
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
@@ -455,13 +455,13 @@ export type ApplicationRoundNodeReservationUnitsArgs = {
   >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  surfaceAreaGte?: InputMaybe<Scalars["Int"]["input"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Int"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
-  typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  typeRankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  typeRankLte?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
@@ -509,7 +509,7 @@ export type ApplicationRoundTimeSlotNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  reservableTimes?: Maybe<Array<Maybe<TimeSlotType>>>;
+  reservableTimes: Array<Maybe<TimeSlotType>>;
   weekday: Scalars["Int"]["output"];
 };
 
@@ -580,7 +580,7 @@ export type ApplicationSectionForApplicationSerializerInput = {
 
 export type ApplicationSectionNode = Node & {
   ageGroup?: Maybe<AgeGroupNode>;
-  allocations?: Maybe<Scalars["Int"]["output"]>;
+  allocations: Scalars["Int"]["output"];
   application: ApplicationNode;
   appliedReservationsPerWeek: Scalars["Int"]["output"];
   extUuid: Scalars["UUID"]["output"];
@@ -598,8 +598,8 @@ export type ApplicationSectionNode = Node & {
   reservationUnitOptions: Array<ReservationUnitOptionNode>;
   reservationsBeginDate: Scalars["Date"]["output"];
   reservationsEndDate: Scalars["Date"]["output"];
-  shouldHaveActiveAccessCode?: Maybe<Scalars["Boolean"]["output"]>;
-  status?: Maybe<ApplicationSectionStatusChoice>;
+  shouldHaveActiveAccessCode: Scalars["Boolean"]["output"];
+  status: ApplicationSectionStatusChoice;
   suitableTimeRanges: Array<SuitableTimeRangeNode>;
 };
 
@@ -841,7 +841,7 @@ export type BannerNotificationNode = Node & {
   messageSv?: Maybe<Scalars["String"]["output"]>;
   name: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  state?: Maybe<BannerNotificationState>;
+  state: BannerNotificationState;
   target: BannerNotificationTarget;
 };
 
@@ -1141,7 +1141,7 @@ export type GeneralRoleNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   modified: Scalars["DateTime"]["output"];
-  permissions?: Maybe<Array<Maybe<UserPermissionChoice>>>;
+  permissions: Array<UserPermissionChoice>;
   role: UserRoleChoice;
   user: UserNode;
 };
@@ -1153,7 +1153,7 @@ export type HelsinkiProfileDataNode = {
   firstName?: Maybe<Scalars["String"]["output"]>;
   isStrongLogin: Scalars["Boolean"]["output"];
   lastName?: Maybe<Scalars["String"]["output"]>;
-  loginMethod?: Maybe<LoginMethod>;
+  loginMethod: LoginMethod;
   municipalityCode?: Maybe<Scalars["String"]["output"]>;
   municipalityName?: Maybe<Scalars["String"]["output"]>;
   phone?: Maybe<Scalars["String"]["output"]>;
@@ -1645,7 +1645,7 @@ export type PaymentMerchantNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
-  pk?: Maybe<Scalars["UUID"]["output"]>;
+  pk: Scalars["UUID"]["output"];
 };
 
 export type PaymentOrderNode = Node & {
@@ -1659,14 +1659,14 @@ export type PaymentOrderNode = Node & {
   receiptUrl?: Maybe<Scalars["String"]["output"]>;
   refundUuid?: Maybe<Scalars["UUID"]["output"]>;
   reservationPk?: Maybe<Scalars["String"]["output"]>;
-  status?: Maybe<OrderStatus>;
+  status: OrderStatus;
 };
 
 export type PaymentProductNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   merchant?: Maybe<PaymentMerchantNode>;
-  pk?: Maybe<Scalars["UUID"]["output"]>;
+  pk: Scalars["UUID"]["output"];
 };
 
 /** An enumeration. */
@@ -1718,7 +1718,7 @@ export type PindoraSectionInfoType = {
   accessCodePhoneNumber: Scalars["String"]["output"];
   accessCodeSmsMessage: Scalars["String"]["output"];
   accessCodeSmsNumber: Scalars["String"]["output"];
-  accessCodeValidity: Array<Maybe<PindoraSectionValidityInfoType>>;
+  accessCodeValidity: Array<PindoraSectionValidityInfoType>;
 };
 
 export type PindoraSectionValidityInfoType = {
@@ -2147,8 +2147,8 @@ export type QueryEquipmentsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<EquipmentOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type QueryEquipmentsAllArgs = {
@@ -2340,10 +2340,10 @@ export type QueryReservationUnitsArgs = {
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  maxPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  maxPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -2356,18 +2356,18 @@ export type QueryReservationUnitsArgs = {
   offset?: InputMaybe<Scalars["Int"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  personsAllowed?: InputMaybe<Scalars["Int"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
   >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
   reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Int"]["input"]>;
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
@@ -2376,13 +2376,13 @@ export type QueryReservationUnitsArgs = {
   >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  surfaceAreaGte?: InputMaybe<Scalars["Int"]["input"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Int"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
-  typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  typeRankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  typeRankLte?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
@@ -2567,7 +2567,7 @@ export type QueryUserArgs = {
 
 export type RecurringReservationNode = Node & {
   abilityGroup?: Maybe<AbilityGroupNode>;
-  accessType?: Maybe<AccessTypeWithMultivalued>;
+  accessType: AccessTypeWithMultivalued;
   ageGroup?: Maybe<AgeGroupNode>;
   allocatedTimeSlot?: Maybe<AllocatedTimeSlotNode>;
   beginDate?: Maybe<Scalars["Date"]["output"]>;
@@ -2579,7 +2579,7 @@ export type RecurringReservationNode = Node & {
   extUuid: Scalars["UUID"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  isAccessCodeIsActiveCorrect?: Maybe<Scalars["Boolean"]["output"]>;
+  isAccessCodeIsActiveCorrect: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple series, queries to Pindora are not optimized. */
   pindoraInfo?: Maybe<PindoraSeriesInfoType>;
@@ -2588,10 +2588,10 @@ export type RecurringReservationNode = Node & {
   rejectedOccurrences: Array<RejectedOccurrenceNode>;
   reservationUnit: ReservationUnitNode;
   reservations: Array<ReservationNode>;
-  shouldHaveActiveAccessCode?: Maybe<Scalars["Boolean"]["output"]>;
-  usedAccessTypes?: Maybe<Array<Maybe<AccessType>>>;
+  shouldHaveActiveAccessCode: Scalars["Boolean"]["output"];
+  usedAccessTypes: Array<Maybe<AccessType>>;
   user?: Maybe<UserNode>;
-  weekdays?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  weekdays: Array<Scalars["Int"]["output"]>;
 };
 
 export type RecurringReservationNodeRejectedOccurrencesArgs = {
@@ -2979,7 +2979,7 @@ export type ReservationNode = Node & {
   accessCodeShouldBeActive?: Maybe<Scalars["Boolean"]["output"]>;
   accessType: AccessType;
   /** Which reservation units' reserveability is affected by this reservation? */
-  affectedReservationUnits?: Maybe<Array<Maybe<Scalars["Int"]["output"]>>>;
+  affectedReservationUnits: Array<Maybe<Scalars["Int"]["output"]>>;
   ageGroup?: Maybe<AgeGroupNode>;
   applyingForFreeOfCharge?: Maybe<Scalars["Boolean"]["output"]>;
   begin: Scalars["DateTime"]["output"];
@@ -2992,7 +2992,7 @@ export type ReservationNode = Node & {
   billingPhone?: Maybe<Scalars["String"]["output"]>;
   bufferTimeAfter: Scalars["Duration"]["output"];
   bufferTimeBefore: Scalars["Duration"]["output"];
-  calendarUrl?: Maybe<Scalars["String"]["output"]>;
+  calendarUrl: Scalars["String"]["output"];
   cancelDetails?: Maybe<Scalars["String"]["output"]>;
   cancelReason?: Maybe<ReservationCancelReasonNode>;
   createdAt?: Maybe<Scalars["DateTime"]["output"]>;
@@ -3006,13 +3006,11 @@ export type ReservationNode = Node & {
   homeCity?: Maybe<CityNode>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  isAccessCodeIsActiveCorrect?: Maybe<Scalars["Boolean"]["output"]>;
-  isBlocked?: Maybe<Scalars["Boolean"]["output"]>;
+  isAccessCodeIsActiveCorrect: Scalars["Boolean"]["output"];
+  isBlocked: Scalars["Boolean"]["output"];
   isHandled?: Maybe<Scalars["Boolean"]["output"]>;
   name?: Maybe<Scalars["String"]["output"]>;
   numPersons?: Maybe<Scalars["Int"]["output"]>;
-  /** @deprecated Please use to 'paymentOrder' instead. */
-  order?: Maybe<PaymentOrderNode>;
   paymentOrder: Array<PaymentOrderNode>;
   /** Info fetched from Pindora API. Cached per reservation for 30s. Please don't use this when filtering multiple reservations, queries to Pindora are not optimized. */
   pindoraInfo?: Maybe<PindoraReservationInfoType>;
@@ -3034,8 +3032,6 @@ export type ReservationNode = Node & {
   reserveeOrganisationName?: Maybe<Scalars["String"]["output"]>;
   reserveePhone?: Maybe<Scalars["String"]["output"]>;
   reserveeType?: Maybe<CustomerTypeChoice>;
-  /** @deprecated Please use to 'type' instead. */
-  staffEvent?: Maybe<Scalars["Boolean"]["output"]>;
   state?: Maybe<ReservationStateChoice>;
   taxPercentageValue?: Maybe<Scalars["Decimal"]["output"]>;
   type?: Maybe<ReservationTypeChoice>;
@@ -3059,10 +3055,10 @@ export type ReservationNodeReservationUnitsArgs = {
   equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  maxPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  maxPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -3074,18 +3070,18 @@ export type ReservationNodeReservationUnitsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  personsAllowed?: InputMaybe<Scalars["Int"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
   >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
   reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Int"]["input"]>;
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
@@ -3094,13 +3090,13 @@ export type ReservationNodeReservationUnitsArgs = {
   >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  surfaceAreaGte?: InputMaybe<Scalars["Int"]["input"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Int"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
-  typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  typeRankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  typeRankLte?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
@@ -3121,13 +3117,10 @@ export type ReservationNodeEdge = {
   node?: Maybe<ReservationNode>;
 };
 
-/** An enumeration. */
+/** When user wants to receive reservation notification emails. */
 export enum ReservationNotification {
-  /** All */
   All = "ALL",
-  /** None */
   None = "NONE",
-  /** Only Handling Required */
   OnlyHandlingRequired = "ONLY_HANDLING_REQUIRED",
 }
 
@@ -3892,7 +3885,7 @@ export type ReservationUnitNode = Node & {
   authentication: Authentication;
   bufferTimeAfter: Scalars["Duration"]["output"];
   bufferTimeBefore: Scalars["Duration"]["output"];
-  calculatedSurfaceArea?: Maybe<Scalars["Int"]["output"]>;
+  calculatedSurfaceArea: Scalars["Int"]["output"];
   canApplyFreeOfCharge: Scalars["Boolean"]["output"];
   cancellationRule?: Maybe<ReservationUnitCancellationRuleNode>;
   cancellationTerms?: Maybe<TermsOfUseNode>;
@@ -3910,7 +3903,7 @@ export type ReservationUnitNode = Node & {
   id: Scalars["ID"]["output"];
   images: Array<ReservationUnitImageNode>;
   isArchived: Scalars["Boolean"]["output"];
-  isClosed?: Maybe<Scalars["Boolean"]["output"]>;
+  isClosed: Scalars["Boolean"]["output"];
   isDraft: Scalars["Boolean"]["output"];
   location?: Maybe<LocationNode>;
   maxPersons?: Maybe<Scalars["Int"]["output"]>;
@@ -3923,7 +3916,7 @@ export type ReservationUnitNode = Node & {
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
   nameSv?: Maybe<Scalars["String"]["output"]>;
-  numActiveUserReservations?: Maybe<Scalars["Int"]["output"]>;
+  numActiveUserReservations: Scalars["Int"]["output"];
   paymentMerchant?: Maybe<PaymentMerchantNode>;
   paymentProduct?: Maybe<PaymentProductNode>;
   paymentTerms?: Maybe<TermsOfUseNode>;
@@ -3933,13 +3926,13 @@ export type ReservationUnitNode = Node & {
   pricings: Array<ReservationUnitPricingNode>;
   publishBegins?: Maybe<Scalars["DateTime"]["output"]>;
   publishEnds?: Maybe<Scalars["DateTime"]["output"]>;
-  publishingState?: Maybe<ReservationUnitPublishingState>;
+  publishingState: ReservationUnitPublishingState;
   purposes: Array<PurposeNode>;
   qualifiers: Array<QualifierNode>;
   rank: Scalars["Int"]["output"];
   requireAdultReservee: Scalars["Boolean"]["output"];
   requireReservationHandling: Scalars["Boolean"]["output"];
-  reservableTimeSpans?: Maybe<Array<Maybe<ReservableTimeSpanType>>>;
+  reservableTimeSpans?: Maybe<Array<ReservableTimeSpanType>>;
   reservationBegins?: Maybe<Scalars["DateTime"]["output"]>;
   reservationBlockWholeDay: Scalars["Boolean"]["output"];
   reservationCancelledInstructions: Scalars["String"]["output"];
@@ -3957,7 +3950,7 @@ export type ReservationUnitNode = Node & {
   reservationPendingInstructionsFi?: Maybe<Scalars["String"]["output"]>;
   reservationPendingInstructionsSv?: Maybe<Scalars["String"]["output"]>;
   reservationStartInterval: ReservationStartInterval;
-  reservationState?: Maybe<ReservationUnitReservationState>;
+  reservationState: ReservationUnitReservationState;
   reservationUnitType?: Maybe<ReservationUnitTypeNode>;
   reservations?: Maybe<Array<ReservationNode>>;
   reservationsMaxDaysBefore?: Maybe<Scalars["Int"]["output"]>;
@@ -4008,8 +4001,8 @@ export type ReservationUnitNodeEquipmentsArgs = {
   name_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<EquipmentOrderingChoices>>>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type ReservationUnitNodePurposesArgs = {
@@ -4202,11 +4195,11 @@ export type ReservationUnitPaymentTypeNode = Node & {
 export type ReservationUnitPricingNode = Node & {
   begins: Scalars["Date"]["output"];
   highestPrice: Scalars["Decimal"]["output"];
-  highestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  highestPriceNet: Scalars["Decimal"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   lowestPrice: Scalars["Decimal"]["output"];
-  lowestPriceNet?: Maybe<Scalars["Decimal"]["output"]>;
+  lowestPriceNet: Scalars["Decimal"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
   priceUnit: PriceUnit;
   taxPercentage: TaxPercentageNode;
@@ -4557,7 +4550,7 @@ export enum ResourceLocationType {
 export type ResourceNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  locationType?: Maybe<ResourceLocationType>;
+  locationType: ResourceLocationType;
   name: Scalars["String"]["output"];
   nameEn?: Maybe<Scalars["String"]["output"]>;
   nameFi?: Maybe<Scalars["String"]["output"]>;
@@ -4792,7 +4785,7 @@ export type SuitableTimeRangeNode = Node & {
   beginTime: Scalars["Time"]["output"];
   dayOfTheWeek: Weekday;
   endTime: Scalars["Time"]["output"];
-  fulfilled?: Maybe<Scalars["Boolean"]["output"]>;
+  fulfilled: Scalars["Boolean"]["output"];
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
@@ -5005,10 +4998,10 @@ export type UnitNodeReservationUnitsArgs = {
   equipments?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  maxPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  maxPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  minPersonsLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  maxPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  maxPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsGte?: InputMaybe<Scalars["Int"]["input"]>;
+  minPersonsLte?: InputMaybe<Scalars["Int"]["input"]>;
   nameEn?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Icontains?: InputMaybe<Scalars["String"]["input"]>;
   nameEn_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
@@ -5020,18 +5013,18 @@ export type UnitNodeReservationUnitsArgs = {
   nameSv_Istartswith?: InputMaybe<Scalars["String"]["input"]>;
   onlyWithPermission?: InputMaybe<Scalars["Boolean"]["input"]>;
   orderBy?: InputMaybe<Array<InputMaybe<ReservationUnitOrderingChoices>>>;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  personsAllowed?: InputMaybe<Scalars["Int"]["input"]>;
   pk?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   publishingState?: InputMaybe<
     Array<InputMaybe<ReservationUnitPublishingState>>
   >;
   purposes?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   qualifiers?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
-  rankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  rankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  rankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  rankLte?: InputMaybe<Scalars["Int"]["input"]>;
   reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
   reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Int"]["input"]>;
   reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
   reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
   reservationKind?: InputMaybe<Scalars["String"]["input"]>;
@@ -5040,13 +5033,13 @@ export type UnitNodeReservationUnitsArgs = {
   >;
   reservationUnitType?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  surfaceAreaGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  surfaceAreaLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  surfaceAreaGte?: InputMaybe<Scalars["Int"]["input"]>;
+  surfaceAreaLte?: InputMaybe<Scalars["Int"]["input"]>;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   tprekDepartmentId?: InputMaybe<Scalars["String"]["input"]>;
   tprekId?: InputMaybe<Scalars["String"]["input"]>;
-  typeRankGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  typeRankLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  typeRankGte?: InputMaybe<Scalars["Int"]["input"]>;
+  typeRankLte?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
   uuid?: InputMaybe<Scalars["UUID"]["input"]>;
 };
@@ -5112,7 +5105,7 @@ export type UnitRoleNode = Node & {
   /** The ID of the object */
   id: Scalars["ID"]["output"];
   modified: Scalars["DateTime"]["output"];
-  permissions?: Maybe<Array<Maybe<UserPermissionChoice>>>;
+  permissions: Array<UserPermissionChoice>;
   role: UserRoleChoice;
   unitGroups: Array<UnitGroupNode>;
   units: Array<UnitNode>;
@@ -5319,14 +5312,14 @@ export type UserNode = Node & {
   generalRoles: Array<GeneralRoleNode>;
   /** The ID of the object */
   id: Scalars["ID"]["output"];
-  isAdAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
-  isStronglyAuthenticated?: Maybe<Scalars["Boolean"]["output"]>;
+  isAdAuthenticated: Scalars["Boolean"]["output"];
+  isStronglyAuthenticated: Scalars["Boolean"]["output"];
   /** Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella. */
   isSuperuser: Scalars["Boolean"]["output"];
   lastName: Scalars["String"]["output"];
-  name?: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
   pk?: Maybe<Scalars["Int"]["output"]>;
-  reservationNotification?: Maybe<Scalars["String"]["output"]>;
+  reservationNotification?: Maybe<ReservationNotification>;
   unitRoles: Array<UnitRoleNode>;
   /** Vaaditaan. Enintään 150 merkkiä. Vain kirjaimet, numerot ja @/./+/-/_ ovat sallittuja. */
   username: Scalars["String"]["output"];
@@ -5444,7 +5437,7 @@ export type ApplicationSectionCommonFragment = {
   id: string;
   pk?: number | null;
   name: string;
-  status?: ApplicationSectionStatusChoice | null;
+  status: ApplicationSectionStatusChoice;
   reservationMaxDuration: number;
   numPersons: number;
   reservationsEndDate: string;
@@ -5501,7 +5494,7 @@ export type ApplicationRoundTimeSlotsFragment = {
   pk?: number | null;
   weekday: number;
   closed: boolean;
-  reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+  reservableTimes: Array<{ begin: string; end: string } | null>;
 };
 
 export type ReservationUnitOptionFragment = {
@@ -5517,7 +5510,7 @@ export type ReservationUnitOptionFragment = {
       pk?: number | null;
       weekday: number;
       closed: boolean;
-      reservableTimes?: Array<{ begin: string; end: string } | null> | null;
+      reservableTimes: Array<{ begin: string; end: string } | null>;
     }>;
     unit?: {
       id: string;
