@@ -5732,8 +5732,8 @@ export type ApplicationRoundForApplicationFragment = {
     readonly id: string;
     readonly pk: number | null;
     readonly nameFi: string | null;
-    readonly nameSv: string | null;
     readonly nameEn: string | null;
+    readonly nameSv: string | null;
     readonly unit: {
       readonly id: string;
       readonly pk: number | null;
@@ -5979,8 +5979,8 @@ export type OrderedReservationUnitCardFragment = {
   readonly id: string;
   readonly pk: number | null;
   readonly nameFi: string | null;
-  readonly nameSv: string | null;
   readonly nameEn: string | null;
+  readonly nameSv: string | null;
   readonly images: ReadonlyArray<{
     readonly id: string;
     readonly imageUrl: string | null;
@@ -6009,8 +6009,8 @@ export type ApplicationReservationUnitListFragment = {
     readonly id: string;
     readonly pk: number | null;
     readonly nameFi: string | null;
-    readonly nameSv: string | null;
     readonly nameEn: string | null;
+    readonly nameSv: string | null;
     readonly unit: {
       readonly id: string;
       readonly pk: number | null;
@@ -6065,8 +6065,8 @@ export type ApplicationViewFragment = {
       readonly id: string;
       readonly pk: number | null;
       readonly nameFi: string | null;
-      readonly nameSv: string | null;
       readonly nameEn: string | null;
+      readonly nameSv: string | null;
       readonly unit: {
         readonly id: string;
         readonly pk: number | null;
@@ -6253,6 +6253,14 @@ export type PurposeCardFragment = {
   readonly smallUrl: string | null;
 };
 
+export type UnitListFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly nameEn: string | null;
+  readonly nameSv: string | null;
+};
+
 export type ApplicationRoundCardFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -6273,8 +6281,8 @@ export type RecurringCardFragment = {
   readonly id: string;
   readonly pk: number | null;
   readonly nameFi: string | null;
-  readonly nameSv: string | null;
   readonly nameEn: string | null;
+  readonly nameSv: string | null;
   readonly reservationUnitType: {
     readonly id: string;
     readonly nameFi: string | null;
@@ -6313,6 +6321,48 @@ export type AddressFieldsFragment = {
     readonly addressStreetFi: string | null;
     readonly addressZip: string;
     readonly addressCityFi: string | null;
+  } | null;
+};
+
+export type RelatedUnitCardFieldsFragment = {
+  readonly maxPersons: number | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly nameEn: string | null;
+  readonly nameSv: string | null;
+  readonly reservationUnitType: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+  } | null;
+  readonly pricings: ReadonlyArray<{
+    readonly id: string;
+    readonly begins: string;
+    readonly priceUnit: PriceUnit;
+    readonly lowestPrice: string;
+    readonly highestPrice: string;
+    readonly taxPercentage: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly value: string;
+    };
+  }>;
+  readonly images: ReadonlyArray<{
+    readonly id: string;
+    readonly imageUrl: string | null;
+    readonly largeUrl: string | null;
+    readonly mediumUrl: string | null;
+    readonly smallUrl: string | null;
+    readonly imageType: ImageType;
+  }>;
+  readonly unit: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
   } | null;
 };
 
@@ -6392,6 +6442,87 @@ export type ReservationInfoCardFragment = {
   }>;
 };
 
+export type ReservationTimePickerFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly maxReservationDuration: number | null;
+  readonly minReservationDuration: number | null;
+  readonly reservationStartInterval: ReservationStartInterval;
+  readonly reservationsMaxDaysBefore: number | null;
+  readonly reservationsMinDaysBefore: number | null;
+  readonly reservationBegins: string | null;
+  readonly reservationEnds: string | null;
+  readonly reservableTimeSpans: ReadonlyArray<{
+    readonly startDatetime: string | null;
+    readonly endDatetime: string | null;
+  } | null> | null;
+  readonly pricings: ReadonlyArray<{
+    readonly id: string;
+    readonly begins: string;
+    readonly priceUnit: PriceUnit;
+    readonly lowestPrice: string;
+    readonly highestPrice: string;
+    readonly taxPercentage: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly value: string;
+    };
+  }>;
+};
+
+export type SingleSearchCardFragment = {
+  readonly reservationBegins: string | null;
+  readonly reservationEnds: string | null;
+  readonly isClosed: boolean | null;
+  readonly firstReservableDatetime: string | null;
+  readonly currentAccessType: AccessType | null;
+  readonly maxPersons: number | null;
+  readonly effectiveAccessType: AccessType | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly nameEn: string | null;
+  readonly nameSv: string | null;
+  readonly pricings: ReadonlyArray<{
+    readonly id: string;
+    readonly begins: string;
+    readonly priceUnit: PriceUnit;
+    readonly lowestPrice: string;
+    readonly highestPrice: string;
+    readonly taxPercentage: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly value: string;
+    };
+  }>;
+  readonly accessTypes: ReadonlyArray<{
+    readonly id: string;
+    readonly accessType: AccessType;
+  }>;
+  readonly reservationUnitType: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
+  } | null;
+  readonly images: ReadonlyArray<{
+    readonly id: string;
+    readonly imageUrl: string | null;
+    readonly largeUrl: string | null;
+    readonly mediumUrl: string | null;
+    readonly smallUrl: string | null;
+    readonly imageType: ImageType;
+  }>;
+  readonly unit: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
+  } | null;
+};
+
 export type OptionsQueryVariables = Exact<{
   reservationUnitTypesOrderBy?: InputMaybe<
     | ReadonlyArray<InputMaybe<ReservationUnitTypeOrderingChoices>>
@@ -6413,6 +6544,8 @@ export type OptionsQueryVariables = Exact<{
     | ReadonlyArray<InputMaybe<ReservationPurposeOrderingChoices>>
     | InputMaybe<ReservationPurposeOrderingChoices>
   >;
+  onlyDirectBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  onlySeasonalBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
 }>;
 
 export type OptionsQuery = {
@@ -6509,8 +6642,8 @@ export type ApplicationFormFragment = {
       readonly id: string;
       readonly pk: number | null;
       readonly nameFi: string | null;
-      readonly nameSv: string | null;
       readonly nameEn: string | null;
+      readonly nameSv: string | null;
       readonly unit: {
         readonly id: string;
         readonly pk: number | null;
@@ -6725,27 +6858,6 @@ export type PindoraSectionFragment = {
     readonly reservationSeriesId: number;
     readonly reservationId: number;
   } | null>;
-};
-
-export type SearchFormParamsUnitQueryVariables = Exact<{
-  publishedReservationUnits?: InputMaybe<Scalars["Boolean"]["input"]>;
-  ownReservations?: InputMaybe<Scalars["Boolean"]["input"]>;
-  onlyDirectBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  onlySeasonalBookable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  orderBy?: InputMaybe<
-    | ReadonlyArray<InputMaybe<UnitOrderingChoices>>
-    | InputMaybe<UnitOrderingChoices>
-  >;
-}>;
-
-export type SearchFormParamsUnitQuery = {
-  readonly unitsAll: ReadonlyArray<{
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-  }> | null;
 };
 
 export type CreateReservationMutationVariables = Exact<{
@@ -7028,157 +7140,6 @@ export type EquipmentFieldsFragment = {
   };
 };
 
-export type ReservationUnitPageFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly uuid: string;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
-  readonly isDraft: boolean;
-  readonly descriptionFi: string | null;
-  readonly descriptionEn: string | null;
-  readonly descriptionSv: string | null;
-  readonly reservationKind: ReservationKind;
-  readonly bufferTimeBefore: number;
-  readonly bufferTimeAfter: number;
-  readonly reservationStartInterval: ReservationStartInterval;
-  readonly canApplyFreeOfCharge: boolean;
-  readonly publishingState: ReservationUnitPublishingState | null;
-  readonly reservationState: ReservationUnitReservationState | null;
-  readonly numActiveUserReservations: number | null;
-  readonly requireReservationHandling: boolean;
-  readonly currentAccessType: AccessType | null;
-  readonly termsOfUseFi: string | null;
-  readonly termsOfUseEn: string | null;
-  readonly termsOfUseSv: string | null;
-  readonly minPersons: number | null;
-  readonly maxPersons: number | null;
-  readonly reservationBegins: string | null;
-  readonly reservationEnds: string | null;
-  readonly reservationsMaxDaysBefore: number | null;
-  readonly reservationsMinDaysBefore: number | null;
-  readonly minReservationDuration: number | null;
-  readonly maxReservationDuration: number | null;
-  readonly maxReservationsPerUser: number | null;
-  readonly unit: {
-    readonly id: string;
-    readonly tprekId: string | null;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-    readonly location: {
-      readonly addressStreetEn: string | null;
-      readonly addressStreetSv: string | null;
-      readonly addressCityEn: string | null;
-      readonly addressCitySv: string | null;
-      readonly id: string;
-      readonly addressStreetFi: string | null;
-      readonly addressZip: string;
-      readonly addressCityFi: string | null;
-    } | null;
-  } | null;
-  readonly pricings: ReadonlyArray<{
-    readonly id: string;
-    readonly begins: string;
-    readonly priceUnit: PriceUnit;
-    readonly lowestPrice: string;
-    readonly highestPrice: string;
-    readonly taxPercentage: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly value: string;
-    };
-  }>;
-  readonly images: ReadonlyArray<{
-    readonly id: string;
-    readonly imageUrl: string | null;
-    readonly largeUrl: string | null;
-    readonly mediumUrl: string | null;
-    readonly smallUrl: string | null;
-    readonly imageType: ImageType;
-  }>;
-  readonly applicationRoundTimeSlots: ReadonlyArray<{
-    readonly id: string;
-    readonly closed: boolean;
-    readonly weekday: number;
-    readonly reservableTimes: ReadonlyArray<{
-      readonly begin: string;
-      readonly end: string;
-    } | null> | null;
-  }>;
-  readonly applicationRounds: ReadonlyArray<{
-    readonly id: string;
-    readonly reservationPeriodBegin: string;
-    readonly reservationPeriodEnd: string;
-  }>;
-  readonly reservationUnitType: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-  } | null;
-  readonly equipments: ReadonlyArray<{
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-    readonly category: {
-      readonly id: string;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
-    };
-  }>;
-  readonly accessTypes: ReadonlyArray<{
-    readonly id: string;
-    readonly pk: number | null;
-    readonly accessType: AccessType;
-    readonly beginDate: string;
-  }>;
-  readonly serviceSpecificTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly textEn: string | null;
-    readonly textSv: string | null;
-  } | null;
-  readonly cancellationTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly textEn: string | null;
-    readonly textSv: string | null;
-  } | null;
-  readonly paymentTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly textEn: string | null;
-    readonly textSv: string | null;
-  } | null;
-  readonly pricingTerms: {
-    readonly id: string;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-    readonly textFi: string | null;
-    readonly textEn: string | null;
-    readonly textSv: string | null;
-  } | null;
-  readonly metadataSet: {
-    readonly id: string;
-    readonly requiredFields: ReadonlyArray<{
-      readonly id: string;
-      readonly fieldName: string;
-    }>;
-    readonly supportedFields: ReadonlyArray<{
-      readonly id: string;
-      readonly fieldName: string;
-    }>;
-  } | null;
-};
-
 export type BlockingReservationFieldsFragment = {
   readonly pk: number | null;
   readonly id: string;
@@ -7191,6 +7152,19 @@ export type BlockingReservationFieldsFragment = {
   readonly bufferTimeBefore: number;
   readonly bufferTimeAfter: number;
   readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+};
+
+export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
+
+export type CurrentUserQuery = {
+  readonly currentUser: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly email: string;
+    readonly isAdAuthenticated: boolean | null;
+  } | null;
 };
 
 export type IsReservableFieldsFragment = {
@@ -7210,415 +7184,6 @@ export type IsReservableFieldsFragment = {
   } | null> | null;
 };
 
-export type ReservationUnitPageQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  pk: Scalars["Int"]["input"];
-  beginDate: Scalars["Date"]["input"];
-  endDate: Scalars["Date"]["input"];
-  state?: InputMaybe<
-    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
-    | InputMaybe<ReservationStateChoice>
-  >;
-}>;
-
-export type ReservationUnitPageQuery = {
-  readonly reservationUnit: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly uuid: string;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-    readonly isDraft: boolean;
-    readonly descriptionFi: string | null;
-    readonly descriptionEn: string | null;
-    readonly descriptionSv: string | null;
-    readonly reservationKind: ReservationKind;
-    readonly bufferTimeBefore: number;
-    readonly bufferTimeAfter: number;
-    readonly reservationStartInterval: ReservationStartInterval;
-    readonly canApplyFreeOfCharge: boolean;
-    readonly publishingState: ReservationUnitPublishingState | null;
-    readonly reservationState: ReservationUnitReservationState | null;
-    readonly numActiveUserReservations: number | null;
-    readonly requireReservationHandling: boolean;
-    readonly currentAccessType: AccessType | null;
-    readonly reservationsMinDaysBefore: number | null;
-    readonly reservationsMaxDaysBefore: number | null;
-    readonly termsOfUseFi: string | null;
-    readonly termsOfUseEn: string | null;
-    readonly termsOfUseSv: string | null;
-    readonly minPersons: number | null;
-    readonly maxPersons: number | null;
-    readonly reservationBegins: string | null;
-    readonly reservationEnds: string | null;
-    readonly minReservationDuration: number | null;
-    readonly maxReservationDuration: number | null;
-    readonly maxReservationsPerUser: number | null;
-    readonly unit: {
-      readonly id: string;
-      readonly tprekId: string | null;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
-      readonly location: {
-        readonly addressStreetEn: string | null;
-        readonly addressStreetSv: string | null;
-        readonly addressCityEn: string | null;
-        readonly addressCitySv: string | null;
-        readonly id: string;
-        readonly addressStreetFi: string | null;
-        readonly addressZip: string;
-        readonly addressCityFi: string | null;
-      } | null;
-    } | null;
-    readonly pricings: ReadonlyArray<{
-      readonly id: string;
-      readonly begins: string;
-      readonly priceUnit: PriceUnit;
-      readonly lowestPrice: string;
-      readonly highestPrice: string;
-      readonly taxPercentage: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly value: string;
-      };
-    }>;
-    readonly images: ReadonlyArray<{
-      readonly id: string;
-      readonly imageUrl: string | null;
-      readonly largeUrl: string | null;
-      readonly mediumUrl: string | null;
-      readonly smallUrl: string | null;
-      readonly imageType: ImageType;
-    }>;
-    readonly applicationRoundTimeSlots: ReadonlyArray<{
-      readonly id: string;
-      readonly closed: boolean;
-      readonly weekday: number;
-      readonly reservableTimes: ReadonlyArray<{
-        readonly begin: string;
-        readonly end: string;
-      } | null> | null;
-    }>;
-    readonly applicationRounds: ReadonlyArray<{
-      readonly id: string;
-      readonly reservationPeriodBegin: string;
-      readonly reservationPeriodEnd: string;
-    }>;
-    readonly reservationUnitType: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
-    } | null;
-    readonly equipments: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
-      readonly category: {
-        readonly id: string;
-        readonly nameFi: string | null;
-        readonly nameEn: string | null;
-        readonly nameSv: string | null;
-      };
-    }>;
-    readonly accessTypes: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly accessType: AccessType;
-      readonly beginDate: string;
-    }>;
-    readonly serviceSpecificTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly textEn: string | null;
-      readonly textSv: string | null;
-    } | null;
-    readonly cancellationTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly textEn: string | null;
-      readonly textSv: string | null;
-    } | null;
-    readonly paymentTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly textEn: string | null;
-      readonly textSv: string | null;
-    } | null;
-    readonly pricingTerms: {
-      readonly id: string;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
-      readonly textFi: string | null;
-      readonly textEn: string | null;
-      readonly textSv: string | null;
-    } | null;
-    readonly metadataSet: {
-      readonly id: string;
-      readonly requiredFields: ReadonlyArray<{
-        readonly id: string;
-        readonly fieldName: string;
-      }>;
-      readonly supportedFields: ReadonlyArray<{
-        readonly id: string;
-        readonly fieldName: string;
-      }>;
-    } | null;
-    readonly reservableTimeSpans: ReadonlyArray<{
-      readonly startDatetime: string | null;
-      readonly endDatetime: string | null;
-    } | null> | null;
-  } | null;
-  readonly affectingReservations: ReadonlyArray<{
-    readonly pk: number | null;
-    readonly id: string;
-    readonly state: ReservationStateChoice | null;
-    readonly isBlocked: boolean | null;
-    readonly begin: string;
-    readonly end: string;
-    readonly numPersons: number | null;
-    readonly calendarUrl: string | null;
-    readonly bufferTimeBefore: number;
-    readonly bufferTimeAfter: number;
-    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
-  }> | null;
-};
-
-export type ReservationUnitCardFieldsFragment = {
-  readonly maxPersons: number | null;
-  readonly currentAccessType: AccessType | null;
-  readonly effectiveAccessType: AccessType | null;
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly nameSv: string | null;
-  readonly nameEn: string | null;
-  readonly accessTypes: ReadonlyArray<{
-    readonly id: string;
-    readonly accessType: AccessType;
-  }>;
-  readonly reservationUnitType: {
-    readonly id: string;
-    readonly nameFi: string | null;
-    readonly nameSv: string | null;
-    readonly nameEn: string | null;
-  } | null;
-  readonly images: ReadonlyArray<{
-    readonly id: string;
-    readonly imageUrl: string | null;
-    readonly largeUrl: string | null;
-    readonly mediumUrl: string | null;
-    readonly smallUrl: string | null;
-    readonly imageType: ImageType;
-  }>;
-  readonly unit: {
-    readonly id: string;
-    readonly nameFi: string | null;
-    readonly nameSv: string | null;
-    readonly nameEn: string | null;
-  } | null;
-};
-
-export type SearchReservationUnitsQueryVariables = Exact<{
-  textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  pk?: InputMaybe<
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  applicationRound?: InputMaybe<
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
-  unit?: InputMaybe<
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  reservationUnitType?: InputMaybe<
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  purposes?: InputMaybe<
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  equipments?: InputMaybe<
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  accessType?: InputMaybe<
-    ReadonlyArray<InputMaybe<AccessType>> | InputMaybe<AccessType>
-  >;
-  accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
-  reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
-  reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
-  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
-  showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  before?: InputMaybe<Scalars["String"]["input"]>;
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<
-    | ReadonlyArray<InputMaybe<ReservationUnitOrderingChoices>>
-    | InputMaybe<ReservationUnitOrderingChoices>
-  >;
-  isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
-  isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-  reservationKind?: InputMaybe<Scalars["String"]["input"]>;
-}>;
-
-export type SearchReservationUnitsQuery = {
-  readonly reservationUnits: {
-    readonly totalCount: number | null;
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly reservationBegins: string | null;
-        readonly reservationEnds: string | null;
-        readonly isClosed: boolean | null;
-        readonly firstReservableDatetime: string | null;
-        readonly currentAccessType: AccessType | null;
-        readonly maxPersons: number | null;
-        readonly effectiveAccessType: AccessType | null;
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-        readonly nameSv: string | null;
-        readonly nameEn: string | null;
-        readonly pricings: ReadonlyArray<{
-          readonly id: string;
-          readonly begins: string;
-          readonly priceUnit: PriceUnit;
-          readonly lowestPrice: string;
-          readonly highestPrice: string;
-          readonly taxPercentage: {
-            readonly id: string;
-            readonly pk: number | null;
-            readonly value: string;
-          };
-        }>;
-        readonly accessTypes: ReadonlyArray<{
-          readonly id: string;
-          readonly accessType: AccessType;
-        }>;
-        readonly reservationUnitType: {
-          readonly id: string;
-          readonly nameFi: string | null;
-          readonly nameSv: string | null;
-          readonly nameEn: string | null;
-        } | null;
-        readonly images: ReadonlyArray<{
-          readonly id: string;
-          readonly imageUrl: string | null;
-          readonly largeUrl: string | null;
-          readonly mediumUrl: string | null;
-          readonly smallUrl: string | null;
-          readonly imageType: ImageType;
-        }>;
-        readonly unit: {
-          readonly id: string;
-          readonly nameFi: string | null;
-          readonly nameSv: string | null;
-          readonly nameEn: string | null;
-        } | null;
-      } | null;
-    } | null>;
-    readonly pageInfo: {
-      readonly endCursor: string | null;
-      readonly hasNextPage: boolean;
-    };
-  } | null;
-};
-
-export type RelatedReservationUnitsQueryVariables = Exact<{
-  unit:
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>;
-  isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
-  isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
-}>;
-
-export type RelatedReservationUnitsQuery = {
-  readonly reservationUnits: {
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly maxPersons: number | null;
-        readonly isDraft: boolean;
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-        readonly nameEn: string | null;
-        readonly nameSv: string | null;
-        readonly images: ReadonlyArray<{
-          readonly id: string;
-          readonly imageUrl: string | null;
-          readonly largeUrl: string | null;
-          readonly mediumUrl: string | null;
-          readonly smallUrl: string | null;
-          readonly imageType: ImageType;
-        }>;
-        readonly unit: {
-          readonly id: string;
-          readonly pk: number | null;
-          readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
-          readonly location: {
-            readonly addressStreetEn: string | null;
-            readonly addressStreetSv: string | null;
-            readonly addressCityEn: string | null;
-            readonly addressCitySv: string | null;
-            readonly id: string;
-            readonly addressStreetFi: string | null;
-            readonly addressZip: string;
-            readonly addressCityFi: string | null;
-          } | null;
-        } | null;
-        readonly reservationUnitType: {
-          readonly id: string;
-          readonly pk: number | null;
-          readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
-        } | null;
-        readonly pricings: ReadonlyArray<{
-          readonly id: string;
-          readonly begins: string;
-          readonly priceUnit: PriceUnit;
-          readonly lowestPrice: string;
-          readonly highestPrice: string;
-          readonly taxPercentage: {
-            readonly id: string;
-            readonly pk: number | null;
-            readonly value: string;
-          };
-        }>;
-      } | null;
-    } | null>;
-  } | null;
-};
-
-export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
-
-export type CurrentUserQuery = {
-  readonly currentUser: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly firstName: string;
-    readonly lastName: string;
-    readonly email: string;
-    readonly isAdAuthenticated: boolean | null;
-  } | null;
-};
-
 export type CanReservationBeChangedFragment = {
   readonly end: string;
   readonly isHandled: boolean | null;
@@ -7635,7 +7200,7 @@ export type CanReservationBeChangedFragment = {
   }>;
 };
 
-export type PriceReservationUnitFragment = {
+export type PriceReservationUnitFieldsFragment = {
   readonly id: string;
   readonly reservationBegins: string | null;
   readonly reservationEnds: string | null;
@@ -7653,7 +7218,7 @@ export type PriceReservationUnitFragment = {
   }>;
 };
 
-export type ReservationPriceFragment = {
+export type ReservationPriceFieldsFragment = {
   readonly id: string;
   readonly price: string | null;
   readonly begin: string;
@@ -7677,6 +7242,38 @@ export type ReservationPriceFragment = {
       };
     }>;
   }>;
+};
+
+export type NotReservableFieldsFragment = {
+  readonly reservationState: ReservationUnitReservationState | null;
+  readonly reservationKind: ReservationKind;
+  readonly id: string;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly maxReservationDuration: number | null;
+  readonly minReservationDuration: number | null;
+  readonly reservationStartInterval: ReservationStartInterval;
+  readonly reservationsMaxDaysBefore: number | null;
+  readonly reservationsMinDaysBefore: number | null;
+  readonly reservationBegins: string | null;
+  readonly reservationEnds: string | null;
+  readonly minPersons: number | null;
+  readonly maxPersons: number | null;
+  readonly reservableTimeSpans: ReadonlyArray<{
+    readonly startDatetime: string | null;
+    readonly endDatetime: string | null;
+  } | null> | null;
+  readonly metadataSet: {
+    readonly id: string;
+    readonly requiredFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
+    readonly supportedFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
+  } | null;
 };
 
 export type BannerNotificationsListAllQueryVariables = Exact<{
@@ -8072,6 +7669,10 @@ export type TermsOfUseQuery = {
 
 export type ApplicationPage1QueryVariables = Exact<{
   id: Scalars["ID"]["input"];
+  orderUnitsBy?: InputMaybe<
+    | ReadonlyArray<InputMaybe<UnitOrderingChoices>>
+    | InputMaybe<UnitOrderingChoices>
+  >;
 }>;
 
 export type ApplicationPage1Query = {
@@ -8098,8 +7699,8 @@ export type ApplicationPage1Query = {
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
-        readonly nameSv: string | null;
         readonly nameEn: string | null;
+        readonly nameSv: string | null;
         readonly unit: {
           readonly id: string;
           readonly pk: number | null;
@@ -8218,6 +7819,13 @@ export type ApplicationPage1Query = {
       readonly cityFi: string | null;
     } | null;
   } | null;
+  readonly unitsAll: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+  }> | null;
 };
 
 export type ApplicationPage2QueryVariables = Exact<{
@@ -8248,8 +7856,8 @@ export type ApplicationPage2Query = {
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
-        readonly nameSv: string | null;
         readonly nameEn: string | null;
+        readonly nameSv: string | null;
         readonly unit: {
           readonly id: string;
           readonly pk: number | null;
@@ -8398,8 +8006,8 @@ export type ApplicationPage3Query = {
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
-        readonly nameSv: string | null;
         readonly nameEn: string | null;
+        readonly nameSv: string | null;
         readonly unit: {
           readonly id: string;
           readonly pk: number | null;
@@ -8561,8 +8169,8 @@ export type ApplicationPagePreviewQuery = {
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
-        readonly nameSv: string | null;
         readonly nameEn: string | null;
+        readonly nameSv: string | null;
         readonly unit: {
           readonly id: string;
           readonly pk: number | null;
@@ -9006,8 +8614,8 @@ export type ApplicationViewQuery = {
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
-        readonly nameSv: string | null;
         readonly nameEn: string | null;
+        readonly nameSv: string | null;
         readonly unit: {
           readonly id: string;
           readonly pk: number | null;
@@ -9107,14 +8715,18 @@ export type ApplicationsQuery = {
   } | null;
 };
 
-export type ReservationUnitPurposesQueryVariables = Exact<{
+export type FrontPageQueryVariables = Exact<{
   orderBy?: InputMaybe<
     | ReadonlyArray<InputMaybe<PurposeOrderingChoices>>
     | InputMaybe<PurposeOrderingChoices>
   >;
+  orderUnitsBy?: InputMaybe<
+    | ReadonlyArray<InputMaybe<UnitOrderingChoices>>
+    | InputMaybe<UnitOrderingChoices>
+  >;
 }>;
 
-export type ReservationUnitPurposesQuery = {
+export type FrontPageQuery = {
   readonly purposes: {
     readonly edges: ReadonlyArray<{
       readonly node: {
@@ -9125,6 +8737,17 @@ export type ReservationUnitPurposesQuery = {
         readonly nameSv: string | null;
         readonly imageUrl: string | null;
         readonly smallUrl: string | null;
+      } | null;
+    } | null>;
+  } | null;
+  readonly units: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
       } | null;
     } | null>;
   } | null;
@@ -9298,15 +8921,15 @@ export type ReservationQuery = {
       readonly id: string;
       readonly canApplyFreeOfCharge: boolean;
       readonly requireReservationHandling: boolean;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
       readonly minPersons: number | null;
       readonly maxPersons: number | null;
       readonly termsOfUseFi: string | null;
       readonly termsOfUseEn: string | null;
       readonly termsOfUseSv: string | null;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
       readonly reservationBegins: string | null;
       readonly reservationEnds: string | null;
       readonly images: ReadonlyArray<{
@@ -9399,6 +9022,250 @@ export type ReservationQuery = {
       readonly nameEn: string | null;
     } | null;
     readonly pindoraInfo: { readonly accessCode: string } | null;
+  } | null;
+};
+
+export type ApplicationRoundTimeSlotFieldsFragment = {
+  readonly id: string;
+  readonly weekday: number;
+  readonly closed: boolean;
+  readonly reservableTimes: ReadonlyArray<{
+    readonly begin: string;
+    readonly end: string;
+  } | null> | null;
+};
+
+export type ReservationUnitPageQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  pk: Scalars["Int"]["input"];
+  beginDate: Scalars["Date"]["input"];
+  endDate: Scalars["Date"]["input"];
+  state?: InputMaybe<
+    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>
+  >;
+}>;
+
+export type ReservationUnitPageQuery = {
+  readonly reservationUnit: {
+    readonly uuid: string;
+    readonly isDraft: boolean;
+    readonly descriptionFi: string | null;
+    readonly descriptionEn: string | null;
+    readonly descriptionSv: string | null;
+    readonly canApplyFreeOfCharge: boolean;
+    readonly numActiveUserReservations: number | null;
+    readonly publishingState: ReservationUnitPublishingState | null;
+    readonly currentAccessType: AccessType | null;
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+    readonly reservationsMinDaysBefore: number | null;
+    readonly reservationsMaxDaysBefore: number | null;
+    readonly reservationState: ReservationUnitReservationState | null;
+    readonly reservationKind: ReservationKind;
+    readonly minPersons: number | null;
+    readonly maxPersons: number | null;
+    readonly termsOfUseFi: string | null;
+    readonly termsOfUseEn: string | null;
+    readonly termsOfUseSv: string | null;
+    readonly reservationBegins: string | null;
+    readonly reservationEnds: string | null;
+    readonly minReservationDuration: number | null;
+    readonly maxReservationDuration: number | null;
+    readonly maxReservationsPerUser: number | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly reservationStartInterval: ReservationStartInterval;
+    readonly unit: {
+      readonly id: string;
+      readonly tprekId: string | null;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
+      readonly location: {
+        readonly addressStreetEn: string | null;
+        readonly addressStreetSv: string | null;
+        readonly addressCityEn: string | null;
+        readonly addressCitySv: string | null;
+        readonly id: string;
+        readonly addressStreetFi: string | null;
+        readonly addressZip: string;
+        readonly addressCityFi: string | null;
+      } | null;
+    } | null;
+    readonly images: ReadonlyArray<{
+      readonly id: string;
+      readonly imageUrl: string | null;
+      readonly largeUrl: string | null;
+      readonly mediumUrl: string | null;
+      readonly smallUrl: string | null;
+      readonly imageType: ImageType;
+    }>;
+    readonly applicationRoundTimeSlots: ReadonlyArray<{
+      readonly id: string;
+      readonly weekday: number;
+      readonly closed: boolean;
+      readonly reservableTimes: ReadonlyArray<{
+        readonly begin: string;
+        readonly end: string;
+      } | null> | null;
+    }>;
+    readonly applicationRounds: ReadonlyArray<{
+      readonly id: string;
+      readonly reservationPeriodBegin: string;
+      readonly reservationPeriodEnd: string;
+    }>;
+    readonly reservationUnitType: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
+    } | null;
+    readonly equipments: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
+      readonly category: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+      };
+    }>;
+    readonly accessTypes: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly accessType: AccessType;
+      readonly beginDate: string;
+    }>;
+    readonly metadataSet: {
+      readonly id: string;
+      readonly requiredFields: ReadonlyArray<{
+        readonly id: string;
+        readonly fieldName: string;
+      }>;
+      readonly supportedFields: ReadonlyArray<{
+        readonly id: string;
+        readonly fieldName: string;
+      }>;
+    } | null;
+    readonly serviceSpecificTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly textEn: string | null;
+      readonly textSv: string | null;
+    } | null;
+    readonly cancellationTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly textEn: string | null;
+      readonly textSv: string | null;
+    } | null;
+    readonly paymentTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly textEn: string | null;
+      readonly textSv: string | null;
+    } | null;
+    readonly pricingTerms: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
+      readonly textFi: string | null;
+      readonly textEn: string | null;
+      readonly textSv: string | null;
+    } | null;
+    readonly reservableTimeSpans: ReadonlyArray<{
+      readonly startDatetime: string | null;
+      readonly endDatetime: string | null;
+    } | null> | null;
+    readonly pricings: ReadonlyArray<{
+      readonly id: string;
+      readonly begins: string;
+      readonly priceUnit: PriceUnit;
+      readonly lowestPrice: string;
+      readonly highestPrice: string;
+      readonly taxPercentage: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly value: string;
+      };
+    }>;
+  } | null;
+  readonly affectingReservations: ReadonlyArray<{
+    readonly pk: number | null;
+    readonly id: string;
+    readonly state: ReservationStateChoice | null;
+    readonly isBlocked: boolean | null;
+    readonly begin: string;
+    readonly end: string;
+    readonly numPersons: number | null;
+    readonly calendarUrl: string | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+  }> | null;
+};
+
+export type RelatedReservationUnitsQueryVariables = Exact<{
+  unit:
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>;
+}>;
+
+export type RelatedReservationUnitsQuery = {
+  readonly reservationUnits: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly maxPersons: number | null;
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+        readonly reservationUnitType: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly nameFi: string | null;
+          readonly nameEn: string | null;
+          readonly nameSv: string | null;
+        } | null;
+        readonly pricings: ReadonlyArray<{
+          readonly id: string;
+          readonly begins: string;
+          readonly priceUnit: PriceUnit;
+          readonly lowestPrice: string;
+          readonly highestPrice: string;
+          readonly taxPercentage: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly value: string;
+          };
+        }>;
+        readonly images: ReadonlyArray<{
+          readonly id: string;
+          readonly imageUrl: string | null;
+          readonly largeUrl: string | null;
+          readonly mediumUrl: string | null;
+          readonly smallUrl: string | null;
+          readonly imageType: ImageType;
+        }>;
+        readonly unit: {
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly nameSv: string | null;
+          readonly nameEn: string | null;
+        } | null;
+      } | null;
+    } | null>;
   } | null;
 };
 
@@ -9553,10 +9420,6 @@ export type ReservationConfirmationPageQuery = {
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly canApplyFreeOfCharge: boolean;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
       readonly reservationPendingInstructionsFi: string | null;
       readonly reservationPendingInstructionsEn: string | null;
       readonly reservationPendingInstructionsSv: string | null;
@@ -9566,6 +9429,10 @@ export type ReservationConfirmationPageQuery = {
       readonly reservationCancelledInstructionsFi: string | null;
       readonly reservationCancelledInstructionsEn: string | null;
       readonly reservationCancelledInstructionsSv: string | null;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
       readonly reservationBegins: string | null;
       readonly reservationEnds: string | null;
       readonly images: ReadonlyArray<{
@@ -9656,12 +9523,12 @@ export type ReservationEditPageQuery = {
     readonly end: string;
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
+      readonly minPersons: number | null;
+      readonly maxPersons: number | null;
       readonly pk: number | null;
       readonly nameFi: string | null;
       readonly nameEn: string | null;
       readonly nameSv: string | null;
-      readonly minPersons: number | null;
-      readonly maxPersons: number | null;
       readonly reservationBegins: string | null;
       readonly reservationEnds: string | null;
       readonly images: ReadonlyArray<{
@@ -9802,10 +9669,6 @@ export type ReservationPageQuery = {
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly canApplyFreeOfCharge: boolean;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
       readonly reservationPendingInstructionsFi: string | null;
       readonly reservationPendingInstructionsEn: string | null;
       readonly reservationPendingInstructionsSv: string | null;
@@ -9820,6 +9683,10 @@ export type ReservationPageQuery = {
       readonly termsOfUseFi: string | null;
       readonly termsOfUseEn: string | null;
       readonly termsOfUseSv: string | null;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
       readonly reservationBegins: string | null;
       readonly reservationEnds: string | null;
       readonly unit: {
@@ -9936,6 +9803,118 @@ export type ReservationInfoFragment = {
     readonly pk: number | null;
     readonly minimum: number;
     readonly maximum: number | null;
+  } | null;
+};
+
+export type SearchReservationUnitsQueryVariables = Exact<{
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  pk?: InputMaybe<
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  applicationRound?: InputMaybe<
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  personsAllowed?: InputMaybe<Scalars["Decimal"]["input"]>;
+  unit?: InputMaybe<
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  reservationUnitType?: InputMaybe<
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  purposes?: InputMaybe<
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  equipments?: InputMaybe<
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  accessType?: InputMaybe<
+    ReadonlyArray<InputMaybe<AccessType>> | InputMaybe<AccessType>
+  >;
+  accessTypeBeginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  accessTypeEndDate?: InputMaybe<Scalars["Date"]["input"]>;
+  reservableDateStart?: InputMaybe<Scalars["Date"]["input"]>;
+  reservableDateEnd?: InputMaybe<Scalars["Date"]["input"]>;
+  reservableTimeStart?: InputMaybe<Scalars["Time"]["input"]>;
+  reservableTimeEnd?: InputMaybe<Scalars["Time"]["input"]>;
+  reservableMinimumDurationMinutes?: InputMaybe<Scalars["Decimal"]["input"]>;
+  showOnlyReservable?: InputMaybe<Scalars["Boolean"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  orderBy?: InputMaybe<
+    | ReadonlyArray<InputMaybe<ReservationUnitOrderingChoices>>
+    | InputMaybe<ReservationUnitOrderingChoices>
+  >;
+  isDraft?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isVisible?: InputMaybe<Scalars["Boolean"]["input"]>;
+  reservationKind?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type SearchReservationUnitsQuery = {
+  readonly reservationUnits: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly reservationBegins: string | null;
+        readonly reservationEnds: string | null;
+        readonly isClosed: boolean | null;
+        readonly firstReservableDatetime: string | null;
+        readonly currentAccessType: AccessType | null;
+        readonly maxPersons: number | null;
+        readonly effectiveAccessType: AccessType | null;
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+        readonly pricings: ReadonlyArray<{
+          readonly id: string;
+          readonly begins: string;
+          readonly priceUnit: PriceUnit;
+          readonly lowestPrice: string;
+          readonly highestPrice: string;
+          readonly taxPercentage: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly value: string;
+          };
+        }>;
+        readonly accessTypes: ReadonlyArray<{
+          readonly id: string;
+          readonly accessType: AccessType;
+        }>;
+        readonly reservationUnitType: {
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly nameSv: string | null;
+          readonly nameEn: string | null;
+        } | null;
+        readonly images: ReadonlyArray<{
+          readonly id: string;
+          readonly imageUrl: string | null;
+          readonly largeUrl: string | null;
+          readonly mediumUrl: string | null;
+          readonly smallUrl: string | null;
+          readonly imageType: ImageType;
+        }>;
+        readonly unit: {
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly nameSv: string | null;
+          readonly nameEn: string | null;
+        } | null;
+      } | null;
+    } | null>;
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
   } | null;
 };
 
@@ -10140,6 +10119,15 @@ export const ApplicantFragmentDoc = gql`
     }
   }
 `;
+export const ReservationUnitNameFieldsFragmentDoc = gql`
+  fragment ReservationUnitNameFields on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+  }
+`;
 export const ImageFragmentDoc = gql`
   fragment Image on ReservationUnitImageNode {
     id
@@ -10152,11 +10140,7 @@ export const ImageFragmentDoc = gql`
 `;
 export const OrderedReservationUnitCardFragmentDoc = gql`
   fragment OrderedReservationUnitCard on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
+    ...ReservationUnitNameFields
     images {
       ...Image
     }
@@ -10167,6 +10151,7 @@ export const OrderedReservationUnitCardFragmentDoc = gql`
       nameEn
     }
   }
+  ${ReservationUnitNameFieldsFragmentDoc}
   ${ImageFragmentDoc}
 `;
 export const ApplicationReservationUnitListFragmentDoc = gql`
@@ -10413,133 +10398,8 @@ export const PurposeCardFragmentDoc = gql`
     smallUrl
   }
 `;
-export const IsReservableFieldsFragmentDoc = gql`
-  fragment IsReservableFields on ReservationUnitNode {
-    id
-    bufferTimeBefore
-    bufferTimeAfter
-    reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
-      startDatetime
-      endDatetime
-    }
-    maxReservationDuration
-    minReservationDuration
-    reservationStartInterval
-    reservationsMaxDaysBefore
-    reservationsMinDaysBefore
-    reservationBegins
-    reservationEnds
-  }
-`;
-export const AvailableTimesReservationUnitFieldsFragmentDoc = gql`
-  fragment AvailableTimesReservationUnitFields on ReservationUnitNode {
-    ...IsReservableFields
-    reservationsMinDaysBefore
-    reservationsMaxDaysBefore
-  }
-  ${IsReservableFieldsFragmentDoc}
-`;
-export const PricingFieldsFragmentDoc = gql`
-  fragment PricingFields on ReservationUnitPricingNode {
-    id
-    begins
-    priceUnit
-    lowestPrice
-    highestPrice
-    taxPercentage {
-      id
-      pk
-      value
-    }
-  }
-`;
-export const PriceReservationUnitFragmentDoc = gql`
-  fragment PriceReservationUnit on ReservationUnitNode {
-    id
-    pricings {
-      ...PricingFields
-    }
-    reservationBegins
-    reservationEnds
-  }
-  ${PricingFieldsFragmentDoc}
-`;
-export const ReservationPriceFragmentDoc = gql`
-  fragment ReservationPrice on ReservationNode {
-    id
-    reservationUnits {
-      ...PriceReservationUnit
-    }
-    price
-    begin
-    state
-    end
-    applyingForFreeOfCharge
-  }
-  ${PriceReservationUnitFragmentDoc}
-`;
-export const ReservationInfoCardFragmentDoc = gql`
-  fragment ReservationInfoCard on ReservationNode {
-    id
-    pk
-    ...ReservationPrice
-    taxPercentageValue
-    state
-    accessType
-    pindoraInfo {
-      accessCode
-    }
-    reservationUnits {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-      images {
-        ...Image
-      }
-      unit {
-        id
-        nameFi
-        nameEn
-        nameSv
-      }
-    }
-  }
-  ${ReservationPriceFragmentDoc}
-  ${ImageFragmentDoc}
-`;
-export const CancelReasonFieldsFragmentDoc = gql`
-  fragment CancelReasonFields on ReservationCancelReasonNode {
-    id
-    pk
-    reasonFi
-    reasonEn
-    reasonSv
-  }
-`;
-export const ReservationOrderStatusFragmentDoc = gql`
-  fragment ReservationOrderStatus on ReservationNode {
-    id
-    state
-    paymentOrder {
-      id
-      status
-    }
-  }
-`;
-export const OrderFieldsFragmentDoc = gql`
-  fragment OrderFields on PaymentOrderNode {
-    id
-    reservationPk
-    status
-    paymentType
-    receiptUrl
-    checkoutUrl
-  }
-`;
-export const ReservationUnitNameFieldsFragmentDoc = gql`
-  fragment ReservationUnitNameFields on ReservationUnitNode {
+export const UnitListFieldsFragmentDoc = gql`
+  fragment UnitListFields on UnitNode {
     id
     pk
     nameFi
@@ -10586,6 +10446,179 @@ export const AddressFieldsFragmentDoc = gql`
   }
   ${UnitNameFieldsI18NFragmentDoc}
 `;
+export const ReservationUnitTypeFieldsFragmentDoc = gql`
+  fragment ReservationUnitTypeFields on ReservationUnitTypeNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+  }
+`;
+export const PricingFieldsFragmentDoc = gql`
+  fragment PricingFields on ReservationUnitPricingNode {
+    id
+    begins
+    priceUnit
+    lowestPrice
+    highestPrice
+    taxPercentage {
+      id
+      pk
+      value
+    }
+  }
+`;
+export const RelatedUnitCardFieldsFragmentDoc = gql`
+  fragment RelatedUnitCardFields on ReservationUnitNode {
+    ...OrderedReservationUnitCard
+    reservationUnitType {
+      ...ReservationUnitTypeFields
+    }
+    maxPersons
+    pricings {
+      ...PricingFields
+    }
+  }
+  ${OrderedReservationUnitCardFragmentDoc}
+  ${ReservationUnitTypeFieldsFragmentDoc}
+  ${PricingFieldsFragmentDoc}
+`;
+export const ReservationInfoContainerFragmentDoc = gql`
+  fragment ReservationInfoContainer on ReservationUnitNode {
+    id
+    reservationBegins
+    reservationEnds
+    reservationsMaxDaysBefore
+    reservationsMinDaysBefore
+    minReservationDuration
+    maxReservationDuration
+    maxReservationsPerUser
+  }
+`;
+export const IsReservableFieldsFragmentDoc = gql`
+  fragment IsReservableFields on ReservationUnitNode {
+    id
+    bufferTimeBefore
+    bufferTimeAfter
+    reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
+      startDatetime
+      endDatetime
+    }
+    maxReservationDuration
+    minReservationDuration
+    reservationStartInterval
+    reservationsMaxDaysBefore
+    reservationsMinDaysBefore
+    reservationBegins
+    reservationEnds
+  }
+`;
+export const AvailableTimesReservationUnitFieldsFragmentDoc = gql`
+  fragment AvailableTimesReservationUnitFields on ReservationUnitNode {
+    ...IsReservableFields
+    reservationsMinDaysBefore
+    reservationsMaxDaysBefore
+  }
+  ${IsReservableFieldsFragmentDoc}
+`;
+export const PriceReservationUnitFieldsFragmentDoc = gql`
+  fragment PriceReservationUnitFields on ReservationUnitNode {
+    id
+    pricings {
+      ...PricingFields
+    }
+    reservationBegins
+    reservationEnds
+  }
+  ${PricingFieldsFragmentDoc}
+`;
+export const ReservationPriceFieldsFragmentDoc = gql`
+  fragment ReservationPriceFields on ReservationNode {
+    id
+    reservationUnits {
+      ...PriceReservationUnitFields
+    }
+    price
+    begin
+    state
+    end
+    applyingForFreeOfCharge
+  }
+  ${PriceReservationUnitFieldsFragmentDoc}
+`;
+export const ReservationInfoCardFragmentDoc = gql`
+  fragment ReservationInfoCard on ReservationNode {
+    id
+    pk
+    ...ReservationPriceFields
+    taxPercentageValue
+    state
+    accessType
+    pindoraInfo {
+      accessCode
+    }
+    reservationUnits {
+      ...ReservationUnitNameFields
+      images {
+        ...Image
+      }
+      unit {
+        id
+        nameFi
+        nameEn
+        nameSv
+      }
+    }
+  }
+  ${ReservationPriceFieldsFragmentDoc}
+  ${ReservationUnitNameFieldsFragmentDoc}
+  ${ImageFragmentDoc}
+`;
+export const ReservationTimePickerFieldsFragmentDoc = gql`
+  fragment ReservationTimePickerFields on ReservationUnitNode {
+    id
+    pk
+    ...IsReservableFields
+    ...PriceReservationUnitFields
+  }
+  ${IsReservableFieldsFragmentDoc}
+  ${PriceReservationUnitFieldsFragmentDoc}
+`;
+export const RecurringCardFragmentDoc = gql`
+  fragment RecurringCard on ReservationUnitNode {
+    ...OrderedReservationUnitCard
+    reservationUnitType {
+      id
+      nameFi
+      nameSv
+      nameEn
+    }
+    maxPersons
+    currentAccessType
+    effectiveAccessType
+  }
+  ${OrderedReservationUnitCardFragmentDoc}
+`;
+export const SingleSearchCardFragmentDoc = gql`
+  fragment SingleSearchCard on ReservationUnitNode {
+    ...RecurringCard
+    pricings {
+      ...PricingFields
+    }
+    reservationBegins
+    reservationEnds
+    isClosed
+    firstReservableDatetime
+    currentAccessType
+    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+      id
+      accessType
+    }
+  }
+  ${RecurringCardFragmentDoc}
+  ${PricingFieldsFragmentDoc}
+`;
 export const TermsOfUseFragmentDoc = gql`
   fragment TermsOfUse on ReservationUnitNode {
     id
@@ -10609,6 +10642,74 @@ export const TermsOfUseFragmentDoc = gql`
   ${TermsOfUseTextFieldsFragmentDoc}
   ${TermsOfUseNameFieldsFragmentDoc}
 `;
+export const CancelReasonFieldsFragmentDoc = gql`
+  fragment CancelReasonFields on ReservationCancelReasonNode {
+    id
+    pk
+    reasonFi
+    reasonEn
+    reasonSv
+  }
+`;
+export const ReservationOrderStatusFragmentDoc = gql`
+  fragment ReservationOrderStatus on ReservationNode {
+    id
+    state
+    paymentOrder {
+      id
+      status
+    }
+  }
+`;
+export const OrderFieldsFragmentDoc = gql`
+  fragment OrderFields on PaymentOrderNode {
+    id
+    reservationPk
+    status
+    paymentType
+    receiptUrl
+    checkoutUrl
+  }
+`;
+export const EquipmentFieldsFragmentDoc = gql`
+  fragment EquipmentFields on EquipmentNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    category {
+      id
+      nameFi
+      nameEn
+      nameSv
+    }
+  }
+`;
+export const BlockingReservationFieldsFragmentDoc = gql`
+  fragment BlockingReservationFields on ReservationNode {
+    pk
+    id
+    state
+    isBlocked
+    begin
+    end
+    numPersons
+    calendarUrl
+    bufferTimeBefore
+    bufferTimeAfter
+    affectedReservationUnits
+  }
+`;
+export const CanReservationBeChangedFragmentDoc = gql`
+  fragment CanReservationBeChanged on ReservationNode {
+    end
+    isHandled
+    price
+    ...CanUserCancelReservation
+  }
+  ${CanUserCancelReservationFragmentDoc}
+`;
 export const MetadataSetsFragmentDoc = gql`
   fragment MetadataSets on ReservationUnitNode {
     id
@@ -10627,161 +10728,15 @@ export const MetadataSetsFragmentDoc = gql`
     }
   }
 `;
-export const ReservationUnitTypeFieldsFragmentDoc = gql`
-  fragment ReservationUnitTypeFields on ReservationUnitTypeNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
-  }
-`;
-export const ReservationInfoContainerFragmentDoc = gql`
-  fragment ReservationInfoContainer on ReservationUnitNode {
-    id
-    reservationBegins
-    reservationEnds
-    reservationsMaxDaysBefore
-    reservationsMinDaysBefore
-    minReservationDuration
-    maxReservationDuration
-    maxReservationsPerUser
-  }
-`;
-export const EquipmentFieldsFragmentDoc = gql`
-  fragment EquipmentFields on EquipmentNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
-    category {
-      id
-      nameFi
-      nameEn
-      nameSv
-    }
-  }
-`;
-export const ReservationUnitPageFieldsFragmentDoc = gql`
-  fragment ReservationUnitPageFields on ReservationUnitNode {
-    unit {
-      ...AddressFields
-    }
-    id
-    pk
-    uuid
-    nameFi
-    nameEn
-    nameSv
-    ...TermsOfUse
-    pricings {
-      ...PricingFields
-    }
-    images {
-      ...Image
-    }
-    ...MetadataSets
-    isDraft
-    applicationRoundTimeSlots {
-      id
-      closed
-      weekday
-      reservableTimes {
-        begin
-        end
-      }
-    }
-    applicationRounds(ongoing: true) {
-      id
-      reservationPeriodBegin
-      reservationPeriodEnd
-    }
-    descriptionFi
-    descriptionEn
-    descriptionSv
-    reservationKind
-    bufferTimeBefore
-    bufferTimeAfter
-    reservationStartInterval
-    canApplyFreeOfCharge
-    publishingState
+export const NotReservableFieldsFragmentDoc = gql`
+  fragment NotReservableFields on ReservationUnitNode {
+    ...IsReservableFields
     reservationState
-    reservationUnitType {
-      ...ReservationUnitTypeFields
-    }
-    ...ReservationInfoContainer
-    numActiveUserReservations
-    requireReservationHandling
-    equipments {
-      id
-      ...EquipmentFields
-    }
-    currentAccessType
-    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
-      id
-      pk
-      accessType
-      beginDate
-    }
+    reservationKind
+    ...MetadataSets
   }
-  ${AddressFieldsFragmentDoc}
-  ${TermsOfUseFragmentDoc}
-  ${PricingFieldsFragmentDoc}
-  ${ImageFragmentDoc}
+  ${IsReservableFieldsFragmentDoc}
   ${MetadataSetsFragmentDoc}
-  ${ReservationUnitTypeFieldsFragmentDoc}
-  ${ReservationInfoContainerFragmentDoc}
-  ${EquipmentFieldsFragmentDoc}
-`;
-export const BlockingReservationFieldsFragmentDoc = gql`
-  fragment BlockingReservationFields on ReservationNode {
-    pk
-    id
-    state
-    isBlocked
-    begin
-    end
-    numPersons
-    calendarUrl
-    bufferTimeBefore
-    bufferTimeAfter
-    affectedReservationUnits
-  }
-`;
-export const RecurringCardFragmentDoc = gql`
-  fragment RecurringCard on ReservationUnitNode {
-    ...OrderedReservationUnitCard
-    reservationUnitType {
-      id
-      nameFi
-      nameSv
-      nameEn
-    }
-    maxPersons
-    currentAccessType
-    effectiveAccessType
-  }
-  ${OrderedReservationUnitCardFragmentDoc}
-`;
-export const ReservationUnitCardFieldsFragmentDoc = gql`
-  fragment ReservationUnitCardFields on ReservationUnitNode {
-    ...RecurringCard
-    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
-      id
-      accessType
-    }
-  }
-  ${RecurringCardFragmentDoc}
-`;
-export const CanReservationBeChangedFragmentDoc = gql`
-  fragment CanReservationBeChanged on ReservationNode {
-    end
-    isHandled
-    price
-    ...CanUserCancelReservation
-  }
-  ${CanUserCancelReservationFragmentDoc}
 `;
 export const ReserveeNameFieldsFragmentDoc = gql`
   fragment ReserveeNameFields on ReservationNode {
@@ -10890,6 +10845,17 @@ export const ApplicationRoundFieldsFragmentDoc = gql`
     }
   }
   ${ApplicationRoundCardFragmentDoc}
+`;
+export const ApplicationRoundTimeSlotFieldsFragmentDoc = gql`
+  fragment ApplicationRoundTimeSlotFields on ApplicationRoundTimeSlotNode {
+    id
+    weekday
+    closed
+    reservableTimes {
+      begin
+      end
+    }
+  }
 `;
 export const ReservationInfoFragmentDoc = gql`
   fragment ReservationInfo on ReservationNode {
@@ -11056,6 +11022,8 @@ export const OptionsDocument = gql`
     $unitsOrderBy: [UnitOrderingChoices]
     $equipmentsOrderBy: [EquipmentOrderingChoices]
     $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
+    $onlyDirectBookable: Boolean
+    $onlySeasonalBookable: Boolean
   ) {
     reservationUnitTypes(orderBy: $reservationUnitTypesOrderBy) {
       edges {
@@ -11118,7 +11086,12 @@ export const OptionsDocument = gql`
       nameEn
       nameSv
     }
-    unitsAll(orderBy: $unitsOrderBy) {
+    unitsAll(
+      publishedReservationUnits: true
+      onlyDirectBookable: $onlyDirectBookable
+      onlySeasonalBookable: $onlySeasonalBookable
+      orderBy: $unitsOrderBy
+    ) {
       id
       pk
       nameFi
@@ -11145,6 +11118,8 @@ export const OptionsDocument = gql`
  *      unitsOrderBy: // value for 'unitsOrderBy'
  *      equipmentsOrderBy: // value for 'equipmentsOrderBy'
  *      reservationPurposesOrderBy: // value for 'reservationPurposesOrderBy'
+ *      onlyDirectBookable: // value for 'onlyDirectBookable'
+ *      onlySeasonalBookable: // value for 'onlySeasonalBookable'
  *   },
  * });
  */
@@ -11238,104 +11213,6 @@ export type UpdateApplicationMutationResult =
 export type UpdateApplicationMutationOptions = Apollo.BaseMutationOptions<
   UpdateApplicationMutation,
   UpdateApplicationMutationVariables
->;
-export const SearchFormParamsUnitDocument = gql`
-  query SearchFormParamsUnit(
-    $publishedReservationUnits: Boolean
-    $ownReservations: Boolean
-    $onlyDirectBookable: Boolean
-    $onlySeasonalBookable: Boolean
-    $orderBy: [UnitOrderingChoices]
-  ) {
-    unitsAll(
-      publishedReservationUnits: $publishedReservationUnits
-      ownReservations: $ownReservations
-      onlyDirectBookable: $onlyDirectBookable
-      onlySeasonalBookable: $onlySeasonalBookable
-      orderBy: $orderBy
-    ) {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-  }
-`;
-
-/**
- * __useSearchFormParamsUnitQuery__
- *
- * To run a query within a React component, call `useSearchFormParamsUnitQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchFormParamsUnitQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSearchFormParamsUnitQuery({
- *   variables: {
- *      publishedReservationUnits: // value for 'publishedReservationUnits'
- *      ownReservations: // value for 'ownReservations'
- *      onlyDirectBookable: // value for 'onlyDirectBookable'
- *      onlySeasonalBookable: // value for 'onlySeasonalBookable'
- *      orderBy: // value for 'orderBy'
- *   },
- * });
- */
-export function useSearchFormParamsUnitQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    SearchFormParamsUnitQuery,
-    SearchFormParamsUnitQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    SearchFormParamsUnitQuery,
-    SearchFormParamsUnitQueryVariables
-  >(SearchFormParamsUnitDocument, options);
-}
-export function useSearchFormParamsUnitLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    SearchFormParamsUnitQuery,
-    SearchFormParamsUnitQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    SearchFormParamsUnitQuery,
-    SearchFormParamsUnitQueryVariables
-  >(SearchFormParamsUnitDocument, options);
-}
-export function useSearchFormParamsUnitSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        SearchFormParamsUnitQuery,
-        SearchFormParamsUnitQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    SearchFormParamsUnitQuery,
-    SearchFormParamsUnitQueryVariables
-  >(SearchFormParamsUnitDocument, options);
-}
-export type SearchFormParamsUnitQueryHookResult = ReturnType<
-  typeof useSearchFormParamsUnitQuery
->;
-export type SearchFormParamsUnitLazyQueryHookResult = ReturnType<
-  typeof useSearchFormParamsUnitLazyQuery
->;
-export type SearchFormParamsUnitSuspenseQueryHookResult = ReturnType<
-  typeof useSearchFormParamsUnitSuspenseQuery
->;
-export type SearchFormParamsUnitQueryResult = Apollo.QueryResult<
-  SearchFormParamsUnitQuery,
-  SearchFormParamsUnitQueryVariables
 >;
 export const CreateReservationDocument = gql`
   mutation CreateReservation($input: ReservationCreateMutationInput!) {
@@ -12056,392 +11933,6 @@ export type AccessCodeQueryResult = Apollo.QueryResult<
   AccessCodeQuery,
   AccessCodeQueryVariables
 >;
-export const ReservationUnitPageDocument = gql`
-  query ReservationUnitPage(
-    $id: ID!
-    $pk: Int!
-    $beginDate: Date!
-    $endDate: Date!
-    $state: [ReservationStateChoice]
-  ) {
-    reservationUnit(id: $id) {
-      ...ReservationUnitPageFields
-      ...AvailableTimesReservationUnitFields
-    }
-    affectingReservations(
-      forReservationUnits: [$pk]
-      beginDate: $beginDate
-      endDate: $endDate
-      state: $state
-    ) {
-      ...BlockingReservationFields
-    }
-  }
-  ${ReservationUnitPageFieldsFragmentDoc}
-  ${AvailableTimesReservationUnitFieldsFragmentDoc}
-  ${BlockingReservationFieldsFragmentDoc}
-`;
-
-/**
- * __useReservationUnitPageQuery__
- *
- * To run a query within a React component, call `useReservationUnitPageQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationUnitPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationUnitPageQuery({
- *   variables: {
- *      id: // value for 'id'
- *      pk: // value for 'pk'
- *      beginDate: // value for 'beginDate'
- *      endDate: // value for 'endDate'
- *      state: // value for 'state'
- *   },
- * });
- */
-export function useReservationUnitPageQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationUnitPageQuery,
-    ReservationUnitPageQueryVariables
-  > &
-    (
-      | { variables: ReservationUnitPageQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ReservationUnitPageQuery,
-    ReservationUnitPageQueryVariables
-  >(ReservationUnitPageDocument, options);
-}
-export function useReservationUnitPageLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationUnitPageQuery,
-    ReservationUnitPageQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationUnitPageQuery,
-    ReservationUnitPageQueryVariables
-  >(ReservationUnitPageDocument, options);
-}
-export function useReservationUnitPageSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationUnitPageQuery,
-        ReservationUnitPageQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationUnitPageQuery,
-    ReservationUnitPageQueryVariables
-  >(ReservationUnitPageDocument, options);
-}
-export type ReservationUnitPageQueryHookResult = ReturnType<
-  typeof useReservationUnitPageQuery
->;
-export type ReservationUnitPageLazyQueryHookResult = ReturnType<
-  typeof useReservationUnitPageLazyQuery
->;
-export type ReservationUnitPageSuspenseQueryHookResult = ReturnType<
-  typeof useReservationUnitPageSuspenseQuery
->;
-export type ReservationUnitPageQueryResult = Apollo.QueryResult<
-  ReservationUnitPageQuery,
-  ReservationUnitPageQueryVariables
->;
-export const SearchReservationUnitsDocument = gql`
-  query SearchReservationUnits(
-    $textSearch: String
-    $pk: [Int]
-    $applicationRound: [Int]
-    $personsAllowed: Decimal
-    $unit: [Int]
-    $reservationUnitType: [Int]
-    $purposes: [Int]
-    $equipments: [Int]
-    $accessType: [AccessType]
-    $accessTypeBeginDate: Date
-    $accessTypeEndDate: Date
-    $reservableDateStart: Date
-    $reservableDateEnd: Date
-    $reservableTimeStart: Time
-    $reservableTimeEnd: Time
-    $reservableMinimumDurationMinutes: Decimal
-    $showOnlyReservable: Boolean
-    $first: Int
-    $before: String
-    $after: String
-    $orderBy: [ReservationUnitOrderingChoices]
-    $isDraft: Boolean
-    $isVisible: Boolean
-    $reservationKind: String
-  ) {
-    reservationUnits(
-      textSearch: $textSearch
-      pk: $pk
-      applicationRound: $applicationRound
-      personsAllowed: $personsAllowed
-      unit: $unit
-      reservationUnitType: $reservationUnitType
-      purposes: $purposes
-      equipments: $equipments
-      accessType: $accessType
-      accessTypeBeginDate: $accessTypeBeginDate
-      accessTypeEndDate: $accessTypeEndDate
-      reservableDateStart: $reservableDateStart
-      reservableDateEnd: $reservableDateEnd
-      reservableTimeStart: $reservableTimeStart
-      reservableTimeEnd: $reservableTimeEnd
-      reservableMinimumDurationMinutes: $reservableMinimumDurationMinutes
-      showOnlyReservable: $showOnlyReservable
-      first: $first
-      after: $after
-      before: $before
-      orderBy: $orderBy
-      isDraft: $isDraft
-      isVisible: $isVisible
-      reservationKind: $reservationKind
-      calculateFirstReservableTime: true
-    ) {
-      edges {
-        node {
-          ...ReservationUnitCardFields
-          reservationBegins
-          reservationEnds
-          isClosed
-          firstReservableDatetime
-          currentAccessType
-          pricings {
-            ...PricingFields
-          }
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
-    }
-  }
-  ${ReservationUnitCardFieldsFragmentDoc}
-  ${PricingFieldsFragmentDoc}
-`;
-
-/**
- * __useSearchReservationUnitsQuery__
- *
- * To run a query within a React component, call `useSearchReservationUnitsQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchReservationUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSearchReservationUnitsQuery({
- *   variables: {
- *      textSearch: // value for 'textSearch'
- *      pk: // value for 'pk'
- *      applicationRound: // value for 'applicationRound'
- *      personsAllowed: // value for 'personsAllowed'
- *      unit: // value for 'unit'
- *      reservationUnitType: // value for 'reservationUnitType'
- *      purposes: // value for 'purposes'
- *      equipments: // value for 'equipments'
- *      accessType: // value for 'accessType'
- *      accessTypeBeginDate: // value for 'accessTypeBeginDate'
- *      accessTypeEndDate: // value for 'accessTypeEndDate'
- *      reservableDateStart: // value for 'reservableDateStart'
- *      reservableDateEnd: // value for 'reservableDateEnd'
- *      reservableTimeStart: // value for 'reservableTimeStart'
- *      reservableTimeEnd: // value for 'reservableTimeEnd'
- *      reservableMinimumDurationMinutes: // value for 'reservableMinimumDurationMinutes'
- *      showOnlyReservable: // value for 'showOnlyReservable'
- *      first: // value for 'first'
- *      before: // value for 'before'
- *      after: // value for 'after'
- *      orderBy: // value for 'orderBy'
- *      isDraft: // value for 'isDraft'
- *      isVisible: // value for 'isVisible'
- *      reservationKind: // value for 'reservationKind'
- *   },
- * });
- */
-export function useSearchReservationUnitsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >(SearchReservationUnitsDocument, options);
-}
-export function useSearchReservationUnitsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >(SearchReservationUnitsDocument, options);
-}
-export function useSearchReservationUnitsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        SearchReservationUnitsQuery,
-        SearchReservationUnitsQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    SearchReservationUnitsQuery,
-    SearchReservationUnitsQueryVariables
-  >(SearchReservationUnitsDocument, options);
-}
-export type SearchReservationUnitsQueryHookResult = ReturnType<
-  typeof useSearchReservationUnitsQuery
->;
-export type SearchReservationUnitsLazyQueryHookResult = ReturnType<
-  typeof useSearchReservationUnitsLazyQuery
->;
-export type SearchReservationUnitsSuspenseQueryHookResult = ReturnType<
-  typeof useSearchReservationUnitsSuspenseQuery
->;
-export type SearchReservationUnitsQueryResult = Apollo.QueryResult<
-  SearchReservationUnitsQuery,
-  SearchReservationUnitsQueryVariables
->;
-export const RelatedReservationUnitsDocument = gql`
-  query RelatedReservationUnits(
-    $unit: [Int]!
-    $isDraft: Boolean
-    $isVisible: Boolean
-  ) {
-    reservationUnits(unit: $unit, isDraft: $isDraft, isVisible: $isVisible) {
-      edges {
-        node {
-          ...ReservationUnitNameFields
-          images {
-            ...Image
-          }
-          unit {
-            ...UnitNameFieldsI18N
-          }
-          reservationUnitType {
-            ...ReservationUnitTypeFields
-          }
-          maxPersons
-          isDraft
-          pricings {
-            ...PricingFields
-          }
-        }
-      }
-    }
-  }
-  ${ReservationUnitNameFieldsFragmentDoc}
-  ${ImageFragmentDoc}
-  ${UnitNameFieldsI18NFragmentDoc}
-  ${ReservationUnitTypeFieldsFragmentDoc}
-  ${PricingFieldsFragmentDoc}
-`;
-
-/**
- * __useRelatedReservationUnitsQuery__
- *
- * To run a query within a React component, call `useRelatedReservationUnitsQuery` and pass it any options that fit your needs.
- * When your component renders, `useRelatedReservationUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useRelatedReservationUnitsQuery({
- *   variables: {
- *      unit: // value for 'unit'
- *      isDraft: // value for 'isDraft'
- *      isVisible: // value for 'isVisible'
- *   },
- * });
- */
-export function useRelatedReservationUnitsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    RelatedReservationUnitsQuery,
-    RelatedReservationUnitsQueryVariables
-  > &
-    (
-      | { variables: RelatedReservationUnitsQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    RelatedReservationUnitsQuery,
-    RelatedReservationUnitsQueryVariables
-  >(RelatedReservationUnitsDocument, options);
-}
-export function useRelatedReservationUnitsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    RelatedReservationUnitsQuery,
-    RelatedReservationUnitsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    RelatedReservationUnitsQuery,
-    RelatedReservationUnitsQueryVariables
-  >(RelatedReservationUnitsDocument, options);
-}
-export function useRelatedReservationUnitsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        RelatedReservationUnitsQuery,
-        RelatedReservationUnitsQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    RelatedReservationUnitsQuery,
-    RelatedReservationUnitsQueryVariables
-  >(RelatedReservationUnitsDocument, options);
-}
-export type RelatedReservationUnitsQueryHookResult = ReturnType<
-  typeof useRelatedReservationUnitsQuery
->;
-export type RelatedReservationUnitsLazyQueryHookResult = ReturnType<
-  typeof useRelatedReservationUnitsLazyQuery
->;
-export type RelatedReservationUnitsSuspenseQueryHookResult = ReturnType<
-  typeof useRelatedReservationUnitsSuspenseQuery
->;
-export type RelatedReservationUnitsQueryResult = Apollo.QueryResult<
-  RelatedReservationUnitsQuery,
-  RelatedReservationUnitsQueryVariables
->;
 export const CurrentUserDocument = gql`
   query CurrentUser {
     currentUser {
@@ -12771,9 +12262,20 @@ export type TermsOfUseQueryResult = Apollo.QueryResult<
   TermsOfUseQueryVariables
 >;
 export const ApplicationPage1Document = gql`
-  query ApplicationPage1($id: ID!) {
+  query ApplicationPage1($id: ID!, $orderUnitsBy: [UnitOrderingChoices]) {
     application(id: $id) {
       ...ApplicationForm
+    }
+    unitsAll(
+      publishedReservationUnits: true
+      onlySeasonalBookable: true
+      orderBy: $orderUnitsBy
+    ) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
     }
   }
   ${ApplicationFormFragmentDoc}
@@ -12792,6 +12294,7 @@ export const ApplicationPage1Document = gql`
  * const { data, loading, error } = useApplicationPage1Query({
  *   variables: {
  *      id: // value for 'id'
+ *      orderUnitsBy: // value for 'orderUnitsBy'
  *   },
  * });
  */
@@ -13699,8 +13202,11 @@ export type ApplicationsQueryResult = Apollo.QueryResult<
   ApplicationsQuery,
   ApplicationsQueryVariables
 >;
-export const ReservationUnitPurposesDocument = gql`
-  query ReservationUnitPurposes($orderBy: [PurposeOrderingChoices]) {
+export const FrontPageDocument = gql`
+  query FrontPage(
+    $orderBy: [PurposeOrderingChoices]
+    $orderUnitsBy: [UnitOrderingChoices]
+  ) {
     purposes(orderBy: $orderBy) {
       edges {
         node {
@@ -13708,79 +13214,80 @@ export const ReservationUnitPurposesDocument = gql`
         }
       }
     }
+    units(publishedReservationUnits: true, orderBy: $orderUnitsBy) {
+      edges {
+        node {
+          ...UnitListFields
+        }
+      }
+    }
   }
   ${PurposeCardFragmentDoc}
+  ${UnitListFieldsFragmentDoc}
 `;
 
 /**
- * __useReservationUnitPurposesQuery__
+ * __useFrontPageQuery__
  *
- * To run a query within a React component, call `useReservationUnitPurposesQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationUnitPurposesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useFrontPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFrontPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useReservationUnitPurposesQuery({
+ * const { data, loading, error } = useFrontPageQuery({
  *   variables: {
  *      orderBy: // value for 'orderBy'
+ *      orderUnitsBy: // value for 'orderUnitsBy'
  *   },
  * });
  */
-export function useReservationUnitPurposesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
-  >
+export function useFrontPageQuery(
+  baseOptions?: Apollo.QueryHookOptions<FrontPageQuery, FrontPageQueryVariables>
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
-  >(ReservationUnitPurposesDocument, options);
+  return Apollo.useQuery<FrontPageQuery, FrontPageQueryVariables>(
+    FrontPageDocument,
+    options
+  );
 }
-export function useReservationUnitPurposesLazyQuery(
+export function useFrontPageLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
+    FrontPageQuery,
+    FrontPageQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
-  >(ReservationUnitPurposesDocument, options);
+  return Apollo.useLazyQuery<FrontPageQuery, FrontPageQueryVariables>(
+    FrontPageDocument,
+    options
+  );
 }
-export function useReservationUnitPurposesSuspenseQuery(
+export function useFrontPageSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationUnitPurposesQuery,
-        ReservationUnitPurposesQueryVariables
-      >
+    | Apollo.SuspenseQueryHookOptions<FrontPageQuery, FrontPageQueryVariables>
 ) {
   const options =
     baseOptions === Apollo.skipToken
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
-  >(ReservationUnitPurposesDocument, options);
+  return Apollo.useSuspenseQuery<FrontPageQuery, FrontPageQueryVariables>(
+    FrontPageDocument,
+    options
+  );
 }
-export type ReservationUnitPurposesQueryHookResult = ReturnType<
-  typeof useReservationUnitPurposesQuery
+export type FrontPageQueryHookResult = ReturnType<typeof useFrontPageQuery>;
+export type FrontPageLazyQueryHookResult = ReturnType<
+  typeof useFrontPageLazyQuery
 >;
-export type ReservationUnitPurposesLazyQueryHookResult = ReturnType<
-  typeof useReservationUnitPurposesLazyQuery
+export type FrontPageSuspenseQueryHookResult = ReturnType<
+  typeof useFrontPageSuspenseQuery
 >;
-export type ReservationUnitPurposesSuspenseQueryHookResult = ReturnType<
-  typeof useReservationUnitPurposesSuspenseQuery
->;
-export type ReservationUnitPurposesQueryResult = Apollo.QueryResult<
-  ReservationUnitPurposesQuery,
-  ReservationUnitPurposesQueryVariables
+export type FrontPageQueryResult = Apollo.QueryResult<
+  FrontPageQuery,
+  FrontPageQueryVariables
 >;
 export const ApplicationRoundCriteriaDocument = gql`
   query ApplicationRoundCriteria($id: ID!) {
@@ -14202,6 +13709,248 @@ export type ReservationSuspenseQueryHookResult = ReturnType<
 export type ReservationQueryResult = Apollo.QueryResult<
   ReservationQuery,
   ReservationQueryVariables
+>;
+export const ReservationUnitPageDocument = gql`
+  query ReservationUnitPage(
+    $id: ID!
+    $pk: Int!
+    $beginDate: Date!
+    $endDate: Date!
+    $state: [ReservationStateChoice]
+  ) {
+    reservationUnit(id: $id) {
+      ...ReservationUnitNameFields
+      ...AvailableTimesReservationUnitFields
+      ...NotReservableFields
+      ...ReservationTimePickerFields
+      ...MetadataSets
+      unit {
+        ...AddressFields
+      }
+      uuid
+      ...TermsOfUse
+      images {
+        ...Image
+      }
+      isDraft
+      applicationRoundTimeSlots {
+        ...ApplicationRoundTimeSlotFields
+      }
+      applicationRounds(ongoing: true) {
+        id
+        reservationPeriodBegin
+        reservationPeriodEnd
+      }
+      descriptionFi
+      descriptionEn
+      descriptionSv
+      canApplyFreeOfCharge
+      reservationUnitType {
+        ...ReservationUnitTypeFields
+      }
+      ...ReservationInfoContainer
+      numActiveUserReservations
+      publishingState
+      equipments {
+        id
+        ...EquipmentFields
+      }
+      currentAccessType
+      accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+        id
+        pk
+        accessType
+        beginDate
+      }
+    }
+    affectingReservations(
+      forReservationUnits: [$pk]
+      beginDate: $beginDate
+      endDate: $endDate
+      state: $state
+    ) {
+      ...BlockingReservationFields
+    }
+  }
+  ${ReservationUnitNameFieldsFragmentDoc}
+  ${AvailableTimesReservationUnitFieldsFragmentDoc}
+  ${NotReservableFieldsFragmentDoc}
+  ${ReservationTimePickerFieldsFragmentDoc}
+  ${MetadataSetsFragmentDoc}
+  ${AddressFieldsFragmentDoc}
+  ${TermsOfUseFragmentDoc}
+  ${ImageFragmentDoc}
+  ${ApplicationRoundTimeSlotFieldsFragmentDoc}
+  ${ReservationUnitTypeFieldsFragmentDoc}
+  ${ReservationInfoContainerFragmentDoc}
+  ${EquipmentFieldsFragmentDoc}
+  ${BlockingReservationFieldsFragmentDoc}
+`;
+
+/**
+ * __useReservationUnitPageQuery__
+ *
+ * To run a query within a React component, call `useReservationUnitPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationUnitPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationUnitPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      pk: // value for 'pk'
+ *      beginDate: // value for 'beginDate'
+ *      endDate: // value for 'endDate'
+ *      state: // value for 'state'
+ *   },
+ * });
+ */
+export function useReservationUnitPageQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationUnitPageQuery,
+    ReservationUnitPageQueryVariables
+  > &
+    (
+      | { variables: ReservationUnitPageQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationUnitPageQuery,
+    ReservationUnitPageQueryVariables
+  >(ReservationUnitPageDocument, options);
+}
+export function useReservationUnitPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationUnitPageQuery,
+    ReservationUnitPageQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationUnitPageQuery,
+    ReservationUnitPageQueryVariables
+  >(ReservationUnitPageDocument, options);
+}
+export function useReservationUnitPageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationUnitPageQuery,
+        ReservationUnitPageQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationUnitPageQuery,
+    ReservationUnitPageQueryVariables
+  >(ReservationUnitPageDocument, options);
+}
+export type ReservationUnitPageQueryHookResult = ReturnType<
+  typeof useReservationUnitPageQuery
+>;
+export type ReservationUnitPageLazyQueryHookResult = ReturnType<
+  typeof useReservationUnitPageLazyQuery
+>;
+export type ReservationUnitPageSuspenseQueryHookResult = ReturnType<
+  typeof useReservationUnitPageSuspenseQuery
+>;
+export type ReservationUnitPageQueryResult = Apollo.QueryResult<
+  ReservationUnitPageQuery,
+  ReservationUnitPageQueryVariables
+>;
+export const RelatedReservationUnitsDocument = gql`
+  query RelatedReservationUnits($unit: [Int]!) {
+    reservationUnits(unit: $unit, isVisible: true) {
+      edges {
+        node {
+          ...RelatedUnitCardFields
+        }
+      }
+    }
+  }
+  ${RelatedUnitCardFieldsFragmentDoc}
+`;
+
+/**
+ * __useRelatedReservationUnitsQuery__
+ *
+ * To run a query within a React component, call `useRelatedReservationUnitsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRelatedReservationUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRelatedReservationUnitsQuery({
+ *   variables: {
+ *      unit: // value for 'unit'
+ *   },
+ * });
+ */
+export function useRelatedReservationUnitsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    RelatedReservationUnitsQuery,
+    RelatedReservationUnitsQueryVariables
+  > &
+    (
+      | { variables: RelatedReservationUnitsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    RelatedReservationUnitsQuery,
+    RelatedReservationUnitsQueryVariables
+  >(RelatedReservationUnitsDocument, options);
+}
+export function useRelatedReservationUnitsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    RelatedReservationUnitsQuery,
+    RelatedReservationUnitsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    RelatedReservationUnitsQuery,
+    RelatedReservationUnitsQueryVariables
+  >(RelatedReservationUnitsDocument, options);
+}
+export function useRelatedReservationUnitsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        RelatedReservationUnitsQuery,
+        RelatedReservationUnitsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    RelatedReservationUnitsQuery,
+    RelatedReservationUnitsQueryVariables
+  >(RelatedReservationUnitsDocument, options);
+}
+export type RelatedReservationUnitsQueryHookResult = ReturnType<
+  typeof useRelatedReservationUnitsQuery
+>;
+export type RelatedReservationUnitsLazyQueryHookResult = ReturnType<
+  typeof useRelatedReservationUnitsLazyQuery
+>;
+export type RelatedReservationUnitsSuspenseQueryHookResult = ReturnType<
+  typeof useRelatedReservationUnitsSuspenseQuery
+>;
+export type RelatedReservationUnitsQueryResult = Apollo.QueryResult<
+  RelatedReservationUnitsQuery,
+  RelatedReservationUnitsQueryVariables
 >;
 export const ReservationCancelPageDocument = gql`
   query ReservationCancelPage($id: ID!) {
@@ -14745,4 +14494,166 @@ export type ReservationPageSuspenseQueryHookResult = ReturnType<
 export type ReservationPageQueryResult = Apollo.QueryResult<
   ReservationPageQuery,
   ReservationPageQueryVariables
+>;
+export const SearchReservationUnitsDocument = gql`
+  query SearchReservationUnits(
+    $textSearch: String
+    $pk: [Int]
+    $applicationRound: [Int]
+    $personsAllowed: Decimal
+    $unit: [Int]
+    $reservationUnitType: [Int]
+    $purposes: [Int]
+    $equipments: [Int]
+    $accessType: [AccessType]
+    $accessTypeBeginDate: Date
+    $accessTypeEndDate: Date
+    $reservableDateStart: Date
+    $reservableDateEnd: Date
+    $reservableTimeStart: Time
+    $reservableTimeEnd: Time
+    $reservableMinimumDurationMinutes: Decimal
+    $showOnlyReservable: Boolean
+    $first: Int
+    $before: String
+    $after: String
+    $orderBy: [ReservationUnitOrderingChoices]
+    $isDraft: Boolean
+    $isVisible: Boolean
+    $reservationKind: String
+  ) {
+    reservationUnits(
+      textSearch: $textSearch
+      pk: $pk
+      applicationRound: $applicationRound
+      personsAllowed: $personsAllowed
+      unit: $unit
+      reservationUnitType: $reservationUnitType
+      purposes: $purposes
+      equipments: $equipments
+      accessType: $accessType
+      accessTypeBeginDate: $accessTypeBeginDate
+      accessTypeEndDate: $accessTypeEndDate
+      reservableDateStart: $reservableDateStart
+      reservableDateEnd: $reservableDateEnd
+      reservableTimeStart: $reservableTimeStart
+      reservableTimeEnd: $reservableTimeEnd
+      reservableMinimumDurationMinutes: $reservableMinimumDurationMinutes
+      showOnlyReservable: $showOnlyReservable
+      first: $first
+      after: $after
+      before: $before
+      orderBy: $orderBy
+      isDraft: $isDraft
+      isVisible: $isVisible
+      reservationKind: $reservationKind
+      calculateFirstReservableTime: true
+    ) {
+      edges {
+        node {
+          ...SingleSearchCard
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+  ${SingleSearchCardFragmentDoc}
+`;
+
+/**
+ * __useSearchReservationUnitsQuery__
+ *
+ * To run a query within a React component, call `useSearchReservationUnitsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchReservationUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchReservationUnitsQuery({
+ *   variables: {
+ *      textSearch: // value for 'textSearch'
+ *      pk: // value for 'pk'
+ *      applicationRound: // value for 'applicationRound'
+ *      personsAllowed: // value for 'personsAllowed'
+ *      unit: // value for 'unit'
+ *      reservationUnitType: // value for 'reservationUnitType'
+ *      purposes: // value for 'purposes'
+ *      equipments: // value for 'equipments'
+ *      accessType: // value for 'accessType'
+ *      accessTypeBeginDate: // value for 'accessTypeBeginDate'
+ *      accessTypeEndDate: // value for 'accessTypeEndDate'
+ *      reservableDateStart: // value for 'reservableDateStart'
+ *      reservableDateEnd: // value for 'reservableDateEnd'
+ *      reservableTimeStart: // value for 'reservableTimeStart'
+ *      reservableTimeEnd: // value for 'reservableTimeEnd'
+ *      reservableMinimumDurationMinutes: // value for 'reservableMinimumDurationMinutes'
+ *      showOnlyReservable: // value for 'showOnlyReservable'
+ *      first: // value for 'first'
+ *      before: // value for 'before'
+ *      after: // value for 'after'
+ *      orderBy: // value for 'orderBy'
+ *      isDraft: // value for 'isDraft'
+ *      isVisible: // value for 'isVisible'
+ *      reservationKind: // value for 'reservationKind'
+ *   },
+ * });
+ */
+export function useSearchReservationUnitsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >(SearchReservationUnitsDocument, options);
+}
+export function useSearchReservationUnitsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >(SearchReservationUnitsDocument, options);
+}
+export function useSearchReservationUnitsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        SearchReservationUnitsQuery,
+        SearchReservationUnitsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    SearchReservationUnitsQuery,
+    SearchReservationUnitsQueryVariables
+  >(SearchReservationUnitsDocument, options);
+}
+export type SearchReservationUnitsQueryHookResult = ReturnType<
+  typeof useSearchReservationUnitsQuery
+>;
+export type SearchReservationUnitsLazyQueryHookResult = ReturnType<
+  typeof useSearchReservationUnitsLazyQuery
+>;
+export type SearchReservationUnitsSuspenseQueryHookResult = ReturnType<
+  typeof useSearchReservationUnitsSuspenseQuery
+>;
+export type SearchReservationUnitsQueryResult = Apollo.QueryResult<
+  SearchReservationUnitsQuery,
+  SearchReservationUnitsQueryVariables
 >;

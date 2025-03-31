@@ -487,7 +487,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export const GET_RESERVATION = gql`
+export const RESERVATION_IN_PROGRESS_QUERY = gql`
   query Reservation($id: ID!) {
     reservation(id: $id) {
       id

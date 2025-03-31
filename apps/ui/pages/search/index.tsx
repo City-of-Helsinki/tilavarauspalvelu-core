@@ -10,7 +10,7 @@ import { ReservationKind } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { SingleSearchForm } from "@/components/search/SingleSearchForm";
 import { ListWithPagination } from "@/components/common/ListWithPagination";
-import ReservationUnitCard from "@/components/search/SingleSearchReservationUnitCard";
+import { SingleSearchCard } from "@/components/search/SingleSearchReservationUnitCard";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { getSearchOptions, processVariables } from "@/modules/search";
@@ -19,6 +19,7 @@ import { SortingComponent } from "@/components/SortingComponent";
 import { Flex } from "common/styles/util";
 import { useSearchParams } from "next/navigation";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { gql } from "@apollo/client";
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { locale } = ctx;
@@ -106,7 +107,7 @@ function SearchSingle({
       <Flex as="section" ref={content}>
         <ListWithPagination
           items={filterNonNullable(reservationUnits).map((ru) => (
-            <ReservationUnitCard reservationUnit={ru} key={ru.pk} />
+            <SingleSearchCard reservationUnit={ru} key={ru.pk} />
           ))}
           isLoading={isLoading}
           pageInfo={pageInfo}
@@ -120,3 +121,72 @@ function SearchSingle({
 }
 
 export default SearchSingle;
+
+// TODO why isDraft and isVisible are options here?
+export const SEARCH_RESERVATION_UNITS = gql`
+  query SearchReservationUnits(
+    $textSearch: String
+    $pk: [Int]
+    $applicationRound: [Int]
+    $personsAllowed: Decimal
+    $unit: [Int]
+    $reservationUnitType: [Int]
+    $purposes: [Int]
+    $equipments: [Int]
+    $accessType: [AccessType]
+    $accessTypeBeginDate: Date
+    $accessTypeEndDate: Date
+    $reservableDateStart: Date
+    $reservableDateEnd: Date
+    $reservableTimeStart: Time
+    $reservableTimeEnd: Time
+    $reservableMinimumDurationMinutes: Decimal
+    $showOnlyReservable: Boolean
+    $first: Int
+    $before: String
+    $after: String
+    $orderBy: [ReservationUnitOrderingChoices]
+    $isDraft: Boolean
+    $isVisible: Boolean
+    $reservationKind: String
+  ) {
+    reservationUnits(
+      textSearch: $textSearch
+      pk: $pk
+      applicationRound: $applicationRound
+      personsAllowed: $personsAllowed
+      unit: $unit
+      reservationUnitType: $reservationUnitType
+      purposes: $purposes
+      equipments: $equipments
+      accessType: $accessType
+      accessTypeBeginDate: $accessTypeBeginDate
+      accessTypeEndDate: $accessTypeEndDate
+      reservableDateStart: $reservableDateStart
+      reservableDateEnd: $reservableDateEnd
+      reservableTimeStart: $reservableTimeStart
+      reservableTimeEnd: $reservableTimeEnd
+      reservableMinimumDurationMinutes: $reservableMinimumDurationMinutes
+      showOnlyReservable: $showOnlyReservable
+      first: $first
+      after: $after
+      before: $before
+      orderBy: $orderBy
+      isDraft: $isDraft
+      isVisible: $isVisible
+      reservationKind: $reservationKind
+      calculateFirstReservableTime: true
+    ) {
+      edges {
+        node {
+          ...SingleSearchCard
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+`;

@@ -12,7 +12,6 @@ import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import { getParameterLabel } from "@/modules/util";
 
 // There is a duplicate in admin-ui but it doesn't have translations
-// export so we can use this on SSR
 export const OPTIONS_QUERY = gql`
   query Options(
     $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderingChoices]
@@ -20,6 +19,8 @@ export const OPTIONS_QUERY = gql`
     $unitsOrderBy: [UnitOrderingChoices]
     $equipmentsOrderBy: [EquipmentOrderingChoices]
     $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
+    $onlyDirectBookable: Boolean
+    $onlySeasonalBookable: Boolean
   ) {
     reservationUnitTypes(orderBy: $reservationUnitTypesOrderBy) {
       edges {
@@ -82,7 +83,12 @@ export const OPTIONS_QUERY = gql`
       nameEn
       nameSv
     }
-    unitsAll(orderBy: $unitsOrderBy) {
+    unitsAll(
+      publishedReservationUnits: true
+      onlyDirectBookable: $onlyDirectBookable
+      onlySeasonalBookable: $onlySeasonalBookable
+      orderBy: $unitsOrderBy
+    ) {
       id
       pk
       nameFi
@@ -99,10 +105,10 @@ const maybeOption = ({
   nameSv,
   pk,
 }: {
-  nameFi?: Maybe<string>;
-  nameEn?: Maybe<string>;
-  nameSv?: Maybe<string>;
-  pk?: Maybe<number>;
+  nameFi: Maybe<string>;
+  nameEn: Maybe<string>;
+  nameSv: Maybe<string>;
+  pk: Maybe<number>;
 }) => {
   if (!nameFi || !pk) {
     // eslint-disable-next-line no-console
@@ -196,12 +202,5 @@ export function useOptions() {
     reservationUnitTypeOptions,
   };
 
-  const params = {
-    ageGroups,
-    cities,
-    reservationUnitTypes,
-    purposes,
-  };
-
-  return { isLoading, options, params };
+  return { isLoading, options };
 }
