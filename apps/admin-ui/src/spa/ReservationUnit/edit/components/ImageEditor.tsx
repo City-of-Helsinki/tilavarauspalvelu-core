@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button, ButtonSize, ButtonVariant, FileInput } from "hds-react";
 import { ImageType } from "@gql/gql-types";
 import { AutoGrid, Flex } from "common/styles/util";
-import { type ImageFormType } from "./form";
+import { type ImageFormType } from "../form";
 import { fontRegular } from "common";
 
 const StyledImage = styled.img`

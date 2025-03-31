@@ -13,7 +13,7 @@ import { IconButton } from "common/src/components";
 import { breakpoints } from "common";
 import { fontBold } from "common/src/common/typography";
 import { useTranslation } from "react-i18next";
-import { ReservationUnitEditFormValues } from "./form";
+import { ReservationUnitEditFormValues } from "../form";
 import { Accordion } from "@/component/Accordion";
 import { getTranslatedError } from "@/common/util";
 

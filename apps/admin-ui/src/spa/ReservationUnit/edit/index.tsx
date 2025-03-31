@@ -8,81 +8,78 @@ import {
   LoadingSpinner,
   Notification,
   TextInput,
-  Tooltip,
 } from "hds-react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import dynamic from "next/dynamic";
 import {
   Control,
   Controller,
-  UseFormReturn,
   useController,
   useForm,
+  UseFormReturn,
 } from "react-hook-form";
 import { type TFunction, useTranslation } from "next-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ReservationStartInterval,
   Authentication,
-  type ReservationUnitPublishingState,
-  type ReservationUnitReservationState,
-  TermsType,
+  EquipmentOrderingChoices,
   ImageType,
-  useUnitWithSpacesAndResourcesQuery,
-  useDeleteImageMutation,
-  useUpdateImageMutation,
-  type UnitWithSpacesAndResourcesQuery,
-  useReservationUnitEditorParametersQuery,
+  ReservationKind,
+  ReservationStartInterval,
   type ReservationUnitEditorParametersQuery,
   type ReservationUnitEditQuery,
+  TermsType,
+  type UnitWithSpacesAndResourcesQuery,
   useCreateImageMutation,
   useCreateReservationUnitMutation,
-  useUpdateReservationUnitMutation,
+  useDeleteImageMutation,
+  useReservationUnitEditorParametersQuery,
   useReservationUnitEditQuery,
-  EquipmentOrderingChoices,
-  ReservationKind,
+  useUnitWithSpacesAndResourcesQuery,
+  useUpdateImageMutation,
+  useUpdateReservationUnitMutation,
 } from "@gql/gql-types";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { H1, H4, fontBold, fontMedium } from "common/src/common/typography";
+import { fontMedium, H4 } from "common/src/common/typography";
 import { breakpoints } from "common";
 import {
   AutoGrid,
-  FullRow,
-  Flex,
-  TitleSection,
   CenterSpinner,
+  Flex,
+  FullRow,
   WhiteButton,
 } from "common/styles/util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
-import { parseAddress, getTranslatedError } from "@/common/util";
+import { getTranslatedError } from "@/common/util";
 import Error404 from "@/common/Error404";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
-import { ArchiveDialog } from "./ArchiveDialog";
-import { ReservationStateTag, ReservationUnitStateTag } from "./tags";
-import { ActivationGroup } from "./ActivationGroup";
-import { ImageEditor } from "./ImageEditor";
-import { PricingTypeView, TaxOption } from "./PricingType";
-import { GenericDialog } from "./GenericDialog";
+import { ArchiveDialog } from "./components/ArchiveDialog";
+import { ActivationGroup } from "./components/ActivationGroup";
+import { ImageEditor } from "./components/ImageEditor";
+import { PricingTypeView, TaxOption } from "./components/PricingTypeView";
 import {
+  BUFFER_TIME_OPTIONS,
+  convertReservationUnit,
+  type ImageFormType,
   type ReservationUnitEditFormValues,
   ReservationUnitEditSchema,
-  convertReservationUnit,
   transformReservationUnit,
-  type ImageFormType,
-  BUFFER_TIME_OPTIONS,
 } from "./form";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { SeasonalSection } from "./SeasonalSection";
+import { SeasonalSection } from "./components/SeasonalSection";
 import { getValidationErrors } from "common/src/apolloUtils";
 import { getReservationUnitUrl, getUnitUrl } from "@/common/urls";
 import { pageSideMargins } from "common/styles/layout";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
 import { ControlledRadioGroup } from "common/src/components/form";
+import { FieldGroup } from "@/spa/ReservationUnit/edit/components/FieldGroup";
+import { DiscardChangesDialog } from "@/spa/ReservationUnit/edit/components/DiscardChangesDialog";
+import { DisplayUnit } from "@/spa/ReservationUnit/edit/components/DisplayUnit";
 
 const RichTextInput = dynamic(
   () => import("../../../component/RichTextInput"),
@@ -229,106 +226,6 @@ const makeTermsOptions = (
       };
     });
 };
-
-const FieldGroupWrapper = styled.div`
-  display: grid;
-  gap: var(--spacing-m);
-  grid-template-columns: 1fr 32px;
-  justify-content: space-between;
-`;
-
-// NOTE using span for easier css selectors
-const FieldGroupHeading = styled.span`
-  padding-bottom: var(--spacing-xs);
-  display: block;
-  ${fontBold}
-`;
-
-function FieldGroup({
-  children,
-  heading,
-  tooltip = "",
-  className,
-  style,
-  required,
-}: {
-  heading: string;
-  tooltip?: string;
-  children?: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-  required?: boolean;
-}): JSX.Element {
-  return (
-    <FieldGroupWrapper className={className} style={style}>
-      <div>
-        <FieldGroupHeading>
-          {heading} {required ? "*" : ""}
-        </FieldGroupHeading>
-        <div className="ReservationUnitEditor__FieldGroup-children">
-          {children}
-        </div>
-      </div>
-      <Tooltip>{tooltip}</Tooltip>
-    </FieldGroupWrapper>
-  );
-}
-
-function DiscardChangesDialog({
-  onClose,
-  onAccept,
-}: {
-  onClose: () => void;
-  onAccept: () => void;
-}): JSX.Element {
-  const { t } = useTranslation();
-
-  return (
-    <GenericDialog
-      onAccept={onAccept}
-      onClose={onClose}
-      description={t("DiscardReservationUnitChangesDialog.description")}
-      title={t("DiscardReservationUnitChangesDialog.title")}
-      acceptLabel={t("DiscardReservationUnitChangesDialog.discard")}
-    />
-  );
-}
-
-const UnitInformationWrapper = styled.div`
-  font-size: var(--fontsize-heading-s);
-  > div:first-child {
-    ${fontBold}
-  }
-`;
-
-function DisplayUnit({
-  heading,
-  unit,
-  unitState,
-  reservationState,
-}: {
-  heading: string;
-  unit?: UnitWithSpacesAndResourcesQuery["unit"];
-  unitState?: ReservationUnitPublishingState;
-  reservationState?: ReservationUnitReservationState;
-}): JSX.Element {
-  const location = unit?.location;
-  return (
-    <>
-      <TitleSection>
-        <H1 $noMargin>{heading}</H1>
-        <Flex $direction="row" $gap="xs">
-          <ReservationStateTag state={reservationState} />
-          <ReservationUnitStateTag state={unitState} />
-        </Flex>
-      </TitleSection>
-      <UnitInformationWrapper>
-        <div>{unit?.nameFi ?? "-"}</div>
-        <div>{location != null ? parseAddress(location) : "-"}</div>
-      </UnitInformationWrapper>
-    </>
-  );
-}
 
 const useImageMutations = () => {
   const [createImage] = useCreateImageMutation();
