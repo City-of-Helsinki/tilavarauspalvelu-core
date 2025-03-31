@@ -2517,7 +2517,7 @@ def test__reservation_unit__first_reservable_time__remove_not_reservable(graphql
     assert is_closed(response) is False
 
     # Don't check queries in CI. Don't know why but some queries appear twice...
-    if os.getenv("DJANGO_SETTINGS_ENVIRONMENT") == "CI":
+    if os.getenv("CI") == "true":
         return
 
     # Check that we fetch reservation units in a big chunk which is then filtered
