@@ -21,9 +21,12 @@ import {
   type SearchReservationUnitsQueryVariables,
   type RecurringCardFragment,
 } from "@gql/gql-types";
-import { filterNonNullable, getImageSource } from "common/src/helpers";
+import {
+  filterNonNullable,
+  getImageSource,
+  getMainImage,
+} from "common/src/helpers";
 import { CenterSpinner, Flex } from "common/styles/util";
-import { getMainImage } from "@/modules/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";

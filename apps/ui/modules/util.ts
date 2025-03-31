@@ -5,7 +5,6 @@ import {
   fromApiDate as fromAPIDate,
   fromUIDate,
 } from "common/src/common/util";
-import { ImageType, type ImageFragment } from "@gql/gql-types";
 import { isBrowser } from "./const";
 import {
   formatMinutes,
@@ -57,12 +56,6 @@ export function getParameterLabel(
     return parameter.nameFi;
   }
   return "no label";
-}
-
-export function getMainImage(ru?: {
-  images: Readonly<ImageFragment[]>;
-}): ImageFragment | null {
-  return ru?.images.find((img) => img.imageType === ImageType.Main) ?? null;
 }
 
 export const isTouchDevice = (): boolean =>
