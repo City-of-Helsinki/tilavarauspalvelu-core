@@ -1,6 +1,7 @@
 import { isAfter, isBefore } from "date-fns";
 import {
-  PricingFieldsFragment,
+  ImageType,
+  type PricingFieldsFragment,
   type ImageFragment,
   type Maybe,
 } from "../gql/gql-types";
@@ -155,6 +156,12 @@ function getImageSourceWithoutDefault(
     default:
       return null;
   }
+}
+
+export function getMainImage(ru?: {
+  images: Readonly<ImageFragment[]>;
+}): ImageFragment | null {
+  return ru?.images.find((img) => img.imageType === ImageType.Main) ?? null;
 }
 
 /// Returns if price is free

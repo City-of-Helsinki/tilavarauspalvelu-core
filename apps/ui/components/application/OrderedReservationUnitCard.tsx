@@ -17,9 +17,8 @@ import {
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
 import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
-import { getMainImage } from "@/modules/util";
 import { getReservationUnitName } from "@/modules/reservationUnit";
-import { getImageSource } from "common/src/helpers";
+import { getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { Flex } from "common/styles/util";
 import { ErrorText } from "common/src/components/ErrorText";

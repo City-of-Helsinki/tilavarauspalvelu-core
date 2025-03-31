@@ -8,8 +8,8 @@ import {
   IconCheck,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { ImageType, type UnitQuery } from "@gql/gql-types";
-import { getImageSource } from "common/src/helpers";
+import { type UnitQuery } from "@gql/gql-types";
+import { getImageSource, getMainImage } from "common/src/helpers";
 import StatusLabel from "common/src/components/StatusLabel";
 import { getReservationUnitUrl } from "@/common/urls";
 import Card from "common/src/components/Card";
@@ -28,10 +28,7 @@ export function ReservationUnitCard({
 }: Readonly<IProps>): JSX.Element {
   const { t } = useTranslation();
 
-  const image =
-    reservationUnit.images?.find((i) => i?.imageType === ImageType.Main) ??
-    reservationUnit.images?.find(() => true) ??
-    null;
+  const image = getMainImage(reservationUnit);
 
   const hasPurposes = (reservationUnit?.purposes?.length || 0) > 0;
 

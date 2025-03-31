@@ -15,11 +15,10 @@ import {
   getTranslationSafe,
   toUIDate,
 } from "common/src/common/util";
-import { getMainImage } from "@/modules/util";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import { isBrowser } from "@/modules/const";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
-import { getImageSource } from "common/src/helpers";
+import { getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import Tag from "common/src/components/Tag";
 import { useSearchParams } from "next/navigation";

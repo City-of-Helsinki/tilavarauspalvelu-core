@@ -13,9 +13,8 @@ import {
 import React from "react";
 import { useTranslation } from "next-i18next";
 import type { RecurringCardFragment } from "@gql/gql-types";
-import { getMainImage } from "@/modules/util";
 import { getReservationUnitName } from "@/modules/reservationUnit";
-import { getImageSource } from "common/src/helpers";
+import { getImageSource, getMainImage } from "common/src/helpers";
 import Card, { CardInfoItem } from "common/src/components/Card";
 import { getReservationUnitPath } from "@/modules/urls";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
