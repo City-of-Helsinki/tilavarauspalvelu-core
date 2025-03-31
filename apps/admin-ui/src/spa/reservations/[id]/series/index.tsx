@@ -135,7 +135,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
       reset(convertToForm(recurringReservation));
     }
   }, [recurringReservation, reset]);
-  const reservationUnit = reservation?.reservationUnits?.[0];
+  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
 
   const [removedReservations, setRemovedReservations] = useState<
     NewReservationListItem[]

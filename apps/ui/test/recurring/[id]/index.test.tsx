@@ -61,7 +61,18 @@ function customRender(
     reservationUnitTypeOptions: [],
   } as const;
   return render(
-    <MockedProvider mocks={mocks} addTypename={false}>
+    <MockedProvider
+      mocks={mocks}
+      addTypename={false}
+      // Have to cache bypass (setting cache to InMemoryCache is not enough)
+      // NOTE if copying this approach any override in the query will take precedence
+      // so for query specific fetchPolicies an alternative approach to cache is required
+      defaultOptions={{
+        watchQuery: { fetchPolicy: "no-cache" },
+        query: { fetchPolicy: "no-cache" },
+        mutate: { fetchPolicy: "no-cache" },
+      }}
+    >
       <SeasonalSearch
         applicationRound={round}
         apiBaseUrl="http://localhost:8000"
@@ -71,8 +82,7 @@ function customRender(
   );
 }
 
-// TODO: providing apollo cache in the mocked provider is necessary for these tests
-describe.skip("Page: SeasonalSearch", () => {
+describe("Page: SeasonalSearch", () => {
   beforeEach(() => {
     mockedSearchParams.mockReturnValue(new URLSearchParams());
   });
