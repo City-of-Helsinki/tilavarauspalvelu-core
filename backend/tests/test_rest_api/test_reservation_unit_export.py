@@ -95,6 +95,7 @@ def test_reservation_unit_export(api_client, settings):
         "tprek_id",
         "type",
         "unit",
+        "updated_at",
     ]
     assert data[0]["reservation_unit_id"] == reservation_unit_1.pk
     assert data[1]["reservation_unit_id"] == reservation_unit_2.pk

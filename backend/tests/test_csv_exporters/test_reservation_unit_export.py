@@ -133,6 +133,7 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == reservation_unit_1.equipments.first().name_fi
     assert row_2[next(index)] == reservation_unit_1.publishing_state
     assert row_2[next(index)] == reservation_unit_1.reservation_state
+    assert row_2[next(index)] == local_datetime_string(reservation_unit_1.updated_at)
 
     # No need to test the second item so thoroughly
     assert writes[2][0] == reservation_units[1].id

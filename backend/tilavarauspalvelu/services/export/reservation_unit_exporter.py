@@ -91,6 +91,7 @@ class ReservationUnitExportRow(BaseExportRow):
     equipments: str = ""
     state: str = ""
     reservation_state: str = ""
+    updated_at: str = ""
 
 
 class ReservationUnitExporter(BaseCSVExporter):
@@ -306,5 +307,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 equipments=", ".join(equipment.name_fi for equipment in instance.equipments.all()),
                 state=instance.publishing_state,
                 reservation_state=instance.reservation_state,
+                updated_at=self.format_datetime(instance.updated_at),
             )
         ]
