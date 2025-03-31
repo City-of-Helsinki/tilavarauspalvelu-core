@@ -1517,20 +1517,17 @@ function ReservationUnitEditor({
   const [createMutation] = useCreateReservationUnitMutation();
 
   const id = base64encode(`UnitNode:${unitPk}`);
+  // TODO combine these two queries into a single params query with minimal data
   const { data: unitResourcesData } = useUnitWithSpacesAndResourcesQuery({
     skip: !unitPk,
     variables: { id },
-    onError: (e) => {
-      // eslint-disable-next-line no-console
-      console.error(e);
+    onError: (_) => {
       errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 
   const { data: parametersData } = useReservationUnitEditorParametersQuery({
-    onError: (e) => {
-      // eslint-disable-next-line no-console
-      console.error(e);
+    onError: (_) => {
       errorToast({ text: t("errors.errorFetchingData") });
     },
     variables: {

@@ -6105,67 +6105,6 @@ export type SpaceCommonFieldsFragment = {
   } | null;
 };
 
-export type ResourceFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly locationType: ResourceLocationType | null;
-  readonly space: {
-    readonly id: string;
-    readonly nameFi: string | null;
-    readonly unit: {
-      readonly id: string;
-      readonly nameFi: string | null;
-      readonly pk: number | null;
-    } | null;
-  } | null;
-};
-
-export type SpaceFieldsFragment = {
-  readonly code: string;
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly surfaceArea: number | null;
-  readonly maxPersons: number | null;
-  readonly resources: ReadonlyArray<{
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly locationType: ResourceLocationType | null;
-    readonly space: {
-      readonly id: string;
-      readonly nameFi: string | null;
-      readonly unit: {
-        readonly id: string;
-        readonly nameFi: string | null;
-        readonly pk: number | null;
-      } | null;
-    } | null;
-  }>;
-  readonly children: ReadonlyArray<{
-    readonly id: string;
-    readonly pk: number | null;
-  }> | null;
-  readonly parent: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-  } | null;
-};
-
-export type ReservationUnitCommonFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly maxPersons: number | null;
-  readonly surfaceArea: number | null;
-  readonly reservationUnitType: {
-    readonly id: string;
-    readonly nameFi: string | null;
-  } | null;
-};
-
 export type UnitNameFieldsFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -6456,143 +6395,6 @@ export type ReservationUnitFragment = {
       readonly id: string;
       readonly fieldName: string;
     }>;
-  } | null;
-};
-
-export type UnitQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type UnitQuery = {
-  readonly unit: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly tprekId: string | null;
-    readonly shortDescriptionFi: string | null;
-    readonly reservationUnits: ReadonlyArray<{
-      readonly isDraft: boolean;
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly maxPersons: number | null;
-      readonly surfaceArea: number | null;
-      readonly resources: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-      }>;
-      readonly purposes: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-      }>;
-      readonly images: ReadonlyArray<{
-        readonly id: string;
-        readonly imageUrl: string | null;
-        readonly largeUrl: string | null;
-        readonly mediumUrl: string | null;
-        readonly smallUrl: string | null;
-        readonly imageType: ImageType;
-      }>;
-      readonly reservationUnitType: {
-        readonly id: string;
-        readonly nameFi: string | null;
-      } | null;
-    }>;
-    readonly spaces: ReadonlyArray<{
-      readonly code: string;
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly surfaceArea: number | null;
-      readonly maxPersons: number | null;
-      readonly resources: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-        readonly locationType: ResourceLocationType | null;
-        readonly space: {
-          readonly id: string;
-          readonly nameFi: string | null;
-          readonly unit: {
-            readonly id: string;
-            readonly nameFi: string | null;
-            readonly pk: number | null;
-          } | null;
-        } | null;
-      }>;
-      readonly children: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-      }> | null;
-      readonly parent: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-      } | null;
-    }>;
-    readonly location: {
-      readonly id: string;
-      readonly addressStreetFi: string | null;
-      readonly addressZip: string;
-      readonly addressCityFi: string | null;
-    } | null;
-  } | null;
-};
-
-export type UnitWithSpacesAndResourcesQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type UnitWithSpacesAndResourcesQuery = {
-  readonly unit: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly spaces: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly surfaceArea: number | null;
-      readonly maxPersons: number | null;
-      readonly resources: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-      }>;
-      readonly parent: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-      } | null;
-    }>;
-    readonly location: {
-      readonly id: string;
-      readonly addressStreetFi: string | null;
-      readonly addressZip: string;
-      readonly addressCityFi: string | null;
-    } | null;
-  } | null;
-};
-
-export type HandlingDataQueryVariables = Exact<{
-  beginDate: Scalars["Date"]["input"];
-  state:
-    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
-    | InputMaybe<ReservationStateChoice>;
-}>;
-
-export type HandlingDataQuery = {
-  readonly reservations: {
-    readonly edges: ReadonlyArray<{
-      readonly node: { readonly id: string; readonly pk: number | null } | null;
-    } | null>;
-  } | null;
-  readonly units: {
-    readonly totalCount: number | null;
-    readonly edges: ReadonlyArray<{
-      readonly node: { readonly id: string; readonly pk: number | null } | null;
-    } | null>;
   } | null;
 };
 
@@ -6888,6 +6690,27 @@ export type ReservationDenyReasonsQuery = {
         readonly pk: number | null;
         readonly reasonFi: string | null;
       } | null;
+    } | null>;
+  } | null;
+};
+
+export type HandlingDataQueryVariables = Exact<{
+  beginDate: Scalars["Date"]["input"];
+  state:
+    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>;
+}>;
+
+export type HandlingDataQuery = {
+  readonly reservations: {
+    readonly edges: ReadonlyArray<{
+      readonly node: { readonly id: string; readonly pk: number | null } | null;
+    } | null>;
+  } | null;
+  readonly units: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: { readonly id: string; readonly pk: number | null } | null;
     } | null>;
   } | null;
 };
@@ -9611,12 +9434,179 @@ export type DeleteResourceMutation = {
   readonly deleteResource: { readonly deleted: boolean | null } | null;
 };
 
+export type ResourceFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly locationType: ResourceLocationType | null;
+  readonly space: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly unit: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly pk: number | null;
+    } | null;
+  } | null;
+};
+
+export type SpaceFieldsFragment = {
+  readonly code: string;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly surfaceArea: number | null;
+  readonly maxPersons: number | null;
+  readonly resources: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly locationType: ResourceLocationType | null;
+    readonly space: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly unit: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly pk: number | null;
+      } | null;
+    } | null;
+  }>;
+  readonly children: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+  }> | null;
+  readonly parent: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+  } | null;
+};
+
+export type UnitWithSpacesAndResourcesQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type UnitWithSpacesAndResourcesQuery = {
+  readonly unit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly spaces: ReadonlyArray<{
+      readonly code: string;
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly surfaceArea: number | null;
+      readonly maxPersons: number | null;
+      readonly resources: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly locationType: ResourceLocationType | null;
+        readonly space: {
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly unit: {
+            readonly id: string;
+            readonly nameFi: string | null;
+            readonly pk: number | null;
+          } | null;
+        } | null;
+      }>;
+      readonly children: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+      }> | null;
+      readonly parent: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
+    }>;
+    readonly location: {
+      readonly id: string;
+      readonly addressStreetFi: string | null;
+      readonly addressZip: string;
+      readonly addressCityFi: string | null;
+    } | null;
+  } | null;
+};
+
 export type DeleteSpaceMutationVariables = Exact<{
   input: SpaceDeleteMutationInput;
 }>;
 
 export type DeleteSpaceMutation = {
   readonly deleteSpace: { readonly deleted: boolean | null } | null;
+};
+
+export type ReservationUnitCardFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly maxPersons: number | null;
+  readonly isDraft: boolean;
+  readonly reservationUnitType: {
+    readonly id: string;
+    readonly nameFi: string | null;
+  } | null;
+  readonly images: ReadonlyArray<{
+    readonly id: string;
+    readonly imageUrl: string | null;
+    readonly largeUrl: string | null;
+    readonly mediumUrl: string | null;
+    readonly smallUrl: string | null;
+    readonly imageType: ImageType;
+  }>;
+  readonly purposes: ReadonlyArray<{ readonly id: string }>;
+  readonly resources: ReadonlyArray<{ readonly id: string }>;
+};
+
+export type UnitPageQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type UnitPageQuery = {
+  readonly unit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly tprekId: string | null;
+    readonly shortDescriptionFi: string | null;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly maxPersons: number | null;
+      readonly isDraft: boolean;
+      readonly reservationUnitType: {
+        readonly id: string;
+        readonly nameFi: string | null;
+      } | null;
+      readonly images: ReadonlyArray<{
+        readonly id: string;
+        readonly imageUrl: string | null;
+        readonly largeUrl: string | null;
+        readonly mediumUrl: string | null;
+        readonly smallUrl: string | null;
+        readonly imageType: ImageType;
+      }>;
+      readonly purposes: ReadonlyArray<{ readonly id: string }>;
+      readonly resources: ReadonlyArray<{ readonly id: string }>;
+    }>;
+    readonly spaces: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    }>;
+    readonly location: {
+      readonly id: string;
+      readonly addressStreetFi: string | null;
+      readonly addressZip: string;
+      readonly addressCityFi: string | null;
+    } | null;
+  } | null;
 };
 
 export type UnitsQueryVariables = Exact<{
@@ -9682,6 +9672,41 @@ export type ResourceQuery = {
     readonly nameSv: string | null;
     readonly nameEn: string | null;
     readonly space: { readonly id: string; readonly pk: number | null } | null;
+  } | null;
+};
+
+export type UnitResourceInfoFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly location: {
+    readonly id: string;
+    readonly addressStreetFi: string | null;
+    readonly addressZip: string;
+    readonly addressCityFi: string | null;
+  } | null;
+};
+
+export type ParentSpaceFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+};
+
+export type NewResourceUnitFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly spaces: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+  }>;
+  readonly location: {
+    readonly id: string;
+    readonly addressStreetFi: string | null;
+    readonly addressZip: string;
+    readonly addressCityFi: string | null;
   } | null;
 };
 
@@ -9854,16 +9879,6 @@ export const TermsOfUseFieldsFragmentDoc = gql`
   ${TermsOfUseNameFieldsFragmentDoc}
   ${TermsOfUseTextFieldsFragmentDoc}
 `;
-export const ImageFragmentDoc = gql`
-  fragment Image on ReservationUnitImageNode {
-    id
-    imageUrl
-    largeUrl
-    mediumUrl
-    smallUrl
-    imageType
-  }
-`;
 export const LocationFieldsFragmentDoc = gql`
   fragment LocationFields on LocationNode {
     id
@@ -9881,65 +9896,6 @@ export const LocationFieldsI18nFragmentDoc = gql`
     addressCitySv
   }
   ${LocationFieldsFragmentDoc}
-`;
-export const SpaceCommonFieldsFragmentDoc = gql`
-  fragment SpaceCommonFields on SpaceNode {
-    id
-    pk
-    nameFi
-    parent {
-      id
-      pk
-      nameFi
-    }
-    surfaceArea
-    maxPersons
-  }
-`;
-export const ResourceFieldsFragmentDoc = gql`
-  fragment ResourceFields on ResourceNode {
-    id
-    pk
-    nameFi
-    locationType
-    space {
-      id
-      nameFi
-      unit {
-        id
-        nameFi
-        pk
-      }
-    }
-  }
-`;
-export const SpaceFieldsFragmentDoc = gql`
-  fragment SpaceFields on SpaceNode {
-    ...SpaceCommonFields
-    code
-    resources {
-      ...ResourceFields
-    }
-    children {
-      id
-      pk
-    }
-  }
-  ${SpaceCommonFieldsFragmentDoc}
-  ${ResourceFieldsFragmentDoc}
-`;
-export const ReservationUnitCommonFieldsFragmentDoc = gql`
-  fragment ReservationUnitCommonFields on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    maxPersons
-    surfaceArea
-    reservationUnitType {
-      id
-      nameFi
-    }
-  }
 `;
 export const ApplicationSectionDurationFragmentDoc = gql`
   fragment ApplicationSectionDuration on ApplicationSectionNode {
@@ -10619,6 +10575,114 @@ export const CreateTagStringFragmentDoc = gql`
     }
   }
 `;
+export const SpaceCommonFieldsFragmentDoc = gql`
+  fragment SpaceCommonFields on SpaceNode {
+    id
+    pk
+    nameFi
+    parent {
+      id
+      pk
+      nameFi
+    }
+    surfaceArea
+    maxPersons
+  }
+`;
+export const ResourceFieldsFragmentDoc = gql`
+  fragment ResourceFields on ResourceNode {
+    id
+    pk
+    nameFi
+    locationType
+    space {
+      id
+      nameFi
+      unit {
+        id
+        nameFi
+        pk
+      }
+    }
+  }
+`;
+export const SpaceFieldsFragmentDoc = gql`
+  fragment SpaceFields on SpaceNode {
+    ...SpaceCommonFields
+    code
+    resources {
+      ...ResourceFields
+    }
+    children {
+      id
+      pk
+    }
+  }
+  ${SpaceCommonFieldsFragmentDoc}
+  ${ResourceFieldsFragmentDoc}
+`;
+export const ImageFragmentDoc = gql`
+  fragment Image on ReservationUnitImageNode {
+    id
+    imageUrl
+    largeUrl
+    mediumUrl
+    smallUrl
+    imageType
+  }
+`;
+export const ReservationUnitCardFragmentDoc = gql`
+  fragment ReservationUnitCard on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    maxPersons
+    isDraft
+    reservationUnitType {
+      id
+      nameFi
+    }
+    images {
+      ...Image
+    }
+    purposes {
+      id
+    }
+    resources {
+      id
+    }
+  }
+  ${ImageFragmentDoc}
+`;
+export const ParentSpaceFieldsFragmentDoc = gql`
+  fragment ParentSpaceFields on SpaceNode {
+    id
+    pk
+    nameFi
+  }
+`;
+export const UnitResourceInfoFieldsFragmentDoc = gql`
+  fragment UnitResourceInfoFields on UnitNode {
+    id
+    pk
+    nameFi
+    location {
+      ...LocationFields
+    }
+  }
+  ${LocationFieldsFragmentDoc}
+`;
+export const NewResourceUnitFieldsFragmentDoc = gql`
+  fragment NewResourceUnitFields on UnitNode {
+    ...UnitResourceInfoFields
+    spaces {
+      id
+      pk
+      nameFi
+    }
+  }
+  ${UnitResourceInfoFieldsFragmentDoc}
+`;
 export const BannerNotificationsListAllDocument = gql`
   query BannerNotificationsListAll {
     bannerNotifications(isVisible: true, target: ALL) {
@@ -10866,294 +10930,6 @@ export type TermsOfUseSuspenseQueryHookResult = ReturnType<
 export type TermsOfUseQueryResult = Apollo.QueryResult<
   TermsOfUseQuery,
   TermsOfUseQueryVariables
->;
-export const UnitDocument = gql`
-  query Unit($id: ID!) {
-    unit(id: $id) {
-      id
-      pk
-      nameFi
-      tprekId
-      shortDescriptionFi
-      reservationUnits {
-        ...ReservationUnitCommonFields
-        resources {
-          id
-          pk
-        }
-        isDraft
-        purposes {
-          id
-          pk
-          nameFi
-        }
-        images {
-          ...Image
-        }
-      }
-      spaces {
-        ...SpaceFields
-      }
-      location {
-        ...LocationFields
-      }
-    }
-  }
-  ${ReservationUnitCommonFieldsFragmentDoc}
-  ${ImageFragmentDoc}
-  ${SpaceFieldsFragmentDoc}
-  ${LocationFieldsFragmentDoc}
-`;
-
-/**
- * __useUnitQuery__
- *
- * To run a query within a React component, call `useUnitQuery` and pass it any options that fit your needs.
- * When your component renders, `useUnitQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useUnitQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useUnitQuery(
-  baseOptions: Apollo.QueryHookOptions<UnitQuery, UnitQueryVariables> &
-    ({ variables: UnitQueryVariables; skip?: boolean } | { skip: boolean })
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<UnitQuery, UnitQueryVariables>(UnitDocument, options);
-}
-export function useUnitLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<UnitQuery, UnitQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<UnitQuery, UnitQueryVariables>(
-    UnitDocument,
-    options
-  );
-}
-export function useUnitSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<UnitQuery, UnitQueryVariables>
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<UnitQuery, UnitQueryVariables>(
-    UnitDocument,
-    options
-  );
-}
-export type UnitQueryHookResult = ReturnType<typeof useUnitQuery>;
-export type UnitLazyQueryHookResult = ReturnType<typeof useUnitLazyQuery>;
-export type UnitSuspenseQueryHookResult = ReturnType<
-  typeof useUnitSuspenseQuery
->;
-export type UnitQueryResult = Apollo.QueryResult<UnitQuery, UnitQueryVariables>;
-export const UnitWithSpacesAndResourcesDocument = gql`
-  query UnitWithSpacesAndResources($id: ID!) {
-    unit(id: $id) {
-      id
-      pk
-      nameFi
-      spaces {
-        ...SpaceCommonFields
-        resources {
-          id
-          pk
-          nameFi
-        }
-      }
-      location {
-        ...LocationFields
-      }
-    }
-  }
-  ${SpaceCommonFieldsFragmentDoc}
-  ${LocationFieldsFragmentDoc}
-`;
-
-/**
- * __useUnitWithSpacesAndResourcesQuery__
- *
- * To run a query within a React component, call `useUnitWithSpacesAndResourcesQuery` and pass it any options that fit your needs.
- * When your component renders, `useUnitWithSpacesAndResourcesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useUnitWithSpacesAndResourcesQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useUnitWithSpacesAndResourcesQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    UnitWithSpacesAndResourcesQuery,
-    UnitWithSpacesAndResourcesQueryVariables
-  > &
-    (
-      | { variables: UnitWithSpacesAndResourcesQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    UnitWithSpacesAndResourcesQuery,
-    UnitWithSpacesAndResourcesQueryVariables
-  >(UnitWithSpacesAndResourcesDocument, options);
-}
-export function useUnitWithSpacesAndResourcesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    UnitWithSpacesAndResourcesQuery,
-    UnitWithSpacesAndResourcesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    UnitWithSpacesAndResourcesQuery,
-    UnitWithSpacesAndResourcesQueryVariables
-  >(UnitWithSpacesAndResourcesDocument, options);
-}
-export function useUnitWithSpacesAndResourcesSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        UnitWithSpacesAndResourcesQuery,
-        UnitWithSpacesAndResourcesQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    UnitWithSpacesAndResourcesQuery,
-    UnitWithSpacesAndResourcesQueryVariables
-  >(UnitWithSpacesAndResourcesDocument, options);
-}
-export type UnitWithSpacesAndResourcesQueryHookResult = ReturnType<
-  typeof useUnitWithSpacesAndResourcesQuery
->;
-export type UnitWithSpacesAndResourcesLazyQueryHookResult = ReturnType<
-  typeof useUnitWithSpacesAndResourcesLazyQuery
->;
-export type UnitWithSpacesAndResourcesSuspenseQueryHookResult = ReturnType<
-  typeof useUnitWithSpacesAndResourcesSuspenseQuery
->;
-export type UnitWithSpacesAndResourcesQueryResult = Apollo.QueryResult<
-  UnitWithSpacesAndResourcesQuery,
-  UnitWithSpacesAndResourcesQueryVariables
->;
-export const HandlingDataDocument = gql`
-  query HandlingData($beginDate: Date!, $state: [ReservationStateChoice]!) {
-    reservations(
-      state: $state
-      beginDate: $beginDate
-      onlyWithHandlingPermission: true
-    ) {
-      edges {
-        node {
-          id
-          pk
-        }
-      }
-    }
-    units(onlyWithPermission: true) {
-      edges {
-        node {
-          id
-          pk
-        }
-      }
-      totalCount
-    }
-  }
-`;
-
-/**
- * __useHandlingDataQuery__
- *
- * To run a query within a React component, call `useHandlingDataQuery` and pass it any options that fit your needs.
- * When your component renders, `useHandlingDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHandlingDataQuery({
- *   variables: {
- *      beginDate: // value for 'beginDate'
- *      state: // value for 'state'
- *   },
- * });
- */
-export function useHandlingDataQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    HandlingDataQuery,
-    HandlingDataQueryVariables
-  > &
-    (
-      | { variables: HandlingDataQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<HandlingDataQuery, HandlingDataQueryVariables>(
-    HandlingDataDocument,
-    options
-  );
-}
-export function useHandlingDataLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    HandlingDataQuery,
-    HandlingDataQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<HandlingDataQuery, HandlingDataQueryVariables>(
-    HandlingDataDocument,
-    options
-  );
-}
-export function useHandlingDataSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        HandlingDataQuery,
-        HandlingDataQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<HandlingDataQuery, HandlingDataQueryVariables>(
-    HandlingDataDocument,
-    options
-  );
-}
-export type HandlingDataQueryHookResult = ReturnType<
-  typeof useHandlingDataQuery
->;
-export type HandlingDataLazyQueryHookResult = ReturnType<
-  typeof useHandlingDataLazyQuery
->;
-export type HandlingDataSuspenseQueryHookResult = ReturnType<
-  typeof useHandlingDataSuspenseQuery
->;
-export type HandlingDataQueryResult = Apollo.QueryResult<
-  HandlingDataQuery,
-  HandlingDataQueryVariables
 >;
 export const BannerNotificationsAdminDocument = gql`
   query BannerNotificationsAdmin($id: ID!) {
@@ -12051,6 +11827,107 @@ export type ReservationDenyReasonsSuspenseQueryHookResult = ReturnType<
 export type ReservationDenyReasonsQueryResult = Apollo.QueryResult<
   ReservationDenyReasonsQuery,
   ReservationDenyReasonsQueryVariables
+>;
+export const HandlingDataDocument = gql`
+  query HandlingData($beginDate: Date!, $state: [ReservationStateChoice]!) {
+    reservations(
+      state: $state
+      beginDate: $beginDate
+      onlyWithHandlingPermission: true
+    ) {
+      edges {
+        node {
+          id
+          pk
+        }
+      }
+    }
+    units(onlyWithPermission: true) {
+      edges {
+        node {
+          id
+          pk
+        }
+      }
+      totalCount
+    }
+  }
+`;
+
+/**
+ * __useHandlingDataQuery__
+ *
+ * To run a query within a React component, call `useHandlingDataQuery` and pass it any options that fit your needs.
+ * When your component renders, `useHandlingDataQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useHandlingDataQuery({
+ *   variables: {
+ *      beginDate: // value for 'beginDate'
+ *      state: // value for 'state'
+ *   },
+ * });
+ */
+export function useHandlingDataQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    HandlingDataQuery,
+    HandlingDataQueryVariables
+  > &
+    (
+      | { variables: HandlingDataQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<HandlingDataQuery, HandlingDataQueryVariables>(
+    HandlingDataDocument,
+    options
+  );
+}
+export function useHandlingDataLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    HandlingDataQuery,
+    HandlingDataQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<HandlingDataQuery, HandlingDataQueryVariables>(
+    HandlingDataDocument,
+    options
+  );
+}
+export function useHandlingDataSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        HandlingDataQuery,
+        HandlingDataQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<HandlingDataQuery, HandlingDataQueryVariables>(
+    HandlingDataDocument,
+    options
+  );
+}
+export type HandlingDataQueryHookResult = ReturnType<
+  typeof useHandlingDataQuery
+>;
+export type HandlingDataLazyQueryHookResult = ReturnType<
+  typeof useHandlingDataLazyQuery
+>;
+export type HandlingDataSuspenseQueryHookResult = ReturnType<
+  typeof useHandlingDataSuspenseQuery
+>;
+export type HandlingDataQueryResult = Apollo.QueryResult<
+  HandlingDataQuery,
+  HandlingDataQueryVariables
 >;
 export const ReservationUnitsFilterParamsDocument = gql`
   query ReservationUnitsFilterParams(
@@ -17410,6 +17287,98 @@ export type DeleteResourceMutationOptions = Apollo.BaseMutationOptions<
   DeleteResourceMutation,
   DeleteResourceMutationVariables
 >;
+export const UnitWithSpacesAndResourcesDocument = gql`
+  query UnitWithSpacesAndResources($id: ID!) {
+    unit(id: $id) {
+      id
+      pk
+      nameFi
+      spaces {
+        ...SpaceFields
+      }
+      location {
+        ...LocationFields
+      }
+    }
+  }
+  ${SpaceFieldsFragmentDoc}
+  ${LocationFieldsFragmentDoc}
+`;
+
+/**
+ * __useUnitWithSpacesAndResourcesQuery__
+ *
+ * To run a query within a React component, call `useUnitWithSpacesAndResourcesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUnitWithSpacesAndResourcesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUnitWithSpacesAndResourcesQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useUnitWithSpacesAndResourcesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    UnitWithSpacesAndResourcesQuery,
+    UnitWithSpacesAndResourcesQueryVariables
+  > &
+    (
+      | { variables: UnitWithSpacesAndResourcesQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    UnitWithSpacesAndResourcesQuery,
+    UnitWithSpacesAndResourcesQueryVariables
+  >(UnitWithSpacesAndResourcesDocument, options);
+}
+export function useUnitWithSpacesAndResourcesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UnitWithSpacesAndResourcesQuery,
+    UnitWithSpacesAndResourcesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    UnitWithSpacesAndResourcesQuery,
+    UnitWithSpacesAndResourcesQueryVariables
+  >(UnitWithSpacesAndResourcesDocument, options);
+}
+export function useUnitWithSpacesAndResourcesSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        UnitWithSpacesAndResourcesQuery,
+        UnitWithSpacesAndResourcesQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    UnitWithSpacesAndResourcesQuery,
+    UnitWithSpacesAndResourcesQueryVariables
+  >(UnitWithSpacesAndResourcesDocument, options);
+}
+export type UnitWithSpacesAndResourcesQueryHookResult = ReturnType<
+  typeof useUnitWithSpacesAndResourcesQuery
+>;
+export type UnitWithSpacesAndResourcesLazyQueryHookResult = ReturnType<
+  typeof useUnitWithSpacesAndResourcesLazyQuery
+>;
+export type UnitWithSpacesAndResourcesSuspenseQueryHookResult = ReturnType<
+  typeof useUnitWithSpacesAndResourcesSuspenseQuery
+>;
+export type UnitWithSpacesAndResourcesQueryResult = Apollo.QueryResult<
+  UnitWithSpacesAndResourcesQuery,
+  UnitWithSpacesAndResourcesQueryVariables
+>;
 export const DeleteSpaceDocument = gql`
   mutation DeleteSpace($input: SpaceDeleteMutationInput!) {
     deleteSpace(input: $input) {
@@ -17459,6 +17428,87 @@ export type DeleteSpaceMutationResult =
 export type DeleteSpaceMutationOptions = Apollo.BaseMutationOptions<
   DeleteSpaceMutation,
   DeleteSpaceMutationVariables
+>;
+export const UnitPageDocument = gql`
+  query UnitPage($id: ID!) {
+    unit(id: $id) {
+      id
+      pk
+      nameFi
+      tprekId
+      shortDescriptionFi
+      reservationUnits {
+        ...ReservationUnitCard
+      }
+      ...NewResourceUnitFields
+    }
+  }
+  ${ReservationUnitCardFragmentDoc}
+  ${NewResourceUnitFieldsFragmentDoc}
+`;
+
+/**
+ * __useUnitPageQuery__
+ *
+ * To run a query within a React component, call `useUnitPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUnitPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUnitPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useUnitPageQuery(
+  baseOptions: Apollo.QueryHookOptions<UnitPageQuery, UnitPageQueryVariables> &
+    ({ variables: UnitPageQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UnitPageQuery, UnitPageQueryVariables>(
+    UnitPageDocument,
+    options
+  );
+}
+export function useUnitPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UnitPageQuery,
+    UnitPageQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UnitPageQuery, UnitPageQueryVariables>(
+    UnitPageDocument,
+    options
+  );
+}
+export function useUnitPageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<UnitPageQuery, UnitPageQueryVariables>
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<UnitPageQuery, UnitPageQueryVariables>(
+    UnitPageDocument,
+    options
+  );
+}
+export type UnitPageQueryHookResult = ReturnType<typeof useUnitPageQuery>;
+export type UnitPageLazyQueryHookResult = ReturnType<
+  typeof useUnitPageLazyQuery
+>;
+export type UnitPageSuspenseQueryHookResult = ReturnType<
+  typeof useUnitPageSuspenseQuery
+>;
+export type UnitPageQueryResult = Apollo.QueryResult<
+  UnitPageQuery,
+  UnitPageQueryVariables
 >;
 export const UnitsDocument = gql`
   query Units(
