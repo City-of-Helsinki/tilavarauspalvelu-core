@@ -10,15 +10,15 @@ import { useTranslation } from "react-i18next";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import styled from "styled-components";
 import { fontBold, fontMedium, H1, H2, H3 } from "common/src/common/typography";
-import { useUnitQuery } from "@gql/gql-types";
+import { useUnitPageQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
-import { errorToast } from "common/src/common/toast";
 import { ExternalLink } from "@/component/ExternalLink";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";
 import { ReservationUnitList } from "./ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
 import { CenterSpinner, Flex } from "common/styles/util";
+import { gql } from "@apollo/client";
 
 interface IProps {
   [key: string]: string;
@@ -70,12 +70,9 @@ function Unit(): JSX.Element {
 
   const typename = "UnitNode";
   const id = base64encode(`${typename}:${unitPk}`);
-  const { data, loading: isLoading } = useUnitQuery({
+  const { data, loading: isLoading } = useUnitPageQuery({
     variables: { id },
     fetchPolicy: "network-only",
-    onError: () => {
-      errorToast({ text: t("errors.errorFetchingData") });
-    },
   });
 
   const { unit } = data ?? {};
@@ -138,9 +135,9 @@ function Unit(): JSX.Element {
         <StyledBoldButton
           disabled={!hasSpacesResources}
           variant={ButtonVariant.Supplementary}
-          iconStart={<IconPlusCircleFill aria-hidden="true" />}
+          iconStart={<IconPlusCircleFill />}
           onClick={() => {
-            history(getReservationUnitUrl(undefined, unitPk));
+            history(getReservationUnitUrl(null, unitPk));
           }}
         >
           {t("Unit.reservationUnitCreate")}
@@ -161,3 +158,19 @@ function Unit(): JSX.Element {
 }
 
 export default Unit;
+
+export const UNIT_PAGE_QUERY = gql`
+  query UnitPage($id: ID!) {
+    unit(id: $id) {
+      id
+      pk
+      nameFi
+      tprekId
+      shortDescriptionFi
+      reservationUnits {
+        ...ReservationUnitCard
+      }
+      ...NewResourceUnitFields
+    }
+  }
+`;

@@ -3,7 +3,7 @@ import React, { createRef } from "react";
 import { useTranslation } from "next-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { useUnitQuery } from "@gql/gql-types";
+import { useUnitWithSpacesAndResourcesQuery } from "@gql/gql-types";
 import { ResourcesTable } from "./ResourcesTable";
 import { SpacesTable } from "./SpacesTable";
 import { SubPageHead } from "./SubPageHead";
@@ -16,6 +16,7 @@ import Error404 from "@/common/Error404";
 import { fontBold, H2 } from "common";
 import { CenterSpinner, Flex } from "common/styles/util";
 import { LinkPrev } from "@/component/LinkPrev";
+import { gql } from "@apollo/client";
 
 interface IProps {
   [key: string]: string;
@@ -42,7 +43,9 @@ function SpacesResources(): JSX.Element {
     data,
     refetch,
     loading: isLoading,
-  } = useUnitQuery({
+    // TODO why is this using the unit query? and not a separate page specific query?
+    // or prop drilling if it's not a separate page
+  } = useUnitWithSpacesAndResourcesQuery({
     variables: { id },
     fetchPolicy: "network-only",
     onError: () => {
@@ -142,3 +145,51 @@ function SpacesResources(): JSX.Element {
 }
 
 export default SpacesResources;
+
+export const RESOURCE_FRAGMENT = gql`
+  fragment ResourceFields on ResourceNode {
+    id
+    pk
+    nameFi
+    locationType
+    space {
+      id
+      nameFi
+      unit {
+        id
+        nameFi
+        pk
+      }
+    }
+  }
+`;
+
+export const SPACE_FRAGMENT = gql`
+  fragment SpaceFields on SpaceNode {
+    ...SpaceCommonFields
+    code
+    resources {
+      ...ResourceFields
+    }
+    children {
+      id
+      pk
+    }
+  }
+`;
+
+export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
+  query UnitWithSpacesAndResources($id: ID!) {
+    unit(id: $id) {
+      id
+      pk
+      nameFi
+      spaces {
+        ...SpaceFields
+      }
+      location {
+        ...LocationFields
+      }
+    }
+  }
+`;
