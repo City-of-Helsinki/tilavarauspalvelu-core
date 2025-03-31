@@ -6,10 +6,10 @@ import React, {
   useState,
 } from "react";
 import {
-  BlockingReservationFieldsFragment,
+  type BlockingReservationFieldsFragment,
   ReservationNode,
+  type ReservationTimePickerFieldsFragment,
   ReservationTypeChoice,
-  ReservationUnitPageQuery,
   useListReservationsQuery,
 } from "@/gql/gql-types";
 import styled from "styled-components";
@@ -54,6 +54,7 @@ import { PendingReservationFormType } from "../reservation-unit/schema";
 import { useCurrentUser } from "@/hooks";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { CalendarEventBuffer } from "common";
+import { gql } from "@apollo/client";
 
 type WeekOptions = "day" | "week" | "month";
 
@@ -88,7 +89,7 @@ const CalendarFooter = styled.div`
 `;
 
 type Props = {
-  reservationUnit: NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
+  reservationUnit: ReservationTimePickerFieldsFragment;
   reservableTimes: ReservableMap;
   activeApplicationRounds: readonly RoundPeriod[];
   blockingReservations: readonly BlockingReservationFieldsFragment[];
@@ -459,3 +460,14 @@ export function ReservationTimePicker({
     </>
   );
 }
+
+// TODO this could be narrowed down
+// (requires rethinking the utility functions to reduce the amount of fragments)
+export const RESERVATION_TIME_PICKER_FRAGMENT = gql`
+  fragment ReservationTimePickerFields on ReservationUnitNode {
+    id
+    pk
+    ...IsReservableFields
+    ...PriceReservationUnitFields
+  }
+`;

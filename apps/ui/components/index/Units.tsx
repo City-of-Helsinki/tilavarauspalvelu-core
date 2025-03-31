@@ -5,7 +5,7 @@ import { IconArrowRight, IconSize } from "hds-react";
 import { breakpoints } from "common/src/common/style";
 import Link from "next/link";
 import { H3 } from "common/src/common/typography";
-import type { UnitNode } from "@gql/gql-types";
+import type { UnitListFieldsFragment } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { singleSearchPrefix } from "@/modules/urls";
 import { anchorStyles, focusStyles } from "common/styles/cssFragments";
@@ -14,10 +14,7 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
-
-type Props = {
-  units: Pick<UnitNode, "pk" | "nameFi" | "nameEn" | "nameSv">[];
-};
+import { gql } from "@apollo/client";
 
 const ITEM_LIMIT = 8;
 
@@ -54,6 +51,10 @@ const UnitItemLink = styled(Link)`
     min-width: 48px;
   }
 `;
+
+type Props = {
+  units: Readonly<UnitListFieldsFragment[]>;
+};
 
 export function Units({ units }: Props): JSX.Element | null {
   const { t, i18n } = useTranslation();
@@ -95,3 +96,13 @@ export function Units({ units }: Props): JSX.Element | null {
     </>
   );
 }
+
+export const UNIT_LIST_FRAGMENT = gql`
+  fragment UnitListFields on UnitNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+  }
+`;

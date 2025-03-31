@@ -32,6 +32,7 @@ import {
 import { type SlotProps } from "common/src/calendar/Calendar";
 import { type ReservationUnitNode } from "common/gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
+import { gql } from "@apollo/client";
 
 export type RoundPeriod = {
   reservationPeriodBegin: string;
@@ -164,6 +165,26 @@ type ReservationUnitReservableProps = {
   blockingReservations: readonly BlockingReservationFieldsFragment[];
   activeApplicationRounds: readonly RoundPeriod[];
 };
+
+// TODO rename to isRangeReservable
+export const IS_RESERVABLE_FRAGMENT = gql`
+  fragment IsReservableFields on ReservationUnitNode {
+    id
+    bufferTimeBefore
+    bufferTimeAfter
+    reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
+      startDatetime
+      endDatetime
+    }
+    maxReservationDuration
+    minReservationDuration
+    reservationStartInterval
+    reservationsMaxDaysBefore
+    reservationsMinDaysBefore
+    reservationBegins
+    reservationEnds
+  }
+`;
 
 /// NOTE don't return [boolean, string] causes issues in TS / JS
 /// instead break this function into cleaner separate functions

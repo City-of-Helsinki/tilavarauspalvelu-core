@@ -26,18 +26,18 @@ import {
   type ReservationUnitNode,
   PriceUnit,
   type EquipmentFieldsFragment,
-  type PriceReservationUnitFragment,
   type UnitNode,
   ReservationUnitReservationState,
-  type MetadataSetsFragment,
   ReservationKind,
   type IsReservableFieldsFragment,
   ReservationStartInterval,
-  Maybe,
-  BlockingReservationFieldsFragment,
-  type ReservationPriceFragment,
-  ReservationStateChoice,
   ReservationUnitAccessTypeNode,
+  type BlockingReservationFieldsFragment,
+  ReservationStateChoice,
+  type NotReservableFieldsFragment,
+  type PricingFieldsFragment,
+  type ReservationPriceFieldsFragment,
+  type PriceReservationUnitFieldsFragment,
 } from "@gql/gql-types";
 import {
   type ReservableMap,
@@ -46,7 +46,6 @@ import {
   dateToKey,
   isRangeReservable,
 } from "@/modules/reservable";
-import { type PricingFieldsFragment } from "common/gql/gql-types";
 import { gql } from "@apollo/client";
 import { getIntervalMinutes } from "common/src/conversion";
 import {
@@ -71,7 +70,7 @@ function formatTime(date: Date): string {
 export { formatTime as getTimeString };
 
 export function isReservationUnitPublished(
-  reservationUnit: Readonly<Pick<ReservationUnitNode, "publishingState">>
+  reservationUnit: Pick<ReservationUnitNode, "publishingState">
 ): boolean {
   const { publishingState } = reservationUnit;
 
@@ -95,7 +94,7 @@ const equipmentCategoryOrder = [
 ] as const;
 
 export function getEquipmentCategories(
-  equipment: ReadonlyDeep<Pick<EquipmentFieldsFragment, "category">[]>
+  equipment: Readonly<Pick<EquipmentFieldsFragment, "category">[]>
 ): string[] {
   if (!equipment || equipment.length === 0) {
     return [];
@@ -124,7 +123,7 @@ export function getEquipmentCategories(
 
 // Why are we doing complex frontend sorting? and always in finnish?
 export function getEquipmentList(
-  equipments: ReadonlyDeep<EquipmentFieldsFragment[]>,
+  equipments: Readonly<EquipmentFieldsFragment[]>,
   lang: LocalizationLanguages
 ): string[] {
   if (equipments.length === 0) {
@@ -153,11 +152,9 @@ export function getEquipmentList(
 }
 
 export function getReservationUnitName(
-  // TODO use a fragment for ReservationUnitName
-  reservationUnit?: Pick<
-    ReadonlyDeep<ReservationUnitNode>,
-    "nameFi" | "nameSv" | "nameEn"
-  > | null,
+  reservationUnit:
+    | Pick<ReservationUnitNode, "nameFi" | "nameSv" | "nameEn">
+    | undefined,
   language: string = i18n?.language ?? "fi"
 ): string | undefined {
   if (!reservationUnit) {
@@ -175,10 +172,7 @@ export function getReservationUnitName(
 }
 
 export function getUnitName(
-  unit:
-    | Pick<ReadonlyDeep<UnitNode>, "nameFi" | "nameSv" | "nameEn">
-    | null
-    | undefined,
+  unit: Pick<UnitNode, "nameFi" | "nameSv" | "nameEn">,
   locale: LocalizationLanguages
 ): string | undefined {
   if (unit == null) {
@@ -196,7 +190,7 @@ function isFuturePricing(pricing: PricingFieldsFragment): boolean {
 
 export function getActivePricing(
   reservationUnit: Readonly<{
-    pricings: Readonly<ReadonlyDeep<PricingFieldsFragment>[]>;
+    pricings: Readonly<PricingFieldsFragment[]>;
   }>
 ): PricingFieldsFragment | undefined {
   const { pricings } = reservationUnit;
@@ -204,7 +198,7 @@ export function getActivePricing(
 }
 
 export const RESERVATION_UNIT_PRICE_FRAGMENT = gql`
-  fragment PriceReservationUnit on ReservationUnitNode {
+  fragment PriceReservationUnitFields on ReservationUnitNode {
     id
     pricings {
       ...PricingFields
@@ -215,9 +209,7 @@ export const RESERVATION_UNIT_PRICE_FRAGMENT = gql`
 `;
 
 export function getFuturePricing(
-  reservationUnit:
-    | Maybe<ReadonlyDeep<PriceReservationUnitFragment>>
-    | undefined,
+  reservationUnit: PriceReservationUnitFieldsFragment,
   applicationRounds: ReadonlyDeep<RoundPeriod[]> = [],
   reservationDate?: Readonly<Date>
 ): PricingFieldsFragment | null {
@@ -318,7 +310,7 @@ export function getPriceString(props: GetPriceType): string {
 
 export type GetReservationUnitPriceProps = {
   t: TFunction;
-  reservationUnit: ReadonlyDeep<PriceReservationUnitFragment>;
+  reservationUnit: ReadonlyDeep<PriceReservationUnitFieldsFragment>;
   pricingDate: Date;
   minutes?: number;
 };
@@ -357,10 +349,10 @@ export function getReservationUnitPrice(
 }
 
 export const RESERVATION_PRICE_FRAGMENT = gql`
-  fragment ReservationPrice on ReservationNode {
+  fragment ReservationPriceFields on ReservationNode {
     id
     reservationUnits {
-      ...PriceReservationUnit
+      ...PriceReservationUnitFields
     }
     price
     begin
@@ -373,7 +365,7 @@ export const RESERVATION_PRICE_FRAGMENT = gql`
 // TODO why do we need both this and getPriceString?
 export function getPrice(
   t: TFunction,
-  reservation: ReservationPriceFragment,
+  reservation: ReservationPriceFieldsFragment,
   lang: LocalizationLanguages,
   reservationUnitPriceOnly = false
 ): string | null {
@@ -404,7 +396,7 @@ export function getPrice(
 
 function getSubventionState(
   reservation: Pick<
-    ReservationPriceFragment,
+    ReservationPriceFieldsFragment,
     "applyingForFreeOfCharge" | "state"
   >
 ): "pending" | "none" | "done" {
@@ -421,14 +413,14 @@ function getSubventionState(
 }
 
 export function isReservationUnitFreeOfCharge(
-  pricings: Readonly<ReadonlyDeep<PricingFieldsFragment>[]>,
+  pricings: Readonly<PricingFieldsFragment[]>,
   date?: Date
 ): boolean {
   return !isReservationUnitPaid(pricings, date);
 }
 
 export function isReservationUnitPaid(
-  pricings: Readonly<ReadonlyDeep<PricingFieldsFragment>[]>,
+  pricings: Readonly<PricingFieldsFragment[]>,
   date?: Date
 ): boolean {
   const active = pricings.filter((p) => isActivePricing(p));
@@ -563,25 +555,8 @@ export function getPossibleTimesForDay({
   return times;
 }
 
-// TODO use a fragment
-export type IsReservableReservationUnitType = Pick<
-  ReservationUnitNode,
-  | "reservationState"
-  | "reservableTimeSpans"
-  | "reservationBegins"
-  | "minReservationDuration"
-  | "maxReservationDuration"
-  | "reservationKind"
-  | "reservationsMaxDaysBefore"
-  | "reservationsMinDaysBefore"
-> &
-  MetadataSetsFragment;
-
 export function isReservationUnitReservable(
-  reservationUnit:
-    | ReadonlyDeep<IsReservableReservationUnitType>
-    | null
-    | undefined
+  reservationUnit: NotReservableFieldsFragmentNarrow
 ):
   | {
       isReservable: false;
@@ -610,14 +585,39 @@ export function isReservationUnitReservable(
   };
 }
 
+export const NOT_RESERVABLE_FIELDS_FRAGMENT = gql`
+  fragment NotReservableFields on ReservationUnitNode {
+    ...IsReservableFields
+    reservationState
+    reservationKind
+    ...MetadataSets
+  }
+`;
+
+export type NotReservableFieldsFragmentNarrow = Omit<
+  NotReservableFieldsFragment,
+  | "bufferTimeBefore"
+  | "bufferTimeAfter"
+  | "reservationStartInterval"
+  | "reservationEnds"
+  | "reservationsMaxDaysBefore"
+  | "reservationsMinDaysBefore"
+  | "maxPersons"
+  | "minPersons"
+>;
+
+// Why doesn't this check reservationEnds?
 function getNotReservableReason(
-  reservationUnit: ReadonlyDeep<IsReservableReservationUnitType>
+  reservationUnit: NotReservableFieldsFragmentNarrow
 ): string | null {
   const {
     minReservationDuration,
     maxReservationDuration,
     reservationKind,
     reservationState,
+    metadataSet,
+    reservableTimeSpans,
+    reservationBegins,
   } = reservationUnit;
 
   if (
@@ -626,13 +626,9 @@ function getNotReservableReason(
   ) {
     return "reservationUnit is not reservable";
   }
-  const resBegins = reservationUnit.reservationBegins
-    ? new Date(reservationUnit.reservationBegins)
-    : null;
-  const hasSupportedFields =
-    (reservationUnit.metadataSet?.supportedFields?.length ?? 0) > 0;
-  const hasReservableTimes =
-    (reservationUnit.reservableTimeSpans?.length ?? 0) > 0;
+  const resBegins = reservationBegins ? new Date(reservationBegins) : null;
+  const hasSupportedFields = (metadataSet?.supportedFields?.length ?? 0) > 0;
+  const hasReservableTimes = (reservableTimeSpans?.length ?? 0) > 0;
   if (!hasSupportedFields) {
     return "reservationUnit has no supported fields";
   }

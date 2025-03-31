@@ -16,9 +16,8 @@ import {
   ReservationKind,
   ReservationStartInterval,
   ReservationUnitReservationState,
-  type PriceReservationUnitFragment,
+  type PriceReservationUnitFieldsFragment,
   type EquipmentFieldsFragment,
-  Maybe,
 } from "@gql/gql-types";
 import {
   type GetReservationUnitPriceProps,
@@ -33,7 +32,7 @@ import {
   isReservationUnitPublished,
   isReservationUnitReservable,
   type GetPriceType,
-  type IsReservableReservationUnitType,
+  type NotReservableFieldsFragmentNarrow,
 } from "./reservationUnit";
 import mockTranslations from "./../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
@@ -654,7 +653,7 @@ function constructPricing({
   highestPrice?: number;
   taxPercentage?: number;
   priceUnit?: PriceUnit;
-}): NonNullable<PriceReservationUnitFragment>["pricings"][0] {
+}): NonNullable<PriceReservationUnitFieldsFragment>["pricings"][0] {
   const p = highestPrice ?? lowestPrice ?? 0;
   return {
     id: "1",
@@ -686,7 +685,9 @@ describe("getReservationUnitPrice", () => {
     pricings,
   }: {
     date: Date;
-    pricings: Readonly<NonNullable<PriceReservationUnitFragment>["pricings"]>;
+    pricings: Readonly<
+      NonNullable<PriceReservationUnitFieldsFragment>["pricings"]
+    >;
   }): GetReservationUnitPriceProps {
     return {
       t: mockT as TFunction,
@@ -771,25 +772,19 @@ describe("isReservationUnitReservable", () => {
     reservationState = ReservationUnitReservationState.Reservable,
     reservationBegins,
     reservableTimeSpans = [],
-    reservationsMaxDaysBefore = null,
   }: {
     minReservationDuration?: number;
     maxReservationDuration?: number;
     reservationState?: ReservationUnitReservationState;
     reservationBegins?: Date;
     reservableTimeSpans?: ReservationUnitNode["reservableTimeSpans"];
-    reservationsMaxDaysBefore?: Maybe<number>;
-  }): ReadonlyDeep<IsReservableReservationUnitType> {
+  }): NotReservableFieldsFragmentNarrow {
     return {
       id: base64encode("ReservationUnitNode:1"),
       reservationKind: ReservationKind.Direct,
-      maxPersons: 10,
       minReservationDuration,
       maxReservationDuration,
       reservationBegins: reservationBegins?.toISOString() ?? null,
-      reservationsMaxDaysBefore,
-      reservationsMinDaysBefore: null,
-      minPersons: null,
       metadataSet: {
         id: "1234",
         supportedFields: [

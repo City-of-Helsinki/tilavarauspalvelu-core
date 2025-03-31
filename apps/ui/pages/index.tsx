@@ -5,12 +5,9 @@ import { useTranslation } from "next-i18next";
 import {
   PurposeOrderingChoices,
   UnitOrderingChoices,
-  SearchFormParamsUnitDocument,
-  type SearchFormParamsUnitQuery,
-  type SearchFormParamsUnitQueryVariables,
-  ReservationUnitPurposesDocument,
-  type ReservationUnitPurposesQuery,
-  type ReservationUnitPurposesQueryVariables,
+  type FrontPageQuery,
+  type FrontPageQueryVariables,
+  FrontPageDocument,
 } from "@gql/gql-types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { Head } from "@/components/index/Header";
@@ -41,54 +38,40 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const commonProps = getCommonServerSideProps();
   const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
 
-  // TODO change these to use the new Documents
-  // TODO combine the queries
-  const { data: purposeData } = await apolloClient.query<
-    ReservationUnitPurposesQuery,
-    ReservationUnitPurposesQueryVariables
+  const { data } = await apolloClient.query<
+    FrontPageQuery,
+    FrontPageQueryVariables
   >({
-    query: ReservationUnitPurposesDocument,
+    query: FrontPageDocument,
     fetchPolicy: "no-cache",
     variables: {
       orderBy: [PurposeOrderingChoices.RankAsc],
+      orderUnitsBy: [UnitOrderingChoices.RankAsc],
     },
   });
   const purposes = filterNonNullable(
-    purposeData?.purposes?.edges.map((edge) => edge?.node)
+    data?.purposes?.edges.map((edge) => edge?.node)
   );
-
-  const { data: unitData } = await apolloClient.query<
-    SearchFormParamsUnitQuery,
-    SearchFormParamsUnitQueryVariables
-  >({
-    query: SearchFormParamsUnitDocument,
-    fetchPolicy: "no-cache",
-    variables: {
-      publishedReservationUnits: true,
-      orderBy: [UnitOrderingChoices.RankAsc],
-    },
-  });
-  const units = filterNonNullable(unitData?.unitsAll);
+  const units = filterNonNullable(data?.units?.edges.map((edge) => edge?.node));
 
   return {
     props: {
       ...commonProps,
       purposes,
       units,
-      ...(await serverSideTranslations(locale ?? "fi", [
-        "common",
-        "home",
-        "navigation",
-        "footer",
-        "notification",
-        "errors",
-      ])),
+      ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
 }
 
-export const RESERVATION_UNIT_PURPOSES = gql`
-  query ReservationUnitPurposes($orderBy: [PurposeOrderingChoices]) {
+export default Home;
+
+// TODO we can limit the number of purposes and units fetched
+export const FRONT_PAGE_QUERY = gql`
+  query FrontPage(
+    $orderBy: [PurposeOrderingChoices]
+    $orderUnitsBy: [UnitOrderingChoices]
+  ) {
     purposes(orderBy: $orderBy) {
       edges {
         node {
@@ -96,7 +79,12 @@ export const RESERVATION_UNIT_PURPOSES = gql`
         }
       }
     }
+    units(publishedReservationUnits: true, orderBy: $orderUnitsBy) {
+      edges {
+        node {
+          ...UnitListFields
+        }
+      }
+    }
   }
 `;
-
-export default Home;

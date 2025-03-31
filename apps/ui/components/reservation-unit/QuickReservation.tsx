@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { chunkArray, fromUIDate, toUIDate } from "common/src/common/util";
 import { fontMedium, H4 } from "common/src/common/typography";
-import type { ReservationUnitPageQuery } from "@gql/gql-types";
+import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { breakpoints } from "common";
 import {
   getReservationUnitPrice,
@@ -24,9 +24,8 @@ import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { type FocusTimeSlot } from "@/modules/reservation";
 import { Flex, NoWrap } from "common/styles/util";
 
-type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type Props = {
-  reservationUnit: QueryT;
+  reservationUnit: ReservationTimePickerFieldsFragment;
   subventionSuffix: JSX.Element | undefined;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   durationOptions: { label: string; value: number }[];
@@ -156,9 +155,7 @@ export function QuickReservation({
     minutes: duration,
   });
 
-  const lastPossibleDate = getLastPossibleReservationDate(
-    reservationUnit ?? undefined
-  );
+  const lastPossibleDate = getLastPossibleReservationDate(reservationUnit);
 
   return (
     <Form
