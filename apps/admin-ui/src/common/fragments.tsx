@@ -1,8 +1,4 @@
 import { gql } from "@apollo/client";
-import {
-  APPLICANT_NAME_FRAGMENT,
-  APPLICATION_SECTION_COMMON_FRAGMENT,
-} from "common/src/queries/application";
 
 export const SPACE_COMMON_FRAGMENT = gql`
   fragment SpaceCommonFields on SpaceNode {
@@ -19,54 +15,6 @@ export const SPACE_COMMON_FRAGMENT = gql`
   }
 `;
 
-export const RESOURCE_FRAGMENT = gql`
-  fragment ResourceFields on ResourceNode {
-    id
-    pk
-    nameFi
-    locationType
-    space {
-      id
-      nameFi
-      unit {
-        id
-        nameFi
-        pk
-      }
-    }
-  }
-`;
-
-export const SPACE_FRAGMENT = gql`
-  ${SPACE_COMMON_FRAGMENT}
-  ${RESOURCE_FRAGMENT}
-  fragment SpaceFields on SpaceNode {
-    ...SpaceCommonFields
-    code
-    resources {
-      ...ResourceFields
-    }
-    children {
-      id
-      pk
-    }
-  }
-`;
-
-export const RESERVATION_UNIT_COMMON_FRAGMENT = gql`
-  fragment ReservationUnitCommonFields on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    maxPersons
-    surfaceArea
-    reservationUnitType {
-      id
-      nameFi
-    }
-  }
-`;
-
 export const UNIT_NAME_FRAGMENT = gql`
   fragment UnitNameFields on UnitNode {
     id
@@ -78,8 +26,6 @@ export const UNIT_NAME_FRAGMENT = gql`
 // NOTE this is for allocation only (it includes the application name)
 // for regular application queries we don't need to query the name through the application relation
 export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
-  ${APPLICANT_NAME_FRAGMENT}
-  ${APPLICATION_SECTION_COMMON_FRAGMENT}
   fragment ApplicationSection on ApplicationSectionNode {
     ...ApplicationSectionCommon
     purpose {

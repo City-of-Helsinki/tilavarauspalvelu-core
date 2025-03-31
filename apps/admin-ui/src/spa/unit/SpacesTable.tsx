@@ -2,13 +2,13 @@ import React, { useRef, useState } from "react";
 import { IconGroup } from "hds-react";
 import { trim } from "lodash-es";
 import { useTranslation } from "react-i18next";
-import { gql, type ApolloQueryResult } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   type Maybe,
+  type UnitWithSpacesAndResourcesQuery,
   useDeleteSpaceMutation,
-  type UnitQuery,
 } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import Modal, { useModal as useHDSModal } from "@/component/HDSModal";
@@ -21,12 +21,8 @@ import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styles/util";
 import { Flex } from "common/styles/util";
 
-interface IProps {
-  unit: UnitQuery["unit"];
-  refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
-}
-
-type SpaceT = NonNullable<UnitQuery["unit"]>["spaces"][0];
+type QueryT = NonNullable<UnitWithSpacesAndResourcesQuery["unit"]>;
+type SpaceT = QueryT["spaces"][0];
 
 function countSubSpaces(space: Pick<SpaceT, "pk" | "children">): number {
   return (space.children || []).reduce(
@@ -42,6 +38,11 @@ type SpacesTableColumn = {
   isSortable: boolean;
   transform?: (space: SpaceT) => JSX.Element | string;
 };
+
+interface IProps {
+  unit: QueryT;
+  refetch: () => Promise<unknown>;
+}
 
 export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
   const { t } = useTranslation();
@@ -101,9 +102,12 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
   }
 
   function handeAddSubSpace(space: SpaceT) {
+    if (unit == null) {
+      return;
+    }
     openWithContent(
       <NewSpaceModal
-        parentSpace={space}
+        parentSpacePk={space.pk}
         unit={unit}
         closeModal={closeModal}
         refetch={refetch}
