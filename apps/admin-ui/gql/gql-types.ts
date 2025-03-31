@@ -6398,80 +6398,6 @@ export type ReservationUnitFragment = {
   } | null;
 };
 
-export type BannerNotificationsAdminFragment = {
-  readonly pk: number | null;
-  readonly name: string;
-  readonly target: BannerNotificationTarget;
-  readonly activeUntil: string | null;
-  readonly draft: boolean;
-  readonly state: BannerNotificationState | null;
-  readonly id: string;
-  readonly level: BannerNotificationLevel;
-  readonly activeFrom: string | null;
-  readonly message: string;
-  readonly messageEn: string | null;
-  readonly messageFi: string | null;
-  readonly messageSv: string | null;
-};
-
-export type BannerNotificationsAdminQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type BannerNotificationsAdminQuery = {
-  readonly bannerNotification: {
-    readonly pk: number | null;
-    readonly name: string;
-    readonly target: BannerNotificationTarget;
-    readonly activeUntil: string | null;
-    readonly draft: boolean;
-    readonly state: BannerNotificationState | null;
-    readonly id: string;
-    readonly level: BannerNotificationLevel;
-    readonly activeFrom: string | null;
-    readonly message: string;
-    readonly messageEn: string | null;
-    readonly messageFi: string | null;
-    readonly messageSv: string | null;
-  } | null;
-};
-
-export type BannerNotificationsAdminListQueryVariables = Exact<{
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<
-    | ReadonlyArray<InputMaybe<BannerNotificationOrderingChoices>>
-    | InputMaybe<BannerNotificationOrderingChoices>
-  >;
-}>;
-
-export type BannerNotificationsAdminListQuery = {
-  readonly bannerNotifications: {
-    readonly totalCount: number | null;
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly pk: number | null;
-        readonly name: string;
-        readonly target: BannerNotificationTarget;
-        readonly activeUntil: string | null;
-        readonly draft: boolean;
-        readonly state: BannerNotificationState | null;
-        readonly id: string;
-        readonly level: BannerNotificationLevel;
-        readonly activeFrom: string | null;
-        readonly message: string;
-        readonly messageEn: string | null;
-        readonly messageFi: string | null;
-        readonly messageSv: string | null;
-      } | null;
-    } | null>;
-    readonly pageInfo: {
-      readonly endCursor: string | null;
-      readonly hasNextPage: boolean;
-    };
-  } | null;
-};
-
 export type ReservationDateOfBirthQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8368,6 +8294,46 @@ export type ReservationTimesInReservationUnitQuery = {
   }> | null;
 };
 
+export type BannerNotificationListFragment = {
+  readonly pk: number | null;
+  readonly name: string;
+  readonly activeFrom: string | null;
+  readonly activeUntil: string | null;
+  readonly state: BannerNotificationState | null;
+  readonly target: BannerNotificationTarget;
+  readonly level: BannerNotificationLevel;
+};
+
+export type BannerNotificationListQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  orderBy?: InputMaybe<
+    | ReadonlyArray<InputMaybe<BannerNotificationOrderingChoices>>
+    | InputMaybe<BannerNotificationOrderingChoices>
+  >;
+}>;
+
+export type BannerNotificationListQuery = {
+  readonly bannerNotifications: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly pk: number | null;
+        readonly name: string;
+        readonly activeFrom: string | null;
+        readonly activeUntil: string | null;
+        readonly state: BannerNotificationState | null;
+        readonly target: BannerNotificationTarget;
+        readonly level: BannerNotificationLevel;
+      } | null;
+    } | null>;
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
+  } | null;
+};
+
 export type BannerNotificationCreateMutationVariables = Exact<{
   input: BannerNotificationCreateMutationInput;
 }>;
@@ -8391,6 +8357,28 @@ export type BannerNotificationDeleteMutationVariables = Exact<{
 export type BannerNotificationDeleteMutation = {
   readonly deleteBannerNotification: {
     readonly deleted: boolean | null;
+  } | null;
+};
+
+export type BannerNotificationPageQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type BannerNotificationPageQuery = {
+  readonly bannerNotification: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly level: BannerNotificationLevel;
+    readonly activeFrom: string | null;
+    readonly message: string;
+    readonly messageEn: string | null;
+    readonly messageFi: string | null;
+    readonly messageSv: string | null;
+    readonly name: string;
+    readonly target: BannerNotificationTarget;
+    readonly activeUntil: string | null;
+    readonly draft: boolean;
+    readonly state: BannerNotificationState | null;
   } | null;
 };
 
@@ -9687,12 +9675,6 @@ export type UnitResourceInfoFieldsFragment = {
   } | null;
 };
 
-export type ParentSpaceFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-};
-
 export type NewResourceUnitFieldsFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -9896,6 +9878,17 @@ export const LocationFieldsI18nFragmentDoc = gql`
     addressCitySv
   }
   ${LocationFieldsFragmentDoc}
+`;
+export const BannerNotificationCommonFragmentDoc = gql`
+  fragment BannerNotificationCommon on BannerNotificationNode {
+    id
+    level
+    activeFrom
+    message
+    messageEn
+    messageFi
+    messageSv
+  }
 `;
 export const ApplicationSectionDurationFragmentDoc = gql`
   fragment ApplicationSectionDuration on ApplicationSectionNode {
@@ -10258,29 +10251,6 @@ export const ReservationUnitFragmentDoc = gql`
   ${UnitNameFieldsFragmentDoc}
   ${ReservationTypeFormFieldsFragmentDoc}
 `;
-export const BannerNotificationCommonFragmentDoc = gql`
-  fragment BannerNotificationCommon on BannerNotificationNode {
-    id
-    level
-    activeFrom
-    message
-    messageEn
-    messageFi
-    messageSv
-  }
-`;
-export const BannerNotificationsAdminFragmentDoc = gql`
-  fragment BannerNotificationsAdmin on BannerNotificationNode {
-    pk
-    ...BannerNotificationCommon
-    name
-    target
-    activeUntil
-    draft
-    state
-  }
-  ${BannerNotificationCommonFragmentDoc}
-`;
 export const DenyDialogFieldsFragmentDoc = gql`
   fragment DenyDialogFields on ReservationNode {
     id
@@ -10345,6 +10315,17 @@ export const ReservationsInIntervalFragmentDoc = gql`
       id
       pk
     }
+  }
+`;
+export const BannerNotificationListFragmentDoc = gql`
+  fragment BannerNotificationList on BannerNotificationNode {
+    pk
+    name
+    activeFrom
+    activeUntil
+    state
+    target
+    level
   }
 `;
 export const PricingFieldsFragmentDoc = gql`
@@ -10654,13 +10635,6 @@ export const ReservationUnitCardFragmentDoc = gql`
   }
   ${ImageFragmentDoc}
 `;
-export const ParentSpaceFieldsFragmentDoc = gql`
-  fragment ParentSpaceFields on SpaceNode {
-    id
-    pk
-    nameFi
-  }
-`;
 export const UnitResourceInfoFieldsFragmentDoc = gql`
   fragment UnitResourceInfoFields on UnitNode {
     id
@@ -10930,183 +10904,6 @@ export type TermsOfUseSuspenseQueryHookResult = ReturnType<
 export type TermsOfUseQueryResult = Apollo.QueryResult<
   TermsOfUseQuery,
   TermsOfUseQueryVariables
->;
-export const BannerNotificationsAdminDocument = gql`
-  query BannerNotificationsAdmin($id: ID!) {
-    bannerNotification(id: $id) {
-      ...BannerNotificationsAdmin
-    }
-  }
-  ${BannerNotificationsAdminFragmentDoc}
-`;
-
-/**
- * __useBannerNotificationsAdminQuery__
- *
- * To run a query within a React component, call `useBannerNotificationsAdminQuery` and pass it any options that fit your needs.
- * When your component renders, `useBannerNotificationsAdminQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useBannerNotificationsAdminQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useBannerNotificationsAdminQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  > &
-    (
-      | { variables: BannerNotificationsAdminQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >(BannerNotificationsAdminDocument, options);
-}
-export function useBannerNotificationsAdminLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >(BannerNotificationsAdminDocument, options);
-}
-export function useBannerNotificationsAdminSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        BannerNotificationsAdminQuery,
-        BannerNotificationsAdminQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    BannerNotificationsAdminQuery,
-    BannerNotificationsAdminQueryVariables
-  >(BannerNotificationsAdminDocument, options);
-}
-export type BannerNotificationsAdminQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminQuery
->;
-export type BannerNotificationsAdminLazyQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminLazyQuery
->;
-export type BannerNotificationsAdminSuspenseQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminSuspenseQuery
->;
-export type BannerNotificationsAdminQueryResult = Apollo.QueryResult<
-  BannerNotificationsAdminQuery,
-  BannerNotificationsAdminQueryVariables
->;
-export const BannerNotificationsAdminListDocument = gql`
-  query BannerNotificationsAdminList(
-    $first: Int
-    $after: String
-    $orderBy: [BannerNotificationOrderingChoices]
-  ) {
-    bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
-      edges {
-        node {
-          ...BannerNotificationsAdmin
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
-    }
-  }
-  ${BannerNotificationsAdminFragmentDoc}
-`;
-
-/**
- * __useBannerNotificationsAdminListQuery__
- *
- * To run a query within a React component, call `useBannerNotificationsAdminListQuery` and pass it any options that fit your needs.
- * When your component renders, `useBannerNotificationsAdminListQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useBannerNotificationsAdminListQuery({
- *   variables: {
- *      first: // value for 'first'
- *      after: // value for 'after'
- *      orderBy: // value for 'orderBy'
- *   },
- * });
- */
-export function useBannerNotificationsAdminListQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >(BannerNotificationsAdminListDocument, options);
-}
-export function useBannerNotificationsAdminListLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >(BannerNotificationsAdminListDocument, options);
-}
-export function useBannerNotificationsAdminListSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        BannerNotificationsAdminListQuery,
-        BannerNotificationsAdminListQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    BannerNotificationsAdminListQuery,
-    BannerNotificationsAdminListQueryVariables
-  >(BannerNotificationsAdminListDocument, options);
-}
-export type BannerNotificationsAdminListQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminListQuery
->;
-export type BannerNotificationsAdminListLazyQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminListLazyQuery
->;
-export type BannerNotificationsAdminListSuspenseQueryHookResult = ReturnType<
-  typeof useBannerNotificationsAdminListSuspenseQuery
->;
-export type BannerNotificationsAdminListQueryResult = Apollo.QueryResult<
-  BannerNotificationsAdminListQuery,
-  BannerNotificationsAdminListQueryVariables
 >;
 export const ReservationDateOfBirthDocument = gql`
   query ReservationDateOfBirth($id: ID!) {
@@ -15521,6 +15318,100 @@ export type ReservationTimesInReservationUnitQueryResult = Apollo.QueryResult<
   ReservationTimesInReservationUnitQuery,
   ReservationTimesInReservationUnitQueryVariables
 >;
+export const BannerNotificationListDocument = gql`
+  query BannerNotificationList(
+    $first: Int
+    $after: String
+    $orderBy: [BannerNotificationOrderingChoices]
+  ) {
+    bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
+      edges {
+        node {
+          ...BannerNotificationList
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+  ${BannerNotificationListFragmentDoc}
+`;
+
+/**
+ * __useBannerNotificationListQuery__
+ *
+ * To run a query within a React component, call `useBannerNotificationListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBannerNotificationListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBannerNotificationListQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      orderBy: // value for 'orderBy'
+ *   },
+ * });
+ */
+export function useBannerNotificationListQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    BannerNotificationListQuery,
+    BannerNotificationListQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    BannerNotificationListQuery,
+    BannerNotificationListQueryVariables
+  >(BannerNotificationListDocument, options);
+}
+export function useBannerNotificationListLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    BannerNotificationListQuery,
+    BannerNotificationListQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    BannerNotificationListQuery,
+    BannerNotificationListQueryVariables
+  >(BannerNotificationListDocument, options);
+}
+export function useBannerNotificationListSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        BannerNotificationListQuery,
+        BannerNotificationListQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    BannerNotificationListQuery,
+    BannerNotificationListQueryVariables
+  >(BannerNotificationListDocument, options);
+}
+export type BannerNotificationListQueryHookResult = ReturnType<
+  typeof useBannerNotificationListQuery
+>;
+export type BannerNotificationListLazyQueryHookResult = ReturnType<
+  typeof useBannerNotificationListLazyQuery
+>;
+export type BannerNotificationListSuspenseQueryHookResult = ReturnType<
+  typeof useBannerNotificationListSuspenseQuery
+>;
+export type BannerNotificationListQueryResult = Apollo.QueryResult<
+  BannerNotificationListQuery,
+  BannerNotificationListQueryVariables
+>;
 export const BannerNotificationCreateDocument = gql`
   mutation BannerNotificationCreate(
     $input: BannerNotificationCreateMutationInput!
@@ -15680,6 +15571,100 @@ export type BannerNotificationDeleteMutationOptions =
     BannerNotificationDeleteMutation,
     BannerNotificationDeleteMutationVariables
   >;
+export const BannerNotificationPageDocument = gql`
+  query BannerNotificationPage($id: ID!) {
+    bannerNotification(id: $id) {
+      id
+      pk
+      level
+      activeFrom
+      message
+      messageEn
+      messageFi
+      messageSv
+      name
+      target
+      activeUntil
+      draft
+      state
+    }
+  }
+`;
+
+/**
+ * __useBannerNotificationPageQuery__
+ *
+ * To run a query within a React component, call `useBannerNotificationPageQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBannerNotificationPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBannerNotificationPageQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useBannerNotificationPageQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    BannerNotificationPageQuery,
+    BannerNotificationPageQueryVariables
+  > &
+    (
+      | { variables: BannerNotificationPageQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    BannerNotificationPageQuery,
+    BannerNotificationPageQueryVariables
+  >(BannerNotificationPageDocument, options);
+}
+export function useBannerNotificationPageLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    BannerNotificationPageQuery,
+    BannerNotificationPageQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    BannerNotificationPageQuery,
+    BannerNotificationPageQueryVariables
+  >(BannerNotificationPageDocument, options);
+}
+export function useBannerNotificationPageSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        BannerNotificationPageQuery,
+        BannerNotificationPageQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    BannerNotificationPageQuery,
+    BannerNotificationPageQueryVariables
+  >(BannerNotificationPageDocument, options);
+}
+export type BannerNotificationPageQueryHookResult = ReturnType<
+  typeof useBannerNotificationPageQuery
+>;
+export type BannerNotificationPageLazyQueryHookResult = ReturnType<
+  typeof useBannerNotificationPageLazyQuery
+>;
+export type BannerNotificationPageSuspenseQueryHookResult = ReturnType<
+  typeof useBannerNotificationPageSuspenseQuery
+>;
+export type BannerNotificationPageQueryResult = Apollo.QueryResult<
+  BannerNotificationPageQuery,
+  BannerNotificationPageQueryVariables
+>;
 export const SearchReservationUnitsDocument = gql`
   query SearchReservationUnits(
     $after: String
