@@ -1,15 +1,12 @@
 import React from "react";
-import { Button, ButtonVariant, Dialog, IconCheck } from "hds-react";
-import styled from "styled-components";
-import { type ApolloQueryResult } from "@apollo/client";
+import { Button, ButtonVariant, Dialog } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
   LocationType,
   type ResourceCreateMutationInput,
+  type NewResourceUnitFieldsFragment,
   useCreateResourceMutation,
-  type UnitQuery,
 } from "@gql/gql-types";
-import { parseAddress } from "@/common/util";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { errorToast } from "common/src/common/toast";
 import {
@@ -22,25 +19,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResourceEditorFields } from "./EditForm";
 import { DialogActionsButtons } from "@/styles/util";
-import { fontMedium } from "common";
-import { Flex } from "common/styles/util";
+import { UnitInfo } from "../space/UnitInfo";
 
 interface IProps {
-  unit: UnitQuery["unit"];
+  unit: NewResourceUnitFieldsFragment;
   spacePk: number;
   closeModal: () => void;
-  refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
+  refetch: () => Promise<unknown>;
 }
-
-const UnitInfo = styled(Flex).attrs({
-  $direction: "row",
-})`
-  margin: var(--spacing-m) 0;
-`;
-
-const Address = styled.span`
-  ${fontMedium}
-`;
 
 export function NewResourceModal({
   unit,
@@ -84,6 +70,9 @@ export function NewResourceModal({
     }
   };
 
+  const parentName =
+    unit?.spaces.find((space) => space.pk === spacePk)?.nameFi ?? null;
+
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
       <CustomDialogHeader
@@ -94,15 +83,7 @@ export function NewResourceModal({
         <p className="text-body" id="custom-dialog-content">
           {t("ResourceModal.info")}
         </p>
-        <UnitInfo>
-          <IconCheck />
-          <div>
-            <span>{unit?.nameFi}</span>
-          </div>
-          {unit?.location ? (
-            <Address>{parseAddress(unit.location)}</Address>
-          ) : null}
-        </UnitInfo>
+        <UnitInfo unit={unit} parentName={parentName} />
         <FormErrorSummary errors={errors} />
         <Editor>
           <ResourceEditorFields form={form} unitPk={unit?.pk ?? 0} />

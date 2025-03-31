@@ -1,13 +1,13 @@
 import React, { useRef, useState } from "react";
 import { trim } from "lodash-es";
 import { useTranslation } from "react-i18next";
-import { gql, type ApolloQueryResult } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   useDeleteResourceMutation,
   type Maybe,
-  type UnitQuery,
+  type UnitWithSpacesAndResourcesQuery,
 } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { getResourceUrl } from "@/common/urls";
@@ -19,11 +19,12 @@ import { TableLink } from "@/styles/util";
 import { Flex } from "common/styles/util";
 
 interface IProps {
-  unit: UnitQuery["unit"];
-  refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
+  unit: QueryT;
+  refetch: () => Promise<unknown>;
 }
 
-type SpaceT = NonNullable<UnitQuery["unit"]>["spaces"][0];
+type QueryT = NonNullable<UnitWithSpacesAndResourcesQuery["unit"]>;
+type SpaceT = QueryT["spaces"][0];
 type ResourceT = NonNullable<SpaceT>["resources"][0];
 
 type ResourcesTableColumn = {

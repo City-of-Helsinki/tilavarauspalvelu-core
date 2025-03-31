@@ -5,47 +5,33 @@ import {
   ButtonVariant,
   Dialog,
   IconArrowLeft,
-  IconCheck,
   LoadingSpinner,
 } from "hds-react";
-import type { UnitQuery } from "@gql/gql-types";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
-import {
-  Address,
-  Name,
-  Parent,
-  StyledTag,
-  UnitInfo,
-} from "./modules/newSpaceModal";
-import { parseAddress } from "@/common/util";
+import { StyledTag } from "./modules/newSpaceModal";
 import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { UseFormReturn } from "react-hook-form";
 import { DialogActionsButtons } from "@/styles/util";
 
 type Props = {
-  unit: UnitQuery["unit"];
   closeModal: () => void;
   hasFixedParent: boolean;
   onPrevPage: () => void;
   form: UseFormReturn<SpaceUpdateForm>;
+  children: React.ReactNode;
 };
 
 export function Page2({
-  unit,
   onPrevPage,
   closeModal,
   hasFixedParent,
   form,
+  children,
 }: Props): JSX.Element {
   const { t } = useTranslation();
-  const { watch, formState } = form;
+  const { formState } = form;
   const { errors, isDirty, isSubmitting } = formState;
-
-  const parentPk = watch("parent") ?? null;
-  const parentName = unit?.spaces.find(
-    (space) => space.pk === parentPk
-  )?.nameFi;
 
   return (
     <>
@@ -66,16 +52,7 @@ export function Page2({
               : "SpaceModal.page2.info"
           )}
         </p>
-        <UnitInfo>
-          <IconCheck />
-          <div>
-            <Name>{unit?.nameFi}</Name>
-            <Parent>{parentName}</Parent>
-          </div>
-          {unit?.location != null && (
-            <Address>{parseAddress(unit?.location)}</Address>
-          )}
-        </UnitInfo>
+        {children}
         <div>
           <FormErrorSummary errors={errors} />
           <SpaceForm form={form} />

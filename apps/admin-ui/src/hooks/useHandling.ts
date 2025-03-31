@@ -4,6 +4,7 @@ import { useSession } from "@/hooks/auth";
 import { useHandlingDataQuery } from "@gql/gql-types";
 import { toApiDate } from "common/src/common/util";
 import { ReservationStateChoice } from "common/gql/gql-types";
+import { gql } from "@apollo/client";
 
 const useHandling = () => {
   const { isAuthenticated } = useSession();
@@ -26,3 +27,29 @@ const useHandling = () => {
 };
 
 export default useHandling;
+
+export const HANDLING_COUNT_QUERY = gql`
+  query HandlingData($beginDate: Date!, $state: [ReservationStateChoice]!) {
+    reservations(
+      state: $state
+      beginDate: $beginDate
+      onlyWithHandlingPermission: true
+    ) {
+      edges {
+        node {
+          id
+          pk
+        }
+      }
+    }
+    units(onlyWithPermission: true) {
+      edges {
+        node {
+          id
+          pk
+        }
+      }
+      totalCount
+    }
+  }
+`;
