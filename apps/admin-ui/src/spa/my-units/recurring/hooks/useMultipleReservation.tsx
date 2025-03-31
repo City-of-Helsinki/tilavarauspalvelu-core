@@ -4,8 +4,8 @@ import type { TimeSelectionForm } from "@/schemas";
 import { getBufferTime } from "@/helpers";
 
 type ReservationUnitBufferType = {
-  bufferTimeBefore?: number;
-  bufferTimeAfter?: number;
+  bufferTimeBefore: number;
+  bufferTimeAfter: number;
 };
 
 // This is only used in recurring form so we can rework it
@@ -15,11 +15,11 @@ export function useMultipleReservation({
   reservationUnit,
 }: {
   values: TimeSelectionForm & {
-    type?: ReservationTypeChoice;
+    type: ReservationTypeChoice;
     bufferTimeBefore?: boolean;
     bufferTimeAfter?: boolean;
   };
-  reservationUnit?: Maybe<ReservationUnitBufferType>;
+  reservationUnit: Maybe<ReservationUnitBufferType>;
 }) {
   // NOTE useMemo is useless here, watcher already filters out unnecessary runs
   const result = generateReservations({
@@ -34,12 +34,16 @@ export function useMultipleReservation({
   return result.map((item) => ({
     ...item,
     buffers: {
-      before: values.bufferTimeBefore
-        ? getBufferTime(reservationUnit?.bufferTimeBefore, values.type)
-        : 0,
-      after: values.bufferTimeAfter
-        ? getBufferTime(reservationUnit?.bufferTimeBefore, values.type)
-        : 0,
+      before: getBufferTime(
+        reservationUnit?.bufferTimeBefore,
+        values.type,
+        values.bufferTimeBefore
+      ),
+      after: getBufferTime(
+        reservationUnit?.bufferTimeBefore,
+        values.type,
+        values.bufferTimeAfter
+      ),
     },
   }));
 }

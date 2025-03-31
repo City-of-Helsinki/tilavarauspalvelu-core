@@ -39,13 +39,17 @@ export function doesIntervalCollide(
 }
 
 export function getBufferTime(
-  b: Maybe<number> | undefined,
-  t: Maybe<ReservationTypeChoice> | undefined
+  buffer: Maybe<number> | undefined,
+  type: Maybe<ReservationTypeChoice>,
+  enabled?: boolean
 ): number {
-  if (t === ReservationTypeChoice.Blocked) {
+  if (!enabled) {
     return 0;
   }
-  return b ?? 0;
+  if (type === ReservationTypeChoice.Blocked) {
+    return 0;
+  }
+  return buffer ?? 0;
 }
 
 /// @brief Create a collision interval from a reservation
@@ -61,10 +65,9 @@ export function reservationToInterval(
     return undefined;
   }
   const t =
-    comparisonReservationType === ReservationTypeChoice.Blocked ||
     x.type === ReservationTypeChoice.Blocked
       ? ReservationTypeChoice.Blocked
-      : undefined;
+      : comparisonReservationType;
   return {
     start: new Date(x.begin),
     end: new Date(x.end),
