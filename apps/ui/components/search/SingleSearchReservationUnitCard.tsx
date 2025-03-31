@@ -8,11 +8,7 @@ import {
 } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
-import type {
-  Maybe,
-  ReservationUnitNode,
-  SearchReservationUnitsQuery,
-} from "@gql/gql-types";
+import { type SingleSearchCardFragment } from "@gql/gql-types";
 import { format, isToday, isTomorrow, isValid } from "date-fns";
 import {
   convertLanguageCode,
@@ -28,25 +24,21 @@ import Card from "common/src/components/Card";
 import Tag from "common/src/components/Tag";
 import { useSearchParams } from "next/navigation";
 import { getReservationUnitPath } from "@/modules/urls";
+import { gql } from "@apollo/client";
 
-type QueryT = NonNullable<SearchReservationUnitsQuery["reservationUnits"]>;
-type Edge = NonNullable<NonNullable<QueryT["edges"]>[0]>;
-type Node = NonNullable<Edge["node"]>;
-interface PropsT {
-  reservationUnit: Node;
-}
-
-function StatusTag(props: {
-  closed?: Maybe<boolean>;
-  availableAt: Maybe<Date> | undefined;
-}): JSX.Element {
+function StatusTag(
+  props: Pick<SingleSearchCardFragment, "isClosed" | "firstReservableDatetime">
+): JSX.Element {
   const { t } = useTranslation();
-  const { closed, availableAt } = props;
+  const { isClosed, firstReservableDatetime } = props;
 
-  if (closed) {
+  if (isClosed) {
     return <Tag type="error">{t("reservationUnitCard:closed")}</Tag>;
   }
 
+  const availableAt = firstReservableDatetime
+    ? new Date(firstReservableDatetime)
+    : null;
   if (!availableAt || !isValid(availableAt)) {
     return <Tag type="neutral">{t("reservationUnitCard:noTimes")}</Tag>;
   }
@@ -67,7 +59,7 @@ function StatusTag(props: {
 
 // TODO SSR version (and remove the use hook)
 function useConstructLink(
-  reservationUnit: Pick<ReservationUnitNode, "pk">
+  reservationUnit: Pick<SingleSearchCardFragment, "pk">
 ): string {
   const params = useSearchParams();
   const date = params.get("startDate");
@@ -92,7 +84,11 @@ function useConstructLink(
   return linkURL.toString();
 }
 
-function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
+interface PropsT {
+  reservationUnit: SingleSearchCardFragment;
+}
+
+export function SingleSearchCard({ reservationUnit }: PropsT): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const name = getTranslationSafe(reservationUnit, "name", lang);
@@ -112,15 +108,8 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
   const img = getMainImage(reservationUnit);
   const imgSrc = getImageSource(img, "small");
 
-  const firstReservableDatetime = reservationUnit.firstReservableDatetime
-    ? new Date(reservationUnit.firstReservableDatetime)
-    : undefined;
   const tags = [
-    <StatusTag
-      closed={reservationUnit.isClosed}
-      availableAt={firstReservableDatetime}
-      key={`status-tag-${reservationUnit.pk}`}
-    />,
+    <StatusTag {...reservationUnit} key={`status-tag-${reservationUnit.pk}`} />,
   ];
 
   const infos = [];
@@ -193,4 +182,20 @@ function ReservationUnitCard({ reservationUnit }: PropsT): JSX.Element {
   );
 }
 
-export default ReservationUnitCard;
+export const SINGLE_SEARCH_CARD_FRAGMENT = gql`
+  fragment SingleSearchCard on ReservationUnitNode {
+    ...RecurringCard
+    pricings {
+      ...PricingFields
+    }
+    reservationBegins
+    reservationEnds
+    isClosed
+    firstReservableDatetime
+    currentAccessType
+    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+      id
+      accessType
+    }
+  }
+`;

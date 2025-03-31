@@ -11,14 +11,12 @@ import {
   EquipmentOrderingChoices,
   OptionsDocument,
   type OptionsQuery,
+  OptionsQueryVariables,
   PurposeOrderingChoices,
   type QueryReservationUnitsArgs,
   ReservationKind,
   ReservationUnitOrderingChoices,
   ReservationUnitTypeOrderingChoices,
-  SearchFormParamsUnitDocument,
-  type SearchFormParamsUnitQuery,
-  type SearchFormParamsUnitQueryVariables,
   UnitOrderingChoices,
 } from "@gql/gql-types";
 import {
@@ -261,14 +259,19 @@ export async function getSearchOptions(
   page: "seasonal" | "direct",
   locale: string
 ) {
-  const lang = convertLanguageCode(locale ?? "");
-  const { data: optionsData } = await apolloClient.query<OptionsQuery>({
+  const lang = convertLanguageCode(locale);
+  const { data: optionsData } = await apolloClient.query<
+    OptionsQuery,
+    OptionsQueryVariables
+  >({
     query: OptionsDocument,
     variables: {
       reservationUnitTypesOrderBy: ReservationUnitTypeOrderingChoices.RankAsc,
       purposesOrderBy: PurposeOrderingChoices.RankAsc,
       unitsOrderBy: UnitOrderingChoices.NameFiAsc,
       equipmentsOrderBy: EquipmentOrderingChoices.CategoryRankAsc,
+      ...(page === "direct" ? { onlyDirectBookable: true } : {}),
+      ...(page === "seasonal" ? { onlySeasonalBookable: true } : {}),
     },
   });
 
@@ -292,19 +295,7 @@ export async function getSearchOptions(
     value: n.pk ?? 0,
     label: getTranslationSafe(n, "name", lang),
   }));
-  const { data: unitData } = await apolloClient.query<
-    SearchFormParamsUnitQuery,
-    SearchFormParamsUnitQueryVariables
-  >({
-    query: SearchFormParamsUnitDocument,
-    variables: {
-      publishedReservationUnits: true,
-      orderBy: UnitOrderingChoices.NameFiAsc,
-      ...(page === "direct" ? { onlyDirectBookable: true } : {}),
-      ...(page === "seasonal" ? { onlySeasonalBookable: true } : {}),
-    },
-  });
-  const unitOptions = filterNonNullable(unitData?.unitsAll).map((node) => ({
+  const unitOptions = filterNonNullable(optionsData?.unitsAll).map((node) => ({
     value: node.pk ?? 0,
     label: getTranslationSafe(node, "name", lang),
   }));

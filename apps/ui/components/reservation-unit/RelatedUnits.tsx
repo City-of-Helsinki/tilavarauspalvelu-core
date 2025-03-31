@@ -3,7 +3,7 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
-import type { RelatedReservationUnitsQuery } from "@gql/gql-types";
+import type { RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 import { getMainImage } from "@/modules/util";
 import Carousel from "../Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
@@ -16,14 +16,10 @@ import {
 } from "common/src/common/util";
 import { getReservationUnitPath } from "@/modules/urls";
 import { H3 } from "common";
+import { gql } from "@apollo/client";
 
-type RelatedQueryT = NonNullable<
-  RelatedReservationUnitsQuery["reservationUnits"]
->;
-type RelatedEdgeT = NonNullable<RelatedQueryT>["edges"][0];
-export type RelatedNodeT = NonNullable<NonNullable<RelatedEdgeT>["node"]>;
-type PropsType = {
-  units: RelatedNodeT[];
+type RelatedUnitsProps = {
+  units: RelatedUnitCardFieldsFragment[];
   className?: string;
   style?: React.CSSProperties;
 };
@@ -32,7 +28,7 @@ export function RelatedUnits({
   units,
   style,
   className,
-}: PropsType): JSX.Element | null {
+}: RelatedUnitsProps): JSX.Element | null {
   const { t } = useTranslation();
   const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
   const isWideMobile = useMedia(`(max-width: ${breakpoints.l})`, false);
@@ -61,7 +57,7 @@ export function RelatedUnits({
 function RelatedUnitCard({
   reservationUnit,
 }: {
-  reservationUnit: RelatedNodeT;
+  reservationUnit: RelatedUnitCardFieldsFragment;
 }): JSX.Element {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
@@ -126,3 +122,16 @@ function RelatedUnitCard({
     />
   );
 }
+
+export const RELATED_UNIT_CARD_FRAGMENT = gql`
+  fragment RelatedUnitCardFields on ReservationUnitNode {
+    ...OrderedReservationUnitCard
+    reservationUnitType {
+      ...ReservationUnitTypeFields
+    }
+    maxPersons
+    pricings {
+      ...PricingFields
+    }
+  }
+`;
