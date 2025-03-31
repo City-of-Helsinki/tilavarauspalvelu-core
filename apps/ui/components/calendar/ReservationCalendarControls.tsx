@@ -19,7 +19,7 @@ import {
   SemiBold,
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationUnitPageQuery } from "@gql/gql-types";
+import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import { formatDateTimeRange } from "@/modules/util";
 import {
@@ -37,9 +37,8 @@ import { ControlledDateInput } from "common/src/components/form";
 import { Flex } from "common/styles/util";
 import { capitalize } from "common/src/helpers";
 
-type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 type CommonProps = {
-  reservationUnit: QueryT;
+  reservationUnit: ReservationTimePickerFieldsFragment;
   reservationForm: UseFormReturn<PendingReservationFormType>;
   durationOptions: { label: string; value: number }[];
   startingTimeOptions: { label: string; value: string }[];
@@ -159,11 +158,11 @@ export function ReservationCalendarControls({
   const dateValue = useMemo(() => fromUIDate(formDate ?? ""), [formDate]);
 
   const duration = !Number.isNaN(Number(formDuration))
-    ? Number(formDuration)
+    ? formDuration
     : (reservationUnit.minReservationDuration ?? 0);
 
   const price =
-    dateValue != null && duration != null
+    dateValue != null
       ? getReservationUnitPrice({
           t,
           reservationUnit,

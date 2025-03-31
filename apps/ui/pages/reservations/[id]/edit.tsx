@@ -264,7 +264,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return notFound;
 }
 
-export const EDIT_PAGE_QUERY = gql`
+export const RESERVATION_EDIT_PAGE_QUERY = gql`
   query ReservationEditPage($id: ID!) {
     reservation(id: $id) {
       id

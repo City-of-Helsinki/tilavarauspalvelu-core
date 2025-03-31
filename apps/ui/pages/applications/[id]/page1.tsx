@@ -24,7 +24,7 @@ import {
 import { createApolloClient } from "@/modules/apolloClient";
 import {
   ApplicationPage1Document,
-  useSearchFormParamsUnitQuery,
+  UnitOrderingChoices,
   useUpdateApplicationMutation,
   type ApplicationPage1Query,
   type ApplicationPage1QueryVariables,
@@ -40,7 +40,8 @@ import { uniq } from "lodash-es";
 
 function Page1({
   application,
-}: Pick<PropsNarrowed, "application">): JSX.Element {
+  unitsAll,
+}: Pick<PropsNarrowed, "application" | "unitsAll">): JSX.Element {
   const router = useRouter();
   const { i18n } = useTranslation();
   const dislayError = useDisplayError();
@@ -66,8 +67,7 @@ function Page1({
     (resUnit) => resUnit.unit?.pk
   );
   const unitsInApplicationRound = filterNonNullable(uniq(resUnitPks));
-  const { data } = useSearchFormParamsUnitQuery();
-  const unitOptions = filterNonNullable(data?.unitsAll)
+  const unitOptions = unitsAll
     .filter((u) => u.pk != null && unitsInApplicationRound.includes(u.pk))
     .map((u) => ({
       value: u.pk ?? 0,
@@ -142,17 +142,20 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     query: ApplicationPage1Document,
     variables: {
       id: base64encode(`ApplicationNode:${pk}`),
+      orderUnitsBy: [UnitOrderingChoices.RankAsc],
     },
   });
   const { application } = data;
   if (application == null) {
     return notFound;
   }
+  const unitsAll = filterNonNullable(data.unitsAll);
 
   return {
     props: {
       ...commonProps,
       application,
+      unitsAll,
       ...(await serverSideTranslations(locale ?? "fi")),
     },
   };
@@ -161,9 +164,20 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 export default Page1;
 
 export const APPLICATION_PAGE1_QUERY = gql`
-  query ApplicationPage1($id: ID!) {
+  query ApplicationPage1($id: ID!, $orderUnitsBy: [UnitOrderingChoices]) {
     application(id: $id) {
       ...ApplicationForm
+    }
+    unitsAll(
+      publishedReservationUnits: true
+      onlySeasonalBookable: true
+      orderBy: $orderUnitsBy
+    ) {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
     }
   }
 `;

@@ -9,7 +9,7 @@ import {
 import type {
   AvailableTimesReservationUnitFieldsFragment,
   BlockingReservationFieldsFragment,
-  ReservationUnitNode,
+  IsReservableFieldsFragment,
 } from "@gql/gql-types";
 import { getPossibleTimesForDay } from "@/modules/reservationUnit";
 import {
@@ -22,7 +22,7 @@ import { dayMax, dayMin, timeToMinutes } from "common/src/helpers";
 import { gql } from "@apollo/client";
 
 export type LastPossibleReservationDateProps = Pick<
-  ReservationUnitNode,
+  IsReservableFieldsFragment,
   "reservationsMaxDaysBefore" | "reservableTimeSpans" | "reservationEnds"
 >;
 

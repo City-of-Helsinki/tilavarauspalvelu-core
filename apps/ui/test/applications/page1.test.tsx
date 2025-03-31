@@ -3,8 +3,6 @@ import {
   type OptionsQuery,
   ReservationPurposeOrderingChoices,
   ReservationUnitTypeOrderingChoices,
-  SearchFormParamsUnitDocument,
-  type SearchFormParamsUnitQuery,
   UpdateApplicationDocument,
   type UpdateApplicationMutation,
 } from "@/gql/gql-types";
@@ -72,7 +70,7 @@ function customRender(
   const application = createMockApplicationFragment(props);
   return render(
     <MockedProvider mocks={mocks} addTypename={false}>
-      <Page1 application={application} />
+      <Page1 application={application} unitsAll={[]} />
     </MockedProvider>
   );
 }
@@ -87,10 +85,6 @@ function createGraphQLMocks(
     },
   };
 
-  const SearchFormParamsUnitQueryMock: SearchFormParamsUnitQuery = {
-    unitsAll: [],
-  };
-
   const OptionsMock: OptionsQuery = createOptionQueryMock();
 
   return [
@@ -101,14 +95,6 @@ function createGraphQLMocks(
       variableMatcher: () => true,
       result: {
         data: UpdateApplicationMutationMock,
-      },
-    },
-    {
-      request: {
-        query: SearchFormParamsUnitDocument,
-      },
-      result: {
-        data: SearchFormParamsUnitQueryMock,
       },
     },
     {

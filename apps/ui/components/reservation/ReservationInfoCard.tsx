@@ -186,7 +186,7 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
   fragment ReservationInfoCard on ReservationNode {
     id
     pk
-    ...ReservationPrice
+    ...ReservationPriceFields
     taxPercentageValue
     state
     accessType
@@ -194,11 +194,7 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
       accessCode
     }
     reservationUnits {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
+      ...ReservationUnitNameFields
       images {
         ...Image
       }
