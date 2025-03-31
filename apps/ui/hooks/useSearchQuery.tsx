@@ -16,7 +16,6 @@ export function useSearchQuery(
 ) {
   const query = useSearchReservationUnitsQuery({
     variables,
-    fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   });
 
