@@ -75,11 +75,6 @@ export function ReservationListEditor({
   });
 
   return (
-    <ReservationList
-      key="list-editor"
-      items={itemsWithButtons}
-      hasPadding
-      isTall={isTall}
-    />
+    <ReservationList items={itemsWithButtons} hasPadding isTall={isTall} />
   );
 }
