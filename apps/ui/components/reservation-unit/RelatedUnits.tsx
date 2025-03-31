@@ -4,12 +4,11 @@ import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
 import { breakpoints } from "common/src/common/style";
 import type { RelatedUnitCardFieldsFragment } from "@gql/gql-types";
-import { getMainImage } from "@/modules/util";
 import Carousel from "../Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
-import { getImageSource } from "common/src/helpers";
+import { getImageSource, getMainImage } from "common/src/helpers";
 import {
   convertLanguageCode,
   getTranslationSafe,
