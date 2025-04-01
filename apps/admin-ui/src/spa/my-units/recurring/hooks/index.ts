@@ -1,6 +1,7 @@
 import { useRecurringReservationUnitQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
+import { gql } from "@apollo/client";
 
 export { useMultipleReservation } from "./useMultipleReservation";
 export { useCreateRecurringReservation } from "./useCreateRecurringReservation";
@@ -20,3 +21,21 @@ export function useRecurringReservationsUnits(unitId: number) {
 
   return { loading, reservationUnits };
 }
+
+export const RECURRING_RESERVATION_UNIT_QUERY = gql`
+  query RecurringReservationUnit($id: ID!) {
+    unit(id: $id) {
+      id
+      nameFi
+      pk
+      reservationUnits {
+        id
+        pk
+        nameFi
+        reservationStartInterval
+        bufferTimeBefore
+        bufferTimeAfter
+      }
+    }
+  }
+`;

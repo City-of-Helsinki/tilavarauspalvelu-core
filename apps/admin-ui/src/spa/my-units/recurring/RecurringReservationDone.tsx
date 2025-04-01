@@ -5,12 +5,10 @@ import { ErrorBoundary } from "react-error-boundary";
 import { H1 } from "common/src/common/typography";
 import { RecurringReservationsView } from "@/component/RecurringReservationsView";
 import Error404 from "@/common/Error404";
-import { useRecurringReservationQuery } from "@gql/gql-types";
-import { base64encode, filterNonNullable } from "common/src/helpers";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { errorToast } from "common/src/common/toast";
 import { getReservationUrl } from "@/common/urls";
 import { Flex } from "common/styles/util";
+import { useRecurringReservations } from "@/hooks";
 
 function RecurringReservationDoneInner({
   recurringPk,
@@ -21,20 +19,7 @@ function RecurringReservationDoneInner({
     keyPrefix: "MyUnits.RecurringReservation.Confirmation",
   });
 
-  const id = base64encode(`RecurringReservationNode:${recurringPk}`);
-  const { data } = useRecurringReservationQuery({
-    skip: !recurringPk,
-    fetchPolicy: "cache-and-network",
-    nextFetchPolicy: "cache-first",
-    variables: { id },
-    onError: () => {
-      errorToast({ text: t("errors.errorFetchingData") });
-    },
-  });
-
-  const { recurringReservation } = data ?? {};
-  const reservations = filterNonNullable(recurringReservation?.reservations);
-
+  const { reservations } = useRecurringReservations(recurringPk);
   const reservationUrl = getReservationUrl(reservations[0]?.pk);
 
   return (

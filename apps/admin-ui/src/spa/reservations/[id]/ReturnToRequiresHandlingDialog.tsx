@@ -2,16 +2,15 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
 import {
-  type ReservationPageQuery,
+  type ReservationNode,
   useRequireHandlingMutation,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { errorToast, successToast } from "common/src/common/toast";
 
-// TODO use a fragment
-type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
+type ReservationType = Pick<ReservationNode, "pk">;
 type Props = {
-  reservation: Pick<ReservationType, "pk">;
+  reservation: ReservationType;
   onClose: () => void;
   onAccept: () => void;
 };

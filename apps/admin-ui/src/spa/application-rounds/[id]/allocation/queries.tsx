@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { APPLICATION_SECTION_ADMIN_FRAGMENT } from "@/common/fragments";
 
 /* minimal query for allocation page to populate the unit filter and reservation-units tabs
  * only needs to be done once when landing on the page
@@ -83,7 +82,7 @@ export const DELETE_ALLOCATED_TIME_SLOT = gql`
   }
 `;
 
-const ALLOCATED_TIME_SLOT_FRAGMENT = gql`
+export const ALLOCATED_TIME_SLOT_FRAGMENT = gql`
   fragment AllocatedTimeSlot on AllocatedTimeSlotNode {
     id
     beginTime
@@ -96,8 +95,6 @@ const ALLOCATED_TIME_SLOT_FRAGMENT = gql`
 /// primarily we need to define reservationUnit parameter as a singular pk instead of array (because of the related allocated time slots)
 /// NOTE Requires higher backend optimizer complexity limit (14 works, lower doesn't)
 export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
-  ${APPLICATION_SECTION_ADMIN_FRAGMENT}
-  ${ALLOCATED_TIME_SLOT_FRAGMENT}
   query ApplicationSectionAllocations(
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!
@@ -132,7 +129,7 @@ export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
     ) {
       edges {
         node {
-          ...ApplicationSection
+          ...ApplicationSectionFields
           allocations
           suitableTimeRanges(fulfilled: false) {
             id

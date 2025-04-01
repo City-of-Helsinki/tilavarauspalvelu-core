@@ -13,8 +13,9 @@ type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 type RecurringReservationType = NonNullable<
   ReservationType["recurringReservation"]
 >;
+
 type Props = {
-  recurringReservation: RecurringReservationType;
+  recurringReservation: Pick<RecurringReservationType, "pk">;
   handleClose: () => void;
   // TODO weird name for the after deny callback
   handleAccept: () => void;
@@ -54,8 +55,7 @@ export function ApprovalButtonsRecurring({
     }
     setModalContent(
       <DenyDialogSeries
-        // FIXME need to query this
-        initialHandlingDetails=""
+        initialHandlingDetails={reservation.handlingDetails ?? ""}
         recurringReservation={recurringReservation}
         onReject={handleReject}
         onClose={handleClose}

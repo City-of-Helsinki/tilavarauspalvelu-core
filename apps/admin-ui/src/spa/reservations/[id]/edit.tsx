@@ -318,9 +318,10 @@ export const RESERVATION_EDIT_PAGE_QUERY = gql`
       id
       pk
       ...CreateTagString
-      ...ReservationCommon
+      ...ReservationCommonFields
       ...ReservationMetaFields
       ...ReservationTitleSectionFields
+      ...UseStaffReservation
       recurringReservation {
         id
         pk

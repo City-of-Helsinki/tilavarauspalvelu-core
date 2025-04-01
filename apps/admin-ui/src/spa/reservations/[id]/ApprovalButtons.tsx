@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  ApprovalDialogFieldsFragment,
-  DenyDialogFieldsFragment,
-  ReservationStateChoice,
-  type ReservationPageQuery,
-} from "@gql/gql-types";
+import { type ApprovalButtonsFragment } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -18,14 +13,23 @@ import {
   isPossibleToEdit,
   isPossibleToReturn,
 } from "@/modules/reservationModificationRules";
+import { gql } from "@apollo/client";
 
-type QueryT = NonNullable<ReservationPageQuery["reservation"]>;
-type ReservationType = DenyDialogFieldsFragment &
-  ApprovalDialogFieldsFragment &
-  Pick<QueryT, "recurringReservation">;
+export const APPROVAL_BUTTONS_FRAGMENT = gql`
+  fragment ApprovalButtons on ReservationNode {
+    id
+    state
+    ...DenyDialogFields
+    ...ApprovalDialogFields
+    recurringReservation {
+      id
+      pk
+    }
+  }
+`;
+
 type Props = {
-  reservation: ReservationType;
-  state: ReservationStateChoice;
+  reservation: ApprovalButtonsFragment;
   isFree: boolean;
   handleClose: () => void;
   handleAccept: () => void;
@@ -33,7 +37,6 @@ type Props = {
 };
 
 function ApprovalButtons({
-  state,
   isFree,
   reservation,
   handleClose,
@@ -42,6 +45,8 @@ function ApprovalButtons({
 }: Props) {
   const { setModalContent } = useModal();
   const { t } = useTranslation();
+
+  const { state } = reservation;
 
   const handleDenyClick = () => {
     setModalContent(

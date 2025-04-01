@@ -2,6 +2,7 @@ import { useTranslation } from "next-i18next";
 import { useRecurringReservationQuery } from "@gql/gql-types";
 import { errorToast } from "common/src/common/toast";
 import { base64encode, filterNonNullable } from "common/src/helpers";
+import { gql } from "@apollo/client";
 
 /// @param recurringPk fetch reservations related to this pk
 /// @param state optionally only fetch some reservation states
@@ -30,3 +31,15 @@ export function useRecurringReservations(recurringPk?: number) {
     refetch,
   };
 }
+
+export const RECURRING_RESERVATION_QUERY = gql`
+  query RecurringReservation($id: ID!) {
+    recurringReservation(id: $id) {
+      ...RecurringReservationFields
+      reservations {
+        id
+        handlingDetails
+      }
+    }
+  }
+`;

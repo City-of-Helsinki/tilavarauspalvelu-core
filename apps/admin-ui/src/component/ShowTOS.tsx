@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useGenericTerms } from "common/src/hooks/useGenericTerms";
-import { Maybe, type TermsOfUseNode } from "@gql/gql-types";
+import { type Maybe, type TermsOfUseTextFieldsFragment } from "@gql/gql-types";
 import { Sanitize } from "common/src/components/Sanitize";
 
 // NOTE This is partial duplicate from ui/application/Preview.tsx
@@ -40,16 +40,15 @@ function TOSElement({
   );
 }
 
-// TODO use a fragment
-type TOSNode = Pick<TermsOfUseNode, "textFi">;
+type TOSNode = Pick<TermsOfUseTextFieldsFragment, "textFi">;
 type Node = {
-  serviceSpecificTerms?: Maybe<TOSNode>;
-  paymentTerms?: Maybe<TOSNode>;
-  pricingTerms?: Maybe<TOSNode>;
-  cancellationTerms?: Maybe<TOSNode>;
+  serviceSpecificTerms: Maybe<TOSNode>;
+  paymentTerms: Maybe<TOSNode>;
+  pricingTerms: Maybe<TOSNode>;
+  cancellationTerms: Maybe<TOSNode>;
 };
 
-const ShowTOS = ({ reservationUnit }: { reservationUnit: Node }) => {
+function ShowTOS({ reservationUnit }: { reservationUnit: Node }) {
   const { t } = useTranslation();
 
   const serviceTerms = reservationUnit.serviceSpecificTerms;
@@ -96,6 +95,6 @@ const ShowTOS = ({ reservationUnit }: { reservationUnit: Node }) => {
       />
     </div>
   );
-};
+}
 
 export default ShowTOS;

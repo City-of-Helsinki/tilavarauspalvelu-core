@@ -10,7 +10,7 @@ import {
   ReservationUnitDocument,
   type ReservationUnitQuery,
   CreateReservationSeriesDocument,
-  type ReservationUnitFragment,
+  type ReservationUnitFieldsFragment,
   type ReservationsInIntervalFragment,
   CurrentUserDocument,
   type CurrentUserQuery,
@@ -25,7 +25,7 @@ import { base64encode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { toApiDateUnsafe } from "common/src/common/util";
 
-export function createReservationUnits(): ReservationUnitFragment[] {
+export function createReservationUnits(): ReservationUnitFieldsFragment[] {
   return [
     createReservationUnitFragment({ pk: 1, nameFi: "Unit" }),
     createReservationUnitFragment({ pk: 2, nameFi: "Absolute" }),
@@ -89,7 +89,7 @@ function createReservationUnitFragment({
 }: {
   pk: number;
   nameFi: string;
-}): ReservationUnitFragment {
+}): ReservationUnitFieldsFragment {
   return {
     authentication: Authentication.Weak,
     nameFi,
