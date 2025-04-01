@@ -21,7 +21,7 @@
     "codegen:admin": "graphql-codegen --project admin-ui",
     "codegen:ui": "graphql-codegen --project ui",
     "codegen:common": "graphql-codegen --project common",
-    "codegen": "pnpm codegen:admin & pnpm codegen:ui & pnpm codegen:common",
+    "codegen": "parallel pnpm ::: codegen:admin codegen:ui codegen:common",
     "codegen:watch": "pnpm codegen:admin --watch & pnpm codegen:ui --watch & pnpm codegen:common --watch"
   },
   "devDependencies": {

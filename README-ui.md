@@ -13,8 +13,9 @@ Include a changelog if applicable.
 
 ## Prerequisites
 
-1. Node 18 (`nvm use`)
-1. pnpm
+1. Node 20 (`nvm use`)
+2. pnpm
+3. GNU parallel (for codegen without watch mode)
 
 ## Scripts
 
