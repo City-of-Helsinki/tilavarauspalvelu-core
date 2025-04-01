@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { trim } from "lodash-es";
 import {
   AccessType,
-  type ListReservationsQuery,
+  type ReservationCardFragment,
   ReservationStateChoice,
 } from "@gql/gql-types";
 import { formatDateTimeRange } from "@/modules/util";
@@ -23,17 +23,39 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { gql } from "@apollo/client";
 
 type CardType = "upcoming" | "past" | "cancelled";
 
-// TODO use a fragment
-type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
-type EdgeT = NonNullable<QueryT["edges"][0]>;
-type NodeT = NonNullable<EdgeT["node"]>;
 interface PropsT {
-  reservation: NodeT;
+  reservation: ReservationCardFragment;
   type?: CardType;
 }
+
+export const RESERVATION_CARD_FRAGMENT = gql`
+  fragment ReservationCard on ReservationNode {
+    pk
+    begin
+    end
+    state
+    accessType
+    reservationUnits {
+      id
+      images {
+        ...Image
+      }
+      unit {
+        id
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+    ...ReservationPriceFields
+    ...ReservationOrderStatus
+    ...CanUserCancelReservation
+  }
+`;
 
 export function ReservationCard({
   reservation,

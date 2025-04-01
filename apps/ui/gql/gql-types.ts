@@ -6387,6 +6387,56 @@ export type AvailableTimesReservationUnitFieldsFragment = {
   } | null> | null;
 };
 
+export type ReservationCardFragment = {
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly state: ReservationStateChoice | null;
+  readonly accessType: AccessType;
+  readonly id: string;
+  readonly price: string | null;
+  readonly applyingForFreeOfCharge: boolean | null;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly reservationBegins: string | null;
+    readonly reservationEnds: string | null;
+    readonly images: ReadonlyArray<{
+      readonly id: string;
+      readonly imageUrl: string | null;
+      readonly largeUrl: string | null;
+      readonly mediumUrl: string | null;
+      readonly smallUrl: string | null;
+      readonly imageType: ImageType;
+    }>;
+    readonly unit: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly nameSv: string | null;
+      readonly nameEn: string | null;
+    } | null;
+    readonly pricings: ReadonlyArray<{
+      readonly id: string;
+      readonly begins: string;
+      readonly priceUnit: PriceUnit;
+      readonly lowestPrice: string;
+      readonly highestPrice: string;
+      readonly taxPercentage: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly value: string;
+      };
+    }>;
+    readonly cancellationRule: {
+      readonly id: string;
+      readonly canBeCancelledTimeBefore: number | null;
+    } | null;
+  }>;
+  readonly paymentOrder: ReadonlyArray<{
+    readonly id: string;
+    readonly status: OrderStatus | null;
+  }>;
+};
+
 export type ReservationInfoCardFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -10362,6 +10412,44 @@ export const ReservationPriceFieldsFragmentDoc = gql`
   }
   ${PriceReservationUnitFieldsFragmentDoc}
 `;
+export const ReservationOrderStatusFragmentDoc = gql`
+  fragment ReservationOrderStatus on ReservationNode {
+    id
+    state
+    paymentOrder {
+      id
+      status
+    }
+  }
+`;
+export const ReservationCardFragmentDoc = gql`
+  fragment ReservationCard on ReservationNode {
+    pk
+    begin
+    end
+    state
+    accessType
+    reservationUnits {
+      id
+      images {
+        ...Image
+      }
+      unit {
+        id
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+    ...ReservationPriceFields
+    ...ReservationOrderStatus
+    ...CanUserCancelReservation
+  }
+  ${ImageFragmentDoc}
+  ${ReservationPriceFieldsFragmentDoc}
+  ${ReservationOrderStatusFragmentDoc}
+  ${CanUserCancelReservationFragmentDoc}
+`;
 export const ReservationInfoCardFragmentDoc = gql`
   fragment ReservationInfoCard on ReservationNode {
     id
@@ -10484,16 +10572,6 @@ export const CancelReasonFieldsFragmentDoc = gql`
     reasonFi
     reasonEn
     reasonSv
-  }
-`;
-export const ReservationOrderStatusFragmentDoc = gql`
-  fragment ReservationOrderStatus on ReservationNode {
-    id
-    state
-    paymentOrder {
-      id
-      status
-    }
   }
 `;
 export const OrderFieldsFragmentDoc = gql`
