@@ -6029,12 +6029,67 @@ export type ApplicationReservationUnitListFragment = {
   }>;
 };
 
+export type TimeSelectorFragment = {
+  readonly id: string;
+  readonly weekday: number;
+  readonly closed: boolean;
+  readonly reservableTimes: ReadonlyArray<{
+    readonly begin: string;
+    readonly end: string;
+  } | null> | null;
+};
+
 export type ApplicationViewFragment = {
   readonly id: string;
   readonly pk: number | null;
   readonly status: ApplicationStatusChoice | null;
   readonly applicantType: ApplicantTypeChoice | null;
   readonly additionalInformation: string | null;
+  readonly applicationSections: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly name: string;
+    readonly status: ApplicationSectionStatusChoice | null;
+    readonly reservationMaxDuration: number;
+    readonly numPersons: number;
+    readonly reservationsEndDate: string;
+    readonly reservationsBeginDate: string;
+    readonly appliedReservationsPerWeek: number;
+    readonly reservationMinDuration: number;
+    readonly reservationUnitOptions: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly preferredOrder: number;
+      readonly reservationUnit: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+      };
+    }>;
+    readonly suitableTimeRanges: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly beginTime: string;
+      readonly endTime: string;
+      readonly dayOfTheWeek: Weekday;
+      readonly priority: Priority;
+    }>;
+    readonly purpose: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
+    } | null;
+    readonly ageGroup: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly minimum: number;
+      readonly maximum: number | null;
+    } | null;
+  }> | null;
   readonly applicationRound: {
     readonly id: string;
     readonly sentDate: string | null;
@@ -6084,68 +6139,6 @@ export type ApplicationViewFragment = {
       }>;
     }>;
   };
-  readonly applicationSections: ReadonlyArray<{
-    readonly id: string;
-    readonly pk: number | null;
-    readonly name: string;
-    readonly status: ApplicationSectionStatusChoice | null;
-    readonly reservationMaxDuration: number;
-    readonly numPersons: number;
-    readonly reservationsEndDate: string;
-    readonly reservationsBeginDate: string;
-    readonly appliedReservationsPerWeek: number;
-    readonly reservationMinDuration: number;
-    readonly suitableTimeRanges: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly beginTime: string;
-      readonly endTime: string;
-      readonly dayOfTheWeek: Weekday;
-      readonly priority: Priority;
-    }>;
-    readonly purpose: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameSv: string | null;
-      readonly nameEn: string | null;
-    } | null;
-    readonly reservationUnitOptions: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly preferredOrder: number;
-      readonly reservationUnit: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-        readonly nameEn: string | null;
-        readonly nameSv: string | null;
-        readonly applicationRoundTimeSlots: ReadonlyArray<{
-          readonly id: string;
-          readonly pk: number | null;
-          readonly weekday: number;
-          readonly closed: boolean;
-          readonly reservableTimes: ReadonlyArray<{
-            readonly begin: string;
-            readonly end: string;
-          } | null> | null;
-        }>;
-        readonly unit: {
-          readonly id: string;
-          readonly pk: number | null;
-          readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
-        } | null;
-      };
-    }>;
-    readonly ageGroup: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly minimum: number;
-      readonly maximum: number | null;
-    } | null;
-  }> | null;
   readonly contactPerson: {
     readonly id: string;
     readonly pk: number | null;
@@ -6672,6 +6665,15 @@ export type ApplicationFormFragment = {
     readonly reservationsBeginDate: string;
     readonly appliedReservationsPerWeek: number;
     readonly reservationMinDuration: number;
+    readonly reservationUnitOptions: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly preferredOrder: number;
+      readonly reservationUnit: {
+        readonly id: string;
+        readonly pk: number | null;
+      };
+    }>;
     readonly suitableTimeRanges: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
@@ -6684,38 +6686,9 @@ export type ApplicationFormFragment = {
       readonly id: string;
       readonly pk: number | null;
       readonly nameFi: string | null;
-      readonly nameSv: string | null;
       readonly nameEn: string | null;
+      readonly nameSv: string | null;
     } | null;
-    readonly reservationUnitOptions: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly preferredOrder: number;
-      readonly reservationUnit: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-        readonly nameEn: string | null;
-        readonly nameSv: string | null;
-        readonly applicationRoundTimeSlots: ReadonlyArray<{
-          readonly id: string;
-          readonly pk: number | null;
-          readonly weekday: number;
-          readonly closed: boolean;
-          readonly reservableTimes: ReadonlyArray<{
-            readonly begin: string;
-            readonly end: string;
-          } | null> | null;
-        }>;
-        readonly unit: {
-          readonly id: string;
-          readonly pk: number | null;
-          readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
-        } | null;
-      };
-    }>;
     readonly ageGroup: {
       readonly id: string;
       readonly pk: number | null;
@@ -7372,68 +7345,6 @@ export type SuitableTimeFragment = {
   readonly priority: Priority;
 };
 
-export type ReservationPurposeNameFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly nameSv: string | null;
-  readonly nameEn: string | null;
-};
-
-export type ReservationUnitNameFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
-  readonly unit: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-  } | null;
-};
-
-export type ApplicationRoundTimeSlotsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly weekday: number;
-  readonly closed: boolean;
-  readonly reservableTimes: ReadonlyArray<{
-    readonly begin: string;
-    readonly end: string;
-  } | null> | null;
-};
-
-export type ReservationUnitOptionFragment = {
-  readonly id: string;
-  readonly reservationUnit: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-    readonly applicationRoundTimeSlots: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly weekday: number;
-      readonly closed: boolean;
-      readonly reservableTimes: ReadonlyArray<{
-        readonly begin: string;
-        readonly end: string;
-      } | null> | null;
-    }>;
-    readonly unit: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
-    } | null;
-  };
-};
-
 export type ApplicantFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -7729,6 +7640,15 @@ export type ApplicationPage1Query = {
       readonly reservationsBeginDate: string;
       readonly appliedReservationsPerWeek: number;
       readonly reservationMinDuration: number;
+      readonly reservationUnitOptions: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly preferredOrder: number;
+        readonly reservationUnit: {
+          readonly id: string;
+          readonly pk: number | null;
+        };
+      }>;
       readonly suitableTimeRanges: ReadonlyArray<{
         readonly id: string;
         readonly pk: number | null;
@@ -7741,38 +7661,9 @@ export type ApplicationPage1Query = {
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
-        readonly nameSv: string | null;
         readonly nameEn: string | null;
+        readonly nameSv: string | null;
       } | null;
-      readonly reservationUnitOptions: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly preferredOrder: number;
-        readonly reservationUnit: {
-          readonly id: string;
-          readonly pk: number | null;
-          readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
-          readonly applicationRoundTimeSlots: ReadonlyArray<{
-            readonly id: string;
-            readonly pk: number | null;
-            readonly weekday: number;
-            readonly closed: boolean;
-            readonly reservableTimes: ReadonlyArray<{
-              readonly begin: string;
-              readonly end: string;
-            } | null> | null;
-          }>;
-          readonly unit: {
-            readonly id: string;
-            readonly pk: number | null;
-            readonly nameFi: string | null;
-            readonly nameEn: string | null;
-            readonly nameSv: string | null;
-          } | null;
-        };
-      }>;
       readonly ageGroup: {
         readonly id: string;
         readonly pk: number | null;
@@ -7839,6 +7730,66 @@ export type ApplicationPage2Query = {
     readonly status: ApplicationStatusChoice | null;
     readonly applicantType: ApplicantTypeChoice | null;
     readonly additionalInformation: string | null;
+    readonly applicationSections: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly name: string;
+      readonly status: ApplicationSectionStatusChoice | null;
+      readonly reservationMaxDuration: number;
+      readonly numPersons: number;
+      readonly reservationsEndDate: string;
+      readonly reservationsBeginDate: string;
+      readonly appliedReservationsPerWeek: number;
+      readonly reservationMinDuration: number;
+      readonly reservationUnitOptions: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly preferredOrder: number;
+        readonly reservationUnit: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly nameFi: string | null;
+          readonly nameEn: string | null;
+          readonly nameSv: string | null;
+          readonly unit: {
+            readonly id: string;
+            readonly nameFi: string | null;
+            readonly nameEn: string | null;
+            readonly nameSv: string | null;
+          } | null;
+          readonly applicationRoundTimeSlots: ReadonlyArray<{
+            readonly id: string;
+            readonly weekday: number;
+            readonly closed: boolean;
+            readonly reservableTimes: ReadonlyArray<{
+              readonly begin: string;
+              readonly end: string;
+            } | null> | null;
+          }>;
+        };
+      }>;
+      readonly suitableTimeRanges: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly beginTime: string;
+        readonly endTime: string;
+        readonly dayOfTheWeek: Weekday;
+        readonly priority: Priority;
+      }>;
+      readonly purpose: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+      } | null;
+      readonly ageGroup: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly minimum: number;
+        readonly maximum: number | null;
+      } | null;
+    }> | null;
     readonly applicationRound: {
       readonly id: string;
       readonly notesWhenApplyingFi: string | null;
@@ -7875,68 +7826,6 @@ export type ApplicationPage2Query = {
         }>;
       }>;
     };
-    readonly applicationSections: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly name: string;
-      readonly status: ApplicationSectionStatusChoice | null;
-      readonly reservationMaxDuration: number;
-      readonly numPersons: number;
-      readonly reservationsEndDate: string;
-      readonly reservationsBeginDate: string;
-      readonly appliedReservationsPerWeek: number;
-      readonly reservationMinDuration: number;
-      readonly suitableTimeRanges: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly beginTime: string;
-        readonly endTime: string;
-        readonly dayOfTheWeek: Weekday;
-        readonly priority: Priority;
-      }>;
-      readonly purpose: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-        readonly nameSv: string | null;
-        readonly nameEn: string | null;
-      } | null;
-      readonly reservationUnitOptions: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly preferredOrder: number;
-        readonly reservationUnit: {
-          readonly id: string;
-          readonly pk: number | null;
-          readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
-          readonly applicationRoundTimeSlots: ReadonlyArray<{
-            readonly id: string;
-            readonly pk: number | null;
-            readonly weekday: number;
-            readonly closed: boolean;
-            readonly reservableTimes: ReadonlyArray<{
-              readonly begin: string;
-              readonly end: string;
-            } | null> | null;
-          }>;
-          readonly unit: {
-            readonly id: string;
-            readonly pk: number | null;
-            readonly nameFi: string | null;
-            readonly nameEn: string | null;
-            readonly nameSv: string | null;
-          } | null;
-        };
-      }>;
-      readonly ageGroup: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly minimum: number;
-        readonly maximum: number | null;
-      } | null;
-    }> | null;
     readonly contactPerson: {
       readonly id: string;
       readonly pk: number | null;
@@ -8036,6 +7925,15 @@ export type ApplicationPage3Query = {
       readonly reservationsBeginDate: string;
       readonly appliedReservationsPerWeek: number;
       readonly reservationMinDuration: number;
+      readonly reservationUnitOptions: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly preferredOrder: number;
+        readonly reservationUnit: {
+          readonly id: string;
+          readonly pk: number | null;
+        };
+      }>;
       readonly suitableTimeRanges: ReadonlyArray<{
         readonly id: string;
         readonly pk: number | null;
@@ -8048,38 +7946,9 @@ export type ApplicationPage3Query = {
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
-        readonly nameSv: string | null;
         readonly nameEn: string | null;
+        readonly nameSv: string | null;
       } | null;
-      readonly reservationUnitOptions: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly preferredOrder: number;
-        readonly reservationUnit: {
-          readonly id: string;
-          readonly pk: number | null;
-          readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
-          readonly applicationRoundTimeSlots: ReadonlyArray<{
-            readonly id: string;
-            readonly pk: number | null;
-            readonly weekday: number;
-            readonly closed: boolean;
-            readonly reservableTimes: ReadonlyArray<{
-              readonly begin: string;
-              readonly end: string;
-            } | null> | null;
-          }>;
-          readonly unit: {
-            readonly id: string;
-            readonly pk: number | null;
-            readonly nameFi: string | null;
-            readonly nameEn: string | null;
-            readonly nameSv: string | null;
-          } | null;
-        };
-      }>;
       readonly ageGroup: {
         readonly id: string;
         readonly pk: number | null;
@@ -8139,6 +8008,51 @@ export type ApplicationPagePreviewQuery = {
     readonly status: ApplicationStatusChoice | null;
     readonly applicantType: ApplicantTypeChoice | null;
     readonly additionalInformation: string | null;
+    readonly applicationSections: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly name: string;
+      readonly status: ApplicationSectionStatusChoice | null;
+      readonly reservationMaxDuration: number;
+      readonly numPersons: number;
+      readonly reservationsEndDate: string;
+      readonly reservationsBeginDate: string;
+      readonly appliedReservationsPerWeek: number;
+      readonly reservationMinDuration: number;
+      readonly reservationUnitOptions: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly preferredOrder: number;
+        readonly reservationUnit: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly nameFi: string | null;
+          readonly nameEn: string | null;
+          readonly nameSv: string | null;
+        };
+      }>;
+      readonly suitableTimeRanges: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly beginTime: string;
+        readonly endTime: string;
+        readonly dayOfTheWeek: Weekday;
+        readonly priority: Priority;
+      }>;
+      readonly purpose: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+      } | null;
+      readonly ageGroup: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly minimum: number;
+        readonly maximum: number | null;
+      } | null;
+    }> | null;
     readonly applicationRound: {
       readonly id: string;
       readonly sentDate: string | null;
@@ -8188,68 +8102,6 @@ export type ApplicationPagePreviewQuery = {
         }>;
       }>;
     };
-    readonly applicationSections: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly name: string;
-      readonly status: ApplicationSectionStatusChoice | null;
-      readonly reservationMaxDuration: number;
-      readonly numPersons: number;
-      readonly reservationsEndDate: string;
-      readonly reservationsBeginDate: string;
-      readonly appliedReservationsPerWeek: number;
-      readonly reservationMinDuration: number;
-      readonly suitableTimeRanges: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly beginTime: string;
-        readonly endTime: string;
-        readonly dayOfTheWeek: Weekday;
-        readonly priority: Priority;
-      }>;
-      readonly purpose: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-        readonly nameSv: string | null;
-        readonly nameEn: string | null;
-      } | null;
-      readonly reservationUnitOptions: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly preferredOrder: number;
-        readonly reservationUnit: {
-          readonly id: string;
-          readonly pk: number | null;
-          readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
-          readonly applicationRoundTimeSlots: ReadonlyArray<{
-            readonly id: string;
-            readonly pk: number | null;
-            readonly weekday: number;
-            readonly closed: boolean;
-            readonly reservableTimes: ReadonlyArray<{
-              readonly begin: string;
-              readonly end: string;
-            } | null> | null;
-          }>;
-          readonly unit: {
-            readonly id: string;
-            readonly pk: number | null;
-            readonly nameFi: string | null;
-            readonly nameEn: string | null;
-            readonly nameSv: string | null;
-          } | null;
-        };
-      }>;
-      readonly ageGroup: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly minimum: number;
-        readonly maximum: number | null;
-      } | null;
-    }> | null;
     readonly contactPerson: {
       readonly id: string;
       readonly pk: number | null;
@@ -8533,6 +8385,18 @@ export type ApplicationViewQuery = {
       readonly reservationsBeginDate: string;
       readonly appliedReservationsPerWeek: number;
       readonly reservationMinDuration: number;
+      readonly reservationUnitOptions: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly preferredOrder: number;
+        readonly reservationUnit: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly nameFi: string | null;
+          readonly nameEn: string | null;
+          readonly nameSv: string | null;
+        };
+      }>;
       readonly suitableTimeRanges: ReadonlyArray<{
         readonly id: string;
         readonly pk: number | null;
@@ -8545,38 +8409,9 @@ export type ApplicationViewQuery = {
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
-        readonly nameSv: string | null;
         readonly nameEn: string | null;
+        readonly nameSv: string | null;
       } | null;
-      readonly reservationUnitOptions: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-        readonly preferredOrder: number;
-        readonly reservationUnit: {
-          readonly id: string;
-          readonly pk: number | null;
-          readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
-          readonly applicationRoundTimeSlots: ReadonlyArray<{
-            readonly id: string;
-            readonly pk: number | null;
-            readonly weekday: number;
-            readonly closed: boolean;
-            readonly reservableTimes: ReadonlyArray<{
-              readonly begin: string;
-              readonly end: string;
-            } | null> | null;
-          }>;
-          readonly unit: {
-            readonly id: string;
-            readonly pk: number | null;
-            readonly nameFi: string | null;
-            readonly nameEn: string | null;
-            readonly nameSv: string | null;
-          } | null;
-        };
-      }>;
       readonly ageGroup: {
         readonly id: string;
         readonly pk: number | null;
@@ -10073,6 +9908,17 @@ export const ApplicationSectionReservationFragmentDoc = gql`
   ${CanUserCancelReservationFragmentDoc}
   ${PindoraReservationFragmentDoc}
 `;
+export const TimeSelectorFragmentDoc = gql`
+  fragment TimeSelector on ApplicationRoundTimeSlotNode {
+    id
+    weekday
+    closed
+    reservableTimes {
+      begin
+      end
+    }
+  }
+`;
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {
     id
@@ -10223,56 +10069,6 @@ export const SuitableTimeFragmentDoc = gql`
     priority
   }
 `;
-export const ReservationPurposeNameFragmentDoc = gql`
-  fragment ReservationPurposeName on ReservationPurposeNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
-  }
-`;
-export const ReservationUnitNameFragmentDoc = gql`
-  fragment ReservationUnitName on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
-    unit {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-  }
-`;
-export const ApplicationRoundTimeSlotsFragmentDoc = gql`
-  fragment ApplicationRoundTimeSlots on ApplicationRoundTimeSlotNode {
-    id
-    pk
-    weekday
-    closed
-    reservableTimes {
-      begin
-      end
-    }
-  }
-`;
-export const ReservationUnitOptionFragmentDoc = gql`
-  fragment ReservationUnitOption on ReservationUnitOptionNode {
-    id
-    reservationUnit {
-      ...ReservationUnitName
-      applicationRoundTimeSlots {
-        ...ApplicationRoundTimeSlots
-      }
-    }
-  }
-  ${ReservationUnitNameFragmentDoc}
-  ${ApplicationRoundTimeSlotsFragmentDoc}
-`;
 export const ApplicationFormFragmentDoc = gql`
   fragment ApplicationForm on ApplicationNode {
     id
@@ -10288,14 +10084,22 @@ export const ApplicationFormFragmentDoc = gql`
     }
     applicationSections {
       ...ApplicationSectionCommon
+      reservationUnitOptions {
+        id
+        reservationUnit {
+          id
+          pk
+        }
+      }
       suitableTimeRanges {
         ...SuitableTime
       }
       purpose {
-        ...ReservationPurposeName
-      }
-      reservationUnitOptions {
-        ...ReservationUnitOption
+        id
+        pk
+        nameFi
+        nameEn
+        nameSv
       }
     }
   }
@@ -10303,8 +10107,6 @@ export const ApplicationFormFragmentDoc = gql`
   ${ApplicationRoundForApplicationFragmentDoc}
   ${ApplicationSectionCommonFragmentDoc}
   ${SuitableTimeFragmentDoc}
-  ${ReservationPurposeNameFragmentDoc}
-  ${ReservationUnitOptionFragmentDoc}
 `;
 export const TermsOfUseNameFieldsFragmentDoc = gql`
   fragment TermsOfUseNameFields on TermsOfUseNode {
@@ -10335,6 +10137,19 @@ export const TermsOfUseFieldsFragmentDoc = gql`
 export const ApplicationViewFragmentDoc = gql`
   fragment ApplicationView on ApplicationNode {
     ...ApplicationForm
+    applicationSections {
+      id
+      reservationUnitOptions {
+        id
+        reservationUnit {
+          id
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
     applicationRound {
       id
       sentDate
@@ -12360,9 +12175,32 @@ export const ApplicationPage2Document = gql`
   query ApplicationPage2($id: ID!) {
     application(id: $id) {
       ...ApplicationForm
+      applicationSections {
+        id
+        reservationUnitOptions {
+          id
+          reservationUnit {
+            id
+            pk
+            nameFi
+            nameEn
+            nameSv
+            unit {
+              id
+              nameFi
+              nameEn
+              nameSv
+            }
+            applicationRoundTimeSlots {
+              ...TimeSelector
+            }
+          }
+        }
+      }
     }
   }
   ${ApplicationFormFragmentDoc}
+  ${TimeSelectorFragmentDoc}
 `;
 
 /**

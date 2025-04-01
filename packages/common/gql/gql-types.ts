@@ -5797,68 +5797,6 @@ export type SuitableTimeFragment = {
   readonly priority: Priority;
 };
 
-export type ReservationPurposeNameFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly nameSv: string | null;
-  readonly nameEn: string | null;
-};
-
-export type ReservationUnitNameFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
-  readonly unit: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-  } | null;
-};
-
-export type ApplicationRoundTimeSlotsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly weekday: number;
-  readonly closed: boolean;
-  readonly reservableTimes: ReadonlyArray<{
-    readonly begin: string;
-    readonly end: string;
-  } | null> | null;
-};
-
-export type ReservationUnitOptionFragment = {
-  readonly id: string;
-  readonly reservationUnit: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-    readonly applicationRoundTimeSlots: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly weekday: number;
-      readonly closed: boolean;
-      readonly reservableTimes: ReadonlyArray<{
-        readonly begin: string;
-        readonly end: string;
-      } | null> | null;
-    }>;
-    readonly unit: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
-    } | null;
-  };
-};
-
 export type ApplicantFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -6149,56 +6087,6 @@ export const SuitableTimeFragmentDoc = gql`
     dayOfTheWeek
     priority
   }
-`;
-export const ReservationPurposeNameFragmentDoc = gql`
-  fragment ReservationPurposeName on ReservationPurposeNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
-  }
-`;
-export const ReservationUnitNameFragmentDoc = gql`
-  fragment ReservationUnitName on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
-    unit {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-  }
-`;
-export const ApplicationRoundTimeSlotsFragmentDoc = gql`
-  fragment ApplicationRoundTimeSlots on ApplicationRoundTimeSlotNode {
-    id
-    pk
-    weekday
-    closed
-    reservableTimes {
-      begin
-      end
-    }
-  }
-`;
-export const ReservationUnitOptionFragmentDoc = gql`
-  fragment ReservationUnitOption on ReservationUnitOptionNode {
-    id
-    reservationUnit {
-      ...ReservationUnitName
-      applicationRoundTimeSlots {
-        ...ApplicationRoundTimeSlots
-      }
-    }
-  }
-  ${ReservationUnitNameFragmentDoc}
-  ${ApplicationRoundTimeSlotsFragmentDoc}
 `;
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {

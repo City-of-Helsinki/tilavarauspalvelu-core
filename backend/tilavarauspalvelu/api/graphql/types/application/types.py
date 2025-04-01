@@ -61,7 +61,7 @@ class ApplicationNode(DjangoNode):
         }
         filterset_class = ApplicationFilterSet
         permission_classes = [ApplicationPermission]
-        max_complexity = 22
+        max_complexity = 24
 
     @classmethod
     def pre_optimization_hook(cls, queryset: ApplicationQuerySet, optimizer: QueryOptimizer) -> models.QuerySet:

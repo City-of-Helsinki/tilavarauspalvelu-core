@@ -26,22 +26,10 @@ import {
   covertCellsToTimeRange,
 } from "./module";
 import { successToast } from "common/src/common/toast";
-import { type ApplicationPage2Query } from "@/gql/gql-types";
+import { type TimeSelectorFragment } from "@/gql/gql-types";
 import { fontBold } from "common";
 import { ErrorText } from "common/src/components/ErrorText";
-
-// TODO fragment
-type ApplicationT = NonNullable<ApplicationPage2Query["application"]>;
-type SectionT = NonNullable<ApplicationT["applicationSections"]>[0];
-type OpeningHoursT =
-  SectionT["reservationUnitOptions"][0]["reservationUnit"]["applicationRoundTimeSlots"];
-
-type Props = {
-  index: number;
-  cells: Cell[][];
-  reservationUnitOptions: { label: string; value: number }[];
-  reservationUnitOpeningHours: OpeningHoursT;
-};
+import { gql } from "@apollo/client";
 
 const CalendarHead = styled.div`
   ${fontBold}
@@ -321,6 +309,13 @@ const CELL_TYPES = [
   },
 ] as const;
 
+type Props = {
+  index: number;
+  cells: Cell[][];
+  reservationUnitOptions: { label: string; value: number }[];
+  reservationUnitOpeningHours: Readonly<TimeSelectorFragment[]>;
+};
+
 export function TimeSelector({
   cells,
   index,
@@ -557,3 +552,15 @@ function ErrorMessage({ index }: { index: number }): JSX.Element | null {
     </ErrorText>
   );
 }
+
+export const TIME_SELECTOR_FRAGMENT = gql`
+  fragment TimeSelector on ApplicationRoundTimeSlotNode {
+    id
+    weekday
+    closed
+    reservableTimes {
+      begin
+      end
+    }
+  }
+`;
