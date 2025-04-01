@@ -1,9 +1,4 @@
 import { gql } from "@apollo/client";
-import {
-  RESERVATION_UNIT_FRAGMENT,
-  UNIT_NAME_FRAGMENT,
-} from "@/common/fragments";
-import { LOCATION_FRAGMENT } from "common/src/queries/fragments";
 
 export const OPTIONS_QUERY = gql`
   query Options(
@@ -41,11 +36,11 @@ export const OPTIONS_QUERY = gql`
 `;
 
 export const UNIT_VIEW_QUERY = gql`
-  ${LOCATION_FRAGMENT}
-  ${UNIT_NAME_FRAGMENT}
   query UnitView($id: ID!) {
     unit(id: $id) {
-      ...UnitNameFields
+      id
+      pk
+      nameFi
       location {
         ...LocationFields
       }
@@ -102,10 +97,9 @@ export const RESERVATION_UNITS_BY_UNIT = gql`
 `;
 
 export const RESERVATION_UNIT_QUERY = gql`
-  ${RESERVATION_UNIT_FRAGMENT}
   query ReservationUnit($id: ID!) {
     reservationUnit(id: $id) {
-      ...ReservationUnit
+      ...ReservationUnitFields
     }
   }
 `;

@@ -17,14 +17,22 @@ export const APPLICATION_FORM_FRAGMENT = gql`
     }
     applicationSections {
       ...ApplicationSectionCommon
+      reservationUnitOptions {
+        id
+        reservationUnit {
+          id
+          pk
+        }
+      }
       suitableTimeRanges {
         ...SuitableTime
       }
       purpose {
-        ...ReservationPurposeName
-      }
-      reservationUnitOptions {
-        ...ReservationUnitOption
+        id
+        pk
+        nameFi
+        nameEn
+        nameSv
       }
     }
   }

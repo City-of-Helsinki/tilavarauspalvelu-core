@@ -1,28 +1,5 @@
 import { gql } from "@apollo/client";
 
-export const SPACE_COMMON_FRAGMENT = gql`
-  fragment SpaceCommonFields on SpaceNode {
-    id
-    pk
-    nameFi
-    parent {
-      id
-      pk
-      nameFi
-    }
-    surfaceArea
-    maxPersons
-  }
-`;
-
-export const UNIT_NAME_FRAGMENT = gql`
-  fragment UnitNameFields on UnitNode {
-    id
-    pk
-    nameFi
-  }
-`;
-
 // NOTE this is for allocation only (it includes the application name)
 // for regular application queries we don't need to query the name through the application relation
 export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
@@ -49,40 +26,6 @@ export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
           id
           pk
           nameFi
-        }
-      }
-    }
-  }
-`;
-
-export const APPLICATION_ADMIN_FRAGMENT = gql`
-  fragment ApplicationAdmin on ApplicationNode {
-    pk
-    id
-    status
-    lastModifiedDate
-    ...Applicant
-    applicationRound {
-      id
-      pk
-      nameFi
-    }
-    applicationSections {
-      ...ApplicationSectionCommon
-      suitableTimeRanges {
-        ...SuitableTime
-      }
-      purpose {
-        ...ReservationPurposeName
-      }
-      allocations
-      reservationUnitOptions {
-        id
-        ...ReservationUnitOption
-        rejected
-        allocatedTimeSlots {
-          pk
-          id
         }
       }
     }
@@ -143,8 +86,7 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
 `;
 
 export const RESERVATION_UNIT_FRAGMENT = gql`
-  ${UNIT_NAME_FRAGMENT}
-  fragment ReservationUnit on ReservationUnitNode {
+  fragment ReservationUnitFields on ReservationUnitNode {
     id
     pk
     nameFi
@@ -154,7 +96,9 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     reservationStartInterval
     authentication
     unit {
-      ...UnitNameFields
+      id
+      pk
+      nameFi
     }
     ...ReservationTypeFormFields
     termsOfUseFi
