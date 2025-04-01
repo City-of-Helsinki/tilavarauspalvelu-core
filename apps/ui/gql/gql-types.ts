@@ -6435,6 +6435,25 @@ export type ReservationInfoCardFragment = {
   }>;
 };
 
+export type ReservationInfoFragment = {
+  readonly id: string;
+  readonly description: string | null;
+  readonly numPersons: number | null;
+  readonly purpose: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+  } | null;
+  readonly ageGroup: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly minimum: number;
+    readonly maximum: number | null;
+  } | null;
+};
+
 export type ReservationTimePickerFieldsFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -9622,25 +9641,6 @@ export type ReservationPageQuery = {
   } | null;
 };
 
-export type ReservationInfoFragment = {
-  readonly id: string;
-  readonly description: string | null;
-  readonly numPersons: number | null;
-  readonly purpose: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-  } | null;
-  readonly ageGroup: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly minimum: number;
-    readonly maximum: number | null;
-  } | null;
-};
-
 export type SearchReservationUnitsQueryVariables = Exact<{
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
   pk?: InputMaybe<
@@ -10390,6 +10390,26 @@ export const ReservationInfoCardFragmentDoc = gql`
   ${ReservationUnitNameFieldsFragmentDoc}
   ${ImageFragmentDoc}
 `;
+export const ReservationInfoFragmentDoc = gql`
+  fragment ReservationInfo on ReservationNode {
+    id
+    description
+    purpose {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    ageGroup {
+      id
+      pk
+      minimum
+      maximum
+    }
+    numPersons
+  }
+`;
 export const ReservationTimePickerFieldsFragmentDoc = gql`
   fragment ReservationTimePickerFields on ReservationUnitNode {
     id
@@ -10670,26 +10690,6 @@ export const ApplicationRoundTimeSlotFieldsFragmentDoc = gql`
       begin
       end
     }
-  }
-`;
-export const ReservationInfoFragmentDoc = gql`
-  fragment ReservationInfo on ReservationNode {
-    id
-    description
-    purpose {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-    ageGroup {
-      id
-      pk
-      minimum
-      maximum
-    }
-    numPersons
   }
 `;
 export const ApplicationReservationsDocument = gql`

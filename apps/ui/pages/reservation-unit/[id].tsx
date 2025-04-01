@@ -43,10 +43,7 @@ import {
   timeToMinutes,
   toNumber,
 } from "common/src/helpers";
-import { Head } from "@/components/reservation-unit/Head";
-import { AddressSection } from "@/components/reservation-unit/Address";
 import { Sanitize } from "common/src/components/Sanitize";
-import { RelatedUnits } from "@/components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Map as MapComponent } from "@/components/Map";
@@ -60,7 +57,6 @@ import {
   isReservationUnitPublished,
   isReservationUnitReservable,
 } from "@/modules/reservationUnit";
-import { EquipmentList } from "@/components/reservation-unit/EquipmentList";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import {
   type FocusTimeSlot,
@@ -73,10 +69,19 @@ import {
   getMaxReservationDuration,
   getMinReservationDuration,
 } from "@/modules/reservable";
-import { SubventionSuffix } from "@/components/reservation/SubventionSuffix";
+import {
+  SubventionSuffix,
+  ReservationTimePicker,
+} from "@/components/reservation";
 import InfoDialog from "@/components/common/InfoDialog";
-import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
-import { ReservationInfoContainer } from "@/components/reservation-unit/ReservationInfoContainer";
+import {
+  AddressSection,
+  Head,
+  RelatedUnits,
+  EquipmentList,
+  QuickReservation,
+  ReservationInfoContainer,
+} from "@/components/reservation-unit";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -91,7 +96,6 @@ import {
 import { LoginFragment } from "@/components/LoginFragment";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
-import { ReservationTimePicker } from "@/components/reservation/ReservationTimePicker";
 import { SubmitButton } from "@/styled/util";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import {

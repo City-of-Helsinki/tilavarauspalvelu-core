@@ -35,7 +35,10 @@ interface PropsT {
   type?: CardType;
 }
 
-function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.Element {
+export function ReservationCard({
+  reservation,
+  type,
+}: Readonly<PropsT>): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnits[0];
@@ -141,5 +144,3 @@ function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.Element {
     />
   );
 }
-
-export default ReservationCard;

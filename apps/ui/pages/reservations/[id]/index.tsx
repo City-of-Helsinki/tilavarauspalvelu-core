@@ -16,7 +16,6 @@ import { Flex, NoWrap } from "common/styles/util";
 import {
   CustomerTypeChoice,
   ReservationStateChoice,
-  type ReservationInfoFragment,
   type ReservationMetadataFieldNode,
   type ReservationPageQuery,
   type ReservationPageQueryVariables,
@@ -30,6 +29,7 @@ import {
   type AccessCodeQuery,
 } from "@gql/gql-types";
 import Link from "next/link";
+import { isBefore, sub } from "date-fns";
 import { createApolloClient } from "@/modules/apolloClient";
 import { formatDateTimeRange } from "@/modules/util";
 import { Sanitize } from "common/src/components/Sanitize";
@@ -45,10 +45,7 @@ import {
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ReservationStatus } from "@/components/reservation/ReservationStatus";
-import { AddressSection } from "@/components/reservation-unit/Address";
-import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
-import { ReservationOrderStatus } from "@/components/reservation/ReservationOrderStatus";
+import { AddressSection } from "@/components/reservation-unit";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -58,11 +55,9 @@ import {
   capitalize,
   filterNonNullable,
   ignoreMaybeArray,
-  LocalizationLanguages,
   toNumber,
 } from "common/src/helpers";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
-import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
 import {
   ButtonLikeLink,
   ButtonLikeExternalLink,
@@ -84,7 +79,14 @@ import { Instructions } from "@/components/Instructions";
 import { gql } from "@apollo/client";
 import StatusLabel from "common/src/components/StatusLabel";
 import IconButton from "common/src/components/IconButton";
-import { isBefore, sub } from "date-fns";
+import {
+  NotModifiableReason,
+  ReservationInfoSection,
+  LabelValuePair,
+  ReservationStatus,
+  ReservationInfoCard,
+  ReservationOrderStatus,
+} from "@/components/reservation";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -297,24 +299,6 @@ function ReserveeInfo({
   );
 }
 
-type LabelValuePairProps = {
-  label: string;
-  value: string | number;
-  testId: string;
-};
-
-function LabelValuePair({
-  label,
-  value,
-  testId,
-}: Readonly<LabelValuePairProps>): JSX.Element {
-  return (
-    <p>
-      {label}: <span data-testid={testId}>{value}</span>
-    </p>
-  );
-}
-
 // TODO add a state check => if state is Created redirect to the reservation funnel
 // if state is Cancelled, Denied, WaitingForPayment what then?
 function Reservation({
@@ -510,7 +494,7 @@ function Reservation({
         </div>
         <Flex>
           <Instructions reservation={reservation} />
-          <ReservationInfo
+          <ReservationInfoSection
             reservation={reservation}
             supportedFields={supportedFields}
           />
@@ -745,6 +729,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return notFound;
 }
 
+export default Reservation;
+
 export const GET_APPLICATION_RECURRING_RESERVATION_QUERY = gql`
   query ApplicationRecurringReservation($id: ID!) {
     recurringReservation(id: $id) {
@@ -799,88 +785,3 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
     }
   }
 `;
-
-function getReservationValue(
-  reservation: ReservationInfoFragment,
-  key: "purpose" | "numPersons" | "ageGroup" | "description",
-  lang: LocalizationLanguages
-): string | number | null {
-  if (key === "ageGroup") {
-    const { minimum, maximum } = reservation.ageGroup || {};
-    return minimum && maximum ? `${minimum} - ${maximum}` : null;
-  } else if (key === "purpose") {
-    if (reservation.purpose != null) {
-      return getTranslationSafe(reservation.purpose, "name", lang);
-    }
-    return null;
-  } else if (key in reservation) {
-    const val = reservation[key as keyof ReservationInfoFragment];
-    if (typeof val === "string" || typeof val === "number") {
-      return val;
-    }
-  }
-  return null;
-}
-
-function ReservationInfo({
-  reservation,
-  supportedFields,
-}: Readonly<{
-  reservation: ReservationInfoFragment;
-  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-}>) {
-  const { t, i18n } = useTranslation();
-  const POSSIBLE_FIELDS = [
-    "purpose",
-    "numPersons",
-    "ageGroup",
-    "description",
-  ] as const;
-  const fields = POSSIBLE_FIELDS.filter((field) =>
-    containsField(supportedFields, field)
-  );
-
-  if (fields.length === 0) {
-    return null;
-  }
-  const lang = convertLanguageCode(i18n.language);
-
-  return (
-    <div>
-      <H4 as="h2">{t("reservationApplication:applicationInfo")}</H4>
-      {fields
-        .map((field) => ({
-          key: field,
-          label: t(`reservationApplication:label.common.${field}`),
-          value: getReservationValue(reservation, field, lang) ?? "-",
-          testId: `reservation__${field}`,
-        }))
-        .map(({ key, ...rest }) => (
-          <LabelValuePair key={key} {...rest} />
-        ))}
-    </div>
-  );
-}
-
-export const RESERVATION_INFO_FRAGMENT = gql`
-  fragment ReservationInfo on ReservationNode {
-    id
-    description
-    purpose {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-    ageGroup {
-      id
-      pk
-      minimum
-      maximum
-    }
-    numPersons
-  }
-`;
-
-export default Reservation;

@@ -14,7 +14,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
-import ReservationCard from "@/components/reservation/ReservationCard";
+import { ReservationCard } from "@/components/reservation";
 import { CenterSpinner } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";
