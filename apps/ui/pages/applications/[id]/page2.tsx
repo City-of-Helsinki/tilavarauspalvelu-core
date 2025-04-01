@@ -112,6 +112,28 @@ export const APPLICATION_PAGE2_QUERY = gql`
   query ApplicationPage2($id: ID!) {
     application(id: $id) {
       ...ApplicationForm
+      applicationSections {
+        id
+        reservationUnitOptions {
+          id
+          reservationUnit {
+            id
+            pk
+            nameFi
+            nameEn
+            nameSv
+            unit {
+              id
+              nameFi
+              nameEn
+              nameSv
+            }
+            applicationRoundTimeSlots {
+              ...TimeSelector
+            }
+          }
+        }
+      }
     }
   }
 `;
