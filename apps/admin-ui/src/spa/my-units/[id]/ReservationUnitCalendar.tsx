@@ -20,6 +20,7 @@ import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { getReserveeName } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 import { useCheckPermission } from "@/hooks";
+import { gql } from "@apollo/client";
 
 type Props = {
   begin: string;
@@ -173,3 +174,29 @@ export function ReservationUnitCalendar({
     </Container>
   );
 }
+
+export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
+  query ReservationUnitCalendar(
+    $id: ID!
+    $pk: Int!
+    $state: [ReservationStateChoice]
+    $beginDate: Date
+    $endDate: Date
+  ) {
+    reservationUnit(id: $id) {
+      id
+      pk
+      reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
+        ...ReservationUnitReservations
+      }
+    }
+    affectingReservations(
+      forReservationUnits: [$pk]
+      state: $state
+      beginDate: $beginDate
+      endDate: $endDate
+    ) {
+      ...ReservationUnitReservations
+    }
+  }
+`;

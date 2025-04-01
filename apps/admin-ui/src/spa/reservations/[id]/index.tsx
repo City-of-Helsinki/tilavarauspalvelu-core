@@ -71,7 +71,6 @@ function ApprovalButtonsWithPermChecks({
         />
       ) : (
         <ApprovalButtons
-          state={reservation.state ?? ReservationStateChoice.Confirmed}
           isFree={isFree}
           reservation={reservation}
           handleClose={closeDialog}
@@ -472,7 +471,7 @@ export const RESERVATION_PAGE_QUERY = gql`
     reservation(id: $id) {
       id
       ...CreateTagString
-      ...ReservationCommon
+      ...ReservationCommonFields
       ...ChangeReservationTime
       ...ReservationTitleSectionFields
       recurringReservation {
@@ -481,8 +480,7 @@ export const RESERVATION_PAGE_QUERY = gql`
       }
       ...ReservationAccessType
       ...VisibleIfPermissionFields
-      ...DenyDialogFields
-      ...ApprovalDialogFields
+      ...ApprovalButtons
       cancelReason {
         id
         reasonFi

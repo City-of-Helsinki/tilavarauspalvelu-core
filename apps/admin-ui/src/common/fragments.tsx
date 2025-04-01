@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 // NOTE this is for allocation only (it includes the application name)
 // for regular application queries we don't need to query the name through the application relation
 export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
-  fragment ApplicationSection on ApplicationSectionNode {
+  fragment ApplicationSectionFields on ApplicationSectionNode {
     ...ApplicationSectionCommon
     purpose {
       id
@@ -33,7 +33,7 @@ export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
 `;
 
 export const RESERVATION_COMMON_FRAGMENT = gql`
-  fragment ReservationCommon on ReservationNode {
+  fragment ReservationCommonFields on ReservationNode {
     id
     pk
     begin
@@ -63,9 +63,8 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
 // TODO do we still need the user here?
 // TODO what is the reservation name vs. reserveeName?
 export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
-  ${RESERVATION_COMMON_FRAGMENT}
   fragment ReservationUnitReservations on ReservationNode {
-    ...ReservationCommon
+    ...ReservationCommonFields
     ...VisibleIfPermissionFields
     name
     numPersons

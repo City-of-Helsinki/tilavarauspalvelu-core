@@ -1,16 +1,19 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { type ReservationNode, ReservationStateChoice } from "@gql/gql-types";
+import {
+  type ApprovalButtonsFragment,
+  ReservationStateChoice,
+} from "@gql/gql-types";
 import { addDays, addMinutes } from "date-fns";
 import ApprovalButtons from "./ApprovalButtons";
 import { vi, describe, test, expect } from "vitest";
+import { base64encode } from "common/src/helpers";
 
-const wrappedRender = (reservation: ReservationNode) => {
+const wrappedRender = (reservation: ApprovalButtonsFragment) => {
   return render(
     <BrowserRouter>
       <ApprovalButtons
-        state={reservation.state ?? ReservationStateChoice.Created}
         isFree
         reservation={reservation}
         handleClose={vi.fn()}
@@ -26,12 +29,21 @@ function createInput({
 }: {
   state: ReservationStateChoice;
   end?: Date;
-}): ReservationNode {
+}): ApprovalButtonsFragment {
   return {
+    id: base64encode("ReservationNode:1"),
+    pk: 1,
     state,
+    begin: end.toISOString(),
     end: end.toISOString(),
+    paymentOrder: [],
     recurringReservation: null,
-  } as ReservationNode;
+    reservationUnits: [],
+    price: null,
+    handlingDetails: null,
+    applyingForFreeOfCharge: false,
+    freeOfChargeReason: null,
+  };
 }
 
 describe("State change rules", () => {
