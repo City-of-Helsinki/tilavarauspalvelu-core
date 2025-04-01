@@ -32,31 +32,6 @@ interface PropsT {
   type?: CardType;
 }
 
-export const RESERVATION_CARD_FRAGMENT = gql`
-  fragment ReservationCard on ReservationNode {
-    pk
-    begin
-    end
-    state
-    accessType
-    reservationUnits {
-      id
-      images {
-        ...Image
-      }
-      unit {
-        id
-        nameFi
-        nameSv
-        nameEn
-      }
-    }
-    ...ReservationPriceFields
-    ...ReservationOrderStatus
-    ...CanUserCancelReservation
-  }
-`;
-
 export function ReservationCard({
   reservation,
   type,
@@ -166,3 +141,45 @@ export function ReservationCard({
     />
   );
 }
+
+export const RESERVATION_CARD_FRAGMENT = gql`
+  fragment ReservationCard on ReservationNode {
+    pk
+    begin
+    end
+    state
+    accessType
+    reservationUnits {
+      id
+      images {
+        ...Image
+      }
+      unit {
+        id
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+    ...ReservationPriceFields
+    ...ReservationOrderStatus
+    ...CanUserCancelReservation
+  }
+`;
+/*
+  * id
+          ...ReservationInfoCard
+          name
+          bufferTimeBefore
+          bufferTimeAfter
+          ...ReservationOrderStatus
+          paymentOrder {
+            id
+            checkoutUrl
+            expiresInMinutes
+          }
+          isBlocked
+          reservationUnits {
+            ...CancellationRuleFields
+          }
+*/
