@@ -1,4 +1,9 @@
-import { UseFormReturn } from "react-hook-form";
+import {
+  type FieldValues,
+  useController,
+  type UseControllerProps,
+  UseFormReturn,
+} from "react-hook-form";
 import {
   BUFFER_TIME_OPTIONS,
   ReservationUnitEditFormValues,
@@ -8,13 +13,57 @@ import { Authentication, ReservationStartInterval } from "@gql/gql-types";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { AutoGrid, Flex } from "common/styled";
 import { FieldGroup } from "@/spa/ReservationUnit/edit/components/FieldGroup";
-import { ActivationGroup } from "@/spa/ReservationUnit/edit/components/ActivationGroup";
 import { ControlledSelect, DateTimeInput } from "common/src/components/form";
 import { getTranslatedError } from "@/common/util";
 import { CustomNumberInput } from "@/spa/ReservationUnit/edit/components/CustomNumberInput";
 import { SpecializedRadioGroup } from "@/spa/ReservationUnit/edit/components/SpecializedRadioGroup";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
 import React from "react";
+import styled from "styled-components";
+import { Checkbox } from "hds-react";
+
+const Indent = styled.div<{ $noIndent: boolean }>`
+  ${({ $noIndent }) => ($noIndent ? null : `margin-left: var(--spacing-l);`)}
+`;
+
+const Wrapper = styled.div<{ $noMargin: boolean }>`
+  ${({ $noMargin }) => ($noMargin ? null : `margin-top: var(--spacing-s);`)}
+`;
+
+interface ControllerProps<T extends FieldValues> extends UseControllerProps<T> {
+  label: string;
+  children: React.ReactNode;
+  noIndent?: boolean;
+  noMargin?: boolean;
+  style?: React.CSSProperties;
+  className?: string;
+}
+
+function ActivationGroup<T extends FieldValues>({
+  control,
+  name,
+  label,
+  children,
+  noIndent = false,
+  noMargin = false,
+  style,
+  className,
+}: ControllerProps<T>): JSX.Element {
+  const {
+    field: { value, onChange },
+  } = useController({ control, name });
+
+  return (
+    <Wrapper $noMargin={noMargin} style={style} className={className}>
+      <Checkbox id={name} label={label} checked={value} onChange={onChange} />
+      {value ? (
+        <Wrapper $noMargin={noMargin}>
+          <Indent $noIndent={noIndent}>{children}</Indent>
+        </Wrapper>
+      ) : null}
+    </Wrapper>
+  );
+}
 
 const bufferTimeOptions = [
   { value: 900, label: "15 minuuttia" },
