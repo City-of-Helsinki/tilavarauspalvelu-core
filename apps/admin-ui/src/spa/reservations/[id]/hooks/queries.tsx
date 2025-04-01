@@ -90,6 +90,7 @@ export const SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT = gql`
   }
 `;
 
+// TODO move / rename
 export const RESERVATION_RECURRING_FRAGMENT = gql`
   fragment ReservationRecurringFields on RecurringReservationNode {
     id
@@ -115,7 +116,7 @@ export const RESERVATION_RECURRING_FRAGMENT = gql`
 `;
 
 export const RECURRING_RESERVATION_FRAGMENT = gql`
-  fragment RecurringReservation on RecurringReservationNode {
+  fragment RecurringReservationFields on RecurringReservationNode {
     id
     pk
     weekdays
@@ -141,16 +142,6 @@ export const RECURRING_RESERVATION_FRAGMENT = gql`
           pk
         }
       }
-    }
-  }
-`;
-
-// TODO do we need orderBy? orderBy: "begin" (for reservations)
-// TODO do we need $state: [String]?
-export const RECURRING_RESERVATION_QUERY = gql`
-  query RecurringReservation($id: ID!) {
-    recurringReservation(id: $id) {
-      ...RecurringReservation
     }
   }
 `;

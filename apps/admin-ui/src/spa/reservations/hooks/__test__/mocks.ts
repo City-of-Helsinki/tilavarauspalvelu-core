@@ -84,6 +84,7 @@ function createReservation({
     paymentOrder: [],
     reservationUnits: [],
     type: ReservationTypeChoice.Behalf,
+    handlingDetails: null,
     recurringReservation: {
       id: base64encode(`RecurringReservationNode:${recurringPk}`),
       pk: recurringPk,

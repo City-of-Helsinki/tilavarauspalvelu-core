@@ -4,7 +4,7 @@ import {
   ReservationTypeChoice,
   useReservationUnitQuery,
   type Maybe,
-  type ReservationUnitFragment,
+  type ReservationUnitFieldsFragment,
 } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -119,7 +119,7 @@ type FormValues = RecurringReservationFormT & ReservationFormMeta;
 function RecurringReservationForm({
   reservationUnit,
 }: {
-  reservationUnit: Maybe<ReservationUnitFragment>;
+  reservationUnit: Maybe<ReservationUnitFieldsFragment>;
 }) {
   const { t } = useTranslation();
 

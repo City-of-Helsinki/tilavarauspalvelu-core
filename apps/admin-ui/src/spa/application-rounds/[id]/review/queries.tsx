@@ -1,13 +1,6 @@
 import { gql } from "@apollo/client";
-import { APPLICATION_SECTION_ADMIN_FRAGMENT } from "@/common/fragments";
-import {
-  APPLICANT_NAME_FRAGMENT,
-  APPLICATION_SECTION_DURATION_FRAGMENT,
-} from "common/src/queries/application";
 
 export const APPLICATIONS_QUERY = gql`
-  ${APPLICANT_NAME_FRAGMENT}
-  ${APPLICATION_SECTION_DURATION_FRAGMENT}
   query Applications(
     $applicationRound: Int!
     $unit: [Int]
@@ -68,7 +61,6 @@ export const APPLICATIONS_QUERY = gql`
 /// TODO rename (there is no Events anymore)
 /// TODO see if we can remove some of the fields (like reservationUnitOptions)
 export const APPLICATIONS_EVENTS_QUERY = gql`
-  ${APPLICATION_SECTION_ADMIN_FRAGMENT}
   query ApplicationSections(
     $applicationRound: Int!
     $applicationStatus: [ApplicationStatusChoice]!
@@ -107,7 +99,7 @@ export const APPLICATIONS_EVENTS_QUERY = gql`
     ) {
       edges {
         node {
-          ...ApplicationSection
+          ...ApplicationSectionFields
           allocations
           reservationUnitOptions {
             id
