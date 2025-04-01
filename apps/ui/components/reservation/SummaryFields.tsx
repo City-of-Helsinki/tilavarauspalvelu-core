@@ -7,6 +7,8 @@ import { AutoGrid } from "common/styles/util";
 import { H4 } from "common";
 import { type MetaFieldsFragment } from "common/gql/gql-types";
 import { capitalize } from "common/src/helpers";
+import { ParagraphAlt, PreviewLabel, PreviewValue } from "./styles";
+import { LabelValuePair } from "./LabelValuePair";
 
 type OptionType = {
   label: string;
@@ -17,24 +19,6 @@ export type OptionsRecord = Record<
   "purpose" | "ageGroup" | "homeCity",
   OptionType[]
 >;
-type NodeT = MetaFieldsFragment;
-
-const ParagraphAlt = styled.div<{ $isWide?: boolean }>`
-  ${({ $isWide }) => $isWide && "grid-column: 1 / -1;"}
-
-  & > div:first-of-type {
-    margin-bottom: var(--spacing-3-xs);
-  }
-`;
-
-const PreviewLabel = styled.div`
-  color: var(--color-black-70);
-  padding-bottom: var(--spacing-2-xs);
-`;
-
-const PreviewValue = styled.div`
-  font-size: var(--fontsize-body-l);
-`;
 
 const Container = styled(AutoGrid)`
   margin-bottom: var(--spacing-2-xl);
@@ -57,25 +41,6 @@ function isNotEmpty(
   return true;
 }
 
-function LabelValuePair({
-  label,
-  value,
-  isWide,
-  testIdKey,
-}: {
-  label: string;
-  value: string;
-  isWide?: boolean;
-  testIdKey: keyof ReservationNode;
-}) {
-  return (
-    <ParagraphAlt $isWide={isWide}>
-      <PreviewLabel>{label}</PreviewLabel>
-      <PreviewValue data-testid={`confirm_${testIdKey}`}>{value}</PreviewValue>
-    </ParagraphAlt>
-  );
-}
-
 /// Helper function to type safely pick the application fields from the reservation
 // TODO move to common (and reuse in the hooks)
 export function getApplicationFields({
@@ -84,7 +49,7 @@ export function getApplicationFields({
   reserveeType,
 }: {
   supportedFields: FieldName[];
-  reservation: NodeT;
+  reservation: MetaFieldsFragment;
   reserveeType: CustomerTypeChoice;
 }) {
   const applicationFields = getReservationApplicationFields({
@@ -103,7 +68,7 @@ export function getGeneralFields({
   reservation,
 }: {
   supportedFields: FieldName[];
-  reservation: NodeT;
+  reservation: MetaFieldsFragment;
 }) {
   const generalFields = getReservationApplicationFields({
     supportedFields,
@@ -124,7 +89,7 @@ export function ApplicationFields({
   options,
   supportedFields,
 }: {
-  reservation: NodeT;
+  reservation: MetaFieldsFragment;
   options: OptionsRecord;
   supportedFields: FieldName[];
 }): JSX.Element {
@@ -175,12 +140,13 @@ export function ApplicationFields({
               reserveeType?.toLocaleLowerCase() || "individual";
             const labelKey = `reservationApplication:label.${typeNamespace}.${key}`;
             const label = t(labelKey);
+            const testId = `confirm_${key}`;
             return (
               <LabelValuePair
                 key={key}
                 label={label}
                 value={value}
-                testIdKey={key}
+                testId={testId}
               />
             );
           })}
@@ -196,7 +162,7 @@ export function GeneralFields({
   options,
 }: {
   supportedFields: FieldName[];
-  reservation: NodeT;
+  reservation: MetaFieldsFragment;
   options: OptionsRecord;
 }): JSX.Element | null {
   const { t } = useTranslation();
@@ -222,12 +188,13 @@ export function GeneralFields({
                 (x) => x === key
               ) != null;
             const label = t(`reservationApplication:label.common.${key}`);
+            const testId = `confirm_${key}`;
             return (
               <LabelValuePair
                 key={key}
                 label={label}
                 value={value}
-                testIdKey={key}
+                testId={testId}
                 isWide={isWide}
               />
             );
