@@ -4,26 +4,22 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
   ReservationOrderingChoices,
-  useListReservationsQuery,
-  type ListReservationsQuery,
   ReservationTypeChoice,
   ReservationStateChoice,
   useDeleteReservationMutation,
+  useListInProgressReservationsQuery,
+  type ReservationNotificationFragment,
 } from "@gql/gql-types";
 import NotificationWrapper from "common/src/components/NotificationWrapper";
 import { useCurrentUser } from "@/hooks";
 import { getCheckoutUrl } from "@/modules/reservation";
 import { filterNonNullable } from "common/src/helpers";
-import { ApolloError } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
 import { toApiDate } from "common/src/common/util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Flex } from "common/styles/util";
-
-type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
-type EdgeT = NonNullable<QueryT["edges"][number]>;
-type NodeT = NonNullable<EdgeT["node"]>;
 
 const BodyText = styled.p`
   margin: 0;
@@ -56,7 +52,7 @@ function ReservationNotification({
 }: {
   onDelete: () => void;
   onNext: () => void;
-  reservation: NodeT;
+  reservation: ReservationNotificationFragment;
   disabled?: boolean;
   isLoading?: boolean;
 }) {
@@ -140,7 +136,7 @@ function ReservationNotification({
 export function InProgressReservationNotification() {
   const { t, i18n } = useTranslation();
   const { currentUser } = useCurrentUser();
-  const { data } = useListReservationsQuery({
+  const { data } = useListInProgressReservationsQuery({
     skip: !currentUser?.pk,
     variables: {
       state: [
@@ -149,7 +145,7 @@ export function InProgressReservationNotification() {
       ],
       orderBy: ReservationOrderingChoices.PkDesc,
       user: currentUser?.pk ?? 0,
-      beginDate: toApiDate(new Date()),
+      beginDate: toApiDate(new Date()) ?? "",
       reservationType: ReservationTypeChoice.Normal,
     },
     fetchPolicy: "no-cache",
@@ -202,7 +198,7 @@ export function InProgressReservationNotification() {
   // NOTE don't need to invalidate the cache on reservations list page because Created is not shown on it.
   // how about WaitingForPayment?
   // it would still be proper to invalidate the cache so if there is such a page, it would show the correct data.
-  const handleDelete = async (reservation?: NodeT) => {
+  const handleDelete = async (reservation: ReservationNotificationFragment) => {
     // If we are on the page for the reservation we are deleting, we should redirect to the front page.
     // The funnel page: reservation-unit/:pk/reservation/:pk should not show this notification at all.
 
@@ -252,10 +248,13 @@ export function InProgressReservationNotification() {
     }
   };
 
-  const handleContinue = (reservation?: NodeT) => {
-    const reservationUnit = reservation?.reservationUnits?.find(() => true);
+  const handleContinue = (reservation: ReservationNotificationFragment) => {
+    const reservationUnit = reservation.reservationUnits?.find(() => true);
+    if (reservationUnit?.pk == null) {
+      throw new Error("No reservation unit pk");
+    }
     const url = getReservationInProgressPath(
-      reservationUnit?.pk,
+      reservationUnit.pk,
       reservation?.pk
     );
     router.push(url);
@@ -298,3 +297,44 @@ export function InProgressReservationNotification() {
     </>
   );
 }
+
+export const RESERVATION_NOTIFICATION_FRAGMENT = gql`
+  fragment ReservationNotification on ReservationNode {
+    id
+    pk
+    state
+    paymentOrder {
+      id
+      expiresInMinutes
+      checkoutUrl
+    }
+    reservationUnits {
+      id
+      pk
+    }
+  }
+`;
+
+export const IN_PROGRESS_RESERVATION_NOTIFICATION_QUERY = gql`
+  query ListInProgressReservations(
+    $state: [ReservationStateChoice!]
+    $orderBy: [ReservationOrderingChoices!]
+    $user: [Int]!
+    $beginDate: Date!
+    $reservationType: [ReservationTypeChoice!]
+  ) {
+    reservations(
+      user: $user
+      state: $state
+      orderBy: $orderBy
+      beginDate: $beginDate
+      reservationType: $reservationType
+    ) {
+      edges {
+        node {
+          ...ReservationNotification
+        }
+      }
+    }
+  }
+`;

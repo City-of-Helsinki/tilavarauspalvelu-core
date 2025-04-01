@@ -22,6 +22,7 @@ import { addDays } from "date-fns";
 import { errorToast } from "common/src/common/toast";
 import { TabWrapper } from "common/styles/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { gql } from "@apollo/client";
 
 const StyledTabPanel = styled(TabPanel)`
   display: flex;
@@ -189,3 +190,35 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 }
 
 export default Reservations;
+
+// NOTE hard coded NORMAL type so only ment to be used in client ui.
+// reservationType valid values: "normal", "behalf", "staff", "blocked"
+// even though the ReservationsReservationTypeChoices says they are uppercase
+// NOTE bang user ID so this doesn't get abused (don't use it without a user)
+export const LIST_RESERVATIONS = gql`
+  query ListReservations(
+    $beginDate: Date
+    $endDate: Date
+    $state: [ReservationStateChoice]
+    $user: [Int]
+    $reservationUnits: [Int]
+    $orderBy: [ReservationOrderingChoices]
+    $reservationType: [ReservationTypeChoice]!
+  ) {
+    reservations(
+      beginDate: $beginDate
+      endDate: $endDate
+      state: $state
+      user: $user
+      reservationUnits: $reservationUnits
+      orderBy: $orderBy
+      reservationType: $reservationType
+    ) {
+      edges {
+        node {
+          ...ReservationCard
+        }
+      }
+    }
+  }
+`;
