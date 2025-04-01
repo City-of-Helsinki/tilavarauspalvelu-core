@@ -6,7 +6,7 @@ import {
   type Maybe,
   Priority,
   ApplicationSectionStatusChoice,
-  type ApplicationFormFragment,
+  type ApplicationViewFragment,
 } from "@gql/gql-types";
 import {
   convertLanguageCode,
@@ -89,12 +89,17 @@ function InfoListItem({ label, value }: { label: string; value: string }) {
   );
 }
 
+type ApplicationT = Pick<ApplicationViewFragment, "applicationSections">;
+type SingleApplicationSectionT = NonNullable<
+  NonNullable<ApplicationT["applicationSections"]>[number]
+>;
+
 function SingleApplicationSection({
   aes,
   primaryTimes,
   secondaryTimes,
 }: {
-  aes: NonNullable<NonNullable<ApplicationT["applicationSections"]>[number]>;
+  aes: SingleApplicationSectionT;
   primaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
   secondaryTimes: Omit<SuitableTimeRangeFormValues, "pk">[];
 }) {
@@ -212,10 +217,6 @@ function SingleApplicationSection({
     </ApplicationSection>
   );
 }
-
-// NOTE: used by Preview and View
-// No form context unlike the edit pages, use application query result
-type ApplicationT = Pick<ApplicationFormFragment, "applicationSections">;
 
 const filterPrimary = (n: { priority: Priority }) =>
   n.priority === Priority.Primary;

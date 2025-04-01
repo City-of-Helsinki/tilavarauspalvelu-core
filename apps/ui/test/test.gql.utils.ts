@@ -230,40 +230,45 @@ function createMockApplicationSection({
   const pk = 1;
   // TODO parametrize so we can zero this for page0 (nothing filled yet)
 
-  const opt1: NonNullable<
-    ApplicationFormFragment["applicationSections"]
-  >[number]["reservationUnitOptions"][number] = {
+  const resUnitCommon = {
+    id: base64encode(`ReservationUnitNode:1`),
+    pk: 1,
+  };
+  const opt1 = {
     id: base64encode(`ReservationUnitOptionNode:1`),
     pk: 1,
     preferredOrder: 1,
-    reservationUnit: {
-      id: base64encode(`ReservationUnitNode:1`),
-      pk: 1,
-      ...generateNameFragment("ReservationUnitNode"),
-      unit: {
-        id: base64encode(`UnitNode:1`),
-        pk: 1,
-        ...generateNameFragment("UnitNode"),
-      },
-      applicationRoundTimeSlots: [
-        {
-          id: base64encode(`ApplicationRoundTimeSlotNode:1`),
-          pk: 1,
-          weekday: 1,
-          closed: false,
-          reservableTimes: [
-            {
-              begin: "08:00",
-              end: "16:00",
+    ...(page === "page2"
+      ? {
+          reservationUnit: {
+            ...resUnitCommon,
+            ...generateNameFragment("ReservationUnitNode"),
+            unit: {
+              id: base64encode(`UnitNode:1`),
+              pk: 1,
+              ...generateNameFragment("UnitNode"),
             },
-          ],
-        },
-      ],
-    },
+            applicationRoundTimeSlots: [
+              {
+                id: base64encode(`ApplicationRoundTimeSlotNode:1`),
+                pk: 1,
+                weekday: 1,
+                closed: false,
+                reservableTimes: [
+                  {
+                    begin: "08:00",
+                    end: "16:00",
+                  },
+                ],
+              },
+            ],
+          },
+        }
+      : {
+          reservationUnit: resUnitCommon,
+        }),
   };
-  const reservationUnitOptions: NonNullable<
-    ApplicationFormFragment["applicationSections"]
-  >[number]["reservationUnitOptions"] = page !== "page0" ? [opt1] : [];
+  const reservationUnitOptions = page !== "page0" ? [opt1] : [];
 
   const page1Data: Omit<
     NonNullable<ApplicationFormFragment["applicationSections"]>[number],
