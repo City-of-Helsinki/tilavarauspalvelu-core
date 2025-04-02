@@ -28,6 +28,7 @@ class RefreshOrderMutationOutput(NamedTuple):
 
 class RefreshOrderMutation(DjangoMutation):
     class Meta:
+        model = PaymentOrder  # Required for "frontend query to factory" matching (see. 'match_queries_to_factories')
         serializer_class = RefreshOrderInputSerializer
         output_serializer_class = RefreshOrderOutputSerializer
         permission_classes = [OrderRefreshPermission]
