@@ -1,90 +1,15 @@
-import { Button, Link } from "hds-react";
 import React from "react";
-import { useTranslation } from "react-i18next";
-import styled from "styled-components";
-import { signOut } from "common/src/browserHelpers";
-import { H1 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
-import { useSession } from "@/hooks/auth";
 import { PUBLIC_URL } from "./const";
 import { env } from "@/env.mjs";
-import { ButtonContainer, Flex } from "common/styles/util";
+import ErrorContainer from "common/src/components/ErrorContainer";
 
-const Wrapper = styled.div`
-  word-break: normal;
-  overflow-wrap: anywhere;
-  gap: var(--spacing-layout-m);
-  h1 {
-    margin-bottom: 0;
-    font-size: 2.5em;
-  }
-  p {
-    margin-bottom: var(--spacing-layout-m);
-  }
-
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-
-  @media (min-width: ${breakpoints.l}) {
-    grid-template-columns: minmax(400px, 600px) 400px;
-    h1 {
-      font-size: 4em;
-    }
-  }
-`;
-
-const Image = styled.img`
-  width: 100%;
-`;
-
-const LogoutSection = ({
-  apiBaseUrl,
-  feedbackUrl,
-}: {
-  apiBaseUrl: string;
-  feedbackUrl: string;
-}): JSX.Element => {
-  const { isAuthenticated } = useSession();
-
-  const { t } = useTranslation();
-
+const Error403 = (): JSX.Element => {
   return (
-    <Flex>
-      <Link external href="/">
-        {t("errorPages.linkToVaraamo")}
-      </Link>
-      <Link external href={feedbackUrl}>
-        {t("errorPages.giveFeedback")}
-      </Link>
-      {isAuthenticated && (
-        <ButtonContainer>
-          <Button onClick={() => signOut(apiBaseUrl, env.NEXT_PUBLIC_BASE_URL)}>
-            {t("Navigation.logout")}
-          </Button>
-        </ButtonContainer>
-      )}
-    </Flex>
-  );
-};
-
-const Error403 = ({
-  apiBaseUrl,
-  feedbackUrl,
-}: {
-  apiBaseUrl: string;
-  feedbackUrl: string;
-}): JSX.Element => {
-  const { t } = useTranslation();
-
-  return (
-    <Wrapper>
-      <div>
-        <H1>403 - {t("errorPages.accessForbidden.title")}</H1>
-        <p>{t("errorPages.accessForbidden.description")}</p>
-        <LogoutSection apiBaseUrl={apiBaseUrl} feedbackUrl={feedbackUrl} />
-      </div>
-      <Image src={`${PUBLIC_URL}/403.png`} />
-    </Wrapper>
+    <ErrorContainer
+      statusCode={403}
+      feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK}
+      imgSrc={`${PUBLIC_URL}/images/403-error.png`}
+    />
   );
 };
 

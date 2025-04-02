@@ -112,9 +112,10 @@ const ErrorContainer = ({
     <ErrorWrapper>
       <Img
         src={
-          HAS_ERROR_IMAGE.includes(statusCode ?? 0)
+          imgSrc ??
+          (HAS_ERROR_IMAGE.includes(statusCode ?? 0)
             ? `/images/${statusCode}-error.png`
-            : imgSrc
+            : "/images/general-error.png")
         }
         alt={
           (imgAlt ?? statusCode)
