@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import {
   AccessType,
-  type ReservationPageQuery,
+  type ReservationKeylessEntryFragment,
   useChangeReservationAccessCodeSingleMutation,
   useRepairReservationAccessCodeSingleMutation,
   useChangeReservationAccessCodeSeriesMutation,
@@ -27,8 +27,6 @@ import { ButtonContainer, Flex, NoWrap } from "common/styles/util";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { useCheckPermission } from "@/hooks";
 import { gql } from "@apollo/client";
-
-type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
 const SummaryHorizontal = styled.div<{
   $isRecurring?: boolean;
@@ -84,7 +82,7 @@ export function ReservationKeylessEntry({
   reservation,
   onSuccess,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationKeylessEntryFragment;
   onSuccess: () => void;
 }>) {
   const { t } = useTranslation();
@@ -131,7 +129,7 @@ function ReservationKeylessEntrySingle({
   reservation,
   onSuccess,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationKeylessEntryFragment;
   onSuccess: () => void;
 }>) {
   const { t } = useTranslation();
@@ -173,7 +171,7 @@ function ReservationKeylessEntryRecurring({
   reservation,
   onSuccess,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationKeylessEntryFragment;
   onSuccess: () => void;
 }>) {
   const { t } = useTranslation();
@@ -238,19 +236,9 @@ function ReservationKeylessEntryRecurring({
 }
 
 function getRecurringReservationAccessCodeValidity(
-  pindoraInfo:
-    | Readonly<{
-        accessCode: string;
-        accessCodeIsActive: boolean;
-        accessCodeValidity: Readonly<
-          Array<{
-            accessCodeBeginsAt: string;
-            accessCodeEndsAt: string;
-          }>
-        >;
-      }>
-    | null
-    | undefined
+  pindoraInfo: NonNullable<
+    ReservationKeylessEntryFragment["recurringReservation"]
+  >["pindoraInfo"]
 ) {
   let validityBeginsDate = null,
     validityEndsDate = null,
@@ -294,7 +282,7 @@ function AccessCodeChangeRepairButton({
   reservation,
   onSuccess,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: ReservationKeylessEntryFragment;
   onSuccess: () => void;
 }>) {
   const { t, i18n } = useTranslation();
@@ -467,6 +455,44 @@ export const REPAIR_RESERVATION_ACCESS_CODE_SERIES = gql`
       pk
       accessCodeIsActive
       accessCodeGeneratedAt
+    }
+  }
+`;
+
+export const RESERVATION_KEYLESS_ENTRY_FRAGMENT = gql`
+  fragment ReservationKeylessEntry on ReservationNode {
+    id
+    pk
+    end
+    reservationUnits {
+      id
+      unit {
+        id
+        pk
+      }
+    }
+    accessType
+    isAccessCodeIsActiveCorrect
+    pindoraInfo {
+      accessCode
+      accessCodeIsActive
+      accessCodeBeginsAt
+      accessCodeEndsAt
+    }
+    recurringReservation {
+      id
+      pk
+      endDate
+      isAccessCodeIsActiveCorrect
+      usedAccessTypes
+      pindoraInfo {
+        accessCode
+        accessCodeIsActive
+        accessCodeValidity {
+          accessCodeBeginsAt
+          accessCodeEndsAt
+        }
+      }
     }
   }
 `;

@@ -246,7 +246,7 @@ class ReservationNode(DjangoNode):
                 "is_blocked",
             }
         }
-        max_complexity = 31
+        max_complexity = 34
         filterset_class = ReservationFilterSet
         permission_classes = [ReservationPermission]
 
