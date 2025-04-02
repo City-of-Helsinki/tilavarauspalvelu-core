@@ -32,7 +32,6 @@ import { getCheckoutUrl } from "@/modules/reservation";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
-import { ReservationStep } from "@/modules/types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { base64encode, filterNonNullable, toNumber } from "common/src/helpers";
@@ -141,7 +140,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     reservationUnit?.requireReservationHandling ||
     reservation?.applyingForFreeOfCharge;
 
-  const steps: ReservationStep[] = useMemo(() => {
+  const steps = useMemo(() => {
     if (reservationUnit == null) {
       return [];
     }

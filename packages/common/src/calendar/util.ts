@@ -1,12 +1,11 @@
 import { addSeconds } from "date-fns";
-import { type CalendarEventBuffer } from "../../types/common";
+import { type CalendarEventBuffer } from "./Calendar";
 
-// TODO use a fragment
 export type ReservationEventType = {
   begin: string;
   end: string;
-  bufferTimeBefore?: number;
-  bufferTimeAfter?: number;
+  bufferTimeBefore: number;
+  bufferTimeAfter: number;
 };
 
 export function getEventBuffers(
