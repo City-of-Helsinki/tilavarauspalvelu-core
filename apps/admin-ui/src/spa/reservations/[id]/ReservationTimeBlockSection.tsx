@@ -19,7 +19,6 @@ import { useModal } from "@/context/ModalContext";
 import {
   eventStyleGetter,
   legend,
-  type ReservationType,
   type CalendarEventType,
   type EventType,
 } from "./eventStyleGetter";
@@ -30,7 +29,6 @@ import { getEventBuffers } from "common/src/calendar/util";
 import { filterNonNullable, toNumber } from "common/src/helpers";
 import VisibleIfPermission from "@/component/VisibleIfPermission";
 import { useSearchParams } from "react-router-dom";
-import type { ApolloQueryResult } from "@apollo/client";
 import { useRecurringReservations, useReservationCalendarData } from "@/hooks";
 import { add, startOfISOWeek } from "date-fns";
 import { RecurringReservationsView } from "@/component/RecurringReservationsView";
@@ -48,6 +46,8 @@ const Container = styled.div`
 
 type WeekOptions = "day" | "week" | "month";
 
+// TODO use a fragment
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 type CalendarProps = {
   reservation: ReservationType;
   refetch: (focusDate?: Date) => void;
@@ -157,7 +157,7 @@ export function TimeBlock({
   onReservationUpdated,
 }: Readonly<{
   reservation: ReservationType;
-  onReservationUpdated: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
+  onReservationUpdated: () => Promise<unknown>;
 }>): JSX.Element {
   const { t } = useTranslation();
 
@@ -221,9 +221,7 @@ export function TimeBlock({
     }
   }, [reservation, calendarRefetch]);
 
-  const handleChanged = async (): Promise<
-    ApolloQueryResult<ReservationPageQuery>
-  > => {
+  const handleChanged = async (): Promise<unknown> => {
     // TODO use allSettled
     await calendarRefetch();
     return onReservationUpdated();

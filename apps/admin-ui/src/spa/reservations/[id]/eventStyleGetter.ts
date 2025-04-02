@@ -1,8 +1,8 @@
 import type { CalendarEvent } from "common/src/calendar/Calendar";
 import {
+  type EventStyleReservationFieldsFragment,
   ReservationStateChoice,
   ReservationTypeChoice,
-  type ReservationPageQuery,
 } from "@gql/gql-types";
 import {
   COMMON_LEGEND,
@@ -12,6 +12,7 @@ import {
   WAITING_PAYMENT,
   POST_PAUSE,
 } from "@/common/calendarStyling";
+import { gql } from "@apollo/client";
 
 const SELECTED = {
   style: {
@@ -38,22 +39,36 @@ export const legend = [
   },
 ];
 
-export type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
+export type EventType = EventStyleReservationFieldsFragment;
 export type CalendarEventType = CalendarEvent<EventType>;
-export type EventBufferType = Pick<
-  ReservationType,
-  "begin" | "end" | "bufferTimeAfter" | "bufferTimeBefore"
+
+export const EVENT_STYLE_RESERVATION_FRAGMENT = gql`
+  fragment EventStyleReservationFields on ReservationNode {
+    id
+    pk
+    begin
+    end
+    bufferTimeAfter
+    bufferTimeBefore
+    name
+    state
+    type
+    recurringReservation {
+      id
+      pk
+    }
+  }
+`;
+
+type CurrentReservationType = Pick<
+  EventStyleReservationFieldsFragment,
+  "pk" | "recurringReservation"
 >;
-export type EventType = EventBufferType &
-  Pick<
-    ReservationType,
-    "pk" | "type" | "state" | "name" | "recurringReservation"
-  >;
 
 // TODO combine with the eventStyleGetter in my-units/eventStyleGetter.ts
 const eventStyleGetter =
   (
-    currentReservation: ReservationType | undefined,
+    currentReservation: CurrentReservationType,
     selectedReservation: EventType | undefined
   ) =>
   ({
