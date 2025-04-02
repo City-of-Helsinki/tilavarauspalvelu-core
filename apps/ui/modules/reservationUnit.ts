@@ -672,7 +672,8 @@ export function getReservationUnitAccessPeriods(
       const endDate = acc.nextEndDate
         ? toUIDate(sub(new Date(acc.nextEndDate), { days: 1 }))
         : null;
-      const accessTypeWithEndDate = { ...aT, endDate };
+      const beginDate = toUIDate(new Date(aT.beginDate));
+      const accessTypeWithEndDate = { ...aT, beginDate, endDate };
       acc.nextEndDate = aT.beginDate;
       acc.array.unshift(accessTypeWithEndDate);
       return { nextEndDate: acc.nextEndDate, array: acc.array };
