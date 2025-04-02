@@ -475,6 +475,7 @@ export const RESERVATION_PAGE_QUERY = gql`
       ...ChangeReservationTime
       ...ReservationTitleSectionFields
       ...ReservationKeylessEntry
+      ...EventStyleReservationFields
       recurringReservation {
         id
         pk
