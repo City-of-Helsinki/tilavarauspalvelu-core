@@ -1,22 +1,6 @@
 import { UserPermissionChoice, useCheckPermissionsQuery } from "@gql/gql-types";
 import { gql } from "@apollo/client";
 
-export const CheckPermissionsQuery = gql`
-  query CheckPermissions(
-    $permission: UserPermissionChoice!
-    $units: [Int!]
-    $requireAll: Boolean = false
-  ) {
-    checkPermissions(
-      permission: $permission
-      units: $units
-      requireAll: $requireAll
-    ) {
-      hasPermission
-    }
-  }
-`;
-
 export function useCheckPermission({
   units,
   permission,
@@ -46,3 +30,19 @@ export function useCheckPermission({
     error,
   };
 }
+
+export const CHECK_PERMISSIONS_QUERY = gql`
+  query CheckPermissions(
+    $permission: UserPermissionChoice!
+    $units: [Int!]
+    $requireAll: Boolean = false
+  ) {
+    checkPermissions(
+      permission: $permission
+      units: $units
+      requireAll: $requireAll
+    ) {
+      hasPermission
+    }
+  }
+`;

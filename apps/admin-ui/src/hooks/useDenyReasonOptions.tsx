@@ -7,22 +7,6 @@ import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { gql } from "@apollo/client";
 
-export const RESERVATION_DENY_REASONS = gql`
-  query ReservationDenyReasons(
-    $orderBy: [ReservationDenyReasonOrderingChoices]
-  ) {
-    reservationDenyReasons(orderBy: $orderBy) {
-      edges {
-        node {
-          id
-          pk
-          reasonFi
-        }
-      }
-    }
-  }
-`;
-
 export function useDenyReasonOptions() {
   const { t } = useTranslation();
 
@@ -44,3 +28,19 @@ export function useDenyReasonOptions() {
 
   return { options: denyReasonOptions, loading };
 }
+
+export const RESERVATION_DENY_REASONS_QUERY = gql`
+  query ReservationDenyReasons(
+    $orderBy: [ReservationDenyReasonOrderingChoices]
+  ) {
+    reservationDenyReasons(orderBy: $orderBy) {
+      edges {
+        node {
+          id
+          pk
+          reasonFi
+        }
+      }
+    }
+  }
+`;

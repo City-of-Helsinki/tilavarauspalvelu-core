@@ -6,7 +6,7 @@ import { toApiDate } from "common/src/common/util";
 import { ReservationStateChoice } from "common/gql/gql-types";
 import { gql } from "@apollo/client";
 
-const useHandling = () => {
+export function useHandling() {
   const { isAuthenticated } = useSession();
 
   const today = useMemo(() => startOfDay(new Date()), []);
@@ -20,13 +20,11 @@ const useHandling = () => {
   });
 
   const handlingCount: number = data?.reservations?.edges?.length ?? 0;
-  const unitCount: number = data?.units?.totalCount ?? 0;
+  const unitCount: number = data?.unitsAll?.length ?? 0;
   const hasOwnUnits: boolean = unitCount > 0;
 
   return { handlingCount, hasOwnUnits, refetch };
-};
-
-export default useHandling;
+}
 
 export const HANDLING_COUNT_QUERY = gql`
   query HandlingData($beginDate: Date!, $state: [ReservationStateChoice]!) {
@@ -42,14 +40,8 @@ export const HANDLING_COUNT_QUERY = gql`
         }
       }
     }
-    units(onlyWithPermission: true) {
-      edges {
-        node {
-          id
-          pk
-        }
-      }
-      totalCount
+    unitsAll(onlyWithPermission: true) {
+      id
     }
   }
 `;

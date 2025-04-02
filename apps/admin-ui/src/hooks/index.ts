@@ -6,3 +6,4 @@ export { useCheckPermission } from "./useCheckPermission";
 export { useCheckCollisions } from "./useCheckCollisions";
 export { useDenyReasonOptions } from "./useDenyReasonOptions";
 export { useRecurringReservations } from "./useRecurringReservations";
+export { useHandling } from "./useHandling";
