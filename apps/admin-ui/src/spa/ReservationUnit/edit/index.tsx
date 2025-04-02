@@ -1846,7 +1846,6 @@ type IRouterProps = {
 /// Wrap the editor so we never reset the form after async loading (because of HDS TimeInput bug)
 function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   const { reservationUnitPk, unitPk: unitPkString } = useParams<IRouterProps>();
-  const { t } = useTranslation();
 
   const typename = "ReservationUnitNode";
   const id = base64encode(`${typename}:${reservationUnitPk}`);
@@ -1898,7 +1897,7 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
   // TODO the unitPk should be removed from the url, not needed since the reservationUnitPk is unique
   // without this we'd move the reservation unit to another unit on save
   if (!isNew && reservationUnit?.unit?.pk !== Number(unitPk)) {
-    return <Error404 message={t("errors.router.unitPkMismatch")} />;
+    return <Error404 />;
   }
   if (!isNew && Number.isNaN(Number(reservationUnitPk))) {
     return <Error404 />;

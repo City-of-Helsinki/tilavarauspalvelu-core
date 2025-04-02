@@ -16,10 +16,7 @@ import Error403 from "@/common/Error403";
 import { CenterSpinner } from "common/styles/util";
 
 // TODO there is no index? (all and requested works like index but not really)
-function ReservationsRouter({
-  apiBaseUrl,
-  feedbackUrl,
-}: RouterProps): JSX.Element {
+function ReservationsRouter(): JSX.Element {
   return (
     <Routes>
       <Route index element={<ListReservationsPage />} />
@@ -28,23 +25,11 @@ function ReservationsRouter({
       <Route path=":id" element={<ReservationPage />} />
       <Route
         path=":id/edit"
-        element={
-          <PermCheckedRoute
-            element={<EditPage />}
-            apiBaseUrl={apiBaseUrl}
-            feedbackUrl={feedbackUrl}
-          />
-        }
+        element={<PermCheckedRoute element={<EditPage />} />}
       />
       <Route
         path=":id/series"
-        element={
-          <PermCheckedRoute
-            element={<SeriesPage />}
-            apiBaseUrl={apiBaseUrl}
-            feedbackUrl={feedbackUrl}
-          />
-        }
+        element={<PermCheckedRoute element={<SeriesPage />} />}
       />
     </Routes>
   );
@@ -81,29 +66,20 @@ function useCheckReservationPermissions(pk?: string) {
   return { hasPermission, loading: qLoading || isLoading };
 }
 
-type RouterProps = {
-  apiBaseUrl: string;
-  feedbackUrl: string;
-};
-
 type PermCheckedRouteProps = {
   element: JSX.Element;
-} & RouterProps;
+};
 
 /// Custom permission checks that use backend queries for the check
 /// requires the query because we don't known the unit the reservation is for
-function PermCheckedRoute({
-  element,
-  apiBaseUrl,
-  feedbackUrl,
-}: PermCheckedRouteProps) {
+function PermCheckedRoute({ element }: PermCheckedRouteProps) {
   const { id } = useParams();
   const { hasPermission, loading } = useCheckReservationPermissions(id);
   if (loading) {
     return <CenterSpinner />;
   }
   if (!hasPermission) {
-    return <Error403 apiBaseUrl={apiBaseUrl} feedbackUrl={feedbackUrl} />;
+    return <Error403 />;
   }
   return element;
 }
