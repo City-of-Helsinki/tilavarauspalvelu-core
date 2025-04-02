@@ -76,45 +76,6 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   }
 `;
 
-export const SINGLE_RESERVATION_ACCESS_TYPE_FRAGMENT = gql`
-  fragment ReservationAccessType on ReservationNode {
-    id
-    accessType
-    isAccessCodeIsActiveCorrect
-    pindoraInfo {
-      accessCode
-      accessCodeIsActive
-      accessCodeBeginsAt
-      accessCodeEndsAt
-    }
-  }
-`;
-
-// TODO move / rename
-export const RESERVATION_RECURRING_FRAGMENT = gql`
-  fragment ReservationRecurringFields on RecurringReservationNode {
-    id
-    pk
-    beginDate
-    beginTime
-    endDate
-    endTime
-    weekdays
-    name
-    description
-    usedAccessTypes
-    isAccessCodeIsActiveCorrect
-    pindoraInfo {
-      accessCode
-      accessCodeIsActive
-      accessCodeValidity {
-        accessCodeBeginsAt
-        accessCodeEndsAt
-      }
-    }
-  }
-`;
-
 export const RECURRING_RESERVATION_FRAGMENT = gql`
   fragment RecurringReservationFields on RecurringReservationNode {
     id
