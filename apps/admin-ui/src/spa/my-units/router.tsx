@@ -7,13 +7,7 @@ import { RecurringReservationDone } from "./recurring/RecurringReservationDone";
 import { withAuthorization } from "@/common/AuthorizationChecker";
 import { UserPermissionChoice } from "@gql/gql-types";
 
-function MyUnitsRouter({
-  apiBaseUrl,
-  feedbackUrl,
-}: {
-  apiBaseUrl: string;
-  feedbackUrl: string;
-}): JSX.Element {
+function MyUnitsRouter({ apiBaseUrl }: { apiBaseUrl: string }): JSX.Element {
   return (
     <Routes>
       <Route index element={<MyUnits />} />
@@ -23,7 +17,6 @@ function MyUnitsRouter({
         element={withAuthorization(
           <RecurringReservation />,
           apiBaseUrl,
-          feedbackUrl,
           UserPermissionChoice.CanCreateStaffReservations
         )}
       />
@@ -32,7 +25,6 @@ function MyUnitsRouter({
         element={withAuthorization(
           <RecurringReservation />,
           apiBaseUrl,
-          feedbackUrl,
           UserPermissionChoice.CanCreateStaffReservations
         )}
       />
@@ -41,7 +33,6 @@ function MyUnitsRouter({
         element={withAuthorization(
           <RecurringReservationDone />,
           apiBaseUrl,
-          feedbackUrl,
           UserPermissionChoice.CanCreateStaffReservations
         )}
       />
@@ -50,7 +41,6 @@ function MyUnitsRouter({
         element={withAuthorization(
           <RecurringReservationDone />,
           apiBaseUrl,
-          feedbackUrl,
           UserPermissionChoice.CanCreateStaffReservations
         )}
       />

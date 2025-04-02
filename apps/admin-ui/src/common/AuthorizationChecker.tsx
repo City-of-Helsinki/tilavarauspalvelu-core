@@ -13,11 +13,9 @@ export function AuthorizationChecker({
   apiUrl,
   children,
   permission,
-  feedbackUrl,
 }: {
   apiUrl: string;
   children: React.ReactNode;
-  feedbackUrl: string;
   permission?: UserPermissionChoice;
 }) {
   const { isAuthenticated, user } = useSessionSuspense();
@@ -32,11 +30,7 @@ export function AuthorizationChecker({
   // Use suspense to avoid flash of unauthorised content
   return (
     <Suspense fallback={<CenterSpinner />}>
-      {hasAccess ? (
-        children
-      ) : (
-        <Error403 apiBaseUrl={apiUrl} feedbackUrl={feedbackUrl} />
-      )}
+      {hasAccess ? children : <Error403 />}
     </Suspense>
   );
 }
@@ -44,14 +38,9 @@ export function AuthorizationChecker({
 export const withAuthorization = (
   component: JSX.Element,
   apiBaseUrl: string,
-  feedbackUrl: string,
   permission?: UserPermissionChoice
 ) => (
-  <AuthorizationChecker
-    permission={permission}
-    apiUrl={apiBaseUrl}
-    feedbackUrl={feedbackUrl}
-  >
+  <AuthorizationChecker permission={permission} apiUrl={apiBaseUrl}>
     {component}
   </AuthorizationChecker>
 );

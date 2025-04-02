@@ -1,18 +1,15 @@
-/// TODO this is a copy of 5xx page, refactor to use same component
-/// TODO use translations
-import { Link } from "hds-react";
 import React from "react";
-import { H1 } from "common/src/common/typography";
-import { PUBLIC_URL } from "./const";
+import ErrorContainer from "common/src/components/ErrorContainer";
+import { env } from "../env.mjs";
+import { PUBLIC_URL } from "@/common/const";
 
-// TODO should there be an image here?
-function Error404({ message }: { message?: string }): JSX.Element {
+function Error404(): JSX.Element {
   return (
-    <>
-      <H1 $large>404: Sivua ei löytynyt</H1>
-      {message && <p>{message}</p>}
-      <Link href={PUBLIC_URL ?? "/"}>Siirry etusivulle</Link>
-    </>
+    <ErrorContainer
+      statusCode={404}
+      feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK}
+      imgSrc={`${PUBLIC_URL}/images/404-error.png`}
+    />
   );
 }
 
