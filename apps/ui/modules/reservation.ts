@@ -25,9 +25,9 @@ import {
 import { getIntervalMinutes } from "common/src/conversion";
 import { fromUIDate } from "./util";
 import { type TFunction } from "i18next";
-import { type PendingReservation } from "@/modules/types";
 import {
   type ReservableMap,
+  ReservationUnitReservableProps,
   type RoundPeriod,
   isRangeReservable,
 } from "./reservable";
@@ -232,7 +232,6 @@ export const CAN_RESERVATION_BE_CHANGED_FRAGMENT = gql`
 export type CanReservationBeChangedProps = {
   reservation: CanReservationBeChangedFragment;
   reservableTimes: ReservableMap;
-  newReservation: PendingReservation;
   reservationUnit: IsReservableFieldsFragment;
   activeApplicationRounds: readonly RoundPeriod[];
   blockingReservations: readonly BlockingReservationFieldsFragment[];
@@ -284,47 +283,25 @@ export function isReservationEditable(
   return true;
 }
 
-/// Only used by reservation edit (both page and component)
-/// NOTE [boolean, string] causes issues in TS / JS
-/// ![false] === ![true] === false, with no type errors
-/// either refactor the return value or add lint rules to disable ! operator
-/// TODO disable undefined from reservation and reservationUnit
-export function canReservationTimeBeChanged({
-  reservation,
-  newReservation,
+export type IsUserAllowedToMoveReservationHereProps =
+  ReservationUnitReservableProps & {
+    isFree: boolean;
+  };
+export function isUserAllowedToMoveReservationHere({
+  range,
+  isFree,
   reservableTimes,
   reservationUnit,
   activeApplicationRounds,
   blockingReservations,
-}: CanReservationBeChangedProps): boolean {
-  if (reservation == null) {
-    return false;
-  }
-  // existing reservation state is not CONFIRMED
-  if (!isReservationConfirmed(reservation)) {
+}: IsUserAllowedToMoveReservationHereProps): boolean {
+  if (!isFree) {
     return false;
   }
 
-  if (!isReservationEditable({ reservation })) {
-    return false;
-  }
-
-  // New reservation would require payment
-  if (!isReservationFreeOfCharge(newReservation)) {
-    return false;
-  }
-
-  if (reservationUnit == null) {
-    return false;
-  }
-
-  //  new reservation is valid
   return isRangeReservable({
     blockingReservations,
-    range: {
-      start: new Date(newReservation.begin),
-      end: new Date(newReservation.end),
-    },
+    range,
     reservationUnit,
     reservableTimes,
     activeApplicationRounds,

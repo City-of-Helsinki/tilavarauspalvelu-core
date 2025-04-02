@@ -1,5 +1,4 @@
 import { breakpoints } from "common/src/common/style";
-import type { PendingReservation } from "@/modules/types";
 import type {
   BlockingReservationFieldsFragment,
   ReservationEditPageQuery,
@@ -11,14 +10,14 @@ import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import {
-  canReservationTimeBeChanged,
   convertFormToFocustimeSlot,
   createDateTime,
   getDurationOptions,
+  isReservationEditable,
+  isUserAllowedToMoveReservationHere,
 } from "@/modules/reservation";
 import {
   getPossibleTimesForDay,
-  getReservationUnitPrice,
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import { type UseFormReturn } from "react-hook-form";
@@ -40,6 +39,7 @@ import { PinkBox as PinkBoxBase } from "./styles";
 import { H4 } from "common";
 import { getReservationPath } from "@/modules/urls";
 
+// TODO fragment
 type ReservationUnitNodeT = NonNullable<
   ReservationUnitPageQuery["reservationUnit"]
 >;
@@ -146,27 +146,17 @@ export function EditStep0({
       reservationUnit.pricings,
       start
     );
-    const newReservation: PendingReservation = {
-      begin: start.toISOString(),
-      end: end.toISOString(),
-      price: isFree
-        ? "0"
-        : getReservationUnitPrice({
-            t,
-            reservationUnit,
-            pricingDate: start,
-            minutes: 0,
-          }),
-    };
 
-    const isNewReservationValid = canReservationTimeBeChanged({
-      reservation,
-      newReservation,
-      reservableTimes,
-      reservationUnit,
-      activeApplicationRounds,
-      blockingReservations,
-    });
+    const isNewReservationValid =
+      isReservationEditable({ reservation }) &&
+      isUserAllowedToMoveReservationHere({
+        isFree,
+        range: { start, end },
+        reservableTimes,
+        reservationUnit,
+        activeApplicationRounds,
+        blockingReservations,
+      });
 
     if (isNewReservationValid) {
       nextStep();
