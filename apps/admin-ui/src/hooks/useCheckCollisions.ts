@@ -8,6 +8,7 @@ import { doesIntervalCollide, reservationToInterval } from "@/helpers";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { gql } from "@apollo/client";
 
 export function useCheckCollisions({
   reservationPk,
@@ -47,7 +48,6 @@ export function useCheckCollisions({
     },
   });
 
-  // TODO: copy paste from requested/hooks/index.ts
   function doesReservationAffectReservationUnit(
     reservation: CalendarReservationFragment,
     resUnitPk: number
@@ -89,3 +89,30 @@ export function useCheckCollisions({
 
   return { isLoading: loading, hasCollisions: collisions.length > 0 };
 }
+
+// TODO there is two versions of this query.
+// This is used in the hooks (collision checks).
+export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
+  query ReservationsByReservationUnit(
+    $id: ID!
+    $pk: Int!
+    $beginDate: Date
+    $endDate: Date
+    $state: [ReservationStateChoice]
+  ) {
+    reservationUnit(id: $id) {
+      id
+      reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
+        ...CalendarReservation
+      }
+    }
+    affectingReservations(
+      forReservationUnits: [$pk]
+      state: $state
+      beginDate: $beginDate
+      endDate: $endDate
+    ) {
+      ...CalendarReservation
+    }
+  }
+`;
