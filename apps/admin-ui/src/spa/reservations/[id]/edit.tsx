@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type ReservationEditPageQuery } from "@gql/gql-types";
+import { type Maybe, type ReservationEditPageQuery } from "@gql/gql-types";
 import { Button, ButtonVariant, LoadingSpinner, TextInput } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -24,9 +24,7 @@ import { LinkPrev } from "@/component/LinkPrev";
 import { useReservationEditData } from "@/hooks";
 import { gql } from "@apollo/client";
 
-// TODO use a fragment
 type ReservationType = NonNullable<ReservationEditPageQuery["reservation"]>;
-type ReservationUnitType = NonNullable<ReservationType["reservationUnits"]>[0];
 type FormValueType = ReservationChangeFormType & ReservationFormMeta;
 
 const noSeparateBillingDefined = (reservation: ReservationType): boolean =>
@@ -46,15 +44,15 @@ const InnerTextInput = styled(TextInput)`
 function EditReservation({
   onCancel,
   reservation,
-  reservationUnit,
   onSuccess,
 }: {
   onCancel: () => void;
   reservation: ReservationType;
-  reservationUnit: ReservationUnitType;
   onSuccess: () => void;
 }) {
   const { t } = useTranslation();
+
+  const reservationUnit = reservation.reservationUnits?.[0];
 
   // TODO recurring requires a description and a name box
   const form = useForm<FormValueType>({
@@ -112,7 +110,7 @@ function EditReservation({
   });
 
   const onSubmit = (values: FormValueType) => {
-    if (!reservationUnit.pk) {
+    if (!reservationUnit?.pk) {
       errorToast({ text: "ERROR: Can't update without reservation unit" });
       return;
     }
@@ -194,8 +192,7 @@ export function EditPage() {
   });
   const navigate = useNavigate();
 
-  const { reservation, reservationUnit, loading, refetch } =
-    useReservationEditData(id);
+  const { reservation, loading, refetch } = useReservationEditData(id);
 
   const handleCancel = () => {
     navigate(-1);
@@ -212,13 +209,10 @@ export function EditPage() {
         <CenterSpinner />
       ) : !reservation ? (
         t("Reservation failed to load", { pk: id })
-      ) : !reservationUnit ? (
-        t("Reservation unit failed to load")
       ) : (
         <ErrorBoundary fallback={<div>{t("pageThrewError")}</div>}>
           <EditReservation
             reservation={reservation}
-            reservationUnit={reservationUnit}
             onCancel={handleCancel}
             onSuccess={handleSuccess}
           />
@@ -234,7 +228,7 @@ function EditPageWrapper({
   title,
 }: {
   title: string;
-  reservation?: ReservationType;
+  reservation: Maybe<ReservationType> | undefined;
   children: React.ReactNode;
 }) {
   const { t } = useTranslation();

@@ -8894,6 +8894,22 @@ export type ReservationEditPageQuery = {
   } | null;
 };
 
+export type EventStyleReservationFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly bufferTimeAfter: number;
+  readonly bufferTimeBefore: number;
+  readonly name: string | null;
+  readonly state: ReservationStateChoice | null;
+  readonly type: ReservationTypeChoice | null;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+  } | null;
+};
+
 export type ReservationPageQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -10531,6 +10547,23 @@ export const ReservationTitleSectionFieldsFragmentDoc = gql`
     paymentOrder {
       id
       status
+    }
+  }
+`;
+export const EventStyleReservationFieldsFragmentDoc = gql`
+  fragment EventStyleReservationFields on ReservationNode {
+    id
+    pk
+    begin
+    end
+    bufferTimeAfter
+    bufferTimeBefore
+    name
+    state
+    type
+    recurringReservation {
+      id
+      pk
     }
   }
 `;
@@ -16439,6 +16472,7 @@ export const ReservationPageDocument = gql`
       ...ChangeReservationTime
       ...ReservationTitleSectionFields
       ...ReservationKeylessEntry
+      ...EventStyleReservationFields
       recurringReservation {
         id
         pk
@@ -16474,6 +16508,7 @@ export const ReservationPageDocument = gql`
   ${ChangeReservationTimeFragmentDoc}
   ${ReservationTitleSectionFieldsFragmentDoc}
   ${ReservationKeylessEntryFragmentDoc}
+  ${EventStyleReservationFieldsFragmentDoc}
   ${VisibleIfPermissionFieldsFragmentDoc}
   ${ApprovalButtonsFragmentDoc}
   ${ReservationTypeFormFieldsFragmentDoc}

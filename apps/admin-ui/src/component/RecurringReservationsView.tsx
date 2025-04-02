@@ -6,7 +6,6 @@ import {
   ReservationStateChoice,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { type ApolloQueryResult } from "@apollo/client";
 import {
   NewReservationListItem,
   ReservationList,
@@ -26,7 +25,7 @@ import { CenterSpinner } from "common/styles/util";
 type Props = {
   recurringPk: number;
   onSelect?: (selected: number) => void;
-  onChange?: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
+  onChange?: () => Promise<unknown>;
   onReservationUpdated?: () => void;
   // optional reservation to copy when creating a new reservation
   // contains a lot more information than the RecurringReservationQuery

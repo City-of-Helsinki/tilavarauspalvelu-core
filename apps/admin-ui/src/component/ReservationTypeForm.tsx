@@ -3,6 +3,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Notification, RadioButton, SelectionGroup, TextArea } from "hds-react";
 import {
   Authentication,
+  type Maybe,
   ReservationTypeChoice,
   type ReservationTypeFormFieldsFragment,
 } from "@gql/gql-types";
@@ -81,8 +82,6 @@ function TypeSelect({ isDisabled }: { isDisabled?: boolean }) {
   );
 }
 
-type TypeFormReservationUnit = ReservationTypeFormFieldsFragment;
-
 // TODO are buffers in different places for Recurring and Single reservations? Check the UI spec
 function ReservationTypeForm({
   reservationUnit,
@@ -90,15 +89,20 @@ function ReservationTypeForm({
   disableBufferToggle,
   disableTypeSelect,
 }: {
-  reservationUnit: TypeFormReservationUnit;
+  reservationUnit: Maybe<ReservationTypeFormFieldsFragment> | undefined;
   children?: React.ReactNode;
   disableBufferToggle?: boolean;
   disableTypeSelect?: boolean;
-}) {
+}): JSX.Element | null {
   const { t } = useTranslation();
 
   const { watch, register } = useFormContext<ReservationFormType>();
   const type = watch("type");
+
+  if (reservationUnit == null) {
+    return null;
+  }
+
   const showAuthWarning =
     type === ReservationTypeChoice.Behalf &&
     reservationUnit.authentication === Authentication.Strong;
