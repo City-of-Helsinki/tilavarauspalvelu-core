@@ -6421,12 +6421,7 @@ export type HandlingDataQuery = {
       readonly node: { readonly id: string; readonly pk: number | null } | null;
     } | null>;
   } | null;
-  readonly units: {
-    readonly totalCount: number | null;
-    readonly edges: ReadonlyArray<{
-      readonly node: { readonly id: string; readonly pk: number | null } | null;
-    } | null>;
-  } | null;
+  readonly unitsAll: ReadonlyArray<{ readonly id: string }> | null;
 };
 
 export type RecurringReservationQueryVariables = Exact<{
@@ -11655,14 +11650,8 @@ export const HandlingDataDocument = gql`
         }
       }
     }
-    units(onlyWithPermission: true) {
-      edges {
-        node {
-          id
-          pk
-        }
-      }
-      totalCount
+    unitsAll(onlyWithPermission: true) {
+      id
     }
   }
 `;

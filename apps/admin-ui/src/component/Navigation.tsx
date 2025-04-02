@@ -12,7 +12,7 @@ import {
 import React from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
-import useHandling from "@/hooks/useHandling";
+import { useHandling } from "@/hooks";
 import Logo from "common/src/components/Logo";
 import { hasSomePermission } from "@/modules/permissionHelper";
 import { env } from "@/env.mjs";
