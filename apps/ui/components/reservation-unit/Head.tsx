@@ -177,9 +177,9 @@ function AccessTypeTooltip({
               {": "}
             </span>
             <span>
-              {accessTypeDuration.endDate !== ""
+              {accessTypeDuration.endDate != null
                 ? `${accessTypeDuration.beginDate} – ${accessTypeDuration.endDate}`
-                : `${t("common:beginLabel")} ${accessTypeDuration.beginDate}`}
+                : `${t("common:dateGte", { value: accessTypeDuration.beginDate })}`}
             </span>
           </li>
         ))}
