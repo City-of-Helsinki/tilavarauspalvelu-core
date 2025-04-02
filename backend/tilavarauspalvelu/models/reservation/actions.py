@@ -22,14 +22,15 @@ from tilavarauspalvelu.enums import (
 )
 from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import ApplicationSection, ReservationMetadataField, Space
+from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationMetadataField, Space
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
 
-    from tilavarauspalvelu.models import Location, PaymentOrder, Reservation, ReservationUnit, Unit
+    from tilavarauspalvelu.models import Location, PaymentOrder, ReservationUnit, Unit
+    from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import Lang
 
 
@@ -290,3 +291,14 @@ class ReservationActions:
 
         payment_order.status = OrderStatus.REFUNDED
         payment_order.save(update_fields=["refund_id", "status"])
+
+    def overlapping_reservations(self) -> ReservationQuerySet:
+        """Find all reservations that overlap with this reservation."""
+        reservation_unit = self.reservation.reservation_units.first()
+        return Reservation.objects.overlapping_reservations(
+            reservation_unit=reservation_unit,
+            begin=self.reservation.begin,
+            end=self.reservation.end,
+            buffer_time_before=self.reservation.buffer_time_before,
+            buffer_time_after=self.reservation.buffer_time_after,
+        ).exclude(id=self.reservation.id)
