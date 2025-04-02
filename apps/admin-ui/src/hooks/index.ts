@@ -7,3 +7,5 @@ export { useCheckCollisions } from "./useCheckCollisions";
 export { useDenyReasonOptions } from "./useDenyReasonOptions";
 export { useRecurringReservations } from "./useRecurringReservations";
 export { useHandling } from "./useHandling";
+export { useReservationCalendarData } from "./useReservationCalendarData";
+export { useReservationEditData } from "./useReservationEditData";
