@@ -474,11 +474,18 @@ export const RESERVATION_PAGE_QUERY = gql`
       ...ReservationCommonFields
       ...ChangeReservationTime
       ...ReservationTitleSectionFields
+      ...ReservationKeylessEntry
       recurringReservation {
         id
-        ...ReservationRecurringFields
+        pk
+        beginDate
+        beginTime
+        endDate
+        endTime
+        weekdays
+        name
+        description
       }
-      ...ReservationAccessType
       ...VisibleIfPermissionFields
       ...ApprovalButtons
       cancelReason {

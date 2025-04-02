@@ -8557,6 +8557,39 @@ export type RepairReservationAccessCodeSeriesMutation = {
   } | null;
 };
 
+export type ReservationKeylessEntryFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly end: string;
+  readonly accessType: AccessType;
+  readonly isAccessCodeIsActiveCorrect: boolean | null;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly unit: { readonly id: string; readonly pk: number | null } | null;
+  }>;
+  readonly pindoraInfo: {
+    readonly accessCode: string;
+    readonly accessCodeIsActive: boolean;
+    readonly accessCodeBeginsAt: string;
+    readonly accessCodeEndsAt: string;
+  } | null;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly endDate: string | null;
+    readonly isAccessCodeIsActiveCorrect: boolean | null;
+    readonly usedAccessTypes: ReadonlyArray<AccessType | null> | null;
+    readonly pindoraInfo: {
+      readonly accessCode: string;
+      readonly accessCodeIsActive: boolean;
+      readonly accessCodeValidity: ReadonlyArray<{
+        readonly accessCodeBeginsAt: string;
+        readonly accessCodeEndsAt: string;
+      }>;
+    } | null;
+  } | null;
+};
+
 export type ReservationApplicationLinkQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8829,18 +8862,6 @@ export type ReservationsByReservationUnitQuery = {
   }> | null;
 };
 
-export type ReservationAccessTypeFragment = {
-  readonly id: string;
-  readonly accessType: AccessType;
-  readonly isAccessCodeIsActiveCorrect: boolean | null;
-  readonly pindoraInfo: {
-    readonly accessCode: string;
-    readonly accessCodeIsActive: boolean;
-    readonly accessCodeBeginsAt: string;
-    readonly accessCodeEndsAt: string;
-  } | null;
-};
-
 export type ReservationRecurringFieldsFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -8851,16 +8872,6 @@ export type ReservationRecurringFieldsFragment = {
   readonly weekdays: ReadonlyArray<number | null> | null;
   readonly name: string;
   readonly description: string;
-  readonly usedAccessTypes: ReadonlyArray<AccessType | null> | null;
-  readonly isAccessCodeIsActiveCorrect: boolean | null;
-  readonly pindoraInfo: {
-    readonly accessCode: string;
-    readonly accessCodeIsActive: boolean;
-    readonly accessCodeValidity: ReadonlyArray<{
-      readonly accessCodeBeginsAt: string;
-      readonly accessCodeEndsAt: string;
-    }>;
-  } | null;
 };
 
 export type RecurringReservationFieldsFragment = {
@@ -8953,16 +8964,16 @@ export type ReservationPageQuery = {
     readonly billingAddressZip: string | null;
     readonly recurringReservation: {
       readonly id: string;
+      readonly pk: number | null;
       readonly beginDate: string | null;
       readonly beginTime: string | null;
       readonly endDate: string | null;
       readonly endTime: string | null;
       readonly weekdays: ReadonlyArray<number | null> | null;
-      readonly pk: number | null;
       readonly name: string;
       readonly description: string;
-      readonly usedAccessTypes: ReadonlyArray<AccessType | null> | null;
       readonly isAccessCodeIsActiveCorrect: boolean | null;
+      readonly usedAccessTypes: ReadonlyArray<AccessType | null> | null;
       readonly pindoraInfo: {
         readonly accessCode: string;
         readonly accessCodeIsActive: boolean;
@@ -10386,6 +10397,43 @@ export const ApprovalButtonsFragmentDoc = gql`
   ${DenyDialogFieldsFragmentDoc}
   ${ApprovalDialogFieldsFragmentDoc}
 `;
+export const ReservationKeylessEntryFragmentDoc = gql`
+  fragment ReservationKeylessEntry on ReservationNode {
+    id
+    pk
+    end
+    reservationUnits {
+      id
+      unit {
+        id
+        pk
+      }
+    }
+    accessType
+    isAccessCodeIsActiveCorrect
+    pindoraInfo {
+      accessCode
+      accessCodeIsActive
+      accessCodeBeginsAt
+      accessCodeEndsAt
+    }
+    recurringReservation {
+      id
+      pk
+      endDate
+      isAccessCodeIsActiveCorrect
+      usedAccessTypes
+      pindoraInfo {
+        accessCode
+        accessCodeIsActive
+        accessCodeValidity {
+          accessCodeBeginsAt
+          accessCodeEndsAt
+        }
+      }
+    }
+  }
+`;
 export const ReservationTitleSectionFieldsFragmentDoc = gql`
   fragment ReservationTitleSectionFields on ReservationNode {
     id
@@ -10453,19 +10501,6 @@ export const CalendarReservationFragmentDoc = gql`
     accessType
   }
 `;
-export const ReservationAccessTypeFragmentDoc = gql`
-  fragment ReservationAccessType on ReservationNode {
-    id
-    accessType
-    isAccessCodeIsActiveCorrect
-    pindoraInfo {
-      accessCode
-      accessCodeIsActive
-      accessCodeBeginsAt
-      accessCodeEndsAt
-    }
-  }
-`;
 export const ReservationRecurringFieldsFragmentDoc = gql`
   fragment ReservationRecurringFields on RecurringReservationNode {
     id
@@ -10477,16 +10512,6 @@ export const ReservationRecurringFieldsFragmentDoc = gql`
     weekdays
     name
     description
-    usedAccessTypes
-    isAccessCodeIsActiveCorrect
-    pindoraInfo {
-      accessCode
-      accessCodeIsActive
-      accessCodeValidity {
-        accessCodeBeginsAt
-        accessCodeEndsAt
-      }
-    }
   }
 `;
 export const ChangeReservationTimeFragmentDoc = gql`
@@ -16449,11 +16474,18 @@ export const ReservationPageDocument = gql`
       ...ReservationCommonFields
       ...ChangeReservationTime
       ...ReservationTitleSectionFields
+      ...ReservationKeylessEntry
       recurringReservation {
         id
-        ...ReservationRecurringFields
+        pk
+        beginDate
+        beginTime
+        endDate
+        endTime
+        weekdays
+        name
+        description
       }
-      ...ReservationAccessType
       ...VisibleIfPermissionFields
       ...ApprovalButtons
       cancelReason {
@@ -16477,8 +16509,7 @@ export const ReservationPageDocument = gql`
   ${ReservationCommonFieldsFragmentDoc}
   ${ChangeReservationTimeFragmentDoc}
   ${ReservationTitleSectionFieldsFragmentDoc}
-  ${ReservationRecurringFieldsFragmentDoc}
-  ${ReservationAccessTypeFragmentDoc}
+  ${ReservationKeylessEntryFragmentDoc}
   ${VisibleIfPermissionFieldsFragmentDoc}
   ${ApprovalButtonsFragmentDoc}
   ${ReservationTypeFormFieldsFragmentDoc}
