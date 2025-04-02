@@ -17,6 +17,7 @@ import Calendar, {
   type SlotClickProps,
   type CalendarEvent,
   SlotProps,
+  type CalendarEventBuffer,
 } from "common/src/calendar/Calendar";
 import { Toolbar } from "common/src/calendar/Toolbar";
 import { addMinutes, differenceInMinutes } from "date-fns";
@@ -33,8 +34,8 @@ import {
   getNewReservation,
 } from "@/modules/reservation";
 import {
-  ReservableMap,
-  RoundPeriod,
+  type ReservableMap,
+  type RoundPeriod,
   getBoundCheckedReservation,
   getSlotPropGetter,
   isRangeReservable,
@@ -47,13 +48,11 @@ import {
 } from "common/src/common/util";
 import { useTranslation } from "next-i18next";
 import { ReservationCalendarControls } from "../calendar/ReservationCalendarControls";
-import { PendingReservation } from "@/modules/types";
 import { getTimeString } from "@/modules/reservationUnit";
 import { UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "../reservation-unit/schema";
 import { useCurrentUser } from "@/hooks";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { CalendarEventBuffer } from "common";
 import { gql } from "@apollo/client";
 
 type WeekOptions = "day" | "week" | "month";
@@ -183,7 +182,7 @@ function useCalendarEventChange({
 
     const { bufferTimeBefore, bufferTimeAfter } = reservationUnit;
     const evts = filterNonNullable(events.map((e) => e.event));
-    const pendingReservation: PendingReservation | null = focusSlot.isReservable
+    const pendingReservation = focusSlot.isReservable
       ? {
           begin: focusSlot.start.toISOString(),
           end: focusSlot.end.toISOString(),
