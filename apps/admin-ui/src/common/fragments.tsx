@@ -103,3 +103,83 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     termsOfUseFi
   }
 `;
+
+export const RESERVATION_META_FRAGMENT = gql`
+  fragment ReservationMetaFields on ReservationNode {
+    ageGroup {
+      id
+      minimum
+      maximum
+      pk
+    }
+    purpose {
+      id
+      nameFi
+      pk
+    }
+    homeCity {
+      id
+      nameFi
+      pk
+    }
+    numPersons
+    name
+    description
+    ...ReserveeNameFields
+    ...ReserveeBillingFields
+    freeOfChargeReason
+    applyingForFreeOfCharge
+  }
+`;
+
+export const RECURRING_RESERVATION_FRAGMENT = gql`
+  fragment RecurringReservationFields on RecurringReservationNode {
+    id
+    pk
+    weekdays
+    beginDate
+    endDate
+    rejectedOccurrences {
+      id
+      beginDatetime
+      endDatetime
+      rejectionReason
+    }
+    reservations {
+      ...ChangeReservationTime
+      state
+      paymentOrder {
+        id
+        status
+      }
+      reservationUnits {
+        id
+        unit {
+          id
+          pk
+        }
+      }
+    }
+  }
+`;
+
+export const CALENDAR_RESERVATION_FRAGMENT = gql`
+  fragment CalendarReservation on ReservationNode {
+    id
+    user {
+      id
+      email
+    }
+    name
+    reserveeName
+    pk
+    begin
+    end
+    state
+    type
+    bufferTimeBefore
+    bufferTimeAfter
+    affectedReservationUnits
+    accessType
+  }
+`;

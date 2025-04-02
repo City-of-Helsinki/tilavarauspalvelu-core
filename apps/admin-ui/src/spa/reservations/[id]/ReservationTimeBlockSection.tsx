@@ -31,10 +31,9 @@ import { filterNonNullable, toNumber } from "common/src/helpers";
 import VisibleIfPermission from "@/component/VisibleIfPermission";
 import { useSearchParams } from "react-router-dom";
 import type { ApolloQueryResult } from "@apollo/client";
-import { useRecurringReservations } from "@/hooks";
+import { useRecurringReservations, useReservationCalendarData } from "@/hooks";
 import { add, startOfISOWeek } from "date-fns";
 import { RecurringReservationsView } from "@/component/RecurringReservationsView";
-import { useReservationData } from "./hooks";
 import { Accordion } from "./components";
 
 const Container = styled.div`
@@ -98,15 +97,13 @@ const Calendar = forwardRef(function Calendar(
     !reservation.recurringReservation &&
     isPossibleToEdit(reservation.state, new Date(reservation.end));
 
-  const eventBuffers = events
-    ? getEventBuffers(
-        filterNonNullable(
-          events
-            .map((e) => e.event)
-            .filter((e) => e?.type !== ReservationTypeChoice.Blocked)
-        )
-      )
-    : [];
+  const eventBuffers = getEventBuffers(
+    filterNonNullable(
+      events
+        .map((e) => e.event)
+        .filter((e) => e?.type !== ReservationTypeChoice.Blocked)
+    )
+  );
 
   return (
     <Container ref={ref}>
@@ -208,12 +205,13 @@ export function TimeBlock({
   // No month view so always query the whole week even if a single day is selected
   // to avoid spamming queries and having to deal with start of day - end of day.
   // focus day can be in the middle of the week.
-  const { events: eventsAll, refetch: calendarRefetch } = useReservationData(
-    startOfISOWeek(focusDate),
-    add(startOfISOWeek(focusDate), { days: 7 }),
-    reservation?.reservationUnits?.[0]?.pk ?? undefined,
-    reservation?.pk ?? undefined
-  );
+  const { events: eventsAll, refetch: calendarRefetch } =
+    useReservationCalendarData({
+      begin: startOfISOWeek(focusDate),
+      end: add(startOfISOWeek(focusDate), { days: 7 }),
+      reservationUnitPk: reservation?.reservationUnits?.[0]?.pk,
+      reservationPk: reservation?.pk,
+    });
 
   // Necessary because the reservation can be removed (denied) from the parent component
   // so update the calendar when that happens.
