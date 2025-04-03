@@ -2,6 +2,8 @@
   "language": "Suomi",
   "dateLabel": "Päivämäärä",
   "timeLabel": "Kellonaika",
+  "timeLabelBegin": "Kellonaika alkaen",
+  "timeLabelEnd": "Kellonaika päättyen",
   "dateWithWeekday": "{{date, datetime}}",
   "dayTimeSeparator": " klo",
   "dateGte": "{{value}} lähtien",

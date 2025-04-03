@@ -2,6 +2,8 @@
   "language": "English",
   "dateLabel": "Date",
   "timeLabel": "Time",
+  "timeLabelBegin": "Time from",
+  "timeLabelEnd": "Time until",
   "dateWithWeekday": "{{date, datetime}}",
   "dayTimeSeparator": ",",
   "dateGte": "from {{value}}",
