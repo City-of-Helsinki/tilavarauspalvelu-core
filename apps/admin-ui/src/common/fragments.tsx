@@ -1,5 +1,14 @@
 import { gql } from "@apollo/client";
 
+export const ALLOCATED_TIME_SLOT_FRAGMENT = gql`
+  fragment AllocatedTimeSlot on AllocatedTimeSlotNode {
+    id
+    beginTime
+    endTime
+    dayOfTheWeek
+  }
+`;
+
 // NOTE this is for allocation only (it includes the application name)
 // for regular application queries we don't need to query the name through the application relation
 export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
@@ -184,6 +193,19 @@ export const CALENDAR_RESERVATION_FRAGMENT = gql`
     recurringReservation {
       id
       pk
+    }
+  }
+`;
+
+export const APPLICATION_ROUND_TIME_SLOTS_FRAGMENT = gql`
+  fragment ApplicationRoundTimeSlots on ApplicationRoundTimeSlotNode {
+    id
+    pk
+    weekday
+    closed
+    reservableTimes {
+      begin
+      end
     }
   }
 `;

@@ -7,6 +7,7 @@ import {
   type ApplicationRoundStatusChoice,
   ApplicationSectionStatusChoice,
   type ApplicationSectionAllocationsQuery,
+  type ReservationUnitNode,
 } from "@gql/gql-types";
 import { breakpoints } from "common";
 import { Accordion } from "@/component/Accordion";
@@ -22,7 +23,6 @@ import { filterNonNullable } from "common/src/helpers";
 import {
   type AllocatedTimeSlotNodeT,
   getRelatedTimeSlots,
-  type ReservationUnitFilterQueryT,
   type SectionNodeT,
 } from "./modules/applicationRoundAllocation";
 import { Flex } from "common/styles/util";
@@ -69,7 +69,7 @@ function EventGroupList({
   refetch,
 }: {
   applicationSections: SectionNodeT[];
-  reservationUnit: NonNullable<ReservationUnitFilterQueryT>;
+  reservationUnit: Pick<ReservationUnitNode, "pk">;
   type: AllocationApplicationSectionCardType;
   refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
 }): JSX.Element {
@@ -95,7 +95,7 @@ function EventGroupList({
 // TODO combine this with the AllocationColumn Props type (it's more or less just passing it through)
 type ApplicationEventsProps = {
   applicationSections: SectionNodeT[] | null;
-  reservationUnit: ReservationUnitFilterQueryT;
+  reservationUnit: Pick<ReservationUnitNode, "pk">;
   refetchApplicationEvents: () => Promise<
     ApolloQueryResult<ApplicationSectionAllocationsQuery>
   >;
@@ -186,7 +186,7 @@ function ApplicationSectionColumn({
   // TODO separate these types (use a union of two types or use Pick to define a new type)
 }: Pick<
   ApplicationEventsProps,
-  "applicationSections" | "reservationUnit" | "refetchApplicationEvents"
+  "applicationSections" | "refetchApplicationEvents" | "reservationUnit"
 >): JSX.Element {
   const { t } = useTranslation();
 

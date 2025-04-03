@@ -12,20 +12,20 @@ import {
   useRejectRestMutation,
   type Maybe,
   type ApplicationSectionAllocationsQuery,
+  type ReservationUnitNode,
 } from "@gql/gql-types";
 import { SemiBold, fontMedium } from "common";
 import { filterNonNullable, truncate } from "common/src/helpers";
 import { convertWeekday } from "common/src/conversion";
 import {
-  type ReservationUnitFilterQueryT,
   type SectionNodeT,
   createDurationString,
   formatTime,
-  AllocatedTimeSlotNodeT,
+  type AllocatedTimeSlotNodeT,
 } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { PopupMenu } from "common/src/components/PopupMenu";
-import { type ApolloQueryResult } from "@apollo/client";
+import { gql, type ApolloQueryResult } from "@apollo/client";
 import { getApplicationUrl } from "@/common/urls";
 import { errorToast } from "common/src/common/toast";
 import { getApplicantName } from "@/helpers";
@@ -39,9 +39,11 @@ export type AllocationApplicationSectionCardType =
   | "partial"
   | "declined";
 
+type ReservationUnitT = Pick<ReservationUnitNode, "pk">;
+
 type Props = {
   applicationSection: SectionNodeT;
-  reservationUnit: NonNullable<ReservationUnitFilterQueryT>;
+  reservationUnit: ReservationUnitT;
   type: AllocationApplicationSectionCardType;
   refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
 };
@@ -268,7 +270,7 @@ function SchedulesList({
   eventsPerWeek,
   refetch,
 }: {
-  currentReservationUnit: ReservationUnitFilterQueryT;
+  currentReservationUnit: ReservationUnitT;
   section: SectionNodeT;
   eventsPerWeek: number;
   refetch: () => Promise<ApolloQueryResult<ApplicationSectionAllocationsQuery>>;
@@ -390,7 +392,7 @@ function AllocatedScheduleSection({
   currentReservationUnit,
 }: {
   allocatedTimeSlot: AllocatedT;
-  currentReservationUnit: ReservationUnitFilterQueryT;
+  currentReservationUnit: ReservationUnitT;
 }): JSX.Element {
   const { t } = useTranslation();
 
@@ -439,3 +441,13 @@ function AllocatedScheduleSection({
     </ScheduleCard>
   );
 }
+
+export const REJECT_REST_MUTATION = gql`
+  mutation RejectRest($input: ReservationUnitOptionUpdateMutationInput!) {
+    updateReservationUnitOption(input: $input) {
+      pk
+      rejected
+      locked
+    }
+  }
+`;

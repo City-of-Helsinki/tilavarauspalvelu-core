@@ -1,4 +1,4 @@
-import { type ApolloQueryResult } from "@apollo/client";
+import { gql, type ApolloQueryResult } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import {
   type AllocatedTimeSlotCreateMutationInput,
@@ -19,14 +19,12 @@ import { getValidationErrors, ValidationError } from "common/src/apolloUtils";
 import { toNumber } from "common/src/helpers";
 
 export function useFocusApplicationEvent(): [
-  number | undefined,
+  number | null,
   (aes?: SectionNodeT) => void,
 ] {
   const [params, setParams] = useSearchParams();
 
-  const selectedAeasPk = params.get("aes")
-    ? Number(params.get("aes"))
-    : undefined;
+  const selectedAeasPk = toNumber(params.get("aes"));
 
   const setFocused = (aes?: SectionNodeT) => {
     // TODO ?? if the applicationEvent is completely allocated => remove the selection
@@ -410,3 +408,27 @@ export function useRemoveAllocation({
   };
   return [handleRemoveAllocation, { isLoading }];
 }
+
+export const CREATE_ALLOCATED_TIME_SLOT = gql`
+  mutation CreateAllocatedTimeSlot(
+    $input: AllocatedTimeSlotCreateMutationInput!
+  ) {
+    createAllocatedTimeslot(input: $input) {
+      beginTime
+      dayOfTheWeek
+      endTime
+      pk
+      reservationUnitOption
+    }
+  }
+`;
+
+export const DELETE_ALLOCATED_TIME_SLOT = gql`
+  mutation DeleteAllocatedTimeSlot(
+    $input: AllocatedTimeSlotDeleteMutationInput!
+  ) {
+    deleteAllocatedTimeslot(input: $input) {
+      deleted
+    }
+  }
+`;

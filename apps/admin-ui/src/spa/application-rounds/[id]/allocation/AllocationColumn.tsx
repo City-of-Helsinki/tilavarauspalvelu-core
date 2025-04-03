@@ -10,6 +10,7 @@ import {
   ApplicationSectionStatusChoice,
   type ApplicationSectionAllocationsQuery,
   Weekday,
+  type ReservationUnitNode,
 } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components/";
 import { transformWeekday, type Day } from "common/src/conversion";
@@ -20,7 +21,6 @@ import {
   getTimeSlotOptions,
   isInsideSelection,
   SectionNodeT,
-  ReservationUnitFilterQueryT,
   AllocatedTimeSlotNodeT,
   SuitableTimeRangeNodeT,
 } from "./modules/applicationRoundAllocation";
@@ -37,7 +37,7 @@ import { addMinutes, startOfDay } from "date-fns";
 
 type Props = {
   applicationSections: SectionNodeT[] | null;
-  reservationUnit?: ReservationUnitFilterQueryT;
+  reservationUnit: Pick<ReservationUnitNode, "pk">;
   refetchApplicationEvents: () => Promise<
     ApolloQueryResult<ApplicationSectionAllocationsQuery>
   >;

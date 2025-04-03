@@ -1,11 +1,9 @@
-/// Plain js / ts helper functions
 import { gql } from "@apollo/client";
 import {
   ReservationTypeChoice,
   ApplicantTypeChoice,
-  type PersonNode,
   type CalendarReservationFragment,
-  type ApplicationNode,
+  type ApplicantNameFieldsFragment,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
   type ApplicationRoundNode,
@@ -136,25 +134,25 @@ export function combineAffectingReservations<T extends AffectedReservations>(
   return filterNonNullable(reservationSet);
 }
 
-// NOTE optionals (?) are super bad because if you forget to query anything from the object there will be no type errors
-// can't remove them because they are not mandatory in the gql schema
-// maybe using an utility function that forces subobjects to NonNullable could work for this.
-// TODO use a fragment
-type Application = {
-  applicantType?:
-    | Pick<ApplicationNode, "applicantType">["applicantType"]
-    | null
-    | undefined;
-  contactPerson?: Pick<PersonNode, "firstName" | "lastName"> | null | undefined;
-  organisation?:
-    | Pick<
-        NonNullable<Pick<ApplicationNode, "organisation">["organisation"]>,
-        "nameFi"
-      >
-    | null
-    | undefined;
-};
-export function getApplicantName(app?: Application | undefined | null): string {
+export const APPLICANT_NAME_FRAGMENT = gql`
+  fragment ApplicantNameFields on ApplicationNode {
+    id
+    applicantType
+    contactPerson {
+      id
+      firstName
+      lastName
+    }
+    organisation {
+      id
+      nameFi
+    }
+  }
+`;
+
+export function getApplicantName(
+  app: ApplicantNameFieldsFragment | undefined
+): string {
   if (!app) {
     return "-";
   }
