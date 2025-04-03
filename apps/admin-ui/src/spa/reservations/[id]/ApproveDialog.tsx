@@ -223,3 +223,12 @@ export const APPROVAL_DIALOG_FRAGMENT = gql`
     ...ReservationPriceDetailsFields
   }
 `;
+
+export const APPROVE_RESERVATION_MUTATION = gql`
+  mutation ApproveReservation($input: ReservationApproveMutationInput!) {
+    approveReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;

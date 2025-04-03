@@ -16,6 +16,7 @@ import { useCheckPermission } from "@/hooks";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { LinkPrev } from "@/component/LinkPrev";
 import { TabWrapper, TitleSection } from "common/styles/util";
+import { gql } from "@apollo/client";
 
 type Params = {
   unitId: string;
@@ -126,3 +127,25 @@ export function MyUnitView() {
     </>
   );
 }
+
+export const UNIT_VIEW_QUERY = gql`
+  query UnitView($id: ID!) {
+    unit(id: $id) {
+      id
+      pk
+      nameFi
+      location {
+        ...LocationFields
+      }
+      reservationUnits {
+        id
+        pk
+        nameFi
+        spaces {
+          id
+          pk
+        }
+      }
+    }
+  }
+`;

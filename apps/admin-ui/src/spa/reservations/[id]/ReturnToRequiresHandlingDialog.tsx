@@ -7,6 +7,7 @@ import {
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { errorToast, successToast } from "common/src/common/toast";
+import { gql } from "@apollo/client";
 
 type ReservationType = Pick<ReservationNode, "pk">;
 type Props = {
@@ -100,4 +101,14 @@ function ReturnToRequiredHandlingDialog({
     </Dialog>
   );
 }
+
 export default ReturnToRequiredHandlingDialog;
+
+export const REQUIRE_HANDLING_RESERVATION = gql`
+  mutation RequireHandling($input: ReservationRequiresHandlingMutationInput!) {
+    requireHandlingForReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;

@@ -1,5 +1,5 @@
 import React from "react";
-import { type ApolloError } from "@apollo/client";
+import { gql, type ApolloError } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "next-i18next";
 import {
@@ -116,3 +116,59 @@ function transformOrderBy(
       return [];
   }
 }
+
+export const APPLICATIONS_QUERY = gql`
+  query Applications(
+    $applicationRound: Int!
+    $unit: [Int]
+    $applicantType: [ApplicantTypeChoice]
+    $status: [ApplicationStatusChoice]!
+    $textSearch: String
+    $orderBy: [ApplicationOrderingChoices]
+    $first: Int
+    $after: String
+  ) {
+    applications(
+      applicationRound: $applicationRound
+      unit: $unit
+      applicantType: $applicantType
+      status: $status
+      textSearch: $textSearch
+      orderBy: $orderBy
+      first: $first
+      after: $after
+    ) {
+      edges {
+        node {
+          id
+          pk
+          status
+          ...ApplicationName
+          applicationSections {
+            id
+            pk
+            name
+            ...ApplicationSectionDuration
+            reservationUnitOptions {
+              id
+              preferredOrder
+              reservationUnit {
+                id
+                unit {
+                  id
+                  pk
+                  nameFi
+                }
+              }
+            }
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+`;
