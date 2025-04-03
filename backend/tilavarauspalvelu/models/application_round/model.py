@@ -12,6 +12,7 @@ from tilavarauspalvelu.enums import (
     ApplicationRoundReservationCreationStatusChoice,
     ApplicationRoundStatusChoice,
     ApplicationStatusChoice,
+    ReservationKind,
 )
 from utils.date_utils import local_datetime
 from utils.db import NowTT
@@ -59,6 +60,7 @@ class ApplicationRound(models.Model):
     reservation_units = models.ManyToManyField(
         "tilavarauspalvelu.ReservationUnit",
         related_name="application_rounds",
+        limit_choices_to=models.Q(reservation_kind__in=ReservationKind.allows_season),
     )
     purposes = models.ManyToManyField(
         "tilavarauspalvelu.ReservationPurpose",
