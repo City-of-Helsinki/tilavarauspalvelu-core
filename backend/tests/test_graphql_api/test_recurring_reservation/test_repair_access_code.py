@@ -83,7 +83,9 @@ def test_repair_reservation_series_access_code__in_seasonal_booking(graphql):
     assert PindoraService.sync_access_code.call_count == 1
 
     # Since connected to seasonal booking, email should be sent.
-    assert EmailService.send_seasonal_reservation_modified_series_access_code_email.called
+    email = EmailService.send_seasonal_reservation_modified_series_access_code_email
+    assert email.call_count == 1
+    assert email.call_args.args[0] == section
 
 
 @patch_method(PindoraService.sync_access_code)

@@ -69,12 +69,7 @@ class ReservationSeriesChangeAccessCodeSerializer(NestingModelSerializer):
                 SentryLogger.log_exception(error, details=f"Reservation series: {instance.pk}")
 
         if instance.allocated_time_slot is not None:
-            # Send email to all reservation series in the same application section where the access code is active.
-            # TODO: Should send a single email with all of the series' info.
             section = instance.allocated_time_slot.reservation_unit_option.application_section
-
-            series: RecurringReservation
-            for series in section.actions.get_reservation_series().should_have_active_access_code():
-                EmailService.send_seasonal_reservation_modified_series_access_code_email(series)
+            EmailService.send_seasonal_reservation_modified_series_access_code_email(section)
 
         return instance
