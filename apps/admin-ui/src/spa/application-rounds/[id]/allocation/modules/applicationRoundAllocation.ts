@@ -4,8 +4,7 @@ import {
   type ApplicationSectionNode,
   Priority,
   Weekday,
-  ApplicationSectionAllocationsQuery,
-  ApplicationRoundFilterQuery,
+  type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { type TFunction } from "next-i18next";
 import { filterNonNullable, timeToMinutes, toNumber } from "common/src/helpers";
@@ -13,22 +12,16 @@ import { formatDuration } from "common/src/common/util";
 import { Day, convertWeekday, transformWeekday } from "common/src/conversion";
 import { set } from "date-fns";
 
+// TODO use a fragment
 type QueryT = NonNullable<
   ApplicationSectionAllocationsQuery["applicationSections"]
 >;
 type EdgeT = NonNullable<QueryT["edges"][0]>;
 export type SectionNodeT = NonNullable<EdgeT["node"]>;
 export type SuitableTimeRangeNodeT = SectionNodeT["suitableTimeRanges"][0];
-export type AllocatedTimeSlotNodeT =
-  SectionNodeT["reservationUnitOptions"][0]["allocatedTimeSlots"][0];
 export type ReservationUnitOptionNodeT = NonNullable<
   SectionNodeT["reservationUnitOptions"]
 >[0];
-
-type ApplicationRoundFilterQueryT =
-  NonNullable<ApplicationRoundFilterQuery>["applicationRound"];
-export type ReservationUnitFilterQueryT =
-  NonNullable<ApplicationRoundFilterQueryT>["reservationUnits"][0];
 
 export type RelatedSlot = {
   day: number;
@@ -240,6 +233,9 @@ export function createDurationString(
       : `${minDurString ?? ""} - ${maxDurString ?? ""}`;
   return durationString;
 }
+
+export type AllocatedTimeSlotNodeT =
+  SectionNodeT["reservationUnitOptions"][0]["allocatedTimeSlots"][0];
 
 export function getRelatedTimeSlots(
   allocations: Pick<
