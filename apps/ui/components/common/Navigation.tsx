@@ -27,7 +27,7 @@ import {
   seasonalPrefix,
   singleSearchPrefix,
 } from "@/modules/urls";
-import { fontBold } from "common/styled";
+import { fontBold, fontMedium } from "common/styled";
 
 type HeaderProps = {
   apiBaseUrl: string;
@@ -49,26 +49,53 @@ const Wrapper = styled.div`
       span:has(.active) {
         /* using box-shadow for a bottom border inside of the element, without affecting text positioning */
         box-shadow: 0 -4px 0 0 var(--color-black) inset;
-        font-weight: bold;
+        ${fontMedium}
       }
     }
   }
 
-  #user-menu-dropdown ul {
-    display: flex;
-    flex-direction: column;
-
-    > * {
+  #user-menu-dropdown {
+    ul {
       display: flex;
-      background: transparent;
-      border: 0;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--color-black-20);
-      transition: background 0.2s;
-      &:hover {
-        background: var(--color-black-10);
-        cursor: pointer;
-        text-decoration: underline;
+      flex-direction: column;
+
+      > * {
+        display: flex;
+        background: transparent;
+        border: 0;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--color-black-20);
+        transition: background 0.2s;
+        color: black;
+        &:hover {
+          background: var(--color-black-10);
+          cursor: pointer;
+          text-decoration: underline;
+        }
+      }
+    }
+    @media (max-width: ${breakpoints.l}) {
+      font-size: var(--fontsize-body-l);
+      ul > * {
+        padding: var(--spacing-s);
+      }
+    }
+  }
+
+  #user-menu {
+    button span svg {
+      margin-top: 10px;
+    }
+    @media (max-width: ${breakpoints.l}) {
+      [class*="HeaderActionBarItemButton-module_actionBarItemButton__"] {
+        padding: var(--spacing-s);
+      }
+      &.visible
+        [class*="HeaderActionBarItemButton-module_actionBarItemButton__"] {
+        border-bottom: 1px solid var(--color-black-20) !important;
+      }
+      [class*="HeaderActionBarItemButton-module_actionBarItemButtonLabel__"] {
+        font-size: var(--fontsize-body-l);
       }
     }
   }
@@ -76,7 +103,6 @@ const Wrapper = styled.div`
   #hds-mobile-menu {
     ul > li {
       > span {
-        padding: var(--spacing-s);
         li,
         a {
           display: block;
@@ -90,11 +116,23 @@ const Wrapper = styled.div`
       &:has(.active) {
         ${fontBold}
       }
+      &:hover,
+      &:focus-within {
+        background: var(--color-black-10);
+        cursor: pointer;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: none;
+      }
     }
   }
 
   [class*="HeaderActionBar-module_title__"] {
-    font-size: var(--fontsize-heading-s) !important;
+    @media (max-width: ${breakpoints.l}) {
+      font-size: var(--fontsize-heading-s) !important;
+      ${fontMedium}
+    }
   }
 `;
 
@@ -134,7 +172,20 @@ function constructName(firstName?: string, lastName?: string) {
   if (lastName) {
     return lastName;
   }
-  return undefined;
+  return "";
+}
+
+function constructInitials(firstName?: string, lastName?: string) {
+  if (firstName && lastName) {
+    return `${firstName.charAt(0).toUpperCase()} ${lastName.charAt(0).toUpperCase()}`;
+  }
+  if (firstName) {
+    return firstName.charAt(0).toUpperCase();
+  }
+  if (lastName) {
+    return lastName.charAt(0).toUpperCase();
+  }
+  return null;
 }
 
 function checkActive(pathname: string, routes: string[], exact: boolean) {
@@ -192,12 +243,18 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
   );
 }
 
-function ActionBar({ apiBaseUrl, profileLink, languageOptions }: HeaderProps) {
+function ActionBar({
+  apiBaseUrl,
+  profileLink,
+  languageOptions,
+}: Readonly<HeaderProps>) {
   const { t } = useTranslation();
   const { isAuthenticated, user } = useSession();
   const { firstName, lastName } = user ?? {};
 
   const userName = constructName(firstName, lastName);
+  const userInitials = constructInitials(firstName, lastName);
+
   return (
     <Header.ActionBar
       title={t("common:applicationName")}
@@ -219,7 +276,7 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: HeaderProps) {
           fixedRightPosition
           id="user-menu"
           label={userName}
-          icon={<IconUser />}
+          avatar={userInitials ?? <IconUser />}
         >
           {!user?.isAdAuthenticated && (
             <a href={profileLink} target="_blank" rel="noopener noreferrer">
