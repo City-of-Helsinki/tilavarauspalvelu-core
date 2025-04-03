@@ -6,6 +6,7 @@ import { toApiDate } from "common/src/common/util";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/common/toast";
+import { gql } from "@apollo/client";
 
 // TODO this should be split into two queries one for the reservation units and one for the daily reservations
 // since the reservation units only change on page load
@@ -86,3 +87,42 @@ export function useUnitResources(
 
   return { ...rest, resources };
 }
+
+export const RESERVATION_UNITS_BY_UNIT_QUERY = gql`
+  query ReservationUnitsByUnit(
+    $id: ID!
+    $pk: Int!
+    $state: [ReservationStateChoice]
+    $beginDate: Date
+    $endDate: Date
+  ) {
+    unit(id: $id) {
+      id
+      reservationUnits {
+        id
+        pk
+        nameFi
+        spaces {
+          id
+          pk
+        }
+        reservationUnitType {
+          id
+          pk
+        }
+        bufferTimeBefore
+        bufferTimeAfter
+        isDraft
+        authentication
+      }
+    }
+    affectingReservations(
+      beginDate: $beginDate
+      endDate: $endDate
+      state: $state
+      forUnits: [$pk]
+    ) {
+      ...ReservationUnitReservations
+    }
+  }
+`;

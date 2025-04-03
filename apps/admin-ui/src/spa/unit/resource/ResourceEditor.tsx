@@ -23,6 +23,7 @@ import {
 } from "./modules/resourceEditor";
 import { ResourceEditorFields } from "./EditForm";
 import { LinkPrev } from "@/component/LinkPrev";
+import { gql } from "@apollo/client";
 
 type Props = {
   resourcePk?: number;
@@ -144,3 +145,27 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     </>
   );
 }
+
+export const RESOURCE_QUERY = gql`
+  query Resource($id: ID!) {
+    resource(id: $id) {
+      id
+      pk
+      nameFi
+      nameSv
+      nameEn
+      space {
+        id
+        pk
+      }
+    }
+  }
+`;
+
+export const UPDATE_RESOURCE = gql`
+  mutation UpdateResource($input: ResourceUpdateMutationInput!) {
+    updateResource(input: $input) {
+      pk
+    }
+  }
+`;

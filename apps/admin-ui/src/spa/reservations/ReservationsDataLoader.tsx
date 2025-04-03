@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { type ApolloError } from "@apollo/client";
+import { gql, type ApolloError } from "@apollo/client";
 import {
   ReservationOrderingChoices,
-  useReservationsQuery,
+  useReservationListQuery,
   ReservationStateChoice,
   OrderStatusWithFree,
-  type ReservationsQueryVariables,
+  type ReservationListQueryVariables,
 } from "@gql/gql-types";
 import { More } from "@/component/More";
 import { LIST_PAGE_SIZE } from "@/common/const";
@@ -59,7 +59,7 @@ function transformStateSafe(t: string): ReservationStateChoice | null {
 
 function mapFilterParams(
   searchParams: URLSearchParams
-): ReservationsQueryVariables {
+): ReservationListQueryVariables {
   const reservationUnitType = searchParams
     .getAll("reservationUnitType")
     .map(Number)
@@ -151,7 +151,7 @@ export function ReservationsDataLoader(): JSX.Element {
   // TODO the sort string should be in the url
   const orderBy = transformSortString(sort);
   const [searchParams] = useSearchParams();
-  const { fetchMore, loading, data, previousData } = useReservationsQuery({
+  const { fetchMore, loading, data, previousData } = useReservationListQuery({
     fetchPolicy: "cache-and-network",
     nextFetchPolicy: "cache-first",
     errorPolicy: "all",
@@ -272,3 +272,59 @@ function transformSortString(
     ReservationOrderingChoices.EndAsc,
   ];
 }
+
+export const RESERVATION_LIST_QUERY = gql`
+  query ReservationList(
+    $first: Int
+    $after: String
+    $orderBy: [ReservationOrderingChoices]
+    $unit: [Int]
+    $reservationUnits: [Int]
+    $reservationUnitType: [Int]
+    $reservationType: [ReservationTypeChoice]
+    $state: [ReservationStateChoice]
+    $orderStatus: [OrderStatusWithFree]
+    $textSearch: String
+    $priceLte: Decimal
+    $priceGte: Decimal
+    $beginDate: Date
+    $endDate: Date
+    $createdAtGte: Date
+    $createdAtLte: Date
+    $applyingForFreeOfCharge: Boolean
+    $isRecurring: Boolean
+  ) {
+    reservations(
+      first: $first
+      after: $after
+      orderBy: $orderBy
+      unit: $unit
+      reservationUnits: $reservationUnits
+      reservationUnitType: $reservationUnitType
+      reservationType: $reservationType
+      state: $state
+      orderStatus: $orderStatus
+      textSearch: $textSearch
+      priceLte: $priceLte
+      priceGte: $priceGte
+      beginDate: $beginDate
+      endDate: $endDate
+      createdAtGte: $createdAtGte
+      createdAtLte: $createdAtLte
+      isRecurring: $isRecurring
+      applyingForFreeOfCharge: $applyingForFreeOfCharge
+      onlyWithPermission: true
+    ) {
+      edges {
+        node {
+          ...ReservationTableElement
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+`;

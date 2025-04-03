@@ -8,6 +8,7 @@ import { useCheckPermission } from "@/hooks";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { CenterSpinner } from "common/styles/util";
+import { gql } from "@apollo/client";
 
 function ApplicationRound({ pk }: { pk: number }): JSX.Element {
   const { t } = useTranslation();
@@ -81,3 +82,11 @@ function ApplicationRoundRouted(): JSX.Element | null {
 }
 
 export default ApplicationRoundRouted;
+
+export const APPLICATION_ROUND_QUERY = gql`
+  query ApplicationRound($id: ID!) {
+    applicationRound(id: $id) {
+      ...ApplicationRoundAdmin
+    }
+  }
+`;

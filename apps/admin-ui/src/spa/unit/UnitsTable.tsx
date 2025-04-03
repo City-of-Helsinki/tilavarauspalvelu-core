@@ -1,21 +1,19 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { memoize } from "lodash-es";
-import type { UnitsQuery } from "@gql/gql-types";
+import type { UnitTableElementFragment } from "@gql/gql-types";
 import type { TFunction } from "i18next";
 import { truncate } from "@/helpers";
 import { getMyUnitUrl, getUnitUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
 import { MAX_UNIT_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styles/util";
+import { gql } from "@apollo/client";
 
-type UnitType = NonNullable<
-  NonNullable<NonNullable<UnitsQuery["units"]>["edges"][0]>["node"]
->;
 type Props = {
   sort: string;
   sortChanged: (field: string) => void;
-  units: UnitType[];
+  units: UnitTableElementFragment[];
   isMyUnits?: boolean;
   isLoading?: boolean;
 };
@@ -23,7 +21,7 @@ type Props = {
 type ColumnType = {
   headerName: string;
   key: string;
-  transform?: (unit: UnitType) => JSX.Element | string;
+  transform?: (unit: UnitTableElementFragment) => JSX.Element | string;
   width: string;
   isSortable: boolean;
 };
@@ -33,7 +31,7 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
     {
       headerName: t("Units.headings.name"),
       key: "nameFi",
-      transform: ({ nameFi, pk }: UnitType) => (
+      transform: ({ nameFi, pk }: UnitTableElementFragment) => (
         <TableLink to={isMyUnits ? getMyUnitUrl(pk) : getUnitUrl(pk)}>
           {truncate(nameFi ?? "-", MAX_UNIT_NAME_LENGTH)}
         </TableLink>
@@ -45,7 +43,7 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
       headerName: t("Units.headings.reservationUnitCount"),
       key: "reservationUnitCount",
       isSortable: true,
-      transform: (unit: UnitType) =>
+      transform: (unit: UnitTableElementFragment) =>
         (unit?.reservationUnits?.length ?? 0).toString(),
       width: "25%",
     },
@@ -53,8 +51,8 @@ function getColConfig(t: TFunction, isMyUnits?: boolean): ColumnType[] {
       headerName: t("Units.headings.unitGroup"),
       key: "unitGroup",
       isSortable: true,
-      transform: (unit: UnitType) =>
-        (unit?.unitGroups || [])
+      transform: (unit: UnitTableElementFragment) =>
+        (unit?.unitGroups ?? [])
           .map((unitGroup) => unitGroup?.nameFi)
           .join(", "),
       width: "25%",
@@ -89,3 +87,19 @@ export function UnitsTable({
     />
   );
 }
+
+export const UNIT_TABLE_ELEMET_FRAGMENT = gql`
+  fragment UnitTableElement on UnitNode {
+    id
+    nameFi
+    pk
+    unitGroups {
+      id
+      nameFi
+    }
+    reservationUnits {
+      id
+      pk
+    }
+  }
+`;

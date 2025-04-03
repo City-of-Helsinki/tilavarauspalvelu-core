@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, ButtonSize, ButtonVariant, TextArea } from "hds-react";
-import { type FetchResult } from "@apollo/client";
+import { gql, type FetchResult } from "@apollo/client";
 import {
   useUpdateApplicationWorkingMemoMutation,
   useUpdateReservationWorkingMemoMutation,
@@ -151,3 +151,25 @@ export function ApplicationWorkingMemo({
     />
   );
 }
+
+export const UPDATE_RESERVATION_WORKING_MEMO = gql`
+  mutation UpdateReservationWorkingMemo($pk: Int!, $workingMemo: String!) {
+    updateReservationWorkingMemo(
+      input: { pk: $pk, workingMemo: $workingMemo }
+    ) {
+      pk
+      workingMemo
+    }
+  }
+`;
+
+export const UPDATE_APPLICATION_WORKING_MEMO = gql`
+  mutation UpdateApplicationWorkingMemo($pk: Int!, $workingMemo: String!) {
+    updateApplicationWorkingMemo(
+      input: { pk: $pk, workingMemo: $workingMemo }
+    ) {
+      pk
+      workingMemo
+    }
+  }
+`;

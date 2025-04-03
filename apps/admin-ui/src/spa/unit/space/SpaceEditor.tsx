@@ -24,6 +24,7 @@ import { base64encode } from "common/src/helpers";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LinkPrev } from "@/component/LinkPrev";
+import { gql } from "@apollo/client";
 
 const Form = styled.form`
   display: flex;
@@ -191,3 +192,48 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
 }
 
 export default SpaceEditor;
+
+export const UPDATE_SPACE = gql`
+  mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
+    updateSpace(input: $input) {
+      pk
+    }
+  }
+`;
+
+// TODO why does this query parents up the tree?
+export const SPACE_QUERY = gql`
+  query Space($id: ID!) {
+    space(id: $id) {
+      ...SpaceCommonFields
+      nameSv
+      nameEn
+      code
+      unit {
+        id
+        pk
+        nameFi
+        descriptionFi
+        location {
+          ...LocationFields
+        }
+        spaces {
+          id
+          pk
+          nameFi
+        }
+      }
+      parent {
+        id
+        parent {
+          id
+          nameFi
+          parent {
+            id
+            nameFi
+          }
+        }
+      }
+    }
+  }
+`;

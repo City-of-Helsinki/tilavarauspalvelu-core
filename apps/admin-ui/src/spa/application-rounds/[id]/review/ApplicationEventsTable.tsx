@@ -26,6 +26,7 @@ import {
 import { ExternalTableLink } from "@/styles/util";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
+import { gql } from "@apollo/client";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
@@ -218,3 +219,75 @@ export function ApplicationEventsTable({
     />
   );
 }
+
+/// NOTE might have some cache issues (because it collides with the other sections query)
+/// TODO rename (there is no Events anymore)
+/// TODO see if we can remove some of the fields (like reservationUnitOptions)
+export const APPLICATION_SECTIONS_QUERY = gql`
+  query ApplicationSections(
+    $applicationRound: Int!
+    $applicationStatus: [ApplicationStatusChoice]!
+    $status: [ApplicationSectionStatusChoice]
+    $unit: [Int]
+    $applicantType: [ApplicantTypeChoice]
+    $preferredOrder: [Int]
+    $textSearch: String
+    $priority: [Priority]
+    $purpose: [Int]
+    $reservationUnit: [Int]
+    $ageGroup: [Int]
+    $homeCity: [Int]
+    $includePreferredOrder10OrHigher: Boolean
+    $orderBy: [ApplicationSectionOrderingChoices]
+    $first: Int
+    $after: String
+  ) {
+    applicationSections(
+      applicationRound: $applicationRound
+      applicationStatus: $applicationStatus
+      status: $status
+      unit: $unit
+      applicantType: $applicantType
+      preferredOrder: $preferredOrder
+      textSearch: $textSearch
+      priority: $priority
+      purpose: $purpose
+      reservationUnit: $reservationUnit
+      ageGroup: $ageGroup
+      homeCity: $homeCity
+      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
+      orderBy: $orderBy
+      first: $first
+      after: $after
+    ) {
+      edges {
+        node {
+          ...ApplicationSectionFields
+          allocations
+          reservationUnitOptions {
+            id
+            allocatedTimeSlots {
+              id
+              pk
+              dayOfTheWeek
+              beginTime
+              endTime
+              reservationUnitOption {
+                id
+                applicationSection {
+                  id
+                  pk
+                }
+              }
+            }
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+`;

@@ -20,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ResourceEditorFields } from "./EditForm";
 import { DialogActionsButtons } from "@/styles/util";
 import { UnitInfo } from "../space/UnitInfo";
+import { gql } from "@apollo/client";
 
 interface IProps {
   unit: NewResourceUnitFieldsFragment;
@@ -104,3 +105,11 @@ export function NewResourceModal({
     </form>
   );
 }
+
+export const CREATE_RESOURCE = gql`
+  mutation CreateResource($input: ResourceCreateMutationInput!) {
+    createResource(input: $input) {
+      pk
+    }
+  }
+`;

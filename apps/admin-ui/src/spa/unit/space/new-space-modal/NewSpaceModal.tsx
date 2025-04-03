@@ -107,3 +107,11 @@ export const NEW_RESOURCE_UNIT_FRAGMENT = gql`
     }
   }
 `;
+
+export const CREATE_SPACE_MUTATION = gql`
+  mutation CreateSpace($input: SpaceCreateMutationInput!) {
+    createSpace(input: $input) {
+      pk
+    }
+  }
+`;
