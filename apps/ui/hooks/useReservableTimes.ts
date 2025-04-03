@@ -7,14 +7,14 @@ import { filterNonNullable } from "common/src/helpers";
 import { useMemo } from "react";
 
 export function useReservableTimes(
-  reservationUnit: Pick<ReservationUnitNode, "reservableTimeSpans">
+  reservationUnit: Pick<ReservationUnitNode, "reservableTimeSpans"> | undefined
 ): ReservableMap {
   const timespans: ReservableMap = useMemo(() => {
     const reservableTimeSpans = filterNonNullable(
-      reservationUnit.reservableTimeSpans
+      reservationUnit?.reservableTimeSpans
     );
     return generateReservableMap(reservableTimeSpans);
-  }, [reservationUnit.reservableTimeSpans]);
+  }, [reservationUnit?.reservableTimeSpans]);
 
   return timespans;
 }

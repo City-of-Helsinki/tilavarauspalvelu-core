@@ -55,8 +55,7 @@ export function getDurationOptions(
 ): { label: string; value: number }[] {
   if (
     opts.minReservationDuration == null ||
-    opts.maxReservationDuration == null ||
-    opts.reservationStartInterval == null
+    opts.maxReservationDuration == null
   ) {
     return [];
   }
@@ -238,9 +237,8 @@ export type CanReservationBeChangedProps = {
 };
 
 export function getWhyReservationCantBeChanged(
-  props: Pick<Required<CanReservationBeChangedProps>, "reservation">
+  reservation: CanReservationBeChangedFragment
 ): string | null {
-  const { reservation } = props;
   // existing reservation state is not CONFIRMED
   if (!isReservationConfirmed(reservation)) {
     return "RESERVATION_MODIFICATION_NOT_ALLOWED";
@@ -275,9 +273,9 @@ export function getWhyReservationCantBeChanged(
 }
 
 export function isReservationEditable(
-  props: Pick<Required<CanReservationBeChangedProps>, "reservation">
+  reservation: CanReservationBeChangedFragment
 ): boolean {
-  if (getWhyReservationCantBeChanged(props) != null) {
+  if (getWhyReservationCantBeChanged(reservation) != null) {
     return false;
   }
   return true;

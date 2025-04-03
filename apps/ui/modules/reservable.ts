@@ -166,7 +166,6 @@ export type ReservationUnitReservableProps = {
   activeApplicationRounds: readonly RoundPeriod[];
 };
 
-// TODO rename to isRangeReservable
 export const IS_RESERVABLE_FRAGMENT = gql`
   fragment IsReservableFields on ReservationUnitNode {
     id

@@ -6,11 +6,11 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import {
-  ReservationUnitPageDocument,
-  type ReservationUnitPageQuery,
-  type ReservationUnitPageQueryVariables,
   type ReservationEditPageQuery,
   type ReservationEditPageQueryVariables,
+  BlockingReservationsDocument,
+  type BlockingReservationsQuery,
+  type BlockingReservationsQueryVariables,
   ReservationEditPageDocument,
 } from "@gql/gql-types";
 import {
@@ -30,7 +30,7 @@ import { EditStep0 } from "@/components/reservation/EditStep0";
 import { EditStep1 } from "@/components/reservation/EditStep1";
 import {
   PendingReservationFormSchema,
-  PendingReservationFormType,
+  type PendingReservationFormType,
 } from "@/components/reservation-unit/schema";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { queryOptions } from "@/modules/queryOptions";
@@ -55,7 +55,7 @@ const StepperWrapper = styled.div`
 `;
 
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
-  const { reservation, reservationUnit, options, blockingReservations } = props;
+  const { reservation, options, blockingReservations } = props;
   const { t, i18n } = useTranslation();
 
   const [step, setStep] = useState<0 | 1>(0);
@@ -106,9 +106,6 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
     },
   ];
 
-  // TODO does this include non active application rounds?
-  const activeApplicationRounds = reservationUnit.applicationRounds;
-
   return (
     <ReservationPageWrapper $nRows={5}>
       <StepperWrapper>
@@ -123,8 +120,6 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
       {step === 0 ? (
         <EditStep0
           reservation={reservation}
-          reservationUnit={reservationUnit}
-          activeApplicationRounds={activeApplicationRounds}
           reservationForm={form}
           nextStep={() => setStep(1)}
           blockingReservations={blockingReservations}
@@ -133,7 +128,6 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
         <EditStep1
           reservation={reservation}
           options={options}
-          reservationUnit={reservationUnit}
           onBack={() => setStep(0)}
           form={form}
         />
@@ -187,14 +181,16 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 
   if (pk != null && pk > 0) {
-    // TODO why are we doing two separate queries? the linked reservationUnit should be part of the reservation query
-    const resId = base64encode(`ReservationNode:${pk}`);
     const { data } = await client.query<
       ReservationEditPageQuery,
       ReservationEditPageQueryVariables
     >({
       query: ReservationEditPageDocument,
-      variables: { id: resId },
+      variables: {
+        id: base64encode(`ReservationNode:${pk}`),
+        beginDate: toApiDate(new Date()) ?? "",
+        endDate: toApiDate(addYears(new Date(), 2)) ?? "",
+      },
     });
     const { reservation } = data;
 
@@ -202,7 +198,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       return notFound;
     }
 
-    if (!isReservationEditable({ reservation })) {
+    if (!isReservationEditable(reservation)) {
       return {
         redirect: {
           permanent: false,
@@ -214,70 +210,71 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       };
     }
 
-    // TODO this is copy pasta from reservation-unit/[id].tsx
     const today = new Date();
     const startDate = today;
     const endDate = addYears(today, 2);
-    const resUnitPk = reservation.reservationUnits.find(() => true)?.pk;
-    if (resUnitPk == null) {
+    const reservationUnit = reservation.reservationUnits.find(() => true);
+    if (reservationUnit?.pk == null) {
       return notFound;
     }
-    const id = base64encode(`ReservationUnitNode:${resUnitPk}`);
-    const { data: reservationUnitData } = await client.query<
-      ReservationUnitPageQuery,
-      ReservationUnitPageQueryVariables
+
+    // Required to do a separate query because we don't known the reservation unit pk
+    const { data: blockingReservationsData } = await client.query<
+      BlockingReservationsQuery,
+      BlockingReservationsQueryVariables
     >({
-      query: ReservationUnitPageDocument,
+      query: BlockingReservationsDocument,
       variables: {
-        id,
-        pk: resUnitPk ?? 0,
+        pk: reservationUnit.pk,
         beginDate: toApiDate(startDate) ?? "",
         endDate: toApiDate(endDate) ?? "",
         state: RELATED_RESERVATION_STATES,
       },
     });
-    const { reservationUnit } = reservationUnitData;
 
     const options = await queryOptions(client, locale ?? "");
 
-    const timespans = filterNonNullable(reservationUnit?.reservableTimeSpans);
     const reservations = filterNonNullable(
-      reservationUnitData?.affectingReservations
-    );
+      blockingReservationsData?.affectingReservations
+    ).filter((r) => r.pk !== reservation.pk);
 
-    if (reservation != null && reservationUnit != null) {
-      return {
-        props: {
-          ...commonProps,
-          ...(await serverSideTranslations(locale ?? "fi")),
-          pk,
-          reservation,
-          options,
-          reservationUnit,
-          reservableTimeSpans: timespans,
-          blockingReservations: reservations,
-        },
-      };
-    }
+    return {
+      props: {
+        ...commonProps,
+        ...(await serverSideTranslations(locale ?? "fi")),
+        reservation,
+        options,
+        blockingReservations: reservations,
+      },
+    };
   }
 
   return notFound;
 }
 
+// NOTE fragment input parameters lack documentation IsReservableFields requires $beginDate and $endDate
 export const RESERVATION_EDIT_PAGE_QUERY = gql`
-  query ReservationEditPage($id: ID!) {
+  query ReservationEditPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
     reservation(id: $id) {
-      id
-      pk
-      name
-      isHandled
-      ...MetaFields
-      ...ReservationInfoCard
-      reservationUnits {
-        id
-        ...CancellationRuleFields
-        ...MetadataSets
-      }
+      ...EditPageReservation
+    }
+  }
+`;
+
+export const BLOCKING_RESERVATIONS_QUERY = gql`
+  query BlockingReservations(
+    $pk: Int!
+    $beginDate: Date!
+    $endDate: Date!
+    $state: [ReservationStateChoice!]
+  ) {
+    affectingReservations(
+      forReservationUnits: [$pk]
+      beginDate: $beginDate
+      endDate: $endDate
+      state: $state
+    ) {
+      ...BlockingReservationFields
     }
   }
 `;

@@ -16,13 +16,11 @@ const Reasons = styled.p`
 `;
 
 export function NotModifiableReason(
-  props: Readonly<CanReservationBeChangedFragment>
+  reservation: CanReservationBeChangedFragment
 ): JSX.Element | null {
   const { t } = useTranslation();
-  const modifyTimeReason = getWhyReservationCantBeChanged({
-    reservation: props,
-  });
-  const isCancellationAllowed = isReservationCancellable(props);
+  const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
+  const isCancellationAllowed = isReservationCancellable(reservation);
 
   if (modifyTimeReason == null) {
     return null;

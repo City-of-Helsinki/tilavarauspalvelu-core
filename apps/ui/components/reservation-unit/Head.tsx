@@ -30,6 +30,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { Flex } from "common/styles/util";
 import { breakpoints } from "common";
 
+// TODO use a fragment
 type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 interface HeadProps {
   reservationUnit: QueryT;

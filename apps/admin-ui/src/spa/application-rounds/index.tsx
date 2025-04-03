@@ -48,7 +48,7 @@ const StyledAccordion = styled(AccordionWithoutTopPadding).attrs({
   }
 `;
 
-// TODO fragment
+// TODO use a fragment?
 type ApplicationRoundListType = NonNullable<
   ApplicationRoundListQuery["applicationRounds"]
 >;

@@ -323,7 +323,7 @@ function Reservation({
   const order = reservation.paymentOrder.find(() => true);
   const reservationUnit = reservation.reservationUnits.find(() => true);
 
-  const modifyTimeReason = getWhyReservationCantBeChanged({ reservation });
+  const modifyTimeReason = getWhyReservationCantBeChanged(reservation);
   const canTimeBeModified = modifyTimeReason == null;
 
   const normalizedOrderStatus =
