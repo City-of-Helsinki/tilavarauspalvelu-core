@@ -1,5 +1,5 @@
 import { useCurrentUserQuery, type CurrentUserQuery } from "@gql/gql-types";
-import { type ApolloError } from "@apollo/client";
+import { gql, type ApolloError } from "@apollo/client";
 
 // TODO this should be replaced with SSR current user in most cases.
 // Causes a flash of unauthenticated content on page load.
@@ -21,3 +21,16 @@ export function useCurrentUser(): {
     loading,
   };
 }
+
+export const CURRENT_USER = gql`
+  query CurrentUser {
+    currentUser {
+      id
+      pk
+      firstName
+      lastName
+      email
+      isAdAuthenticated
+    }
+  }
+`;

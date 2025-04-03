@@ -5730,6 +5730,28 @@ export type BannerNotificationsListQuery = {
   } | null;
 };
 
+export type TermsOfUseQueryVariables = Exact<{
+  termsType?: InputMaybe<TermsType>;
+}>;
+
+export type TermsOfUseQuery = {
+  readonly termsOfUse: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: string | null;
+        readonly termsType: TermsType;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+        readonly textFi: string | null;
+        readonly textEn: string | null;
+        readonly textSv: string | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type ApplicationNameFragment = {
   readonly id: string;
   readonly applicantType: ApplicantTypeChoice | null;
@@ -5994,28 +6016,6 @@ export type MetadataSetsFragment = {
       readonly id: string;
       readonly fieldName: string;
     }>;
-  } | null;
-};
-
-export type TermsOfUseQueryVariables = Exact<{
-  termsType?: InputMaybe<TermsType>;
-}>;
-
-export type TermsOfUseQuery = {
-  readonly termsOfUse: {
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly id: string;
-        readonly pk: string | null;
-        readonly termsType: TermsType;
-        readonly nameFi: string | null;
-        readonly nameEn: string | null;
-        readonly nameSv: string | null;
-        readonly textFi: string | null;
-        readonly textEn: string | null;
-        readonly textSv: string | null;
-      } | null;
-    } | null>;
   } | null;
 };
 
