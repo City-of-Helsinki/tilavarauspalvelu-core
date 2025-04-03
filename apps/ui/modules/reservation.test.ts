@@ -7,6 +7,7 @@ import {
   type CanUserCancelReservationFragment,
   type IsReservableFieldsFragment,
   type PaymentOrderNode,
+  type CanReservationBeChangedFragment,
 } from "@gql/gql-types";
 import {
   isUserAllowedToMoveReservationHere,
@@ -340,14 +341,12 @@ describe("isReservationEditable", () => {
     isHandled?: boolean;
     cancellationBuffer?: number;
   }) {
-    return {
-      reservation: createMockReservation({
-        state,
-        begin,
-        isHandled,
-        canBeCancelledTimeBefore: cancellationBuffer,
-      }),
-    };
+    return createMockReservation({
+      state,
+      begin,
+      isHandled,
+      canBeCancelledTimeBefore: cancellationBuffer,
+    });
   }
 
   test("YES for confirmed reservation in the future", () => {
@@ -373,7 +372,7 @@ describe("isReservationEditable", () => {
   });
 
   test("NO for handled reservation", () => {
-    const input = constructInput({
+    const input: CanReservationBeChangedFragment = constructInput({
       begin: addHours(new Date(), 24),
       isHandled: true,
     });
@@ -382,17 +381,16 @@ describe("isReservationEditable", () => {
 
   test("NO without a cancellation rule", () => {
     const baseUnit = createMockReservationUnit({});
-    const input = {
+    const input: CanReservationBeChangedFragment = {
       ...constructInput({
         begin: addHours(new Date(), 24),
       }),
-      reservation: createMockReservation({
-        reservationUnit: {
+      reservationUnits: [
+        {
           ...baseUnit,
           cancellationRule: null,
         },
-      }),
-      reservationUnit: baseUnit,
+      ],
     };
     expect(isReservationEditable(input)).toBe(false);
   });

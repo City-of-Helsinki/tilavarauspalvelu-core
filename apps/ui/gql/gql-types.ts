@@ -6428,6 +6428,237 @@ export type AvailableTimesReservationUnitFieldsFragment = {
   }> | null;
 };
 
+export type EditPageReservationUnitFragment = {
+  readonly id: string;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly maxReservationDuration: number | null;
+  readonly minReservationDuration: number | null;
+  readonly reservationStartInterval: ReservationStartInterval;
+  readonly reservationsMaxDaysBefore: number | null;
+  readonly reservationsMinDaysBefore: number | null;
+  readonly reservationBegins: string | null;
+  readonly reservationEnds: string | null;
+  readonly termsOfUseFi: string | null;
+  readonly termsOfUseEn: string | null;
+  readonly termsOfUseSv: string | null;
+  readonly pk: number | null;
+  readonly minPersons: number | null;
+  readonly maxPersons: number | null;
+  readonly pricings: ReadonlyArray<{
+    readonly id: string;
+    readonly begins: string;
+    readonly priceUnit: PriceUnit;
+    readonly lowestPrice: string;
+    readonly highestPrice: string;
+    readonly taxPercentage: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly value: string;
+    };
+  }>;
+  readonly applicationRounds: ReadonlyArray<{
+    readonly id: string;
+    readonly reservationPeriodBegin: string;
+    readonly reservationPeriodEnd: string;
+  }>;
+  readonly reservableTimeSpans: ReadonlyArray<{
+    readonly startDatetime: string | null;
+    readonly endDatetime: string | null;
+  }> | null;
+  readonly serviceSpecificTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly textEn: string | null;
+    readonly textSv: string | null;
+  } | null;
+  readonly cancellationTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly textEn: string | null;
+    readonly textSv: string | null;
+  } | null;
+  readonly paymentTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly textEn: string | null;
+    readonly textSv: string | null;
+  } | null;
+  readonly pricingTerms: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+    readonly textFi: string | null;
+    readonly textEn: string | null;
+    readonly textSv: string | null;
+  } | null;
+  readonly metadataSet: {
+    readonly id: string;
+    readonly requiredFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
+    readonly supportedFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
+  } | null;
+};
+
+export type EditPageReservationFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly isHandled: boolean | null;
+  readonly price: string | null;
+  readonly taxPercentageValue: string | null;
+  readonly state: ReservationStateChoice | null;
+  readonly accessType: AccessType;
+  readonly applyingForFreeOfCharge: boolean | null;
+  readonly freeOfChargeReason: string | null;
+  readonly description: string | null;
+  readonly numPersons: number | null;
+  readonly reserveeFirstName: string | null;
+  readonly reserveeLastName: string | null;
+  readonly reserveeEmail: string | null;
+  readonly reserveePhone: string | null;
+  readonly reserveeType: CustomerTypeChoice | null;
+  readonly reserveeOrganisationName: string | null;
+  readonly reserveeId: string | null;
+  readonly reserveeIsUnregisteredAssociation: boolean | null;
+  readonly reserveeAddressStreet: string | null;
+  readonly reserveeAddressCity: string | null;
+  readonly reserveeAddressZip: string | null;
+  readonly billingFirstName: string | null;
+  readonly billingLastName: string | null;
+  readonly billingPhone: string | null;
+  readonly billingEmail: string | null;
+  readonly billingAddressStreet: string | null;
+  readonly billingAddressCity: string | null;
+  readonly billingAddressZip: string | null;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+    readonly reservationBegins: string | null;
+    readonly reservationEnds: string | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly maxReservationDuration: number | null;
+    readonly minReservationDuration: number | null;
+    readonly reservationStartInterval: ReservationStartInterval;
+    readonly reservationsMaxDaysBefore: number | null;
+    readonly reservationsMinDaysBefore: number | null;
+    readonly termsOfUseFi: string | null;
+    readonly termsOfUseEn: string | null;
+    readonly termsOfUseSv: string | null;
+    readonly minPersons: number | null;
+    readonly maxPersons: number | null;
+    readonly images: ReadonlyArray<{
+      readonly id: string;
+      readonly imageUrl: string | null;
+      readonly largeUrl: string | null;
+      readonly mediumUrl: string | null;
+      readonly smallUrl: string | null;
+      readonly imageType: ImageType;
+    }>;
+    readonly unit: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
+    } | null;
+    readonly pricings: ReadonlyArray<{
+      readonly id: string;
+      readonly begins: string;
+      readonly priceUnit: PriceUnit;
+      readonly lowestPrice: string;
+      readonly highestPrice: string;
+      readonly taxPercentage: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly value: string;
+      };
+    }>;
+    readonly applicationRounds: ReadonlyArray<{
+      readonly id: string;
+      readonly reservationPeriodBegin: string;
+      readonly reservationPeriodEnd: string;
+    }>;
+    readonly cancellationRule: {
+      readonly id: string;
+      readonly canBeCancelledTimeBefore: number | null;
+    } | null;
+    readonly reservableTimeSpans: ReadonlyArray<{
+      readonly startDatetime: string | null;
+      readonly endDatetime: string | null;
+    }> | null;
+    readonly serviceSpecificTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly textEn: string | null;
+      readonly textSv: string | null;
+    } | null;
+    readonly cancellationTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly textEn: string | null;
+      readonly textSv: string | null;
+    } | null;
+    readonly paymentTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly textEn: string | null;
+      readonly textSv: string | null;
+    } | null;
+    readonly pricingTerms: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
+      readonly textFi: string | null;
+      readonly textEn: string | null;
+      readonly textSv: string | null;
+    } | null;
+    readonly metadataSet: {
+      readonly id: string;
+      readonly requiredFields: ReadonlyArray<{
+        readonly id: string;
+        readonly fieldName: string;
+      }>;
+      readonly supportedFields: ReadonlyArray<{
+        readonly id: string;
+        readonly fieldName: string;
+      }>;
+    } | null;
+  }>;
+  readonly pindoraInfo: { readonly accessCode: string } | null;
+  readonly ageGroup: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly maximum: number | null;
+    readonly minimum: number;
+  } | null;
+  readonly purpose: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+  } | null;
+  readonly homeCity: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
+  } | null;
+};
+
 export type ReservationCardFragment = {
   readonly pk: number | null;
   readonly begin: string;
@@ -9341,21 +9572,25 @@ export type ReservationConfirmationPageQuery = {
 
 export type ReservationEditPageQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
+  beginDate: Scalars["Date"]["input"];
+  endDate: Scalars["Date"]["input"];
 }>;
 
 export type ReservationEditPageQuery = {
   readonly reservation: {
     readonly id: string;
     readonly pk: number | null;
-    readonly name: string | null;
+    readonly begin: string;
+    readonly end: string;
     readonly isHandled: boolean | null;
+    readonly price: string | null;
+    readonly taxPercentageValue: string | null;
+    readonly state: ReservationStateChoice | null;
+    readonly accessType: AccessType;
     readonly applyingForFreeOfCharge: boolean | null;
     readonly freeOfChargeReason: string | null;
     readonly description: string | null;
     readonly numPersons: number | null;
-    readonly taxPercentageValue: string | null;
-    readonly state: ReservationStateChoice | null;
-    readonly accessType: AccessType;
     readonly reserveeFirstName: string | null;
     readonly reserveeLastName: string | null;
     readonly reserveeEmail: string | null;
@@ -9374,19 +9609,26 @@ export type ReservationEditPageQuery = {
     readonly billingAddressStreet: string | null;
     readonly billingAddressCity: string | null;
     readonly billingAddressZip: string | null;
-    readonly price: string | null;
-    readonly begin: string;
-    readonly end: string;
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
-      readonly minPersons: number | null;
-      readonly maxPersons: number | null;
       readonly pk: number | null;
       readonly nameFi: string | null;
       readonly nameEn: string | null;
       readonly nameSv: string | null;
       readonly reservationBegins: string | null;
       readonly reservationEnds: string | null;
+      readonly bufferTimeBefore: number;
+      readonly bufferTimeAfter: number;
+      readonly maxReservationDuration: number | null;
+      readonly minReservationDuration: number | null;
+      readonly reservationStartInterval: ReservationStartInterval;
+      readonly reservationsMaxDaysBefore: number | null;
+      readonly reservationsMinDaysBefore: number | null;
+      readonly termsOfUseFi: string | null;
+      readonly termsOfUseEn: string | null;
+      readonly termsOfUseSv: string | null;
+      readonly minPersons: number | null;
+      readonly maxPersons: number | null;
       readonly images: ReadonlyArray<{
         readonly id: string;
         readonly imageUrl: string | null;
@@ -9401,21 +9643,6 @@ export type ReservationEditPageQuery = {
         readonly nameEn: string | null;
         readonly nameSv: string | null;
       } | null;
-      readonly cancellationRule: {
-        readonly id: string;
-        readonly canBeCancelledTimeBefore: number | null;
-      } | null;
-      readonly metadataSet: {
-        readonly id: string;
-        readonly requiredFields: ReadonlyArray<{
-          readonly id: string;
-          readonly fieldName: string;
-        }>;
-        readonly supportedFields: ReadonlyArray<{
-          readonly id: string;
-          readonly fieldName: string;
-        }>;
-      } | null;
       readonly pricings: ReadonlyArray<{
         readonly id: string;
         readonly begins: string;
@@ -9428,7 +9655,59 @@ export type ReservationEditPageQuery = {
           readonly value: string;
         };
       }>;
+      readonly applicationRounds: ReadonlyArray<{
+        readonly id: string;
+        readonly reservationPeriodBegin: string;
+        readonly reservationPeriodEnd: string;
+      }>;
+      readonly cancellationRule: {
+        readonly id: string;
+        readonly canBeCancelledTimeBefore: number | null;
+      } | null;
+      readonly reservableTimeSpans: ReadonlyArray<{
+        readonly startDatetime: string | null;
+        readonly endDatetime: string | null;
+      }> | null;
+      readonly serviceSpecificTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly textEn: string | null;
+        readonly textSv: string | null;
+      } | null;
+      readonly cancellationTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly textEn: string | null;
+        readonly textSv: string | null;
+      } | null;
+      readonly paymentTerms: {
+        readonly id: string;
+        readonly textFi: string | null;
+        readonly textEn: string | null;
+        readonly textSv: string | null;
+      } | null;
+      readonly pricingTerms: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+        readonly textFi: string | null;
+        readonly textEn: string | null;
+        readonly textSv: string | null;
+      } | null;
+      readonly metadataSet: {
+        readonly id: string;
+        readonly requiredFields: ReadonlyArray<{
+          readonly id: string;
+          readonly fieldName: string;
+        }>;
+        readonly supportedFields: ReadonlyArray<{
+          readonly id: string;
+          readonly fieldName: string;
+        }>;
+      } | null;
     }>;
+    readonly pindoraInfo: { readonly accessCode: string } | null;
     readonly ageGroup: {
       readonly id: string;
       readonly pk: number | null;
@@ -9449,8 +9728,32 @@ export type ReservationEditPageQuery = {
       readonly nameSv: string | null;
       readonly nameEn: string | null;
     } | null;
-    readonly pindoraInfo: { readonly accessCode: string } | null;
   } | null;
+};
+
+export type BlockingReservationsQueryVariables = Exact<{
+  pk: Scalars["Int"]["input"];
+  beginDate: Scalars["Date"]["input"];
+  endDate: Scalars["Date"]["input"];
+  state?: InputMaybe<
+    ReadonlyArray<ReservationStateChoice> | ReservationStateChoice
+  >;
+}>;
+
+export type BlockingReservationsQuery = {
+  readonly affectingReservations: ReadonlyArray<{
+    readonly pk: number | null;
+    readonly id: string;
+    readonly state: ReservationStateChoice | null;
+    readonly isBlocked: boolean;
+    readonly begin: string;
+    readonly end: string;
+    readonly numPersons: number | null;
+    readonly calendarUrl: string;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly affectedReservationUnits: ReadonlyArray<number | null>;
+  }> | null;
 };
 
 export type ApplicationRecurringReservationQueryVariables = Exact<{
@@ -10438,6 +10741,15 @@ export const AvailableTimesReservationUnitFieldsFragmentDoc = gql`
   }
   ${IsReservableFieldsFragmentDoc}
 `;
+export const CanReservationBeChangedFragmentDoc = gql`
+  fragment CanReservationBeChanged on ReservationNode {
+    end
+    isHandled
+    price
+    ...CanUserCancelReservation
+  }
+  ${CanUserCancelReservationFragmentDoc}
+`;
 export const PriceReservationUnitFieldsFragmentDoc = gql`
   fragment PriceReservationUnitFields on ReservationUnitNode {
     id
@@ -10462,47 +10774,6 @@ export const ReservationPriceFieldsFragmentDoc = gql`
     applyingForFreeOfCharge
   }
   ${PriceReservationUnitFieldsFragmentDoc}
-`;
-export const ReservationOrderStatusFragmentDoc = gql`
-  fragment ReservationOrderStatus on ReservationNode {
-    id
-    state
-    paymentOrder {
-      id
-      status
-    }
-  }
-`;
-export const ReservationCardFragmentDoc = gql`
-  fragment ReservationCard on ReservationNode {
-    pk
-    begin
-    end
-    state
-    accessType
-    reservationUnits {
-      id
-      nameFi
-      nameSv
-      nameEn
-      images {
-        ...Image
-      }
-      unit {
-        id
-        nameFi
-        nameSv
-        nameEn
-      }
-    }
-    ...ReservationPriceFields
-    ...ReservationOrderStatus
-    ...CanUserCancelReservation
-  }
-  ${ImageFragmentDoc}
-  ${ReservationPriceFieldsFragmentDoc}
-  ${ReservationOrderStatusFragmentDoc}
-  ${CanUserCancelReservationFragmentDoc}
 `;
 export const ReservationInfoCardFragmentDoc = gql`
   fragment ReservationInfoCard on ReservationNode {
@@ -10531,179 +10802,6 @@ export const ReservationInfoCardFragmentDoc = gql`
   ${ReservationPriceFieldsFragmentDoc}
   ${ReservationUnitNameFieldsFragmentDoc}
   ${ImageFragmentDoc}
-`;
-export const ReservationInfoFragmentDoc = gql`
-  fragment ReservationInfo on ReservationNode {
-    id
-    description
-    purpose {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-    ageGroup {
-      id
-      pk
-      minimum
-      maximum
-    }
-    numPersons
-  }
-`;
-export const ReservationTimePickerFieldsFragmentDoc = gql`
-  fragment ReservationTimePickerFields on ReservationUnitNode {
-    id
-    pk
-    ...IsReservableFields
-    ...PriceReservationUnitFields
-  }
-  ${IsReservableFieldsFragmentDoc}
-  ${PriceReservationUnitFieldsFragmentDoc}
-`;
-export const RecurringCardFragmentDoc = gql`
-  fragment RecurringCard on ReservationUnitNode {
-    ...OrderedReservationUnitCard
-    reservationUnitType {
-      id
-      nameFi
-      nameSv
-      nameEn
-    }
-    maxPersons
-    currentAccessType
-    effectiveAccessType
-  }
-  ${OrderedReservationUnitCardFragmentDoc}
-`;
-export const SingleSearchCardFragmentDoc = gql`
-  fragment SingleSearchCard on ReservationUnitNode {
-    ...RecurringCard
-    pricings {
-      ...PricingFields
-    }
-    reservationBegins
-    reservationEnds
-    isClosed
-    firstReservableDatetime
-    currentAccessType
-    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
-      id
-      accessType
-    }
-  }
-  ${RecurringCardFragmentDoc}
-  ${PricingFieldsFragmentDoc}
-`;
-export const TermsOfUseFragmentDoc = gql`
-  fragment TermsOfUse on ReservationUnitNode {
-    id
-    termsOfUseFi
-    termsOfUseEn
-    termsOfUseSv
-    serviceSpecificTerms {
-      ...TermsOfUseTextFields
-    }
-    cancellationTerms {
-      ...TermsOfUseTextFields
-    }
-    paymentTerms {
-      ...TermsOfUseTextFields
-    }
-    pricingTerms {
-      ...TermsOfUseNameFields
-      ...TermsOfUseTextFields
-    }
-  }
-  ${TermsOfUseTextFieldsFragmentDoc}
-  ${TermsOfUseNameFieldsFragmentDoc}
-`;
-export const CancelReasonFieldsFragmentDoc = gql`
-  fragment CancelReasonFields on ReservationCancelReasonNode {
-    id
-    pk
-    reasonFi
-    reasonEn
-    reasonSv
-  }
-`;
-export const OrderFieldsFragmentDoc = gql`
-  fragment OrderFields on PaymentOrderNode {
-    id
-    reservationPk
-    status
-    paymentType
-    receiptUrl
-    checkoutUrl
-  }
-`;
-export const EquipmentFieldsFragmentDoc = gql`
-  fragment EquipmentFields on EquipmentNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
-    category {
-      id
-      nameFi
-      nameEn
-      nameSv
-    }
-  }
-`;
-export const BlockingReservationFieldsFragmentDoc = gql`
-  fragment BlockingReservationFields on ReservationNode {
-    pk
-    id
-    state
-    isBlocked
-    begin
-    end
-    numPersons
-    calendarUrl
-    bufferTimeBefore
-    bufferTimeAfter
-    affectedReservationUnits
-  }
-`;
-export const CanReservationBeChangedFragmentDoc = gql`
-  fragment CanReservationBeChanged on ReservationNode {
-    end
-    isHandled
-    price
-    ...CanUserCancelReservation
-  }
-  ${CanUserCancelReservationFragmentDoc}
-`;
-export const MetadataSetsFragmentDoc = gql`
-  fragment MetadataSets on ReservationUnitNode {
-    id
-    minPersons
-    maxPersons
-    metadataSet {
-      id
-      requiredFields {
-        id
-        fieldName
-      }
-      supportedFields {
-        id
-        fieldName
-      }
-    }
-  }
-`;
-export const NotReservableFieldsFragmentDoc = gql`
-  fragment NotReservableFields on ReservationUnitNode {
-    ...IsReservableFields
-    reservationState
-    reservationKind
-    ...MetadataSets
-  }
-  ${IsReservableFieldsFragmentDoc}
-  ${MetadataSetsFragmentDoc}
 `;
 export const ReserveeNameFieldsFragmentDoc = gql`
   fragment ReserveeNameFields on ReservationNode {
@@ -10765,6 +10863,251 @@ export const MetaFieldsFragmentDoc = gql`
   }
   ${ReserveeNameFieldsFragmentDoc}
   ${ReserveeBillingFieldsFragmentDoc}
+`;
+export const TermsOfUseFragmentDoc = gql`
+  fragment TermsOfUse on ReservationUnitNode {
+    id
+    termsOfUseFi
+    termsOfUseEn
+    termsOfUseSv
+    serviceSpecificTerms {
+      ...TermsOfUseTextFields
+    }
+    cancellationTerms {
+      ...TermsOfUseTextFields
+    }
+    paymentTerms {
+      ...TermsOfUseTextFields
+    }
+    pricingTerms {
+      ...TermsOfUseNameFields
+      ...TermsOfUseTextFields
+    }
+  }
+  ${TermsOfUseTextFieldsFragmentDoc}
+  ${TermsOfUseNameFieldsFragmentDoc}
+`;
+export const ReservationTimePickerFieldsFragmentDoc = gql`
+  fragment ReservationTimePickerFields on ReservationUnitNode {
+    id
+    pk
+    ...IsReservableFields
+    ...PriceReservationUnitFields
+  }
+  ${IsReservableFieldsFragmentDoc}
+  ${PriceReservationUnitFieldsFragmentDoc}
+`;
+export const MetadataSetsFragmentDoc = gql`
+  fragment MetadataSets on ReservationUnitNode {
+    id
+    minPersons
+    maxPersons
+    metadataSet {
+      id
+      requiredFields {
+        id
+        fieldName
+      }
+      supportedFields {
+        id
+        fieldName
+      }
+    }
+  }
+`;
+export const EditPageReservationUnitFragmentDoc = gql`
+  fragment EditPageReservationUnit on ReservationUnitNode {
+    id
+    ...IsReservableFields
+    pricings {
+      ...PricingFields
+    }
+    ...TermsOfUse
+    ...ReservationTimePickerFields
+    ...MetadataSets
+    applicationRounds(ongoing: true) {
+      id
+      reservationPeriodBegin
+      reservationPeriodEnd
+    }
+  }
+  ${IsReservableFieldsFragmentDoc}
+  ${PricingFieldsFragmentDoc}
+  ${TermsOfUseFragmentDoc}
+  ${ReservationTimePickerFieldsFragmentDoc}
+  ${MetadataSetsFragmentDoc}
+`;
+export const EditPageReservationFragmentDoc = gql`
+  fragment EditPageReservation on ReservationNode {
+    id
+    pk
+    begin
+    end
+    ...CanReservationBeChanged
+    ...ReservationInfoCard
+    ...MetaFields
+    reservationUnits {
+      ...EditPageReservationUnit
+    }
+  }
+  ${CanReservationBeChangedFragmentDoc}
+  ${ReservationInfoCardFragmentDoc}
+  ${MetaFieldsFragmentDoc}
+  ${EditPageReservationUnitFragmentDoc}
+`;
+export const ReservationOrderStatusFragmentDoc = gql`
+  fragment ReservationOrderStatus on ReservationNode {
+    id
+    state
+    paymentOrder {
+      id
+      status
+    }
+  }
+`;
+export const ReservationCardFragmentDoc = gql`
+  fragment ReservationCard on ReservationNode {
+    pk
+    begin
+    end
+    state
+    accessType
+    reservationUnits {
+      id
+      nameFi
+      nameSv
+      nameEn
+      images {
+        ...Image
+      }
+      unit {
+        id
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+    ...ReservationPriceFields
+    ...ReservationOrderStatus
+    ...CanUserCancelReservation
+  }
+  ${ImageFragmentDoc}
+  ${ReservationPriceFieldsFragmentDoc}
+  ${ReservationOrderStatusFragmentDoc}
+  ${CanUserCancelReservationFragmentDoc}
+`;
+export const ReservationInfoFragmentDoc = gql`
+  fragment ReservationInfo on ReservationNode {
+    id
+    description
+    purpose {
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
+    }
+    ageGroup {
+      id
+      pk
+      minimum
+      maximum
+    }
+    numPersons
+  }
+`;
+export const RecurringCardFragmentDoc = gql`
+  fragment RecurringCard on ReservationUnitNode {
+    ...OrderedReservationUnitCard
+    reservationUnitType {
+      id
+      nameFi
+      nameSv
+      nameEn
+    }
+    maxPersons
+    currentAccessType
+    effectiveAccessType
+  }
+  ${OrderedReservationUnitCardFragmentDoc}
+`;
+export const SingleSearchCardFragmentDoc = gql`
+  fragment SingleSearchCard on ReservationUnitNode {
+    ...RecurringCard
+    pricings {
+      ...PricingFields
+    }
+    reservationBegins
+    reservationEnds
+    isClosed
+    firstReservableDatetime
+    currentAccessType
+    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+      id
+      accessType
+    }
+  }
+  ${RecurringCardFragmentDoc}
+  ${PricingFieldsFragmentDoc}
+`;
+export const CancelReasonFieldsFragmentDoc = gql`
+  fragment CancelReasonFields on ReservationCancelReasonNode {
+    id
+    pk
+    reasonFi
+    reasonEn
+    reasonSv
+  }
+`;
+export const OrderFieldsFragmentDoc = gql`
+  fragment OrderFields on PaymentOrderNode {
+    id
+    reservationPk
+    status
+    paymentType
+    receiptUrl
+    checkoutUrl
+  }
+`;
+export const EquipmentFieldsFragmentDoc = gql`
+  fragment EquipmentFields on EquipmentNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    category {
+      id
+      nameFi
+      nameEn
+      nameSv
+    }
+  }
+`;
+export const BlockingReservationFieldsFragmentDoc = gql`
+  fragment BlockingReservationFields on ReservationNode {
+    pk
+    id
+    state
+    isBlocked
+    begin
+    end
+    numPersons
+    calendarUrl
+    bufferTimeBefore
+    bufferTimeAfter
+    affectedReservationUnits
+  }
+`;
+export const NotReservableFieldsFragmentDoc = gql`
+  fragment NotReservableFields on ReservationUnitNode {
+    ...IsReservableFields
+    reservationState
+    reservationKind
+    ...MetadataSets
+  }
+  ${IsReservableFieldsFragmentDoc}
+  ${MetadataSetsFragmentDoc}
 `;
 export const BannerNotificationCommonFragmentDoc = gql`
   fragment BannerNotificationCommon on BannerNotificationNode {
@@ -14132,25 +14475,12 @@ export type ReservationConfirmationPageQueryResult = Apollo.QueryResult<
   ReservationConfirmationPageQueryVariables
 >;
 export const ReservationEditPageDocument = gql`
-  query ReservationEditPage($id: ID!) {
+  query ReservationEditPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
     reservation(id: $id) {
-      id
-      pk
-      name
-      isHandled
-      ...MetaFields
-      ...ReservationInfoCard
-      reservationUnits {
-        id
-        ...CancellationRuleFields
-        ...MetadataSets
-      }
+      ...EditPageReservation
     }
   }
-  ${MetaFieldsFragmentDoc}
-  ${ReservationInfoCardFragmentDoc}
-  ${CancellationRuleFieldsFragmentDoc}
-  ${MetadataSetsFragmentDoc}
+  ${EditPageReservationFragmentDoc}
 `;
 
 /**
@@ -14166,6 +14496,8 @@ export const ReservationEditPageDocument = gql`
  * const { data, loading, error } = useReservationEditPageQuery({
  *   variables: {
  *      id: // value for 'id'
+ *      beginDate: // value for 'beginDate'
+ *      endDate: // value for 'endDate'
  *   },
  * });
  */
@@ -14226,6 +14558,102 @@ export type ReservationEditPageSuspenseQueryHookResult = ReturnType<
 export type ReservationEditPageQueryResult = Apollo.QueryResult<
   ReservationEditPageQuery,
   ReservationEditPageQueryVariables
+>;
+export const BlockingReservationsDocument = gql`
+  query BlockingReservations(
+    $pk: Int!
+    $beginDate: Date!
+    $endDate: Date!
+    $state: [ReservationStateChoice!]
+  ) {
+    affectingReservations(
+      forReservationUnits: [$pk]
+      beginDate: $beginDate
+      endDate: $endDate
+      state: $state
+    ) {
+      ...BlockingReservationFields
+    }
+  }
+  ${BlockingReservationFieldsFragmentDoc}
+`;
+
+/**
+ * __useBlockingReservationsQuery__
+ *
+ * To run a query within a React component, call `useBlockingReservationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useBlockingReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useBlockingReservationsQuery({
+ *   variables: {
+ *      pk: // value for 'pk'
+ *      beginDate: // value for 'beginDate'
+ *      endDate: // value for 'endDate'
+ *      state: // value for 'state'
+ *   },
+ * });
+ */
+export function useBlockingReservationsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    BlockingReservationsQuery,
+    BlockingReservationsQueryVariables
+  > &
+    (
+      | { variables: BlockingReservationsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    BlockingReservationsQuery,
+    BlockingReservationsQueryVariables
+  >(BlockingReservationsDocument, options);
+}
+export function useBlockingReservationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    BlockingReservationsQuery,
+    BlockingReservationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    BlockingReservationsQuery,
+    BlockingReservationsQueryVariables
+  >(BlockingReservationsDocument, options);
+}
+export function useBlockingReservationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        BlockingReservationsQuery,
+        BlockingReservationsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    BlockingReservationsQuery,
+    BlockingReservationsQueryVariables
+  >(BlockingReservationsDocument, options);
+}
+export type BlockingReservationsQueryHookResult = ReturnType<
+  typeof useBlockingReservationsQuery
+>;
+export type BlockingReservationsLazyQueryHookResult = ReturnType<
+  typeof useBlockingReservationsLazyQuery
+>;
+export type BlockingReservationsSuspenseQueryHookResult = ReturnType<
+  typeof useBlockingReservationsSuspenseQuery
+>;
+export type BlockingReservationsQueryResult = Apollo.QueryResult<
+  BlockingReservationsQuery,
+  BlockingReservationsQueryVariables
 >;
 export const ApplicationRecurringReservationDocument = gql`
   query ApplicationRecurringReservation($id: ID!) {

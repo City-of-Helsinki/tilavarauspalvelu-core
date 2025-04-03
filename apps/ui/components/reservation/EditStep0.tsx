@@ -1,8 +1,7 @@
 import { breakpoints } from "common/src/common/style";
 import type {
   BlockingReservationFieldsFragment,
-  ReservationEditPageQuery,
-  ReservationUnitPageQuery,
+  EditPageReservationFragment,
 } from "@gql/gql-types";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
@@ -34,21 +33,15 @@ import { QuickReservation } from "../reservation-unit/QuickReservation";
 import { getNextAvailableTime } from "../reservation-unit/utils";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Sanitize } from "common/src/components/Sanitize";
-import { type RoundPeriod } from "@/modules/reservable";
 import { PinkBox as PinkBoxBase } from "./styles";
 import { H4 } from "common";
 import { getReservationPath } from "@/modules/urls";
+import { gql } from "@apollo/client";
+import ErrorComponent from "next/error";
 
-// TODO fragment
-type ReservationUnitNodeT = NonNullable<
-  ReservationUnitPageQuery["reservationUnit"]
->;
-type ReservationNodeT = NonNullable<ReservationEditPageQuery["reservation"]>;
 type Props = {
-  reservation: ReservationNodeT;
-  reservationUnit: ReservationUnitNodeT;
+  reservation: EditPageReservationFragment;
   reservationForm: UseFormReturn<PendingReservationFormType>;
-  activeApplicationRounds: readonly RoundPeriod[];
   blockingReservations: readonly BlockingReservationFieldsFragment[];
   nextStep: () => void;
 };
@@ -108,14 +101,13 @@ const PinkBox = styled(PinkBoxBase)`
 
 export function EditStep0({
   reservation,
-  reservationUnit,
-  activeApplicationRounds,
   reservationForm,
   nextStep,
-  blockingReservations: blockingReservationsOrig,
-}: Props): JSX.Element {
+  blockingReservations,
+}: Props): JSX.Element | null {
   const { t, i18n } = useTranslation();
-
+  const reservationUnit = reservation.reservationUnits[0];
+  const activeApplicationRounds = reservationUnit?.applicationRounds ?? [];
   const originalBegin = new Date(reservation.begin);
   const originalEnd = new Date(reservation.end);
 
@@ -126,11 +118,10 @@ export function EditStep0({
 
   const reservableTimes = useReservableTimes(reservationUnit);
 
-  const blockingReservations = blockingReservationsOrig.filter(
-    (r) => r.pk !== reservation.pk
-  );
-
   const submitReservation = (data: PendingReservationFormType) => {
+    if (reservationUnit == null) {
+      throw new Error("No reservation unit found");
+    }
     const slot = convertFormToFocustimeSlot({
       data,
       reservationUnit,
@@ -148,7 +139,7 @@ export function EditStep0({
     );
 
     const isNewReservationValid =
-      isReservationEditable({ reservation }) &&
+      isReservationEditable(reservation) &&
       isUserAllowedToMoveReservationHere({
         isFree,
         range: { start, end },
@@ -167,6 +158,10 @@ export function EditStep0({
     watch("duration") ?? differenceInMinutes(originalBegin, originalEnd);
   const dateValue = watch("date");
   const timeValue = watch("time");
+
+  if (reservationUnit == null) {
+    return <ErrorComponent statusCode={404} />;
+  }
 
   const focusDate = createDateTime(dateValue, timeValue);
   const durationOptions = getDurationOptions(reservationUnit, t);
@@ -264,3 +259,36 @@ export function EditStep0({
     </>
   );
 }
+
+export const EDIT_PAGE_RESERVATION_UNIT_FRAGMENT = gql`
+  fragment EditPageReservationUnit on ReservationUnitNode {
+    id
+    ...IsReservableFields
+    pricings {
+      ...PricingFields
+    }
+    ...TermsOfUse
+    ...ReservationTimePickerFields
+    ...MetadataSets
+    applicationRounds(ongoing: true) {
+      id
+      reservationPeriodBegin
+      reservationPeriodEnd
+    }
+  }
+`;
+
+export const EDIT_PAGE_RESERVATION_FRAGMENT = gql`
+  fragment EditPageReservation on ReservationNode {
+    id
+    pk
+    begin
+    end
+    ...CanReservationBeChanged
+    ...ReservationInfoCard
+    ...MetaFields
+    reservationUnits {
+      ...EditPageReservationUnit
+    }
+  }
+`;
