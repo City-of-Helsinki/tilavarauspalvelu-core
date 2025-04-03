@@ -2,6 +2,8 @@
   "language": "Svenska",
   "dateLabel": "Datum",
   "timeLabel": "Tid",
+  "timeLabelBegin": "Tid från",
+  "timeLabelEnd": "Tid till",
   "dateWithWeekday": "{{date, datetime}}",
   "dayTimeSeparator": " kl.",
   "dateGte": "från {{value}}",
