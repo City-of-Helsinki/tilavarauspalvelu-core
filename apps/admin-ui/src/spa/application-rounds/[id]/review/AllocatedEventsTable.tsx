@@ -63,7 +63,7 @@ function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
   const accessCodeActiveAlert =
     slot.recurringReservation?.shouldHaveActiveAccessCode &&
     !slot.recurringReservation?.isAccessCodeIsActiveCorrect
-      ? t("RequestedReservation.accessCodesNotActive")
+      ? t("accessType.accessCodeState.ACCESS_CODE_PENDING")
       : "";
   return {
     key: `${applicationPk}-${slot.pk}`,
