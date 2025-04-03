@@ -21,6 +21,7 @@ import { getReserveeName } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 import { useCheckPermission } from "@/hooks";
 import { gql } from "@apollo/client";
+import { combineAffectingReservations } from "@/helpers";
 
 type Props = {
   begin: string;
@@ -115,22 +116,7 @@ export function ReservationUnitCalendar({
     },
   });
 
-  function doesReservationAffectReservationUnit(
-    reservation: ReservationType,
-    resUnitPk: number
-  ) {
-    return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
-  }
-
-  const reservationSet = filterNonNullable(data?.reservationUnit?.reservations);
-  const affectingReservations = filterNonNullable(data?.affectingReservations);
-  const reservations = filterNonNullable(
-    reservationSet?.concat(
-      affectingReservations?.filter((y) =>
-        doesReservationAffectReservationUnit(y, reservationUnitPk ?? 0)
-      ) ?? []
-    )
-  );
+  const reservations = combineAffectingReservations(data, reservationUnitPk);
 
   const events = reservations.map((reservation) => {
     const isBlocked = reservation.type === ReservationTypeChoice.Blocked;
@@ -188,6 +174,7 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
       pk
       reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
         ...ReservationUnitReservations
+        ...CombineAffectedReservations
       }
     }
     affectingReservations(
@@ -197,6 +184,7 @@ export const RESERVATION_UNIT_CALENDAR_QUERY = gql`
       endDate: $endDate
     ) {
       ...ReservationUnitReservations
+      ...CombineAffectedReservations
     }
   }
 `;
