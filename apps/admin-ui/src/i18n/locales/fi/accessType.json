@@ -17,6 +17,8 @@
   },
   "validity": {
     "label": "Voimassa",
+    "activeFrom": "Voimassa alkaen",
+    "currentlyActive": "Voimassa oleva pääsytapa",
     "fromNextReservation": "Voimassaoloaika seuraavasta varauksesta"
   },
   "actions": {
@@ -27,5 +29,6 @@
     "changeSuccess": "Ovikoodi vaihdettu",
     "repair": "Korjaa ovikoodi",
     "repairSuccess": "Ovikoodi korjattu"
-  }
+  },
+  "accessTypeLabel": "Tilaan pääsy"
 }

@@ -9,7 +9,7 @@ import {
 
 type StatusLabelProps = {
   type: StatusLabelType;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   slim?: boolean;
   children: React.ReactNode;
   className?: string;
@@ -29,6 +29,7 @@ const ColoredLabel = styled(HDSStatusLabel)<{
     border-color: ${(props) => getStatusBorderColor(props.$type)};
     white-space: nowrap;
     margin-block: ${(props) => (props.$slim ? "-6px" : "unset")};
+    height: 100%; // Don't grow the label height to fit its container
   }
   svg {
     scale: 0.8;

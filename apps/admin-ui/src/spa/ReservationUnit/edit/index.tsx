@@ -33,7 +33,7 @@ import {
   ReservationUnitEditSchema,
   transformReservationUnit,
 } from "./form";
-import { SeasonalSection } from "./components/SeasonalSection";
+import { SeasonalSection } from "@/spa/ReservationUnit/edit/components/SeasonalSection";
 import { getReservationUnitUrl } from "@/common/urls";
 import { DisplayUnit } from "@/spa/ReservationUnit/edit/components/DisplayUnit";
 import { BottomButtonsStripe } from "@/spa/ReservationUnit/edit/components/BottomButtonsStripe";
@@ -42,6 +42,7 @@ import { TermsSection } from "@/spa/ReservationUnit/edit/components/TermsSection
 import { DescriptionSection } from "@/spa/ReservationUnit/edit/components/DescriptionSection";
 import { OpeningHoursSection } from "@/spa/ReservationUnit/edit/components/OpeningHoursSection";
 import { CommunicationSection } from "@/spa/ReservationUnit/edit/components/CommunicationSection";
+import { AccessTypeSection } from "@/spa/ReservationUnit/edit/components/AccessTypeSection";
 import { ReservationUnitSettingsSection } from "@/spa/ReservationUnit/edit/components/ReservationUnitSettingsSection";
 import { PricingSection } from "@/spa/ReservationUnit/edit/components/PricingSection";
 import { ErrorInfo } from "@/spa/ReservationUnit/edit/components/ErrorInfo";
@@ -343,6 +344,7 @@ function ReservationUnitEditor({
           previewUrlPrefix={previewUrlPrefix}
         />
         {isSeasonal && <SeasonalSection form={form} />}
+        <AccessTypeSection form={form} />
       </StyledContainerMedium>
 
       <BottomButtonsStripe

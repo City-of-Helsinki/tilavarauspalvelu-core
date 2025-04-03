@@ -29,6 +29,12 @@ import { constructApiDate } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
+export const AccessTypes = [
+  "ACCESS_CODE",
+  "OPENED_BY_STAFF",
+  "PHYSICAL_KEY",
+  "UNRESTRICTED",
+] as const;
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
