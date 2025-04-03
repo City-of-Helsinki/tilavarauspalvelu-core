@@ -84,7 +84,7 @@ function SearchSingle({
 
   const routes = [
     {
-      title: t("breadcrumb:search"),
+      title: t("breadcrumb:searchSingle"),
     },
   ] as const;
 

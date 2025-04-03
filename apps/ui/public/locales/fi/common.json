@@ -124,5 +124,6 @@
   "peopleSuffixShort": "hlö",
   "yearSuffixShort": "v",
   "amountSuffixShort": "kpl",
-  "validity": "Voimassaoloaika"
+  "validity": "Voimassaoloaika",
+  "helsinkiCity": "Helsingin kaupunki"
 }
