@@ -15,7 +15,7 @@ import { useSession } from "@/hooks/auth";
 import { type CurrentUserQuery } from "@gql/gql-types";
 import Logo from "common/src/components/Logo";
 import { useRouter } from "next/router";
-import { breakpoints, fontBold } from "common";
+import { breakpoints, fontBold, fontMedium } from "common";
 import { useLocation } from "react-use";
 import { signIn, signOut } from "common/src/browserHelpers";
 import { getLocalizationLang } from "common/src/helpers";
@@ -48,26 +48,53 @@ const Wrapper = styled.div`
       span:has(.active) {
         /* using box-shadow for a bottom border inside of the element, without affecting text positioning */
         box-shadow: 0 -4px 0 0 var(--color-black) inset;
-        font-weight: bold;
+        ${fontMedium}
       }
     }
   }
 
-  #user-menu-dropdown ul {
-    display: flex;
-    flex-direction: column;
-
-    > * {
+  #user-menu-dropdown {
+    ul {
       display: flex;
-      background: transparent;
-      border: 0;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--color-black-20);
-      transition: background 0.2s;
-      &:hover {
-        background: var(--color-black-10);
-        cursor: pointer;
-        text-decoration: underline;
+      flex-direction: column;
+
+      > * {
+        display: flex;
+        background: transparent;
+        border: 0;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--color-black-20);
+        transition: background 0.2s;
+        color: black;
+        &:hover {
+          background: var(--color-black-10);
+          cursor: pointer;
+          text-decoration: underline;
+        }
+      }
+    }
+    @media (max-width: ${breakpoints.l}) {
+      font-size: var(--fontsize-body-l);
+      ul > * {
+        padding: var(--spacing-s);
+      }
+    }
+  }
+
+  #user-menu {
+    button span svg {
+      margin-top: 10px;
+    }
+    @media (max-width: ${breakpoints.l}) {
+      [class*="HeaderActionBarItemButton-module_actionBarItemButton__"] {
+        padding: var(--spacing-s);
+      }
+      &.visible
+        [class*="HeaderActionBarItemButton-module_actionBarItemButton__"] {
+        border-bottom: 1px solid var(--color-black-20) !important;
+      }
+      [class*="HeaderActionBarItemButton-module_actionBarItemButtonLabel__"] {
+        font-size: var(--fontsize-body-l);
       }
     }
   }
@@ -75,12 +102,14 @@ const Wrapper = styled.div`
   #hds-mobile-menu {
     ul > li {
       > span {
-        padding: var(--spacing-s);
         li,
         a {
           display: block;
           width: 100%;
           font-size: var(--fontsize-body-xl);
+          &:hover {
+            text-decoration: none;
+          }
         }
       }
       &:first-child {
@@ -89,13 +118,21 @@ const Wrapper = styled.div`
       &:has(.active) {
         ${fontBold}
       }
+      &:hover,
+      &:focus-within {
+        background: var(--color-black-10);
+        cursor: pointer;
+        text-decoration: none;
+      }
     }
   }
 
   [class*="HeaderActionBar-module_title__"] {
-    font-size: var(--fontsize-heading-s) !important;
+    @media (max-width: ${breakpoints.l}) {
+      font-size: var(--fontsize-heading-s) !important;
+      ${fontMedium}
+    }
   }
-`;
 `;
 
 const menuItems = [
@@ -134,7 +171,7 @@ function constructName(firstName?: string, lastName?: string) {
   if (lastName) {
     return lastName;
   }
-  return undefined;
+  return "";
 }
 
 function checkActive(pathname: string, routes: string[], exact: boolean) {
@@ -198,6 +235,7 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: HeaderProps) {
   const { firstName, lastName } = user ?? {};
 
   const userName = constructName(firstName, lastName);
+
   return (
     <Header.ActionBar
       title={t("common:applicationName")}
@@ -220,7 +258,18 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: HeaderProps) {
           fixedRightPosition
           id="user-menu"
           label={userName}
-          icon={<IconUser />}
+          aria-label={userName}
+          avatar={
+            userName !== "" ? (
+              userName
+                .split(" ")
+                .map((c) => c.charAt(0))
+                .join("")
+                .toUpperCase()
+            ) : (
+              <IconUser />
+            )
+          }
         >
           {!user?.isAdAuthenticated && (
             <a href={profileLink} target="_blank" rel="noopener noreferrer">
