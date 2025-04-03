@@ -38,7 +38,6 @@ import { formatDateTimeRange } from "@/common/util";
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
 import { errorToast, successToast } from "common/src/common/toast";
-import { type ReservationToCopyT } from "./ReservationsList";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);
@@ -100,53 +99,6 @@ function formatDateInterval(t: TFunction, begin: Date, end: Date) {
   const durationString = formatDuration(differenceInMinutes(end, begin), t);
   return `${dateString} (${durationString})`;
 }
-
-export const CHANGE_RESERVATION_TIME = gql`
-  mutation StaffAdjustReservationTime(
-    $input: ReservationStaffAdjustTimeMutationInput!
-  ) {
-    staffAdjustReservationTime(input: $input) {
-      pk
-      begin
-      end
-      state
-    }
-  }
-`;
-
-export const ADD_RESERVATION_TO_SERIES = gql`
-  mutation AddReservationToSeries($input: ReservationSeriesAddMutationInput!) {
-    addReservationToSeries(input: $input) {
-      pk
-    }
-  }
-`;
-
-export const CHANGE_RESERVATION_TIME_QUERY_FRAGMENT = gql`
-  fragment ChangeReservationTime on ReservationNode {
-    id
-    pk
-    begin
-    end
-    type
-    bufferTimeAfter
-    bufferTimeBefore
-    recurringReservation {
-      pk
-      id
-      weekdays
-      beginDate
-      endDate
-    }
-    reservationUnits {
-      id
-      pk
-      bufferTimeBefore
-      bufferTimeAfter
-      reservationStartInterval
-    }
-  }
-`;
 
 type CommonProps = {
   onClose: () => void;
@@ -312,7 +264,7 @@ function DialogContent({
 }
 
 export type NewReservationModalProps = CommonProps & {
-  reservationToCopy: ReservationToCopyT;
+  reservationToCopy: ChangeReservationTimeFragment;
   onAccept: () => void;
 };
 
@@ -523,3 +475,50 @@ export function EditTimeModal({
     </StyledDialog>
   );
 }
+
+export const CHANGE_RESERVATION_TIME = gql`
+  mutation StaffAdjustReservationTime(
+    $input: ReservationStaffAdjustTimeMutationInput!
+  ) {
+    staffAdjustReservationTime(input: $input) {
+      pk
+      begin
+      end
+      state
+    }
+  }
+`;
+
+export const ADD_RESERVATION_TO_SERIES = gql`
+  mutation AddReservationToSeries($input: ReservationSeriesAddMutationInput!) {
+    addReservationToSeries(input: $input) {
+      pk
+    }
+  }
+`;
+
+export const CHANGE_RESERVATION_TIME_QUERY_FRAGMENT = gql`
+  fragment ChangeReservationTime on ReservationNode {
+    id
+    pk
+    begin
+    end
+    type
+    bufferTimeAfter
+    bufferTimeBefore
+    recurringReservation {
+      pk
+      id
+      weekdays
+      beginDate
+      endDate
+    }
+    reservationUnits {
+      id
+      pk
+      bufferTimeBefore
+      bufferTimeAfter
+      reservationStartInterval
+    }
+  }
+`;

@@ -10,9 +10,9 @@ import { Toolbar, ToolbarBtn } from "common/src/calendar/Toolbar";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
-  type ReservationPageQuery,
   ReservationStateChoice,
   ReservationTypeChoice,
+  type TimeBlockSectionFragment,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
@@ -33,6 +33,7 @@ import { useRecurringReservations, useReservationCalendarData } from "@/hooks";
 import { add, startOfISOWeek } from "date-fns";
 import { RecurringReservationsView } from "@/component/RecurringReservationsView";
 import { Accordion } from "./components";
+import { gql } from "@apollo/client";
 
 const Container = styled.div`
   .rbc-calendar {
@@ -46,10 +47,8 @@ const Container = styled.div`
 
 type WeekOptions = "day" | "week" | "month";
 
-// TODO use a fragment
-type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 type CalendarProps = {
-  reservation: ReservationType;
+  reservation: TimeBlockSectionFragment;
   refetch: (focusDate?: Date) => void;
   focusDate: Date;
   events: Array<CalendarEventType>;
@@ -152,11 +151,11 @@ const maybeStringToDate: (s?: string) => Date | undefined = (str) =>
 const onlyFutureDates: (d?: Date) => Date | undefined = (d) =>
   d && d > new Date() ? d : undefined;
 
-export function TimeBlock({
+export function TimeBlockSection({
   reservation,
   onReservationUpdated,
 }: Readonly<{
-  reservation: ReservationType;
+  reservation: TimeBlockSectionFragment;
   onReservationUpdated: () => Promise<unknown>;
 }>): JSX.Element {
   const { t } = useTranslation();
@@ -268,3 +267,21 @@ export function TimeBlock({
     </>
   );
 }
+
+export const TIME_BLOCK_FRAGMENT = gql`
+  fragment TimeBlockSection on ReservationNode {
+    id
+    pk
+    ...EventStyleReservationFields
+    ...ReservationToCopy
+    ...VisibleIfPermissionFields
+    reservationUnits {
+      id
+      pk
+    }
+    recurringReservation {
+      id
+      pk
+    }
+  }
+`;

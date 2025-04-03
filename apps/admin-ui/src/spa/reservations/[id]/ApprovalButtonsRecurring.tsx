@@ -1,5 +1,5 @@
 import React from "react";
-import { type ReservationPageQuery } from "@gql/gql-types";
+import { type RecurringReservationNode } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -8,14 +8,8 @@ import { useModal } from "@/context/ModalContext";
 import { useRecurringReservations } from "@/hooks";
 import { isPossibleToDeny } from "@/modules/reservationModificationRules";
 
-// TODO use a fragment
-type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
-type RecurringReservationType = NonNullable<
-  ReservationType["recurringReservation"]
->;
-
 type Props = {
-  recurringReservation: Pick<RecurringReservationType, "pk">;
+  recurringReservation: Pick<RecurringReservationNode, "pk">;
   handleClose: () => void;
   // TODO weird name for the after deny callback
   handleAccept: () => void;
