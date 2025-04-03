@@ -5,13 +5,10 @@ import {
   TermsType,
   ReservationTypeChoice,
   CreateStaffReservationDocument,
-  ReservationTimesInReservationUnitDocument,
-  type ReservationTimesInReservationUnitQuery,
   ReservationUnitDocument,
   type ReservationUnitQuery,
   CreateReservationSeriesDocument,
   type ReservationUnitFieldsFragment,
-  type ReservationsInIntervalFragment,
   CurrentUserDocument,
   type CurrentUserQuery,
   OptionsDocument,
@@ -19,7 +16,12 @@ import {
   ReservationPurposeOrderingChoices,
   TermsOfUseDocument,
   type TermsOfUseQuery,
-  type ReservationTimesInReservationUnitQueryVariables,
+  CalendarReservationFragment,
+  AccessType,
+  ReservationStateChoice,
+  type ReservationsByReservationUnitQueryVariables,
+  ReservationsByReservationUnitDocument,
+  type ReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
@@ -163,7 +165,7 @@ const everydayReservations = Array.from(Array(365).keys()).reduce(
   []
 );
 
-const reservationsByUnitResponse: ReservationsInIntervalFragment[] =
+const reservationsByUnitResponse: CalendarReservationFragment[] =
   mondayMorningReservations
     .concat(everydayReservations)
     // backend returns days unsorted but our mondays are first
@@ -176,6 +178,12 @@ const reservationsByUnitResponse: ReservationsInIntervalFragment[] =
       end: x.end.toUTCString(),
       bufferTimeBefore: 0,
       bufferTimeAfter: 0,
+      accessType: AccessType.Unrestricted,
+      name: "Test reservation",
+      reserveeName: "Test reservee",
+      pk: 1,
+      state: ReservationStateChoice.Confirmed,
+      user: null,
       type: ReservationTypeChoice.Normal,
       affectedReservationUnits: [],
       recurringReservation: null,
@@ -278,7 +286,7 @@ const otherMocks = [
 function createInIntervalQueryMock({ begin, end }: { begin: Date; end: Date }) {
   const beginDate = toApiDateUnsafe(begin);
   const endDate = toApiDateUnsafe(end);
-  const variables: ReservationTimesInReservationUnitQueryVariables = {
+  const variables: ReservationsByReservationUnitQueryVariables = {
     id: base64encode(`ReservationUnitNode:1`),
     pk: 1,
     beginDate,
@@ -287,7 +295,7 @@ function createInIntervalQueryMock({ begin, end }: { begin: Date; end: Date }) {
   };
   return {
     request: {
-      query: ReservationTimesInReservationUnitDocument,
+      query: ReservationsByReservationUnitDocument,
       variables,
     },
     result: {
@@ -318,7 +326,7 @@ function createReservationUnitResponse(): ReservationUnitQuery {
   };
 }
 
-function createReservationsInIntervalResponse(): ReservationTimesInReservationUnitQuery {
+function createReservationsInIntervalResponse(): ReservationsByReservationUnitQuery {
   return {
     reservationUnit: {
       id: base64encode(`ReservationUnitNode:1`),

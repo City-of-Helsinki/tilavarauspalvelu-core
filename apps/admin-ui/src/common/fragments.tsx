@@ -181,5 +181,9 @@ export const CALENDAR_RESERVATION_FRAGMENT = gql`
     bufferTimeAfter
     affectedReservationUnits
     accessType
+    recurringReservation {
+      id
+      pk
+    }
   }
 `;

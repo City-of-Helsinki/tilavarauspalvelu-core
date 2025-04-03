@@ -1,11 +1,14 @@
 import {
-  type CalendarReservationFragment,
   ReservationTypeChoice,
   useReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
 import { errorToast } from "common/src/common/toast";
-import { doesIntervalCollide, reservationToInterval } from "@/helpers";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  combineAffectingReservations,
+  doesIntervalCollide,
+  reservationToInterval,
+} from "@/helpers";
+import { base64encode } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { gql } from "@apollo/client";
@@ -48,22 +51,7 @@ export function useCheckCollisions({
     },
   });
 
-  function doesReservationAffectReservationUnit(
-    reservation: CalendarReservationFragment,
-    resUnitPk: number
-  ) {
-    return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
-  }
-  const reservationSet = filterNonNullable(data?.reservationUnit?.reservations);
-  // NOTE we could use a recular concat here (we only have single reservationUnit here)
-  const affectingReservations = filterNonNullable(data?.affectingReservations);
-  const reservations = filterNonNullable(
-    reservationSet?.concat(
-      affectingReservations?.filter((y) =>
-        doesReservationAffectReservationUnit(y, reservationUnitPk ?? 0)
-      ) ?? []
-    )
-  );
+  const reservations = combineAffectingReservations(data, reservationUnitPk);
 
   const collisions = reservations
     .filter((x) => x?.pk !== reservationPk)
@@ -104,6 +92,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
       id
       reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
         ...CalendarReservation
+        ...CombineAffectedReservations
       }
     }
     affectingReservations(
@@ -113,6 +102,7 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
       endDate: $endDate
     ) {
       ...CalendarReservation
+      ...CombineAffectedReservations
     }
   }
 `;

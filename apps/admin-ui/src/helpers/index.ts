@@ -1,16 +1,19 @@
 /// Plain js / ts helper functions
+import { gql } from "@apollo/client";
 import {
   ReservationTypeChoice,
   ApplicantTypeChoice,
   type PersonNode,
-  type ReservationsInIntervalFragment,
-  ApplicationNode,
+  type CalendarReservationFragment,
+  type ApplicationNode,
   ApplicationRoundReservationCreationStatusChoice,
   ApplicationRoundStatusChoice,
   type ApplicationRoundNode,
   type Maybe,
   ReservationStartInterval,
+  type CombineAffectedReservationsFragment,
 } from "@gql/gql-types";
+import { filterNonNullable } from "common/src/helpers";
 import { addSeconds } from "date-fns";
 
 export { truncate } from "common/src/helpers";
@@ -58,11 +61,19 @@ export function getBufferTime(
 /// @return Interval
 /// @desc Special handling for Blocked reservations since they don't collide with buffers.
 export function reservationToInterval(
-  x: ReservationsInIntervalFragment,
+  x: Pick<
+    CalendarReservationFragment,
+    | "begin"
+    | "end"
+    | "bufferTimeBefore"
+    | "bufferTimeAfter"
+    | "recurringReservation"
+    | "type"
+  >,
   comparisonReservationType: ReservationTypeChoice
-): CollisionInterval | undefined {
+): CollisionInterval | null {
   if (!x || !x.begin || !x.end) {
-    return undefined;
+    return null;
   }
   const t =
     x.type === ReservationTypeChoice.Blocked
@@ -80,9 +91,55 @@ export function reservationToInterval(
   };
 }
 
+// NOTE: because we are combining two queries here we need to manually define the type
+// this is type safe because this is gonna type error if the endpoints change
+type AffectedReservations = {
+  reservationUnit: Readonly<{
+    reservations: readonly CombineAffectedReservationsFragment[] | null;
+  }> | null;
+  affectingReservations: readonly CombineAffectedReservationsFragment[] | null;
+};
+
+/// Minimal fragment for combining affected reservations (inherit this for any queries using affectedReservations)
+export const COMBINE_AFFECTED_RESERVATIONS_FRAGMENT = gql`
+  fragment CombineAffectedReservations on ReservationNode {
+    id
+    pk
+    affectedReservationUnits
+  }
+`;
+
+function isAffecting(
+  reservation: Pick<
+    CombineAffectedReservationsFragment,
+    "affectedReservationUnits"
+  >,
+  resUnitPk: number
+) {
+  return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
+}
+export function combineAffectingReservations<T extends AffectedReservations>(
+  data: Maybe<T> | undefined,
+  reservationUnitPk: Maybe<number> | undefined
+): NonNullable<NonNullable<T["reservationUnit"]>["reservations"]> {
+  if (data == null || reservationUnitPk == null) {
+    return [];
+  }
+
+  // NOTE we could use a recular concat here (we only have single reservationUnit here)
+  const affectingReservations = filterNonNullable(
+    data.affectingReservations
+  ).filter((y) => isAffecting(y, reservationUnitPk));
+  const reservationSet = filterNonNullable(
+    data.reservationUnit?.reservations
+  ).concat(affectingReservations);
+  return filterNonNullable(reservationSet);
+}
+
 // NOTE optionals (?) are super bad because if you forget to query anything from the object there will be no type errors
 // can't remove them because they are not mandatory in the gql schema
 // maybe using an utility function that forces subobjects to NonNullable could work for this.
+// TODO use a fragment
 type Application = {
   applicantType?:
     | Pick<ApplicationNode, "applicantType">["applicantType"]

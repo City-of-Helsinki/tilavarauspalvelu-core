@@ -6297,6 +6297,10 @@ export type CalendarReservationFragment = {
   readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
   readonly accessType: AccessType;
   readonly user: { readonly id: string; readonly email: string } | null;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+  } | null;
 };
 
 export type ReservationDateOfBirthQueryVariables = Exact<{
@@ -6515,6 +6519,12 @@ export type UpdateApplicationWorkingMemoMutation = {
   } | null;
 };
 
+export type CombineAffectedReservationsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+};
+
 export type ReservationsByReservationUnitQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   pk: Scalars["Int"]["input"];
@@ -6543,6 +6553,10 @@ export type ReservationsByReservationUnitQuery = {
       readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
       readonly accessType: AccessType;
       readonly user: { readonly id: string; readonly email: string } | null;
+      readonly recurringReservation: {
+        readonly id: string;
+        readonly pk: number | null;
+      } | null;
     }> | null;
   } | null;
   readonly affectingReservations: ReadonlyArray<{
@@ -6559,6 +6573,10 @@ export type ReservationsByReservationUnitQuery = {
     readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
     readonly accessType: AccessType;
     readonly user: { readonly id: string; readonly email: string } | null;
+    readonly recurringReservation: {
+      readonly id: string;
+      readonly pk: number | null;
+    } | null;
   }> | null;
 };
 
@@ -8417,63 +8435,6 @@ export type CreateReservationSeriesMutation = {
   readonly createReservationSeries: { readonly pk: number | null } | null;
 };
 
-export type ReservationsInIntervalFragment = {
-  readonly id: string;
-  readonly begin: string;
-  readonly end: string;
-  readonly bufferTimeBefore: number;
-  readonly bufferTimeAfter: number;
-  readonly type: ReservationTypeChoice | null;
-  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
-  readonly recurringReservation: {
-    readonly id: string;
-    readonly pk: number | null;
-  } | null;
-};
-
-export type ReservationTimesInReservationUnitQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  pk: Scalars["Int"]["input"];
-  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  endDate?: InputMaybe<Scalars["Date"]["input"]>;
-  state?: InputMaybe<
-    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
-    | InputMaybe<ReservationStateChoice>
-  >;
-}>;
-
-export type ReservationTimesInReservationUnitQuery = {
-  readonly reservationUnit: {
-    readonly id: string;
-    readonly reservations: ReadonlyArray<{
-      readonly id: string;
-      readonly begin: string;
-      readonly end: string;
-      readonly bufferTimeBefore: number;
-      readonly bufferTimeAfter: number;
-      readonly type: ReservationTypeChoice | null;
-      readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
-      readonly recurringReservation: {
-        readonly id: string;
-        readonly pk: number | null;
-      } | null;
-    }> | null;
-  } | null;
-  readonly affectingReservations: ReadonlyArray<{
-    readonly id: string;
-    readonly begin: string;
-    readonly end: string;
-    readonly bufferTimeBefore: number;
-    readonly bufferTimeAfter: number;
-    readonly type: ReservationTypeChoice | null;
-    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
-    readonly recurringReservation: {
-      readonly id: string;
-      readonly pk: number | null;
-    } | null;
-  }> | null;
-};
-
 export type BannerNotificationListFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -10287,6 +10248,17 @@ export const CalendarReservationFragmentDoc = gql`
     bufferTimeAfter
     affectedReservationUnits
     accessType
+    recurringReservation {
+      id
+      pk
+    }
+  }
+`;
+export const CombineAffectedReservationsFragmentDoc = gql`
+  fragment CombineAffectedReservations on ReservationNode {
+    id
+    pk
+    affectedReservationUnits
   }
 `;
 export const AllocatedTimeSlotFragmentDoc = gql`
@@ -10457,21 +10429,6 @@ export const ApplicationAdminFragmentDoc = gql`
   ${ApplicationSectionCommonFragmentDoc}
   ${SuitableTimeFragmentDoc}
   ${ReservationUnitOptionFragmentDoc}
-`;
-export const ReservationsInIntervalFragmentDoc = gql`
-  fragment ReservationsInInterval on ReservationNode {
-    id
-    begin
-    end
-    bufferTimeBefore
-    bufferTimeAfter
-    type
-    affectedReservationUnits
-    recurringReservation {
-      id
-      pk
-    }
-  }
 `;
 export const BannerNotificationListFragmentDoc = gql`
   fragment BannerNotificationList on BannerNotificationNode {
@@ -11600,6 +11557,7 @@ export const ReservationsByReservationUnitDocument = gql`
       id
       reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
         ...CalendarReservation
+        ...CombineAffectedReservations
       }
     }
     affectingReservations(
@@ -11609,9 +11567,11 @@ export const ReservationsByReservationUnitDocument = gql`
       endDate: $endDate
     ) {
       ...CalendarReservation
+      ...CombineAffectedReservations
     }
   }
   ${CalendarReservationFragmentDoc}
+  ${CombineAffectedReservationsFragmentDoc}
 `;
 
 /**
@@ -14927,6 +14887,7 @@ export const ReservationUnitCalendarDocument = gql`
       pk
       reservations(state: $state, beginDate: $beginDate, endDate: $endDate) {
         ...ReservationUnitReservations
+        ...CombineAffectedReservations
       }
     }
     affectingReservations(
@@ -14936,9 +14897,11 @@ export const ReservationUnitCalendarDocument = gql`
       endDate: $endDate
     ) {
       ...ReservationUnitReservations
+      ...CombineAffectedReservations
     }
   }
   ${ReservationUnitReservationsFragmentDoc}
+  ${CombineAffectedReservationsFragmentDoc}
 `;
 
 /**
@@ -15541,112 +15504,6 @@ export type CreateReservationSeriesMutationResult =
 export type CreateReservationSeriesMutationOptions = Apollo.BaseMutationOptions<
   CreateReservationSeriesMutation,
   CreateReservationSeriesMutationVariables
->;
-export const ReservationTimesInReservationUnitDocument = gql`
-  query ReservationTimesInReservationUnit(
-    $id: ID!
-    $pk: Int!
-    $beginDate: Date
-    $endDate: Date
-    $state: [ReservationStateChoice]
-  ) {
-    reservationUnit(id: $id) {
-      id
-      reservations(beginDate: $beginDate, endDate: $endDate, state: $state) {
-        ...ReservationsInInterval
-      }
-    }
-    affectingReservations(
-      forReservationUnits: [$pk]
-      state: $state
-      beginDate: $beginDate
-      endDate: $endDate
-    ) {
-      ...ReservationsInInterval
-    }
-  }
-  ${ReservationsInIntervalFragmentDoc}
-`;
-
-/**
- * __useReservationTimesInReservationUnitQuery__
- *
- * To run a query within a React component, call `useReservationTimesInReservationUnitQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationTimesInReservationUnitQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationTimesInReservationUnitQuery({
- *   variables: {
- *      id: // value for 'id'
- *      pk: // value for 'pk'
- *      beginDate: // value for 'beginDate'
- *      endDate: // value for 'endDate'
- *      state: // value for 'state'
- *   },
- * });
- */
-export function useReservationTimesInReservationUnitQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationTimesInReservationUnitQuery,
-    ReservationTimesInReservationUnitQueryVariables
-  > &
-    (
-      | {
-          variables: ReservationTimesInReservationUnitQueryVariables;
-          skip?: boolean;
-        }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ReservationTimesInReservationUnitQuery,
-    ReservationTimesInReservationUnitQueryVariables
-  >(ReservationTimesInReservationUnitDocument, options);
-}
-export function useReservationTimesInReservationUnitLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationTimesInReservationUnitQuery,
-    ReservationTimesInReservationUnitQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationTimesInReservationUnitQuery,
-    ReservationTimesInReservationUnitQueryVariables
-  >(ReservationTimesInReservationUnitDocument, options);
-}
-export function useReservationTimesInReservationUnitSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationTimesInReservationUnitQuery,
-        ReservationTimesInReservationUnitQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationTimesInReservationUnitQuery,
-    ReservationTimesInReservationUnitQueryVariables
-  >(ReservationTimesInReservationUnitDocument, options);
-}
-export type ReservationTimesInReservationUnitQueryHookResult = ReturnType<
-  typeof useReservationTimesInReservationUnitQuery
->;
-export type ReservationTimesInReservationUnitLazyQueryHookResult = ReturnType<
-  typeof useReservationTimesInReservationUnitLazyQuery
->;
-export type ReservationTimesInReservationUnitSuspenseQueryHookResult =
-  ReturnType<typeof useReservationTimesInReservationUnitSuspenseQuery>;
-export type ReservationTimesInReservationUnitQueryResult = Apollo.QueryResult<
-  ReservationTimesInReservationUnitQuery,
-  ReservationTimesInReservationUnitQueryVariables
 >;
 export const BannerNotificationListDocument = gql`
   query BannerNotificationList(
