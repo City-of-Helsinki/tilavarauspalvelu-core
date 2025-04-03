@@ -23,7 +23,7 @@ export default function Logo({
   return (
     <HDSLogo
       src={logoSrcFromLanguage(i18n.language)}
-      alt={t("common:applicationName")}
+      alt={t("common:helsinkiCity")}
       size={size}
       style={style}
     />

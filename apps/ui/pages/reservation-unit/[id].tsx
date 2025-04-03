@@ -784,7 +784,7 @@ function ReservationUnitWrapped(props: PropsNarrowed) {
   const lang = convertLanguageCode(i18n.language);
   const reservationUnitName = getTranslationSafe(reservationUnit, "name", lang);
   const routes = [
-    { slug: getSingleSearchPath(), title: t("breadcrumb:search") },
+    { slug: getSingleSearchPath(), title: t("breadcrumb:searchSingle") },
     { title: reservationUnitName ?? "-" },
   ] as const;
 
