@@ -6019,6 +6019,13 @@ export type TermsOfUseQuery = {
   } | null;
 };
 
+export type AllocatedTimeSlotFragment = {
+  readonly id: string;
+  readonly beginTime: string;
+  readonly endTime: string;
+  readonly dayOfTheWeek: Weekday;
+};
+
 export type ApplicationSectionFieldsFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -6292,6 +6299,17 @@ export type CalendarReservationFragment = {
   } | null;
 };
 
+export type ApplicationRoundTimeSlotsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly weekday: number;
+  readonly closed: boolean;
+  readonly reservableTimes: ReadonlyArray<{
+    readonly begin: string;
+    readonly end: string;
+  } | null>;
+};
+
 export type ReservationDateOfBirthQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -6512,6 +6530,20 @@ export type CombineAffectedReservationsFragment = {
   readonly id: string;
   readonly pk: number | null;
   readonly affectedReservationUnits: ReadonlyArray<number | null>;
+};
+
+export type ApplicantNameFieldsFragment = {
+  readonly id: string;
+  readonly applicantType: ApplicantTypeChoice | null;
+  readonly contactPerson: {
+    readonly id: string;
+    readonly firstName: string;
+    readonly lastName: string;
+  } | null;
+  readonly organisation: {
+    readonly id: string;
+    readonly nameFi: string | null;
+  } | null;
 };
 
 export type ReservationsByReservationUnitQueryVariables = Exact<{
@@ -7035,59 +7067,15 @@ export type ReservationUnitEditorParametersQuery = {
   } | null;
 };
 
-export type ApplicationRoundFilterQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
+export type RejectRestMutationVariables = Exact<{
+  input: ReservationUnitOptionUpdateMutationInput;
 }>;
 
-export type ApplicationRoundFilterQuery = {
-  readonly applicationRound: {
-    readonly id: string;
-    readonly nameFi: string | null;
-    readonly status: ApplicationRoundStatusChoice;
-    readonly reservationPeriodBegin: string;
-    readonly reservationPeriodEnd: string;
-    readonly reservationUnits: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly unit: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-      } | null;
-    }>;
-  } | null;
-};
-
-export type AllApplicationEventsQueryVariables = Exact<{
-  applicationRound: Scalars["Int"]["input"];
-  applicationStatus:
-    | ReadonlyArray<InputMaybe<ApplicationStatusChoice>>
-    | InputMaybe<ApplicationStatusChoice>;
-  unit:
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>;
-  reservationUnit:
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>;
-}>;
-
-export type AllApplicationEventsQuery = {
-  readonly applicationSections: {
-    readonly totalCount: number | null;
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly id: string;
-        readonly reservationUnitOptions: ReadonlyArray<{
-          readonly id: string;
-          readonly reservationUnit: {
-            readonly id: string;
-            readonly pk: number | null;
-            readonly nameFi: string | null;
-          };
-        }>;
-      } | null;
-    } | null>;
+export type RejectRestMutation = {
+  readonly updateReservationUnitOption: {
+    readonly pk: number | null;
+    readonly rejected: boolean | null;
+    readonly locked: boolean | null;
   } | null;
 };
 
@@ -7111,13 +7099,6 @@ export type DeleteAllocatedTimeSlotMutationVariables = Exact<{
 
 export type DeleteAllocatedTimeSlotMutation = {
   readonly deleteAllocatedTimeslot: { readonly deleted: boolean | null } | null;
-};
-
-export type AllocatedTimeSlotFragment = {
-  readonly id: string;
-  readonly beginTime: string;
-  readonly endTime: string;
-  readonly dayOfTheWeek: Weekday;
 };
 
 export type ApplicationSectionAllocationsQueryVariables = Exact<{
@@ -7258,15 +7239,59 @@ export type ApplicationSectionAllocationsQuery = {
   }> | null;
 };
 
-export type RejectRestMutationVariables = Exact<{
-  input: ReservationUnitOptionUpdateMutationInput;
+export type AllApplicationEventsQueryVariables = Exact<{
+  applicationRound: Scalars["Int"]["input"];
+  applicationStatus:
+    | ReadonlyArray<InputMaybe<ApplicationStatusChoice>>
+    | InputMaybe<ApplicationStatusChoice>;
+  unit:
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>;
+  reservationUnit:
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
-export type RejectRestMutation = {
-  readonly updateReservationUnitOption: {
-    readonly pk: number | null;
-    readonly rejected: boolean | null;
-    readonly locked: boolean | null;
+export type AllApplicationEventsQuery = {
+  readonly applicationSections: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly reservationUnitOptions: ReadonlyArray<{
+          readonly id: string;
+          readonly reservationUnit: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly nameFi: string | null;
+          };
+        }>;
+      } | null;
+    } | null>;
+  } | null;
+};
+
+export type ApplicationRoundFilterQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ApplicationRoundFilterQuery = {
+  readonly applicationRound: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly status: ApplicationRoundStatusChoice;
+    readonly reservationPeriodBegin: string;
+    readonly reservationPeriodEnd: string;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly unit: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
+    }>;
   } | null;
 };
 
@@ -7903,6 +7928,34 @@ export type ApplicationAdminFragment = {
   } | null;
 };
 
+export type ReservationUnitOptionFragment = {
+  readonly id: string;
+  readonly reservationUnit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+    readonly unit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
+    } | null;
+    readonly applicationRoundTimeSlots: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly weekday: number;
+      readonly closed: boolean;
+      readonly reservableTimes: ReadonlyArray<{
+        readonly begin: string;
+        readonly end: string;
+      } | null>;
+    }>;
+  };
+};
+
 export type ApplicationAdminQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -8061,45 +8114,6 @@ export type RestoreAllApplicationOptionsMutationVariables = Exact<{
 
 export type RestoreAllApplicationOptionsMutation = {
   readonly restoreAllApplicationOptions: { readonly pk: number | null } | null;
-};
-
-export type ApplicationRoundTimeSlotsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly weekday: number;
-  readonly closed: boolean;
-  readonly reservableTimes: ReadonlyArray<{
-    readonly begin: string;
-    readonly end: string;
-  } | null>;
-};
-
-export type ReservationUnitOptionFragment = {
-  readonly id: string;
-  readonly reservationUnit: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-    readonly unit: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
-    } | null;
-    readonly applicationRoundTimeSlots: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly weekday: number;
-      readonly closed: boolean;
-      readonly reservableTimes: ReadonlyArray<{
-        readonly begin: string;
-        readonly end: string;
-      } | null>;
-    }>;
-  };
 };
 
 export type CreateStaffReservationMutationVariables = Exact<{
@@ -9923,6 +9937,14 @@ export const BannerNotificationCommonFragmentDoc = gql`
     messageSv
   }
 `;
+export const AllocatedTimeSlotFragmentDoc = gql`
+  fragment AllocatedTimeSlot on AllocatedTimeSlotNode {
+    id
+    beginTime
+    endTime
+    dayOfTheWeek
+  }
+`;
 export const ApplicationSectionDurationFragmentDoc = gql`
   fragment ApplicationSectionDuration on ApplicationSectionNode {
     id
@@ -10250,14 +10272,6 @@ export const CombineAffectedReservationsFragmentDoc = gql`
     affectedReservationUnits
   }
 `;
-export const AllocatedTimeSlotFragmentDoc = gql`
-  fragment AllocatedTimeSlot on AllocatedTimeSlotNode {
-    id
-    beginTime
-    endTime
-    dayOfTheWeek
-  }
-`;
 export const ApplicationRoundBaseFragmentDoc = gql`
   fragment ApplicationRoundBase on ApplicationRoundNode {
     id
@@ -10333,6 +10347,21 @@ export const ApplicantFragmentDoc = gql`
     }
   }
 `;
+export const ApplicantNameFieldsFragmentDoc = gql`
+  fragment ApplicantNameFields on ApplicationNode {
+    id
+    applicantType
+    contactPerson {
+      id
+      firstName
+      lastName
+    }
+    organisation {
+      id
+      nameFi
+    }
+  }
+`;
 export const SuitableTimeFragmentDoc = gql`
   fragment SuitableTime on SuitableTimeRangeNode {
     id
@@ -10385,6 +10414,7 @@ export const ApplicationAdminFragmentDoc = gql`
     status
     lastModifiedDate
     ...Applicant
+    ...ApplicantNameFields
     applicationRound {
       id
       pk
@@ -10415,6 +10445,7 @@ export const ApplicationAdminFragmentDoc = gql`
     }
   }
   ${ApplicantFragmentDoc}
+  ${ApplicantNameFieldsFragmentDoc}
   ${ApplicationSectionCommonFragmentDoc}
   ${SuitableTimeFragmentDoc}
   ${ReservationUnitOptionFragmentDoc}
@@ -12979,209 +13010,57 @@ export type ReservationUnitEditorParametersQueryResult = Apollo.QueryResult<
   ReservationUnitEditorParametersQuery,
   ReservationUnitEditorParametersQueryVariables
 >;
-export const ApplicationRoundFilterDocument = gql`
-  query ApplicationRoundFilter($id: ID!) {
-    applicationRound(id: $id) {
-      id
-      nameFi
-      status
-      reservationPeriodBegin
-      reservationPeriodEnd
-      reservationUnits {
-        id
-        pk
-        nameFi
-        unit {
-          id
-          pk
-          nameFi
-        }
-      }
+export const RejectRestDocument = gql`
+  mutation RejectRest($input: ReservationUnitOptionUpdateMutationInput!) {
+    updateReservationUnitOption(input: $input) {
+      pk
+      rejected
+      locked
     }
   }
 `;
+export type RejectRestMutationFn = Apollo.MutationFunction<
+  RejectRestMutation,
+  RejectRestMutationVariables
+>;
 
 /**
- * __useApplicationRoundFilterQuery__
+ * __useRejectRestMutation__
  *
- * To run a query within a React component, call `useApplicationRoundFilterQuery` and pass it any options that fit your needs.
- * When your component renders, `useApplicationRoundFilterQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
+ * To run a mutation, you first call `useRejectRestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRejectRestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
  *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const { data, loading, error } = useApplicationRoundFilterQuery({
+ * const [rejectRestMutation, { data, loading, error }] = useRejectRestMutation({
  *   variables: {
- *      id: // value for 'id'
+ *      input: // value for 'input'
  *   },
  * });
  */
-export function useApplicationRoundFilterQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ApplicationRoundFilterQuery,
-    ApplicationRoundFilterQueryVariables
-  > &
-    (
-      | { variables: ApplicationRoundFilterQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    ApplicationRoundFilterQuery,
-    ApplicationRoundFilterQueryVariables
-  >(ApplicationRoundFilterDocument, options);
-}
-export function useApplicationRoundFilterLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ApplicationRoundFilterQuery,
-    ApplicationRoundFilterQueryVariables
+export function useRejectRestMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RejectRestMutation,
+    RejectRestMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ApplicationRoundFilterQuery,
-    ApplicationRoundFilterQueryVariables
-  >(ApplicationRoundFilterDocument, options);
+  return Apollo.useMutation<RejectRestMutation, RejectRestMutationVariables>(
+    RejectRestDocument,
+    options
+  );
 }
-export function useApplicationRoundFilterSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ApplicationRoundFilterQuery,
-        ApplicationRoundFilterQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ApplicationRoundFilterQuery,
-    ApplicationRoundFilterQueryVariables
-  >(ApplicationRoundFilterDocument, options);
-}
-export type ApplicationRoundFilterQueryHookResult = ReturnType<
-  typeof useApplicationRoundFilterQuery
+export type RejectRestMutationHookResult = ReturnType<
+  typeof useRejectRestMutation
 >;
-export type ApplicationRoundFilterLazyQueryHookResult = ReturnType<
-  typeof useApplicationRoundFilterLazyQuery
->;
-export type ApplicationRoundFilterSuspenseQueryHookResult = ReturnType<
-  typeof useApplicationRoundFilterSuspenseQuery
->;
-export type ApplicationRoundFilterQueryResult = Apollo.QueryResult<
-  ApplicationRoundFilterQuery,
-  ApplicationRoundFilterQueryVariables
->;
-export const AllApplicationEventsDocument = gql`
-  query AllApplicationEvents(
-    $applicationRound: Int!
-    $applicationStatus: [ApplicationStatusChoice]!
-    $unit: [Int]!
-    $reservationUnit: [Int]!
-  ) {
-    applicationSections(
-      applicationRound: $applicationRound
-      reservationUnit: $reservationUnit
-      unit: $unit
-      applicationStatus: $applicationStatus
-    ) {
-      edges {
-        node {
-          id
-          reservationUnitOptions {
-            id
-            reservationUnit {
-              id
-              pk
-              nameFi
-            }
-          }
-        }
-      }
-      totalCount
-    }
-  }
-`;
-
-/**
- * __useAllApplicationEventsQuery__
- *
- * To run a query within a React component, call `useAllApplicationEventsQuery` and pass it any options that fit your needs.
- * When your component renders, `useAllApplicationEventsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAllApplicationEventsQuery({
- *   variables: {
- *      applicationRound: // value for 'applicationRound'
- *      applicationStatus: // value for 'applicationStatus'
- *      unit: // value for 'unit'
- *      reservationUnit: // value for 'reservationUnit'
- *   },
- * });
- */
-export function useAllApplicationEventsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    AllApplicationEventsQuery,
-    AllApplicationEventsQueryVariables
-  > &
-    (
-      | { variables: AllApplicationEventsQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    AllApplicationEventsQuery,
-    AllApplicationEventsQueryVariables
-  >(AllApplicationEventsDocument, options);
-}
-export function useAllApplicationEventsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    AllApplicationEventsQuery,
-    AllApplicationEventsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    AllApplicationEventsQuery,
-    AllApplicationEventsQueryVariables
-  >(AllApplicationEventsDocument, options);
-}
-export function useAllApplicationEventsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        AllApplicationEventsQuery,
-        AllApplicationEventsQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    AllApplicationEventsQuery,
-    AllApplicationEventsQueryVariables
-  >(AllApplicationEventsDocument, options);
-}
-export type AllApplicationEventsQueryHookResult = ReturnType<
-  typeof useAllApplicationEventsQuery
->;
-export type AllApplicationEventsLazyQueryHookResult = ReturnType<
-  typeof useAllApplicationEventsLazyQuery
->;
-export type AllApplicationEventsSuspenseQueryHookResult = ReturnType<
-  typeof useAllApplicationEventsSuspenseQuery
->;
-export type AllApplicationEventsQueryResult = Apollo.QueryResult<
-  AllApplicationEventsQuery,
-  AllApplicationEventsQueryVariables
+export type RejectRestMutationResult =
+  Apollo.MutationResult<RejectRestMutation>;
+export type RejectRestMutationOptions = Apollo.BaseMutationOptions<
+  RejectRestMutation,
+  RejectRestMutationVariables
 >;
 export const CreateAllocatedTimeSlotDocument = gql`
   mutation CreateAllocatedTimeSlot(
@@ -13465,57 +13344,209 @@ export type ApplicationSectionAllocationsQueryResult = Apollo.QueryResult<
   ApplicationSectionAllocationsQuery,
   ApplicationSectionAllocationsQueryVariables
 >;
-export const RejectRestDocument = gql`
-  mutation RejectRest($input: ReservationUnitOptionUpdateMutationInput!) {
-    updateReservationUnitOption(input: $input) {
-      pk
-      rejected
-      locked
+export const AllApplicationEventsDocument = gql`
+  query AllApplicationEvents(
+    $applicationRound: Int!
+    $applicationStatus: [ApplicationStatusChoice]!
+    $unit: [Int]!
+    $reservationUnit: [Int]!
+  ) {
+    applicationSections(
+      applicationRound: $applicationRound
+      reservationUnit: $reservationUnit
+      unit: $unit
+      applicationStatus: $applicationStatus
+    ) {
+      edges {
+        node {
+          id
+          reservationUnitOptions {
+            id
+            reservationUnit {
+              id
+              pk
+              nameFi
+            }
+          }
+        }
+      }
+      totalCount
     }
   }
 `;
-export type RejectRestMutationFn = Apollo.MutationFunction<
-  RejectRestMutation,
-  RejectRestMutationVariables
->;
 
 /**
- * __useRejectRestMutation__
+ * __useAllApplicationEventsQuery__
  *
- * To run a mutation, you first call `useRejectRestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRejectRestMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
+ * To run a query within a React component, call `useAllApplicationEventsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllApplicationEventsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
  *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const [rejectRestMutation, { data, loading, error }] = useRejectRestMutation({
+ * const { data, loading, error } = useAllApplicationEventsQuery({
  *   variables: {
- *      input: // value for 'input'
+ *      applicationRound: // value for 'applicationRound'
+ *      applicationStatus: // value for 'applicationStatus'
+ *      unit: // value for 'unit'
+ *      reservationUnit: // value for 'reservationUnit'
  *   },
  * });
  */
-export function useRejectRestMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RejectRestMutation,
-    RejectRestMutationVariables
+export function useAllApplicationEventsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    AllApplicationEventsQuery,
+    AllApplicationEventsQueryVariables
+  > &
+    (
+      | { variables: AllApplicationEventsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    AllApplicationEventsQuery,
+    AllApplicationEventsQueryVariables
+  >(AllApplicationEventsDocument, options);
+}
+export function useAllApplicationEventsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    AllApplicationEventsQuery,
+    AllApplicationEventsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<RejectRestMutation, RejectRestMutationVariables>(
-    RejectRestDocument,
-    options
-  );
+  return Apollo.useLazyQuery<
+    AllApplicationEventsQuery,
+    AllApplicationEventsQueryVariables
+  >(AllApplicationEventsDocument, options);
 }
-export type RejectRestMutationHookResult = ReturnType<
-  typeof useRejectRestMutation
+export function useAllApplicationEventsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        AllApplicationEventsQuery,
+        AllApplicationEventsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    AllApplicationEventsQuery,
+    AllApplicationEventsQueryVariables
+  >(AllApplicationEventsDocument, options);
+}
+export type AllApplicationEventsQueryHookResult = ReturnType<
+  typeof useAllApplicationEventsQuery
 >;
-export type RejectRestMutationResult =
-  Apollo.MutationResult<RejectRestMutation>;
-export type RejectRestMutationOptions = Apollo.BaseMutationOptions<
-  RejectRestMutation,
-  RejectRestMutationVariables
+export type AllApplicationEventsLazyQueryHookResult = ReturnType<
+  typeof useAllApplicationEventsLazyQuery
+>;
+export type AllApplicationEventsSuspenseQueryHookResult = ReturnType<
+  typeof useAllApplicationEventsSuspenseQuery
+>;
+export type AllApplicationEventsQueryResult = Apollo.QueryResult<
+  AllApplicationEventsQuery,
+  AllApplicationEventsQueryVariables
+>;
+export const ApplicationRoundFilterDocument = gql`
+  query ApplicationRoundFilter($id: ID!) {
+    applicationRound(id: $id) {
+      id
+      nameFi
+      status
+      reservationPeriodBegin
+      reservationPeriodEnd
+      reservationUnits {
+        id
+        pk
+        nameFi
+        unit {
+          id
+          pk
+          nameFi
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useApplicationRoundFilterQuery__
+ *
+ * To run a query within a React component, call `useApplicationRoundFilterQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationRoundFilterQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApplicationRoundFilterQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useApplicationRoundFilterQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationRoundFilterQuery,
+    ApplicationRoundFilterQueryVariables
+  > &
+    (
+      | { variables: ApplicationRoundFilterQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ApplicationRoundFilterQuery,
+    ApplicationRoundFilterQueryVariables
+  >(ApplicationRoundFilterDocument, options);
+}
+export function useApplicationRoundFilterLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ApplicationRoundFilterQuery,
+    ApplicationRoundFilterQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ApplicationRoundFilterQuery,
+    ApplicationRoundFilterQueryVariables
+  >(ApplicationRoundFilterDocument, options);
+}
+export function useApplicationRoundFilterSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ApplicationRoundFilterQuery,
+        ApplicationRoundFilterQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ApplicationRoundFilterQuery,
+    ApplicationRoundFilterQueryVariables
+  >(ApplicationRoundFilterDocument, options);
+}
+export type ApplicationRoundFilterQueryHookResult = ReturnType<
+  typeof useApplicationRoundFilterQuery
+>;
+export type ApplicationRoundFilterLazyQueryHookResult = ReturnType<
+  typeof useApplicationRoundFilterLazyQuery
+>;
+export type ApplicationRoundFilterSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationRoundFilterSuspenseQuery
+>;
+export type ApplicationRoundFilterQueryResult = Apollo.QueryResult<
+  ApplicationRoundFilterQuery,
+  ApplicationRoundFilterQueryVariables
 >;
 export const ApplicationRoundCriteriaDocument = gql`
   query ApplicationRoundCriteria($id: ID!) {
