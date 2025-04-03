@@ -191,7 +191,7 @@ export const ApplicationPage2Schema = z.object({
 export type ApplicationPage2FormValues = z.infer<typeof ApplicationPage2Schema>;
 
 function convertApplicationSectionPage1(
-  section: ReadonlyDeep<SectionType>
+  section: SectionType
 ): ApplicationSectionPage1FormValues {
   const reservationUnits = filterNonNullable(
     section.reservationUnitOptions?.map(
@@ -297,7 +297,7 @@ const convertOrganisation = (o: Organisation): OrganisationFormValues => ({
   identifier: o?.identifier ?? "",
   yearEstablished: o?.yearEstablished ?? 0,
   coreBusiness: o?.coreBusinessFi ?? "",
-  address: convertAddress(o?.address),
+  address: convertAddress(o?.address ?? null),
 });
 
 const ApplicantTypeSchema = z.enum([
@@ -688,7 +688,7 @@ export function transformPage3Application(
 }
 
 export function validateApplication(
-  application: ReadonlyDeep<ApplicationFormFragment>
+  application: ApplicationFormFragment
 ): { valid: true } | { valid: false; page: 1 | 2 | 3 } {
   const { applicationRound } = application;
   const begin = new Date(applicationRound.reservationPeriodBegin);
@@ -698,6 +698,7 @@ export function validateApplication(
   if (!page1.success) {
     return { valid: false, page: 1 };
   }
+  // @ts-expect-error -- don't need to use convertApplicationPage2 here (we don't need the reservationUnitOptions for validation)
   const form2 = convertApplicationPage2(application);
   const page2 = ApplicationPage2Schema.safeParse(form2);
   if (!page2.success) {

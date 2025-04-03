@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import {
-  type ReservationQuery,
   useUpdateRecurringReservationMutation,
   useUpdateStaffReservationMutation,
   type ReservationSeriesUpdateMutationInput,
@@ -8,6 +7,7 @@ import {
   CustomerTypeChoice,
   type Maybe,
   type UpdateStaffReservationMutationVariables,
+  type UseStaffReservationFragment,
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
 
@@ -18,16 +18,14 @@ type ExtraParamsT = { seriesName?: string };
 export type MutationInputParams = Omit<InputT, "pk"> &
   Omit<MemoT, "pk"> &
   ExtraParamsT;
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+
+type Props = {
+  reservation: UseStaffReservationFragment;
+  onSuccess: () => void;
+};
 
 /// Combines regular and recurring reservation change mutation
-export function useStaffReservationMutation({
-  reservation,
-  onSuccess,
-}: {
-  reservation: Pick<ReservationType, "pk" | "recurringReservation">;
-  onSuccess: () => void;
-}) {
+export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
   const { t } = useTranslation();
 
   const [mutation] = useUpdateStaffReservationMutation();

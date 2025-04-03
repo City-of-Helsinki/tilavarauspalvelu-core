@@ -95,6 +95,19 @@ export function ViewApplication({
 export const APPLICATION_VIEW_FRAGMENT = gql`
   fragment ApplicationView on ApplicationNode {
     ...ApplicationForm
+    applicationSections {
+      id
+      reservationUnitOptions {
+        id
+        reservationUnit {
+          id
+          pk
+          nameFi
+          nameEn
+          nameSv
+        }
+      }
+    }
     applicationRound {
       id
       sentDate

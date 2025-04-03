@@ -13,12 +13,13 @@ import {
   useAccessCodeQuery,
 } from "@gql/gql-types";
 import { getPrice, isReservationUnitPaid } from "@/modules/reservationUnit";
+import { formatDateTimeRange, formatDuration } from "@/modules/util";
 import {
-  formatDateTimeRange,
-  formatDuration,
+  base64encode,
+  capitalize,
+  getImageSource,
   getMainImage,
-} from "@/modules/util";
-import { base64encode, capitalize, getImageSource } from "common/src/helpers";
+} from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
 import { Flex } from "common/styles/util";
 import {
@@ -186,7 +187,7 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
   fragment ReservationInfoCard on ReservationNode {
     id
     pk
-    ...ReservationPrice
+    ...ReservationPriceFields
     taxPercentageValue
     state
     accessType
@@ -194,11 +195,7 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
       accessCode
     }
     reservationUnits {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
+      ...ReservationUnitNameFields
       images {
         ...Image
       }

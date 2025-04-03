@@ -16,7 +16,7 @@ import {
   ReservationKind,
   ReservationStartInterval,
   ReservationUnitReservationState,
-  type PriceReservationUnitFragment,
+  type PriceReservationUnitFieldsFragment,
   type EquipmentFieldsFragment,
 } from "@gql/gql-types";
 import {
@@ -32,7 +32,7 @@ import {
   isReservationUnitPublished,
   isReservationUnitReservable,
   type GetPriceType,
-  type IsReservableReservationUnitType,
+  type NotReservableFieldsFragmentNarrow,
 } from "./reservationUnit";
 import mockTranslations from "./../public/locales/fi/prices.json";
 import { type ReservableMap, dateToKey, type RoundPeriod } from "./reservable";
@@ -393,10 +393,6 @@ describe("isReservationUnitPublished", () => {
       expected
     );
   });
-
-  test("NO without state", () => {
-    expect(isReservationUnitPublished({})).toBe(false);
-  });
 });
 
 function createMockEquipment({
@@ -525,23 +521,6 @@ describe("getReservationUnitName", () => {
     () => {
       const reservationUnit = generateNameFragment("Unit 1");
       expect(getReservationUnitName(reservationUnit)).toEqual("Unit 1 FI");
-    }
-  );
-
-  test.for([
-    ["", "Unit 1 FI"],
-    [null, "Unit 1 FI"],
-    [undefined, "Unit 1 FI"],
-  ])(
-    "should return the name of the unit in the default language",
-    ([val, nameFi]) => {
-      const reservationUnit = {
-        nameFi,
-        nameEn: val,
-        nameSv: val,
-      };
-      expect(getReservationUnitName(reservationUnit, "sv")).toEqual(nameFi);
-      expect(getReservationUnitName(reservationUnit, "en")).toEqual(nameFi);
     }
   );
 });
@@ -674,7 +653,7 @@ function constructPricing({
   highestPrice?: number;
   taxPercentage?: number;
   priceUnit?: PriceUnit;
-}): NonNullable<PriceReservationUnitFragment>["pricings"][0] {
+}): NonNullable<PriceReservationUnitFieldsFragment>["pricings"][0] {
   const p = highestPrice ?? lowestPrice ?? 0;
   return {
     id: "1",
@@ -684,6 +663,7 @@ function constructPricing({
     highestPrice: highestPrice?.toString() ?? p.toString(),
     taxPercentage: {
       id: "1",
+      pk: 1,
       value: (taxPercentage ?? 24).toString(),
     },
   };
@@ -705,13 +685,17 @@ describe("getReservationUnitPrice", () => {
     pricings,
   }: {
     date: Date;
-    pricings: Readonly<NonNullable<PriceReservationUnitFragment>["pricings"]>;
+    pricings: Readonly<
+      NonNullable<PriceReservationUnitFieldsFragment>["pricings"]
+    >;
   }): GetReservationUnitPriceProps {
     return {
       t: mockT as TFunction,
       pricingDate: date,
       reservationUnit: {
         id: "1",
+        reservationBegins: null,
+        reservationEnds: null,
         pricings,
       },
     };
@@ -787,24 +771,20 @@ describe("isReservationUnitReservable", () => {
     maxReservationDuration = 3600,
     reservationState = ReservationUnitReservationState.Reservable,
     reservationBegins,
-    reservableTimeSpans,
-    reservationsMaxDaysBefore,
+    reservableTimeSpans = [],
   }: {
     minReservationDuration?: number;
     maxReservationDuration?: number;
     reservationState?: ReservationUnitReservationState;
     reservationBegins?: Date;
     reservableTimeSpans?: ReservationUnitNode["reservableTimeSpans"];
-    reservationsMaxDaysBefore?: number;
-  }): ReadonlyDeep<IsReservableReservationUnitType> {
+  }): NotReservableFieldsFragmentNarrow {
     return {
       id: base64encode("ReservationUnitNode:1"),
       reservationKind: ReservationKind.Direct,
-      maxPersons: 10,
       minReservationDuration,
       maxReservationDuration,
       reservationBegins: reservationBegins?.toISOString() ?? null,
-      reservationsMaxDaysBefore,
       metadataSet: {
         id: "1234",
         supportedFields: [

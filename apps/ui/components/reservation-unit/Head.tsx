@@ -19,7 +19,7 @@ import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
 import { H1, H3 } from "common/src/common/typography";
 import { formatDateTime } from "@/modules/util";
 import { IconWithText } from "../common/IconWithText";
-import { Images } from "./Images";
+import { Images } from "./";
 import {
   getActivePricing,
   getPriceString,

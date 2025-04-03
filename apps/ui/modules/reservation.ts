@@ -19,13 +19,15 @@ import {
   type CancellationRuleFieldsFragment,
   type BlockingReservationFieldsFragment,
   type CanUserCancelReservationFragment,
+  CanReservationBeChangedFragment,
+  PaymentOrderNode,
 } from "@gql/gql-types";
 import { getIntervalMinutes } from "common/src/conversion";
 import { fromUIDate } from "./util";
 import { type TFunction } from "i18next";
-import { type PendingReservation } from "@/modules/types";
 import {
   type ReservableMap,
+  ReservationUnitReservableProps,
   type RoundPeriod,
   isRangeReservable,
 } from "./reservable";
@@ -33,6 +35,7 @@ import { type PendingReservationFormType } from "@/components/reservation-unit/s
 import { isValidDate, toUIDate } from "common/src/common/util";
 import { getTimeString } from "./reservationUnit";
 import { timeToMinutes } from "common/src/helpers";
+import { gql } from "@apollo/client";
 
 // TimeSlots change the Calendar view. How many intervals are shown i.e. every half an hour, every hour
 // we use every hour only => 2
@@ -42,11 +45,12 @@ export const SLOTS_EVERY_HOUR = 2;
 /// @param t translation function
 /// opts should never include undefined values but our codegen doesn't properly type it
 export function getDurationOptions(
-  opts: {
-    minReservationDuration?: Maybe<number>;
-    maxReservationDuration?: Maybe<number>;
-    reservationStartInterval: Maybe<ReservationStartInterval> | undefined;
-  },
+  opts: Pick<
+    ReservationUnitNode,
+    | "minReservationDuration"
+    | "maxReservationDuration"
+    | "reservationStartInterval"
+  >,
   t: TFunction
 ): { label: string; value: number }[] {
   if (
@@ -118,11 +122,13 @@ type IsWithinCancellationPeriodReservationT = Pick<
   ReservationNodeT,
   "begin"
 > & {
-  reservationUnits?: Maybe<Array<CancellationRuleFieldsFragment>> | undefined;
+  reservationUnits?: Readonly<
+    Maybe<Array<CancellationRuleFieldsFragment>> | undefined
+  >;
 };
 
 function isTooCloseToCancel(
-  reservation: IsWithinCancellationPeriodReservationT
+  reservation: Readonly<IsWithinCancellationPeriodReservationT>
 ): boolean {
   const reservationUnit = reservation.reservationUnits?.[0];
   const begin = new Date(reservation.begin);
@@ -214,14 +220,18 @@ function isReservationFreeOfCharge(
   return !(Number(reservation.price) > 0);
 }
 
+export const CAN_RESERVATION_BE_CHANGED_FRAGMENT = gql`
+  fragment CanReservationBeChanged on ReservationNode {
+    end
+    isHandled
+    price
+    ...CanUserCancelReservation
+  }
+`;
+
 export type CanReservationBeChangedProps = {
-  reservation: Pick<
-    ReservationNode,
-    "begin" | "end" | "isHandled" | "state" | "price"
-  > &
-    CanUserCancelReservationFragment;
+  reservation: CanReservationBeChangedFragment;
   reservableTimes: ReservableMap;
-  newReservation: PendingReservation;
   reservationUnit: IsReservableFieldsFragment;
   activeApplicationRounds: readonly RoundPeriod[];
   blockingReservations: readonly BlockingReservationFieldsFragment[];
@@ -273,47 +283,25 @@ export function isReservationEditable(
   return true;
 }
 
-/// Only used by reservation edit (both page and component)
-/// NOTE [boolean, string] causes issues in TS / JS
-/// ![false] === ![true] === false, with no type errors
-/// either refactor the return value or add lint rules to disable ! operator
-/// TODO disable undefined from reservation and reservationUnit
-export function canReservationTimeBeChanged({
-  reservation,
-  newReservation,
+export type IsUserAllowedToMoveReservationHereProps =
+  ReservationUnitReservableProps & {
+    isFree: boolean;
+  };
+export function isUserAllowedToMoveReservationHere({
+  range,
+  isFree,
   reservableTimes,
   reservationUnit,
   activeApplicationRounds,
   blockingReservations,
-}: CanReservationBeChangedProps): boolean {
-  if (reservation == null) {
-    return false;
-  }
-  // existing reservation state is not CONFIRMED
-  if (!isReservationConfirmed(reservation)) {
+}: IsUserAllowedToMoveReservationHereProps): boolean {
+  if (!isFree) {
     return false;
   }
 
-  if (!isReservationEditable({ reservation })) {
-    return false;
-  }
-
-  // New reservation would require payment
-  if (!isReservationFreeOfCharge(newReservation)) {
-    return false;
-  }
-
-  if (reservationUnit == null) {
-    return false;
-  }
-
-  //  new reservation is valid
   return isRangeReservable({
     blockingReservations,
-    range: {
-      start: new Date(newReservation.begin),
-      end: new Date(newReservation.end),
-    },
+    range,
     reservationUnit,
     reservableTimes,
     activeApplicationRounds,
@@ -321,13 +309,13 @@ export function canReservationTimeBeChanged({
 }
 
 export function getCheckoutUrl(
-  order?: Maybe<{ checkoutUrl?: Maybe<string> }>,
+  order: Pick<PaymentOrderNode, "checkoutUrl"> | undefined | null,
   lang = "fi"
-): string | undefined {
+): string | null {
   const { checkoutUrl } = order ?? {};
 
   if (!checkoutUrl) {
-    return undefined;
+    return null;
   }
 
   try {
@@ -339,7 +327,7 @@ export function getCheckoutUrl(
     // eslint-disable-next-line no-console
     console.error(e);
   }
-  return undefined;
+  return null;
 }
 
 export function getNewReservation({

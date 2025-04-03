@@ -32,7 +32,6 @@ import { getCheckoutUrl } from "@/modules/reservation";
 import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
 import { Step0 } from "@/components/reservation/Step0";
 import { Step1 } from "@/components/reservation/Step1";
-import { ReservationStep } from "@/modules/types";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { useConfirmNavigation } from "@/hooks/useConfirmNavigation";
 import { base64encode, filterNonNullable, toNumber } from "common/src/helpers";
@@ -141,7 +140,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
     reservationUnit?.requireReservationHandling ||
     reservation?.applyingForFreeOfCharge;
 
-  const steps: ReservationStep[] = useMemo(() => {
+  const steps = useMemo(() => {
     if (reservationUnit == null) {
       return [];
     }
@@ -487,7 +486,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   };
 }
 
-export const GET_RESERVATION = gql`
+export const RESERVATION_IN_PROGRESS_QUERY = gql`
   query Reservation($id: ID!) {
     reservation(id: $id) {
       id

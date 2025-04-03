@@ -538,7 +538,7 @@ function BasicSection({
   unit,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  unit: UnitWithSpacesAndResourcesQuery["unit"];
+  unit: UnitWithSpacesAndResourcesQuery["unit"] | undefined;
 }) {
   const { t } = useTranslation();
   const { control, formState, register, watch, setValue } = form;
@@ -1317,10 +1317,12 @@ function DescriptionSection({
   reservationUnitTypes,
 }: Readonly<{
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  equipments: ReservationUnitEditorParametersQuery["equipmentsAll"];
-  purposes: ReservationUnitEditorParametersQuery["purposes"];
-  qualifiers: ReservationUnitEditorParametersQuery["qualifiers"];
-  reservationUnitTypes: ReservationUnitEditorParametersQuery["reservationUnitTypes"];
+  equipments: ReservationUnitEditorParametersQuery["equipmentsAll"] | undefined;
+  purposes: ReservationUnitEditorParametersQuery["purposes"] | undefined;
+  qualifiers: ReservationUnitEditorParametersQuery["qualifiers"] | undefined;
+  reservationUnitTypes:
+    | ReservationUnitEditorParametersQuery["reservationUnitTypes"]
+    | undefined;
 }>) {
   const { t } = useTranslation();
   const { control, formState } = form;
@@ -1515,20 +1517,17 @@ function ReservationUnitEditor({
   const [createMutation] = useCreateReservationUnitMutation();
 
   const id = base64encode(`UnitNode:${unitPk}`);
+  // TODO combine these two queries into a single params query with minimal data
   const { data: unitResourcesData } = useUnitWithSpacesAndResourcesQuery({
     skip: !unitPk,
     variables: { id },
-    onError: (e) => {
-      // eslint-disable-next-line no-console
-      console.error(e);
+    onError: (_) => {
       errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 
   const { data: parametersData } = useReservationUnitEditorParametersQuery({
-    onError: (e) => {
-      // eslint-disable-next-line no-console
-      console.error(e);
+    onError: (_) => {
       errorToast({ text: t("errors.errorFetchingData") });
     },
     variables: {

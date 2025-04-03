@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import {
   AccessType,
-  type ReservationQuery,
+  type ReservationPageQuery,
   useChangeReservationAccessCodeSingleMutation,
   useRepairReservationAccessCodeSingleMutation,
   useChangeReservationAccessCodeSeriesMutation,
@@ -28,7 +28,7 @@ import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { useCheckPermission } from "@/hooks";
 import { gql } from "@apollo/client";
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
 const SummaryHorizontal = styled.div<{
   $isRecurring?: boolean;
@@ -239,14 +239,16 @@ function ReservationKeylessEntryRecurring({
 
 function getRecurringReservationAccessCodeValidity(
   pindoraInfo:
-    | {
+    | Readonly<{
         accessCode: string;
         accessCodeIsActive: boolean;
-        accessCodeValidity: Array<{
-          accessCodeBeginsAt: string;
-          accessCodeEndsAt: string;
-        }>;
-      }
+        accessCodeValidity: Readonly<
+          Array<{
+            accessCodeBeginsAt: string;
+            accessCodeEndsAt: string;
+          }>
+        >;
+      }>
     | null
     | undefined
 ) {

@@ -16,7 +16,7 @@ import {
 import { formatters as getFormatters, H4 } from "common";
 import { breakpoints } from "common/src/common/style";
 import {
-  type ApplicationRoundTimeSlotNode,
+  type ApplicationRoundTimeSlotFieldsFragment,
   type ReservationCreateMutationInput,
   useCreateReservationMutation,
   type ReservationUnitPageQuery,
@@ -31,6 +31,7 @@ import {
   CurrentUserDocument,
   type CurrentUserQuery,
   type TimeSlotType,
+  type RelatedUnitCardFieldsFragment,
 } from "@gql/gql-types";
 import {
   base64encode,
@@ -42,13 +43,7 @@ import {
   timeToMinutes,
   toNumber,
 } from "common/src/helpers";
-import { Head } from "@/components/reservation-unit/Head";
-import { AddressSection } from "@/components/reservation-unit/Address";
 import { Sanitize } from "common/src/components/Sanitize";
-import {
-  RelatedUnits,
-  type RelatedNodeT,
-} from "@/components/reservation-unit/RelatedUnits";
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Map as MapComponent } from "@/components/Map";
@@ -62,7 +57,6 @@ import {
   isReservationUnitPublished,
   isReservationUnitReservable,
 } from "@/modules/reservationUnit";
-import { EquipmentList } from "@/components/reservation-unit/EquipmentList";
 import { JustForDesktop, JustForMobile } from "@/modules/style/layout";
 import {
   type FocusTimeSlot,
@@ -75,10 +69,19 @@ import {
   getMaxReservationDuration,
   getMinReservationDuration,
 } from "@/modules/reservable";
-import { SubventionSuffix } from "@/components/reservation/SubventionSuffix";
+import {
+  SubventionSuffix,
+  ReservationTimePicker,
+} from "@/components/reservation";
 import InfoDialog from "@/components/common/InfoDialog";
-import { QuickReservation } from "@/components/reservation-unit/QuickReservation";
-import { ReservationInfoContainer } from "@/components/reservation-unit/ReservationInfoContainer";
+import {
+  AddressSection,
+  Head,
+  RelatedUnits,
+  EquipmentList,
+  QuickReservation,
+  ReservationInfoContainer,
+} from "@/components/reservation-unit";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -93,7 +96,6 @@ import {
 import { LoginFragment } from "@/components/LoginFragment";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
-import { ReservationTimePicker } from "@/components/reservation/ReservationTimePicker";
 import { SubmitButton } from "@/styled/util";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
 import {
@@ -105,6 +107,7 @@ import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { Flex } from "common/styles/util";
 import { useDisplayError } from "@/hooks/useDisplayError";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
+import { gql } from "@apollo/client";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
@@ -204,7 +207,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 
     const bookingTerms = await getGenericTerms(apolloClient);
 
-    let relatedReservationUnits: RelatedNodeT[] = [];
+    let relatedReservationUnits: RelatedUnitCardFieldsFragment[] = [];
     if (reservationUnit?.unit?.pk) {
       const { data: relatedData } = await apolloClient.query<
         RelatedReservationUnitsQuery,
@@ -213,7 +216,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         query: RelatedReservationUnitsDocument,
         variables: {
           unit: [reservationUnit.unit.pk],
-          isVisible: true,
         },
       });
 
@@ -221,14 +223,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         relatedData?.reservationUnits?.edges?.map((n) => n?.node)
       ).filter((n) => n?.pk !== reservationUnitData.reservationUnit?.pk);
     }
-
-    if (!reservationUnit?.pk) {
-      return notFound;
-    }
-
-    const reservableTimeSpans = filterNonNullable(
-      reservationUnitData.reservationUnit?.reservableTimeSpans
-    );
     const queryParams = new URLSearchParams(query as Record<string, string>);
     const searchDate = queryParams.get("date") ?? null;
     const searchTime = queryParams.get("time") ?? null;
@@ -245,7 +239,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit,
-        reservableTimeSpans,
         blockingReservations,
         relatedReservationUnits,
         activeApplicationRounds,
@@ -280,12 +273,21 @@ function formatTimeSlot(slot: TimeSlotType): string {
   return formatTimeRange(beginTime, endTimeChecked, true);
 }
 
+export const APPLICATION_ROUND_TIME_SLOT_FRAGMENT = gql`
+  fragment ApplicationRoundTimeSlotFields on ApplicationRoundTimeSlotNode {
+    id
+    weekday
+    closed
+    reservableTimes {
+      begin
+      end
+    }
+  }
+`;
+
 // Returns an element for a weekday in the application round timetable, with up to two timespans
 function ApplicationRoundScheduleDay(
-  props: Pick<
-    ApplicationRoundTimeSlotNode,
-    "weekday" | "reservableTimes" | "closed"
-  >
+  props: ApplicationRoundTimeSlotFieldsFragment
 ) {
   const { t } = useTranslation();
   const { weekday, reservableTimes, closed } = props;
@@ -436,14 +438,13 @@ function ReservationUnit({
     if (reservationUnit.pk == null) {
       throw new Error("Reservation unit pk is missing");
     }
-    const slot =
-      convertFormToFocustimeSlot({
-        data,
-        reservationUnit,
-        reservableTimes,
-        activeApplicationRounds,
-        blockingReservations,
-      }) ?? {};
+    const slot = convertFormToFocustimeSlot({
+      data,
+      reservationUnit,
+      reservableTimes,
+      activeApplicationRounds,
+      blockingReservations,
+    });
     if (!slot.isReservable) {
       throw new Error("Reservation slot is not reservable");
     }
@@ -885,3 +886,79 @@ function PriceChangeNotice({
 }
 
 export default ReservationUnitWrapped;
+
+export const RESERVATION_UNIT_PAGE_QUERY = gql`
+  query ReservationUnitPage(
+    $id: ID!
+    $pk: Int!
+    $beginDate: Date!
+    $endDate: Date!
+    $state: [ReservationStateChoice]
+  ) {
+    reservationUnit(id: $id) {
+      ...ReservationUnitNameFields
+      ...AvailableTimesReservationUnitFields
+      ...NotReservableFields
+      ...ReservationTimePickerFields
+      ...MetadataSets
+      unit {
+        ...AddressFields
+      }
+      uuid
+      ...TermsOfUse
+      images {
+        ...Image
+      }
+      isDraft
+      applicationRoundTimeSlots {
+        ...ApplicationRoundTimeSlotFields
+      }
+      applicationRounds(ongoing: true) {
+        id
+        reservationPeriodBegin
+        reservationPeriodEnd
+      }
+      descriptionFi
+      descriptionEn
+      descriptionSv
+      canApplyFreeOfCharge
+      reservationUnitType {
+        ...ReservationUnitTypeFields
+      }
+      ...ReservationInfoContainer
+      numActiveUserReservations
+      publishingState
+      equipments {
+        id
+        ...EquipmentFields
+      }
+      currentAccessType
+      accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+        id
+        pk
+        accessType
+        beginDate
+      }
+    }
+    affectingReservations(
+      forReservationUnits: [$pk]
+      beginDate: $beginDate
+      endDate: $endDate
+      state: $state
+    ) {
+      ...BlockingReservationFields
+    }
+  }
+`;
+
+export const RELATED_RESERVATION_UNITS_QUERY = gql`
+  query RelatedReservationUnits($unit: [Int]!) {
+    reservationUnits(unit: $unit, isVisible: true) {
+      edges {
+        node {
+          ...RelatedUnitCardFields
+        }
+      }
+    }
+  }
+`;

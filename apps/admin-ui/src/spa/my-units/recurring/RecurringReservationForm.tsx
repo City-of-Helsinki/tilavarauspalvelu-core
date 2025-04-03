@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ReservationTypeChoice,
-  type ReservationUnitQuery,
   useReservationUnitQuery,
   type Maybe,
+  type ReservationUnitFieldsFragment,
 } from "@gql/gql-types";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -30,9 +30,7 @@ import {
   useFilteredReservationList,
   useMultipleReservation,
 } from "./hooks";
-import ReservationTypeForm, {
-  type TypeFormReservationUnit,
-} from "@/component/ReservationTypeForm";
+import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { base64encode, toNumber } from "common/src/helpers";
@@ -92,12 +90,12 @@ function RecurringReservationFormWrapper({ reservationUnits }: Props) {
     variables: { id },
     skip: !isValid,
   });
-  const { reservationUnit } = queryData ?? {};
 
   if (reservationUnits.length === 0) {
     return <Notification type="alert">No reservation units found</Notification>;
   }
 
+  const reservationUnit = queryData?.reservationUnit ?? null;
   // NOTE requires a second auto grid so that the select scales similar to others
   return (
     <>
@@ -117,15 +115,11 @@ function RecurringReservationFormWrapper({ reservationUnits }: Props) {
 
 export { RecurringReservationFormWrapper as RecurringReservationForm };
 
-type QueryT = NonNullable<NonNullable<ReservationUnitQuery>["reservationUnit"]>;
-type ReservationUnitType = TypeFormReservationUnit &
-  Pick<QueryT, "pk" | "reservationStartInterval">;
-
 type FormValues = RecurringReservationFormT & ReservationFormMeta;
 function RecurringReservationForm({
   reservationUnit,
 }: {
-  reservationUnit?: Maybe<ReservationUnitType>;
+  reservationUnit: Maybe<ReservationUnitFieldsFragment>;
 }) {
   const { t } = useTranslation();
 

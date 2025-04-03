@@ -1,15 +1,11 @@
 import React, { type ReactNode } from "react";
 import { useCheckPermission } from "@/hooks";
 import {
-  type ReservationUnitReservationsFragment,
   UserPermissionChoice,
+  type VisibleIfPermissionFieldsFragment,
 } from "@gql/gql-types";
 import { useSession } from "@/hooks/auth";
-
-type ReservationPermissionType = Pick<
-  ReservationUnitReservationsFragment,
-  "reservationUnits" | "user"
->;
+import { gql } from "@apollo/client";
 
 function VisibleIfPermission({
   reservation,
@@ -17,7 +13,7 @@ function VisibleIfPermission({
   children,
   otherwise,
 }: {
-  reservation: ReservationPermissionType;
+  reservation: VisibleIfPermissionFieldsFragment;
   permission: UserPermissionChoice;
   children: ReactNode;
   otherwise?: JSX.Element | null;
@@ -38,3 +34,20 @@ function VisibleIfPermission({
 }
 
 export default VisibleIfPermission;
+
+export const VISIBLE_IF_PERMISSION_FRAGMENT = gql`
+  fragment VisibleIfPermissionFields on ReservationNode {
+    id
+    user {
+      id
+      pk
+    }
+    reservationUnits {
+      id
+      unit {
+        id
+        pk
+      }
+    }
+  }
+`;

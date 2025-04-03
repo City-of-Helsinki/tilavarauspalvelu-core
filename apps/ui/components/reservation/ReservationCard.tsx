@@ -4,10 +4,10 @@ import { useTranslation } from "next-i18next";
 import { trim } from "lodash-es";
 import {
   AccessType,
-  type ListReservationsQuery,
+  type ReservationCardFragment,
   ReservationStateChoice,
 } from "@gql/gql-types";
-import { formatDateTimeRange, getMainImage } from "@/modules/util";
+import { formatDateTimeRange } from "@/modules/util";
 import {
   isReservationCancellable,
   getNormalizedReservationOrderStatus,
@@ -16,26 +16,26 @@ import { getPrice } from "@/modules/reservationUnit";
 import { ReservationOrderStatus } from "./ReservationOrderStatus";
 import { ReservationStatus } from "./ReservationStatus";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
-import { capitalize, getImageSource } from "common/src/helpers";
+import { capitalize, getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { getReservationPath } from "@/modules/urls";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { gql } from "@apollo/client";
 
 type CardType = "upcoming" | "past" | "cancelled";
 
-// TODO use a fragment
-type QueryT = NonNullable<ListReservationsQuery["reservations"]>;
-type EdgeT = NonNullable<QueryT["edges"][0]>;
-type NodeT = NonNullable<EdgeT["node"]>;
 interface PropsT {
-  reservation: NodeT;
+  reservation: ReservationCardFragment;
   type?: CardType;
 }
 
-function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.Element {
+export function ReservationCard({
+  reservation,
+  type,
+}: Readonly<PropsT>): JSX.Element {
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnits[0];
@@ -142,4 +142,44 @@ function ReservationCard({ reservation, type }: Readonly<PropsT>): JSX.Element {
   );
 }
 
-export default ReservationCard;
+export const RESERVATION_CARD_FRAGMENT = gql`
+  fragment ReservationCard on ReservationNode {
+    pk
+    begin
+    end
+    state
+    accessType
+    reservationUnits {
+      id
+      images {
+        ...Image
+      }
+      unit {
+        id
+        nameFi
+        nameSv
+        nameEn
+      }
+    }
+    ...ReservationPriceFields
+    ...ReservationOrderStatus
+    ...CanUserCancelReservation
+  }
+`;
+/*
+  * id
+          ...ReservationInfoCard
+          name
+          bufferTimeBefore
+          bufferTimeAfter
+          ...ReservationOrderStatus
+          paymentOrder {
+            id
+            checkoutUrl
+            expiresInMinutes
+          }
+          isBlocked
+          reservationUnits {
+            ...CancellationRuleFields
+          }
+*/

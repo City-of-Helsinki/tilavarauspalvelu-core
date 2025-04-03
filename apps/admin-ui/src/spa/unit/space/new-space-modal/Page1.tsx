@@ -1,48 +1,33 @@
 import React from "react";
-import {
-  Button,
-  ButtonVariant,
-  Dialog,
-  IconArrowRight,
-  IconCheck,
-} from "hds-react";
+import { Button, ButtonVariant, Dialog, IconArrowRight } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { type UnitQuery } from "@gql/gql-types";
-import { parseAddress } from "@/common/util";
+import { type UnitPageQuery } from "@gql/gql-types";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { ParentSelector } from "../ParentSelector";
-import {
-  Address,
-  Name,
-  Parent,
-  StyledTag,
-  UnitInfo,
-} from "./modules/newSpaceModal";
+import { StyledTag } from "./modules/newSpaceModal";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { SpaceUpdateForm } from "../SpaceForm";
 import { DialogActionsButtons } from "@/styles/util";
 import { H4 } from "common";
 
+type Props = {
+  unit: Pick<NonNullable<UnitPageQuery["unit"]>, "pk">;
+  closeModal: () => void;
+  hasFixedParent: boolean;
+  form: UseFormReturn<SpaceUpdateForm>;
+  onNextPage: () => void;
+  children: React.ReactNode;
+};
 export function Page1({
   unit,
   closeModal,
   hasFixedParent,
   form,
   onNextPage,
-}: {
-  unit: UnitQuery["unit"];
-  closeModal: () => void;
-  hasFixedParent: boolean;
-  form: UseFormReturn<SpaceUpdateForm>;
-  onNextPage: () => void;
-}): JSX.Element {
+  children,
+}: Props): JSX.Element {
   const { t } = useTranslation();
-  const { control, watch } = form;
-
-  const parentPk = watch("parent") ?? null;
-  const parentName = unit?.spaces.find(
-    (space) => space.pk === parentPk
-  )?.nameFi;
+  const { control } = form;
 
   return (
     <>
@@ -59,16 +44,7 @@ export function Page1({
         <p className="text-body" id="custom-dialog-content">
           {t("SpaceModal.page1.info")}
         </p>
-        <UnitInfo>
-          <IconCheck />
-          <div>
-            <Name>{unit?.nameFi}</Name>
-            <Parent>{parentName}</Parent>
-          </div>
-          {unit?.location ? (
-            <Address>{parseAddress(unit?.location)}</Address>
-          ) : null}
-        </UnitInfo>
+        {children}
         {!hasFixedParent ? <H4>{t("SpaceModal.page1.title")}</H4> : null}
         {!hasFixedParent ? (
           <Controller

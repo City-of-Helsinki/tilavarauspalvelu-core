@@ -16,10 +16,9 @@ import {
   H6,
 } from "common/src/common/typography";
 import { breakpoints } from "common/src/common/style";
-import type { ReservationUnitCardFieldsFragment } from "@gql/gql-types";
-import { getMainImage } from "@/modules/util";
+import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
 import { getReservationUnitName } from "@/modules/reservationUnit";
-import { getImageSource } from "common/src/helpers";
+import { getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
 import { Flex } from "common/styles/util";
 import { ErrorText } from "common/src/components/ErrorText";
@@ -27,8 +26,10 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
+import { gql } from "@apollo/client";
 
-type ReservationUnitType = ReservationUnitCardFieldsFragment;
+type ReservationUnitType = OrderedReservationUnitCardFragment;
+
 type Props = {
   order: number;
   reservationUnit: ReservationUnitType;
@@ -277,3 +278,18 @@ export function OrderedReservationUnitCard({
     </>
   );
 }
+
+export const ORDERED_RESERVATION_UNIT_CARD_FRAGMENT = gql`
+  fragment OrderedReservationUnitCard on ReservationUnitNode {
+    ...ReservationUnitNameFields
+    images {
+      ...Image
+    }
+    unit {
+      id
+      nameFi
+      nameSv
+      nameEn
+    }
+  }
+`;

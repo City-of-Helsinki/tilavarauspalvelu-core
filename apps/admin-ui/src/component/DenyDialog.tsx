@@ -15,10 +15,10 @@ import {
   type ReservationRefundMutationInput,
   useDenyReservationMutation,
   useRefundReservationMutation,
-  type ReservationQuery,
   type ReservationSeriesDenyMutationInput,
   useDenyReservationSeriesMutation,
   OrderStatus,
+  type DenyDialogFieldsFragment,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { CenterSpinner, Flex } from "common/styles/util";
@@ -32,13 +32,6 @@ import { convertOptionToHDS, toNumber } from "common/src/helpers";
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
 `;
-
-// TODO use a fragment
-type QueryT = NonNullable<ReservationQuery["reservation"]>;
-type ReservationType = Pick<
-  QueryT,
-  "pk" | "handlingDetails" | "price" | "paymentOrder"
->;
 
 type ReturnAllowedState =
   // state selection
@@ -65,12 +58,8 @@ function isPriceReturnable(x: {
   );
 }
 
-function findPrice(reservation: Pick<ReservationType, "price">): number {
-  return toNumber(reservation.price) ?? 0;
-}
-
 function convertToReturnState(
-  reservation: ReservationType
+  reservation: Pick<DenyDialogFieldsFragment, "price" | "paymentOrder">
 ): ReturnAllowedState {
   const { price, paymentOrder } = reservation;
   const order = paymentOrder[0] ?? null;
@@ -137,35 +126,37 @@ const ReturnMoney = ({
   }
 };
 
-type Props = {
-  reservation: ReservationType;
-  onClose: () => void;
-  onReject: (vars: DenyVariables) => void;
-};
-
 type DenyVariables = {
-  shouldRefund: boolean;
   handlingDetails: string;
   denyReasonPk: number | null;
 };
 
-function DialogContent({ reservation, onClose, onReject }: Props): JSX.Element {
+type DialogContentProps = {
+  initialHandlingDetails: string;
+  onClose: () => void;
+  onReject: (vars: DenyVariables) => void;
+  disabled?: boolean;
+  children?: JSX.Element;
+};
+
+function DialogContent({
+  initialHandlingDetails,
+  onClose,
+  onReject,
+  disabled,
+  children,
+}: DialogContentProps): JSX.Element {
   const { t } = useTranslation();
 
   const [handlingDetails, setHandlingDetails] = useState<string>(
-    reservation.handlingDetails ?? ""
+    initialHandlingDetails
   );
   const [denyReasonPk, setDenyReason] = useState<number | null>(null);
-
-  const [returnState, setReturnState] = useState<ReturnAllowedState>(
-    convertToReturnState(reservation)
-  );
 
   const { options, loading } = useDenyReasonOptions();
 
   const handleDeny = () => {
-    const shouldRefund = returnState === "refund";
-    onReject({ shouldRefund, handlingDetails, denyReasonPk });
+    onReject({ handlingDetails, denyReasonPk });
   };
 
   if (loading) {
@@ -205,16 +196,12 @@ function DialogContent({ reservation, onClose, onReject }: Props): JSX.Element {
               "RequestedReservation.DenyDialog.handlingDetailsHelper"
             )}
           />
-          <ReturnMoney
-            state={returnState}
-            onChange={setReturnState}
-            price={findPrice(reservation)}
-          />
+          {children}
         </Flex>
       </Dialog.Content>
       <ActionButtons>
         <Button
-          disabled={!denyReasonPk || returnState === "not-decided"}
+          disabled={!denyReasonPk || disabled}
           onClick={handleDeny}
           data-testid="deny-dialog__deny-button"
         >
@@ -268,7 +255,7 @@ export function DenyDialog({
   onReject,
   title,
 }: {
-  reservation: ReservationType;
+  reservation: DenyDialogFieldsFragment;
   onClose: () => void;
   onReject: () => void;
   title?: string;
@@ -279,6 +266,10 @@ export function DenyDialog({
 
   const denyReservation = (input: ReservationDenyMutationInput) =>
     denyReservationMutation({ variables: { input } });
+
+  const [returnState, setReturnState] = useState<ReturnAllowedState>(
+    convertToReturnState(reservation)
+  );
 
   const refundReservation = async (input: ReservationRefundMutationInput) => {
     try {
@@ -296,7 +287,8 @@ export function DenyDialog({
   };
 
   const handleDeny = async (vars: DenyVariables) => {
-    const { shouldRefund, handlingDetails, denyReasonPk } = vars;
+    const shouldRefund = returnState === "refund";
+    const { handlingDetails, denyReasonPk } = vars;
     try {
       if (denyReasonPk == null) {
         throw new Error("Deny PK undefined");
@@ -342,10 +334,17 @@ export function DenyDialog({
   return (
     <DenyDialogWrapper title={title} onClose={onClose}>
       <DialogContent
-        reservation={reservation}
+        initialHandlingDetails={reservation.handlingDetails ?? ""}
         onReject={handleDeny}
         onClose={onClose}
-      />
+        disabled={returnState === "not-decided"}
+      >
+        <ReturnMoney
+          state={returnState}
+          onChange={setReturnState}
+          price={toNumber(reservation.price) ?? 0}
+        />
+      </DialogContent>
     </DenyDialogWrapper>
   );
 }
@@ -354,27 +353,24 @@ export function DenyDialogSeries({
   title,
   onClose,
   onReject,
-  reservation,
+  initialHandlingDetails,
   recurringReservation,
 }: {
   title?: string;
   onClose: () => void;
   onReject: () => void;
-  reservation: ReservationType;
-  recurringReservation: NonNullable<QueryT["recurringReservation"]>;
+  initialHandlingDetails: string;
+  recurringReservation: { pk: number | null };
 }): JSX.Element {
   const { t } = useTranslation();
   const [denyMutation] = useDenyReservationSeriesMutation();
 
   const handleDeny = async (vars: DenyVariables) => {
-    const { shouldRefund, handlingDetails, denyReasonPk } = vars;
+    const { handlingDetails, denyReasonPk } = vars;
     const inputPk = recurringReservation.pk;
     try {
       if (denyReasonPk == null) {
         throw new Error("Deny PK undefined");
-      }
-      if (shouldRefund) {
-        throw new Error("Refund not allowed for series");
       }
       if (inputPk == null) {
         throw new Error("Recurring reservation PK undefined");
@@ -410,13 +406,28 @@ export function DenyDialogSeries({
   return (
     <DenyDialogWrapper title={title} onClose={onClose}>
       <DialogContent
-        reservation={reservation}
+        initialHandlingDetails={initialHandlingDetails}
         onReject={handleDeny}
         onClose={onClose}
       />
     </DenyDialogWrapper>
   );
 }
+
+export const DENY_DIALOG_FRAGMENT = gql`
+  fragment DenyDialogFields on ReservationNode {
+    id
+    pk
+    handlingDetails
+    price
+    paymentOrder {
+      id
+      orderUuid
+      status
+      refundUuid
+    }
+  }
+`;
 
 export const DENY_RESERVATION = gql`
   mutation DenyReservation($input: ReservationDenyMutationInput!) {

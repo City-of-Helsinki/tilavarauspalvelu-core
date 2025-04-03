@@ -1,86 +1,9 @@
 import { gql } from "@apollo/client";
-import {
-  APPLICANT_NAME_FRAGMENT,
-  APPLICATION_SECTION_COMMON_FRAGMENT,
-} from "common/src/queries/application";
-
-export const SPACE_COMMON_FRAGMENT = gql`
-  fragment SpaceCommonFields on SpaceNode {
-    id
-    pk
-    nameFi
-    parent {
-      id
-      pk
-      nameFi
-    }
-    surfaceArea
-    maxPersons
-  }
-`;
-
-export const RESOURCE_FRAGMENT = gql`
-  fragment ResourceFields on ResourceNode {
-    id
-    pk
-    nameFi
-    locationType
-    space {
-      id
-      nameFi
-      unit {
-        id
-        nameFi
-        pk
-      }
-    }
-  }
-`;
-
-export const SPACE_FRAGMENT = gql`
-  ${SPACE_COMMON_FRAGMENT}
-  ${RESOURCE_FRAGMENT}
-  fragment SpaceFields on SpaceNode {
-    ...SpaceCommonFields
-    code
-    resources {
-      ...ResourceFields
-    }
-    children {
-      id
-      pk
-    }
-  }
-`;
-
-export const RESERVATION_UNIT_COMMON_FRAGMENT = gql`
-  fragment ReservationUnitCommonFields on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    maxPersons
-    surfaceArea
-    reservationUnitType {
-      id
-      nameFi
-    }
-  }
-`;
-
-export const UNIT_NAME_FRAGMENT = gql`
-  fragment UnitNameFields on UnitNode {
-    id
-    pk
-    nameFi
-  }
-`;
 
 // NOTE this is for allocation only (it includes the application name)
 // for regular application queries we don't need to query the name through the application relation
 export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
-  ${APPLICANT_NAME_FRAGMENT}
-  ${APPLICATION_SECTION_COMMON_FRAGMENT}
-  fragment ApplicationSection on ApplicationSectionNode {
+  fragment ApplicationSectionFields on ApplicationSectionNode {
     ...ApplicationSectionCommon
     purpose {
       id
@@ -109,42 +32,8 @@ export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
   }
 `;
 
-export const APPLICATION_ADMIN_FRAGMENT = gql`
-  fragment ApplicationAdmin on ApplicationNode {
-    pk
-    id
-    status
-    lastModifiedDate
-    ...Applicant
-    applicationRound {
-      id
-      pk
-      nameFi
-    }
-    applicationSections {
-      ...ApplicationSectionCommon
-      suitableTimeRanges {
-        ...SuitableTime
-      }
-      purpose {
-        ...ReservationPurposeName
-      }
-      allocations
-      reservationUnitOptions {
-        id
-        ...ReservationUnitOption
-        rejected
-        allocatedTimeSlots {
-          pk
-          id
-        }
-      }
-    }
-  }
-`;
-
 export const RESERVATION_COMMON_FRAGMENT = gql`
-  fragment ReservationCommon on ReservationNode {
+  fragment ReservationCommonFields on ReservationNode {
     id
     pk
     begin
@@ -161,6 +50,7 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
     }
     user {
       id
+      email
       firstName
       lastName
     }
@@ -173,9 +63,9 @@ export const RESERVATION_COMMON_FRAGMENT = gql`
 // TODO do we still need the user here?
 // TODO what is the reservation name vs. reserveeName?
 export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
-  ${RESERVATION_COMMON_FRAGMENT}
   fragment ReservationUnitReservations on ReservationNode {
-    ...ReservationCommon
+    ...ReservationCommonFields
+    ...VisibleIfPermissionFields
     name
     numPersons
     calendarUrl
@@ -190,20 +80,12 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
         pk
       }
     }
-    user {
-      id
-      firstName
-      lastName
-      email
-      pk
-    }
     affectedReservationUnits
   }
 `;
 
 export const RESERVATION_UNIT_FRAGMENT = gql`
-  ${UNIT_NAME_FRAGMENT}
-  fragment ReservationUnit on ReservationUnitNode {
+  fragment ReservationUnitFields on ReservationUnitNode {
     id
     pk
     nameFi
@@ -213,29 +95,11 @@ export const RESERVATION_UNIT_FRAGMENT = gql`
     reservationStartInterval
     authentication
     unit {
-      ...UnitNameFields
-    }
-    ...MetadataSets
-    cancellationTerms {
       id
-      textFi
+      pk
       nameFi
     }
-    paymentTerms {
-      id
-      textFi
-      nameFi
-    }
-    pricingTerms {
-      id
-      textFi
-      nameFi
-    }
+    ...ReservationTypeFormFields
     termsOfUseFi
-    serviceSpecificTerms {
-      id
-      textFi
-      nameFi
-    }
   }
 `;

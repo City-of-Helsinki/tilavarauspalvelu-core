@@ -23,3 +23,14 @@ export const UPDATE_STAFF_RECURRING_RESERVATION = gql`
     }
   }
 `;
+
+export const USE_STAFF_RESERVATION_FRAGMENT = gql`
+  fragment UseStaffReservation on ReservationNode {
+    id
+    pk
+    recurringReservation {
+      id
+      pk
+    }
+  }
+`;

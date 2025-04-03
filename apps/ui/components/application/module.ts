@@ -35,8 +35,8 @@ type Timespan = {
 };
 
 export function aesToCells(
-  schedule: SuitableTimeRangeFormValues[],
-  openingHours?: DailyOpeningHours
+  schedule: Readonly<SuitableTimeRangeFormValues[]>,
+  openingHours: Readonly<DailyOpeningHours>
 ): Cell[][] {
   const firstSlotStart = 7;
   const lastSlotStart = 23;
@@ -85,15 +85,14 @@ export function aesToCells(
   return cells;
 }
 
-type DailyOpeningHours = Pick<
-  ApplicationRoundTimeSlotNode,
-  "weekday" | "closed" | "reservableTimes"
->[];
+type DailyOpeningHours = Readonly<
+  Pick<ApplicationRoundTimeSlotNode, "weekday" | "closed" | "reservableTimes">[]
+>;
 
 function getOpeningHours(
   day: number,
   openingHours?: DailyOpeningHours
-): OpeningHourPeriod[] | null {
+): Readonly<OpeningHourPeriod[]> | null {
   if (!openingHours) {
     return null;
   }

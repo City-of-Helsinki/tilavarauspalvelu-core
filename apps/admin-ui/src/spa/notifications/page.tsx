@@ -24,8 +24,8 @@ import {
   useBannerNotificationDeleteMutation,
   useBannerNotificationUpdateMutation,
   useBannerNotificationCreateMutation,
-  useBannerNotificationsAdminQuery,
-  type BannerNotificationsAdminQuery,
+  useBannerNotificationPageQuery,
+  type BannerNotificationPageQuery,
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
@@ -275,7 +275,7 @@ const GridForm = styled.form`
 const NotificationForm = ({
   notification,
 }: {
-  notification?: BannerNotificationsAdminQuery["bannerNotification"];
+  notification?: BannerNotificationPageQuery["bannerNotification"];
 }) => {
   const { t } = useTranslation("translation", { keyPrefix: "Notifications" });
 
@@ -614,7 +614,7 @@ const getName = (
 const useRemoveNotification = ({
   notification,
 }: {
-  notification?: BannerNotificationsAdminQuery["bannerNotification"];
+  notification?: BannerNotificationPageQuery["bannerNotification"];
 }) => {
   const { t } = useTranslation();
 
@@ -661,7 +661,7 @@ function LoadedContent({
   children,
 }: {
   isNew: boolean;
-  notification?: BannerNotificationsAdminQuery["bannerNotification"];
+  notification?: BannerNotificationPageQuery["bannerNotification"];
   children?: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -704,7 +704,7 @@ function PageWrapped({ pk }: { pk?: number }): JSX.Element {
   const typename = "BannerNotificationNode";
 
   const id = base64encode(`${typename}:${pk}`);
-  const { data, loading: isLoading } = useBannerNotificationsAdminQuery({
+  const { data, loading: isLoading } = useBannerNotificationPageQuery({
     skip: !pk,
     variables: { id },
   });
@@ -732,3 +732,23 @@ function PageRouted() {
 }
 
 export default PageRouted;
+
+export const BANNER_NOTIFICATION_PAGE_QUERY = gql`
+  query BannerNotificationPage($id: ID!) {
+    bannerNotification(id: $id) {
+      id
+      pk
+      level
+      activeFrom
+      message
+      messageEn
+      messageFi
+      messageSv
+      name
+      target
+      activeUntil
+      draft
+      state
+    }
+  }
+`;

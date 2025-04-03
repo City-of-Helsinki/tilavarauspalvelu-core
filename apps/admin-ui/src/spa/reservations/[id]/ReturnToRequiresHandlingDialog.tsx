@@ -2,21 +2,20 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Button, ButtonVariant, Dialog, IconInfoCircle } from "hds-react";
 import {
-  type ReservationQuery,
+  type ReservationNode,
   useRequireHandlingMutation,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { errorToast, successToast } from "common/src/common/toast";
 
-// TODO use a fragment
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type ReservationType = Pick<ReservationNode, "pk">;
 type Props = {
   reservation: ReservationType;
   onClose: () => void;
   onAccept: () => void;
 };
 
-const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
+function DialogContent({ reservation, onClose, onAccept }: Props) {
   const { t, i18n } = useTranslation();
 
   const [backToRequireHandlingMutation] = useRequireHandlingMutation();
@@ -69,13 +68,13 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
       </Dialog.ActionButtons>
     </>
   );
-};
+}
 
-const ReturnToRequiredHandlingDialog = ({
+function ReturnToRequiredHandlingDialog({
   reservation,
   onClose,
   onAccept,
-}: Props): JSX.Element => {
+}: Props): JSX.Element {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 
@@ -100,5 +99,5 @@ const ReturnToRequiredHandlingDialog = ({
       />
     </Dialog>
   );
-};
+}
 export default ReturnToRequiredHandlingDialog;

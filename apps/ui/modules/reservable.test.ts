@@ -21,7 +21,7 @@ import {
 } from "@/gql/gql-types";
 import { createMockReservationUnit } from "@/test/test.gql.utils";
 import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
-import { toNumber } from "common/src/helpers";
+import { base64encode, toNumber } from "common/src/helpers";
 
 describe("generateReservableMap", () => {
   beforeEach(() => {
@@ -473,10 +473,10 @@ describe("isRangeReservable", () => {
     function createMockReservation({
       start,
       end,
-      state,
+      state = ReservationStateChoice.Confirmed,
       bufferTimeAfter,
       bufferTimeBefore,
-      isBlocked,
+      isBlocked = false,
     }: {
       start: Date;
       end: Date;
@@ -484,16 +484,19 @@ describe("isRangeReservable", () => {
       bufferTimeAfter?: number;
       bufferTimeBefore?: number;
       isBlocked?: boolean;
-    }) {
+    }): BlockingReservationFieldsFragment {
       return {
+        id: base64encode("ReservationNode:1"),
         pk: 1,
-        id: "1",
         bufferTimeAfter: 60 * 60 * (bufferTimeAfter ?? 0),
         bufferTimeBefore: 60 * 60 * (bufferTimeBefore ?? 0),
-        state: state ?? ReservationStateChoice.Confirmed,
+        state,
         begin: start.toISOString(),
         end: end.toISOString(),
-        isBlocked: isBlocked ?? false,
+        isBlocked,
+        numPersons: null,
+        calendarUrl: null,
+        affectedReservationUnits: [],
       };
     }
 

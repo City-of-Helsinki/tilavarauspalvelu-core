@@ -4,12 +4,12 @@ import styled from "styled-components";
 import dynamic from "next/dynamic";
 import { breakpoints } from "common/src/common/style";
 import type { ImageFragment } from "@gql/gql-types";
-import Carousel from "../Carousel";
+import Carousel from "@/components/Carousel";
 import { getImageSource } from "common/src/helpers";
 
 const Modal = dynamic(() => import("../Modal").then((module) => module.Modal));
 type Props = {
-  images: ImageFragment[];
+  images: Readonly<ImageFragment[]>;
   contextName?: string;
 };
 
@@ -80,7 +80,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
   const [showModal, setShowModal] = useState(false);
   const [currentImage, setCurrentImage] = useState<ImageFragment>();
 
-  if (images?.length === 0) {
+  if (images.length === 0) {
     return <div />;
   }
 
@@ -91,7 +91,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
           name: contextName,
         })}
       >
-        {images?.map((image, index) => (
+        {images.map((image, index) => (
           <CarouselImage
             key={image.imageUrl}
             alt={`${t("common:imgAltForSpace", { name: contextName })} #${

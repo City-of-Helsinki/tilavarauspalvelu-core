@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { type ApolloQueryResult } from "@apollo/client";
 import {
+  type NewResourceUnitFieldsFragment,
   useCreateSpaceMutation,
   type SpaceCreateMutationInput,
-  type UnitQuery,
 } from "@gql/gql-types";
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
@@ -12,21 +11,21 @@ import { SpaceUpdateSchema, SpaceUpdateForm } from "../SpaceForm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { errorToast } from "common/src/common/toast";
 import { useTranslation } from "react-i18next";
+import { gql } from "@apollo/client";
+import { UnitInfo } from "../UnitInfo";
 
 type Props = {
-  unit: UnitQuery["unit"];
-  parentSpace?: SpaceT;
+  unit: NewResourceUnitFieldsFragment;
+  parentSpacePk?: number | null;
   closeModal: () => void;
-  refetch: () => Promise<ApolloQueryResult<UnitQuery>>;
+  refetch: () => Promise<unknown>;
 };
-
-type SpaceT = NonNullable<UnitQuery["unit"]>["spaces"][0];
 
 export function NewSpaceModal({
   unit,
   closeModal,
   refetch,
-  parentSpace,
+  parentSpacePk,
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
   const [mutation] = useCreateSpaceMutation();
@@ -41,7 +40,7 @@ export function NewSpaceModal({
       nameFi: "",
       nameSv: "",
       nameEn: "",
-      parent: parentSpace?.pk ?? null,
+      parent: parentSpacePk ?? null,
       pk: undefined,
     },
   });
@@ -62,7 +61,15 @@ export function NewSpaceModal({
 
   const [page, setPage] = useState(0);
 
-  const hasFixedParent = Boolean(parentSpace);
+  // TODO this is weird, what's the difference between fixed parent and a normal parent?
+  // i.e. this is set on creation but is it an important distinction to watch("parent")?
+  const hasFixedParent = parentSpacePk != null;
+  const { watch } = form;
+
+  const parentPk = watch("parent");
+  const parentName =
+    unit?.spaces.find((space) => space.pk === parentPk)?.nameFi ?? null;
+
   return (
     <form noValidate onSubmit={form.handleSubmit(createSpaces)}>
       {page === 0 ? (
@@ -72,16 +79,31 @@ export function NewSpaceModal({
           hasFixedParent={hasFixedParent}
           form={form}
           onNextPage={() => setPage(1)}
-        />
+        >
+          <UnitInfo parentName={parentName} unit={unit} />
+        </Page1>
       ) : (
         <Page2
-          unit={unit}
           form={form}
           onPrevPage={() => setPage(0)}
           closeModal={closeModal}
           hasFixedParent={hasFixedParent}
-        />
+        >
+          <UnitInfo parentName={parentName} unit={unit} />
+        </Page2>
       )}
     </form>
   );
 }
+
+// Common with resources (the modals are almost identical)
+export const NEW_RESOURCE_UNIT_FRAGMENT = gql`
+  fragment NewResourceUnitFields on UnitNode {
+    ...UnitResourceInfoFields
+    spaces {
+      id
+      pk
+      nameFi
+    }
+  }
+`;

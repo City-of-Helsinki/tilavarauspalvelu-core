@@ -1,13 +1,3 @@
-export type CalendarBufferEvent = {
-  state: "BUFFER";
-};
-
-export type CalendarEventBuffer = {
-  start: Date;
-  end: Date;
-  event: CalendarBufferEvent;
-};
-
 export type DAY = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 // @deprecated used by MetaFields

@@ -4,9 +4,9 @@ import { type TFunction } from "i18next";
 import {
   type BannerNotificationNode,
   BannerNotificationOrderingChoices,
-  BannerNotificationsAdminFragment,
+  type BannerNotificationListFragment,
   BannerNotificationState,
-  useBannerNotificationsAdminListQuery,
+  useBannerNotificationListQuery,
 } from "@gql/gql-types";
 import { H1 } from "common/src/common/typography";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -26,21 +26,22 @@ import {
 } from "hds-react";
 import { getNotificationUrl } from "@/common/urls";
 import { CenterSpinner, TitleSection } from "common/styles/util";
+import { gql } from "@apollo/client";
 
 const getStatusLabelProps = (
   state: BannerNotificationState | null | undefined
 ): { type: StatusLabelType; icon: JSX.Element } => {
   switch (state) {
     case BannerNotificationState.Draft:
-      return { type: "draft", icon: <IconPen aria-hidden="true" /> };
+      return { type: "draft", icon: <IconPen /> };
     case BannerNotificationState.Scheduled:
-      return { type: "info", icon: <IconClock aria-hidden="true" /> };
+      return { type: "info", icon: <IconClock /> };
     case BannerNotificationState.Active:
-      return { type: "success", icon: <IconCheck aria-hidden="true" /> };
+      return { type: "success", icon: <IconCheck /> };
     default:
       return {
         type: "info",
-        icon: <IconQuestionCircleFill aria-hidden="true" />,
+        icon: <IconQuestionCircleFill />,
       };
   }
 };
@@ -67,10 +68,10 @@ const getColConfig = (t: TFunction) => [
     transform: (notification: NonNullable<BannerNotificationNode>) =>
       notification.pk ? (
         <TableLink to={getNotificationUrl(notification.pk)}>
-          {notification.name ?? t("Notifications.noName")}
+          {notification.name}
         </TableLink>
       ) : (
-        (notification.name ?? t("Notifications.noName"))
+        notification.name
       ),
   },
   {
@@ -100,14 +101,14 @@ const getColConfig = (t: TFunction) => [
     key: "target",
     isSortable: true,
     transform: (notification: NonNullable<BannerNotificationNode>) =>
-      t(`Notifications.target.${notification.target ?? "noTarget"}`),
+      t(`Notifications.target.${notification.target}`),
   },
   {
     headerName: t("Notifications.headings.level"),
     key: "level",
     isSortable: true,
     transform: (notification: NonNullable<BannerNotificationNode>) =>
-      t(`Notifications.level.${notification.level ?? "noLevel"}`),
+      t(`Notifications.level.${notification.level}`),
   },
 ];
 
@@ -117,7 +118,7 @@ function NotificationsTable({
   sort,
   isLoading,
 }: {
-  notifications: BannerNotificationsAdminFragment[];
+  notifications: BannerNotificationListFragment[];
   onSortChanged: (key: string) => void;
   sort: string;
   isLoading: boolean;
@@ -150,7 +151,7 @@ function Page() {
   const orderBy = transformSortString(sort);
 
   const { data, loading, previousData, fetchMore } =
-    useBannerNotificationsAdminListQuery({
+    useBannerNotificationListQuery({
       variables: {
         first: GQL_MAX_RESULTS_PER_QUERY,
         orderBy,
@@ -263,3 +264,38 @@ function transformSortString(
 }
 
 export default Page;
+
+export const BANNER_NOTIFICATIONS_LIST_FRAGMENT = gql`
+  fragment BannerNotificationList on BannerNotificationNode {
+    id
+    pk
+    name
+    activeFrom
+    activeUntil
+    state
+    target
+    level
+  }
+`;
+
+// TODO reduce the size of the query (use a different fragment or no fragment at all)
+export const BANNER_NOTIFICATION_LIST_QUERY = gql`
+  query BannerNotificationList(
+    $first: Int
+    $after: String
+    $orderBy: [BannerNotificationOrderingChoices]
+  ) {
+    bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
+      edges {
+        node {
+          ...BannerNotificationList
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+`;

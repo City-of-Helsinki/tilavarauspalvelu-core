@@ -16,7 +16,6 @@ import { Flex, NoWrap } from "common/styles/util";
 import {
   CustomerTypeChoice,
   ReservationStateChoice,
-  type ReservationInfoFragment,
   type ReservationMetadataFieldNode,
   type ReservationPageQuery,
   type ReservationPageQueryVariables,
@@ -27,8 +26,10 @@ import {
   OrderStatus,
   useAccessCodeQuery,
   AccessType,
+  type AccessCodeQuery,
 } from "@gql/gql-types";
 import Link from "next/link";
+import { isBefore, sub } from "date-fns";
 import { createApolloClient } from "@/modules/apolloClient";
 import { formatDateTimeRange } from "@/modules/util";
 import { Sanitize } from "common/src/components/Sanitize";
@@ -44,10 +45,7 @@ import {
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { ReservationStatus } from "@/components/reservation/ReservationStatus";
-import { AddressSection } from "@/components/reservation-unit/Address";
-import { ReservationInfoCard } from "@/components/reservation/ReservationInfoCard";
-import { ReservationOrderStatus } from "@/components/reservation/ReservationOrderStatus";
+import { AddressSection } from "@/components/reservation-unit";
 import {
   getCommonServerSideProps,
   getGenericTerms,
@@ -57,11 +55,9 @@ import {
   capitalize,
   filterNonNullable,
   ignoreMaybeArray,
-  LocalizationLanguages,
   toNumber,
 } from "common/src/helpers";
 import { containsField, containsNameField } from "common/src/metaFieldsHelpers";
-import { NotModifiableReason } from "@/components/reservation/NotModifiableReason";
 import {
   ButtonLikeLink,
   ButtonLikeExternalLink,
@@ -83,7 +79,14 @@ import { Instructions } from "@/components/Instructions";
 import { gql } from "@apollo/client";
 import StatusLabel from "common/src/components/StatusLabel";
 import IconButton from "common/src/components/IconButton";
-import { isBefore, sub } from "date-fns";
+import {
+  NotModifiableReason,
+  ReservationInfoSection,
+  LabelValuePair,
+  ReservationStatus,
+  ReservationInfoCard,
+  ReservationOrderStatus,
+} from "@/components/reservation";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -296,24 +299,6 @@ function ReserveeInfo({
   );
 }
 
-type LabelValuePairProps = {
-  label: string;
-  value: string | number;
-  testId: string;
-};
-
-function LabelValuePair({
-  label,
-  value,
-  testId,
-}: Readonly<LabelValuePairProps>): JSX.Element {
-  return (
-    <p>
-      {label}: <span data-testid={testId}>{value}</span>
-    </p>
-  );
-}
-
 // TODO add a state check => if state is Created redirect to the reservation funnel
 // if state is Cancelled, Denied, WaitingForPayment what then?
 function Reservation({
@@ -332,7 +317,7 @@ function Reservation({
       id: base64encode(`ReservationNode:${reservation.pk}`),
     },
   });
-  const { pindoraInfo } = accessCodeData?.reservation ?? {};
+  const pindoraInfo = accessCodeData?.reservation?.pindoraInfo ?? null;
 
   // NOTE typescript can't type array off index
   const order = reservation.paymentOrder.find(() => true);
@@ -367,7 +352,8 @@ function Reservation({
     reservation.state === ReservationStateChoice.RequiresHandling;
   const isCancellable = isReservationCancellable(reservation);
 
-  const checkoutUrl = getCheckoutUrl(order, i18n.language);
+  const lang = convertLanguageCode(i18n.language);
+  const checkoutUrl = getCheckoutUrl(order, lang);
 
   const hasCheckoutUrl = !!checkoutUrl;
   const isWaitingForPayment =
@@ -434,7 +420,7 @@ function Reservation({
               data-testid="reservation__reservation-unit"
               href={getReservationUnitPath(reservationUnit?.pk)}
             >
-              {getReservationUnitName(reservationUnit)}
+              {getReservationUnitName(reservationUnit, lang) ?? "-"}
             </Link>
             <NoWrap data-testid="reservation__time">{timeString}</NoWrap>
           </SubHeading>
@@ -450,18 +436,18 @@ function Reservation({
                 href={reservation.calendarUrl ?? ""}
               >
                 {t("reservations:saveToCalendar")}
-                <IconCalendar aria-hidden="true" />
+                <IconCalendar />
               </ButtonLikeExternalLink>
             )}
             {hasReceipt && (
               <ButtonLikeExternalLink
                 size="large"
                 data-testid="reservation__confirmation--button__receipt-link"
-                href={`${order.receiptUrl}&lang=${i18n.language}`}
+                href={`${order.receiptUrl}&lang=${lang}`}
                 target="_blank"
               >
                 {t("reservations:downloadReceipt")}
-                <IconLinkExternal aria-hidden="true" />
+                <IconLinkExternal />
               </ButtonLikeExternalLink>
             )}
           </SecondaryActions>
@@ -476,7 +462,7 @@ function Reservation({
                 data-testid="reservation-detail__button--checkout"
               >
                 {t("reservations:payReservation")}
-                <IconArrowRight aria-hidden="true" />
+                <IconArrowRight />
               </ButtonLikeLink>
             )}
             {canTimeBeModified && (
@@ -486,7 +472,7 @@ function Reservation({
                 data-testid="reservation-detail__button--edit"
               >
                 {t("reservations:modifyReservationTime")}
-                <IconCalendar aria-hidden="true" />
+                <IconCalendar />
               </ButtonLikeLink>
             )}
             {isCancellable && (
@@ -500,15 +486,15 @@ function Reservation({
                     isBeingHandled ? "application" : "reservation"
                   }`
                 )}
-                <IconCross aria-hidden="true" />
+                <IconCross />
               </ButtonLikeLink>
             )}
           </Actions>
-          <NotModifiableReason reservation={reservation} />
+          <NotModifiableReason {...reservation} />
         </div>
         <Flex>
           <Instructions reservation={reservation} />
-          <ReservationInfo
+          <ReservationInfoSection
             reservation={reservation}
             supportedFields={supportedFields}
           />
@@ -524,7 +510,7 @@ function Reservation({
           )}
           <TermsInfo reservation={reservation} termsOfUse={termsOfUse} />
           <AddressSection
-            title={getReservationUnitName(reservationUnit) ?? "-"}
+            title={getReservationUnitName(reservationUnit, lang) ?? "-"}
             unit={reservationUnit?.unit}
           />
         </Flex>
@@ -630,18 +616,10 @@ function TermsInfo({
 function AccessCodeInfo({
   pindoraInfo,
   feedbackUrl,
-}: Readonly<{
-  pindoraInfo:
-    | {
-        accessCode: string | null;
-        accessCodeBeginsAt: string;
-        accessCodeEndsAt: string;
-        accessCodeIsActive: boolean;
-      }
-    | null
-    | undefined;
-  feedbackUrl: string;
-}>): JSX.Element {
+}: Readonly<
+  Pick<NonNullable<AccessCodeQuery["reservation"]>, "pindoraInfo"> &
+    Pick<PropsNarrowed, "feedbackUrl">
+>): JSX.Element {
   const { t, i18n } = useTranslation();
   return (
     <div>
@@ -751,6 +729,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   return notFound;
 }
 
+export default Reservation;
+
 export const GET_APPLICATION_RECURRING_RESERVATION_QUERY = gql`
   query ApplicationRecurringReservation($id: ID!) {
     recurringReservation(id: $id) {
@@ -771,6 +751,7 @@ export const GET_APPLICATION_RECURRING_RESERVATION_QUERY = gql`
     }
   }
 `;
+
 export const GET_RESERVATION_PAGE_QUERY = gql`
   query ReservationPage($id: ID!) {
     reservation(id: $id) {
@@ -781,6 +762,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
       ...ReservationInfo
       ...ReservationInfoCard
       ...Instructions
+      ...CanReservationBeChanged
       applyingForFreeOfCharge
       calendarUrl
       paymentOrder {
@@ -797,95 +779,9 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
           ...UnitNameFieldsI18N
         }
         canApplyFreeOfCharge
-        ...CancellationRuleFields
         ...MetadataSets
         ...TermsOfUse
       }
     }
   }
 `;
-
-function getReservationValue(
-  reservation: ReservationInfoFragment,
-  key: "purpose" | "numPersons" | "ageGroup" | "description",
-  lang: LocalizationLanguages
-): string | number | null {
-  if (key === "ageGroup") {
-    const { minimum, maximum } = reservation.ageGroup || {};
-    return minimum && maximum ? `${minimum} - ${maximum}` : null;
-  } else if (key === "purpose") {
-    if (reservation.purpose != null) {
-      return getTranslationSafe(reservation.purpose, "name", lang);
-    }
-    return null;
-  } else if (key in reservation) {
-    const val = reservation[key as keyof ReservationInfoFragment];
-    if (typeof val === "string" || typeof val === "number") {
-      return val;
-    }
-  }
-  return null;
-}
-
-function ReservationInfo({
-  reservation,
-  supportedFields,
-}: Readonly<{
-  reservation: ReservationInfoFragment;
-  supportedFields: Pick<ReservationMetadataFieldNode, "fieldName">[];
-}>) {
-  const { t, i18n } = useTranslation();
-  const POSSIBLE_FIELDS = [
-    "purpose",
-    "numPersons",
-    "ageGroup",
-    "description",
-  ] as const;
-  const fields = POSSIBLE_FIELDS.filter((field) =>
-    containsField(supportedFields, field)
-  );
-
-  if (fields.length === 0) {
-    return null;
-  }
-  const lang = convertLanguageCode(i18n.language);
-
-  return (
-    <div>
-      <H4 as="h2">{t("reservationApplication:applicationInfo")}</H4>
-      {fields
-        .map((field) => ({
-          key: field,
-          label: t(`reservationApplication:label.common.${field}`),
-          value: getReservationValue(reservation, field, lang) ?? "-",
-          testId: `reservation__${field}`,
-        }))
-        .map(({ key, ...rest }) => (
-          <LabelValuePair key={key} {...rest} />
-        ))}
-    </div>
-  );
-}
-
-export const RESERVATION_INFO_FRAGMENT = gql`
-  fragment ReservationInfo on ReservationNode {
-    id
-    description
-    purpose {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-    ageGroup {
-      id
-      pk
-      minimum
-      maximum
-    }
-    numPersons
-  }
-`;
-
-export default Reservation;

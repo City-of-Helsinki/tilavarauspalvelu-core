@@ -27,11 +27,13 @@ const gqlConfig = {
   // With this on you have to explicitly set the field to null to pass it to a component or
   // you know, query it properly from the server like you should in 99% of cases.
   avoidOptionals: {
-    field: false,
+    field: true,
+    // TODO mark the one that causes querys to enforce input parameters
     inputValue: false,
     object: false,
     defaultValue: false,
   },
+  immutableTypes: true,
   // TODO this would improve linting fragments but it causes some issues in type generation
   // experimentalFragmentVariables: true,
   skipTypename: true,

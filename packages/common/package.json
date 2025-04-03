@@ -26,7 +26,6 @@
     "hds-react": "^4.2.0",
     "i18next": "^23.15.1",
     "lodash-es": "^4.17.21",
-    "next": "15.2.4",
     "next-i18next": "^15.4.2",
     "react": "^18.3.1",
     "react-big-calendar": "^1.17.1",
@@ -41,6 +40,7 @@
   },
   "peerDependencies": {
     "@apollo/client": "^3.13.1",
+    "next": "15.2.4",
     "next-i18next": "^15.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.3.1",
@@ -60,6 +60,7 @@
     "@types/sanitize-html": "^2.13.0",
     "@vitejs/plugin-react": "^4.3.4",
     "happy-dom": "^17.1.8",
+    "next": "15.2.4",
     "postcss-styled-syntax": "^0.7.1",
     "prettier": "^3.5.3",
     "stylelint": "^16.14.1",

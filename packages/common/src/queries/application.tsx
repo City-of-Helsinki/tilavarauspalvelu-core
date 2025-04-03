@@ -61,58 +61,6 @@ export const SUITABLE_TIME_FRAGMENT = gql`
   }
 `;
 
-export const RESERVATION_PURPOSE_NAME_FRAGMENT = gql`
-  fragment ReservationPurposeName on ReservationPurposeNode {
-    id
-    pk
-    nameFi
-    nameSv
-    nameEn
-  }
-`;
-
-export const RESERVATION_UNIT_NAME_FRAGMENT = gql`
-  fragment ReservationUnitName on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
-    unit {
-      id
-      pk
-      nameFi
-      nameEn
-      nameSv
-    }
-  }
-`;
-
-export const APPLICATION_ROUND_TIME_SLOTS_FRAGMENT = gql`
-  fragment ApplicationRoundTimeSlots on ApplicationRoundTimeSlotNode {
-    id
-    pk
-    weekday
-    closed
-    reservableTimes {
-      begin
-      end
-    }
-  }
-`;
-
-export const RESERVATION_UNIT_OPTION_FRAGMENT = gql`
-  fragment ReservationUnitOption on ReservationUnitOptionNode {
-    id
-    reservationUnit {
-      ...ReservationUnitName
-      applicationRoundTimeSlots {
-        ...ApplicationRoundTimeSlots
-      }
-    }
-  }
-`;
-
 export const APPLICANT_FRAGMENT = gql`
   fragment Applicant on ApplicationNode {
     id

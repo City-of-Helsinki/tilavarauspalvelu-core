@@ -2,9 +2,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
-  type ReservationQuery,
+  type ReservationPageQuery,
   ReservationStateChoice,
-  useRecurringReservationQuery,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { type ApolloQueryResult } from "@apollo/client";
@@ -16,9 +15,7 @@ import { ReservationListButton } from "@/component/ReservationListButton";
 import { DenyDialog } from "@/component/DenyDialog";
 import { useModal } from "@/context/ModalContext";
 import { EditTimeModal } from "@/component/EditTimeModal";
-import { base64encode, filterNonNullable } from "common/src/helpers";
-import { errorToast } from "common/src/common/toast";
-import { useCheckPermission } from "@/hooks";
+import { useCheckPermission, useRecurringReservations } from "@/hooks";
 import {
   isPossibleToDeny,
   isPossibleToEdit,
@@ -28,11 +25,11 @@ import { CenterSpinner } from "common/styles/util";
 type Props = {
   recurringPk: number;
   onSelect?: (selected: number) => void;
-  onChange?: () => Promise<ApolloQueryResult<ReservationQuery>>;
+  onChange?: () => Promise<ApolloQueryResult<ReservationPageQuery>>;
   onReservationUpdated?: () => void;
   // optional reservation to copy when creating a new reservation
   // contains a lot more information than the RecurringReservationQuery
-  reservationToCopy?: ReservationQuery["reservation"];
+  reservationToCopy?: ReservationPageQuery["reservation"];
 };
 
 export function RecurringReservationsView({
@@ -45,25 +42,14 @@ export function RecurringReservationsView({
   const { t } = useTranslation();
   const { setModalContent } = useModal();
 
-  const id = base64encode(`RecurringReservationNode:${recurringPk}`);
-  const { data, loading, refetch } = useRecurringReservationQuery({
-    skip: !recurringPk,
-    fetchPolicy: "cache-and-network",
-    nextFetchPolicy: "cache-first",
-    variables: { id },
-    onError: () => {
-      errorToast({ text: t("errors.errorFetchingData") });
-    },
-  });
+  const { reservations, loading, refetch, recurringReservation } =
+    useRecurringReservations(recurringPk);
 
   const unitPk = reservationToCopy?.reservationUnits?.[0]?.unit?.pk;
   const { hasPermission } = useCheckPermission({
     units: unitPk ? [unitPk] : [],
     permission: UserPermissionChoice.CanManageReservations,
   });
-
-  const { recurringReservation } = data ?? {};
-  const reservations = filterNonNullable(recurringReservation?.reservations);
 
   if (loading) {
     return <CenterSpinner />;
@@ -95,6 +81,7 @@ export function RecurringReservationsView({
   const handleRemove = (res: (typeof reservations)[0]) => {
     setModalContent(
       <DenyDialog
+        // @ts-expect-error -- FIXME make a separate version of DenyDialog for recurring reservations
         reservation={res}
         onReject={() => {
           refetch();

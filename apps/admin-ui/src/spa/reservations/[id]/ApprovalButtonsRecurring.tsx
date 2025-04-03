@@ -1,5 +1,5 @@
 import React from "react";
-import { type ReservationQuery } from "@gql/gql-types";
+import { type ReservationPageQuery } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
@@ -9,12 +9,13 @@ import { useRecurringReservations } from "@/hooks";
 import { isPossibleToDeny } from "@/modules/reservationModificationRules";
 
 // TODO use a fragment
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 type RecurringReservationType = NonNullable<
   ReservationType["recurringReservation"]
 >;
+
 type Props = {
-  recurringReservation: RecurringReservationType;
+  recurringReservation: Pick<RecurringReservationType, "pk">;
   handleClose: () => void;
   // TODO weird name for the after deny callback
   handleAccept: () => void;
@@ -54,7 +55,7 @@ export function ApprovalButtonsRecurring({
     }
     setModalContent(
       <DenyDialogSeries
-        reservation={reservation}
+        initialHandlingDetails={reservation.handlingDetails ?? ""}
         recurringReservation={recurringReservation}
         onReject={handleReject}
         onClose={handleClose}

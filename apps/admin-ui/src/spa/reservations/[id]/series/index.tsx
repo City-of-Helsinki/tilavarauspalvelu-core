@@ -69,10 +69,10 @@ function convertToForm(value: NodeT): RescheduleReservationSeriesForm {
     (x) => new Date(x.begin) >= new Date()
   );
   const bufferTimeBefore = calculateMedian(
-    reservations.map((x) => x.bufferTimeBefore) ?? []
+    reservations.map((x) => x.bufferTimeBefore)
   );
   const bufferTimeAfter = calculateMedian(
-    reservations.map((x) => x.bufferTimeAfter) ?? []
+    reservations.map((x) => x.bufferTimeAfter)
   );
   const begin = fromAPIDateTime(value?.beginDate, value?.beginTime);
   const end = fromAPIDateTime(value?.endDate, value?.endTime);
@@ -109,7 +109,10 @@ function SeriesPageInner({ pk }: { pk: number }) {
     variables: { id: base64encode(`ReservationNode:${pk}`) },
   });
   const { reservation } = data ?? {};
-  const { recurringReservation } = reservation ?? {};
+  const recurringReservation =
+    reservation?.recurringReservation != null
+      ? reservation.recurringReservation
+      : null;
 
   const [mutate] = useRescheduleReservationSeriesMutation();
 
@@ -132,7 +135,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
       reset(convertToForm(recurringReservation));
     }
   }, [recurringReservation, reset]);
-  const reservationUnit = reservation?.reservationUnits?.[0];
+  const reservationUnit = reservation?.reservationUnits?.[0] ?? null;
 
   const [removedReservations, setRemovedReservations] = useState<
     NewReservationListItem[]
@@ -428,7 +431,7 @@ export const SERIES_PAGE_QUERY = gql`
       pk
       type
       recurringReservation {
-        ...RecurringReservation
+        ...RecurringReservationFields
         recurrenceInDays
         endTime
         beginTime
@@ -448,7 +451,7 @@ export const SERIES_PAGE_QUERY = gql`
 export const SERIES_QUERY = gql`
   query ReservationSeries($id: ID!) {
     recurringReservation(id: $id) {
-      ...RecurringReservation
+      ...RecurringReservationFields
     }
   }
 `;

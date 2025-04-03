@@ -2,7 +2,7 @@ import type { CalendarEvent } from "common/src/calendar/Calendar";
 import {
   ReservationStateChoice,
   ReservationTypeChoice,
-  type ReservationQuery,
+  type ReservationPageQuery,
 } from "@gql/gql-types";
 import {
   COMMON_LEGEND,
@@ -38,23 +38,34 @@ export const legend = [
   },
 ];
 
-type ReservationType = NonNullable<ReservationQuery["reservation"]>;
+// TODO fragment
+export type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
+export type EventBufferType = Pick<
+  ReservationType,
+  "begin" | "end" | "bufferTimeAfter" | "bufferTimeBefore"
+>;
+export type EventType = EventBufferType &
+  Pick<
+    ReservationType,
+    "pk" | "type" | "state" | "name" | "recurringReservation"
+  >;
+export type CalendarEventType = CalendarEvent<EventType>;
+
 // TODO combine with the eventStyleGetter in my-units/eventStyleGetter.ts
 const eventStyleGetter =
   (
-    currentReservation?: ReservationType,
-    selectedReservation?: ReservationType
+    currentReservation: ReservationType | undefined,
+    selectedReservation: EventType | undefined
   ) =>
   ({
     event,
-    // TODO use a fragment
-  }: CalendarEvent<ReservationType>): {
+  }: CalendarEventType): {
     style: React.CSSProperties;
     className?: string;
   } => {
     const isPartOfRecurrance =
-      currentReservation?.recurringReservation &&
-      currentReservation.recurringReservation?.pk ===
+      currentReservation?.recurringReservation?.pk != null &&
+      currentReservation?.recurringReservation.pk ===
         event?.recurringReservation?.pk;
 
     const isConfirmed = event?.state === ReservationStateChoice.Confirmed;
@@ -102,4 +113,4 @@ const eventStyleGetter =
     };
   };
 
-export default eventStyleGetter;
+export { eventStyleGetter };

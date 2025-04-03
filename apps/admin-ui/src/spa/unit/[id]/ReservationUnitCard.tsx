@@ -8,17 +8,16 @@ import {
   IconCheck,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { ImageType, type UnitQuery } from "@gql/gql-types";
-import { getImageSource } from "common/src/helpers";
+import { type ReservationUnitCardFragment } from "@gql/gql-types";
+import { getImageSource, getMainImage } from "common/src/helpers";
 import StatusLabel from "common/src/components/StatusLabel";
 import { getReservationUnitUrl } from "@/common/urls";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
+import { gql } from "@apollo/client";
 
-type UnitType = NonNullable<UnitQuery["unit"]>;
-type ReservationUnitType = NonNullable<UnitType["reservationUnits"]>[0];
 interface IProps {
-  reservationUnit: ReservationUnitType;
+  reservationUnit: ReservationUnitCardFragment;
   unitId: number;
 }
 
@@ -28,13 +27,8 @@ export function ReservationUnitCard({
 }: Readonly<IProps>): JSX.Element {
   const { t } = useTranslation();
 
-  const image =
-    reservationUnit.images?.find((i) => i?.imageType === ImageType.Main) ??
-    reservationUnit.images?.find(() => true) ??
-    null;
-
-  const hasPurposes = (reservationUnit?.purposes?.length || 0) > 0;
-
+  const image = getMainImage(reservationUnit);
+  const hasPurposes = (reservationUnit.purposes.length ?? 0) > 0;
   const link = getReservationUnitUrl(reservationUnit.pk, unitId);
   const imgSrc = getImageSource(image, "medium");
 
@@ -98,3 +92,26 @@ export function ReservationUnitCard({
     />
   );
 }
+
+export const RESERVATION_UNIT_CARD_FRAGMENT = gql`
+  fragment ReservationUnitCard on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    maxPersons
+    isDraft
+    reservationUnitType {
+      id
+      nameFi
+    }
+    images {
+      ...Image
+    }
+    purposes {
+      id
+    }
+    resources {
+      id
+    }
+  }
+`;
