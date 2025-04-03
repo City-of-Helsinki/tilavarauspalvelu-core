@@ -1,7 +1,5 @@
 import { gql } from "@apollo/client";
 
-export { TERMS_OF_USE_QUERY as TERMS_OF_USE } from "common/src/queries/queries";
-
 export const RESERVATION_UNIT_TYPE_FRAGMENT = gql`
   fragment ReservationUnitTypeFields on ReservationUnitTypeNode {
     id

@@ -6637,6 +6637,19 @@ export type SingleSearchCardFragment = {
   } | null;
 };
 
+export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
+
+export type CurrentUserQuery = {
+  readonly currentUser: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly email: string;
+    readonly isAdAuthenticated: boolean | null;
+  } | null;
+};
+
 export type OptionsQueryVariables = Exact<{
   reservationUnitTypesOrderBy?: InputMaybe<
     | ReadonlyArray<InputMaybe<ReservationUnitTypeOrderingChoices>>
@@ -7156,19 +7169,6 @@ export type BlockingReservationFieldsFragment = {
   readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
 };
 
-export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
-
-export type CurrentUserQuery = {
-  readonly currentUser: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly firstName: string;
-    readonly lastName: string;
-    readonly email: string;
-    readonly isAdAuthenticated: boolean | null;
-  } | null;
-};
-
 export type IsReservableFieldsFragment = {
   readonly id: string;
   readonly bufferTimeBefore: number;
@@ -7313,6 +7313,28 @@ export type BannerNotificationsListQuery = {
         readonly messageEn: string | null;
         readonly messageFi: string | null;
         readonly messageSv: string | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
+export type TermsOfUseQueryVariables = Exact<{
+  termsType?: InputMaybe<TermsType>;
+}>;
+
+export type TermsOfUseQuery = {
+  readonly termsOfUse: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: string | null;
+        readonly termsType: TermsType;
+        readonly nameFi: string | null;
+        readonly nameEn: string | null;
+        readonly nameSv: string | null;
+        readonly textFi: string | null;
+        readonly textEn: string | null;
+        readonly textSv: string | null;
       } | null;
     } | null>;
   } | null;
@@ -7582,28 +7604,6 @@ export type MetadataSetsFragment = {
       readonly id: string;
       readonly fieldName: string;
     }>;
-  } | null;
-};
-
-export type TermsOfUseQueryVariables = Exact<{
-  termsType?: InputMaybe<TermsType>;
-}>;
-
-export type TermsOfUseQuery = {
-  readonly termsOfUse: {
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly id: string;
-        readonly pk: string | null;
-        readonly termsType: TermsType;
-        readonly nameFi: string | null;
-        readonly nameEn: string | null;
-        readonly nameSv: string | null;
-        readonly textFi: string | null;
-        readonly textEn: string | null;
-        readonly textSv: string | null;
-      } | null;
-    } | null>;
   } | null;
 };
 
@@ -11067,6 +11067,86 @@ export type CancelApplicationMutationOptions = Apollo.BaseMutationOptions<
   CancelApplicationMutation,
   CancelApplicationMutationVariables
 >;
+export const CurrentUserDocument = gql`
+  query CurrentUser {
+    currentUser {
+      id
+      pk
+      firstName
+      lastName
+      email
+      isAdAuthenticated
+    }
+  }
+`;
+
+/**
+ * __useCurrentUserQuery__
+ *
+ * To run a query within a React component, call `useCurrentUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCurrentUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCurrentUserQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCurrentUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    CurrentUserQuery,
+    CurrentUserQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(
+    CurrentUserDocument,
+    options
+  );
+}
+export function useCurrentUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    CurrentUserQuery,
+    CurrentUserQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(
+    CurrentUserDocument,
+    options
+  );
+}
+export function useCurrentUserSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        CurrentUserQuery,
+        CurrentUserQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<CurrentUserQuery, CurrentUserQueryVariables>(
+    CurrentUserDocument,
+    options
+  );
+}
+export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
+export type CurrentUserLazyQueryHookResult = ReturnType<
+  typeof useCurrentUserLazyQuery
+>;
+export type CurrentUserSuspenseQueryHookResult = ReturnType<
+  typeof useCurrentUserSuspenseQuery
+>;
+export type CurrentUserQueryResult = Apollo.QueryResult<
+  CurrentUserQuery,
+  CurrentUserQueryVariables
+>;
 export const OptionsDocument = gql`
   query Options(
     $reservationUnitTypesOrderBy: [ReservationUnitTypeOrderingChoices]
@@ -11859,86 +11939,6 @@ export type AccessCodeSuspenseQueryHookResult = ReturnType<
 export type AccessCodeQueryResult = Apollo.QueryResult<
   AccessCodeQuery,
   AccessCodeQueryVariables
->;
-export const CurrentUserDocument = gql`
-  query CurrentUser {
-    currentUser {
-      id
-      pk
-      firstName
-      lastName
-      email
-      isAdAuthenticated
-    }
-  }
-`;
-
-/**
- * __useCurrentUserQuery__
- *
- * To run a query within a React component, call `useCurrentUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useCurrentUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useCurrentUserQuery({
- *   variables: {
- *   },
- * });
- */
-export function useCurrentUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(
-    CurrentUserDocument,
-    options
-  );
-}
-export function useCurrentUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    CurrentUserQuery,
-    CurrentUserQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(
-    CurrentUserDocument,
-    options
-  );
-}
-export function useCurrentUserSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        CurrentUserQuery,
-        CurrentUserQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<CurrentUserQuery, CurrentUserQueryVariables>(
-    CurrentUserDocument,
-    options
-  );
-}
-export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
-export type CurrentUserLazyQueryHookResult = ReturnType<
-  typeof useCurrentUserLazyQuery
->;
-export type CurrentUserSuspenseQueryHookResult = ReturnType<
-  typeof useCurrentUserSuspenseQuery
->;
-export type CurrentUserQueryResult = Apollo.QueryResult<
-  CurrentUserQuery,
-  CurrentUserQueryVariables
 >;
 export const BannerNotificationsListAllDocument = gql`
   query BannerNotificationsListAll {
