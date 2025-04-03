@@ -33,7 +33,7 @@ import Error404 from "@/common/Error404";
 import { ApplicationDatas, Summary } from "@/styles/util";
 import { Accordion, DataWrapper } from "./components";
 import { ReservationKeylessEntry } from "./ReservationKeylessEntrySection";
-import { TimeBlock } from "./ReservationTimeBlockSection";
+import { TimeBlockSection } from "./ReservationTimeBlockSection";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
@@ -410,7 +410,10 @@ function RequestedReservation({
           onSuccess={refetch}
         />
 
-        <TimeBlock reservation={reservation} onReservationUpdated={refetch} />
+        <TimeBlockSection
+          reservation={reservation}
+          onReservationUpdated={refetch}
+        />
 
         <ReservationDetailsAccordion reservation={reservation} />
 
@@ -472,10 +475,9 @@ export const RESERVATION_PAGE_QUERY = gql`
       id
       ...CreateTagString
       ...ReservationCommonFields
-      ...ChangeReservationTime
+      ...TimeBlockSection
       ...ReservationTitleSectionFields
       ...ReservationKeylessEntry
-      ...EventStyleReservationFields
       recurringReservation {
         id
         pk
@@ -487,7 +489,6 @@ export const RESERVATION_PAGE_QUERY = gql`
         name
         description
       }
-      ...VisibleIfPermissionFields
       ...ApprovalButtons
       cancelReason {
         id

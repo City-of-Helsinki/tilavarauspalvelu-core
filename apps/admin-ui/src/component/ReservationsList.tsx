@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import {
   RejectionReadinessChoice,
-  ReservationPageQuery,
+  type ReservationToCopyFragment,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
@@ -13,6 +13,7 @@ import { NewReservationModal } from "@/component/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
 import { H6 } from "common";
 import StatusLabel from "common/src/components/StatusLabel";
+import { gql } from "@apollo/client";
 
 export type NewReservationListItem = {
   date: Date;
@@ -155,7 +156,7 @@ function StatusElement({ item }: { item: NewReservationListItem }) {
 }
 
 type AddNewReservationButtonProps = {
-  reservationToCopy: ReservationPageQuery["reservation"];
+  reservationToCopy: ReservationToCopyFragment;
   refetch: () => void;
 };
 
@@ -275,3 +276,16 @@ export function ReservationList(props: Props | ExtendedProps) {
     </ListWrapper>
   );
 }
+
+export const RESERVATION_TO_COPY_FRAGMENT = gql`
+  fragment ReservationToCopy on ReservationNode {
+    ...ChangeReservationTime
+    reservationUnits {
+      id
+      unit {
+        id
+        pk
+      }
+    }
+  }
+`;

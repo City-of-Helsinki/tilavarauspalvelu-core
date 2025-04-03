@@ -2,8 +2,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import {
-  type ReservationPageQuery,
   ReservationStateChoice,
+  type ReservationToCopyFragment,
   UserPermissionChoice,
 } from "@gql/gql-types";
 import {
@@ -28,7 +28,7 @@ type Props = {
   onReservationUpdated?: () => void;
   // optional reservation to copy when creating a new reservation
   // contains a lot more information than the RecurringReservationQuery
-  reservationToCopy?: ReservationPageQuery["reservation"];
+  reservationToCopy?: ReservationToCopyFragment;
 };
 
 export function RecurringReservationsView({

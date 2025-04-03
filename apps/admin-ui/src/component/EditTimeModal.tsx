@@ -15,7 +15,6 @@ import {
   type ChangeReservationTimeFragment,
   ReservationTypeChoice,
   useStaffAdjustReservationTimeMutation,
-  type ReservationPageQuery,
   type ReservationSeriesAddMutationInput,
   useAddReservationToSeriesMutation,
 } from "@gql/gql-types";
@@ -100,53 +99,6 @@ function formatDateInterval(t: TFunction, begin: Date, end: Date) {
   const durationString = formatDuration(differenceInMinutes(end, begin), t);
   return `${dateString} (${durationString})`;
 }
-
-export const CHANGE_RESERVATION_TIME = gql`
-  mutation StaffAdjustReservationTime(
-    $input: ReservationStaffAdjustTimeMutationInput!
-  ) {
-    staffAdjustReservationTime(input: $input) {
-      pk
-      begin
-      end
-      state
-    }
-  }
-`;
-
-export const ADD_RESERVATION_TO_SERIES = gql`
-  mutation AddReservationToSeries($input: ReservationSeriesAddMutationInput!) {
-    addReservationToSeries(input: $input) {
-      pk
-    }
-  }
-`;
-
-export const CHANGE_RESERVATION_TIME_QUERY_FRAGMENT = gql`
-  fragment ChangeReservationTime on ReservationNode {
-    id
-    pk
-    begin
-    end
-    type
-    bufferTimeAfter
-    bufferTimeBefore
-    recurringReservation {
-      pk
-      id
-      weekdays
-      beginDate
-      endDate
-    }
-    reservationUnits {
-      id
-      pk
-      bufferTimeBefore
-      bufferTimeAfter
-      reservationStartInterval
-    }
-  }
-`;
 
 type CommonProps = {
   onClose: () => void;
@@ -311,12 +263,8 @@ function DialogContent({
   );
 }
 
-type ReservationToCopyT = Pick<
-  NonNullable<ReservationPageQuery["reservation"]>,
-  "type" | "reservationUnits" | "recurringReservation"
->;
 export type NewReservationModalProps = CommonProps & {
-  reservationToCopy: ReservationToCopyT;
+  reservationToCopy: ChangeReservationTimeFragment;
   onAccept: () => void;
 };
 
@@ -527,3 +475,50 @@ export function EditTimeModal({
     </StyledDialog>
   );
 }
+
+export const CHANGE_RESERVATION_TIME = gql`
+  mutation StaffAdjustReservationTime(
+    $input: ReservationStaffAdjustTimeMutationInput!
+  ) {
+    staffAdjustReservationTime(input: $input) {
+      pk
+      begin
+      end
+      state
+    }
+  }
+`;
+
+export const ADD_RESERVATION_TO_SERIES = gql`
+  mutation AddReservationToSeries($input: ReservationSeriesAddMutationInput!) {
+    addReservationToSeries(input: $input) {
+      pk
+    }
+  }
+`;
+
+export const CHANGE_RESERVATION_TIME_QUERY_FRAGMENT = gql`
+  fragment ChangeReservationTime on ReservationNode {
+    id
+    pk
+    begin
+    end
+    type
+    bufferTimeAfter
+    bufferTimeBefore
+    recurringReservation {
+      pk
+      id
+      weekdays
+      beginDate
+      endDate
+    }
+    reservationUnits {
+      id
+      pk
+      bufferTimeBefore
+      bufferTimeAfter
+      reservationStartInterval
+    }
+  }
+`;
