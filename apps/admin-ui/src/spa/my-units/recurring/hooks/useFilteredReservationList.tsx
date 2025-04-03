@@ -1,70 +1,21 @@
 import { useMemo } from "react";
 import {
-  type ReservationsInIntervalFragment,
   ReservationTypeChoice,
-  useReservationTimesInReservationUnitQuery,
   type Maybe,
+  useReservationsByReservationUnitQuery,
 } from "@gql/gql-types";
 import { isValidDate, toApiDate } from "common/src/common/util";
 import { addDays, addMinutes, startOfDay } from "date-fns";
 import {
   type CollisionInterval,
+  combineAffectingReservations,
   doesIntervalCollide,
   reservationToInterval,
 } from "@/helpers";
 import { type NewReservationListItem } from "@/component/ReservationsList";
-import {
-  base64encode,
-  filterNonNullable,
-  timeToMinutes,
-} from "common/src/helpers";
+import { base64encode, timeToMinutes } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
-import { gql } from "@apollo/client";
 import { errorToast } from "common/src/common/toast";
-
-// TODO there is multiples of these fragments (for each Calendar), should be unified
-const RESERVATIONS_IN_INTERVAL_FRAGMENT = gql`
-  fragment ReservationsInInterval on ReservationNode {
-    id
-    begin
-    end
-    bufferTimeBefore
-    bufferTimeAfter
-    type
-    affectedReservationUnits
-    recurringReservation {
-      id
-      pk
-    }
-  }
-`;
-
-// TODO this query would not be needed if the Calendar query would be passed to the useCheckCollisions
-export const GET_RESERVATIONS_IN_INTERVAL = gql`
-  ${RESERVATIONS_IN_INTERVAL_FRAGMENT}
-  query ReservationTimesInReservationUnit(
-    $id: ID!
-    $pk: Int!
-    $beginDate: Date
-    $endDate: Date
-    $state: [ReservationStateChoice]
-  ) {
-    reservationUnit(id: $id) {
-      id
-      reservations(beginDate: $beginDate, endDate: $endDate, state: $state) {
-        ...ReservationsInInterval
-      }
-    }
-    affectingReservations(
-      forReservationUnits: [$pk]
-      state: $state
-      beginDate: $beginDate
-      endDate: $endDate
-    ) {
-      ...ReservationsInInterval
-    }
-  }
-`;
 
 function useReservationsInInterval({
   begin,
@@ -92,7 +43,8 @@ function useReservationsInInterval({
   const id = base64encode(`${typename}:${reservationUnitPk}`);
   // NOTE unlike array fetches this fetches a single element with an included array
   // so it doesn't have the 100 limitation of array fetch nor does it have pagination
-  const { loading, data, refetch } = useReservationTimesInReservationUnitQuery({
+  // NOTE Reuse the query (useCheckCollisions), even though it's a bit larger than we need
+  const { loading, data, refetch } = useReservationsByReservationUnitQuery({
     skip: !isValidQuery,
     variables: {
       id,
@@ -107,22 +59,7 @@ function useReservationsInInterval({
     },
   });
 
-  function doesReservationAffectReservationUnit(
-    reservation: ReservationsInIntervalFragment,
-    resUnitPk: number
-  ) {
-    return reservation.affectedReservationUnits?.some((pk) => pk === resUnitPk);
-  }
-
-  const reservationSet = filterNonNullable(data?.reservationUnit?.reservations);
-  const affectingReservations = filterNonNullable(data?.affectingReservations);
-  const reservations = filterNonNullable(
-    reservationSet?.concat(
-      affectingReservations?.filter((y) =>
-        doesReservationAffectReservationUnit(y, reservationUnitPk ?? 0)
-      ) ?? []
-    )
-  )
+  const reservations = combineAffectingReservations(data, reservationUnitPk)
     .map((x) => reservationToInterval(x, reservationType))
     .filter((x): x is CollisionInterval => x != null);
 
