@@ -10,6 +10,7 @@ import {
   type UseStaffReservationFragment,
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
+import { gql } from "@apollo/client";
 
 type InputT = UpdateStaffReservationMutationVariables["input"];
 type MemoT = UpdateStaffReservationMutationVariables["workingMemo"];
@@ -115,3 +116,38 @@ function convertReserveeType(
       return undefined;
   }
 }
+
+export const USE_STAFF_RESERVATION_FRAGMENT = gql`
+  fragment UseStaffReservation on ReservationNode {
+    id
+    pk
+    recurringReservation {
+      id
+      pk
+    }
+  }
+`;
+
+export const UPDATE_STAFF_RESERVATION_MUTATION = gql`
+  mutation UpdateStaffReservation(
+    $input: ReservationStaffModifyMutationInput!
+    $workingMemo: ReservationWorkingMemoMutationInput!
+  ) {
+    staffReservationModify(input: $input) {
+      pk
+    }
+    updateReservationWorkingMemo(input: $workingMemo) {
+      workingMemo
+    }
+  }
+`;
+
+export const UPDATE_STAFF_RECURRING_RESERVATION_MUTATION = gql`
+  mutation UpdateRecurringReservation(
+    $input: ReservationSeriesUpdateMutationInput!
+  ) {
+    updateReservationSeries(input: $input) {
+      pk
+    }
+  }
+`;

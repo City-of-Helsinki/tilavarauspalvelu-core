@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { IconArrowRight, IconCalendar, IconSize } from "hds-react";
-import { type ApplicationRoundsQuery } from "@gql/gql-types";
+import { type ApplicationRoundCardFragment } from "@gql/gql-types";
 import { formatDate } from "@/common/util";
 import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
 import { getApplicationRoundUrl } from "@/common/urls";
@@ -11,17 +11,7 @@ import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { Flex } from "common/styles/util";
 import { Card } from "common/src/components";
 import { fontMedium } from "common";
-
-type ApplicationRoundListType = NonNullable<
-  ApplicationRoundsQuery["applicationRounds"]
->;
-type ApplicationRoundType = NonNullable<
-  NonNullable<ApplicationRoundListType["edges"]>[0]
->["node"];
-
-interface IProps {
-  applicationRound: NonNullable<ApplicationRoundType>;
-}
+import { gql } from "@apollo/client";
 
 const Times = styled(Flex).attrs({
   $gap: "m",
@@ -65,9 +55,13 @@ function Stat({ value, label }: { value: number; label: string }): JSX.Element {
   );
 }
 
+interface ApplicationCardProps {
+  applicationRound: NonNullable<ApplicationRoundCardFragment>;
+}
+
 export function ApplicationRoundCard({
   applicationRound,
-}: IProps): JSX.Element {
+}: ApplicationCardProps): JSX.Element {
   const { t } = useTranslation();
 
   const name = applicationRound.nameFi;
@@ -119,3 +113,18 @@ export function ApplicationRoundCard({
     </Card>
   );
 }
+
+export const APPLICATION_ROUND_CARD_FRAGMENT = gql`
+  fragment ApplicationRoundCard on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    status
+    applicationPeriodBegin
+    applicationPeriodEnd
+    reservationPeriodBegin
+    reservationPeriodEnd
+    reservationUnitCount
+    applicationsCount
+  }
+`;

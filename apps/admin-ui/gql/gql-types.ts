@@ -6026,6 +6026,19 @@ export type AllocatedTimeSlotFragment = {
   readonly dayOfTheWeek: Weekday;
 };
 
+export type SpaceCommonFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly surfaceArea: number | null;
+  readonly maxPersons: number | null;
+  readonly parent: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+  } | null;
+};
+
 export type ApplicationSectionFieldsFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -6648,6 +6661,44 @@ export type HandlingDataQuery = {
   readonly unitsAll: ReadonlyArray<{ readonly id: string }> | null;
 };
 
+export type OptionsQueryVariables = Exact<{
+  reservationPurposesOrderBy?: InputMaybe<
+    | ReadonlyArray<InputMaybe<ReservationPurposeOrderingChoices>>
+    | InputMaybe<ReservationPurposeOrderingChoices>
+  >;
+}>;
+
+export type OptionsQuery = {
+  readonly reservationPurposes: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
+    } | null>;
+  } | null;
+  readonly ageGroups: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly minimum: number;
+        readonly maximum: number | null;
+      } | null;
+    } | null>;
+  } | null;
+  readonly cities: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly pk: number | null;
+      } | null;
+    } | null>;
+  } | null;
+};
+
 export type RecurringReservationQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -7067,6 +7118,19 @@ export type ReservationUnitEditorParametersQuery = {
   } | null;
 };
 
+export type ApplicationRoundCardFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly status: ApplicationRoundStatusChoice;
+  readonly applicationPeriodBegin: string;
+  readonly applicationPeriodEnd: string;
+  readonly reservationPeriodBegin: string;
+  readonly reservationPeriodEnd: string;
+  readonly reservationUnitCount: number;
+  readonly applicationsCount: number;
+};
+
 export type RejectRestMutationVariables = Exact<{
   input: ReservationUnitOptionUpdateMutationInput;
 }>;
@@ -7325,103 +7389,131 @@ export type ApplicationRoundCriteriaQuery = {
   } | null;
 };
 
-export type RejectedOccurrencesQueryVariables = Exact<{
-  applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
-  unit?: InputMaybe<
+export type ApplicationRoundQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ApplicationRoundQuery = {
+  readonly applicationRound: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly status: ApplicationRoundStatusChoice;
+    readonly applicationPeriodBegin: string;
+    readonly applicationPeriodEnd: string;
+    readonly applicationsCount: number;
+    readonly isSettingHandledAllowed: boolean;
+    readonly reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice;
+    readonly reservationUnits: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly unit: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
+    }>;
+  } | null;
+};
+
+export type AllocatedTimeSlotsQueryVariables = Exact<{
+  applicationRound: Scalars["Int"]["input"];
+  allocatedUnit?: InputMaybe<
     | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
-  reservationUnit?: InputMaybe<
+  applicantType?: InputMaybe<
+    | ReadonlyArray<InputMaybe<ApplicantTypeChoice>>
+    | InputMaybe<ApplicantTypeChoice>
+  >;
+  applicationSectionStatus?: InputMaybe<
+    | ReadonlyArray<InputMaybe<ApplicationSectionStatusChoice>>
+    | InputMaybe<ApplicationSectionStatusChoice>
+  >;
+  allocatedReservationUnit?: InputMaybe<
     | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
-  orderBy?: InputMaybe<
-    | ReadonlyArray<InputMaybe<RejectedOccurrenceOrderingChoices>>
-    | InputMaybe<RejectedOccurrenceOrderingChoices>
+  dayOfTheWeek?: InputMaybe<
+    ReadonlyArray<InputMaybe<Weekday>> | InputMaybe<Weekday>
   >;
   textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  accessCodeState?: InputMaybe<
+    ReadonlyArray<InputMaybe<AccessCodeState>> | InputMaybe<AccessCodeState>
+  >;
+  orderBy?: InputMaybe<
+    | ReadonlyArray<InputMaybe<AllocatedTimeSlotOrderingChoices>>
+    | InputMaybe<AllocatedTimeSlotOrderingChoices>
+  >;
   after?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
-export type RejectedOccurrencesQuery = {
-  readonly rejectedOccurrences: {
+export type AllocatedTimeSlotsQuery = {
+  readonly allocatedTimeSlots: {
     readonly totalCount: number | null;
-    readonly pageInfo: {
-      readonly hasNextPage: boolean;
-      readonly endCursor: string | null;
-    };
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly id: string;
         readonly pk: number | null;
-        readonly beginDatetime: string;
-        readonly endDatetime: string;
-        readonly rejectionReason: RejectionReadinessChoice;
+        readonly dayOfTheWeek: Weekday;
+        readonly endTime: string;
+        readonly beginTime: string;
         readonly recurringReservation: {
           readonly id: string;
-          readonly allocatedTimeSlot: {
-            readonly id: string;
-            readonly pk: number | null;
-            readonly dayOfTheWeek: Weekday;
-            readonly beginTime: string;
-            readonly endTime: string;
-            readonly reservationUnitOption: {
-              readonly id: string;
-              readonly applicationSection: {
-                readonly id: string;
-                readonly name: string;
-                readonly application: {
-                  readonly id: string;
-                  readonly pk: number | null;
-                  readonly applicantType: ApplicantTypeChoice | null;
-                  readonly contactPerson: {
-                    readonly id: string;
-                    readonly firstName: string;
-                    readonly lastName: string;
-                  } | null;
-                  readonly organisation: {
-                    readonly id: string;
-                    readonly nameFi: string | null;
-                  } | null;
-                };
-              };
-              readonly reservationUnit: {
-                readonly id: string;
-                readonly nameFi: string | null;
-                readonly pk: number | null;
-                readonly unit: {
-                  readonly id: string;
-                  readonly nameFi: string | null;
-                } | null;
-              };
-            };
-          } | null;
+          readonly pk: number | null;
+          readonly shouldHaveActiveAccessCode: boolean;
+          readonly isAccessCodeIsActiveCorrect: boolean;
           readonly reservations: ReadonlyArray<{
             readonly id: string;
             readonly pk: number | null;
           }>;
+        } | null;
+        readonly reservationUnitOption: {
+          readonly id: string;
+          readonly rejected: boolean;
+          readonly locked: boolean;
+          readonly preferredOrder: number;
+          readonly applicationSection: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly name: string;
+            readonly reservationsEndDate: string;
+            readonly reservationsBeginDate: string;
+            readonly reservationMinDuration: number;
+            readonly reservationMaxDuration: number;
+            readonly application: {
+              readonly pk: number | null;
+              readonly id: string;
+              readonly applicantType: ApplicantTypeChoice | null;
+              readonly organisation: {
+                readonly id: string;
+                readonly nameFi: string | null;
+                readonly organisationType: OrganizationTypeChoice;
+              } | null;
+              readonly contactPerson: {
+                readonly id: string;
+                readonly lastName: string;
+                readonly firstName: string;
+              } | null;
+            };
+          };
+          readonly reservationUnit: {
+            readonly id: string;
+            readonly nameFi: string | null;
+            readonly unit: {
+              readonly id: string;
+              readonly nameFi: string | null;
+            } | null;
+          };
         };
       } | null;
     } | null>;
-  } | null;
-};
-
-export type EndAllocationMutationVariables = Exact<{
-  pk: Scalars["Int"]["input"];
-}>;
-
-export type EndAllocationMutation = {
-  readonly setApplicationRoundHandled: { readonly pk: number | null } | null;
-};
-
-export type SendResultsMutationVariables = Exact<{
-  pk: Scalars["Int"]["input"];
-}>;
-
-export type SendResultsMutation = {
-  readonly setApplicationRoundResultsSent: {
-    readonly pk: number | null;
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
   } | null;
 };
 
@@ -7627,147 +7719,98 @@ export type ApplicationSectionsQuery = {
   } | null;
 };
 
-export type AllocatedTimeSlotsQueryVariables = Exact<{
-  applicationRound: Scalars["Int"]["input"];
-  allocatedUnit?: InputMaybe<
+export type RejectedOccurrencesQueryVariables = Exact<{
+  applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
+  unit?: InputMaybe<
     | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
   >;
-  applicantType?: InputMaybe<
-    | ReadonlyArray<InputMaybe<ApplicantTypeChoice>>
-    | InputMaybe<ApplicantTypeChoice>
-  >;
-  applicationSectionStatus?: InputMaybe<
-    | ReadonlyArray<InputMaybe<ApplicationSectionStatusChoice>>
-    | InputMaybe<ApplicationSectionStatusChoice>
-  >;
-  allocatedReservationUnit?: InputMaybe<
+  reservationUnit?: InputMaybe<
     | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
     | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  dayOfTheWeek?: InputMaybe<
-    ReadonlyArray<InputMaybe<Weekday>> | InputMaybe<Weekday>
-  >;
-  textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  accessCodeState?: InputMaybe<
-    ReadonlyArray<InputMaybe<AccessCodeState>> | InputMaybe<AccessCodeState>
   >;
   orderBy?: InputMaybe<
-    | ReadonlyArray<InputMaybe<AllocatedTimeSlotOrderingChoices>>
-    | InputMaybe<AllocatedTimeSlotOrderingChoices>
+    | ReadonlyArray<InputMaybe<RejectedOccurrenceOrderingChoices>>
+    | InputMaybe<RejectedOccurrenceOrderingChoices>
   >;
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
   after?: InputMaybe<Scalars["String"]["input"]>;
   first?: InputMaybe<Scalars["Int"]["input"]>;
 }>;
 
-export type AllocatedTimeSlotsQuery = {
-  readonly allocatedTimeSlots: {
+export type RejectedOccurrencesQuery = {
+  readonly rejectedOccurrences: {
     readonly totalCount: number | null;
+    readonly pageInfo: {
+      readonly hasNextPage: boolean;
+      readonly endCursor: string | null;
+    };
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly id: string;
         readonly pk: number | null;
-        readonly dayOfTheWeek: Weekday;
-        readonly endTime: string;
-        readonly beginTime: string;
+        readonly beginDatetime: string;
+        readonly endDatetime: string;
+        readonly rejectionReason: RejectionReadinessChoice;
         readonly recurringReservation: {
           readonly id: string;
-          readonly pk: number | null;
-          readonly shouldHaveActiveAccessCode: boolean;
-          readonly isAccessCodeIsActiveCorrect: boolean;
+          readonly allocatedTimeSlot: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly dayOfTheWeek: Weekday;
+            readonly beginTime: string;
+            readonly endTime: string;
+            readonly reservationUnitOption: {
+              readonly id: string;
+              readonly applicationSection: {
+                readonly id: string;
+                readonly name: string;
+                readonly application: {
+                  readonly id: string;
+                  readonly pk: number | null;
+                  readonly applicantType: ApplicantTypeChoice | null;
+                  readonly contactPerson: {
+                    readonly id: string;
+                    readonly firstName: string;
+                    readonly lastName: string;
+                  } | null;
+                  readonly organisation: {
+                    readonly id: string;
+                    readonly nameFi: string | null;
+                  } | null;
+                };
+              };
+              readonly reservationUnit: {
+                readonly id: string;
+                readonly nameFi: string | null;
+                readonly pk: number | null;
+                readonly unit: {
+                  readonly id: string;
+                  readonly nameFi: string | null;
+                } | null;
+              };
+            };
+          } | null;
           readonly reservations: ReadonlyArray<{
             readonly id: string;
             readonly pk: number | null;
           }>;
-        } | null;
-        readonly reservationUnitOption: {
-          readonly id: string;
-          readonly rejected: boolean;
-          readonly locked: boolean;
-          readonly preferredOrder: number;
-          readonly applicationSection: {
-            readonly id: string;
-            readonly pk: number | null;
-            readonly name: string;
-            readonly reservationsEndDate: string;
-            readonly reservationsBeginDate: string;
-            readonly reservationMinDuration: number;
-            readonly reservationMaxDuration: number;
-            readonly application: {
-              readonly pk: number | null;
-              readonly id: string;
-              readonly applicantType: ApplicantTypeChoice | null;
-              readonly organisation: {
-                readonly id: string;
-                readonly nameFi: string | null;
-                readonly organisationType: OrganizationTypeChoice;
-              } | null;
-              readonly contactPerson: {
-                readonly id: string;
-                readonly lastName: string;
-                readonly firstName: string;
-              } | null;
-            };
-          };
-          readonly reservationUnit: {
-            readonly id: string;
-            readonly nameFi: string | null;
-            readonly unit: {
-              readonly id: string;
-              readonly nameFi: string | null;
-            } | null;
-          };
         };
-      } | null;
-    } | null>;
-    readonly pageInfo: {
-      readonly endCursor: string | null;
-      readonly hasNextPage: boolean;
-    };
-  } | null;
-};
-
-export type ApplicationRoundBaseFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly status: ApplicationRoundStatusChoice;
-  readonly applicationPeriodBegin: string;
-  readonly applicationPeriodEnd: string;
-};
-
-export type ApplicationRoundsQueryVariables = Exact<{ [key: string]: never }>;
-
-export type ApplicationRoundsQuery = {
-  readonly applicationRounds: {
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly reservationPeriodBegin: string;
-        readonly reservationPeriodEnd: string;
-        readonly applicationsCount: number;
-        readonly reservationUnitCount: number;
-        readonly statusTimestamp: string | null;
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-        readonly status: ApplicationRoundStatusChoice;
-        readonly applicationPeriodBegin: string;
-        readonly applicationPeriodEnd: string;
       } | null;
     } | null>;
   } | null;
 };
 
 export type ApplicationRoundAdminFragment = {
-  readonly applicationsCount: number;
-  readonly isSettingHandledAllowed: boolean;
-  readonly reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice;
   readonly id: string;
   readonly pk: number | null;
   readonly nameFi: string | null;
   readonly status: ApplicationRoundStatusChoice;
   readonly applicationPeriodBegin: string;
   readonly applicationPeriodEnd: string;
+  readonly applicationsCount: number;
+  readonly isSettingHandledAllowed: boolean;
+  readonly reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice;
   readonly reservationUnits: ReadonlyArray<{
     readonly id: string;
     readonly pk: number | null;
@@ -7780,31 +7823,45 @@ export type ApplicationRoundAdminFragment = {
   }>;
 };
 
-export type ApplicationRoundQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
+export type EndAllocationMutationVariables = Exact<{
+  pk: Scalars["Int"]["input"];
 }>;
 
-export type ApplicationRoundQuery = {
-  readonly applicationRound: {
-    readonly applicationsCount: number;
-    readonly isSettingHandledAllowed: boolean;
-    readonly reservationCreationStatus: ApplicationRoundReservationCreationStatusChoice;
-    readonly id: string;
+export type EndAllocationMutation = {
+  readonly setApplicationRoundHandled: { readonly pk: number | null } | null;
+};
+
+export type SendResultsMutationVariables = Exact<{
+  pk: Scalars["Int"]["input"];
+}>;
+
+export type SendResultsMutation = {
+  readonly setApplicationRoundResultsSent: {
     readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly status: ApplicationRoundStatusChoice;
-    readonly applicationPeriodBegin: string;
-    readonly applicationPeriodEnd: string;
-    readonly reservationUnits: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly unit: {
+  } | null;
+};
+
+export type ApplicationRoundListQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type ApplicationRoundListQuery = {
+  readonly applicationRounds: {
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly statusTimestamp: string | null;
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
+        readonly status: ApplicationRoundStatusChoice;
+        readonly applicationPeriodBegin: string;
+        readonly applicationPeriodEnd: string;
+        readonly reservationPeriodBegin: string;
+        readonly reservationPeriodEnd: string;
+        readonly reservationUnitCount: number;
+        readonly applicationsCount: number;
       } | null;
-    }>;
+    } | null>;
   } | null;
 };
 
@@ -8124,6 +8181,61 @@ export type CreateStaffReservationMutation = {
   readonly createStaffReservation: { readonly pk: number | null } | null;
 };
 
+export type ReservationUnitQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationUnitQuery = {
+  readonly reservationUnit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly maxPersons: number | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly reservationStartInterval: ReservationStartInterval;
+    readonly authentication: Authentication;
+    readonly termsOfUseFi: string | null;
+    readonly minPersons: number | null;
+    readonly unit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+    } | null;
+    readonly serviceSpecificTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly nameFi: string | null;
+    } | null;
+    readonly paymentTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly nameFi: string | null;
+    } | null;
+    readonly pricingTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly nameFi: string | null;
+    } | null;
+    readonly cancellationTerms: {
+      readonly id: string;
+      readonly textFi: string | null;
+      readonly nameFi: string | null;
+    } | null;
+    readonly metadataSet: {
+      readonly id: string;
+      readonly requiredFields: ReadonlyArray<{
+        readonly id: string;
+        readonly fieldName: string;
+      }>;
+      readonly supportedFields: ReadonlyArray<{
+        readonly id: string;
+        readonly fieldName: string;
+      }>;
+    } | null;
+  } | null;
+};
+
 export type ReservationUnitCalendarQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   pk: Scalars["Int"]["input"];
@@ -8219,71 +8331,6 @@ export type ReservationUnitCalendarQuery = {
   }> | null;
 };
 
-export type OptionsQueryVariables = Exact<{
-  reservationPurposesOrderBy?: InputMaybe<
-    | ReadonlyArray<InputMaybe<ReservationPurposeOrderingChoices>>
-    | InputMaybe<ReservationPurposeOrderingChoices>
-  >;
-}>;
-
-export type OptionsQuery = {
-  readonly reservationPurposes: {
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly nameFi: string | null;
-      } | null;
-    } | null>;
-  } | null;
-  readonly ageGroups: {
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly minimum: number;
-        readonly maximum: number | null;
-      } | null;
-    } | null>;
-  } | null;
-  readonly cities: {
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly id: string;
-        readonly nameFi: string | null;
-        readonly pk: number | null;
-      } | null;
-    } | null>;
-  } | null;
-};
-
-export type UnitViewQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type UnitViewQuery = {
-  readonly unit: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly location: {
-      readonly id: string;
-      readonly addressStreetFi: string | null;
-      readonly addressZip: string;
-      readonly addressCityFi: string | null;
-    } | null;
-    readonly reservationUnits: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly spaces: ReadonlyArray<{
-        readonly id: string;
-        readonly pk: number | null;
-      }>;
-    }>;
-  } | null;
-};
-
 export type ReservationUnitsByUnitQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
   pk: Scalars["Int"]["input"];
@@ -8355,58 +8402,30 @@ export type ReservationUnitsByUnitQuery = {
   }> | null;
 };
 
-export type ReservationUnitQueryVariables = Exact<{
+export type UnitViewQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
 
-export type ReservationUnitQuery = {
-  readonly reservationUnit: {
+export type UnitViewQuery = {
+  readonly unit: {
     readonly id: string;
     readonly pk: number | null;
     readonly nameFi: string | null;
-    readonly maxPersons: number | null;
-    readonly bufferTimeBefore: number;
-    readonly bufferTimeAfter: number;
-    readonly reservationStartInterval: ReservationStartInterval;
-    readonly authentication: Authentication;
-    readonly termsOfUseFi: string | null;
-    readonly minPersons: number | null;
-    readonly unit: {
+    readonly location: {
+      readonly id: string;
+      readonly addressStreetFi: string | null;
+      readonly addressZip: string;
+      readonly addressCityFi: string | null;
+    } | null;
+    readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
       readonly nameFi: string | null;
-    } | null;
-    readonly serviceSpecificTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly nameFi: string | null;
-    } | null;
-    readonly paymentTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly nameFi: string | null;
-    } | null;
-    readonly pricingTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly nameFi: string | null;
-    } | null;
-    readonly cancellationTerms: {
-      readonly id: string;
-      readonly textFi: string | null;
-      readonly nameFi: string | null;
-    } | null;
-    readonly metadataSet: {
-      readonly id: string;
-      readonly requiredFields: ReadonlyArray<{
+      readonly spaces: ReadonlyArray<{
         readonly id: string;
-        readonly fieldName: string;
+        readonly pk: number | null;
       }>;
-      readonly supportedFields: ReadonlyArray<{
-        readonly id: string;
-        readonly fieldName: string;
-      }>;
-    } | null;
+    }>;
   } | null;
 };
 
@@ -8584,6 +8603,146 @@ export type SearchReservationUnitsQuery = {
   } | null;
 };
 
+export type ReservationUnitTableElementFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly maxPersons: number | null;
+  readonly surfaceArea: number | null;
+  readonly publishingState: ReservationUnitPublishingState;
+  readonly reservationState: ReservationUnitReservationState;
+  readonly unit: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly pk: number | null;
+  } | null;
+  readonly reservationUnitType: {
+    readonly id: string;
+    readonly nameFi: string | null;
+  } | null;
+};
+
+export type ReservationListQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  orderBy?: InputMaybe<
+    | ReadonlyArray<InputMaybe<ReservationOrderingChoices>>
+    | InputMaybe<ReservationOrderingChoices>
+  >;
+  unit?: InputMaybe<
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  reservationUnits?: InputMaybe<
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  reservationUnitType?: InputMaybe<
+    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
+    | InputMaybe<Scalars["Int"]["input"]>
+  >;
+  reservationType?: InputMaybe<
+    | ReadonlyArray<InputMaybe<ReservationTypeChoice>>
+    | InputMaybe<ReservationTypeChoice>
+  >;
+  state?: InputMaybe<
+    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>
+  >;
+  orderStatus?: InputMaybe<
+    | ReadonlyArray<InputMaybe<OrderStatusWithFree>>
+    | InputMaybe<OrderStatusWithFree>
+  >;
+  textSearch?: InputMaybe<Scalars["String"]["input"]>;
+  priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
+  endDate?: InputMaybe<Scalars["Date"]["input"]>;
+  createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
+  createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
+  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
+  isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type ReservationListQuery = {
+  readonly reservations: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly name: string | null;
+        readonly id: string;
+        readonly pk: number | null;
+        readonly begin: string;
+        readonly end: string;
+        readonly createdAt: string | null;
+        readonly state: ReservationStateChoice | null;
+        readonly type: ReservationTypeChoice | null;
+        readonly isBlocked: boolean;
+        readonly workingMemo: string | null;
+        readonly reserveeName: string | null;
+        readonly bufferTimeBefore: number;
+        readonly bufferTimeAfter: number;
+        readonly reservationUnits: ReadonlyArray<{
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly unit: {
+            readonly id: string;
+            readonly nameFi: string | null;
+          } | null;
+        }>;
+        readonly paymentOrder: ReadonlyArray<{
+          readonly id: string;
+          readonly status: OrderStatus;
+        }>;
+        readonly user: {
+          readonly id: string;
+          readonly email: string;
+          readonly firstName: string;
+          readonly lastName: string;
+        } | null;
+      } | null;
+    } | null>;
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
+  } | null;
+};
+
+export type ReservationTableElementFragment = {
+  readonly name: string | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly createdAt: string | null;
+  readonly state: ReservationStateChoice | null;
+  readonly type: ReservationTypeChoice | null;
+  readonly isBlocked: boolean;
+  readonly workingMemo: string | null;
+  readonly reserveeName: string | null;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly unit: {
+      readonly id: string;
+      readonly nameFi: string | null;
+    } | null;
+  }>;
+  readonly paymentOrder: ReadonlyArray<{
+    readonly id: string;
+    readonly status: OrderStatus;
+  }>;
+  readonly user: {
+    readonly id: string;
+    readonly email: string;
+    readonly firstName: string;
+    readonly lastName: string;
+  } | null;
+};
+
 export type ApprovalButtonsFragment = {
   readonly id: string;
   readonly state: ReservationStateChoice | null;
@@ -8645,6 +8804,17 @@ export type ApprovalDialogFieldsFragment = {
       };
     }>;
   }>;
+};
+
+export type ApproveReservationMutationVariables = Exact<{
+  input: ReservationApproveMutationInput;
+}>;
+
+export type ApproveReservationMutation = {
+  readonly approveReservation: {
+    readonly pk: number | null;
+    readonly state: ReservationStateChoice | null;
+  } | null;
 };
 
 export type ChangeReservationAccessCodeSingleMutationVariables = Exact<{
@@ -8795,6 +8965,17 @@ export type ReservationTitleSectionFieldsFragment = {
     readonly id: string;
     readonly status: OrderStatus;
   }>;
+};
+
+export type RequireHandlingMutationVariables = Exact<{
+  input: ReservationRequiresHandlingMutationInput;
+}>;
+
+export type RequireHandlingMutation = {
+  readonly requireHandlingForReservation: {
+    readonly pk: number | null;
+    readonly state: ReservationStateChoice | null;
+  } | null;
 };
 
 export type ReservationEditPageQueryVariables = Exact<{
@@ -9109,28 +9290,6 @@ export type ReservationPageQuery = {
   } | null;
 };
 
-export type ApproveReservationMutationVariables = Exact<{
-  input: ReservationApproveMutationInput;
-}>;
-
-export type ApproveReservationMutation = {
-  readonly approveReservation: {
-    readonly pk: number | null;
-    readonly state: ReservationStateChoice | null;
-  } | null;
-};
-
-export type RequireHandlingMutationVariables = Exact<{
-  input: ReservationRequiresHandlingMutationInput;
-}>;
-
-export type RequireHandlingMutation = {
-  readonly requireHandlingForReservation: {
-    readonly pk: number | null;
-    readonly state: ReservationStateChoice | null;
-  } | null;
-};
-
 export type SeriesPageQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -9318,6 +9477,15 @@ export type CreateTagStringFragment = {
   } | null;
 };
 
+export type UseStaffReservationFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+  } | null;
+};
+
 export type UpdateStaffReservationMutationVariables = Exact<{
   input: ReservationStaffModifyMutationInput;
   workingMemo: ReservationWorkingMemoMutationInput;
@@ -9336,102 +9504,6 @@ export type UpdateRecurringReservationMutationVariables = Exact<{
 
 export type UpdateRecurringReservationMutation = {
   readonly updateReservationSeries: { readonly pk: number | null } | null;
-};
-
-export type UseStaffReservationFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly recurringReservation: {
-    readonly id: string;
-    readonly pk: number | null;
-  } | null;
-};
-
-export type ReservationsQueryVariables = Exact<{
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<
-    | ReadonlyArray<InputMaybe<ReservationOrderingChoices>>
-    | InputMaybe<ReservationOrderingChoices>
-  >;
-  unit?: InputMaybe<
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  reservationUnits?: InputMaybe<
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  reservationUnitType?: InputMaybe<
-    | ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-    | InputMaybe<Scalars["Int"]["input"]>
-  >;
-  reservationType?: InputMaybe<
-    | ReadonlyArray<InputMaybe<ReservationTypeChoice>>
-    | InputMaybe<ReservationTypeChoice>
-  >;
-  state?: InputMaybe<
-    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
-    | InputMaybe<ReservationStateChoice>
-  >;
-  orderStatus?: InputMaybe<
-    | ReadonlyArray<InputMaybe<OrderStatusWithFree>>
-    | InputMaybe<OrderStatusWithFree>
-  >;
-  textSearch?: InputMaybe<Scalars["String"]["input"]>;
-  priceLte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  priceGte?: InputMaybe<Scalars["Decimal"]["input"]>;
-  beginDate?: InputMaybe<Scalars["Date"]["input"]>;
-  endDate?: InputMaybe<Scalars["Date"]["input"]>;
-  createdAtGte?: InputMaybe<Scalars["Date"]["input"]>;
-  createdAtLte?: InputMaybe<Scalars["Date"]["input"]>;
-  applyingForFreeOfCharge?: InputMaybe<Scalars["Boolean"]["input"]>;
-  isRecurring?: InputMaybe<Scalars["Boolean"]["input"]>;
-}>;
-
-export type ReservationsQuery = {
-  readonly reservations: {
-    readonly totalCount: number | null;
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly name: string | null;
-        readonly id: string;
-        readonly pk: number | null;
-        readonly begin: string;
-        readonly end: string;
-        readonly createdAt: string | null;
-        readonly state: ReservationStateChoice | null;
-        readonly type: ReservationTypeChoice | null;
-        readonly isBlocked: boolean;
-        readonly workingMemo: string | null;
-        readonly reserveeName: string | null;
-        readonly bufferTimeBefore: number;
-        readonly bufferTimeAfter: number;
-        readonly reservationUnits: ReadonlyArray<{
-          readonly id: string;
-          readonly nameFi: string | null;
-          readonly unit: {
-            readonly id: string;
-            readonly nameFi: string | null;
-          } | null;
-        }>;
-        readonly paymentOrder: ReadonlyArray<{
-          readonly id: string;
-          readonly status: OrderStatus;
-        }>;
-        readonly user: {
-          readonly id: string;
-          readonly email: string;
-          readonly firstName: string;
-          readonly lastName: string;
-        } | null;
-      } | null;
-    } | null>;
-    readonly pageInfo: {
-      readonly endCursor: string | null;
-      readonly hasNextPage: boolean;
-    };
-  } | null;
 };
 
 export type ReservationPermissionsQueryVariables = Exact<{
@@ -9563,6 +9635,55 @@ export type DeleteSpaceMutation = {
   readonly deleteSpace: { readonly deleted: boolean | null } | null;
 };
 
+export type UnitListQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  orderBy?: InputMaybe<
+    | ReadonlyArray<InputMaybe<UnitOrderingChoices>>
+    | InputMaybe<UnitOrderingChoices>
+  >;
+  nameFi?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type UnitListQuery = {
+  readonly units: {
+    readonly totalCount: number | null;
+    readonly edges: ReadonlyArray<{
+      readonly node: {
+        readonly id: string;
+        readonly nameFi: string | null;
+        readonly pk: number | null;
+        readonly unitGroups: ReadonlyArray<{
+          readonly id: string;
+          readonly nameFi: string | null;
+        }>;
+        readonly reservationUnits: ReadonlyArray<{
+          readonly id: string;
+          readonly pk: number | null;
+        }>;
+      } | null;
+    } | null>;
+    readonly pageInfo: {
+      readonly endCursor: string | null;
+      readonly hasNextPage: boolean;
+    };
+  } | null;
+};
+
+export type UnitTableElementFragment = {
+  readonly id: string;
+  readonly nameFi: string | null;
+  readonly pk: number | null;
+  readonly unitGroups: ReadonlyArray<{
+    readonly id: string;
+    readonly nameFi: string | null;
+  }>;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+  }>;
+};
+
 export type ReservationUnitCardFragment = {
   readonly id: string;
   readonly pk: number | null;
@@ -9631,55 +9752,12 @@ export type UnitPageQuery = {
   } | null;
 };
 
-export type UnitsQueryVariables = Exact<{
-  first?: InputMaybe<Scalars["Int"]["input"]>;
-  after?: InputMaybe<Scalars["String"]["input"]>;
-  orderBy?: InputMaybe<
-    | ReadonlyArray<InputMaybe<UnitOrderingChoices>>
-    | InputMaybe<UnitOrderingChoices>
-  >;
-  nameFi?: InputMaybe<Scalars["String"]["input"]>;
-}>;
-
-export type UnitsQuery = {
-  readonly units: {
-    readonly totalCount: number | null;
-    readonly edges: ReadonlyArray<{
-      readonly node: {
-        readonly id: string;
-        readonly nameFi: string | null;
-        readonly pk: number | null;
-        readonly unitGroups: ReadonlyArray<{
-          readonly id: string;
-          readonly nameFi: string | null;
-        }>;
-        readonly reservationUnits: ReadonlyArray<{
-          readonly id: string;
-          readonly pk: number | null;
-        }>;
-      } | null;
-    } | null>;
-    readonly pageInfo: {
-      readonly endCursor: string | null;
-      readonly hasNextPage: boolean;
-    };
-  } | null;
-};
-
 export type CreateResourceMutationVariables = Exact<{
   input: ResourceCreateMutationInput;
 }>;
 
 export type CreateResourceMutation = {
   readonly createResource: { readonly pk: number | null } | null;
-};
-
-export type UpdateResourceMutationVariables = Exact<{
-  input: ResourceUpdateMutationInput;
-}>;
-
-export type UpdateResourceMutation = {
-  readonly updateResource: { readonly pk: number | null } | null;
 };
 
 export type ResourceQueryVariables = Exact<{
@@ -9697,49 +9775,12 @@ export type ResourceQuery = {
   } | null;
 };
 
-export type UnitResourceInfoFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly location: {
-    readonly id: string;
-    readonly addressStreetFi: string | null;
-    readonly addressZip: string;
-    readonly addressCityFi: string | null;
-  } | null;
-};
-
-export type NewResourceUnitFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly spaces: ReadonlyArray<{
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-  }>;
-  readonly location: {
-    readonly id: string;
-    readonly addressStreetFi: string | null;
-    readonly addressZip: string;
-    readonly addressCityFi: string | null;
-  } | null;
-};
-
-export type CreateSpaceMutationVariables = Exact<{
-  input: SpaceCreateMutationInput;
+export type UpdateResourceMutationVariables = Exact<{
+  input: ResourceUpdateMutationInput;
 }>;
 
-export type CreateSpaceMutation = {
-  readonly createSpace: { readonly pk: number | null } | null;
-};
-
-export type UpdateSpaceMutationVariables = Exact<{
-  input: SpaceUpdateMutationInput;
-}>;
-
-export type UpdateSpaceMutation = {
-  readonly updateSpace: { readonly pk: number | null } | null;
+export type UpdateResourceMutation = {
+  readonly updateResource: { readonly pk: number | null } | null;
 };
 
 export type UnitSpacesQueryVariables = Exact<{
@@ -9761,17 +9802,12 @@ export type UnitSpacesQuery = {
   } | null;
 };
 
-export type SpaceCommonFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly surfaceArea: number | null;
-  readonly maxPersons: number | null;
-  readonly parent: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-  } | null;
+export type UpdateSpaceMutationVariables = Exact<{
+  input: SpaceUpdateMutationInput;
+}>;
+
+export type UpdateSpaceMutation = {
+  readonly updateSpace: { readonly pk: number | null } | null;
 };
 
 export type SpaceQueryVariables = Exact<{
@@ -9819,6 +9855,43 @@ export type SpaceQuery = {
       } | null;
     } | null;
   } | null;
+};
+
+export type UnitResourceInfoFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly location: {
+    readonly id: string;
+    readonly addressStreetFi: string | null;
+    readonly addressZip: string;
+    readonly addressCityFi: string | null;
+  } | null;
+};
+
+export type NewResourceUnitFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly spaces: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+  }>;
+  readonly location: {
+    readonly id: string;
+    readonly addressStreetFi: string | null;
+    readonly addressZip: string;
+    readonly addressCityFi: string | null;
+  } | null;
+};
+
+export type CreateSpaceMutationVariables = Exact<{
+  input: SpaceCreateMutationInput;
+}>;
+
+export type CreateSpaceMutation = {
+  readonly createSpace: { readonly pk: number | null } | null;
 };
 
 export const ReserveeNameFieldsFragmentDoc = gql`
@@ -10272,19 +10345,28 @@ export const CombineAffectedReservationsFragmentDoc = gql`
     affectedReservationUnits
   }
 `;
-export const ApplicationRoundBaseFragmentDoc = gql`
-  fragment ApplicationRoundBase on ApplicationRoundNode {
+export const ApplicationRoundCardFragmentDoc = gql`
+  fragment ApplicationRoundCard on ApplicationRoundNode {
     id
     pk
     nameFi
     status
     applicationPeriodBegin
     applicationPeriodEnd
+    reservationPeriodBegin
+    reservationPeriodEnd
+    reservationUnitCount
+    applicationsCount
   }
 `;
 export const ApplicationRoundAdminFragmentDoc = gql`
   fragment ApplicationRoundAdmin on ApplicationRoundNode {
-    ...ApplicationRoundBase
+    id
+    pk
+    nameFi
+    status
+    applicationPeriodBegin
+    applicationPeriodEnd
     applicationsCount
     isSettingHandledAllowed
     reservationCreationStatus
@@ -10299,7 +10381,6 @@ export const ApplicationRoundAdminFragmentDoc = gql`
       }
     }
   }
-  ${ApplicationRoundBaseFragmentDoc}
 `;
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {
@@ -10461,6 +10542,41 @@ export const BannerNotificationListFragmentDoc = gql`
     target
     level
   }
+`;
+export const ReservationUnitTableElementFragmentDoc = gql`
+  fragment ReservationUnitTableElement on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    unit {
+      id
+      nameFi
+      pk
+    }
+    reservationUnitType {
+      id
+      nameFi
+    }
+    maxPersons
+    surfaceArea
+    publishingState
+    reservationState
+  }
+`;
+export const ReservationTableElementFragmentDoc = gql`
+  fragment ReservationTableElement on ReservationNode {
+    ...ReservationCommonFields
+    name
+    reservationUnits {
+      id
+      nameFi
+      unit {
+        id
+        nameFi
+      }
+    }
+  }
+  ${ReservationCommonFieldsFragmentDoc}
 `;
 export const DenyDialogFieldsFragmentDoc = gql`
   fragment DenyDialogFields on ReservationNode {
@@ -10719,6 +10835,21 @@ export const SpaceFieldsFragmentDoc = gql`
   }
   ${SpaceCommonFieldsFragmentDoc}
   ${ResourceFieldsFragmentDoc}
+`;
+export const UnitTableElementFragmentDoc = gql`
+  fragment UnitTableElement on UnitNode {
+    id
+    nameFi
+    pk
+    unitGroups {
+      id
+      nameFi
+    }
+    reservationUnits {
+      id
+      pk
+    }
+  }
 `;
 export const ImageFragmentDoc = gql`
   fragment Image on ReservationUnitImageNode {
@@ -11947,6 +12078,98 @@ export type HandlingDataSuspenseQueryHookResult = ReturnType<
 export type HandlingDataQueryResult = Apollo.QueryResult<
   HandlingDataQuery,
   HandlingDataQueryVariables
+>;
+export const OptionsDocument = gql`
+  query Options(
+    $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
+  ) {
+    reservationPurposes(orderBy: $reservationPurposesOrderBy) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+        }
+      }
+    }
+    ageGroups {
+      edges {
+        node {
+          id
+          pk
+          minimum
+          maximum
+        }
+      }
+    }
+    cities {
+      edges {
+        node {
+          id
+          nameFi
+          pk
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useOptionsQuery__
+ *
+ * To run a query within a React component, call `useOptionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOptionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOptionsQuery({
+ *   variables: {
+ *      reservationPurposesOrderBy: // value for 'reservationPurposesOrderBy'
+ *   },
+ * });
+ */
+export function useOptionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<OptionsQuery, OptionsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<OptionsQuery, OptionsQueryVariables>(
+    OptionsDocument,
+    options
+  );
+}
+export function useOptionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<OptionsQuery, OptionsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<OptionsQuery, OptionsQueryVariables>(
+    OptionsDocument,
+    options
+  );
+}
+export function useOptionsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<OptionsQuery, OptionsQueryVariables>
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<OptionsQuery, OptionsQueryVariables>(
+    OptionsDocument,
+    options
+  );
+}
+export type OptionsQueryHookResult = ReturnType<typeof useOptionsQuery>;
+export type OptionsLazyQueryHookResult = ReturnType<typeof useOptionsLazyQuery>;
+export type OptionsSuspenseQueryHookResult = ReturnType<
+  typeof useOptionsSuspenseQuery
+>;
+export type OptionsQueryResult = Apollo.QueryResult<
+  OptionsQuery,
+  OptionsQueryVariables
 >;
 export const RecurringReservationDocument = gql`
   query RecurringReservation($id: ID!) {
@@ -13650,139 +13873,65 @@ export type ApplicationRoundCriteriaQueryResult = Apollo.QueryResult<
   ApplicationRoundCriteriaQuery,
   ApplicationRoundCriteriaQueryVariables
 >;
-export const RejectedOccurrencesDocument = gql`
-  query RejectedOccurrences(
-    $applicationRound: Int
-    $unit: [Int]
-    $reservationUnit: [Int]
-    $orderBy: [RejectedOccurrenceOrderingChoices]
-    $textSearch: String
-    $after: String
-    $first: Int
-  ) {
-    rejectedOccurrences(
-      applicationRound: $applicationRound
-      unit: $unit
-      reservationUnit: $reservationUnit
-      orderBy: $orderBy
-      textSearch: $textSearch
-      after: $after
-      first: $first
-    ) {
-      totalCount
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      edges {
-        node {
-          id
-          pk
-          beginDatetime
-          endDatetime
-          rejectionReason
-          recurringReservation {
-            id
-            allocatedTimeSlot {
-              id
-              pk
-              dayOfTheWeek
-              beginTime
-              endTime
-              reservationUnitOption {
-                id
-                applicationSection {
-                  id
-                  name
-                  application {
-                    id
-                    pk
-                    applicantType
-                    contactPerson {
-                      id
-                      firstName
-                      lastName
-                    }
-                    organisation {
-                      id
-                      nameFi
-                    }
-                  }
-                }
-                reservationUnit {
-                  id
-                  nameFi
-                  pk
-                  unit {
-                    id
-                    nameFi
-                  }
-                }
-              }
-            }
-            reservations {
-              id
-              pk
-            }
-          }
-        }
-      }
+export const ApplicationRoundDocument = gql`
+  query ApplicationRound($id: ID!) {
+    applicationRound(id: $id) {
+      ...ApplicationRoundAdmin
     }
   }
+  ${ApplicationRoundAdminFragmentDoc}
 `;
 
 /**
- * __useRejectedOccurrencesQuery__
+ * __useApplicationRoundQuery__
  *
- * To run a query within a React component, call `useRejectedOccurrencesQuery` and pass it any options that fit your needs.
- * When your component renders, `useRejectedOccurrencesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useApplicationRoundQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationRoundQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useRejectedOccurrencesQuery({
+ * const { data, loading, error } = useApplicationRoundQuery({
  *   variables: {
- *      applicationRound: // value for 'applicationRound'
- *      unit: // value for 'unit'
- *      reservationUnit: // value for 'reservationUnit'
- *      orderBy: // value for 'orderBy'
- *      textSearch: // value for 'textSearch'
- *      after: // value for 'after'
- *      first: // value for 'first'
+ *      id: // value for 'id'
  *   },
  * });
  */
-export function useRejectedOccurrencesQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    RejectedOccurrencesQuery,
-    RejectedOccurrencesQueryVariables
-  >
+export function useApplicationRoundQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ApplicationRoundQuery,
+    ApplicationRoundQueryVariables
+  > &
+    (
+      | { variables: ApplicationRoundQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    RejectedOccurrencesQuery,
-    RejectedOccurrencesQueryVariables
-  >(RejectedOccurrencesDocument, options);
+  return Apollo.useQuery<ApplicationRoundQuery, ApplicationRoundQueryVariables>(
+    ApplicationRoundDocument,
+    options
+  );
 }
-export function useRejectedOccurrencesLazyQuery(
+export function useApplicationRoundLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    RejectedOccurrencesQuery,
-    RejectedOccurrencesQueryVariables
+    ApplicationRoundQuery,
+    ApplicationRoundQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    RejectedOccurrencesQuery,
-    RejectedOccurrencesQueryVariables
-  >(RejectedOccurrencesDocument, options);
+    ApplicationRoundQuery,
+    ApplicationRoundQueryVariables
+  >(ApplicationRoundDocument, options);
 }
-export function useRejectedOccurrencesSuspenseQuery(
+export function useApplicationRoundSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        RejectedOccurrencesQuery,
-        RejectedOccurrencesQueryVariables
+        ApplicationRoundQuery,
+        ApplicationRoundQueryVariables
       >
 ) {
   const options =
@@ -13790,122 +13939,190 @@ export function useRejectedOccurrencesSuspenseQuery(
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    RejectedOccurrencesQuery,
-    RejectedOccurrencesQueryVariables
-  >(RejectedOccurrencesDocument, options);
+    ApplicationRoundQuery,
+    ApplicationRoundQueryVariables
+  >(ApplicationRoundDocument, options);
 }
-export type RejectedOccurrencesQueryHookResult = ReturnType<
-  typeof useRejectedOccurrencesQuery
+export type ApplicationRoundQueryHookResult = ReturnType<
+  typeof useApplicationRoundQuery
 >;
-export type RejectedOccurrencesLazyQueryHookResult = ReturnType<
-  typeof useRejectedOccurrencesLazyQuery
+export type ApplicationRoundLazyQueryHookResult = ReturnType<
+  typeof useApplicationRoundLazyQuery
 >;
-export type RejectedOccurrencesSuspenseQueryHookResult = ReturnType<
-  typeof useRejectedOccurrencesSuspenseQuery
+export type ApplicationRoundSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationRoundSuspenseQuery
 >;
-export type RejectedOccurrencesQueryResult = Apollo.QueryResult<
-  RejectedOccurrencesQuery,
-  RejectedOccurrencesQueryVariables
+export type ApplicationRoundQueryResult = Apollo.QueryResult<
+  ApplicationRoundQuery,
+  ApplicationRoundQueryVariables
 >;
-export const EndAllocationDocument = gql`
-  mutation EndAllocation($pk: Int!) {
-    setApplicationRoundHandled(input: { pk: $pk }) {
-      pk
+export const AllocatedTimeSlotsDocument = gql`
+  query AllocatedTimeSlots(
+    $applicationRound: Int!
+    $allocatedUnit: [Int]
+    $applicantType: [ApplicantTypeChoice]
+    $applicationSectionStatus: [ApplicationSectionStatusChoice]
+    $allocatedReservationUnit: [Int]
+    $dayOfTheWeek: [Weekday]
+    $textSearch: String
+    $accessCodeState: [AccessCodeState]
+    $orderBy: [AllocatedTimeSlotOrderingChoices]
+    $after: String
+    $first: Int
+  ) {
+    allocatedTimeSlots(
+      after: $after
+      first: $first
+      applicationRound: $applicationRound
+      allocatedUnit: $allocatedUnit
+      applicantType: $applicantType
+      applicationSectionStatus: $applicationSectionStatus
+      allocatedReservationUnit: $allocatedReservationUnit
+      accessCodeState: $accessCodeState
+      dayOfTheWeek: $dayOfTheWeek
+      textSearch: $textSearch
+      orderBy: $orderBy
+    ) {
+      edges {
+        node {
+          id
+          pk
+          dayOfTheWeek
+          endTime
+          beginTime
+          recurringReservation {
+            id
+            pk
+            shouldHaveActiveAccessCode
+            isAccessCodeIsActiveCorrect
+            reservations {
+              id
+              pk
+            }
+          }
+          reservationUnitOption {
+            id
+            rejected
+            locked
+            preferredOrder
+            applicationSection {
+              id
+              pk
+              name
+              reservationsEndDate
+              reservationsBeginDate
+              reservationMinDuration
+              reservationMaxDuration
+              application {
+                pk
+                id
+                ...ApplicationName
+              }
+            }
+            reservationUnit {
+              id
+              nameFi
+              unit {
+                id
+                nameFi
+              }
+            }
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
     }
   }
+  ${ApplicationNameFragmentDoc}
 `;
-export type EndAllocationMutationFn = Apollo.MutationFunction<
-  EndAllocationMutation,
-  EndAllocationMutationVariables
->;
 
 /**
- * __useEndAllocationMutation__
+ * __useAllocatedTimeSlotsQuery__
  *
- * To run a mutation, you first call `useEndAllocationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useEndAllocationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
+ * To run a query within a React component, call `useAllocatedTimeSlotsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllocatedTimeSlotsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
  *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const [endAllocationMutation, { data, loading, error }] = useEndAllocationMutation({
+ * const { data, loading, error } = useAllocatedTimeSlotsQuery({
  *   variables: {
- *      pk: // value for 'pk'
+ *      applicationRound: // value for 'applicationRound'
+ *      allocatedUnit: // value for 'allocatedUnit'
+ *      applicantType: // value for 'applicantType'
+ *      applicationSectionStatus: // value for 'applicationSectionStatus'
+ *      allocatedReservationUnit: // value for 'allocatedReservationUnit'
+ *      dayOfTheWeek: // value for 'dayOfTheWeek'
+ *      textSearch: // value for 'textSearch'
+ *      accessCodeState: // value for 'accessCodeState'
+ *      orderBy: // value for 'orderBy'
+ *      after: // value for 'after'
+ *      first: // value for 'first'
  *   },
  * });
  */
-export function useEndAllocationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    EndAllocationMutation,
-    EndAllocationMutationVariables
+export function useAllocatedTimeSlotsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
+  > &
+    (
+      | { variables: AllocatedTimeSlotsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
+  >(AllocatedTimeSlotsDocument, options);
+}
+export function useAllocatedTimeSlotsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    EndAllocationMutation,
-    EndAllocationMutationVariables
-  >(EndAllocationDocument, options);
+  return Apollo.useLazyQuery<
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
+  >(AllocatedTimeSlotsDocument, options);
 }
-export type EndAllocationMutationHookResult = ReturnType<
-  typeof useEndAllocationMutation
->;
-export type EndAllocationMutationResult =
-  Apollo.MutationResult<EndAllocationMutation>;
-export type EndAllocationMutationOptions = Apollo.BaseMutationOptions<
-  EndAllocationMutation,
-  EndAllocationMutationVariables
->;
-export const SendResultsDocument = gql`
-  mutation SendResults($pk: Int!) {
-    setApplicationRoundResultsSent(input: { pk: $pk }) {
-      pk
-    }
-  }
-`;
-export type SendResultsMutationFn = Apollo.MutationFunction<
-  SendResultsMutation,
-  SendResultsMutationVariables
->;
-
-/**
- * __useSendResultsMutation__
- *
- * To run a mutation, you first call `useSendResultsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSendResultsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [sendResultsMutation, { data, loading, error }] = useSendResultsMutation({
- *   variables: {
- *      pk: // value for 'pk'
- *   },
- * });
- */
-export function useSendResultsMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    SendResultsMutation,
-    SendResultsMutationVariables
-  >
+export function useAllocatedTimeSlotsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        AllocatedTimeSlotsQuery,
+        AllocatedTimeSlotsQueryVariables
+      >
 ) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<SendResultsMutation, SendResultsMutationVariables>(
-    SendResultsDocument,
-    options
-  );
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    AllocatedTimeSlotsQuery,
+    AllocatedTimeSlotsQueryVariables
+  >(AllocatedTimeSlotsDocument, options);
 }
-export type SendResultsMutationHookResult = ReturnType<
-  typeof useSendResultsMutation
+export type AllocatedTimeSlotsQueryHookResult = ReturnType<
+  typeof useAllocatedTimeSlotsQuery
 >;
-export type SendResultsMutationResult =
-  Apollo.MutationResult<SendResultsMutation>;
-export type SendResultsMutationOptions = Apollo.BaseMutationOptions<
-  SendResultsMutation,
-  SendResultsMutationVariables
+export type AllocatedTimeSlotsLazyQueryHookResult = ReturnType<
+  typeof useAllocatedTimeSlotsLazyQuery
+>;
+export type AllocatedTimeSlotsSuspenseQueryHookResult = ReturnType<
+  typeof useAllocatedTimeSlotsSuspenseQuery
+>;
+export type AllocatedTimeSlotsQueryResult = Apollo.QueryResult<
+  AllocatedTimeSlotsQuery,
+  AllocatedTimeSlotsQueryVariables
 >;
 export const ApplicationsDocument = gql`
   query Applications(
@@ -14205,150 +14422,139 @@ export type ApplicationSectionsQueryResult = Apollo.QueryResult<
   ApplicationSectionsQuery,
   ApplicationSectionsQueryVariables
 >;
-export const AllocatedTimeSlotsDocument = gql`
-  query AllocatedTimeSlots(
-    $applicationRound: Int!
-    $allocatedUnit: [Int]
-    $applicantType: [ApplicantTypeChoice]
-    $applicationSectionStatus: [ApplicationSectionStatusChoice]
-    $allocatedReservationUnit: [Int]
-    $dayOfTheWeek: [Weekday]
+export const RejectedOccurrencesDocument = gql`
+  query RejectedOccurrences(
+    $applicationRound: Int
+    $unit: [Int]
+    $reservationUnit: [Int]
+    $orderBy: [RejectedOccurrenceOrderingChoices]
     $textSearch: String
-    $accessCodeState: [AccessCodeState]
-    $orderBy: [AllocatedTimeSlotOrderingChoices]
     $after: String
     $first: Int
   ) {
-    allocatedTimeSlots(
+    rejectedOccurrences(
+      applicationRound: $applicationRound
+      unit: $unit
+      reservationUnit: $reservationUnit
+      orderBy: $orderBy
+      textSearch: $textSearch
       after: $after
       first: $first
-      applicationRound: $applicationRound
-      allocatedUnit: $allocatedUnit
-      applicantType: $applicantType
-      applicationSectionStatus: $applicationSectionStatus
-      allocatedReservationUnit: $allocatedReservationUnit
-      accessCodeState: $accessCodeState
-      dayOfTheWeek: $dayOfTheWeek
-      textSearch: $textSearch
-      orderBy: $orderBy
     ) {
+      totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
       edges {
         node {
           id
           pk
-          dayOfTheWeek
-          endTime
-          beginTime
+          beginDatetime
+          endDatetime
+          rejectionReason
           recurringReservation {
             id
-            pk
-            shouldHaveActiveAccessCode
-            isAccessCodeIsActiveCorrect
+            allocatedTimeSlot {
+              id
+              pk
+              dayOfTheWeek
+              beginTime
+              endTime
+              reservationUnitOption {
+                id
+                applicationSection {
+                  id
+                  name
+                  application {
+                    id
+                    pk
+                    applicantType
+                    contactPerson {
+                      id
+                      firstName
+                      lastName
+                    }
+                    organisation {
+                      id
+                      nameFi
+                    }
+                  }
+                }
+                reservationUnit {
+                  id
+                  nameFi
+                  pk
+                  unit {
+                    id
+                    nameFi
+                  }
+                }
+              }
+            }
             reservations {
               id
               pk
             }
           }
-          reservationUnitOption {
-            id
-            rejected
-            locked
-            preferredOrder
-            applicationSection {
-              id
-              pk
-              name
-              reservationsEndDate
-              reservationsBeginDate
-              reservationMinDuration
-              reservationMaxDuration
-              application {
-                pk
-                id
-                ...ApplicationName
-              }
-            }
-            reservationUnit {
-              id
-              nameFi
-              unit {
-                id
-                nameFi
-              }
-            }
-          }
         }
       }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
     }
   }
-  ${ApplicationNameFragmentDoc}
 `;
 
 /**
- * __useAllocatedTimeSlotsQuery__
+ * __useRejectedOccurrencesQuery__
  *
- * To run a query within a React component, call `useAllocatedTimeSlotsQuery` and pass it any options that fit your needs.
- * When your component renders, `useAllocatedTimeSlotsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useRejectedOccurrencesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRejectedOccurrencesQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useAllocatedTimeSlotsQuery({
+ * const { data, loading, error } = useRejectedOccurrencesQuery({
  *   variables: {
  *      applicationRound: // value for 'applicationRound'
- *      allocatedUnit: // value for 'allocatedUnit'
- *      applicantType: // value for 'applicantType'
- *      applicationSectionStatus: // value for 'applicationSectionStatus'
- *      allocatedReservationUnit: // value for 'allocatedReservationUnit'
- *      dayOfTheWeek: // value for 'dayOfTheWeek'
- *      textSearch: // value for 'textSearch'
- *      accessCodeState: // value for 'accessCodeState'
+ *      unit: // value for 'unit'
+ *      reservationUnit: // value for 'reservationUnit'
  *      orderBy: // value for 'orderBy'
+ *      textSearch: // value for 'textSearch'
  *      after: // value for 'after'
  *      first: // value for 'first'
  *   },
  * });
  */
-export function useAllocatedTimeSlotsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    AllocatedTimeSlotsQuery,
-    AllocatedTimeSlotsQueryVariables
-  > &
-    (
-      | { variables: AllocatedTimeSlotsQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
+export function useRejectedOccurrencesQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
+  >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    AllocatedTimeSlotsQuery,
-    AllocatedTimeSlotsQueryVariables
-  >(AllocatedTimeSlotsDocument, options);
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
+  >(RejectedOccurrencesDocument, options);
 }
-export function useAllocatedTimeSlotsLazyQuery(
+export function useRejectedOccurrencesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    AllocatedTimeSlotsQuery,
-    AllocatedTimeSlotsQueryVariables
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    AllocatedTimeSlotsQuery,
-    AllocatedTimeSlotsQueryVariables
-  >(AllocatedTimeSlotsDocument, options);
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
+  >(RejectedOccurrencesDocument, options);
 }
-export function useAllocatedTimeSlotsSuspenseQuery(
+export function useRejectedOccurrencesSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        AllocatedTimeSlotsQuery,
-        AllocatedTimeSlotsQueryVariables
+        RejectedOccurrencesQuery,
+        RejectedOccurrencesQueryVariables
       >
 ) {
   const options =
@@ -14356,86 +14562,182 @@ export function useAllocatedTimeSlotsSuspenseQuery(
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    AllocatedTimeSlotsQuery,
-    AllocatedTimeSlotsQueryVariables
-  >(AllocatedTimeSlotsDocument, options);
+    RejectedOccurrencesQuery,
+    RejectedOccurrencesQueryVariables
+  >(RejectedOccurrencesDocument, options);
 }
-export type AllocatedTimeSlotsQueryHookResult = ReturnType<
-  typeof useAllocatedTimeSlotsQuery
+export type RejectedOccurrencesQueryHookResult = ReturnType<
+  typeof useRejectedOccurrencesQuery
 >;
-export type AllocatedTimeSlotsLazyQueryHookResult = ReturnType<
-  typeof useAllocatedTimeSlotsLazyQuery
+export type RejectedOccurrencesLazyQueryHookResult = ReturnType<
+  typeof useRejectedOccurrencesLazyQuery
 >;
-export type AllocatedTimeSlotsSuspenseQueryHookResult = ReturnType<
-  typeof useAllocatedTimeSlotsSuspenseQuery
+export type RejectedOccurrencesSuspenseQueryHookResult = ReturnType<
+  typeof useRejectedOccurrencesSuspenseQuery
 >;
-export type AllocatedTimeSlotsQueryResult = Apollo.QueryResult<
-  AllocatedTimeSlotsQuery,
-  AllocatedTimeSlotsQueryVariables
+export type RejectedOccurrencesQueryResult = Apollo.QueryResult<
+  RejectedOccurrencesQuery,
+  RejectedOccurrencesQueryVariables
 >;
-export const ApplicationRoundsDocument = gql`
-  query ApplicationRounds {
+export const EndAllocationDocument = gql`
+  mutation EndAllocation($pk: Int!) {
+    setApplicationRoundHandled(input: { pk: $pk }) {
+      pk
+    }
+  }
+`;
+export type EndAllocationMutationFn = Apollo.MutationFunction<
+  EndAllocationMutation,
+  EndAllocationMutationVariables
+>;
+
+/**
+ * __useEndAllocationMutation__
+ *
+ * To run a mutation, you first call `useEndAllocationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEndAllocationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [endAllocationMutation, { data, loading, error }] = useEndAllocationMutation({
+ *   variables: {
+ *      pk: // value for 'pk'
+ *   },
+ * });
+ */
+export function useEndAllocationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    EndAllocationMutation,
+    EndAllocationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    EndAllocationMutation,
+    EndAllocationMutationVariables
+  >(EndAllocationDocument, options);
+}
+export type EndAllocationMutationHookResult = ReturnType<
+  typeof useEndAllocationMutation
+>;
+export type EndAllocationMutationResult =
+  Apollo.MutationResult<EndAllocationMutation>;
+export type EndAllocationMutationOptions = Apollo.BaseMutationOptions<
+  EndAllocationMutation,
+  EndAllocationMutationVariables
+>;
+export const SendResultsDocument = gql`
+  mutation SendResults($pk: Int!) {
+    setApplicationRoundResultsSent(input: { pk: $pk }) {
+      pk
+    }
+  }
+`;
+export type SendResultsMutationFn = Apollo.MutationFunction<
+  SendResultsMutation,
+  SendResultsMutationVariables
+>;
+
+/**
+ * __useSendResultsMutation__
+ *
+ * To run a mutation, you first call `useSendResultsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendResultsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendResultsMutation, { data, loading, error }] = useSendResultsMutation({
+ *   variables: {
+ *      pk: // value for 'pk'
+ *   },
+ * });
+ */
+export function useSendResultsMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    SendResultsMutation,
+    SendResultsMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<SendResultsMutation, SendResultsMutationVariables>(
+    SendResultsDocument,
+    options
+  );
+}
+export type SendResultsMutationHookResult = ReturnType<
+  typeof useSendResultsMutation
+>;
+export type SendResultsMutationResult =
+  Apollo.MutationResult<SendResultsMutation>;
+export type SendResultsMutationOptions = Apollo.BaseMutationOptions<
+  SendResultsMutation,
+  SendResultsMutationVariables
+>;
+export const ApplicationRoundListDocument = gql`
+  query ApplicationRoundList {
     applicationRounds(onlyWithPermissions: true) {
       edges {
         node {
-          ...ApplicationRoundBase
-          reservationPeriodBegin
-          reservationPeriodEnd
-          applicationsCount
-          reservationUnitCount
+          ...ApplicationRoundCard
           statusTimestamp
         }
       }
     }
   }
-  ${ApplicationRoundBaseFragmentDoc}
+  ${ApplicationRoundCardFragmentDoc}
 `;
 
 /**
- * __useApplicationRoundsQuery__
+ * __useApplicationRoundListQuery__
  *
- * To run a query within a React component, call `useApplicationRoundsQuery` and pass it any options that fit your needs.
- * When your component renders, `useApplicationRoundsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useApplicationRoundListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApplicationRoundListQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useApplicationRoundsQuery({
+ * const { data, loading, error } = useApplicationRoundListQuery({
  *   variables: {
  *   },
  * });
  */
-export function useApplicationRoundsQuery(
+export function useApplicationRoundListQuery(
   baseOptions?: Apollo.QueryHookOptions<
-    ApplicationRoundsQuery,
-    ApplicationRoundsQueryVariables
+    ApplicationRoundListQuery,
+    ApplicationRoundListQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    ApplicationRoundsQuery,
-    ApplicationRoundsQueryVariables
-  >(ApplicationRoundsDocument, options);
+    ApplicationRoundListQuery,
+    ApplicationRoundListQueryVariables
+  >(ApplicationRoundListDocument, options);
 }
-export function useApplicationRoundsLazyQuery(
+export function useApplicationRoundListLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    ApplicationRoundsQuery,
-    ApplicationRoundsQueryVariables
+    ApplicationRoundListQuery,
+    ApplicationRoundListQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    ApplicationRoundsQuery,
-    ApplicationRoundsQueryVariables
-  >(ApplicationRoundsDocument, options);
+    ApplicationRoundListQuery,
+    ApplicationRoundListQueryVariables
+  >(ApplicationRoundListDocument, options);
 }
-export function useApplicationRoundsSuspenseQuery(
+export function useApplicationRoundListSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
     | Apollo.SuspenseQueryHookOptions<
-        ApplicationRoundsQuery,
-        ApplicationRoundsQueryVariables
+        ApplicationRoundListQuery,
+        ApplicationRoundListQueryVariables
       >
 ) {
   const options =
@@ -14443,105 +14745,22 @@ export function useApplicationRoundsSuspenseQuery(
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
   return Apollo.useSuspenseQuery<
-    ApplicationRoundsQuery,
-    ApplicationRoundsQueryVariables
-  >(ApplicationRoundsDocument, options);
+    ApplicationRoundListQuery,
+    ApplicationRoundListQueryVariables
+  >(ApplicationRoundListDocument, options);
 }
-export type ApplicationRoundsQueryHookResult = ReturnType<
-  typeof useApplicationRoundsQuery
+export type ApplicationRoundListQueryHookResult = ReturnType<
+  typeof useApplicationRoundListQuery
 >;
-export type ApplicationRoundsLazyQueryHookResult = ReturnType<
-  typeof useApplicationRoundsLazyQuery
+export type ApplicationRoundListLazyQueryHookResult = ReturnType<
+  typeof useApplicationRoundListLazyQuery
 >;
-export type ApplicationRoundsSuspenseQueryHookResult = ReturnType<
-  typeof useApplicationRoundsSuspenseQuery
+export type ApplicationRoundListSuspenseQueryHookResult = ReturnType<
+  typeof useApplicationRoundListSuspenseQuery
 >;
-export type ApplicationRoundsQueryResult = Apollo.QueryResult<
-  ApplicationRoundsQuery,
-  ApplicationRoundsQueryVariables
->;
-export const ApplicationRoundDocument = gql`
-  query ApplicationRound($id: ID!) {
-    applicationRound(id: $id) {
-      ...ApplicationRoundAdmin
-    }
-  }
-  ${ApplicationRoundAdminFragmentDoc}
-`;
-
-/**
- * __useApplicationRoundQuery__
- *
- * To run a query within a React component, call `useApplicationRoundQuery` and pass it any options that fit your needs.
- * When your component renders, `useApplicationRoundQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useApplicationRoundQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useApplicationRoundQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ApplicationRoundQuery,
-    ApplicationRoundQueryVariables
-  > &
-    (
-      | { variables: ApplicationRoundQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ApplicationRoundQuery, ApplicationRoundQueryVariables>(
-    ApplicationRoundDocument,
-    options
-  );
-}
-export function useApplicationRoundLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ApplicationRoundQuery,
-    ApplicationRoundQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ApplicationRoundQuery,
-    ApplicationRoundQueryVariables
-  >(ApplicationRoundDocument, options);
-}
-export function useApplicationRoundSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ApplicationRoundQuery,
-        ApplicationRoundQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ApplicationRoundQuery,
-    ApplicationRoundQueryVariables
-  >(ApplicationRoundDocument, options);
-}
-export type ApplicationRoundQueryHookResult = ReturnType<
-  typeof useApplicationRoundQuery
->;
-export type ApplicationRoundLazyQueryHookResult = ReturnType<
-  typeof useApplicationRoundLazyQuery
->;
-export type ApplicationRoundSuspenseQueryHookResult = ReturnType<
-  typeof useApplicationRoundSuspenseQuery
->;
-export type ApplicationRoundQueryResult = Apollo.QueryResult<
-  ApplicationRoundQuery,
-  ApplicationRoundQueryVariables
+export type ApplicationRoundListQueryResult = Apollo.QueryResult<
+  ApplicationRoundListQuery,
+  ApplicationRoundListQueryVariables
 >;
 export const ApplicationAdminDocument = gql`
   query ApplicationAdmin($id: ID!) {
@@ -14894,6 +15113,89 @@ export type CreateStaffReservationMutationOptions = Apollo.BaseMutationOptions<
   CreateStaffReservationMutation,
   CreateStaffReservationMutationVariables
 >;
+export const ReservationUnitDocument = gql`
+  query ReservationUnit($id: ID!) {
+    reservationUnit(id: $id) {
+      ...ReservationUnitFields
+    }
+  }
+  ${ReservationUnitFieldsFragmentDoc}
+`;
+
+/**
+ * __useReservationUnitQuery__
+ *
+ * To run a query within a React component, call `useReservationUnitQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationUnitQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationUnitQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationUnitQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationUnitQuery,
+    ReservationUnitQueryVariables
+  > &
+    (
+      | { variables: ReservationUnitQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ReservationUnitQuery, ReservationUnitQueryVariables>(
+    ReservationUnitDocument,
+    options
+  );
+}
+export function useReservationUnitLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationUnitQuery,
+    ReservationUnitQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationUnitQuery,
+    ReservationUnitQueryVariables
+  >(ReservationUnitDocument, options);
+}
+export function useReservationUnitSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationUnitQuery,
+        ReservationUnitQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationUnitQuery,
+    ReservationUnitQueryVariables
+  >(ReservationUnitDocument, options);
+}
+export type ReservationUnitQueryHookResult = ReturnType<
+  typeof useReservationUnitQuery
+>;
+export type ReservationUnitLazyQueryHookResult = ReturnType<
+  typeof useReservationUnitLazyQuery
+>;
+export type ReservationUnitSuspenseQueryHookResult = ReturnType<
+  typeof useReservationUnitSuspenseQuery
+>;
+export type ReservationUnitQueryResult = Apollo.QueryResult<
+  ReservationUnitQuery,
+  ReservationUnitQueryVariables
+>;
 export const ReservationUnitCalendarDocument = gql`
   query ReservationUnitCalendar(
     $id: ID!
@@ -15001,184 +15303,6 @@ export type ReservationUnitCalendarSuspenseQueryHookResult = ReturnType<
 export type ReservationUnitCalendarQueryResult = Apollo.QueryResult<
   ReservationUnitCalendarQuery,
   ReservationUnitCalendarQueryVariables
->;
-export const OptionsDocument = gql`
-  query Options(
-    $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
-  ) {
-    reservationPurposes(orderBy: $reservationPurposesOrderBy) {
-      edges {
-        node {
-          id
-          pk
-          nameFi
-        }
-      }
-    }
-    ageGroups {
-      edges {
-        node {
-          id
-          pk
-          minimum
-          maximum
-        }
-      }
-    }
-    cities {
-      edges {
-        node {
-          id
-          nameFi
-          pk
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useOptionsQuery__
- *
- * To run a query within a React component, call `useOptionsQuery` and pass it any options that fit your needs.
- * When your component renders, `useOptionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOptionsQuery({
- *   variables: {
- *      reservationPurposesOrderBy: // value for 'reservationPurposesOrderBy'
- *   },
- * });
- */
-export function useOptionsQuery(
-  baseOptions?: Apollo.QueryHookOptions<OptionsQuery, OptionsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<OptionsQuery, OptionsQueryVariables>(
-    OptionsDocument,
-    options
-  );
-}
-export function useOptionsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<OptionsQuery, OptionsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<OptionsQuery, OptionsQueryVariables>(
-    OptionsDocument,
-    options
-  );
-}
-export function useOptionsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<OptionsQuery, OptionsQueryVariables>
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<OptionsQuery, OptionsQueryVariables>(
-    OptionsDocument,
-    options
-  );
-}
-export type OptionsQueryHookResult = ReturnType<typeof useOptionsQuery>;
-export type OptionsLazyQueryHookResult = ReturnType<typeof useOptionsLazyQuery>;
-export type OptionsSuspenseQueryHookResult = ReturnType<
-  typeof useOptionsSuspenseQuery
->;
-export type OptionsQueryResult = Apollo.QueryResult<
-  OptionsQuery,
-  OptionsQueryVariables
->;
-export const UnitViewDocument = gql`
-  query UnitView($id: ID!) {
-    unit(id: $id) {
-      id
-      pk
-      nameFi
-      location {
-        ...LocationFields
-      }
-      reservationUnits {
-        id
-        pk
-        nameFi
-        spaces {
-          id
-          pk
-        }
-      }
-    }
-  }
-  ${LocationFieldsFragmentDoc}
-`;
-
-/**
- * __useUnitViewQuery__
- *
- * To run a query within a React component, call `useUnitViewQuery` and pass it any options that fit your needs.
- * When your component renders, `useUnitViewQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useUnitViewQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useUnitViewQuery(
-  baseOptions: Apollo.QueryHookOptions<UnitViewQuery, UnitViewQueryVariables> &
-    ({ variables: UnitViewQueryVariables; skip?: boolean } | { skip: boolean })
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<UnitViewQuery, UnitViewQueryVariables>(
-    UnitViewDocument,
-    options
-  );
-}
-export function useUnitViewLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    UnitViewQuery,
-    UnitViewQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<UnitViewQuery, UnitViewQueryVariables>(
-    UnitViewDocument,
-    options
-  );
-}
-export function useUnitViewSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<UnitViewQuery, UnitViewQueryVariables>
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<UnitViewQuery, UnitViewQueryVariables>(
-    UnitViewDocument,
-    options
-  );
-}
-export type UnitViewQueryHookResult = ReturnType<typeof useUnitViewQuery>;
-export type UnitViewLazyQueryHookResult = ReturnType<
-  typeof useUnitViewLazyQuery
->;
-export type UnitViewSuspenseQueryHookResult = ReturnType<
-  typeof useUnitViewSuspenseQuery
->;
-export type UnitViewQueryResult = Apollo.QueryResult<
-  UnitViewQuery,
-  UnitViewQueryVariables
 >;
 export const ReservationUnitsByUnitDocument = gql`
   query ReservationUnitsByUnit(
@@ -15298,88 +15422,91 @@ export type ReservationUnitsByUnitQueryResult = Apollo.QueryResult<
   ReservationUnitsByUnitQuery,
   ReservationUnitsByUnitQueryVariables
 >;
-export const ReservationUnitDocument = gql`
-  query ReservationUnit($id: ID!) {
-    reservationUnit(id: $id) {
-      ...ReservationUnitFields
+export const UnitViewDocument = gql`
+  query UnitView($id: ID!) {
+    unit(id: $id) {
+      id
+      pk
+      nameFi
+      location {
+        ...LocationFields
+      }
+      reservationUnits {
+        id
+        pk
+        nameFi
+        spaces {
+          id
+          pk
+        }
+      }
     }
   }
-  ${ReservationUnitFieldsFragmentDoc}
+  ${LocationFieldsFragmentDoc}
 `;
 
 /**
- * __useReservationUnitQuery__
+ * __useUnitViewQuery__
  *
- * To run a query within a React component, call `useReservationUnitQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationUnitQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useUnitViewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUnitViewQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useReservationUnitQuery({
+ * const { data, loading, error } = useUnitViewQuery({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useReservationUnitQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationUnitQuery,
-    ReservationUnitQueryVariables
-  > &
-    (
-      | { variables: ReservationUnitQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
+export function useUnitViewQuery(
+  baseOptions: Apollo.QueryHookOptions<UnitViewQuery, UnitViewQueryVariables> &
+    ({ variables: UnitViewQueryVariables; skip?: boolean } | { skip: boolean })
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ReservationUnitQuery, ReservationUnitQueryVariables>(
-    ReservationUnitDocument,
+  return Apollo.useQuery<UnitViewQuery, UnitViewQueryVariables>(
+    UnitViewDocument,
     options
   );
 }
-export function useReservationUnitLazyQuery(
+export function useUnitViewLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationUnitQuery,
-    ReservationUnitQueryVariables
+    UnitViewQuery,
+    UnitViewQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationUnitQuery,
-    ReservationUnitQueryVariables
-  >(ReservationUnitDocument, options);
+  return Apollo.useLazyQuery<UnitViewQuery, UnitViewQueryVariables>(
+    UnitViewDocument,
+    options
+  );
 }
-export function useReservationUnitSuspenseQuery(
+export function useUnitViewSuspenseQuery(
   baseOptions?:
     | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationUnitQuery,
-        ReservationUnitQueryVariables
-      >
+    | Apollo.SuspenseQueryHookOptions<UnitViewQuery, UnitViewQueryVariables>
 ) {
   const options =
     baseOptions === Apollo.skipToken
       ? baseOptions
       : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationUnitQuery,
-    ReservationUnitQueryVariables
-  >(ReservationUnitDocument, options);
+  return Apollo.useSuspenseQuery<UnitViewQuery, UnitViewQueryVariables>(
+    UnitViewDocument,
+    options
+  );
 }
-export type ReservationUnitQueryHookResult = ReturnType<
-  typeof useReservationUnitQuery
+export type UnitViewQueryHookResult = ReturnType<typeof useUnitViewQuery>;
+export type UnitViewLazyQueryHookResult = ReturnType<
+  typeof useUnitViewLazyQuery
 >;
-export type ReservationUnitLazyQueryHookResult = ReturnType<
-  typeof useReservationUnitLazyQuery
+export type UnitViewSuspenseQueryHookResult = ReturnType<
+  typeof useUnitViewSuspenseQuery
 >;
-export type ReservationUnitSuspenseQueryHookResult = ReturnType<
-  typeof useReservationUnitSuspenseQuery
->;
-export type ReservationUnitQueryResult = Apollo.QueryResult<
-  ReservationUnitQuery,
-  ReservationUnitQueryVariables
+export type UnitViewQueryResult = Apollo.QueryResult<
+  UnitViewQuery,
+  UnitViewQueryVariables
 >;
 export const RecurringReservationUnitDocument = gql`
   query RecurringReservationUnit($id: ID!) {
@@ -15904,22 +16031,7 @@ export const SearchReservationUnitsDocument = gql`
     ) {
       edges {
         node {
-          id
-          pk
-          nameFi
-          unit {
-            id
-            nameFi
-            pk
-          }
-          reservationUnitType {
-            id
-            nameFi
-          }
-          maxPersons
-          surfaceArea
-          publishingState
-          reservationState
+          ...ReservationUnitTableElement
         }
       }
       pageInfo {
@@ -15929,6 +16041,7 @@ export const SearchReservationUnitsDocument = gql`
       totalCount
     }
   }
+  ${ReservationUnitTableElementFragmentDoc}
 `;
 
 /**
@@ -16010,6 +16123,201 @@ export type SearchReservationUnitsSuspenseQueryHookResult = ReturnType<
 export type SearchReservationUnitsQueryResult = Apollo.QueryResult<
   SearchReservationUnitsQuery,
   SearchReservationUnitsQueryVariables
+>;
+export const ReservationListDocument = gql`
+  query ReservationList(
+    $first: Int
+    $after: String
+    $orderBy: [ReservationOrderingChoices]
+    $unit: [Int]
+    $reservationUnits: [Int]
+    $reservationUnitType: [Int]
+    $reservationType: [ReservationTypeChoice]
+    $state: [ReservationStateChoice]
+    $orderStatus: [OrderStatusWithFree]
+    $textSearch: String
+    $priceLte: Decimal
+    $priceGte: Decimal
+    $beginDate: Date
+    $endDate: Date
+    $createdAtGte: Date
+    $createdAtLte: Date
+    $applyingForFreeOfCharge: Boolean
+    $isRecurring: Boolean
+  ) {
+    reservations(
+      first: $first
+      after: $after
+      orderBy: $orderBy
+      unit: $unit
+      reservationUnits: $reservationUnits
+      reservationUnitType: $reservationUnitType
+      reservationType: $reservationType
+      state: $state
+      orderStatus: $orderStatus
+      textSearch: $textSearch
+      priceLte: $priceLte
+      priceGte: $priceGte
+      beginDate: $beginDate
+      endDate: $endDate
+      createdAtGte: $createdAtGte
+      createdAtLte: $createdAtLte
+      isRecurring: $isRecurring
+      applyingForFreeOfCharge: $applyingForFreeOfCharge
+      onlyWithPermission: true
+    ) {
+      edges {
+        node {
+          ...ReservationTableElement
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+  ${ReservationTableElementFragmentDoc}
+`;
+
+/**
+ * __useReservationListQuery__
+ *
+ * To run a query within a React component, call `useReservationListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationListQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      orderBy: // value for 'orderBy'
+ *      unit: // value for 'unit'
+ *      reservationUnits: // value for 'reservationUnits'
+ *      reservationUnitType: // value for 'reservationUnitType'
+ *      reservationType: // value for 'reservationType'
+ *      state: // value for 'state'
+ *      orderStatus: // value for 'orderStatus'
+ *      textSearch: // value for 'textSearch'
+ *      priceLte: // value for 'priceLte'
+ *      priceGte: // value for 'priceGte'
+ *      beginDate: // value for 'beginDate'
+ *      endDate: // value for 'endDate'
+ *      createdAtGte: // value for 'createdAtGte'
+ *      createdAtLte: // value for 'createdAtLte'
+ *      applyingForFreeOfCharge: // value for 'applyingForFreeOfCharge'
+ *      isRecurring: // value for 'isRecurring'
+ *   },
+ * });
+ */
+export function useReservationListQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    ReservationListQuery,
+    ReservationListQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ReservationListQuery, ReservationListQueryVariables>(
+    ReservationListDocument,
+    options
+  );
+}
+export function useReservationListLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationListQuery,
+    ReservationListQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationListQuery,
+    ReservationListQueryVariables
+  >(ReservationListDocument, options);
+}
+export function useReservationListSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationListQuery,
+        ReservationListQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationListQuery,
+    ReservationListQueryVariables
+  >(ReservationListDocument, options);
+}
+export type ReservationListQueryHookResult = ReturnType<
+  typeof useReservationListQuery
+>;
+export type ReservationListLazyQueryHookResult = ReturnType<
+  typeof useReservationListLazyQuery
+>;
+export type ReservationListSuspenseQueryHookResult = ReturnType<
+  typeof useReservationListSuspenseQuery
+>;
+export type ReservationListQueryResult = Apollo.QueryResult<
+  ReservationListQuery,
+  ReservationListQueryVariables
+>;
+export const ApproveReservationDocument = gql`
+  mutation ApproveReservation($input: ReservationApproveMutationInput!) {
+    approveReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;
+export type ApproveReservationMutationFn = Apollo.MutationFunction<
+  ApproveReservationMutation,
+  ApproveReservationMutationVariables
+>;
+
+/**
+ * __useApproveReservationMutation__
+ *
+ * To run a mutation, you first call `useApproveReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useApproveReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [approveReservationMutation, { data, loading, error }] = useApproveReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useApproveReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ApproveReservationMutation,
+    ApproveReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    ApproveReservationMutation,
+    ApproveReservationMutationVariables
+  >(ApproveReservationDocument, options);
+}
+export type ApproveReservationMutationHookResult = ReturnType<
+  typeof useApproveReservationMutation
+>;
+export type ApproveReservationMutationResult =
+  Apollo.MutationResult<ApproveReservationMutation>;
+export type ApproveReservationMutationOptions = Apollo.BaseMutationOptions<
+  ApproveReservationMutation,
+  ApproveReservationMutationVariables
 >;
 export const ChangeReservationAccessCodeSingleDocument = gql`
   mutation ChangeReservationAccessCodeSingle(
@@ -16333,6 +16641,57 @@ export type ReservationApplicationLinkQueryResult = Apollo.QueryResult<
   ReservationApplicationLinkQuery,
   ReservationApplicationLinkQueryVariables
 >;
+export const RequireHandlingDocument = gql`
+  mutation RequireHandling($input: ReservationRequiresHandlingMutationInput!) {
+    requireHandlingForReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;
+export type RequireHandlingMutationFn = Apollo.MutationFunction<
+  RequireHandlingMutation,
+  RequireHandlingMutationVariables
+>;
+
+/**
+ * __useRequireHandlingMutation__
+ *
+ * To run a mutation, you first call `useRequireHandlingMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRequireHandlingMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [requireHandlingMutation, { data, loading, error }] = useRequireHandlingMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRequireHandlingMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RequireHandlingMutation,
+    RequireHandlingMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RequireHandlingMutation,
+    RequireHandlingMutationVariables
+  >(RequireHandlingDocument, options);
+}
+export type RequireHandlingMutationHookResult = ReturnType<
+  typeof useRequireHandlingMutation
+>;
+export type RequireHandlingMutationResult =
+  Apollo.MutationResult<RequireHandlingMutation>;
+export type RequireHandlingMutationOptions = Apollo.BaseMutationOptions<
+  RequireHandlingMutation,
+  RequireHandlingMutationVariables
+>;
 export const ReservationEditPageDocument = gql`
   query ReservationEditPage($id: ID!) {
     reservation(id: $id) {
@@ -16558,108 +16917,6 @@ export type ReservationPageSuspenseQueryHookResult = ReturnType<
 export type ReservationPageQueryResult = Apollo.QueryResult<
   ReservationPageQuery,
   ReservationPageQueryVariables
->;
-export const ApproveReservationDocument = gql`
-  mutation ApproveReservation($input: ReservationApproveMutationInput!) {
-    approveReservation(input: $input) {
-      pk
-      state
-    }
-  }
-`;
-export type ApproveReservationMutationFn = Apollo.MutationFunction<
-  ApproveReservationMutation,
-  ApproveReservationMutationVariables
->;
-
-/**
- * __useApproveReservationMutation__
- *
- * To run a mutation, you first call `useApproveReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useApproveReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [approveReservationMutation, { data, loading, error }] = useApproveReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useApproveReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    ApproveReservationMutation,
-    ApproveReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    ApproveReservationMutation,
-    ApproveReservationMutationVariables
-  >(ApproveReservationDocument, options);
-}
-export type ApproveReservationMutationHookResult = ReturnType<
-  typeof useApproveReservationMutation
->;
-export type ApproveReservationMutationResult =
-  Apollo.MutationResult<ApproveReservationMutation>;
-export type ApproveReservationMutationOptions = Apollo.BaseMutationOptions<
-  ApproveReservationMutation,
-  ApproveReservationMutationVariables
->;
-export const RequireHandlingDocument = gql`
-  mutation RequireHandling($input: ReservationRequiresHandlingMutationInput!) {
-    requireHandlingForReservation(input: $input) {
-      pk
-      state
-    }
-  }
-`;
-export type RequireHandlingMutationFn = Apollo.MutationFunction<
-  RequireHandlingMutation,
-  RequireHandlingMutationVariables
->;
-
-/**
- * __useRequireHandlingMutation__
- *
- * To run a mutation, you first call `useRequireHandlingMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRequireHandlingMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [requireHandlingMutation, { data, loading, error }] = useRequireHandlingMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useRequireHandlingMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RequireHandlingMutation,
-    RequireHandlingMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RequireHandlingMutation,
-    RequireHandlingMutationVariables
-  >(RequireHandlingDocument, options);
-}
-export type RequireHandlingMutationHookResult = ReturnType<
-  typeof useRequireHandlingMutation
->;
-export type RequireHandlingMutationResult =
-  Apollo.MutationResult<RequireHandlingMutation>;
-export type RequireHandlingMutationOptions = Apollo.BaseMutationOptions<
-  RequireHandlingMutation,
-  RequireHandlingMutationVariables
 >;
 export const SeriesPageDocument = gql`
   query SeriesPage($id: ID!) {
@@ -17001,159 +17258,6 @@ export type UpdateRecurringReservationMutationOptions =
     UpdateRecurringReservationMutation,
     UpdateRecurringReservationMutationVariables
   >;
-export const ReservationsDocument = gql`
-  query Reservations(
-    $first: Int
-    $after: String
-    $orderBy: [ReservationOrderingChoices]
-    $unit: [Int]
-    $reservationUnits: [Int]
-    $reservationUnitType: [Int]
-    $reservationType: [ReservationTypeChoice]
-    $state: [ReservationStateChoice]
-    $orderStatus: [OrderStatusWithFree]
-    $textSearch: String
-    $priceLte: Decimal
-    $priceGte: Decimal
-    $beginDate: Date
-    $endDate: Date
-    $createdAtGte: Date
-    $createdAtLte: Date
-    $applyingForFreeOfCharge: Boolean
-    $isRecurring: Boolean
-  ) {
-    reservations(
-      first: $first
-      after: $after
-      orderBy: $orderBy
-      unit: $unit
-      reservationUnits: $reservationUnits
-      reservationUnitType: $reservationUnitType
-      reservationType: $reservationType
-      state: $state
-      orderStatus: $orderStatus
-      textSearch: $textSearch
-      priceLte: $priceLte
-      priceGte: $priceGte
-      beginDate: $beginDate
-      endDate: $endDate
-      createdAtGte: $createdAtGte
-      createdAtLte: $createdAtLte
-      isRecurring: $isRecurring
-      applyingForFreeOfCharge: $applyingForFreeOfCharge
-      onlyWithPermission: true
-    ) {
-      edges {
-        node {
-          ...ReservationCommonFields
-          name
-          reservationUnits {
-            id
-            nameFi
-            unit {
-              id
-              nameFi
-            }
-          }
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
-    }
-  }
-  ${ReservationCommonFieldsFragmentDoc}
-`;
-
-/**
- * __useReservationsQuery__
- *
- * To run a query within a React component, call `useReservationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationsQuery({
- *   variables: {
- *      first: // value for 'first'
- *      after: // value for 'after'
- *      orderBy: // value for 'orderBy'
- *      unit: // value for 'unit'
- *      reservationUnits: // value for 'reservationUnits'
- *      reservationUnitType: // value for 'reservationUnitType'
- *      reservationType: // value for 'reservationType'
- *      state: // value for 'state'
- *      orderStatus: // value for 'orderStatus'
- *      textSearch: // value for 'textSearch'
- *      priceLte: // value for 'priceLte'
- *      priceGte: // value for 'priceGte'
- *      beginDate: // value for 'beginDate'
- *      endDate: // value for 'endDate'
- *      createdAtGte: // value for 'createdAtGte'
- *      createdAtLte: // value for 'createdAtLte'
- *      applyingForFreeOfCharge: // value for 'applyingForFreeOfCharge'
- *      isRecurring: // value for 'isRecurring'
- *   },
- * });
- */
-export function useReservationsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    ReservationsQuery,
-    ReservationsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ReservationsQuery, ReservationsQueryVariables>(
-    ReservationsDocument,
-    options
-  );
-}
-export function useReservationsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationsQuery,
-    ReservationsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<ReservationsQuery, ReservationsQueryVariables>(
-    ReservationsDocument,
-    options
-  );
-}
-export function useReservationsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationsQuery,
-        ReservationsQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<ReservationsQuery, ReservationsQueryVariables>(
-    ReservationsDocument,
-    options
-  );
-}
-export type ReservationsQueryHookResult = ReturnType<
-  typeof useReservationsQuery
->;
-export type ReservationsLazyQueryHookResult = ReturnType<
-  typeof useReservationsLazyQuery
->;
-export type ReservationsSuspenseQueryHookResult = ReturnType<
-  typeof useReservationsSuspenseQuery
->;
-export type ReservationsQueryResult = Apollo.QueryResult<
-  ReservationsQuery,
-  ReservationsQueryVariables
->;
 export const ReservationPermissionsDocument = gql`
   query ReservationPermissions($id: ID!) {
     reservation(id: $id) {
@@ -17435,6 +17539,100 @@ export type DeleteSpaceMutationOptions = Apollo.BaseMutationOptions<
   DeleteSpaceMutation,
   DeleteSpaceMutationVariables
 >;
+export const UnitListDocument = gql`
+  query UnitList(
+    $first: Int
+    $after: String
+    $orderBy: [UnitOrderingChoices]
+    $nameFi: String
+  ) {
+    units(
+      first: $first
+      after: $after
+      orderBy: $orderBy
+      nameFi: $nameFi
+      onlyWithPermission: true
+    ) {
+      edges {
+        node {
+          ...UnitTableElement
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+  ${UnitTableElementFragmentDoc}
+`;
+
+/**
+ * __useUnitListQuery__
+ *
+ * To run a query within a React component, call `useUnitListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUnitListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUnitListQuery({
+ *   variables: {
+ *      first: // value for 'first'
+ *      after: // value for 'after'
+ *      orderBy: // value for 'orderBy'
+ *      nameFi: // value for 'nameFi'
+ *   },
+ * });
+ */
+export function useUnitListQuery(
+  baseOptions?: Apollo.QueryHookOptions<UnitListQuery, UnitListQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<UnitListQuery, UnitListQueryVariables>(
+    UnitListDocument,
+    options
+  );
+}
+export function useUnitListLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UnitListQuery,
+    UnitListQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<UnitListQuery, UnitListQueryVariables>(
+    UnitListDocument,
+    options
+  );
+}
+export function useUnitListSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<UnitListQuery, UnitListQueryVariables>
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<UnitListQuery, UnitListQueryVariables>(
+    UnitListDocument,
+    options
+  );
+}
+export type UnitListQueryHookResult = ReturnType<typeof useUnitListQuery>;
+export type UnitListLazyQueryHookResult = ReturnType<
+  typeof useUnitListLazyQuery
+>;
+export type UnitListSuspenseQueryHookResult = ReturnType<
+  typeof useUnitListSuspenseQuery
+>;
+export type UnitListQueryResult = Apollo.QueryResult<
+  UnitListQuery,
+  UnitListQueryVariables
+>;
 export const UnitPageDocument = gql`
   query UnitPage($id: ID!) {
     unit(id: $id) {
@@ -17516,104 +17714,6 @@ export type UnitPageQueryResult = Apollo.QueryResult<
   UnitPageQuery,
   UnitPageQueryVariables
 >;
-export const UnitsDocument = gql`
-  query Units(
-    $first: Int
-    $after: String
-    $orderBy: [UnitOrderingChoices]
-    $nameFi: String
-  ) {
-    units(
-      first: $first
-      after: $after
-      orderBy: $orderBy
-      nameFi: $nameFi
-      onlyWithPermission: true
-    ) {
-      edges {
-        node {
-          id
-          nameFi
-          pk
-          unitGroups {
-            id
-            nameFi
-          }
-          reservationUnits {
-            id
-            pk
-          }
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
-    }
-  }
-`;
-
-/**
- * __useUnitsQuery__
- *
- * To run a query within a React component, call `useUnitsQuery` and pass it any options that fit your needs.
- * When your component renders, `useUnitsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useUnitsQuery({
- *   variables: {
- *      first: // value for 'first'
- *      after: // value for 'after'
- *      orderBy: // value for 'orderBy'
- *      nameFi: // value for 'nameFi'
- *   },
- * });
- */
-export function useUnitsQuery(
-  baseOptions?: Apollo.QueryHookOptions<UnitsQuery, UnitsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<UnitsQuery, UnitsQueryVariables>(
-    UnitsDocument,
-    options
-  );
-}
-export function useUnitsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<UnitsQuery, UnitsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<UnitsQuery, UnitsQueryVariables>(
-    UnitsDocument,
-    options
-  );
-}
-export function useUnitsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<UnitsQuery, UnitsQueryVariables>
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<UnitsQuery, UnitsQueryVariables>(
-    UnitsDocument,
-    options
-  );
-}
-export type UnitsQueryHookResult = ReturnType<typeof useUnitsQuery>;
-export type UnitsLazyQueryHookResult = ReturnType<typeof useUnitsLazyQuery>;
-export type UnitsSuspenseQueryHookResult = ReturnType<
-  typeof useUnitsSuspenseQuery
->;
-export type UnitsQueryResult = Apollo.QueryResult<
-  UnitsQuery,
-  UnitsQueryVariables
->;
 export const CreateResourceDocument = gql`
   mutation CreateResource($input: ResourceCreateMutationInput!) {
     createResource(input: $input) {
@@ -17663,56 +17763,6 @@ export type CreateResourceMutationResult =
 export type CreateResourceMutationOptions = Apollo.BaseMutationOptions<
   CreateResourceMutation,
   CreateResourceMutationVariables
->;
-export const UpdateResourceDocument = gql`
-  mutation UpdateResource($input: ResourceUpdateMutationInput!) {
-    updateResource(input: $input) {
-      pk
-    }
-  }
-`;
-export type UpdateResourceMutationFn = Apollo.MutationFunction<
-  UpdateResourceMutation,
-  UpdateResourceMutationVariables
->;
-
-/**
- * __useUpdateResourceMutation__
- *
- * To run a mutation, you first call `useUpdateResourceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateResourceMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateResourceMutation, { data, loading, error }] = useUpdateResourceMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUpdateResourceMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateResourceMutation,
-    UpdateResourceMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    UpdateResourceMutation,
-    UpdateResourceMutationVariables
-  >(UpdateResourceDocument, options);
-}
-export type UpdateResourceMutationHookResult = ReturnType<
-  typeof useUpdateResourceMutation
->;
-export type UpdateResourceMutationResult =
-  Apollo.MutationResult<UpdateResourceMutation>;
-export type UpdateResourceMutationOptions = Apollo.BaseMutationOptions<
-  UpdateResourceMutation,
-  UpdateResourceMutationVariables
 >;
 export const ResourceDocument = gql`
   query Resource($id: ID!) {
@@ -17793,105 +17843,55 @@ export type ResourceQueryResult = Apollo.QueryResult<
   ResourceQuery,
   ResourceQueryVariables
 >;
-export const CreateSpaceDocument = gql`
-  mutation CreateSpace($input: SpaceCreateMutationInput!) {
-    createSpace(input: $input) {
+export const UpdateResourceDocument = gql`
+  mutation UpdateResource($input: ResourceUpdateMutationInput!) {
+    updateResource(input: $input) {
       pk
     }
   }
 `;
-export type CreateSpaceMutationFn = Apollo.MutationFunction<
-  CreateSpaceMutation,
-  CreateSpaceMutationVariables
+export type UpdateResourceMutationFn = Apollo.MutationFunction<
+  UpdateResourceMutation,
+  UpdateResourceMutationVariables
 >;
 
 /**
- * __useCreateSpaceMutation__
+ * __useUpdateResourceMutation__
  *
- * To run a mutation, you first call `useCreateSpaceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateSpaceMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useUpdateResourceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateResourceMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createSpaceMutation, { data, loading, error }] = useCreateSpaceMutation({
+ * const [updateResourceMutation, { data, loading, error }] = useUpdateResourceMutation({
  *   variables: {
  *      input: // value for 'input'
  *   },
  * });
  */
-export function useCreateSpaceMutation(
+export function useUpdateResourceMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    CreateSpaceMutation,
-    CreateSpaceMutationVariables
+    UpdateResourceMutation,
+    UpdateResourceMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<CreateSpaceMutation, CreateSpaceMutationVariables>(
-    CreateSpaceDocument,
-    options
-  );
+  return Apollo.useMutation<
+    UpdateResourceMutation,
+    UpdateResourceMutationVariables
+  >(UpdateResourceDocument, options);
 }
-export type CreateSpaceMutationHookResult = ReturnType<
-  typeof useCreateSpaceMutation
+export type UpdateResourceMutationHookResult = ReturnType<
+  typeof useUpdateResourceMutation
 >;
-export type CreateSpaceMutationResult =
-  Apollo.MutationResult<CreateSpaceMutation>;
-export type CreateSpaceMutationOptions = Apollo.BaseMutationOptions<
-  CreateSpaceMutation,
-  CreateSpaceMutationVariables
->;
-export const UpdateSpaceDocument = gql`
-  mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
-    updateSpace(input: $input) {
-      pk
-    }
-  }
-`;
-export type UpdateSpaceMutationFn = Apollo.MutationFunction<
-  UpdateSpaceMutation,
-  UpdateSpaceMutationVariables
->;
-
-/**
- * __useUpdateSpaceMutation__
- *
- * To run a mutation, you first call `useUpdateSpaceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateSpaceMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateSpaceMutation, { data, loading, error }] = useUpdateSpaceMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUpdateSpaceMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateSpaceMutation,
-    UpdateSpaceMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<UpdateSpaceMutation, UpdateSpaceMutationVariables>(
-    UpdateSpaceDocument,
-    options
-  );
-}
-export type UpdateSpaceMutationHookResult = ReturnType<
-  typeof useUpdateSpaceMutation
->;
-export type UpdateSpaceMutationResult =
-  Apollo.MutationResult<UpdateSpaceMutation>;
-export type UpdateSpaceMutationOptions = Apollo.BaseMutationOptions<
-  UpdateSpaceMutation,
-  UpdateSpaceMutationVariables
+export type UpdateResourceMutationResult =
+  Apollo.MutationResult<UpdateResourceMutation>;
+export type UpdateResourceMutationOptions = Apollo.BaseMutationOptions<
+  UpdateResourceMutation,
+  UpdateResourceMutationVariables
 >;
 export const UnitSpacesDocument = gql`
   query UnitSpaces($id: ID!) {
@@ -17978,6 +17978,56 @@ export type UnitSpacesSuspenseQueryHookResult = ReturnType<
 export type UnitSpacesQueryResult = Apollo.QueryResult<
   UnitSpacesQuery,
   UnitSpacesQueryVariables
+>;
+export const UpdateSpaceDocument = gql`
+  mutation UpdateSpace($input: SpaceUpdateMutationInput!) {
+    updateSpace(input: $input) {
+      pk
+    }
+  }
+`;
+export type UpdateSpaceMutationFn = Apollo.MutationFunction<
+  UpdateSpaceMutation,
+  UpdateSpaceMutationVariables
+>;
+
+/**
+ * __useUpdateSpaceMutation__
+ *
+ * To run a mutation, you first call `useUpdateSpaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateSpaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateSpaceMutation, { data, loading, error }] = useUpdateSpaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateSpaceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateSpaceMutation,
+    UpdateSpaceMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<UpdateSpaceMutation, UpdateSpaceMutationVariables>(
+    UpdateSpaceDocument,
+    options
+  );
+}
+export type UpdateSpaceMutationHookResult = ReturnType<
+  typeof useUpdateSpaceMutation
+>;
+export type UpdateSpaceMutationResult =
+  Apollo.MutationResult<UpdateSpaceMutation>;
+export type UpdateSpaceMutationOptions = Apollo.BaseMutationOptions<
+  UpdateSpaceMutation,
+  UpdateSpaceMutationVariables
 >;
 export const SpaceDocument = gql`
   query Space($id: ID!) {
@@ -18074,4 +18124,54 @@ export type SpaceSuspenseQueryHookResult = ReturnType<
 export type SpaceQueryResult = Apollo.QueryResult<
   SpaceQuery,
   SpaceQueryVariables
+>;
+export const CreateSpaceDocument = gql`
+  mutation CreateSpace($input: SpaceCreateMutationInput!) {
+    createSpace(input: $input) {
+      pk
+    }
+  }
+`;
+export type CreateSpaceMutationFn = Apollo.MutationFunction<
+  CreateSpaceMutation,
+  CreateSpaceMutationVariables
+>;
+
+/**
+ * __useCreateSpaceMutation__
+ *
+ * To run a mutation, you first call `useCreateSpaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateSpaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createSpaceMutation, { data, loading, error }] = useCreateSpaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateSpaceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateSpaceMutation,
+    CreateSpaceMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<CreateSpaceMutation, CreateSpaceMutationVariables>(
+    CreateSpaceDocument,
+    options
+  );
+}
+export type CreateSpaceMutationHookResult = ReturnType<
+  typeof useCreateSpaceMutation
+>;
+export type CreateSpaceMutationResult =
+  Apollo.MutationResult<CreateSpaceMutation>;
+export type CreateSpaceMutationOptions = Apollo.BaseMutationOptions<
+  CreateSpaceMutation,
+  CreateSpaceMutationVariables
 >;

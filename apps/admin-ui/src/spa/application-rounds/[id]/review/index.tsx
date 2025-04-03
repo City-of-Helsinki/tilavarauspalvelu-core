@@ -77,22 +77,6 @@ type ReviewProps = {
   refetch: () => Promise<ApolloQueryResult<ApplicationRoundQuery>>;
 };
 
-export const END_ALLOCATION_MUTATION = gql`
-  mutation EndAllocation($pk: Int!) {
-    setApplicationRoundHandled(input: { pk: $pk }) {
-      pk
-    }
-  }
-`;
-
-export const SEND_RESULTS_MUTATION = gql`
-  mutation SendResults($pk: Int!) {
-    setApplicationRoundResultsSent(input: { pk: $pk }) {
-      pk
-    }
-  }
-`;
-
 function EndAllocation({
   applicationRound,
   refetch,
@@ -415,3 +399,42 @@ export function Review({
     </>
   );
 }
+
+export const APPLICATION_ROUND_ADMIN_FRAGMENT = gql`
+  fragment ApplicationRoundAdmin on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    status
+    applicationPeriodBegin
+    applicationPeriodEnd
+    applicationsCount
+    isSettingHandledAllowed
+    reservationCreationStatus
+    reservationUnits {
+      id
+      pk
+      nameFi
+      unit {
+        id
+        pk
+        nameFi
+      }
+    }
+  }
+`;
+export const END_ALLOCATION_MUTATION = gql`
+  mutation EndAllocation($pk: Int!) {
+    setApplicationRoundHandled(input: { pk: $pk }) {
+      pk
+    }
+  }
+`;
+
+export const SEND_RESULTS_MUTATION = gql`
+  mutation SendResults($pk: Int!) {
+    setApplicationRoundResultsSent(input: { pk: $pk }) {
+      pk
+    }
+  }
+`;

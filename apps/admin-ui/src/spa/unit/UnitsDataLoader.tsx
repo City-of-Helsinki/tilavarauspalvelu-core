@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { type ApolloError } from "@apollo/client";
-import { UnitOrderingChoices, useUnitsQuery } from "@gql/gql-types";
+import { gql, type ApolloError } from "@apollo/client";
+import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { LARGE_LIST_PAGE_SIZE } from "@/common/const";
@@ -28,7 +28,7 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
   const [searchParams] = useSearchParams();
   const searchFilter = searchParams.get("search");
 
-  const { fetchMore, loading, data, previousData } = useUnitsQuery({
+  const { fetchMore, loading, data, previousData } = useUnitListQuery({
     variables: {
       orderBy,
       first: LARGE_LIST_PAGE_SIZE,
@@ -87,3 +87,31 @@ function transformSortString(orderBy: string | null): UnitOrderingChoices[] {
       return [];
   }
 }
+
+export const UNIT_LIST_QUERY = gql`
+  query UnitList(
+    $first: Int
+    $after: String
+    $orderBy: [UnitOrderingChoices]
+    $nameFi: String
+  ) {
+    units(
+      first: $first
+      after: $after
+      orderBy: $orderBy
+      nameFi: $nameFi
+      onlyWithPermission: true
+    ) {
+      edges {
+        node {
+          ...UnitTableElement
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+`;

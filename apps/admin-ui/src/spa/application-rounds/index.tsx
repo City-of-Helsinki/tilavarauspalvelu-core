@@ -1,5 +1,5 @@
 import React from "react";
-import { type ApolloError } from "@apollo/client";
+import { gql, type ApolloError } from "@apollo/client";
 import { orderBy } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -7,8 +7,8 @@ import { H1 } from "common/src/common/typography";
 import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundNode,
-  type ApplicationRoundsQuery,
-  useApplicationRoundsQuery,
+  useApplicationRoundListQuery,
+  type ApplicationRoundListQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicationRoundUrl } from "@/common/urls";
@@ -48,8 +48,9 @@ const StyledAccordion = styled(AccordionWithoutTopPadding).attrs({
   }
 `;
 
+// TODO fragment
 type ApplicationRoundListType = NonNullable<
-  ApplicationRoundsQuery["applicationRounds"]
+  ApplicationRoundListQuery["applicationRounds"]
 >;
 type ApplicationRoundType = NonNullable<
   NonNullable<ApplicationRoundListType["edges"]>[0]
@@ -92,7 +93,7 @@ function AllApplicationRounds(): JSX.Element | null {
   const { t } = useTranslation();
 
   // TODO pagination
-  const { data, loading, error } = useApplicationRoundsQuery({
+  const { data, loading, error } = useApplicationRoundListQuery({
     onError: (err: ApolloError) => {
       errorToast({ text: err.message });
     },
@@ -236,3 +237,16 @@ function AllApplicationRounds(): JSX.Element | null {
 }
 
 export default AllApplicationRounds;
+
+export const APPLICATION_ROUND_LIST_QUERY = gql`
+  query ApplicationRoundList {
+    applicationRounds(onlyWithPermissions: true) {
+      edges {
+        node {
+          ...ApplicationRoundCard
+          statusTimestamp
+        }
+      }
+    }
+  }
+`;

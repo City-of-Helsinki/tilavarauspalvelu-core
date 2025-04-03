@@ -4,8 +4,8 @@ import type { TFunction } from "i18next";
 import { memoize } from "lodash-es";
 import {
   OrderStatus,
-  ReservationsQuery,
   ReservationStateChoice,
+  type ReservationTableElementFragment,
 } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { getReservationUrl } from "@/common/urls";
@@ -27,23 +27,22 @@ import {
   IconPen,
   IconQuestionCircleFill,
 } from "hds-react";
+import { gql } from "@apollo/client";
 
 type ReservationTableColumn = {
   headerName: string;
   key: string;
   isSortable: boolean;
-  transform?: (reservationtype: ReservationType) => JSX.Element | string;
+  transform?: (
+    reservationtype: ReservationTableElementFragment
+  ) => JSX.Element | string;
 };
 
-type ReservationListType = NonNullable<ReservationsQuery["reservations"]>;
-type ReservationType = NonNullable<
-  NonNullable<ReservationListType["edges"][0]>["node"]
->;
 type Props = {
   sort: string;
   sortChanged: (field: string) => void;
   isLoading: boolean;
-  reservations: ReservationType[];
+  reservations: ReservationTableElementFragment[];
 };
 
 const getStatusLabelProps = (
@@ -98,7 +97,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     headerName: t("Reservations.headings.reserveeName"),
     key: "reservee_name",
     isSortable: true,
-    transform: (reservation: ReservationType) => {
+    transform: (reservation: ReservationTableElementFragment) => {
       const reservationDisplayName = getReserveeName(
         reservation,
         t,
@@ -115,35 +114,35 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     headerName: t("Reservations.headings.reservationUnit"),
     key: "reservation_unit_name_fi",
     isSortable: true,
-    transform: ({ reservationUnits }: ReservationType) =>
+    transform: ({ reservationUnits }: ReservationTableElementFragment) =>
       truncate(reservationUnits?.[0]?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
     headerName: t("Reservations.headings.unit"),
     key: "unit_name_fi",
     isSortable: true,
-    transform: ({ reservationUnits }: ReservationType) =>
+    transform: ({ reservationUnits }: ReservationTableElementFragment) =>
       truncate(reservationUnits?.[0]?.unit?.nameFi || "-", MAX_NAME_LENGTH),
   },
   {
     headerName: t("Reservations.headings.datetime"),
     key: "begin",
     isSortable: true,
-    transform: ({ begin, end }: ReservationType) =>
+    transform: ({ begin, end }: ReservationTableElementFragment) =>
       formatDateTimeRange(t, new Date(begin), new Date(end)),
   },
   {
     headerName: t("Reservations.headings.createdAt"),
     key: "created_at",
     isSortable: true,
-    transform: ({ createdAt }: ReservationType) =>
+    transform: ({ createdAt }: ReservationTableElementFragment) =>
       createdAt ? formatDateTime(createdAt) : "-",
   },
   {
     headerName: t("Reservations.headings.paymentStatus"),
     key: "orderStatus",
     isSortable: true,
-    transform: ({ paymentOrder }: ReservationType) => {
+    transform: ({ paymentOrder }: ReservationTableElementFragment) => {
       const order = paymentOrder?.[0];
       if (!order) {
         return "-";
@@ -160,7 +159,7 @@ const getColConfig = (t: TFunction): ReservationTableColumn[] => [
     headerName: t("Reservations.headings.state"),
     key: "state",
     isSortable: true,
-    transform: ({ state }: ReservationType) => {
+    transform: ({ state }: ReservationTableElementFragment) => {
       const labelProps = getStatusLabelProps(state);
       return (
         <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
@@ -198,3 +197,18 @@ export function ReservationsTable({
     />
   );
 }
+
+export const RESERVATION_TABLE_ELEMENT_FRAGMENT = gql`
+  fragment ReservationTableElement on ReservationNode {
+    ...ReservationCommonFields
+    name
+    reservationUnits {
+      id
+      nameFi
+      unit {
+        id
+        nameFi
+      }
+    }
+  }
+`;

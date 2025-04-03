@@ -1,5 +1,5 @@
 import React from "react";
-import { type ApolloError } from "@apollo/client";
+import { gql, type ApolloError } from "@apollo/client";
 import {
   ApplicationSectionStatusChoice,
   AllocatedTimeSlotOrderingChoices,
@@ -156,3 +156,86 @@ function transformOrderBy(
       return [];
   }
 }
+
+export const ALLOCATED_TIME_SLOTS_QUERY = gql`
+  query AllocatedTimeSlots(
+    $applicationRound: Int!
+    $allocatedUnit: [Int]
+    $applicantType: [ApplicantTypeChoice]
+    $applicationSectionStatus: [ApplicationSectionStatusChoice]
+    $allocatedReservationUnit: [Int]
+    $dayOfTheWeek: [Weekday]
+    $textSearch: String
+    $accessCodeState: [AccessCodeState]
+    $orderBy: [AllocatedTimeSlotOrderingChoices]
+    $after: String
+    $first: Int
+  ) {
+    allocatedTimeSlots(
+      after: $after
+      first: $first
+      applicationRound: $applicationRound
+      allocatedUnit: $allocatedUnit
+      applicantType: $applicantType
+      applicationSectionStatus: $applicationSectionStatus
+      allocatedReservationUnit: $allocatedReservationUnit
+      accessCodeState: $accessCodeState
+      dayOfTheWeek: $dayOfTheWeek
+      textSearch: $textSearch
+      orderBy: $orderBy
+    ) {
+      edges {
+        node {
+          id
+          pk
+          dayOfTheWeek
+          endTime
+          beginTime
+          recurringReservation {
+            id
+            pk
+            shouldHaveActiveAccessCode
+            isAccessCodeIsActiveCorrect
+            reservations {
+              id
+              pk
+            }
+          }
+          reservationUnitOption {
+            id
+            rejected
+            locked
+            preferredOrder
+            applicationSection {
+              id
+              pk
+              name
+              reservationsEndDate
+              reservationsBeginDate
+              reservationMinDuration
+              reservationMaxDuration
+              application {
+                pk
+                id
+                ...ApplicationName
+              }
+            }
+            reservationUnit {
+              id
+              nameFi
+              unit {
+                id
+                nameFi
+              }
+            }
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+`;

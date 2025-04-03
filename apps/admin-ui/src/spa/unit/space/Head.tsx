@@ -12,6 +12,7 @@ import { Flex } from "common/styles/util";
 
 interface IProps {
   title: string;
+  // TODO narrow down
   space?: SpaceQuery["space"];
   maxPersons?: number;
   surfaceArea?: number;

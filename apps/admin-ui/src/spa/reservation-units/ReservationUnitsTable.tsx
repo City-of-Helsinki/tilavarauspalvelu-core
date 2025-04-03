@@ -4,7 +4,7 @@ import type { TFunction } from "i18next";
 import {
   ReservationUnitPublishingState,
   ReservationUnitReservationState,
-  SearchReservationUnitsQuery,
+  type ReservationUnitTableElementFragment,
 } from "@gql/gql-types";
 import { truncate } from "@/helpers";
 import { getReservationUnitUrl } from "@/common/urls";
@@ -22,17 +22,12 @@ import {
 } from "hds-react";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
+import { gql } from "@apollo/client";
 
-type ReservationUnitList = NonNullable<
-  SearchReservationUnitsQuery["reservationUnits"]
->;
-type ReservationUnitNode = NonNullable<
-  NonNullable<ReservationUnitList["edges"][0]>["node"]
->;
 type Props = {
   sort: string;
   sortChanged: (field: string) => void;
-  reservationUnits: ReservationUnitNode[];
+  reservationUnits: ReservationUnitTableElementFragment[];
   isLoading?: boolean;
 };
 
@@ -79,7 +74,7 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.name"),
     key: "nameFi",
-    transform: ({ nameFi, pk, unit }: ReservationUnitNode) => (
+    transform: ({ nameFi, pk, unit }: ReservationUnitTableElementFragment) => (
       <TableLink to={getReservationUnitUrl(pk, unit?.pk)}>
         {truncate(nameFi ?? "-", MAX_NAME_LENGTH)}
       </TableLink>
@@ -90,13 +85,16 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.unitName"),
     key: "unitNameFi",
     isSortable: true,
-    transform: (resUnit: ReservationUnitNode) => resUnit.unit?.nameFi ?? "-",
+    transform: (resUnit: ReservationUnitTableElementFragment) =>
+      resUnit.unit?.nameFi ?? "-",
   },
   {
     headerName: t("ReservationUnits.headings.reservationUnitType"),
     key: "typeFi",
     isSortable: true,
-    transform: ({ reservationUnitType }: ReservationUnitNode) => (
+    transform: ({
+      reservationUnitType,
+    }: ReservationUnitTableElementFragment) => (
       <span>{reservationUnitType?.nameFi ?? "-"}</span>
     ),
   },
@@ -104,7 +102,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.maxPersons"),
     key: "maxPersons",
     isSortable: true,
-    transform: ({ maxPersons }: ReservationUnitNode) => (
+    transform: ({ maxPersons }: ReservationUnitTableElementFragment) => (
       <span>{maxPersons || "-"}</span>
     ),
   },
@@ -112,7 +110,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("ReservationUnits.headings.surfaceArea"),
     key: "surfaceArea",
     isSortable: true,
-    transform: ({ surfaceArea }: ReservationUnitNode) =>
+    transform: ({ surfaceArea }: ReservationUnitTableElementFragment) =>
       surfaceArea != null ? (
         <span>
           {Number(surfaceArea).toLocaleString("fi") || "-"}
@@ -125,7 +123,7 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.state"),
     key: "state",
-    transform: ({ publishingState }: ReservationUnitNode) => {
+    transform: ({ publishingState }: ReservationUnitTableElementFragment) => {
       const labelProps = getPublishingStateProps(publishingState);
       return (
         <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
@@ -137,7 +135,7 @@ const getColConfig = (t: TFunction) => [
   {
     headerName: t("ReservationUnits.headings.reservationState"),
     key: "reservationState",
-    transform: ({ reservationState }: ReservationUnitNode) => {
+    transform: ({ reservationState }: ReservationUnitTableElementFragment) => {
       const labelProps = getStatusLabelProps(reservationState);
       return (
         <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
@@ -174,3 +172,24 @@ export function ReservationUnitsTable({
     />
   );
 }
+
+export const RESERVATION_UNIT_TABLE_ELEMENT_FRAGMENT = gql`
+  fragment ReservationUnitTableElement on ReservationUnitNode {
+    id
+    pk
+    nameFi
+    unit {
+      id
+      nameFi
+      pk
+    }
+    reservationUnitType {
+      id
+      nameFi
+    }
+    maxPersons
+    surfaceArea
+    publishingState
+    reservationState
+  }
+`;

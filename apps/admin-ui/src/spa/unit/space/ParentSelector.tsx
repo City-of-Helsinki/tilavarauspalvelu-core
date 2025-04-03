@@ -9,6 +9,7 @@ import {
   filterNonNullable,
   toNumber,
 } from "common/src/helpers";
+import { gql } from "@apollo/client";
 
 function spacesAsHierarchy(
   unit: UnitSpacesQuery["unit"] | undefined,
@@ -125,3 +126,20 @@ export function ParentSelector({
     />
   );
 }
+
+export const SPACE_HIERARCHY_QUERY = gql`
+  query UnitSpaces($id: ID!) {
+    unit(id: $id) {
+      id
+      spaces {
+        id
+        pk
+        nameFi
+        parent {
+          id
+          pk
+        }
+      }
+    }
+  }
+`;

@@ -4,6 +4,7 @@ import {
   useOptionsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
+import { gql } from "@apollo/client";
 
 export function useOptions() {
   const { data: optionsData } = useOptionsQuery({
@@ -36,3 +37,38 @@ export function useOptions() {
 
   return { ageGroup, purpose, homeCity };
 }
+
+export const OPTIONS_QUERY = gql`
+  query Options(
+    $reservationPurposesOrderBy: [ReservationPurposeOrderingChoices]
+  ) {
+    reservationPurposes(orderBy: $reservationPurposesOrderBy) {
+      edges {
+        node {
+          id
+          pk
+          nameFi
+        }
+      }
+    }
+    ageGroups {
+      edges {
+        node {
+          id
+          pk
+          minimum
+          maximum
+        }
+      }
+    }
+    cities {
+      edges {
+        node {
+          id
+          nameFi
+          pk
+        }
+      }
+    }
+  }
+`;
