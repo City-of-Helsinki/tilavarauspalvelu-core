@@ -27,6 +27,7 @@ import {
   seasonalPrefix,
   singleSearchPrefix,
 } from "@/modules/urls";
+import { fontBold } from "common/styled";
 
 type HeaderProps = {
   apiBaseUrl: string;
@@ -86,10 +87,14 @@ const Wrapper = styled.div`
       &:first-child {
         display: none;
       }
+      &:has(.active) {
+        ${fontBold}
+      }
     }
-    .active {
-      font-weight: bold;
-    }
+  }
+
+  [class*="HeaderActionBar-module_title__"] {
+    font-size: var(--fontsize-heading-s) !important;
   }
 `;
 
@@ -161,10 +166,9 @@ function NavigationMenu({ user }: { user: CurrentUserQuery["currentUser"] }) {
           i18n.language === "fi" ? "" : getLocalizationLang(i18n.language);
 
         return (
-          <Header.ActionBarSubItem
+          <Header.Link
             key={item.label}
             label={t(item.label)}
-            aria-label={t(item.label)}
             href={
               getLocalizationLang(i18n.language) === "fi"
                 ? item.routes[0]
@@ -203,9 +207,8 @@ function ActionBar({ apiBaseUrl, profileLink, languageOptions }: HeaderProps) {
       titleHref={env.NEXT_PUBLIC_BASE_URL ?? "/"}
       openFrontPageLinksAriaLabel={t("common:applicationName")}
       logo={<Logo size={LogoSize.Large} />}
-      logoAriaLabel={`${t("common:applicationName")} logo`}
-      logoHref={env.NEXT_PUBLIC_BASE_URL}
-      menuButtonLabel="Menu"
+      logoAriaLabel={t("common:helsinkiCity")}
+      menuButtonLabel={t("navigation:navigation")}
     >
       <Header.LanguageSelector
         languages={languageOptions}
