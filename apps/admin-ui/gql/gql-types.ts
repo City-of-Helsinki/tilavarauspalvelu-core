@@ -6446,6 +6446,31 @@ export type ReservationTypeFormFieldsFragment = {
   } | null;
 };
 
+export type ReservationToCopyFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly type: ReservationTypeChoice | null;
+  readonly bufferTimeAfter: number;
+  readonly bufferTimeBefore: number;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly reservationStartInterval: ReservationStartInterval;
+    readonly unit: { readonly id: string; readonly pk: number | null } | null;
+  }>;
+  readonly recurringReservation: {
+    readonly pk: number | null;
+    readonly id: string;
+    readonly weekdays: ReadonlyArray<number>;
+    readonly beginDate: string | null;
+    readonly endDate: string | null;
+  } | null;
+};
+
 export type VisibleIfPermissionFieldsFragment = {
   readonly id: string;
   readonly user: { readonly id: string; readonly pk: number | null } | null;
@@ -8728,6 +8753,34 @@ export type ReservationKeylessEntryFragment = {
   } | null;
 };
 
+export type TimeBlockSectionFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly bufferTimeAfter: number;
+  readonly bufferTimeBefore: number;
+  readonly name: string | null;
+  readonly state: ReservationStateChoice | null;
+  readonly type: ReservationTypeChoice | null;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly reservationStartInterval: ReservationStartInterval;
+    readonly unit: { readonly id: string; readonly pk: number | null } | null;
+  }>;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly weekdays: ReadonlyArray<number>;
+    readonly beginDate: string | null;
+    readonly endDate: string | null;
+  } | null;
+  readonly user: { readonly id: string; readonly pk: number | null } | null;
+};
+
 export type ReservationApplicationLinkQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -10532,6 +10585,56 @@ export const ReservationKeylessEntryFragmentDoc = gql`
     }
   }
 `;
+export const EventStyleReservationFieldsFragmentDoc = gql`
+  fragment EventStyleReservationFields on ReservationNode {
+    id
+    pk
+    begin
+    end
+    bufferTimeAfter
+    bufferTimeBefore
+    name
+    state
+    type
+    recurringReservation {
+      id
+      pk
+    }
+  }
+`;
+export const ReservationToCopyFragmentDoc = gql`
+  fragment ReservationToCopy on ReservationNode {
+    ...ChangeReservationTime
+    reservationUnits {
+      id
+      unit {
+        id
+        pk
+      }
+    }
+  }
+  ${ChangeReservationTimeFragmentDoc}
+`;
+export const TimeBlockSectionFragmentDoc = gql`
+  fragment TimeBlockSection on ReservationNode {
+    id
+    pk
+    ...EventStyleReservationFields
+    ...ReservationToCopy
+    ...VisibleIfPermissionFields
+    reservationUnits {
+      id
+      pk
+    }
+    recurringReservation {
+      id
+      pk
+    }
+  }
+  ${EventStyleReservationFieldsFragmentDoc}
+  ${ReservationToCopyFragmentDoc}
+  ${VisibleIfPermissionFieldsFragmentDoc}
+`;
 export const ReservationTitleSectionFieldsFragmentDoc = gql`
   fragment ReservationTitleSectionFields on ReservationNode {
     id
@@ -10547,23 +10650,6 @@ export const ReservationTitleSectionFieldsFragmentDoc = gql`
     paymentOrder {
       id
       status
-    }
-  }
-`;
-export const EventStyleReservationFieldsFragmentDoc = gql`
-  fragment EventStyleReservationFields on ReservationNode {
-    id
-    pk
-    begin
-    end
-    bufferTimeAfter
-    bufferTimeBefore
-    name
-    state
-    type
-    recurringReservation {
-      id
-      pk
     }
   }
 `;
@@ -16469,10 +16555,9 @@ export const ReservationPageDocument = gql`
       id
       ...CreateTagString
       ...ReservationCommonFields
-      ...ChangeReservationTime
+      ...TimeBlockSection
       ...ReservationTitleSectionFields
       ...ReservationKeylessEntry
-      ...EventStyleReservationFields
       recurringReservation {
         id
         pk
@@ -16484,7 +16569,6 @@ export const ReservationPageDocument = gql`
         name
         description
       }
-      ...VisibleIfPermissionFields
       ...ApprovalButtons
       cancelReason {
         id
@@ -16505,11 +16589,9 @@ export const ReservationPageDocument = gql`
   }
   ${CreateTagStringFragmentDoc}
   ${ReservationCommonFieldsFragmentDoc}
-  ${ChangeReservationTimeFragmentDoc}
+  ${TimeBlockSectionFragmentDoc}
   ${ReservationTitleSectionFieldsFragmentDoc}
   ${ReservationKeylessEntryFragmentDoc}
-  ${EventStyleReservationFieldsFragmentDoc}
-  ${VisibleIfPermissionFieldsFragmentDoc}
   ${ApprovalButtonsFragmentDoc}
   ${ReservationTypeFormFieldsFragmentDoc}
   ${ReservationMetaFieldsFragmentDoc}
