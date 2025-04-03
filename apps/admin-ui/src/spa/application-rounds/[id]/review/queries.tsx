@@ -174,6 +174,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
           recurringReservation {
             id
             pk
+            shouldHaveActiveAccessCode
             isAccessCodeIsActiveCorrect
             reservations {
               id
