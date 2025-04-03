@@ -401,7 +401,7 @@ function NewReservationWrapper(props: PropsNarrowed): JSX.Element | null {
   const routes = [
     {
       slug: getSingleSearchPath(),
-      title: t("breadcrumb:search"),
+      title: t("breadcrumb:searchSingle"),
     },
     {
       slug: getReservationUnitPath(reservationUnit?.pk),
