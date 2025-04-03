@@ -60,10 +60,11 @@ function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
   const applicationPk = application.pk ?? 0;
   const reservationPk = slot.recurringReservation?.reservations[0]?.pk ?? null;
   const link = getReservationUrl(reservationPk);
-  const accessCodeActiveAlert = slot.recurringReservation
-    ?.isAccessCodeIsActiveCorrect
-    ? ""
-    : t("RequestedReservation.accessCodesNotActive");
+  const accessCodeActiveAlert =
+    slot.recurringReservation?.shouldHaveActiveAccessCode &&
+    !slot.recurringReservation?.isAccessCodeIsActiveCorrect
+      ? t("RequestedReservation.accessCodesNotActive")
+      : "";
   return {
     key: `${applicationPk}-${slot.pk}`,
     applicationPk,
