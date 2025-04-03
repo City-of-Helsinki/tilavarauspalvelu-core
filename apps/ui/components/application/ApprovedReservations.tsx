@@ -561,7 +561,7 @@ function ReservationUnitAccessTypeList({
                   : "")}
             </span>
             <span>
-              {period.endDate !== ""
+              {period.endDate != null
                 ? `${period.beginDate} – ${period.endDate}`
                 : t("common:dateGte", { value: period.beginDate })}
             </span>
