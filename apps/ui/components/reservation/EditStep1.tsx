@@ -1,6 +1,5 @@
 import {
-  type ReservationEditPageQuery,
-  type ReservationUnitPageQuery,
+  type EditPageReservationFragment,
   useAdjustReservationTimeMutation,
 } from "@gql/gql-types";
 import {
@@ -11,7 +10,7 @@ import {
   LoadingSpinner,
 } from "hds-react";
 import { breakpoints } from "common/src/common/style";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { filterNonNullable } from "common/src/helpers";
@@ -30,14 +29,10 @@ import { AcceptTerms } from "./AcceptTerms";
 import { getReservationPath } from "@/modules/urls";
 import { useDisplayError } from "@/hooks/useDisplayError";
 import { useRouter } from "next/router";
+import ErrorComponent from "next/error";
 
-type ReservationUnitNodeT = NonNullable<
-  ReservationUnitPageQuery["reservationUnit"]
->;
-type ReservationNodeT = NonNullable<ReservationEditPageQuery["reservation"]>;
 type Props = {
-  reservation: ReservationNodeT;
-  reservationUnit: ReservationUnitNodeT;
+  reservation: EditPageReservationFragment;
   options: OptionsRecord;
   onBack: () => void;
   form: UseFormReturn<PendingReservationFormType>;
@@ -95,23 +90,13 @@ const StyledForm = styled.form`
 
 export function EditStep1({
   reservation,
-  reservationUnit,
   options,
   onBack,
   form,
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  // But why? shouldn't it be an error if the reservationUnit doesn't match the reservation?
-  // should we even be querying reservation.reservationUnit in the first place if we are making a separate
-  // query for the reservationUnit itself? and are we making or
-  // is it just reservationUnit = reservation.reservationUnit in the parent component?
-  const frozenReservationUnit = useMemo(() => {
-    return (
-      reservation.reservationUnits?.find((n) => n?.pk === reservationUnit.pk) ??
-      undefined
-    );
-  }, [reservation, reservationUnit]);
+  const reservationUnit = reservation.reservationUnits[0];
 
   const [isTermsAccepted, setIsTermsAccepted] = useState({
     space: false,
@@ -126,7 +111,7 @@ export function EditStep1({
   };
 
   const supportedFields = filterNonNullable(
-    frozenReservationUnit?.metadataSet?.supportedFields
+    reservationUnit?.metadataSet?.supportedFields
   );
 
   const {
@@ -137,18 +122,10 @@ export function EditStep1({
   const router = useRouter();
   const displayError = useDisplayError();
 
-  const apiValues = convertReservationFormToApi(watch());
-  const modifiedReservation = {
-    ...reservation,
-    begin: apiValues?.begin ?? reservation.begin,
-    end: apiValues?.end ?? reservation.end,
-  };
-
   const [mutation, { loading }] = useAdjustReservationTimeMutation();
 
   const isLoading = loading || isSubmitting;
 
-  // TODO refactor to use form submit instead of getValues
   const onSubmit = async (formValues: PendingReservationFormType) => {
     if (!termsAccepted) {
       errorToast({
@@ -156,7 +133,6 @@ export function EditStep1({
       });
       return;
     }
-    // const formValues = getValues();
     const times = convertReservationFormToApi(formValues);
     if (reservation.pk == null || times == null) {
       return;
@@ -175,6 +151,19 @@ export function EditStep1({
   };
 
   const termsAccepted = isTermsAccepted.space && isTermsAccepted.service;
+
+  // We need to modify reservation because we want to show the new time
+  const apiValues = convertReservationFormToApi(watch());
+  const modifiedReservation = {
+    ...reservation,
+    begin: apiValues?.begin ?? reservation.begin,
+    end: apiValues?.end ?? reservation.end,
+  };
+
+  if (reservationUnit == null) {
+    return <ErrorComponent statusCode={404} />;
+  }
+
   return (
     <>
       <StyledReservationInfoCard

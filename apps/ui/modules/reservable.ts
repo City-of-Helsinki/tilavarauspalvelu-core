@@ -73,7 +73,7 @@ export function dateToKey(date: Date): ReservableMapKey {
 // because the key should only care about the Date part and we don't want
 // make stupid mistakes by using Map.get(new Date()) instead of Map.get(startOfDay(new Date()))
 export function generateReservableMap(
-  reservableTimeSpans: ReservableTimeSpanType[]
+  reservableTimeSpans: readonly ReservableTimeSpanType[]
 ): ReservableMap {
   const converted = reservableTimeSpans
     .map((n) => {
@@ -166,7 +166,6 @@ export type ReservationUnitReservableProps = {
   activeApplicationRounds: readonly RoundPeriod[];
 };
 
-// TODO rename to isRangeReservable
 export const IS_RESERVABLE_FRAGMENT = gql`
   fragment IsReservableFields on ReservationUnitNode {
     id
