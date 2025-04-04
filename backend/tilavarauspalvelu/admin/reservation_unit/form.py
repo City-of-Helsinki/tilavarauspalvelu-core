@@ -80,6 +80,7 @@ class ReservationUnitAccessTypeForm(forms.ModelForm):
 
 class ReservationUnitAccessTypeFormSet(BaseInlineFormSet):
     form = ReservationUnitAccessTypeForm
+    instance: ReservationUnit
 
     def clean(self) -> None:
         today = local_date()
@@ -92,11 +93,7 @@ class ReservationUnitAccessTypeFormSet(BaseInlineFormSet):
     @transaction.atomic
     def save(self, commit: bool = True) -> list[ReservationUnitAccessType]:  # noqa: FBT001, FBT002
         access_types = super().save(commit=commit)
-        if not access_types:
-            return access_types
-
-        reservation_unit: ReservationUnit = access_types[0].reservation_unit
-        reservation_unit.actions.update_access_types_for_reservations()
+        self.instance.actions.update_access_types_for_reservations()
         return access_types
 
     def _should_delete_form(self, form: ReservationUnitAccessTypeForm) -> bool:
