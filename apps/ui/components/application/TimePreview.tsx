@@ -1,10 +1,9 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
-import { fontBold, H4 } from "common/src/common/typography";
+import { fontBold, H4 } from "common/styled";
+import { breakpoints, WEEKDAYS } from "common/src/const";
 import { fromMondayFirstUnsafe } from "common/src/helpers";
-import { WEEKDAYS } from "common/src/const";
 import type {
   ApplicationPage2FormValues,
   SuitableTimeRangeFormValues,

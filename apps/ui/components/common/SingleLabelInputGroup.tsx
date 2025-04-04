@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { fontMedium } from "common";
+import { fontMedium } from "common/styled";
 import { ReactNode } from "react";
 
 type SingleLabelRangeInputProps = {

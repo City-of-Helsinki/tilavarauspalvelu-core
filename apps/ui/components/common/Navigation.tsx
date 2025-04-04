@@ -15,7 +15,7 @@ import { useSession } from "@/hooks/auth";
 import { type CurrentUserQuery } from "@gql/gql-types";
 import Logo from "common/src/components/Logo";
 import { useRouter } from "next/router";
-import { breakpoints } from "common";
+import { breakpoints } from "common/src/const";
 import { useLocation } from "react-use";
 import { signIn, signOut } from "common/src/browserHelpers";
 import { getLocalizationLang } from "common/src/helpers";

@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { signIn } from "common/src/browserHelpers";
 import { Button, IconArrowRight, IconGroup } from "hds-react";
-import { fontBold, H2 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { fontBold, H2 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { HERO_IMAGE_URL } from "@/common/const";
 import { KorosHeading, Heading } from "./KorosHeading";
 

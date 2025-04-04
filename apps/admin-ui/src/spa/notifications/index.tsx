@@ -8,14 +8,13 @@ import {
   BannerNotificationState,
   useBannerNotificationListQuery,
 } from "@gql/gql-types";
-import { H1 } from "common/src/common/typography";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { valueForDateInput, valueForTimeInput } from "@/helpers";
 import { GQL_MAX_RESULTS_PER_QUERY } from "@/common/const";
 import { CustomTable } from "@/component/Table";
 import { filterNonNullable } from "common/src/helpers";
 import { More } from "@/component/More";
-import { TableLink } from "@/styles/util";
+import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
 import {
@@ -25,7 +24,7 @@ import {
   IconQuestionCircleFill,
 } from "hds-react";
 import { getNotificationUrl } from "@/common/urls";
-import { CenterSpinner, TitleSection } from "common/styles/util";
+import { CenterSpinner, TitleSection, H1 } from "common/styled";
 import { gql } from "@apollo/client";
 
 const getStatusLabelProps = (
@@ -45,6 +44,8 @@ const getStatusLabelProps = (
       };
   }
 };
+
+// TODO use a fragment (TableElementFragment similar to other Tables)
 
 // Tila, Nimi, Voimassa alk, Voimassa asti, Kohderyhmä, Tyyppi
 const getColConfig = (t: TFunction) => [

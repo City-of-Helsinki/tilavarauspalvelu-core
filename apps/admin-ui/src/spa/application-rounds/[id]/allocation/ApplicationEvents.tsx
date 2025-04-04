@@ -2,14 +2,14 @@ import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { useSearchParams } from "react-router-dom";
-import { H4, fontMedium } from "common/src/common/typography";
+import { Flex, H4, fontMedium } from "common/styled";
+import { breakpoints } from "common/src/const";
 import {
   type ApplicationRoundStatusChoice,
   ApplicationSectionStatusChoice,
   type ApplicationSectionAllocationsQuery,
   type ReservationUnitNode,
 } from "@gql/gql-types";
-import { breakpoints } from "common";
 import { Accordion } from "@/component/Accordion";
 import { AllocationCalendar } from "./AllocationCalendar";
 import { AllocationColumn } from "./AllocationColumn";
@@ -25,7 +25,6 @@ import {
   getRelatedTimeSlots,
   type SectionNodeT,
 } from "./modules/applicationRoundAllocation";
-import { Flex } from "common/styles/util";
 
 // TODO max-width for the grid columns (315px, 480px, 332px)
 // TODO not perfect (aligment issues with the last columns and grid end),

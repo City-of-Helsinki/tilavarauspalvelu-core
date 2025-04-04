@@ -2,8 +2,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { H2 } from "common/src/common/typography";
-import { Flex } from "common/styles/util";
+import { Flex, H2 } from "common/styled";
 
 interface IProps {
   heading: string | JSX.Element | null;

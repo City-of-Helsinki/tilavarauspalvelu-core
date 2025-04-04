@@ -13,8 +13,7 @@ import { ToastContainer } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
 import { useSession } from "@/hooks/auth";
 import { hasAnyPermission } from "@/modules/permissionHelper";
-import { mainStyles } from "common/styles/layout";
-import { CenterSpinner } from "common/styles/util";
+import { CenterSpinner, mainStyles } from "common/styled";
 
 type Props = {
   apiBaseUrl: string;

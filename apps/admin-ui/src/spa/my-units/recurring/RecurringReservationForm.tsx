@@ -34,9 +34,8 @@ import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import { base64encode, toNumber } from "common/src/helpers";
-import { Element } from "@/styles/util";
-import { Label } from "@/styles/layout";
-import { AutoGrid, Flex } from "common/styles/util";
+import { Element } from "@/styled";
+import { AutoGrid, Flex, Strong } from "common/styled";
 import { errorToast } from "common/src/common/toast";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
@@ -359,11 +358,11 @@ function RecurringReservationForm({
 
           {reservationUnit?.pk != null && (
             <Element $wide id="create-recurring__reservations-list">
-              <Label $bold>
+              <Strong>
                 {t(`${TRANS_PREFIX}.reservationsList`, {
                   count: newReservationsToMake.length,
                 })}
-              </Label>
+              </Strong>
               {localError && (
                 <Notification type="alert">{localError}</Notification>
               )}

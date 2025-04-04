@@ -2,7 +2,8 @@ import React from "react";
 import styled, { css } from "styled-components";
 import { IconClock, IconEuroSign, IconLocation } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { H1 } from "common/src/common/typography";
+import { H1 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import {
   type CancelReasonFieldsFragment,
   useCancelReservationMutation,
@@ -17,7 +18,6 @@ import {
 } from "common/src/common/util";
 import { errorToast } from "common/src/common/toast";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
-import { breakpoints } from "common";
 import { getPrice } from "@/modules/reservationUnit";
 import { formatDateTimeStrings } from "@/modules/util";
 import { LocalizationLanguages } from "common/src/helpers";

@@ -13,7 +13,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { ApplicationSection } from "./ApplicationSection";
 import { type ApplicationPage1FormValues } from "./form";
 import { useReservationUnitList } from "@/hooks";
-import { ButtonContainer } from "common/styles/util";
+import { ButtonContainer } from "common/styled";
 import { type OptionTypes } from "./ReservationUnitList";
 
 type Props = {

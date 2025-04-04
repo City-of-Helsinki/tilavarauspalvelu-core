@@ -8,12 +8,13 @@ import { convertWeekday } from "common/src/conversion";
 import { getApplicantName, truncate } from "@/helpers";
 import { getApplicationUrl, getReservationUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
-import { ExternalTableLink, TableLink } from "@/styles/util";
+import { ExternalTableLink, TableLink } from "@/styled";
 import styled from "styled-components";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
+// TODO use a fragment
 type QueryData = NonNullable<AllocatedTimeSlotsQuery["allocatedTimeSlots"]>;
 type Edge = NonNullable<QueryData["edges"]>[0];
 type Node = NonNullable<NonNullable<Edge>["node"]>;

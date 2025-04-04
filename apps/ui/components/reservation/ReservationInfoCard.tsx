@@ -5,7 +5,7 @@ import { differenceInMinutes } from "date-fns";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { formatters as getFormatters } from "common";
-import { H4, Strong } from "common/src/common/typography";
+import { Flex, H4, Strong } from "common/styled";
 import {
   AccessType,
   type ReservationInfoCardFragment,
@@ -21,7 +21,6 @@ import {
   getMainImage,
 } from "common/src/helpers";
 import { getReservationUnitPath } from "@/modules/urls";
-import { Flex } from "common/styles/util";
 import {
   convertLanguageCode,
   getTranslationSafe,

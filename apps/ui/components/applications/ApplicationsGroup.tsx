@@ -1,8 +1,7 @@
 import React from "react";
-import { H2 } from "common/src/common/typography";
+import { Flex, H2 } from "common/styled";
 import { type ApplicationsGroupFragment } from "@gql/gql-types";
 import { ApplicationCard } from "./ApplicationCard";
-import { Flex } from "common/styles/util";
 import { gql } from "@apollo/client";
 
 type Props = {

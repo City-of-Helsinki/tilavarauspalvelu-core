@@ -13,7 +13,7 @@ import { getReservationPath } from "@/modules/urls";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { CenterSpinner } from "common/styles/util";
+import { CenterSpinner } from "common/styled";
 import { ignoreMaybeArray } from "common/src/helpers";
 
 // TODO should be moved to /reservations/success

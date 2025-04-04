@@ -9,15 +9,14 @@ import {
   Notification,
   NotificationSize,
 } from "hds-react";
-import { breakpoints } from "common/src/common/style";
+import { Flex, NoWrap, fontBold } from "common/styled";
+import { breakpoints, WEEKDAYS } from "common/src/const";
 import { filterNonNullable, fromMondayFirstUnsafe } from "common/src/helpers";
-import { WEEKDAYS } from "common/src/const";
 import { arrowDown, arrowUp } from "@/styled/util";
 import { TimePreview } from "./TimePreview";
 import { type ApplicationPage2FormValues } from "./form";
 import { useFormContext } from "react-hook-form";
 import { ControlledSelect } from "common/src/components/form";
-import { Flex, NoWrap } from "common/styles/util";
 import { isTouchDevice } from "@/modules/util";
 import {
   aesToCells,
@@ -27,7 +26,6 @@ import {
 } from "./module";
 import { successToast } from "common/src/common/toast";
 import { type TimeSelectorFragment } from "@/gql/gql-types";
-import { fontBold } from "common";
 import { ErrorText } from "common/src/components/ErrorText";
 import { gql } from "@apollo/client";
 

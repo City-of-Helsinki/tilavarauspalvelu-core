@@ -6,7 +6,7 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { WEEKDAYS } from "common/src/const";
-import { Flex } from "common/styles/util";
+import { Flex } from "common/styled";
 
 const Day = styled.button`
   background-color: var(--color-black-5);

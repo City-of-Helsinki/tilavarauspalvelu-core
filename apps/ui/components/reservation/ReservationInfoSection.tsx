@@ -11,7 +11,7 @@ import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
-import { H4 } from "common";
+import { H4 } from "common/styled";
 
 export function ReservationInfoSection({
   reservation,

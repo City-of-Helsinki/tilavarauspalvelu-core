@@ -2,12 +2,11 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
-import { H1 } from "common/src/common/typography";
 import { RecurringReservationsView } from "@/component/RecurringReservationsView";
 import Error404 from "@/common/Error404";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { getReservationUrl } from "@/common/urls";
-import { Flex } from "common/styles/util";
+import { Flex, H1 } from "common/styled";
 import { useRecurringReservations } from "@/hooks";
 
 function RecurringReservationDoneInner({

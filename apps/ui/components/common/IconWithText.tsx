@@ -1,4 +1,4 @@
-import { Flex } from "common/styles/util";
+import { Flex } from "common/styled";
 import React from "react";
 
 type IconWithTextProps = {

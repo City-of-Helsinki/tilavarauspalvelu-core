@@ -1,5 +1,5 @@
-import { breakpoints } from "common/src/common/style";
 import styled from "styled-components";
+import { breakpoints } from "common/src/const";
 
 export const ActionContainer = styled.div`
   display: grid;

@@ -19,7 +19,7 @@ import {
   transformApplicantType,
   transformApplicationSectionStatus,
 } from "./utils";
-import { CenterSpinner } from "common/styles/util";
+import { CenterSpinner } from "common/styled";
 
 type Props = {
   applicationRoundPk: number;

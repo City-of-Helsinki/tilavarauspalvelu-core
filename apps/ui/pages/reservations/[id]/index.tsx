@@ -10,9 +10,8 @@ import {
   IconLock,
 } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { H1, H4, fontRegular } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
-import { Flex, NoWrap } from "common/styles/util";
+import { Flex, NoWrap, H1, H4, fontRegular } from "common/styled";
+import { breakpoints } from "common/src/const";
 import {
   CustomerTypeChoice,
   ReservationStateChoice,

@@ -28,10 +28,9 @@ import {
   IconLinkExternal,
 } from "hds-react";
 import styled from "styled-components";
-import { H1 } from "common/src/common/typography";
+import { Flex, H1 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { ButtonLikeExternalLink } from "@/components/common/ButtonLikeLink";
-import { Flex } from "common/styles/util";
-import { breakpoints } from "common";
 import { BackLinkList } from "@/components/reservation/CancelledLinkSet";
 import { Instructions } from "@/components/Instructions";
 import { gql } from "@apollo/client";

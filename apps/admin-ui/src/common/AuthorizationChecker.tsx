@@ -7,7 +7,7 @@ import {
   hasAnyPermission,
   hasSomePermission,
 } from "@/modules/permissionHelper";
-import { CenterSpinner } from "common/styles/util";
+import { CenterSpinner } from "common/styled";
 
 export function AuthorizationChecker({
   apiUrl,

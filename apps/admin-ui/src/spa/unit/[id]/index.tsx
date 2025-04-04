@@ -9,7 +9,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import styled from "styled-components";
-import { fontBold, fontMedium, H1, H2, H3 } from "common/src/common/typography";
 import { useUnitPageQuery } from "@gql/gql-types";
 import { parseAddress } from "@/common/util";
 import { ExternalLink } from "@/component/ExternalLink";
@@ -17,7 +16,15 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import Error404 from "@/common/Error404";
 import { ReservationUnitList } from "./ReservationUnitList";
 import { getReservationUnitUrl, getSpacesResourcesUrl } from "@/common/urls";
-import { CenterSpinner, Flex } from "common/styles/util";
+import {
+  CenterSpinner,
+  Flex,
+  fontBold,
+  fontMedium,
+  H1,
+  H2,
+  H3,
+} from "common/styled";
 import { gql } from "@apollo/client";
 
 interface IProps {

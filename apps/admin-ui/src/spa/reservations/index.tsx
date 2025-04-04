@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toUIDate } from "common/src/common/util";
 import { useTranslation } from "react-i18next";
-import { H1 } from "common/src/common/typography";
+import { H1 } from "common/styled";
 import { ReservationsDataLoader } from "./ReservationsDataLoader";
 import { Filters } from "./Filters";
 

@@ -9,7 +9,7 @@ import {
   IconCross,
   LoadingSpinner,
 } from "hds-react";
-import { breakpoints } from "common/src/common/style";
+import { breakpoints } from "common/src/const";
 import React, { useState } from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";

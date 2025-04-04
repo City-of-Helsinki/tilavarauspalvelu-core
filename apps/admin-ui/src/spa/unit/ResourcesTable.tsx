@@ -15,14 +15,15 @@ import { CustomTable } from "@/component/Table";
 import { errorToast, successToast } from "common/src/common/toast";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
-import { TableLink } from "@/styles/util";
-import { Flex } from "common/styles/util";
+import { TableLink } from "@/styled";
+import { Flex } from "common/styled";
 
 interface IProps {
   unit: QueryT;
   refetch: () => Promise<unknown>;
 }
 
+// TODO use a fragment (TableElementFragment similar to other Tables)
 type QueryT = NonNullable<UnitWithSpacesAndResourcesQuery["unit"]>;
 type SpaceT = QueryT["spaces"][0];
 type ResourceT = NonNullable<SpaceT>["resources"][0];

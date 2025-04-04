@@ -23,7 +23,7 @@ import { filterNonNullable } from "common/src/helpers";
 import { containsField, FieldName } from "common/src/metaFieldsHelpers";
 import { getApplicationFields, getGeneralFields } from "./SummaryFields";
 import { type Inputs } from "common/src/reservation-form/types";
-import { LinkLikeButton } from "common/styles/buttonCss";
+import { LinkLikeButton } from "common/styled";
 import {
   convertLanguageCode,
   getTranslationSafe,

@@ -1,1 +1,1 @@
-export { CenterSpinner } from "common/styles/util";
+export { CenterSpinner } from "common/styled";

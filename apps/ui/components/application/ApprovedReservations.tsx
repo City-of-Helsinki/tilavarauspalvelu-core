@@ -17,7 +17,16 @@ import {
   getApplicationSectionPath,
   getReservationUnitPath,
 } from "@/modules/urls";
-import { breakpoints, fontBold, fontMedium, fontRegular, H5 } from "common";
+import {
+  fontBold,
+  fontMedium,
+  fontRegular,
+  ButtonContainer,
+  Flex,
+  LinkLikeButton,
+  H5,
+} from "common/styled";
+import { breakpoints } from "common/src/const";
 import {
   getTranslationSafe,
   toApiDate,
@@ -55,7 +64,6 @@ import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { AccordionWithIcons } from "../AccordionWithIcons";
 import { CenterSpinner } from "../common/common";
 import { useMedia } from "react-use";
-import { ButtonContainer, Flex } from "common/styles/util";
 import { useRouter } from "next/router";
 import {
   isReservationCancellableReason,
@@ -67,7 +75,6 @@ import { useSearchParams } from "next/navigation";
 import { IconButton, StatusLabel } from "common/src/components";
 import type { StatusLabelType } from "common/src/tags";
 import { gql } from "@apollo/client";
-import { LinkLikeButton } from "common/styles/buttonCss";
 import { Sanitize } from "common/src/components/Sanitize";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
 

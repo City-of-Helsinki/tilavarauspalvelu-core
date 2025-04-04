@@ -1,11 +1,11 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import IconButton from "./IconButton";
-import { IconArrowRight } from "hds-react";
-import { fontBold, H1 } from "../common/typography";
-import { breakpoints } from "../common/style";
 import Image from "next/image";
+import { IconArrowRight } from "hds-react";
+import IconButton from "./IconButton";
+import { fontBold, H1 } from "../../styled";
+import { breakpoints } from "../const";
 
 const IMAGE_WIDTH = "418";
 const IMAGE_HEIGHT = "350";

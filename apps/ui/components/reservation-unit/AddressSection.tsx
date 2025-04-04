@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { fontMedium, H4 } from "common/src/common/typography";
 import type {
   Maybe,
   LocationFieldsI18nFragment,
@@ -10,7 +9,7 @@ import type {
 import { IconLinkExternal } from "hds-react";
 import { IconButton } from "common/src/components";
 import { mapUrlPrefix } from "@/modules/const";
-import { Flex } from "common/styles/util";
+import { Flex, H4, fontMedium } from "common/styled";
 import {
   convertLanguageCode,
   getTranslationSafe,

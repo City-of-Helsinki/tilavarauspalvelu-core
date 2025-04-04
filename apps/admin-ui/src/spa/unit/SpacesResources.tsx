@@ -13,8 +13,7 @@ import { NewResourceModal } from "./resource/NewResourceModal";
 import { base64encode } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import Error404 from "@/common/Error404";
-import { fontBold, H2 } from "common";
-import { CenterSpinner, Flex } from "common/styles/util";
+import { fontBold, H2, CenterSpinner, Flex } from "common/styled";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
 

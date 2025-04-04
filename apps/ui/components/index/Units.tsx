@@ -2,14 +2,12 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { IconArrowRight, IconSize } from "hds-react";
-import { breakpoints } from "common/src/common/style";
 import Link from "next/link";
-import { H3 } from "common/src/common/typography";
+import { breakpoints } from "common/src/const";
+import { Flex, H3, anchorStyles, focusStyles } from "common/styled";
 import type { UnitListFieldsFragment } from "@gql/gql-types";
 import { IconButton } from "common/src/components";
 import { singleSearchPrefix } from "@/modules/urls";
-import { anchorStyles, focusStyles } from "common/styles/cssFragments";
-import { Flex } from "common/styles/util";
 import {
   convertLanguageCode,
   getTranslationSafe,

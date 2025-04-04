@@ -2,7 +2,7 @@
 /// TODO use translations
 import { Link } from "hds-react";
 import React from "react";
-import { H1 } from "common/src/common/typography";
+import { H1 } from "common/styled";
 import { PUBLIC_URL } from "./const";
 
 // TODO should there be an image here?

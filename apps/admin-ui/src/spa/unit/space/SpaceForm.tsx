@@ -2,7 +2,7 @@ import React from "react";
 import { TextInput } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { breakpoints } from "common/src/common/style";
+import { breakpoints } from "common/src/const";
 import { z } from "zod";
 import { UseFormReturn } from "react-hook-form";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";

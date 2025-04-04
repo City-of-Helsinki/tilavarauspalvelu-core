@@ -1,7 +1,7 @@
 import React, { Children, useEffect, useState } from "react";
 import { IconAngleDown, IconAngleUp } from "hds-react";
 import styled from "styled-components";
-import { fontMedium } from "../common/typography";
+import { fontMedium } from "../../styled";
 import IconButton from "./IconButton";
 
 export interface ShowAllContainerProps {

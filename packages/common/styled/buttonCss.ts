@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 import { focusStyles } from "./cssFragments";
-import { breakpoints } from "../src";
+import { breakpoints } from "../src/const";
 
 export type ButtonStyleProps = {
   readonly variant?: "primary" | "secondary";

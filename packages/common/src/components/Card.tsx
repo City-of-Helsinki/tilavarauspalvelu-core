@@ -1,9 +1,8 @@
 import React, { ElementType } from "react";
 import styled from "styled-components";
-import { breakpoints } from "../common/style";
 import Link from "next/link";
-import { fontMedium } from "../common/typography";
-import { Flex } from "../../styles/util";
+import { Flex, fontMedium } from "../../styled";
+import { breakpoints } from "../const";
 
 type CardVariant = "default" | "vertical";
 

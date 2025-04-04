@@ -19,7 +19,8 @@ import {
   ReservationKind,
   type ReservationUnitHeadFragment,
 } from "@gql/gql-types";
-import { H1, H3 } from "common/src/common/typography";
+import { Flex, H1, H3 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { formatDateTime } from "@/modules/util";
 import { IconWithText } from "../common/IconWithText";
 import { Images } from "./";
@@ -30,8 +31,6 @@ import {
   isReservationUnitPaid,
 } from "@/modules/reservationUnit";
 import { filterNonNullable } from "common/src/helpers";
-import { Flex } from "common/styles/util";
-import { breakpoints } from "common";
 import { gql } from "@apollo/client";
 
 interface HeadProps {

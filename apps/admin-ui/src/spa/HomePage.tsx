@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { H2 } from "common/src/common/typography";
+import { H2 } from "common/styled";
 import { HERO_IMAGE_URL } from "@/common/const";
 import { KorosHeading, Heading } from "@/component/KorosHeading";
 import { useSession } from "@/hooks/auth";

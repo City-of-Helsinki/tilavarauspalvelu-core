@@ -3,7 +3,7 @@ import { Button, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "react-i18next";
 import type { ApolloQueryResult } from "@apollo/client";
 import type { PageInfo, Query } from "@gql/gql-types";
-import { Flex } from "common/styles/util";
+import { Flex } from "common/styled";
 
 type Props = {
   count: number;

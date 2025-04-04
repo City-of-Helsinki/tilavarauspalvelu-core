@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "next-i18next";
 import { useFormContext } from "react-hook-form";
 import type { ApplicationRoundForApplicationFragment } from "@gql/gql-types";
-import { H4 } from "common/src/common/typography";
+import { AutoGrid, Flex, H4 } from "common/styled";
 import { getLocalizationLang } from "common/src/helpers";
 import { type OptionTypes, ReservationUnitList } from "./ReservationUnitList";
 import { ApplicationSectionSummary } from "./ApplicationSectionSummary";
@@ -18,7 +18,6 @@ import { Accordion } from "@/components/Accordion";
 import { getDurationOptions } from "@/modules/const";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { type ApplicationPage1FormValues } from "./form";
-import { AutoGrid, Flex } from "common/styles/util";
 import {
   ControlledNumberInput,
   ControlledSelect,

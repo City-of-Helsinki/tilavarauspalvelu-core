@@ -18,12 +18,11 @@ import { CustomerTypeChoice, MetadataSetsFragment } from "../../gql/gql-types";
 import ReservationFormField from "./ReservationFormField";
 import { Inputs, Reservation } from "./types";
 import { RadioButtonWithImage } from "./RadioButtonWithImage";
-import { fontMedium, fontRegular, H4, H5 } from "../common/typography";
+import { AutoGrid, fontMedium, fontRegular, H4, H5 } from "../../styled";
 import type { OptionType } from "../../types/common";
 import IconPremises from "../icons/IconPremises";
 import { containsField } from "../metaFieldsHelpers";
 import { capitalize, filterNonNullable } from "../helpers";
-import { AutoGrid } from "../../styles/util";
 
 type CommonProps = {
   options: Record<string, OptionType[]>;

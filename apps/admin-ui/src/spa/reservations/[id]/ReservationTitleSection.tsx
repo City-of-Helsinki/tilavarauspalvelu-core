@@ -9,7 +9,7 @@ import {
   IconSize,
 } from "hds-react";
 import { useTranslation } from "react-i18next";
-import { H1 } from "common/src/common/typography";
+import { Flex, TitleSection, H1 } from "common/styled";
 import {
   type Maybe,
   OrderStatus,
@@ -18,7 +18,6 @@ import {
   useReservationApplicationLinkQuery,
 } from "@gql/gql-types";
 import { getName } from "./util";
-import { Flex, TitleSection } from "common/styles/util";
 import { formatDateTime } from "@/common/util";
 import { getApplicationUrl } from "@/common/urls";
 import { gql } from "@apollo/client";

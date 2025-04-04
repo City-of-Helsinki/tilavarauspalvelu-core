@@ -18,9 +18,10 @@ import { CustomTable } from "@/component/Table";
 import { getSpaceUrl } from "@/common/urls";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
-import { TableLink } from "@/styles/util";
-import { Flex } from "common/styles/util";
+import { TableLink } from "@/styled";
+import { Flex } from "common/styled";
 
+// TODO use a fragment (TableElementFragment similar to other Tables)
 type QueryT = NonNullable<UnitWithSpacesAndResourcesQuery["unit"]>;
 type SpaceT = QueryT["spaces"][0];
 

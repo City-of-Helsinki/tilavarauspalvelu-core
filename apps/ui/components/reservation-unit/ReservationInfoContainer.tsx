@@ -5,7 +5,7 @@ import { type ReservationInfoContainerFragment } from "@gql/gql-types";
 import { Trans, useTranslation } from "next-i18next";
 import { daysByMonths } from "@/modules/const";
 import { formatDate } from "@/modules/util";
-import { H4 } from "common/src/common/typography";
+import { H4 } from "common/styled";
 import styled from "styled-components";
 
 const Subheading = styled(H4).attrs({ as: "h2", $noMargin: true })`

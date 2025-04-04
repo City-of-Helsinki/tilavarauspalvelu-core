@@ -1,11 +1,10 @@
-import { H1 } from "common/src/common/typography";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { RecurringReservationForm } from "./RecurringReservationForm";
 import { useRecurringReservationsUnits } from "./hooks";
 import { LinkPrev } from "@/component/LinkPrev";
-import { CenterSpinner } from "common/styles/util";
+import { CenterSpinner, H1 } from "common/styled";
 import { toNumber } from "common/src/helpers";
 
 type Params = {

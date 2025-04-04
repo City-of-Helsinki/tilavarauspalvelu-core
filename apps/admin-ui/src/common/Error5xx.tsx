@@ -1,7 +1,7 @@
 import { Link } from "hds-react";
 import React from "react";
 import styled from "styled-components";
-import { H1 } from "common/src/common/typography";
+import { H1 } from "common/styled";
 import { PUBLIC_URL } from "./const";
 import { useTranslation } from "next-i18next";
 

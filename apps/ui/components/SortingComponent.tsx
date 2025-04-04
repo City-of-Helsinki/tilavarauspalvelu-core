@@ -10,11 +10,9 @@ import {
   Option,
   Select,
 } from "hds-react";
-import { fontMedium } from "common/src/common/typography";
-import { breakpoints } from "common";
-import { Flex } from "common/styles/util";
+import { Flex, fontMedium, focusStyles } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { convertOptionToHDS } from "common/src/helpers";
-import { focusStyles } from "common/styles/cssFragments";
 import { convertLanguageCode } from "common/src/common/util";
 
 export const SORTING_OPTIONS = [

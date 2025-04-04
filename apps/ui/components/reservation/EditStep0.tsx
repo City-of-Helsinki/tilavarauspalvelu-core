@@ -1,13 +1,14 @@
-import { breakpoints } from "common/src/common/style";
+import React from "react";
 import type {
   BlockingReservationFieldsFragment,
   EditPageReservationFragment,
 } from "@gql/gql-types";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
-import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
+import { H4 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import {
   convertFormToFocustimeSlot,
   createDateTime,
@@ -34,7 +35,6 @@ import { getNextAvailableTime } from "../reservation-unit/utils";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Sanitize } from "common/src/components/Sanitize";
 import { PinkBox as PinkBoxBase } from "./styles";
-import { H4 } from "common";
 import { getReservationPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
 import ErrorComponent from "next/error";

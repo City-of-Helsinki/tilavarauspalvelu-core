@@ -17,7 +17,7 @@ import { ApplicationsGroup } from "@/components/applications/ApplicationsGroup";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { createApolloClient } from "@/modules/apolloClient";
 import { useCurrentUser } from "@/hooks";
-import { H1 } from "common";
+import { H1 } from "common/styled";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { gql } from "@apollo/client";
 import { errorToast, successToast } from "common/src/common/toast";

@@ -10,11 +10,12 @@ import type { TFunction } from "i18next";
 import { getApplicantName } from "@/helpers";
 import { toUIDate } from "common/src/common/util";
 import { formatTime } from "@/common/util";
-import { ExternalTableLink } from "@/styles/util";
+import { ExternalTableLink } from "@/styled";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
+// TODO use a fragment
 type QueryData = NonNullable<RejectedOccurrencesQuery["rejectedOccurrences"]>;
 type Edge = NonNullable<QueryData["edges"]>[0];
 type Node = NonNullable<NonNullable<Edge>["node"]>;

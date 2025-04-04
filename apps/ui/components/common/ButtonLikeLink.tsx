@@ -1,7 +1,6 @@
 import styled from "styled-components";
-import { ButtonCss, ButtonStyleProps } from "common/styles/buttonCss";
+import { fontMedium, ButtonCss, ButtonStyleProps } from "common/styled";
 import Link from "next/link";
-import { fontMedium } from "common";
 
 /* small overrides that might be moved to buttonCss.ts after testing
  * gap: in case there is an icon

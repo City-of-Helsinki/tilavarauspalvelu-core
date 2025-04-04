@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { breakpoints } from "common/src/common/style";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Legend, LegendsWrapper } from "@/component/Legend";
@@ -10,7 +9,8 @@ import { fromUIDate, isValidDate, toUIDate } from "common/src/common/util";
 import { startOfDay } from "date-fns";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { AutoGrid, Flex } from "common/styles/util";
+import { AutoGrid, Flex } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { useReservationUnitTypes } from "@/hooks";
 import { HR } from "@/component/Table";
 import { SearchTags } from "@/component/SearchTags";

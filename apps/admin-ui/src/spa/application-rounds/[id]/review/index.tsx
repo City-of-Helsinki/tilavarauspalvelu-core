@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { Link, useSearchParams } from "react-router-dom";
 import { type Maybe } from "graphql/jsutils/Maybe";
-import { H1 } from "common/src/common/typography";
 import { filterNonNullable } from "common/src/helpers";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
@@ -41,7 +40,7 @@ import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
 import { errorToast } from "common/src/common/toast";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
-import { Flex, TabWrapper, TitleSection } from "common/styles/util";
+import { Flex, TabWrapper, TitleSection, H1 } from "common/styled";
 
 const TabContent = styled.div`
   display: grid;

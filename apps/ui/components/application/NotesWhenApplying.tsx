@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { getTranslationSafe } from "common/src/common/util";
 import { getLocalizationLang } from "common/src/helpers";
 import { Sanitize } from "common/src/components/Sanitize";
-import { H4 } from "common";
+import { H4 } from "common/styled";
 
 const NotesBox = styled.div`
   box-sizing: border-box;

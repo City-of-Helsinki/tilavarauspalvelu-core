@@ -1,4 +1,4 @@
-import { fontMedium, fontRegular } from "common/src/common/typography";
+import { fontMedium, fontRegular } from "common/styled";
 import { Button } from "hds-react";
 import Link from "next/link";
 import styled, { css } from "styled-components";

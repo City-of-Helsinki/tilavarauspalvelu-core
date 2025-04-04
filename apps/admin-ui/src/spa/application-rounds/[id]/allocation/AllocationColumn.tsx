@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { IconCross, Option, Select } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { type TFunction } from "i18next";
-import { fontMedium } from "common/src/common/typography";
+import { fontMedium } from "common/styled";
 import { type ApolloQueryResult } from "@apollo/client";
 import styled from "styled-components";
 import {

@@ -6,8 +6,8 @@ import { Stepper } from "hds-react";
 import { FormProvider, useForm } from "react-hook-form";
 import type { GetServerSidePropsContext } from "next";
 import { useTranslation } from "next-i18next";
-import { breakpoints } from "common/src/common/style";
-import { H1, H4 } from "common/src/common/typography";
+import { Flex, H1, H4 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import {
   useConfirmReservationMutation,
   useUpdateReservationMutation,
@@ -45,7 +45,6 @@ import {
 } from "common/src/common/util";
 import { gql } from "@apollo/client";
 import { PinkBox as PinkBoxBase } from "@/components/reservation/styles";
-import { Flex } from "common/styles/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { ReservationPageWrapper } from "@/styled/reservation";
 import { useDisplayError } from "@/hooks/useDisplayError";

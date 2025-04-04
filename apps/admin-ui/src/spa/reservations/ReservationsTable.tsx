@@ -16,7 +16,7 @@ import {
 } from "@/common/util";
 import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
-import { TableLink } from "@/styles/util";
+import { TableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
 import {

@@ -4,9 +4,8 @@ import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { isBrowser } from "common/src/helpers";
 import { IconCross } from "hds-react";
-import { Flex } from "common/styles/util";
-import { breakpoints } from "common";
-import { focusStyles } from "common/styles/cssFragments";
+import { Flex, focusStyles } from "common/styled";
+import { breakpoints } from "common/src/const";
 
 const Overlay = styled(Flex).attrs({
   $justifyContent: "center",

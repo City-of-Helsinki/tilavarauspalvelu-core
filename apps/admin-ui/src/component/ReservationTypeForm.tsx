@@ -18,7 +18,7 @@ import {
 import { BufferToggles } from "./BufferToggles";
 import ShowTOS from "./ShowTOS";
 import { HR } from "@/component/Table";
-import { Element } from "@/styles/util";
+import { Element } from "@/styled";
 import { gql } from "@apollo/client";
 
 const CommentsTextArea = styled(TextArea)`

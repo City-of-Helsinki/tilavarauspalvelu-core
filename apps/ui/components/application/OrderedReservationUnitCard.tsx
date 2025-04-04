@@ -9,18 +9,12 @@ import {
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import {
-  fontBold,
-  fontMedium,
-  fontRegular,
-  H6,
-} from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { Flex, H6, fontBold, fontMedium, fontRegular } from "common/styled";
+import { breakpoints } from "common/src/const";
 import type { OrderedReservationUnitCardFragment } from "@gql/gql-types";
 import { getReservationUnitName } from "@/modules/reservationUnit";
 import { getImageSource, getMainImage } from "common/src/helpers";
 import Card from "common/src/components/Card";
-import { Flex } from "common/styles/util";
 import { ErrorText } from "common/src/components/ErrorText";
 import {
   convertLanguageCode,

@@ -7,8 +7,8 @@ import { ParentSelector } from "../ParentSelector";
 import { StyledTag } from "./modules/newSpaceModal";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { SpaceUpdateForm } from "../SpaceForm";
-import { DialogActionsButtons } from "@/styles/util";
-import { H4 } from "common";
+import { DialogActionsButtons } from "@/styled";
+import { H4 } from "common/styled";
 
 type Props = {
   unit: Pick<NonNullable<UnitPageQuery["unit"]>, "pk">;

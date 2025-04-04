@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
+import { breakpoints } from "common/src/const";
 
 const MobileWrapper = styled.div<{ $breakpoint: string }>`
   @media (min-width: ${({ $breakpoint }) => $breakpoint}) {
@@ -8,7 +8,7 @@ const MobileWrapper = styled.div<{ $breakpoint: string }>`
   }
 `;
 
-export const JustForMobile = ({
+export function JustForMobile({
   children,
   customBreakpoint = breakpoints.m,
   style,
@@ -16,13 +16,13 @@ export const JustForMobile = ({
   children: React.ReactNode;
   customBreakpoint?: string;
   style?: React.CSSProperties;
-}): JSX.Element => {
+}): JSX.Element {
   return (
     <MobileWrapper $breakpoint={customBreakpoint} style={style}>
       {children}
     </MobileWrapper>
   );
-};
+}
 
 const DesktopWrapper = styled.div<{ $breakpoint: string }>`
   @media (max-width: ${({ $breakpoint }) => $breakpoint}) {
@@ -30,7 +30,7 @@ const DesktopWrapper = styled.div<{ $breakpoint: string }>`
   }
 `;
 
-export const JustForDesktop = ({
+export function JustForDesktop({
   children,
   customBreakpoint = breakpoints.m,
   style,
@@ -38,10 +38,10 @@ export const JustForDesktop = ({
   children: React.ReactNode;
   customBreakpoint?: string;
   style?: React.CSSProperties;
-}): JSX.Element => {
+}): JSX.Element {
   return (
     <DesktopWrapper $breakpoint={customBreakpoint} style={style}>
       {children}
     </DesktopWrapper>
   );
-};
+}

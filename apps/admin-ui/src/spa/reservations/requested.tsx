@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { H1 } from "common/src/common/typography";
+import { H1 } from "common/styled";
 import { Filters } from "./Filters";
 import { ReservationsDataLoader } from "./ReservationsDataLoader";
 import { HR } from "@/component/Table";

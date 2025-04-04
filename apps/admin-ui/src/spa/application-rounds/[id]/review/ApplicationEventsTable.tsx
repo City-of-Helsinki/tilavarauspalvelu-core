@@ -23,7 +23,7 @@ import {
   calculateAppliedReservationTime,
   formatAppliedReservationTime,
 } from "./utils";
-import { ExternalTableLink } from "@/styles/util";
+import { ExternalTableLink } from "@/styled";
 import type { StatusLabelType } from "common/src/tags";
 import StatusLabel from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
@@ -31,6 +31,7 @@ import { gql } from "@apollo/client";
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
+// TODO use a fragment
 type QueryDate = NonNullable<ApplicationSectionsQuery["applicationSections"]>;
 type Edge = NonNullable<QueryDate["edges"]>[0];
 type Node = NonNullable<NonNullable<Edge>["node"]>;

@@ -3,9 +3,9 @@ import { Button } from "hds-react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { chunkArray, fromUIDate, toUIDate } from "common/src/common/util";
-import { fontMedium, H4 } from "common/src/common/typography";
+import { Flex, NoWrap, H4, fontMedium } from "common/styled";
+import { breakpoints } from "common/src/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
-import { breakpoints } from "common";
 import {
   getReservationUnitPrice,
   isReservationUnitFreeOfCharge,
@@ -22,7 +22,6 @@ import { ControlledDateInput } from "common/src/components/form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { type FocusTimeSlot } from "@/modules/reservation";
-import { Flex, NoWrap } from "common/styles/util";
 
 type Props = {
   reservationUnit: ReservationTimePickerFieldsFragment;

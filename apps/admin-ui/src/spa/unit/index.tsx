@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, LinkSize } from "hds-react";
-import { H1 } from "common/src/common/typography";
+import { H1 } from "common/styled";
 import { useTranslation } from "next-i18next";
 import { Filters } from "./Filters";
 import { UnitsDataLoader } from "./UnitsDataLoader";

@@ -1,5 +1,5 @@
 import React from "react";
-import { KVWrapper, Label, Value } from "@/styles/util";
+import { KVWrapper, Label, Value } from "@/styled";
 import styled from "styled-components";
 import { Accordion as AccordionBase } from "hds-react";
 

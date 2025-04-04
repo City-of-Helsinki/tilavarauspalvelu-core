@@ -3,15 +3,22 @@ import { gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { H1, H3, SemiBold, Strong } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import {
+  H1,
+  H3,
+  SemiBold,
+  Strong,
+  CenterSpinner,
+  Flex,
+  TitleSection,
+} from "common/styled";
+import { breakpoints } from "common/src/const";
 import { useApplicationRoundCriteriaQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { formatDate } from "@/common/util";
 import { errorToast } from "common/src/common/toast";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import TimeframeStatus from "../TimeframeStatus";
-import { CenterSpinner, Flex, TitleSection } from "common/styles/util";
 
 interface IRouteParams {
   [key: string]: string;

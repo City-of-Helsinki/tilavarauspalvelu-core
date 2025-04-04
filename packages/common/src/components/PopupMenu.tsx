@@ -3,8 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { FocusTrap } from "focus-trap-react";
 import { createPortal } from "react-dom";
-import { Flex } from "../../styles/util";
-import { toggleButtonCss } from "../../styles/buttonCss";
+import { Flex, toggleButtonCss } from "../../styled";
 import { useTranslation } from "next-i18next";
 
 const Container = styled.div`

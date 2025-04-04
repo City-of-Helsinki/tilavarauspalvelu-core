@@ -2,7 +2,7 @@ import React from "react";
 import type { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { CancelledLinkSet } from "@/components/reservation/CancelledLinkSet";
-import { H1 } from "common";
+import { H1 } from "common/styled";
 import {
   getCommonServerSideProps,
   getReservationByOrderUuid,

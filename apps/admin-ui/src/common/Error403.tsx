@@ -3,12 +3,11 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
 import { signOut } from "common/src/browserHelpers";
-import { H1 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { ButtonContainer, Flex, H1 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { useSession } from "@/hooks/auth";
 import { PUBLIC_URL } from "./const";
 import { env } from "@/env.mjs";
-import { ButtonContainer, Flex } from "common/styles/util";
 
 const Wrapper = styled.div`
   word-break: normal;

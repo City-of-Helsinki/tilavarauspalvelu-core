@@ -1,4 +1,4 @@
-import { breakpoints } from "common";
+import { breakpoints } from "common/src/const";
 import styled from "styled-components";
 
 const CARD_COLUMN_SIZE = 390;

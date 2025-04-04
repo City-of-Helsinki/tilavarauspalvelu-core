@@ -19,7 +19,7 @@ import {
 import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { ButtonLikeLink } from "@/components/common/ButtonLikeLink";
-import { ButtonContainer, Flex } from "common/styles/util";
+import { ButtonContainer, Flex } from "common/styled";
 import {
   Button,
   ButtonSize,

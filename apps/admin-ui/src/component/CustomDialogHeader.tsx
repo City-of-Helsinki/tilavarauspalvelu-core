@@ -1,8 +1,7 @@
 import React from "react";
 import { IconCross } from "hds-react";
 import styled from "styled-components";
-import { H4 } from "common";
-import { Flex } from "common/styles/util";
+import { Flex, H4 } from "common/styled";
 
 const Container = styled(Flex).attrs({
   $direction: "row",

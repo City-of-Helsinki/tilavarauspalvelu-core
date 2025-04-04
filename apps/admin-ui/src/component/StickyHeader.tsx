@@ -1,8 +1,7 @@
 import React from "react";
 import styled from "styled-components";
-import { ButtonContainer } from "common/styles/util";
-import { H2 } from "common";
-import { breakpoints } from "common/src/common/style";
+import { ButtonContainer, H2 } from "common/styled";
+import { breakpoints } from "common/src/const";
 
 const Sticky = styled.div`
   z-index: var(--tilavaraus-admin-stack-sticky-reservation-header);

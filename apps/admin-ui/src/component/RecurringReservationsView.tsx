@@ -19,7 +19,7 @@ import {
   isPossibleToDeny,
   isPossibleToEdit,
 } from "@/modules/reservationModificationRules";
-import { CenterSpinner } from "common/styles/util";
+import { CenterSpinner } from "common/styled";
 
 type Props = {
   recurringPk: number;

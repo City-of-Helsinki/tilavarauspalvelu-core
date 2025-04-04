@@ -19,11 +19,10 @@ import {
 } from "hds-react";
 import { formatDate, formatTime } from "@/common/util";
 import React, { useState } from "react";
-
 import { Accordion, DataWrapper } from "@/spa/reservations/[id]/components";
 import styled, { css } from "styled-components";
-import { breakpoints } from "common";
-import { ButtonContainer, Flex, NoWrap } from "common/styles/util";
+import { ButtonContainer, Flex, NoWrap } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { useCheckPermission } from "@/hooks";
 import { gql } from "@apollo/client";

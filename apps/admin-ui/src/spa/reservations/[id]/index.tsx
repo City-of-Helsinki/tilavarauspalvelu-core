@@ -11,7 +11,7 @@ import {
   UserPermissionChoice,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { ButtonContainer, CenterSpinner } from "common/styles/util";
+import { ButtonContainer, CenterSpinner } from "common/styled";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/component/StickyHeader";
 import { ReservationWorkingMemo } from "@/component/WorkingMemo";
@@ -30,7 +30,7 @@ import ReservationTitleSection from "./ReservationTitleSection";
 import { base64encode, isPriceFree } from "common/src/helpers";
 import { formatAgeGroup } from "@/common/util";
 import Error404 from "@/common/Error404";
-import { ApplicationDatas, Summary } from "@/styles/util";
+import { ApplicationDatas, Summary } from "@/styled";
 import { Accordion, DataWrapper } from "./components";
 import { ReservationKeylessEntry } from "./ReservationKeylessEntrySection";
 import { TimeBlockSection } from "./ReservationTimeBlockSection";

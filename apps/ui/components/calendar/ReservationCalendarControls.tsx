@@ -13,12 +13,13 @@ import { maxBy } from "lodash-es";
 import { fromUIDate } from "common/src/common/util";
 import { Transition } from "react-transition-group";
 import {
+  SemiBold,
+  Flex,
   fontBold,
   fontMedium,
   fontRegular,
-  SemiBold,
-} from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+} from "common/styled";
+import { breakpoints } from "common/src/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import { getReservationUnitPrice } from "@/modules/reservationUnit";
 import { formatDateTimeRange } from "@/modules/util";
@@ -34,7 +35,6 @@ import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { useMedia } from "react-use";
 import { type FocusTimeSlot } from "@/modules/reservation";
 import { ControlledDateInput } from "common/src/components/form";
-import { Flex } from "common/styles/util";
 import { capitalize } from "common/src/helpers";
 
 type CommonProps = {

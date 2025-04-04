@@ -33,7 +33,7 @@ import {
   IconArrowLeft,
   IconArrowRight,
 } from "hds-react";
-import { AutoGrid, ButtonContainer, Flex } from "common/styles/util";
+import { AutoGrid, ButtonContainer, Flex } from "common/styled";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormSubHeading } from "@/components/application/styled";
 import { createApolloClient } from "@/modules/apolloClient";

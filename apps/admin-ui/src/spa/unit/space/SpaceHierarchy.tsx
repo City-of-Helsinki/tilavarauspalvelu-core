@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import type { SpaceQuery } from "@gql/gql-types";
-import { fontMedium } from "common";
+import { fontMedium } from "common/styled";
 
 type Node = SpaceQuery["space"];
 type Props = {

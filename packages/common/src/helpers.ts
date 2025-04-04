@@ -5,8 +5,8 @@ import {
   type ImageFragment,
   type Maybe,
 } from "../gql/gql-types";
-import { pixel } from "./common/style";
-import { OptionInProps } from "hds-react";
+import { type OptionInProps } from "hds-react";
+import { pixel } from "./const";
 
 /// Enforce readonly on all nested properties
 /// only single level deep i.e. {a: {b: {c: string}}} -> {readonly a: {b: {c: string}}}
