@@ -12,25 +12,6 @@ import {
 import { Sanitize } from "common/src/components/Sanitize";
 import { useTranslation } from "next-i18next";
 
-export const INSTRUCTIOSN_FRAGMENT = gql`
-  fragment Instructions on ReservationNode {
-    id
-    state
-    reservationUnits {
-      id
-      reservationPendingInstructionsFi
-      reservationPendingInstructionsEn
-      reservationPendingInstructionsSv
-      reservationConfirmedInstructionsFi
-      reservationConfirmedInstructionsEn
-      reservationConfirmedInstructionsSv
-      reservationCancelledInstructionsFi
-      reservationCancelledInstructionsEn
-      reservationCancelledInstructionsSv
-    }
-  }
-`;
-
 type Props = {
   reservation: InstructionsFragment;
 };
@@ -82,3 +63,22 @@ function getReservationUnitInstructionsKey(
       return null;
   }
 }
+
+export const INSTRUCTIOSN_FRAGMENT = gql`
+  fragment Instructions on ReservationNode {
+    id
+    state
+    reservationUnits {
+      id
+      reservationPendingInstructionsFi
+      reservationPendingInstructionsEn
+      reservationPendingInstructionsSv
+      reservationConfirmedInstructionsFi
+      reservationConfirmedInstructionsEn
+      reservationConfirmedInstructionsSv
+      reservationCancelledInstructionsFi
+      reservationCancelledInstructionsEn
+      reservationCancelledInstructionsSv
+    }
+  }
+`;
