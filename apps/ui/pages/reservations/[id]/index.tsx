@@ -774,9 +774,7 @@ export const GET_RESERVATION_PAGE_QUERY = gql`
       reservationUnits {
         id
         unit {
-          id
-          tprekId
-          ...UnitNameFieldsI18N
+          ...AddressFields
         }
         canApplyFreeOfCharge
         ...MetadataSets

@@ -15,7 +15,10 @@ import {
   formatDuration,
   getTranslationSafe,
 } from "common/src/common/util";
-import { ReservationKind, type ReservationUnitPageQuery } from "@gql/gql-types";
+import {
+  ReservationKind,
+  type ReservationUnitHeadFragment,
+} from "@gql/gql-types";
 import { H1, H3 } from "common/src/common/typography";
 import { formatDateTime } from "@/modules/util";
 import { IconWithText } from "../common/IconWithText";
@@ -29,11 +32,10 @@ import {
 import { filterNonNullable } from "common/src/helpers";
 import { Flex } from "common/styles/util";
 import { breakpoints } from "common";
+import { gql } from "@apollo/client";
 
-// TODO use a fragment
-type QueryT = NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
 interface HeadProps {
-  reservationUnit: QueryT;
+  reservationUnit: ReservationUnitHeadFragment;
   reservationUnitIsReservable?: boolean;
   subventionSuffix?: JSX.Element;
 }
@@ -46,8 +48,9 @@ const NotificationWrapper = styled.div`
 `;
 
 type NonReservableNotificationProps = {
-  reservationUnit: Readonly<
-    Pick<QueryT, "reservationKind" | "reservationBegins">
+  reservationUnit: Pick<
+    ReservationUnitHeadFragment,
+    "reservationKind" | "reservationBegins"
   >;
 };
 
@@ -162,7 +165,7 @@ const AccessTypeTooltipWrapper = styled.div`
 
 function AccessTypeTooltip({
   accessTypes,
-}: Readonly<{ accessTypes: QueryT["accessTypes"] }>): JSX.Element {
+}: Pick<ReservationUnitHeadFragment, "accessTypes">): JSX.Element {
   const { t } = useTranslation();
 
   const accessTypeDurations = getReservationUnitAccessPeriods(accessTypes);
@@ -311,3 +314,40 @@ function IconList({
     </IconListWrapper>
   );
 }
+
+export const RESERVATION_UNIT_HEAD_FRAGMENT = gql`
+  fragment ReservationUnitHead on ReservationUnitNode {
+    id
+    reservationKind
+    reservationBegins
+    nameFi
+    nameSv
+    nameEn
+    unit {
+      id
+      nameFi
+      nameSv
+      nameEn
+    }
+    minReservationDuration
+    maxReservationDuration
+    maxPersons
+    minPersons
+    pricings {
+      ...PricingFields
+    }
+    currentAccessType
+    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+      id
+      pk
+      accessType
+      beginDate
+    }
+    reservationUnitType {
+      ...ReservationUnitTypeFields
+    }
+    images {
+      ...Image
+    }
+  }
+`;

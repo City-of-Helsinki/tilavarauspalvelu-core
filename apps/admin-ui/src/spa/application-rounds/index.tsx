@@ -1,5 +1,5 @@
 import React from "react";
-import { gql, type ApolloError } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { orderBy } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
@@ -13,7 +13,6 @@ import {
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";
-import { errorToast } from "common/src/common/toast";
 import { truncate } from "@/helpers";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
 import { TableLink } from "@/styles/util";
@@ -93,11 +92,7 @@ function AllApplicationRounds(): JSX.Element | null {
   const { t } = useTranslation();
 
   // TODO pagination
-  const { data, loading, error } = useApplicationRoundListQuery({
-    onError: (err: ApolloError) => {
-      errorToast({ text: err.message });
-    },
-  });
+  const { data, loading, error } = useApplicationRoundListQuery();
 
   const allApplicationRounds = filterNonNullable(
     data?.applicationRounds?.edges?.map((ar) => ar?.node)
