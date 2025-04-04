@@ -90,7 +90,7 @@ export function ApplicationSectionSummary({
   const hours = getHours(
     begin,
     end,
-    appliedReservationsPerWeek,
+    appliedReservationsPerWeek ?? 1,
     minDuration / 60
   );
 
@@ -116,7 +116,7 @@ export function ApplicationSectionSummary({
     {
       icon: <IconCalendar style={{ flexShrink: 0 }} />,
       text: t("applicationEventSummary:eventsPerWeek", {
-        count: appliedReservationsPerWeek,
+        count: appliedReservationsPerWeek ?? 1,
       }),
     },
   ];
