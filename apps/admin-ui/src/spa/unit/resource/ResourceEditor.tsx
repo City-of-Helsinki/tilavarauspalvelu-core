@@ -9,7 +9,6 @@ import {
   LocationType,
   useUpdateResourceMutation,
   useResourceQuery,
-  useUnitWithSpacesAndResourcesQuery,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
 import { ButtonContainer, CenterSpinner } from "common/styled";
@@ -24,6 +23,7 @@ import {
 import { ResourceEditorFields } from "./EditForm";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
+import Error404 from "@/common/Error404";
 
 type Props = {
   resourcePk?: number;
@@ -34,28 +34,16 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const history = useNavigate();
   const { t } = useTranslation();
 
-  const { data: unitData, loading: isUnitLoading } =
-    useUnitWithSpacesAndResourcesQuery({
-      variables: { id: base64encode(`UnitNode:${unitPk}`) },
-      skip: !unitPk || Number.isNaN(unitPk),
-      onError: (e) => {
-        errorToast({ text: t("errors.errorFetchingData", { error: e }) });
-      },
-    });
-
-  const {
-    data,
-    loading: isSpaceLoading,
-    refetch,
-  } = useResourceQuery({
-    variables: { id: base64encode(`ResourceNode:${resourcePk}`) },
+  const { data, loading, refetch } = useResourceQuery({
+    variables: {
+      id: base64encode(`ResourceNode:${resourcePk}`),
+      unitId: base64encode(`UnitNode:${unitPk}`),
+    },
     skip: !resourcePk || Number.isNaN(resourcePk),
     onError: (e) => {
       errorToast({ text: t("errors.errorFetchingData", { error: e }) });
     },
   });
-
-  const isLoading = isUnitLoading || isSpaceLoading;
 
   const [mutation] = useUpdateResourceMutation();
 
@@ -85,13 +73,12 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     }
   }, [data, reset]);
 
-  if (isLoading) {
+  if (loading) {
     return <CenterSpinner />;
   }
 
-  // TODO errors (pk error, query error etc.)
-  if (data?.resource == null || unitData?.unit == null) {
-    return null;
+  if (data?.resource == null || data?.unit == null) {
+    return <Error404 />;
   }
 
   const onSubmit = async (values: ResourceUpdateForm) => {
@@ -115,7 +102,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
     }
   };
 
-  const unit = unitData.unit;
+  const unit = data.unit;
   const resource = data.resource;
 
   return (
@@ -147,7 +134,7 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
 }
 
 export const RESOURCE_QUERY = gql`
-  query Resource($id: ID!) {
+  query Resource($id: ID!, $unitId: ID!) {
     resource(id: $id) {
       id
       pk
@@ -157,6 +144,14 @@ export const RESOURCE_QUERY = gql`
       space {
         id
         pk
+      }
+    }
+    unit(id: $unitId) {
+      id
+      pk
+      nameFi
+      location {
+        ...LocationFields
       }
     }
   }

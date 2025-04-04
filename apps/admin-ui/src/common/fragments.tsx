@@ -9,22 +9,6 @@ export const ALLOCATED_TIME_SLOT_FRAGMENT = gql`
   }
 `;
 
-// TODO don't use convienice fragments
-export const SPACE_COMMON_FRAGMENT = gql`
-  fragment SpaceCommonFields on SpaceNode {
-    id
-    pk
-    nameFi
-    parent {
-      id
-      pk
-      nameFi
-    }
-    surfaceArea
-    maxPersons
-  }
-`;
-
 // NOTE this is for allocation only (it includes the application name)
 // for regular application queries we don't need to query the name through the application relation
 export const APPLICATION_SECTION_ADMIN_FRAGMENT = gql`
