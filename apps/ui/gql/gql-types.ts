@@ -6341,11 +6341,8 @@ export type RecurringCardFragment = {
 
 export type AddressFieldsFragment = {
   readonly id: string;
-  readonly tprekId: string | null;
   readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
+  readonly tprekId: string | null;
   readonly location: {
     readonly addressStreetEn: string | null;
     readonly addressStreetSv: string | null;
@@ -6356,6 +6353,59 @@ export type AddressFieldsFragment = {
     readonly addressZip: string;
     readonly addressCityFi: string | null;
   } | null;
+};
+
+export type ReservationUnitHeadFragment = {
+  readonly id: string;
+  readonly reservationKind: ReservationKind;
+  readonly reservationBegins: string | null;
+  readonly nameFi: string | null;
+  readonly nameSv: string | null;
+  readonly nameEn: string | null;
+  readonly minReservationDuration: number | null;
+  readonly maxReservationDuration: number | null;
+  readonly maxPersons: number | null;
+  readonly minPersons: number | null;
+  readonly currentAccessType: AccessType | null;
+  readonly unit: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
+  } | null;
+  readonly pricings: ReadonlyArray<{
+    readonly id: string;
+    readonly begins: string;
+    readonly priceUnit: PriceUnit;
+    readonly lowestPrice: string;
+    readonly highestPrice: string;
+    readonly taxPercentage: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly value: string;
+    };
+  }>;
+  readonly accessTypes: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly accessType: AccessType;
+    readonly beginDate: string;
+  }>;
+  readonly reservationUnitType: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+  } | null;
+  readonly images: ReadonlyArray<{
+    readonly id: string;
+    readonly imageUrl: string | null;
+    readonly largeUrl: string | null;
+    readonly mediumUrl: string | null;
+    readonly smallUrl: string | null;
+    readonly imageType: ImageType;
+  }>;
 };
 
 export type RelatedUnitCardFieldsFragment = {
@@ -7099,24 +7149,6 @@ export type UpdateApplicationMutationVariables = Exact<{
 
 export type UpdateApplicationMutation = {
   readonly updateApplication: { readonly pk: number | null } | null;
-};
-
-export type UnitNameFieldsI18NFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
-  readonly location: {
-    readonly addressStreetEn: string | null;
-    readonly addressStreetSv: string | null;
-    readonly addressCityEn: string | null;
-    readonly addressCitySv: string | null;
-    readonly id: string;
-    readonly addressStreetFi: string | null;
-    readonly addressZip: string;
-    readonly addressCityFi: string | null;
-  } | null;
 };
 
 export type TermsOfUseFragment = {
@@ -9143,7 +9175,6 @@ export type ReservationUnitPageQuery = {
     readonly canApplyFreeOfCharge: boolean;
     readonly numActiveUserReservations: number;
     readonly publishingState: ReservationUnitPublishingState;
-    readonly currentAccessType: AccessType | null;
     readonly id: string;
     readonly pk: number | null;
     readonly nameFi: string | null;
@@ -9155,24 +9186,25 @@ export type ReservationUnitPageQuery = {
     readonly reservationKind: ReservationKind;
     readonly minPersons: number | null;
     readonly maxPersons: number | null;
+    readonly reservationBegins: string | null;
+    readonly minReservationDuration: number | null;
+    readonly maxReservationDuration: number | null;
+    readonly currentAccessType: AccessType | null;
     readonly termsOfUseFi: string | null;
     readonly termsOfUseEn: string | null;
     readonly termsOfUseSv: string | null;
-    readonly reservationBegins: string | null;
     readonly reservationEnds: string | null;
-    readonly minReservationDuration: number | null;
-    readonly maxReservationDuration: number | null;
     readonly maxReservationsPerUser: number | null;
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
     readonly reservationStartInterval: ReservationStartInterval;
     readonly unit: {
       readonly id: string;
-      readonly tprekId: string | null;
-      readonly pk: number | null;
       readonly nameFi: string | null;
-      readonly nameEn: string | null;
       readonly nameSv: string | null;
+      readonly nameEn: string | null;
+      readonly pk: number | null;
+      readonly tprekId: string | null;
       readonly location: {
         readonly addressStreetEn: string | null;
         readonly addressStreetSv: string | null;
@@ -9184,14 +9216,6 @@ export type ReservationUnitPageQuery = {
         readonly addressCityFi: string | null;
       } | null;
     } | null;
-    readonly images: ReadonlyArray<{
-      readonly id: string;
-      readonly imageUrl: string | null;
-      readonly largeUrl: string | null;
-      readonly mediumUrl: string | null;
-      readonly smallUrl: string | null;
-      readonly imageType: ImageType;
-    }>;
     readonly applicationRoundTimeSlots: ReadonlyArray<{
       readonly id: string;
       readonly weekday: number;
@@ -9206,13 +9230,6 @@ export type ReservationUnitPageQuery = {
       readonly reservationPeriodBegin: string;
       readonly reservationPeriodEnd: string;
     }>;
-    readonly reservationUnitType: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
-    } | null;
     readonly equipments: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
@@ -9226,12 +9243,6 @@ export type ReservationUnitPageQuery = {
         readonly nameSv: string | null;
       };
     }>;
-    readonly accessTypes: ReadonlyArray<{
-      readonly id: string;
-      readonly pk: number | null;
-      readonly accessType: AccessType;
-      readonly beginDate: string;
-    }>;
     readonly metadataSet: {
       readonly id: string;
       readonly requiredFields: ReadonlyArray<{
@@ -9243,6 +9254,39 @@ export type ReservationUnitPageQuery = {
         readonly fieldName: string;
       }>;
     } | null;
+    readonly pricings: ReadonlyArray<{
+      readonly id: string;
+      readonly begins: string;
+      readonly priceUnit: PriceUnit;
+      readonly lowestPrice: string;
+      readonly highestPrice: string;
+      readonly taxPercentage: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly value: string;
+      };
+    }>;
+    readonly accessTypes: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly accessType: AccessType;
+      readonly beginDate: string;
+    }>;
+    readonly reservationUnitType: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
+    } | null;
+    readonly images: ReadonlyArray<{
+      readonly id: string;
+      readonly imageUrl: string | null;
+      readonly largeUrl: string | null;
+      readonly mediumUrl: string | null;
+      readonly smallUrl: string | null;
+      readonly imageType: ImageType;
+    }>;
     readonly serviceSpecificTerms: {
       readonly id: string;
       readonly textFi: string | null;
@@ -9274,18 +9318,6 @@ export type ReservationUnitPageQuery = {
       readonly startDatetime: string | null;
       readonly endDatetime: string | null;
     }> | null;
-    readonly pricings: ReadonlyArray<{
-      readonly id: string;
-      readonly begins: string;
-      readonly priceUnit: PriceUnit;
-      readonly lowestPrice: string;
-      readonly highestPrice: string;
-      readonly taxPercentage: {
-        readonly id: string;
-        readonly pk: number | null;
-        readonly value: string;
-      };
-    }>;
   } | null;
   readonly affectingReservations: ReadonlyArray<{
     readonly pk: number | null;
@@ -9850,11 +9882,11 @@ export type ReservationPageQuery = {
       readonly reservationEnds: string | null;
       readonly unit: {
         readonly id: string;
-        readonly tprekId: string | null;
         readonly nameFi: string | null;
-        readonly nameEn: string | null;
         readonly nameSv: string | null;
+        readonly nameEn: string | null;
         readonly pk: number | null;
+        readonly tprekId: string | null;
         readonly location: {
           readonly addressStreetEn: string | null;
           readonly addressStreetSv: string | null;
@@ -10644,35 +10676,16 @@ export const LocationFieldsI18nFragmentDoc = gql`
   }
   ${LocationFieldsFragmentDoc}
 `;
-export const UnitNameFieldsI18NFragmentDoc = gql`
-  fragment UnitNameFieldsI18N on UnitNode {
+export const AddressFieldsFragmentDoc = gql`
+  fragment AddressFields on UnitNode {
     id
     pk
-    nameFi
-    nameEn
-    nameSv
+    tprekId
     location {
       ...LocationFieldsI18n
     }
   }
   ${LocationFieldsI18nFragmentDoc}
-`;
-export const AddressFieldsFragmentDoc = gql`
-  fragment AddressFields on UnitNode {
-    ...UnitNameFieldsI18N
-    id
-    tprekId
-  }
-  ${UnitNameFieldsI18NFragmentDoc}
-`;
-export const ReservationUnitTypeFieldsFragmentDoc = gql`
-  fragment ReservationUnitTypeFields on ReservationUnitTypeNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
-  }
 `;
 export const PricingFieldsFragmentDoc = gql`
   fragment PricingFields on ReservationUnitPricingNode {
@@ -10687,6 +10700,54 @@ export const PricingFieldsFragmentDoc = gql`
       value
     }
   }
+`;
+export const ReservationUnitTypeFieldsFragmentDoc = gql`
+  fragment ReservationUnitTypeFields on ReservationUnitTypeNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+  }
+`;
+export const ReservationUnitHeadFragmentDoc = gql`
+  fragment ReservationUnitHead on ReservationUnitNode {
+    id
+    reservationKind
+    reservationBegins
+    nameFi
+    nameSv
+    nameEn
+    unit {
+      id
+      nameFi
+      nameSv
+      nameEn
+    }
+    minReservationDuration
+    maxReservationDuration
+    maxPersons
+    minPersons
+    pricings {
+      ...PricingFields
+    }
+    currentAccessType
+    accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
+      id
+      pk
+      accessType
+      beginDate
+    }
+    reservationUnitType {
+      ...ReservationUnitTypeFields
+    }
+    images {
+      ...Image
+    }
+  }
+  ${PricingFieldsFragmentDoc}
+  ${ReservationUnitTypeFieldsFragmentDoc}
+  ${ImageFragmentDoc}
 `;
 export const RelatedUnitCardFieldsFragmentDoc = gql`
   fragment RelatedUnitCardFields on ReservationUnitNode {
@@ -14015,14 +14076,12 @@ export const ReservationUnitPageDocument = gql`
       ...NotReservableFields
       ...ReservationTimePickerFields
       ...MetadataSets
+      ...ReservationUnitHead
       unit {
         ...AddressFields
       }
       uuid
       ...TermsOfUse
-      images {
-        ...Image
-      }
       isDraft
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlotFields
@@ -14036,22 +14095,12 @@ export const ReservationUnitPageDocument = gql`
       descriptionEn
       descriptionSv
       canApplyFreeOfCharge
-      reservationUnitType {
-        ...ReservationUnitTypeFields
-      }
       ...ReservationInfoContainer
       numActiveUserReservations
       publishingState
       equipments {
         id
         ...EquipmentFields
-      }
-      currentAccessType
-      accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
-        id
-        pk
-        accessType
-        beginDate
       }
     }
     affectingReservations(
@@ -14068,11 +14117,10 @@ export const ReservationUnitPageDocument = gql`
   ${NotReservableFieldsFragmentDoc}
   ${ReservationTimePickerFieldsFragmentDoc}
   ${MetadataSetsFragmentDoc}
+  ${ReservationUnitHeadFragmentDoc}
   ${AddressFieldsFragmentDoc}
   ${TermsOfUseFragmentDoc}
-  ${ImageFragmentDoc}
   ${ApplicationRoundTimeSlotFieldsFragmentDoc}
-  ${ReservationUnitTypeFieldsFragmentDoc}
   ${ReservationInfoContainerFragmentDoc}
   ${EquipmentFieldsFragmentDoc}
   ${BlockingReservationFieldsFragmentDoc}
@@ -14775,9 +14823,7 @@ export const ReservationPageDocument = gql`
       reservationUnits {
         id
         unit {
-          id
-          tprekId
-          ...UnitNameFieldsI18N
+          ...AddressFields
         }
         canApplyFreeOfCharge
         ...MetadataSets
@@ -14792,7 +14838,7 @@ export const ReservationPageDocument = gql`
   ${InstructionsFragmentDoc}
   ${CanReservationBeChangedFragmentDoc}
   ${OrderFieldsFragmentDoc}
-  ${UnitNameFieldsI18NFragmentDoc}
+  ${AddressFieldsFragmentDoc}
   ${MetadataSetsFragmentDoc}
   ${TermsOfUseFragmentDoc}
 `;

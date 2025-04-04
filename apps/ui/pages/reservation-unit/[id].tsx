@@ -901,14 +901,12 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       ...NotReservableFields
       ...ReservationTimePickerFields
       ...MetadataSets
+      ...ReservationUnitHead
       unit {
         ...AddressFields
       }
       uuid
       ...TermsOfUse
-      images {
-        ...Image
-      }
       isDraft
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlotFields
@@ -922,22 +920,12 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       descriptionEn
       descriptionSv
       canApplyFreeOfCharge
-      reservationUnitType {
-        ...ReservationUnitTypeFields
-      }
       ...ReservationInfoContainer
       numActiveUserReservations
       publishingState
       equipments {
         id
         ...EquipmentFields
-      }
-      currentAccessType
-      accessTypes(isActiveOrFuture: true, orderBy: [beginDateAsc]) {
-        id
-        pk
-        accessType
-        beginDate
       }
     }
     affectingReservations(
