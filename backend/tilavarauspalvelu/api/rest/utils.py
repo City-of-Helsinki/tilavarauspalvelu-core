@@ -4,14 +4,14 @@ import dataclasses
 import datetime
 import uuid
 from functools import cache, wraps
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from import_export.admin import ExportMixin
 from import_export.declarative import ModelDeclarativeMetaclass
 from import_export.resources import ModelResource
-from import_export.widgets import DateTimeWidget, TimeWidget
+from import_export.widgets import BooleanWidget, DateTimeWidget, DurationWidget, IntegerWidget, TimeWidget
 
 from tilavarauspalvelu.models import ReservableTimeSpan, ReservationStatistic
 
@@ -204,6 +204,13 @@ def create_reservable_time_spans_exporter() -> ExportMixin:
     return exporter
 
 
+class MinutesDurationWidget(DurationWidget):
+    def render(self, value: Any, **kwargs: Any) -> int | None:
+        if value is None or type(value) is not datetime.timedelta:
+            return None
+        return int(value.total_seconds() / 60)
+
+
 def fix_field_datetime_formats(resource: ModelDeclarativeMetaclass) -> None:
     field: ImportExportField
     for field in resource.fields.values():
@@ -212,3 +219,7 @@ def fix_field_datetime_formats(resource: ModelDeclarativeMetaclass) -> None:
                 field.widget.formats = ["%Y-%m-%dT%H:%M:%S%:z"]
             case TimeWidget():
                 field.widget.formats = ["%H:%M:%S%:z"]
+            case DurationWidget():
+                field.widget = MinutesDurationWidget()
+            case IntegerWidget() | BooleanWidget():
+                field.widget.coerce_to_string = False
