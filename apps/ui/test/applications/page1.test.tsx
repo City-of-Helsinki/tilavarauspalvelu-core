@@ -260,6 +260,13 @@ describe("Page1", () => {
       dur.label
     );
 
+    const eventsPerWeek = within(section).getByLabelText(
+      /application:Page1.eventsPerWeek/,
+      { selector: "input" }
+    );
+    expect(eventsPerWeek).toBeInTheDocument();
+    await user.type(eventsPerWeek, "1");
+
     const submitBtn = view.getByRole("button", { name: "common:next" });
     await user.click(submitBtn);
     expect(view.queryAllByText(/application:validation/)).toHaveLength(0);

@@ -62,7 +62,12 @@ const ApplicationSectionPage1Schema = z
     purpose: z.number().refine((s) => s, { path: [""], message: "Required" }),
     minDuration: z.number().min(1, { message: "Required" }),
     maxDuration: z.number().min(1, { message: "Required" }),
-    appliedReservationsPerWeek: z.number().min(1).max(7),
+    appliedReservationsPerWeek: z
+      .number()
+      .min(1)
+      .max(7)
+      .nullable()
+      .refine((s) => s, { path: [""], message: "Required" }),
     begin: z.string().min(1, { message: "Required" }),
     end: z.string().min(1, { message: "Required" }),
     // TODO do we want to keep the pk of the options? so we can update them when the order changes and not recreate the whole list on save?
@@ -218,7 +223,7 @@ function convertApplicationSectionPage1(
     purpose: section.purpose?.pk ?? 0,
     minDuration: section.reservationMinDuration ?? 0,
     maxDuration: section.reservationMaxDuration ?? 0,
-    appliedReservationsPerWeek: section.appliedReservationsPerWeek ?? 0,
+    appliedReservationsPerWeek: section.appliedReservationsPerWeek,
     reservationUnits,
     // TODO why do these default to undefined instead of empty string?
     begin: convertDate(section.reservationsBeginDate) ?? "",
@@ -581,7 +586,7 @@ export function convertApplicationPage1(
     maxDuration: 0,
     begin: "",
     end: "",
-    appliedReservationsPerWeek: 1,
+    appliedReservationsPerWeek: null,
     reservationUnits,
     accordionOpen: true,
   };
