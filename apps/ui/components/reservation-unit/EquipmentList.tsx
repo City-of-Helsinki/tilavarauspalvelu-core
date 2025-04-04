@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
+import { breakpoints } from "common/src/const";
 import type { EquipmentFieldsFragment } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components";
 import { getEquipmentList } from "@/modules/reservationUnit";

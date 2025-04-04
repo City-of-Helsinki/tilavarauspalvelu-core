@@ -3,7 +3,6 @@ import { gql } from "@apollo/client";
 import { orderBy } from "lodash-es";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { H1 } from "common/src/common/typography";
 import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundNode,
@@ -15,11 +14,11 @@ import { getApplicationRoundUrl } from "@/common/urls";
 import { formatDate } from "@/common/util";
 import { truncate } from "@/helpers";
 import { ApplicationRoundCard } from "./ApplicationRoundCard";
-import { TableLink } from "@/styles/util";
+import { TableLink } from "@/styled";
 import { CustomTable } from "@/component/Table";
 import Error404 from "@/common/Error404";
 import { Accordion } from "hds-react";
-import { CenterSpinner, Flex } from "common/styles/util";
+import { CenterSpinner, Flex, H1 } from "common/styled";
 
 const AccordionWithoutTopPadding = styled(Accordion).attrs({
   closeButton: false,

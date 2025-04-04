@@ -27,7 +27,6 @@ import {
   useBannerNotificationPageQuery,
   type BannerNotificationPageQuery,
 } from "@gql/gql-types";
-import { H1 } from "common/src/common/typography";
 import { fromUIDate } from "common/src/common/util";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import {
@@ -48,7 +47,7 @@ import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { errorToast, successToast } from "common/src/common/toast";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
-import { CenterSpinner, Flex, TitleSection } from "common/styles/util";
+import { CenterSpinner, Flex, TitleSection, H1 } from "common/styled";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { getValidationErrors } from "common/src/apolloUtils";
 

@@ -2,7 +2,8 @@ import { IconArrowRight, IconEuroSign, IconGroup, IconHome } from "hds-react";
 import React from "react";
 import { useTranslation } from "next-i18next";
 import { useMedia } from "react-use";
-import { breakpoints } from "common/src/common/style";
+import { H3 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import type { RelatedUnitCardFieldsFragment } from "@gql/gql-types";
 import Carousel from "../Carousel";
 import { getActivePricing, getPriceString } from "@/modules/reservationUnit";
@@ -14,7 +15,6 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 import { getReservationUnitPath } from "@/modules/urls";
-import { H3 } from "common";
 import { gql } from "@apollo/client";
 
 type RelatedUnitsProps = {

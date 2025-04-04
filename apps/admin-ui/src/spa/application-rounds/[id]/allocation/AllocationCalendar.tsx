@@ -2,16 +2,15 @@ import { IconCheck, IconCross } from "hds-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
-import { fontMedium } from "common/src/common/typography";
 import { filterNonNullable, timeToMinutes } from "common/src/helpers";
 import {
   ApplicationSectionStatusChoice,
   type SuitableTimeRangeNode,
 } from "@gql/gql-types";
-import { breakpoints } from "common";
+import { fontMedium } from "common/styled";
+import { breakpoints, WEEKDAYS } from "common/src/const";
 import { type Day } from "common/src/conversion";
 import { transformWeekday } from "common/src/conversion";
-import { WEEKDAYS } from "common/src/const";
 import { ALLOCATION_CALENDAR_TIMES } from "@/common/const";
 import {
   applicationEventSchedulesToCells,

@@ -11,10 +11,10 @@ import {
   ButtonVariant,
 } from "hds-react";
 import { fromUIDate, toUIDate } from "common/src/common/util";
-import { breakpoints } from "common";
+import { Flex } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { toMondayFirstUnsafe } from "common/src/helpers";
 import { useSearchParams } from "react-router-dom";
-import { Flex } from "common/styles/util";
 
 const Wrapper = styled(Flex).attrs({
   $gap: "none",

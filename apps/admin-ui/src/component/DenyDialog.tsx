@@ -21,7 +21,7 @@ import {
   type DenyDialogFieldsFragment,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { CenterSpinner, Flex } from "common/styles/util";
+import { CenterSpinner, Flex } from "common/styled";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "@/hooks";
 import { successToast, errorToast } from "common/src/common/toast";

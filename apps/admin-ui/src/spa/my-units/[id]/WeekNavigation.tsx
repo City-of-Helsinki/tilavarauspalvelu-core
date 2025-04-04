@@ -9,7 +9,7 @@ import {
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { DATE_FORMAT, DATE_FORMAT_SHORT } from "@/common/util";
-import { Flex } from "common/styles/util";
+import { Flex } from "common/styled";
 import styled from "styled-components";
 
 const Btn = styled(Button)`

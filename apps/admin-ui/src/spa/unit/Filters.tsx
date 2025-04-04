@@ -1,5 +1,5 @@
 import React from "react";
-import { AutoGrid } from "common/styles/util";
+import { AutoGrid } from "common/styled";
 import { SearchFilter } from "@/component/QueryParamFilters";
 import { SearchTags } from "@/component/SearchTags";
 

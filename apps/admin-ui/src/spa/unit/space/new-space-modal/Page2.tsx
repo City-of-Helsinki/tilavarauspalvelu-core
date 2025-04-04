@@ -12,7 +12,7 @@ import { StyledTag } from "./modules/newSpaceModal";
 import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { UseFormReturn } from "react-hook-form";
-import { DialogActionsButtons } from "@/styles/util";
+import { DialogActionsButtons } from "@/styled";
 
 type Props = {
   closeModal: () => void;

@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { H1 } from "common/src/common/typography";
+import { H1 } from "common/styled";
 import { Filters } from "@/spa/unit/Filters";
 import { UnitsDataLoader } from "@/spa/unit/UnitsDataLoader";
 

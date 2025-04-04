@@ -13,7 +13,7 @@ import { gql } from "@apollo/client";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { useCheckPermission } from "@/hooks";
 import Error403 from "@/common/Error403";
-import { CenterSpinner } from "common/styles/util";
+import { CenterSpinner } from "common/styled";
 
 // TODO there is no index? (all and requested works like index but not really)
 function ReservationsRouter(): JSX.Element {

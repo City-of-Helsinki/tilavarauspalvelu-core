@@ -8,7 +8,8 @@ import {
   type ApplicationRoundCriteriaQuery,
   type ApplicationRoundCriteriaQueryVariables,
 } from "@gql/gql-types";
-import { breakpoints, H1, H2, H3 } from "common";
+import { H1, H2, H3 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Sanitize } from "common/src/components/Sanitize";
 import { Breadcrumb } from "@/components/common/Breadcrumb";

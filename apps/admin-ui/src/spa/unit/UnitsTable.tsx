@@ -7,7 +7,7 @@ import { truncate } from "@/helpers";
 import { getMyUnitUrl, getUnitUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
 import { MAX_UNIT_NAME_LENGTH } from "@/common/const";
-import { TableLink } from "@/styles/util";
+import { TableLink } from "@/styled";
 import { gql } from "@apollo/client";
 
 type Props = {

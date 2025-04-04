@@ -1,12 +1,3 @@
-import { CalendarEvent } from "common/src/calendar/Calendar";
-import { breakpoints } from "common/src/common/style";
-import {
-  addMinutes,
-  differenceInMinutes,
-  isToday,
-  setHours,
-  startOfDay,
-} from "date-fns";
 import React, {
   type CSSProperties,
   useCallback,
@@ -14,6 +5,13 @@ import React, {
   useRef,
   useState,
 } from "react";
+import {
+  addMinutes,
+  differenceInMinutes,
+  isToday,
+  setHours,
+  startOfDay,
+} from "date-fns";
 import Popup from "reactjs-popup";
 import styled, { css } from "styled-components";
 import {
@@ -23,6 +21,9 @@ import {
 } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
+import { CalendarEvent } from "common/src/calendar/Calendar";
+import { CenterSpinner } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { POST_PAUSE, PRE_PAUSE } from "@/common/calendarStyling";
 import { getReserveeName, sortByName } from "@/common/util";
 import { useModal } from "@/context/ModalContext";
@@ -31,7 +32,6 @@ import { ReservationPopupContent } from "./ReservationPopupContent";
 import eventStyleGetter from "./eventStyleGetter";
 import { CreateReservationModal } from "./CreateReservationModal";
 import { useCheckPermission } from "@/hooks";
-import { CenterSpinner } from "common/styles/util";
 
 type CalendarEventType = CalendarEvent<ReservationUnitReservationsFragment>;
 type Resource = {

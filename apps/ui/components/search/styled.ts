@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import { breakpoints, fontMedium } from "common";
+import { Flex, fontMedium } from "common/styled";
+import { breakpoints } from "common/src/const";
 import {
   ShowAllContainer,
   type ShowAllContainerProps,
 } from "common/src/components";
-import { Flex } from "common/styles/util";
 import { SubmitButton } from "@/styled/util";
 
 /// Filter container using responsive grid

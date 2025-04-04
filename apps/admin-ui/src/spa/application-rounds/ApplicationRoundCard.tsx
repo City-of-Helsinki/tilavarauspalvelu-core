@@ -8,9 +8,8 @@ import { ApplicationRoundStatusLabel } from "./ApplicationRoundStatusLabel";
 import { getApplicationRoundUrl } from "@/common/urls";
 import TimeframeStatus from "./TimeframeStatus";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import { Flex } from "common/styles/util";
+import { Flex, fontMedium } from "common/styled";
 import { Card } from "common/src/components";
-import { fontMedium } from "common";
 import { gql } from "@apollo/client";
 
 const Times = styled(Flex).attrs({

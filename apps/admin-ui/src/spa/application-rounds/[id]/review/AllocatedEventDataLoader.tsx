@@ -20,7 +20,7 @@ import { useSearchParams } from "react-router-dom";
 import { AllocatedEventsTable, SORT_KEYS } from "./AllocatedEventsTable";
 import { transformWeekday, type Day } from "common/src/conversion";
 import { getPermissionErrors } from "common/src/apolloUtils";
-import { CenterSpinner } from "common/styles/util";
+import { CenterSpinner } from "common/styled";
 
 type Props = {
   applicationRoundPk: number;

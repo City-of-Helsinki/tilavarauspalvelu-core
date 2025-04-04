@@ -15,7 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
-import { NoWrap } from "common/styles/util";
+import { NoWrap } from "common/styled";
 
 type StatusPropsType = {
   type: StatusLabelType;

@@ -4,7 +4,7 @@ import {
   ReservationStateChoice,
 } from "@/gql/gql-types";
 import { gql } from "@apollo/client";
-import { H4 } from "common";
+import { H4 } from "common/styled";
 import {
   convertLanguageCode,
   getTranslationSafe,

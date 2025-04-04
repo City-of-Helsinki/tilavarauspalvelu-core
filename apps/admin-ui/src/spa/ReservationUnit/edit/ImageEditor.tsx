@@ -3,9 +3,8 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button, ButtonSize, ButtonVariant, FileInput } from "hds-react";
 import { ImageType } from "@gql/gql-types";
-import { AutoGrid, Flex } from "common/styles/util";
+import { AutoGrid, Flex, fontRegular } from "common/styled";
 import { type ImageFormType } from "./form";
-import { fontRegular } from "common";
 
 const StyledImage = styled.img`
   max-height: 12.5em;

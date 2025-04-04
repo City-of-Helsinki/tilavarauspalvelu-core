@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Button, ButtonVariant } from "hds-react";
 import type { PageInfo, SearchReservationUnitsQuery } from "@gql/gql-types";
 import type { ApolloQueryResult } from "@apollo/client";
-import { CenterSpinner, Flex } from "common/styles/util";
+import { CenterSpinner, Flex } from "common/styled";
 
 const HitCountSummary = styled.div`
   font-size: var(--fontsize-body-l);

@@ -2,7 +2,7 @@ import { get } from "lodash-es";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Table, TableProps } from "hds-react";
-import { fontBold } from "common";
+import { fontBold } from "common/styled";
 
 type TableWrapperProps = {
   $tableBackground?: string;

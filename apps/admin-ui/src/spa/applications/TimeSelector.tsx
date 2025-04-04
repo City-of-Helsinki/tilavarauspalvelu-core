@@ -5,8 +5,7 @@ import { Priority, type ApplicationAdminQuery } from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { filterNonNullable } from "common/src/helpers";
 import { WEEKDAYS } from "common/src/const";
-import { Flex, NoWrap } from "common/styles/util";
-import { fontMedium } from "common";
+import { fontMedium, Flex, NoWrap } from "common/styled";
 
 type Cell = {
   hour: number;

@@ -10,7 +10,7 @@ import {
   IconPen,
   LoadingSpinner,
 } from "hds-react";
-import { breakpoints } from "common/src/common/style";
+import { breakpoints } from "common/src/const";
 import {
   ApplicantTypeChoice,
   ApplicationStatusChoice,

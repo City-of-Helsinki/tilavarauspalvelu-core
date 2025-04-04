@@ -1,9 +1,9 @@
-import { Checkbox, IconLinkExternal } from "hds-react";
 import React from "react";
+import { Checkbox, IconLinkExternal } from "hds-react";
 import styled from "styled-components";
-import { breakpoints } from "../common/style";
-import { H6 } from "../common/typography";
 import Link from "next/link";
+import { H6 } from "../../styled";
+import { breakpoints } from "../const";
 
 type LinkT = {
   href: string;

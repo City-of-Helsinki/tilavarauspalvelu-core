@@ -3,14 +3,13 @@ import { Button, ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { H2, H3 } from "common/src/common/typography";
 import {
   useUpdateSpaceMutation,
   type SpaceUpdateMutationInput,
   useSpaceQuery,
 } from "@gql/gql-types";
 import { errorToast, successToast } from "common/src/common/toast";
-import { ButtonContainer, CenterSpinner } from "common/styles/util";
+import { ButtonContainer, CenterSpinner, H2, H3 } from "common/styled";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
 import { Head } from "./Head";
 import { SpaceHierarchy } from "./SpaceHierarchy";

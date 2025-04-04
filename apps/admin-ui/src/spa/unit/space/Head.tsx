@@ -3,12 +3,11 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
 import type { SpaceQuery } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
 import { getUnitUrl } from "@/common/urls";
-import { fontMedium, H1 } from "common";
-import { Flex } from "common/styles/util";
+import { fontMedium, H1, Flex } from "common/styled";
+import { breakpoints } from "common/src/const";
 
 interface IProps {
   title: string;

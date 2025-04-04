@@ -10,7 +10,7 @@ import { truncate } from "@/helpers";
 import { getReservationUnitUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
 import { MAX_NAME_LENGTH } from "@/common/const";
-import { TableLink } from "@/styles/util";
+import { TableLink } from "@/styled";
 import {
   IconCheck,
   IconClock,

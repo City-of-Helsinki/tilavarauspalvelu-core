@@ -1,11 +1,9 @@
-import { breakpoints } from "common";
-import { toggleButtonCss } from "common/styles/buttonCss";
-import { truncatedText } from "common/styles/cssFragments";
-import { Flex } from "common/styles/util";
+import React, { useEffect, useRef } from "react";
 import { IconAngleDown, IconAngleUp, useAccordion } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { useEffect, useRef } from "react";
 import styled from "styled-components";
+import { Flex, toggleButtonCss, truncatedText } from "common/styled";
+import { breakpoints } from "common/src/const";
 
 type Props = {
   heading: string;

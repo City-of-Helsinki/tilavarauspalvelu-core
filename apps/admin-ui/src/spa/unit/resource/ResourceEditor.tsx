@@ -12,7 +12,7 @@ import {
   useUnitWithSpacesAndResourcesQuery,
 } from "@gql/gql-types";
 import { base64encode } from "common/src/helpers";
-import { ButtonContainer, CenterSpinner } from "common/styles/util";
+import { ButtonContainer, CenterSpinner } from "common/styled";
 import { SubPageHead } from "../SubPageHead";
 import { errorToast, successToast } from "common/src/common/toast";
 import { FormErrorSummary } from "@/common/FormErrorSummary";

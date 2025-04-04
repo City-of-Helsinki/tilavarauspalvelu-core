@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { fontMedium, Strongish } from "../common/typography";
+import { fontMedium, Strongish } from "../../styled";
 import { CustomerTypeChoice } from "../../gql/gql-types";
 import { Inputs, Reservation } from "./types";
 import { OptionType } from "../../types/common";
