@@ -238,6 +238,7 @@ class ReservationUnitExporter(BaseCSVExporter):
 
     def get_data_rows(self, instance: ReservationUnit) -> Iterable[ReservationUnitExportRow]:
         pricing: ReservationUnitPricing = next(iter(instance.pricings.all()), None)
+        start_interval = ReservationStartInterval(instance.reservation_start_interval)
         return [
             ReservationUnitExportRow(
                 reservation_unit_id=instance.id,
@@ -297,7 +298,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 buffer_time_before_reservation=self.format_timedelta(instance.buffer_time_before),
                 buffer_time_after_reservation=self.format_timedelta(instance.buffer_time_after),
                 hauki_resource_id=getattr(instance.origin_hauki_resource, "id", None),
-                reservation_start_interval=ReservationStartInterval(instance.reservation_start_interval).label,
+                reservation_start_interval=self.format_timedelta(start_interval.as_timedelta),
                 maximum_number_of_days_before_reservations_can_be_made=instance.reservations_max_days_before,
                 minimum_days_before_reservations_can_be_made=instance.reservations_min_days_before,
                 maximum_number_of_active_reservations_per_user=instance.max_reservations_per_user,

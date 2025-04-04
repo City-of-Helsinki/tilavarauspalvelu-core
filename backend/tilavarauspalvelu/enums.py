@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import enum
 import operator
 from enum import StrEnum
@@ -642,9 +643,13 @@ class ReservationStartInterval(models.TextChoices):
     INTERVAL_360_MINUTES = "interval_360_mins", _("6 hours")
     INTERVAL_420_MINUTES = "interval_420_mins", _("7 hours")
 
-    @property
+    @enum.property
     def as_number(self) -> int:
         return int(self.value.split("_")[1])
+
+    @enum.property
+    def as_timedelta(self) -> datetime.timedelta:
+        return datetime.timedelta(minutes=self.as_number)
 
 
 class ReservationKind(models.TextChoices):
