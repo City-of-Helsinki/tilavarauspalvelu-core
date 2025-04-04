@@ -5,7 +5,7 @@ import { Tabs, TabList, Tab, TabPanel } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { TabWrapper, H1 } from "common/styled";
+import { TabWrapper, H1, CenterSpinner } from "common/styled";
 import {
   ReservationStateChoice,
   ReservationOrderingChoices,
@@ -15,7 +15,6 @@ import {
 import { filterNonNullable } from "common/src/helpers";
 import { useSession } from "@/hooks/auth";
 import { ReservationCard } from "@/components/reservation";
-import { CenterSpinner } from "@/components/common/common";
 import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";
 import { addDays } from "date-fns";
