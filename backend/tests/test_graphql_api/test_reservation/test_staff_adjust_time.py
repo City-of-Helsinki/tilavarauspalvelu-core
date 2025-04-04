@@ -10,6 +10,7 @@ from tilavarauspalvelu.enums import AccessType, ReservationStartInterval, Reserv
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
+from tilavarauspalvelu.models.reservation.actions import ReservationActions
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime, next_hour
 
 from tests.factories import (
@@ -652,3 +653,32 @@ def test_reservation__staff_adjust_time__pindora_call_failed(graphql):
     assert response.field_error_messages() == ["Pindora Error"]
 
     assert PindoraService.sync_access_code.called is True
+
+
+def test_reservation__staff_adjust_time__overlapping_reservation_created_at_the_same_time(graphql):
+    reservation = ReservationFactory.create_for_time_adjustment()
+    reservation_begin = reservation.begin
+    reservation_end = reservation.end
+    reservation_unit = reservation.reservation_units.first()
+
+    graphql.login_with_superuser()
+    data = get_staff_adjust_data(reservation)
+
+    def callback(*args, **kwargs):
+        res = ReservationFactory.create_for_reservation_unit(
+            reservation_unit=reservation_unit,
+            begin=reservation_begin,
+            end=reservation_end,
+        )
+        return Reservation.objects.filter(pk=res.pk)
+
+    with patch_method(ReservationActions.overlapping_reservations, side_effect=callback):
+        response = graphql(ADJUST_STAFF_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Overlapping reservations were created at the same time."]
+
+    # Reservation is not changed
+    reservation.refresh_from_db()
+    assert reservation.begin == reservation_begin
+    assert reservation.end == reservation_end

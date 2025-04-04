@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
@@ -12,8 +12,9 @@ from tilavarauspalvelu.enums import AccessType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.models import Reservation
+from tilavarauspalvelu.typing import StaffReservationAdjustTimeData
 from utils.date_utils import DEFAULT_TIMEZONE
-from utils.external_service.errors import external_service_errors_as_validation_errors
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import ReservationUnit
@@ -41,7 +42,7 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
             "state",
         ]
 
-    def validate(self, data: dict[str, Any]) -> dict[str, Any]:
+    def validate(self, data: StaffReservationAdjustTimeData) -> StaffReservationAdjustTimeData:
         begin = data["begin"].astimezone(DEFAULT_TIMEZONE)
         end = data["end"].astimezone(DEFAULT_TIMEZONE)
 
@@ -69,16 +70,32 @@ class StaffReservationAdjustTimeSerializer(NestingModelSerializer):
 
         return data
 
-    def update(self, instance: Reservation, validated_data: dict[str, Any]) -> Reservation:
+    def update(self, instance: Reservation, validated_data: StaffReservationAdjustTimeData) -> Reservation:
+        previous_data = StaffReservationAdjustTimeData(
+            begin=instance.begin,
+            end=instance.end,
+            buffer_time_before=instance.buffer_time_before,
+            buffer_time_after=instance.buffer_time_after,
+            access_type=AccessType(instance.access_type),
+        )
+
         had_access_code = instance.access_type == AccessType.ACCESS_CODE
+        instance: Reservation = super().update(instance=instance, validated_data=validated_data)
+        has_access_codes = instance.access_type == AccessType.ACCESS_CODE
 
-        with transaction.atomic():
-            instance = super().update(instance=instance, validated_data=validated_data)
-            has_access_codes = instance.access_type == AccessType.ACCESS_CODE
+        if instance.actions.overlapping_reservations().exists():
+            # Rollback the changes
+            super().update(instance=instance, validated_data=previous_data)
+            msg = "Overlapping reservations were created at the same time."
+            raise ValidationError(msg, code=error_codes.OVERLAPPING_RESERVATIONS)
 
-            if had_access_code or has_access_codes:
-                with external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR):
-                    PindoraService.sync_access_code(obj=instance)
+        if had_access_code or has_access_codes:
+            try:
+                PindoraService.sync_access_code(obj=instance)
+            except ExternalServiceError as error:
+                # Rollback the changes
+                super().update(instance=instance, validated_data=previous_data)
+                raise ValidationError(str(error), code=error_codes.PINDORA_ERROR) from error
 
         EmailService.send_reservation_modified_email(reservation=instance)
         EmailService.send_staff_notification_reservation_requires_handling_email(reservation=instance)
