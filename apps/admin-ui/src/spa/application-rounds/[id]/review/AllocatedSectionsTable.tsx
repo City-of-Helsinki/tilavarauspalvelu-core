@@ -3,25 +3,23 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { memoize } from "lodash-es";
 import { IconLinkExternal, IconSize, Tooltip } from "hds-react";
-import type { AllocatedTimeSlotsQuery } from "@gql/gql-types";
+import type { AllocatedSectionsTableElementFragment } from "@gql/gql-types";
 import { convertWeekday } from "common/src/conversion";
 import { getApplicantName, truncate } from "@/helpers";
 import { getApplicationUrl, getReservationUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
 import { ExternalTableLink, TableLink } from "@/styled";
 import styled from "styled-components";
+import { gql } from "@apollo/client";
+import { formatTimeRange, timeToMinutes } from "common/src/helpers";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
-// TODO use a fragment
-type QueryData = NonNullable<AllocatedTimeSlotsQuery["allocatedTimeSlots"]>;
-type Edge = NonNullable<QueryData["edges"]>[0];
-type Node = NonNullable<NonNullable<Edge>["node"]>;
 type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  schedules: Node[];
+  schedules: AllocatedSectionsTableElementFragment[];
   isLoading?: boolean;
 };
 
@@ -38,10 +36,13 @@ type ApplicationScheduleView = {
   accessCodeActiveAlert?: string;
 };
 
-function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
-  const allocatedReservationUnit = slot.reservationUnitOption?.reservationUnit;
-  const allocatedReservationUnitName = allocatedReservationUnit?.nameFi ?? "-";
-  const allocatedUnit = allocatedReservationUnit?.unit?.nameFi ?? "-";
+function timeSlotMapper(
+  t: TFunction,
+  slot: AllocatedSectionsTableElementFragment
+): ApplicationScheduleView {
+  const allocatedReservationUnit = slot.reservationUnitOption.reservationUnit;
+  const allocatedReservationUnitName = allocatedReservationUnit.nameFi ?? "-";
+  const allocatedUnit = allocatedReservationUnit.unit?.nameFi ?? "-";
 
   const application =
     slot.reservationUnitOption.applicationSection?.application;
@@ -50,13 +51,13 @@ function timeSlotMapper(t: TFunction, slot: Node): ApplicationScheduleView {
   // TODO should this check the state directly?
   const isAllocated = !slot.reservationUnitOption.rejected;
 
-  const day = slot?.dayOfTheWeek ? convertWeekday(slot?.dayOfTheWeek) : 0;
-  const begin = slot?.beginTime ?? "";
-  const end = slot?.endTime ?? "";
-  const timeString = isAllocated
-    ? `${t("dayShort." + day)} ${begin.slice(0, 5)} - ${end.slice(0, 5)}`
-    : "-";
-  const name = slot.reservationUnitOption.applicationSection.name ?? "-";
+  const day = convertWeekday(slot.dayOfTheWeek);
+  const timeRange = formatTimeRange(
+    timeToMinutes(slot.beginTime),
+    timeToMinutes(slot.endTime)
+  );
+  const timeString = isAllocated ? `${t("dayShort." + day)} ${timeRange}` : "-";
+  const name = slot.reservationUnitOption.applicationSection.name;
 
   const applicationPk = application.pk ?? 0;
   const reservationPk = slot.recurringReservation?.reservations[0]?.pk ?? null;
@@ -163,7 +164,7 @@ const getColConfig = (t: TFunction) =>
   }));
 export const SORT_KEYS = COLS.filter((c) => c.isSortable).map((c) => c.key);
 
-export function AllocatedEventsTable({
+export function AllocatedSectionsTable({
   sort,
   sortChanged: onSortChanged,
   schedules,
@@ -194,3 +195,51 @@ export function AllocatedEventsTable({
     />
   );
 }
+
+export const ALLOCATED_SECTIONS_TABLE_ELEMENT_FRAGMENT = gql`
+  fragment AllocatedSectionsTableElement on AllocatedTimeSlotNode {
+    id
+    pk
+    dayOfTheWeek
+    endTime
+    beginTime
+    recurringReservation {
+      id
+      pk
+      shouldHaveActiveAccessCode
+      isAccessCodeIsActiveCorrect
+      reservations {
+        id
+        pk
+      }
+    }
+    reservationUnitOption {
+      id
+      rejected
+      locked
+      preferredOrder
+      applicationSection {
+        id
+        pk
+        name
+        reservationsEndDate
+        reservationsBeginDate
+        reservationMinDuration
+        reservationMaxDuration
+        application {
+          pk
+          id
+          ...ApplicationName
+        }
+      }
+      reservationUnit {
+        id
+        nameFi
+        unit {
+          id
+          nameFi
+        }
+      }
+    }
+  }
+`;

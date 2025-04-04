@@ -109,26 +109,6 @@ export const RESERVATIONUNIT_RESERVATIONS_FRAGMENT = gql`
   }
 `;
 
-export const RESERVATION_UNIT_FRAGMENT = gql`
-  fragment ReservationUnitFields on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    maxPersons
-    bufferTimeBefore
-    bufferTimeAfter
-    reservationStartInterval
-    authentication
-    unit {
-      id
-      pk
-      nameFi
-    }
-    ...ReservationTypeFormFields
-    termsOfUseFi
-  }
-`;
-
 export const RESERVATION_META_FRAGMENT = gql`
   fragment ReservationMetaFields on ReservationNode {
     ageGroup {
@@ -184,31 +164,6 @@ export const RECURRING_RESERVATION_FRAGMENT = gql`
           pk
         }
       }
-    }
-  }
-`;
-
-export const CALENDAR_RESERVATION_FRAGMENT = gql`
-  fragment CalendarReservation on ReservationNode {
-    id
-    user {
-      id
-      email
-    }
-    name
-    reserveeName
-    pk
-    begin
-    end
-    state
-    type
-    bufferTimeBefore
-    bufferTimeAfter
-    affectedReservationUnits
-    accessType
-    recurringReservation {
-      id
-      pk
     }
   }
 `;

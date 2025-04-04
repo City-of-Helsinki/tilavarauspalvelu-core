@@ -11,8 +11,8 @@ import {
 } from "hds-react";
 import { useTranslation } from "react-i18next";
 import {
+  type CreateStaffReservationFragment,
   type ReservationStaffCreateMutationInput,
-  type ReservationUnitQuery,
   useCreateStaffReservationMutation,
   useReservationUnitQuery,
 } from "@gql/gql-types";
@@ -41,19 +41,6 @@ import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { base64encode } from "common/src/helpers";
 import { errorToast, successToast } from "common/src/common/toast";
-
-// TODO use a fragment
-type ReservationUnitType = NonNullable<ReservationUnitQuery["reservationUnit"]>;
-
-export const CREATE_STAFF_RESERVATION = gql`
-  mutation CreateStaffReservation(
-    $input: ReservationStaffCreateMutationInput!
-  ) {
-    createStaffReservation(input: $input) {
-      pk
-    }
-  }
-`;
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
@@ -106,7 +93,7 @@ function useCheckFormCollisions({
   reservationUnit,
 }: {
   form: UseFormReturn<FormValueType>;
-  reservationUnit: ReservationUnitType;
+  reservationUnit: CreateStaffReservationFragment;
 }) {
   const { watch } = form;
 
@@ -146,7 +133,7 @@ function CollisionWarning({
   reservationUnit,
 }: {
   form: UseFormReturn<FormValueType>;
-  reservationUnit: ReservationUnitType;
+  reservationUnit: CreateStaffReservationFragment;
 }) {
   const { t } = useTranslation();
   const { hasCollisions } = useCheckFormCollisions({ form, reservationUnit });
@@ -173,7 +160,7 @@ function ActionContainer({
   onSubmit,
 }: {
   form: UseFormReturn<FormValueType>;
-  reservationUnit: ReservationUnitType;
+  reservationUnit: CreateStaffReservationFragment;
   onCancel: () => void;
   onSubmit: (values: FormValueType) => void;
 }) {
@@ -219,7 +206,7 @@ function DialogContent({
   start,
 }: {
   onClose: () => void;
-  reservationUnit: ReservationUnitType;
+  reservationUnit: CreateStaffReservationFragment;
   start: Date;
 }) {
   const { t, i18n } = useTranslation();
@@ -311,12 +298,16 @@ function DialogContent({
         ...rest
       } = values;
 
-      const bufferBefore = enableBufferTimeBefore
-        ? getBufferTime(reservationUnit.bufferTimeBefore, type)
-        : 0;
-      const bufferAfter = enableBufferTimeAfter
-        ? getBufferTime(reservationUnit.bufferTimeAfter, type)
-        : 0;
+      const bufferBefore = getBufferTime(
+        reservationUnit.bufferTimeBefore,
+        type,
+        enableBufferTimeBefore
+      );
+      const bufferAfter = getBufferTime(
+        reservationUnit.bufferTimeAfter,
+        type,
+        enableBufferTimeAfter
+      );
       const input: ReservationStaffCreateMutationInput = {
         ...rest,
         reservationUnit: reservationUnit.pk,
@@ -439,7 +430,26 @@ export function CreateReservationModal({
 export const RESERVATION_UNIT_QUERY = gql`
   query ReservationUnit($id: ID!) {
     reservationUnit(id: $id) {
-      ...ReservationUnitFields
+      ...CreateStaffReservation
+    }
+  }
+`;
+
+export const CREATE_STAFF_RESERVATION_FRAGMENT = gql`
+  fragment CreateStaffReservation on ReservationUnitNode {
+    pk
+    nameFi
+    reservationStartInterval
+    ...ReservationTypeFormFields
+  }
+`;
+
+export const CREATE_STAFF_RESERVATION = gql`
+  mutation CreateStaffReservation(
+    $input: ReservationStaffCreateMutationInput!
+  ) {
+    createStaffReservation(input: $input) {
+      pk
     }
   }
 `;

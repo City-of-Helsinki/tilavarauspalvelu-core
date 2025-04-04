@@ -8,7 +8,7 @@ import {
   ReservationUnitDocument,
   type ReservationUnitQuery,
   CreateReservationSeriesDocument,
-  type ReservationUnitFieldsFragment,
+  type CreateStaffReservationFragment,
   CurrentUserDocument,
   type CurrentUserQuery,
   OptionsDocument,
@@ -27,7 +27,7 @@ import { base64encode } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { toApiDateUnsafe } from "common/src/common/util";
 
-export function createReservationUnits(): ReservationUnitFieldsFragment[] {
+export function createReservationUnits(): CreateStaffReservationFragment[] {
   return [
     createReservationUnitFragment({ pk: 1, nameFi: "Unit" }),
     createReservationUnitFragment({ pk: 2, nameFi: "Absolute" }),
@@ -91,7 +91,7 @@ function createReservationUnitFragment({
 }: {
   pk: number;
   nameFi: string;
-}): ReservationUnitFieldsFragment {
+}): CreateStaffReservationFragment {
   return {
     authentication: Authentication.Weak,
     nameFi,
@@ -106,12 +106,6 @@ function createReservationUnitFragment({
     paymentTerms: emptyTerms,
     cancellationTerms: emptyTerms,
     serviceSpecificTerms: emptyTerms,
-    termsOfUseFi: "",
-    unit: {
-      id: base64encode(`UnitNode:1`),
-      pk: 1,
-      nameFi: "unit name",
-    },
     metadataSet: {
       id: "1",
       supportedFields: supportedFields.map((x) => ({

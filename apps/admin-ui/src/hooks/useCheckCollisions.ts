@@ -78,8 +78,7 @@ export function useCheckCollisions({
   return { isLoading: loading, hasCollisions: collisions.length > 0 };
 }
 
-// TODO there is two versions of this query.
-// This is used in the hooks (collision checks).
+// this is used by both the check collisions and the calendar
 export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
   query ReservationsByReservationUnit(
     $id: ID!
@@ -103,6 +102,31 @@ export const RESERVATIONS_BY_RESERVATIONUNITS = gql`
     ) {
       ...CalendarReservation
       ...CombineAffectedReservations
+    }
+  }
+`;
+
+export const CALENDAR_RESERVATION_FRAGMENT = gql`
+  fragment CalendarReservation on ReservationNode {
+    id
+    user {
+      id
+      email
+    }
+    name
+    reserveeName
+    pk
+    begin
+    end
+    state
+    type
+    bufferTimeBefore
+    bufferTimeAfter
+    affectedReservationUnits
+    accessType
+    recurringReservation {
+      id
+      pk
     }
   }
 `;

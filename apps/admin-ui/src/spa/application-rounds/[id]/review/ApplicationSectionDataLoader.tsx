@@ -1,5 +1,5 @@
 import React from "react";
-import { type ApolloError } from "@apollo/client";
+import { gql, type ApolloError } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
 import {
   ApplicationSectionOrderingChoices,
@@ -14,7 +14,10 @@ import {
 import { errorToast } from "common/src/common/toast";
 import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
-import { ApplicationEventsTable, SORT_KEYS } from "./ApplicationEventsTable";
+import {
+  ApplicationSectionsTable,
+  SORT_KEYS,
+} from "./ApplicationSectionsTable";
 import {
   transformApplicantType,
   transformApplicationSectionStatus,
@@ -25,8 +28,7 @@ type Props = {
   applicationRoundPk: number;
 };
 
-// TODO rename the component (section)
-export function ApplicationEventDataLoader({
+export function ApplicationSectionDataLoader({
   applicationRoundPk,
 }: Props): JSX.Element {
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
@@ -36,7 +38,6 @@ export function ApplicationEventDataLoader({
   const nameFilter = searchParams.get("search");
   const eventStatusFilter = searchParams.getAll("eventStatus");
 
-  // TODO rename the query (section)
   const query = useApplicationSectionsQuery({
     skip: !applicationRoundPk,
     variables: {
@@ -78,7 +79,7 @@ export function ApplicationEventDataLoader({
           {totalCount} {t("ApplicationRound.applicationEventCount")}
         </b>
       </span>
-      <ApplicationEventsTable
+      <ApplicationSectionsTable
         applicationSections={applicationSections}
         sort={orderBy}
         sortChanged={handleSortChanged}
@@ -134,3 +135,57 @@ function transformOrderBy(
       return [];
   }
 }
+
+/// NOTE might have some cache issues (because it collides with the other sections query)
+/// TODO rename (there is no Events anymore)
+/// TODO see if we can remove some of the fields (like reservationUnitOptions)
+export const APPLICATION_SECTIONS_QUERY = gql`
+  query ApplicationSections(
+    $applicationRound: Int!
+    $applicationStatus: [ApplicationStatusChoice]!
+    $status: [ApplicationSectionStatusChoice]
+    $unit: [Int]
+    $applicantType: [ApplicantTypeChoice]
+    $preferredOrder: [Int]
+    $textSearch: String
+    $priority: [Priority]
+    $purpose: [Int]
+    $reservationUnit: [Int]
+    $ageGroup: [Int]
+    $homeCity: [Int]
+    $includePreferredOrder10OrHigher: Boolean
+    $orderBy: [ApplicationSectionOrderingChoices]
+    $first: Int
+    $after: String
+  ) {
+    applicationSections(
+      applicationRound: $applicationRound
+      applicationStatus: $applicationStatus
+      status: $status
+      unit: $unit
+      applicantType: $applicantType
+      preferredOrder: $preferredOrder
+      textSearch: $textSearch
+      priority: $priority
+      purpose: $purpose
+      reservationUnit: $reservationUnit
+      ageGroup: $ageGroup
+      homeCity: $homeCity
+      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
+      orderBy: $orderBy
+      first: $first
+      after: $after
+    ) {
+      edges {
+        node {
+          ...ApplicationSectionTableElement
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      totalCount
+    }
+  }
+`;
