@@ -68,19 +68,18 @@ function ClientApp({
 }: Props) {
   return (
     <BrowserRouter basename={PUBLIC_URL}>
-      <PageWrapper apiBaseUrl={apiBaseUrl} feedbackUrl={feedbackUrl}>
+      <PageWrapper apiBaseUrl={apiBaseUrl}>
         <Routes>
           <Route path="*" element={<Error404 />} />
           <Route
             path="/"
-            element={withAuthorization(<HomePage />, apiBaseUrl, feedbackUrl)}
+            element={withAuthorization(<HomePage />, apiBaseUrl)}
           />
           <Route
             path={`${applicationsUrl}/*`}
             element={withAuthorization(
               <ApplicationRouter />,
               apiBaseUrl,
-              feedbackUrl,
               UserPermissionChoice.CanManageApplications
             )}
           />
@@ -89,7 +88,6 @@ function ClientApp({
             element={withAuthorization(
               <ApplicationRoundsRouter />,
               apiBaseUrl,
-              feedbackUrl,
               UserPermissionChoice.CanManageApplications
             )}
           />
@@ -98,7 +96,6 @@ function ClientApp({
             element={withAuthorization(
               <ReservationUnits />,
               apiBaseUrl,
-              feedbackUrl,
               UserPermissionChoice.CanManageReservationUnits
             )}
           />
@@ -107,7 +104,6 @@ function ClientApp({
             element={withAuthorization(
               <Units />,
               apiBaseUrl,
-              feedbackUrl,
               UserPermissionChoice.CanManageReservationUnits
             )}
           />
@@ -118,30 +114,18 @@ function ClientApp({
                 reservationUnitPreviewUrl={reservationUnitPreviewUrl}
               />,
               apiBaseUrl,
-              feedbackUrl,
               UserPermissionChoice.CanManageReservationUnits
             )}
           />
           <Route
             path="/reservations/*"
-            element={withAuthorization(
-              <ReservationsRouter
-                apiBaseUrl={apiBaseUrl}
-                feedbackUrl={feedbackUrl}
-              />,
-              apiBaseUrl,
-              feedbackUrl
-            )}
+            element={withAuthorization(<ReservationsRouter />, apiBaseUrl)}
           />
           <Route
             path="/my-units/*"
             element={withAuthorization(
-              <MyUnitsRouter
-                apiBaseUrl={apiBaseUrl}
-                feedbackUrl={feedbackUrl}
-              />,
-              apiBaseUrl,
-              feedbackUrl
+              <MyUnitsRouter apiBaseUrl={apiBaseUrl} />,
+              apiBaseUrl
             )}
           />
           <Route
@@ -149,7 +133,6 @@ function ClientApp({
             element={withAuthorization(
               <NotificationsRouter />,
               apiBaseUrl,
-              feedbackUrl,
               UserPermissionChoice.CanManageNotifications
             )}
           />

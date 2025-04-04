@@ -18,7 +18,6 @@ import { CenterSpinner } from "common/styles/util";
 
 type Props = {
   apiBaseUrl: string;
-  feedbackUrl: string;
   children: React.ReactNode;
 };
 
@@ -26,24 +25,23 @@ const Content = styled.main`
   ${mainStyles}
 `;
 
-const FallbackComponent = (err: unknown, feedbackUrl: string) => {
+const FallbackComponent = (err: unknown) => {
   // eslint-disable-next-line no-console
   console.error(err);
   Sentry.captureException(err);
-  return <Error5xx feedbackUrl={feedbackUrl} />;
+  return <Error5xx />;
 };
 
 // NOTE client only because Navigation requires react-router-dom
 export default function PageWrapper({
   apiBaseUrl,
-  feedbackUrl,
   children,
 }: Props): JSX.Element {
   const { user } = useSession();
   const hasAccess = hasAnyPermission(user);
   const { modalContent } = useModal();
   return (
-    <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e, feedbackUrl)}>
+    <ErrorBoundary FallbackComponent={(e) => FallbackComponent(e)}>
       <ClientOnly>
         <Navigation apiBaseUrl={apiBaseUrl} />
         <Suspense fallback={<CenterSpinner />}>

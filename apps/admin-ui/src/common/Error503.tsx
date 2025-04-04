@@ -1,16 +1,16 @@
 import React from "react";
-import ErrorContainer from "common/src/components/ErrorContainer";
+import { PUBLIC_URL } from "./const";
 import { env } from "@/env.mjs";
-import { PUBLIC_URL } from "@/common/const";
+import ErrorContainer from "common/src/components/ErrorContainer";
 
-function Error5xx(): JSX.Element {
+const Error503 = (): JSX.Element => {
   return (
     <ErrorContainer
-      statusCode={500}
+      statusCode={503}
       feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK}
       imgSrc={`${PUBLIC_URL}/images/403-error.png`}
     />
   );
-}
+};
 
-export default Error5xx;
+export default Error503;

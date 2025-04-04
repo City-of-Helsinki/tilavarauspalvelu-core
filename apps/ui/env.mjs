@@ -58,6 +58,7 @@ function createEnv() {
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_SOURCE_BRANCH_NAME: process.env.NEXT_PUBLIC_SOURCE_BRANCH_NAME,
     NEXT_PUBLIC_SOURCE_VERSION: process.env.NEXT_PUBLIC_SOURCE_VERSION,
+    EMAIL_VARAAMO_EXT_LINK: process.env.EMAIL_VARAAMO_EXT_LINK,
   });
 
   if (!clientConfig.success) {
