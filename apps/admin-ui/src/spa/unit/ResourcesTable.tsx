@@ -7,7 +7,7 @@ import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   useDeleteResourceMutation,
   type Maybe,
-  type UnitWithSpacesAndResourcesQuery,
+  type ResourceTableFragment,
 } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { getResourceUrl } from "@/common/urls";
@@ -17,16 +17,14 @@ import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
 import { Flex } from "common/styled";
+import { TFunction } from "next-i18next";
 
 interface IProps {
-  unit: QueryT;
+  unit: ResourceTableFragment;
   refetch: () => Promise<unknown>;
 }
 
-// TODO use a fragment (TableElementFragment similar to other Tables)
-type QueryT = NonNullable<UnitWithSpacesAndResourcesQuery["unit"]>;
-type SpaceT = QueryT["spaces"][0];
-type ResourceT = NonNullable<SpaceT>["resources"][0];
+type ResourceT = ResourceTableFragment["spaces"][0]["resources"][0];
 
 type ResourcesTableColumn = {
   headerName: string;
@@ -35,36 +33,18 @@ type ResourcesTableColumn = {
   transform?: (resource: ResourceT) => JSX.Element | string;
 };
 
-export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
-  const resources = unit?.spaces?.flatMap((s) => s?.resources);
-
-  const [deleteResourceMutation] = useDeleteResourceMutation();
-
-  const deleteResource = (pk: number) =>
-    deleteResourceMutation({ variables: { input: { pk: String(pk) } } });
-
-  const { t } = useTranslation();
-
-  const history = useNavigate();
-
-  const [resourceWaitingForDelete, setResourceWaitingForDelete] =
-    useState<ResourceT | null>(null);
-
-  function handleEditResource(pk: Maybe<number> | undefined) {
-    if (pk == null || unit?.pk == null) {
-      return;
-    }
-    history(getResourceUrl(pk, unit.pk));
-  }
-
-  function handleDeleteResource(resource: ResourceT) {
-    if (resource.pk == null) {
-      return;
-    }
-    setResourceWaitingForDelete(resource);
-  }
-
-  const cols: ResourcesTableColumn[] = [
+function getColConfig({
+  t,
+  unit,
+  handleEditResource,
+  handleDeleteResource,
+}: {
+  unit?: Pick<ResourceTableFragment, "pk">;
+  handleEditResource: (pk: number | null) => void;
+  handleDeleteResource: (resource: Pick<ResourceT, "pk" | "nameFi">) => void;
+  t: TFunction;
+}) {
+  return [
     {
       headerName: t("ResourceTable.headings.name"),
       key: `nameFi`,
@@ -80,13 +60,6 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
       isSortable: false,
     },
     {
-      headerName: t("ResourceTable.headings.unitName"),
-      key: "space.unit.nameFi",
-      transform: ({ space }: ResourceT) =>
-        space?.unit?.nameFi ?? t("ResourceTable.noSpace"),
-      isSortable: false,
-    },
-    {
       headerName: "",
       key: "type",
       transform: (resource: ResourceT) => (
@@ -99,6 +72,45 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
       isSortable: false,
     },
   ];
+}
+
+export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
+  const resources = unit.spaces.flatMap((s) => s.resources);
+
+  const [deleteResourceMutation] = useDeleteResourceMutation();
+
+  const deleteResource = (pk: number) =>
+    deleteResourceMutation({ variables: { input: { pk: String(pk) } } });
+
+  const { t } = useTranslation();
+
+  const history = useNavigate();
+
+  const [resourceWaitingForDelete, setResourceWaitingForDelete] = useState<Pick<
+    ResourceT,
+    "pk" | "nameFi"
+  > | null>(null);
+
+  function handleEditResource(pk: Maybe<number> | undefined) {
+    if (pk == null || unit?.pk == null) {
+      return;
+    }
+    history(getResourceUrl(pk, unit.pk));
+  }
+
+  function handleDeleteResource(resource: Pick<ResourceT, "pk" | "nameFi">) {
+    if (resource.pk == null) {
+      return;
+    }
+    setResourceWaitingForDelete(resource);
+  }
+
+  const cols: ResourcesTableColumn[] = getColConfig({
+    t,
+    unit,
+    handleEditResource,
+    handleDeleteResource,
+  });
 
   const handleConfirmDelete = async () => {
     if (resourceWaitingForDelete?.pk == null) {
@@ -114,7 +126,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     }
   };
 
-  const rows = resources ?? [];
+  const rows = resources;
 
   // TODO add if no resources:
   // const hasSpaces={Boolean(unit?.spaces?.length)}
@@ -181,3 +193,19 @@ function ResourceMenu({
     </Flex>
   );
 }
+
+export const RESOURCE_TABLE_FRAGMENT = gql`
+  fragment ResourceTable on UnitNode {
+    id
+    pk
+    spaces {
+      id
+      resources {
+        id
+        pk
+        nameFi
+        locationType
+      }
+    }
+  }
+`;

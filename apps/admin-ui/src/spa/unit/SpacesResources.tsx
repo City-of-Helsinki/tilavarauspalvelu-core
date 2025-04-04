@@ -3,7 +3,7 @@ import React, { createRef } from "react";
 import { useTranslation } from "next-i18next";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { useUnitWithSpacesAndResourcesQuery } from "@gql/gql-types";
+import { useSpacesResourcesQuery } from "@gql/gql-types";
 import { ResourcesTable } from "./ResourcesTable";
 import { SpacesTable } from "./SpacesTable";
 import { SubPageHead } from "./SubPageHead";
@@ -42,9 +42,7 @@ function SpacesResources(): JSX.Element {
     data,
     refetch,
     loading: isLoading,
-    // TODO why is this using the unit query? and not a separate page specific query?
-    // or prop drilling if it's not a separate page
-  } = useUnitWithSpacesAndResourcesQuery({
+  } = useSpacesResourcesQuery({
     variables: { id },
     fetchPolicy: "network-only",
     onError: () => {
@@ -145,50 +143,13 @@ function SpacesResources(): JSX.Element {
 
 export default SpacesResources;
 
-export const RESOURCE_FRAGMENT = gql`
-  fragment ResourceFields on ResourceNode {
-    id
-    pk
-    nameFi
-    locationType
-    space {
-      id
-      nameFi
-      unit {
-        id
-        nameFi
-        pk
-      }
-    }
-  }
-`;
-
-export const SPACE_FRAGMENT = gql`
-  fragment SpaceFields on SpaceNode {
-    ...SpaceCommonFields
-    code
-    resources {
-      ...ResourceFields
-    }
-    children {
-      id
-      pk
-    }
-  }
-`;
-
-export const UNIT_WITH_SPACES_AND_RESOURCES = gql`
-  query UnitWithSpacesAndResources($id: ID!) {
+export const SPACES_RESOURCES_QUERY = gql`
+  query SpacesResources($id: ID!) {
     unit(id: $id) {
       id
-      pk
-      nameFi
-      spaces {
-        ...SpaceFields
-      }
-      location {
-        ...LocationFields
-      }
+      ...UnitSubpageHead
+      ...SpacesTable
+      ...ResourceTable
     }
   }
 `;

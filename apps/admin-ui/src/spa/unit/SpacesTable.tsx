@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
   type Maybe,
-  type UnitWithSpacesAndResourcesQuery,
+  type SpacesTableFragment,
   useDeleteSpaceMutation,
 } from "@gql/gql-types";
 import { PopupMenu } from "common/src/components/PopupMenu";
@@ -21,9 +21,7 @@ import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
 import { Flex } from "common/styled";
 
-// TODO use a fragment (TableElementFragment similar to other Tables)
-type QueryT = NonNullable<UnitWithSpacesAndResourcesQuery["unit"]>;
-type SpaceT = QueryT["spaces"][0];
+type SpaceT = SpacesTableFragment["spaces"][0];
 
 function countSubSpaces(space: Pick<SpaceT, "pk" | "children">): number {
   return (space.children || []).reduce(
@@ -41,7 +39,7 @@ type SpacesTableColumn = {
 };
 
 interface IProps {
-  unit: QueryT;
+  unit: SpacesTableFragment;
   refetch: () => Promise<unknown>;
 }
 
@@ -88,10 +86,14 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
 
   const history = useNavigate();
 
-  const [spaceWaitingForDelete, setSpaceWaitingForDelete] =
-    useState<SpaceT | null>(null);
+  const [spaceWaitingForDelete, setSpaceWaitingForDelete] = useState<Pick<
+    SpaceT,
+    "pk" | "nameFi"
+  > | null>(null);
 
-  function handleRemoveSpace(space: SpaceT) {
+  function handleRemoveSpace(
+    space: Pick<SpaceT, "resources" | "pk" | "nameFi">
+  ) {
     if (space && space.resources && space?.resources.length > 0) {
       errorToast({
         text: t("SpaceTable.removeConflictMessage"),
@@ -244,6 +246,25 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
     </>
   );
 }
+
+export const SPACE_TABLE_FRAGMENT = gql`
+  fragment SpacesTable on UnitNode {
+    ...NewResourceUnitFields
+    spaces {
+      id
+      pk
+      code
+      surfaceArea
+      maxPersons
+      resources {
+        id
+      }
+      children {
+        id
+      }
+    }
+  }
+`;
 
 export const DELETE_SPACE = gql`
   mutation DeleteSpace($input: SpaceDeleteMutationInput!) {
