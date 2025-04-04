@@ -17,7 +17,6 @@ from utils.date_utils import (
     local_datetime_string,
     local_time_string,
     local_timedelta_string,
-    timedelta_to_json,
 )
 from utils.utils import to_ascii
 
@@ -112,7 +111,7 @@ class BaseCSVExporter(ABC):
         return response
 
     def format_datetime(self, value: datetime.datetime | None) -> str | None:
-        """Format a datetime as string to the given format."""
+        """Format a datetime as string in the given format."""
         if not value:
             return None
         if self.datetime_format == "ISO":
@@ -120,7 +119,7 @@ class BaseCSVExporter(ABC):
         return local_datetime_string(value)
 
     def format_date(self, value: datetime.date | None) -> str | None:
-        """Format a date as string to the given format."""
+        """Format a date as string in the given format."""
         if not value:
             return None
         if self.datetime_format == "ISO":
@@ -128,19 +127,20 @@ class BaseCSVExporter(ABC):
         return local_date_string(value)
 
     def format_time(self, value: datetime.time | None) -> str | None:
-        """Format a time as string to the given format."""
+        """Format a time as string in the given format."""
         if not value:
             return None
         if self.datetime_format == "ISO":
             return value.replace(tzinfo=DEFAULT_TIMEZONE).isoformat(timespec="seconds")
         return local_time_string(value.replace(tzinfo=DEFAULT_TIMEZONE))
 
-    def format_timedelta(self, value: datetime.timedelta | None) -> str | None:
-        """Format a timedelta as string to the given format."""
+    def format_timedelta(self, value: datetime.timedelta | None) -> str | int | None:
+        """Format a timedelta as string in the given format."""
         if not value:
             return None
         if self.datetime_format == "ISO":
-            return timedelta_to_json(value)
+            # Time deltas given in minutes to export API as requested
+            return int(value.total_seconds() / 60)
         return local_timedelta_string(value)
 
     @property

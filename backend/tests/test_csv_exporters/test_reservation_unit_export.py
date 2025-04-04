@@ -64,6 +64,7 @@ def test_reservation_unit_export_multiple():
     index = itertools.count()
     row_2 = writes[1]
     reservation_unit_1: ReservationUnit = reservation_units[0]
+    interval = ReservationStartInterval(reservation_unit_1.reservation_start_interval)
 
     # asserts on individual lines since it's easier to debug
     assert row_2[next(index)] == reservation_unit_1.id
@@ -123,7 +124,7 @@ def test_reservation_unit_export_multiple():
     assert row_2[next(index)] == (local_timedelta_string(reservation_unit_1.buffer_time_before) or None)
     assert row_2[next(index)] == (local_timedelta_string(reservation_unit_1.buffer_time_after) or None)
     assert row_2[next(index)] == reservation_unit_1.origin_hauki_resource_id
-    assert row_2[next(index)] == ReservationStartInterval(reservation_unit_1.reservation_start_interval).label
+    assert row_2[next(index)] == local_timedelta_string(interval.as_timedelta)
     assert row_2[next(index)] == reservation_unit_1.reservations_max_days_before
     assert row_2[next(index)] == reservation_unit_1.reservations_min_days_before
     assert row_2[next(index)] == reservation_unit_1.max_reservations_per_user
