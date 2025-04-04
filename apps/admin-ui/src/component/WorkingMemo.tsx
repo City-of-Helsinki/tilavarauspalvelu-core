@@ -9,7 +9,7 @@ import {
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { errorToast, successToast } from "common/src/common/toast";
-import { ButtonContainer } from "common/styles/util";
+import { ButtonContainer } from "common/styled";
 
 function WorkingMemo({
   initialValue,

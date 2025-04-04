@@ -12,7 +12,7 @@ import { Button, ButtonSize, ButtonVariant, IconCross } from "hds-react";
 import { useCheckPermission } from "@/hooks";
 import { NewReservationModal } from "@/component/EditTimeModal";
 import { useModal } from "@/context/ModalContext";
-import { H6 } from "common";
+import { H6 } from "common/styled";
 import StatusLabel from "common/src/components/StatusLabel";
 import { gql } from "@apollo/client";
 

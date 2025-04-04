@@ -46,8 +46,6 @@ import {
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
 import { base64encode, filterNonNullable } from "common/src/helpers";
-import { H1, H4, fontBold, fontMedium } from "common/src/common/typography";
-import { breakpoints } from "common";
 import {
   AutoGrid,
   FullRow,
@@ -55,7 +53,13 @@ import {
   TitleSection,
   CenterSpinner,
   WhiteButton,
-} from "common/styles/util";
+  H1,
+  H4,
+  fontBold,
+  fontMedium,
+  pageSideMargins,
+} from "common/styled";
+import { breakpoints } from "common/src/const";
 import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
 import { parseAddress, getTranslatedError } from "@/common/util";
@@ -80,7 +84,6 @@ import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { SeasonalSection } from "./SeasonalSection";
 import { getValidationErrors } from "common/src/apolloUtils";
 import { getReservationUnitUrl, getUnitUrl } from "@/common/urls";
-import { pageSideMargins } from "common/styles/layout";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
 import { ControlledRadioGroup } from "common/src/components/form";
 import { gql } from "@apollo/client";

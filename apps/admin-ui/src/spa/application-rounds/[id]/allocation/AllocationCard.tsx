@@ -2,7 +2,6 @@ import React from "react";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
 import { useTranslation } from "react-i18next";
 import styled from "styled-components";
-import { H5, Strong, fontMedium } from "common/src/common/typography";
 import { type ApolloQueryResult } from "@apollo/client";
 import {
   Priority,
@@ -10,7 +9,7 @@ import {
 } from "@gql/gql-types";
 import { filterNonNullable, timeToMinutes } from "common/src/helpers";
 import { convertWeekday } from "common/src/conversion";
-import { SemiBold } from "common";
+import { H5, Strong, Flex, SemiBold, fontMedium } from "common/styled";
 import { formatDuration } from "@/common/util";
 import { Accordion } from "@/component/Accordion";
 import {
@@ -28,7 +27,6 @@ import {
   useRemoveAllocation,
 } from "./hooks";
 import { getApplicantName } from "@/helpers";
-import { Flex } from "common/styles/util";
 import { NotificationInline } from "./NotificationInline";
 
 type Props = {

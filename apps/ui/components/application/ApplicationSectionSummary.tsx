@@ -3,10 +3,9 @@ import { IconCalendar, IconClock, IconGroup } from "hds-react";
 import React from "react";
 import { Trans, useTranslation, TFunction } from "next-i18next";
 import styled from "styled-components";
-import { H4 } from "common/src/common/typography";
+import { Flex, H4 } from "common/styled";
 import { fromUIDate } from "common/src/common/util";
 import { type ApplicationSectionPage1FormValues } from "./form";
-import { Flex } from "common/styles/util";
 import { IconWithText } from "@/components/common/IconWithText";
 
 const Message = styled.p`

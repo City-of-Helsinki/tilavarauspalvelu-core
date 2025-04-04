@@ -19,7 +19,7 @@ import { toApiDate } from "common/src/common/util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { getReservationInProgressPath } from "@/modules/urls";
 import { Button, ButtonSize, ButtonVariant, LoadingSpinner } from "hds-react";
-import { Flex } from "common/styles/util";
+import { Flex } from "common/styled";
 
 const BodyText = styled.p`
   margin: 0;

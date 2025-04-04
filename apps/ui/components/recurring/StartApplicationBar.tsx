@@ -7,7 +7,6 @@ import {
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { breakpoints } from "common/src/common/style";
 import { useRouter } from "next/router";
 import {
   type ApplicationCreateMutationInput,
@@ -15,13 +14,13 @@ import {
   useCreateApplicationMutation,
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
-import { Flex, NoWrap, WhiteButton } from "common/styles/util";
+import { Flex, NoWrap, WhiteButton, pageSideMargins } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { useMedia } from "react-use";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { useDisplayError } from "@/hooks/useDisplayError";
 import { useReservationUnitList } from "@/hooks";
 import { useSearchParams } from "next/navigation";
-import { pageSideMargins } from "common/styles/layout";
 import { LoginFragment } from "../LoginFragment";
 import { getPostLoginUrl } from "@/modules/util";
 

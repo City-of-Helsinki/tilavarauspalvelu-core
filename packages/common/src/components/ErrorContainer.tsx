@@ -1,12 +1,11 @@
 import styled from "styled-components";
-import { breakpoints } from "../common/style";
 import Image from "next/image";
 import { TFunction, useTranslation } from "next-i18next";
-import { H1 } from "../common/typography";
 import IconButton from "./IconButton";
 import { IconArrowRight } from "hds-react";
 import React from "react";
-import { Flex } from "../../styles/util";
+import { Flex, H1 } from "../../styled";
+import { breakpoints } from "../const";
 
 const IMAGE_WIDTH = "418";
 const IMAGE_HEIGHT = "350";

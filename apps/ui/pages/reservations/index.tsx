@@ -5,7 +5,7 @@ import { Tabs, TabList, Tab, TabPanel } from "hds-react";
 import styled from "styled-components";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
-import { H1 } from "common/src/common/typography";
+import { TabWrapper, H1 } from "common/styled";
 import {
   ReservationStateChoice,
   ReservationOrderingChoices,
@@ -20,7 +20,6 @@ import { getCommonServerSideProps } from "@/modules/serverUtils";
 import { toApiDate } from "common/src/common/util";
 import { addDays } from "date-fns";
 import { errorToast } from "common/src/common/toast";
-import { TabWrapper } from "common/styles/util";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { gql } from "@apollo/client";
 

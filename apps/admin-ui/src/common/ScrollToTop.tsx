@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useScrollPosition } from "@n8tb1t/use-scroll-position";
 import { IconAngleUp } from "hds-react";
-import { useDebounce, useWindowSize } from "react-use";
-import { breakpoints } from "common/src/common/style";
+import { useMedia } from "react-use";
+import { focusStyles } from "common/styled";
 import { useTranslation } from "next-i18next";
-import { focusStyles } from "common/styles/cssFragments";
+import { breakpoints } from "common/src/const";
 
 const Btn = styled.button`
   --min-size: 44px;
@@ -34,32 +34,18 @@ const Btn = styled.button`
   ${focusStyles}
 `;
 
-const breakpoint = breakpoints.m;
-
 function ScrollToTop(): JSX.Element | null {
   const { t } = useTranslation();
-  const [isEnabled, setIsEnabled] = useState<boolean>(false);
-  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState(false);
 
-  const { width } = useWindowSize();
+  // TODO why disable this on mobile? (proably because it blocks some submit buttons)
+  const isMobile = useMedia(`(max-width: ${breakpoints.m})`, false);
 
-  const checkBreakpoint = (w: number) => {
-    setIsEnabled(w > parseInt(breakpoint, 10));
-  };
-
-  // eslint-disable-next-line no-empty-pattern
-  const [] = useDebounce(
-    () => {
-      checkBreakpoint(width);
-    },
-    300,
-    [width]
-  );
-
+  const height = window.innerHeight;
   useScrollPosition(
     ({ currPos }) => {
       const yPos = Math.abs(currPos.y) + window.innerHeight;
-      setIsVisible(yPos > 2000);
+      setIsVisible(yPos > height + 100);
     },
     undefined,
     undefined,
@@ -71,12 +57,12 @@ function ScrollToTop(): JSX.Element | null {
     window.scroll({ top: 0, left: 0, behavior: "smooth" });
   };
 
-  if (!isEnabled || !isVisible) {
+  if (!isMobile || !isVisible) {
     return null;
   }
   return (
     <Btn aria-label={t("common:scrollToTop")} onClick={handleClick}>
-      <IconAngleUp aria-hidden="true" />
+      <IconAngleUp />
     </Btn>
   );
 }

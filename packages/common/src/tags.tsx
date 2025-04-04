@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Tag } from "hds-react";
 import type { StatusLabelType as HDSStatusLabelType } from "hds-react";
-import { Flex } from "../styles/util";
+import { Flex } from "../styled";
 
 export const FilterTags = styled(Flex).attrs({
   $gap: "s",

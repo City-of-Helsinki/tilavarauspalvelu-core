@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   IconAngleDown,
   IconAngleUp,
@@ -5,7 +6,7 @@ import {
   IconSize,
   RadioButton,
 } from "hds-react";
-import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import styled, { css } from "styled-components";
 import {
@@ -14,7 +15,7 @@ import {
   type ApplicationSectionAllocationsQuery,
   type ReservationUnitNode,
 } from "@gql/gql-types";
-import { SemiBold, fontMedium } from "common";
+import { SemiBold, fontMedium } from "common/styled";
 import { filterNonNullable, truncate } from "common/src/helpers";
 import { convertWeekday } from "common/src/conversion";
 import {
@@ -31,7 +32,6 @@ import { errorToast } from "common/src/common/toast";
 import { getApplicantName } from "@/helpers";
 import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/common/const";
 import { formatAgeGroup } from "@/common/util";
-import { Link } from "react-router-dom";
 
 export type AllocationApplicationSectionCardType =
   | "unallocated"

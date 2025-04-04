@@ -21,7 +21,8 @@ import {
 } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
-import { RELATED_RESERVATION_STATES } from "common/src/const";
+import { RELATED_RESERVATION_STATES, breakpoints } from "common/src/const";
+import { H1 } from "common/styled";
 import { gql } from "@apollo/client";
 import { StepState, Stepper } from "hds-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -40,7 +41,6 @@ import {
 } from "@/modules/reservation";
 import { getReservationPath, reservationsPrefix } from "@/modules/urls";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { breakpoints, H1 } from "common";
 
 type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;

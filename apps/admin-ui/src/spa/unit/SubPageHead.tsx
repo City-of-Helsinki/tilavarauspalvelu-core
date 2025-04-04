@@ -1,11 +1,10 @@
 import { IconLocation } from "hds-react";
 import React from "react";
-import { H1, fontMedium } from "common/src/common/typography";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
 import { type UnitWithSpacesAndResourcesQuery } from "@gql/gql-types";
 import { formatAddress } from "@/common/util";
-import { Flex } from "common/styles/util";
+import { Flex, H1, fontMedium } from "common/styled";
 
 // TODO should use a fragment that is shared by both UnitQuery and UnitWithSpacesAndResourcesQuery
 type UnitType = NonNullable<UnitWithSpacesAndResourcesQuery["unit"]>;

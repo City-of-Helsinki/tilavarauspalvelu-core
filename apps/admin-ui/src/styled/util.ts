@@ -1,7 +1,8 @@
 import { Dialog } from "hds-react";
 import styled, { css } from "styled-components";
 import { Link } from "react-router-dom";
-import { breakpoints, fontMedium } from "common";
+import { fontMedium } from "common/styled";
+import { breakpoints } from "common/src/const";
 
 export const TableLink = styled(Link)`
   --focus-ring-color: var(--color-coat-of-arms);
@@ -33,6 +34,7 @@ export const ExternalTableLink = styled(Link).attrs({
   }
 `;
 
+// TODO what is this for? and why is it different to other Modals
 export const DialogActionsButtons = styled(Dialog.ActionButtons)`
   justify-content: space-between;
 `;
@@ -72,6 +74,7 @@ export const Label = styled.div<{ $isSummary?: boolean }>`
     `};
 `;
 
+// TODO why is this <div> and not <span>
 export const Value = styled.div<{ $isSummary?: boolean }>`
   word-wrap: break-word;
   overflow-wrap: anywhere;

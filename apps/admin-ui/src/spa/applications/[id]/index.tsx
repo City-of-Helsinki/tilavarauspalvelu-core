@@ -15,14 +15,17 @@ import { isEqual, trim } from "lodash-es";
 import { gql, type ApolloQueryResult } from "@apollo/client";
 import { type TFunction } from "i18next";
 import {
-  fontMedium,
+  CenterSpinner,
+  Flex,
+  TitleSection,
   H1,
   H3,
   H4,
   H5,
   Strong,
-} from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+  fontMedium,
+} from "common/styled";
+import { breakpoints, WEEKDAYS } from "common/src/const";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import {
   getPermissionErrors,
@@ -44,7 +47,6 @@ import {
 } from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, type Day } from "common/src/conversion";
-import { WEEKDAYS } from "common/src/const";
 import { formatNumber, formatDate, formatAgeGroups } from "@/common/util";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import { Accordion as AccordionBase } from "@/component/Accordion";
@@ -58,10 +60,10 @@ import { getApplicantName } from "@/helpers";
 import Error404 from "@/common/Error404";
 import { useCheckPermission } from "@/hooks";
 import { errorToast } from "common/src/common/toast";
-import { CenterSpinner, Flex, TitleSection } from "common/styles/util";
-import { ApplicationDatas, Summary } from "@/styles/util";
+import { ApplicationDatas, Summary } from "@/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 
+// TODO use a fragment
 type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
 type ApplicationSectionType = NonNullable<
   ApplicationType["applicationSections"]

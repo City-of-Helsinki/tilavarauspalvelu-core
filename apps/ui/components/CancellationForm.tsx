@@ -3,18 +3,17 @@ import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { Button, ButtonVariant, IconCross, LoadingSpinner } from "hds-react";
 import { useTranslation } from "next-i18next";
-import { fontMedium } from "common/src/common/typography";
+import { AutoGrid, ButtonContainer, Flex, fontMedium } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { type CancelReasonFieldsFragment } from "@gql/gql-types";
 import {
   convertLanguageCode,
   getTranslationSafe,
 } from "common/src/common/util";
 import { ControlledSelect } from "common/src/components/form";
-import { AutoGrid, ButtonContainer, Flex } from "common/styles/util";
 import { ButtonLikeLink } from "./common/ButtonLikeLink";
 import TermsBox from "common/src/termsbox/TermsBox";
 import { AccordionWithState } from "./Accordion";
-import { breakpoints } from "common";
 import { Sanitize } from "common/src/components/Sanitize";
 
 const Actions = styled(ButtonContainer).attrs({

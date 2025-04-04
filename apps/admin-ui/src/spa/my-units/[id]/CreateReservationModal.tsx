@@ -26,7 +26,8 @@ import {
   type ReservationFormType,
   type ReservationFormMeta,
 } from "@/schemas";
-import { breakpoints } from "common/src/common/style";
+import { CenterSpinner } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
 import {
   dateTime,
@@ -40,8 +41,8 @@ import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { base64encode } from "common/src/helpers";
 import { errorToast, successToast } from "common/src/common/toast";
-import { CenterSpinner } from "common/styles/util";
 
+// TODO use a fragment
 type ReservationUnitType = NonNullable<ReservationUnitQuery["reservationUnit"]>;
 
 export const CREATE_STAFF_RESERVATION = gql`

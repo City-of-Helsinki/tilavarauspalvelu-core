@@ -11,7 +11,7 @@ import { More } from "@/component/More";
 import { ReservationUnitsTable } from "./ReservationUnitsTable";
 import { useSearchParams } from "react-router-dom";
 import { errorToast } from "common/src/common/toast";
-import { CenterSpinner } from "common/styles/util";
+import { CenterSpinner } from "common/styled";
 
 function transformOrderBy(
   orderBy: string,

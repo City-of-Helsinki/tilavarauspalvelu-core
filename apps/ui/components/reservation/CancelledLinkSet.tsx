@@ -4,7 +4,7 @@ import { IconArrowRight, IconSignout, IconSize } from "hds-react";
 import { signOut } from "common/src/browserHelpers";
 import { getSingleSearchPath } from "@/modules/urls";
 import { IconButton } from "common/src/components";
-import { Flex } from "common/styles/util";
+import { Flex } from "common/styled";
 
 type Props =
   | {

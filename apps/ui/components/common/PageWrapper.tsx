@@ -6,7 +6,7 @@ import { BannerNotificationTarget } from "@gql/gql-types";
 import Footer from "./Footer";
 import Navigation from "./Navigation";
 import { InProgressReservationNotification } from "@/components/UnpaidReservationNotification";
-import { mainStyles } from "common/styles/layout";
+import { mainStyles } from "common/styled";
 
 interface PageProps {
   children: React.ReactNode;

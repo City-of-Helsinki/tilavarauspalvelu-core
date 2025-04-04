@@ -7,7 +7,7 @@ import {
   type Maybe,
   type TermsOfUseFragment,
 } from "@/gql/gql-types";
-import { Flex } from "common/styles/util";
+import { Flex } from "common/styled";
 import {
   convertLanguageCode,
   getTranslationSafe,

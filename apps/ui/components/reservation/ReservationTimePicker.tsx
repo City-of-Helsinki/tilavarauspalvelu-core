@@ -24,7 +24,7 @@ import { addMinutes, differenceInMinutes } from "date-fns";
 import { eventStyleGetter } from "@/components/common/calendarUtils";
 import { Legend } from "@/components/calendar/Legend";
 import { useMedia } from "react-use";
-import { breakpoints } from "common/src/common/style";
+import { breakpoints, RELATED_RESERVATION_STATES } from "common/src/const";
 import { getEventBuffers } from "common/src/calendar/util";
 import { filterNonNullable, getLocalizationLang } from "common/src/helpers";
 import {
@@ -52,7 +52,6 @@ import { getTimeString } from "@/modules/reservationUnit";
 import { UseFormReturn } from "react-hook-form";
 import { PendingReservationFormType } from "../reservation-unit/schema";
 import { useCurrentUser } from "@/hooks";
-import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { gql } from "@apollo/client";
 
 type WeekOptions = "day" | "week" | "month";

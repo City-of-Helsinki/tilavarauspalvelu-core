@@ -19,7 +19,7 @@ import {
 import { AccordionWithState as Accordion } from "@/components/Accordion";
 import { TimeSelector } from "./TimeSelector";
 import { aesToCells } from "./module";
-import { ButtonContainer } from "common/styles/util";
+import { ButtonContainer } from "common/styled";
 import { getApplicationPath } from "@/modules/urls";
 
 type Node = NonNullable<ApplicationPage2Query["application"]>;

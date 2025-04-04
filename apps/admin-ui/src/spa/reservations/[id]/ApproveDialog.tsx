@@ -17,7 +17,7 @@ import {
   type ReservationApproveMutationInput,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { Flex } from "common/styles/util";
+import { Flex } from "common/styled";
 import { getReservationPriceDetails } from "./util";
 import { errorToast, successToast } from "common/src/common/toast";
 import { toNumber } from "common/src/helpers";

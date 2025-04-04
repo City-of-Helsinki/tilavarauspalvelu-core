@@ -8,13 +8,11 @@ import type { PurposeCardFragment } from "@gql/gql-types";
 import { getSingleSearchPath } from "@/modules/urls";
 import { ReservationUnitSearch } from "./ReservationUnitSearch";
 import { pixel } from "@/styled/util";
-import { breakpoints } from "common/src/common/style";
-import { H3 } from "common/src/common/typography";
+import { Flex, H3, anchorStyles, focusStyles } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { ShowAllContainer } from "common/src/components";
-import { anchorStyles, focusStyles } from "common/styles/cssFragments";
 import { getTranslationSafe } from "common/src/common/util";
 import { getLocalizationLang } from "common/src/helpers";
-import { Flex } from "common/styles/util";
 import { gql } from "@apollo/client";
 
 const Top = styled(Flex).attrs({

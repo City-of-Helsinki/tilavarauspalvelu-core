@@ -13,8 +13,9 @@ import {
   toApiDate,
   toUIDate,
 } from "common/src/common/util";
-import { formatters as getFormatters, H4 } from "common";
-import { breakpoints } from "common/src/common/style";
+import { formatters as getFormatters } from "common";
+import { Flex, H4 } from "common/styled";
+import { breakpoints, RELATED_RESERVATION_STATES } from "common/src/const";
 import {
   type ApplicationRoundTimeSlotFieldsFragment,
   type ReservationCreateMutationInput,
@@ -94,7 +95,6 @@ import {
   type PendingReservationFormType,
 } from "@/components/reservation-unit/schema";
 import { LoginFragment } from "@/components/LoginFragment";
-import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { SubmitButton } from "@/styled/util";
 import { ReservationUnitPageWrapper } from "@/styled/reservation";
@@ -104,7 +104,6 @@ import {
 } from "@/modules/urls";
 import { ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { Flex } from "common/styles/util";
 import { useDisplayError } from "@/hooks/useDisplayError";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 import { gql } from "@apollo/client";

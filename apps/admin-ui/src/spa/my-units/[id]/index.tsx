@@ -1,10 +1,10 @@
 import React from "react";
-import { H1 } from "common/src/common/typography";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Tabs } from "hds-react";
-import { breakpoints } from "common/src/common/style";
+import { TabWrapper, TitleSection, H1 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { parseAddress } from "@/common/util";
 import { getRecurringReservationUrl } from "@/common/urls";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
@@ -15,7 +15,6 @@ import { UserPermissionChoice, useUnitViewQuery } from "@gql/gql-types";
 import { useCheckPermission } from "@/hooks";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { LinkPrev } from "@/component/LinkPrev";
-import { TabWrapper, TitleSection } from "common/styles/util";
 import { gql } from "@apollo/client";
 
 type Params = {

@@ -3,7 +3,7 @@ import { NotificationType } from "hds-react";
 import styled from "styled-components";
 import { useLocalStorage } from "react-use";
 import NotificationWrapper from "./NotificationWrapper";
-import { breakpoints } from "../common/style";
+import { breakpoints } from "../const";
 import {
   BannerNotificationLevel,
   BannerNotificationTarget,

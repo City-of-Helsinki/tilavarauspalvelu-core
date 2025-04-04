@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { ApplicantTypeChoice } from "@gql/gql-types";
 import { useController, useFormContext } from "react-hook-form";
 import type { ApplicationPage3FormValues } from "./form";
-import { Flex } from "common/styles/util";
+import { Flex } from "common/styled";
 import styled from "styled-components";
 import { ErrorText } from "common/src/components/ErrorText";
 

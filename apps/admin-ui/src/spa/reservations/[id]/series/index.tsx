@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { NewReservationListItem } from "@/component/ReservationsList";
 import { ApolloError, gql, useApolloClient } from "@apollo/client";
 import {
@@ -19,14 +20,18 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { format, isSameDay } from "date-fns";
 import { useTranslation } from "next-i18next";
-import { Label } from "@/styles/layout";
-import { AutoGrid, ButtonContainer, CenterSpinner } from "common/styles/util";
-import { H1 } from "common";
+import { Element } from "@/styled";
+import {
+  AutoGrid,
+  ButtonContainer,
+  CenterSpinner,
+  H1,
+  Strong,
+} from "common/styled";
 import { LinkPrev } from "@/component/LinkPrev";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, ButtonSize, Notification } from "hds-react";
-import { useEffect, useState } from "react";
 import {
   fromApiDate,
   fromUIDate,
@@ -34,7 +39,6 @@ import {
   toApiDateUnsafe,
   toUIDate,
 } from "common/src/common/util";
-import { Element } from "@/styles/util";
 import { ControlledDateInput, TimeInput } from "common/src/components/form";
 import { WeekdaysSelector } from "@/spa/my-units/recurring/WeekdaysSelector";
 import { ReservationListEditor } from "@/component/ReservationListEditor";
@@ -385,11 +389,11 @@ function SeriesPageInner({ pk }: { pk: number }) {
               $unlimitedMaxWidth
             >
               {/* TODO can we refactor this part (the name + count) into the ReservationListEditor */}
-              <Label $bold>
+              <Strong>
                 {t(`MyUnits.RecurringReservationForm.reservationsList`, {
                   count: reservationsCount,
                 })}
-              </Label>
+              </Strong>
               {localError && (
                 <Notification type="alert">{localError}</Notification>
               )}

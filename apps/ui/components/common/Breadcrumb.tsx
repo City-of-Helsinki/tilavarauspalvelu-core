@@ -1,11 +1,10 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { IconAngleLeft, IconAngleRight, IconSize } from "hds-react";
-import { breakpoints, fontMedium } from "common";
+import { Flex, fontMedium, truncatedText } from "common/styled";
+import { breakpoints } from "common/src/const";
 import { useMedia } from "react-use";
 import Link from "next/link";
-import { Flex } from "common/styles/util";
-import { truncatedText } from "common/styles/cssFragments";
 import { useTranslation } from "next-i18next";
 
 export type RouteItem = {

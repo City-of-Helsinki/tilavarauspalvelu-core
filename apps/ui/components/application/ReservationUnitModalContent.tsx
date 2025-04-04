@@ -12,8 +12,8 @@ import {
 import React from "react";
 import { useTranslation } from "next-i18next";
 import styled from "styled-components";
-import { H2, H3 } from "common/src/common/typography";
-import { breakpoints } from "common/src/common/style";
+import { CenterSpinner, Flex, H2, H3 } from "common/styled";
+import { breakpoints } from "common/src/const";
 import {
   ReservationUnitOrderingChoices,
   useSearchReservationUnitsQuery,
@@ -26,7 +26,6 @@ import {
   getImageSource,
   getMainImage,
 } from "common/src/helpers";
-import { CenterSpinner, Flex } from "common/styles/util";
 import { getApplicationRoundName } from "@/modules/applicationRound";
 import { getReservationUnitName, getUnitName } from "@/modules/reservationUnit";
 import { getReservationUnitPath } from "@/modules/urls";

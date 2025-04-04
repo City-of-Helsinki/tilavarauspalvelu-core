@@ -1,13 +1,13 @@
 import React from "react";
 import Link from "next/link";
 import styled, { css } from "styled-components";
-import { fontMedium } from "../common/typography";
 import {
   anchorStyles,
   focusStyles,
+  fontMedium,
   visitedStyles,
-} from "../../styles/cssFragments";
-import { Flex } from "../../styles/util";
+  Flex,
+} from "../../styled";
 
 interface IconButtonProps {
   // the button label text

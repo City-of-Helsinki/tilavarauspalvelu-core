@@ -12,12 +12,13 @@ import {
   formatAppliedReservationTime,
 } from "./utils";
 import { getApplicationUrl } from "@/common/urls";
-import { ExternalTableLink } from "@/styles/util";
+import { ExternalTableLink } from "@/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
+// TODO use a fragment
 type QueryData = NonNullable<ApplicationsQuery["applications"]>;
 type Edge = NonNullable<QueryData["edges"]>[0];
 type Node = NonNullable<NonNullable<Edge>["node"]>;

@@ -1,7 +1,7 @@
 import React from "react";
 import { Checkbox } from "hds-react";
 import styled from "styled-components";
-import { fontRegular } from "../../common/typography";
+import { fontRegular } from "../../../styled";
 import {
   Control,
   FieldValues,

@@ -4,7 +4,14 @@ import { useTranslation } from "react-i18next";
 import { uniqBy } from "lodash-es";
 import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
-import { H1, fontBold, fontMedium } from "common/src/common/typography";
+import {
+  CenterSpinner,
+  TabWrapper,
+  H1,
+  autoGridCss,
+  fontBold,
+  fontMedium,
+} from "common/styled";
 import { ShowAllContainer } from "common/src/components";
 import { hasPermission as hasUnitPermission } from "@/modules/permissionHelper";
 import {
@@ -24,7 +31,6 @@ import {
 } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
 import { useOptions } from "@/hooks";
-import { autoGridCss, CenterSpinner, TabWrapper } from "common/styles/util";
 import { errorToast } from "common/src/common/toast";
 import {
   ALLOCATION_POLL_INTERVAL,

@@ -13,7 +13,7 @@ import { More } from "@/component/More";
 import { useSort } from "@/hooks/useSort";
 import { ApplicationsTable, SORT_KEYS } from "./ApplicationsTable";
 import { transformApplicantType, transformApplicationStatuses } from "./utils";
-import { CenterSpinner } from "common/styles/util";
+import { CenterSpinner } from "common/styled";
 
 type Props = {
   applicationRoundPk: number;

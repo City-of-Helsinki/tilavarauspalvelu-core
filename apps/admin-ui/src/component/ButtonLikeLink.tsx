@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { ButtonCss, ButtonStyleProps } from "common/styles/buttonCss";
+import { ButtonCss, ButtonStyleProps } from "common/styled";
 
 /// @brief looks like a button but is a link
 /// @desc why? because nesting buttons and links is invalid html and HDS doesn't include this
