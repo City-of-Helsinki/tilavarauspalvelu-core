@@ -1,7 +1,7 @@
 import React from "react";
 import { CustomTable } from "@/component/Table";
 import { getApplicationUrl, getReservationUrl } from "@/common/urls";
-import type { RejectedOccurrencesQuery } from "@gql/gql-types";
+import type { RejectedOccurancesTableElementFragment } from "@gql/gql-types";
 import { truncate } from "common/src/helpers";
 import { IconLinkExternal, IconSize } from "hds-react";
 import { memoize } from "lodash-es";
@@ -11,18 +11,15 @@ import { getApplicantName } from "@/helpers";
 import { toUIDate } from "common/src/common/util";
 import { formatTime } from "@/common/util";
 import { ExternalTableLink } from "@/styled";
+import { gql } from "@apollo/client";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
-// TODO use a fragment
-type QueryData = NonNullable<RejectedOccurrencesQuery["rejectedOccurrences"]>;
-type Edge = NonNullable<QueryData["edges"]>[0];
-type Node = NonNullable<NonNullable<Edge>["node"]>;
 type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  rejectedOccurrences: Node[];
+  rejectedOccurrences: RejectedOccurancesTableElementFragment[];
   isLoading?: boolean;
 };
 
@@ -39,7 +36,10 @@ type RejectedOccurrencesView = {
   link: string;
 };
 
-function timeSlotMapper(t: TFunction, slot: Node): RejectedOccurrencesView {
+function timeSlotMapper(
+  t: TFunction,
+  slot: RejectedOccurancesTableElementFragment
+): RejectedOccurrencesView {
   const allocatedSlot = slot.recurringReservation?.allocatedTimeSlot;
   const allocatedReservationUnit =
     allocatedSlot?.reservationUnitOption.reservationUnit;
@@ -98,7 +98,7 @@ const COLS = [
     }: RejectedOccurrencesView) => (
       <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
         {truncate(applicantName ?? "-", applicantTruncateLen)}
-        <IconLinkExternal size={IconSize.ExtraSmall} aria-hidden="true" />
+        <IconLinkExternal size={IconSize.ExtraSmall} />
       </ExternalTableLink>
     ),
   },
@@ -106,29 +106,27 @@ const COLS = [
     headerTKey: "ApplicationEventSchedules.headings.eventName",
     isSortable: true,
     key: "rejected_event_name_fi",
-    transform: ({ name }: RejectedOccurrencesView) => {
-      return <span>{truncate(name ?? "-", unitsTruncateLen)}</span>;
-    },
+    transform: ({ name }: RejectedOccurrencesView) => (
+      <span>{truncate(name ?? "-", unitsTruncateLen)}</span>
+    ),
   },
   {
     headerTKey: "ApplicationEvent.headings.unit",
     isSortable: true,
     key: "rejected_unit_name_fi",
-    transform: ({ unitName }: RejectedOccurrencesView) => {
-      return <span>{truncate(unitName ?? "-", unitsTruncateLen)}</span>;
-    },
+    transform: ({ unitName }: RejectedOccurrencesView) => (
+      <span>{truncate(unitName ?? "-", unitsTruncateLen)}</span>
+    ),
   },
   {
     headerTKey: "ApplicationEventSchedules.headings.reservationUnit",
     isSortable: true,
     key: "rejected_reservation_unit_name_fi",
-    transform: ({ allocatedReservationUnitName }: RejectedOccurrencesView) => {
-      return (
-        <span>
-          {truncate(allocatedReservationUnitName ?? "-", unitsTruncateLen)}
-        </span>
-      );
-    },
+    transform: ({ allocatedReservationUnitName }: RejectedOccurrencesView) => (
+      <span>
+        {truncate(allocatedReservationUnitName ?? "-", unitsTruncateLen)}
+      </span>
+    ),
   },
   {
     headerTKey: "ApplicationEventSchedules.headings.occurrenceTime",
@@ -187,3 +185,57 @@ export function RejectedOccurrencesTable({
     />
   );
 }
+
+export const REJECTED_OCCURANCES_TABLE_ELEMENT_FRAGMENT = gql`
+  fragment RejectedOccurancesTableElement on RejectedOccurrenceNode {
+    id
+    pk
+    beginDatetime
+    endDatetime
+    rejectionReason
+    recurringReservation {
+      id
+      allocatedTimeSlot {
+        id
+        pk
+        dayOfTheWeek
+        beginTime
+        endTime
+        reservationUnitOption {
+          id
+          applicationSection {
+            id
+            name
+            application {
+              id
+              pk
+              applicantType
+              contactPerson {
+                id
+                firstName
+                lastName
+              }
+              organisation {
+                id
+                nameFi
+              }
+            }
+          }
+          reservationUnit {
+            id
+            nameFi
+            pk
+            unit {
+              id
+              nameFi
+            }
+          }
+        }
+      }
+      reservations {
+        id
+        pk
+      }
+    }
+  }
+`;

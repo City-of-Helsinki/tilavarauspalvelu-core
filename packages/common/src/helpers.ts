@@ -236,11 +236,11 @@ export function formatMinutes(
 }
 
 export function formatTimeRange(
-  begin: number,
-  end: number,
+  beginMins: number,
+  endMins: number,
   trailingMinutes = false
 ): string {
-  return `${formatMinutes(begin, trailingMinutes)}–${formatMinutes(end, trailingMinutes)}`;
+  return `${formatMinutes(beginMins, trailingMinutes)}–${formatMinutes(endMins, trailingMinutes)}`;
 }
 
 export function formatApiTimeInterval({

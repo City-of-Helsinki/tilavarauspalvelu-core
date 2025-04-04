@@ -24,7 +24,7 @@ type Props = {
   unitOptions: { nameFi: string; pk: number }[];
 };
 
-function RejectedOccurrencesDataLoader({
+export function RejectedOccurrencesDataLoader({
   applicationRoundPk,
   unitOptions,
 }: Props): JSX.Element {
@@ -143,8 +143,6 @@ function transformOrderBy(
   }
 }
 
-export default RejectedOccurrencesDataLoader;
-
 export const REJECTED_OCCURRENCES_QUERY = gql`
   query RejectedOccurrences(
     $applicationRound: Int
@@ -171,55 +169,7 @@ export const REJECTED_OCCURRENCES_QUERY = gql`
       }
       edges {
         node {
-          id
-          pk
-          beginDatetime
-          endDatetime
-          rejectionReason
-          recurringReservation {
-            id
-            allocatedTimeSlot {
-              id
-              pk
-              dayOfTheWeek
-              beginTime
-              endTime
-              reservationUnitOption {
-                id
-                applicationSection {
-                  id
-                  name
-                  application {
-                    id
-                    pk
-                    applicantType
-                    contactPerson {
-                      id
-                      firstName
-                      lastName
-                    }
-                    organisation {
-                      id
-                      nameFi
-                    }
-                  }
-                }
-                reservationUnit {
-                  id
-                  nameFi
-                  pk
-                  unit {
-                    id
-                    nameFi
-                  }
-                }
-              }
-            }
-            reservations {
-              id
-              pk
-            }
-          }
+          ...RejectedOccurancesTableElement
         }
       }
     }

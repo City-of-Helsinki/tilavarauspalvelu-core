@@ -17,7 +17,7 @@ import {
   transformApplicantType,
 } from "./utils";
 import { useSearchParams } from "react-router-dom";
-import { AllocatedEventsTable, SORT_KEYS } from "./AllocatedEventsTable";
+import { AllocatedSectionsTable, SORT_KEYS } from "./AllocatedSectionsTable";
 import { transformWeekday, type Day } from "common/src/conversion";
 import { getPermissionErrors } from "common/src/apolloUtils";
 import { CenterSpinner } from "common/styled";
@@ -96,7 +96,7 @@ export function TimeSlotDataLoader({
           {totalCount} {t("ApplicationRound.applicationEventCount")}
         </b>
       </span>
-      <AllocatedEventsTable
+      <AllocatedSectionsTable
         schedules={aes}
         sort={orderBy}
         sortChanged={handleSortChanged}
@@ -186,49 +186,7 @@ export const ALLOCATED_TIME_SLOTS_QUERY = gql`
     ) {
       edges {
         node {
-          id
-          pk
-          dayOfTheWeek
-          endTime
-          beginTime
-          recurringReservation {
-            id
-            pk
-            shouldHaveActiveAccessCode
-            isAccessCodeIsActiveCorrect
-            reservations {
-              id
-              pk
-            }
-          }
-          reservationUnitOption {
-            id
-            rejected
-            locked
-            preferredOrder
-            applicationSection {
-              id
-              pk
-              name
-              reservationsEndDate
-              reservationsBeginDate
-              reservationMinDuration
-              reservationMaxDuration
-              application {
-                pk
-                id
-                ...ApplicationName
-              }
-            }
-            reservationUnit {
-              id
-              nameFi
-              unit {
-                id
-                nameFi
-              }
-            }
-          }
+          ...AllocatedSectionsTableElement
         }
       }
       pageInfo {

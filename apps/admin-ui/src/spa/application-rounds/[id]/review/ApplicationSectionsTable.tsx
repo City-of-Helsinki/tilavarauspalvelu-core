@@ -12,7 +12,7 @@ import {
   IconSize,
 } from "hds-react";
 import {
-  ApplicationSectionsQuery,
+  type ApplicationSectionTableElementFragment,
   ApplicationSectionStatusChoice,
 } from "@gql/gql-types";
 import { MAX_APPLICATION_ROUND_NAME_LENGTH } from "@/common/const";
@@ -31,14 +31,10 @@ import { gql } from "@apollo/client";
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
-// TODO use a fragment
-type QueryDate = NonNullable<ApplicationSectionsQuery["applicationSections"]>;
-type Edge = NonNullable<QueryDate["edges"]>[0];
-type Node = NonNullable<NonNullable<Edge>["node"]>;
 type Props = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  applicationSections: Node[];
+  applicationSections: ApplicationSectionTableElementFragment[];
   isLoading?: boolean;
 };
 
@@ -46,19 +42,21 @@ type UnitType = {
   pk: number;
   name: string;
 };
-type ApplicationEventView = {
-  applicationPk?: number;
-  pk?: number;
+type ApplicationSectionView = {
+  applicationPk: number | null;
+  pk: number | null;
   applicantName?: string;
   nameFi: string;
   units: UnitType[];
-  status?: ApplicationSectionStatusChoice;
+  status: ApplicationSectionStatusChoice | null;
   applicationCount: string;
 };
 
-function appEventMapper(appEvent: Node): ApplicationEventView {
+function sectionMapper(
+  aes: ApplicationSectionTableElementFragment
+): ApplicationSectionView {
   // TODO why is this modified?
-  const resUnits = appEvent.reservationUnitOptions?.flatMap((eru) => ({
+  const resUnits = aes.reservationUnitOptions?.flatMap((eru) => ({
     ...eru?.reservationUnit?.unit,
     priority: eru?.preferredOrder ?? 0,
   }));
@@ -69,15 +67,15 @@ function appEventMapper(appEvent: Node): ApplicationEventView {
     }))
     .filter((unit): unit is UnitType => !!unit.pk && !!unit.name);
 
-  const status = appEvent.status ?? undefined;
-  const name = appEvent.name || "-";
-  const applicantName = getApplicantName(appEvent.application);
-  const time = calculateAppliedReservationTime(appEvent);
+  const status = aes.status;
+  const name = aes.name || "-";
+  const applicantName = getApplicantName(aes.application);
+  const time = calculateAppliedReservationTime(aes);
   const applicationCount = formatAppliedReservationTime(time);
 
   return {
-    applicationPk: appEvent.application.pk ?? undefined,
-    pk: appEvent.pk ?? undefined,
+    applicationPk: aes.application.pk,
+    pk: aes.pk,
     applicantName,
     units,
     nameFi: name,
@@ -122,7 +120,7 @@ const getColConfig = (t: TFunction) =>
     {
       headerTKey: "ApplicationEvent.headings.id",
       key: "application_id,pk",
-      transform: ({ pk, applicationPk }: ApplicationEventView) =>
+      transform: ({ pk, applicationPk }: ApplicationSectionView) =>
         `${applicationPk}-${pk}`,
     },
     {
@@ -132,7 +130,7 @@ const getColConfig = (t: TFunction) =>
         applicantName,
         applicationPk,
         pk,
-      }: ApplicationEventView) => (
+      }: ApplicationSectionView) => (
         <ExternalTableLink to={getApplicationUrl(applicationPk, pk)}>
           {truncate(applicantName ?? "-", applicantTruncateLen)}
           <IconLinkExternal size={IconSize.ExtraSmall} aria-hidden="true" />
@@ -142,13 +140,13 @@ const getColConfig = (t: TFunction) =>
     {
       headerTKey: "ApplicationEvent.headings.name",
       key: "nameFi",
-      transform: ({ nameFi }: ApplicationEventView) =>
+      transform: ({ nameFi }: ApplicationSectionView) =>
         truncate(nameFi, MAX_APPLICATION_ROUND_NAME_LENGTH),
     },
     {
       headerTKey: "ApplicationEvent.headings.unit",
       key: "preferredUnitNameFi",
-      transform: ({ units }: ApplicationEventView) => {
+      transform: ({ units }: ApplicationSectionView) => {
         const allUnits = units.map((u) => u.name).join(", ");
 
         return (
@@ -167,7 +165,7 @@ const getColConfig = (t: TFunction) =>
     {
       headerTKey: "ApplicationEvent.headings.stats",
       key: "applicationCount",
-      transform: ({ applicationCount }: ApplicationEventView) =>
+      transform: ({ applicationCount }: ApplicationSectionView) =>
         applicationCount,
     },
     {
@@ -189,7 +187,7 @@ const getColConfig = (t: TFunction) =>
     isSortable: SORT_KEYS.includes(key) ?? undefined,
   }));
 
-export function ApplicationEventsTable({
+export function ApplicationSectionsTable({
   sort,
   sortChanged: onSortChanged,
   applicationSections,
@@ -197,7 +195,7 @@ export function ApplicationEventsTable({
 }: Props): JSX.Element {
   const { t } = useTranslation();
 
-  const views = applicationSections.map((ae) => appEventMapper(ae));
+  const views = applicationSections.map((ae) => sectionMapper(ae));
 
   const cols = memoize(() => getColConfig(t))();
 
@@ -221,74 +219,26 @@ export function ApplicationEventsTable({
   );
 }
 
-/// NOTE might have some cache issues (because it collides with the other sections query)
-/// TODO rename (there is no Events anymore)
-/// TODO see if we can remove some of the fields (like reservationUnitOptions)
-export const APPLICATION_SECTIONS_QUERY = gql`
-  query ApplicationSections(
-    $applicationRound: Int!
-    $applicationStatus: [ApplicationStatusChoice]!
-    $status: [ApplicationSectionStatusChoice]
-    $unit: [Int]
-    $applicantType: [ApplicantTypeChoice]
-    $preferredOrder: [Int]
-    $textSearch: String
-    $priority: [Priority]
-    $purpose: [Int]
-    $reservationUnit: [Int]
-    $ageGroup: [Int]
-    $homeCity: [Int]
-    $includePreferredOrder10OrHigher: Boolean
-    $orderBy: [ApplicationSectionOrderingChoices]
-    $first: Int
-    $after: String
-  ) {
-    applicationSections(
-      applicationRound: $applicationRound
-      applicationStatus: $applicationStatus
-      status: $status
-      unit: $unit
-      applicantType: $applicantType
-      preferredOrder: $preferredOrder
-      textSearch: $textSearch
-      priority: $priority
-      purpose: $purpose
-      reservationUnit: $reservationUnit
-      ageGroup: $ageGroup
-      homeCity: $homeCity
-      includePreferredOrder10OrHigher: $includePreferredOrder10OrHigher
-      orderBy: $orderBy
-      first: $first
-      after: $after
-    ) {
-      edges {
-        node {
-          ...ApplicationSectionFields
-          allocations
-          reservationUnitOptions {
+export const APPLICATION_SECTION_TABLE_ELEMENT_FRAGMENT = gql`
+  fragment ApplicationSectionTableElement on ApplicationSectionNode {
+    ...ApplicationSectionFields
+    allocations
+    reservationUnitOptions {
+      id
+      allocatedTimeSlots {
+        id
+        pk
+        dayOfTheWeek
+        beginTime
+        endTime
+        reservationUnitOption {
+          id
+          applicationSection {
             id
-            allocatedTimeSlots {
-              id
-              pk
-              dayOfTheWeek
-              beginTime
-              endTime
-              reservationUnitOption {
-                id
-                applicationSection {
-                  id
-                  pk
-                }
-              }
-            }
+            pk
           }
         }
       }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-      totalCount
     }
   }
 `;
