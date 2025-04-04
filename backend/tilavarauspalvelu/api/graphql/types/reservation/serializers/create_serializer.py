@@ -16,7 +16,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnit
 from utils.date_utils import DEFAULT_TIMEZONE
-from utils.external_service.errors import ExternalServiceError, external_service_errors_as_validation_errors
+from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import User
@@ -118,16 +118,35 @@ class ReservationCreateSerializer(NestingModelSerializer):
         if prefill_info is not None:
             data.update({key: value for key, value in prefill_info.items() if value is not None})
 
-    @transaction.atomic()
     def create(self, validated_data: ReservationCreateData) -> Reservation:
-        # Must be able to link reservation unit to the reservation
-        reservation_unit: ReservationUnit = validated_data.pop("reservation_unit")
-        reservation: Reservation = super().create(validated_data)
-        reservation.reservation_units.set([reservation_unit])
+        with transaction.atomic():
+            # Must be able to link reservation unit to the reservation
+            reservation_unit: ReservationUnit = validated_data.pop("reservation_unit")
+            reservation: Reservation = super().create(validated_data)
+            reservation.reservation_units.set([reservation_unit])
 
-        # Pindora request must succeed, or the reservation is not created.
+        reservation.begin.astimezone(DEFAULT_TIMEZONE)
+        reservation.end.astimezone(DEFAULT_TIMEZONE)
+
+        # After creating the reservation, check again if there are any overlapping reservations.
+        # This can fail if two reservations are created for reservation units in the same
+        # space-resource hierarchy at almost the same time, meaning when we check for overlapping
+        # reservations during validation, neither of the reservations are yet created.
+        if reservation.actions.overlapping_reservations().exists():
+            reservation.delete()
+            msg = "Overlapping reservations were created at the same time."
+            raise ValidationError(msg, code=error_codes.OVERLAPPING_RESERVATIONS)
+
+        # Pindora request must succeed, otherwise the reservation is removed.
+        # Do this after the second overlapping reservation check, so that we don't need to
+        # remove the access code in Pindora from the removed reservation.
         if reservation.access_type == AccessType.ACCESS_CODE:
-            with external_service_errors_as_validation_errors(code=error_codes.PINDORA_ERROR):
+            try:
                 PindoraService.create_access_code(obj=reservation)
+
+            except Exception as error:
+                reservation.delete()
+                code = error_codes.PINDORA_ERROR if isinstance(error, ExternalServiceError) else None
+                raise ValidationError(str(error), code=code) from error
 
         return reservation

@@ -6,8 +6,10 @@ from typing import TYPE_CHECKING
 from django.db import transaction
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField, IntegerPrimaryKeyField
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import AccessType, CustomerTypeChoice, ReservationStateChoice, ReservationTypeChoice
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -159,6 +161,15 @@ class ReservationStaffCreateSerializer(NestingModelSerializer):
             reservation_unit: ReservationUnit = validated_data.pop("reservation_unit")
             reservation: Reservation = super().create(validated_data)
             reservation.reservation_units.set([reservation_unit])
+
+        # After creating the reservation, check again if there are any overlapping reservations.
+        # This can fail if two reservations are created for reservation units in the same
+        # space-resource hierarchy at almost the same time, meaning when we check for overlapping
+        # reservations during validation, neither of the reservations are yet created.
+        if reservation.actions.overlapping_reservations().exists():
+            reservation.delete()
+            msg = "Overlapping reservations were created at the same time."
+            raise ValidationError(msg, code=error_codes.OVERLAPPING_RESERVATIONS)
 
         if reservation.access_type == AccessType.ACCESS_CODE:
             is_active = reservation.type != ReservationTypeChoice.BLOCKED

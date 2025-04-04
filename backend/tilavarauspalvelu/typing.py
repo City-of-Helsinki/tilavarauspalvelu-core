@@ -231,7 +231,7 @@ class ReservationConfirmData(TypedDict):
 
 
 class ReservationAdjustTimeData(TypedDict):
-    pk: int
+    pk: NotRequired[int]
     begin: datetime.datetime
     end: datetime.datetime
 
@@ -327,6 +327,16 @@ class StaffCreateReservationData(TypedDict):
 
 class StaffReservationData(StaffCreateReservationData):
     pk: int
+
+
+class StaffReservationAdjustTimeData(TypedDict):
+    pk: NotRequired[int]
+    begin: datetime.datetime
+    end: datetime.datetime
+
+    buffer_time_before: NotRequired[datetime.timedelta]
+    buffer_time_after: NotRequired[datetime.timedelta]
+    access_type: NotRequired[AccessType]
 
 
 class ReservationSeriesCreateData(TypedDict):
