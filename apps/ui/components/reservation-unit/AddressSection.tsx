@@ -158,8 +158,11 @@ export function AddressSection({ title, unit }: Props): JSX.Element {
 
 export const ADDRESS_FIELDS = gql`
   fragment AddressFields on UnitNode {
-    ...UnitNameFieldsI18N
     id
+    pk
     tprekId
+    location {
+      ...LocationFieldsI18n
+    }
   }
 `;
