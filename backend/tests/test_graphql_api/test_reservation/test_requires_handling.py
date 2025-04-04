@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 import pytest
 from django.test import override_settings
 
@@ -7,9 +9,11 @@ from tilavarauspalvelu.enums import AccessType, ReservationNotification, Reserva
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
+from tilavarauspalvelu.models.reservation.actions import ReservationActions
 from utils.date_utils import local_datetime
 
-from tests.factories import ReservationFactory, UserFactory
+from tests.factories import ReservationFactory, ReservationUnitFactory, UserFactory
 from tests.helpers import patch_method
 
 from .helpers import REQUIRE_HANDLING_MUTATION, get_require_handling_data
@@ -146,3 +150,69 @@ def test_reservation__requires_handling__pindora_api__call_fails__404(graphql):
     assert PindoraService.deactivate_access_code.call_count == 1
 
     assert SentryLogger.log_exception.called is True
+
+
+def test_reservation__requires_handling__denied_overlaps_with_existing_reservation(graphql):
+    now = local_datetime()
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+
+    ReservationUnitHierarchy.refresh()
+
+    ReservationFactory.create(
+        begin=now + datetime.timedelta(hours=1),
+        end=now + datetime.timedelta(hours=2),
+        state=ReservationStateChoice.CONFIRMED,
+        reservation_units=[reservation_unit],
+    )
+    reservation = ReservationFactory.create_for_requires_handling(
+        begin=now + datetime.timedelta(hours=1),
+        end=now + datetime.timedelta(hours=2),
+        state=ReservationStateChoice.DENIED,
+        reservation_units=[reservation_unit],
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_require_handling_data(reservation)
+
+    response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Reservation overlaps with existing reservations."]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.DENIED
+
+
+def test_reservation__requires_handling__denied_overlaps_with_existing_reservation__after_mutation(graphql):
+    now = local_datetime()
+    reservation_unit = ReservationUnitFactory.create_reservable_now()
+
+    ReservationUnitHierarchy.refresh()
+
+    reservation = ReservationFactory.create_for_reservation_unit(
+        begin=now + datetime.timedelta(hours=1),
+        end=now + datetime.timedelta(hours=2),
+        state=ReservationStateChoice.DENIED,
+        reservation_unit=reservation_unit,
+    )
+
+    graphql.login_with_superuser()
+    input_data = get_require_handling_data(reservation)
+
+    def callback(*args, **kwargs):
+        ReservationFactory.create_for_reservation_unit(
+            begin=now + datetime.timedelta(hours=1),
+            end=now + datetime.timedelta(hours=2),
+            state=ReservationStateChoice.CONFIRMED,
+            reservation_unit=reservation_unit,
+        )
+        return Reservation.objects.filter(pk=reservation.pk)
+
+    with patch_method(ReservationActions.overlapping_reservations, side_effect=callback):
+        response = graphql(REQUIRE_HANDLING_MUTATION, input_data=input_data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Overlapping reservations were created at the same time."]
+
+    reservation.refresh_from_db()
+    assert reservation.state == ReservationStateChoice.DENIED
