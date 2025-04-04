@@ -25,6 +25,7 @@ import {
   Flex,
   LinkLikeButton,
   H5,
+  CenterSpinner,
 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
@@ -62,7 +63,6 @@ import { type TFunction } from "i18next";
 import { convertWeekday } from "common/src/conversion";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { AccordionWithIcons } from "../AccordionWithIcons";
-import { CenterSpinner } from "../common/common";
 import { useMedia } from "react-use";
 import { useRouter } from "next/router";
 import {

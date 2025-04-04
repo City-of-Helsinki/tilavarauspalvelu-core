@@ -93,7 +93,7 @@ function EventGroupList({
 
 // TODO combine this with the AllocationColumn Props type (it's more or less just passing it through)
 type ApplicationEventsProps = {
-  applicationSections: SectionNodeT[] | null;
+  applicationSections: SectionNodeT[];
   reservationUnit: Pick<ReservationUnitNode, "pk">;
   refetchApplicationEvents: () => Promise<
     ApolloQueryResult<ApplicationSectionAllocationsQuery>

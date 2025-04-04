@@ -67,13 +67,13 @@ export function applicationEventSchedulesToCells(
   return cells;
 }
 
-export const timeSlotKeyToTime = (slot: string): number => {
+export function timeSlotKeyToTime(slot: string): number {
   const [, hours, minutes] = slot.split("-").map(toNumber);
   if (hours == null || minutes == null) {
     return 0;
   }
   return set(new Date(), { hours, minutes }).getTime();
-};
+}
 
 export function getTimeSlotOptions(
   day: Day,
