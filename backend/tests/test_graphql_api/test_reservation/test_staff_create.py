@@ -10,6 +10,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
+from tilavarauspalvelu.models.reservation.actions import ReservationActions
 from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, next_hour
 
 from tests.factories import (
@@ -593,3 +594,31 @@ def test_reservation__staff_create__access_type__access_code__pindora_failure(gr
     assert reservation.access_type == AccessType.ACCESS_CODE
     assert reservation.access_code_is_active is False
     assert reservation.access_code_generated_at is None
+
+
+def test_reservation__staff_create__two_overlapping_reservation_created_at_the_same_time(graphql):
+    reservation_unit = ReservationUnitFactory.create()
+
+    data = get_staff_create_data(reservation_unit)
+    graphql.login_with_superuser()
+
+    ReservationUnitHierarchy.refresh()
+    reservation: Reservation | None = None
+
+    def callback(*args, **kwargs):
+        nonlocal reservation
+        reservation = ReservationFactory.create_for_reservation_unit(
+            reservation_unit=reservation_unit,
+            begin=datetime.datetime.fromisoformat(data["begin"]),
+            end=datetime.datetime.fromisoformat(data["end"]),
+        )
+        return Reservation.objects.filter(pk=reservation.pk)
+
+    with patch_method(ReservationActions.overlapping_reservations, side_effect=callback):
+        response = graphql(CREATE_STAFF_MUTATION, input_data=data)
+
+    assert response.error_message() == "Mutation was unsuccessful."
+    assert response.field_error_messages() == ["Overlapping reservations were created at the same time."]
+
+    # The other reservation is retained, but might be deleted during its own endpoint
+    assert Reservation.objects.first() == reservation
