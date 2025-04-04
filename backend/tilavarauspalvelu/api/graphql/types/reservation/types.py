@@ -226,9 +226,6 @@ class ReservationNode(DjangoNode):
                     "working_memo",
                     "handled_at",
                     "staff_event",
-                    "access_code_generated_at",
-                    "access_code_is_active",
-                    "access_code_should_be_active",
                 }
                 # FIELDS ARE PRIVATE BY DEFAULT
                 else private_field_check
