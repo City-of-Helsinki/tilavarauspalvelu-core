@@ -27,8 +27,8 @@ import { ApplicationRoundStatusLabel } from "../../ApplicationRoundStatusLabel";
 import TimeframeStatus from "../../TimeframeStatus";
 import { ApplicationDataLoader } from "./ApplicationDataLoader";
 import { Filters } from "./Filters";
-import { ApplicationEventDataLoader } from "./ApplicationEventDataLoader";
-import { TimeSlotDataLoader } from "./AllocatedEventDataLoader";
+import { ApplicationSectionDataLoader } from "./ApplicationSectionDataLoader";
+import { TimeSlotDataLoader } from "./AllocatedSectionDataLoader";
 import { ApolloQueryResult, gql } from "@apollo/client";
 import {
   getPermissionErrors,
@@ -36,7 +36,7 @@ import {
 } from "common/src/apolloUtils";
 import { useCheckPermission } from "@/hooks";
 import { isApplicationRoundInProgress } from "@/helpers";
-import RejectedOccurrencesDataLoader from "./RejectedOccurrencesDataLoader";
+import { RejectedOccurrencesDataLoader } from "./RejectedOccurrencesDataLoader";
 import { errorToast } from "common/src/common/toast";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
@@ -355,7 +355,7 @@ export function Review({
                 statusOption="event"
                 enableApplicant
               />
-              <ApplicationEventDataLoader
+              <ApplicationSectionDataLoader
                 applicationRoundPk={applicationRound.pk ?? 0}
               />
             </TabContent>

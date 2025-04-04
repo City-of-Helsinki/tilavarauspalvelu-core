@@ -6157,55 +6157,6 @@ export type ReservationUnitReservationsFragment = {
   } | null;
 };
 
-export type ReservationUnitFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly maxPersons: number | null;
-  readonly bufferTimeBefore: number;
-  readonly bufferTimeAfter: number;
-  readonly reservationStartInterval: ReservationStartInterval;
-  readonly authentication: Authentication;
-  readonly termsOfUseFi: string | null;
-  readonly minPersons: number | null;
-  readonly unit: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly serviceSpecificTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly paymentTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly pricingTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly cancellationTerms: {
-    readonly id: string;
-    readonly textFi: string | null;
-    readonly nameFi: string | null;
-  } | null;
-  readonly metadataSet: {
-    readonly id: string;
-    readonly requiredFields: ReadonlyArray<{
-      readonly id: string;
-      readonly fieldName: string;
-    }>;
-    readonly supportedFields: ReadonlyArray<{
-      readonly id: string;
-      readonly fieldName: string;
-    }>;
-  } | null;
-};
-
 export type ReservationMetaFieldsFragment = {
   readonly numPersons: number | null;
   readonly name: string | null;
@@ -6290,26 +6241,6 @@ export type RecurringReservationFieldsFragment = {
       readonly endDate: string | null;
     } | null;
   }>;
-};
-
-export type CalendarReservationFragment = {
-  readonly id: string;
-  readonly name: string | null;
-  readonly reserveeName: string | null;
-  readonly pk: number | null;
-  readonly begin: string;
-  readonly end: string;
-  readonly state: ReservationStateChoice | null;
-  readonly type: ReservationTypeChoice | null;
-  readonly bufferTimeBefore: number;
-  readonly bufferTimeAfter: number;
-  readonly affectedReservationUnits: ReadonlyArray<number | null>;
-  readonly accessType: AccessType;
-  readonly user: { readonly id: string; readonly email: string } | null;
-  readonly recurringReservation: {
-    readonly id: string;
-    readonly pk: number | null;
-  } | null;
 };
 
 export type ApplicationRoundTimeSlotsFragment = {
@@ -6612,6 +6543,26 @@ export type ReservationsByReservationUnitQuery = {
       readonly pk: number | null;
     } | null;
   }> | null;
+};
+
+export type CalendarReservationFragment = {
+  readonly id: string;
+  readonly name: string | null;
+  readonly reserveeName: string | null;
+  readonly pk: number | null;
+  readonly begin: string;
+  readonly end: string;
+  readonly state: ReservationStateChoice | null;
+  readonly type: ReservationTypeChoice | null;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly affectedReservationUnits: ReadonlyArray<number | null>;
+  readonly accessType: AccessType;
+  readonly user: { readonly id: string; readonly email: string } | null;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+  } | null;
 };
 
 export type CheckPermissionsQueryVariables = Exact<{
@@ -7517,6 +7468,62 @@ export type AllocatedTimeSlotsQuery = {
   } | null;
 };
 
+export type AllocatedSectionsTableElementFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly dayOfTheWeek: Weekday;
+  readonly endTime: string;
+  readonly beginTime: string;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly shouldHaveActiveAccessCode: boolean;
+    readonly isAccessCodeIsActiveCorrect: boolean;
+    readonly reservations: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+    }>;
+  } | null;
+  readonly reservationUnitOption: {
+    readonly id: string;
+    readonly rejected: boolean;
+    readonly locked: boolean;
+    readonly preferredOrder: number;
+    readonly applicationSection: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly name: string;
+      readonly reservationsEndDate: string;
+      readonly reservationsBeginDate: string;
+      readonly reservationMinDuration: number;
+      readonly reservationMaxDuration: number;
+      readonly application: {
+        readonly pk: number | null;
+        readonly id: string;
+        readonly applicantType: ApplicantTypeChoice | null;
+        readonly organisation: {
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly organisationType: OrganizationTypeChoice;
+        } | null;
+        readonly contactPerson: {
+          readonly id: string;
+          readonly lastName: string;
+          readonly firstName: string;
+        } | null;
+      };
+    };
+    readonly reservationUnit: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly unit: {
+        readonly id: string;
+        readonly nameFi: string | null;
+      } | null;
+    };
+  };
+};
+
 export type ApplicationsQueryVariables = Exact<{
   applicationRound: Scalars["Int"]["input"];
   unit?: InputMaybe<
@@ -7719,6 +7726,76 @@ export type ApplicationSectionsQuery = {
   } | null;
 };
 
+export type ApplicationSectionTableElementFragment = {
+  readonly allocations: number;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly name: string;
+  readonly status: ApplicationSectionStatusChoice;
+  readonly reservationMaxDuration: number;
+  readonly numPersons: number;
+  readonly reservationsEndDate: string;
+  readonly reservationsBeginDate: string;
+  readonly appliedReservationsPerWeek: number;
+  readonly reservationMinDuration: number;
+  readonly reservationUnitOptions: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly preferredOrder: number;
+    readonly allocatedTimeSlots: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly dayOfTheWeek: Weekday;
+      readonly beginTime: string;
+      readonly endTime: string;
+      readonly reservationUnitOption: {
+        readonly id: string;
+        readonly applicationSection: {
+          readonly id: string;
+          readonly pk: number | null;
+        };
+      };
+    }>;
+    readonly reservationUnit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly unit: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
+    };
+  }>;
+  readonly purpose: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+  } | null;
+  readonly application: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly status: ApplicationStatusChoice;
+    readonly applicantType: ApplicantTypeChoice | null;
+    readonly organisation: {
+      readonly id: string;
+      readonly nameFi: string | null;
+      readonly organisationType: OrganizationTypeChoice;
+    } | null;
+    readonly contactPerson: {
+      readonly id: string;
+      readonly lastName: string;
+      readonly firstName: string;
+    } | null;
+  };
+  readonly ageGroup: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly minimum: number;
+    readonly maximum: number | null;
+  } | null;
+};
+
 export type RejectedOccurrencesQueryVariables = Exact<{
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<
@@ -7799,6 +7876,58 @@ export type RejectedOccurrencesQuery = {
       } | null;
     } | null>;
   } | null;
+};
+
+export type RejectedOccurancesTableElementFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly beginDatetime: string;
+  readonly endDatetime: string;
+  readonly rejectionReason: RejectionReadinessChoice;
+  readonly recurringReservation: {
+    readonly id: string;
+    readonly allocatedTimeSlot: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly dayOfTheWeek: Weekday;
+      readonly beginTime: string;
+      readonly endTime: string;
+      readonly reservationUnitOption: {
+        readonly id: string;
+        readonly applicationSection: {
+          readonly id: string;
+          readonly name: string;
+          readonly application: {
+            readonly id: string;
+            readonly pk: number | null;
+            readonly applicantType: ApplicantTypeChoice | null;
+            readonly contactPerson: {
+              readonly id: string;
+              readonly firstName: string;
+              readonly lastName: string;
+            } | null;
+            readonly organisation: {
+              readonly id: string;
+              readonly nameFi: string | null;
+            } | null;
+          };
+        };
+        readonly reservationUnit: {
+          readonly id: string;
+          readonly nameFi: string | null;
+          readonly pk: number | null;
+          readonly unit: {
+            readonly id: string;
+            readonly nameFi: string | null;
+          } | null;
+        };
+      };
+    } | null;
+    readonly reservations: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+    }>;
+  };
 };
 
 export type ApplicationRoundAdminFragment = {
@@ -8173,35 +8302,21 @@ export type RestoreAllApplicationOptionsMutation = {
   readonly restoreAllApplicationOptions: { readonly pk: number | null } | null;
 };
 
-export type CreateStaffReservationMutationVariables = Exact<{
-  input: ReservationStaffCreateMutationInput;
-}>;
-
-export type CreateStaffReservationMutation = {
-  readonly createStaffReservation: { readonly pk: number | null } | null;
-};
-
 export type ReservationUnitQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
 
 export type ReservationUnitQuery = {
   readonly reservationUnit: {
-    readonly id: string;
     readonly pk: number | null;
     readonly nameFi: string | null;
-    readonly maxPersons: number | null;
-    readonly bufferTimeBefore: number;
-    readonly bufferTimeAfter: number;
     readonly reservationStartInterval: ReservationStartInterval;
     readonly authentication: Authentication;
-    readonly termsOfUseFi: string | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly id: string;
     readonly minPersons: number | null;
-    readonly unit: {
-      readonly id: string;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-    } | null;
+    readonly maxPersons: number | null;
     readonly serviceSpecificTerms: {
       readonly id: string;
       readonly textFi: string | null;
@@ -8234,6 +8349,57 @@ export type ReservationUnitQuery = {
       }>;
     } | null;
   } | null;
+};
+
+export type CreateStaffReservationFragment = {
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly reservationStartInterval: ReservationStartInterval;
+  readonly authentication: Authentication;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly id: string;
+  readonly minPersons: number | null;
+  readonly maxPersons: number | null;
+  readonly serviceSpecificTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
+  } | null;
+  readonly paymentTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
+  } | null;
+  readonly pricingTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
+  } | null;
+  readonly cancellationTerms: {
+    readonly id: string;
+    readonly textFi: string | null;
+    readonly nameFi: string | null;
+  } | null;
+  readonly metadataSet: {
+    readonly id: string;
+    readonly requiredFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
+    readonly supportedFields: ReadonlyArray<{
+      readonly id: string;
+      readonly fieldName: string;
+    }>;
+  } | null;
+};
+
+export type CreateStaffReservationMutationVariables = Exact<{
+  input: ReservationStaffCreateMutationInput;
+}>;
+
+export type CreateStaffReservationMutation = {
+  readonly createStaffReservation: { readonly pk: number | null } | null;
 };
 
 export type ReservationUnitCalendarQueryVariables = Exact<{
@@ -10018,85 +10184,6 @@ export const AllocatedTimeSlotFragmentDoc = gql`
     dayOfTheWeek
   }
 `;
-export const ApplicationSectionDurationFragmentDoc = gql`
-  fragment ApplicationSectionDuration on ApplicationSectionNode {
-    id
-    reservationsEndDate
-    reservationsBeginDate
-    appliedReservationsPerWeek
-    reservationMinDuration
-  }
-`;
-export const ApplicationSectionCommonFragmentDoc = gql`
-  fragment ApplicationSectionCommon on ApplicationSectionNode {
-    id
-    pk
-    name
-    status
-    ...ApplicationSectionDuration
-    reservationMaxDuration
-    ageGroup {
-      id
-      pk
-      minimum
-      maximum
-    }
-    numPersons
-    reservationUnitOptions {
-      id
-      pk
-      preferredOrder
-    }
-  }
-  ${ApplicationSectionDurationFragmentDoc}
-`;
-export const ApplicationNameFragmentDoc = gql`
-  fragment ApplicationName on ApplicationNode {
-    id
-    applicantType
-    organisation {
-      id
-      nameFi
-      organisationType
-    }
-    contactPerson {
-      id
-      lastName
-      firstName
-    }
-  }
-`;
-export const ApplicationSectionFieldsFragmentDoc = gql`
-  fragment ApplicationSectionFields on ApplicationSectionNode {
-    ...ApplicationSectionCommon
-    purpose {
-      id
-      pk
-      nameFi
-    }
-    application {
-      id
-      pk
-      status
-      ...ApplicationName
-    }
-    reservationUnitOptions {
-      id
-      reservationUnit {
-        id
-        pk
-        nameFi
-        unit {
-          id
-          pk
-          nameFi
-        }
-      }
-    }
-  }
-  ${ApplicationSectionCommonFragmentDoc}
-  ${ApplicationNameFragmentDoc}
-`;
 export const ReservationCommonFieldsFragmentDoc = gql`
   fragment ReservationCommonFields on ReservationNode {
     id
@@ -10161,73 +10248,6 @@ export const ReservationUnitReservationsFragmentDoc = gql`
   }
   ${ReservationCommonFieldsFragmentDoc}
   ${VisibleIfPermissionFieldsFragmentDoc}
-`;
-export const MetadataSetsFragmentDoc = gql`
-  fragment MetadataSets on ReservationUnitNode {
-    id
-    minPersons
-    maxPersons
-    metadataSet {
-      id
-      requiredFields {
-        id
-        fieldName
-      }
-      supportedFields {
-        id
-        fieldName
-      }
-    }
-  }
-`;
-export const ReservationTypeFormFieldsFragmentDoc = gql`
-  fragment ReservationTypeFormFields on ReservationUnitNode {
-    ...MetadataSets
-    authentication
-    bufferTimeBefore
-    bufferTimeAfter
-    serviceSpecificTerms {
-      id
-      textFi
-      nameFi
-    }
-    paymentTerms {
-      id
-      textFi
-      nameFi
-    }
-    pricingTerms {
-      id
-      textFi
-      nameFi
-    }
-    cancellationTerms {
-      id
-      textFi
-      nameFi
-    }
-  }
-  ${MetadataSetsFragmentDoc}
-`;
-export const ReservationUnitFieldsFragmentDoc = gql`
-  fragment ReservationUnitFields on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    maxPersons
-    bufferTimeBefore
-    bufferTimeAfter
-    reservationStartInterval
-    authentication
-    unit {
-      id
-      pk
-      nameFi
-    }
-    ...ReservationTypeFormFields
-    termsOfUseFi
-  }
-  ${ReservationTypeFormFieldsFragmentDoc}
 `;
 export const ReservationMetaFieldsFragmentDoc = gql`
   fragment ReservationMetaFields on ReservationNode {
@@ -10314,6 +10334,13 @@ export const RecurringReservationFieldsFragmentDoc = gql`
   }
   ${ChangeReservationTimeFragmentDoc}
 `;
+export const CombineAffectedReservationsFragmentDoc = gql`
+  fragment CombineAffectedReservations on ReservationNode {
+    id
+    pk
+    affectedReservationUnits
+  }
+`;
 export const CalendarReservationFragmentDoc = gql`
   fragment CalendarReservation on ReservationNode {
     id
@@ -10338,13 +10365,6 @@ export const CalendarReservationFragmentDoc = gql`
     }
   }
 `;
-export const CombineAffectedReservationsFragmentDoc = gql`
-  fragment CombineAffectedReservations on ReservationNode {
-    id
-    pk
-    affectedReservationUnits
-  }
-`;
 export const ApplicationRoundCardFragmentDoc = gql`
   fragment ApplicationRoundCard on ApplicationRoundNode {
     id
@@ -10357,6 +10377,210 @@ export const ApplicationRoundCardFragmentDoc = gql`
     reservationPeriodEnd
     reservationUnitCount
     applicationsCount
+  }
+`;
+export const ApplicationNameFragmentDoc = gql`
+  fragment ApplicationName on ApplicationNode {
+    id
+    applicantType
+    organisation {
+      id
+      nameFi
+      organisationType
+    }
+    contactPerson {
+      id
+      lastName
+      firstName
+    }
+  }
+`;
+export const AllocatedSectionsTableElementFragmentDoc = gql`
+  fragment AllocatedSectionsTableElement on AllocatedTimeSlotNode {
+    id
+    pk
+    dayOfTheWeek
+    endTime
+    beginTime
+    recurringReservation {
+      id
+      pk
+      shouldHaveActiveAccessCode
+      isAccessCodeIsActiveCorrect
+      reservations {
+        id
+        pk
+      }
+    }
+    reservationUnitOption {
+      id
+      rejected
+      locked
+      preferredOrder
+      applicationSection {
+        id
+        pk
+        name
+        reservationsEndDate
+        reservationsBeginDate
+        reservationMinDuration
+        reservationMaxDuration
+        application {
+          pk
+          id
+          ...ApplicationName
+        }
+      }
+      reservationUnit {
+        id
+        nameFi
+        unit {
+          id
+          nameFi
+        }
+      }
+    }
+  }
+  ${ApplicationNameFragmentDoc}
+`;
+export const ApplicationSectionDurationFragmentDoc = gql`
+  fragment ApplicationSectionDuration on ApplicationSectionNode {
+    id
+    reservationsEndDate
+    reservationsBeginDate
+    appliedReservationsPerWeek
+    reservationMinDuration
+  }
+`;
+export const ApplicationSectionCommonFragmentDoc = gql`
+  fragment ApplicationSectionCommon on ApplicationSectionNode {
+    id
+    pk
+    name
+    status
+    ...ApplicationSectionDuration
+    reservationMaxDuration
+    ageGroup {
+      id
+      pk
+      minimum
+      maximum
+    }
+    numPersons
+    reservationUnitOptions {
+      id
+      pk
+      preferredOrder
+    }
+  }
+  ${ApplicationSectionDurationFragmentDoc}
+`;
+export const ApplicationSectionFieldsFragmentDoc = gql`
+  fragment ApplicationSectionFields on ApplicationSectionNode {
+    ...ApplicationSectionCommon
+    purpose {
+      id
+      pk
+      nameFi
+    }
+    application {
+      id
+      pk
+      status
+      ...ApplicationName
+    }
+    reservationUnitOptions {
+      id
+      reservationUnit {
+        id
+        pk
+        nameFi
+        unit {
+          id
+          pk
+          nameFi
+        }
+      }
+    }
+  }
+  ${ApplicationSectionCommonFragmentDoc}
+  ${ApplicationNameFragmentDoc}
+`;
+export const ApplicationSectionTableElementFragmentDoc = gql`
+  fragment ApplicationSectionTableElement on ApplicationSectionNode {
+    ...ApplicationSectionFields
+    allocations
+    reservationUnitOptions {
+      id
+      allocatedTimeSlots {
+        id
+        pk
+        dayOfTheWeek
+        beginTime
+        endTime
+        reservationUnitOption {
+          id
+          applicationSection {
+            id
+            pk
+          }
+        }
+      }
+    }
+  }
+  ${ApplicationSectionFieldsFragmentDoc}
+`;
+export const RejectedOccurancesTableElementFragmentDoc = gql`
+  fragment RejectedOccurancesTableElement on RejectedOccurrenceNode {
+    id
+    pk
+    beginDatetime
+    endDatetime
+    rejectionReason
+    recurringReservation {
+      id
+      allocatedTimeSlot {
+        id
+        pk
+        dayOfTheWeek
+        beginTime
+        endTime
+        reservationUnitOption {
+          id
+          applicationSection {
+            id
+            name
+            application {
+              id
+              pk
+              applicantType
+              contactPerson {
+                id
+                firstName
+                lastName
+              }
+              organisation {
+                id
+                nameFi
+              }
+            }
+          }
+          reservationUnit {
+            id
+            nameFi
+            pk
+            unit {
+              id
+              nameFi
+            }
+          }
+        }
+      }
+      reservations {
+        id
+        pk
+      }
+    }
   }
 `;
 export const ApplicationRoundAdminFragmentDoc = gql`
@@ -10530,6 +10754,62 @@ export const ApplicationAdminFragmentDoc = gql`
   ${ApplicationSectionCommonFragmentDoc}
   ${SuitableTimeFragmentDoc}
   ${ReservationUnitOptionFragmentDoc}
+`;
+export const MetadataSetsFragmentDoc = gql`
+  fragment MetadataSets on ReservationUnitNode {
+    id
+    minPersons
+    maxPersons
+    metadataSet {
+      id
+      requiredFields {
+        id
+        fieldName
+      }
+      supportedFields {
+        id
+        fieldName
+      }
+    }
+  }
+`;
+export const ReservationTypeFormFieldsFragmentDoc = gql`
+  fragment ReservationTypeFormFields on ReservationUnitNode {
+    ...MetadataSets
+    authentication
+    bufferTimeBefore
+    bufferTimeAfter
+    serviceSpecificTerms {
+      id
+      textFi
+      nameFi
+    }
+    paymentTerms {
+      id
+      textFi
+      nameFi
+    }
+    pricingTerms {
+      id
+      textFi
+      nameFi
+    }
+    cancellationTerms {
+      id
+      textFi
+      nameFi
+    }
+  }
+  ${MetadataSetsFragmentDoc}
+`;
+export const CreateStaffReservationFragmentDoc = gql`
+  fragment CreateStaffReservation on ReservationUnitNode {
+    pk
+    nameFi
+    reservationStartInterval
+    ...ReservationTypeFormFields
+  }
+  ${ReservationTypeFormFieldsFragmentDoc}
 `;
 export const BannerNotificationListFragmentDoc = gql`
   fragment BannerNotificationList on BannerNotificationNode {
@@ -13985,49 +14265,7 @@ export const AllocatedTimeSlotsDocument = gql`
     ) {
       edges {
         node {
-          id
-          pk
-          dayOfTheWeek
-          endTime
-          beginTime
-          recurringReservation {
-            id
-            pk
-            shouldHaveActiveAccessCode
-            isAccessCodeIsActiveCorrect
-            reservations {
-              id
-              pk
-            }
-          }
-          reservationUnitOption {
-            id
-            rejected
-            locked
-            preferredOrder
-            applicationSection {
-              id
-              pk
-              name
-              reservationsEndDate
-              reservationsBeginDate
-              reservationMinDuration
-              reservationMaxDuration
-              application {
-                pk
-                id
-                ...ApplicationName
-              }
-            }
-            reservationUnit {
-              id
-              nameFi
-              unit {
-                id
-                nameFi
-              }
-            }
-          }
+          ...AllocatedSectionsTableElement
         }
       }
       pageInfo {
@@ -14037,7 +14275,7 @@ export const AllocatedTimeSlotsDocument = gql`
       totalCount
     }
   }
-  ${ApplicationNameFragmentDoc}
+  ${AllocatedSectionsTableElementFragmentDoc}
 `;
 
 /**
@@ -14302,25 +14540,7 @@ export const ApplicationSectionsDocument = gql`
     ) {
       edges {
         node {
-          ...ApplicationSectionFields
-          allocations
-          reservationUnitOptions {
-            id
-            allocatedTimeSlots {
-              id
-              pk
-              dayOfTheWeek
-              beginTime
-              endTime
-              reservationUnitOption {
-                id
-                applicationSection {
-                  id
-                  pk
-                }
-              }
-            }
-          }
+          ...ApplicationSectionTableElement
         }
       }
       pageInfo {
@@ -14330,7 +14550,7 @@ export const ApplicationSectionsDocument = gql`
       totalCount
     }
   }
-  ${ApplicationSectionFieldsFragmentDoc}
+  ${ApplicationSectionTableElementFragmentDoc}
 `;
 
 /**
@@ -14448,59 +14668,12 @@ export const RejectedOccurrencesDocument = gql`
       }
       edges {
         node {
-          id
-          pk
-          beginDatetime
-          endDatetime
-          rejectionReason
-          recurringReservation {
-            id
-            allocatedTimeSlot {
-              id
-              pk
-              dayOfTheWeek
-              beginTime
-              endTime
-              reservationUnitOption {
-                id
-                applicationSection {
-                  id
-                  name
-                  application {
-                    id
-                    pk
-                    applicantType
-                    contactPerson {
-                      id
-                      firstName
-                      lastName
-                    }
-                    organisation {
-                      id
-                      nameFi
-                    }
-                  }
-                }
-                reservationUnit {
-                  id
-                  nameFi
-                  pk
-                  unit {
-                    id
-                    nameFi
-                  }
-                }
-              }
-            }
-            reservations {
-              id
-              pk
-            }
-          }
+          ...RejectedOccurancesTableElement
         }
       }
     }
   }
+  ${RejectedOccurancesTableElementFragmentDoc}
 `;
 
 /**
@@ -15061,65 +15234,13 @@ export type RestoreAllApplicationOptionsMutationOptions =
     RestoreAllApplicationOptionsMutation,
     RestoreAllApplicationOptionsMutationVariables
   >;
-export const CreateStaffReservationDocument = gql`
-  mutation CreateStaffReservation(
-    $input: ReservationStaffCreateMutationInput!
-  ) {
-    createStaffReservation(input: $input) {
-      pk
-    }
-  }
-`;
-export type CreateStaffReservationMutationFn = Apollo.MutationFunction<
-  CreateStaffReservationMutation,
-  CreateStaffReservationMutationVariables
->;
-
-/**
- * __useCreateStaffReservationMutation__
- *
- * To run a mutation, you first call `useCreateStaffReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateStaffReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createStaffReservationMutation, { data, loading, error }] = useCreateStaffReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateStaffReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateStaffReservationMutation,
-    CreateStaffReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateStaffReservationMutation,
-    CreateStaffReservationMutationVariables
-  >(CreateStaffReservationDocument, options);
-}
-export type CreateStaffReservationMutationHookResult = ReturnType<
-  typeof useCreateStaffReservationMutation
->;
-export type CreateStaffReservationMutationResult =
-  Apollo.MutationResult<CreateStaffReservationMutation>;
-export type CreateStaffReservationMutationOptions = Apollo.BaseMutationOptions<
-  CreateStaffReservationMutation,
-  CreateStaffReservationMutationVariables
->;
 export const ReservationUnitDocument = gql`
   query ReservationUnit($id: ID!) {
     reservationUnit(id: $id) {
-      ...ReservationUnitFields
+      ...CreateStaffReservation
     }
   }
-  ${ReservationUnitFieldsFragmentDoc}
+  ${CreateStaffReservationFragmentDoc}
 `;
 
 /**
@@ -15195,6 +15316,58 @@ export type ReservationUnitSuspenseQueryHookResult = ReturnType<
 export type ReservationUnitQueryResult = Apollo.QueryResult<
   ReservationUnitQuery,
   ReservationUnitQueryVariables
+>;
+export const CreateStaffReservationDocument = gql`
+  mutation CreateStaffReservation(
+    $input: ReservationStaffCreateMutationInput!
+  ) {
+    createStaffReservation(input: $input) {
+      pk
+    }
+  }
+`;
+export type CreateStaffReservationMutationFn = Apollo.MutationFunction<
+  CreateStaffReservationMutation,
+  CreateStaffReservationMutationVariables
+>;
+
+/**
+ * __useCreateStaffReservationMutation__
+ *
+ * To run a mutation, you first call `useCreateStaffReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateStaffReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createStaffReservationMutation, { data, loading, error }] = useCreateStaffReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateStaffReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateStaffReservationMutation,
+    CreateStaffReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateStaffReservationMutation,
+    CreateStaffReservationMutationVariables
+  >(CreateStaffReservationDocument, options);
+}
+export type CreateStaffReservationMutationHookResult = ReturnType<
+  typeof useCreateStaffReservationMutation
+>;
+export type CreateStaffReservationMutationResult =
+  Apollo.MutationResult<CreateStaffReservationMutation>;
+export type CreateStaffReservationMutationOptions = Apollo.BaseMutationOptions<
+  CreateStaffReservationMutation,
+  CreateStaffReservationMutationVariables
 >;
 export const ReservationUnitCalendarDocument = gql`
   query ReservationUnitCalendar(
