@@ -231,7 +231,7 @@ class ReservationConfirmData(TypedDict):
 
 
 class ReservationAdjustTimeData(TypedDict):
-    pk: int
+    pk: NotRequired[int]
     begin: datetime.datetime
     end: datetime.datetime
 
