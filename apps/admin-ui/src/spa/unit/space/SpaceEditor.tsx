@@ -204,18 +204,18 @@ export const UPDATE_SPACE = gql`
 export const SPACE_QUERY = gql`
   query Space($id: ID!) {
     space(id: $id) {
-      ...SpaceCommonFields
+      id
+      pk
+      nameFi
       nameSv
       nameEn
       code
+      surfaceArea
+      maxPersons
       unit {
         id
-        pk
-        nameFi
+        ...UnitSubpageHead
         descriptionFi
-        location {
-          ...LocationFields
-        }
         spaces {
           id
           pk
@@ -224,6 +224,8 @@ export const SPACE_QUERY = gql`
       }
       parent {
         id
+        pk
+        nameFi
         parent {
           id
           nameFi

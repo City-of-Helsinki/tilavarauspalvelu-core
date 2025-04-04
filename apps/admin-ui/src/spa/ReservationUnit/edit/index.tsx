@@ -29,10 +29,9 @@ import {
   type ReservationUnitReservationState,
   TermsType,
   ImageType,
-  useUnitWithSpacesAndResourcesQuery,
+  type ReservationUnitEditUnitFragment,
   useDeleteImageMutation,
   useUpdateImageMutation,
-  type UnitWithSpacesAndResourcesQuery,
   useReservationUnitEditorParametersQuery,
   type ReservationUnitEditorParametersQuery,
   type ReservationUnitEditQuery,
@@ -42,6 +41,7 @@ import {
   useReservationUnitEditQuery,
   EquipmentOrderingChoices,
   ReservationKind,
+  type UnitSubpageHeadFragment,
 } from "@gql/gql-types";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { DateTimeInput } from "common/src/components/form/DateTimeInput";
@@ -312,7 +312,7 @@ function DisplayUnit({
   reservationState,
 }: {
   heading: string;
-  unit?: UnitWithSpacesAndResourcesQuery["unit"];
+  unit?: UnitSubpageHeadFragment;
   unitState?: ReservationUnitPublishingState;
   reservationState?: ReservationUnitReservationState;
 }): JSX.Element {
@@ -539,15 +539,14 @@ function SpecializedRadioGroup({
 
 function BasicSection({
   form,
-  unit,
+  spaces,
 }: {
   form: UseFormReturn<ReservationUnitEditFormValues>;
-  unit: UnitWithSpacesAndResourcesQuery["unit"] | undefined;
+  spaces: ReservationUnitEditUnitFragment["spaces"];
 }) {
   const { t } = useTranslation();
   const { control, formState, register, watch, setValue } = form;
   const { errors } = formState;
-  const { spaces } = unit ?? {};
 
   const spaceOptions = filterNonNullable(spaces).map((s) => ({
     label: s?.nameFi ?? "-",
@@ -1520,16 +1519,6 @@ function ReservationUnitEditor({
   const [updateMutation] = useUpdateReservationUnitMutation();
   const [createMutation] = useCreateReservationUnitMutation();
 
-  const id = base64encode(`UnitNode:${unitPk}`);
-  // TODO combine these two queries into a single params query with minimal data
-  const { data: unitResourcesData } = useUnitWithSpacesAndResourcesQuery({
-    skip: !unitPk,
-    variables: { id },
-    onError: (_) => {
-      errorToast({ text: t("errors.errorFetchingData") });
-    },
-  });
-
   const { data: parametersData } = useReservationUnitEditorParametersQuery({
     onError: (_) => {
       errorToast({ text: t("errors.errorFetchingData") });
@@ -1567,7 +1556,7 @@ function ReservationUnitEditor({
     TermsType.CancellationTerms
   );
 
-  const { unit } = unitResourcesData ?? {};
+  const unit = reservationUnit?.unit;
   const cancellationRuleOptions = filterNonNullable(
     parametersData?.reservationUnitCancellationRules?.edges.map((e) => e?.node)
   ).map((n) => ({
@@ -1746,7 +1735,7 @@ function ReservationUnitEditor({
           unitState={reservationUnit?.publishingState ?? undefined}
         />
         <ErrorInfo form={form} />
-        <BasicSection form={form} unit={unit} />
+        <BasicSection form={form} spaces={unit?.spaces ?? []} />
         <DescriptionSection
           form={form}
           equipments={parametersData?.equipmentsAll}
@@ -1926,6 +1915,25 @@ function EditorWrapper({ previewUrlPrefix }: { previewUrlPrefix: string }) {
 
 export default EditorWrapper;
 
+export const RESERVATION_UNIT_EDIT_UNIT_FRAGMENT = gql`
+  fragment ReservationUnitEditUnit on UnitNode {
+    ...UnitSubpageHead
+    spaces {
+      id
+      pk
+      nameFi
+      maxPersons
+      surfaceArea
+      resources {
+        id
+        pk
+        nameFi
+        locationType
+      }
+    }
+  }
+`;
+
 export const RESERVATION_UNIT_EDIT_QUERY = gql`
   query ReservationUnitEdit($id: ID!) {
     reservationUnit(id: $id) {
@@ -2008,9 +2016,7 @@ export const RESERVATION_UNIT_EDIT_QUERY = gql`
         nameFi
       }
       unit {
-        id
-        pk
-        nameFi
+        ...ReservationUnitEditUnit
       }
       minPersons
       maxPersons
