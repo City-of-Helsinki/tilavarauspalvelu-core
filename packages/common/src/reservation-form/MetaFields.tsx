@@ -78,6 +78,10 @@ const InfoHeading = styled(Subheading)<{ $zeroMargin?: boolean }>`
     $zeroMargin ? 0 : "var(--spacing-layout-m) 0 var(--spacing-xs)"};
 `;
 
+const MandatoryFieldsInfoText = styled.p`
+  font-size: var(--fontsize-body-s);
+`;
+
 const ReserverInfoHeading = styled(Subheading)`
   margin: var(--spacing-layout-m) 0 var(--spacing-xs);
 `;
@@ -232,6 +236,9 @@ export function ReservationMetaFields({
       <InfoHeading $zeroMargin={noHeadingMarginal}>
         {t("reservationCalendar:reservationInfo")}
       </InfoHeading>
+      <MandatoryFieldsInfoText>
+        {t("forms:mandatoryFieldsText")}
+      </MandatoryFieldsInfoText>
       <AutoGrid>
         <ReservationFormFields
           options={options}

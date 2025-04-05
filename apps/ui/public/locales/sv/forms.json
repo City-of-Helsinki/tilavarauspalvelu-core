@@ -20,5 +20,6 @@
   "heading": {
     "errorsTitle": "Fyll i den information som saknas",
     "errorsSubtitle": "Fyll i följande fält för att göra bokningen:"
-  }
+  },
+  "mandatoryFieldsText": "* Fält markerade med asterisk är obligatoriska."
 }

@@ -184,8 +184,8 @@
     },
     "reservationUnitTerms": "Kompletterande bokningssvillkor",
     "termsOfService": "Bokningsvillkor för Helsingfors stads lokaler och utrustning",
-    "userAcceptsGeneralTerms": "Jag har läst och godkänner avtalsvillkoren.",
-    "userAcceptsSpecificTerms": "Jag har läst och godkänner de kompletterande bokningsvillkoren.",
+    "userAcceptsGeneralTerms": "Jag har läst och godkänner avtalsvillkoren. (*)",
+    "userAcceptsSpecificTerms": "Jag har läst och godkänner de kompletterande bokningsvillkoren. (*)",
     "reservationDeleted": "Bokning avbruten.",
     "applicationSectionCancelled": "Avbruten {{ cancelled }} / {{ future }} bokning.",
     "applicationSectionCancelledAll": "Avbruten alla {{ cancelled }} bokning."
