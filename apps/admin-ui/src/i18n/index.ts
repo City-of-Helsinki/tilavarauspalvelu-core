@@ -90,6 +90,7 @@ i18n.addResourceBundle("fi", "forms", {
   },
   // duplicated in reservationForm.json (translation system is borked and cant be shared)
   invalidEmail: "Sähköpostin tulee olla oikeassa muodossa (sisältäen @-merkin)",
+  mandatoryFieldsText: "* Tähdellä merkityt syötekentät ovat pakollisia.",
 });
 i18n.addResourceBundle("fi", "errors", errors);
 

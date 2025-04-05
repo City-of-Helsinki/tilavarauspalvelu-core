@@ -70,6 +70,12 @@ const FixedDialog = styled(Dialog)`
   }
 `;
 
+const MandatoryFieldsText = styled.div`
+  margin-top: calc(var(--spacing-xs) * -1);
+  grid-column: 1 / span 3;
+  font-size: var(--fontsize-body-s);
+`;
+
 type FormValueType = ReservationFormType & ReservationFormMeta;
 
 const Form = styled.form`
@@ -334,6 +340,9 @@ function DialogContent({
       <Dialog.Content>
         <FormProvider {...form}>
           <Form onSubmit={handleSubmit(onSubmit)}>
+            <MandatoryFieldsText>
+              {t("forms:mandatoryFieldsText")}
+            </MandatoryFieldsText>
             <ControlledDateInput
               name="date"
               control={control}
