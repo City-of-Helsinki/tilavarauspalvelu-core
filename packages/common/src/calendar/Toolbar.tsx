@@ -45,10 +45,10 @@ export const ToolbarBtn = styled.button.attrs({ type: "button" })<{
     border-radius: 0;
     cursor: pointer;
     user-select: none;
-    ${fontMedium}
     color: var(--color-black);
     font-size: var(--fontsize-body-m);
     height: 44px;
+    ${fontMedium}
 
     ${(props) =>
       props.$borderless &&
@@ -88,7 +88,7 @@ export function Toolbar({
   view,
   date,
   children,
-}: ToolbarProps) {
+}: Readonly<ToolbarProps>) {
   const culture = { locale: fi };
   const { t } = useTranslation();
 
@@ -129,54 +129,28 @@ export function Toolbar({
       $alignItems="center"
       $wrap="wrap"
       className="rbc-toolbar"
+      aria-hidden="true"
     >
       <Flex $direction="row">
-        <ToolbarBtn
-          onClick={() => onNavigate("TODAY")}
-          aria-label={t("reservationCalendar:showCurrentDay")}
-        >
+        <ToolbarBtn onClick={() => onNavigate("TODAY")}>
           {t("common:today")}
         </ToolbarBtn>
         {children}
       </Flex>
       <DateNavigationWrapper>
-        <ToolbarBtn
-          $borderless
-          onClick={() => onNavigate("PREV")}
-          aria-label={t("reservationCalendar:showPrevious", {
-            view: t(`common:${view}`).toLowerCase(),
-          })}
-        >
+        <ToolbarBtn $borderless onClick={() => onNavigate("PREV")}>
           <IconAngleLeft />
         </ToolbarBtn>
         <Label>{title}</Label>
-        <ToolbarBtn
-          $borderless
-          onClick={() => onNavigate("NEXT")}
-          aria-label={t("reservationCalendar:showNext", {
-            view: t(`common:${view}`).toLowerCase(),
-          })}
-        >
+        <ToolbarBtn $borderless onClick={() => onNavigate("NEXT")}>
           <IconAngleRight />
         </ToolbarBtn>
       </DateNavigationWrapper>
       <div>
-        <ToolbarBtn
-          $active={view === "day"}
-          onClick={() => onView("day")}
-          aria-label={t("reservationCalendar:showView", {
-            view: t("common:day").toLowerCase(),
-          })}
-        >
+        <ToolbarBtn $active={view === "day"} onClick={() => onView("day")}>
           {t("common:day")}
         </ToolbarBtn>
-        <ToolbarBtn
-          $active={view === "week"}
-          onClick={() => onView("week")}
-          aria-label={t("reservationCalendar:showView", {
-            view: t("common:week").toLowerCase(),
-          })}
-        >
+        <ToolbarBtn $active={view === "week"} onClick={() => onView("week")}>
           {t("common:week")}
         </ToolbarBtn>
       </div>
