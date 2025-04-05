@@ -153,7 +153,7 @@ export function ReservationUnitList({
       >
         {t("reservationUnitList:infoReservationUnits")}
       </Notification>
-      <Flex $gap="m" $direction="column">
+      <Flex $gap="m" $direction="column" aria-live="polite">
         {currentReservationUnits.map((ru, i, all) => (
           <OrderedReservationUnitCard
             key={ru.pk}
