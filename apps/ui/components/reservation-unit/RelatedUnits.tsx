@@ -37,13 +37,16 @@ export function RelatedUnits({
   }
   return (
     <div style={style} className={className}>
-      <H3 as="h2">{t("reservationUnit:relatedReservationUnits")}</H3>
+      <H3 as="h2" id="related-reservation-units">
+        {t("reservationUnit:relatedReservationUnits")}
+      </H3>
       <Carousel
         slidesToShow={isMobile ? 1 : isWideMobile ? 2 : 3}
         slidesToScroll={isMobile ? 1 : isWideMobile ? 2 : 3}
         wrapAround={false}
         hideCenterControls
         cellSpacing={24}
+        frameAriaLabel={t("reservationUnit:relatedReservationUnits")}
       >
         {units.map((ru) => (
           <RelatedUnitCard key={ru.pk} reservationUnit={ru} />
