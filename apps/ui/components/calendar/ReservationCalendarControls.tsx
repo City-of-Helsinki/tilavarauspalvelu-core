@@ -327,17 +327,12 @@ function ControlledToggler({
         onClick={() => onChange(!value)}
         data-testid="calendar-controls__toggle-button"
         type="button"
+        aria-label={value ? t("common:showLess") : t("common:showMore")}
       >
         {value ? (
-          <IconAngleDown
-            aria-label={t("common:showLess")}
-            size={IconSize.Medium}
-          />
+          <IconAngleDown size={IconSize.Medium} />
         ) : (
-          <IconAngleUp
-            aria-label={t("common:showMore")}
-            size={IconSize.Medium}
-          />
+          <IconAngleUp size={IconSize.Medium} />
         )}
       </ToggleButton>
     </Flex>
