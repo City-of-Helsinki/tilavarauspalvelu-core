@@ -145,14 +145,20 @@ const ChildContainer = styled.div`
 function WrapWithLink({
   content,
   link,
-}: {
+  focusable = true,
+}: Readonly<{
   content: JSX.Element;
   link?: string;
-}): JSX.Element {
+  focusable?: boolean;
+}>): JSX.Element {
   if (!link) {
     return content;
   }
-  return <Link href={link}>{content}</Link>;
+  return (
+    <Link href={link} tabIndex={focusable ? 0 : -1}>
+      {content}
+    </Link>
+  );
 }
 
 /**
@@ -216,15 +222,9 @@ export default function Card({
       {imageSrc && (
         <ImageWrapper>
           <WrapWithLink
-            content={
-              <Image
-                src={imageSrc}
-                alt={imageAlt}
-                aria-hidden="true"
-                tabIndex={-1}
-              />
-            }
+            content={<Image src={imageSrc} alt={imageAlt} aria-hidden="true" />}
             link={link}
+            focusable={false}
           />
         </ImageWrapper>
       )}
