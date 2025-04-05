@@ -44,7 +44,7 @@ import {
   toNumber,
 } from "common/src/helpers";
 import { Sanitize } from "common/src/components/Sanitize";
-import { AccordionWithState as Accordion } from "@/components/Accordion";
+import { RelatedUnits } from "@/components/reservation-unit/RelatedUnits";
 import { createApolloClient } from "@/modules/apolloClient";
 import { Map as MapComponent } from "@/components/Map";
 import { getPostLoginUrl } from "@/modules/util";
@@ -77,7 +77,6 @@ import InfoDialog from "@/components/common/InfoDialog";
 import {
   AddressSection,
   Head,
-  RelatedUnits,
   EquipmentList,
   QuickReservation,
   ReservationInfoContainer,
@@ -102,7 +101,12 @@ import {
   getReservationInProgressPath,
   getSingleSearchPath,
 } from "@/modules/urls";
-import { ButtonVariant, LoadingSpinner, Notification } from "hds-react";
+import {
+  Accordion,
+  ButtonVariant,
+  LoadingSpinner,
+  Notification,
+} from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { Flex } from "common/styles/util";
 import { useDisplayError } from "@/hooks/useDisplayError";
@@ -383,7 +387,7 @@ function ReservationUnit({
   searchDuration,
   searchDate,
   searchTime,
-}: PropsNarrowed): JSX.Element | null {
+}: Readonly<PropsNarrowed>): JSX.Element | null {
   const { t, i18n } = useTranslation();
   const lang = convertLanguageCode(i18n.language);
   const router = useRouter();
@@ -679,9 +683,8 @@ function ReservationUnit({
         {termsOfUseContent && (
           <Accordion
             heading={t("reservationUnit:terms")}
-            disableBottomMargin
             headingLevel={2}
-            theme="thin"
+            closeButton={false}
             data-testid="reservation-unit__reservation-notice"
           >
             <PriceChangeNotice
@@ -693,9 +696,9 @@ function ReservationUnit({
         )}
         {showApplicationRoundTimeSlots && (
           <Accordion
-            disableBottomMargin
             headingLevel={2}
             heading={t("reservationUnit:recurringHeading")}
+            closeButton={false}
           >
             <p>{t("reservationUnit:recurringBody")}</p>
             {applicationRoundTimeSlots?.map((day) => (
@@ -705,10 +708,9 @@ function ReservationUnit({
         )}
         {reservationUnit.unit?.tprekId && (
           <Accordion
-            disableBottomMargin
+            closeButton={false}
             heading={t("common:location")}
-            theme="thin"
-            open
+            initiallyOpen
           >
             <JustForMobile customBreakpoint={breakpoints.l}>
               <AddressSection
@@ -721,7 +723,6 @@ function ReservationUnit({
         )}
         {(paymentTermsContent || cancellationTermsContent) && (
           <Accordion
-            disableBottomMargin
             heading={t(
               `reservationUnit:${
                 paymentTermsContent
@@ -729,7 +730,7 @@ function ReservationUnit({
                   : "cancellationTerms"
               }`
             )}
-            theme="thin"
+            closeButton={false}
             data-testid="reservation-unit__payment-and-cancellation-terms"
           >
             {paymentTermsContent && <Sanitize html={paymentTermsContent} />}
@@ -739,8 +740,7 @@ function ReservationUnit({
         {shouldDisplayPricingTerms && pricingTermsContent && (
           <Accordion
             heading={t("reservationUnit:pricingTerms")}
-            disableBottomMargin
-            theme="thin"
+            closeButton={false}
             data-testid="reservation-unit__pricing-terms"
           >
             <Sanitize html={pricingTermsContent} />
@@ -748,8 +748,7 @@ function ReservationUnit({
         )}
         <Accordion
           heading={t("reservationUnit:termsOfUse")}
-          theme="thin"
-          disableBottomMargin
+          closeButton={false}
           data-testid="reservation-unit__terms-of-use"
         >
           {serviceSpecificTermsContent && (

@@ -46,10 +46,10 @@ export const ToolbarBtn = styled.button.attrs({ type: "button" })<{
     border-radius: 0;
     cursor: pointer;
     user-select: none;
-    ${fontMedium}
     color: var(--color-black);
     font-size: var(--fontsize-body-m);
     height: 44px;
+    ${fontMedium}
 
     ${(props) =>
       props.$borderless &&
@@ -130,11 +130,13 @@ export function Toolbar({
       $alignItems="center"
       $wrap="wrap"
       className="rbc-toolbar"
+      aria-hidden="true"
     >
       <Flex $direction="row">
         <ToolbarBtn
           onClick={() => onNavigate("TODAY")}
-          aria-label={t("reservationCalendar:showCurrentDay")}
+          aria-hidden="true"
+          tabIndex={-1}
         >
           {t("common:today")}
         </ToolbarBtn>
@@ -144,9 +146,8 @@ export function Toolbar({
         <ToolbarBtn
           $borderless
           onClick={() => onNavigate("PREV")}
-          aria-label={t("reservationCalendar:showPrevious", {
-            view: t(`common:${view}`).toLowerCase(),
-          })}
+          aria-hidden="true"
+          tabIndex={-1}
         >
           <IconAngleLeft />
         </ToolbarBtn>
@@ -154,9 +155,8 @@ export function Toolbar({
         <ToolbarBtn
           $borderless
           onClick={() => onNavigate("NEXT")}
-          aria-label={t("reservationCalendar:showNext", {
-            view: t(`common:${view}`).toLowerCase(),
-          })}
+          aria-hidden="true"
+          tabIndex={-1}
         >
           <IconAngleRight />
         </ToolbarBtn>
@@ -165,18 +165,16 @@ export function Toolbar({
         <ToolbarBtn
           $active={view === "day"}
           onClick={() => onView("day")}
-          aria-label={t("reservationCalendar:showView", {
-            view: t("common:day").toLowerCase(),
-          })}
+          aria-hidden="true"
+          tabIndex={-1}
         >
           {t("common:day")}
         </ToolbarBtn>
         <ToolbarBtn
           $active={view === "week"}
           onClick={() => onView("week")}
-          aria-label={t("reservationCalendar:showView", {
-            view: t("common:week").toLowerCase(),
-          })}
+          aria-hidden="true"
+          tabIndex={-1}
         >
           {t("common:week")}
         </ToolbarBtn>

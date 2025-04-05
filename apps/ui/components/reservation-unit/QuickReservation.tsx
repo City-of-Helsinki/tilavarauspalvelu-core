@@ -136,7 +136,7 @@ export function QuickReservation({
   LoginAndSubmit,
   className,
   style,
-}: Props): JSX.Element | null {
+}: Readonly<Props>): JSX.Element | null {
   const { t } = useTranslation();
   const { control, watch, handleSubmit } = reservationForm;
   const formDate = watch("date");
@@ -291,6 +291,7 @@ function TimeChunkSection({
                 data-testid="quick-reservation__slot"
                 onClick={() => setValue("time", value, { shouldDirty: true })}
                 type="button"
+                aria-pressed={watch("time") === value ? "true" : "false"}
               >
                 {value}
               </SlotButton>
