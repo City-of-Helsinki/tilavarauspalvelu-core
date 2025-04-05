@@ -20,5 +20,6 @@
   "heading": {
     "errorsTitle": "Fill in the missing information",
     "errorsSubtitle": "Fill in the following fields to make the booking:"
-  }
+  },
+  "mandatoryFieldsText": "* Fields marked with an asterisk are required."
 }
