@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { type TFunction } from "i18next";
 import {
-  type BannerNotificationNode,
   BannerNotificationOrderingChoices,
-  type BannerNotificationListFragment,
+  type BannerNotificationTableElementFragment,
   BannerNotificationState,
   useBannerNotificationListQuery,
 } from "@gql/gql-types";
@@ -45,15 +44,13 @@ const getStatusLabelProps = (
   }
 };
 
-// TODO use a fragment (TableElementFragment similar to other Tables)
-
 // Tila, Nimi, Voimassa alk, Voimassa asti, Kohderyhmä, Tyyppi
 const getColConfig = (t: TFunction) => [
   {
     headerName: t("Notifications.headings.state"),
     key: "state",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationNode>) => {
+    transform: (notification: BannerNotificationTableElementFragment) => {
       const labelProps = getStatusLabelProps(notification.state);
       return (
         <StatusLabel type={labelProps.type} icon={labelProps.icon} slim>
@@ -66,7 +63,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("Notifications.headings.name"),
     key: "name",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationNode>) =>
+    transform: (notification: BannerNotificationTableElementFragment) =>
       notification.pk ? (
         <TableLink to={getNotificationUrl(notification.pk)}>
           {notification.name}
@@ -79,7 +76,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("Notifications.headings.activeFrom"),
     key: "starts",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationNode>) =>
+    transform: (notification: BannerNotificationTableElementFragment) =>
       notification.activeFrom
         ? `${valueForDateInput(notification.activeFrom)} ${valueForTimeInput(
             notification.activeFrom
@@ -90,7 +87,7 @@ const getColConfig = (t: TFunction) => [
     headerName: t("Notifications.headings.activeUntil"),
     key: "ends",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationNode>) =>
+    transform: (notification: BannerNotificationTableElementFragment) =>
       notification.activeUntil
         ? `${valueForDateInput(notification.activeUntil)} ${valueForTimeInput(
             notification.activeUntil
@@ -101,14 +98,14 @@ const getColConfig = (t: TFunction) => [
     headerName: t("Notifications.headings.targetGroup"),
     key: "target",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationNode>) =>
+    transform: (notification: BannerNotificationTableElementFragment) =>
       t(`Notifications.target.${notification.target}`),
   },
   {
     headerName: t("Notifications.headings.level"),
     key: "level",
     isSortable: true,
-    transform: (notification: NonNullable<BannerNotificationNode>) =>
+    transform: (notification: BannerNotificationTableElementFragment) =>
       t(`Notifications.level.${notification.level}`),
   },
 ];
@@ -119,7 +116,7 @@ function NotificationsTable({
   sort,
   isLoading,
 }: {
-  notifications: BannerNotificationListFragment[];
+  notifications: BannerNotificationTableElementFragment[];
   onSortChanged: (key: string) => void;
   sort: string;
   isLoading: boolean;
@@ -266,8 +263,8 @@ function transformSortString(
 
 export default Page;
 
-export const BANNER_NOTIFICATIONS_LIST_FRAGMENT = gql`
-  fragment BannerNotificationList on BannerNotificationNode {
+export const BANNER_NOTIFICATIONS_TABLE_ELEMENT_FRAGMENT = gql`
+  fragment BannerNotificationTableElement on BannerNotificationNode {
     id
     pk
     name
@@ -289,7 +286,7 @@ export const BANNER_NOTIFICATION_LIST_QUERY = gql`
     bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
       edges {
         node {
-          ...BannerNotificationList
+          ...BannerNotificationTableElement
         }
       }
       pageInfo {
