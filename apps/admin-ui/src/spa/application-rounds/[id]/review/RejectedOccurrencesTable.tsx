@@ -48,7 +48,8 @@ function timeSlotMapper(
 
   const application =
     allocatedSlot?.reservationUnitOption.applicationSection?.application;
-  const applicantName = getApplicantName(application);
+  const applicantName =
+    application != null ? getApplicantName(application) : "-";
 
   const date = toUIDate(new Date(slot?.beginDatetime));
   const begin = formatTime(slot?.beginDatetime);
@@ -209,16 +210,7 @@ export const REJECTED_OCCURANCES_TABLE_ELEMENT_FRAGMENT = gql`
             application {
               id
               pk
-              applicantType
-              contactPerson {
-                id
-                firstName
-                lastName
-              }
-              organisation {
-                id
-                nameFi
-              }
+              ...ApplicantNameFields
             }
           }
           reservationUnit {
