@@ -82,7 +82,7 @@ import {
 } from "./form";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { SeasonalSection } from "./SeasonalSection";
-import { getValidationErrors } from "common/src/apolloUtils";
+import { useDisplayError } from "common/src/hooks";
 import { getReservationUnitUrl, getUnitUrl } from "@/common/urls";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
 import { ControlledRadioGroup } from "common/src/components/form";
@@ -1528,6 +1528,8 @@ function ReservationUnitEditor({
     },
   });
 
+  const displayError = useDisplayError();
+
   // ----------------------------- Constants ---------------------------------
   const { getValues, setValue, watch, formState, handleSubmit } = form;
   const { isDirty: hasChanges, isSubmitting: isSaving } = formState;
@@ -1630,21 +1632,6 @@ function ReservationUnitEditor({
     return upPk;
   };
 
-  const handleError = (e: unknown) => {
-    const validationErrors = getValidationErrors(e);
-    const validationError = validationErrors[0];
-    if (validationError != null) {
-      errorToast({
-        text: t(`errors.backendValidation.${validationError.code}`),
-      });
-    } else if (e instanceof Error) {
-      const msg = e.message;
-      errorToast({ text: msg });
-    } else {
-      errorToast({ text: t("ReservationDialog.saveFailed") });
-    }
-  };
-
   // Have to define these like this because otherwise the state changes don't work
   const handlePublish = async () => {
     setValue("isDraft", false);
@@ -1652,7 +1639,7 @@ function ReservationUnitEditor({
     try {
       await handleSubmit(onSubmit)();
     } catch (error) {
-      handleError(error);
+      displayError(error);
     }
   };
 
@@ -1662,7 +1649,7 @@ function ReservationUnitEditor({
     try {
       await handleSubmit(onSubmit)();
     } catch (error) {
-      handleError(error);
+      displayError(error);
     }
   };
 
@@ -1675,7 +1662,7 @@ function ReservationUnitEditor({
       successToast({ text: t("ArchiveReservationUnitDialog.success") });
       history(getUnitUrl(unit?.pk));
     } catch (e) {
-      handleError(e);
+      displayError(e);
     }
   };
 

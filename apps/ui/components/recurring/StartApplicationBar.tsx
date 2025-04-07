@@ -18,7 +18,7 @@ import { Flex, NoWrap, WhiteButton, pageSideMargins } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useMedia } from "react-use";
 import { ignoreMaybeArray, toNumber } from "common/src/helpers";
-import { useDisplayError } from "@/hooks/useDisplayError";
+import { useDisplayError } from "common/src/hooks";
 import { useReservationUnitList } from "@/hooks";
 import { useSearchParams } from "next/navigation";
 import { LoginFragment } from "../LoginFragment";

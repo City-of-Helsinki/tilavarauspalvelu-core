@@ -68,6 +68,7 @@
       "APPLICATION_STATUS_CANNOT_SEND": "Hakemusta ei voi lähettää.",
       "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
       "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Liian pitkä varausaika.",
+      "RESERVATION_CANCELLATION_NOT_ALLOWED": "Peruutus ei ole sallittu.",
       "invalid": "Virheellinen arvo.",
       "generic_validation_error": "Tapahtui virhe."
     }

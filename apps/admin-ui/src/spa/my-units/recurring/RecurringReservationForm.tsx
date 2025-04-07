@@ -38,10 +38,8 @@ import { Element } from "@/styled";
 import { AutoGrid, Flex, Strong } from "common/styled";
 import { errorToast } from "common/src/common/toast";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
-import {
-  getSeriesOverlapErrors,
-  getValidationErrors,
-} from "common/src/apolloUtils";
+import { useDisplayError } from "common/src/hooks";
+import { getSeriesOverlapErrors } from "common/src/apolloUtils";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import {
   ReservationListEditor,
@@ -194,6 +192,7 @@ function RecurringReservationForm({
   });
 
   const navigate = useNavigate();
+  const displayError = useDisplayError();
 
   const onSubmit = async ({
     enableBufferTimeBefore,
@@ -254,15 +253,7 @@ function RecurringReservationForm({
           .getElementById("create-recurring__reservations-list")
           ?.scrollIntoView();
       } else {
-        const validationErrors = getValidationErrors(e);
-        const validationError = validationErrors[0];
-        if (validationError != null) {
-          errorToast({
-            text: t(`errors.backendValidation.${validationError.code}`),
-          });
-        } else {
-          errorToast({ text: t("ReservationDialog.saveFailed") });
-        }
+        displayError(e);
         // on exception in RecurringReservation (because we are catching the individual errors)
         // We don't need to cleanup the RecurringReservation that has zero connections.
         // Based on documentation backend will do this for us.
