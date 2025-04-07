@@ -8745,7 +8745,7 @@ export type CreateReservationSeriesMutation = {
   readonly createReservationSeries: { readonly pk: number | null } | null;
 };
 
-export type BannerNotificationListFragment = {
+export type BannerNotificationTableElementFragment = {
   readonly id: string;
   readonly pk: number | null;
   readonly name: string;
@@ -10978,8 +10978,8 @@ export const CreateStaffReservationFragmentDoc = gql`
   }
   ${ReservationTypeFormFieldsFragmentDoc}
 `;
-export const BannerNotificationListFragmentDoc = gql`
-  fragment BannerNotificationList on BannerNotificationNode {
+export const BannerNotificationTableElementFragmentDoc = gql`
+  fragment BannerNotificationTableElement on BannerNotificationNode {
     id
     pk
     name
@@ -15966,7 +15966,7 @@ export const BannerNotificationListDocument = gql`
     bannerNotifications(first: $first, after: $after, orderBy: $orderBy) {
       edges {
         node {
-          ...BannerNotificationList
+          ...BannerNotificationTableElement
         }
       }
       pageInfo {
@@ -15976,7 +15976,7 @@ export const BannerNotificationListDocument = gql`
       totalCount
     }
   }
-  ${BannerNotificationListFragmentDoc}
+  ${BannerNotificationTableElementFragmentDoc}
 `;
 
 /**
