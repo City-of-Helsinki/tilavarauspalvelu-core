@@ -46,11 +46,12 @@ function getCustomerApplicationStatusLabelProps(
       return { type: "success", icon: <IconCheck /> };
     case ApplicationStatusChoice.Handled:
     case ApplicationStatusChoice.InAllocation:
-    case ApplicationStatusChoice.Received:
       return {
         type: "info",
         icon: <IconCogwheel />,
       };
+    case ApplicationStatusChoice.Received:
+      return { type: "alert", icon: <IconEnvelope /> };
     // These two should never be shown to the client, so they are shown as any other unexpected status
     case ApplicationStatusChoice.Cancelled:
     case ApplicationStatusChoice.Expired:
