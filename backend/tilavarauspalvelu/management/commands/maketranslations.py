@@ -26,5 +26,5 @@ class Command(makemessages.Command):
     def handle(self, *args: Any, **options: Any) -> Any:
         omit_header: bool = options.pop("omit_header", False)
         if omit_header:
-            self.xgettext_options = makemessages.Command.xgettext_options[:] + ["--omit-header"]
+            self.xgettext_options = [*makemessages.Command.xgettext_options[:], "--omit-header"]
         super().handle(*args, **options)
