@@ -23,7 +23,7 @@ import {
   type ApplicationPage2QueryVariables,
 } from "@/gql/gql-types";
 import { getApplicationPath } from "@/modules/urls";
-import { useDisplayError } from "@/hooks/useDisplayError";
+import { useDisplayError } from "common/src/hooks";
 import { gql } from "@apollo/client";
 
 function Page2({ application }: PropsNarrowed): JSX.Element {

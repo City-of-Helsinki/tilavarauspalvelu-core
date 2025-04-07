@@ -16,7 +16,7 @@ import {
   getTranslationSafe,
   toUIDate,
 } from "common/src/common/util";
-import { errorToast } from "common/src/common/toast";
+import { useDisplayError } from "common/src/hooks";
 import { getApplicationPath, getReservationPath } from "@/modules/urls";
 import { getPrice } from "@/modules/reservationUnit";
 import { formatDateTimeStrings } from "@/modules/util";
@@ -46,12 +46,14 @@ type CancellationProps = {
 export function ReservationCancellation(props: CancellationProps): JSX.Element {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+  const displayError = useDisplayError();
 
   const { reservation } = props;
 
   const [cancelReservation, { loading }] = useCancelReservationMutation();
 
   const backLink = getBackPath(reservation);
+
   const handleNext = () => {
     const queryParam = isPartOfApplication(reservation)
       ? `deletedReservationPk=${reservation.pk}`
@@ -76,10 +78,8 @@ export function ReservationCancellation(props: CancellationProps): JSX.Element {
         },
       });
       handleNext();
-    } catch (_) {
-      errorToast({
-        text: t("reservations:cancel.mutationFailed"),
-      });
+    } catch (err: unknown) {
+      displayError(err);
     }
   };
 

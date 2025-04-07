@@ -35,7 +35,7 @@ import {
   getTranslationSafe,
 } from "common/src/common/util";
 import { gql } from "@apollo/client";
-import { useDisplayError } from "@/hooks/useDisplayError";
+import { useDisplayError } from "common/src/hooks";
 import { uniq } from "lodash-es";
 
 function Page1({

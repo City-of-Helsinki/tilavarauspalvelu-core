@@ -27,7 +27,7 @@ import { type UseFormReturn } from "react-hook-form";
 import { convertReservationFormToApi } from "@/modules/reservation";
 import { AcceptTerms } from "./AcceptTerms";
 import { getReservationPath } from "@/modules/urls";
-import { useDisplayError } from "@/hooks/useDisplayError";
+import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import ErrorComponent from "next/error";
 
