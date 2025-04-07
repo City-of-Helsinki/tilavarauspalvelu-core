@@ -585,8 +585,10 @@ function getReservationSeriesAccessText(
     case AccessTypeWithMultivalued.Multivalued:
       if (usedAccessTypes.includes(AccessType.AccessCode)) {
         return (
-          t(`reservationUnit:accessTypes.${AccessType.AccessCode}`) +
-          (pindoraInfo?.accessCode ? `: ${pindoraInfo.accessCode}` : "")
+          `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ` +
+          (pindoraInfo?.accessCode
+            ? pindoraInfo.accessCode
+            : t("reservations:contactSupport"))
         );
       } else
         return usedAccessTypes
@@ -595,8 +597,10 @@ function getReservationSeriesAccessText(
           .join(" / ");
     case AccessTypeWithMultivalued.AccessCode:
       return (
-        t(`reservationUnit:accessTypes.${accessType}`) +
-        (pindoraInfo?.accessCode ? `: ${pindoraInfo.accessCode}` : "")
+        `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ` +
+        (pindoraInfo?.accessCode
+          ? pindoraInfo.accessCode
+          : t("reservations:contactSupport"))
       );
     default:
       return t(`reservationUnit:accessTypes.${accessType}`);
