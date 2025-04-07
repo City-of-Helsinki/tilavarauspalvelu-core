@@ -55,14 +55,13 @@ type ApplicationSectionView = {
 function sectionMapper(
   aes: ApplicationSectionTableElementFragment
 ): ApplicationSectionView {
-  // TODO why is this modified?
   const resUnits = aes.reservationUnitOptions?.flatMap((eru) => ({
-    ...eru?.reservationUnit?.unit,
-    priority: eru?.preferredOrder ?? 0,
+    ...eru.reservationUnit?.unit,
+    priority: eru.preferredOrder,
   }));
   const units = orderBy(uniqBy(resUnits, "pk"), "priority", "asc")
     .map((unit) => ({
-      pk: unit.pk ?? 0,
+      pk: unit.pk,
       name: unit.nameFi,
     }))
     .filter((unit): unit is UnitType => !!unit.pk && !!unit.name);

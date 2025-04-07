@@ -137,8 +137,6 @@ function transformOrderBy(
 }
 
 /// NOTE might have some cache issues (because it collides with the other sections query)
-/// TODO rename (there is no Events anymore)
-/// TODO see if we can remove some of the fields (like reservationUnitOptions)
 export const APPLICATION_SECTIONS_QUERY = gql`
   query ApplicationSections(
     $applicationRound: Int!

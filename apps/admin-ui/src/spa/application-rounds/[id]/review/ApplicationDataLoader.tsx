@@ -140,28 +140,7 @@ export const APPLICATIONS_QUERY = gql`
     ) {
       edges {
         node {
-          id
-          pk
-          status
-          ...ApplicationName
-          applicationSections {
-            id
-            pk
-            name
-            ...ApplicationSectionDuration
-            reservationUnitOptions {
-              id
-              preferredOrder
-              reservationUnit {
-                id
-                unit {
-                  id
-                  pk
-                  nameFi
-                }
-              }
-            }
-          }
+          ...ApplicationsTableElement
         }
       }
       pageInfo {

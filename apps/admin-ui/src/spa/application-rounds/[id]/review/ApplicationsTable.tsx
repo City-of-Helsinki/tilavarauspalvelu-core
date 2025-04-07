@@ -3,7 +3,10 @@ import { useTranslation } from "react-i18next";
 import { memoize, orderBy, uniqBy } from "lodash-es";
 import type { TFunction } from "i18next";
 import { IconLinkExternal, IconSize } from "hds-react";
-import { ApplicationsQuery, ApplicationStatusChoice } from "@gql/gql-types";
+import {
+  type ApplicationsTableElementFragment,
+  ApplicationStatusChoice,
+} from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicantName, truncate } from "@/helpers";
 import { CustomTable } from "@/component/Table";
@@ -14,14 +17,11 @@ import {
 import { getApplicationUrl } from "@/common/urls";
 import { ExternalTableLink } from "@/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
+import { gql } from "@apollo/client";
 
 const unitsTruncateLen = 23;
 const applicantTruncateLen = 20;
 
-// TODO use a fragment
-type QueryData = NonNullable<ApplicationsQuery["applications"]>;
-type Edge = NonNullable<QueryData["edges"]>[0];
-type Node = NonNullable<NonNullable<Edge>["node"]>;
 type UnitType = {
   pk: number;
   name: string;
@@ -35,7 +35,7 @@ type ApplicationView = {
   applicantType: string;
   units: UnitType[];
   applicationCount: string;
-  status?: ApplicationStatusChoice;
+  status: ApplicationStatusChoice | null;
 };
 
 export const SORT_KEYS = [
@@ -105,21 +105,24 @@ const getColConfig = (t: TFunction) =>
     isSortable: SORT_KEYS.includes(key) ?? undefined,
   }));
 
-function appMapper(app: Node, t: TFunction): ApplicationView {
-  const applicationEvents = (app.applicationSections || [])
+function appMapper(
+  app: ApplicationsTableElementFragment,
+  t: TFunction
+): ApplicationView {
+  const applicationEvents = (app.applicationSections ?? [])
     .flatMap((ae) => ae?.reservationUnitOptions)
     .flatMap((eru) => ({
       ...eru?.reservationUnit?.unit,
       priority: eru?.preferredOrder ?? 0,
     }));
-  const units = orderBy(uniqBy(applicationEvents, "pk"), "priority", "asc").map(
-    (u) => ({ pk: u.pk ?? 0, name: u.nameFi ?? "-" })
-  );
+  const units = orderBy(uniqBy(applicationEvents, "pk"), "priority", "asc")
+    .map(({ pk, nameFi }) => ({ pk, name: nameFi }))
+    .filter((u): u is UnitType => u.pk != null && u.name != null);
 
   const name = app.applicationSections?.find(() => true)?.name || "-";
   const firstEvent = app.applicationSections?.find(() => true);
   const eventPk = firstEvent?.pk ?? 0;
-  const status = app.status ?? undefined;
+  const status = app.status;
   const applicantName = getApplicantName(app);
   const applicantType =
     app.applicantType != null
@@ -153,7 +156,7 @@ function appMapper(app: Node, t: TFunction): ApplicationView {
 type ApplicationsTableProps = {
   sort: string | null;
   sortChanged: (field: string) => void;
-  applications: Node[];
+  applications: ApplicationsTableElementFragment[];
   isLoading?: boolean;
 };
 
@@ -188,3 +191,30 @@ export function ApplicationsTable({
     />
   );
 }
+
+export const APPLICATIONS_TABLE_ELEMENT_FRAGMENT = gql`
+  fragment ApplicationsTableElement on ApplicationNode {
+    id
+    pk
+    status
+    ...ApplicationName
+    applicationSections {
+      id
+      pk
+      name
+      ...ApplicationSectionDuration
+      reservationUnitOptions {
+        id
+        preferredOrder
+        reservationUnit {
+          id
+          unit {
+            id
+            pk
+            nameFi
+          }
+        }
+      }
+    }
+  }
+`;

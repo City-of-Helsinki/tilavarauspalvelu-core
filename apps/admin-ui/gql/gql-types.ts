@@ -7827,6 +7827,44 @@ export type ApplicationSectionTableElementFragment = {
   } | null;
 };
 
+export type ApplicationsTableElementFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly status: ApplicationStatusChoice | null;
+  readonly applicantType: ApplicantTypeChoice | null;
+  readonly applicationSections: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly name: string;
+    readonly reservationsEndDate: string;
+    readonly reservationsBeginDate: string;
+    readonly appliedReservationsPerWeek: number;
+    readonly reservationMinDuration: number;
+    readonly reservationUnitOptions: ReadonlyArray<{
+      readonly id: string;
+      readonly preferredOrder: number;
+      readonly reservationUnit: {
+        readonly id: string;
+        readonly unit: {
+          readonly id: string;
+          readonly pk: number | null;
+          readonly nameFi: string | null;
+        } | null;
+      };
+    }>;
+  }> | null;
+  readonly organisation: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly organisationType: OrganizationTypeChoice;
+  } | null;
+  readonly contactPerson: {
+    readonly id: string;
+    readonly lastName: string;
+    readonly firstName: string;
+  } | null;
+};
+
 export type RejectedOccurrencesQueryVariables = Exact<{
   applicationRound?: InputMaybe<Scalars["Int"]["input"]>;
   unit?: InputMaybe<
@@ -10584,6 +10622,34 @@ export const ApplicationSectionTableElementFragmentDoc = gql`
     }
   }
   ${ApplicationSectionFieldsFragmentDoc}
+`;
+export const ApplicationsTableElementFragmentDoc = gql`
+  fragment ApplicationsTableElement on ApplicationNode {
+    id
+    pk
+    status
+    ...ApplicationName
+    applicationSections {
+      id
+      pk
+      name
+      ...ApplicationSectionDuration
+      reservationUnitOptions {
+        id
+        preferredOrder
+        reservationUnit {
+          id
+          unit {
+            id
+            pk
+            nameFi
+          }
+        }
+      }
+    }
+  }
+  ${ApplicationNameFragmentDoc}
+  ${ApplicationSectionDurationFragmentDoc}
 `;
 export const RejectedOccurancesTableElementFragmentDoc = gql`
   fragment RejectedOccurancesTableElement on RejectedOccurrenceNode {
@@ -14427,28 +14493,7 @@ export const ApplicationsDocument = gql`
     ) {
       edges {
         node {
-          id
-          pk
-          status
-          ...ApplicationName
-          applicationSections {
-            id
-            pk
-            name
-            ...ApplicationSectionDuration
-            reservationUnitOptions {
-              id
-              preferredOrder
-              reservationUnit {
-                id
-                unit {
-                  id
-                  pk
-                  nameFi
-                }
-              }
-            }
-          }
+          ...ApplicationsTableElement
         }
       }
       pageInfo {
@@ -14458,8 +14503,7 @@ export const ApplicationsDocument = gql`
       totalCount
     }
   }
-  ${ApplicationNameFragmentDoc}
-  ${ApplicationSectionDurationFragmentDoc}
+  ${ApplicationsTableElementFragmentDoc}
 `;
 
 /**
