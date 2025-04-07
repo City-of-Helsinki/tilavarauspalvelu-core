@@ -17,7 +17,6 @@ import {
   useReservationUnitQuery,
 } from "@gql/gql-types";
 import styled from "styled-components";
-import { get } from "lodash-es";
 import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorBoundary } from "react-error-boundary";
@@ -40,7 +39,8 @@ import { ControlledTimeInput } from "@/component/ControlledTimeInput";
 import { ControlledDateInput } from "common/src/components/form";
 import ReservationTypeForm from "@/component/ReservationTypeForm";
 import { base64encode } from "common/src/helpers";
-import { errorToast, successToast } from "common/src/common/toast";
+import { successToast } from "common/src/common/toast";
+import { useDisplayError } from "common/src/hooks";
 
 // NOTE HDS forces buttons over each other on mobile, we want them side-by-side
 const ActionButtons = styled(Dialog.ActionButtons)`
@@ -148,11 +148,11 @@ function CollisionWarning({
   return (
     <StyledNotification
       size={NotificationSize.Small}
-      label={t("errors.descriptive.collision")}
+      label={t("errors.timeCollision")}
       type="error"
       data-testid="CreateReservationModal__collision-warning"
     >
-      {t("errors.descriptive.collision")}
+      {t("errors.timeCollision")}
     </StyledNotification>
   );
 }
@@ -213,7 +213,7 @@ function DialogContent({
   reservationUnit: CreateStaffReservationFragment;
   start: Date;
 }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const interval = getNormalizedInterval(
     reservationUnit.reservationStartInterval
   );
@@ -273,17 +273,7 @@ function DialogContent({
 
   const createStaffReservation = (input: ReservationStaffCreateMutationInput) =>
     create({ variables: { input } });
-
-  const errorHandler = (errorMsg?: string) => {
-    const translatedError = i18n.exists(`errors.descriptive.${errorMsg}`)
-      ? t(`errors.descriptive.${errorMsg}`)
-      : t("errors.descriptive.genericError");
-    errorToast({
-      text: t("ReservationDialog.saveFailedWithError", {
-        error: translatedError,
-      }),
-    });
-  };
+  const displayError = useDisplayError();
 
   const onSubmit = async (values: FormValueType) => {
     try {
@@ -331,8 +321,8 @@ function DialogContent({
         }),
       });
       onClose();
-    } catch (e) {
-      errorHandler(get(e, "message"));
+    } catch (err) {
+      displayError(err);
     }
   };
 

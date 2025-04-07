@@ -9,8 +9,9 @@ import {
   type UpdateStaffReservationMutationVariables,
   type UseStaffReservationFragment,
 } from "@gql/gql-types";
-import { errorToast, successToast } from "common/src/common/toast";
-import { gql } from "@apollo/client";
+import { successToast } from "common/src/common/toast";
+import { ApolloError, gql } from "@apollo/client";
+import { useDisplayError } from "common/src/hooks";
 
 type InputT = UpdateStaffReservationMutationVariables["input"];
 type MemoT = UpdateStaffReservationMutationVariables["workingMemo"];
@@ -28,9 +29,8 @@ type Props = {
 /// Combines regular and recurring reservation change mutation
 export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
   const { t } = useTranslation();
-
+  const displayError = useDisplayError();
   const [mutation] = useUpdateStaffReservationMutation();
-
   const [recurringMutation] = useUpdateRecurringReservationMutation();
 
   const handleSuccess = (isRecurring: boolean) => {
@@ -39,9 +39,6 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
     }`;
     successToast({ text: t(trKey) });
     onSuccess();
-  };
-  const handleError = () => {
-    errorToast({ text: t("Reservation.EditPage.saveError") });
   };
 
   const editStaffReservation = async (vals: MutationInputParams) => {
@@ -69,9 +66,8 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
           },
         });
 
-        if (res.errors) {
-          handleError();
-          return;
+        if (res.errors != null && res.errors.length > 0) {
+          throw new ApolloError({ graphQLErrors: res.errors });
         }
         handleSuccess(true);
       } else {
@@ -91,8 +87,8 @@ export function useStaffReservationMutation({ reservation, onSuccess }: Props) {
         mutation({ variables });
         handleSuccess(false);
       }
-    } catch (_) {
-      handleError();
+    } catch (err) {
+      displayError(err);
     }
   };
 

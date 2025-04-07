@@ -198,42 +198,13 @@ const translations: ITranslations = {
     // TODO describe what failed if you don't know why it failed
     functionFailedTitle: ["Toiminto epäonnistui"],
     unexpectedError: ["Odottamaton virhe"],
-    missingReservationType: ["Varaustyyppi puuttuu"],
     errorRecurringReservationsDoneDisplay: [
       "Virhe. Varaus tehty, mutta sen näyttäminen epäonnistui.",
     ],
-    mutationFailed: ["Muutos epäonnistui"],
     noPermission: ["Sinulla ei ole käyttöoikeutta."],
-    mutationNoDataReturned: ["Odottamaton vastaus."],
-    cantRejectAlreadyAllocated: ["Jo jaettua vuoroa ei voi hylätä."],
-    errorEndingAllocation: ["Virhe käsittelyn päättämisessä"],
-    errorEndingAllocationUnhandledApplications: [
-      "Käsittelyssä on vielä käsittelemättömiä hakemuksia.",
+    timeCollision: [
+      "Valitsemasi aika ei ole enää vapaana. Ole hyvä ja valitse uusi aika.",
     ],
-    errorEndingAllocationNotInAllocation: [
-      "Käsittelyä ei ole aloitettu tai se on jo päättynyt.",
-    ],
-    formValidationError: ["Lomakkeessa on virheitä. {{ message }}"],
-    descriptive: {
-      "Reservation overlaps with reservation before due to buffer time.": [
-        "Varaus menee päällekkäin edellisen varauksen kanssa tauon takia.",
-      ],
-      "Reservation overlaps with reservation after due to buffer time.": [
-        "Varaus menee päällekkäin seuraavan varauksen kanssa tauon takia.",
-      ],
-      collision: [
-        "Valitsemasi aika ei ole enää vapaana. Ole hyvä ja valitse uusi aika.",
-      ],
-      "Overlapping reservations are not allowed.": [
-        "Ajankohdalle on jo varaus toisen varausyksikön kautta.",
-      ],
-      unknown: ["Tuntematon virhe"],
-      genericError: [""],
-      "Only reservations with states DENIED and CONFIRMED can be reverted to requires handling.":
-        [
-          "Vain hylätyt ja vahvistetut varaukset voidaan palauttaa käsiteltäväksi.",
-        ],
-    },
   },
   breadcrumb: {
     frontpage: ["Etusivu"],
@@ -716,7 +687,6 @@ const translations: ITranslations = {
       save: ["Tallenna"],
       saveSuccess: ["Varauksen muutokset tallennettu"],
       saveSuccessRecurring: ["Muutokset tallennettu tuleviin varauksiin!"],
-      saveError: ["Varauksen muutos epäonnistui"],
       pageThrewError: ["Virhe: varausta ei voi muokata"],
     },
   },
@@ -756,7 +726,6 @@ const translations: ITranslations = {
   ResourceEditor: {
     defaultHeading: ["(nimetön resurssi)"],
     resourceUpdated: ["Tiedot tallennettu."],
-    saveFailed: ["Tallennus epäonnistui"],
     resourceUpdatedNotification: ["Resurssin tiedot tallennettu."],
     label: {
       spacePk: ["Tila"],
@@ -790,9 +759,6 @@ const translations: ITranslations = {
         // we could pass the object type as a variable so we can reuse the same error message.
         NOT_FOUND: ["Ilmoitusta ei löytynyt"],
         noMutationPermission: ["Ei oikeutta muokata ilmoitusta"],
-      },
-      deleteFailed: {
-        generic: ["Ilmoituksen poisto epäonnistui"],
       },
     },
     success: {
@@ -1033,7 +999,6 @@ const translations: ITranslations = {
     other: ["Muut tiedot"],
     cancel: ["Palaa tallentamatta tietoja"],
     save: ["Tallenna tiedot"],
-    saveFailed: ["Tallennus ei onnistunut"],
     label: {
       nameFi: ["Tilan nimi suomeksi"],
       nameEn: ["Tilan nimi englanniksi"],
@@ -1093,7 +1058,6 @@ const translations: ITranslations = {
       codeLabel: ["Tilan numero"],
       codePlaceholder: ["Numero tai koodi"],
       saving: ["Luodaan tilatietoja..."],
-      saveFailed: ["Tallennus ei onnistunut"],
     },
   },
   SpaceTable: {
@@ -1115,11 +1079,8 @@ const translations: ITranslations = {
     removeFailed: ["Tilan poistaminen ei onnistunut."],
   },
   ReservationDialog: {
-    // dialog specific
     title: ["Varaa {{reservationUnit}}"],
     accept: ["Varaa"],
-    saveFailedWithError: ["Tallennus ei onnistunut. {{error}}"],
-    saveFailed: ["Tallennus ei onnistunut."],
     saveSuccess: ["Varaus tehty kohteeseen {{reservationUnit}}"],
   },
   ReservationUnits: {
@@ -1712,7 +1673,6 @@ const translations: ITranslations = {
     namePlaceholder: ["Resurssin nimi  {{language}}"],
     cancel: ["Palaa tallentamatta tietoja"],
     save: ["Tallenna"],
-    saveError: ["Tietojen tallennus epäonnistui."],
   },
   ResourceTable: {
     headings: {
@@ -1727,7 +1687,6 @@ const translations: ITranslations = {
     ],
     removeConfirmationAccept: ["Poista"],
     removeConfirmationCancel: ["Kumoa"],
-    removeFailed: ["Resurssin poistaminen ei onnistunut."],
     removeSuccess: ["Resurssi poistettu."],
   },
   RecurringReservationsView: {
@@ -1953,7 +1912,6 @@ const translations: ITranslations = {
     workingMemoLabel: ["Kirjoita kommentti"],
     workingMemoHelperText: ["Kommentit näkyvät vain henkilökunnalle"],
     savedWorkingMemo: ["Kommentti tallennettu"],
-    errorSavingWorkingMemo: ["Kommentin tallennus ei onnistunut"],
     user: ["Varauksen tekijä"],
     email: ["Sähköposti"],
     birthDate: ["Syntymäaika"],
@@ -1990,7 +1948,6 @@ const translations: ITranslations = {
       successNotify: ["Varaus hylätty"],
       title: ["Vahvista varauksen hylkäys"],
       handlingDetailsHelper: ["Näytetään vain henkilökunnalle"],
-      errorSaving: ["Hylkäys epäonnistui"],
       refund: {
         notAllowed: ["Palautus ei mahdollinen"],
         alreadyRefunded: ["Jo palautettu"],
@@ -2008,7 +1965,6 @@ const translations: ITranslations = {
       titleWithoutSubvention: ["Hyväksy varaus"],
       subventionReason: ["Varaajan antamat subvention perusteet"],
       accept: ["Hyväksy varaus"],
-      errorSaving: ["Hyväksyminen ei onnistunut. {{error}}"],
       approved: ["Varaus hyväksytty."],
       price: ["Varauksen hinta"],
       clearPrice: ["Aseta varaus maksuttomaksi"],
@@ -2037,7 +1993,6 @@ const translations: ITranslations = {
       title: ["Palauta käsiteltäväksi"],
       accept: ["Palauta käsiteltäväksi"],
       returned: ["Varaus palautettu käsiteltäväksi"],
-      errorSaving: ["Palauttaminen ei onnistunut {{error}}"],
     },
     noName: ["-"],
   },
@@ -2085,32 +2040,16 @@ const translations: ITranslations = {
     unlockOptions: ["Palauta käsittelyyn"],
     errors: {
       accepting: {
-        alreadyDeclined: ['Varaukselle "{{name}}" on jo tehty hylkäys.'],
-        // TODO this should only happen if the it's already allocated for that day
-        // there should be no blocks to allocate for another day (unless it's completely fullfilled?)
-        alreadyAllocated: ['Varaukselle "{{name}}" on jo jaettu vuoro.'],
-        statusHandled: ['Varaus "{{name}}" on jo kokonaan jaettu.'],
-        maxAllocations: [
-          'Varaukselle "{{name}}" on jo jaettu maksimi määrä vuoroja.',
-        ],
-        statusCancelled: ['Varaus "{{name}}" on peruutettu.'],
-        title: ["Vuoron jakaminen epäonnistui"],
         generic: [
           "Varmista, että hakukierros on käsittelyssä ja että valittu ajankohta on vapaana.",
         ],
-        receivedCantAllocate: [
-          "Hakukierrokselle ei voi jakaa vuoroja, koska se on vielä avoinna.",
-        ],
-        alreadyAllocatedWithSpaceHierrarchy: [
-          'Vuoroa "{{name}}" ei voi jakaa, koska se on jo jaettu toiselle varausyksikölle.',
-        ],
       },
       remove: {
-        title: ["Vuoron poistaminen epäonnistui"],
         generic: ['Vuoron poistaminen varaukselta "{{name}}" epäonnistui.'],
         alreadyDeleted: ['Vuoro varaukselle "{{name}}" on jo poistettu.'],
       },
       noPermission: ["Sinulla ei ole riittäviä oikeuksia jakaa vuoroa."],
+      // TODO these are not errors but warnings that are printed as notifications
       allocatedDurationIsIncorrect: [
         "Jaettu vuoro ei vastaa hakijan toiveita.",
       ],

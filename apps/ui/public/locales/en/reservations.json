@@ -28,8 +28,7 @@
     "ingressApplication": "You are about to cancel a booking that is part of a seasonal booking.",
     "infoBody": "We want to make the Varaamo service even better. We would love to hear why you are cancelling your booking.",
     "infoBodyApplication": "We want to make the Varaamo service even better. We would love to hear why you are cancelling your seasonal booking.",
-    "reason": "Reason for the cancellation",
-    "mutationFailed": "Failed to cancel the booking"
+    "reason": "Reason for the cancellation"
   },
   "cancelSection": {
     "title": "Cancel all bookings",

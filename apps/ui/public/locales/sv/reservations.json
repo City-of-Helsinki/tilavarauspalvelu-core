@@ -28,8 +28,7 @@
     "ingressApplication": "Du håller på att avboka en bokning som ingår i en säsongsbokning.",
     "infoBody": "Vi vill göra Varaamo ännu bättre. Vi vill gärna veta varför du avbokar din bokning.",
     "infoBodyApplication": "Vi vill göra Varaamo ännu bättre. Vi vill gärna veta varför du avbokar din säsöngsbokning.",
-    "reason": "Orsak till avbokningen",
-    "mutationFailed": "Bokningen kunde inte avbokas"
+    "reason": "Orsak till avbokningen"
   },
   "cancelSection": {
     "title": "Avboka alla bokningar",

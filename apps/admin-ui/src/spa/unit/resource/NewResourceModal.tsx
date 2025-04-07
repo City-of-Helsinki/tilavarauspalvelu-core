@@ -8,7 +8,6 @@ import {
   useCreateResourceMutation,
 } from "@gql/gql-types";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
-import { errorToast } from "common/src/common/toast";
 import {
   Editor,
   ResourceUpdateForm,
@@ -21,6 +20,7 @@ import { ResourceEditorFields } from "./EditForm";
 import { DialogActionsButtons } from "@/styled";
 import { UnitInfo } from "../space/UnitInfo";
 import { gql } from "@apollo/client";
+import { useDisplayError } from "common/src/hooks";
 
 interface IProps {
   unit: NewResourceUnitFieldsFragment;
@@ -36,6 +36,7 @@ export function NewResourceModal({
   spacePk,
 }: IProps): JSX.Element | null {
   const { t } = useTranslation();
+  const displayError = useDisplayError();
 
   const [createResourceMutation, { loading: isMutationLoading }] =
     useCreateResourceMutation();
@@ -66,8 +67,8 @@ export function NewResourceModal({
       });
       closeModal();
       refetch();
-    } catch (_) {
-      errorToast({ text: t("ResourceModal.saveError") });
+    } catch (err) {
+      displayError(err);
     }
   };
 

@@ -8,8 +8,9 @@ import {
   type UpdateApplicationWorkingMemoMutation,
 } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
-import { errorToast, successToast } from "common/src/common/toast";
+import { successToast } from "common/src/common/toast";
 import { ButtonContainer } from "common/styled";
+import { useDisplayError } from "common/src/hooks";
 
 function WorkingMemo({
   initialValue,
@@ -29,10 +30,9 @@ function WorkingMemo({
 }) {
   const [workingMemo, setWorkingMemo] = useState<string>(initialValue);
   const { t } = useTranslation();
+  const displayError = useDisplayError();
 
   const handleSave = async () => {
-    // TODO awful error handling code, real problem is the lack of error design
-    // compounded with using two separate mutations here
     try {
       const res = await onMutate(workingMemo);
       if (res.errors != null) {
@@ -55,25 +55,8 @@ function WorkingMemo({
         text: t("RequestedReservation.savedWorkingMemo"),
       });
       onSuccess();
-    } catch (ex) {
-      if (ex instanceof Error) {
-        const { message } = ex;
-        if (message === "No permission to mutate.") {
-          errorToast({
-            text: t("errors.noPermission"),
-          });
-          return;
-        }
-        if (message === "No data returned") {
-          errorToast({
-            text: t("errors.mutationNoDataReturned"),
-          });
-          return;
-        }
-      }
-      errorToast({
-        text: t("RequestedReservation.errorSavingWorkingMemo"),
-      });
+    } catch (err) {
+      displayError(err);
     }
   };
 

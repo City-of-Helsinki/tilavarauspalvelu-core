@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { gql, type ApolloError } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { UnitOrderingChoices, useUnitListQuery } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
@@ -8,6 +8,7 @@ import { More } from "@/component/More";
 import { UnitsTable } from "./UnitsTable";
 import { useSearchParams } from "react-router-dom";
 import { CenterSpinner } from "common/styled";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   isMyUnits?: boolean;
@@ -25,6 +26,7 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
 
   const orderBy = transformSortString(sort);
 
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const searchFilter = searchParams.get("search");
 
@@ -34,8 +36,8 @@ export function UnitsDataLoader({ isMyUnits }: Props): JSX.Element {
       first: LARGE_LIST_PAGE_SIZE,
       nameFi: searchFilter,
     },
-    onError: (err: ApolloError) => {
-      errorToast({ text: err.message });
+    onError: () => {
+      errorToast({ text: t("errors.errorFetchingData") });
     },
     fetchPolicy: "cache-and-network",
   });

@@ -284,7 +284,7 @@ function AccessCodeChangeRepairButton({
   reservation: ReservationKeylessEntryFragment;
   onSuccess: () => void;
 }>) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [changeAccessCodeMutationSingle] =

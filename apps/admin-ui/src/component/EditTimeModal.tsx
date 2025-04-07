@@ -33,11 +33,13 @@ import {
   getBufferTime,
   getNormalizedInterval,
   parseDateTimeSafe,
+  parseDateTimeUnsafe,
 } from "@/helpers";
 import { formatDateTimeRange } from "@/common/util";
 import { gql } from "@apollo/client";
 import { filterNonNullable } from "common/src/helpers";
-import { errorToast, successToast } from "common/src/common/toast";
+import { successToast } from "common/src/common/toast";
+import { useDisplayError } from "common/src/hooks";
 
 const StyledForm = styled.form`
   margin-top: var(--spacing-m);
@@ -115,7 +117,7 @@ type DialogContentProps = {
   reservationUnitPk: number;
   bufferTimeBefore: number;
   bufferTimeAfter: number;
-  mutate: (values: MutationValues) => void;
+  mutate: (values: MutationValues) => Promise<void>;
   topContent?: React.ReactNode;
   type: "move" | "new";
 } & CommonProps;
@@ -137,7 +139,7 @@ function DialogContent({
   topContent,
   type,
 }: DialogContentProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const {
     handleSubmit,
@@ -165,37 +167,24 @@ function DialogContent({
     },
     reservationType: formType,
   });
+  const displayError = useDisplayError();
 
-  const onSubmit = (values: EditFormValueType) => {
-    const newStart = parseDateTimeSafe(formDate, formStartTime);
-    const newEnd = parseDateTimeSafe(formDate, formEndTime);
-    const { pk } = values;
-    if (newStart && newEnd) {
-      try {
-        mutate({
-          pk,
-          begin: newStart,
-          end: newEnd,
-          buffers: {
-            before: values.enableBufferTimeBefore ? bufferTimeBefore : 0,
-            after: values.enableBufferTimeAfter ? bufferTimeAfter : 0,
-          },
-        });
-      } catch (err) {
-        if (err instanceof Error) {
-          const { message } = err;
-          const translatedError = i18n.exists(`errors.descriptive.${message}`)
-            ? t(`errors.descriptive.${message}`)
-            : t("errors.descriptive.genericError");
-          errorToast({
-            text: t("ReservationDialog.saveFailedWithError", {
-              error: translatedError,
-            }),
-          });
-        } else {
-          errorToast({ text: t("ReservationDialog.saveFailed") });
-        }
-      }
+  const onSubmit = async (values: EditFormValueType) => {
+    try {
+      const newStart = parseDateTimeUnsafe(formDate, formStartTime);
+      const newEnd = parseDateTimeUnsafe(formDate, formEndTime);
+      const { pk } = values;
+      await mutate({
+        pk,
+        begin: newStart,
+        end: newEnd,
+        buffers: {
+          before: values.enableBufferTimeBefore ? bufferTimeBefore : 0,
+          after: values.enableBufferTimeAfter ? bufferTimeAfter : 0,
+        },
+      });
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -338,7 +327,7 @@ export function NewReservationModal({
         id="modal-header"
         title={t("Reservation.NewReservationModal.title")}
       />
-      <ErrorBoundary fallback={<div>{t("errors.descriptive.unknown")}</div>}>
+      <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
         <DialogContent
           form={form}
           reservationUnitPk={reservationUnit?.pk ?? 0}
@@ -436,7 +425,7 @@ export function EditTimeModal({
         id="modal-header"
         title={t("Reservation.EditTimeModal.title")}
       />
-      <ErrorBoundary fallback={<div>{t("errors.descriptive.unknown")}</div>}>
+      <ErrorBoundary fallback={<div>{t("errors.unexpectedError")}</div>}>
         <DialogContent
           form={form}
           reservationUnitPk={reservation.reservationUnits?.[0]?.pk ?? 0}

@@ -9,10 +9,9 @@ import { Page2 } from "./Page2";
 import { useForm } from "react-hook-form";
 import { SpaceUpdateSchema, SpaceUpdateForm } from "../SpaceForm";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { errorToast } from "common/src/common/toast";
-import { useTranslation } from "react-i18next";
 import { gql } from "@apollo/client";
 import { UnitInfo } from "../UnitInfo";
+import { useDisplayError } from "common/src/hooks";
 
 type Props = {
   unit: NewResourceUnitFieldsFragment;
@@ -27,7 +26,6 @@ export function NewSpaceModal({
   refetch,
   parentSpacePk,
 }: Props): JSX.Element | null {
-  const { t } = useTranslation();
   const [mutation] = useCreateSpaceMutation();
 
   const createSpace = (input: SpaceCreateMutationInput) =>
@@ -44,6 +42,7 @@ export function NewSpaceModal({
       pk: undefined,
     },
   });
+  const displayError = useDisplayError();
 
   async function createSpaces({ parent, ...values }: SpaceUpdateForm) {
     try {
@@ -54,8 +53,8 @@ export function NewSpaceModal({
       });
       closeModal();
       refetch();
-    } catch (_) {
-      errorToast({ text: t("SpaceModal.page2.saveFailed") });
+    } catch (err) {
+      displayError(err);
     }
   }
 

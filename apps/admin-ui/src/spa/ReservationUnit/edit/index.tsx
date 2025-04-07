@@ -86,7 +86,7 @@ import { useDisplayError } from "common/src/hooks";
 import { getReservationUnitUrl, getUnitUrl } from "@/common/urls";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
 import { ControlledRadioGroup } from "common/src/components/form";
-import { gql } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
 
 const RichTextInput = dynamic(
   () => import("../../../component/RichTextInput"),
@@ -1584,11 +1584,10 @@ function ReservationUnitEditor({
           });
 
     const { data, errors: mutationErrors } = await promise;
-    if (mutationErrors != null) {
-      const msg = t("ReservationUnitEditor.saveFailed", {
-        error: mutationErrors,
+    if (mutationErrors != null && mutationErrors.length > 0) {
+      throw new ApolloError({
+        graphQLErrors: mutationErrors,
       });
-      throw new Error(msg);
     }
 
     const getPk = (d: typeof data) => {

@@ -1,7 +1,7 @@
 import React, { type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useParams, useNavigate } from "react-router-dom";
-import { gql } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
 import { useTranslation, type TFunction } from "next-i18next";
 import styled from "styled-components";
 import { z } from "zod";
@@ -44,12 +44,12 @@ import {
 import { base64encode } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
-import { errorToast, successToast } from "common/src/common/toast";
+import { successToast } from "common/src/common/toast";
 import StatusLabel from "common/src/components/StatusLabel";
 import { type StatusLabelType } from "common/src/tags";
 import { CenterSpinner, Flex, TitleSection, H1 } from "common/styled";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import { getValidationErrors } from "common/src/apolloUtils";
+import { useDisplayError } from "common/src/hooks";
 
 const RichTextInput = dynamic(() => import("@/component/RichTextInput"), {
   ssr: false,
@@ -325,33 +325,8 @@ const NotificationForm = ({
   const [createMutation] = useBannerNotificationCreateMutation();
   const [updateMutation] = useBannerNotificationUpdateMutation();
 
-  // TODO rewrite this for the new error codes
-  const handleError = (errorMsgs: string[]) => {
-    // TODO improved filtering here
-    const alreadyExists = errorMsgs.find(
-      (x) => x === "banner notification jolla on tämä name, on jo olemassa."
-    );
-    const isMissingMessage = errorMsgs.find(
-      (x) => x === "Non-draft notifications must have a message."
-    );
-    const isPermissionError = errorMsgs.find(
-      (x) => x === "No permission to mutate."
-    );
-    if (alreadyExists) {
-      errorToast({ text: t("error.submit.alreadyExists") });
-    } else if (isMissingMessage) {
-      errorToast({ text: t("error.submit.missingMessage") });
-    } else if (isPermissionError) {
-      errorToast({ text: t("error.submit.noMutationPermission") });
-    } else {
-      // eslint-disable-next-line no-console
-      console.error(errorMsgs);
-      // We haven't properly mapped error messages
-      errorToast({ text: t("error.submit.generic") });
-    }
-  };
-
   const navigate = useNavigate();
+  const displayError = useDisplayError();
 
   const onSubmit = async (data: NotificationFormType) => {
     const end = parseDateTimeSafe(data.activeUntil, data.activeUntilTime);
@@ -389,16 +364,7 @@ const NotificationForm = ({
       });
       navigate("..");
     } catch (e) {
-      const mutErrors = getValidationErrors(e);
-      if (mutErrors.length > 0) {
-        const hasNotFound = mutErrors.some((err) => err.code === "NOT_FOUND");
-        if (hasNotFound) {
-          errorToast({ text: t("error.submit.NOT_FOUND") });
-          return;
-        }
-      }
-      // TODO this is not necessary gql error, for example notifySuccess can throw on null
-      handleError(["gql threw an error"]);
+      displayError(e);
     }
   };
 
@@ -592,12 +558,12 @@ const NotificationForm = ({
   );
 };
 
-const getName = (
+function getName(
   isNew: boolean,
   isLoading: boolean,
   name: string | undefined,
   t: TFunction
-) => {
+) {
   if (name) {
     return name;
   }
@@ -608,25 +574,19 @@ const getName = (
     return t("Notifications.newNotification");
   }
   return t("Notifications.error.notFound");
-};
+}
 
-const useRemoveNotification = ({
+function useRemoveNotification({
   notification,
 }: {
   notification?: BannerNotificationPageQuery["bannerNotification"];
-}) => {
+}) {
   const { t } = useTranslation();
-
-  const handleError = (errorMsgs: string[]) => {
-    // eslint-disable-next-line no-console
-    console.error(errorMsgs);
-    // We haven't properly mapped error messages
-    errorToast({ text: t("Notifications.error.deleteFailed.generic") });
-  };
 
   const [removeMutation] = useBannerNotificationDeleteMutation();
 
   const navigate = useNavigate();
+  const displayError = useDisplayError();
 
   const removeNotification = async () => {
     try {
@@ -637,22 +597,21 @@ const useRemoveNotification = ({
           },
         },
       });
-      if (res.errors) {
-        handleError(res.errors.map((e) => e.message));
-        return;
+      if (res.errors != null && res.errors?.length > 0) {
+        throw new ApolloError({
+          graphQLErrors: res.errors,
+        });
       }
 
       successToast({ text: t("Notifications.success.removed") });
       navigate("..");
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
-      handleError(["gql threw an error"]);
+      displayError(e);
     }
   };
 
   return removeNotification;
-};
+}
 
 function LoadedContent({
   isNew,
