@@ -104,12 +104,16 @@ function useCheckFormCollisions({
   const enableBufferTimeBefore = watch("enableBufferTimeBefore");
   const type = watch("type");
 
-  const bufferBeforeSeconds = enableBufferTimeBefore
-    ? getBufferTime(reservationUnit.bufferTimeBefore, type)
-    : 0;
-  const bufferAfterSeconds = enableBufferTimeAfter
-    ? getBufferTime(reservationUnit.bufferTimeAfter, type)
-    : 0;
+  const bufferBeforeSeconds = getBufferTime(
+    reservationUnit.bufferTimeBefore,
+    type,
+    enableBufferTimeBefore
+  );
+  const bufferAfterSeconds = getBufferTime(
+    reservationUnit.bufferTimeAfter,
+    type,
+    enableBufferTimeAfter
+  );
 
   const start = parseDateTimeSafe(formDate, formStartTime);
   const end = parseDateTimeSafe(formDate, formEndTime);
