@@ -69,6 +69,7 @@
       "APPLICATION_STATUS_CANNOT_SEND": "Ansökan kan inte skickas.",
       "OVERLAPPING_RESERVATIONS": "Överlappande bokningar.",
       "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "För lång bokningstid.",
+      "RESERVATION_CANCELLATION_NOT_ALLOWED": "Avbokning är inte tillåten.",
       "invalid": "Ogiltigt värde.",
       "generic_validation_error": "Ett fel uppstod."
     }

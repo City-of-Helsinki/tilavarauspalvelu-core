@@ -88,6 +88,7 @@ i18n.addResourceBundle("fi", "forms", {
   invalidEmail: "Sähköpostin tulee olla oikeassa muodossa (sisältäen @-merkin)",
 });
 
+// TODO combine with customer ui by loading the same json
 i18n.addResourceBundle("fi", "errors", {
   generic: {
     heading: "Jokin meni vikaan",
@@ -122,6 +123,41 @@ i18n.addResourceBundle("fi", "errors", {
     subHeadingB: "tai Ota yhteyttä-lomakkeella.",
     email: "varaamo@hel.fi",
     button: "Ota yhteyttä",
+  },
+  general_error: "Tapahtui määrittämätön virhe.",
+  api: {
+    UNKNOWN: "Tapahtui virhe.",
+    validation: {
+      RESERVATION_TIME_DOES_NOT_MATCH_ALLOWED_INTERVAL:
+        "Aloitusaika ei ole sallittu",
+      RESERVATION_END_DATE_TOO_FAR:
+        "Ei pystytty luomaan varauksia yli 2 vuoden päähän",
+      RESERVATION_SERIES_ALREADY_STARTED: "Toistuva varaus on jo alkanut",
+      RESERVATION_UNIT_PRICINGS_MISSING: "Varausyksiköllä ei ole hinnoittelua",
+      RESERVATION_UNIT_PRICINGS_NO_ACTIVE_PRICINGS:
+        "Varausyksiköllä ei ole aktiivisia hinnoitteluita",
+      RESERVATION_UNIT_PRICINGS_DUPLICATE_DATE: "Päivämäärä on jo käytössä",
+      RESERVATION_UNIT_PRICINGS_INVALID_PRICES:
+        "Hinnoittelussa on virheellisiä hintoja",
+      RESERVATION_UNIT_MISSING_TRANSLATIONS:
+        "Varausyksiköllä puuttuu käännökset",
+      RESERVATION_UNIT_MISSING_SPACES_OR_RESOURCES:
+        "Varausyksiköllä ei ole tiloja tai resursseja",
+      RESERVATION_UNIT_MISSING_RESERVATION_UNIT_TYPE:
+        "Varausyksiköllä ei ole varausyksikkötyyppiä",
+      RESERVATION_UNIT_HAS_FUTURE_RESERVATIONS:
+        "Varausyksiköllä on tulevia varauksia",
+      RESERVATION_DENYING_NOT_ALLOWED:
+        "Ainoastaan käsiteltävät ja hyväksytyt varaukset voidaan hylätä",
+      RESERVATION_WRONG_ACCESS_TYPE:
+        "Toimintoa ei voida suorittaa, koska varaus ei käytä ovikoodia",
+      RESERVATION_ACCESS_CODE_CHANGE_NOT_ALLOWED:
+        "Ovikoodia ei voida vaihtaa, varauksen tilan tai tyypin takia",
+      RESERVATION_HAS_ENDED: "Varaus on jo päättynyt",
+      PINDORA_ERROR: "Ovikoodin luonti epäonnistui",
+      invalid: "Virheellinen arvo.",
+      generic_validation_error: "Tapahtui virhe.",
+    },
   },
 });
 

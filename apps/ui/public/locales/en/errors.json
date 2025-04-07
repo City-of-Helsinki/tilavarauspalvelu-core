@@ -69,6 +69,7 @@
       "APPLICATION_STATUS_CANNOT_SEND": "Application cannot be sent.",
       "OVERLAPPING_RESERVATIONS": "There are duplicate bookings.",
       "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "The booking time is too long.",
+      "RESERVATION_CANCELLATION_NOT_ALLOWED": "Cancellation is not allowed.",
       "invalid": "Invalid value.",
       "generic_validation_error": "An error occurred."
     }

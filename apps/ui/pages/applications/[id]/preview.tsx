@@ -27,7 +27,7 @@ import {
   IconArrowLeft,
   LoadingSpinner,
 } from "hds-react";
-import { useDisplayError } from "@/hooks/useDisplayError";
+import { useDisplayError } from "common/src/hooks";
 import { ErrorText } from "common/src/components/ErrorText";
 import Link from "next/link";
 import { validateApplication } from "@/components/application/form";

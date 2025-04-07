@@ -26,8 +26,8 @@ import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "@/hooks";
 import { successToast, errorToast } from "common/src/common/toast";
 import { gql } from "@apollo/client";
-import { getValidationErrors } from "common/src/apolloUtils";
 import { convertOptionToHDS, toNumber } from "common/src/helpers";
+import { useDisplayError } from "common/src/hooks";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
@@ -271,6 +271,8 @@ export function DenyDialog({
     convertToReturnState(reservation)
   );
 
+  const displayError = useDisplayError();
+
   const refundReservation = async (input: ReservationRefundMutationInput) => {
     try {
       await refundReservationMutation({ variables: { input } });
@@ -319,15 +321,7 @@ export function DenyDialog({
         onReject();
       }
     } catch (e) {
-      const validationErrors = getValidationErrors(e);
-      const validationError = validationErrors[0];
-      if (validationError != null) {
-        errorToast({
-          text: t(`errors.backendValidation.${validationError.code}`),
-        });
-      } else {
-        errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
-      }
+      displayError(e);
     }
   };
 
@@ -364,6 +358,7 @@ export function DenyDialogSeries({
 }): JSX.Element {
   const { t } = useTranslation();
   const [denyMutation] = useDenyReservationSeriesMutation();
+  const displayError = useDisplayError();
 
   const handleDeny = async (vars: DenyVariables) => {
     const { handlingDetails, denyReasonPk } = vars;
@@ -391,15 +386,7 @@ export function DenyDialogSeries({
       });
       onReject();
     } catch (e) {
-      const validationErrors = getValidationErrors(e);
-      const validationError = validationErrors[0];
-      if (validationError != null) {
-        errorToast({
-          text: t(`errors.backendValidation.${validationError.code}`),
-        });
-      } else {
-        errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
-      }
+      displayError(e);
     }
   };
 
