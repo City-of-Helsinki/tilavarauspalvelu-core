@@ -113,10 +113,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
     variables: { id: base64encode(`ReservationNode:${pk}`) },
   });
   const { reservation } = data ?? {};
-  const recurringReservation =
-    reservation?.recurringReservation != null
-      ? reservation.recurringReservation
-      : null;
+  const recurringReservation = reservation?.recurringReservation ?? null;
 
   const [mutate] = useRescheduleReservationSeriesMutation();
 
@@ -212,14 +209,16 @@ function SeriesPageInner({ pk }: { pk: number }) {
       return;
     }
 
-    const buffers = {
-      before: values.bufferTimeBefore
-        ? getBufferTime(reservationUnit.bufferTimeBefore, values.type)
-        : undefined,
-      after: values.bufferTimeAfter
-        ? getBufferTime(reservationUnit.bufferTimeAfter, values.type)
-        : undefined,
-    };
+    const bufferTimeBefore = getBufferTime(
+      reservationUnit.bufferTimeBefore,
+      values.type,
+      values.bufferTimeBefore
+    );
+    const bufferTimeAfter = getBufferTime(
+      reservationUnit.bufferTimeAfter,
+      values.type,
+      values.bufferTimeAfter
+    );
 
     try {
       const input: ReservationSeriesRescheduleMutationInput = {
@@ -229,8 +228,8 @@ function SeriesPageInner({ pk }: { pk: number }) {
         endDate: toApiDateUnsafe(fromUIDateUnsafe(values.endingDate)),
         endTime: values.endTime,
         weekdays: values.repeatOnDays,
-        bufferTimeBefore: (buffers.before ?? 0).toString(),
-        bufferTimeAfter: (buffers.after ?? 0).toString(),
+        bufferTimeBefore: bufferTimeBefore.toString(),
+        bufferTimeAfter: bufferTimeAfter.toString(),
         skipDates: skipDates.map((x) => toApiDateUnsafe(x)),
       };
       const mutRes = await mutate({ variables: { input } });
