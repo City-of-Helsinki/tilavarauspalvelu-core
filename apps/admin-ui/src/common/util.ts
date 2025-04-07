@@ -57,6 +57,14 @@ export function formatDateTimeRange(
   )} ${format(end, "HH:mm")}`;
 }
 
+export function formatDateRange(t: TFunction, start: Date, end: Date): string {
+  const startDay = t(`dayShort.${toMondayFirstUnsafe(getDay(start))}`);
+  if (isSameDay(start, end)) {
+    return `${startDay} ${format(start, DATE_FORMAT)}`;
+  }
+  return `${startDay} ${format(start, DATE_FORMAT)}–${format(end, DATE_FORMAT)}`;
+}
+
 export const formatNumber = (
   input?: number | null,
   suffix?: string

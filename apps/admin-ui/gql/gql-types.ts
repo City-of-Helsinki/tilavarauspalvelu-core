@@ -7830,7 +7830,7 @@ export type ApplicationSectionTableElementFragment = {
 export type ApplicationsTableElementFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly status: ApplicationStatusChoice | null;
+  readonly status: ApplicationStatusChoice;
   readonly applicantType: ApplicantTypeChoice | null;
   readonly applicationSections: ReadonlyArray<{
     readonly id: string;
@@ -8063,9 +8063,72 @@ export type ApplicationRoundListQuery = {
   } | null;
 };
 
-export type ApplicationAdminFragment = {
-  readonly pk: number | null;
+export type ApplicationPageSectionFragment = {
+  readonly allocations: number;
   readonly id: string;
+  readonly pk: number | null;
+  readonly name: string;
+  readonly status: ApplicationSectionStatusChoice;
+  readonly reservationMaxDuration: number;
+  readonly numPersons: number;
+  readonly reservationsEndDate: string;
+  readonly reservationsBeginDate: string;
+  readonly appliedReservationsPerWeek: number;
+  readonly reservationMinDuration: number;
+  readonly suitableTimeRanges: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly beginTime: string;
+    readonly endTime: string;
+    readonly dayOfTheWeek: Weekday;
+    readonly priority: Priority;
+  }>;
+  readonly purpose: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+  } | null;
+  readonly reservationUnitOptions: ReadonlyArray<{
+    readonly id: string;
+    readonly pk: number | null;
+    readonly preferredOrder: number;
+    readonly rejected: boolean;
+    readonly allocatedTimeSlots: ReadonlyArray<{
+      readonly pk: number | null;
+      readonly id: string;
+    }>;
+    readonly reservationUnit: {
+      readonly id: string;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly unit: {
+        readonly id: string;
+        readonly pk: number | null;
+        readonly nameFi: string | null;
+      } | null;
+      readonly applicationRoundTimeSlots: ReadonlyArray<{
+        readonly id: string;
+        readonly pk: number | null;
+        readonly weekday: number;
+        readonly closed: boolean;
+        readonly reservableTimes: ReadonlyArray<{
+          readonly begin: string;
+          readonly end: string;
+        } | null>;
+      }>;
+    };
+  }>;
+  readonly ageGroup: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly minimum: number;
+    readonly maximum: number | null;
+  } | null;
+};
+
+export type ApplicationPageFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
   readonly status: ApplicationStatusChoice;
   readonly lastModifiedDate: string;
   readonly applicantType: ApplicantTypeChoice | null;
@@ -8099,14 +8162,12 @@ export type ApplicationAdminFragment = {
       readonly id: string;
       readonly pk: number | null;
       readonly nameFi: string | null;
-      readonly nameSv: string | null;
-      readonly nameEn: string | null;
     } | null;
     readonly reservationUnitOptions: ReadonlyArray<{
       readonly id: string;
-      readonly rejected: boolean;
       readonly pk: number | null;
       readonly preferredOrder: number;
+      readonly rejected: boolean;
       readonly allocatedTimeSlots: ReadonlyArray<{
         readonly pk: number | null;
         readonly id: string;
@@ -8115,14 +8176,10 @@ export type ApplicationAdminFragment = {
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
-        readonly nameEn: string | null;
-        readonly nameSv: string | null;
         readonly unit: {
           readonly id: string;
           readonly pk: number | null;
           readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
         } | null;
         readonly applicationRoundTimeSlots: ReadonlyArray<{
           readonly id: string;
@@ -8183,20 +8240,22 @@ export type ApplicationAdminFragment = {
   } | null;
 };
 
-export type ReservationUnitOptionFragment = {
+export type ReservationUnitOptionFieldsFragment = {
   readonly id: string;
+  readonly pk: number | null;
+  readonly rejected: boolean;
+  readonly allocatedTimeSlots: ReadonlyArray<{
+    readonly pk: number | null;
+    readonly id: string;
+  }>;
   readonly reservationUnit: {
     readonly id: string;
     readonly pk: number | null;
     readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
     readonly unit: {
       readonly id: string;
       readonly pk: number | null;
       readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
     } | null;
     readonly applicationRoundTimeSlots: ReadonlyArray<{
       readonly id: string;
@@ -8218,8 +8277,8 @@ export type ApplicationAdminQueryVariables = Exact<{
 export type ApplicationAdminQuery = {
   readonly application: {
     readonly workingMemo: string;
-    readonly pk: number | null;
     readonly id: string;
+    readonly pk: number | null;
     readonly status: ApplicationStatusChoice;
     readonly lastModifiedDate: string;
     readonly applicantType: ApplicantTypeChoice | null;
@@ -8254,14 +8313,12 @@ export type ApplicationAdminQuery = {
         readonly id: string;
         readonly pk: number | null;
         readonly nameFi: string | null;
-        readonly nameSv: string | null;
-        readonly nameEn: string | null;
       } | null;
       readonly reservationUnitOptions: ReadonlyArray<{
         readonly id: string;
-        readonly rejected: boolean;
         readonly pk: number | null;
         readonly preferredOrder: number;
+        readonly rejected: boolean;
         readonly allocatedTimeSlots: ReadonlyArray<{
           readonly pk: number | null;
           readonly id: string;
@@ -8270,14 +8327,10 @@ export type ApplicationAdminQuery = {
           readonly id: string;
           readonly pk: number | null;
           readonly nameFi: string | null;
-          readonly nameEn: string | null;
-          readonly nameSv: string | null;
           readonly unit: {
             readonly id: string;
             readonly pk: number | null;
             readonly nameFi: string | null;
-            readonly nameEn: string | null;
-            readonly nameSv: string | null;
           } | null;
           readonly applicationRoundTimeSlots: ReadonlyArray<{
             readonly id: string;
@@ -10651,6 +10704,21 @@ export const ApplicationsTableElementFragmentDoc = gql`
   ${ApplicationNameFragmentDoc}
   ${ApplicationSectionDurationFragmentDoc}
 `;
+export const ApplicantNameFieldsFragmentDoc = gql`
+  fragment ApplicantNameFields on ApplicationNode {
+    id
+    applicantType
+    contactPerson {
+      id
+      firstName
+      lastName
+    }
+    organisation {
+      id
+      nameFi
+    }
+  }
+`;
 export const RejectedOccurancesTableElementFragmentDoc = gql`
   fragment RejectedOccurancesTableElement on RejectedOccurrenceNode {
     id
@@ -10674,16 +10742,7 @@ export const RejectedOccurancesTableElementFragmentDoc = gql`
             application {
               id
               pk
-              applicantType
-              contactPerson {
-                id
-                firstName
-                lastName
-              }
-              organisation {
-                id
-                nameFi
-              }
+              ...ApplicantNameFields
             }
           }
           reservationUnit {
@@ -10703,6 +10762,7 @@ export const RejectedOccurancesTableElementFragmentDoc = gql`
       }
     }
   }
+  ${ApplicantNameFieldsFragmentDoc}
 `;
 export const ApplicationRoundAdminFragmentDoc = gql`
   fragment ApplicationRoundAdmin on ApplicationRoundNode {
@@ -10773,21 +10833,6 @@ export const ApplicantFragmentDoc = gql`
     }
   }
 `;
-export const ApplicantNameFieldsFragmentDoc = gql`
-  fragment ApplicantNameFields on ApplicationNode {
-    id
-    applicantType
-    contactPerson {
-      id
-      firstName
-      lastName
-    }
-    organisation {
-      id
-      nameFi
-    }
-  }
-`;
 export const SuitableTimeFragmentDoc = gql`
   fragment SuitableTime on SuitableTimeRangeNode {
     id
@@ -10810,21 +10855,23 @@ export const ApplicationRoundTimeSlotsFragmentDoc = gql`
     }
   }
 `;
-export const ReservationUnitOptionFragmentDoc = gql`
-  fragment ReservationUnitOption on ReservationUnitOptionNode {
+export const ReservationUnitOptionFieldsFragmentDoc = gql`
+  fragment ReservationUnitOptionFields on ReservationUnitOptionNode {
     id
+    pk
+    rejected
+    allocatedTimeSlots {
+      pk
+      id
+    }
     reservationUnit {
       id
       pk
       nameFi
-      nameEn
-      nameSv
       unit {
         id
         pk
         nameFi
-        nameEn
-        nameSv
       }
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlots
@@ -10833,10 +10880,31 @@ export const ReservationUnitOptionFragmentDoc = gql`
   }
   ${ApplicationRoundTimeSlotsFragmentDoc}
 `;
-export const ApplicationAdminFragmentDoc = gql`
-  fragment ApplicationAdmin on ApplicationNode {
-    pk
+export const ApplicationPageSectionFragmentDoc = gql`
+  fragment ApplicationPageSection on ApplicationSectionNode {
+    ...ApplicationSectionCommon
+    suitableTimeRanges {
+      ...SuitableTime
+    }
+    purpose {
+      id
+      pk
+      nameFi
+    }
+    allocations
+    reservationUnitOptions {
+      id
+      ...ReservationUnitOptionFields
+    }
+  }
+  ${ApplicationSectionCommonFragmentDoc}
+  ${SuitableTimeFragmentDoc}
+  ${ReservationUnitOptionFieldsFragmentDoc}
+`;
+export const ApplicationPageFieldsFragmentDoc = gql`
+  fragment ApplicationPageFields on ApplicationNode {
     id
+    pk
     status
     lastModifiedDate
     ...Applicant
@@ -10847,34 +10915,12 @@ export const ApplicationAdminFragmentDoc = gql`
       nameFi
     }
     applicationSections {
-      ...ApplicationSectionCommon
-      suitableTimeRanges {
-        ...SuitableTime
-      }
-      purpose {
-        id
-        pk
-        nameFi
-        nameSv
-        nameEn
-      }
-      allocations
-      reservationUnitOptions {
-        id
-        ...ReservationUnitOption
-        rejected
-        allocatedTimeSlots {
-          pk
-          id
-        }
-      }
+      ...ApplicationPageSection
     }
   }
   ${ApplicantFragmentDoc}
   ${ApplicantNameFieldsFragmentDoc}
-  ${ApplicationSectionCommonFragmentDoc}
-  ${SuitableTimeFragmentDoc}
-  ${ReservationUnitOptionFragmentDoc}
+  ${ApplicationPageSectionFragmentDoc}
 `;
 export const MetadataSetsFragmentDoc = gql`
   fragment MetadataSets on ReservationUnitNode {
@@ -15024,7 +15070,7 @@ export type ApplicationRoundListQueryResult = Apollo.QueryResult<
 export const ApplicationAdminDocument = gql`
   query ApplicationAdmin($id: ID!) {
     application(id: $id) {
-      ...ApplicationAdmin
+      ...ApplicationPageFields
       workingMemo
       user {
         id
@@ -15032,7 +15078,7 @@ export const ApplicationAdminDocument = gql`
       }
     }
   }
-  ${ApplicationAdminFragmentDoc}
+  ${ApplicationPageFieldsFragmentDoc}
 `;
 
 /**

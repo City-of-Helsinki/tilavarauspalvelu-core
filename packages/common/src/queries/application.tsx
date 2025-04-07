@@ -27,6 +27,7 @@ export const APPLICATION_SECTION_DURATION_FRAGMENT = gql`
   }
 `;
 
+// TODO don't use convenience fragments
 export const APPLICATION_SECTION_COMMON_FRAGMENT = gql`
   fragment ApplicationSectionCommon on ApplicationSectionNode {
     id

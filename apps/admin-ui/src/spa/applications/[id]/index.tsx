@@ -26,7 +26,12 @@ import {
   fontMedium,
 } from "common/styled";
 import { breakpoints, WEEKDAYS } from "common/src/const";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import {
+  base64encode,
+  filterNonNullable,
+  formatTimeRange,
+  timeToMinutes,
+} from "common/src/helpers";
 import {
   getPermissionErrors,
   getValidationErrors,
@@ -44,10 +49,19 @@ import {
   type ApplicationAdminQuery,
   useRejectRestMutation,
   UserPermissionChoice,
+  type SuitableTimeFragment,
+  type ReservationUnitOptionFieldsFragment,
+  type ApplicationPageSectionFragment,
+  type ApplicationPageFieldsFragment,
 } from "@gql/gql-types";
 import { formatDuration } from "common/src/common/util";
 import { convertWeekday, type Day } from "common/src/conversion";
-import { formatNumber, formatDate, formatAgeGroups } from "@/common/util";
+import {
+  formatNumber,
+  formatDate,
+  formatAgeGroups,
+  formatDateRange,
+} from "@/common/util";
 import ScrollIntoView from "@/common/ScrollIntoView";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import { ApplicationWorkingMemo } from "@/component/WorkingMemo";
@@ -63,20 +77,11 @@ import { errorToast } from "common/src/common/toast";
 import { ApplicationDatas, Summary } from "@/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
 
-// TODO use a fragment
-type ApplicationType = NonNullable<ApplicationAdminQuery["application"]>;
-type ApplicationSectionType = NonNullable<
-  ApplicationType["applicationSections"]
->[0];
-type ReservationUnitOptionType = NonNullable<
-  ApplicationSectionType["reservationUnitOptions"]
->[0];
-type SuitableTimeRangeType = NonNullable<
-  ApplicationSectionType["suitableTimeRanges"]
->[0];
-
 function printSuitableTimes(
-  timeRanges: SuitableTimeRangeType[],
+  timeRanges: Pick<
+    SuitableTimeFragment,
+    "dayOfTheWeek" | "beginTime" | "endTime" | "priority"
+  >[],
   day: Day,
   priority: Priority
 ): string {
@@ -85,7 +90,9 @@ function printSuitableTimes(
     .filter((s) => s.priority === priority);
 
   return schedules
-    .map((s) => `${s.beginTime.substring(0, 2)}-${s.endTime.substring(0, 2)}`)
+    .map((s) =>
+      formatTimeRange(timeToMinutes(s.beginTime), timeToMinutes(s.endTime))
+    )
     .join(", ");
 }
 
@@ -213,7 +220,7 @@ function SchedulesContent({
   as,
   priority,
 }: {
-  as: ApplicationSectionType;
+  as: ApplicationPageSectionFragment;
   priority: Priority;
 }): JSX.Element {
   const { t } = useTranslation();
@@ -247,7 +254,7 @@ function RejectOptionButton({
   applicationStatus,
   refetch,
 }: {
-  option: ReservationUnitOptionType;
+  option: ReservationUnitOptionFieldsFragment;
   applicationStatus: ApplicationStatusChoice;
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }) {
@@ -356,7 +363,7 @@ function RejectAllOptionsButton({
   applicationStatus,
   refetch,
 }: {
-  section: ApplicationSectionType;
+  section: ApplicationPageSectionFragment;
   applicationStatus: ApplicationStatusChoice;
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }) {
@@ -463,14 +470,6 @@ function RejectAllOptionsButton({
   );
 }
 
-interface DataType extends ReservationUnitOptionType {
-  index: number;
-}
-type ColumnType = {
-  key: string;
-  transform: (data: DataType) => ReactNode;
-};
-
 const TimeSection = styled(Flex).attrs({
   $gap: "l",
 })`
@@ -489,30 +488,24 @@ const TimeSection = styled(Flex).attrs({
   }
 `;
 
-function ApplicationSectionDetails({
+interface DataType extends ReservationUnitOptionFieldsFragment {
+  index: number;
+}
+type ColumnType = {
+  key: string;
+  transform: (data: DataType) => ReactNode;
+};
+
+function ReservationUnitOptionsSection({
   section,
-  application,
   refetch,
+  applicationStatus,
 }: {
-  section: ApplicationSectionType;
-  application: ApplicationType;
+  section: Pick<ApplicationPageSectionFragment, "reservationUnitOptions">;
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
-}): JSX.Element {
+  applicationStatus: Maybe<ApplicationStatusChoice>;
+}) {
   const { t } = useTranslation();
-
-  const minDuration = section?.reservationMinDuration ?? undefined;
-  const maxDuration = section?.reservationMaxDuration ?? undefined;
-  const duration = appEventDuration(minDuration, maxDuration, t);
-  const hash = section?.pk?.toString() ?? "";
-  const heading = `${application?.pk}-${section.pk} ${section.name}`;
-
-  // TODO use a function for this
-  const dates =
-    section.reservationsBeginDate != null && section.reservationsEndDate
-      ? `${formatDate(section.reservationsBeginDate)} - ${formatDate(
-          section.reservationsEndDate
-        )}`
-      : "No dates";
 
   const cols: Array<ColumnType> = [
     {
@@ -521,20 +514,20 @@ function ApplicationSectionDetails({
     },
     {
       key: "unit",
-      transform: (reservationUnitOption: ReservationUnitOptionType) =>
+      transform: (reservationUnitOption: ReservationUnitOptionFieldsFragment) =>
         reservationUnitOption?.reservationUnit?.unit?.nameFi ?? "-",
     },
     {
       key: "name",
-      transform: (reservationUnitOption: ReservationUnitOptionType) =>
+      transform: (reservationUnitOption: ReservationUnitOptionFieldsFragment) =>
         reservationUnitOption?.reservationUnit?.nameFi ?? "-",
     },
     {
       key: "status",
-      transform: (reservationUnitOption: ReservationUnitOptionType) => {
-        if (reservationUnitOption.rejected) {
+      transform: ({ rejected }: ReservationUnitOptionFieldsFragment) => {
+        if (rejected) {
           return (
-            <DeclinedTag iconStart={<IconCross aria-hidden="true" />}>
+            <DeclinedTag iconStart={<IconCross />}>
               {t("Application.rejected")}
             </DeclinedTag>
           );
@@ -543,13 +536,14 @@ function ApplicationSectionDetails({
     },
     {
       key: "reject",
-      transform: (reservationUnitOption: ReservationUnitOptionType) => {
+      transform: (option: ReservationUnitOptionFieldsFragment) => {
+        if (applicationStatus == null) {
+          return null;
+        }
         return (
           <RejectOptionButton
-            option={reservationUnitOption}
-            applicationStatus={
-              application?.status ?? ApplicationStatusChoice.Draft
-            }
+            option={option}
+            applicationStatus={applicationStatus}
             refetch={refetch}
           />
         );
@@ -557,12 +551,44 @@ function ApplicationSectionDetails({
     },
   ];
 
-  const rows: DataType[] = filterNonNullable(
-    section?.reservationUnitOptions
-  ).map((ru, index) => ({
+  const rows: DataType[] = section.reservationUnitOptions.map((ru, index) => ({
     ...ru,
     index: index + 1,
   }));
+
+  return (
+    <ApplicationSectionsContainer>
+      {rows.map((row) => (
+        <div style={{ display: "contents" }} key={row.pk}>
+          {cols.map((col) => (
+            <div key={`${col.key}-${row.pk}`}>{col.transform(row)}</div>
+          ))}
+        </div>
+      ))}
+    </ApplicationSectionsContainer>
+  );
+}
+
+function ApplicationSectionDetails({
+  section,
+  application,
+  refetch,
+}: {
+  section: ApplicationPageSectionFragment;
+  application: ApplicationPageFieldsFragment;
+  refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
+}): JSX.Element {
+  const { t } = useTranslation();
+
+  const minDuration = section.reservationMinDuration;
+  const maxDuration = section.reservationMaxDuration;
+  const duration = appEventDuration(minDuration, maxDuration, t);
+  const hash = section.pk?.toString() ?? "";
+  const heading = `${application.pk ?? "-"}-${section.pk ?? "-"} ${section.name}`;
+
+  const beginDate = new Date(section.reservationsBeginDate);
+  const endDate = new Date(section.reservationsEndDate);
+  const dates = formatDateRange(t, beginDate, endDate);
 
   return (
     <ScrollIntoView key={section.pk} hash={hash}>
@@ -612,15 +638,11 @@ function ApplicationSectionDetails({
             }
           />
         </Flex>
-        <ApplicationSectionsContainer>
-          {rows.map((row) => (
-            <div style={{ display: "contents" }} key={row.pk}>
-              {cols.map((col) => (
-                <div key={`${col.key}-${row.pk}`}>{col.transform(row)}</div>
-              ))}
-            </div>
-          ))}
-        </ApplicationSectionsContainer>
+        <ReservationUnitOptionsSection
+          section={section}
+          refetch={refetch}
+          applicationStatus={application?.status}
+        />
         <H4 as="h3">{t("ApplicationEvent.requestedTimes")}</H4>
         <TimeSection>
           <TimeSelector applicationSection={section} />
@@ -638,7 +660,7 @@ function RejectApplicationButton({
   application,
   refetch,
 }: {
-  application: ApplicationType;
+  application: ApplicationPageFieldsFragment;
   refetch: () => Promise<ApolloQueryResult<ApplicationAdminQuery>>;
 }): JSX.Element | null {
   const { t } = useTranslation();
@@ -789,8 +811,8 @@ function ApplicationDetails({
     },
   });
 
-  const application = data?.application ?? undefined;
-  const applicationRound = application?.applicationRound ?? undefined;
+  const application = data?.application;
+  const applicationRound = application?.applicationRound;
 
   if (isLoading) {
     return <CenterSpinner />;
@@ -807,28 +829,26 @@ function ApplicationDetails({
     return <div>{t("errors.noPermission")}</div>;
   }
 
+  if (applicationRound == null) {
+    return <Error404 />;
+  }
+
   const isOrganisation = application?.organisation != null;
 
   // TODO replace this with an explicit check and warn on undefined fields
   const hasBillingAddress =
     application?.billingAddress != null &&
-    !isEqual(application?.billingAddress, application?.organisation?.address);
+    !isEqual(application?.billingAddress, application.organisation?.address);
 
   const customerName = getApplicantName(application);
   // TODO where is this defined in the application form?
-  const homeCity = application?.homeCity?.nameFi ?? "-";
+  const homeCity = application.homeCity?.nameFi ?? "-";
 
   // TODO (test these and either change the query to do the sorting or sort on the client)
   // sort reservationUnitOptions by priority
   // sort applicationSections by "begin" date (test case would be to have the second section begin before the first)
 
-  const applicationSections = filterNonNullable(
-    application?.applicationSections
-  );
-
-  if (application == null || applicationRound == null) {
-    return <Error404 />;
-  }
+  const applicationSections = application.applicationSections ?? [];
 
   return (
     <>
@@ -1020,10 +1040,30 @@ function ApplicationDetailsRouted(): JSX.Element {
 
 export default ApplicationDetailsRouted;
 
-export const APPLICATION_ADMIN_FRAGMENT = gql`
-  fragment ApplicationAdmin on ApplicationNode {
-    pk
+export const APPLICATION_PAGE_SECTION_FRAGMENT = gql`
+  fragment ApplicationPageSection on ApplicationSectionNode {
+    ...ApplicationSectionCommon
+    suitableTimeRanges {
+      ...SuitableTime
+    }
+    purpose {
+      id
+      pk
+      nameFi
+    }
+    allocations
+    reservationUnitOptions {
+      id
+      ...ReservationUnitOptionFields
+    }
+  }
+`;
+
+// NOTE only include fields here that need to be passed to other components
+export const APPLICATION_PAGE_FRAGMENT = gql`
+  fragment ApplicationPageFields on ApplicationNode {
     id
+    pk
     status
     lastModifiedDate
     ...Applicant
@@ -1034,47 +1074,29 @@ export const APPLICATION_ADMIN_FRAGMENT = gql`
       nameFi
     }
     applicationSections {
-      ...ApplicationSectionCommon
-      suitableTimeRanges {
-        ...SuitableTime
-      }
-      purpose {
-        id
-        pk
-        nameFi
-        nameSv
-        nameEn
-      }
-      allocations
-      reservationUnitOptions {
-        id
-        ...ReservationUnitOption
-        rejected
-        allocatedTimeSlots {
-          pk
-          id
-        }
-      }
+      ...ApplicationPageSection
     }
   }
 `;
 
 // TODO this is not a good fragment, match a component / function not just create them for tab count
 export const RESERVATION_UNIT_OPTION_FRAGMENT = gql`
-  fragment ReservationUnitOption on ReservationUnitOptionNode {
+  fragment ReservationUnitOptionFields on ReservationUnitOptionNode {
     id
+    pk
+    rejected
+    allocatedTimeSlots {
+      pk
+      id
+    }
     reservationUnit {
       id
       pk
       nameFi
-      nameEn
-      nameSv
       unit {
         id
         pk
         nameFi
-        nameEn
-        nameSv
       }
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlots
@@ -1086,7 +1108,7 @@ export const RESERVATION_UNIT_OPTION_FRAGMENT = gql`
 export const APPLICATION_ADMIN_QUERY = gql`
   query ApplicationAdmin($id: ID!) {
     application(id: $id) {
-      ...ApplicationAdmin
+      ...ApplicationPageFields
       workingMemo
       user {
         id

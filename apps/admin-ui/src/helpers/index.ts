@@ -150,9 +150,7 @@ export const APPLICANT_NAME_FRAGMENT = gql`
   }
 `;
 
-export function getApplicantName(
-  app: ApplicantNameFieldsFragment | undefined
-): string {
+export function getApplicantName(app: ApplicantNameFieldsFragment): string {
   if (!app) {
     return "-";
   }
