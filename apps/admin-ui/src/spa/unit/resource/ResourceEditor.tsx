@@ -24,6 +24,7 @@ import { ResourceEditorFields } from "./EditForm";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
 import Error404 from "@/common/Error404";
+import { useDisplayError } from "common/src/hooks";
 
 type Props = {
   resourcePk?: number;
@@ -33,6 +34,7 @@ type Props = {
 export function ResourceEditor({ resourcePk, unitPk }: Props) {
   const history = useNavigate();
   const { t } = useTranslation();
+  const displayError = useDisplayError();
 
   const { data, loading, refetch } = useResourceQuery({
     variables: {
@@ -97,8 +99,8 @@ export function ResourceEditor({ resourcePk, unitPk }: Props) {
       });
       refetch();
       history(-1);
-    } catch (_) {
-      errorToast({ text: t("ResourceModal.saveError") });
+    } catch (err) {
+      displayError(err);
     }
   };
 

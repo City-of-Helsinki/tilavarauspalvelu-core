@@ -28,8 +28,7 @@
     "ingressApplication": "Olet perumassa kausivaraukseen kuuluvan varauksen.",
     "infoBody": "Haluamme tehdä Varaamosta entistä paremman. Kuulisimme mielellämme syyn varauksen perumiseen.",
     "infoBodyApplication": "Haluamme tehdä Varaamosta entistä paremman. Kuulisimme mielellämme syyn kausivarauksen perumiseen.",
-    "reason": "Perumisen syy",
-    "mutationFailed": "Varauksen peruminen epäonnistui"
+    "reason": "Perumisen syy"
   },
   "cancelSection": {
     "title": "Peru kaikki varaukset",

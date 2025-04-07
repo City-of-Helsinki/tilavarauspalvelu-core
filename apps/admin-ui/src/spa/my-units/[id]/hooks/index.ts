@@ -7,6 +7,7 @@ import { base64encode, filterNonNullable } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/common/toast";
 import { gql } from "@apollo/client";
+import { useTranslation } from "react-i18next";
 
 // TODO this should be split into two queries one for the reservation units and one for the daily reservations
 // since the reservation units only change on page load
@@ -16,6 +17,7 @@ export function useUnitResources(
   unitPk: string,
   reservationUnitTypes?: number[]
 ) {
+  const { t } = useTranslation();
   const id = base64encode(`UnitNode:${unitPk}`);
   const isValid = Number(unitPk) > 0;
   const { data, ...rest } = useReservationUnitsByUnitQuery({
@@ -28,7 +30,7 @@ export function useUnitResources(
       state: RELATED_RESERVATION_STATES,
     },
     onError: () => {
-      errorToast({ text: "Varauksia ei voitu hakea" });
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 

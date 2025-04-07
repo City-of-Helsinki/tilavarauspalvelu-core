@@ -46,11 +46,7 @@ function Reservations(): JSX.Element | null {
   // TODO also combine with other instances of LIST_RESERVATIONS
   // TODO also should do cache invalidation if the user makes a reservation
   // TODO move the query to SSR (and remove useSession)
-  const {
-    data,
-    loading: isLoading,
-    error,
-  } = useListReservationsQuery({
+  const { data, loading: isLoading } = useListReservationsQuery({
     skip: !currentUser?.pk,
     variables: {
       state:
@@ -72,13 +68,10 @@ function Reservations(): JSX.Element | null {
       endDate: tab === "past" ? toApiDate(addDays(today, -1)) : undefined,
       reservationType: ReservationTypeChoice.Normal,
     },
-  });
-
-  useEffect(() => {
-    if (error) {
+    onError: () => {
       errorToast({ text: t("common:error.dataError") });
-    }
-  }, [error, t]);
+    },
+  });
 
   useEffect(() => {
     if (routerError === "order1") {

@@ -21,7 +21,7 @@ import {
 } from "common/src/helpers";
 import { getApplicationPath } from "@/modules/urls";
 import { useTranslation } from "next-i18next";
-import { gql } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
 import { H1 } from "common/styled";
 import { breakpoints } from "common/src/const";
 import {
@@ -31,7 +31,6 @@ import {
   toUIDate,
 } from "common/src/common/util";
 import { useRouter } from "next/router";
-import { errorToast } from "common/src/common/toast";
 import {
   IconCalendarEvent,
   IconClock,
@@ -43,6 +42,7 @@ import styled from "styled-components";
 import { isReservationCancellable } from "@/modules/reservation";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
+import { useDisplayError } from "common/src/hooks";
 
 type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
 
@@ -74,6 +74,7 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
 
   const backLink = getApplicationPath(applicationPk, "view");
   const router = useRouter();
+  const displayError = useDisplayError();
 
   const onAccept = async (values: CancelFormValues) => {
     const { reason } = values;
@@ -91,7 +92,9 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
         },
       });
       if (errors != null && errors.length > 0) {
-        errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
+        throw new ApolloError({
+          graphQLErrors: errors,
+        });
       } else {
         const res = data?.cancelAllApplicationSectionReservations;
         if (res) {
@@ -100,10 +103,8 @@ function ReservationCancelPage(props: PropsNarrowed): JSX.Element {
           router.push(url);
         }
       }
-    } catch (_) {
-      errorToast({
-        text: t("reservations:cancel.mutationFailed"),
-      });
+    } catch (err) {
+      displayError(err);
     }
   };
 

@@ -149,7 +149,7 @@ function RecurringReservationForm({
     { value: "biweekly", label: t("common.biweekly") },
   ] as const;
 
-  const [mutate] = useCreateRecurringReservation();
+  const mutate = useCreateRecurringReservation();
 
   const [removedReservations, setRemovedReservations] = useState<
     NewReservationListItem[]
@@ -229,7 +229,7 @@ function RecurringReservationForm({
     };
 
     try {
-      const recurringPk = await mutate?.({
+      const recurringPk = await mutate({
         data,
         skipDates,
         reservationUnitPk: reservationUnit.pk,

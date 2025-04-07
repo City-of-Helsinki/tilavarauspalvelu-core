@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { gql, type ApolloError } from "@apollo/client";
+import { gql } from "@apollo/client";
 import {
   ReservationUnitOrderingChoices,
   ReservationUnitPublishingState,
@@ -12,6 +12,7 @@ import { ReservationUnitsTable } from "./ReservationUnitsTable";
 import { useSearchParams } from "react-router-dom";
 import { errorToast } from "common/src/common/toast";
 import { CenterSpinner } from "common/styled";
+import { useTranslation } from "react-i18next";
 
 function transformOrderBy(
   orderBy: string,
@@ -60,6 +61,29 @@ function transformSortString(
   return [];
 }
 
+function convertToReservationUnitState(
+  state: string
+): ReservationUnitPublishingState | null {
+  switch (state) {
+    case ReservationUnitPublishingState.Archived:
+      return ReservationUnitPublishingState.Archived;
+    case ReservationUnitPublishingState.Draft:
+      return ReservationUnitPublishingState.Draft;
+    case ReservationUnitPublishingState.Hidden:
+      return ReservationUnitPublishingState.Hidden;
+    case ReservationUnitPublishingState.Published:
+      return ReservationUnitPublishingState.Published;
+    case ReservationUnitPublishingState.ScheduledHiding:
+      return ReservationUnitPublishingState.ScheduledHiding;
+    case ReservationUnitPublishingState.ScheduledPeriod:
+      return ReservationUnitPublishingState.ScheduledPeriod;
+    case ReservationUnitPublishingState.ScheduledPublishing:
+      return ReservationUnitPublishingState.ScheduledPublishing;
+    default:
+      return null;
+  }
+}
+
 export function ReservationUnitsDataReader(): JSX.Element {
   const [sort, setSort] = useState<string>("");
   const onSortChanged = (sortField: string) => {
@@ -89,28 +113,7 @@ export function ReservationUnitsDataReader(): JSX.Element {
   const surfaceAreaLte = toNumber(searchParams.get("surfaceAreaLte"));
   const surfaceAreaGte = toNumber(searchParams.get("surfaceAreaGte"));
 
-  function convertToReservationUnitState(
-    state: string
-  ): ReservationUnitPublishingState | null {
-    switch (state) {
-      case ReservationUnitPublishingState.Archived:
-        return ReservationUnitPublishingState.Archived;
-      case ReservationUnitPublishingState.Draft:
-        return ReservationUnitPublishingState.Draft;
-      case ReservationUnitPublishingState.Hidden:
-        return ReservationUnitPublishingState.Hidden;
-      case ReservationUnitPublishingState.Published:
-        return ReservationUnitPublishingState.Published;
-      case ReservationUnitPublishingState.ScheduledHiding:
-        return ReservationUnitPublishingState.ScheduledHiding;
-      case ReservationUnitPublishingState.ScheduledPeriod:
-        return ReservationUnitPublishingState.ScheduledPeriod;
-      case ReservationUnitPublishingState.ScheduledPublishing:
-        return ReservationUnitPublishingState.ScheduledPublishing;
-      default:
-        return null;
-    }
-  }
+  const { t } = useTranslation();
 
   const query = useSearchReservationUnitsQuery({
     variables: {
@@ -127,8 +130,8 @@ export function ReservationUnitsDataReader(): JSX.Element {
       ),
       reservationUnitType: reservationUnitTypes,
     },
-    onError: (err: ApolloError) => {
-      errorToast({ text: err.message });
+    onError: () => {
+      errorToast({ text: t("errors.errorFetchingData") });
     },
     fetchPolicy: "cache-and-network",
     // TODO enable or no?

@@ -33,10 +33,6 @@ import {
   timeToMinutes,
 } from "common/src/helpers";
 import {
-  getPermissionErrors,
-  getValidationErrors,
-} from "common/src/apolloUtils";
-import {
   ApplicationStatusChoice,
   ApplicantTypeChoice,
   Priority,
@@ -76,6 +72,7 @@ import { useCheckPermission } from "@/hooks";
 import { errorToast } from "common/src/common/toast";
 import { ApplicationDatas, Summary } from "@/styled";
 import { ApplicationStatusLabel } from "common/src/components/statuses";
+import { useDisplayError } from "common/src/hooks";
 
 function printSuitableTimes(
   timeRanges: Pick<
@@ -267,15 +264,16 @@ function RejectOptionButton({
     requireAll: true,
   });
   const { t } = useTranslation();
+  const displayError = useDisplayError();
 
   const updateOption = async (
     pk: Maybe<number> | undefined,
     rejected: boolean
   ): Promise<void> => {
-    if (pk == null) {
-      return;
-    }
     try {
+      if (pk == null) {
+        throw new Error("no pk in option");
+      }
       await mutation({
         variables: {
           input: {
@@ -286,26 +284,7 @@ function RejectOptionButton({
       });
       refetch();
     } catch (err) {
-      const mutationErrors = getValidationErrors(err);
-      if (getPermissionErrors(err).length > 0) {
-        errorToast({ text: t("errors.noPermission") });
-      } else if (mutationErrors.length > 0) {
-        // TODO handle other codes also
-        const isInvalidState = mutationErrors.find(
-          (e) => e.code === "invalid" && e.field === "rejected"
-        );
-        if (isInvalidState) {
-          errorToast({ text: t("errors.cantRejectAlreadyAllocated") });
-        } else {
-          // TODO this should show them with cleaner formatting (multiple errors)
-          // TODO these should be translated
-          const message = mutationErrors.map((e) => e.message).join(", ");
-          errorToast({ text: t("errors.formValidationError", { message }) });
-        }
-      } else {
-        // TODO this translation is missing
-        errorToast({ text: t("errors.errorRejectingOption") });
-      }
+      displayError(err);
     }
   };
 
@@ -383,20 +362,21 @@ function RejectAllOptionsButton({
   const [restoreMutation, { loading: restoreLoading }] =
     useRestoreAllSectionOptionsMutation();
 
+  const displayError = useDisplayError();
+
   const isLoading = rejectLoading || restoreLoading;
 
   const mutate = async (
     pk: Maybe<number> | undefined,
     restore: boolean
   ): Promise<void> => {
-    if (pk == null) {
-      // TODO this is an error
-      return;
-    }
-    if (isLoading) {
-      return;
-    }
     try {
+      if (pk == null) {
+        throw new Error("no pk in section");
+      }
+      if (isLoading) {
+        throw new Error("mutation already in progress");
+      }
       const mutation = restore ? restoreMutation : rejectMutation;
       await mutation({
         variables: {
@@ -407,26 +387,7 @@ function RejectAllOptionsButton({
       });
       refetch();
     } catch (err) {
-      const mutationErrors = getValidationErrors(err);
-      if (getPermissionErrors(err).length > 0) {
-        errorToast({ text: t("errors.noPermission") });
-      } else if (mutationErrors.length > 0) {
-        // TODO handle other codes also
-        const isInvalidState = mutationErrors.find(
-          (e) => e.code === "CANNOT_REJECT_SECTION_OPTIONS"
-        );
-        if (isInvalidState) {
-          errorToast({ text: t("errors.cantRejectAlreadyAllocated") });
-        } else {
-          // TODO this should show them with cleaner formatting (multiple errors)
-          // TODO these should be translated
-          const message = mutationErrors.map((e) => e.message).join(", ");
-          errorToast({ text: t("errors.formValidationError", { message }) });
-        }
-      } else {
-        // TODO this translation is missing
-        errorToast({ text: t("errors.errorRejectingOption") });
-      }
+      displayError(err);
     }
   };
 
@@ -680,6 +641,7 @@ function RejectApplicationButton({
 
   const [restoreMutation, { loading: isRestoreLoading }] =
     useRestoreAllApplicationOptionsMutation();
+  const displayError = useDisplayError();
 
   const isLoading = isRejectionLoading || isRestoreLoading;
 
@@ -687,15 +649,15 @@ function RejectApplicationButton({
     pk: Maybe<number> | undefined,
     shouldReject: boolean
   ): Promise<void> => {
-    if (pk == null) {
-      return;
-    }
-    if (isLoading) {
-      return;
-    }
-
-    const mutation = shouldReject ? rejectionMutation : restoreMutation;
     try {
+      if (pk == null) {
+        throw new Error("no pk in application");
+      }
+      if (isLoading) {
+        throw new Error("mutation already in progress");
+      }
+
+      const mutation = shouldReject ? rejectionMutation : restoreMutation;
       await mutation({
         variables: {
           input: {
@@ -705,25 +667,7 @@ function RejectApplicationButton({
       });
       refetch();
     } catch (err) {
-      const mutationErrors = getValidationErrors(err);
-      if (getPermissionErrors(err).length > 0) {
-        errorToast({ text: t("errors.noPermission") });
-      } else if (mutationErrors.length > 0) {
-        // TODO handle other codes also
-        const isInvalidState = mutationErrors.find(
-          (e) => e.code === "CANNOT_REJECT_APPLICATION_OPTIONS"
-        );
-        if (isInvalidState) {
-          errorToast({ text: t("errors.cantRejectAlreadyAllocated") });
-        } else {
-          // TODO this should show them with cleaner formatting (multiple errors)
-          // TODO these should be translated
-          const message = mutationErrors.map((e) => e.message).join(", ");
-          errorToast({ text: t("errors.formValidationError", { message }) });
-        }
-      } else {
-        errorToast({ text: t("errors.errorRejectingApplication") });
-      }
+      displayError(err);
     }
   };
 

@@ -6,8 +6,9 @@ import {
   useRequireHandlingMutation,
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
-import { errorToast, successToast } from "common/src/common/toast";
+import { successToast } from "common/src/common/toast";
 import { gql } from "@apollo/client";
+import { useDisplayError } from "common/src/hooks";
 
 type ReservationType = Pick<ReservationNode, "pk">;
 type Props = {
@@ -17,7 +18,8 @@ type Props = {
 };
 
 function DialogContent({ reservation, onClose, onAccept }: Props) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const displayError = useDisplayError();
 
   const [backToRequireHandlingMutation] = useRequireHandlingMutation();
 
@@ -33,24 +35,7 @@ function DialogContent({ reservation, onClose, onAccept }: Props) {
       });
       onAccept();
     } catch (err) {
-      let message = "errors.descriptive.genericError";
-      if (err instanceof Error) {
-        message = err.message;
-      }
-      const hasTranslatedErrorMsg = i18n.exists(
-        `errors.descriptive.${message}`
-      );
-      const errorTranslated = hasTranslatedErrorMsg
-        ? `errors.descriptive.${message}`
-        : `errors.descriptive.genericError`;
-      errorToast({
-        text: t(
-          "RequestedReservation.ReturnToRequiresHandlingDialog.errorSaving",
-          {
-            error: t(errorTranslated),
-          }
-        ),
-      });
+      displayError(err);
     }
   };
 
@@ -91,7 +76,7 @@ function ReturnToRequiredHandlingDialog({
       <Dialog.Header
         id="modal-header"
         title={t("RequestedReservation.ReturnToRequiresHandlingDialog.title")}
-        iconStart={<IconInfoCircle aria-hidden="true" />}
+        iconStart={<IconInfoCircle />}
       />
       <DialogContent
         reservation={reservation}

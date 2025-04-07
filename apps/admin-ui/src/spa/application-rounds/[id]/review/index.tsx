@@ -30,17 +30,13 @@ import { Filters } from "./Filters";
 import { ApplicationSectionDataLoader } from "./ApplicationSectionDataLoader";
 import { TimeSlotDataLoader } from "./AllocatedSectionDataLoader";
 import { ApolloQueryResult, gql } from "@apollo/client";
-import {
-  getPermissionErrors,
-  getValidationErrors,
-} from "common/src/apolloUtils";
 import { useCheckPermission } from "@/hooks";
 import { isApplicationRoundInProgress } from "@/helpers";
 import { RejectedOccurrencesDataLoader } from "./RejectedOccurrencesDataLoader";
-import { errorToast } from "common/src/common/toast";
 import { hasPermission } from "@/modules/permissionHelper";
 import { useSession } from "@/hooks/auth";
 import { Flex, TabWrapper, TitleSection, H1 } from "common/styled";
+import { useDisplayError } from "common/src/hooks";
 
 const TabContent = styled.div`
   display: grid;
@@ -88,6 +84,7 @@ function EndAllocation({
 
   const [mutation] = useEndAllocationMutation();
   const [sendResults] = useSendResultsMutation();
+  const displayError = useDisplayError();
 
   const handleEndAllocation = async () => {
     try {
@@ -98,26 +95,7 @@ function EndAllocation({
         setWaitingForHandle(false);
       }
     } catch (err) {
-      const errors = getValidationErrors(err);
-      if (getPermissionErrors(err).length > 0) {
-        errorToast({ text: t("errors.noPermission") });
-      } else if (errors.length > 0) {
-        const unhandledCode = "APPLICATION_ROUND_HAS_UNHANDLED_APPLICATIONS";
-        const notInAllocationCode = "APPLICATION_ROUND_NOT_IN_ALLOCATION";
-        if (errors.some((e) => e.code === unhandledCode)) {
-          errorToast({
-            text: t("errors.errorEndingAllocationUnhandledApplications"),
-          });
-        } else if (errors.some((e) => e.code === notInAllocationCode)) {
-          errorToast({
-            text: t("errors.errorEndingAllocationNotInAllocation"),
-          });
-        } else {
-          errorToast({ text: t("errors.errorEndingAllocation") });
-        }
-      } else {
-        errorToast({ text: t("errors.errorEndingAllocation") });
-      }
+      displayError(err);
     }
     // refetch even on errors (if somebody else has ended the allocation)
     refetch();
@@ -128,8 +106,8 @@ function EndAllocation({
       await sendResults({
         variables: { pk: applicationRound.pk ?? 0 },
       });
-    } catch (_) {
-      errorToast({ text: t("errors.errorSendingResults") });
+    } catch (err) {
+      displayError(err);
     }
     refetch();
   };
