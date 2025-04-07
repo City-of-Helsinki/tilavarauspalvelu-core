@@ -346,7 +346,7 @@ const IconTextWrapper = styled.span`
   }
 `;
 
-type ReservationUnitTableElem = {
+type ReservationSeriesTableElem = {
   reservationUnit: ApplicationSectionReservationUnitFragment;
   dateOfWeek: string;
   // same for this actual end / start times or a combined string
@@ -373,13 +373,13 @@ const TooltipIconWrapper = styled.span`
   }
 `;
 
-function ReservationUnitTable({
+function ReservationSeriesTable({
   reservationUnits,
 }: Readonly<{
-  reservationUnits: ReservationUnitTableElem[];
+  reservationUnits: ReservationSeriesTableElem[];
 }>) {
   const { t, i18n } = useTranslation();
-  type ModalT = ReservationUnitTableElem["reservationUnit"];
+  type ModalT = ReservationSeriesTableElem["reservationUnit"];
   const [modal, setModal] = useState<ModalT | null>(null);
 
   const lang = getLocalizationLang(i18n.language);
@@ -391,7 +391,7 @@ function ReservationUnitTable({
       key: "reservationUnit",
       headerName: t("application:view.reservationsTab.reservationUnit"),
       isSortable: false,
-      transform: (elem: ReservationUnitTableElem) =>
+      transform: (elem: ReservationSeriesTableElem) =>
         createReservationUnitLink({
           reservationUnit: elem.reservationUnit,
           lang,
@@ -401,7 +401,7 @@ function ReservationUnitTable({
       key: "dateOfWeek",
       headerName: t("common:day"),
       isSortable: false,
-      transform: ({ dateOfWeek }: ReservationUnitTableElem) => (
+      transform: ({ dateOfWeek }: ReservationSeriesTableElem) => (
         <IconTextWrapper className="hide-on-mobile">
           {dateOfWeek}
         </IconTextWrapper>
@@ -411,7 +411,7 @@ function ReservationUnitTable({
       key: "time",
       headerName: t("common:timeLabel"),
       isSortable: false,
-      transform: ({ dateOfWeek, time }: ReservationUnitTableElem) => (
+      transform: ({ dateOfWeek, time }: ReservationSeriesTableElem) => (
         <IconTextWrapper aria-label={t("common:timeLabel")}>
           <IconClock />
           <OnlyForMobile>{dateOfWeek}</OnlyForMobile>
@@ -423,9 +423,9 @@ function ReservationUnitTable({
       key: "accessTypes",
       headerName: t("reservationUnit:accessType"),
       isSortable: false,
-      transform: (elem: ReservationUnitTableElem) => (
+      transform: (elem: ReservationSeriesTableElem) => (
         <TooltipIconWrapper>
-          {getReservationUnitAccessText(elem, t)}
+          {getReservationSeriesAccessText(elem, t)}
           {elem.accessType === AccessTypeWithMultivalued.Multivalued && (
             <Tooltip>{t("application:view.accessTypeWarning")}</Tooltip>
           )}
@@ -436,7 +436,7 @@ function ReservationUnitTable({
     {
       key: "helpLink",
       headerName: t("application:view.helpModal.title"),
-      transform: ({ reservationUnit }: ReservationUnitTableElem) => (
+      transform: ({ reservationUnit }: ReservationSeriesTableElem) => (
         <StyledLinkLikeButton onClick={() => setModal(reservationUnit)}>
           <IconInfoCircle />
           {isMobile
@@ -533,7 +533,7 @@ function ReservationUnitAccessTypeList({
   pk,
 }: Readonly<{
   accessTypes: Omit<ReservationUnitAccessTypeNode, "reservationUnit">[];
-  reservationUnits: ReservationUnitTableElem[];
+  reservationUnits: ReservationSeriesTableElem[];
   pk: number | null | undefined;
 }>) {
   const { t } = useTranslation();
@@ -572,20 +572,27 @@ function ReservationUnitAccessTypeList({
   );
 }
 
-function getReservationUnitAccessText(
-  reservationUnit: ReservationUnitTableElem,
+function getReservationSeriesAccessText(
+  reservationUnit: ReservationSeriesTableElem,
   t: TFunction
 ) {
   const { accessType, usedAccessTypes, pindoraInfo } = reservationUnit;
   if (usedAccessTypes == null || usedAccessTypes.length === 0) {
     return "";
   }
+
   switch (accessType) {
     case AccessTypeWithMultivalued.Multivalued:
-      return usedAccessTypes
-        .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
-        .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
-        .join(" / ");
+      if (usedAccessTypes.includes(AccessType.AccessCode)) {
+        return (
+          t(`reservationUnit:accessTypes.${AccessType.AccessCode}`) +
+          (pindoraInfo?.accessCode ? `: ${pindoraInfo.accessCode}` : "")
+        );
+      } else
+        return usedAccessTypes
+          .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
+          .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
+          .join(" / ");
     case AccessTypeWithMultivalued.AccessCode:
       return (
         t(`reservationUnit:accessTypes.${accessType}`) +
@@ -989,7 +996,7 @@ function sectionToreservations(
 function sectionToReservationUnits(
   t: TFunction,
   section: ApplicationSectionT
-): ReservationUnitTableElem[] {
+): ReservationSeriesTableElem[] {
   const reservationUnitsByDay = filterNonNullable(
     section.reservationUnitOptions
       .map((ruo) => ruo.allocatedTimeSlots.map((ats) => ats))
@@ -1056,7 +1063,7 @@ export function ApplicationSection({
 }>) {
   const { t } = useTranslation();
 
-  const reservationUnits: ReservationUnitTableElem[] =
+  const reservationUnits: ReservationSeriesTableElem[] =
     sectionToReservationUnits(t, applicationSection);
   const reservations = sectionToreservations(t, applicationSection)
     // NOTE we need to slice even if backend returns only 20 of each
@@ -1069,7 +1076,7 @@ export function ApplicationSection({
         <MarginHeader>
           {t("application:view.reservationsTab.reservationUnitsTitle")}
         </MarginHeader>
-        <ReservationUnitTable reservationUnits={reservationUnits} />
+        <ReservationSeriesTable reservationUnits={reservationUnits} />
         <MarginHeader>
           {t("application:view.reservationsTab.reservationsTitle")}
         </MarginHeader>
