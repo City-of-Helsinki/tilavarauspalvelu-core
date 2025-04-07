@@ -198,7 +198,7 @@
     "EXPIRED": "Rauennut",
     "HANDLED": "Käsittelyssä",
     "IN_ALLOCATION": "Käsittelyssä",
-    "RECEIVED": "Käsittelyssä",
+    "RECEIVED": "Lähetetty",
     "RESULTS_SENT": "Käsitelty"
   },
   "applicationEventStatus": {
