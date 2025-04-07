@@ -264,6 +264,17 @@ function formatReservationTimes(
   return times.map((x) => x.label).join(" / ") || "-";
 }
 
+function accessCodeSafe(
+  pindoraInfo: PindoraSectionFragment | null,
+  t: TFunction
+) {
+  if (!pindoraInfo?.accessCode) {
+    return t("reservations:contactSupport");
+  } else {
+    return pindoraInfo.accessCode;
+  }
+}
+
 export function ApprovedReservations({ application }: Readonly<Props>) {
   const { t, i18n } = useTranslation();
   const searchParams = useSearchParams();
@@ -437,7 +448,6 @@ function ReservationSeriesTable({
           {elem.accessType === AccessTypeWithMultivalued.Multivalued && (
             <Tooltip>{t("application:view.accessTypeWarning")}</Tooltip>
           )}
-          {/* TODO?: do we want to show a tooltip if there's no accessCode to show (== no elem.pindoraInfo.accessCode)? */}
         </TooltipIconWrapper>
       ),
     },
@@ -553,6 +563,7 @@ function ReservationUnitAccessTypeList({
   const reservationUnit = reservationUnits.find(
     (rU) => rU.reservationUnit.pk === pk
   );
+
   const accessPeriods = getReservationUnitAccessPeriods(accessTypes);
   return (
     <ModalAccessInfo>
@@ -565,7 +576,8 @@ function ReservationUnitAccessTypeList({
           <li key={period.pk}>
             <span>
               {t(`reservationUnit:accessTypes.${period.accessType}`) +
-                (period.accessType === AccessType.AccessCode
+                (period.accessType === AccessType.AccessCode &&
+                reservationUnit?.pindoraInfo?.accessCode
                   ? ` (${reservationUnit?.pindoraInfo?.accessCode})`
                   : "")}
             </span>
@@ -593,24 +605,14 @@ function getReservationSeriesAccessText(
   switch (accessType) {
     case AccessTypeWithMultivalued.Multivalued:
       if (usedAccessTypes.includes(AccessType.AccessCode)) {
-        return (
-          `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ` +
-          (pindoraInfo?.accessCode
-            ? pindoraInfo.accessCode
-            : t("reservations:contactSupport"))
-        );
+        return `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ${accessCodeSafe(pindoraInfo, t)}`;
       } else
         return usedAccessTypes
           .filter((aT) => aT != null && aT !== AccessType.Unrestricted)
           .map((aT) => t(`reservationUnit:accessTypes.${aT}`))
           .join(" / ");
     case AccessTypeWithMultivalued.AccessCode:
-      return (
-        `${t("reservationUnit:accessTypes." + AccessType.AccessCode)}: ` +
-        (pindoraInfo?.accessCode
-          ? pindoraInfo.accessCode
-          : t("reservations:contactSupport"))
-      );
+      return `${t("reservationUnit:accessTypes." + accessType)}: ${accessCodeSafe(pindoraInfo, t)}`;
     default:
       return t(`reservationUnit:accessTypes.${accessType}`);
   }
