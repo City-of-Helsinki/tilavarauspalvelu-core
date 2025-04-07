@@ -555,8 +555,7 @@ function ReservationUnitAccessTypeList({
           <li key={period.pk}>
             <span>
               {t(`reservationUnit:accessTypes.${period.accessType}`) +
-                (reservationUnit?.accessType ===
-                AccessTypeWithMultivalued.AccessCode
+                (period.accessType === AccessType.AccessCode
                   ? ` (${reservationUnit?.pindoraInfo?.accessCode})`
                   : "")}
             </span>
