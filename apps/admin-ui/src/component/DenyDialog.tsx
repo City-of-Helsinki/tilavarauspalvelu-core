@@ -24,8 +24,8 @@ import { useModal } from "@/context/ModalContext";
 import { CenterSpinner, Flex } from "common/styled";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "@/hooks";
-import { successToast, errorToast } from "common/src/common/toast";
-import { gql } from "@apollo/client";
+import { successToast } from "common/src/common/toast";
+import { ApolloError, gql } from "@apollo/client";
 import { convertOptionToHDS, toNumber } from "common/src/helpers";
 import { useDisplayError } from "common/src/hooks";
 
@@ -280,11 +280,7 @@ export function DenyDialog({
         text: t("RequestedReservation.DenyDialog.refund.mutationSuccess"),
       });
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("Refund failed with: ", err);
-      errorToast({
-        text: t("RequestedReservation.DenyDialog.refund.mutationFailure"),
-      });
+      displayError(err);
     }
   };
 
@@ -306,22 +302,21 @@ export function DenyDialog({
         handlingDetails,
       });
 
-      // TODO check that the data is valid
       if (res.errors != null && res.errors.length > 0) {
-        errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
-      } else {
-        if (shouldRefund) {
-          // TODO check errors and valid reposponse
-          await refundReservation({ pk: reservation.pk });
-        } else {
-          successToast({
-            text: t("RequestedReservation.DenyDialog.successNotify"),
-          });
-        }
-        onReject();
+        throw new ApolloError({
+          graphQLErrors: res.errors,
+        });
       }
-    } catch (e) {
-      displayError(e);
+      if (shouldRefund) {
+        await refundReservation({ pk: reservation.pk });
+      } else {
+        successToast({
+          text: t("RequestedReservation.DenyDialog.successNotify"),
+        });
+      }
+      onReject();
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -378,15 +373,17 @@ export function DenyDialogSeries({
       };
       const res = await denyMutation({ variables: { input } });
 
-      if (res.errors != null && res.errors?.length > 0) {
-        errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
+      if (res.errors != null && res.errors.length > 0) {
+        throw new ApolloError({
+          graphQLErrors: res.errors,
+        });
       }
       successToast({
         text: t("RequestedReservation.DenyDialog.successNotify"),
       });
       onReject();
-    } catch (e) {
-      displayError(e);
+    } catch (err) {
+      displayError(err);
     }
   };
 

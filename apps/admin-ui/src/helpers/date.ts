@@ -18,16 +18,20 @@ export const dateTime = (date: string, time: string): string => {
   return parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date()).toISOString();
 };
 
+export function parseDateTimeUnsafe(date: string, time: string): Date {
+  const d = parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date());
+  if (!isValid(d)) {
+    throw new Error("Invalid date");
+  }
+  return d;
+}
+
 export function parseDateTimeSafe(
   date: string,
   time: string
 ): Date | undefined {
   try {
-    const d = parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date());
-    if (Number.isNaN(d.getTime())) {
-      return undefined;
-    }
-    return d;
+    return parseDateTimeUnsafe(date, time);
   } catch (_) {
     return undefined;
   }

@@ -2,17 +2,18 @@ import { useRecurringReservationUnitQuery } from "@gql/gql-types";
 import { base64encode, filterNonNullable } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { gql } from "@apollo/client";
-
+import { useTranslation } from "react-i18next";
 export { useMultipleReservation } from "./useMultipleReservation";
 export { useCreateRecurringReservation } from "./useCreateRecurringReservation";
 export { useFilteredReservationList } from "./useFilteredReservationList";
 
 export function useRecurringReservationsUnits(unitId: number) {
+  const { t } = useTranslation();
   const id = base64encode(`UnitNode:${unitId}`);
   const { loading, data } = useRecurringReservationUnitQuery({
     variables: { id },
-    onError: (err) => {
-      errorToast({ text: err.message });
+    onError: () => {
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 

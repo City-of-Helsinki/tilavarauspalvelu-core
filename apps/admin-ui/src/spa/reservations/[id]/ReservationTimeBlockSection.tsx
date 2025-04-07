@@ -71,10 +71,8 @@ const Calendar = forwardRef(function Calendar(
   const selectedEvent = eventsAll.find((e) => e.event?.pk === selected);
 
   // Because the calendar is fixed to 6 - 24 interval anything outside it causes rendering artefacts.
-  // TODO this is common problem in the UI
-  // can be removed if and when scroll is added to the Calendar
   const isInsideCalendarRange = (x: { start: Date; end: Date }) =>
-    x.start.getHours() >= 6 && x.end.getHours() >= 6;
+    x.end.getHours() > 6;
   const events = eventsAll.filter(isInsideCalendarRange);
 
   const handleEditAccept = () => {

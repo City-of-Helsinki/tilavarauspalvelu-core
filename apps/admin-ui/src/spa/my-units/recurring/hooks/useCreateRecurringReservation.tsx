@@ -1,5 +1,3 @@
-import { useTranslation } from "react-i18next";
-import { get } from "lodash-es";
 import {
   ReservationStateChoice,
   ReservationTypeChoice,
@@ -11,7 +9,6 @@ import {
 import type { RecurringReservationForm, ReservationFormMeta } from "@/schemas";
 import { fromUIDateUnsafe, toApiDateUnsafe } from "common/src/common/util";
 import { gql } from "@apollo/client";
-import { errorToast } from "common/src/common/toast";
 import { useSession } from "@/hooks/auth";
 import { transformReserveeType } from "common/src/conversion";
 
@@ -48,14 +45,6 @@ export function useCreateRecurringReservation() {
     input: ReservationSeriesCreateMutationInput
   ) => create({ variables: { input } });
 
-  const { t } = useTranslation();
-  const handleError = (error: unknown) => {
-    const errorMessage = get(error, "messages[0]");
-    errorToast({
-      text: t("ReservationDialog.saveFailedWithError", { errorMessage }),
-    });
-  };
-
   const { user } = useSession();
 
   // NOTE unsafe
@@ -66,7 +55,7 @@ export function useCreateRecurringReservation() {
     reservationUnitPk: number;
     // metaFields: ReservationMetadataFieldNode[];
     buffers: { before?: number; after?: number };
-  }): Promise<number | undefined> => {
+  }): Promise<number | null> => {
     const { data, reservationUnitPk, buffers } = props;
     const {
       ageGroup,
@@ -107,7 +96,7 @@ export function useCreateRecurringReservation() {
       reservationDetails,
       skipDates,
       // checkOpeningHours: true,
-      ageGroup: !Number.isNaN(Number(ageGroup)) ? Number(ageGroup) : undefined,
+      ageGroup: !Number.isNaN(ageGroup) ? ageGroup : undefined,
       reservationUnit: reservationUnitPk,
       beginDate: toApiDateUnsafe(fromUIDateUnsafe(data.startingDate)),
       beginTime: startTime,
@@ -121,14 +110,8 @@ export function useCreateRecurringReservation() {
 
     const { data: createResponse } = await createReservationSeries(input);
 
-    if (createResponse?.createReservationSeries == null) {
-      handleError(undefined);
-      return undefined;
-    }
-    const { pk } = createResponse.createReservationSeries;
-
-    return pk ?? undefined;
+    return createResponse?.createReservationSeries?.pk ?? null;
   };
 
-  return [mutate];
+  return mutate;
 }

@@ -49,7 +49,7 @@ export function useReservationCalendarData({
       ],
     },
     onError: () => {
-      errorToast({ text: "Varauksia ei voitu hakea" });
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 

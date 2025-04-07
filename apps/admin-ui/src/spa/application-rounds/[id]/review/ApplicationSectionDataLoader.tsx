@@ -1,5 +1,5 @@
 import React from "react";
-import { gql, type ApolloError } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
 import {
   ApplicationSectionOrderingChoices,
@@ -31,6 +31,7 @@ type Props = {
 export function ApplicationSectionDataLoader({
   applicationRoundPk,
 }: Props): JSX.Element {
+  const { t } = useTranslation();
   const [orderBy, handleSortChanged] = useSort(SORT_KEYS);
   const [searchParams] = useSearchParams();
   const unitFilter = searchParams.getAll("unit");
@@ -50,8 +51,8 @@ export function ApplicationSectionDataLoader({
       textSearch: nameFilter,
       orderBy: transformOrderBy(orderBy),
     },
-    onError: (err: ApolloError) => {
-      errorToast({ text: err.message });
+    onError: () => {
+      errorToast({ text: t("errors.errorFetchingData") });
     },
     fetchPolicy: "cache-and-network",
     // TODO enable or no?
@@ -59,8 +60,6 @@ export function ApplicationSectionDataLoader({
   });
 
   const { fetchMore, previousData, loading, data } = query;
-
-  const { t } = useTranslation();
 
   const dataToUse = data ?? previousData;
   if (loading && !dataToUse) {

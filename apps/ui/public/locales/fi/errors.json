@@ -69,6 +69,9 @@
       "OVERLAPPING_RESERVATIONS": "Päällekkäisiä varauksia.",
       "RESERVATION_UNITS_MAX_DURATION_EXCEEDED": "Liian pitkä varausaika.",
       "RESERVATION_CANCELLATION_NOT_ALLOWED": "Peruutus ei ole sallittu.",
+      "CANCEL_REASON_DOES_NOT_EXIST": "Peruutus syytä ei ole olemassa",
+      "CANCELLATION_NOT_ALLOWED": "Peruutus ei ole sallittu",
+      "CANCELLATION_TIME_PAST": "Peruutusaika on menneisyydessä",
       "invalid": "Virheellinen arvo.",
       "generic_validation_error": "Tapahtui virhe."
     }

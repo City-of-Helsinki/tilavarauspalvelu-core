@@ -44,10 +44,8 @@ export function MyUnitView() {
   const { loading, data } = useUnitViewQuery({
     skip: !isPkValid,
     variables: { id },
-    onError: (err) => {
-      errorToast({
-        text: err.message,
-      });
+    onError: () => {
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 

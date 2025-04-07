@@ -19,9 +19,10 @@ import {
 import { useModal } from "@/context/ModalContext";
 import { Flex } from "common/styled";
 import { getReservationPriceDetails } from "./util";
-import { errorToast, successToast } from "common/src/common/toast";
+import { successToast } from "common/src/common/toast";
 import { toNumber } from "common/src/helpers";
 import { gql } from "@apollo/client";
+import { useDisplayError } from "common/src/hooks";
 
 const Label = styled.p`
   color: var(--color-black-70);
@@ -43,9 +44,10 @@ type Props = {
 };
 
 const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [mutation] = useApproveReservationMutation();
+  const displayError = useDisplayError();
 
   const approveReservation = async (input: ReservationApproveMutationInput) => {
     try {
@@ -53,21 +55,7 @@ const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
       successToast({ text: t("RequestedReservation.ApproveDialog.approved") });
       onAccept();
     } catch (err) {
-      let message = "errors.descriptive.genericError";
-      if (err instanceof Error) {
-        message = err.message;
-      }
-      const hasTranslatedErrorMsg = i18n.exists(
-        `errors.descriptive.${message}`
-      );
-      const errorTranslated = hasTranslatedErrorMsg
-        ? `errors.descriptive.${message}`
-        : `errors.descriptive.genericError`;
-      errorToast({
-        text: t("RequestedReservation.ApproveDialog.errorSaving", {
-          error: t(errorTranslated),
-        }),
-      });
+      displayError(err);
     }
   };
 

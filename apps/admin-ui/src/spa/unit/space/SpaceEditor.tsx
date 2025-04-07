@@ -24,6 +24,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LinkPrev } from "@/component/LinkPrev";
 import { gql } from "@apollo/client";
+import { useDisplayError } from "common/src/hooks";
 
 const Form = styled.form`
   display: flex;
@@ -47,6 +48,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
   const updateSpace = (input: SpaceUpdateMutationInput) =>
     mutation({ variables: { input } });
 
+  const displayError = useDisplayError();
   const {
     data,
     refetch,
@@ -54,8 +56,8 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     error,
   } = useSpaceQuery({
     variables: { id: base64encode(`SpaceNode:${space}`) },
-    onError: (e) => {
-      errorToast({ text: t("errors.errorFetchingData", { error: e }) });
+    onError: () => {
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 
@@ -111,8 +113,7 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
     try {
       const { parent, surfaceArea, pk, ...rest } = values;
       if (pk == null || pk === 0) {
-        errorToast({ text: t("SpaceEditor.saveFailed") });
-        return;
+        throw new Error("Space pk is not defined");
       }
       await updateSpace({
         ...rest,
@@ -125,8 +126,8 @@ function SpaceEditor({ space, unit }: Props): JSX.Element {
       });
       refetch();
       history(-1);
-    } catch (_) {
-      errorToast({ text: t("SpaceEditor.saveFailed") });
+    } catch (err) {
+      displayError(err);
     }
   };
 
