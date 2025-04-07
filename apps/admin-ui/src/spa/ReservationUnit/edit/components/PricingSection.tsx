@@ -1,14 +1,44 @@
 import { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
-import { TaxOption } from "@/spa/ReservationUnit/edit/components/PricingTypeView";
+import {
+  PricingTypeView,
+  TaxOption,
+} from "@/spa/ReservationUnit/edit/components/PricingTypeView";
 import { useTranslation } from "next-i18next";
 import { EditAccordion } from "@/spa/ReservationUnit/edit/components/styled";
 import { AutoGrid } from "common/styled";
-import { PricingControl } from "@/spa/ReservationUnit/edit/components/PricingControl";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
 import { ControlledSelect } from "common/src/components/form";
 import { getTranslatedError } from "@/common/util";
 import React from "react";
+import { FieldGroup } from "@/spa/ReservationUnit/edit/components/FieldGroup";
+
+function PricingControl({
+  pricing,
+  form,
+  taxPercentageOptions,
+}: {
+  form: UseFormReturn<ReservationUnitEditFormValues>;
+  pricing: ReservationUnitEditFormValues["pricings"][0];
+  taxPercentageOptions: TaxOption[];
+}) {
+  const { t } = useTranslation();
+  return (
+    <FieldGroup
+      key={`pricing-${pricing.pk}`}
+      heading={t("ReservationUnitEditor.label.pricingType")}
+      required
+      tooltip={t("ReservationUnitEditor.tooltip.pricingType")}
+      style={{ gridColumn: "1 / -1" }}
+    >
+      <PricingTypeView
+        pk={pricing.pk}
+        form={form}
+        taxPercentageOptions={taxPercentageOptions}
+      />
+    </FieldGroup>
+  );
+}
 
 export function PricingSection({
   form,
