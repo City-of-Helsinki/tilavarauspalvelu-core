@@ -3762,7 +3762,6 @@ export type ReservationUnitAccessTypeNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
-  readonly reservationUnit: ReservationUnitNode;
 };
 
 /** Ordering fields for the 'ReservationUnitAccessType' model. */
@@ -4198,9 +4197,6 @@ export type ReservationUnitNodeAccessTypesArgs = {
     ReadonlyArray<InputMaybe<ReservationUnitAccessTypeOrderingChoices>>
   >;
   pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnit?: InputMaybe<
-    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-  >;
 };
 
 export type ReservationUnitNodeApplicationRoundsArgs = {
