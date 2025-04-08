@@ -9,7 +9,7 @@ import {
 
 type StatusLabelProps = {
   type: StatusLabelType;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   slim?: boolean;
   children: React.ReactNode;
   className?: string;
