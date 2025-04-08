@@ -109,7 +109,7 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     deny_reason = ForeignKeyFactory("tests.factories.ReservationDenyReasonFactory")
     cancel_reason = ForeignKeyFactory("tests.factories.ReservationCancelReasonFactory")
     purpose = ForeignKeyFactory("tests.factories.ReservationPurposeFactory")
-    home_city = ForeignKeyFactory("tests.factories.HomeCityFactory")
+    home_city = ForeignKeyFactory("tests.factories.CityFactory")
     age_group = ForeignKeyFactory("tests.factories.AgeGroupFactory")
 
     payment_order = ReverseForeignKeyFactory("tests.factories.PaymentOrderFactory")
@@ -247,6 +247,22 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     @classmethod
     def create_for_deny(cls, **kwargs: Any) -> Reservation:
         """Create a Reservation for a single ReservationUnit in the necessary state for denying it."""
+        from .reservation_unit import ReservationUnitFactory
+
+        sub_kwargs = cls.pop_sub_kwargs("reservation_units", kwargs)
+        reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
+
+        begin = next_hour(plus_hours=1)
+        kwargs.setdefault("state", ReservationStateChoice.REQUIRES_HANDLING)
+        kwargs.setdefault("type", ReservationTypeChoice.NORMAL)
+        kwargs.setdefault("begin", begin)
+        kwargs.setdefault("end", begin + datetime.timedelta(hours=1))
+        kwargs.setdefault("reservation_units", [reservation_unit])
+        return cls.create(**kwargs)
+
+    @classmethod
+    def create_for_approve(cls, **kwargs: Any) -> Reservation:
+        """Create a Reservation for a single ReservationUnit in the necessary state for approving it."""
         from .reservation_unit import ReservationUnitFactory
 
         sub_kwargs = cls.pop_sub_kwargs("reservation_units", kwargs)
