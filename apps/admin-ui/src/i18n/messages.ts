@@ -878,6 +878,15 @@ const translations: ITranslations = {
         "duration must be a multiple of the reservation start interval": [
           "Keston on oltava varauksen alkamisvälin kerrannainen",
         ],
+        "access type duplicate beginDate": [
+          "Tilaan pääsyillä on oltava eri alkamisajat",
+        ],
+        "access type invalid beginDate": [
+          "Tilaan pääsyillä on virheellinen alkamisaika",
+        ],
+        "access types are required for publish": [
+          "Varausyksikölle täytyy määrittää vähintään yksi tilaan pääsy ennen julkaisua",
+        ],
       },
     },
     level: {
@@ -1257,6 +1266,8 @@ const translations: ITranslations = {
       begins: ["Alkaa"],
       openingTime: ["Alkamisaika"],
       closingTime: ["Päättymisaika"],
+      accessTypes: ["Tilaan pääsy"],
+      beginDate: ["Voimassa alkaen"],
     },
     tooltip: {
       reservationKind: [

@@ -18,6 +18,7 @@ import {
   ImageType,
   type ReservationUnitEditQuery,
   type ReservationUnitPricingSerializerInput,
+  AccessType,
 } from "@gql/gql-types";
 import { addDays, endOfDay, format } from "date-fns";
 import { z } from "zod";
@@ -29,6 +30,12 @@ import { constructApiDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
+export const AccessTypes = [
+  "ACCESS_CODE",
+  "OPENED_BY_STAFF",
+  "PHYSICAL_KEY",
+  "UNRESTRICTED",
+] as const;
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -173,6 +180,39 @@ const SeasonalFormSchema = z.object({
   reservableTimes: z.array(ReservableTimeSchema.optional()),
 });
 type SeasonalFormType = z.infer<typeof SeasonalFormSchema>;
+
+const AccessTypesFormSchema = z.object({
+  pk: z.number().optional(),
+  accessType: z.nativeEnum(AccessType),
+  beginDate: z.string(),
+});
+export type AccessTypesFormType = z.infer<typeof AccessTypesFormSchema>;
+
+function validateAccessTypes(
+  accessTypes: AccessTypesFormType[],
+  ctx: z.RefinementCtx
+): void {
+  const seenDates: string[] = [];
+
+  accessTypes.forEach((at, index) => {
+    if (fromUIDate(at.beginDate) == null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "access type invalid beginDate",
+        path: [`accessTypes.${index}.beginDate`],
+      });
+    }
+
+    if (seenDates.includes(at.beginDate)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "access type duplicate beginDate",
+        path: [`accessTypes.${index}.beginDate`],
+      });
+    }
+    seenDates.push(at.beginDate);
+  });
+}
 
 function validateSeasonalTimes(
   data: SeasonalFormType[],
@@ -353,8 +393,6 @@ const bufferTimeSchema = z
 // because it doesn't work in customer ui (backend supports it though)
 export const BUFFER_TIME_OPTIONS = ["noBuffer", "bufferTimesSet"] as const;
 
-export type BufferTime = z.infer<typeof bufferTimeSchema>;
-
 export const ReservationUnitEditSchema = z
   .object({
     authentication: z.nativeEnum(Authentication),
@@ -439,11 +477,14 @@ export const ReservationUnitEditSchema = z
     hasBufferTimeBefore: z.boolean(),
     hasBufferTimeAfter: z.boolean(),
     hasCancellationRule: z.boolean(),
+    accessTypes: z.array(AccessTypesFormSchema),
   })
   .superRefine((v, ctx) => {
     if (v.isArchived) {
       return;
     }
+
+    validateAccessTypes(v.accessTypes, ctx);
 
     // Drafts also require seasonal times validation
     if (v.reservationKind !== ReservationKind.Direct) {
@@ -507,6 +548,14 @@ export const ReservationUnitEditSchema = z
 
     if (v.isDraft) {
       return;
+    }
+
+    if (v.accessTypes.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "access types are required for publish",
+        path: ["accessTypes"],
+      });
     }
 
     if (v.reservationKind !== ReservationKind.Season) {
@@ -784,9 +833,20 @@ function convertSeasonalList(
   });
 }
 
+function convertAccessTypes(
+  accessTypes: NonNullable<Node["accessTypes"]>
+): AccessTypesFormType[] {
+  return accessTypes.map((at) => ({
+    pk: at?.pk ?? undefined,
+    accessType: at.accessType,
+    beginDate: convertBegins(at.beginDate),
+  }));
+}
+
 export function convertReservationUnit(
   data?: Node
 ): ReservationUnitEditFormValues {
+  // Convert from API data to form values
   return {
     bufferType:
       data?.reservationBlockWholeDay === true
@@ -899,6 +959,7 @@ export function convertReservationUnit(
     hasBufferTimeBefore: !!data?.bufferTimeBefore,
     hasBufferTimeAfter: !!data?.bufferTimeAfter,
     hasCancellationRule: data?.cancellationRule != null,
+    accessTypes: convertAccessTypes(filterNonNullable(data?.accessTypes)),
   };
 }
 
@@ -906,6 +967,7 @@ export function convertReservationUnit(
 export function transformReservationUnit(
   values: ReservationUnitEditFormValues
 ) {
+  // Convert from form values to API data
   const {
     pk,
     isDraft,
@@ -938,6 +1000,7 @@ export function transformReservationUnit(
     termsOfUseFi,
     termsOfUseSv,
     seasons,
+    accessTypes,
     images, // images are updated with a separate mutation
     ...vals
   } = values;
@@ -996,6 +1059,13 @@ export function transformReservationUnit(
     cancellationRule: hasCancellationRule ? cancellationRule : null,
     pricings: filterNonNullable(
       pricings.map((p) => transformPricing(p, hasFuturePricing))
+    ),
+    accessTypes: filterNonNullable(
+      accessTypes.map((at) => ({
+        pk: at.pk,
+        accessType: at.accessType,
+        beginDate: toApiDate(fromUIDate(at.beginDate) || new Date()) || "",
+      }))
     ),
     applicationRoundTimeSlots,
   };
