@@ -6971,6 +6971,12 @@ export type ReservationUnitEditQuery = {
         readonly end: string;
       } | null>;
     }>;
+    readonly accessTypes: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly accessType: AccessType;
+      readonly beginDate: string;
+    }>;
   } | null;
 };
 
@@ -13191,6 +13197,12 @@ export const ReservationUnitEditDocument = gql`
       }
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlots
+      }
+      accessTypes(isActiveOrFuture: true) {
+        id
+        pk
+        accessType
+        beginDate
       }
     }
   }
