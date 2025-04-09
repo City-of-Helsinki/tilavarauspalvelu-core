@@ -267,7 +267,6 @@ const OrganisationsSchema = z.object({
   pk: z.number().optional(),
   name: z.string().min(1).max(255),
   identifier: z.string().max(255).optional(),
-  yearEstablished: z.number().optional(),
   coreBusiness: z.string().min(1).max(255),
   address: AddressSchema,
 });
@@ -302,7 +301,6 @@ const convertOrganisation = (o: Organisation): OrganisationFormValues => ({
   pk: o?.pk ?? undefined,
   name: o?.nameFi ?? "",
   identifier: o?.identifier ?? "",
-  yearEstablished: o?.yearEstablished ?? 0,
   coreBusiness: o?.coreBusinessFi ?? "",
   address: convertAddress(o?.address ?? null),
 });
