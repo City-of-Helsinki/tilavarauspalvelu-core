@@ -146,13 +146,13 @@ function getImageSourceWithoutDefault(
 ): string | null {
   switch (size) {
     case "small":
-      return image.smallUrl ?? null;
+      return image.smallUrl;
     case "large":
-      return image.largeUrl ?? null;
+      return image.largeUrl;
     case "medium":
-      return image.mediumUrl ?? null;
+      return image.mediumUrl;
     case "full":
-      return image.imageUrl ?? null;
+      return image.imageUrl;
     default:
       return null;
   }

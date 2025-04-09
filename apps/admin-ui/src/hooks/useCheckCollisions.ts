@@ -24,8 +24,8 @@ export function useCheckCollisions({
 }: {
   reservationPk?: number;
   reservationUnitPk: number;
-  start?: Date;
-  end?: Date;
+  start: Date | null;
+  end: Date | null;
   buffers: {
     before: number;
     after: number;

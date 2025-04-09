@@ -39,7 +39,7 @@ import {
   valueForDateInput,
   valueForTimeInput,
   dateTime,
-  parseDateTimeSafe,
+  constructDateTimeSafe,
 } from "@/helpers";
 import { base64encode } from "common/src/helpers";
 import { ControlledDateInput } from "common/src/components/form";
@@ -187,8 +187,8 @@ const checkStartIsBeforeEnd = (
   },
   ctx: z.RefinementCtx
 ) => {
-  const start = parseDateTimeSafe(data.activeFrom, data.activeFromTime);
-  const end = parseDateTimeSafe(data.activeUntil, data.activeUntilTime);
+  const start = constructDateTimeSafe(data.activeFrom, data.activeFromTime);
+  const end = constructDateTimeSafe(data.activeUntil, data.activeUntilTime);
   if (start && end && start > end) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -329,7 +329,7 @@ const NotificationForm = ({
   const displayError = useDisplayError();
 
   const onSubmit = async (data: NotificationFormType) => {
-    const end = parseDateTimeSafe(data.activeUntil, data.activeUntilTime);
+    const end = constructDateTimeSafe(data.activeUntil, data.activeUntilTime);
     const start =
       data.activeFrom !== ""
         ? dateTime(data.activeFrom, data.activeFromTime)

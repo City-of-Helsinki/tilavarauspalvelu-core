@@ -32,8 +32,8 @@ import { useCheckCollisions } from "@/hooks";
 import {
   getBufferTime,
   getNormalizedInterval,
-  parseDateTimeSafe,
-  parseDateTimeUnsafe,
+  constructDateTimeSafe,
+  constructDateTimeUnsafe,
 } from "@/helpers";
 import { formatDateTimeRange } from "@/common/util";
 import { gql } from "@apollo/client";
@@ -154,8 +154,8 @@ function DialogContent({
   const formPks = watch("pk");
   const formType = watch("type");
 
-  const start = parseDateTimeSafe(formDate, formStartTime);
-  const end = parseDateTimeSafe(formDate, formEndTime);
+  const start = constructDateTimeSafe(formDate, formStartTime);
+  const end = constructDateTimeSafe(formDate, formEndTime);
   const { hasCollisions, isLoading } = useCheckCollisions({
     reservationPk: formPks,
     reservationUnitPk,
@@ -171,8 +171,8 @@ function DialogContent({
 
   const onSubmit = async (values: EditFormValueType) => {
     try {
-      const newStart = parseDateTimeUnsafe(formDate, formStartTime);
-      const newEnd = parseDateTimeUnsafe(formDate, formEndTime);
+      const newStart = constructDateTimeUnsafe(formDate, formStartTime);
+      const newEnd = constructDateTimeUnsafe(formDate, formEndTime);
       const { pk } = values;
       await mutate({
         pk,

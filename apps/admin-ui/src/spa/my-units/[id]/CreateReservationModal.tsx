@@ -29,10 +29,10 @@ import { CenterSpinner } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useCheckCollisions } from "@/hooks";
 import {
+  constructDateTimeSafe,
   dateTime,
   getBufferTime,
   getNormalizedInterval,
-  parseDateTimeSafe,
 } from "@/helpers";
 import { useModal } from "@/context/ModalContext";
 import { ControlledTimeInput } from "@/component/ControlledTimeInput";
@@ -115,8 +115,8 @@ function useCheckFormCollisions({
     enableBufferTimeAfter
   );
 
-  const start = parseDateTimeSafe(formDate, formStartTime);
-  const end = parseDateTimeSafe(formDate, formEndTime);
+  const start = constructDateTimeSafe(formDate, formStartTime);
+  const end = constructDateTimeSafe(formDate, formEndTime);
   const { hasCollisions } = useCheckCollisions({
     reservationPk: undefined,
     reservationUnitPk: reservationUnit?.pk ?? 0,
