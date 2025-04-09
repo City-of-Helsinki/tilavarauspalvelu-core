@@ -51,6 +51,7 @@ const TITLE_CELL_WIDTH_CH = 11;
 const MOBILE_CUTOFF = 1000;
 const MOBILE_MARGIN = 150;
 const DESKTOP_MARGIN = 500;
+const MAX_RESOURCES_WITHOUT_SCROLL = 10;
 
 const TemplateProps: CSSProperties = {
   zIndex: "var(--tilavaraus-admin-stack-calendar-buffer)",
@@ -188,13 +189,14 @@ const HideTimesOverTitles = styled.div`
   z-index: var(--tilavaraus-admin-stack-calendar-header-names);
 `;
 
-const Container = styled.div<{ $height: number }>`
+const Container = styled.div<{ $height: number | "auto" }>`
   max-width: 100%;
   overflow: auto;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
 
-  height: ${({ $height }) => $height}px;
+  height: ${({ $height }) =>
+    typeof $height === "number" ? `${$height}px` : "auto"};
 `;
 
 function Cells({
@@ -527,12 +529,14 @@ export function UnitCalendar({
   const margins = windowHeight < MOBILE_CUTOFF ? MOBILE_MARGIN : DESKTOP_MARGIN;
   const containerHeight = windowHeight - margins;
 
+  const height =
+    resources.length > MAX_RESOURCES_WITHOUT_SCROLL ? containerHeight : "auto";
   if (isLoading) {
     return <CenterSpinner />;
   }
 
   return (
-    <Container $height={containerHeight}>
+    <Container $height={height}>
       <HideTimesOverTitles />
       <FlexContainer $numCols={N_COLS} ref={calendarRef}>
         <HeadingRow>

@@ -9,13 +9,13 @@ import { parseAddress } from "@/common/util";
 import { getRecurringReservationUrl } from "@/common/urls";
 import { ReservationUnitCalendarView } from "./ReservationUnitCalendarView";
 import { UnitReservations } from "./UnitReservations";
-import { base64encode, filterNonNullable } from "common/src/helpers";
+import { base64encode, toNumber } from "common/src/helpers";
 import { errorToast } from "common/src/common/toast";
 import { UserPermissionChoice, useUnitViewQuery } from "@gql/gql-types";
 import { useCheckPermission } from "@/hooks";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { LinkPrev } from "@/component/LinkPrev";
-import { CenterSpinner, TabWrapper, TitleSection } from "common/styles/util";
+import { TabWrapper, TitleSection } from "common/styles/util";
 
 type Params = {
   unitId: string;
@@ -35,10 +35,11 @@ const TabPanel = styled(Tabs.TabPanel)`
 `;
 
 export function MyUnitView() {
-  const { unitId: pk } = useParams<Params>();
+  const { unitId } = useParams<Params>();
   const { t } = useTranslation();
+  const pk = toNumber(unitId);
 
-  const isPkValid = pk != null && Number(pk) > 0;
+  const isPkValid = pk != null && pk > 0;
   const id = base64encode(`UnitNode:${pk}`);
   const { loading, data } = useUnitViewQuery({
     skip: !isPkValid,
@@ -53,7 +54,7 @@ export function MyUnitView() {
   const { unit } = data ?? {};
 
   const { hasPermission: canCreateReservations } = useCheckPermission({
-    units: [Number(pk)],
+    units: pk != null ? [pk] : [],
     permission: UserPermissionChoice.CanCreateStaffReservations,
   });
 
@@ -65,10 +66,7 @@ export function MyUnitView() {
     setSearchParams(vals, { replace: true });
   };
 
-  if (loading) {
-    return <CenterSpinner />;
-  }
-  if (!unit || !isPkValid) {
+  if (!isPkValid) {
     return (
       <>
         <LinkPrev />
@@ -79,24 +77,22 @@ export function MyUnitView() {
 
   const recurringReservationUrl = getRecurringReservationUrl(pk);
 
-  const reservationUnitOptions = filterNonNullable(
-    data?.unit?.reservationUnits
-  ).map((reservationUnit) => ({
-    label: reservationUnit?.nameFi ?? "-",
-    value: reservationUnit?.pk ?? 0,
-  }));
+  const reservationUnitOptions = (unit?.reservationUnits ?? []).map(
+    ({ pk, nameFi }) => ({
+      label: nameFi ?? "-",
+      value: pk ?? 0,
+    })
+  );
 
   const activeTab = selectedTab === "reservation-unit" ? 1 : 0;
 
+  const title = loading ? t("common.loading") : (unit?.nameFi ?? "-");
+  const location = unit?.location ? parseAddress(unit.location) : "-";
   return (
     <>
       <TitleSection>
-        <H1 $noMargin>{unit?.nameFi}</H1>
-        {unit.location && (
-          <LocationOnlyOnDesktop>
-            {parseAddress(unit.location)}
-          </LocationOnlyOnDesktop>
-        )}
+        <H1 $noMargin>{title}</H1>
+        <LocationOnlyOnDesktop>{location}</LocationOnlyOnDesktop>
       </TitleSection>
       <div>
         <ButtonLikeLink
