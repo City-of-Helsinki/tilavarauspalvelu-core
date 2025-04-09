@@ -44,7 +44,7 @@ function Page3Form(): JSX.Element | null {
   const { options } = useOptions();
   const { cityOptions } = options;
 
-  const { watch, unregister, register } =
+  const { watch, unregister, register, setValue } =
     useFormContext<ApplicationPage3FormValues>();
   const type = watch("applicantType");
 
@@ -58,9 +58,11 @@ function Page3Form(): JSX.Element | null {
     if (hasRegistration) {
       register("organisation.identifier", { required: true });
     } else {
+      // Unregister does not remove the form value (neither from DOM nor from the form state)
+      setValue("organisation.identifier", undefined);
       unregister("organisation.identifier");
     }
-  }, [type, register, unregister]);
+  }, [type, register, unregister, setValue]);
 
   const hasBillingAddress = watch("hasBillingAddress");
   useEffect(() => {
