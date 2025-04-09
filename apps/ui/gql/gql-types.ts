@@ -6439,6 +6439,9 @@ export type ReservationCardFragment = {
   readonly applyingForFreeOfCharge: boolean | null;
   readonly reservationUnits: ReadonlyArray<{
     readonly id: string;
+    readonly nameFi: string | null;
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
     readonly reservationBegins: string | null;
     readonly reservationEnds: string | null;
     readonly images: ReadonlyArray<{
@@ -9678,6 +9681,9 @@ export type ListReservationsQuery = {
         readonly applyingForFreeOfCharge: boolean | null;
         readonly reservationUnits: ReadonlyArray<{
           readonly id: string;
+          readonly nameFi: string | null;
+          readonly nameSv: string | null;
+          readonly nameEn: string | null;
           readonly reservationBegins: string | null;
           readonly reservationEnds: string | null;
           readonly images: ReadonlyArray<{
@@ -10476,6 +10482,9 @@ export const ReservationCardFragmentDoc = gql`
     accessType
     reservationUnits {
       id
+      nameFi
+      nameSv
+      nameEn
       images {
         ...Image
       }
