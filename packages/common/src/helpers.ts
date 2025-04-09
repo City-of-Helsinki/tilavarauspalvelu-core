@@ -257,7 +257,11 @@ export function formatApiTimeInterval({
   }
   // NOTE this uses extra cycles because of double conversions but it's safer than stripping from raw data
   const btime = formatMinutes(timeToMinutes(beginTime), trailingMinutes);
-  const etime = formatMinutes(timeToMinutes(endTime), trailingMinutes);
+  const endTimeMins = timeToMinutes(endTime);
+  const etime = formatMinutes(
+    endTimeMins === 0 ? 24 * 60 : endTimeMins,
+    trailingMinutes
+  );
   return `${btime}–${etime}`;
 }
 
