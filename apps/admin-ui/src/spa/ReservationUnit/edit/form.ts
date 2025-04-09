@@ -25,7 +25,7 @@ import {
   checkLengthWithoutHtml,
   checkTimeStringFormat,
 } from "common/src/schemas/schemaCommon";
-import { constructApiDate } from "@/helpers";
+import { constructApiDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
@@ -319,30 +319,28 @@ function validateDateTimeInterval({
   }
 
   // TODO if the above checks fail this doesn't need to be checked, right?
-  if (endDate !== "" && beginDate !== "") {
-    const begin = constructApiDate(beginDate, beginTime);
-    const end = constructApiDate(endDate, endTime);
-    if (begin == null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Invalid date",
-        path: [path.beginDate],
-      });
-    }
-    if (end == null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Invalid date",
-        path: [path.endDate],
-      });
-    }
-    if (begin && end && begin >= end) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `${path.beginDate} must be before end`,
-        path: [path.beginDate],
-      });
-    }
+  const begin = constructApiDateTime(beginDate, beginTime);
+  const end = constructApiDateTime(endDate, endTime);
+  if (begin == null) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Invalid date",
+      path: [path.beginDate],
+    });
+  }
+  if (end == null) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Invalid date",
+      path: [path.endDate],
+    });
+  }
+  if (begin && end && begin >= end) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `${path.beginDate} must be before end`,
+      path: [path.beginDate],
+    });
   }
 }
 
@@ -967,19 +965,19 @@ export function transformReservationUnit(
       surfaceArea != null && surfaceArea > 0 ? Math.floor(surfaceArea) : null,
     reservationBegins:
       hasScheduledReservation && hasReservationBegins
-        ? constructApiDate(reservationBeginsDate, reservationBeginsTime)
+        ? constructApiDateTime(reservationBeginsDate, reservationBeginsTime)
         : null,
     reservationEnds:
       hasScheduledReservation && hasReservationEnds
-        ? constructApiDate(reservationEndsDate, reservationEndsTime)
+        ? constructApiDateTime(reservationEndsDate, reservationEndsTime)
         : null,
     publishBegins:
       hasScheduledPublish && hasPublishBegins
-        ? constructApiDate(publishBeginsDate, publishBeginsTime)
+        ? constructApiDateTime(publishBeginsDate, publishBeginsTime)
         : null,
     publishEnds:
       hasScheduledPublish && hasPublishEnds
-        ? constructApiDate(publishEndsDate, publishEndsTime)
+        ? constructApiDateTime(publishEndsDate, publishEndsTime)
         : null,
     reservationBlockWholeDay: bufferType === "blocksWholeDay",
     bufferTimeAfter:
