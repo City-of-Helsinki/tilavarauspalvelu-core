@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import type { GetServerSidePropsContext } from "next";
@@ -32,6 +33,21 @@ function Page2({ application }: PropsNarrowed): JSX.Element {
 
   const saveAndNavigate = async (values: ApplicationPage2FormValues) => {
     try {
+      const isInvalidPk = values.applicationSections.some(
+        (section) => typeof section.pk !== "number"
+      );
+      if (isInvalidPk) {
+        const context = {
+          level: "error" as const,
+          extra: {
+            formValues: values,
+          },
+        };
+        Sentry.captureMessage(
+          "Invalid type in section pk (not number) in application form",
+          context
+        );
+      }
       const input = transformApplicationPage2(values);
       const { data } = await mutate({ variables: { input } });
       const { pk } = data?.updateApplication ?? {};
@@ -49,6 +65,24 @@ function Page2({ application }: PropsNarrowed): JSX.Element {
     defaultValues: convertApplicationPage2(application),
     resolver: zodResolver(ApplicationPage2Schema),
   });
+
+  useEffect(() => {
+    const isInvalidPk = (application.applicationSections ?? []).some(
+      (section) => typeof section.pk !== "number"
+    );
+    if (isInvalidPk) {
+      const context = {
+        level: "error" as const,
+        extra: {
+          application,
+        },
+      };
+      Sentry.captureMessage(
+        "Invalid type in section pk (not number) in application gql query",
+        context
+      );
+    }
+  }, [application]);
 
   return (
     <FormProvider {...form}>

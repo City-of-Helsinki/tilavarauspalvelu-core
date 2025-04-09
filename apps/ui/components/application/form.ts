@@ -162,8 +162,9 @@ const ApplicationSectionPage2Schema = z
 function transformApplicationSectionPage2(
   values: ApplicationSectionPage2FormValues
 ): UpdateApplicationSectionForApplicationSerializerInput {
+  // NOTE: there is a type issue somewhere that causes this to be a string for some cases
   return {
-    pk: values.pk,
+    pk: Number(values.pk),
     suitableTimeRanges: values.suitableTimeRanges.map(
       transformSuitableTimeRange
     ),
@@ -177,7 +178,8 @@ function convertApplicationSectionPage2(
     section.reservationUnitOptions.find(() => true)?.reservationUnit.pk ?? 0;
   const { name, appliedReservationsPerWeek } = section;
   return {
-    pk: section.pk ?? 0,
+    // NOTE: there is a type issue somewhere that causes the mutation output to be a string for some cases
+    pk: Number(section.pk ?? 0),
     name,
     suitableTimeRanges: filterNonNullable(section.suitableTimeRanges).map(
       (timeRanges) => convertTimeRange(timeRanges)
