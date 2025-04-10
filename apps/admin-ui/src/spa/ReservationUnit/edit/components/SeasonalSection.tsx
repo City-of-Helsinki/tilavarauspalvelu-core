@@ -7,7 +7,7 @@ import {
   IconPlus,
 } from "hds-react";
 import styled, { css } from "styled-components";
-import { Controller, UseFormReturn } from "react-hook-form";
+import { Controller, useFieldArray, UseFormReturn } from "react-hook-form";
 import { TimeInput } from "common/src/components/form/TimeInput";
 import { IconButton } from "common/src/components";
 import { fontBold } from "common/styled";
@@ -76,13 +76,13 @@ const SeasonalTimeWrapper = styled.div`
   grid-area: a;
 
   /* use more margin instead of gap because we have invisible columns (mobile is vertical layout) */
-  margin-bottom: var(--spacing-xs);
-  gap: var(--spacing-2-xs);
+  margin-bottom: var(--spacing-s);
+  column-gap: var(--spacing-2-xs);
 
   @media (min-width: ${breakpoints.xl}) {
     grid-column-end: unset;
     grid-row: 1 / -1;
-    margin: 0 var(--spacing-l);
+    margin: 0 var(--spacing-m);
   }
 `;
 
@@ -102,7 +102,7 @@ const StyledTimeInput = styled(TimeInput)`
 // first row is for input labels, align this with the input field itself
 const alignToInput = css`
   grid-row-start: 2;
-  align-self: end;
+  align-self: center;
 `;
 const AndSpan = styled.span`
   ${alignToInput};
@@ -128,7 +128,7 @@ const Controls = styled.div`
   display: grid;
   padding-bottom: 0.25rem;
   grid: subgrid / subgrid;
-  align-items: end;
+  align-items: center;
   gap: var(--spacing-m);
   justify-content: space-between;
 
@@ -150,41 +150,29 @@ function SeasonRow({
   form: UseFormReturn<ReservationUnitEditFormValues>;
   index: number;
 }): JSX.Element {
-  const { control, unregister, register, setValue, trigger, watch, formState } =
-    form;
-  const { errors } = formState;
   const { t } = useTranslation();
-
+  const { control, trigger, watch, formState } = form;
+  const { errors } = formState;
+  const {
+    fields: reservableTimes,
+    append,
+    remove,
+  } = useFieldArray({
+    control,
+    name: `seasons.${index}.reservableTimes`,
+  });
   const day = watch(`seasons.${index}`);
 
   const handleAddTime = () => {
-    const times = day.reservableTimes;
-    const i = times.length;
-    register(`seasons.${index}.reservableTimes.${i}.begin`);
-    register(`seasons.${index}.reservableTimes.${i}.end`);
-    setValue(`seasons.${index}.reservableTimes.${i}.begin`, "", {
-      shouldTouch: true,
-      shouldDirty: true,
-    });
-    setValue(`seasons.${index}.reservableTimes.${i}.end`, "", {
-      shouldTouch: true,
-      shouldDirty: true,
+    append({
+      begin: "",
+      end: "",
     });
   };
 
   const handleRemoveTime = () => {
-    const times = day.reservableTimes;
-    const i = times.length - 1;
-    // no other way to dirty the form when unregistering
-    setValue(`seasons.${index}.reservableTimes.${i}.begin`, "invalid", {
-      shouldTouch: true,
-      shouldDirty: true,
-    });
-    setValue(`seasons.${index}.reservableTimes.${i}.end`, "invalid", {
-      shouldTouch: true,
-      shouldDirty: true,
-    });
-    unregister(`seasons.${index}.reservableTimes.${i}`);
+    // Remove always deletes the last item
+    remove(reservableTimes.length - 1);
   };
 
   const isClosed = watch(`seasons.${index}.closed`);
@@ -192,17 +180,14 @@ function SeasonRow({
   return (
     <SeasonRowWrapper>
       <DayLabel>{t(`dayLong.${day.weekday}`)}</DayLabel>
-      {day.reservableTimes.map((time, i) => {
-        if (time?.begin == null || time.end == null) {
+      {reservableTimes.map((time, i) => {
+        if (time.begin == null || time.end == null) {
           return null;
         }
-        // we only have two fields but unregister makes i > 1
-        const area = i > 0 ? `a1` : "a0";
         return (
           <>
-            {i !== 0 && <AndSpan>{t("common.and")}</AndSpan>}
-            {/* eslint-disable-next-line react/no-array-index-key -- TODO key */}
-            <SeasonalTimeWrapper key={i} style={{ gridArea: area }}>
+            {i > 0 && <AndSpan>{t("common.and")}</AndSpan>}
+            <SeasonalTimeWrapper key={time.id} style={{ gridArea: `a${i}` }}>
               <Controller
                 control={control}
                 name={`seasons.${index}.reservableTimes.${i}.begin`}
@@ -213,7 +198,6 @@ function SeasonRow({
                       onBlur();
                       trigger();
                     }}
-                    // id={`seasons.${index}.begin`}
                     disabled={isClosed}
                     label={t("ReservationUnitEditor.label.openingTime")}
                     error={getTranslatedError(
@@ -234,7 +218,6 @@ function SeasonRow({
                       onBlur();
                       trigger();
                     }}
-                    // id={`seasons.${index}.end`}
                     disabled={isClosed}
                     label={t("ReservationUnitEditor.label.closingTime")}
                     error={getTranslatedError(
@@ -249,6 +232,7 @@ function SeasonRow({
           </>
         );
       })}
+
       <Controls>
         <Controller
           control={control}
@@ -267,7 +251,7 @@ function SeasonRow({
             />
           )}
         />
-        {day.reservableTimes.filter((v) => v != null).length < 2 ? (
+        {reservableTimes.length < 2 ? (
           <IconButton
             onClick={handleAddTime}
             disabled={isClosed}
@@ -303,42 +287,40 @@ export function SeasonalSection({
 }): JSX.Element {
   const { t } = useTranslation();
   const {
-    setValue,
-    watch,
+    control,
     formState: { errors },
   } = form;
+  const { fields: days, replace } = useFieldArray({ control, name: "seasons" });
 
-  const seasons = watch("seasons");
-  if (seasons.length !== 7) {
+  if (days.length !== 7) {
     // eslint-disable-next-line no-console
     console.warn("Seasons should always have 7 days");
   }
-  const error = errors.seasons;
 
   const handleClear = () => {
+    // Generate 7 empty days and replace the current seasons
     const val = Array.from(Array(7)).map((_, i) => ({
       pk: 0,
       weekday: i,
       closed: false,
       reservableTimes: [{ begin: "", end: "" }],
     }));
-    setValue("seasons", val, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true,
-    });
+
+    replace(val);
   };
 
   return (
     <Accordion
-      open={error != null}
+      open={errors.seasons != null}
       heading={t("ReservationUnitEditor.seasonalTimesTitle")}
     >
       <SeasonalInnerWrapper>
         <p>{t("ReservationUnitEditor.seasonalTimesDescription")}</p>
-        {seasons.map((day, index) => (
-          <SeasonRow key={day.weekday} form={form} index={index} />
+
+        {days.map((day, index) => (
+          <SeasonRow key={day.id} form={form} index={index} />
         ))}
+
         <div>
           <Button variant={ButtonVariant.Secondary} onClick={handleClear}>
             {t("ReservationUnitEditor.clearSeasonalTimes")}
