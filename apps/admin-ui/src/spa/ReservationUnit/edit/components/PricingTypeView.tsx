@@ -7,7 +7,7 @@ import { Controller, UseFormReturn } from "react-hook-form";
 import { addDays } from "date-fns";
 import { AutoGrid } from "common/styled";
 import { getTranslatedError } from "@/common/util";
-import { type ReservationUnitEditFormValues, PaymentTypes } from "./form";
+import { type ReservationUnitEditFormValues, PaymentTypes } from "../form";
 import { ControlledDateInput } from "common/src/components/form";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
