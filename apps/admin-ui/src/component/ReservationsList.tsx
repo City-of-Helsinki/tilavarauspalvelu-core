@@ -2,6 +2,7 @@ import React from "react";
 import { toUIDate } from "common/src/common/util";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import { startOfDay } from "date-fns";
 import {
   type Maybe,
   RejectionReadinessChoice,
@@ -236,6 +237,13 @@ export function ReservationList(props: Props | ExtendedProps) {
   const hasReservation =
     "reservationToCopy" in props && !!props.reservationToCopy;
 
+  // NOTE this doesn't properly handle other reservation states than removed
+  // should drill the actual state in the props (not just the removed flag)
+  const hasReservationsInFuture = items.some(
+    (item) => !item.isRemoved && item.date >= startOfDay(new Date())
+  );
+  const showNewReservationButton = hasReservation && hasReservationsInFuture;
+
   const removed = items.filter((x) => x.isRemoved).length;
   const count = items.length - removed;
   return (
@@ -246,7 +254,7 @@ export function ReservationList(props: Props | ExtendedProps) {
             {header} {`(${count})`}
           </H6>
         )}
-        {hasReservation && (
+        {showNewReservationButton && (
           <div>
             <AddNewReservationButton
               reservationToCopy={props.reservationToCopy}
