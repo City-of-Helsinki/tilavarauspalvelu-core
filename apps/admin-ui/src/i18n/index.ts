@@ -5,6 +5,7 @@ import messages from "./messages";
 import * as reservationApplicationFi from "./locales/fi/reservationApplication.json";
 import * as reservationFormFi from "./locales/fi/reservationForm.json";
 import * as errors from "./locales/fi/errors.json";
+import * as accessTypeFi from "./locales/fi/accessType.json";
 
 i18n.use(initReactI18next).init({
   resources: messages,
@@ -17,6 +18,14 @@ i18n.use(initReactI18next).init({
     escapeValue: false,
   },
 });
+
+i18n.addResourceBundle(
+  "fi",
+  "reservationApplication",
+  reservationApplicationFi
+);
+i18n.addResourceBundle("fi", "reservationForm", reservationFormFi);
+i18n.addResourceBundle("fi", "accessType", accessTypeFi);
 
 // manually add namespaces here so we can share components with the Next frontend
 i18n.addResourceBundle("fi", "common", {
@@ -60,12 +69,6 @@ i18n.addResourceBundle("fi", "reservationCalendar", {
   reserverInfo: "Varaajan tiedot",
   reservationInfo: "Varauksen tiedot",
 });
-i18n.addResourceBundle(
-  "fi",
-  "reservationApplication",
-  reservationApplicationFi
-);
-i18n.addResourceBundle("fi", "reservationForm", reservationFormFi);
 i18n.addResourceBundle("fi", "application", {
   // NOTE these differ between customer and admin application
   status: {

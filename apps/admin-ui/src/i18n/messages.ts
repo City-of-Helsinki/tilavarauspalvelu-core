@@ -1641,11 +1641,6 @@ const translations: ITranslations = {
     CANCELLED: ["Peruutettu"],
     FREE: ["Maksuton"],
   },
-  accessCodeState: {
-    ACCESS_CODE_CREATED: ["Ovikoodi luotu"],
-    ACCESS_CODE_PENDING: ["Ovikoodia luodaan"],
-    ACCESS_CODE_NOT_REQUIRED: ["Ei tarvitse ovikoodia"],
-  },
   reservationStartInterval: {
     INTERVAL_15_MINS: ["15 min välein"],
     INTERVAL_30_MINS: ["30 min välein"],
@@ -1918,27 +1913,7 @@ const translations: ITranslations = {
     hideBirthDate: ["Piilota"],
     showBirthDate: ["Näytä"],
     alreadyEnded: ["Päättynyt"],
-    keylessEntry: ["Avaimeton kulku"],
-    accessCodeLabel: ["Ovikoodi"],
-    accessCodeStatusLabel: ["Status"],
-    accessCodeStatusActive: ["Aktiivinen"],
-    accessCodeStatusInactive: ["Ei-aktiivinen"],
-    accessCodeValidityLabel: ["Voimassa"],
-    accessCodeChange: ["Vaihda ovikoodi"],
-    accessCodeRepair: ["Korjaa ovikoodi"],
-    accessCodeChangedSuccess: ["Ovikoodi vaihdettu"],
-    accessCodeRepairedSuccess: ["Ovikoodi korjattu"],
-    accessCodeChangeConfirm: [
-      "Uuden ovikoodin generointi nollaa aiemman ovikoodit. Haluatko varmasti generoida uuden ovikoodin?",
-    ],
-    accessCodeChangeMultiple: ["Vaihda kausivarauksen ovikoodi"],
-    accessCodeChangeConfirmMultiple: [
-      "Ovikoodi vaihtuu myös muille tähän kausivaraukseen liittyville viikkovuoroille. Haluatko varmasti vaihtaa ovikoodin?",
-    ],
-    accessCodeValidityFromNextReservation: [
-      "Voimassaoloaika seuraavasta varauksesta",
-    ],
-    accessCodesNotActive: ["Ovikoodia luodaan"],
+    keylessEntryHeader: ["Avaimeton kulku"],
     DenyDialog: {
       reject: ["Hylkää varaus"],
       denyReason: ["Hylkäyksen syy"],
