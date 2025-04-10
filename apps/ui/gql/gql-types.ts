@@ -6351,6 +6351,20 @@ export type AddressFieldsFragment = {
   } | null;
 };
 
+export type EquipmentFieldsFragment = {
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly nameEn: string | null;
+  readonly nameSv: string | null;
+  readonly category: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
+  };
+};
+
 export type ReservationUnitHeadFragment = {
   readonly id: string;
   readonly reservationKind: ReservationKind;
@@ -6703,6 +6717,27 @@ export type EditPageReservationFragment = {
     readonly nameSv: string | null;
     readonly nameEn: string | null;
   } | null;
+};
+
+export type AdjustReservationTimeMutationVariables = Exact<{
+  input: ReservationAdjustTimeMutationInput;
+}>;
+
+export type AdjustReservationTimeMutation = {
+  readonly adjustReservationTime: {
+    readonly pk: number | null;
+    readonly state: ReservationStateChoice | null;
+    readonly begin: string | null;
+    readonly end: string | null;
+  } | null;
+};
+
+export type CancelReservationMutationVariables = Exact<{
+  input: ReservationCancellationMutationInput;
+}>;
+
+export type CancelReservationMutation = {
+  readonly cancelReservation: { readonly pk: number | null } | null;
 };
 
 export type ReservationCardFragment = {
@@ -7189,6 +7224,36 @@ export type CancelReasonFieldsFragment = {
   readonly reasonSv: string | null;
 };
 
+export type CancellationRuleFieldsFragment = {
+  readonly id: string;
+  readonly cancellationRule: {
+    readonly id: string;
+    readonly canBeCancelledTimeBefore: number | null;
+  } | null;
+};
+
+export type OrderFieldsFragment = {
+  readonly id: string;
+  readonly reservationPk: string | null;
+  readonly status: OrderStatus;
+  readonly paymentType: PaymentType;
+  readonly receiptUrl: string | null;
+  readonly checkoutUrl: string | null;
+};
+
+export type BlockingReservationFieldsFragment = {
+  readonly pk: number | null;
+  readonly id: string;
+  readonly state: ReservationStateChoice | null;
+  readonly isBlocked: boolean;
+  readonly begin: string;
+  readonly end: string;
+  readonly numPersons: number | null;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+};
+
 export type PindoraReservationFragment = {
   readonly accessCode: string;
   readonly accessCodeBeginsAt: string;
@@ -7218,148 +7283,6 @@ export type PindoraSectionFragment = {
   }>;
 };
 
-export type CreateReservationMutationVariables = Exact<{
-  input: ReservationCreateMutationInput;
-}>;
-
-export type CreateReservationMutation = {
-  readonly createReservation: { readonly pk: number | null } | null;
-};
-
-export type UpdateReservationMutationVariables = Exact<{
-  input: ReservationUpdateMutationInput;
-}>;
-
-export type UpdateReservationMutation = {
-  readonly updateReservation: {
-    readonly pk: number | null;
-    readonly state: ReservationStateChoice | null;
-  } | null;
-};
-
-export type DeleteReservationMutationVariables = Exact<{
-  input: ReservationDeleteTentativeMutationInput;
-}>;
-
-export type DeleteReservationMutation = {
-  readonly deleteTentativeReservation: {
-    readonly deleted: boolean | null;
-  } | null;
-};
-
-export type CancelReservationMutationVariables = Exact<{
-  input: ReservationCancellationMutationInput;
-}>;
-
-export type CancelReservationMutation = {
-  readonly cancelReservation: { readonly pk: number | null } | null;
-};
-
-export type ConfirmReservationMutationVariables = Exact<{
-  input: ReservationConfirmMutationInput;
-}>;
-
-export type ConfirmReservationMutation = {
-  readonly confirmReservation: {
-    readonly pk: number | null;
-    readonly state: ReservationStateChoice | null;
-    readonly order: {
-      readonly id: string;
-      readonly checkoutUrl: string | null;
-    } | null;
-  } | null;
-};
-
-export type CancellationRuleFieldsFragment = {
-  readonly id: string;
-  readonly cancellationRule: {
-    readonly id: string;
-    readonly canBeCancelledTimeBefore: number | null;
-  } | null;
-};
-
-export type ReservationOrderStatusFragment = {
-  readonly id: string;
-  readonly state: ReservationStateChoice | null;
-  readonly paymentOrder: ReadonlyArray<{
-    readonly id: string;
-    readonly status: OrderStatus;
-  }>;
-};
-
-export type OrderFieldsFragment = {
-  readonly id: string;
-  readonly reservationPk: string | null;
-  readonly status: OrderStatus;
-  readonly paymentType: PaymentType;
-  readonly receiptUrl: string | null;
-  readonly checkoutUrl: string | null;
-};
-
-export type CanUserCancelReservationFragment = {
-  readonly id: string;
-  readonly state: ReservationStateChoice | null;
-  readonly begin: string;
-  readonly reservationUnits: ReadonlyArray<{
-    readonly id: string;
-    readonly cancellationRule: {
-      readonly id: string;
-      readonly canBeCancelledTimeBefore: number | null;
-    } | null;
-  }>;
-};
-
-export type ReservationStateQueryVariables = Exact<{
-  id: Scalars["ID"]["input"];
-}>;
-
-export type ReservationStateQuery = {
-  readonly reservation: {
-    readonly id: string;
-    readonly pk: number | null;
-    readonly state: ReservationStateChoice | null;
-  } | null;
-};
-
-export type AdjustReservationTimeMutationVariables = Exact<{
-  input: ReservationAdjustTimeMutationInput;
-}>;
-
-export type AdjustReservationTimeMutation = {
-  readonly adjustReservationTime: {
-    readonly pk: number | null;
-    readonly state: ReservationStateChoice | null;
-    readonly begin: string | null;
-    readonly end: string | null;
-  } | null;
-};
-
-export type OrderQueryVariables = Exact<{
-  orderUuid: Scalars["String"]["input"];
-}>;
-
-export type OrderQuery = {
-  readonly order: {
-    readonly id: string;
-    readonly reservationPk: string | null;
-    readonly status: OrderStatus;
-    readonly paymentType: PaymentType;
-    readonly receiptUrl: string | null;
-    readonly checkoutUrl: string | null;
-  } | null;
-};
-
-export type RefreshOrderMutationVariables = Exact<{
-  input: RefreshOrderMutationInput;
-}>;
-
-export type RefreshOrderMutation = {
-  readonly refreshOrder: {
-    readonly orderUuid: string | null;
-    readonly status: string | null;
-  } | null;
-};
-
 export type AccessCodeQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -7374,49 +7297,6 @@ export type AccessCodeQuery = {
       readonly accessCodeIsActive: boolean;
     } | null;
   } | null;
-};
-
-export type ReservationUnitTypeFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
-};
-
-export type ReservationUnitNameFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
-};
-
-export type EquipmentFieldsFragment = {
-  readonly id: string;
-  readonly pk: number | null;
-  readonly nameFi: string | null;
-  readonly nameEn: string | null;
-  readonly nameSv: string | null;
-  readonly category: {
-    readonly id: string;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
-  };
-};
-
-export type BlockingReservationFieldsFragment = {
-  readonly pk: number | null;
-  readonly id: string;
-  readonly state: ReservationStateChoice | null;
-  readonly isBlocked: boolean;
-  readonly begin: string;
-  readonly end: string;
-  readonly numPersons: number | null;
-  readonly bufferTimeBefore: number;
-  readonly bufferTimeAfter: number;
-  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
 };
 
 export type IsReservableFieldsFragment = {
@@ -7434,6 +7314,28 @@ export type IsReservableFieldsFragment = {
     readonly startDatetime: string | null;
     readonly endDatetime: string | null;
   }> | null;
+};
+
+export type CanUserCancelReservationFragment = {
+  readonly id: string;
+  readonly state: ReservationStateChoice | null;
+  readonly begin: string;
+  readonly reservationUnits: ReadonlyArray<{
+    readonly id: string;
+    readonly cancellationRule: {
+      readonly id: string;
+      readonly canBeCancelledTimeBefore: number | null;
+    } | null;
+  }>;
+};
+
+export type ReservationOrderStatusFragment = {
+  readonly id: string;
+  readonly state: ReservationStateChoice | null;
+  readonly paymentOrder: ReadonlyArray<{
+    readonly id: string;
+    readonly status: OrderStatus;
+  }>;
 };
 
 export type CanReservationBeChangedFragment = {
@@ -7525,6 +7427,21 @@ export type NotReservableFieldsFragment = {
       readonly id: string;
       readonly fieldName: string;
     }>;
+  } | null;
+};
+
+export type OrderQueryVariables = Exact<{
+  orderUuid: Scalars["String"]["input"];
+}>;
+
+export type OrderQuery = {
+  readonly order: {
+    readonly id: string;
+    readonly reservationPk: string | null;
+    readonly status: OrderStatus;
+    readonly paymentType: PaymentType;
+    readonly receiptUrl: string | null;
+    readonly checkoutUrl: string | null;
   } | null;
 };
 
@@ -9035,15 +8952,15 @@ export type ReservationQuery = {
       readonly id: string;
       readonly canApplyFreeOfCharge: boolean;
       readonly requireReservationHandling: boolean;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
       readonly minPersons: number | null;
       readonly maxPersons: number | null;
       readonly termsOfUseFi: string | null;
       readonly termsOfUseEn: string | null;
       readonly termsOfUseSv: string | null;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
       readonly reservationBegins: string | null;
       readonly reservationEnds: string | null;
       readonly images: ReadonlyArray<{
@@ -9139,6 +9056,42 @@ export type ReservationQuery = {
   } | null;
 };
 
+export type UpdateReservationMutationVariables = Exact<{
+  input: ReservationUpdateMutationInput;
+}>;
+
+export type UpdateReservationMutation = {
+  readonly updateReservation: {
+    readonly pk: number | null;
+    readonly state: ReservationStateChoice | null;
+  } | null;
+};
+
+export type ConfirmReservationMutationVariables = Exact<{
+  input: ReservationConfirmMutationInput;
+}>;
+
+export type ConfirmReservationMutation = {
+  readonly confirmReservation: {
+    readonly pk: number | null;
+    readonly state: ReservationStateChoice | null;
+    readonly order: {
+      readonly id: string;
+      readonly checkoutUrl: string | null;
+    } | null;
+  } | null;
+};
+
+export type DeleteReservationMutationVariables = Exact<{
+  input: ReservationDeleteTentativeMutationInput;
+}>;
+
+export type DeleteReservationMutation = {
+  readonly deleteTentativeReservation: {
+    readonly deleted: boolean | null;
+  } | null;
+};
+
 export type ApplicationRoundTimeSlotFieldsFragment = {
   readonly id: string;
   readonly weekday: number;
@@ -9162,6 +9115,11 @@ export type ReservationUnitPageQueryVariables = Exact<{
 
 export type ReservationUnitPageQuery = {
   readonly reservationUnit: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly nameFi: string | null;
+    readonly nameEn: string | null;
+    readonly nameSv: string | null;
     readonly uuid: string;
     readonly isDraft: boolean;
     readonly descriptionFi: string | null;
@@ -9170,11 +9128,6 @@ export type ReservationUnitPageQuery = {
     readonly canApplyFreeOfCharge: boolean;
     readonly numActiveUserReservations: number;
     readonly publishingState: ReservationUnitPublishingState;
-    readonly id: string;
-    readonly pk: number | null;
-    readonly nameFi: string | null;
-    readonly nameEn: string | null;
-    readonly nameSv: string | null;
     readonly reservationsMinDaysBefore: number | null;
     readonly reservationsMaxDaysBefore: number | null;
     readonly reservationState: ReservationUnitReservationState;
@@ -9382,6 +9335,14 @@ export type RelatedReservationUnitsQuery = {
   } | null;
 };
 
+export type CreateReservationMutationVariables = Exact<{
+  input: ReservationCreateMutationInput;
+}>;
+
+export type CreateReservationMutation = {
+  readonly createReservation: { readonly pk: number | null } | null;
+};
+
 export type ReservationCancelPageQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
 }>;
@@ -9533,6 +9494,10 @@ export type ReservationConfirmationPageQuery = {
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly canApplyFreeOfCharge: boolean;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
       readonly reservationPendingInstructionsFi: string | null;
       readonly reservationPendingInstructionsEn: string | null;
       readonly reservationPendingInstructionsSv: string | null;
@@ -9542,10 +9507,6 @@ export type ReservationConfirmationPageQuery = {
       readonly reservationCancelledInstructionsFi: string | null;
       readonly reservationCancelledInstructionsEn: string | null;
       readonly reservationCancelledInstructionsSv: string | null;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
       readonly reservationBegins: string | null;
       readonly reservationEnds: string | null;
       readonly images: ReadonlyArray<{
@@ -9853,6 +9814,10 @@ export type ReservationPageQuery = {
     readonly reservationUnits: ReadonlyArray<{
       readonly id: string;
       readonly canApplyFreeOfCharge: boolean;
+      readonly pk: number | null;
+      readonly nameFi: string | null;
+      readonly nameEn: string | null;
+      readonly nameSv: string | null;
       readonly reservationPendingInstructionsFi: string | null;
       readonly reservationPendingInstructionsEn: string | null;
       readonly reservationPendingInstructionsSv: string | null;
@@ -9867,10 +9832,6 @@ export type ReservationPageQuery = {
       readonly termsOfUseFi: string | null;
       readonly termsOfUseEn: string | null;
       readonly termsOfUseSv: string | null;
-      readonly pk: number | null;
-      readonly nameFi: string | null;
-      readonly nameEn: string | null;
-      readonly nameSv: string | null;
       readonly reservationBegins: string | null;
       readonly reservationEnds: string | null;
       readonly unit: {
@@ -10166,6 +10127,18 @@ export type SearchReservationUnitsQuery = {
   } | null;
 };
 
+export type ReservationStateQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationStateQuery = {
+  readonly reservation: {
+    readonly id: string;
+    readonly pk: number | null;
+    readonly state: ReservationStateChoice | null;
+  } | null;
+};
+
 export const InstructionsFragmentDoc = gql`
   fragment Instructions on ReservationNode {
     id
@@ -10394,15 +10367,6 @@ export const ApplicantFragmentDoc = gql`
     }
   }
 `;
-export const ReservationUnitNameFieldsFragmentDoc = gql`
-  fragment ReservationUnitNameFields on ReservationUnitNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
-  }
-`;
 export const ImageFragmentDoc = gql`
   fragment Image on ReservationUnitImageNode {
     id
@@ -10415,7 +10379,11 @@ export const ImageFragmentDoc = gql`
 `;
 export const OrderedReservationUnitCardFragmentDoc = gql`
   fragment OrderedReservationUnitCard on ReservationUnitNode {
-    ...ReservationUnitNameFields
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
     images {
       ...Image
     }
@@ -10426,7 +10394,6 @@ export const OrderedReservationUnitCardFragmentDoc = gql`
       nameEn
     }
   }
-  ${ReservationUnitNameFieldsFragmentDoc}
   ${ImageFragmentDoc}
 `;
 export const ApplicationReservationUnitListFragmentDoc = gql`
@@ -10680,6 +10647,21 @@ export const AddressFieldsFragmentDoc = gql`
   }
   ${LocationFieldsI18nFragmentDoc}
 `;
+export const EquipmentFieldsFragmentDoc = gql`
+  fragment EquipmentFields on EquipmentNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    category {
+      id
+      nameFi
+      nameEn
+      nameSv
+    }
+  }
+`;
 export const PricingFieldsFragmentDoc = gql`
   fragment PricingFields on ReservationUnitPricingNode {
     id
@@ -10692,15 +10674,6 @@ export const PricingFieldsFragmentDoc = gql`
       pk
       value
     }
-  }
-`;
-export const ReservationUnitTypeFieldsFragmentDoc = gql`
-  fragment ReservationUnitTypeFields on ReservationUnitTypeNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
   }
 `;
 export const ReservationUnitHeadFragmentDoc = gql`
@@ -10732,21 +10705,28 @@ export const ReservationUnitHeadFragmentDoc = gql`
       beginDate
     }
     reservationUnitType {
-      ...ReservationUnitTypeFields
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
     }
     images {
       ...Image
     }
   }
   ${PricingFieldsFragmentDoc}
-  ${ReservationUnitTypeFieldsFragmentDoc}
   ${ImageFragmentDoc}
 `;
 export const RelatedUnitCardFieldsFragmentDoc = gql`
   fragment RelatedUnitCardFields on ReservationUnitNode {
     ...OrderedReservationUnitCard
     reservationUnitType {
-      ...ReservationUnitTypeFields
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
     }
     maxPersons
     pricings {
@@ -10754,7 +10734,6 @@ export const RelatedUnitCardFieldsFragmentDoc = gql`
     }
   }
   ${OrderedReservationUnitCardFragmentDoc}
-  ${ReservationUnitTypeFieldsFragmentDoc}
   ${PricingFieldsFragmentDoc}
 `;
 export const ReservationInfoContainerFragmentDoc = gql`
@@ -10841,7 +10820,11 @@ export const ReservationInfoCardFragmentDoc = gql`
       accessCode
     }
     reservationUnits {
-      ...ReservationUnitNameFields
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
       images {
         ...Image
       }
@@ -10854,7 +10837,6 @@ export const ReservationInfoCardFragmentDoc = gql`
     }
   }
   ${ReservationPriceFieldsFragmentDoc}
-  ${ReservationUnitNameFieldsFragmentDoc}
   ${ImageFragmentDoc}
 `;
 export const ReserveeNameFieldsFragmentDoc = gql`
@@ -11121,21 +11103,6 @@ export const OrderFieldsFragmentDoc = gql`
     paymentType
     receiptUrl
     checkoutUrl
-  }
-`;
-export const EquipmentFieldsFragmentDoc = gql`
-  fragment EquipmentFields on EquipmentNode {
-    id
-    pk
-    nameFi
-    nameEn
-    nameSv
-    category {
-      id
-      nameFi
-      nameEn
-      nameSv
-    }
   }
 `;
 export const BlockingReservationFieldsFragmentDoc = gql`
@@ -11461,6 +11428,109 @@ export type CancelApplicationMutationOptions = Apollo.BaseMutationOptions<
   CancelApplicationMutation,
   CancelApplicationMutationVariables
 >;
+export const AdjustReservationTimeDocument = gql`
+  mutation AdjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
+    adjustReservationTime(input: $input) {
+      pk
+      state
+      begin
+      end
+    }
+  }
+`;
+export type AdjustReservationTimeMutationFn = Apollo.MutationFunction<
+  AdjustReservationTimeMutation,
+  AdjustReservationTimeMutationVariables
+>;
+
+/**
+ * __useAdjustReservationTimeMutation__
+ *
+ * To run a mutation, you first call `useAdjustReservationTimeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAdjustReservationTimeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [adjustReservationTimeMutation, { data, loading, error }] = useAdjustReservationTimeMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAdjustReservationTimeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AdjustReservationTimeMutation,
+    AdjustReservationTimeMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    AdjustReservationTimeMutation,
+    AdjustReservationTimeMutationVariables
+  >(AdjustReservationTimeDocument, options);
+}
+export type AdjustReservationTimeMutationHookResult = ReturnType<
+  typeof useAdjustReservationTimeMutation
+>;
+export type AdjustReservationTimeMutationResult =
+  Apollo.MutationResult<AdjustReservationTimeMutation>;
+export type AdjustReservationTimeMutationOptions = Apollo.BaseMutationOptions<
+  AdjustReservationTimeMutation,
+  AdjustReservationTimeMutationVariables
+>;
+export const CancelReservationDocument = gql`
+  mutation CancelReservation($input: ReservationCancellationMutationInput!) {
+    cancelReservation(input: $input) {
+      pk
+    }
+  }
+`;
+export type CancelReservationMutationFn = Apollo.MutationFunction<
+  CancelReservationMutation,
+  CancelReservationMutationVariables
+>;
+
+/**
+ * __useCancelReservationMutation__
+ *
+ * To run a mutation, you first call `useCancelReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCancelReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cancelReservationMutation, { data, loading, error }] = useCancelReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCancelReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CancelReservationMutation,
+    CancelReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CancelReservationMutation,
+    CancelReservationMutationVariables
+  >(CancelReservationDocument, options);
+}
+export type CancelReservationMutationHookResult = ReturnType<
+  typeof useCancelReservationMutation
+>;
+export type CancelReservationMutationResult =
+  Apollo.MutationResult<CancelReservationMutation>;
+export type CancelReservationMutationOptions = Apollo.BaseMutationOptions<
+  CancelReservationMutation,
+  CancelReservationMutationVariables
+>;
 export const CurrentUserDocument = gql`
   query CurrentUser {
     currentUser {
@@ -11740,529 +11810,16 @@ export type UpdateApplicationMutationOptions = Apollo.BaseMutationOptions<
   UpdateApplicationMutation,
   UpdateApplicationMutationVariables
 >;
-export const CreateReservationDocument = gql`
-  mutation CreateReservation($input: ReservationCreateMutationInput!) {
-    createReservation(input: $input) {
-      pk
-    }
-  }
-`;
-export type CreateReservationMutationFn = Apollo.MutationFunction<
-  CreateReservationMutation,
-  CreateReservationMutationVariables
->;
-
-/**
- * __useCreateReservationMutation__
- *
- * To run a mutation, you first call `useCreateReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createReservationMutation, { data, loading, error }] = useCreateReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CreateReservationMutation,
-    CreateReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CreateReservationMutation,
-    CreateReservationMutationVariables
-  >(CreateReservationDocument, options);
-}
-export type CreateReservationMutationHookResult = ReturnType<
-  typeof useCreateReservationMutation
->;
-export type CreateReservationMutationResult =
-  Apollo.MutationResult<CreateReservationMutation>;
-export type CreateReservationMutationOptions = Apollo.BaseMutationOptions<
-  CreateReservationMutation,
-  CreateReservationMutationVariables
->;
-export const UpdateReservationDocument = gql`
-  mutation UpdateReservation($input: ReservationUpdateMutationInput!) {
-    updateReservation(input: $input) {
-      pk
-      state
-    }
-  }
-`;
-export type UpdateReservationMutationFn = Apollo.MutationFunction<
-  UpdateReservationMutation,
-  UpdateReservationMutationVariables
->;
-
-/**
- * __useUpdateReservationMutation__
- *
- * To run a mutation, you first call `useUpdateReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateReservationMutation, { data, loading, error }] = useUpdateReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUpdateReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    UpdateReservationMutation,
-    UpdateReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    UpdateReservationMutation,
-    UpdateReservationMutationVariables
-  >(UpdateReservationDocument, options);
-}
-export type UpdateReservationMutationHookResult = ReturnType<
-  typeof useUpdateReservationMutation
->;
-export type UpdateReservationMutationResult =
-  Apollo.MutationResult<UpdateReservationMutation>;
-export type UpdateReservationMutationOptions = Apollo.BaseMutationOptions<
-  UpdateReservationMutation,
-  UpdateReservationMutationVariables
->;
-export const DeleteReservationDocument = gql`
-  mutation DeleteReservation($input: ReservationDeleteTentativeMutationInput!) {
-    deleteTentativeReservation(input: $input) {
-      deleted
-    }
-  }
-`;
-export type DeleteReservationMutationFn = Apollo.MutationFunction<
-  DeleteReservationMutation,
-  DeleteReservationMutationVariables
->;
-
-/**
- * __useDeleteReservationMutation__
- *
- * To run a mutation, you first call `useDeleteReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDeleteReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [deleteReservationMutation, { data, loading, error }] = useDeleteReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useDeleteReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    DeleteReservationMutation,
-    DeleteReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    DeleteReservationMutation,
-    DeleteReservationMutationVariables
-  >(DeleteReservationDocument, options);
-}
-export type DeleteReservationMutationHookResult = ReturnType<
-  typeof useDeleteReservationMutation
->;
-export type DeleteReservationMutationResult =
-  Apollo.MutationResult<DeleteReservationMutation>;
-export type DeleteReservationMutationOptions = Apollo.BaseMutationOptions<
-  DeleteReservationMutation,
-  DeleteReservationMutationVariables
->;
-export const CancelReservationDocument = gql`
-  mutation CancelReservation($input: ReservationCancellationMutationInput!) {
-    cancelReservation(input: $input) {
-      pk
-    }
-  }
-`;
-export type CancelReservationMutationFn = Apollo.MutationFunction<
-  CancelReservationMutation,
-  CancelReservationMutationVariables
->;
-
-/**
- * __useCancelReservationMutation__
- *
- * To run a mutation, you first call `useCancelReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCancelReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [cancelReservationMutation, { data, loading, error }] = useCancelReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCancelReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    CancelReservationMutation,
-    CancelReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    CancelReservationMutation,
-    CancelReservationMutationVariables
-  >(CancelReservationDocument, options);
-}
-export type CancelReservationMutationHookResult = ReturnType<
-  typeof useCancelReservationMutation
->;
-export type CancelReservationMutationResult =
-  Apollo.MutationResult<CancelReservationMutation>;
-export type CancelReservationMutationOptions = Apollo.BaseMutationOptions<
-  CancelReservationMutation,
-  CancelReservationMutationVariables
->;
-export const ConfirmReservationDocument = gql`
-  mutation ConfirmReservation($input: ReservationConfirmMutationInput!) {
-    confirmReservation(input: $input) {
-      pk
-      state
-      order {
-        id
-        checkoutUrl
-      }
-    }
-  }
-`;
-export type ConfirmReservationMutationFn = Apollo.MutationFunction<
-  ConfirmReservationMutation,
-  ConfirmReservationMutationVariables
->;
-
-/**
- * __useConfirmReservationMutation__
- *
- * To run a mutation, you first call `useConfirmReservationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useConfirmReservationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [confirmReservationMutation, { data, loading, error }] = useConfirmReservationMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useConfirmReservationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    ConfirmReservationMutation,
-    ConfirmReservationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    ConfirmReservationMutation,
-    ConfirmReservationMutationVariables
-  >(ConfirmReservationDocument, options);
-}
-export type ConfirmReservationMutationHookResult = ReturnType<
-  typeof useConfirmReservationMutation
->;
-export type ConfirmReservationMutationResult =
-  Apollo.MutationResult<ConfirmReservationMutation>;
-export type ConfirmReservationMutationOptions = Apollo.BaseMutationOptions<
-  ConfirmReservationMutation,
-  ConfirmReservationMutationVariables
->;
-export const ReservationStateDocument = gql`
-  query ReservationState($id: ID!) {
-    reservation(id: $id) {
-      id
-      pk
-      state
-    }
-  }
-`;
-
-/**
- * __useReservationStateQuery__
- *
- * To run a query within a React component, call `useReservationStateQuery` and pass it any options that fit your needs.
- * When your component renders, `useReservationStateQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useReservationStateQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useReservationStateQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    ReservationStateQuery,
-    ReservationStateQueryVariables
-  > &
-    (
-      | { variables: ReservationStateQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<ReservationStateQuery, ReservationStateQueryVariables>(
-    ReservationStateDocument,
-    options
-  );
-}
-export function useReservationStateLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    ReservationStateQuery,
-    ReservationStateQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    ReservationStateQuery,
-    ReservationStateQueryVariables
-  >(ReservationStateDocument, options);
-}
-export function useReservationStateSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        ReservationStateQuery,
-        ReservationStateQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    ReservationStateQuery,
-    ReservationStateQueryVariables
-  >(ReservationStateDocument, options);
-}
-export type ReservationStateQueryHookResult = ReturnType<
-  typeof useReservationStateQuery
->;
-export type ReservationStateLazyQueryHookResult = ReturnType<
-  typeof useReservationStateLazyQuery
->;
-export type ReservationStateSuspenseQueryHookResult = ReturnType<
-  typeof useReservationStateSuspenseQuery
->;
-export type ReservationStateQueryResult = Apollo.QueryResult<
-  ReservationStateQuery,
-  ReservationStateQueryVariables
->;
-export const AdjustReservationTimeDocument = gql`
-  mutation AdjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
-    adjustReservationTime(input: $input) {
-      pk
-      state
-      begin
-      end
-    }
-  }
-`;
-export type AdjustReservationTimeMutationFn = Apollo.MutationFunction<
-  AdjustReservationTimeMutation,
-  AdjustReservationTimeMutationVariables
->;
-
-/**
- * __useAdjustReservationTimeMutation__
- *
- * To run a mutation, you first call `useAdjustReservationTimeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAdjustReservationTimeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [adjustReservationTimeMutation, { data, loading, error }] = useAdjustReservationTimeMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useAdjustReservationTimeMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    AdjustReservationTimeMutation,
-    AdjustReservationTimeMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    AdjustReservationTimeMutation,
-    AdjustReservationTimeMutationVariables
-  >(AdjustReservationTimeDocument, options);
-}
-export type AdjustReservationTimeMutationHookResult = ReturnType<
-  typeof useAdjustReservationTimeMutation
->;
-export type AdjustReservationTimeMutationResult =
-  Apollo.MutationResult<AdjustReservationTimeMutation>;
-export type AdjustReservationTimeMutationOptions = Apollo.BaseMutationOptions<
-  AdjustReservationTimeMutation,
-  AdjustReservationTimeMutationVariables
->;
-export const OrderDocument = gql`
-  query Order($orderUuid: String!) {
-    order(orderUuid: $orderUuid) {
-      ...OrderFields
-    }
-  }
-  ${OrderFieldsFragmentDoc}
-`;
-
-/**
- * __useOrderQuery__
- *
- * To run a query within a React component, call `useOrderQuery` and pass it any options that fit your needs.
- * When your component renders, `useOrderQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOrderQuery({
- *   variables: {
- *      orderUuid: // value for 'orderUuid'
- *   },
- * });
- */
-export function useOrderQuery(
-  baseOptions: Apollo.QueryHookOptions<OrderQuery, OrderQueryVariables> &
-    ({ variables: OrderQueryVariables; skip?: boolean } | { skip: boolean })
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<OrderQuery, OrderQueryVariables>(
-    OrderDocument,
-    options
-  );
-}
-export function useOrderLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<OrderQuery, OrderQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<OrderQuery, OrderQueryVariables>(
-    OrderDocument,
-    options
-  );
-}
-export function useOrderSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<OrderQuery, OrderQueryVariables>
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<OrderQuery, OrderQueryVariables>(
-    OrderDocument,
-    options
-  );
-}
-export type OrderQueryHookResult = ReturnType<typeof useOrderQuery>;
-export type OrderLazyQueryHookResult = ReturnType<typeof useOrderLazyQuery>;
-export type OrderSuspenseQueryHookResult = ReturnType<
-  typeof useOrderSuspenseQuery
->;
-export type OrderQueryResult = Apollo.QueryResult<
-  OrderQuery,
-  OrderQueryVariables
->;
-export const RefreshOrderDocument = gql`
-  mutation RefreshOrder($input: RefreshOrderMutationInput!) {
-    refreshOrder(input: $input) {
-      orderUuid
-      status
-    }
-  }
-`;
-export type RefreshOrderMutationFn = Apollo.MutationFunction<
-  RefreshOrderMutation,
-  RefreshOrderMutationVariables
->;
-
-/**
- * __useRefreshOrderMutation__
- *
- * To run a mutation, you first call `useRefreshOrderMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRefreshOrderMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [refreshOrderMutation, { data, loading, error }] = useRefreshOrderMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useRefreshOrderMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RefreshOrderMutation,
-    RefreshOrderMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RefreshOrderMutation,
-    RefreshOrderMutationVariables
-  >(RefreshOrderDocument, options);
-}
-export type RefreshOrderMutationHookResult = ReturnType<
-  typeof useRefreshOrderMutation
->;
-export type RefreshOrderMutationResult =
-  Apollo.MutationResult<RefreshOrderMutation>;
-export type RefreshOrderMutationOptions = Apollo.BaseMutationOptions<
-  RefreshOrderMutation,
-  RefreshOrderMutationVariables
->;
 export const AccessCodeDocument = gql`
   query AccessCode($id: ID!) {
     reservation(id: $id) {
       id
       pindoraInfo {
-        accessCode
-        accessCodeBeginsAt
-        accessCodeEndsAt
-        accessCodeIsActive
+        ...PindoraReservation
       }
     }
   }
+  ${PindoraReservationFragmentDoc}
 `;
 
 /**
@@ -12333,6 +11890,73 @@ export type AccessCodeSuspenseQueryHookResult = ReturnType<
 export type AccessCodeQueryResult = Apollo.QueryResult<
   AccessCodeQuery,
   AccessCodeQueryVariables
+>;
+export const OrderDocument = gql`
+  query Order($orderUuid: String!) {
+    order(orderUuid: $orderUuid) {
+      ...OrderFields
+    }
+  }
+  ${OrderFieldsFragmentDoc}
+`;
+
+/**
+ * __useOrderQuery__
+ *
+ * To run a query within a React component, call `useOrderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrderQuery({
+ *   variables: {
+ *      orderUuid: // value for 'orderUuid'
+ *   },
+ * });
+ */
+export function useOrderQuery(
+  baseOptions: Apollo.QueryHookOptions<OrderQuery, OrderQueryVariables> &
+    ({ variables: OrderQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<OrderQuery, OrderQueryVariables>(
+    OrderDocument,
+    options
+  );
+}
+export function useOrderLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<OrderQuery, OrderQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<OrderQuery, OrderQueryVariables>(
+    OrderDocument,
+    options
+  );
+}
+export function useOrderSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<OrderQuery, OrderQueryVariables>
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<OrderQuery, OrderQueryVariables>(
+    OrderDocument,
+    options
+  );
+}
+export type OrderQueryHookResult = ReturnType<typeof useOrderQuery>;
+export type OrderLazyQueryHookResult = ReturnType<typeof useOrderLazyQuery>;
+export type OrderSuspenseQueryHookResult = ReturnType<
+  typeof useOrderSuspenseQuery
+>;
+export type OrderQueryResult = Apollo.QueryResult<
+  OrderQuery,
+  OrderQueryVariables
 >;
 export const BannerNotificationsListAllDocument = gql`
   query BannerNotificationsListAll {
@@ -14054,6 +13678,162 @@ export type ReservationQueryResult = Apollo.QueryResult<
   ReservationQuery,
   ReservationQueryVariables
 >;
+export const UpdateReservationDocument = gql`
+  mutation UpdateReservation($input: ReservationUpdateMutationInput!) {
+    updateReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;
+export type UpdateReservationMutationFn = Apollo.MutationFunction<
+  UpdateReservationMutation,
+  UpdateReservationMutationVariables
+>;
+
+/**
+ * __useUpdateReservationMutation__
+ *
+ * To run a mutation, you first call `useUpdateReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateReservationMutation, { data, loading, error }] = useUpdateReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateReservationMutation,
+    UpdateReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UpdateReservationMutation,
+    UpdateReservationMutationVariables
+  >(UpdateReservationDocument, options);
+}
+export type UpdateReservationMutationHookResult = ReturnType<
+  typeof useUpdateReservationMutation
+>;
+export type UpdateReservationMutationResult =
+  Apollo.MutationResult<UpdateReservationMutation>;
+export type UpdateReservationMutationOptions = Apollo.BaseMutationOptions<
+  UpdateReservationMutation,
+  UpdateReservationMutationVariables
+>;
+export const ConfirmReservationDocument = gql`
+  mutation ConfirmReservation($input: ReservationConfirmMutationInput!) {
+    confirmReservation(input: $input) {
+      pk
+      state
+      order {
+        id
+        checkoutUrl
+      }
+    }
+  }
+`;
+export type ConfirmReservationMutationFn = Apollo.MutationFunction<
+  ConfirmReservationMutation,
+  ConfirmReservationMutationVariables
+>;
+
+/**
+ * __useConfirmReservationMutation__
+ *
+ * To run a mutation, you first call `useConfirmReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [confirmReservationMutation, { data, loading, error }] = useConfirmReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useConfirmReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ConfirmReservationMutation,
+    ConfirmReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    ConfirmReservationMutation,
+    ConfirmReservationMutationVariables
+  >(ConfirmReservationDocument, options);
+}
+export type ConfirmReservationMutationHookResult = ReturnType<
+  typeof useConfirmReservationMutation
+>;
+export type ConfirmReservationMutationResult =
+  Apollo.MutationResult<ConfirmReservationMutation>;
+export type ConfirmReservationMutationOptions = Apollo.BaseMutationOptions<
+  ConfirmReservationMutation,
+  ConfirmReservationMutationVariables
+>;
+export const DeleteReservationDocument = gql`
+  mutation DeleteReservation($input: ReservationDeleteTentativeMutationInput!) {
+    deleteTentativeReservation(input: $input) {
+      deleted
+    }
+  }
+`;
+export type DeleteReservationMutationFn = Apollo.MutationFunction<
+  DeleteReservationMutation,
+  DeleteReservationMutationVariables
+>;
+
+/**
+ * __useDeleteReservationMutation__
+ *
+ * To run a mutation, you first call `useDeleteReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteReservationMutation, { data, loading, error }] = useDeleteReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDeleteReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteReservationMutation,
+    DeleteReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DeleteReservationMutation,
+    DeleteReservationMutationVariables
+  >(DeleteReservationDocument, options);
+}
+export type DeleteReservationMutationHookResult = ReturnType<
+  typeof useDeleteReservationMutation
+>;
+export type DeleteReservationMutationResult =
+  Apollo.MutationResult<DeleteReservationMutation>;
+export type DeleteReservationMutationOptions = Apollo.BaseMutationOptions<
+  DeleteReservationMutation,
+  DeleteReservationMutationVariables
+>;
 export const ReservationUnitPageDocument = gql`
   query ReservationUnitPage(
     $id: ID!
@@ -14063,7 +13843,11 @@ export const ReservationUnitPageDocument = gql`
     $state: [ReservationStateChoice]
   ) {
     reservationUnit(id: $id) {
-      ...ReservationUnitNameFields
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
       ...AvailableTimesReservationUnitFields
       ...NotReservableFields
       ...ReservationTimePickerFields
@@ -14104,7 +13888,6 @@ export const ReservationUnitPageDocument = gql`
       ...BlockingReservationFields
     }
   }
-  ${ReservationUnitNameFieldsFragmentDoc}
   ${AvailableTimesReservationUnitFieldsFragmentDoc}
   ${NotReservableFieldsFragmentDoc}
   ${ReservationTimePickerFieldsFragmentDoc}
@@ -14282,6 +14065,56 @@ export type RelatedReservationUnitsSuspenseQueryHookResult = ReturnType<
 export type RelatedReservationUnitsQueryResult = Apollo.QueryResult<
   RelatedReservationUnitsQuery,
   RelatedReservationUnitsQueryVariables
+>;
+export const CreateReservationDocument = gql`
+  mutation CreateReservation($input: ReservationCreateMutationInput!) {
+    createReservation(input: $input) {
+      pk
+    }
+  }
+`;
+export type CreateReservationMutationFn = Apollo.MutationFunction<
+  CreateReservationMutation,
+  CreateReservationMutationVariables
+>;
+
+/**
+ * __useCreateReservationMutation__
+ *
+ * To run a mutation, you first call `useCreateReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createReservationMutation, { data, loading, error }] = useCreateReservationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateReservationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateReservationMutation,
+    CreateReservationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateReservationMutation,
+    CreateReservationMutationVariables
+  >(CreateReservationDocument, options);
+}
+export type CreateReservationMutationHookResult = ReturnType<
+  typeof useCreateReservationMutation
+>;
+export type CreateReservationMutationResult =
+  Apollo.MutationResult<CreateReservationMutation>;
+export type CreateReservationMutationOptions = Apollo.BaseMutationOptions<
+  CreateReservationMutation,
+  CreateReservationMutationVariables
 >;
 export const ReservationCancelPageDocument = gql`
   query ReservationCancelPage($id: ID!) {
@@ -15179,4 +15012,88 @@ export type SearchReservationUnitsSuspenseQueryHookResult = ReturnType<
 export type SearchReservationUnitsQueryResult = Apollo.QueryResult<
   SearchReservationUnitsQuery,
   SearchReservationUnitsQueryVariables
+>;
+export const ReservationStateDocument = gql`
+  query ReservationState($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      state
+    }
+  }
+`;
+
+/**
+ * __useReservationStateQuery__
+ *
+ * To run a query within a React component, call `useReservationStateQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationStateQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationStateQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationStateQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationStateQuery,
+    ReservationStateQueryVariables
+  > &
+    (
+      | { variables: ReservationStateQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<ReservationStateQuery, ReservationStateQueryVariables>(
+    ReservationStateDocument,
+    options
+  );
+}
+export function useReservationStateLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationStateQuery,
+    ReservationStateQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationStateQuery,
+    ReservationStateQueryVariables
+  >(ReservationStateDocument, options);
+}
+export function useReservationStateSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationStateQuery,
+        ReservationStateQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationStateQuery,
+    ReservationStateQueryVariables
+  >(ReservationStateDocument, options);
+}
+export type ReservationStateQueryHookResult = ReturnType<
+  typeof useReservationStateQuery
+>;
+export type ReservationStateLazyQueryHookResult = ReturnType<
+  typeof useReservationStateLazyQuery
+>;
+export type ReservationStateSuspenseQueryHookResult = ReturnType<
+  typeof useReservationStateSuspenseQuery
+>;
+export type ReservationStateQueryResult = Apollo.QueryResult<
+  ReservationStateQuery,
+  ReservationStateQueryVariables
 >;

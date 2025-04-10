@@ -275,7 +275,11 @@ export function OrderedReservationUnitCard({
 
 export const ORDERED_RESERVATION_UNIT_CARD_FRAGMENT = gql`
   fragment OrderedReservationUnitCard on ReservationUnitNode {
-    ...ReservationUnitNameFields
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
     images {
       ...Image
     }
