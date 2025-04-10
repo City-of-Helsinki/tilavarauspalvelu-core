@@ -680,9 +680,6 @@ function ApplicationRoundAllocationRouted(): JSX.Element {
 
 export default ApplicationRoundAllocationRouted;
 
-/// NOTE have to design a separate query for allocation page (a bit different data than the listing page)
-/// primarily we need to define reservationUnit parameter as a singular pk instead of array (because of the related allocated time slots)
-/// NOTE Requires higher backend optimizer complexity limit (14 works, lower doesn't)
 export const APPLICATION_SECTIONS_FOR_ALLOCATION_QUERY = gql`
   query ApplicationSectionAllocations(
     $applicationRound: Int!

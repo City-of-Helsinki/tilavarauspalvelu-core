@@ -7,7 +7,7 @@ import {
   ApplicationRoundStatusChoice,
   type ApplicationRoundNode,
   useApplicationRoundListQuery,
-  type ApplicationRoundListQuery,
+  type ApplicationRoundListElementFragment,
 } from "@gql/gql-types";
 import { filterNonNullable } from "common/src/helpers";
 import { getApplicationRoundUrl } from "@/common/urls";
@@ -46,14 +46,6 @@ const StyledAccordion = styled(AccordionWithoutTopPadding).attrs({
   }
 `;
 
-// TODO use a fragment?
-type ApplicationRoundListType = NonNullable<
-  ApplicationRoundListQuery["applicationRounds"]
->;
-type ApplicationRoundType = NonNullable<
-  NonNullable<ApplicationRoundListType["edges"]>[0]
->["node"];
-
 function RoundsAccordion({
   rounds,
   name,
@@ -61,7 +53,7 @@ function RoundsAccordion({
   initiallyOpen,
   emptyContent,
 }: {
-  rounds: NonNullable<ApplicationRoundType>[];
+  rounds: ApplicationRoundListElementFragment[];
   hideIfEmpty?: boolean;
   name: string;
   initiallyOpen?: boolean;
@@ -232,13 +224,19 @@ function AllApplicationRounds(): JSX.Element | null {
 
 export default AllApplicationRounds;
 
+export const APPLICATION_ROUND_LIST_FRAGMENT = gql`
+  fragment ApplicationRoundListElement on ApplicationRoundNode {
+    ...ApplicationRoundCard
+    statusTimestamp
+  }
+`;
+
 export const APPLICATION_ROUND_LIST_QUERY = gql`
   query ApplicationRoundList {
     applicationRounds(onlyWithPermissions: true) {
       edges {
         node {
-          ...ApplicationRoundCard
-          statusTimestamp
+          ...ApplicationRoundListElement
         }
       }
     }
