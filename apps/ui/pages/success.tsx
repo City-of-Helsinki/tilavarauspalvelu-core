@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { CenterSpinner } from "common/styled";
 import { ignoreMaybeArray } from "common/src/helpers";
+import { gql } from "@apollo/client";
 
 // TODO should be moved to /reservations/success
 // but because this is webstore callback page we need to leave the url (use an url rewrite)
@@ -120,3 +121,13 @@ function Page(pros: NarrowedProps): JSX.Element {
 }
 
 export default Page;
+
+export const GET_RESERVATION_STATE = gql`
+  query ReservationState($id: ID!) {
+    reservation(id: $id) {
+      id
+      pk
+      state
+    }
+  }
+`;

@@ -6,6 +6,7 @@ import type { EquipmentFieldsFragment } from "@gql/gql-types";
 import { ShowAllContainer } from "common/src/components";
 import { getEquipmentList } from "@/modules/reservationUnit";
 import { convertLanguageCode } from "common/src/common/util";
+import { gql } from "@apollo/client";
 
 type Props = {
   equipment: EquipmentFieldsFragment[];
@@ -54,3 +55,19 @@ export function EquipmentList({
     </EquipmentContainer>
   );
 }
+
+export const EQUIPMENT_FRAGMENT = gql`
+  fragment EquipmentFields on EquipmentNode {
+    id
+    pk
+    nameFi
+    nameEn
+    nameSv
+    category {
+      id
+      nameFi
+      nameEn
+      nameSv
+    }
+  }
+`;

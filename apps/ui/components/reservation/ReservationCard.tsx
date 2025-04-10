@@ -169,20 +169,3 @@ export const RESERVATION_CARD_FRAGMENT = gql`
     ...CanUserCancelReservation
   }
 `;
-/*
-  * id
-          ...ReservationInfoCard
-          name
-          bufferTimeBefore
-          bufferTimeAfter
-          ...ReservationOrderStatus
-          paymentOrder {
-            id
-            checkoutUrl
-            expiresInMinutes
-          }
-          isBlocked
-          reservationUnits {
-            ...CancellationRuleFields
-          }
-*/
