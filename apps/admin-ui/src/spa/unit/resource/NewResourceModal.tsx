@@ -7,7 +7,6 @@ import {
   type NewResourceUnitFieldsFragment,
   useCreateResourceMutation,
 } from "@gql/gql-types";
-import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import {
   Editor,
   ResourceUpdateForm,
@@ -77,10 +76,7 @@ export function NewResourceModal({
 
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)}>
-      <CustomDialogHeader
-        title={t("ResourceModal.modalTitle")}
-        close={closeModal}
-      />
+      <Dialog.Header title={t("ResourceModal.modalTitle")} id="modal-header" />
       <Dialog.Content>
         <p className="text-body" id="custom-dialog-content">
           {t("ResourceModal.info")}

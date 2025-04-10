@@ -1,5 +1,6 @@
 import { Tag } from "hds-react";
 import styled from "styled-components";
+import { breakpoints } from "common/src/const";
 
 export const EditorColumns = styled.div`
   display: grid;
@@ -13,5 +14,9 @@ export const EditorColumns = styled.div`
 export const StyledTag = styled(Tag)`
   background-color: var(--color-bus-light);
   color: var(--color-bus);
-  margin-top: var(--spacing-s);
+  @media (min-width: ${breakpoints.m}) {
+    position: absolute;
+    top: var(--spacing-m);
+    right: calc(var(--spacing-xl) * 2);
+  }
 `;

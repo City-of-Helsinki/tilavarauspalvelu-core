@@ -22,7 +22,6 @@ import {
 } from "@gql/gql-types";
 import { useModal } from "@/context/ModalContext";
 import { CenterSpinner, Flex } from "common/styled";
-import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "@/hooks";
 import { successToast } from "common/src/common/toast";
 import { ApolloError, gql } from "@apollo/client";
@@ -145,12 +144,13 @@ function DialogContent({
   onReject,
   disabled,
   children,
-}: DialogContentProps): JSX.Element {
+}: Readonly<DialogContentProps>): JSX.Element {
   const { t } = useTranslation();
 
   const [handlingDetails, setHandlingDetails] = useState<string>(
     initialHandlingDetails
   );
+
   const [denyReasonPk, setDenyReason] = useState<number | null>(null);
 
   const { options, loading } = useDenyReasonOptions();
@@ -223,25 +223,31 @@ function DenyDialogWrapper({
   children,
   title,
   onClose,
-}: {
+  focusAfterCloseRef,
+}: Readonly<{
   children: JSX.Element;
   title?: string;
   onClose: () => void;
-}): JSX.Element {
+  focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
+}>): JSX.Element {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 
   return (
     <Dialog
       variant="danger"
-      id="info-dialog"
-      aria-labelledby="modal-header"
+      id="deny-dialog"
+      aria-labelledby="deny-dialog__header"
+      aria-live="polite"
       isOpen={isOpen}
+      close={onClose}
+      closeButtonLabelText={t("common.close")}
+      focusAfterCloseRef={focusAfterCloseRef}
     >
       <Flex>
-        <CustomDialogHeader
+        <Dialog.Header
+          id="deny-dialog__header"
           title={title ?? t("RequestedReservation.DenyDialog.title")}
-          close={onClose}
         />
         {children}
       </Flex>
@@ -254,12 +260,14 @@ export function DenyDialog({
   onClose,
   onReject,
   title,
-}: {
+  focusAfterCloseRef,
+}: Readonly<{
   reservation: DenyDialogFieldsFragment;
   onClose: () => void;
   onReject: () => void;
   title?: string;
-}): JSX.Element {
+  focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
+}>): JSX.Element {
   const { t } = useTranslation();
   const [denyReservationMutation] = useDenyReservationMutation();
   const [refundReservationMutation] = useRefundReservationMutation();
@@ -321,7 +329,11 @@ export function DenyDialog({
   };
 
   return (
-    <DenyDialogWrapper title={title} onClose={onClose}>
+    <DenyDialogWrapper
+      title={title}
+      onClose={onClose}
+      focusAfterCloseRef={focusAfterCloseRef}
+    >
       <DialogContent
         initialHandlingDetails={reservation.handlingDetails ?? ""}
         onReject={handleDeny}
@@ -344,13 +356,15 @@ export function DenyDialogSeries({
   onReject,
   initialHandlingDetails,
   recurringReservation,
-}: {
+  focusAfterCloseRef,
+}: Readonly<{
   title?: string;
   onClose: () => void;
   onReject: () => void;
   initialHandlingDetails: string;
   recurringReservation: { pk: number | null };
-}): JSX.Element {
+  focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
+}>): JSX.Element {
   const { t } = useTranslation();
   const [denyMutation] = useDenyReservationSeriesMutation();
   const displayError = useDisplayError();
@@ -388,7 +402,11 @@ export function DenyDialogSeries({
   };
 
   return (
-    <DenyDialogWrapper title={title} onClose={onClose}>
+    <DenyDialogWrapper
+      title={title}
+      onClose={onClose}
+      focusAfterCloseRef={focusAfterCloseRef}
+    >
       <DialogContent
         initialHandlingDetails={initialHandlingDetails}
         onReject={handleDeny}

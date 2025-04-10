@@ -85,7 +85,6 @@ export function NewSpaceModal({
         <Page2
           form={form}
           onPrevPage={() => setPage(0)}
-          closeModal={closeModal}
           hasFixedParent={hasFixedParent}
         >
           <UnitInfo parentName={parentName} unit={unit} />
