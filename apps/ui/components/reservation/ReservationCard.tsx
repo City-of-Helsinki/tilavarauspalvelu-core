@@ -35,7 +35,7 @@ interface PropsT {
 export function ReservationCard({
   reservation,
   type,
-}: Readonly<PropsT>): JSX.Element {
+}: Readonly<PropsT>): JSX.Element | null {
   const { t, i18n } = useTranslation();
 
   const reservationUnit = reservation.reservationUnits[0];
@@ -49,12 +49,12 @@ export function ReservationCard({
   const lang = convertLanguageCode(i18n.language);
   const price = getPrice(t, reservation, lang);
 
-  const name = getTranslationSafe(reservationUnit ?? {}, "name", lang);
-  const unitName = getTranslationSafe(
-    reservationUnit?.unit ?? {},
-    "name",
-    lang
-  );
+  if (!reservationUnit) {
+    return null;
+  }
+
+  const name = getTranslationSafe(reservationUnit, "name", lang);
+  const unitName = getTranslationSafe(reservationUnit.unit ?? {}, "name", lang);
   const title = trim(`${name}, ${unitName}`, ", ");
 
   const normalizedOrderStatus =
@@ -151,6 +151,9 @@ export const RESERVATION_CARD_FRAGMENT = gql`
     accessType
     reservationUnits {
       id
+      nameFi
+      nameSv
+      nameEn
       images {
         ...Image
       }

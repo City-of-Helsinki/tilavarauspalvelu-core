@@ -12,8 +12,10 @@
 .PHONY: lint
 .PHONY: migrate
 .PHONY: migrations
+.PHONY: scheduler
 .PHONY: translate
 .PHONY: translations
+.PHONY: worker
 
 # Trick to allow passing commands to make
 # Use quotes (" ") if command contains flags (-h / --help)
@@ -28,7 +30,7 @@ define helptext
 
  Commands:
 
-  celery                             Run a local celery worker.
+  celery                             Run a local celery worker and beat scheduler.
   check-translations                 Check if translations are up to date.
   clear-db                           Reset database.
   dev                                Run local backend.
@@ -38,8 +40,10 @@ define helptext
   lint                               Run pre-commit hooks.
   migrate                            Run database migrations.
   migrations                         Compile database migrations.
+  scheduler                          Run a local celery beat scheduler.
   translate                          Compile translation strings.
   translations                       Fetch all translation strings under ./locale/.
+  worker                             Run a local celery worker.
 
 endef
 
@@ -79,6 +83,9 @@ migrate:
 migrations:
 	@python manage.py makemigrations
 
+scheduler:
+	@celery -A config beat --loglevel=INFO --scheduler=config.celery.beat:VaraamoDatabaseScheduler
+
 translate:
 	@echo ""
 	@echo Compiling translations...
@@ -92,3 +99,6 @@ translations:
 	@python manage.py maketranslations -l fi -l sv --no-obsolete --omit-header --add-location file
 	@echo ""
 	@echo Done!
+
+worker:
+	@celery -A config worker --loglevel=INFO
