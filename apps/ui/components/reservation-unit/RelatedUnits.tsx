@@ -126,7 +126,11 @@ export const RELATED_UNIT_CARD_FRAGMENT = gql`
   fragment RelatedUnitCardFields on ReservationUnitNode {
     ...OrderedReservationUnitCard
     reservationUnitType {
-      ...ReservationUnitTypeFields
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
     }
     maxPersons
     pricings {

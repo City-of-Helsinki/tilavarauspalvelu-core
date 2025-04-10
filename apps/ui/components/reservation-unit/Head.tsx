@@ -343,7 +343,11 @@ export const RESERVATION_UNIT_HEAD_FRAGMENT = gql`
       beginDate
     }
     reservationUnitType {
-      ...ReservationUnitTypeFields
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
     }
     images {
       ...Image

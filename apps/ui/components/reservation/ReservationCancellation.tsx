@@ -24,6 +24,7 @@ import { LocalizationLanguages } from "common/src/helpers";
 import { useRouter } from "next/router";
 import { type CancelFormValues, CancellationForm } from "../CancellationForm";
 import { Card } from "common/src/components";
+import { gql } from "@apollo/client";
 
 const infoCss = css`
   @media (min-width: ${breakpoints.m}) {
@@ -216,3 +217,11 @@ function getTranslatedTerms(
   }
   return null;
 }
+
+export const CANCEL_RESERVATION = gql`
+  mutation CancelReservation($input: ReservationCancellationMutationInput!) {
+    cancelReservation(input: $input) {
+      pk
+    }
+  }
+`;

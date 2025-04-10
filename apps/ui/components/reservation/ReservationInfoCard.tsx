@@ -194,7 +194,11 @@ export const RESERVATION_INFO_CARD_FRAGMENT = gql`
       accessCode
     }
     reservationUnits {
-      ...ReservationUnitNameFields
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
       images {
         ...Image
       }
