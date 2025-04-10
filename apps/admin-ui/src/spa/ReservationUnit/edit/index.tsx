@@ -1,14 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  Button,
-  ButtonSize,
-  ButtonVariant,
-  IconArrowLeft,
-  IconLinkExternal,
-  LoadingSpinner,
-  Notification,
-  TextInput,
-} from "hds-react";
+import { IconLinkExternal, Notification, TextInput } from "hds-react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import dynamic from "next/dynamic";
@@ -49,8 +40,6 @@ import {
   fontMedium,
   FullRow,
   H4,
-  pageSideMargins,
-  WhiteButton,
 } from "common/styled";
 import { errorToast, successToast } from "common/src/common/toast";
 import { useModal } from "@/context/ModalContext";
@@ -58,7 +47,6 @@ import { getTranslatedError } from "@/common/util";
 import Error404 from "@/common/Error404";
 import { Accordion as AccordionBase } from "@/component/Accordion";
 import { ControlledNumberInput } from "common/src/components/form/ControlledNumberInput";
-import { ArchiveDialog } from "./components/ArchiveDialog";
 import { ActivationGroup } from "./components/ActivationGroup";
 import { PricingTypeView, TaxOption } from "./components/PricingTypeView";
 import {
@@ -71,16 +59,15 @@ import {
 } from "./form";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { SeasonalSection } from "./components/SeasonalSection";
-import { getReservationUnitUrl, getUnitUrl } from "@/common/urls";
+import { getReservationUnitUrl } from "@/common/urls";
 import { ControlledCheckbox } from "common/src/components/form/ControlledCheckbox";
 import { ControlledRadioGroup } from "common/src/components/form";
 import { ApolloError, gql } from "@apollo/client";
 import { FieldGroup } from "@/spa/ReservationUnit/edit/components/FieldGroup";
-import { DiscardChangesDialog } from "@/spa/ReservationUnit/edit/components/DiscardChangesDialog";
 import { DisplayUnit } from "@/spa/ReservationUnit/edit/components/DisplayUnit";
 import { breakpoints } from "common/src/const";
 import { ImageEditor } from "@/spa/ReservationUnit/edit/components/ImageEditor";
-import { useDisplayError } from "common/src/hooks";
+import { BottomButtonsStripe } from "@/spa/ReservationUnit/edit/components/BottomButtonsStripe";
 
 const RichTextInput = dynamic(
   () => import("../../../component/RichTextInput"),
@@ -139,67 +126,6 @@ const SubAccordion = styled(Accordion)`
     svg {
       margin: 0;
       color: var(--color-bus);
-    }
-  }
-`;
-
-const PreviewLink = styled.a`
-  display: flex;
-  place-items: center;
-  border: 2px solid var(--color-white);
-  background-color: transparent;
-  text-decoration: none;
-
-  opacity: 0.5;
-  cursor: not-allowed;
-  color: var(--color-white);
-
-  :link,
-  :visited {
-    opacity: 1;
-    color: var(--color-white);
-    cursor: pointer;
-
-    &:hover {
-      background-color: var(--color-white);
-      color: var(--color-black);
-    }
-  }
-
-  > span {
-    margin: 0 var(--spacing-m);
-  }
-`;
-
-const ButtonsStripe = styled.div`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  background-color: var(--color-bus-dark);
-  z-index: var(--tilavaraus-admin-stack-button-stripe);
-
-  padding: var(--spacing-s) 0;
-  ${pageSideMargins};
-
-  /* back button should be left aligned */
-  gap: var(--spacing-m);
-
-  & > *:first-child {
-    margin-right: auto;
-  }
-
-  /* four buttons is too much on mobile */
-
-  & > *:nth-child(2) {
-    display: none;
-  }
-
-  @media (min-width: ${breakpoints.s}) {
-    & > *:nth-child(2) {
-      display: flex;
     }
   }
 `;
@@ -1431,11 +1357,8 @@ function ReservationUnitEditor({
     },
   });
 
-  const displayError = useDisplayError();
-
   // ----------------------------- Constants ---------------------------------
-  const { getValues, setValue, watch, formState, handleSubmit } = form;
-  const { isDirty: hasChanges, isSubmitting: isSaving } = formState;
+  const { getValues, watch, handleSubmit } = form;
 
   const paymentTermsOptions = makeTermsOptions(
     parametersData,
@@ -1534,83 +1457,11 @@ function ReservationUnitEditor({
     return upPk;
   };
 
-  // Have to define these like this because otherwise the state changes don't work
-  const handlePublish = async () => {
-    setValue("isDraft", false);
-    setValue("isArchived", false);
-    try {
-      await handleSubmit(onSubmit)();
-    } catch (error) {
-      displayError(error);
-    }
-  };
-
-  const handleSaveAsDraft = async () => {
-    setValue("isDraft", true);
-    setValue("isArchived", false);
-    try {
-      await handleSubmit(onSubmit)();
-    } catch (error) {
-      displayError(error);
-    }
-  };
-
-  const handleAcceptArchive = async () => {
-    setValue("isArchived", true);
-    setValue("isDraft", false);
-    setModalContent(null);
-    try {
-      await handleSubmit(onSubmit)();
-      successToast({ text: t("ArchiveReservationUnitDialog.success") });
-      history(getUnitUrl(unit?.pk));
-    } catch (e) {
-      displayError(e);
-    }
-  };
-
-  const handleArchiveButtonClick = () => {
-    if (reservationUnit != null) {
-      setModalContent(
-        <ArchiveDialog
-          reservationUnit={reservationUnit}
-          onAccept={handleAcceptArchive}
-          onClose={() => setModalContent(null)}
-        />
-      );
-    }
-  };
-
-  const handleBack = () => {
-    if (hasChanges) {
-      setModalContent(
-        <DiscardChangesDialog
-          onAccept={() => {
-            setModalContent(null);
-            history(-1);
-          }}
-          onClose={() => setModalContent(null)}
-        />
-      );
-    } else {
-      history(-1);
-    }
-  };
-
   const kind = watch("reservationKind");
   const isDirect =
     kind === ReservationKind.Direct || kind === ReservationKind.DirectAndSeason;
   const isSeasonal =
     kind === ReservationKind.Season || kind === ReservationKind.DirectAndSeason;
-
-  const previewDisabled =
-    isSaving ||
-    !reservationUnit?.pk ||
-    !reservationUnit.uuid ||
-    previewUrlPrefix === "";
-
-  const draftEnabled = hasChanges || !watch("isDraft");
-  const publishEnabled = hasChanges || watch("isDraft");
-  const archiveEnabled = watch("pk") !== 0 && !watch("isArchived");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -1619,7 +1470,7 @@ function ReservationUnitEditor({
           heading={
             reservationUnit?.nameFi ?? t("ReservationUnitEditor.defaultHeading")
           }
-          unit={unit ?? undefined}
+          unit={unit}
           reservationState={reservationUnit?.reservationState ?? undefined}
           unitState={reservationUnit?.publishingState ?? undefined}
         />
@@ -1658,64 +1509,16 @@ function ReservationUnitEditor({
           previewUrlPrefix={previewUrlPrefix}
         />
         {isSeasonal && <SeasonalSection form={form} />}
-        <div>
-          <Button
-            onClick={handleArchiveButtonClick}
-            variant={ButtonVariant.Secondary}
-            disabled={isSaving || !archiveEnabled}
-          >
-            {t("ReservationUnitEditor.archive")}
-          </Button>
-        </div>
       </StyledContainerMedium>
-      <ButtonsStripe>
-        <WhiteButton
-          size={ButtonSize.Small}
-          variant={ButtonVariant.Supplementary}
-          iconStart={<IconArrowLeft />}
-          disabled={isSaving}
-          onClick={handleBack}
-        >
-          {t("common.prev")}
-        </WhiteButton>
-        <PreviewLink
-          target="_blank"
-          rel="noopener noreferrer"
-          href={
-            !previewDisabled
-              ? `${previewUrlPrefix}/${reservationUnit?.pk}?ru=${reservationUnit?.uuid}`
-              : undefined
-          }
-          onClick={(e) => previewDisabled && e.preventDefault()}
-          title={t(
-            hasChanges
-              ? "ReservationUnitEditor.noPreviewUnsavedChangesTooltip"
-              : "ReservationUnitEditor.previewTooltip"
-          )}
-        >
-          <span>{t("ReservationUnitEditor.preview")}</span>
-        </PreviewLink>
-        <WhiteButton
-          size={ButtonSize.Small}
-          variant={isSaving ? ButtonVariant.Clear : ButtonVariant.Secondary}
-          iconStart={isSaving ? <LoadingSpinner small /> : undefined}
-          disabled={isSaving || !draftEnabled}
-          type="button"
-          onClick={handleSaveAsDraft}
-        >
-          {t("ReservationUnitEditor.saveAsDraft")}
-        </WhiteButton>
-        <WhiteButton
-          variant={isSaving ? ButtonVariant.Clear : ButtonVariant.Primary}
-          size={ButtonSize.Small}
-          iconStart={isSaving ? <LoadingSpinner small /> : undefined}
-          disabled={isSaving || !publishEnabled}
-          type="button"
-          onClick={handlePublish}
-        >
-          {t("ReservationUnitEditor.saveAndPublish")}
-        </WhiteButton>
-      </ButtonsStripe>
+
+      <BottomButtonsStripe
+        reservationUnit={reservationUnit}
+        unit={unit}
+        previewUrlPrefix={previewUrlPrefix}
+        setModalContent={setModalContent}
+        onSubmit={onSubmit}
+        form={form}
+      />
     </form>
   );
 }
