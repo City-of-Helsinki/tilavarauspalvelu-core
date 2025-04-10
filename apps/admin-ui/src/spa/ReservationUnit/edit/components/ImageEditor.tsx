@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Button, ButtonSize, ButtonVariant, FileInput } from "hds-react";
 import { ImageType } from "@gql/gql-types";
+import { type ImageFormType } from "../form";
 import { AutoGrid, Flex, fontRegular } from "common/styled";
-import { type ImageFormType } from "./form";
 
 const StyledImage = styled.img`
   max-height: 12.5em;
@@ -39,22 +39,28 @@ const FileInputContainer = styled.div`
 
   div:nth-of-type(3) {
     width: 100%;
+
     button {
       width: 100%;
     }
   }
+
   ul#file-input-list {
     display: none;
   }
+
   div > div > div > div:nth-of-type(1) {
     display: none;
   }
+
   #file-input-success {
     display: none;
   }
+
   #file-input-info {
     display: none;
   }
+
   #file-input-helper {
     display: none;
   }
@@ -64,10 +70,11 @@ const SmallButton = styled(Button).attrs({
   variant: ButtonVariant.Secondary,
   size: ButtonSize.Small,
 })`
-  ${fontRegular}
+  ${fontRegular};
   border: 0;
   padding: 0;
   min-height: 0;
+
   span {
     padding: 0;
     margin: 0 !important;

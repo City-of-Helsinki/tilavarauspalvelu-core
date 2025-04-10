@@ -13,7 +13,7 @@ import { IconButton } from "common/src/components";
 import { fontBold } from "common/styled";
 import { breakpoints } from "common/src/const";
 import { useTranslation } from "react-i18next";
-import { ReservationUnitEditFormValues } from "./form";
+import { ReservationUnitEditFormValues } from "../form";
 import { Accordion } from "@/component/Accordion";
 import { getTranslatedError } from "@/common/util";
 
@@ -105,7 +105,7 @@ const alignToInput = css`
   align-self: end;
 `;
 const AndSpan = styled.span`
-  ${alignToInput}
+  ${alignToInput};
   display: none;
   @media (min-width: ${breakpoints.xl}) {
     display: inline-block;
