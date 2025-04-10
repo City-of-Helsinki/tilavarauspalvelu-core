@@ -8039,6 +8039,20 @@ export type SendResultsMutation = {
   } | null;
 };
 
+export type ApplicationRoundListElementFragment = {
+  readonly statusTimestamp: string | null;
+  readonly id: string;
+  readonly pk: number | null;
+  readonly nameFi: string | null;
+  readonly status: ApplicationRoundStatusChoice;
+  readonly applicationPeriodBegin: string;
+  readonly applicationPeriodEnd: string;
+  readonly reservationPeriodBegin: string;
+  readonly reservationPeriodEnd: string;
+  readonly reservationUnitCount: number;
+  readonly applicationsCount: number;
+};
+
 export type ApplicationRoundListQueryVariables = Exact<{
   [key: string]: never;
 }>;
@@ -10511,20 +10525,6 @@ export const ReservationUnitEditUnitFragmentDoc = gql`
   }
   ${UnitSubpageHeadFragmentDoc}
 `;
-export const ApplicationRoundCardFragmentDoc = gql`
-  fragment ApplicationRoundCard on ApplicationRoundNode {
-    id
-    pk
-    nameFi
-    status
-    applicationPeriodBegin
-    applicationPeriodEnd
-    reservationPeriodBegin
-    reservationPeriodEnd
-    reservationUnitCount
-    applicationsCount
-  }
-`;
 export const ApplicationNameFragmentDoc = gql`
   fragment ApplicationName on ApplicationNode {
     id
@@ -10786,6 +10786,27 @@ export const ApplicationRoundAdminFragmentDoc = gql`
       }
     }
   }
+`;
+export const ApplicationRoundCardFragmentDoc = gql`
+  fragment ApplicationRoundCard on ApplicationRoundNode {
+    id
+    pk
+    nameFi
+    status
+    applicationPeriodBegin
+    applicationPeriodEnd
+    reservationPeriodBegin
+    reservationPeriodEnd
+    reservationUnitCount
+    applicationsCount
+  }
+`;
+export const ApplicationRoundListElementFragmentDoc = gql`
+  fragment ApplicationRoundListElement on ApplicationRoundNode {
+    ...ApplicationRoundCard
+    statusTimestamp
+  }
+  ${ApplicationRoundCardFragmentDoc}
 `;
 export const ApplicantFragmentDoc = gql`
   fragment Applicant on ApplicationNode {
@@ -14989,13 +15010,12 @@ export const ApplicationRoundListDocument = gql`
     applicationRounds(onlyWithPermissions: true) {
       edges {
         node {
-          ...ApplicationRoundCard
-          statusTimestamp
+          ...ApplicationRoundListElement
         }
       }
     }
   }
-  ${ApplicationRoundCardFragmentDoc}
+  ${ApplicationRoundListElementFragmentDoc}
 `;
 
 /**
