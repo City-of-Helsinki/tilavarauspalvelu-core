@@ -2,7 +2,6 @@ import React from "react";
 import { Button, ButtonVariant, Dialog, IconArrowRight } from "hds-react";
 import { useTranslation } from "react-i18next";
 import { type UnitPageQuery } from "@gql/gql-types";
-import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { ParentSelector } from "../ParentSelector";
 import { StyledTag } from "./modules/newSpaceModal";
 import { Controller, UseFormReturn } from "react-hook-form";
@@ -31,16 +30,16 @@ export function Page1({
 
   return (
     <>
-      <CustomDialogHeader
-        extras={<StyledTag>{`${t("SpaceModal.phase")} 1/2`}</StyledTag>}
+      <Dialog.Header
         title={t(
           hasFixedParent
             ? "SpaceModal.page1.subSpaceModalTitle"
             : "SpaceModal.page1.modalTitle"
         )}
-        close={closeModal}
+        id="modal-header"
       />
       <Dialog.Content>
+        <StyledTag>{`${t("SpaceModal.phase")} 1/2`}</StyledTag>
         <p className="text-body" id="custom-dialog-content">
           {t("SpaceModal.page1.info")}
         </p>

@@ -7,7 +7,6 @@ import {
   IconArrowLeft,
   LoadingSpinner,
 } from "hds-react";
-import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { StyledTag } from "./modules/newSpaceModal";
 import { SpaceForm, type SpaceUpdateForm } from "../SpaceForm";
 import { FormErrorSummary } from "@/common/FormErrorSummary";
@@ -15,7 +14,6 @@ import { UseFormReturn } from "react-hook-form";
 import { DialogActionsButtons } from "@/styled";
 
 type Props = {
-  closeModal: () => void;
   hasFixedParent: boolean;
   onPrevPage: () => void;
   form: UseFormReturn<SpaceUpdateForm>;
@@ -24,7 +22,6 @@ type Props = {
 
 export function Page2({
   onPrevPage,
-  closeModal,
   hasFixedParent,
   form,
   children,
@@ -35,16 +32,16 @@ export function Page2({
 
   return (
     <>
-      <CustomDialogHeader
+      <Dialog.Header
         title={t(
           hasFixedParent
             ? "SpaceModal.page2.subSpaceModalTitle"
             : "SpaceModal.page2.modalTitle"
         )}
-        extras={<StyledTag>{`${t("SpaceModal.phase")} 2/2`}</StyledTag>}
-        close={closeModal}
+        id="modal-header"
       />
       <Dialog.Content>
+        <StyledTag>{`${t("SpaceModal.phase")} 2/2`}</StyledTag>
         <p className="text-body" id="custom-dialog-content">
           {t(
             hasFixedParent

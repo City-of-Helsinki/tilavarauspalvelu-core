@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { type ApprovalButtonsFragment } from "@gql/gql-types";
 import { useTranslation } from "react-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
@@ -44,6 +44,10 @@ function ApprovalButtons({
   disableNonEssentialButtons,
 }: Props) {
   const { setModalContent } = useModal();
+  const approvalButtonRef = useRef<HTMLButtonElement>(null);
+  const denyButtonRef = useRef<HTMLButtonElement>(null);
+  const returnToHandlingButtonRef = useRef<HTMLButtonElement>(null);
+
   const { t } = useTranslation();
 
   const { state } = reservation;
@@ -54,6 +58,7 @@ function ApprovalButtons({
         reservation={reservation}
         onReject={handleAccept}
         onClose={handleClose}
+        focusAfterCloseRef={denyButtonRef}
       />
     );
   };
@@ -64,6 +69,7 @@ function ApprovalButtons({
         reservation={reservation}
         onAccept={handleAccept}
         onClose={handleClose}
+        focusAfterCloseRef={returnToHandlingButtonRef}
       />
     );
   };
@@ -75,6 +81,7 @@ function ApprovalButtons({
         reservation={reservation}
         onAccept={handleAccept}
         onClose={handleClose}
+        focusAfterCloseRef={approvalButtonRef}
       />
     );
   };
@@ -98,6 +105,7 @@ function ApprovalButtons({
           {...btnCommon}
           onClick={handleApproveClick}
           data-testid="approval-buttons__approve-button"
+          ref={approvalButtonRef}
         >
           {t("RequestedReservation.approve")}
         </Button>
@@ -107,6 +115,7 @@ function ApprovalButtons({
           {...btnCommon}
           onClick={handleDenyClick}
           data-testid="approval-buttons__reject-button"
+          ref={denyButtonRef}
         >
           {t("RequestedReservation.reject")}
         </Button>
@@ -116,6 +125,7 @@ function ApprovalButtons({
           {...btnCommon}
           onClick={handleReturnToHandlingClick}
           data-testid="approval-buttons__return-to-handling-button"
+          ref={returnToHandlingButtonRef}
         >
           {t("RequestedReservation.returnToHandling")}
         </Button>

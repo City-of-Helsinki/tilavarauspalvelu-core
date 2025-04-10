@@ -15,6 +15,7 @@ type Props = {
   reservation: ReservationType;
   onClose: () => void;
   onAccept: () => void;
+  focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
 };
 
 function DialogContent({ reservation, onClose, onAccept }: Props) {
@@ -60,7 +61,8 @@ function ReturnToRequiredHandlingDialog({
   reservation,
   onClose,
   onAccept,
-}: Props): JSX.Element {
+  focusAfterCloseRef,
+}: Readonly<Props>): JSX.Element {
   const { isOpen } = useModal();
   const { t } = useTranslation();
 
@@ -71,7 +73,7 @@ function ReturnToRequiredHandlingDialog({
       aria-labelledby="modal-header"
       aria-describedby="modal-description"
       isOpen={isOpen}
-      focusAfterCloseRef={undefined}
+      focusAfterCloseRef={focusAfterCloseRef}
     >
       <Dialog.Header
         id="modal-header"
