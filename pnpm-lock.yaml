@@ -136,8 +136,8 @@ importers:
         specifier: ^8.3.19
         version: 8.3.19(graphql@16.10.0)
       '@happy-dom/jest-environment':
-        specifier: ^17.1.8
-        version: 17.1.8
+        specifier: ^17.4.4
+        version: 17.4.4
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.0
@@ -275,8 +275,8 @@ importers:
         version: 3.24.2
     devDependencies:
       '@happy-dom/jest-environment':
-        specifier: ^17.1.8
-        version: 17.1.8
+        specifier: ^17.4.4
+        version: 17.4.4
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.0
@@ -396,8 +396,8 @@ importers:
         specifier: ^3.13.1
         version: 3.13.1(@types/react@18.2.7)(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.1))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@happy-dom/jest-environment':
-        specifier: ^17.1.8
-        version: 17.1.8
+        specifier: ^17.4.4
+        version: 17.4.4
       '@testing-library/dom':
         specifier: ^10.4.0
         version: 10.4.0
@@ -1565,8 +1565,8 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@happy-dom/jest-environment@17.1.8':
-    resolution: {integrity: sha512-cqgpNXvX0Xnsyn2/GcfAVaaYpf8vwcV7NakmrK/2hd9zEzntGMsoNvSNFQJamo+lrbBO0o3mUobosH34AyV9eg==}
+  '@happy-dom/jest-environment@17.4.4':
+    resolution: {integrity: sha512-5imA+SpP7ZcIwE1u2swWZq6UJhyZIWNtlE/gnqhVz+y91G6hgF+t9hVSsWH29Tfib+wg/zC9ryJPDDyAuqXfEg==}
     engines: {node: '>=18.0.0'}
 
   '@hookform/resolvers@2.9.11':
@@ -4174,6 +4174,10 @@ packages:
 
   happy-dom@17.1.8:
     resolution: {integrity: sha512-Yxbq/FG79z1rhAf/iB6YM8wO2JB/JDQBy99RiLSs+2siEAi5J05x9eW1nnASHZJbpldjJE2KuFLsLZ+AzX/IxA==}
+    engines: {node: '>=18.0.0'}
+
+  happy-dom@17.4.4:
+    resolution: {integrity: sha512-/Pb0ctk3HTZ5xEL3BZ0hK1AqDSAUuRQitOmROPHhfUYEWpmTImwfD8vFDGADmMAX0JYgbcgxWoLFKtsWhcpuVA==}
     engines: {node: '>=18.0.0'}
 
   has-ansi@2.0.0:
@@ -7993,12 +7997,12 @@ snapshots:
     dependencies:
       graphql: 16.10.0
 
-  '@happy-dom/jest-environment@17.1.8':
+  '@happy-dom/jest-environment@17.4.4':
     dependencies:
       '@jest/environment': 29.7.0
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      happy-dom: 17.1.8
+      happy-dom: 17.4.4
       jest-mock: 29.7.0
       jest-util: 29.7.0
 
@@ -11001,6 +11005,11 @@ snapshots:
   graphql@16.10.0: {}
 
   happy-dom@17.1.8:
+    dependencies:
+      webidl-conversions: 7.0.0
+      whatwg-mimetype: 3.0.0
+
+  happy-dom@17.4.4:
     dependencies:
       webidl-conversions: 7.0.0
       whatwg-mimetype: 3.0.0
