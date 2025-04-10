@@ -1,0 +1,31 @@
+{
+  "type": {
+    "ACCESS_CODE": "Ovikoodi",
+    "OPENED_BY_STAFF": "Henkilökunnan toimesta",
+    "PHYSICAL_KEY": "Noudettavalla avaimella",
+    "UNRESTRICTED": "Rajoittamaton"
+  },
+  "accessCodeState": {
+    "ACCESS_CODE_CREATED": "Ovikoodi luotu",
+    "ACCESS_CODE_PENDING": "Ovikoodia luodaan",
+    "ACCESS_CODE_NOT_REQUIRED": "Ei tarvitse ovikoodia"
+  },
+  "status": {
+    "label": "Status",
+    "active": "Aktiivinen",
+    "inactive": "Ei-aktiivinen"
+  },
+  "validity": {
+    "label": "Voimassa",
+    "fromNextReservation": "Voimassaoloaika seuraavasta varauksesta"
+  },
+  "actions": {
+    "change": "Vaihda ovikoodi",
+    "changeMultiple": "Vaihda kausivarauksen ovikoodi",
+    "changeConfirmation": "Uuden ovikoodin generointi nollaa aiemman ovikoodit. Haluatko varmasti generoida uuden ovikoodin?",
+    "changeMultipleConfirmation": "Ovikoodi vaihtuu myös muille tähän kausivaraukseen liittyville viikkovuoroille. Haluatko varmasti vaihtaa ovikoodin?",
+    "changeSuccess": "Ovikoodi vaihdettu",
+    "repair": "Korjaa ovikoodi",
+    "repairSuccess": "Ovikoodi korjattu"
+  }
+}

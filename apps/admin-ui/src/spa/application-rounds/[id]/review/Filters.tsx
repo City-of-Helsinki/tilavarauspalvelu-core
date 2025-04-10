@@ -56,7 +56,7 @@ export function Filters({
 
   const accessCodeOptions = Object.values(AccessCodeState).map((s) => ({
     value: s,
-    label: t(`accessCodeState.${s}`),
+    label: t(`accessType.accessCodeState.${s}`),
   }));
 
   const translateTag = (key: string, value: string) => {
@@ -76,7 +76,7 @@ export function Filters({
       case "eventStatus":
         return t(`ApplicationSectionStatusChoice.${value}`);
       case "accessCodeState":
-        return t(`accessCodeState.${value}`);
+        return t(`accessType.accessCodeState.${value}`);
       default:
         return value;
     }
