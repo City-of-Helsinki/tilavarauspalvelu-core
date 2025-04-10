@@ -1,7 +1,9 @@
 import React from "react";
 import {
+  Button,
   ButtonSize,
   ButtonVariant,
+  Dialog,
   IconArrowLeft,
   LoadingSpinner,
 } from "hds-react";
@@ -11,10 +13,7 @@ import { UseFormReturn } from "react-hook-form";
 import type { ReservationUnitEditFormValues } from "@/spa/ReservationUnit/edit/form";
 import { useNavigate } from "react-router-dom";
 import { getUnitUrl } from "@/common/urls";
-import { errorToast, successToast } from "common/src/common/toast";
-import { getValidationErrors } from "common/src/apolloUtils";
-import { DiscardChangesDialog } from "./DiscardChangesDialog";
-import { ArchiveDialog } from "./ArchiveDialog";
+import { successToast } from "common/src/common/toast";
 import type {
   ReservationUnitEditQuery,
   UnitSubpageHeadFragment,
@@ -22,6 +21,7 @@ import type {
 import { breakpoints } from "common/src/const";
 import { pageSideMargins, WhiteButton } from "common/styled";
 import { useDisplayError } from "common/src/hooks";
+import { useModal } from "@/context/ModalContext";
 
 type QueryData = ReservationUnitEditQuery["reservationUnit"];
 type Node = NonNullable<QueryData>;
@@ -86,6 +86,118 @@ const ButtonsStripe = styled.div`
     }
   }
 `;
+
+const ActionButtons = styled(Dialog.ActionButtons)`
+  justify-content: end;
+`;
+
+function DialogContent({
+  onClose,
+  onAccept,
+  description,
+  acceptLabel,
+}: {
+  onClose: () => void;
+  onAccept: () => void;
+  description: string;
+  acceptLabel: string;
+}): JSX.Element {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <Dialog.Content>
+        <p id="modal-description" className="text-body">
+          {description}
+        </p>
+      </Dialog.Content>
+      <ActionButtons>
+        <Button onClick={onAccept}>{acceptLabel}</Button>
+        <Button variant={ButtonVariant.Secondary} onClick={onClose}>
+          {t("common.cancel")}
+        </Button>
+      </ActionButtons>
+    </>
+  );
+}
+
+function GenericDialog({
+  onClose,
+  onAccept,
+  title,
+  description,
+  acceptLabel,
+}: {
+  onClose: () => void;
+  onAccept: () => void;
+  title: string;
+  description: string;
+  acceptLabel: string;
+}): JSX.Element {
+  const { isOpen } = useModal();
+
+  return (
+    <Dialog
+      variant="primary"
+      id="info-dialog"
+      aria-labelledby="modal-header"
+      aria-describedby="modal-description"
+      isOpen={isOpen}
+    >
+      <Dialog.Header id="modal-header" title={title} />
+      <DialogContent
+        description={description}
+        acceptLabel={acceptLabel}
+        onAccept={onAccept}
+        onClose={onClose}
+      />
+    </Dialog>
+  );
+}
+
+function ArchiveDialog({
+  reservationUnit,
+  onClose,
+  onAccept,
+}: {
+  reservationUnit: Pick<Node, "nameFi">;
+  onClose: () => void;
+  onAccept: () => void;
+}): JSX.Element {
+  const { t } = useTranslation();
+
+  return (
+    <GenericDialog
+      onAccept={onAccept}
+      onClose={onClose}
+      description={t("ArchiveReservationUnitDialog.description")}
+      title={t("ArchiveReservationUnitDialog.title", {
+        name: reservationUnit.nameFi ?? "-",
+      })}
+      acceptLabel={t("ArchiveReservationUnitDialog.archive")}
+    />
+  );
+}
+
+function DiscardChangesDialog({
+  onClose,
+  onAccept,
+}: {
+  onClose: () => void;
+  onAccept: () => void;
+}): JSX.Element {
+  const { t } = useTranslation();
+
+  return (
+    <GenericDialog
+      onAccept={onAccept}
+      onClose={onClose}
+      description={t("DiscardReservationUnitChangesDialog.description")}
+      title={t("DiscardReservationUnitChangesDialog.title")}
+      acceptLabel={t("DiscardReservationUnitChangesDialog.discard")}
+    />
+  );
+}
 
 export function BottomButtonsStripe({
   reservationUnit,
@@ -178,21 +290,6 @@ export function BottomButtonsStripe({
       );
     } else {
       history(-1);
-    }
-  };
-
-  const handleError = (e: unknown) => {
-    const validationErrors = getValidationErrors(e);
-    const validationError = validationErrors[0];
-    if (validationError != null) {
-      errorToast({
-        text: t(`errors.backendValidation.${validationError.code}`),
-      });
-    } else if (e instanceof Error) {
-      const msg = e.message;
-      errorToast({ text: msg });
-    } else {
-      errorToast({ text: t("ReservationDialog.saveFailed") });
     }
   };
 
