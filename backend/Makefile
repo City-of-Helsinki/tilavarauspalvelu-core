@@ -84,7 +84,7 @@ migrations:
 	@python manage.py makemigrations
 
 scheduler:
-	@celery -A config beat --loglevel=INFO --scheduler=django-tvp
+	@celery -A config beat --loglevel=INFO --scheduler=config.celery.beat:VaraamoDatabaseScheduler
 
 translate:
 	@echo ""
