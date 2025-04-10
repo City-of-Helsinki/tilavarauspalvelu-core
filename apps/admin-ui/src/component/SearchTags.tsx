@@ -14,12 +14,14 @@ export function SearchTags({
   hide = [],
   defaultTags = [],
   clearButtonLabel,
-}: {
+  clearButtonAriaLabel,
+}: Readonly<{
   translateTag: (key: string, val: string) => string;
   hide?: string[];
   defaultTags?: Array<{ key: string; value: string | string[] }>;
   clearButtonLabel?: string;
-}): JSX.Element {
+  clearButtonAriaLabel?: string;
+}>): JSX.Element {
   const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
 
@@ -68,13 +70,18 @@ export function SearchTags({
           onDelete={() => handleDelete(tag)}
           key={`${tag.key}-${tag.value}`}
           id={`search-tag-${tag.key}`}
+          aria-label={t("common.removeTag", { tag: tag.tr })}
         >
           {tag.tr}
         </StyledTag>
       ))}
       {tags.length > 0 && (
-        <ResetButton onClick={handleReset} onDelete={handleReset}>
-          {clearButtonLabel || t("common.clear")}
+        <ResetButton
+          onClick={handleReset}
+          onDelete={handleReset}
+          aria-label={clearButtonAriaLabel ?? t("common.clearTags")}
+        >
+          {clearButtonLabel ?? t("common.clear")}
         </ResetButton>
       )}
     </FilterTags>

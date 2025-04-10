@@ -33,7 +33,11 @@ export function ListReservationsPage(): JSX.Element {
         <H1 $marginTop="l">{t("Reservations.allReservationListHeading")}</H1>
         <p>{t("Reservations.allReservationListDescription")}</p>
       </div>
-      <Filters defaultFilters={defaultFilters} />
+      <Filters
+        defaultFilters={defaultFilters}
+        clearButtonLabel={t("common.returnDefaults")}
+        clearButtonAriaLabel={t("common.defaultTags")}
+      />
       <ReservationsDataLoader />
     </>
   );
