@@ -4,17 +4,6 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Flex, H2 } from "common/styled";
 
-interface IProps {
-  heading: string | JSX.Element | null;
-  initiallyOpen?: boolean;
-  open?: boolean;
-  children: ReactNode;
-  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-  disabled?: boolean;
-  className?: string;
-  style?: React.CSSProperties;
-}
-
 const ToggleButton = styled.button`
   border: 0;
   background: none;
@@ -28,6 +17,7 @@ const Heading = styled(Flex).attrs({
   cursor: pointer;
   user-select: none;
   border-bottom: 1px solid var(--border-color);
+
   ${({ $disabled }) =>
     $disabled
       ? `
@@ -41,7 +31,6 @@ const Heading = styled(Flex).attrs({
 
       cursor: pointer;
     `}
-
   h2, h3, h4, h5, h6 {
     font-size: var(--header-font-size);
   }
@@ -101,7 +90,16 @@ export function Accordion({
   className,
   style,
   ...rest
-}: IProps): JSX.Element {
+}: {
+  heading: string | JSX.Element | null;
+  initiallyOpen?: boolean;
+  open?: boolean;
+  children: ReactNode;
+  headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  disabled?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
+}): JSX.Element {
   const [accordionOpenState, toggleOpenState] = useState(initiallyOpen);
 
   const { t } = useTranslation();
