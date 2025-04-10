@@ -114,7 +114,7 @@ export function RecurringReservationsView({
     const startDate = new Date(x.begin);
     const endDate = new Date(x.end);
 
-    if (hasPermission && onChange && isPossibleToDeny(x.state, endDate)) {
+    if (hasPermission && onChange && isPossibleToEdit(x.state, endDate)) {
       buttons.push(
         <ReservationListButton
           key="change"
@@ -140,7 +140,7 @@ export function RecurringReservationsView({
         />
       );
     }
-    if (hasPermission && isPossibleToEdit(x.state, endDate)) {
+    if (hasPermission && isPossibleToDeny(x.state, endDate)) {
       buttons.push(
         <ReservationListButton
           key="deny"
