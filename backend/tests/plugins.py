@@ -69,13 +69,54 @@ def setup_now_tt():
 
 @pytest.hookimpl()
 def pytest_addoption(parser: pytest.Parser) -> None:
-    parser.addoption("--skip-slow", action="store_true", default=False, help="Skip slow running tests.")
+    parser.addoption(
+        "--skip-slow",
+        action="store_true",
+        default=False,
+        help="Skip slow running tests.",
+    )
+
+    parser.addoption(
+        "--only-frontend-query-tests",
+        action="store_true",
+        default=False,
+        help="Only run frontend query tests.",
+    )
+    parser.addoption(
+        "--with-frontend-query-tests",
+        action="store_true",
+        default=False,
+        help="Also run frontend query tests.",
+    )
 
 
 @pytest.hookimpl()
 def pytest_collection_modifyitems(config, items):
     skip_slow = config.getoption("--skip-slow")
+    only_frontend_query_tests = config.getoption("--only-frontend-query-tests")
+    with_frontend_query_tests = config.getoption("--with-frontend-query-tests")
+
+    if only_frontend_query_tests and with_frontend_query_tests:
+        msg = "Cannot use '--only-frontend-query-tests' and '--with-frontend-query-tests' together"
+        raise ValueError(msg)
 
     for item in items:
-        if skip_slow and "slow" in item.keywords:
-            item.add_marker(pytest.mark.skip(reason="Skipped due to --skip-slow option"))
+        is_slot_test = "slot" in item.keywords
+
+        if skip_slow and is_slot_test:
+            msg = "Skipped due to '--skip-slow' option"
+            item.add_marker(pytest.mark.skip(reason=msg))
+            continue
+
+        if with_frontend_query_tests:
+            continue
+
+        is_frontend_query_test = "frontend_query" in item.keywords
+
+        if is_frontend_query_test and not only_frontend_query_tests:
+            msg = "Frontend query test skipped due to '--only-frontend-query-tests' option not set"
+            item.add_marker(pytest.mark.skip(reason=msg))
+
+        if not is_frontend_query_test and only_frontend_query_tests:
+            msg = "Non frontend query test skipped due to '--only-frontend-query-tests option' option"
+            item.add_marker(pytest.mark.skip(reason=msg))

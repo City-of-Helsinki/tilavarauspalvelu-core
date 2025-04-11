@@ -29,6 +29,7 @@ if TYPE_CHECKING:
 
 pytestmark = [
     pytest.mark.django_db,
+    pytest.mark.frontend_query,
 ]
 
 
