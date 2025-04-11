@@ -11,6 +11,7 @@ import {
   PindoraSectionFragment,
   PindoraReservationFragment,
   ReservationUnitAccessTypeNode,
+  Maybe,
 } from "@/gql/gql-types";
 import {
   getApplicationReservationPath,
@@ -619,7 +620,7 @@ type ReservationsTableElem = {
     | "reservationCancelledInstructionsEn"
     | "reservationCancelledInstructionsSv"
   >;
-  accessType?: AccessType;
+  accessType?: Maybe<AccessType>;
   accessTypeChanged?: boolean;
   accessCodeTime?: string | null;
   pindoraInfo?: PindoraReservationFragment | null;
