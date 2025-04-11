@@ -1,0 +1,100 @@
+name: "Frontend query tests"
+
+on:
+  push:
+    paths:
+      - backend/**
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+# Cancel a workflow from the same PR, branch or tag when a new workflow is triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: 3.13
+
+jobs:
+
+  frontend-query-tests:
+    name: "Run frontend query tests"
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:13-3.3-alpine
+        env:
+          POSTGRES_USER: tvp
+          POSTGRES_PASSWORD: tvp
+          POSTGRES_DB: tvp
+          DEBUG: true
+          SECRET_KEY: build_secret
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Set up python"
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: "Install Poetry and project dependencies"
+        uses: ./.github/actions/poetry
+        with:
+          python-version: ${{ steps.setup-python.outputs.python-version }}
+
+      - name: "Install pnpm"
+        uses: pnpm/action-setup@v4
+
+      - name: "Install Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: "Install frontend dependencies"
+        run: pnpm install --frozen-lockfile
+
+      - name: "Pick queries from frontend files"
+        run: pnpm gql-pluck
+
+      - name: "Defragment frontend queries"
+        working-directory: backend
+        run: poetry run python manage.py defragment_frontend_queries
+        env:
+          DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
+
+      - name: "Run frontend query tests"
+        working-directory: backend
+        run: |
+          poetry run coverage run \
+            --branch \
+            -m pytest \
+              --disable-warnings \
+              --only-frontend-query-tests
+        env:
+          DJANGO_SETTINGS_ENVIRONMENT: AutomatedTests
