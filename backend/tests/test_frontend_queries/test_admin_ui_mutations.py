@@ -50,6 +50,7 @@ from .helpers import assert_no_undefined_variables, get_admin_query_info
 
 pytestmark = [
     pytest.mark.django_db,
+    pytest.mark.frontend_query,
 ]
 
 
