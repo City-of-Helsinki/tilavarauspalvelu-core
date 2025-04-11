@@ -139,6 +139,18 @@ function isTooCloseToCancel(
   return cancelLatest < now;
 }
 
+export const CAN_USER_CANCEL_RESERVATION_FRAGMENT = gql`
+  fragment CanUserCancelReservation on ReservationNode {
+    id
+    state
+    begin
+    reservationUnits {
+      id
+      ...CancellationRuleFields
+    }
+  }
+`;
+
 export function isReservationCancellable(
   reservation: CanUserCancelReservationFragment
 ): boolean {
@@ -192,6 +204,17 @@ function shouldShowOrderStatus(
   }
   return true;
 }
+
+export const RESERVATION_ORDER_STATUS_FRAGMENT = gql`
+  fragment ReservationOrderStatus on ReservationNode {
+    id
+    state
+    paymentOrder {
+      id
+      status
+    }
+  }
+`;
 
 export function getNormalizedReservationOrderStatus(
   reservation: ReservationOrderStatusFragment

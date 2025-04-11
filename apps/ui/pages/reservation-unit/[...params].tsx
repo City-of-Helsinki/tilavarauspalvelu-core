@@ -510,3 +510,33 @@ export const RESERVATION_IN_PROGRESS_QUERY = gql`
     }
   }
 `;
+
+export const UPDATE_RESERVATION = gql`
+  mutation UpdateReservation($input: ReservationUpdateMutationInput!) {
+    updateReservation(input: $input) {
+      pk
+      state
+    }
+  }
+`;
+
+export const CONFIRM_RESERVATION = gql`
+  mutation ConfirmReservation($input: ReservationConfirmMutationInput!) {
+    confirmReservation(input: $input) {
+      pk
+      state
+      order {
+        id
+        checkoutUrl
+      }
+    }
+  }
+`;
+
+export const DELETE_RESERVATION = gql`
+  mutation DeleteReservation($input: ReservationDeleteTentativeMutationInput!) {
+    deleteTentativeReservation(input: $input) {
+      deleted
+    }
+  }
+`;

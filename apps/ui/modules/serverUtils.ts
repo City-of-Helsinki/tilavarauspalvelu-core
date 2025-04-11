@@ -1,5 +1,5 @@
 import { env } from "@/env.mjs";
-import { NormalizedCacheObject, type ApolloClient } from "@apollo/client";
+import { gql, NormalizedCacheObject, type ApolloClient } from "@apollo/client";
 import {
   TermsType,
   TermsOfUseDocument,
@@ -101,3 +101,11 @@ export async function getReservationByOrderUuid(
 
   return data?.reservation ?? null;
 }
+
+export const GET_ORDER = gql`
+  query Order($orderUuid: String!) {
+    order(orderUuid: $orderUuid) {
+      ...OrderFields
+    }
+  }
+`;

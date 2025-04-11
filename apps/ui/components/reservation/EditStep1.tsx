@@ -30,6 +30,7 @@ import { getReservationPath } from "@/modules/urls";
 import { useDisplayError } from "common/src/hooks";
 import { useRouter } from "next/router";
 import ErrorComponent from "next/error";
+import { gql } from "@apollo/client";
 
 type Props = {
   reservation: EditPageReservationFragment;
@@ -217,3 +218,14 @@ export function EditStep1({
     </>
   );
 }
+
+export const ADJUST_RESERVATION_TIME = gql`
+  mutation AdjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
+    adjustReservationTime(input: $input) {
+      pk
+      state
+      begin
+      end
+    }
+  }
+`;

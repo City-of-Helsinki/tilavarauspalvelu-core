@@ -895,7 +895,11 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
     $state: [ReservationStateChoice]
   ) {
     reservationUnit(id: $id) {
-      ...ReservationUnitNameFields
+      id
+      pk
+      nameFi
+      nameEn
+      nameSv
       ...AvailableTimesReservationUnitFields
       ...NotReservableFields
       ...ReservationTimePickerFields
@@ -946,6 +950,14 @@ export const RELATED_RESERVATION_UNITS_QUERY = gql`
           ...RelatedUnitCardFields
         }
       }
+    }
+  }
+`;
+
+export const CREATE_RESERVATION = gql`
+  mutation CreateReservation($input: ReservationCreateMutationInput!) {
+    createReservation(input: $input) {
+      pk
     }
   }
 `;
