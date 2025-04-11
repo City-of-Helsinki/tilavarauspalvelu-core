@@ -7142,7 +7142,6 @@ export type BlockingReservationFieldsFragment = {
   readonly begin: string;
   readonly end: string;
   readonly numPersons: number | null;
-  readonly calendarUrl: string;
   readonly bufferTimeBefore: number;
   readonly bufferTimeAfter: number;
   readonly affectedReservationUnits: ReadonlyArray<number | null>;
@@ -9064,7 +9063,6 @@ export type ReservationUnitPageQuery = {
     readonly begin: string;
     readonly end: string;
     readonly numPersons: number | null;
-    readonly calendarUrl: string;
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
     readonly affectedReservationUnits: ReadonlyArray<number | null>;
@@ -10662,7 +10660,6 @@ export const BlockingReservationFieldsFragmentDoc = gql`
     begin
     end
     numPersons
-    calendarUrl
     bufferTimeBefore
     bufferTimeAfter
     affectedReservationUnits
