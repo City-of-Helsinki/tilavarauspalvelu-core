@@ -104,7 +104,7 @@ export function ReservationKeylessEntry({
   return (
     <Accordion
       id="reservation__access-type"
-      heading={t("RequestedReservation.keylessEntry")}
+      heading={t("RequestedReservation.keylessEntryHeader")}
       initiallyOpen={isAccessCodeActiveIncorrect}
     >
       <div>
@@ -137,22 +137,22 @@ function ReservationKeylessEntrySingle({
 
   return (
     <SummaryHorizontal>
-      <DataWrapper label={t("RequestedReservation.accessCodeLabel")}>
+      <DataWrapper label={t("accessType:type.ACCESS_CODE")}>
         {pindoraInfo?.accessCode ?? "-"}
       </DataWrapper>
 
       <Flex $alignItems="center" $gap="xs" $direction="row">
-        <DataWrapper label={t("RequestedReservation.accessCodeStatusLabel")}>
+        <DataWrapper label={t("accessType:status.label")}>
           {pindoraInfo?.accessCodeIsActive
-            ? t("RequestedReservation.accessCodeStatusActive")
-            : t("RequestedReservation.accessCodeStatusInactive")}
+            ? t("accessType:status.active")
+            : t("accessType:status.inactive")}
         </DataWrapper>
         {!reservation.isAccessCodeIsActiveCorrect && (
           <IconAlertCircleFill color="var(--color-error)" />
         )}
       </Flex>
 
-      <DataWrapper label={t("RequestedReservation.accessCodeValidityLabel")}>
+      <DataWrapper label={t("accessType:validity.label")}>
         {reservation.pindoraInfo
           ? `${formatTime(pindoraInfo?.accessCodeBeginsAt)}–${formatTime(pindoraInfo?.accessCodeEndsAt)}`
           : "-"}
@@ -188,15 +188,15 @@ function ReservationKeylessEntryRecurring({
 
   return (
     <SummaryHorizontal $isRecurring>
-      <DataWrapper label={t("RequestedReservation.accessCodeLabel")}>
+      <DataWrapper label={t("accessType:type.ACCESS_CODE")}>
         {pindoraInfo?.accessCode ?? "-"}
       </DataWrapper>
 
       <Flex $alignItems="center" $gap="xs" $direction="row">
-        <DataWrapper label={t("RequestedReservation.accessCodeStatusLabel")}>
+        <DataWrapper label={t("accessType:status.label")}>
           {pindoraInfo?.accessCodeIsActive
-            ? t("RequestedReservation.accessCodeStatusActive")
-            : t("RequestedReservation.accessCodeStatusInactive")}
+            ? t("accessType:status.active")
+            : t("accessType:status.inactive")}
         </DataWrapper>
         {!reservation.recurringReservation.isAccessCodeIsActiveCorrect && (
           <IconAlertCircleFill color="var(--color-error)" />
@@ -211,7 +211,7 @@ function ReservationKeylessEntryRecurring({
       </DataWrapper>
 
       <Flex $alignItems="center" $gap="xs" $direction="row">
-        <DataWrapper label={t("RequestedReservation.accessCodeValidityLabel")}>
+        <DataWrapper label={t("accessType:validity.label")}>
           <NoWrap>
             {validityBeginsTime
               ? `${formatTime(validityBeginsTime)}–${formatTime(validityEndsTime)}`
@@ -220,7 +220,7 @@ function ReservationKeylessEntryRecurring({
         </DataWrapper>
         {validityBeginsTime && (
           <Tooltip placement="top">
-            {t("RequestedReservation.accessCodeValidityFromNextReservation")} (
+            {t("accessType:validity.fromNextReservation")} (
             {formatDate(validityBeginsTime)})
           </Tooltip>
         )}
@@ -320,7 +320,7 @@ function AccessCodeChangeRepairButton({
 
         await repairMutation(payload);
         successToast({
-          text: t("RequestedReservation.accessCodeRepairedSuccess"),
+          text: t("accessType:actions.repairSuccess"),
         });
       } else {
         const changeMutation = reservation.recurringReservation
@@ -329,7 +329,7 @@ function AccessCodeChangeRepairButton({
 
         await changeMutation(payload);
         successToast({
-          text: t("RequestedReservation.accessCodeChangedSuccess"),
+          text: t("accessType:actions.changeSuccess"),
         });
       }
       onSuccess(); // refetch reservation
@@ -367,24 +367,20 @@ function AccessCodeChangeRepairButton({
         disabled={!hasPermission || isReservationEnded}
       >
         {reservation.isAccessCodeIsActiveCorrect
-          ? t("RequestedReservation.accessCodeChange")
-          : t("RequestedReservation.accessCodeRepair")}
+          ? t("accessType:actions.change")
+          : t("accessType:actions.repair")}
       </Button>
       <ConfirmationDialog
         isOpen={isModalOpen}
         onAccept={() => handleExecuteMutation()}
         onCancel={() => setIsModalOpen(false)}
-        heading={
-          reservation.recurringReservation
-            ? t("RequestedReservation.accessCodeChangeMultiple")
-            : t("RequestedReservation.accessCodeChange")
-        }
-        content={
-          reservation.recurringReservation
-            ? t("RequestedReservation.accessCodeChangeConfirmMultiple")
-            : t("RequestedReservation.accessCodeChangeConfirm")
-        }
-        acceptLabel={t("RequestedReservation.accessCodeChange")}
+        heading={t(
+          `accessType:actions.change${reservation.recurringReservation ? "Multiple" : ""}`
+        )}
+        content={t(
+          `accessType:actions.changeConfirmation${reservation.recurringReservation ? "Multiple" : ""}`
+        )}
+        acceptLabel={t("accessType:actions.change")}
         cancelLabel={t("RequestedReservation.cancel")}
         acceptIcon={<IconRefresh />}
       />

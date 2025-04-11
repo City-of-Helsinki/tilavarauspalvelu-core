@@ -17,9 +17,8 @@ class ReservationUnitAccessTypeNode(DjangoNode):
         model = ReservationUnitAccessType
         fields = [
             "pk",
-            "begin_date",
             "access_type",
-            "reservation_unit",
+            "begin_date",
         ]
         filterset_class = ReservationUnitAccessTypeFilterSet
         permission_classes = [ReservationUnitAccessTypePermission]

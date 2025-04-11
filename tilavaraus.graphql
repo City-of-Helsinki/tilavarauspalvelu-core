@@ -3927,7 +3927,6 @@ type ReservationUnitAccessTypeNode implements Node {
   """
   id: ID!
   pk: Int
-  reservationUnit: ReservationUnitNode!
 }
 
 """
@@ -4214,7 +4213,6 @@ type ReservationUnitNode implements Node {
     """
     orderBy: [ReservationUnitAccessTypeOrderingChoices]
     pk: [Int]
-    reservationUnit: [Int]
   ): [ReservationUnitAccessTypeNode!]!
   allowReservationsWithoutOpeningHours: Boolean!
   applicationRoundTimeSlots: [ApplicationRoundTimeSlotNode!]!

@@ -3762,7 +3762,6 @@ export type ReservationUnitAccessTypeNode = Node & {
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
   readonly pk: Maybe<Scalars["Int"]["output"]>;
-  readonly reservationUnit: ReservationUnitNode;
 };
 
 /** Ordering fields for the 'ReservationUnitAccessType' model. */
@@ -4198,9 +4197,6 @@ export type ReservationUnitNodeAccessTypesArgs = {
     ReadonlyArray<InputMaybe<ReservationUnitAccessTypeOrderingChoices>>
   >;
   pk?: InputMaybe<ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>>;
-  reservationUnit?: InputMaybe<
-    ReadonlyArray<InputMaybe<Scalars["Int"]["input"]>>
-  >;
 };
 
 export type ReservationUnitNodeApplicationRoundsArgs = {
@@ -6974,6 +6970,12 @@ export type ReservationUnitEditQuery = {
         readonly begin: string;
         readonly end: string;
       } | null>;
+    }>;
+    readonly accessTypes: ReadonlyArray<{
+      readonly id: string;
+      readonly pk: number | null;
+      readonly accessType: AccessType;
+      readonly beginDate: string;
     }>;
   } | null;
 };
@@ -13195,6 +13197,12 @@ export const ReservationUnitEditDocument = gql`
       }
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlots
+      }
+      accessTypes(isActiveOrFuture: true) {
+        id
+        pk
+        accessType
+        beginDate
       }
     }
   }

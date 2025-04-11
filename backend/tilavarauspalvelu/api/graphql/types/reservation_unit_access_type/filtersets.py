@@ -23,8 +23,6 @@ __all__ = [
 
 class ReservationUnitAccessTypeFilterSet(ModelFilterSet):
     pk = IntMultipleChoiceFilter()
-    reservation_unit = IntMultipleChoiceFilter()
-
     is_active_or_future = django_filters.BooleanFilter(method="filter_is_active_or_future")
 
     class Meta:
