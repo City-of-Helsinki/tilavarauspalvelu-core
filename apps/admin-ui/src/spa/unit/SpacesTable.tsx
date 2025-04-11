@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { IconGroup } from "hds-react";
 import { trim } from "lodash-es";
 import { useTranslation } from "react-i18next";
-import { gql } from "@apollo/client";
+import { ApolloError, gql } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ConfirmationDialog } from "common/src/components/ConfirmationDialog";
 import {
@@ -20,6 +20,7 @@ import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
 import { Flex } from "common/styled";
+import { useDisplayError } from "common/src/hooks";
 
 type SpaceT = SpacesTableFragment["spaces"][0];
 
@@ -53,6 +54,7 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
   } = useHDSModal();
 
   const [deleteSpaceMutation] = useDeleteSpaceMutation();
+  const displayError = useDisplayError();
 
   async function deleteSpace(pk: Maybe<number> | undefined) {
     if (pk == null || pk === 0) {
@@ -62,25 +64,19 @@ export function SpacesTable({ unit, refetch }: IProps): JSX.Element {
       const res = await deleteSpaceMutation({
         variables: { input: { pk: String(pk) } },
       });
+      if (res.errors != null && res.errors.length > 0) {
+        throw new ApolloError({
+          graphQLErrors: res.errors,
+        });
+      }
       if (res.data?.deleteSpace?.deleted) {
         setSpaceWaitingForDelete(null);
         refetch();
       } else {
-        // TODO missing translation
         errorToast({ text: t("SpaceTable.removeFailed") });
       }
-    } catch (_) {
-      /* TODO handle this error
-       "extensions": {
-        "code": "MUTATION_VALIDATION_ERROR",
-        "errors": [{
-          "field": "nonFieldErrors",
-          "message": "Space occurs in active application round.",
-          "code": "invalid"
-        }]
-        }
-      */
-      errorToast({ text: t("SpaceTable.removeFailed") });
+    } catch (err) {
+      displayError(err);
     }
   }
 

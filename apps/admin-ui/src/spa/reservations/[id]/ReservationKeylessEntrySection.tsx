@@ -8,8 +8,8 @@ import {
   useRepairReservationAccessCodeSeriesMutation,
   UserPermissionChoice,
 } from "@gql/gql-types";
-import { errorToast, successToast } from "common/src/common/toast";
-import { getValidationErrors } from "common/src/apolloUtils";
+import { successToast } from "common/src/common/toast";
+import { useDisplayError } from "common/src/hooks";
 import {
   Button,
   ButtonSize,
@@ -284,7 +284,7 @@ function AccessCodeChangeRepairButton({
   reservation: ReservationKeylessEntryFragment;
   onSuccess: () => void;
 }>) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [changeAccessCodeMutationSingle] =
@@ -301,6 +301,8 @@ function AccessCodeChangeRepairButton({
     units: [reservation.reservationUnits?.[0]?.unit?.pk ?? 0],
     permission: UserPermissionChoice.CanManageReservations,
   });
+
+  const displayError = useDisplayError();
 
   const handleExecuteMutation = async () => {
     const instance = reservation.recurringReservation || reservation;
@@ -339,27 +341,7 @@ function AccessCodeChangeRepairButton({
   };
 
   const handleExecuteMutationError = (e: unknown) => {
-    const validationErrors = getValidationErrors(e);
-    if (validationErrors.length > 0) {
-      const code = validationErrors[0]?.validation_code;
-      if (code && i18n.exists(`errors.backendValidation.${code}`)) {
-        errorToast({ text: t(`errors.backendValidation.${code}`) });
-        return;
-      }
-
-      if (validationErrors[0]?.message || validationErrors[0]?.code) {
-        errorToast({
-          text: validationErrors[0]?.message ?? validationErrors[0]?.code,
-        });
-        return;
-      }
-    }
-
-    if (e instanceof Error) {
-      errorToast({ text: e.message });
-    } else {
-      errorToast({ text: t("errors.descriptive.genericError") });
-    }
+    displayError(e);
   };
 
   const endDate = reservation.recurringReservation?.endDate || reservation.end;

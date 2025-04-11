@@ -104,7 +104,7 @@ import {
 } from "@/modules/urls";
 import { ButtonVariant, LoadingSpinner, Notification } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
-import { useDisplayError } from "@/hooks/useDisplayError";
+import { useDisplayError } from "common/src/hooks";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
 import { gql } from "@apollo/client";
 

@@ -12,12 +12,13 @@ import {
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { getResourceUrl } from "@/common/urls";
 import { CustomTable } from "@/component/Table";
-import { errorToast, successToast } from "common/src/common/toast";
+import { successToast } from "common/src/common/toast";
 import { truncate } from "common/src/helpers";
 import { MAX_NAME_LENGTH } from "@/common/const";
 import { TableLink } from "@/styled";
 import { Flex } from "common/styled";
 import { TFunction } from "next-i18next";
+import { useDisplayError } from "common/src/hooks";
 
 interface IProps {
   unit: ResourceTableFragment;
@@ -111,6 +112,7 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
     handleEditResource,
     handleDeleteResource,
   });
+  const displayError = useDisplayError();
 
   const handleConfirmDelete = async () => {
     if (resourceWaitingForDelete?.pk == null) {
@@ -121,8 +123,8 @@ export function ResourcesTable({ unit, refetch }: IProps): JSX.Element {
       successToast({ text: t("ResourceTable.removeSuccess") });
       setResourceWaitingForDelete(null);
       refetch();
-    } catch (_) {
-      errorToast({ text: t("ResourceTable.removeFailed") });
+    } catch (err) {
+      displayError(err);
     }
   };
 

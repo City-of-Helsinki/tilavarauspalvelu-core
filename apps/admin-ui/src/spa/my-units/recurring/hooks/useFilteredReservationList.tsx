@@ -16,6 +16,7 @@ import { type NewReservationListItem } from "@/component/ReservationsList";
 import { base64encode, timeToMinutes } from "common/src/helpers";
 import { RELATED_RESERVATION_STATES } from "common/src/const";
 import { errorToast } from "common/src/common/toast";
+import { useTranslation } from "react-i18next";
 
 function useReservationsInInterval({
   begin,
@@ -28,6 +29,7 @@ function useReservationsInInterval({
   reservationUnitPk?: number;
   reservationType: ReservationTypeChoice;
 }) {
+  const { t } = useTranslation();
   const apiStart = toApiDate(begin);
   // NOTE backend error, it returns all till 00:00 not 23:59
   const apiEnd = toApiDate(addDays(end, 1));
@@ -54,8 +56,8 @@ function useReservationsInInterval({
       endDate: apiEnd ?? "",
     },
     fetchPolicy: "no-cache",
-    onError: (err) => {
-      errorToast({ text: err.message });
+    onError: () => {
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 

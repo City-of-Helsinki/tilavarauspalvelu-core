@@ -28,10 +28,10 @@ import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { gql, type ApolloQueryResult } from "@apollo/client";
 import { getApplicationUrl } from "@/common/urls";
-import { errorToast } from "common/src/common/toast";
 import { getApplicantName } from "@/helpers";
 import { MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH } from "@/common/const";
 import { formatAgeGroup } from "@/common/util";
+import { useDisplayError } from "common/src/hooks";
 
 export type AllocationApplicationSectionCardType =
   | "unallocated"
@@ -303,6 +303,7 @@ function SchedulesList({
   const thisOption = section.reservationUnitOptions?.find(
     (ruo) => ruo.reservationUnit?.pk === currentReservationUnit.pk
   );
+  const displayError = useDisplayError();
 
   const updateOption = async (
     pk: Maybe<number> | undefined,
@@ -324,8 +325,8 @@ function SchedulesList({
         },
       });
       refetch();
-    } catch (_) {
-      errorToast({ text: t("errors.mutationFailed") });
+    } catch (err) {
+      displayError(err);
     }
   };
 

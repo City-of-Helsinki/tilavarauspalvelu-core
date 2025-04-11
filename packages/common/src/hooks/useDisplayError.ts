@@ -1,5 +1,5 @@
-import { type ApiError, getApiErrors } from "common/src/apolloUtils";
-import { errorToast } from "common/src/common/toast";
+import { type ApiError, getApiErrors } from "../apolloUtils";
+import { errorToast } from "../common/toast";
 import { type TFunction, useTranslation } from "next-i18next";
 
 /// formatErrorMessage
@@ -16,6 +16,11 @@ export function formatErrorMessage(t: TFunction, err: ApiError): string {
   return t(`errors:api.${err.code}`);
 }
 
+/// useDisplayError
+/// convert backend error code to user friendly message and toast it
+/// only usable for mutations
+/// you can pass the error object directly from the catch block
+/// NOTE don't use this for queries (they don't return an error code)
 export function useDisplayError() {
   const { t } = useTranslation();
 

@@ -24,10 +24,10 @@ import { useModal } from "@/context/ModalContext";
 import { CenterSpinner, Flex } from "common/styled";
 import { CustomDialogHeader } from "@/component/CustomDialogHeader";
 import { useDenyReasonOptions } from "@/hooks";
-import { successToast, errorToast } from "common/src/common/toast";
-import { gql } from "@apollo/client";
-import { getValidationErrors } from "common/src/apolloUtils";
+import { successToast } from "common/src/common/toast";
+import { ApolloError, gql } from "@apollo/client";
 import { convertOptionToHDS, toNumber } from "common/src/helpers";
+import { useDisplayError } from "common/src/hooks";
 
 const ActionButtons = styled(Dialog.ActionButtons)`
   justify-content: end;
@@ -271,6 +271,8 @@ export function DenyDialog({
     convertToReturnState(reservation)
   );
 
+  const displayError = useDisplayError();
+
   const refundReservation = async (input: ReservationRefundMutationInput) => {
     try {
       await refundReservationMutation({ variables: { input } });
@@ -278,11 +280,7 @@ export function DenyDialog({
         text: t("RequestedReservation.DenyDialog.refund.mutationSuccess"),
       });
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("Refund failed with: ", err);
-      errorToast({
-        text: t("RequestedReservation.DenyDialog.refund.mutationFailure"),
-      });
+      displayError(err);
     }
   };
 
@@ -304,30 +302,21 @@ export function DenyDialog({
         handlingDetails,
       });
 
-      // TODO check that the data is valid
       if (res.errors != null && res.errors.length > 0) {
-        errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
-      } else {
-        if (shouldRefund) {
-          // TODO check errors and valid reposponse
-          await refundReservation({ pk: reservation.pk });
-        } else {
-          successToast({
-            text: t("RequestedReservation.DenyDialog.successNotify"),
-          });
-        }
-        onReject();
-      }
-    } catch (e) {
-      const validationErrors = getValidationErrors(e);
-      const validationError = validationErrors[0];
-      if (validationError != null) {
-        errorToast({
-          text: t(`errors.backendValidation.${validationError.code}`),
+        throw new ApolloError({
+          graphQLErrors: res.errors,
         });
-      } else {
-        errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
       }
+      if (shouldRefund) {
+        await refundReservation({ pk: reservation.pk });
+      } else {
+        successToast({
+          text: t("RequestedReservation.DenyDialog.successNotify"),
+        });
+      }
+      onReject();
+    } catch (err) {
+      displayError(err);
     }
   };
 
@@ -364,6 +353,7 @@ export function DenyDialogSeries({
 }): JSX.Element {
   const { t } = useTranslation();
   const [denyMutation] = useDenyReservationSeriesMutation();
+  const displayError = useDisplayError();
 
   const handleDeny = async (vars: DenyVariables) => {
     const { handlingDetails, denyReasonPk } = vars;
@@ -383,23 +373,17 @@ export function DenyDialogSeries({
       };
       const res = await denyMutation({ variables: { input } });
 
-      if (res.errors != null && res.errors?.length > 0) {
-        errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
+      if (res.errors != null && res.errors.length > 0) {
+        throw new ApolloError({
+          graphQLErrors: res.errors,
+        });
       }
       successToast({
         text: t("RequestedReservation.DenyDialog.successNotify"),
       });
       onReject();
-    } catch (e) {
-      const validationErrors = getValidationErrors(e);
-      const validationError = validationErrors[0];
-      if (validationError != null) {
-        errorToast({
-          text: t(`errors.backendValidation.${validationError.code}`),
-        });
-      } else {
-        errorToast({ text: t("RequestedReservation.DenyDialog.errorSaving") });
-      }
+    } catch (err) {
+      displayError(err);
     }
   };
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { gql, type ApolloError } from "@apollo/client";
+import { gql } from "@apollo/client";
 import {
   ReservationOrderingChoices,
   useReservationListQuery,
@@ -16,6 +16,7 @@ import { useSearchParams } from "react-router-dom";
 import { transformReservationTypeSafe } from "common/src/conversion";
 import { errorToast } from "common/src/common/toast";
 import { CenterSpinner } from "common/styled";
+import { useTranslation } from "react-i18next";
 
 function transformPaymentStatusSafe(t: string): OrderStatusWithFree | null {
   switch (t) {
@@ -139,6 +140,7 @@ function mapFilterParams(
 }
 
 export function ReservationsDataLoader(): JSX.Element {
+  const { t } = useTranslation();
   const [sort, setSort] = useState<string>("-state");
   const onSortChanged = (sortField: string) => {
     if (sort === sortField) {
@@ -160,8 +162,8 @@ export function ReservationsDataLoader(): JSX.Element {
       first: LIST_PAGE_SIZE,
       ...mapFilterParams(searchParams),
     },
-    onError: (err: ApolloError) => {
-      errorToast({ text: err.message });
+    onError: () => {
+      errorToast({ text: t("errors.errorFetchingData") });
     },
   });
 

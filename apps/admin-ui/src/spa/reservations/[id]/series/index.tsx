@@ -55,10 +55,8 @@ import { fromAPIDateTime, getBufferTime } from "@/helpers";
 import { BufferToggles } from "@/component/BufferToggles";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { getReservationUrl } from "@/common/urls";
-import {
-  getSeriesOverlapErrors,
-  getValidationErrors,
-} from "common/src/apolloUtils";
+import { getSeriesOverlapErrors } from "common/src/apolloUtils";
+import { useDisplayError } from "common/src/hooks";
 import { generateReservations } from "@/spa/my-units/recurring/generateReservations";
 import Error404 from "@/common/Error404";
 
@@ -182,6 +180,7 @@ function SeriesPageInner({ pk }: { pk: number }) {
 
   const client = useApolloClient();
   const navigate = useNavigate();
+  const displayError = useDisplayError();
 
   const onSubmit = async (values: RescheduleReservationSeriesForm) => {
     setLocalError(null);
@@ -280,18 +279,10 @@ function SeriesPageInner({ pk }: { pk: number }) {
             .getElementById("edit-recurring__reservations-list")
             ?.scrollIntoView();
         } else {
-          const validationErrors = getValidationErrors(err);
-          const validationError = validationErrors[0];
-          if (validationError != null) {
-            errorToast({
-              text: t(`errors.backendValidation.${validationError.code}`),
-            });
-          } else {
-            errorToast({ text: t("ReservationDialog.saveFailed") });
-          }
+          displayError(err);
         }
       } else {
-        errorToast({ text: t("ReservationDialog.saveFailed") });
+        displayError(err);
       }
     }
   };

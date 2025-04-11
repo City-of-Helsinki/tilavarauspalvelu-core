@@ -1,5 +1,5 @@
 import React from "react";
-import { gql, type ApolloError } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "next-i18next";
 import {
@@ -42,8 +42,8 @@ export function ApplicationDataLoader({
       textSearch: nameFilter,
       orderBy: transformOrderBy(orderBy),
     },
-    onError: (err: ApolloError) => {
-      errorToast({ text: err.message });
+    onError: () => {
+      errorToast({ text: t("errors.errorFetchingData") });
     },
     fetchPolicy: "cache-and-network",
     // TODO enable or no?

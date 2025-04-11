@@ -38,7 +38,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormSubHeading } from "@/components/application/styled";
 import { createApolloClient } from "@/modules/apolloClient";
 import { gql } from "@apollo/client";
-import { useDisplayError } from "@/hooks/useDisplayError";
+import { useDisplayError } from "common/src/hooks";
 
 function Page3Form(): JSX.Element | null {
   const { options } = useOptions();

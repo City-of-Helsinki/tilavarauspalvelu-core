@@ -18,18 +18,19 @@ export const dateTime = (date: string, time: string): string => {
   return parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date()).toISOString();
 };
 
-export function parseDateTimeSafe(
-  date: string,
-  time: string
-): Date | undefined {
+export function constructDateTimeUnsafe(date: string, time: string): Date {
+  const d = parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date());
+  if (!isValid(d)) {
+    throw new Error("Invalid date");
+  }
+  return d;
+}
+
+export function constructDateTimeSafe(date: string, time: string): Date | null {
   try {
-    const d = parse(`${date} ${time}`, "dd.MM.yyyy HH:mm", new Date());
-    if (Number.isNaN(d.getTime())) {
-      return undefined;
-    }
-    return d;
+    return constructDateTimeUnsafe(date, time);
   } catch (_) {
-    return undefined;
+    return null;
   }
 }
 
@@ -55,13 +56,24 @@ export function fromAPIDateTime(
 // TODO this requires a bit of thought, why are we prefering ISO strings over Date objects?
 // we should have valid Date object for all the checks
 // convert it to ISO string only in mutations after the validation
-export function constructApiDate(date: string, time: string): string | null {
-  if (date === "" || time === "") {
+export function constructApiDateTime(
+  date: string,
+  time: string
+): string | null {
+  try {
+    return constructApiDateTimeUnsafe(date, time);
+  } catch (_) {
     return null;
   }
+}
+
+export function constructApiDateTimeUnsafe(date: string, time: string): string {
+  if (date === "" || time === "") {
+    throw new Error("Invalid date or time");
+  }
   const d = fromUIDate(date);
-  if (!d || Number.isNaN(d.getTime())) {
-    return null;
+  if (d == null || isValid(d)) {
+    throw new Error("Invalid date");
   }
   const d2 = setTimeOnDate(d, time);
   return d2.toISOString();

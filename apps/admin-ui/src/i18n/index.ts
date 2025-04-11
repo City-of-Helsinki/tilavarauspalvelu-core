@@ -4,6 +4,7 @@ import messages from "./messages";
 
 import * as reservationApplicationFi from "./locales/fi/reservationApplication.json";
 import * as reservationFormFi from "./locales/fi/reservationForm.json";
+import * as errors from "./locales/fi/errors.json";
 
 i18n.use(initReactI18next).init({
   resources: messages,
@@ -87,42 +88,6 @@ i18n.addResourceBundle("fi", "forms", {
   // duplicated in reservationForm.json (translation system is borked and cant be shared)
   invalidEmail: "Sähköpostin tulee olla oikeassa muodossa (sisältäen @-merkin)",
 });
-
-i18n.addResourceBundle("fi", "errors", {
-  generic: {
-    heading: "Jokin meni vikaan",
-    body: "Pahoittelut, emme valitettavasti pysty näyttämään sivua juuri nyt.",
-    body2: "Yritä myöhemmin uudelleen!",
-  },
-  403: {
-    heading: "Ei käyttöoikeuksia sivulle",
-    body: "Voit nähdä sivun sisällön, jos kirjaudut sisään ja sinulla on riittävät käyttö-oikeudet.",
-    body2:
-      "Esihenkilö tai toimipisteesi pääkäyttäjä voi pyytää sinulle käyttöoikeudet Varaamon asiakaspalvelusta.",
-  },
-  404: {
-    heading: "Sivua ei valitettavasti löytynyt",
-    body: "Tarkista, että sivun osoite on kirjoitettu oikein. Olemme myös saattaneet poistaa tai siirtää sivun.",
-  },
-  500: {
-    heading: "Jotain meni pieleen",
-    body: "Pahoittelut, emme valitettavasti pysty näyttämään sivua juuri nyt.",
-  },
-  503: {
-    heading: "Palaamme pian!",
-    body: "Päivitämme Varaamo-palvelua. Kiitos kärsivällisyydestä!",
-  },
-  buttons: {
-    backToHome: "Siirry Varaamon etusivulle",
-    giveFeedback: "Anna palautetta",
-  },
-  deactivatedAccount: {
-    heading: "Käyttäjätunnuksesi ei ole voimassa.",
-    subHeadingA: "Ota yhteyttä asiakaspalveluun sähköpostitse",
-    subHeadingB: "tai Ota yhteyttä-lomakkeella.",
-    email: "varaamo@hel.fi",
-    button: "Ota yhteyttä",
-  },
-});
+i18n.addResourceBundle("fi", "errors", errors);
 
 export default i18n;
