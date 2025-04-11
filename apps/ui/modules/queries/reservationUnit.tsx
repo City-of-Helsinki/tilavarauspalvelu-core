@@ -45,7 +45,6 @@ export const BLOCKING_RESERVATION_FRAGMENT = gql`
     begin
     end
     numPersons
-    calendarUrl
     bufferTimeBefore
     bufferTimeAfter
     affectedReservationUnits
