@@ -3099,12 +3099,12 @@ export type ReservationMetadataSetNodeEdge = {
 
 export type ReservationNode = Node & {
   readonly accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
-  readonly accessCodeIsActive: Scalars["Boolean"]["output"];
+  readonly accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
   readonly accessCodeShouldBeActive: Maybe<Scalars["Boolean"]["output"]>;
-  readonly accessType: AccessType;
+  readonly accessType: Maybe<AccessType>;
   /** Which reservation units' reserveability is affected by this reservation? */
-  readonly affectedReservationUnits: ReadonlyArray<
-    Maybe<Scalars["Int"]["output"]>
+  readonly affectedReservationUnits: Maybe<
+    ReadonlyArray<Maybe<Scalars["Int"]["output"]>>
   >;
   readonly ageGroup: Maybe<AgeGroupNode>;
   readonly applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
@@ -3118,7 +3118,7 @@ export type ReservationNode = Node & {
   readonly billingPhone: Maybe<Scalars["String"]["output"]>;
   readonly bufferTimeAfter: Scalars["Duration"]["output"];
   readonly bufferTimeBefore: Scalars["Duration"]["output"];
-  readonly calendarUrl: Scalars["String"]["output"];
+  readonly calendarUrl: Maybe<Scalars["String"]["output"]>;
   readonly cancelDetails: Maybe<Scalars["String"]["output"]>;
   readonly cancelReason: Maybe<ReservationCancelReasonNode>;
   readonly createdAt: Maybe<Scalars["DateTime"]["output"]>;
@@ -3132,7 +3132,7 @@ export type ReservationNode = Node & {
   readonly homeCity: Maybe<CityNode>;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly isAccessCodeIsActiveCorrect: Scalars["Boolean"]["output"];
+  readonly isAccessCodeIsActiveCorrect: Maybe<Scalars["Boolean"]["output"]>;
   readonly isBlocked: Scalars["Boolean"]["output"];
   readonly isHandled: Maybe<Scalars["Boolean"]["output"]>;
   readonly name: Maybe<Scalars["String"]["output"]>;
