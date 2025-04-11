@@ -495,7 +495,6 @@ describe("isRangeReservable", () => {
         end: end.toISOString(),
         isBlocked,
         numPersons: null,
-        calendarUrl: "",
         affectedReservationUnits: [],
       };
     }

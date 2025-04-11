@@ -3099,12 +3099,12 @@ export type ReservationMetadataSetNodeEdge = {
 
 export type ReservationNode = Node & {
   readonly accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
-  readonly accessCodeIsActive: Scalars["Boolean"]["output"];
+  readonly accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
   readonly accessCodeShouldBeActive: Maybe<Scalars["Boolean"]["output"]>;
-  readonly accessType: AccessType;
+  readonly accessType: Maybe<AccessType>;
   /** Which reservation units' reserveability is affected by this reservation? */
-  readonly affectedReservationUnits: ReadonlyArray<
-    Maybe<Scalars["Int"]["output"]>
+  readonly affectedReservationUnits: Maybe<
+    ReadonlyArray<Maybe<Scalars["Int"]["output"]>>
   >;
   readonly ageGroup: Maybe<AgeGroupNode>;
   readonly applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
@@ -3118,7 +3118,7 @@ export type ReservationNode = Node & {
   readonly billingPhone: Maybe<Scalars["String"]["output"]>;
   readonly bufferTimeAfter: Scalars["Duration"]["output"];
   readonly bufferTimeBefore: Scalars["Duration"]["output"];
-  readonly calendarUrl: Scalars["String"]["output"];
+  readonly calendarUrl: Maybe<Scalars["String"]["output"]>;
   readonly cancelDetails: Maybe<Scalars["String"]["output"]>;
   readonly cancelReason: Maybe<ReservationCancelReasonNode>;
   readonly createdAt: Maybe<Scalars["DateTime"]["output"]>;
@@ -3132,7 +3132,7 @@ export type ReservationNode = Node & {
   readonly homeCity: Maybe<CityNode>;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly isAccessCodeIsActiveCorrect: Scalars["Boolean"]["output"];
+  readonly isAccessCodeIsActiveCorrect: Maybe<Scalars["Boolean"]["output"]>;
   readonly isBlocked: Scalars["Boolean"]["output"];
   readonly isHandled: Maybe<Scalars["Boolean"]["output"]>;
   readonly name: Maybe<Scalars["String"]["output"]>;
@@ -5868,8 +5868,8 @@ export type ApplicationSectionReservationFragment = {
           readonly pk: number | null;
           readonly end: string;
           readonly state: ReservationStateChoice | null;
-          readonly accessType: AccessType;
-          readonly accessCodeIsActive: boolean;
+          readonly accessType: AccessType | null;
+          readonly accessCodeIsActive: boolean | null;
           readonly begin: string;
           readonly pindoraInfo: {
             readonly accessCode: string;
@@ -5974,8 +5974,8 @@ export type ApplicationReservationsQuery = {
               readonly pk: number | null;
               readonly end: string;
               readonly state: ReservationStateChoice | null;
-              readonly accessType: AccessType;
-              readonly accessCodeIsActive: boolean;
+              readonly accessType: AccessType | null;
+              readonly accessCodeIsActive: boolean | null;
               readonly begin: string;
               readonly pindoraInfo: {
                 readonly accessCode: string;
@@ -6565,7 +6565,7 @@ export type EditPageReservationFragment = {
   readonly price: string | null;
   readonly taxPercentageValue: string | null;
   readonly state: ReservationStateChoice | null;
-  readonly accessType: AccessType;
+  readonly accessType: AccessType | null;
   readonly applyingForFreeOfCharge: boolean | null;
   readonly freeOfChargeReason: string | null;
   readonly description: string | null;
@@ -6714,7 +6714,7 @@ export type ReservationCardFragment = {
   readonly begin: string;
   readonly end: string;
   readonly state: ReservationStateChoice | null;
-  readonly accessType: AccessType;
+  readonly accessType: AccessType | null;
   readonly id: string;
   readonly price: string | null;
   readonly applyingForFreeOfCharge: boolean | null;
@@ -6767,7 +6767,7 @@ export type ReservationInfoCardFragment = {
   readonly pk: number | null;
   readonly taxPercentageValue: string | null;
   readonly state: ReservationStateChoice | null;
-  readonly accessType: AccessType;
+  readonly accessType: AccessType | null;
   readonly price: string | null;
   readonly begin: string;
   readonly end: string;
@@ -7418,10 +7418,9 @@ export type BlockingReservationFieldsFragment = {
   readonly begin: string;
   readonly end: string;
   readonly numPersons: number | null;
-  readonly calendarUrl: string;
   readonly bufferTimeBefore: number;
   readonly bufferTimeAfter: number;
-  readonly affectedReservationUnits: ReadonlyArray<number | null>;
+  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
 };
 
 export type IsReservableFieldsFragment = {
@@ -8609,8 +8608,8 @@ export type ApplicationSectionViewQuery = {
                 readonly pk: number | null;
                 readonly end: string;
                 readonly state: ReservationStateChoice | null;
-                readonly accessType: AccessType;
-                readonly accessCodeIsActive: boolean;
+                readonly accessType: AccessType | null;
+                readonly accessCodeIsActive: boolean | null;
                 readonly begin: string;
                 readonly pindoraInfo: {
                   readonly accessCode: string;
@@ -8999,14 +8998,14 @@ export type ReservationQuery = {
     readonly name: string | null;
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
-    readonly calendarUrl: string;
+    readonly calendarUrl: string | null;
     readonly applyingForFreeOfCharge: boolean | null;
     readonly freeOfChargeReason: string | null;
     readonly description: string | null;
     readonly numPersons: number | null;
     readonly taxPercentageValue: string | null;
     readonly state: ReservationStateChoice | null;
-    readonly accessType: AccessType;
+    readonly accessType: AccessType | null;
     readonly reserveeFirstName: string | null;
     readonly reserveeLastName: string | null;
     readonly reserveeEmail: string | null;
@@ -9327,10 +9326,9 @@ export type ReservationUnitPageQuery = {
     readonly begin: string;
     readonly end: string;
     readonly numPersons: number | null;
-    readonly calendarUrl: string;
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
-    readonly affectedReservationUnits: ReadonlyArray<number | null>;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
   }> | null;
 };
 
@@ -9399,7 +9397,7 @@ export type ReservationCancelPageQuery = {
     readonly pk: number | null;
     readonly taxPercentageValue: string | null;
     readonly state: ReservationStateChoice | null;
-    readonly accessType: AccessType;
+    readonly accessType: AccessType | null;
     readonly price: string | null;
     readonly begin: string;
     readonly end: string;
@@ -9500,7 +9498,7 @@ export type ReservationConfirmationPageQuery = {
     readonly id: string;
     readonly pk: number | null;
     readonly name: string | null;
-    readonly calendarUrl: string;
+    readonly calendarUrl: string | null;
     readonly reserveeFirstName: string | null;
     readonly reserveeLastName: string | null;
     readonly reserveeEmail: string | null;
@@ -9523,7 +9521,7 @@ export type ReservationConfirmationPageQuery = {
     readonly numPersons: number | null;
     readonly taxPercentageValue: string | null;
     readonly state: ReservationStateChoice | null;
-    readonly accessType: AccessType;
+    readonly accessType: AccessType | null;
     readonly price: string | null;
     readonly begin: string;
     readonly end: string;
@@ -9618,7 +9616,7 @@ export type ReservationEditPageQuery = {
     readonly price: string | null;
     readonly taxPercentageValue: string | null;
     readonly state: ReservationStateChoice | null;
-    readonly accessType: AccessType;
+    readonly accessType: AccessType | null;
     readonly applyingForFreeOfCharge: boolean | null;
     readonly freeOfChargeReason: string | null;
     readonly description: string | null;
@@ -9781,10 +9779,9 @@ export type BlockingReservationsQuery = {
     readonly begin: string;
     readonly end: string;
     readonly numPersons: number | null;
-    readonly calendarUrl: string;
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
-    readonly affectedReservationUnits: ReadonlyArray<number | null>;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
   }> | null;
 };
 
@@ -9820,7 +9817,7 @@ export type ReservationPageQuery = {
     readonly id: string;
     readonly pk: number | null;
     readonly applyingForFreeOfCharge: boolean | null;
-    readonly calendarUrl: string;
+    readonly calendarUrl: string | null;
     readonly reserveeFirstName: string | null;
     readonly reserveeLastName: string | null;
     readonly reserveeEmail: string | null;
@@ -9843,7 +9840,7 @@ export type ReservationPageQuery = {
     readonly numPersons: number | null;
     readonly taxPercentageValue: string | null;
     readonly state: ReservationStateChoice | null;
-    readonly accessType: AccessType;
+    readonly accessType: AccessType | null;
     readonly end: string;
     readonly isHandled: boolean | null;
     readonly price: string | null;
@@ -10010,7 +10007,7 @@ export type ListReservationsQuery = {
         readonly begin: string;
         readonly end: string;
         readonly state: ReservationStateChoice | null;
-        readonly accessType: AccessType;
+        readonly accessType: AccessType | null;
         readonly id: string;
         readonly price: string | null;
         readonly applyingForFreeOfCharge: boolean | null;
@@ -11154,7 +11151,6 @@ export const BlockingReservationFieldsFragmentDoc = gql`
     begin
     end
     numPersons
-    calendarUrl
     bufferTimeBefore
     bufferTimeAfter
     affectedReservationUnits

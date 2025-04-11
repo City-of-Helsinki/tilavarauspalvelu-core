@@ -3225,13 +3225,13 @@ type ReservationMetadataSetNodeEdge {
 
 type ReservationNode implements Node {
   accessCodeGeneratedAt: DateTime
-  accessCodeIsActive: Boolean!
+  accessCodeIsActive: Boolean
   accessCodeShouldBeActive: Boolean
-  accessType: AccessType!
+  accessType: AccessType
   """
   Which reservation units' reserveability is affected by this reservation?
   """
-  affectedReservationUnits: [Int]!
+  affectedReservationUnits: [Int]
   ageGroup: AgeGroupNode
   applyingForFreeOfCharge: Boolean
   begin: DateTime!
@@ -3244,7 +3244,7 @@ type ReservationNode implements Node {
   billingPhone: String
   bufferTimeAfter: Duration!
   bufferTimeBefore: Duration!
-  calendarUrl: String!
+  calendarUrl: String
   cancelDetails: String
   cancelReason: ReservationCancelReasonNode
   createdAt: DateTime
@@ -3260,7 +3260,7 @@ type ReservationNode implements Node {
   The ID of the object
   """
   id: ID!
-  isAccessCodeIsActiveCorrect: Boolean!
+  isAccessCodeIsActiveCorrect: Boolean
   isBlocked: Boolean!
   isHandled: Boolean
   name: String

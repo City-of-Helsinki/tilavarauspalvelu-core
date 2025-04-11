@@ -3099,12 +3099,12 @@ export type ReservationMetadataSetNodeEdge = {
 
 export type ReservationNode = Node & {
   readonly accessCodeGeneratedAt: Maybe<Scalars["DateTime"]["output"]>;
-  readonly accessCodeIsActive: Scalars["Boolean"]["output"];
+  readonly accessCodeIsActive: Maybe<Scalars["Boolean"]["output"]>;
   readonly accessCodeShouldBeActive: Maybe<Scalars["Boolean"]["output"]>;
-  readonly accessType: AccessType;
+  readonly accessType: Maybe<AccessType>;
   /** Which reservation units' reserveability is affected by this reservation? */
-  readonly affectedReservationUnits: ReadonlyArray<
-    Maybe<Scalars["Int"]["output"]>
+  readonly affectedReservationUnits: Maybe<
+    ReadonlyArray<Maybe<Scalars["Int"]["output"]>>
   >;
   readonly ageGroup: Maybe<AgeGroupNode>;
   readonly applyingForFreeOfCharge: Maybe<Scalars["Boolean"]["output"]>;
@@ -3118,7 +3118,7 @@ export type ReservationNode = Node & {
   readonly billingPhone: Maybe<Scalars["String"]["output"]>;
   readonly bufferTimeAfter: Scalars["Duration"]["output"];
   readonly bufferTimeBefore: Scalars["Duration"]["output"];
-  readonly calendarUrl: Scalars["String"]["output"];
+  readonly calendarUrl: Maybe<Scalars["String"]["output"]>;
   readonly cancelDetails: Maybe<Scalars["String"]["output"]>;
   readonly cancelReason: Maybe<ReservationCancelReasonNode>;
   readonly createdAt: Maybe<Scalars["DateTime"]["output"]>;
@@ -3132,7 +3132,7 @@ export type ReservationNode = Node & {
   readonly homeCity: Maybe<CityNode>;
   /** The ID of the object */
   readonly id: Scalars["ID"]["output"];
-  readonly isAccessCodeIsActiveCorrect: Scalars["Boolean"]["output"];
+  readonly isAccessCodeIsActiveCorrect: Maybe<Scalars["Boolean"]["output"]>;
   readonly isBlocked: Scalars["Boolean"]["output"];
   readonly isHandled: Maybe<Scalars["Boolean"]["output"]>;
   readonly name: Maybe<Scalars["String"]["output"]>;
@@ -6109,8 +6109,8 @@ export type ReservationCommonFieldsFragment = {
 export type ReservationUnitReservationsFragment = {
   readonly name: string | null;
   readonly numPersons: number | null;
-  readonly calendarUrl: string;
-  readonly affectedReservationUnits: ReadonlyArray<number | null>;
+  readonly calendarUrl: string | null;
+  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
   readonly id: string;
   readonly pk: number | null;
   readonly begin: string;
@@ -6460,7 +6460,7 @@ export type UpdateApplicationWorkingMemoMutation = {
 export type CombineAffectedReservationsFragment = {
   readonly id: string;
   readonly pk: number | null;
-  readonly affectedReservationUnits: ReadonlyArray<number | null>;
+  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
 };
 
 export type ApplicantNameFieldsFragment = {
@@ -6502,8 +6502,8 @@ export type ReservationsByReservationUnitQuery = {
       readonly type: ReservationTypeChoice | null;
       readonly bufferTimeBefore: number;
       readonly bufferTimeAfter: number;
-      readonly affectedReservationUnits: ReadonlyArray<number | null>;
-      readonly accessType: AccessType;
+      readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+      readonly accessType: AccessType | null;
       readonly user: { readonly id: string; readonly email: string } | null;
       readonly recurringReservation: {
         readonly id: string;
@@ -6522,8 +6522,8 @@ export type ReservationsByReservationUnitQuery = {
     readonly type: ReservationTypeChoice | null;
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
-    readonly affectedReservationUnits: ReadonlyArray<number | null>;
-    readonly accessType: AccessType;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+    readonly accessType: AccessType | null;
     readonly user: { readonly id: string; readonly email: string } | null;
     readonly recurringReservation: {
       readonly id: string;
@@ -6543,8 +6543,8 @@ export type CalendarReservationFragment = {
   readonly type: ReservationTypeChoice | null;
   readonly bufferTimeBefore: number;
   readonly bufferTimeAfter: number;
-  readonly affectedReservationUnits: ReadonlyArray<number | null>;
-  readonly accessType: AccessType;
+  readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+  readonly accessType: AccessType | null;
   readonly user: { readonly id: string; readonly email: string } | null;
   readonly recurringReservation: {
     readonly id: string;
@@ -8556,8 +8556,8 @@ export type ReservationUnitCalendarQuery = {
     readonly reservations: ReadonlyArray<{
       readonly name: string | null;
       readonly numPersons: number | null;
-      readonly calendarUrl: string;
-      readonly affectedReservationUnits: ReadonlyArray<number | null>;
+      readonly calendarUrl: string | null;
+      readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
       readonly id: string;
       readonly pk: number | null;
       readonly begin: string;
@@ -8597,8 +8597,8 @@ export type ReservationUnitCalendarQuery = {
   readonly affectingReservations: ReadonlyArray<{
     readonly name: string | null;
     readonly numPersons: number | null;
-    readonly calendarUrl: string;
-    readonly affectedReservationUnits: ReadonlyArray<number | null>;
+    readonly calendarUrl: string | null;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
     readonly id: string;
     readonly pk: number | null;
     readonly begin: string;
@@ -8668,8 +8668,8 @@ export type ReservationUnitsByUnitQuery = {
   readonly affectingReservations: ReadonlyArray<{
     readonly name: string | null;
     readonly numPersons: number | null;
-    readonly calendarUrl: string;
-    readonly affectedReservationUnits: ReadonlyArray<number | null>;
+    readonly calendarUrl: string | null;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
     readonly id: string;
     readonly pk: number | null;
     readonly begin: string;
@@ -9171,8 +9171,8 @@ export type ReservationKeylessEntryFragment = {
   readonly id: string;
   readonly pk: number | null;
   readonly end: string;
-  readonly accessType: AccessType;
-  readonly isAccessCodeIsActiveCorrect: boolean;
+  readonly accessType: AccessType | null;
+  readonly isAccessCodeIsActiveCorrect: boolean | null;
   readonly reservationUnits: ReadonlyArray<{
     readonly id: string;
     readonly unit: { readonly id: string; readonly pk: number | null } | null;
@@ -9440,8 +9440,8 @@ export type ReservationPageQuery = {
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
     readonly name: string | null;
-    readonly accessType: AccessType;
-    readonly isAccessCodeIsActiveCorrect: boolean;
+    readonly accessType: AccessType | null;
+    readonly isAccessCodeIsActiveCorrect: boolean | null;
     readonly numPersons: number | null;
     readonly description: string | null;
     readonly freeOfChargeReason: string | null;
