@@ -77,10 +77,9 @@ class ReservationNode(DjangoNode):
     is_access_code_is_active_correct = AnnotatedField(
         graphene.Boolean,
         expression=L("is_access_code_is_active_correct"),
-        required=True,
     )
 
-    calendar_url = graphene.String(required=True)
+    calendar_url = graphene.String()
 
     affected_reservation_units = AnnotatedField(
         graphene.List(graphene.Int, required=True),
@@ -92,7 +91,6 @@ class ReservationNode(DjangoNode):
                 distinct=True,
             )
         ),
-        required=True,
     )
 
     pindora_info = MultiField(
@@ -123,6 +121,10 @@ class ReservationNode(DjangoNode):
     price_net = graphene.Decimal()
     unit_price = graphene.Decimal()
     tax_percentage_value = graphene.Decimal()
+    #
+    access_type = graphene.Field(graphene.Enum.from_enum(AccessType))
+    access_code_generated_at = graphene.DateTime()
+    access_code_is_active = graphene.Boolean()
     #
     applying_for_free_of_charge = graphene.Boolean()
     free_of_charge_reason = graphene.String()
@@ -178,6 +180,7 @@ class ReservationNode(DjangoNode):
             "access_code_generated_at",
             "access_code_is_active",
             "access_code_should_be_active",
+            "is_access_code_is_active_correct",
             "pindora_info",
             #
             "applying_for_free_of_charge",
