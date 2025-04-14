@@ -17,6 +17,8 @@ const STATUS_CODES_WITH_NONGENERIC_CONTENT = [403, 404, 500, 503];
 
 type ErrorPageProps = {
   statusCode?: number;
+  title?: string;
+  body?: string;
   imgSrc?: string;
   imgAlt?: string;
   feedbackUrl?: string | null;
@@ -82,11 +84,15 @@ const constructFeedbackUrl = (
 
 function statusCodeText({
   statusCode,
+  title,
+  body,
   t,
-}: {
+}: Readonly<{
   statusCode?: number;
+  title?: string;
+  body?: string;
   t: TFunction;
-}) {
+}>) {
   const statusCodeString = STATUS_CODES_WITH_NONGENERIC_CONTENT.includes(
     statusCode ?? 0
   )
@@ -94,13 +100,17 @@ function statusCodeText({
     : "generic";
   return (
     <>
-      <H1>
+      <H1 data-testid={`error__${statusCode}--title`}>
         {statusCode !== 500 ? `${statusCode}: ` : ""}
-        {t(`${statusCodeString}.heading`)}
+        {title ?? t(`${statusCodeString}.heading`)}
       </H1>
-      <Body>{t(`${statusCodeString}.body`)}</Body>
+      <Body data-testid={`error__${statusCode}--body`}>
+        {body ?? t(`${statusCodeString}.body`)}
+      </Body>
       {STATUS_CODES_WITH_SECOND_PARAGRAPH.includes(statusCode ?? 0) && (
-        <Body>{t(`${statusCodeString}.body2`)}</Body>
+        <Body data-testid={`error__${statusCode}--body2`}>
+          {t(`${statusCodeString}.body2`)}
+        </Body>
       )}
     </>
   );
@@ -108,11 +118,13 @@ function statusCodeText({
 
 const ErrorContainer = ({
   statusCode,
+  title,
+  body,
   feedbackUrl,
   imgSrc,
   imgAlt,
   children,
-}: ErrorPageProps) => {
+}: Readonly<ErrorPageProps>) => {
   const { t, i18n } = useTranslation("errors");
 
   return (
@@ -134,19 +146,21 @@ const ErrorContainer = ({
         aria-hidden="true"
       />
       <TextContent>
-        {children || statusCodeText({ statusCode, t })}
+        {children || statusCodeText({ statusCode, title, body, t })}
         <Flex $direction={"column"} $gap="xs">
           <IconButton
             label={t("buttons.giveFeedback")}
             icon={<IconArrowRight />}
             href={constructFeedbackUrl(i18n, feedbackUrl) ?? feedbackUrl}
             rel="noopener noreferrer"
+            data-testid="error__feedback-button"
           />
           {STATUS_CODES_WITH_FRONTPAGE_LINK.includes(statusCode ?? 0) && (
             <IconButton
               label={t("buttons.backToHome")}
               icon={<IconArrowRight />}
               href="/"
+              data-testid="error__frontpage-button"
             />
           )}
         </Flex>
