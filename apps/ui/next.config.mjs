@@ -70,12 +70,8 @@ export default withSentryConfig(nextConfig, {
   // https://github.com/getsentry/sentry-webpack-plugin#options
   org: "city-of-helsinki",
   project: "tilavarauspalvelu-ui",
-  // project: "tilavaraus-ui",
-  // only upload source maps to production sentry
-  sentryUrl: "https://sentry.hel.fi/",
-  // sentryUrl: "https://sentry.test.hel.ninja/",
-  authToken: env.SENTRY_AUTH_TOKEN,
-  // Only print logs for uploading source maps in CI
+  sentryUrl: env.SENTRY_ENABLE_SOURCE_MAPS ? "https://sentry.hel.fi/" : "",
+  authToken: env.SENTRY_ENABLE_SOURCE_MAPS ? env.SENTRY_AUTH_TOKEN : "",
   silent: !process.env.CI,
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
@@ -94,4 +90,7 @@ export default withSentryConfig(nextConfig, {
   },
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   tunnelRoute: "/monitoring",
+  sourcemaps: {
+    disable: !env.SENTRY_ENABLE_SOURCE_MAPS,
+  },
 });
