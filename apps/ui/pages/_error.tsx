@@ -7,6 +7,7 @@ import { env } from "@/env.mjs";
 const CustomErrorComponent: NextPage<ErrorProps> = (props) => {
   return (
     <ErrorContainer
+      title={props.title}
       statusCode={props.statusCode}
       feedbackUrl={env.EMAIL_VARAAMO_EXT_LINK}
     />
