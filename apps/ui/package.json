@@ -13,8 +13,7 @@
     "lint:fix": "eslint . --fix",
     "lint:css": "stylelint '**/*.tsx'",
     "tsc:check": "tsc --noEmit --project tsconfig.json",
-    "tsc:clean": "tsc --build --clean",
-    "format": "prettier --ignore-path \"../.prettierignore\" --write \"**/*.{js,jsx,ts,tsx,json}\""
+    "tsc:clean": "tsc --build --clean"
   },
   "dependencies": {
     "@apollo/client": "^3.13.1",
