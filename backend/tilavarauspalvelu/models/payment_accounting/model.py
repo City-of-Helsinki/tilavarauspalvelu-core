@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -74,6 +73,13 @@ class PaymentAccounting(models.Model):
                 name="product_invoicing_data_together",
                 violation_error_message="Must fill all product invoicing fields or none of them",
             ),
+            models.CheckConstraint(
+                check=~models.Q(project="") | ~models.Q(profit_center="") | ~models.Q(internal_order=""),
+                name="internal_order_profit_center_or_project_required",
+                violation_error_message=(
+                    "At least one of the following fields must be filled: 'internal_order', 'profit_center', 'project'"
+                ),
+            ),
         ]
 
     def __str__(self) -> str:
@@ -90,12 +96,3 @@ class PaymentAccounting(models.Model):
             reservation_units = reservation_units_from_units.union(self.reservation_units.all())
             for reservation_unit in reservation_units:
                 refresh_reservation_unit_accounting.delay(reservation_unit.pk)
-
-    def clean(self) -> None:
-        if not self.project and not self.profit_center and not self.internal_order:
-            error_message = _("One of the following fields must be given: internal_order, profit_center, project")
-            raise ValidationError({
-                "internal_order": [error_message],
-                "profit_center": [error_message],
-                "project": [error_message],
-            })
