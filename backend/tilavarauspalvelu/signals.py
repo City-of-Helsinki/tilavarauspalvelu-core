@@ -33,10 +33,19 @@ from social_core.exceptions import AuthCanceled, AuthFailed, AuthStateForbidden,
 
 from tilavarauspalvelu.integrations.image_cache import purge_previous_image_cache
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.models import Purpose, Reservation, ReservationUnit, ReservationUnitImage, Space, Unit
+from tilavarauspalvelu.models import (
+    PaymentAccounting,
+    Purpose,
+    Reservation,
+    ReservationUnit,
+    ReservationUnitImage,
+    Space,
+    Unit,
+)
 from tilavarauspalvelu.tasks import (
     create_or_update_reservation_statistics,
     create_reservation_unit_thumbnails_and_urls,
+    refresh_reservation_unit_accounting,
     refresh_reservation_unit_product_mapping,
     update_affecting_time_spans_task,
     update_reservation_unit_hierarchy_task,
@@ -125,6 +134,17 @@ def _unit_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[Unit]]) -> None
     if settings.UPDATE_SEARCH_VECTORS:
         pks = list(instance.reservation_units.values_list("pk", flat=True))
         update_reservation_unit_search_vectors_task.delay(pks=pks)
+
+
+@receiver(post_save, sender=PaymentAccounting, dispatch_uid="payment_accounting_post_save")
+def _payment_accounting_post_save(sender: Any, **kwargs: Unpack[PostSaveKwargs[PaymentAccounting]]) -> None:
+    instance = kwargs["instance"]
+
+    if settings.UPDATE_ACCOUNTING:
+        reservation_units_from_units = ReservationUnit.objects.filter(unit__in=instance.units.all())
+        reservation_units = reservation_units_from_units.union(instance.reservation_units.all())
+        for reservation_unit in reservation_units:
+            refresh_reservation_unit_accounting.delay(reservation_unit.pk)
 
 
 # --- Post delete signals -----------------------------------------------------------------------------------------
