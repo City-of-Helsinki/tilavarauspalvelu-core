@@ -122,12 +122,13 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
     def validate(self, data: dict[str, Any]) -> dict[str, Any]:
         is_draft = self.get_or_default("is_draft", data)
+        is_archived = self.get_or_default("is_archived", data)
 
         self._validate_reservation_duration_fields(data)
         self._validate_pricings(data)
         self._validate_access_types(access_types=data.get("access_types", []), is_draft=is_draft)
 
-        if not is_draft:
+        if not is_draft and not is_archived:
             self._validate_for_publish(data)
 
         return data

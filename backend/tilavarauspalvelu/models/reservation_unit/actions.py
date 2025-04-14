@@ -414,7 +414,7 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             return False
         if self.reservation_unit.payment_product is not None:
             return True
-        if self.reservation_unit.is_draft:
+        if self.reservation_unit.is_draft or self.reservation_unit.is_archived:
             return False
 
         # Has PAID active or future pricings
