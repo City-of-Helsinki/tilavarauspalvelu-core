@@ -43,6 +43,25 @@ class Product:
 
 
 @dataclass(frozen=True)
+class ProductInvoicingParams:
+    sales_org: str
+    sales_office: str
+    material: str
+    order_type: str
+
+    def __bool__(self) -> bool:
+        return bool(self.sales_org and self.sales_office and self.material and self.order_type)
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "salesOrg": self.sales_org,
+            "salesOffice": self.sales_office,
+            "material": self.material,
+            "orderType": self.order_type,
+        }
+
+
+@dataclass(frozen=True)
 class CreateOrUpdateAccountingParams:
     vat_code: str
     internal_order: str
@@ -52,6 +71,7 @@ class CreateOrUpdateAccountingParams:
     company_code: str
     main_ledger_account: str
     balance_profit_center: str
+    product_invoicing: ProductInvoicingParams
 
     def to_json(self) -> dict[str, Any]:
         json = {
@@ -74,6 +94,9 @@ class CreateOrUpdateAccountingParams:
 
         if self.operation_area:
             json["operationArea"] = self.operation_area
+
+        if self.product_invoicing:
+            json["productInvoicing"] = self.product_invoicing.to_json()
 
         return json
 
