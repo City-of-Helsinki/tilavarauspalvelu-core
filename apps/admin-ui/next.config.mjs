@@ -69,9 +69,8 @@ export default withSentryConfig(config, {
   org: "city-of-helsinki",
   project: "tilavarauspalvelu-admin-ui",
   // only upload source maps to production sentry
-  sentryUrl: "https://sentry.hel.fi/",
-  authToken: env.SENTRY_AUTH_TOKEN,
-  // Only print logs for uploading source maps in CI
+  sentryUrl: env.SENTRY_ENABLE_SOURCE_MAPS ? "https://sentry.hel.fi/" : "",
+  authToken: env.SENTRY_ENABLE_SOURCE_MAPS ? env.SENTRY_AUTH_TOKEN : "",
   silent: !process.env.CI,
   // Hides source maps from generated client bundles
   hideSourceMaps: true,
@@ -90,4 +89,7 @@ export default withSentryConfig(config, {
   tunnelRoute: "/monitoring",
   // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
   automaticVercelMonitors: false,
+  sourcemaps: {
+    disable: !env.SENTRY_ENABLE_SOURCE_MAPS,
+  },
 });

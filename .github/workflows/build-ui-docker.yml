@@ -30,6 +30,8 @@ jobs:
       # required because error pages use build time env vars, not runtime env vars
       # it's the same on every environment
       EMAIL_VARAAMO_EXT_LINK: "https://lomake.hel.fi/varaamo-palaute"
+      # Disable source maps for now because of connection issues
+      SENTRY_ENABLE_SOURCE_MAPS: "false"
 
     permissions:
       contents: read
@@ -87,6 +89,7 @@ jobs:
           NEXT_PUBLIC_SOURCE_VERSION=${{ github.sha }}
           NEXT_PUBLIC_SOURCE_BRANCH_NAME=${{ github.ref_name }}
           CI=true
+          SENTRY_ENABLE_SOURCE_MAPS={{ env.SENTRY_ENABLE_SOURCE_MAPS }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         annotations: ${{ steps.meta.outputs.annotations }}
