@@ -39,6 +39,12 @@ class PaymentAccounting(models.Model):
     operation_area: str = models.CharField(blank=True, default="", max_length=6, validators=[is_numeric])
     balance_profit_center: str = models.CharField(max_length=10)
 
+    # Must be provided together or not at all
+    product_invoicing_sales_org = models.CharField(max_length=4, blank=True, default="", validators=[is_numeric])
+    product_invoicing_sales_office = models.CharField(max_length=4, blank=True, default="", validators=[is_numeric])
+    product_invoicing_material = models.CharField(max_length=8, blank=True, default="", validators=[is_numeric])
+    product_invoicing_order_type = models.CharField(max_length=4, blank=True, default="")
+
     objects: ClassVar[PaymentAccountingManager] = LazyModelManager.new()
     actions: PaymentAccountingActions = LazyModelAttribute.new()
     validators: PaymentAccountingValidator = LazyModelAttribute.new()
@@ -49,6 +55,26 @@ class PaymentAccounting(models.Model):
         verbose_name = _("payment accounting")
         verbose_name_plural = _("payment accountings")
         ordering = ["pk"]
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    models.Q(
+                        product_invoicing_sales_org="",
+                        product_invoicing_sales_office="",
+                        product_invoicing_material="",
+                        product_invoicing_order_type="",
+                    )
+                    | models.Q(
+                        ~models.Q(product_invoicing_sales_org=""),
+                        ~models.Q(product_invoicing_sales_office=""),
+                        ~models.Q(product_invoicing_material=""),
+                        ~models.Q(product_invoicing_order_type=""),
+                    )
+                ),
+                name="product_invoicing_data_together",
+                violation_error_message="Must fill all product invoicing fields or none of them",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.name
