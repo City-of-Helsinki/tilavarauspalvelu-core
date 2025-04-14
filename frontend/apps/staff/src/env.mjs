@@ -18,14 +18,13 @@ const optionalUrl = z
 const ServerSchema = z.object({
   SENTRY_AUTH_TOKEN: z.string().optional(),
   SENTRY_DSN: z.string().optional(),
-  // TODO enum?
   SENTRY_ENVIRONMENT: z.string().optional(),
   SENTRY_ENABLE_SOURCE_MAPS: coerceBoolean,
   ENABLE_FETCH_HACK: coerceBoolean,
+  SKIP_ENV_VALIDATION: coerceBoolean,
   RESERVATION_UNIT_PREVIEW_URL_PREFIX: optionalUrl,
   // mandatory because the SSR can't connect to the API without it
-  // frontend SSR is running on a different
-  // host than the backend
+  // frontend SSR is running on a different host than the backend
   TILAVARAUS_API_URL: z.string().url(),
   EMAIL_VARAAMO_EXT_LINK: optionalUrl,
 });
