@@ -1,4 +1,4 @@
-# ruff: noqa: T201
+# ruff: noqa: T201, RUF100
 from __future__ import annotations
 
 import dataclasses
@@ -21,6 +21,8 @@ from graphql import (
     parse,
     print_ast,
 )
+
+from utils.utils import check_path
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -66,22 +68,6 @@ def defragment_queries_in_file(path: Path) -> None:
 class FragmentsAndOperations:
     operations: dict[str, OperationDefinitionNode] = dataclasses.field(default_factory=dict)
     fragments: dict[str, FragmentDefinitionNode] = dataclasses.field(default_factory=dict)
-
-
-def check_path(path: Path, *, should_be_file: bool = False, should_be_dir: bool = False) -> Path:
-    if not path.exists():
-        msg = f"{path} does not exist"
-        raise FileNotFoundError(msg)
-
-    if should_be_file and not path.is_file():
-        msg = f"{path} is not a file"
-        raise FileNotFoundError(msg)
-
-    if should_be_dir and not path.is_dir():
-        msg = f"{path} is not a directory"
-        raise FileNotFoundError(msg)
-
-    return path
 
 
 def parse_queries(document: str) -> str:

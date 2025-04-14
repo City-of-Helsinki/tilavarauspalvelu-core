@@ -25,6 +25,7 @@ from utils.date_utils import local_datetime
 
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
+    from pathlib import Path
 
     from django.http import HttpRequest
 
@@ -310,3 +311,19 @@ def only_drf_validation_errors() -> Generator[None]:
         raise to_drf_validation_error(error) from error
     except Exception as error:
         raise ValidationError(detail=str(error)) from error
+
+
+def check_path(path: Path, *, should_be_file: bool = False, should_be_dir: bool = False) -> Path:
+    if not path.exists():
+        msg = f"{path} does not exist"
+        raise FileNotFoundError(msg)
+
+    if should_be_file and not path.is_file():
+        msg = f"{path} is not a file"
+        raise FileNotFoundError(msg)
+
+    if should_be_dir and not path.is_dir():
+        msg = f"{path} is not a directory"
+        raise FileNotFoundError(msg)
+
+    return path
