@@ -16,6 +16,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
     CreateOrUpdateAccountingParams,
     CreateProductParams,
     Product,
+    ProductInvoicingParams,
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 
@@ -37,6 +38,12 @@ create_or_update_account_params = CreateOrUpdateAccountingParams(
     company_code="4444",
     main_ledger_account="555555",
     balance_profit_center="2983300",
+    product_invoicing=ProductInvoicingParams(
+        sales_org="2900",
+        sales_office="2911",
+        material="12345678",
+        order_type="ZTY1",
+    ),
 )
 
 
