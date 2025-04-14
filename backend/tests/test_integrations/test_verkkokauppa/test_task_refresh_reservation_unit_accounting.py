@@ -7,7 +7,11 @@ from django.test import override_settings
 
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import CreateOrUpdateAccountingError
-from tilavarauspalvelu.integrations.verkkokauppa.product.types import CreateOrUpdateAccountingParams, Product
+from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
+    CreateOrUpdateAccountingParams,
+    Product,
+    ProductInvoicingParams,
+)
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting
 
@@ -51,6 +55,7 @@ def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save
     assert reservation_unit.payment_product is not None
 
     assert VerkkokauppaAPIClient.create_product.called is True
+
     VerkkokauppaAPIClient.create_or_update_accounting.assert_called_with(
         product_uuid=reservation_unit.payment_product.id,
         params=CreateOrUpdateAccountingParams(
@@ -62,6 +67,12 @@ def test_refresh_reservation_unit_accounting__is_called_on_reservation_unit_save
             company_code=reservation_unit.payment_accounting.company_code,
             main_ledger_account=reservation_unit.payment_accounting.main_ledger_account,
             balance_profit_center=reservation_unit.payment_accounting.balance_profit_center,
+            product_invoicing=ProductInvoicingParams(
+                sales_org=reservation_unit.payment_accounting.product_invoicing_sales_org,
+                sales_office=reservation_unit.payment_accounting.product_invoicing_sales_office,
+                material=reservation_unit.payment_accounting.product_invoicing_material,
+                order_type=reservation_unit.payment_accounting.product_invoicing_order_type,
+            ),
         ),
     )
 
