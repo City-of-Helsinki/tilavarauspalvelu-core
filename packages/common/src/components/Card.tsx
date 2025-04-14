@@ -405,6 +405,10 @@ const InfoItem = styled(Flex).attrs({
 })`
   font-size: var(--fontsize-body-s);
   margin-top: auto;
+  p {
+    margin: 0;
+    font-size: var(--fontsize-body-s);
+  }
 `;
 
 function Infos({
@@ -435,7 +439,7 @@ function Info({
   return (
     <InfoItem {...rest}>
       {icon}
-      <span>{value}</span>
+      <p>{value}</p>
     </InfoItem>
   );
 }
