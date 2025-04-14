@@ -372,10 +372,12 @@ class ReservationUnitSerializer(NestingModelSerializer):
 
         pricings = validated_data.pop("pricings", [])
         access_types = validated_data.pop("access_types", [])
-        reservation_unit = super().update(instance, validated_data)
-        self.handle_pricings(pricings, reservation_unit)
-        self.handle_access_types(access_types, reservation_unit)
-        return reservation_unit
+        self.handle_pricings(pricings, instance)
+        self.handle_access_types(access_types, instance)
+        # Reservation Unit needs to be updated last, due to post_save signals.
+        # Verkkokauppa payment product update is triggered by the post_save signal of the ReservationUnit,
+        # and requires a paid pricing to already be present in the database.
+        return super().update(instance, validated_data)
 
     def remove_personal_data_and_logs_on_archive(self, instance: ReservationUnit) -> None:
         """
