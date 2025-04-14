@@ -18,6 +18,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.product.exceptions import Creat
 from tilavarauspalvelu.integrations.verkkokauppa.product.types import (
     CreateOrUpdateAccountingParams,
     CreateProductParams,
+    ProductInvoicingParams,
 )
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import OriginHaukiResource, PaymentProduct, Reservation, ReservationUnit
@@ -591,6 +592,12 @@ class ReservationUnitActions(ReservationUnitHaukiExporter):
             company_code=accounting.company_code,
             main_ledger_account=accounting.main_ledger_account,
             balance_profit_center=accounting.balance_profit_center,
+            product_invoicing=ProductInvoicingParams(
+                sales_org=accounting.product_invoicing_sales_org,
+                sales_office=accounting.product_invoicing_sales_office,
+                material=accounting.product_invoicing_material,
+                order_type=accounting.product_invoicing_order_type,
+            ),
         )
 
         try:
