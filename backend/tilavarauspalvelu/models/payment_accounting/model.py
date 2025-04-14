@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -84,15 +83,3 @@ class PaymentAccounting(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
-    def save(self, *args: Any, **kwargs: Any) -> None:
-        from tilavarauspalvelu.models import ReservationUnit
-        from tilavarauspalvelu.tasks import refresh_reservation_unit_accounting
-
-        super().save(*args, **kwargs)
-
-        if settings.UPDATE_ACCOUNTING:
-            reservation_units_from_units = ReservationUnit.objects.filter(unit__in=self.units.all())
-            reservation_units = reservation_units_from_units.union(self.reservation_units.all())
-            for reservation_unit in reservation_units:
-                refresh_reservation_unit_accounting.delay(reservation_unit.pk)
