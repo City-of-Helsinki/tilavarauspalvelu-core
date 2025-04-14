@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from typing import Any
 from unittest.mock import patch
 
 import pytest
-from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 
 from tests.factories import PaymentAccountingFactory, ReservationUnitFactory
 
@@ -13,7 +14,7 @@ pytestmark = [
 ]
 
 
-def test_webshop_sync_is_not_triggered_when_accounting_is_not_used(settings):
+def test_payment_accounting__webshop_sync_is_not_triggered_when_accounting_is_not_used(settings):
     settings.UPDATE_ACCOUNTING = True
 
     with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
@@ -22,7 +23,7 @@ def test_webshop_sync_is_not_triggered_when_accounting_is_not_used(settings):
     assert mock.call_count == 0
 
 
-def test_webshop_sync_trigger_reservation_units(settings):
+def test_payment_accounting__webshop_sync_trigger_reservation_units(settings):
     settings.UPDATE_ACCOUNTING = True
 
     with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
@@ -40,7 +41,7 @@ def test_webshop_sync_trigger_reservation_units(settings):
     assert mock.call_args.args == (reservation_unit.pk,)
 
 
-def test_webshop_sync_updates_reservation_units_under_units(settings):
+def test_payment_accounting__webshop_sync_updates_reservation_units_under_units(settings):
     settings.UPDATE_ACCOUNTING = True
 
     with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
@@ -58,7 +59,7 @@ def test_webshop_sync_updates_reservation_units_under_units(settings):
     assert mock.call_args.args == (reservation_unit.pk,)
 
 
-def test_webshop_sync_updates_all_unique_reservation_units(settings):
+def test_payment_accounting__payment_accounting__webshop_sync_updates_all_unique_reservation_units(settings):
     settings.UPDATE_ACCOUNTING = True
 
     with patch("tilavarauspalvelu.tasks.refresh_reservation_unit_accounting.delay") as mock:
@@ -77,20 +78,42 @@ def test_webshop_sync_updates_all_unique_reservation_units(settings):
     assert sorted(call.args[0] for call in mock.call_args_list) == [reservation_unit_1.pk, reservation_unit_2.pk]
 
 
-def test_one_of_the_fields_is_required(settings):
+def test_payment_accounting__one_of_the_fields_is_required(settings):
     settings.UPDATE_ACCOUNTING = True
 
-    payment_accounting = PaymentAccountingFactory.create(
-        name="Invalid",
-        internal_order="",
-        profit_center="",
-        project="",
-    )
-    with pytest.raises(ValidationError) as error:
-        payment_accounting.full_clean()
+    with pytest.raises(IntegrityError) as error:
+        PaymentAccountingFactory.create(
+            internal_order="",
+            profit_center="",
+            project="",
+        )
 
-    assert error.value.message_dict == {
-        "internal_order": ["One of the following fields must be given: internal_order, profit_center, project"],
-        "profit_center": ["One of the following fields must be given: internal_order, profit_center, project"],
-        "project": ["One of the following fields must be given: internal_order, profit_center, project"],
+    constraint = "internal_order_profit_center_or_project_required"
+    assert constraint in str(error.value)
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "product_invoicing_sales_org",
+        "product_invoicing_sales_office",
+        "product_invoicing_material",
+        "product_invoicing_order_type",
+    ],
+)
+def test_payment_accounting__product_invoicing_fields_are_required_together(settings, field):
+    settings.UPDATE_ACCOUNTING = True
+
+    kwargs: dict[str, Any] = {
+        "product_invoicing_sales_org": "1234",
+        "product_invoicing_sales_office": "1234",
+        "product_invoicing_material": "12341234",
+        "product_invoicing_order_type": "ASDF",
+        field: "",
     }
+
+    with pytest.raises(IntegrityError) as error:
+        PaymentAccountingFactory.create(**kwargs)
+
+    constraint = "product_invoicing_data_together"
+    assert constraint in str(error.value)

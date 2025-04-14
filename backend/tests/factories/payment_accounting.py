@@ -24,5 +24,10 @@ class PaymentAccountingFactory(GenericDjangoModelFactory[PaymentAccounting]):
     operation_area = "123456"
     balance_profit_center = "2983300"
 
+    product_invoicing_sales_org = "2900"
+    product_invoicing_sales_office = "2911"
+    product_invoicing_material = "12345678"
+    product_invoicing_order_type = "ZTY1"
+
     reservation_units = ReverseForeignKeyFactory("tests.factories.ReservationUnitFactory")
     units = ReverseForeignKeyFactory("tests.factories.UnitFactory")
