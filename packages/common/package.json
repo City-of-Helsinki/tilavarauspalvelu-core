@@ -51,15 +51,15 @@
     "@happy-dom/jest-environment": "^17.4.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
+    "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/lodash-es": "^4.17.12",
     "@types/react": "^18.2.7",
     "@types/react-big-calendar": "^1.16.1",
     "@types/react-dom": "18.3.0",
     "@types/sanitize-html": "^2.13.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "happy-dom": "^17.1.8",
+    "@vitejs/plugin-react": "^4.4.0",
+    "happy-dom": "^17.4.4",
     "next": "15.2.4",
     "postcss-styled-syntax": "^0.7.1",
     "prettier": "^3.5.3",
@@ -69,6 +69,6 @@
     "typescript": "^5.7.3",
     "typescript-cookie": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.0.7"
+    "vitest": "^3.1.1"
   }
 }
