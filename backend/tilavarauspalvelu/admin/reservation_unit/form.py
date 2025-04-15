@@ -308,20 +308,19 @@ class ReservationUnitAdminForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         editing: bool = getattr(self.instance, "pk", None) is not None
+        if not editing:
+            return
 
-        if editing and self.instance.current_access_type == AccessType.ACCESS_CODE:
+        if self.instance.access_types.active_or_future().filter(access_type=AccessType.ACCESS_CODE).exists():
             pindora_field = self.fields["pindora_response"]
             pindora_field.initial = self.get_pindora_response(self.instance)
             pindora_field.widget.attrs.update({"cols": "100", "rows": "10"})
 
     def get_pindora_response(self, obj: ReservationUnit) -> str | None:
-        if obj.current_access_type != AccessType.ACCESS_CODE:
-            return None
-
-        response = PindoraClient.get_reservation_unit(reservation_unit=obj)
-
-        if response is None:
-            return None
+        try:
+            response = PindoraClient.get_reservation_unit(reservation_unit=obj)
+        except ExternalServiceError as error:
+            return str(error)
 
         return json.dumps(response, default=str, indent=2)
 
