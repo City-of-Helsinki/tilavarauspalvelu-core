@@ -152,7 +152,11 @@ class RecurringReservation(models.Model):
         from tilavarauspalvelu.models import Reservation
 
         sq = SubqueryArray(
-            Reservation.objects.filter(recurring_reservation=models.OuterRef("pk")).values("access_type"),
+            (
+                Reservation.objects.going_to_occur()
+                .filter(recurring_reservation=models.OuterRef("pk"))
+                .values("access_type")
+            ),
             agg_field="access_type",
             distinct=True,
             coalesce_output_type="varchar",
@@ -162,7 +166,9 @@ class RecurringReservation(models.Model):
 
     @used_access_types.override
     def _(self) -> list[AccessType]:
-        qs = self.reservations.aggregate(used_access_types=Coalesce(ArrayAgg("access_type", distinct=True), []))
+        qs = self.reservations.going_to_occur().aggregate(
+            used_access_types=Coalesce(ArrayAgg("access_type", distinct=True), [])
+        )
         return [AccessType(access_type) for access_type in qs["used_access_types"]]
 
     @lookup_property(joins=["reservations"], skip_codegen=True)
