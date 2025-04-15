@@ -12,10 +12,10 @@ type Params = {
   reservationUnitId: string;
 };
 
-function RecurringReservationInner({ unitId }: { unitId: number }) {
+function RecurringReservationInner({ unitPk }: { unitPk: number }) {
   const { t } = useTranslation();
 
-  const { loading, reservationUnits } = useRecurringReservationsUnits(unitId);
+  const { loading, reservationUnits } = useRecurringReservationsUnits(unitPk);
 
   return (
     <>
@@ -41,14 +41,14 @@ export function RecurringReservation() {
   const { unitId } = useParams<Params>();
 
   const unitPk = toNumber(unitId);
-  const isError = unitPk == null || unitPk <= 1;
+  const isInvalid = unitPk == null || unitPk < 1;
   return (
     <>
       <LinkPrev />
-      {isError ? (
+      {isInvalid ? (
         <RecurringErrorPage />
       ) : (
-        <RecurringReservationInner unitId={unitPk} />
+        <RecurringReservationInner unitPk={unitPk} />
       )}
     </>
   );
