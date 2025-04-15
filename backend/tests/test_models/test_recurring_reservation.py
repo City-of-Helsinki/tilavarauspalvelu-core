@@ -87,6 +87,32 @@ def test_recurring_reservation__access_type__multiple_different():
     assert series.used_access_types == [AccessType.ACCESS_CODE, AccessType.PHYSICAL_KEY]
 
 
+def test_recurring_reservation__access_type__only_going_to_occur():
+    series = RecurringReservationFactory.create()
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.PHYSICAL_KEY,
+        state=ReservationStateChoice.CANCELLED,
+    )
+    ReservationFactory.create(
+        recurring_reservation=series,
+        access_type=AccessType.ACCESS_CODE,
+    )
+
+    # Test non-ORM code
+    assert series.access_type == AccessTypeWithMultivalued.ACCESS_CODE
+    assert series.used_access_types == [AccessType.ACCESS_CODE]
+
+    series = RecurringReservation.objects.annotate(
+        used_access_types=L("used_access_types"),
+        access_type=L("access_type"),
+    ).first()
+
+    # Test ORM code
+    assert series.access_type == AccessTypeWithMultivalued.ACCESS_CODE
+    assert series.used_access_types == [AccessType.ACCESS_CODE]
+
+
 def test_recurring_reservation__should_have_active_access_code__active():
     series = RecurringReservationFactory.create()
     ReservationFactory.create(
