@@ -58,7 +58,7 @@ const CustomBottomControls = styled.div`
     margin: 0;
     padding: 0 var(--spacing-3-xs);
     list-style-type: none;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgb(0, 0, 0, 0.3);
     border-radius: var(--spacing-xs);
 
     li {

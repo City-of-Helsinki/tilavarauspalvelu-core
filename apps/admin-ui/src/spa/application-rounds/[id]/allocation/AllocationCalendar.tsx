@@ -135,7 +135,7 @@ const Selection = styled.div<{ $isFirst: boolean; $isLast: boolean }>`
   position: absolute;
   width: calc(100% + 4px);
   height: calc(100% + 4px);
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgb(0, 0, 0, 0.1);
   border: 2px solid var(--color-black);
   border-top-width: 0;
   border-bottom-width: 0;
