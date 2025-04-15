@@ -92,6 +92,7 @@ i18n.addResourceBundle("fi", "forms", {
   invalidEmail: "Sähköpostin tulee olla oikeassa muodossa (sisältäen @-merkin)",
   mandatoryFieldsText: "* Tähdellä merkityt syötekentät ovat pakollisia.",
 });
+
 i18n.addResourceBundle("fi", "errors", errors);
 
 export default i18n;
