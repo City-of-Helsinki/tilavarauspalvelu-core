@@ -8,9 +8,11 @@ from tilavarauspalvelu.enums import BannerNotificationLevel, BannerNotificationT
 from tilavarauspalvelu.models import TermsOfUse
 from tilavarauspalvelu.models.banner_notification.model import BannerNotification
 from tilavarauspalvelu.tasks import (
+    create_missing_pindora_reservations,
     prune_reservations_task,
     update_affecting_time_spans_task,
     update_expired_orders_task,
+    update_pindora_access_code_is_active,
 )
 from utils.date_utils import DEFAULT_TIMEZONE
 
@@ -118,7 +120,7 @@ def _create_periodic_tasks() -> None:
         crontab=even_5_minute,
         description=(
             "Poistaa väliaikaiset varaukset, joita ei ole vahvistettu (lähetetty), "
-            "jos ne ovat yli 20 minuuttia vanhoja eikä niihin liity verkkomaksua."
+            "jos ne ovat yli 20 minuuttia vanhoja eikä niihin liity verkkomaksua. "
             "Ne joihin liittyy verkkomaksu, poistetaan jos tilaus verkkokauppaan on "
             "luotu yli 10 minuuttia sitten ja maksutilauksen status on rauennut tai peruttu."
         ),
@@ -132,6 +134,27 @@ def _create_periodic_tasks() -> None:
             "Päivittää näkymän ensimmäiseen varattavaan aikaan vaikuttavista varauksista, "
             "joista tiettyihin varausyksikköihin tietyllä aikavälillä vaikuttavat varaukset "
             "voidaan hakea esikäsiteltynä."
+        ),
+    )
+
+    PeriodicTask.objects.create(
+        name="Puuttuvien ovikoodien luominen",
+        task=create_missing_pindora_reservations.name,
+        crontab=even_5_minute,
+        description=(
+            "Luo puuttuvat ovikoodit varauksiin, joiden kulkutapa on ovikoodi ja "
+            "lähettää sähköpostin uudesta ovikoodista varauksissa."
+        ),
+    )
+
+    PeriodicTask.objects.create(
+        name="Ovikoodin aktiivisuustilan korjaaminen",
+        task=update_pindora_access_code_is_active.name,
+        crontab=off_5_minute,
+        description=(
+            "Korjaa ovikoodillisten varausten ovikoodien aktiivisuuden tilan. "
+            "Eli jos varauksen ovikoodi on aktiivinen kun sen ei pitäisi olla, "
+            "koodi päivitetään pinodrassa inaktiiviseksi, ja päin vastoin."
         ),
     )
 
