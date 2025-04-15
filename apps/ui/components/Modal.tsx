@@ -13,7 +13,7 @@ const Overlay = styled(Flex).attrs({
 })`
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgb(0, 0, 0, 0.5);
   z-index: var(--tilavaraus-stack-order-modal);
 `;
 
@@ -25,7 +25,7 @@ const ModalElement = styled(Flex)<{ $maxWidth?: string; $height?: string }>`
   max-width: ${({ $maxWidth }) => $maxWidth ?? "var(--modal-max-width)"};
   width: 90%;
   position: relative;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgb(0, 0, 0, 0.1);
   height: ${({ $height }) => $height ?? "auto"};
   max-height: 90vh;
   overflow-y: auto;
