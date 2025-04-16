@@ -25,7 +25,7 @@ from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIEr
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from tilavarauspalvelu.models.reservation.actions import ReservationActions
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, next_hour
+from utils.date_utils import DEFAULT_TIMEZONE, combine, local_date, local_datetime, local_start_of_day, next_hour
 
 from tests.factories import (
     ApplicationRoundFactory,
@@ -197,10 +197,20 @@ def test_reservation__create__reservation_unit_closed__allow_reservations_withou
 
 def test_reservation__create__reservation_unit_in_open_application_round(graphql):
     reservation_unit = ReservationUnitFactory.create_reservable_now()
-    ApplicationRoundFactory.create_in_status_open(reservation_units=[reservation_unit])
+
+    start_of_today = local_start_of_day()
+
+    application_round = ApplicationRoundFactory.create_in_status_open(
+        reservation_units=[reservation_unit],
+        application_period_begin=start_of_today - datetime.timedelta(days=1),
+        application_period_end=start_of_today + datetime.timedelta(days=1),
+    )
+
+    begin = combine(application_round.reservation_period_begin, datetime.time(hour=12), tzinfo=DEFAULT_TIMEZONE)
+    end = begin + datetime.timedelta(days=1)
 
     graphql.login_with_superuser()
-    data = get_create_data(reservation_unit)
+    data = get_create_data(reservation_unit, begin=begin, end=end)
     response = graphql(CREATE_MUTATION, input_data=data)
 
     assert response.field_error_messages() == ["Reservation unit is in an open application round."]

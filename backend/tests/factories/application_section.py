@@ -9,7 +9,14 @@ from factory import fuzzy
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, Weekday
 from tilavarauspalvelu.models import ApplicationSection
 
-from ._base import FakerFI, ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder, ReverseForeignKeyFactory
+from ._base import (
+    FakerFI,
+    ForeignKeyFactory,
+    GenericDjangoModelFactory,
+    ModelFactoryBuilder,
+    ReverseForeignKeyFactory,
+    coerce_date,
+)
 
 if TYPE_CHECKING:
     from tilavarauspalvelu.models import Application
@@ -27,8 +34,12 @@ class ApplicationSectionFactory(GenericDjangoModelFactory[ApplicationSection]):
     name = FakerFI("word")
     num_persons = fuzzy.FuzzyInteger(low=1, high=1000)
 
-    reservations_begin_date = factory.LazyAttribute(lambda i: i.application.application_round.reservation_period_begin)
-    reservations_end_date = factory.LazyAttribute(lambda i: i.application.application_round.reservation_period_end)
+    reservations_begin_date = factory.LazyAttribute(
+        lambda i: coerce_date(i.application.application_round.reservation_period_begin),
+    )
+    reservations_end_date = factory.LazyAttribute(
+        lambda i: coerce_date(i.application.application_round.reservation_period_end),
+    )
 
     reservation_min_duration = datetime.timedelta(hours=1)
     reservation_max_duration = datetime.timedelta(hours=2)
