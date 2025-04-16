@@ -50,6 +50,12 @@ For more detailed information, please refer to the [Tilavarauspalvelu page in Co
   - [Translations](#translations)
   - [Debugging](#debugging)
 - [Frontend](#frontend)
+  - [Codegen](#codegen)
+  - [Linting](#linting-1)
+  - [Testing](#testing-1)
+  - [Configuration](#configuration)
+  - [Scripts](#scripts)
+  - [Common Issues](#common-issues)
 
 ---
 
@@ -65,6 +71,9 @@ see the [backend](#backend) section.
   - Ubuntu: https://docs.docker.com/engine/install/ubuntu/
   - Mac: https://docs.docker.com/desktop/setup/install/mac-install/
   - Windows: https://docs.docker.com/desktop/setup/install/windows-install/
+- GNU parallel (for codegen without watch mode)
+  - Ubuntu: `sudo apt-get install parallel`
+  - Mac: `brew install parallel`
 - Node version manager
   - Ubuntu: https://github.com/nvm-sh/nvm
   - Mac: `brew install nvm`
@@ -127,7 +136,14 @@ npm install -g pnpm
 pnpm i
 ```
 
-4. Start the frontend.
+4. Copy `.env.example` to `.env.local`.
+
+```shell
+cp apps/ui/.env.example apps/ui/.env.local
+cp apps/admin-ui/.env.example apps/admin-ui/.env.local
+```
+
+5. Start the frontend.
 
 ```shell
 pnpm dev
@@ -410,4 +426,174 @@ See documentation for [django-environment-config] for more details.
 
 ## Frontend
 
-TODO: Check [old readme](README-ui.md)
+### Tech Stack
+
+### Codegen
+
+Codegen is used to generate Typescript types from GraphQL queries.
+
+[Codegen]: https://the-guild.dev/graphql/codegen
+
+Needs to be run if either the backend schema or any frontend query changes.
+
+Pulls the schema from `http://localhost:8000/graphql/`, crawls the frontend code for queries, and generates Typescript types for them.
+
+Update GraphQL schema and types.
+``` sh
+pnpm codegen
+```
+
+Run in watch mode (all apps).
+``` sh
+pnpm codegen:watch
+```
+Watch mode has some issues with changes in packages/common not propagated to the other packages.
+In those cases running `pnpm codegen` first fixes the issue.
+
+Individual apps
+``` shell
+# customer
+pnpm codegen:ui
+# admin
+pnpm codegen:admin
+# common
+pnpm codegen:common
+```
+
+### Linting
+
+Lint is done by three different tools with their own commands.
+All lints are ran on CI, but locally they are not run by default.
+
+Typecheck all packages. Relatively fast to run.
+``` shell
+pnpm tsc:check
+# if you need to remove caches
+pnpm tsc:clean
+```
+
+Run eslint and prettier. Takes a while to run.
+``` shell
+pnpm lint
+# automatic fixing
+pnpm lint:fix
+```
+
+Stylelint all packages.
+``` shell
+pnpm lint:css
+```
+
+### Testing
+
+Locally tests run in watch mode by default, so they need to be run per application.
+
+``` shell
+# customer
+cd apps/ui
+pnpm test
+# admin
+cd apps/admin-ui
+pnpm test
+# common
+cd packages/common
+pnpm test
+```
+
+Run all tests to all packages locally.
+``` shell
+CI=true pnpm test
+```
+
+### Configuration
+
+### Scripts
+
+All available top level scripts are listed in the root `package.json`. Most of them use turborepo to run
+the same command in all packages. They can be run with `pnpm {command}`.
+
+Top level commands are ran parallel to all packages (that contain that command) and output
+to standard output. Normally this is what you want, but if you have 100 lint errors in both apps
+all the errors are going to be mixed together.
+
+Target commands to specific packages using the `--filter` flag. `{package_name}` is the subpath e.g. `admin-ui` for `apps/admin-ui`.
+``` shell
+# only that package
+pnpm {command} --filter {package_name}
+
+# only that package and it's dependencies
+pnpm {command} --filter {package_name}...
+```
+
+Turborepo uses aggressive caching for all commands. This might cause issues in situations where
+the file is unchanged e.g. during large rebases.
+
+Disable turborepo cache.
+``` shell
+# disable reads (this is usually what you want)
+pnpm lint --force
+# disable writes (usually if you adding a new commands)
+pnpm build --no-cache
+```
+
+#### Other commands
+
+Pluck graphql queries from frontend code as `graphql` files per app and store them in `/gql-pluck-output/`.
+``` shell
+pnpm gql-pluck
+```
+
+Interactive tool to remove package caches `node_modules`. Useful if other commands are not working (broken dependencies).
+``` shell
+pnpm clean
+```
+
+Build and start the app in production mode. Useful for testing the production build locally.
+``` shell
+pnpm build
+pnpm start
+```
+
+Production builds `pnpm build` breaks local caches. If restarting development server doesn't work then
+``` shell
+rm -rf apps/ui/.next apps/ui/.turbo apps/admin-ui/.next apps/admin-ui/.turbo
+```
+
+#### Adding a new command
+
+If the command should be run inside a package.
+
+- Add the command to all needed `package.json` of the individual packages.
+- Add the master command to `turbo.json`
+- Add `turbo $cmd` to `/package.json`
+- Run the command `pnpm $cmd`
+
+If only needed on the root package.
+
+- Add the `$cmd` directly to `/package.json`
+- Run the command `pnpm $cmd`
+
+### Common Issues
+
+#### Don't find query in the network tab
+
+If the query is done on the server side (i.e. in `getServerSideProps`), you won't find it in the network tab.
+In Customer UI most queries are done on SSR.
+
+#### Getting 404 on valid page load
+
+Probably an SSR error. These are not visible in the browser.
+Check the console logs in the terminal where `pnpm dev` is running.
+
+#### Node 18 / 20 fetch failed server side
+
+Node 18+ fetch defaults `localhost` to IPv6 not IPv4.
+
+Check that your `/etc/hosts` has
+```
+127.0.0.1       localhost
+# IMPORTANT! ipv6 address after ipv4
+::1             localhost
+```
+
+Use `ENABLE_FETCH_HACK=true` env which changes SSR fetches to 127.0.0.1 instead of localhost.
