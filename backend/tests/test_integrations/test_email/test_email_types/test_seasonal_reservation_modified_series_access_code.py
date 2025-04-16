@@ -28,7 +28,7 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import (
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from utils.date_utils import local_datetime
 
-from tests.factories import ApplicationFactory, RecurringReservationFactory, UserFactory
+from tests.factories import ApplicationFactory, ApplicationRoundFactory, RecurringReservationFactory, UserFactory
 from tests.helpers import TranslationsFromPOFiles, patch_method
 from tests.test_graphql_api.test_recurring_reservation.helpers import create_reservation_series
 from tests.test_integrations.test_email.helpers import (
@@ -339,11 +339,12 @@ def test_email_service__send_seasonal_reservation_modified_series_access_code(ou
     )
 
     user = UserFactory.create(email="user@email.com")
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create(
         user=user,
         contact_person__email="contact@email.com",
         sent_date=local_datetime(),
-        application_round__sent_date=local_datetime(),
+        application_round=application_round,
     )
     reservation_series = create_reservation_series(
         user=user,
@@ -368,11 +369,12 @@ def test_email_service__send_seasonal_reservation_modified_series_access_code(ou
 @freeze_time("2024-01-01 12:00:00+02:00")
 def test_email_service__send_seasonal_reservation_modified_series_access_code__no_reservations(outbox):
     user = UserFactory.create(email="user@email.com")
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create(
         user=user,
         contact_person__email="contact@email.com",
         sent_date=local_datetime(),
-        application_round__sent_date=local_datetime(),
+        application_round=application_round,
     )
     reservation_series = RecurringReservationFactory.create(
         user=user,
@@ -392,11 +394,12 @@ def test_email_service__send_seasonal_reservation_modified_series_access_code__n
 @freeze_time("2024-01-01 12:00:00+02:00")
 @patch_method(SentryLogger.log_message)
 def test_email_service__send_seasonal_reservation_modified_series_access_code__no_recipients(outbox):
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
     application = ApplicationFactory.create(
         user=None,
         contact_person=None,
         sent_date=local_datetime(),
-        application_round__sent_date=local_datetime(),
+        application_round=application_round,
     )
     reservation_series = create_reservation_series(
         user=None,

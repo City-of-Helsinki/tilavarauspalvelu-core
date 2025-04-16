@@ -1093,7 +1093,7 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=OPEN, ReservationUnit not part of round": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=1),
+                reservation_period_begin=_date(day=6),
                 reservation_period_end=_date(day=20),
                 reservation_units=[],
             ),
@@ -1106,7 +1106,7 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, STATUS=UPCOMING": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.UPCOMING,
-                reservation_period_begin=_date(day=1),
+                reservation_period_begin=_date(day=6),
                 reservation_period_end=_date(day=20),
             ),
             filters=ReservableFilters(),
@@ -1118,7 +1118,7 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Period overlaps, Status=OPEN": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.OPEN,
-                reservation_period_begin=_date(day=1),
+                reservation_period_begin=_date(day=6),
                 reservation_period_end=_date(day=20),
             ),
             filters=ReservableFilters(),
@@ -1166,7 +1166,7 @@ def test__reservation_unit__first_reservable_time__filters_and_reservation_unit_
         "ApplicationRound | Not overlapping, Period in the past, Status=UPCOMING": AR_ReservableParams(
             application_round_params=ApplicationStatusParams(
                 status=ApplicationRoundStatusChoice.UPCOMING,
-                reservation_period_begin=_date(day=1),
+                reservation_period_begin=_date(day=6),
                 reservation_period_end=_date(day=10),
             ),
             filters=ReservableFilters(),

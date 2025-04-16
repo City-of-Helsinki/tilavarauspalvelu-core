@@ -13,7 +13,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraClient, PindoraS
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError, PindoraNotFoundError
 from tilavarauspalvelu.models import Reservation, ReservationUnitHierarchy
 from tilavarauspalvelu.models.reservation.actions import ReservationActions
-from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime
+from utils.date_utils import DEFAULT_TIMEZONE, local_date, local_datetime, local_start_of_day
 
 from tests.factories import (
     ApplicationRoundFactory,
@@ -303,12 +303,34 @@ def test_reservation__adjust_time__reservation_unit_not_open_in_new_time(graphql
 
 
 def test_reservation__adjust_time__reservation_unit_in_open_application_round(graphql):
-    reservation = ReservationFactory.create_for_time_adjustment()
+    space = SpaceFactory.create()
 
-    ApplicationRoundFactory.create_in_status_open(
-        reservation_units=[reservation.reservation_units.first()],
-        reservation_period_begin=reservation.begin.date(),
-        reservation_period_end=reservation.end.date() + datetime.timedelta(days=1),  # +1d to reduce flakiness at night
+    reservation_unit = ReservationUnitFactory.create_reservable_now(
+        origin_hauki_resource__id="987",
+        spaces=[space],
+        unit=space.unit,
+        pricings__lowest_price=0,
+        pricings__highest_price=0,
+        pricings__tax_percentage__value=0,
+        cancellation_rule__can_be_cancelled_time_before=datetime.timedelta(),
+    )
+
+    application_round = ApplicationRoundFactory.create_in_status_open(reservation_units=[reservation_unit])
+
+    begin = local_start_of_day(application_round.reservation_period_begin) + datetime.timedelta(days=1)
+    end = begin + datetime.timedelta(hours=1)
+
+    ReservableTimeSpanFactory.create(
+        resource=reservation_unit.origin_hauki_resource,
+        start_datetime=begin - datetime.timedelta(days=1),
+        end_datetime=end + datetime.timedelta(days=4),
+    )
+
+    reservation = ReservationFactory.create(
+        state=ReservationStateChoice.CONFIRMED,
+        begin=begin,
+        end=end,
+        reservation_units=[reservation_unit],
     )
 
     graphql.login_with_superuser()

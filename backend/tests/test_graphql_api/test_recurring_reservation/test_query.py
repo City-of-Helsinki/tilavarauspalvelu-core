@@ -24,6 +24,7 @@ from tilavarauspalvelu.integrations.keyless_entry.typing import (
 from utils.date_utils import local_datetime
 
 from tests.factories import (
+    ApplicationRoundFactory,
     ApplicationSectionFactory,
     RecurringReservationFactory,
     ReservationFactory,
@@ -372,9 +373,8 @@ def test_recurring_reservations__query__pindora_info__reservation_past(graphql):
 
 @freeze_time(local_datetime(2022, 1, 1))
 def test_recurring_reservations__query__pindora_info__in_application_section(graphql):
-    section = ApplicationSectionFactory.create(
-        application__application_round__sent_date=local_datetime(2022, 1, 1),
-    )
+    application_round = ApplicationRoundFactory.create_in_status_results_sent()
+    section = ApplicationSectionFactory.create(application__application_round=application_round)
     reservation_unit = ReservationUnitFactory.create()
     series = RecurringReservationFactory.create(
         begin=local_datetime(2022, 1, 1, 10),

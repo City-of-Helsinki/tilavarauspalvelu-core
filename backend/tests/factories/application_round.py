@@ -25,6 +25,7 @@ from ._base import (
     GenericDjangoModelFactory,
     ManyToManyFactory,
     ModelFactoryBuilder,
+    coerce_date,
 )
 
 if TYPE_CHECKING:
@@ -64,11 +65,15 @@ class ApplicationRoundFactory(GenericDjangoModelFactory[ApplicationRound]):
     application_period_begin = factory.LazyAttribute(lambda i: i.timestamp)
     application_period_end = factory.LazyAttribute(lambda i: i.application_period_begin + datetime.timedelta(weeks=4))
 
-    reservation_period_begin = factory.LazyAttribute(lambda i: i.timestamp.date())
-    reservation_period_end = factory.LazyAttribute(lambda i: i.reservation_period_begin + datetime.timedelta(weeks=4))
+    reservation_period_begin = factory.LazyAttribute(
+        lambda i: coerce_date(i.application_period_end) + datetime.timedelta(days=1),
+    )
+    reservation_period_end = factory.LazyAttribute(
+        lambda i: coerce_date(i.reservation_period_begin) + datetime.timedelta(weeks=4),
+    )
 
-    public_display_begin = factory.LazyAttribute(lambda i: i.timestamp)
-    public_display_end = factory.LazyAttribute(lambda i: i.public_display_begin + datetime.timedelta(weeks=4))
+    public_display_begin = factory.LazyAttribute(lambda i: i.application_period_begin - datetime.timedelta(days=7))
+    public_display_end = factory.LazyAttribute(lambda i: i.application_period_end + datetime.timedelta(days=4))
 
     handled_date = None
     sent_date = None
@@ -267,41 +272,46 @@ class ApplicationRoundBuilder(ModelFactoryBuilder[ApplicationRound]):
                 return self.results_sent()
 
     def upcoming(self) -> Self:
+        now = local_start_of_day()
         return self.set(
             sent_date=None,
             handled_date=None,
-            application_period_begin=local_start_of_day() + datetime.timedelta(days=2),
-            application_period_end=local_start_of_day() + datetime.timedelta(days=4),
+            application_period_begin=now + datetime.timedelta(days=2),
+            application_period_end=now + datetime.timedelta(days=4),
         )
 
     def open(self) -> Self:
+        now = local_start_of_day()
         return self.set(
             sent_date=None,
             handled_date=None,
-            application_period_begin=local_start_of_day() - datetime.timedelta(days=2),
-            application_period_end=local_start_of_day() + datetime.timedelta(days=2),
+            application_period_begin=now - datetime.timedelta(days=2),
+            application_period_end=now + datetime.timedelta(days=2),
         )
 
     def in_allocation(self) -> Self:
+        now = local_start_of_day()
         return self.set(
             sent_date=None,
             handled_date=None,
-            application_period_begin=local_start_of_day() - datetime.timedelta(days=4),
-            application_period_end=local_start_of_day() - datetime.timedelta(days=2),
+            application_period_begin=now - datetime.timedelta(days=4),
+            application_period_end=now - datetime.timedelta(days=2),
         )
 
     def handled(self) -> Self:
+        now = local_start_of_day()
         return self.set(
             sent_date=None,
-            handled_date=local_start_of_day(),
-            application_period_begin=local_start_of_day() - datetime.timedelta(days=4),
-            application_period_end=local_start_of_day() - datetime.timedelta(days=2),
+            handled_date=now,
+            application_period_begin=now - datetime.timedelta(days=4),
+            application_period_end=now - datetime.timedelta(days=2),
         )
 
     def results_sent(self) -> Self:
+        now = local_start_of_day()
         return self.set(
-            sent_date=local_start_of_day(),
-            handled_date=local_start_of_day(),
-            application_period_begin=local_start_of_day() - datetime.timedelta(days=4),
-            application_period_end=local_start_of_day() - datetime.timedelta(days=2),
+            sent_date=now,
+            handled_date=now,
+            application_period_begin=now - datetime.timedelta(days=4),
+            application_period_end=now - datetime.timedelta(days=2),
         )
