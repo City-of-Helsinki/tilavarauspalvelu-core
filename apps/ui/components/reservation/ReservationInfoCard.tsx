@@ -171,7 +171,7 @@ export function ReservationInfoCard({
             })})`}
         </div>
         {reservation.accessType !== AccessType.Unrestricted && (
-          <div>
+          <div data-testid="reservation__reservation-info-card__accessType">
             {!shouldDisplayAccessCode && `${t("reservationUnit:accessType")}: `}
             {t(`reservationUnit:accessTypes.${reservation.accessType}`)}
             {shouldDisplayAccessCode && accessCode && `: ${accessCode}`}
