@@ -11,6 +11,7 @@ import {
   PindoraReservationFragment,
   ReservationUnitAccessTypeNode,
   Maybe,
+  ApplicationRoundNode,
 } from "@/gql/gql-types";
 import {
   getApplicationReservationPath,
@@ -69,7 +70,7 @@ import {
   isReservationCancellableReason,
   ReservationCancellableReason,
 } from "@/modules/reservation";
-import { formatDateTimeStrings } from "@/modules/util";
+import { formatDateRange, formatDateTimeStrings } from "@/modules/util";
 import { PopupMenu } from "common/src/components/PopupMenu";
 import { useSearchParams } from "next/navigation";
 import { IconButton, StatusLabel } from "common/src/components";
@@ -77,12 +78,18 @@ import type { StatusLabelType } from "common/src/tags";
 import { gql } from "@apollo/client";
 import { Sanitize } from "common/src/components/Sanitize";
 import { getReservationUnitAccessPeriods } from "@/modules/reservationUnit";
+import { isBefore } from "date-fns";
 
 const N_RESERVATIONS_TO_SHOW = 20;
 
 type ApplicationT = Pick<ApplicationNode, "id" | "pk">;
+type ApplicationRoundT = Pick<
+  ApplicationRoundNode,
+  "reservationPeriodBegin" | "reservationPeriodEnd"
+>;
 type Props = {
   application: ApplicationT;
+  applicationRound: ApplicationRoundT;
 };
 
 const H3 = styled(H5).attrs({
@@ -275,7 +282,10 @@ function accessCodeSafe(
   }
 }
 
-export function ApprovedReservations({ application }: Readonly<Props>) {
+export function ApprovedReservations({
+  application,
+  applicationRound,
+}: Readonly<Props>) {
   const { t, i18n } = useTranslation();
   const searchParams = useSearchParams();
   const { data, loading } = useApplicationReservationsQuery({
@@ -332,6 +342,7 @@ export function ApprovedReservations({ application }: Readonly<Props>) {
             applicationSection={aes}
             key={aes.pk}
             application={application}
+            applicationRound={applicationRound}
           />
         </AccordionWithIcons>
       ))}
@@ -394,8 +405,10 @@ const TooltipIconWrapper = styled.span`
 
 function ReservationSeriesTable({
   reservationUnits,
+  applicationRound,
 }: Readonly<{
   reservationUnits: ReservationSeriesTableElem[];
+  applicationRound: ApplicationRoundT;
 }>) {
   const { t, i18n } = useTranslation();
   type ModalT = ReservationSeriesTableElem["reservationUnit"];
@@ -513,6 +526,12 @@ function ReservationSeriesTable({
               accessTypes={modal.accessTypes}
               reservationUnits={reservationUnits}
               pk={modal?.pk}
+              roundReservationBegin={
+                new Date(applicationRound.reservationPeriodBegin)
+              }
+              roundReservationEnd={
+                new Date(applicationRound.reservationPeriodEnd)
+              }
             />
           )}
         </Dialog.Content>
@@ -549,12 +568,16 @@ function ReservationUnitAccessTypeList({
   accessTypes,
   reservationUnits,
   pk,
+  roundReservationBegin,
+  roundReservationEnd,
 }: Readonly<{
   accessTypes: Readonly<
     Pick<ReservationUnitAccessTypeNode, "pk" | "beginDate" | "accessType">[]
   >;
   reservationUnits: ReservationSeriesTableElem[];
   pk: number | null | undefined;
+  roundReservationBegin: Date;
+  roundReservationEnd: Date;
 }>) {
   const { t } = useTranslation();
   if (!accessTypes || accessTypes.length === 0 || !pk) {
@@ -564,7 +587,6 @@ function ReservationUnitAccessTypeList({
     (rU) => rU.reservationUnit.pk === pk
   );
 
-  const accessPeriods = getReservationUnitAccessPeriods(accessTypes);
   return (
     <ModalAccessInfo>
       <AccessTypeList>
@@ -572,22 +594,40 @@ function ReservationUnitAccessTypeList({
           <span>{`${t("reservationUnit:accessType")}:`}</span>
           <span>{`${t("common:validity")}:`}</span>
         </li>
-        {accessPeriods.map((period) => (
-          <li key={period.pk}>
-            <span>
-              {t(`reservationUnit:accessTypes.${period.accessType}`) +
-                (period.accessType === AccessType.AccessCode &&
-                reservationUnit?.pindoraInfo?.accessCode
-                  ? ` (${reservationUnit?.pindoraInfo?.accessCode})`
-                  : "")}
-            </span>
-            <span>
-              {period.endDate != null
-                ? `${period.beginDate} – ${period.endDate}`
-                : t("common:dateGte", { value: period.beginDate })}
-            </span>
-          </li>
-        ))}
+        {getReservationUnitAccessPeriods(accessTypes)
+          .filter(
+            // Filter out access periods which end before the season starts, or start after the season has ended
+            (accessTypePeriod) =>
+              (!accessTypePeriod.endDate ||
+                isBefore(roundReservationBegin, accessTypePeriod.endDate)) &&
+              isBefore(accessTypePeriod.beginDate, roundReservationEnd)
+          )
+          .map((period) => {
+            // If an access period starts before the season show the season's start as the access period begin date
+            const periodBeginDate = isBefore(
+              period.beginDate,
+              roundReservationBegin
+            )
+              ? roundReservationBegin
+              : period.beginDate;
+            // If an access period ends after the season (or doesn't end) show the season's end as the access period end date
+            const periodEndDate =
+              !period.endDate || isBefore(roundReservationEnd, period.endDate)
+                ? roundReservationEnd
+                : period.endDate;
+            return (
+              <li key={period.pk}>
+                <span>
+                  {t(`reservationUnit:accessTypes.${period.accessType}`) +
+                    (period.accessType === AccessType.AccessCode &&
+                    reservationUnit?.pindoraInfo?.accessCode
+                      ? ` (${reservationUnit?.pindoraInfo?.accessCode})`
+                      : "")}
+                </span>
+                <span>{formatDateRange(periodBeginDate, periodEndDate)}</span>
+              </li>
+            );
+          })}
       </AccessTypeList>
     </ModalAccessInfo>
   );
@@ -1079,9 +1119,11 @@ export function AllReservations({
 export function ApplicationSection({
   applicationSection,
   application,
+  applicationRound,
 }: Readonly<{
   applicationSection: ApplicationSectionT;
   application: Pick<ApplicationT, "pk">;
+  applicationRound: ApplicationRoundT;
 }>) {
   const { t } = useTranslation();
 
@@ -1098,7 +1140,10 @@ export function ApplicationSection({
         <MarginHeader>
           {t("application:view.reservationsTab.reservationUnitsTitle")}
         </MarginHeader>
-        <ReservationSeriesTable reservationUnits={reservationUnits} />
+        <ReservationSeriesTable
+          reservationUnits={reservationUnits}
+          applicationRound={applicationRound}
+        />
         <MarginHeader>
           {t("application:view.reservationsTab.reservationsTitle")}
         </MarginHeader>

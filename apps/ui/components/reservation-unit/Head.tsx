@@ -14,6 +14,7 @@ import {
   convertLanguageCode,
   formatDuration,
   getTranslationSafe,
+  toUIDate,
 } from "common/src/common/util";
 import {
   ReservationKind,
@@ -21,7 +22,7 @@ import {
 } from "@gql/gql-types";
 import { Flex, H1, H3 } from "common/styled";
 import { breakpoints } from "common/src/const";
-import { formatDateTime } from "@/modules/util";
+import { formatDateRange, formatDateTime } from "@/modules/util";
 import { IconWithText } from "../common/IconWithText";
 import { Images } from "./";
 import {
@@ -172,7 +173,7 @@ function AccessTypeTooltip({
     <Tooltip>
       <ul>
         {accessTypeDurations.map((accessTypeDuration) => (
-          <li key={accessTypeDuration.beginDate}>
+          <li key={toUIDate(accessTypeDuration.beginDate)}>
             <span>
               {t(
                 `reservationUnit:accessTypes.${accessTypeDuration.accessType}`
@@ -181,8 +182,11 @@ function AccessTypeTooltip({
             </span>
             <span>
               {accessTypeDuration.endDate != null
-                ? `${accessTypeDuration.beginDate} – ${accessTypeDuration.endDate}`
-                : `${t("common:dateGte", { value: accessTypeDuration.beginDate })}`}
+                ? formatDateRange(
+                    accessTypeDuration.beginDate,
+                    accessTypeDuration.endDate
+                  )
+                : `${t("common:dateGte", { value: toUIDate(accessTypeDuration.beginDate) })}`}
             </span>
           </li>
         ))}

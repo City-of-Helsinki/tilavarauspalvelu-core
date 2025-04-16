@@ -150,7 +150,10 @@ function View({
             </Tabs.Tab>
           </Tabs.TabList>
           <TabPanel>
-            <ApprovedReservations application={application} />
+            <ApprovedReservations
+              application={application}
+              applicationRound={applicationRound}
+            />
           </TabPanel>
           <TabPanel>
             <ViewApplication application={application} tos={tos} />

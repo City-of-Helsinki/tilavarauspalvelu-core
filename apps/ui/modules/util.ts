@@ -131,6 +131,15 @@ export function formatDateTimeRange(
   return `${day} ${beginDate}${separator} ${time}–${endTime} ${endDate}`.trim();
 }
 
+// A function which takes two Date objects, and returns a string with the date range in dd.mm.yyyy format and a separator,
+// as long as begin and end are not the same day. If they are, it returns only the day in question in dd.mm.yyyy format.
+export function formatDateRange(begin: Date, end: Date): string {
+  const beginDate = toUIDate(begin);
+  const endDate = toUIDate(end);
+
+  return `${beginDate}${!isSameDay(begin, end) ? " – " + endDate : ""}`.trim();
+}
+
 function formatDay(t: TFunction, date: Date): string {
   return t("common:dateWithWeekday", {
     date,
