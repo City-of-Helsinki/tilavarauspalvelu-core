@@ -37,6 +37,7 @@ import {
 import {
   base64encode,
   filterNonNullable,
+  formatListToCSV,
   formatTimeRange,
   fromMondayFirstUnsafe,
   ignoreMaybeArray,
@@ -304,7 +305,8 @@ function ApplicationRoundScheduleDay(
   props: ApplicationRoundTimeSlotFieldsFragment
 ) {
   const { t } = useTranslation();
-  const { weekday, reservableTimes, closed } = props;
+  const { weekday, closed } = props;
+  const reservableTimes = filterNonNullable(props.reservableTimes);
   return (
     <StyledApplicationRoundScheduleDay>
       <span data-testid="application-round-time-slot__weekday">
@@ -313,11 +315,12 @@ function ApplicationRoundScheduleDay(
       {closed ? (
         <span data-testid="application-round-time-slot__value">-</span>
       ) : (
-        reservableTimes && (
+        reservableTimes.length > 0 && (
           <span data-testid="application-round-time-slot__value">
-            {reservableTimes[0] && formatTimeSlot(reservableTimes[0])}
-            {reservableTimes[1] &&
-              ` ${t("common:and")} ${formatTimeSlot(reservableTimes[1])}`}
+            {formatListToCSV(
+              t,
+              reservableTimes.map((slot) => formatTimeSlot(slot))
+            )}
           </span>
         )
       )}
@@ -729,7 +732,7 @@ function ReservationUnit({
             closeButton={false}
           >
             <p>{t("reservationUnit:recurringBody")}</p>
-            {applicationRoundTimeSlots?.map((day) => (
+            {applicationRoundTimeSlots.map((day) => (
               <ApplicationRoundScheduleDay key={day.weekday} {...day} />
             ))}
           </Accordion>
