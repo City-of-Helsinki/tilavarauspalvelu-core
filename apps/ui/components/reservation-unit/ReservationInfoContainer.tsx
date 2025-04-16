@@ -36,18 +36,18 @@ type RervationStatus = "willOpen" | "isOpen" | "hasClosed";
 function getStatus(
   reservationUnit: Pick<NodeT, "reservationBegins" | "reservationEnds">
 ): RervationStatus | null {
-  const now = new Date().toISOString();
+  const now = new Date();
   const { reservationBegins, reservationEnds } = reservationUnit;
 
-  if (reservationEnds && reservationEnds < now) {
+  if (reservationEnds && new Date(reservationEnds) < now) {
     return "hasClosed";
   }
 
-  if (reservationBegins && reservationBegins > now) {
+  if (reservationBegins && new Date(reservationBegins) > now) {
     return "willOpen";
   }
 
-  if (reservationBegins && reservationBegins < now) {
+  if (reservationBegins && new Date(reservationBegins) < now) {
     if (reservationEnds) {
       return "isOpen";
     }
@@ -62,14 +62,13 @@ export function ReservationInfoContainer({
 }: Props): JSX.Element | null {
   const { t } = useTranslation();
 
-  const isReservable =
-    reservationUnitIsReservable &&
-    (reservationUnit.reservationsMaxDaysBefore != null ||
-      reservationUnit.reservationsMinDaysBefore != null);
-
   if (!reservationUnitIsReservable) {
     return null;
   }
+
+  const isReservable =
+    reservationUnit.reservationsMaxDaysBefore != null ||
+    reservationUnit.reservationsMinDaysBefore != null;
 
   // TODO this should be a list
   return (
@@ -77,12 +76,8 @@ export function ReservationInfoContainer({
       <Subheading>{t("reservationCalendar:reservationInfo")}</Subheading>
       {isReservable && <ReservationMinMaxDaysBefore {...reservationUnit} />}
       <ReservationStatus reservationUnit={reservationUnit} />
-      {reservationUnitIsReservable && (
-        <ReservationDuration {...reservationUnit} />
-      )}
-      {reservationUnitIsReservable && (
-        <ReservationMaxReservationsPerUser {...reservationUnit} />
-      )}
+      <ReservationDuration {...reservationUnit} />
+      <ReservationMaxReservationsPerUser {...reservationUnit} />
     </div>
   );
 }
@@ -159,6 +154,7 @@ function ReservationDuration({
   if (minReservationDuration == null || maxReservationDuration == null) {
     return null;
   }
+
   return (
     <p>
       <Trans

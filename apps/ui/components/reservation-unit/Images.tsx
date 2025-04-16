@@ -41,8 +41,6 @@ const ThumbnailImage = styled.img`
 `;
 
 const ModalContent = styled.div`
-  max-width: 578px;
-
   @media (max-width: ${breakpoints.s}) {
     margin: 0.5em;
     margin-top: var(--spacing-layout-m);
@@ -108,12 +106,7 @@ export function Images({ images, contextName }: Props): JSX.Element {
           />
         ))}
       </Carousel>
-      <Modal
-        handleClose={() => setShowModal(false)}
-        show={showModal}
-        // TODO should calculate max width based on image size
-        maxWidth="576px"
-      >
+      <Modal handleClose={() => setShowModal(false)} show={showModal}>
         <ModalContent>
           {currentImage ? (
             <LargeImage

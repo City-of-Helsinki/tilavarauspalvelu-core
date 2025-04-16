@@ -7,6 +7,7 @@ import {
 } from "../gql/gql-types";
 import { type OptionInProps } from "hds-react";
 import { pixel } from "./const";
+import { type TFunction } from "i18next";
 
 /// Enforce readonly on all nested properties
 /// only single level deep i.e. {a: {b: {c: string}}} -> {readonly a: {b: {c: string}}}
@@ -312,4 +313,22 @@ export function convertOptionToHDS(option: {
     label: option.label,
     value: option.value.toString(),
   };
+}
+
+/// @description Convert a list of strings to a comma separated string
+export function formatListToCSV(
+  t: TFunction,
+  list: Readonly<Array<Readonly<string>>>
+): string {
+  if (list.length === 0) {
+    return "";
+  }
+  if (list.length === 1 && list[0]) {
+    return list[0];
+  }
+  const lastItem = list[list.length - 1];
+  return (
+    list.slice(0, list.length - 1).join(", ") +
+    ` ${t("common:and")} ${lastItem}`
+  );
 }
