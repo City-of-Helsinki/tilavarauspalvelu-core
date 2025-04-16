@@ -639,7 +639,7 @@ function getReservationSeriesAccessText(
 ) {
   const { accessType, usedAccessTypes, pindoraInfo } = reservationUnit;
   if (usedAccessTypes == null || usedAccessTypes.length === 0) {
-    return "";
+    return "-";
   }
 
   switch (accessType) {
