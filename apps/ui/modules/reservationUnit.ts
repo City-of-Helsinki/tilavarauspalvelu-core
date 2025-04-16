@@ -652,25 +652,42 @@ type AccessTypeDurations = Pick<
   ReservationUnitAccessTypeNode,
   "beginDate" | "accessType" | "pk"
 >;
-type AccessTypeDurationsExtended = AccessTypeDurations & {
-  endDate: string | null;
+type AccessTypeDurationsExtended = {
+  accessType: string;
+  pk: number | null;
+  beginDate: Date;
+  endDate: Date | null;
 };
 
 export function getReservationUnitAccessPeriods(
   accessTypes: Readonly<AccessTypeDurations[]>
 ): Readonly<AccessTypeDurationsExtended[]> {
   type nextEndDateIterator = {
-    nextEndDate: string | null;
+    nextEndDate: Date | null;
     array: AccessTypeDurationsExtended[];
   };
-  return accessTypes.reduceRight<nextEndDateIterator>(
+  // map the access type periods to a list of objects with the begin and end dates in Date format
+  const accessTypeDurationDates = accessTypes.map((aT) => ({
+    type: aT.accessType,
+    pk: aT.pk,
+    begin: new Date(aT.beginDate),
+    end: null,
+  }));
+
+  return accessTypeDurationDates.reduceRight<nextEndDateIterator>(
     (acc, aT) => {
       const endDate = acc.nextEndDate
-        ? toUIDate(sub(new Date(acc.nextEndDate), { days: 1 }))
+        ? sub(acc.nextEndDate, { days: 1 })
         : null;
-      const beginDate = toUIDate(new Date(aT.beginDate));
-      const accessTypeWithEndDate = { ...aT, beginDate, endDate };
-      acc.nextEndDate = aT.beginDate;
+      const beginDate = aT.begin;
+      const accessTypeWithEndDate = {
+        ...aT,
+        accessType: aT.type,
+        pk: aT.pk,
+        beginDate: aT.begin,
+        endDate,
+      };
+      acc.nextEndDate = beginDate;
       acc.array.unshift(accessTypeWithEndDate);
       return { nextEndDate: acc.nextEndDate, array: acc.array };
     },
