@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from copy import copy, deepcopy
 from typing import TYPE_CHECKING, Any, Self
 
@@ -364,3 +365,9 @@ class ManyToManyFactory[TModel: Model](_PostFactory[TModel]):
                 self.manager(instance).add(model)
             else:
                 factory.build(**kwargs)
+
+
+def coerce_date(date: datetime.date | datetime.datetime) -> datetime.date:
+    if isinstance(date, datetime.datetime):
+        return date.date()
+    return date

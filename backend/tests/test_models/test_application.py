@@ -86,6 +86,7 @@ def test_application__status():
     assert Application.objects.filter(L(status=ApplicationStatusChoice.HANDLED)).exists()
 
     # Application round has been marked as sent -> application is RESULTS_SENT
+    application_round.handled_date = now
     application_round.sent_date = now
     application_round.save()
     assert application.status == ApplicationStatusChoice.RESULTS_SENT

@@ -191,10 +191,7 @@ def test_application_round_applications_export__multiple_applications(graphql):
 def test_application_round_applications_export__missing_data(graphql, column_value_mapping, missing):
     # given:
     # - There is one non-draft application with the given missing data in the system
-    application_round = ApplicationRoundFactory.create_in_status_in_allocation(
-        reservation_period_begin=datetime.datetime(2023, 2, 7),
-        reservation_period_end=datetime.datetime(2023, 2, 8),
-    )
+    application_round = ApplicationRoundFactory.create_in_status_in_allocation()
     data = {
         "sent_date": local_datetime(),
         "application_round": application_round,
