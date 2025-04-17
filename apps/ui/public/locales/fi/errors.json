@@ -23,13 +23,13 @@
   },
   "buttons": {
     "backToHome": "Siirry Varaamon etusivulle",
-    "giveFeedback": "Anna palautetta"
+    "contact": "Ota yhteyttä"
   },
   "search": "Tapahtui virhe haettaessa tiloja. Yritä uudelleen!",
   "deactivatedAccount": {
     "heading": "Käyttäjätunnuksesi ei ole voimassa.",
     "subHeadingA": "Ota yhteyttä asiakaspalveluun sähköpostitse",
-    "subHeadingB": "tai Anna palautetta-lomakkeella.",
+    "subHeadingB": "tai Ota yhteyttä-lomakkeella.",
     "email": "varaamo@hel.fi"
   },
   "applicationMutation": {

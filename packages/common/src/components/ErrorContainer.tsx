@@ -149,11 +149,11 @@ const ErrorContainer = ({
         {children || statusCodeText({ statusCode, title, body, t })}
         <Flex $direction={"column"} $gap="xs">
           <IconButton
-            label={t("buttons.giveFeedback")}
+            label={t("buttons.contact")}
             icon={<IconArrowRight />}
             href={constructFeedbackUrl(i18n, feedbackUrl) ?? feedbackUrl}
             rel="noopener noreferrer"
-            data-testid="error__feedback-button"
+            data-testid="error__contact-button"
           />
           {STATUS_CODES_WITH_FRONTPAGE_LINK.includes(statusCode ?? 0) && (
             <IconButton
