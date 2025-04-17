@@ -5,8 +5,8 @@
   "dateTypeTomorrow": "I morgon",
   "dateTypeWeekend": "Denna helg",
   "infoDate": "dd.mm.åååå",
-  "labelEndDate": "Slutdatum",
-  "labelStartDate": "Startdatum",
+  "labelEndDate": "Datum till",
+  "labelStartDate": "Datum från",
   "errors": {
     "endDateBeforeStartDate": "Startdatumet måste vara före slutdatumet",
     "dateInvalid": "Datumet måste vara i formatet dd.mm.åååå",

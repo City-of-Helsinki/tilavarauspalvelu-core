@@ -187,8 +187,8 @@
     },
     "reservationUnitTerms": "Additional booking conditions",
     "termsOfService": "Booking conditions for City of Helsinki spaces and equipment",
-    "userAcceptsGeneralTerms": "I have read and I accept the Terms of Agreement.",
-    "userAcceptsSpecificTerms": "I have read and I accept the Additional booking conditions.",
+    "userAcceptsGeneralTerms": "I have read and I accept the Terms of Agreement. (*)",
+    "userAcceptsSpecificTerms": "I have read and I accept the Additional booking conditions. (*)",
     "subHeading": {
       "applicationInfo": "Application information"
     },

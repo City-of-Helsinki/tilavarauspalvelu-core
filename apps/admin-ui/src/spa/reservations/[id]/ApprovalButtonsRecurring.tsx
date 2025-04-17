@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { type RecurringReservationNode } from "@gql/gql-types";
 import { useTranslation } from "next-i18next";
 import { Button, ButtonSize, ButtonVariant } from "hds-react";
@@ -22,8 +22,9 @@ export function ApprovalButtonsRecurring({
   handleClose,
   handleAccept,
   disableNonEssentialButtons,
-}: Props): JSX.Element | null {
+}: Readonly<Props>): JSX.Element | null {
   const { setModalContent } = useModal();
+  const denyRecurringButtonRef = useRef<HTMLButtonElement>(null);
   const { t } = useTranslation();
 
   // check if there are any reservations that can be deleted
@@ -54,6 +55,7 @@ export function ApprovalButtonsRecurring({
         onReject={handleReject}
         onClose={handleClose}
         title={t("ApprovalButtons.recurring.DenyDialog.title")}
+        focusAfterCloseRef={denyRecurringButtonRef}
       />
     );
   };
@@ -69,6 +71,7 @@ export function ApprovalButtonsRecurring({
         variant={ButtonVariant.Secondary}
         onClick={handleDenyClick}
         data-testid="approval-buttons-recurring__reject-button"
+        ref={denyRecurringButtonRef}
       >
         {t("ApprovalButtons.recurring.rejectAllButton")}
       </Button>

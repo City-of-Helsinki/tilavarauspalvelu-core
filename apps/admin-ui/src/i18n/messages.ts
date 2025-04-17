@@ -128,6 +128,9 @@ const translations: ITranslations = {
     // TODO this is only used in FilterControls
     resetFilters: ["Tyhjennä suodattimet"],
     resetSearch: ["Tyhjennä hakukenttä"],
+    removeTag: ['Poista hakuehto "{{tag}}"'],
+    clearTags: ["Tyhjennä hakuehdot"],
+    defaultTags: ["Palauta oletushakuehdot"],
     apply: ["Käytä"],
     areaUnitSquareMeter: [" m²"],
     volumeUnit: [" kpl", " ", " "],

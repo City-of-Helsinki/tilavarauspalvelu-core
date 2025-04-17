@@ -145,14 +145,20 @@ const ChildContainer = styled.div`
 function WrapWithLink({
   content,
   link,
-}: {
+  focusable = true,
+}: Readonly<{
   content: JSX.Element;
   link?: string;
-}): JSX.Element {
+  focusable?: boolean;
+}>): JSX.Element {
   if (!link) {
     return content;
   }
-  return <Link href={link}>{content}</Link>;
+  return (
+    <Link href={link} tabIndex={focusable ? 0 : -1}>
+      {content}
+    </Link>
+  );
 }
 
 /**
@@ -216,15 +222,9 @@ export default function Card({
       {imageSrc && (
         <ImageWrapper>
           <WrapWithLink
-            content={
-              <Image
-                src={imageSrc}
-                alt={imageAlt}
-                aria-hidden="true"
-                tabIndex={-1}
-              />
-            }
+            content={<Image src={imageSrc} alt={imageAlt} aria-hidden="true" />}
             link={link}
+            focusable={false}
           />
         </ImageWrapper>
       )}
@@ -405,6 +405,10 @@ const InfoItem = styled(Flex).attrs({
 })`
   font-size: var(--fontsize-body-s);
   margin-top: auto;
+  p {
+    margin: 0;
+    font-size: var(--fontsize-body-s);
+  }
 `;
 
 function Infos({
@@ -435,7 +439,7 @@ function Info({
   return (
     <InfoItem {...rest}>
       {icon}
-      <span>{value}</span>
+      <p>{value}</p>
     </InfoItem>
   );
 }

@@ -33,10 +33,12 @@ const MoreWrapper = styled(ShowAllContainer)`
 export function Filters({
   defaultFilters = [],
   clearButtonLabel,
-}: {
+  clearButtonAriaLabel,
+}: Readonly<{
   defaultFilters?: Array<{ key: string; value: string | string[] }>;
   clearButtonLabel?: string;
-}): JSX.Element {
+  clearButtonAriaLabel?: string;
+}>): JSX.Element {
   const { t } = useTranslation();
 
   const { options: reservationUnitTypeOptions } = useReservationUnitTypes();
@@ -187,6 +189,7 @@ export function Filters({
         translateTag={translateTag}
         defaultTags={defaultFilters}
         clearButtonLabel={clearButtonLabel}
+        clearButtonAriaLabel={clearButtonAriaLabel}
       />
     </Flex>
   );

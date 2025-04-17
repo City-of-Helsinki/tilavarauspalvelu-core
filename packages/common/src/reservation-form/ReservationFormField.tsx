@@ -240,8 +240,8 @@ const ReservationFormField = ({
         invalid={!!error}
         required={required}
         step={1}
-        minusStepButtonAriaLabel={t("common:decrease")}
-        plusStepButtonAriaLabel={t("common:increase")}
+        minusStepButtonAriaLabel={t("common:subtract")}
+        plusStepButtonAriaLabel={t("common:add")}
         min={minValue}
         max={maxValue}
         onChange={(e) => {

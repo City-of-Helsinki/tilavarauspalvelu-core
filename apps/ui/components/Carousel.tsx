@@ -14,6 +14,7 @@ type Props = {
   hideCenterControls?: boolean;
   controlAriaLabel?: string;
   slideIndex?: number;
+  frameAriaLabel?: string;
 };
 
 const SmallArrowButton = styled.button`
@@ -88,7 +89,7 @@ function Carousel({
   hideCenterControls = false,
   controlAriaLabel = "",
   ...rest
-}: Props): JSX.Element {
+}: Readonly<Props>): JSX.Element {
   const { t } = useTranslation();
 
   return (

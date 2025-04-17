@@ -2,6 +2,8 @@
   "language": "Suomi",
   "dateLabel": "Päivämäärä",
   "timeLabel": "Kellonaika",
+  "timeLabelBegin": "Kellonaika alkaen",
+  "timeLabelEnd": "Kellonaika päättyen",
   "dateWithWeekday": "{{date, datetime}}",
   "dayTimeSeparator": " klo",
   "dateGte": "{{value}} lähtien",
@@ -124,5 +126,6 @@
   "peopleSuffixShort": "hlö",
   "yearSuffixShort": "v",
   "amountSuffixShort": "kpl",
-  "validity": "Voimassaoloaika"
+  "validity": "Voimassaoloaika",
+  "helsinkiCity": "Helsingin kaupunki"
 }

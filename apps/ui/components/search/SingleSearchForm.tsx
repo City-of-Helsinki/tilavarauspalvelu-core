@@ -234,8 +234,8 @@ export function SingleSearchForm({
             control={control}
             names={{ begin: "timeBegin", end: "timeEnd" }}
             labels={{
-              begin: `${t("common:timeLabel")}: ${t("common:beginLabel")}`,
-              end: `${t("common:timeLabel")}: ${t("common:endLabel")}`,
+              begin: `${t("common:timeLabelBegin")}`,
+              end: `${t("common:timeLabelEnd")}`,
             }}
             placeholders={{
               begin: t("common:beginLabel"),

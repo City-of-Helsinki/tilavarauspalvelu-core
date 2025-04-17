@@ -5,8 +5,8 @@
   "dateTypeTomorrow": "Tomorrow",
   "dateTypeWeekend": "On the weekend",
   "infoDate": "dd.mm.yyyy",
-  "labelEndDate": "End date",
-  "labelStartDate": "Start date",
+  "labelEndDate": "Date until",
+  "labelStartDate": "Date from",
   "errors": {
     "endDateBeforeStartDate": "End date must be after start date",
     "dateInvalid": "The date must be in the format dd.mm.yyyy",

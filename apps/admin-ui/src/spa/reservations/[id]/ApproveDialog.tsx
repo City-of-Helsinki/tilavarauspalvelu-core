@@ -41,6 +41,7 @@ type Props = {
   onClose: () => void;
   onAccept: () => void;
   isFree?: boolean;
+  focusAfterCloseRef?: React.RefObject<HTMLButtonElement>;
 };
 
 const DialogContent = ({ reservation, onClose, onAccept }: Props) => {
@@ -168,6 +169,7 @@ const ApproveDialog = ({
   isFree,
   onClose,
   onAccept,
+  focusAfterCloseRef,
 }: Props): JSX.Element => {
   const { isOpen } = useModal();
   const { t } = useTranslation();
@@ -178,7 +180,7 @@ const ApproveDialog = ({
       id="info-dialog"
       aria-labelledby="modal-header"
       isOpen={isOpen}
-      focusAfterCloseRef={undefined}
+      focusAfterCloseRef={focusAfterCloseRef}
     >
       <Flex>
         <Dialog.Header
