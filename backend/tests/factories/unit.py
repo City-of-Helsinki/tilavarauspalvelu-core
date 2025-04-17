@@ -65,6 +65,7 @@ class UnitFactory(GenericDjangoModelFactory[Unit]):
     location = ReverseOneToOneFactory("tests.factories.LocationFactory")
 
     reservation_units = ReverseForeignKeyFactory("tests.factories.ReservationUnitFactory")
+    spaces = ReverseForeignKeyFactory("tests.factories.SpaceFactory")
 
     unit_roles = ManyToManyFactory("tests.factories.UnitRoleFactory")
     unit_groups = ManyToManyFactory("tests.factories.UnitGroupFactory")
