@@ -25,7 +25,6 @@ from tests.factories import (
     PaymentOrderFactory,
     ReservationFactory,
     ReservationMetadataSetFactory,
-    ReservationUnitPaymentTypeFactory,
     UserFactory,
 )
 from tests.helpers import patch_method
@@ -263,7 +262,7 @@ def test_reservation__confirm__creates_local_order_when_payment_type_is_on_site(
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_on_site(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_units__payment_types__code=PaymentType.INVOICE,
+        reservation_units__pricings__payment_type=PaymentType.INVOICE,
         user__preferred_language="fi",
     )
 
@@ -296,7 +295,7 @@ def test_reservation__confirm__calls_verkkokauppa_api_when_payment_type_is_not_o
 @patch_method(SentryLogger.log_exception)
 def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_units__payment_types__code=PaymentType.INVOICE,
+        reservation_units__pricings__payment_type=PaymentType.INVOICE,
         user__preferred_language="fi",
     )
 
@@ -314,7 +313,7 @@ def test_reservation__confirm__does_not_save_when_api_call_fails(graphql):
 
 def test_reservation__confirm__default_payment_type__on_site(graphql):
     reservation = ReservationFactory.create_for_confirmation(
-        reservation_units__payment_types__code=PaymentType.ON_SITE,
+        reservation_units__pricings__payment_type=PaymentType.ON_SITE,
     )
 
     graphql.login_with_superuser()
@@ -330,13 +329,9 @@ def test_reservation__confirm__default_payment_type__on_site(graphql):
 
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__default_payment_type__invoice(graphql):
-    payment_type_1 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.ON_SITE.value)
-    payment_type_2 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.INVOICE.value)
-
-    reservation = ReservationFactory.create_for_confirmation(reservation_units__payment_types=None)
-
-    reservation_unit = reservation.reservation_units.first()
-    reservation_unit.payment_types.add(payment_type_1, payment_type_2)
+    reservation = ReservationFactory.create_for_confirmation(
+        reservation_units__pricings__payment_type=PaymentType.INVOICE,
+    )
 
     VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
 
@@ -355,14 +350,9 @@ def test_reservation__confirm__default_payment_type__invoice(graphql):
 
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__default_payment_type__online(graphql):
-    payment_type_1 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.ON_SITE.value)
-    payment_type_2 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.INVOICE.value)
-    payment_type_3 = ReservationUnitPaymentTypeFactory.create(code=PaymentType.ONLINE.value)
-
-    reservation = ReservationFactory.create_for_confirmation(reservation_units__payment_types=None)
-
-    reservation_unit = reservation.reservation_units.first()
-    reservation_unit.payment_types.add(payment_type_1, payment_type_2, payment_type_3)
+    reservation = ReservationFactory.create_for_confirmation(
+        reservation_units__pricings__payment_type=PaymentType.ONLINE,
+    )
 
     VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
 
@@ -406,7 +396,9 @@ def test_reservation__confirm__order_not_created_when_price_is_zero(graphql):
 
 @patch_method(VerkkokauppaAPIClient.create_order)
 def test_reservation__confirm__return_order_data(graphql):
-    reservation = ReservationFactory.create_for_confirmation(reservation_units__payment_types__code=PaymentType.ONLINE)
+    reservation = ReservationFactory.create_for_confirmation(
+        reservation_units__pricings__payment_type=PaymentType.ONLINE,
+    )
 
     VerkkokauppaAPIClient.create_order.return_value = OrderFactory.create()
 

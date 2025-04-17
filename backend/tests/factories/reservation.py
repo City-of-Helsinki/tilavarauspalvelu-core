@@ -181,15 +181,17 @@ class ReservationFactory(GenericDjangoModelFactory[Reservation]):
     @classmethod
     def create_for_confirmation(cls, **kwargs: Any) -> Reservation:
         """Create a Reservation for a single ReservationUnit in the necessary state for confirmation."""
+        from .payment_accounting import PaymentAccountingFactory
         from .payment_product import PaymentProductFactory
         from .reservable_time_span import ReservableTimeSpanFactory
         from .reservation_unit import ReservationUnitFactory
 
         sub_kwargs = cls.pop_sub_kwargs("reservation_units", kwargs)
         sub_kwargs.setdefault("origin_hauki_resource__id", "987")
-        sub_kwargs.setdefault("payment_types__code", PaymentType.ON_SITE)
         sub_kwargs.setdefault("payment_product", PaymentProductFactory.create())
+        sub_kwargs.setdefault("payment_accounting", PaymentAccountingFactory.create())
         sub_kwargs.setdefault("pricings__highest_price", 20)
+        sub_kwargs.setdefault("pricings__payment_type", PaymentType.ON_SITE)
         reservation_unit = ReservationUnitFactory.create(**sub_kwargs)
 
         day_start = local_start_of_day()
