@@ -47,6 +47,7 @@ create_order_params: CreateOrderParams = CreateOrderParams(
             price_gross=Decimal(124),
             price_vat=Decimal(24),
             vat_percentage=Decimal(24),
+            invoicing_date=None,
             meta=[
                 OrderItemMetaParams(
                     key="firstKey",

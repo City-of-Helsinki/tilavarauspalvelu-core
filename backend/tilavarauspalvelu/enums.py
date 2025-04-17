@@ -337,6 +337,10 @@ class CustomerTypeChoice(models.TextChoices):
             CustomerTypeChoice.NONPROFIT.value,
         ]
 
+    @enum.property
+    def is_organisation(self) -> bool:
+        return self in CustomerTypeChoice.organisation
+
 
 class ReservationStateChoice(models.TextChoices):
     CREATED = "CREATED", pgettext_lazy("ReservationState", "Created")
@@ -681,6 +685,13 @@ class PaymentType(models.TextChoices):
     ONLINE = "ONLINE", pgettext_lazy("PaymentType", "Online")
     ON_SITE = "ON_SITE", pgettext_lazy("PaymentType", "On site")
     INVOICE = "INVOICE", pgettext_lazy("PaymentType", "Invoice")
+
+    @classproperty
+    def requires_verkkokauppa(cls) -> list[str]:
+        return [  # type: ignore[return-value]
+            cls.ONLINE.value,
+            cls.INVOICE.value,
+        ]
 
 
 class PriceUnit(models.TextChoices):

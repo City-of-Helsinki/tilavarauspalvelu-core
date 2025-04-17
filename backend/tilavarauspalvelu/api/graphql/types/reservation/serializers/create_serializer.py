@@ -73,11 +73,12 @@ class ReservationCreateSerializer(NestingModelSerializer):
 
         if pricing is None:
             msg = "No pricing found for the given date."
-            raise ValidationError(msg, code=error_codes.NO_PRICING_FOUND)
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_ACTIVE_PRICING)
 
         if pricing.highest_price > 0:
-            reservation_unit.validators.validate_has_payment_type()
+            pricing.validators.validate_has_payment_type()
             reservation_unit.validators.validate_has_payment_product()
+            reservation_unit.validators.validate_has_payment_accounting()
 
         data["sku"] = reservation_unit.sku
         data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)
