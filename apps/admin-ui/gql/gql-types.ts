@@ -28,12 +28,30 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
+  /**
+   * The `Date` scalar type represents a Date
+   * value as specified by
+   * [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+   */
   Date: { input: string; output: string };
+  /**
+   * The `DateTime` scalar type represents a DateTime
+   * value as specified by
+   * [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+   */
   DateTime: { input: string; output: string };
+  /** The `Decimal` scalar type represents a python Decimal. */
   Decimal: { input: string; output: string };
+  /** Represents a DurationField value as an integer in seconds. */
   Duration: { input: number; output: number };
+  /** Time scalar that can parse time-strings from database. */
   Time: { input: string; output: string };
+  /**
+   * Leverages the internal Python implementation of UUID (uuid.UUID) to provide native UUID objects
+   * in fields, resolvers and input.
+   */
   UUID: { input: string; output: string };
+  /** Represents a file upload. */
   Upload: { input: unknown; output: unknown };
 };
 
