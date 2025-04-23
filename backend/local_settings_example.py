@@ -23,8 +23,6 @@ class LocalMixin:
 class DockerMixin:
     """Add custom docker settings here."""
 
-    GRAPHQL_CODEGEN_ENABLED = False  # Set to True to enable codegen for frontend by disabling CSRF protection
-
 
 class AutomatedTestMixin:
     """Add custom automated test settings here."""
