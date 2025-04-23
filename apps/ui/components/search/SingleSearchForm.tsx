@@ -16,10 +16,7 @@ import { FilterTagList } from "../FilterTagList";
 import SingleLabelInputGroup from "@/components/common/SingleLabelInputGroup";
 import { useSearchModify } from "@/hooks/useSearchValues";
 import { ControlledSelect } from "common/src/components/form/ControlledSelect";
-import {
-  mapParamToNumber,
-  mapSingleBooleanParamToFormValue,
-} from "@/modules/search";
+import { mapParamToNumber } from "@/modules/search";
 import {
   Filters,
   OptionalFilters,
@@ -28,7 +25,7 @@ import {
 } from "./styled";
 import { useSearchParams, type ReadonlyURLSearchParams } from "next/navigation";
 import { AccessType } from "@gql/gql-types";
-import { toNumber } from "common/src/helpers";
+import { ignoreMaybeArray, toNumber } from "common/src/helpers";
 
 const StyledCheckBox = styled(Checkbox)`
   margin: 0 !important;
@@ -49,7 +46,7 @@ type SearchFormValues = {
   endDate: string | null;
   duration: number | null;
   personsAllowed: number | null;
-  showOnlyReservable?: boolean;
+  showOnlyReservable: boolean;
   textSearch: string;
 };
 
@@ -57,8 +54,7 @@ function mapQueryToForm(params: ReadonlyURLSearchParams): SearchFormValues {
   const dur = toNumber(params.get("duration"));
   const duration = dur != null && dur > 0 ? dur : null;
   const showOnlyReservable =
-    mapSingleBooleanParamToFormValue(params.getAll("showOnlyReservable")) ??
-    true;
+    ignoreMaybeArray(params.getAll("showOnlyReservable")) !== "false";
   return {
     purposes: mapParamToNumber(params.getAll("purposes"), 1),
     units: mapParamToNumber(params.getAll("units"), 1),
