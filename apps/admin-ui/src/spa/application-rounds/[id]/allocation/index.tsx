@@ -27,6 +27,7 @@ import {
   base64encode,
   convertOptionToHDS,
   filterNonNullable,
+  sort,
   toNumber,
 } from "common/src/helpers";
 import { SearchTags } from "@/component/SearchTags";
@@ -145,7 +146,7 @@ function Filters({
     label: unit?.nameFi ?? "",
   }));
 
-  const unitFilter = searchParams.get("unit");
+  const unitFilter = toNumber(searchParams.get("unit"));
   const setUnitFilter = (value: number) => {
     // NOTE different logic because values are not atomic and we need to set two params
     const vals = new URLSearchParams(searchParams);
@@ -155,7 +156,7 @@ function Filters({
   };
 
   useEffect(() => {
-    if (units.length > 0 && unitFilter == null) {
+    if (units.length > 0 && (unitFilter == null || unitFilter < 1)) {
       setUnitFilter(units[0]?.pk ?? 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- this is the correct list, but should be refactored
@@ -175,7 +176,7 @@ function Filters({
         options={unitOptions.map(convertOptionToHDS)}
         disabled={unitOptions.length === 0}
         value={unitOptions
-          .find((v) => v.value === toNumber(unitFilter))
+          .find((v) => v.value === unitFilter)
           ?.value?.toString()}
         onChange={(selection) => {
           const val = selection.find(() => true)?.value;
@@ -228,7 +229,7 @@ function ApplicationRoundAllocation({
 
   const [searchParams, setParams] = useSearchParams();
 
-  const unitFilter = searchParams.get("unit");
+  const unitFilter = toNumber(searchParams.get("unit"));
   const setSingleValueSearchParam = (param: string, value: string | null) => {
     const vals = new URLSearchParams(searchParams);
     if (value == null) {
@@ -240,7 +241,7 @@ function ApplicationRoundAllocation({
   };
 
   const unitReservationUnits = reservationUnits.filter(
-    (ru) => ru.unit?.pk != null && ru?.unit?.pk === Number(unitFilter)
+    (ru) => ru.unit?.pk != null && ru.unit.pk === unitFilter
   );
 
   const selectedReservationUnit =
@@ -308,7 +309,7 @@ function ApplicationRoundAllocation({
       errorToast({ text: t("errors.errorFetchingData") });
     },
   });
-  const { data, refetch, previousData, fetchMore } = query;
+  const { data, loading, refetch, previousData, fetchMore } = query;
 
   // NOTE onComplete isn't called more than once
   // how this interacts with the polling is unknown
@@ -323,14 +324,14 @@ function ApplicationRoundAllocation({
     }
   }, [data, fetchMore]);
 
-  if (
-    reservationUnitFilterQuery == null ||
-    applicationRound?.reservationPeriodBegin == null ||
-    applicationRound.reservationPeriodEnd == null
-  ) {
+  // TODO these should check the loading state also (it's only an error if not loading)
+  if (reservationUnitFilterQuery == null) {
+    // eslint-disable-next-line no-console -- TODO use logger
+    console.warn("Skipping allocation query because reservation unit");
+  } else if (applicationRound == null) {
     // eslint-disable-next-line no-console -- TODO use logger
     console.warn(
-      "Skipping allocation query because reservation unit or reservation period is not set"
+      "Skipping allocation query because application round is not set"
     );
   }
 
@@ -341,12 +342,14 @@ function ApplicationRoundAllocation({
   // NOTE get the count of all application sections for the selected reservation unit
   // TODO this can be combined with the above query (but requires casting the alias)
   const { data: allEventsData } = useAllApplicationEventsQuery({
-    skip: !applicationRoundPk || !selectedReservationUnit || !unitFilter,
+    skip:
+      applicationRoundPk === 0 ||
+      reservationUnitFilterQuery == null ||
+      unitFilter == null,
     variables: {
       applicationRound: applicationRoundPk,
-      // cast constructor is ok because of the skip
-      reservationUnit: [Number(selectedReservationUnit)],
-      unit: [Number(unitFilter)],
+      reservationUnit: [reservationUnitFilterQuery],
+      unit: [unitFilter],
       applicationStatus: VALID_ALLOCATION_APPLICATION_STATUSES,
     },
     // NOTE returns incorrectly filtered data if we enable cache
@@ -377,13 +380,10 @@ function ApplicationRoundAllocation({
     appEventsData?.applicationSections?.edges.map((e) => e?.node)
   )
     .filter((section) => {
-      const opts = section?.reservationUnitOptions?.filter((r) => {
-        if (r?.reservationUnit == null) {
-          return false;
-        }
+      const opts = section.reservationUnitOptions.filter((r) => {
         if (
           r.allocatedTimeSlots.filter(
-            (ats) => ats.reservationUnitOption?.pk === r.pk
+            (ats) => ats.reservationUnitOption.pk === r.pk
           ).length > 0
         ) {
           return true;
@@ -391,13 +391,13 @@ function ApplicationRoundAllocation({
         if (preferredOrderFilterQuery.length > 0) {
           const includedInPreferredOrder =
             preferredOrderFilterQuery.includes(r.preferredOrder) ||
-            (includePreferredOrder10OrHigher && (r.preferredOrder ?? 0) >= 10);
+            (includePreferredOrder10OrHigher && r.preferredOrder >= 10);
           const orderFiltered =
             includedInPreferredOrder &&
             r.reservationUnit.pk === reservationUnitFilterQuery;
           return orderFiltered;
         }
-        return r?.reservationUnit.pk === reservationUnitFilterQuery;
+        return r.reservationUnit.pk === reservationUnitFilterQuery;
       });
       return opts.length > 0;
     })
@@ -405,11 +405,11 @@ function ApplicationRoundAllocation({
       // query includes locked and rejected show we can show them in the left column
       // but no allocation can be made to those
       // which are made using suitableTimeRanges so filter them out
-      const opts = section?.reservationUnitOptions?.filter((r) => {
+      const opts = section.reservationUnitOptions.filter((r) => {
         if (r.reservationUnit.pk !== reservationUnitFilterQuery) {
           return false;
         }
-        if (r?.locked || r?.rejected) {
+        if (r.locked || r.rejected) {
           return false;
         }
         return true;
@@ -498,12 +498,12 @@ function ApplicationRoundAllocation({
 
   // NOTE findIndex returns -1 if not found
   const initiallyActiveTab = unitReservationUnits.findIndex(
-    (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
+    (x) => x.pk != null && x.pk === reservationUnitFilterQuery
   );
 
   const reservationUnit =
     unitReservationUnits.find(
-      (x) => x.pk != null && x.pk.toString() === selectedReservationUnit
+      (x) => x.pk != null && x.pk === reservationUnitFilterQuery
     ) ?? reservationUnits[0];
 
   return (
@@ -564,7 +564,8 @@ function ApplicationRoundAllocation({
           </>
         )}
       </NumberOfResultsContainer>
-      {reservationUnit && (
+      {/* NOTE there is an effect inside this component that removes "aes" query param if we don't have data */}
+      {reservationUnit && !loading ? (
         <AllocationPageContent
           applicationSections={applicationSections}
           reservationUnit={reservationUnit}
@@ -573,7 +574,9 @@ function ApplicationRoundAllocation({
           refetchApplicationEvents={handleRefetchApplicationEvents}
           applicationRoundStatus={applicationRoundStatus}
         />
-      )}
+      ) : loading ? (
+        <CenterSpinner />
+      ) : null}
     </>
   );
 }
@@ -610,21 +613,22 @@ function AllocationWrapper({
     );
 
   // filter the list of individual units so user can select only the ones they have permission to
-  const filteredUnits = units
-    .filter(hasAccess)
+  const filteredUnits = sort(
+    units.filter(hasAccess),
     // TODO name sort fails with numbers because 11 < 2
-    .sort((a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0);
+    (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
+  );
 
   // user has no accesss to specific unit through URL with search params -> reset the filter
   const [searchParams, setParams] = useSearchParams();
   useEffect(() => {
-    const unit = searchParams.get("unit");
-    if (unit && !filteredUnits.some((u) => u.pk === Number(unit))) {
+    const unit = toNumber(searchParams.get("unit"));
+    if (!loading && !filteredUnits.some((u) => u.pk === unit)) {
       const p = new URLSearchParams(searchParams);
       p.delete("unit");
       setParams(p, { replace: true });
     }
-  }, [filteredUnits, searchParams, setParams]);
+  }, [filteredUnits, searchParams, setParams, loading]);
 
   // TODO don't use spinners, skeletons are better
   // also this blocks the sub component query (the initial with zero filters) which slows down the page load
@@ -645,8 +649,9 @@ function AllocationWrapper({
 
   const roundName = applicationRound?.nameFi ?? "-";
 
-  const resUnits = uniqBy(filterNonNullable(reservationUnits), "pk").sort(
-    (a, b) => a?.nameFi?.localeCompare(b?.nameFi ?? "") ?? 0
+  const resUnits = sort(
+    uniqBy(reservationUnits, "pk"),
+    (a, b) => a.nameFi?.localeCompare(b.nameFi ?? "") ?? 0
   );
 
   return (

@@ -19,7 +19,7 @@ import {
 } from "./ApplicationEventCard";
 import { useFocusApplicationEvent } from "./hooks";
 import { type ApolloQueryResult } from "@apollo/client";
-import { filterNonNullable } from "common/src/helpers";
+import { filterNonNullable, toNumber } from "common/src/helpers";
 import {
   type AllocatedTimeSlotNodeT,
   getRelatedTimeSlots,
@@ -122,10 +122,10 @@ export function AllocationPageContent({
   // When selected reservation unit changes, remove any focused application event that's not in the new reservation unit
   // TODO could include it in the hook or wrap it inside it's own
   useEffect(() => {
-    const selectedAeasPk = params.get("aes");
-    if (selectedAeasPk) {
-      const selectedAeas = applicationSections?.find(
-        (ae) => ae.pk === Number(selectedAeasPk)
+    const selectedAesPk = toNumber(params.get("aes"));
+    if (selectedAesPk) {
+      const selectedAeas = applicationSections.find(
+        (ae) => ae.pk === selectedAesPk
       );
       setFocusedApplicationEvent(selectedAeas);
     } else {
