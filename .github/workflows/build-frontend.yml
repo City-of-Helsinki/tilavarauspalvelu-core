@@ -11,6 +11,7 @@ on:
   repository_dispatch:
     types:
       - fast-forward
+      - update-graphql-schema
 
 # Cancel a workflow from the same PR, branch or tag when a new workflow is triggered.
 concurrency:

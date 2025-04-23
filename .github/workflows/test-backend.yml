@@ -8,6 +8,9 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+  repository_dispatch:
+    types:
+      - update-graphql-schema
 
 # Cancel a workflow from the same PR, branch or tag when a new workflow is triggered.
 concurrency:
