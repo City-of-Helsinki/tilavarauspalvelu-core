@@ -4,7 +4,6 @@ import {
   useApplicationReservationsQuery,
   ReservationStateChoice,
   AccessType,
-  ReservationUnitNode,
   type ApplicationNode,
   ApplicationSectionReservationUnitFragment,
   AccessTypeWithMultivalued,
@@ -660,19 +659,27 @@ function createReservationUnitLink({
 }: {
   lang: LocalizationLanguages;
   reservationUnit: Pick<
-    ReservationUnitNode,
-    "nameSv" | "nameFi" | "nameEn" | "id" | "pk"
+    ApplicationSectionReservationUnitFragment,
+    "nameSv" | "nameFi" | "nameEn" | "id" | "pk" | "unit"
   >;
 }): JSX.Element {
   const { pk } = reservationUnit;
   const name = getTranslationSafe(reservationUnit, "name", lang);
+  const unit = reservationUnit.unit
+    ? `, ${getTranslationSafe(reservationUnit.unit, "name", lang)}`
+    : "";
   if (pk == null || pk <= 0) {
-    return <span>{name}</span>;
+    return (
+      <span>
+        {name}
+        {unit}
+      </span>
+    );
   }
   return (
     <ReservationUnitLink
       href={getReservationUnitPath(pk)}
-      label={name}
+      label={name + unit}
       openInNewTab
       icon={<IconLinkExternal />}
     />
@@ -1211,6 +1218,12 @@ export const APPLICATION_SECTION_RESERVATION_UNIT_FRAGMENT = gql`
     nameEn
     id
     pk
+    unit {
+      id
+      nameFi
+      nameSv
+      nameEn
+    }
     reservationCancelledInstructionsFi
     reservationCancelledInstructionsSv
     reservationCancelledInstructionsEn
