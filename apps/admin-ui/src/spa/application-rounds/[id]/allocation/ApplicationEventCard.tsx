@@ -64,7 +64,7 @@ const borderCss = css<{ $type: AllocationApplicationSectionCardType }>`
   }};
 `;
 
-const Card = styled.button<{ $type: AllocationApplicationSectionCardType }>`
+const Card = styled.div<{ $type: AllocationApplicationSectionCardType }>`
   position: relative;
   display: flex;
   flex-direction: column;
