@@ -4,7 +4,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path, reverse
-from django.views.decorators.csrf import csrf_exempt
 from graphene_django_extensions import FileUploadGraphQLView
 
 from tilavarauspalvelu.api.gdpr.views import TilavarauspalveluGDPRAPIView
@@ -33,13 +32,8 @@ admin.site.each_context = lambda request: original_each_context(request) | {
     "helsinki_logout_url": reverse("helusers:auth_logout"),
 }
 
-# Make it possible to turn off CSRF protection for the GraphQL endpoint for frontend graphql codegen
-graphql_view = FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)
-if settings.GRAPHQL_CODEGEN_ENABLED:
-    graphql_view = csrf_exempt(graphql_view)  # NOSONAR
-
 urlpatterns = [
-    path("graphql/", graphql_view),
+    path("graphql/", FileUploadGraphQLView.as_view(graphiql=settings.DEBUG)),
     path("admin/", admin.site.urls),
     path("v1/reservation_calendar/<int:pk>/", reservation_ical, name="reservation_calendar"),
     path("v1/terms_of_use_pdf/", terms_of_use_pdf, name="terms_of_use_pdf"),
