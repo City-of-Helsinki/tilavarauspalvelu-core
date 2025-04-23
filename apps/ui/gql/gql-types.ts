@@ -8815,6 +8815,7 @@ export type ApplicationRoundQuery = {
     readonly nameFi: string | null;
     readonly nameEn: string | null;
     readonly nameSv: string | null;
+    readonly status: ApplicationRoundStatusChoice;
     readonly reservationPeriodBegin: string;
     readonly reservationPeriodEnd: string;
     readonly reservationUnits: ReadonlyArray<{
@@ -13357,6 +13358,7 @@ export const ApplicationRoundDocument = gql`
       nameFi
       nameEn
       nameSv
+      status
       reservationPeriodBegin
       reservationPeriodEnd
       reservationUnits {
