@@ -8,18 +8,17 @@ import {
   type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { filterNonNullable, timeToMinutes } from "common/src/helpers";
-import { convertWeekday } from "common/src/conversion";
 import { H5, Strong, Flex, SemiBold, fontMedium } from "common/styled";
 import { formatDuration } from "@/common/util";
 import { Accordion } from "@/component/Accordion";
 import {
-  formatTime,
   formatTimeRangeList,
   createDurationString,
   decodeTimeSlot,
   type SectionNodeT,
   type SuitableTimeRangeNodeT,
   type AllocatedTimeSlotNodeT,
+  formatSuitableTimeRange,
 } from "./modules/applicationRoundAllocation";
 import {
   useAcceptSlotMutation,
@@ -147,12 +146,7 @@ export function AllocatedCard({
         {applicationSection.name}
       </H5>
       <Applicant>{applicantName}</Applicant>
-      {allocatedTimeSlot != null ? (
-        <AllocatedDetails
-          section={applicationSection}
-          allocatedTimeSlot={allocatedTimeSlot}
-        />
-      ) : null}
+      <AllocatedDetails allocatedTimeSlot={allocatedTimeSlot} />
       <StyledAccordion
         heading={t("Allocation.showTimeRequests")}
         headingLevel="h3"
@@ -309,39 +303,26 @@ export function SuitableTimeCard({
   );
 }
 
-function getDurationFromApiTimeInHours(begin: string, end: string) {
-  const bh = timeToMinutes(begin) / 60;
-  const eh = timeToMinutes(end) / 60;
-  if (bh == null || eh == null) {
-    return undefined;
-  }
+function getDurationFromApiTimeInHours({
+  beginTime,
+  endTime,
+}: {
+  beginTime: string;
+  endTime: string;
+}): number {
+  const bh = timeToMinutes(beginTime) / 60;
+  const eh = timeToMinutes(endTime) / 60;
   return (eh === 0 ? 24 : eh) - bh;
 }
 
 function AllocatedDetails({
-  section,
   allocatedTimeSlot,
 }: {
-  section: SectionNodeT;
   allocatedTimeSlot: AllocatedTimeSlotNodeT;
 }) {
   const { t } = useTranslation();
-  const { beginTime, endTime, dayOfTheWeek } = allocatedTimeSlot;
-  const allocationDuration = getDurationFromApiTimeInHours(beginTime, endTime);
-  const day = convertWeekday(dayOfTheWeek);
-  const allocatedTimeString = `${t(`dayShort.${day}`)} ${formatTime(beginTime)} - ${formatTime(endTime)}`;
-
-  if (allocationDuration == null) {
-    // eslint-disable-next-line no-console
-    console.warn("Allocation duration is undefined", { section });
-  }
-
-  if (allocatedTimeString == null || allocationDuration == null) {
-    // eslint-disable-next-line no-console
-    console.warn("Allocated time string or duration is undefined", {
-      section,
-    });
-  }
+  const allocationDuration = getDurationFromApiTimeInHours(allocatedTimeSlot);
+  const timeString = formatSuitableTimeRange(t, allocatedTimeSlot);
 
   const durString = t("common.hoursUnit", { count: allocationDuration });
 
@@ -349,7 +330,7 @@ function AllocatedDetails({
     <DetailRow>
       <span>{t("Allocation.allocatedTime")}</span>
       <SemiBold>
-        {allocatedTimeString} ({durString})
+        {timeString} ({durString})
       </SemiBold>
     </DetailRow>
   );
