@@ -28,7 +28,8 @@
 **/build
 **/out
 
-# graphql query pluck
+# graphql
+**/gql-types.ts
 gql-pluck-output/
 
 # local config
