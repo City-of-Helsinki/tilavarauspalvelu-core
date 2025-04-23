@@ -5,16 +5,17 @@ import { Notification, NotificationSize } from "hds-react";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { H1 } from "common/styled";
 import {
-  ReservationKind,
+  type ApplicationCreateMutationInput,
   ApplicationRoundDocument,
   type ApplicationRoundQuery,
   type ApplicationRoundQueryVariables,
-  type CreateApplicationMutationVariables,
-  type CreateApplicationMutation,
+  ApplicationRoundStatusChoice,
   CreateApplicationDocument,
-  type ApplicationCreateMutationInput,
+  type CreateApplicationMutation,
+  type CreateApplicationMutationVariables,
   CurrentUserDocument,
   type CurrentUserQuery,
+  ReservationKind,
 } from "@gql/gql-types";
 import {
   base64encode,
@@ -172,6 +173,17 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   if (applicationRound == null) {
     return notFound;
   }
+  if (applicationRound.status !== ApplicationRoundStatusChoice.Open) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: seasonalPrefix,
+      },
+      props: {
+        notFound: true, // for prop narrowing
+      },
+    };
+  }
 
   const { data: userData } = await apolloClient.query<CurrentUserQuery>({
     query: CurrentUserDocument,
@@ -236,6 +248,7 @@ export const APPLICATION_ROUND_QUERY = gql`
       nameFi
       nameEn
       nameSv
+      status
       reservationPeriodBegin
       reservationPeriodEnd
       reservationUnits {
