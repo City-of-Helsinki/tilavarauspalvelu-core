@@ -6004,6 +6004,12 @@ export type ApplicationSectionReservationUnitFragment = {
   readonly reservationCancelledInstructionsSv: string | null;
   readonly reservationCancelledInstructionsEn: string | null;
   readonly currentAccessType: AccessType | null;
+  readonly unit: {
+    readonly id: string;
+    readonly nameFi: string | null;
+    readonly nameSv: string | null;
+    readonly nameEn: string | null;
+  } | null;
   readonly accessTypes: ReadonlyArray<{
     readonly id: string;
     readonly pk: number | null;
@@ -10205,6 +10211,12 @@ export const ApplicationSectionReservationUnitFragmentDoc = gql`
     nameEn
     id
     pk
+    unit {
+      id
+      nameFi
+      nameSv
+      nameEn
+    }
     reservationCancelledInstructionsFi
     reservationCancelledInstructionsSv
     reservationCancelledInstructionsEn
