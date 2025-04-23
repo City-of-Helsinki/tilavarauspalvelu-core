@@ -26,7 +26,7 @@ import {
   checkLengthWithoutHtml,
   checkTimeStringFormat,
 } from "common/src/schemas/schemaCommon";
-import { constructApiDateTime } from "@/helpers";
+import { fromUIDateTime } from "@/helpers";
 import { intervalToNumber } from "@/schemas/utils";
 
 export const PaymentTypes = ["ONLINE", "INVOICE", "ON_SITE"] as const;
@@ -358,17 +358,16 @@ function validateDateTimeInterval({
     });
   }
 
-  // TODO if the above checks fail this doesn't need to be checked, right?
-  const begin = constructApiDateTime(beginDate, beginTime);
-  const end = constructApiDateTime(endDate, endTime);
-  if (begin == null) {
+  const begin = fromUIDateTime(beginDate, beginTime);
+  const end = fromUIDateTime(endDate, endTime);
+  if (beginDate !== "" && begin == null) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "Invalid date",
       path: [path.beginDate],
     });
   }
-  if (end == null) {
+  if (endDate !== "" && end == null) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "Invalid date",
@@ -1020,6 +1019,11 @@ export function transformReservationUnit(
         : [],
     }));
 
+  function maybeToApiDateTime(date: string, time: string): string | null {
+    const d = fromUIDateTime(date, time);
+    return d != null ? d.toISOString() : null;
+  }
+
   return {
     ...vals,
     ...(pk > 0 ? { pk } : {}),
@@ -1028,19 +1032,19 @@ export function transformReservationUnit(
       surfaceArea != null && surfaceArea > 0 ? Math.floor(surfaceArea) : null,
     reservationBegins:
       hasScheduledReservation && hasReservationBegins
-        ? constructApiDateTime(reservationBeginsDate, reservationBeginsTime)
+        ? maybeToApiDateTime(reservationBeginsDate, reservationBeginsTime)
         : null,
     reservationEnds:
       hasScheduledReservation && hasReservationEnds
-        ? constructApiDateTime(reservationEndsDate, reservationEndsTime)
+        ? maybeToApiDateTime(reservationEndsDate, reservationEndsTime)
         : null,
     publishBegins:
       hasScheduledPublish && hasPublishBegins
-        ? constructApiDateTime(publishBeginsDate, publishBeginsTime)
+        ? maybeToApiDateTime(publishBeginsDate, publishBeginsTime)
         : null,
     publishEnds:
       hasScheduledPublish && hasPublishEnds
-        ? constructApiDateTime(publishEndsDate, publishEndsTime)
+        ? maybeToApiDateTime(publishEndsDate, publishEndsTime)
         : null,
     reservationBlockWholeDay: bufferType === "blocksWholeDay",
     bufferTimeAfter:

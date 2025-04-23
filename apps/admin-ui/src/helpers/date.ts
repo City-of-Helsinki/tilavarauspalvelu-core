@@ -53,30 +53,24 @@ export function fromAPIDateTime(
   }
 }
 
-// TODO this requires a bit of thought, why are we prefering ISO strings over Date objects?
-// we should have valid Date object for all the checks
-// convert it to ISO string only in mutations after the validation
-export function constructApiDateTime(
-  date: string,
-  time: string
-): string | null {
+export function fromUIDateTime(date: string, time: string): Date | null {
   try {
-    return constructApiDateTimeUnsafe(date, time);
+    return fromUIDateTimeUnsafe(date, time);
   } catch (_) {
     return null;
   }
 }
 
-export function constructApiDateTimeUnsafe(date: string, time: string): string {
+export function fromUIDateTimeUnsafe(date: string, time: string): Date {
   if (date === "" || time === "") {
     throw new Error("Invalid date or time");
   }
   const d = fromUIDate(date);
-  if (d == null || isValid(d)) {
+  if (d == null || !isValid(d)) {
     throw new Error("Invalid date");
   }
   const d2 = setTimeOnDate(d, time);
-  return d2.toISOString();
+  return d2;
 }
 
 export function setTimeOnDate(date: Date, time: string): Date {
@@ -88,8 +82,7 @@ export function setTimeOnDate(date: Date, time: string): Date {
 }
 
 function timeToDuration(time: string) {
-  // NOTE arrays are incorrectly typed
-  const [h, m]: Array<number | undefined> = time
+  const [h, m] = time
     .split(":")
     .map(Number)
     .filter((x) => Number.isFinite(x));
