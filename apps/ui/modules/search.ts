@@ -234,21 +234,6 @@ export function processVariables({
   };
 }
 
-// default to false if the param is present but not true, null if not present
-export function mapSingleBooleanParamToFormValue(
-  param: string | string[] | undefined
-): boolean | null {
-  if (param == null) return null;
-  if (param === "") return null;
-  if (Array.isArray(param)) {
-    const found = param.find((p) => p === "true");
-    if (found != null) return true;
-    if (param.length > 1) return false;
-    return null;
-  }
-  return param === "true";
-}
-
 export function mapParamToNumber(param: string[], min?: number): number[] {
   const numbers = param.map(Number).filter(Number.isInteger);
   return min != null ? numbers.filter((n) => n >= min) : numbers;
