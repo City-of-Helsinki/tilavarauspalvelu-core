@@ -6,6 +6,9 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+  repository_dispatch:
+    types:
+      - update-graphql-schema
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -32,7 +35,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
@@ -54,7 +57,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
@@ -73,7 +76,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
@@ -95,7 +98,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
