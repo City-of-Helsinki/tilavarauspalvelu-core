@@ -488,7 +488,6 @@ class Common(Environment):
     RESERVATION_UNIT_IMAGES_ROOT = "reservation_unit_images"
     RESERVATION_UNIT_PURPOSE_IMAGES_ROOT = "reservation_unit_purpose_images"
     TPREK_UNIT_URL = values.URLValue()
-    GRAPHQL_CODEGEN_ENABLED = False
     UPDATE_RESERVATION_UNIT_HIERARCHY = True
     UPDATE_SEARCH_VECTORS = True
     UPDATE_AFFECTING_TIME_SPANS = True
@@ -660,7 +659,6 @@ class Local(Common, overrides_from=LocalMixin):
     # --- Misc settings-----------------------------------------------------------------------------------------------
 
     SENTRY_LOGGER_ALWAYS_RE_RAISE = True
-    GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
     UPDATE_RESERVATION_UNIT_HIERARCHY = values.BooleanValue(default=True)
@@ -718,7 +716,6 @@ class Docker(Common, overrides_from=DockerMixin):
 
     HAUKI_API_KEY = values.StringValue(default=None)
 
-    GRAPHQL_CODEGEN_ENABLED = values.BooleanValue(default=False)
     ICAL_HASH_SECRET = values.StringValue(default="")  # nosec # NOSONAR
     EXPORT_AUTHORIZATION_TOKEN = values.StringValue(default="")  # nosec # NOSONAR
     RAISE_ERROR_ON_REFRESH_FAILURE = True
