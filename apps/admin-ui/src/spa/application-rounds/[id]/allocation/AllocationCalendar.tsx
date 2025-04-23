@@ -228,7 +228,8 @@ function addTimeSlotToArray(
   const { beginTime, endTime } = slot;
 
   const beginMinutes = timeToMinutes(beginTime);
-  const endMinutes = timeToMinutes(endTime);
+  const endM = timeToMinutes(endTime);
+  const endMinutes = endM === 0 ? 24 * 60 : endM;
   for (let i = beginMinutes; i < endMinutes; i += 30) {
     const cell = i / 60;
     const key = encodeTimeSlot(day, cell);
@@ -270,11 +271,11 @@ function removeOtherAllocatedDays(
 
 // Generate the focused slots for a selected application section
 function generateFocusedSlots(focusedAes: SectionNodeT, day: Day): Slot[] {
-  const focusedTimeSlots = focusedAes?.suitableTimeRanges?.filter((ts) =>
+  const focusedTimeSlots = focusedAes.suitableTimeRanges.filter((ts) =>
     isDay(ts, day)
   );
-  const focusedAllocatedTimeSlots = focusedAes?.reservationUnitOptions
-    ?.filter((a) => a.allocatedTimeSlots?.some((ts) => isDay(ts, day)))
+  const focusedAllocatedTimeSlots = focusedAes.reservationUnitOptions
+    .filter((a) => a.allocatedTimeSlots.some((ts) => isDay(ts, day)))
     .map((ts) => removeOtherAllocatedDays(ts, day));
 
   const focusedSlots: Slot[] = [];
@@ -297,7 +298,7 @@ function isAllocated(
   day: Day
 ): boolean {
   return ae.allocatedTimeSlots
-    ?.map((tr) => isInsideCell(day, cell, tr))
+    .map((tr) => isInsideCell(day, cell, tr))
     .some((x) => x);
 }
 
@@ -313,25 +314,24 @@ export function AllocationCalendar({
   );
 
   const [searchParams] = useSearchParams();
-  const priorityFilter = searchParams.getAll("priority");
-  const priorityFilterSanitized = convertPriorityFilter(priorityFilter);
+  const priorityFilter = convertPriorityFilter(searchParams.getAll("priority"));
 
   const [focused] = useFocusApplicationEvent();
-  const aes = applicationSections?.map((ae) => {
+  const aes = applicationSections.map((ae) => {
     // if priority filter is set, we need to filter what is shown in calendar based on that
     // these are included in the backend request because we want to show them elsewhere, but not in the calendar
     if (priorityFilter.length > 0) {
       return {
         ...ae,
-        suitableTimeRanges: ae.suitableTimeRanges?.filter((tr) =>
-          priorityFilterSanitized.find((p) => p === tr.priority)
+        suitableTimeRanges: ae.suitableTimeRanges.filter((tr) =>
+          priorityFilter.find((p) => p === tr.priority)
         ),
       };
     }
     return ae;
   });
 
-  const focusedApplicationEvent = aes?.find((ae) => ae.pk === focused);
+  const focusedApplicationEvent = aes.find((ae) => ae.pk === focused);
 
   const [focusedAllocated] = useFocusAllocatedSlot();
 
@@ -344,14 +344,14 @@ export function AllocationCalendar({
       .filter(isNotHandled)
       .filter((ae) => ae.suitableTimeRanges?.some((tr) => isDay(tr, day)));
 
-    const resUnits = aes?.flatMap((ae) => ae.reservationUnitOptions);
+    const resUnits = aes.flatMap((ae) => ae.reservationUnitOptions);
 
     const allocated = filterNonNullable(resUnits)
       .filter((a) => a.allocatedTimeSlots?.some((ts) => isDay(ts, day)))
       .map((ts) => removeOtherAllocatedDays(ts, day));
 
     const focusedAllocatedTimes = filterNonNullable(allocated).filter((a) =>
-      a.allocatedTimeSlots?.some((ts) => ts.pk === focusedAllocated)
+      a.allocatedTimeSlots.some((ts) => ts.pk === focusedAllocated)
     );
 
     const focusedSlots =

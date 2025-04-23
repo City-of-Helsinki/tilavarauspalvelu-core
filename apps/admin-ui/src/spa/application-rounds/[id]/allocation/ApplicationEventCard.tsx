@@ -21,8 +21,8 @@ import { convertWeekday } from "common/src/conversion";
 import {
   type SectionNodeT,
   createDurationString,
-  formatTime,
   type AllocatedTimeSlotNodeT,
+  formatSuitableTimeRange,
 } from "./modules/applicationRoundAllocation";
 import { useFocusAllocatedSlot, useFocusApplicationEvent } from "./hooks";
 import { PopupMenu } from "common/src/components/PopupMenu";
@@ -396,11 +396,6 @@ function AllocatedScheduleSection({
   currentReservationUnit: ReservationUnitT;
 }): JSX.Element {
   const { t } = useTranslation();
-
-  const day = convertWeekday(allocatedTimeSlot.dayOfTheWeek);
-  const begin = allocatedTimeSlot.beginTime;
-  const end = allocatedTimeSlot.endTime;
-
   const [focused, setFocused] = useFocusAllocatedSlot();
   const isActive = allocatedTimeSlot.pk === focused;
 
@@ -432,9 +427,7 @@ function AllocatedScheduleSection({
         checked={isActive}
       />
       <div>
-        <SemiBold>
-          {t(`dayShort.${day}`)} {formatTime(begin)}-{formatTime(end)}
-        </SemiBold>
+        <SemiBold>{formatSuitableTimeRange(t, allocatedTimeSlot)}</SemiBold>
         <div>
           {truncate(combinedName, MAX_ALLOCATION_CARD_UNIT_NAME_LENGTH)}
         </div>

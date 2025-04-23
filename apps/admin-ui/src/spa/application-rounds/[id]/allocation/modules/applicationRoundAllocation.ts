@@ -7,7 +7,12 @@ import {
   type ApplicationSectionAllocationsQuery,
 } from "@gql/gql-types";
 import { type TFunction } from "next-i18next";
-import { filterNonNullable, timeToMinutes, toNumber } from "common/src/helpers";
+import {
+  filterNonNullable,
+  formatTimeRange,
+  timeToMinutes,
+  toNumber,
+} from "common/src/helpers";
 import { formatDuration } from "common/src/common/util";
 import { Day, convertWeekday, transformWeekday } from "common/src/conversion";
 import { set } from "date-fns";
@@ -153,17 +158,16 @@ export function getTimeSeries(
   return timeSlots;
 }
 
-function formatTimeRange(
+export function formatSuitableTimeRange(
   t: TFunction,
   range: Pick<SuitableTimeRangeNode, "dayOfTheWeek" | "beginTime" | "endTime">
 ): string {
-  // TODO convert the day of the week
   const day = convertWeekday(range.dayOfTheWeek);
   const weekday = t(`dayShort.${day}`);
-  // TODO don't use substring to convert times (wrap it in a function)
-  return `${weekday} ${Number(
-    range.beginTime.substring(0, 2)
-  )}-${Number(range.endTime.substring(0, 2))}`;
+  const begin = timeToMinutes(range.beginTime);
+  const end = timeToMinutes(range.endTime);
+  const timeRangeString = formatTimeRange(begin, end, true);
+  return `${weekday} ${timeRangeString}`;
 }
 
 export function formatTimeRangeList(
@@ -175,19 +179,19 @@ export function formatTimeRangeList(
   priority: Priority
 ): string {
   const schedules = sortBy(
-    aes?.filter((s) => s?.priority === priority),
+    aes.filter((s) => s.priority === priority),
     ["dayOfTheWeek", "beginTime"]
   );
 
   return filterNonNullable(schedules)
-    .map((schedule) => formatTimeRange(t, schedule))
+    .map((schedule) => formatSuitableTimeRange(t, schedule))
     .join(", ");
 }
 
-export const timeSlotKeyToScheduleTime = (
+export function timeSlotKeyToScheduleTime(
   slot: string | undefined,
   padEnd = false
-): string => {
+): string {
   let [, hours, minutes] = slot?.split("-").map(toNumber) ?? [];
   if (hours == null || minutes == null) {
     return "";
@@ -202,15 +206,6 @@ export const timeSlotKeyToScheduleTime = (
   }
 
   return `${padStart(`${hours}`, 2, "0")}:${padStart(`${minutes}`, 2, "0")}:00`;
-};
-
-// remove the trailing seconds from time values
-// TODO this should be an util function (there is similar used in application-round page)
-export function formatTime(time?: string) {
-  if (time == null) {
-    return "";
-  }
-  return time.slice(0, 5);
 }
 
 export function createDurationString(
