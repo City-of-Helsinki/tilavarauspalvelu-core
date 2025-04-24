@@ -27,7 +27,6 @@ import { fromUIDate } from "./util";
 import { type TFunction } from "i18next";
 import {
   type ReservableMap,
-  ReservationUnitReservableProps,
   type RoundPeriod,
   isRangeReservable,
 } from "./reservable";
@@ -302,31 +301,6 @@ export function isReservationEditable(
     return false;
   }
   return true;
-}
-
-export type IsUserAllowedToMoveReservationHereProps =
-  ReservationUnitReservableProps & {
-    isFree: boolean;
-  };
-export function isUserAllowedToMoveReservationHere({
-  range,
-  isFree,
-  reservableTimes,
-  reservationUnit,
-  activeApplicationRounds,
-  blockingReservations,
-}: IsUserAllowedToMoveReservationHereProps): boolean {
-  if (!isFree) {
-    return false;
-  }
-
-  return isRangeReservable({
-    blockingReservations,
-    range,
-    reservationUnit,
-    reservableTimes,
-    activeApplicationRounds,
-  });
 }
 
 export function getCheckoutUrl(

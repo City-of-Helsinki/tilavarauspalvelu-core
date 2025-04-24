@@ -15,7 +15,7 @@ import {
 } from "common/src/common/util";
 import { formatters as getFormatters } from "common";
 import { Flex, H4 } from "common/styled";
-import { breakpoints, RELATED_RESERVATION_STATES } from "common/src/const";
+import { breakpoints } from "common/src/const";
 import {
   type ApplicationRoundTimeSlotFieldsFragment,
   type ReservationCreateMutationInput,
@@ -52,8 +52,6 @@ import { Map as MapComponent } from "@/components/Map";
 import { getPostLoginUrl } from "@/modules/util";
 import {
   getFuturePricing,
-  getNextAvailableTime,
-  getPossibleTimesForDay,
   getPriceString,
   getReservationUnitName,
   getTimeString,
@@ -104,12 +102,16 @@ import {
 import { Accordion, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useDisplayError } from "common/src/hooks";
-import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
+import {
+  useRemoveStoredReservation,
+  useAvailableTimes,
+  useToastIfQueryParam,
+} from "@/hooks";
 import { gql } from "@apollo/client";
-import { useToastIfQueryParam } from "@/hooks";
 import { type ApiError, getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 import { errorToast } from "common/src/common/toast";
+import { useBlockingReservations } from "@/hooks/useBlockingReservations";
 
 const StyledApplicationRoundScheduleDay = styled.p`
   span:first-child {
@@ -239,7 +241,6 @@ const StyledRelatedUnits = styled(RelatedUnits)`
 function ReservationUnit({
   reservationUnit,
   relatedReservationUnits,
-  blockingReservations,
   termsOfUse,
   apiBaseUrl,
   searchDuration,
@@ -311,6 +312,7 @@ function ReservationUnit({
   }, [dateValue, timeValue]);
 
   const activeApplicationRounds = reservationUnit.applicationRounds;
+  const { blockingReservations } = useBlockingReservations(reservationUnit.pk);
 
   const submitReservation = async (data: PendingReservationFormType) => {
     if (reservationUnit.pk == null) {
@@ -446,36 +448,29 @@ function ReservationUnit({
     message: t("reservationCalendar:errors.invalidReservationRedirect"),
   });
 
-  const startingTimeOptions = getPossibleTimesForDay({
-    reservableTimes,
+  const { startingTimeOptions, nextAvailableTime } = useAvailableTimes({
     date: focusDate,
-    reservationUnit,
-    activeApplicationRounds,
     duration: durationValue,
-    blockingReservations,
-  });
-  const nextAvailableTime = getNextAvailableTime({
-    start: focusDate,
     reservableTimes,
-    duration: durationValue,
     reservationUnit,
     activeApplicationRounds,
     blockingReservations,
   });
+
+  const subventionSuffix = useMemo(
+    () =>
+      reservationUnit.canApplyFreeOfCharge ? (
+        <SubventionSuffix setIsDialogOpen={setIsDialogOpen} />
+      ) : undefined,
+    [reservationUnit.canApplyFreeOfCharge]
+  );
 
   return (
     <ReservationUnitPageWrapper>
       <Head
         reservationUnit={reservationUnit}
         reservationUnitIsReservable={reservationUnitIsReservable}
-        subventionSuffix={
-          reservationUnit.canApplyFreeOfCharge ? (
-            <SubventionSuffix
-              placement="reservation-unit-head"
-              setIsDialogOpen={setIsDialogOpen}
-            />
-          ) : undefined
-        }
+        subventionSuffix={subventionSuffix}
       />
       <div>
         {reservationUnitIsReservable && (
@@ -488,14 +483,7 @@ function ReservationUnit({
             focusSlot={focusSlot}
             submitReservation={submitReservation}
             LoginAndSubmit={LoginAndSubmit}
-            subventionSuffix={
-              reservationUnit.canApplyFreeOfCharge ? (
-                <SubventionSuffix
-                  placement="reservation-unit-head"
-                  setIsDialogOpen={setIsDialogOpen}
-                />
-              ) : undefined
-            }
+            subventionSuffix={subventionSuffix}
           />
         )}
         <JustForDesktop customBreakpoint={breakpoints.l}>
@@ -775,19 +763,15 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     const startDate = today;
     const endDate = addYears(today, 2);
 
-    const typename = "ReservationUnitNode";
-    const id = base64encode(`${typename}:${pk}`);
     const { data: reservationUnitData } = await apolloClient.query<
       ReservationUnitPageQuery,
       ReservationUnitPageQueryVariables
     >({
       query: ReservationUnitPageDocument,
       variables: {
-        id,
+        id: base64encode(`ReservationUnitNode:${pk}`),
         beginDate: toApiDate(startDate) ?? "",
         endDate: toApiDate(endDate) ?? "",
-        state: RELATED_RESERVATION_STATES,
-        pk,
       },
     });
 
@@ -832,24 +816,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       ignoreMaybeArray(queryParams.get("duration"))
     );
 
-    const blockingReservations = filterNonNullable(
-      reservationUnitData.affectingReservations
-    );
-
     return {
       props: {
         ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit,
-        // TODO these should be fetched on the client (polling)
-        // 3 reasons
-        // - it gets outdated fast (somebody else makes a reservation)
-        // - it's outdated if the user cancels current reservation (dangling tentative reservation)
-        // - it's relatively expensive (since we are taking 2 year time span, instead of just the required single week)
-        // other considerations
-        // - it's below the fold
-        // - it's inside a Calendar component (mostly) so no layout shifts
-        blockingReservations,
         relatedReservationUnits,
         termsOfUse: { genericTerms: bookingTerms },
         searchDuration,
@@ -866,13 +837,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 export default ReservationUnitWrapped;
 
 export const RESERVATION_UNIT_PAGE_QUERY = gql`
-  query ReservationUnitPage(
-    $id: ID!
-    $pk: Int!
-    $beginDate: Date!
-    $endDate: Date!
-    $state: [ReservationStateChoice]
-  ) {
+  query ReservationUnitPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
     reservationUnit(id: $id) {
       id
       pk
@@ -905,14 +870,6 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
         id
         ...EquipmentFields
       }
-    }
-    affectingReservations(
-      forReservationUnits: [$pk]
-      beginDate: $beginDate
-      endDate: $endDate
-      state: $state
-    ) {
-      ...BlockingReservationFields
     }
   }
 `;
