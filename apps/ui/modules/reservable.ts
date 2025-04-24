@@ -219,7 +219,7 @@ export function isRangeReservable({
   // check interval length
   // can't use normalized end because that would make the interval 1ms shorter
   const intervalMinutes = getIntervalMinutes(reservationStartInterval);
-  if (differenceInSeconds(end, start) % (intervalMinutes * 60) !== 0) {
+  if (differenceInMinutes(end, start) % intervalMinutes !== 0) {
     return false;
   }
 
