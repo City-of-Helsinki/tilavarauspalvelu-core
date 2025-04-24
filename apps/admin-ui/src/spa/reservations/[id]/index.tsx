@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
-import { gql, type ApolloQueryResult } from "@apollo/client";
-import { trim } from "lodash-es";
+import { type ApolloQueryResult, gql } from "@apollo/client";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import {
@@ -15,7 +14,6 @@ import { ButtonContainer, CenterSpinner } from "common/styled";
 import ShowWhenTargetInvisible from "@/component/ShowWhenTargetInvisible";
 import { StickyHeader } from "@/component/StickyHeader";
 import { ReservationWorkingMemo } from "@/component/WorkingMemo";
-import { BirthDate } from "@/component/BirthDate";
 import {
   createTagString,
   getName,
@@ -34,6 +32,7 @@ import { ApplicationDatas, Summary } from "@/styled";
 import { Accordion, DataWrapper } from "./components";
 import { ReservationKeylessEntry } from "./ReservationKeylessEntrySection";
 import { TimeBlockSection } from "./ReservationTimeBlockSection";
+import { ReservationReserveeDetailsSection } from "@/spa/reservations/[id]/ReservationReserveeDetailsSection";
 
 type ReservationType = NonNullable<ReservationPageQuery["reservation"]>;
 
@@ -303,49 +302,6 @@ function ReservationPricingDetailsAccordion({
   );
 }
 
-function ReservationReserveeDetailsAccordion({
-  reservation,
-}: Readonly<{
-  reservation: ReservationType;
-}>) {
-  const { t } = useTranslation();
-
-  return (
-    <Accordion
-      id="reservation__reservee-details"
-      heading={t("RequestedReservation.reserveeDetails")}
-    >
-      <ApplicationDatas>
-        <DataWrapper label={t("RequestedReservation.user")}>
-          {trim(
-            `${reservation?.user?.firstName || ""} ${
-              reservation?.user?.lastName || ""
-            }`
-          ) || t("RequestedReservation.noName")}
-        </DataWrapper>
-        <DataWrapper label={t("RequestedReservation.email")}>
-          {reservation?.user?.email}
-        </DataWrapper>
-        <DataWrapper label={t("RequestedReservation.birthDate")}>
-          <BirthDate reservationPk={reservation?.pk ?? 0} />
-        </DataWrapper>
-        <DataWrapper label={t("RequestedReservation.addressStreet")}>
-          <span>{reservation.reserveeAddressStreet || "-"}</span>
-          <br />
-          <span>
-            {reservation.reserveeAddressZip || reservation.reserveeAddressCity
-              ? `${reservation.reserveeAddressZip} ${reservation.reserveeAddressCity}`
-              : ""}
-          </span>
-        </DataWrapper>
-        <DataWrapper label={t("RequestedReservation.addressCity")}>
-          {reservation.reserveeAddressCity || "-"}
-        </DataWrapper>
-      </ApplicationDatas>
-    </Accordion>
-  );
-}
-
 function RequestedReservation({
   reservation,
   refetch,
@@ -423,7 +379,7 @@ function RequestedReservation({
           <ReservationPricingDetailsAccordion reservation={reservation} />
         )}
 
-        <ReservationReserveeDetailsAccordion reservation={reservation} />
+        <ReservationReserveeDetailsSection reservation={reservation} />
       </div>
     </>
   );
