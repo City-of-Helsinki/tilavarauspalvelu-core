@@ -1,8 +1,5 @@
 import React from "react";
-import type {
-  BlockingReservationFieldsFragment,
-  EditPageReservationFragment,
-} from "@gql/gql-types";
+import type { EditPageReservationFragment } from "@gql/gql-types";
 import { differenceInMinutes } from "date-fns";
 import { Button, ButtonVariant, IconArrowRight, IconCross } from "hds-react";
 import { useTranslation } from "next-i18next";
@@ -14,18 +11,12 @@ import {
   createDateTime,
   getDurationOptions,
   isReservationEditable,
-  isUserAllowedToMoveReservationHere,
 } from "@/modules/reservation";
-import {
-  getNextAvailableTime,
-  getPossibleTimesForDay,
-  isReservationUnitFreeOfCharge,
-} from "@/modules/reservationUnit";
+import { isReservationUnitFreeOfCharge } from "@/modules/reservationUnit";
 import { type UseFormReturn } from "react-hook-form";
 import { type PendingReservationFormType } from "@/components/reservation-unit/schema";
 import {
   convertLanguageCode,
-  fromUIDate,
   getTranslationSafe,
 } from "common/src/common/util";
 import { useReservableTimes } from "@/hooks/useReservableTimes";
@@ -38,13 +29,9 @@ import { PinkBox as PinkBoxBase } from "./styles";
 import { getReservationPath } from "@/modules/urls";
 import { gql } from "@apollo/client";
 import ErrorComponent from "next/error";
-
-type Props = {
-  reservation: EditPageReservationFragment;
-  reservationForm: UseFormReturn<PendingReservationFormType>;
-  blockingReservations: readonly BlockingReservationFieldsFragment[];
-  nextStep: () => void;
-};
+import { useAvailableTimes } from "@/hooks";
+import { useBlockingReservations } from "@/hooks/useBlockingReservations";
+import { isRangeReservable } from "@/modules/reservable";
 
 const StyledCalendarWrapper = styled.div`
   grid-column: 1 / -1;
@@ -99,17 +86,42 @@ const PinkBox = styled(PinkBoxBase)`
   }
 `;
 
-export function EditStep0({
+type EditStep0Props = {
+  reservation: EditPageReservationFragment;
+  reservationForm: UseFormReturn<PendingReservationFormType>;
+  nextStep: () => void;
+};
+
+// Non null assertion to simplify types
+function EditStep0Wrapped(props: EditStep0Props): JSX.Element {
+  const reservationUnit = props.reservation.reservationUnits[0];
+  if (reservationUnit == null) {
+    return <ErrorComponent statusCode={404} />;
+  }
+  return <EditStep0 {...props} reservationUnit={reservationUnit} />;
+}
+
+type ReservationUnitT = NonNullable<
+  EditPageReservationFragment["reservationUnits"][number]
+>;
+
+function EditStep0({
   reservation,
   reservationForm,
+  reservationUnit,
   nextStep,
-  blockingReservations,
-}: Props): JSX.Element | null {
+}: EditStep0Props & {
+  reservationUnit: ReservationUnitT;
+}): JSX.Element | null {
   const { t, i18n } = useTranslation();
-  const reservationUnit = reservation.reservationUnits[0];
-  const activeApplicationRounds = reservationUnit?.applicationRounds ?? [];
+  const activeApplicationRounds = reservationUnit.applicationRounds;
   const originalBegin = new Date(reservation.begin);
   const originalEnd = new Date(reservation.end);
+
+  const { blockingReservations } = useBlockingReservations(
+    reservationUnit.pk,
+    reservation.pk
+  );
 
   const { watch, handleSubmit, formState } = reservationForm;
   const { dirtyFields } = formState;
@@ -121,6 +133,9 @@ export function EditStep0({
   const submitReservation = (data: PendingReservationFormType) => {
     if (reservationUnit == null) {
       throw new Error("No reservation unit found");
+    }
+    if (!isReservationEditable(reservation)) {
+      throw new Error("Reservation is not editable");
     }
     const slot = convertFormToFocustimeSlot({
       data,
@@ -137,17 +152,17 @@ export function EditStep0({
       reservationUnit.pricings,
       start
     );
+    if (!isFree) {
+      throw new Error("Reservation unit is not free of charge");
+    }
 
-    const isNewReservationValid =
-      isReservationEditable(reservation) &&
-      isUserAllowedToMoveReservationHere({
-        isFree,
-        range: { start, end },
-        reservableTimes,
-        reservationUnit,
-        activeApplicationRounds,
-        blockingReservations,
-      });
+    const isNewReservationValid = isRangeReservable({
+      range: { start, end },
+      reservableTimes,
+      reservationUnit,
+      activeApplicationRounds,
+      blockingReservations,
+    });
 
     if (isNewReservationValid) {
       nextStep();
@@ -158,34 +173,20 @@ export function EditStep0({
     watch("duration") ?? differenceInMinutes(originalBegin, originalEnd);
   const dateValue = watch("date");
   const timeValue = watch("time");
+  const { startingTimeOptions, nextAvailableTime } = useAvailableTimes({
+    date: createDateTime(dateValue, timeValue),
+    duration: durationValue,
+    reservableTimes,
+    reservationUnit,
+    activeApplicationRounds,
+    blockingReservations,
+  });
 
-  if (reservationUnit == null) {
-    return <ErrorComponent statusCode={404} />;
-  }
-
-  const focusDate = createDateTime(dateValue, timeValue);
   const durationOptions = getDurationOptions(reservationUnit, t);
   const focusSlot = convertFormToFocustimeSlot({
     data: watch(),
     reservationUnit,
     reservableTimes,
-    activeApplicationRounds,
-    blockingReservations,
-  });
-  const startingTimeOptions = getPossibleTimesForDay({
-    reservableTimes,
-    date: fromUIDate(watch("date") ?? "") ?? new Date(),
-    reservationUnit,
-    activeApplicationRounds,
-    duration: durationValue,
-    blockingReservations,
-  });
-
-  const nextAvailableTime = getNextAvailableTime({
-    start: focusDate,
-    reservableTimes,
-    duration: durationValue,
-    reservationUnit,
     activeApplicationRounds,
     blockingReservations,
   });
@@ -257,6 +258,8 @@ export function EditStep0({
     </>
   );
 }
+
+export { EditStep0Wrapped as EditStep0 };
 
 export const EDIT_PAGE_RESERVATION_UNIT_FRAGMENT = gql`
   fragment EditPageReservationUnit on ReservationUnitNode {

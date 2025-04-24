@@ -8,20 +8,12 @@ import { createApolloClient } from "@/modules/apolloClient";
 import {
   type ReservationEditPageQuery,
   type ReservationEditPageQueryVariables,
-  BlockingReservationsDocument,
-  type BlockingReservationsQuery,
-  type BlockingReservationsQueryVariables,
   ReservationEditPageDocument,
 } from "@gql/gql-types";
-import {
-  base64encode,
-  filterNonNullable,
-  ignoreMaybeArray,
-  toNumber,
-} from "common/src/helpers";
+import { base64encode, ignoreMaybeArray, toNumber } from "common/src/helpers";
 import { toApiDate } from "common/src/common/util";
 import { addYears } from "date-fns";
-import { RELATED_RESERVATION_STATES, breakpoints } from "common/src/const";
+import { breakpoints } from "common/src/const";
 import { H1 } from "common/styled";
 import { gql } from "@apollo/client";
 import { StepState, Stepper } from "hds-react";
@@ -55,7 +47,7 @@ const StepperWrapper = styled.div`
 `;
 
 function ReservationEditPage(props: PropsNarrowed): JSX.Element {
-  const { reservation, options, blockingReservations } = props;
+  const { reservation, options } = props;
   const { t, i18n } = useTranslation();
 
   const [step, setStep] = useState<0 | 1>(0);
@@ -122,7 +114,6 @@ function ReservationEditPage(props: PropsNarrowed): JSX.Element {
           reservation={reservation}
           reservationForm={form}
           nextStep={() => setStep(1)}
-          blockingReservations={blockingReservations}
         />
       ) : (
         <EditStep1
@@ -210,33 +201,12 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
       };
     }
 
-    const today = new Date();
-    const startDate = today;
-    const endDate = addYears(today, 2);
     const reservationUnit = reservation.reservationUnits.find(() => true);
     if (reservationUnit?.pk == null) {
       return notFound;
     }
 
-    // Required to do a separate query because we don't known the reservation unit pk
-    const { data: blockingReservationsData } = await client.query<
-      BlockingReservationsQuery,
-      BlockingReservationsQueryVariables
-    >({
-      query: BlockingReservationsDocument,
-      variables: {
-        pk: reservationUnit.pk,
-        beginDate: toApiDate(startDate) ?? "",
-        endDate: toApiDate(endDate) ?? "",
-        state: RELATED_RESERVATION_STATES,
-      },
-    });
-
     const options = await queryOptions(client, locale ?? "");
-
-    const reservations = filterNonNullable(
-      blockingReservationsData?.affectingReservations
-    ).filter((r) => r.pk !== reservation.pk);
 
     return {
       props: {
@@ -244,7 +214,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         ...(await serverSideTranslations(locale ?? "fi")),
         reservation,
         options,
-        blockingReservations: reservations,
       },
     };
   }
@@ -257,24 +226,6 @@ export const RESERVATION_EDIT_PAGE_QUERY = gql`
   query ReservationEditPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
     reservation(id: $id) {
       ...EditPageReservation
-    }
-  }
-`;
-
-export const BLOCKING_RESERVATIONS_QUERY = gql`
-  query BlockingReservations(
-    $pk: Int!
-    $beginDate: Date!
-    $endDate: Date!
-    $state: [ReservationStateChoice!]
-  ) {
-    affectingReservations(
-      forReservationUnits: [$pk]
-      beginDate: $beginDate
-      endDate: $endDate
-      state: $state
-    ) {
-      ...BlockingReservationFields
     }
   }
 `;
