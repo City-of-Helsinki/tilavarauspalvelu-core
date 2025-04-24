@@ -228,7 +228,6 @@ export function EditStep0({
         <ReservationTimePicker
           reservationUnit={reservationUnit}
           reservableTimes={reservableTimes}
-          activeApplicationRounds={activeApplicationRounds}
           reservationForm={reservationForm}
           isReservationQuotaReached={false}
           startingTimeOptions={startingTimeOptions}

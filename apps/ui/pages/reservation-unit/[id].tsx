@@ -71,10 +71,7 @@ import {
   getMaxReservationDuration,
   getMinReservationDuration,
 } from "@/modules/reservable";
-import {
-  SubventionSuffix,
-  ReservationTimePicker,
-} from "@/components/reservation";
+import { SubventionSuffix } from "@/components/reservation";
 import InfoDialog from "@/components/common/InfoDialog";
 import {
   AddressSection,
@@ -83,6 +80,7 @@ import {
   QuickReservation,
   RelatedUnits,
   ReservationInfoContainer,
+  ReservationUnitCalendarSection,
 } from "@/components/reservation-unit";
 import {
   getCommonServerSideProps,
@@ -103,12 +101,7 @@ import {
   getReservationInProgressPath,
   getSingleSearchPath,
 } from "@/modules/urls";
-import {
-  Accordion,
-  ButtonVariant,
-  LoadingSpinner,
-  Notification,
-} from "hds-react";
+import { Accordion, ButtonVariant, LoadingSpinner } from "hds-react";
 import { Breadcrumb } from "@/components/common/Breadcrumb";
 import { useDisplayError } from "common/src/hooks";
 import { useRemoveStoredReservation } from "@/hooks/useRemoveStoredReservation";
@@ -369,12 +362,6 @@ function ReservationUnit({
     blockingReservations,
   ]);
 
-  const isReservationQuotaReached =
-    reservationUnit.maxReservationsPerUser != null &&
-    reservationUnit.numActiveUserReservations != null &&
-    reservationUnit.numActiveUserReservations >=
-      reservationUnit.maxReservationsPerUser;
-
   const showApplicationRoundTimeSlots = activeApplicationRounds.length > 0;
 
   const { applicationRoundTimeSlots } = reservationUnit;
@@ -523,35 +510,21 @@ function ReservationUnit({
             html={getTranslationSafe(reservationUnit, "description", lang)}
           />
         </div>
-        {equipment?.length > 0 && (
+        {equipment.length > 0 && (
           <div data-testid="reservation-unit__equipment">
             <H4 as="h2">{t("reservationUnit:equipment")}</H4>
             <EquipmentList equipment={equipment} />
           </div>
         )}
         {reservationUnitIsReservable && (
-          <div data-testid="reservation-unit__calendar--wrapper">
-            <H4 as="h2">
-              {t("reservations:reservationCalendar", {
-                title: getTranslationSafe(reservationUnit, "name", lang),
-              })}
-            </H4>
-            <ReservationQuotaReached
-              isReservationQuotaReached={isReservationQuotaReached}
-              reservationUnit={reservationUnit}
-            />
-            <ReservationTimePicker
-              reservationUnit={reservationUnit}
-              reservableTimes={reservableTimes}
-              activeApplicationRounds={activeApplicationRounds}
-              reservationForm={reservationForm}
-              isReservationQuotaReached={isReservationQuotaReached}
-              loginAndSubmitButton={LoginAndSubmit}
-              startingTimeOptions={startingTimeOptions}
-              submitReservation={submitReservation}
-              blockingReservations={blockingReservations}
-            />
-          </div>
+          <ReservationUnitCalendarSection
+            reservationUnit={reservationUnit}
+            reservationForm={reservationForm}
+            startingTimeOptions={startingTimeOptions}
+            blockingReservations={blockingReservations}
+            loginAndSubmitButton={LoginAndSubmit}
+            submitReservation={submitReservation}
+          />
         )}
         <ReservationInfoContainer
           reservationUnit={reservationUnit}
@@ -657,46 +630,6 @@ function ReservationUnitWrapped(props: PropsNarrowed) {
       <Breadcrumb routes={routes} />
       <ReservationUnit {...props} />
     </>
-  );
-}
-
-function ReservationQuotaReached({
-  reservationUnit,
-  isReservationQuotaReached,
-}: {
-  reservationUnit: NonNullable<ReservationUnitPageQuery["reservationUnit"]>;
-  isReservationQuotaReached: boolean;
-}) {
-  const { t } = useTranslation();
-
-  const isReached = reservationUnit.maxReservationsPerUser;
-  if (!isReached || !reservationUnit.numActiveUserReservations) {
-    return null;
-  }
-
-  const label = t(
-    `reservationCalendar:reservationQuota${
-      isReservationQuotaReached ? "Full" : ""
-    }Label`
-  );
-
-  return (
-    <Notification
-      type={isReservationQuotaReached ? "alert" : "info"}
-      label={label}
-    >
-      <span data-testid="reservation-unit--notification__reservation-quota">
-        {t(
-          `reservationCalendar:reservationQuota${
-            isReservationQuotaReached ? "Full" : ""
-          }`,
-          {
-            count: reservationUnit.numActiveUserReservations ?? 0,
-            total: reservationUnit.maxReservationsPerUser,
-          }
-        )}
-      </span>
-    </Notification>
   );
 }
 
@@ -906,6 +839,14 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         ...commonProps,
         ...(await serverSideTranslations(locale ?? "fi")),
         reservationUnit,
+        // TODO these should be fetched on the client (polling)
+        // 3 reasons
+        // - it gets outdated fast (somebody else makes a reservation)
+        // - it's outdated if the user cancels current reservation (dangling tentative reservation)
+        // - it's relatively expensive (since we are taking 2 year time span, instead of just the required single week)
+        // other considerations
+        // - it's below the fold
+        // - it's inside a Calendar component (mostly) so no layout shifts
         blockingReservations,
         relatedReservationUnits,
         termsOfUse: { genericTerms: bookingTerms },
@@ -950,17 +891,13 @@ export const RESERVATION_UNIT_PAGE_QUERY = gql`
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlotFields
       }
-      applicationRounds(ongoing: true) {
-        id
-        reservationPeriodBegin
-        reservationPeriodEnd
-      }
+
       descriptionFi
       descriptionEn
       descriptionSv
       canApplyFreeOfCharge
       ...ReservationInfoContainer
-      numActiveUserReservations
+      ...ReservationQuotaReached
       publishingState
       equipments {
         id

@@ -81,12 +81,17 @@
     "invalidReservationRedirect": "Bokningen är inte längre giltig."
   },
   "reservingStartsAt": "Objektet går att boka från och med {{date}}.",
-  "reservationQuotaLabel": "Befintliga bokningar",
-  "reservationQuota_one": "Du har {{count}}/{{total}} bokning för det här objektet.",
-  "reservationQuota_other": "Du har {{count}}/{{total}} bokningar för det här objektet.",
-  "reservationQuotaFullLabel": "Det maximala antalet bokningar har fyllts.",
-  "reservationQuotaFull_one": "Du kan inte göra nya bokningar.",
-  "reservationQuotaFull_other": "Du kan inte göra nya bokningar.",
+  "reservationQuota": {
+    "some": {
+      "title": "Befintliga bokningar",
+      "text_one": "Du har {{count}}/{{total}} bokning för det här objektet.",
+      "text_other": "Du har {{count}}/{{total}} bokningar för det här objektet."
+    },
+    "full": {
+      "title": "Du kan inte göra nya bokningar.",
+      "text": "Det maximala antalet bokningar {{count}} har fyllts för det här objektet."
+    }
+  },
   "quickReservation": {
     "heading": "Se lediga tider och boka",
     "subheading": "Lediga tider",

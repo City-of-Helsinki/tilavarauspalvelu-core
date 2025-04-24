@@ -171,7 +171,7 @@ function NewReservation(props: PropsNarrowed): JSX.Element | null {
   // NOTE this is the only place where reservation is deleted, don't add a second place or it gets called repeatedly
   const onNavigationConfirmed = useCallback(() => {
     // TODO rewrite browser history so user will not end up here if they press next
-    deleteReservation({
+    return deleteReservation({
       variables: {
         input: {
           pk: reservation?.pk?.toString() ?? "",

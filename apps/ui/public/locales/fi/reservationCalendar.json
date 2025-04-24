@@ -79,12 +79,17 @@
     "invalidReservationRedirect": "Varaus ei ole enää voimassa."
   },
   "reservingStartsAt": "Kohde on varattavissa {{date}} alkaen.",
-  "reservationQuotaLabel": "Olemassaolevia varauksia",
-  "reservationQuota_one": "Sinulla on jo {{count}}/{{total}} varaus tähän kohteeseen.",
-  "reservationQuota_other": "Sinulla on {{count}}/{{total}} varausta tähän kohteeseen.",
-  "reservationQuotaFullLabel": "Varausten enimmäismäärä on täynnä.",
-  "reservationQuotaFull_one": "Et voi tehdä uusia varauksia.",
-  "reservationQuotaFull_other": "Et voi tehdä uusia varauksia.",
+  "reservationQuota": {
+    "some": {
+      "title": "Olemassaolevia varauksia",
+      "text_one": "Sinulla on {{count}}/{{total}} varaus tähän kohteeseen.",
+      "text_other": "Sinulla on {{count}}/{{total}} varausta tähän kohteeseen."
+    },
+    "full": {
+      "title": "Et voi tehdä uusia varauksia.",
+      "text": "Sinun varausten enimmäismäärä {{count}} on täynnä tähän kohteeseen."
+    }
+  },
   "quickReservation": {
     "heading": "Katso vapaat ajat ja varaa",
     "subheading": "Vapaat ajat",
