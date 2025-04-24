@@ -52,6 +52,7 @@ import { Map as MapComponent } from "@/components/Map";
 import { getPostLoginUrl } from "@/modules/util";
 import {
   getFuturePricing,
+  getNextAvailableTime,
   getPossibleTimesForDay,
   getPriceString,
   getReservationUnitName,
@@ -88,7 +89,6 @@ import {
 } from "@/modules/serverUtils";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getNextAvailableTime } from "@/components/reservation-unit/utils";
 import {
   PendingReservationFormSchema,
   type PendingReservationFormType,
@@ -167,18 +167,19 @@ function ApplicationRoundScheduleDay(
   );
 }
 
-function SubmitFragment(
-  props: Readonly<{
-    focusSlot: FocusTimeSlot;
-    apiBaseUrl: string;
-    reservationForm: UseFormReturn<PendingReservationFormType>;
-    loadingText: string;
-    buttonText: string;
-  }>
-): JSX.Element {
-  const { isSubmitting } = props.reservationForm.formState;
-  const { focusSlot } = props;
-  const { isReservable } = props.focusSlot;
+function SubmitFragment({
+  focusSlot,
+  buttonText,
+  loadingText,
+  reservationForm,
+  apiBaseUrl,
+}: Readonly<{
+  focusSlot: FocusTimeSlot;
+  apiBaseUrl: string;
+  reservationForm: UseFormReturn<PendingReservationFormType>;
+  loadingText: string;
+  buttonText: string;
+}>): JSX.Element {
   const returnToUrl = useMemo(() => {
     if (!focusSlot.isReservable) {
       return;
@@ -191,10 +192,12 @@ function SubmitFragment(
     return getPostLoginUrl(params);
   }, [focusSlot]);
 
+  const { isReservable } = focusSlot;
+  const { isSubmitting } = reservationForm.formState;
   return (
     <LoginFragment
       isActionDisabled={!isReservable}
-      apiBaseUrl={props.apiBaseUrl}
+      apiBaseUrl={apiBaseUrl}
       type="reservation"
       componentIfAuthenticated={
         <SubmitButton
@@ -204,7 +207,7 @@ function SubmitFragment(
           disabled={!isReservable || isSubmitting}
           data-testid="quick-reservation__button--submit"
         >
-          {isSubmitting ? props.loadingText : props.buttonText}
+          {isSubmitting ? loadingText : buttonText}
         </SubmitButton>
       }
       returnUrl={returnToUrl}
@@ -305,13 +308,13 @@ function ReservationUnit({
     if (!slot.isReservable) {
       throw new Error("Reservation slot is not reservable");
     }
-    const { start: begin, end } = slot;
+    const { start, end } = slot;
     const input: ReservationCreateMutationInput = {
-      begin: begin.toISOString(),
+      begin: start.toISOString(),
       end: end.toISOString(),
       reservationUnit: reservationUnit.pk,
     };
-    await createReservation(input);
+    return await createReservation(input);
   };
 
   const reservableTimes = useReservableTimes(reservationUnit);
@@ -423,11 +426,10 @@ function ReservationUnit({
 
   const startingTimeOptions = getPossibleTimesForDay({
     reservableTimes,
-    interval: reservationUnit.reservationStartInterval,
     date: focusDate,
     reservationUnit,
     activeApplicationRounds,
-    durationValue,
+    duration: durationValue,
     blockingReservations,
   });
   const nextAvailableTime = getNextAvailableTime({

@@ -7,14 +7,14 @@ import { Flex, NoWrap, H4, fontMedium } from "common/styled";
 import { breakpoints } from "common/src/const";
 import type { ReservationTimePickerFieldsFragment } from "@gql/gql-types";
 import {
+  getLastPossibleReservationDate,
   getReservationUnitPrice,
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
 import Carousel from "../Carousel";
-import { getLastPossibleReservationDate } from "@/components/reservation-unit/utils";
 import {
-  Control,
-  FieldValues,
+  type Control,
+  type FieldValues,
   type SubmitHandler,
   type UseFormReturn,
 } from "react-hook-form";

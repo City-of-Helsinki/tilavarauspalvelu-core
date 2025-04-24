@@ -17,6 +17,7 @@ import {
   isUserAllowedToMoveReservationHere,
 } from "@/modules/reservation";
 import {
+  getNextAvailableTime,
   getPossibleTimesForDay,
   isReservationUnitFreeOfCharge,
 } from "@/modules/reservationUnit";
@@ -31,7 +32,6 @@ import { useReservableTimes } from "@/hooks/useReservableTimes";
 import { ButtonLikeLink } from "../common/ButtonLikeLink";
 import { ReservationTimePicker } from "./ReservationTimePicker";
 import { QuickReservation } from "../reservation-unit/QuickReservation";
-import { getNextAvailableTime } from "../reservation-unit/utils";
 import { ReservationInfoCard } from "./ReservationInfoCard";
 import { Sanitize } from "common/src/components/Sanitize";
 import { PinkBox as PinkBoxBase } from "./styles";
@@ -174,11 +174,10 @@ export function EditStep0({
   });
   const startingTimeOptions = getPossibleTimesForDay({
     reservableTimes,
-    interval: reservationUnit?.reservationStartInterval,
     date: fromUIDate(watch("date") ?? "") ?? new Date(),
     reservationUnit,
     activeApplicationRounds,
-    durationValue,
+    duration: durationValue,
     blockingReservations,
   });
 

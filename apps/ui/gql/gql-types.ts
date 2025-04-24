@@ -6495,23 +6495,6 @@ export type ReservationQuotaReachedQuery = {
   } | null;
 };
 
-export type AvailableTimesReservationUnitFieldsFragment = {
-  readonly reservationsMinDaysBefore: number | null;
-  readonly reservationsMaxDaysBefore: number | null;
-  readonly id: string;
-  readonly bufferTimeBefore: number;
-  readonly bufferTimeAfter: number;
-  readonly maxReservationDuration: number | null;
-  readonly minReservationDuration: number | null;
-  readonly reservationStartInterval: ReservationStartInterval;
-  readonly reservationBegins: string | null;
-  readonly reservationEnds: string | null;
-  readonly reservableTimeSpans: ReadonlyArray<{
-    readonly startDatetime: string | null;
-    readonly endDatetime: string | null;
-  }> | null;
-};
-
 export type EditPageReservationUnitFragment = {
   readonly id: string;
   readonly bufferTimeBefore: number;
@@ -7425,6 +7408,23 @@ export type ReservationPriceFieldsFragment = {
       };
     }>;
   }>;
+};
+
+export type AvailableTimesReservationUnitFieldsFragment = {
+  readonly reservationsMinDaysBefore: number | null;
+  readonly reservationsMaxDaysBefore: number | null;
+  readonly id: string;
+  readonly bufferTimeBefore: number;
+  readonly bufferTimeAfter: number;
+  readonly maxReservationDuration: number | null;
+  readonly minReservationDuration: number | null;
+  readonly reservationStartInterval: ReservationStartInterval;
+  readonly reservationBegins: string | null;
+  readonly reservationEnds: string | null;
+  readonly reservableTimeSpans: ReadonlyArray<{
+    readonly startDatetime: string | null;
+    readonly endDatetime: string | null;
+  }> | null;
 };
 
 export type NotReservableFieldsFragment = {
@@ -10791,32 +10791,6 @@ export const ReservationQuotaReachedFragmentDoc = gql`
     numActiveUserReservations
   }
 `;
-export const IsReservableFieldsFragmentDoc = gql`
-  fragment IsReservableFields on ReservationUnitNode {
-    id
-    bufferTimeBefore
-    bufferTimeAfter
-    reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
-      startDatetime
-      endDatetime
-    }
-    maxReservationDuration
-    minReservationDuration
-    reservationStartInterval
-    reservationsMaxDaysBefore
-    reservationsMinDaysBefore
-    reservationBegins
-    reservationEnds
-  }
-`;
-export const AvailableTimesReservationUnitFieldsFragmentDoc = gql`
-  fragment AvailableTimesReservationUnitFields on ReservationUnitNode {
-    ...IsReservableFields
-    reservationsMinDaysBefore
-    reservationsMaxDaysBefore
-  }
-  ${IsReservableFieldsFragmentDoc}
-`;
 export const CanReservationBeChangedFragmentDoc = gql`
   fragment CanReservationBeChanged on ReservationNode {
     end
@@ -10942,6 +10916,24 @@ export const MetaFieldsFragmentDoc = gql`
   }
   ${ReserveeNameFieldsFragmentDoc}
   ${ReserveeBillingFieldsFragmentDoc}
+`;
+export const IsReservableFieldsFragmentDoc = gql`
+  fragment IsReservableFields on ReservationUnitNode {
+    id
+    bufferTimeBefore
+    bufferTimeAfter
+    reservableTimeSpans(startDate: $beginDate, endDate: $endDate) {
+      startDatetime
+      endDatetime
+    }
+    maxReservationDuration
+    minReservationDuration
+    reservationStartInterval
+    reservationsMaxDaysBefore
+    reservationsMinDaysBefore
+    reservationBegins
+    reservationEnds
+  }
 `;
 export const TermsOfUseFragmentDoc = gql`
   fragment TermsOfUse on ReservationUnitNode {
@@ -11166,6 +11158,14 @@ export const BlockingReservationFieldsFragmentDoc = gql`
     bufferTimeAfter
     affectedReservationUnits
   }
+`;
+export const AvailableTimesReservationUnitFieldsFragmentDoc = gql`
+  fragment AvailableTimesReservationUnitFields on ReservationUnitNode {
+    ...IsReservableFields
+    reservationsMinDaysBefore
+    reservationsMaxDaysBefore
+  }
+  ${IsReservableFieldsFragmentDoc}
 `;
 export const NotReservableFieldsFragmentDoc = gql`
   fragment NotReservableFields on ReservationUnitNode {
