@@ -24,14 +24,14 @@ import { useEffect } from "react";
 export function useConfirmNavigation(props: {
   confirm: boolean;
   confirmMessage: string;
-  onNavigationConfirmed?: () => void;
+  onNavigationConfirmed?: () => Promise<unknown>;
   whitelist?: Array<RegExp | string>;
 }) {
   const { confirm, confirmMessage, onNavigationConfirmed, whitelist } = props;
   const router = useRouter();
   useEffect(() => {
     // The only way to escape the routing is to throw an error
-    const handler = (url: string) => {
+    const handler = async (url: string) => {
       // skip so we don't call the callback if checks are disabled
       if (!confirm) {
         return;
@@ -51,7 +51,9 @@ export function useConfirmNavigation(props: {
 
         throw "Route Canceled";
       }
-      onNavigationConfirmed?.();
+      if (onNavigationConfirmed != null) {
+        await onNavigationConfirmed();
+      }
     };
     router.events.on("beforeHistoryChange", handler);
 

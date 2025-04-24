@@ -6477,6 +6477,24 @@ export type ReservationInfoContainerFragment = {
   readonly maxReservationsPerUser: number | null;
 };
 
+export type ReservationQuotaReachedFragment = {
+  readonly id: string;
+  readonly maxReservationsPerUser: number | null;
+  readonly numActiveUserReservations: number;
+};
+
+export type ReservationQuotaReachedQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReservationQuotaReachedQuery = {
+  readonly reservationUnit: {
+    readonly id: string;
+    readonly maxReservationsPerUser: number | null;
+    readonly numActiveUserReservations: number;
+  } | null;
+};
+
 export type AvailableTimesReservationUnitFieldsFragment = {
   readonly reservationsMinDaysBefore: number | null;
   readonly reservationsMaxDaysBefore: number | null;
@@ -6878,6 +6896,11 @@ export type ReservationTimePickerFieldsFragment = {
   readonly reservationsMinDaysBefore: number | null;
   readonly reservationBegins: string | null;
   readonly reservationEnds: string | null;
+  readonly applicationRounds: ReadonlyArray<{
+    readonly id: string;
+    readonly reservationPeriodBegin: string;
+    readonly reservationPeriodEnd: string;
+  }>;
   readonly reservableTimeSpans: ReadonlyArray<{
     readonly startDatetime: string | null;
     readonly endDatetime: string | null;
@@ -9133,7 +9156,6 @@ export type ReservationUnitPageQuery = {
     readonly descriptionEn: string | null;
     readonly descriptionSv: string | null;
     readonly canApplyFreeOfCharge: boolean;
-    readonly numActiveUserReservations: number;
     readonly publishingState: ReservationUnitPublishingState;
     readonly reservationsMinDaysBefore: number | null;
     readonly reservationsMaxDaysBefore: number | null;
@@ -9150,6 +9172,7 @@ export type ReservationUnitPageQuery = {
     readonly termsOfUseSv: string | null;
     readonly reservationEnds: string | null;
     readonly maxReservationsPerUser: number | null;
+    readonly numActiveUserReservations: number;
     readonly bufferTimeBefore: number;
     readonly bufferTimeAfter: number;
     readonly reservationStartInterval: ReservationStartInterval;
@@ -9180,11 +9203,6 @@ export type ReservationUnitPageQuery = {
         readonly end: string;
       } | null>;
     }>;
-    readonly applicationRounds: ReadonlyArray<{
-      readonly id: string;
-      readonly reservationPeriodBegin: string;
-      readonly reservationPeriodEnd: string;
-    }>;
     readonly equipments: ReadonlyArray<{
       readonly id: string;
       readonly pk: number | null;
@@ -9197,6 +9215,11 @@ export type ReservationUnitPageQuery = {
         readonly nameEn: string | null;
         readonly nameSv: string | null;
       };
+    }>;
+    readonly applicationRounds: ReadonlyArray<{
+      readonly id: string;
+      readonly reservationPeriodBegin: string;
+      readonly reservationPeriodEnd: string;
     }>;
     readonly metadataSet: {
       readonly id: string;
@@ -10761,6 +10784,13 @@ export const ReservationInfoContainerFragmentDoc = gql`
     maxReservationsPerUser
   }
 `;
+export const ReservationQuotaReachedFragmentDoc = gql`
+  fragment ReservationQuotaReached on ReservationUnitNode {
+    id
+    maxReservationsPerUser
+    numActiveUserReservations
+  }
+`;
 export const IsReservableFieldsFragmentDoc = gql`
   fragment IsReservableFields on ReservationUnitNode {
     id
@@ -10942,6 +10972,11 @@ export const ReservationTimePickerFieldsFragmentDoc = gql`
     pk
     ...IsReservableFields
     ...PriceReservationUnitFields
+    applicationRounds(ongoing: true) {
+      id
+      reservationPeriodBegin
+      reservationPeriodEnd
+    }
   }
   ${IsReservableFieldsFragmentDoc}
   ${PriceReservationUnitFieldsFragmentDoc}
@@ -11440,6 +11475,89 @@ export type CancelApplicationMutationResult =
 export type CancelApplicationMutationOptions = Apollo.BaseMutationOptions<
   CancelApplicationMutation,
   CancelApplicationMutationVariables
+>;
+export const ReservationQuotaReachedDocument = gql`
+  query ReservationQuotaReached($id: ID!) {
+    reservationUnit(id: $id) {
+      ...ReservationQuotaReached
+    }
+  }
+  ${ReservationQuotaReachedFragmentDoc}
+`;
+
+/**
+ * __useReservationQuotaReachedQuery__
+ *
+ * To run a query within a React component, call `useReservationQuotaReachedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReservationQuotaReachedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReservationQuotaReachedQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useReservationQuotaReachedQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ReservationQuotaReachedQuery,
+    ReservationQuotaReachedQueryVariables
+  > &
+    (
+      | { variables: ReservationQuotaReachedQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    ReservationQuotaReachedQuery,
+    ReservationQuotaReachedQueryVariables
+  >(ReservationQuotaReachedDocument, options);
+}
+export function useReservationQuotaReachedLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ReservationQuotaReachedQuery,
+    ReservationQuotaReachedQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    ReservationQuotaReachedQuery,
+    ReservationQuotaReachedQueryVariables
+  >(ReservationQuotaReachedDocument, options);
+}
+export function useReservationQuotaReachedSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        ReservationQuotaReachedQuery,
+        ReservationQuotaReachedQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    ReservationQuotaReachedQuery,
+    ReservationQuotaReachedQueryVariables
+  >(ReservationQuotaReachedDocument, options);
+}
+export type ReservationQuotaReachedQueryHookResult = ReturnType<
+  typeof useReservationQuotaReachedQuery
+>;
+export type ReservationQuotaReachedLazyQueryHookResult = ReturnType<
+  typeof useReservationQuotaReachedLazyQuery
+>;
+export type ReservationQuotaReachedSuspenseQueryHookResult = ReturnType<
+  typeof useReservationQuotaReachedSuspenseQuery
+>;
+export type ReservationQuotaReachedQueryResult = Apollo.QueryResult<
+  ReservationQuotaReachedQuery,
+  ReservationQuotaReachedQueryVariables
 >;
 export const AdjustReservationTimeDocument = gql`
   mutation AdjustReservationTime($input: ReservationAdjustTimeMutationInput!) {
@@ -13876,17 +13994,12 @@ export const ReservationUnitPageDocument = gql`
       applicationRoundTimeSlots {
         ...ApplicationRoundTimeSlotFields
       }
-      applicationRounds(ongoing: true) {
-        id
-        reservationPeriodBegin
-        reservationPeriodEnd
-      }
       descriptionFi
       descriptionEn
       descriptionSv
       canApplyFreeOfCharge
       ...ReservationInfoContainer
-      numActiveUserReservations
+      ...ReservationQuotaReached
       publishingState
       equipments {
         id
@@ -13911,6 +14024,7 @@ export const ReservationUnitPageDocument = gql`
   ${TermsOfUseFragmentDoc}
   ${ApplicationRoundTimeSlotFieldsFragmentDoc}
   ${ReservationInfoContainerFragmentDoc}
+  ${ReservationQuotaReachedFragmentDoc}
   ${EquipmentFieldsFragmentDoc}
   ${BlockingReservationFieldsFragmentDoc}
 `;
