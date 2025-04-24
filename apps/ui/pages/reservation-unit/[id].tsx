@@ -117,157 +117,6 @@ import { type ApiError, getApiErrors } from "common/src/apolloUtils";
 import { formatErrorMessage } from "common/src/hooks/useDisplayError";
 import { errorToast } from "common/src/common/toast";
 
-type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
-type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
-
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-  const { params, query, locale } = ctx;
-  const pk = toNumber(ignoreMaybeArray(params?.id));
-  const uuid = query.ru;
-  const commonProps = getCommonServerSideProps();
-  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
-
-  const notFound = {
-    props: {
-      ...commonProps,
-      ...(await serverSideTranslations(locale ?? "fi")),
-      notFound: true, // required for type narrowing
-    },
-    notFound: true,
-  };
-
-  const isPostLogin = query.isPostLogin === "true";
-
-  // recheck login status in case user cancelled the login
-  const { data: userData } = await apolloClient.query<CurrentUserQuery>({
-    query: CurrentUserDocument,
-  });
-  let mutationErrors: ApiError[] | null = null;
-  if (pk != null && pk > 0 && isPostLogin && userData?.currentUser != null) {
-    const begin = ignoreMaybeArray(query.begin);
-    const end = ignoreMaybeArray(query.end);
-
-    if (begin != null && end != null) {
-      const input: ReservationCreateMutationInput = {
-        begin,
-        end,
-        reservationUnit: pk,
-      };
-      try {
-        const res = await apolloClient.mutate<
-          CreateReservationMutation,
-          CreateReservationMutationVariables
-        >({
-          mutation: CreateReservationDocument,
-          variables: {
-            input,
-          },
-        });
-        const { pk: reservationPk } = res.data?.createReservation ?? {};
-        return {
-          redirect: {
-            destination: getReservationInProgressPath(pk, reservationPk),
-            permanent: false,
-          },
-          props: {
-            notFound: true, // required for type narrowing
-          },
-        };
-      } catch (error) {
-        // Format errors so we can JSON.stringify them and toast them on client
-        mutationErrors = getApiErrors(error);
-      }
-    }
-  }
-
-  if (pk != null && pk > 0) {
-    const today = new Date();
-    const startDate = today;
-    const endDate = addYears(today, 2);
-
-    const typename = "ReservationUnitNode";
-    const id = base64encode(`${typename}:${pk}`);
-    const { data: reservationUnitData } = await apolloClient.query<
-      ReservationUnitPageQuery,
-      ReservationUnitPageQueryVariables
-    >({
-      query: ReservationUnitPageDocument,
-      variables: {
-        id,
-        beginDate: toApiDate(startDate) ?? "",
-        endDate: toApiDate(endDate) ?? "",
-        state: RELATED_RESERVATION_STATES,
-        pk,
-      },
-    });
-    const activeApplicationRounds = filterNonNullable(
-      reservationUnitData?.reservationUnit?.applicationRounds
-    );
-
-    const previewPass = uuid === reservationUnitData.reservationUnit?.uuid;
-
-    const { reservationUnit } = reservationUnitData;
-    if (reservationUnit == null) {
-      return notFound;
-    }
-    if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
-      return notFound;
-    }
-
-    const isDraft = reservationUnit?.isDraft;
-    if (isDraft && !previewPass) {
-      return notFound;
-    }
-
-    const bookingTerms = await getGenericTerms(apolloClient);
-
-    let relatedReservationUnits: RelatedUnitCardFieldsFragment[] = [];
-    if (reservationUnit?.unit?.pk) {
-      const { data: relatedData } = await apolloClient.query<
-        RelatedReservationUnitsQuery,
-        RelatedReservationUnitsQueryVariables
-      >({
-        query: RelatedReservationUnitsDocument,
-        variables: {
-          unit: [reservationUnit.unit.pk],
-        },
-      });
-
-      relatedReservationUnits = filterNonNullable(
-        relatedData?.reservationUnits?.edges?.map((n) => n?.node)
-      ).filter((n) => n?.pk !== reservationUnitData.reservationUnit?.pk);
-    }
-    const queryParams = new URLSearchParams(query as Record<string, string>);
-    const searchDate = queryParams.get("date") ?? null;
-    const searchTime = queryParams.get("time") ?? null;
-    const searchDuration = toNumber(
-      ignoreMaybeArray(queryParams.get("duration"))
-    );
-
-    const blockingReservations = filterNonNullable(
-      reservationUnitData?.affectingReservations
-    );
-
-    return {
-      props: {
-        ...commonProps,
-        ...(await serverSideTranslations(locale ?? "fi")),
-        reservationUnit,
-        blockingReservations,
-        relatedReservationUnits,
-        activeApplicationRounds,
-        termsOfUse: { genericTerms: bookingTerms },
-        searchDuration,
-        searchDate,
-        searchTime,
-        mutationErrors,
-      },
-    };
-  }
-
-  return notFound;
-}
-
 const StyledApplicationRoundScheduleDay = styled.p`
   span:first-child {
     display: inline-block;
@@ -393,7 +242,6 @@ const StyledRelatedUnits = styled(RelatedUnits)`
 function ReservationUnit({
   reservationUnit,
   relatedReservationUnits,
-  activeApplicationRounds,
   blockingReservations,
   termsOfUse,
   apiBaseUrl,
@@ -464,6 +312,8 @@ function ReservationUnit({
   const focusDate = useMemo(() => {
     return createDateTime(dateValue, timeValue);
   }, [dateValue, timeValue]);
+
+  const activeApplicationRounds = reservationUnit.applicationRounds;
 
   const submitReservation = async (data: PendingReservationFormType) => {
     if (reservationUnit.pk == null) {
@@ -718,10 +568,7 @@ function ReservationUnit({
             closeButton={false}
             data-testid="reservation-unit__reservation-notice"
           >
-            <PriceChangeNotice
-              reservationUnit={reservationUnit}
-              activeApplicationRounds={activeApplicationRounds}
-            />
+            <PriceChangeNotice reservationUnit={reservationUnit} />
             <Sanitize html={termsOfUseContent} />
           </Accordion>
         )}
@@ -869,9 +716,10 @@ function ReservationQuotaReached({
 
 function PriceChangeNotice({
   reservationUnit,
-  activeApplicationRounds,
-}: Pick<PropsNarrowed, "reservationUnit" | "activeApplicationRounds">) {
+}: Pick<PropsNarrowed, "reservationUnit">) {
   const { t, i18n } = useTranslation();
+
+  const activeApplicationRounds = reservationUnit.applicationRounds;
   const futurePricing = getFuturePricing(
     reservationUnit,
     activeApplicationRounds
@@ -913,6 +761,154 @@ function PriceChangeNotice({
       .
     </p>
   );
+}
+
+type Props = Awaited<ReturnType<typeof getServerSideProps>>["props"];
+type PropsNarrowed = Exclude<Props, { notFound: boolean }>;
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { params, query, locale } = ctx;
+  const pk = toNumber(ignoreMaybeArray(params?.id));
+  const uuid = query.ru;
+  const commonProps = getCommonServerSideProps();
+  const apolloClient = createApolloClient(commonProps.apiBaseUrl, ctx);
+
+  const notFound = {
+    props: {
+      ...commonProps,
+      ...(await serverSideTranslations(locale ?? "fi")),
+      notFound: true, // required for type narrowing
+    },
+    notFound: true,
+  };
+
+  const isPostLogin = query.isPostLogin === "true";
+
+  // recheck login status in case user cancelled the login
+  const { data: userData } = await apolloClient.query<CurrentUserQuery>({
+    query: CurrentUserDocument,
+  });
+  let mutationErrors: ApiError[] | null = null;
+  if (pk != null && pk > 0 && isPostLogin && userData?.currentUser != null) {
+    const begin = ignoreMaybeArray(query.begin);
+    const end = ignoreMaybeArray(query.end);
+
+    if (begin != null && end != null) {
+      const input: ReservationCreateMutationInput = {
+        begin,
+        end,
+        reservationUnit: pk,
+      };
+      try {
+        const res = await apolloClient.mutate<
+          CreateReservationMutation,
+          CreateReservationMutationVariables
+        >({
+          mutation: CreateReservationDocument,
+          variables: {
+            input,
+          },
+        });
+        const { pk: reservationPk } = res.data?.createReservation ?? {};
+        return {
+          redirect: {
+            destination: getReservationInProgressPath(pk, reservationPk),
+            permanent: false,
+          },
+          props: {
+            notFound: true, // required for type narrowing
+          },
+        };
+      } catch (error) {
+        // Format errors so we can JSON.stringify them and toast them on client
+        mutationErrors = getApiErrors(error);
+      }
+    }
+  }
+
+  if (pk != null && pk > 0) {
+    const today = new Date();
+    const startDate = today;
+    const endDate = addYears(today, 2);
+
+    const typename = "ReservationUnitNode";
+    const id = base64encode(`${typename}:${pk}`);
+    const { data: reservationUnitData } = await apolloClient.query<
+      ReservationUnitPageQuery,
+      ReservationUnitPageQueryVariables
+    >({
+      query: ReservationUnitPageDocument,
+      variables: {
+        id,
+        beginDate: toApiDate(startDate) ?? "",
+        endDate: toApiDate(endDate) ?? "",
+        state: RELATED_RESERVATION_STATES,
+        pk,
+      },
+    });
+
+    const { reservationUnit } = reservationUnitData;
+
+    if (reservationUnit == null) {
+      return notFound;
+    }
+
+    const previewPass = uuid === reservationUnitData.reservationUnit?.uuid;
+    if (!isReservationUnitPublished(reservationUnit) && !previewPass) {
+      return notFound;
+    }
+
+    const isDraft = reservationUnit?.isDraft;
+    if (isDraft && !previewPass) {
+      return notFound;
+    }
+
+    const bookingTerms = await getGenericTerms(apolloClient);
+
+    let relatedReservationUnits: RelatedUnitCardFieldsFragment[] = [];
+    if (reservationUnit?.unit?.pk) {
+      const { data: relatedData } = await apolloClient.query<
+        RelatedReservationUnitsQuery,
+        RelatedReservationUnitsQueryVariables
+      >({
+        query: RelatedReservationUnitsDocument,
+        variables: {
+          unit: [reservationUnit.unit.pk],
+        },
+      });
+      relatedReservationUnits = filterNonNullable(
+        relatedData?.reservationUnits?.edges?.map((n) => n?.node)
+      ).filter((n) => n?.pk !== reservationUnitData.reservationUnit?.pk);
+    }
+
+    const queryParams = new URLSearchParams(query as Record<string, string>);
+    const searchDate = queryParams.get("date") ?? null;
+    const searchTime = queryParams.get("time") ?? null;
+    const searchDuration = toNumber(
+      ignoreMaybeArray(queryParams.get("duration"))
+    );
+
+    const blockingReservations = filterNonNullable(
+      reservationUnitData.affectingReservations
+    );
+
+    return {
+      props: {
+        ...commonProps,
+        ...(await serverSideTranslations(locale ?? "fi")),
+        reservationUnit,
+        blockingReservations,
+        relatedReservationUnits,
+        termsOfUse: { genericTerms: bookingTerms },
+        searchDuration,
+        searchDate,
+        searchTime,
+        mutationErrors,
+      },
+    };
+  }
+
+  return notFound;
 }
 
 export default ReservationUnitWrapped;
