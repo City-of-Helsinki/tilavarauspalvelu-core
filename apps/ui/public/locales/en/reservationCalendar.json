@@ -81,12 +81,17 @@
     "invalidReservationRedirect": "The booking is no longer valid."
   },
   "reservingStartsAt": "The item will be available from {{date}}.",
-  "reservationQuotaLabel": "Existing bookings",
-  "reservationQuota_one": "You have {{count}}/{{total}} booking for this item.",
-  "reservationQuota_other": "You have {{count}}/{{total}} bookings for this item.",
-  "reservationQuotaFullLabel": "You have reached the maximum number of bookings.",
-  "reservationQuotaFull_one": "You cannot make new bookings.",
-  "reservationQuotaFull_other": "You cannot make new bookings.",
+  "reservationQuota": {
+    "some": {
+      "title": "Existing bookings",
+      "text_one": "You have {{count}}/{{total}} booking for this item.",
+      "text_other": "You have {{count}}/{{total}} bookings for this item."
+    },
+    "full": {
+      "title": "You cannot make new bookings.",
+      "text": "You have reached the maximum number of bookings {{count}} for this item."
+    }
+  },
   "quickReservation": {
     "heading": "See the available times and make a booking",
     "subheading": "Available times",
