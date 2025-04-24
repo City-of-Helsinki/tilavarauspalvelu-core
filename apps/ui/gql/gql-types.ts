@@ -6953,6 +6953,31 @@ export type SingleSearchCardFragment = {
   } | null;
 };
 
+export type AffectingReservationsQueryVariables = Exact<{
+  pk: Scalars["Int"]["input"];
+  beginDate: Scalars["Date"]["input"];
+  endDate: Scalars["Date"]["input"];
+  state?: InputMaybe<
+    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
+    | InputMaybe<ReservationStateChoice>
+  >;
+}>;
+
+export type AffectingReservationsQuery = {
+  readonly affectingReservations: ReadonlyArray<{
+    readonly pk: number | null;
+    readonly id: string;
+    readonly state: ReservationStateChoice | null;
+    readonly isBlocked: boolean;
+    readonly begin: string;
+    readonly end: string;
+    readonly numPersons: number | null;
+    readonly bufferTimeBefore: number;
+    readonly bufferTimeAfter: number;
+    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
+  }> | null;
+};
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = {
@@ -9134,13 +9159,8 @@ export type ApplicationRoundTimeSlotFieldsFragment = {
 
 export type ReservationUnitPageQueryVariables = Exact<{
   id: Scalars["ID"]["input"];
-  pk: Scalars["Int"]["input"];
   beginDate: Scalars["Date"]["input"];
   endDate: Scalars["Date"]["input"];
-  state?: InputMaybe<
-    | ReadonlyArray<InputMaybe<ReservationStateChoice>>
-    | InputMaybe<ReservationStateChoice>
-  >;
 }>;
 
 export type ReservationUnitPageQuery = {
@@ -9297,18 +9317,6 @@ export type ReservationUnitPageQuery = {
       readonly endDatetime: string | null;
     }> | null;
   } | null;
-  readonly affectingReservations: ReadonlyArray<{
-    readonly pk: number | null;
-    readonly id: string;
-    readonly state: ReservationStateChoice | null;
-    readonly isBlocked: boolean;
-    readonly begin: string;
-    readonly end: string;
-    readonly numPersons: number | null;
-    readonly bufferTimeBefore: number;
-    readonly bufferTimeAfter: number;
-    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
-  }> | null;
 };
 
 export type RelatedReservationUnitsQueryVariables = Exact<{
@@ -9746,30 +9754,6 @@ export type ReservationEditPageQuery = {
       readonly nameEn: string | null;
     } | null;
   } | null;
-};
-
-export type BlockingReservationsQueryVariables = Exact<{
-  pk: Scalars["Int"]["input"];
-  beginDate: Scalars["Date"]["input"];
-  endDate: Scalars["Date"]["input"];
-  state?: InputMaybe<
-    ReadonlyArray<ReservationStateChoice> | ReservationStateChoice
-  >;
-}>;
-
-export type BlockingReservationsQuery = {
-  readonly affectingReservations: ReadonlyArray<{
-    readonly pk: number | null;
-    readonly id: string;
-    readonly state: ReservationStateChoice | null;
-    readonly isBlocked: boolean;
-    readonly begin: string;
-    readonly end: string;
-    readonly numPersons: number | null;
-    readonly bufferTimeBefore: number;
-    readonly bufferTimeAfter: number;
-    readonly affectedReservationUnits: ReadonlyArray<number | null> | null;
-  }> | null;
 };
 
 export type ApplicationRecurringReservationQueryVariables = Exact<{
@@ -11661,6 +11645,102 @@ export type CancelReservationMutationResult =
 export type CancelReservationMutationOptions = Apollo.BaseMutationOptions<
   CancelReservationMutation,
   CancelReservationMutationVariables
+>;
+export const AffectingReservationsDocument = gql`
+  query AffectingReservations(
+    $pk: Int!
+    $beginDate: Date!
+    $endDate: Date!
+    $state: [ReservationStateChoice]
+  ) {
+    affectingReservations(
+      forReservationUnits: [$pk]
+      beginDate: $beginDate
+      endDate: $endDate
+      state: $state
+    ) {
+      ...BlockingReservationFields
+    }
+  }
+  ${BlockingReservationFieldsFragmentDoc}
+`;
+
+/**
+ * __useAffectingReservationsQuery__
+ *
+ * To run a query within a React component, call `useAffectingReservationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAffectingReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAffectingReservationsQuery({
+ *   variables: {
+ *      pk: // value for 'pk'
+ *      beginDate: // value for 'beginDate'
+ *      endDate: // value for 'endDate'
+ *      state: // value for 'state'
+ *   },
+ * });
+ */
+export function useAffectingReservationsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    AffectingReservationsQuery,
+    AffectingReservationsQueryVariables
+  > &
+    (
+      | { variables: AffectingReservationsQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    )
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    AffectingReservationsQuery,
+    AffectingReservationsQueryVariables
+  >(AffectingReservationsDocument, options);
+}
+export function useAffectingReservationsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    AffectingReservationsQuery,
+    AffectingReservationsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    AffectingReservationsQuery,
+    AffectingReservationsQueryVariables
+  >(AffectingReservationsDocument, options);
+}
+export function useAffectingReservationsSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        AffectingReservationsQuery,
+        AffectingReservationsQueryVariables
+      >
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    AffectingReservationsQuery,
+    AffectingReservationsQueryVariables
+  >(AffectingReservationsDocument, options);
+}
+export type AffectingReservationsQueryHookResult = ReturnType<
+  typeof useAffectingReservationsQuery
+>;
+export type AffectingReservationsLazyQueryHookResult = ReturnType<
+  typeof useAffectingReservationsLazyQuery
+>;
+export type AffectingReservationsSuspenseQueryHookResult = ReturnType<
+  typeof useAffectingReservationsSuspenseQuery
+>;
+export type AffectingReservationsQueryResult = Apollo.QueryResult<
+  AffectingReservationsQuery,
+  AffectingReservationsQueryVariables
 >;
 export const CurrentUserDocument = gql`
   query CurrentUser {
@@ -13967,13 +14047,7 @@ export type DeleteReservationMutationOptions = Apollo.BaseMutationOptions<
   DeleteReservationMutationVariables
 >;
 export const ReservationUnitPageDocument = gql`
-  query ReservationUnitPage(
-    $id: ID!
-    $pk: Int!
-    $beginDate: Date!
-    $endDate: Date!
-    $state: [ReservationStateChoice]
-  ) {
+  query ReservationUnitPage($id: ID!, $beginDate: Date!, $endDate: Date!) {
     reservationUnit(id: $id) {
       id
       pk
@@ -14006,14 +14080,6 @@ export const ReservationUnitPageDocument = gql`
         ...EquipmentFields
       }
     }
-    affectingReservations(
-      forReservationUnits: [$pk]
-      beginDate: $beginDate
-      endDate: $endDate
-      state: $state
-    ) {
-      ...BlockingReservationFields
-    }
   }
   ${AvailableTimesReservationUnitFieldsFragmentDoc}
   ${NotReservableFieldsFragmentDoc}
@@ -14026,7 +14092,6 @@ export const ReservationUnitPageDocument = gql`
   ${ReservationInfoContainerFragmentDoc}
   ${ReservationQuotaReachedFragmentDoc}
   ${EquipmentFieldsFragmentDoc}
-  ${BlockingReservationFieldsFragmentDoc}
 `;
 
 /**
@@ -14042,10 +14107,8 @@ export const ReservationUnitPageDocument = gql`
  * const { data, loading, error } = useReservationUnitPageQuery({
  *   variables: {
  *      id: // value for 'id'
- *      pk: // value for 'pk'
  *      beginDate: // value for 'beginDate'
  *      endDate: // value for 'endDate'
- *      state: // value for 'state'
  *   },
  * });
  */
@@ -14559,102 +14622,6 @@ export type ReservationEditPageSuspenseQueryHookResult = ReturnType<
 export type ReservationEditPageQueryResult = Apollo.QueryResult<
   ReservationEditPageQuery,
   ReservationEditPageQueryVariables
->;
-export const BlockingReservationsDocument = gql`
-  query BlockingReservations(
-    $pk: Int!
-    $beginDate: Date!
-    $endDate: Date!
-    $state: [ReservationStateChoice!]
-  ) {
-    affectingReservations(
-      forReservationUnits: [$pk]
-      beginDate: $beginDate
-      endDate: $endDate
-      state: $state
-    ) {
-      ...BlockingReservationFields
-    }
-  }
-  ${BlockingReservationFieldsFragmentDoc}
-`;
-
-/**
- * __useBlockingReservationsQuery__
- *
- * To run a query within a React component, call `useBlockingReservationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useBlockingReservationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useBlockingReservationsQuery({
- *   variables: {
- *      pk: // value for 'pk'
- *      beginDate: // value for 'beginDate'
- *      endDate: // value for 'endDate'
- *      state: // value for 'state'
- *   },
- * });
- */
-export function useBlockingReservationsQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    BlockingReservationsQuery,
-    BlockingReservationsQueryVariables
-  > &
-    (
-      | { variables: BlockingReservationsQueryVariables; skip?: boolean }
-      | { skip: boolean }
-    )
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    BlockingReservationsQuery,
-    BlockingReservationsQueryVariables
-  >(BlockingReservationsDocument, options);
-}
-export function useBlockingReservationsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    BlockingReservationsQuery,
-    BlockingReservationsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    BlockingReservationsQuery,
-    BlockingReservationsQueryVariables
-  >(BlockingReservationsDocument, options);
-}
-export function useBlockingReservationsSuspenseQuery(
-  baseOptions?:
-    | Apollo.SkipToken
-    | Apollo.SuspenseQueryHookOptions<
-        BlockingReservationsQuery,
-        BlockingReservationsQueryVariables
-      >
-) {
-  const options =
-    baseOptions === Apollo.skipToken
-      ? baseOptions
-      : { ...defaultOptions, ...baseOptions };
-  return Apollo.useSuspenseQuery<
-    BlockingReservationsQuery,
-    BlockingReservationsQueryVariables
-  >(BlockingReservationsDocument, options);
-}
-export type BlockingReservationsQueryHookResult = ReturnType<
-  typeof useBlockingReservationsQuery
->;
-export type BlockingReservationsLazyQueryHookResult = ReturnType<
-  typeof useBlockingReservationsLazyQuery
->;
-export type BlockingReservationsSuspenseQueryHookResult = ReturnType<
-  typeof useBlockingReservationsSuspenseQuery
->;
-export type BlockingReservationsQueryResult = Apollo.QueryResult<
-  BlockingReservationsQuery,
-  BlockingReservationsQueryVariables
 >;
 export const ApplicationRecurringReservationDocument = gql`
   query ApplicationRecurringReservation($id: ID!) {

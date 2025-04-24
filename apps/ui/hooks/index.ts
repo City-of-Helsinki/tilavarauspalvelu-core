@@ -6,3 +6,5 @@ export { useReservationUnitList } from "./useReservationUnitList";
 export { useSearchQuery } from "./useSearchQuery";
 export { useToastIfQueryParam } from "./useToastIfQueryParam";
 export { useCurrentUser } from "./useCurrentUser";
+export { useAvailableTimes } from "./useAvailableTimes";
+export { useRemoveStoredReservation } from "./useRemoveStoredReservation";
