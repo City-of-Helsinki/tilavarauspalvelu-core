@@ -33,6 +33,7 @@ import {
   type CurrentUserQuery,
   type TimeSlotType,
   type RelatedUnitCardFieldsFragment,
+  type PricingFieldsFragment,
 } from "@gql/gql-types";
 import {
   base64encode,
@@ -421,11 +422,6 @@ function ReservationUnit({
 
   const shouldDisplayBottomWrapper = relatedReservationUnits?.length > 0;
 
-  const termsOfUseContent = getTranslationSafe(
-    reservationUnit,
-    "termsOfUse",
-    lang
-  );
   const paymentTermsContent = reservationUnit.paymentTerms
     ? getTranslationSafe(reservationUnit.paymentTerms, "text", lang)
     : undefined;
@@ -561,17 +557,7 @@ function ReservationUnit({
           reservationUnit={reservationUnit}
           reservationUnitIsReservable={reservationUnitIsReservable}
         />
-        {termsOfUseContent && (
-          <Accordion
-            heading={t("reservationUnit:terms")}
-            headingLevel={2}
-            closeButton={false}
-            data-testid="reservation-unit__reservation-notice"
-          >
-            <PriceChangeNotice reservationUnit={reservationUnit} />
-            <Sanitize html={termsOfUseContent} />
-          </Accordion>
-        )}
+        <NoticeWhenReservingSection reservationUnit={reservationUnit} />
         {showApplicationRoundTimeSlots && (
           <Accordion
             headingLevel={2}
@@ -714,22 +700,44 @@ function ReservationQuotaReached({
   );
 }
 
-function PriceChangeNotice({
+function NoticeWhenReservingSection({
   reservationUnit,
-}: Pick<PropsNarrowed, "reservationUnit">) {
+}: {
+  reservationUnit: PropsNarrowed["reservationUnit"];
+}): JSX.Element | null {
   const { t, i18n } = useTranslation();
-
-  const activeApplicationRounds = reservationUnit.applicationRounds;
-  const futurePricing = getFuturePricing(
+  const lang = convertLanguageCode(i18n.language);
+  const termsOfUseContent = getTranslationSafe(
     reservationUnit,
-    activeApplicationRounds
+    "termsOfUse",
+    lang
   );
 
-  const formatters = getFormatters(i18n.language);
+  const appRounds = reservationUnit.applicationRounds;
+  const futurePricing = getFuturePricing(reservationUnit, appRounds);
 
-  if (!futurePricing) {
+  if (!futurePricing && !termsOfUseContent) {
     return null;
   }
+  return (
+    <Accordion
+      heading={t("reservationUnit:terms")}
+      headingLevel={2}
+      closeButton={false}
+      data-testid="reservation-unit__reservation-notice"
+    >
+      {futurePricing && <PriceChangeNotice futurePricing={futurePricing} />}
+      {termsOfUseContent && <Sanitize html={termsOfUseContent} />}
+    </Accordion>
+  );
+}
+
+function PriceChangeNotice({
+  futurePricing,
+}: {
+  futurePricing: PricingFieldsFragment;
+}): JSX.Element {
+  const { t, i18n } = useTranslation();
 
   const isPaid = !isPriceFree(futurePricing);
   const taxPercentage = toNumber(futurePricing.taxPercentage.value) ?? 0;
@@ -739,6 +747,7 @@ function PriceChangeNotice({
     pricing: futurePricing,
   }).toLocaleLowerCase();
   const showTaxNotice = isPaid && taxPercentage > 0;
+  const formatters = getFormatters(i18n.language);
 
   return (
     <p style={{ marginTop: 0 }}>
