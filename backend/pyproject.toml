@@ -448,6 +448,7 @@ DJANGO_SETTINGS_MODULE = "config.settings"
 DJANGO_SETTINGS_ENVIRONMENT = "AutomatedTests"
 markers = [
     "slow: Marks a test that takes a long time to run.",
+    "frontend_query: Marks a frontend query test."
 ]
 python_files = [
     "tests.py",
