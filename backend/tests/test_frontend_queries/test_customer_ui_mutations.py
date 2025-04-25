@@ -7,21 +7,16 @@ import pytest
 from graphql import OperationType
 
 from tilavarauspalvelu.enums import ApplicantTypeChoice
-from tilavarauspalvelu.integrations.verkkokauppa.payment.types import PaymentStatus
-from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from utils.date_utils import next_hour
 
 from tests.factories import (
     ApplicationFactory,
     ApplicationRoundFactory,
     ApplicationSectionFactory,
-    PaymentFactory,
-    PaymentOrderFactory,
     ReservationCancelReasonFactory,
     ReservationFactory,
     ReservationUnitFactory,
 )
-from tests.helpers import patch_method
 
 from .helpers import assert_no_undefined_variables, get_customer_query_info
 
@@ -281,33 +276,6 @@ def test_frontend_queries__customer_ui__DeleteReservation(graphql):
     variables = query_info.variables
     variables["input"] = {
         "pk": reservation.pk,
-    }
-    assert_no_undefined_variables(variables)
-
-    query = query_info.query
-    graphql.login_with_superuser()
-
-    response = graphql(query, variables=variables)
-
-    assert response.has_errors is False, response.errors
-
-
-@patch_method(VerkkokauppaAPIClient.get_payment)
-def test_frontend_queries__customer_ui__RefreshOrder(graphql):
-    customer_factories = get_customer_query_info()
-    factories = customer_factories["RefreshOrder"]
-
-    assert len(factories) == 1
-    query_info = factories[0]
-
-    order = PaymentOrderFactory.create(reservation__pk=1)
-
-    payment = PaymentFactory.create(status=PaymentStatus.PAID_ONLINE)
-    VerkkokauppaAPIClient.get_payment.return_value = payment
-
-    variables = query_info.variables
-    variables["input"] = {
-        "orderUuid": str(order.remote_id),
     }
     assert_no_undefined_variables(variables)
 
