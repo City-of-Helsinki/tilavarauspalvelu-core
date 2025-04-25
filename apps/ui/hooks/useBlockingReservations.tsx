@@ -24,6 +24,9 @@ export function useBlockingReservations(
   const { data, ...rest } = useAffectingReservationsQuery({
     pollInterval: BLOCKING_RESERVATIONS_POLL_INTERVAL,
     skip: reservationUnitPk == null || reservationUnitPk < 1,
+    // no-cache because we are polling and have no pagination
+    // Apollo cant automatically merge when reservation is deleted
+    fetchPolicy: "no-cache",
     variables: {
       pk: reservationUnitPk ?? 0,
       beginDate: toApiDate(begin) ?? "",

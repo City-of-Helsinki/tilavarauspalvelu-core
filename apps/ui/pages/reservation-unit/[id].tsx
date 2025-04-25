@@ -167,11 +167,11 @@ function ApplicationRoundScheduleDay(
 }
 
 function SubmitFragment({
+  apiBaseUrl,
   focusSlot,
   buttonText,
   loadingText,
   reservationForm,
-  apiBaseUrl,
 }: Readonly<{
   focusSlot: FocusTimeSlot;
   apiBaseUrl: string;

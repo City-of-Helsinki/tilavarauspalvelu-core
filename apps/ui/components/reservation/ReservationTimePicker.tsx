@@ -141,8 +141,6 @@ function useCalendarEventChange({
   const calendarEvents: Array<
     CalendarEventBuffer | CalendarEvent<ReservationNode>
   > = useMemo(() => {
-    const existingReservations = blockingReservations;
-
     const shouldDisplayFocusSlot = focusSlot.isReservable;
 
     let focusEvent = null;
@@ -157,7 +155,7 @@ function useCalendarEventChange({
     }
 
     const events = [
-      ...existingReservations,
+      ...blockingReservations,
       ...(focusEvent != null ? [focusEvent] : []),
     ].map((n) => {
       const suffix = n.state === "INITIAL" ? n.durationString : "";
