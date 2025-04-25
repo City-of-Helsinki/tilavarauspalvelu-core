@@ -242,6 +242,21 @@
             "en": "365 days"
           },
           "storageType": 1
+        },
+        {
+          "name": "sentryReplaySession",
+          "host": ".hel.fi",
+          "description": {
+            "fi": "Sentry vianseurannan järjestelmän istunnon tunniste.",
+            "sv": "Sentrys system för felspårning identifierar sessionen.",
+            "en": "Sentry's error tracking system identifies the session."
+          },
+          "expiration": {
+            "fi": "365 päivää",
+            "sv": "365 dagar",
+            "en": "365 days"
+          },
+          "storageType": 3
         }
       ]
     }
@@ -364,7 +379,11 @@
       "en": "Cookie"
     },
     "storageType2": "localStorage",
-    "storageType3": "sessionStorage",
+    "storageType3": {
+      "fi": "Istuntotallennus",
+      "sv": "Sessionslagring",
+      "en": "Session storage"
+    },
     "storageType4": "IndexedDB",
     "storageType5": "Cache Storage"
   }
