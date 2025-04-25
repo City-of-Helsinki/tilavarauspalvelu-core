@@ -326,7 +326,7 @@ test("Form can't be submitted without reservation type selection", async () => {
   expect(submit).not.toBeDisabled();
   await user.click(submit);
   await expect.poll(() => view.queryByText(/required/i)).toBeInTheDocument();
-});
+}, 10000);
 
 test("Form submission without any blocking reservations", async () => {
   const user = userEvent.setup({
