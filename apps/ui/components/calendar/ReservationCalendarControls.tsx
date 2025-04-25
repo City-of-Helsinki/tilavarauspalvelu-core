@@ -60,9 +60,7 @@ const ToggleButton = styled.button`
   cursor: pointer;
 `;
 
-const TogglerLabel = styled.div`
-  padding: var(--spacing-xs) 0;
-`;
+const TogglerLabel = styled.div``;
 
 const TogglerDate = styled.div`
   ${fontBold}
