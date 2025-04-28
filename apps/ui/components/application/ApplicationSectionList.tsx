@@ -20,6 +20,7 @@ import {
   InfoItemContainer,
   InfoItem,
   ScheduleDay,
+  RegularText,
 } from "./styled";
 import { SuitableTimeRangeFormValues } from "./form";
 import { WEEKDAYS } from "common/src/const";
@@ -33,6 +34,7 @@ import {
   Tooltip,
 } from "hds-react";
 import { getDayTimes } from "./module";
+import { NoWrap } from "common/styled";
 
 function formatDurationSeconds(seconds: number, t: TFunction): string {
   const hours = Math.floor(seconds / 3600);
@@ -80,11 +82,17 @@ function getLabelProps(
   }
 }
 
-function InfoListItem({ label, value }: { label: string; value: string }) {
+function InfoListItem({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | JSX.Element;
+}) {
   return (
     <li>
       <h4>{`${label}: `}</h4>
-      <span>{value}</span>
+      {value}
     </li>
   );
 }
@@ -130,32 +138,42 @@ function SingleApplicationSection({
     {
       key: "numPersons",
       label: t("application:preview.applicationEvent.numPersons"),
-      value: `${aes.numPersons} ${t("common:peopleSuffixShort")}`,
+      value: (
+        <NoWrap>{`${aes.numPersons} ${t("common:peopleSuffixShort")}`}</NoWrap>
+      ),
     },
     {
       key: "ageGroup",
       label: t("application:preview.applicationEvent.ageGroup"),
-      value: `${ageGroupToString(aes.ageGroup)} ${t("common:yearSuffixShort")}`,
+      value: (
+        <NoWrap>
+          {`${ageGroupToString(aes.ageGroup)} ${t("common:yearSuffixShort")}`}
+        </NoWrap>
+      ),
     },
     {
       key: "duration",
       label: t("application:preview.applicationEvent.duration"),
-      value: duration,
+      value: <NoWrap>{duration}</NoWrap>,
     },
     {
       key: "eventsPerWeek",
       label: t("application:preview.applicationEvent.eventsPerWeek"),
-      value: `${aes.appliedReservationsPerWeek} ${t("common:amountSuffixShort")}`,
+      value: (
+        <NoWrap>
+          {`${aes.appliedReservationsPerWeek} ${t("common:amountSuffixShort")}`}
+        </NoWrap>
+      ),
     },
     {
       key: "period",
       label: t("application:preview.applicationEvent.period"),
-      value: `${reservationsBegin} - ${reservationsEnd}`,
+      value: <NoWrap>{`${reservationsBegin} - ${reservationsEnd}`}</NoWrap>,
     },
     {
       key: "purpose",
       label: t("application:preview.applicationEvent.purpose"),
-      value: getTranslationSafe(aes.purpose ?? {}, "name", lang),
+      value: <span>{getTranslationSafe(aes.purpose ?? {}, "name", lang)}</span>,
     },
   ];
 
@@ -194,7 +212,9 @@ function SingleApplicationSection({
             <ol>
               {filterNonNullable(reservationUnits).map((ru) => (
                 <li key={ru.pk}>
-                  {getTranslationSafe(ru, "name", lang).trim()}
+                  <RegularText>
+                    {getTranslationSafe(ru, "name", lang).trim()}
+                  </RegularText>
                 </li>
               ))}
             </ol>
