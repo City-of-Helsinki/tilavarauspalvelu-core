@@ -117,6 +117,10 @@ export const InfoItem = styled(Flex).attrs({
     padding-inline: var(--spacing-m);
   }
 
+  ul {
+    ${fontMedium};
+  }
+
   li {
     h4 {
       display: inline;
@@ -124,7 +128,6 @@ export const InfoItem = styled(Flex).attrs({
     }
     span {
       white-space: nowrap;
-      ${fontMedium};
     }
   }
 
