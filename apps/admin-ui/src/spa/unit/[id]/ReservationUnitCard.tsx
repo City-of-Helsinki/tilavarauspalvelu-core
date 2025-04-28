@@ -15,6 +15,7 @@ import { getReservationUnitUrl } from "@/common/urls";
 import Card from "common/src/components/Card";
 import { ButtonLikeLink } from "@/component/ButtonLikeLink";
 import { gql } from "@apollo/client";
+import { Link } from "react-router-dom";
 
 interface IProps {
   reservationUnit: ReservationUnitCardFragment;
@@ -89,6 +90,7 @@ export function ReservationUnitCard({
       infos={infos}
       tags={tags}
       buttons={buttons}
+      LinkComponent={Link}
     />
   );
 }
