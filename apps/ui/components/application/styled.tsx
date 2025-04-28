@@ -123,7 +123,6 @@ export const InfoItem = styled(Flex).attrs({
       ${fontRegular};
     }
     span {
-      white-space: nowrap;
       ${fontMedium};
     }
   }
@@ -146,6 +145,13 @@ export const InfoItem = styled(Flex).attrs({
     *:last-child > & {
       border-right: 0;
     }
+  }
+`;
+
+export const RegularText = styled.span`
+  &&& {
+    font-size: var(--fontsize-body-m);
+    ${fontRegular};
   }
 `;
 
