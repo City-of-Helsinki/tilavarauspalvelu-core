@@ -30,6 +30,7 @@ export type CardProps = {
   children?: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  LinkComponent?: LinkComponent;
 };
 
 const Wrapper = styled.div<{ $bgColor: string }>`
@@ -141,21 +142,45 @@ const ChildContainer = styled.div`
   align-content: end;
 `;
 
-// TODO: Replace next/link so that the link doesn't cause page reload in admin-ui
+// Don't import react-router-dom here because we don't want to have it as a dependency
+type LinkProps = {
+  children: React.ReactNode;
+  tabIndex?: number;
+  to: To;
+};
+type LinkComponent = React.ForwardRefExoticComponent<
+  LinkProps & React.RefAttributes<HTMLAnchorElement>
+>;
+type To = string | Partial<Path>;
+interface Path {
+  pathname: string;
+  search: string;
+  hash: string;
+}
+
 function WrapWithLink({
   content,
   link,
   focusable = true,
+  LinkComponent,
 }: Readonly<{
   content: JSX.Element;
   link?: string;
   focusable?: boolean;
+  LinkComponent?: LinkComponent;
 }>): JSX.Element {
   if (!link) {
     return content;
   }
+  if (LinkComponent) {
+    return (
+      <LinkComponent tabIndex={focusable ? 0 : 1} to={link}>
+        {content}
+      </LinkComponent>
+    );
+  }
   return (
-    <Link href={link} tabIndex={focusable ? 0 : -1}>
+    <Link tabIndex={focusable ? 0 : 1} href={link}>
       {content}
     </Link>
   );
@@ -164,10 +189,10 @@ function WrapWithLink({
 /**
  * @name Card
  * @description Card component that displays a plain card with a heading and main text. It may also contain an image and tags/status labels, infos, and buttons. Any child elements are rendered after the main text.
- * @param {string} heading - The heading text of the card.
+ * @param {string} [heading] - The heading text of the card.
  * @param {string} [headingTestId] - The test ID of the heading element.
  * @param {string} [headingLevel=3] - The level of the heading element (1-6)
- * @param {string} text - The main text content of the card.
+ * @param {string} [text] - The main text content of the card.
  * @param {string} [textTestId] - The test ID of the text element.
  * @param {"default" | "vertical"} [variant="default"] - The variant of the card, either "default" or "vertical".
  * @param {string} [backgroundColor="var(--color-black-5)"] - The background color of the card.
@@ -179,6 +204,9 @@ function WrapWithLink({
  * @param {Array<{ value: string; icon?: JSX.Element, testId?: string }>} [infos] - An array of info objects (icon & text) to display in the card.
  * @param {Array<JSX.Element>} [buttons] - An array of button elements to display in the card.
  * @param {ReactNode} [children] - Additional children elements to render in the card, after the main text.
+ * @param {string} [className] - Additional class names to apply to the card.
+ * @param {React.CSSProperties} [style] - Additional styles to apply to the card.
+ * @param {React.ReactElement} [LinkComponent] - A custom Link component to use instead of the next Link.
  *
  * @returns {JSX.Element} The rendered Card component.
  */
@@ -200,6 +228,7 @@ export default function Card({
   children,
   className,
   style,
+  LinkComponent,
 }: Readonly<CardProps>): JSX.Element {
   const wrapperClasses = [`card--${variant ?? "default"}`];
   let itemCount = 1; // Texts are always present
@@ -225,6 +254,7 @@ export default function Card({
             content={<Image src={imageSrc} alt={imageAlt} aria-hidden="true" />}
             link={link}
             focusable={false}
+            LinkComponent={LinkComponent}
           />
         </ImageWrapper>
       )}
@@ -236,6 +266,7 @@ export default function Card({
           text={text}
           textTestId={textTestId}
           link={link}
+          LinkComponent={LinkComponent}
         />
         {children && <ChildContainer>{children}</ChildContainer>}
         {infos && <Infos infos={infos} />}
@@ -365,6 +396,7 @@ function Texts({
   text,
   textTestId,
   link,
+  LinkComponent,
 }: Readonly<{
   heading: string;
   headingTestId?: string;
@@ -372,6 +404,7 @@ function Texts({
   text: string;
   textTestId?: string;
   link?: string;
+  LinkComponent?: LinkComponent;
 }>) {
   const headingElement = `h${headingLevel.toString()}` as ElementType;
   return (
@@ -387,6 +420,7 @@ function Texts({
           </Header>
         }
         link={link}
+        LinkComponent={LinkComponent}
       />
       <Text data-testid={textTestId ?? "card__content"}>{text}</Text>
     </TextContainer>
