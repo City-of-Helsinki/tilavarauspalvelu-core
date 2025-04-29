@@ -2080,10 +2080,6 @@ msgid "Reservation kind"
 msgstr "Varauksen tyyppi"
 
 #: tilavarauspalvelu/admin/reservation_unit/form.py
-msgid "Payment types"
-msgstr "Maksutyyppi"
-
-#: tilavarauspalvelu/admin/reservation_unit/form.py
 msgid "Reservation block whole day"
 msgstr "Varaukset sulkevat koko päivän"
 
@@ -2503,6 +2499,11 @@ msgstr "Maksettu"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "OrderStatus"
+msgid "Paid by invoice"
+msgstr "Maksettu laskulla"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "OrderStatus"
 msgid "Paid manually"
 msgstr "Maksettu manuaalisesti"
 
@@ -2822,18 +2823,18 @@ msgstr "Maksuton"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "PaymentType"
-msgid "Online"
-msgstr "Verkossa"
-
-#: tilavarauspalvelu/enums.py
-msgctxt "PaymentType"
 msgid "On site"
 msgstr "Paikan päällä"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "PaymentType"
-msgid "Invoice"
-msgstr "Lasku"
+msgid "Online"
+msgstr "Verkossa"
+
+#: tilavarauspalvelu/enums.py
+msgctxt "PaymentType"
+msgid "Online or invoice"
+msgstr "Verkossa tai laskulla"
 
 #: tilavarauspalvelu/enums.py
 msgctxt "PriceUnit"
@@ -4227,14 +4228,6 @@ msgstr "varausyksikkövaihtoehtot"
 #: tilavarauspalvelu/models/reservation_unit_option/model.py
 msgid "Preferred order must be unique for each application section"
 msgstr "Suosittu järjestys tulee olla uniikki jokaiselle hakemuksen osalle"
-
-#: tilavarauspalvelu/models/reservation_unit_payment_type/model.py
-msgid "reservation unit payment type"
-msgstr "varausyksikön maksutyyppi"
-
-#: tilavarauspalvelu/models/reservation_unit_payment_type/model.py
-msgid "reservation unit payment types"
-msgstr "varausyksikön maksutyypit"
 
 #: tilavarauspalvelu/models/reservation_unit_pricing/model.py
 msgid "reservation unit pricing"
