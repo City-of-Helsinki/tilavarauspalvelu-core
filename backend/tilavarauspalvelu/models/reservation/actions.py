@@ -9,7 +9,9 @@ from django.conf import settings
 from django.db.models import Prefetch
 from django.utils.translation import pgettext
 from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
+from rest_framework.exceptions import ValidationError
 
+from tilavarauspalvelu.api.graphql.extensions import error_codes
 from tilavarauspalvelu.enums import (
     CalendarProperty,
     CustomerTypeChoice,
@@ -21,15 +23,22 @@ from tilavarauspalvelu.enums import (
     TimezoneRuleProperty,
 )
 from tilavarauspalvelu.exceptions import ReservationPriceCalculationError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
+from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
+    create_mock_verkkokauppa_order,
+    get_verkkokauppa_order_params,
+)
+from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import ApplicationSection, Reservation, ReservationMetadataField, Space
+from tilavarauspalvelu.models import ApplicationSection, PaymentOrder, Reservation, ReservationMetadataField, Space
 from tilavarauspalvelu.translation import get_attr_by_language, get_translated
 from utils.date_utils import DEFAULT_TIMEZONE, local_datetime
 
 if TYPE_CHECKING:
     from decimal import Decimal
 
-    from tilavarauspalvelu.models import Location, PaymentOrder, ReservationUnit, Unit
+    from tilavarauspalvelu.integrations.verkkokauppa.order.types import Order
+    from tilavarauspalvelu.models import Location, ReservationUnit, Unit
     from tilavarauspalvelu.models.reservation.queryset import ReservationQuerySet
     from tilavarauspalvelu.typing import Lang
 
@@ -292,6 +301,52 @@ class ReservationActions:
         payment_order.status = OrderStatus.REFUNDED
         payment_order.save(update_fields=["refund_id", "status"])
 
+    def create_payment_order(self, payment_type: PaymentType) -> PaymentOrder:
+        if payment_type == PaymentType.ON_SITE:
+            return PaymentOrder.objects.create(
+                payment_type=payment_type,
+                status=OrderStatus.PAID_MANUALLY,
+                language=self.reservation.user.get_preferred_language(),
+                price_net=self.reservation.price_net,
+                price_vat=self.reservation.price_vat_amount,
+                price_total=self.reservation.price,
+                reservation=self.reservation,
+            )
+
+        verkkokauppa_order = self.create_order_in_verkkokauppa()
+
+        return PaymentOrder.objects.create(
+            payment_type=payment_type,
+            status=OrderStatus.DRAFT,
+            language=self.reservation.user.get_preferred_language(),
+            price_net=self.reservation.price_net,
+            price_vat=self.reservation.price_vat_amount,
+            price_total=self.reservation.price,
+            reservation=self.reservation,
+            reservation_user_uuid=self.reservation.user.uuid,
+            remote_id=verkkokauppa_order.order_id,
+            checkout_url=verkkokauppa_order.checkout_url,
+            receipt_url=verkkokauppa_order.receipt_url,
+        )
+
+    def create_order_in_verkkokauppa(self) -> Order:
+        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
+            return create_mock_verkkokauppa_order(self.reservation)
+
+        invoicing_date: datetime.date | None = None
+        if self.should_offer_invoicing():
+            invoicing_date = self.reservation.begin.date()
+
+        order_params = get_verkkokauppa_order_params(self.reservation, invoicing_date=invoicing_date)
+
+        try:
+            return VerkkokauppaAPIClient.create_order(order_params=order_params)
+        except CreateOrderError as err:
+            sentry_msg = "Creating order in Verkkokauppa failed"
+            SentryLogger.log_exception(err, details=sentry_msg, reservation_id=self.reservation.pk)
+            msg = "Upstream service call failed. Unable to confirm the reservation."
+            raise ValidationError(msg, code=error_codes.UPSTREAM_CALL_FAILED) from err
+
     def overlapping_reservations(self) -> ReservationQuerySet:
         """Find all reservations that overlap with this reservation."""
         reservation_unit = self.reservation.reservation_units.first()
@@ -302,3 +357,29 @@ class ReservationActions:
             buffer_time_before=self.reservation.buffer_time_before,
             buffer_time_after=self.reservation.buffer_time_after,
         ).exclude(id=self.reservation.id)
+
+    def should_offer_invoicing(self) -> bool:
+        if self.reservation.reservee_type is None:
+            return False
+
+        reservee_type = CustomerTypeChoice(self.reservation.reservee_type)
+        if not reservee_type.is_organisation:
+            return False
+
+        if reservee_type == CustomerTypeChoice.NONPROFIT and self.reservation.reservee_is_unregistered_association:
+            return False
+
+        reservation_unit: ReservationUnit = self.reservation.reservation_units.first()
+
+        pricing = reservation_unit.actions.get_active_pricing(by_date=self.reservation.begin.date())
+        if pricing is None:
+            return False
+
+        if pricing.payment_type != PaymentType.ONLINE_OR_INVOICE:
+            return False
+
+        accounting = reservation_unit.actions.get_accounting()
+        if accounting is None:
+            return False
+
+        return accounting.actions.supports_invoicing()
