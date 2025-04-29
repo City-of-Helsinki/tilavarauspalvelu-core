@@ -21,8 +21,10 @@ from .types.equipment.types import EquipmentAllNode, EquipmentNode
 from .types.equipment_category.types import EquipmentCategoryNode
 from .types.helsinki_profile.types import HelsinkiProfileDataNode
 from .types.location.types import LocationNode
-from .types.merchants.types import PaymentMerchantNode, PaymentOrderNode, PaymentProductNode
 from .types.organisation.types import OrganisationNode
+from .types.payment_merchant.types import PaymentMerchantNode
+from .types.payment_order.types import PaymentOrderNode
+from .types.payment_product.types import PaymentProductNode
 from .types.permissions.types import GeneralRoleNode, PermissionCheckerType, UnitRoleNode
 from .types.person.types import PersonNode
 from .types.purpose.types import PurposeNode

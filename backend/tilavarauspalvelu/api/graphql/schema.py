@@ -40,7 +40,6 @@ from .mutations import (
     EquipmentUpdateMutation,
     PurposeCreateMutation,
     PurposeUpdateMutation,
-    RefreshOrderMutation,
     RejectAllApplicationOptionsMutation,
     RejectAllSectionOptionsMutation,
     ReservationAdjustTimeMutation,
@@ -122,7 +121,7 @@ from .queries import (
     UnitNode,
     UserNode,
 )
-from .types.merchants.permissions import PaymentOrderPermission
+from .types.payment_order.permissions import PaymentOrderPermission
 
 if TYPE_CHECKING:
     import datetime
@@ -381,9 +380,6 @@ class Mutation(graphene.ObjectType):
     deny_reservation_series = ReservationSeriesDenyMutation.Field()
     change_reservation_series_access_code = ReservationSeriesChangeAccessCodeMutation.Field()
     repair_reservation_series_access_code = ReservationSeriesRepairAccessCodeMutation.Field()
-    #
-    # Orders
-    refresh_order = RefreshOrderMutation.Field()
     #
     # User
     update_current_user = CurrentUserUpdateMutation.Field()
