@@ -92,6 +92,7 @@ class OrderStatus(models.TextChoices):
     EXPIRED = "EXPIRED", pgettext_lazy("OrderStatus", "Expired")
     CANCELLED = "CANCELLED", pgettext_lazy("OrderStatus", "Cancelled")
     PAID = "PAID", pgettext_lazy("OrderStatus", "Paid")
+    PAID_BY_INVOICE = "PAID_BY_INVOICE", pgettext_lazy("OrderStatus", "Paid by invoice")
     PAID_MANUALLY = "PAID_MANUALLY", pgettext_lazy("OrderStatus", "Paid manually")
     REFUNDED = "REFUNDED", pgettext_lazy("OrderStatus", "Refunded")
 
