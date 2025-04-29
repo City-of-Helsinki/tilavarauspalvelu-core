@@ -47,6 +47,7 @@ create_order_params: CreateOrderParams = CreateOrderParams(
             price_gross=Decimal(124),
             price_vat=Decimal(24),
             vat_percentage=Decimal(24),
+            invoicing_date=None,
             meta=[
                 OrderItemMetaParams(
                     key="firstKey",
@@ -420,10 +421,10 @@ def test_verkkokauppa__get_order__raises_exception_on_timeout():
     VerkkokauppaAPIClient.request,
     return_value=ResponseMock(status_code=404, json_data=get_order_404_response),
 )
-def test_verkkokauppa__get_order__raises_exception_on_404():
-    with pytest.raises(GetOrderError) as err:
-        VerkkokauppaAPIClient.get_order(order_uuid=uuid.UUID(get_order_response["orderId"]))
-    assert str(err.value) == "Order not found: [{'code': 'order-not-found', 'message': 'Order not found'}]"
+def test_verkkokauppa__get_order__returns_none_when_order_is_missing():
+    order_uuid = uuid.UUID(get_order_response["orderId"])
+    response = VerkkokauppaAPIClient.get_order(order_uuid=order_uuid)
+    assert response is None
 
 
 @patch_method(
