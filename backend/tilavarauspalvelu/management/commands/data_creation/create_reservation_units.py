@@ -52,7 +52,6 @@ from .create_reservation_related_things import (
     _create_payment_merchants,
     _create_purposes,
     _create_qualifiers,
-    _create_reservation_unit_payment_types,
     _fetch_and_build_reservation_unit_image,
 )
 from .create_seasonal_booking import _create_application_round_time_slots
@@ -86,7 +85,6 @@ if TYPE_CHECKING:
         PaymentMerchant,
         ReservationMetadataSet,
         ReservationUnitCancellationRule,
-        ReservationUnitPaymentType,
         ReservationUnitType,
         TaxPercentage,
         TermsOfUse,
@@ -105,7 +103,6 @@ def _create_reservation_units(
 ) -> list[ReservationUnit]:
     # --- Create dependencies for the reservation units  ------------------------------------------------------------
 
-    payment_types = _create_reservation_unit_payment_types()
     merchants = _create_payment_merchants()
     accountings = _create_payment_accountings()
 
@@ -125,7 +122,6 @@ def _create_reservation_units(
         metadata_sets,
         terms_of_use,
         tax_percentages,
-        payment_types,
         merchants,
         accountings,
     )
@@ -435,7 +431,6 @@ def _create_paid_reservation_units(
     metadata_sets: dict[SetName, ReservationMetadataSet],
     terms_of_use: dict[TermsOfUseTypeChoices, TermsOfUse],
     tax_percentages: dict[Percentage, TaxPercentage],
-    payment_types: dict[str, ReservationUnitPaymentType],
     merchants: list[PaymentMerchant],
     accountings: list[PaymentAccounting],
 ) -> None:
@@ -489,7 +484,7 @@ def _create_paid_reservation_units(
         HandlingInfo(name="yes", handling_required=True),
     ]
     payment_type_choices: list[PaymentTypeInfo] = [
-        PaymentTypeInfo(name="invoice", payment_type=PaymentType.INVOICE),
+        PaymentTypeInfo(name="invoice or online", payment_type=PaymentType.ONLINE_OR_INVOICE),
         PaymentTypeInfo(name="online", payment_type=PaymentType.ONLINE),
         PaymentTypeInfo(name="on site", payment_type=PaymentType.ON_SITE),
     ]
@@ -498,14 +493,12 @@ def _create_paid_reservation_units(
         TaxPercentageInfo(name="25.5%", value="25.5"),
     ]
 
-    ReservationUnitPaymentTypesThoughModel: type[models.Model] = ReservationUnit.payment_types.through  # noqa: N806
     ReservationUnitSpacesThoughModel: type[models.Model] = ReservationUnit.spaces.through  # noqa: N806
 
     units: list[Unit] = []
     reservation_units: list[ReservationUnit] = []
     spaces: list[Space] = []
     reservation_unit_spaces: list[models.Model] = []
-    reservation_unit_payment_types: list[models.Model] = []
     pricings: list[ReservationUnitPricing] = []
     reservation_unit_access_types: list[ReservationUnitAccessType] = []
     payment_products: list[PaymentProduct] = []
@@ -625,13 +618,6 @@ def _create_paid_reservation_units(
             )
         )
 
-        reservation_unit_payment_types.append(
-            ReservationUnitPaymentTypesThoughModel(
-                reservationunit=reservation_unit,
-                reservationunitpaymenttype=payment_types[data.payment_type_info.payment_type],
-            ),
-        )
-
         pricing = ReservationUnitPricingFactory.build(
             begins=datetime.date(2021, 1, 1),
             price_unit=data.price_info.price_unit,
@@ -639,6 +625,7 @@ def _create_paid_reservation_units(
             highest_price=data.price_info.highest_price,
             reservation_unit=reservation_unit,
             tax_percentage=tax_percentages[data.tax_percentage_info.value],
+            payment_type=data.payment_type_info.payment_type,
         )
         pricings.append(pricing)
 
@@ -662,7 +649,6 @@ def _create_paid_reservation_units(
     PaymentProduct.objects.bulk_create(payment_products)
     ReservationUnit.objects.bulk_create(reservation_units)
     ReservationUnitSpacesThoughModel.objects.bulk_create(reservation_unit_spaces)
-    ReservationUnitPaymentTypesThoughModel.objects.bulk_create(reservation_unit_payment_types)
     ReservationUnitPricing.objects.bulk_create(pricings)
     ReservationUnitImage.objects.bulk_create(images)
 

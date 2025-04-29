@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Literal
 from django.db import models
 from lookup_property import L
 
-from tilavarauspalvelu.enums import AuthenticationType, ReservationKind, ReservationStartInterval
+from tilavarauspalvelu.enums import AuthenticationType, PaymentType, ReservationKind, ReservationStartInterval
 from tilavarauspalvelu.models import ReservationUnit, ReservationUnitPricing
 from utils.date_utils import local_date
 
@@ -128,7 +128,6 @@ class ReservationUnitExporter(BaseCSVExporter):
                 "resources",
                 "purposes",
                 "equipments",
-                "payment_types",
                 "qualifiers",
                 models.Prefetch("pricings", ReservationUnitPricing.objects.active()),
             )
@@ -239,6 +238,7 @@ class ReservationUnitExporter(BaseCSVExporter):
     def get_data_rows(self, instance: ReservationUnit) -> Iterable[ReservationUnitExportRow]:
         pricing: ReservationUnitPricing = next(iter(instance.pricings.all()), None)
         start_interval = ReservationStartInterval(instance.reservation_start_interval)
+        payment_type = getattr(pricing, "payment_type", None)
         return [
             ReservationUnitExportRow(
                 reservation_unit_id=instance.id,
@@ -279,7 +279,7 @@ class ReservationUnitExporter(BaseCSVExporter):
                 require_a_handling=instance.require_reservation_handling,
                 authentication=AuthenticationType(instance.authentication).label,
                 reservation_kind=ReservationKind(instance.reservation_kind).label,
-                payment_type=", ".join(payment_type.code for payment_type in instance.payment_types.all()),
+                payment_type=PaymentType(payment_type).label if payment_type else "",
                 can_apply_free_of_charge=instance.can_apply_free_of_charge,
                 additional_instructions_for_pending_reservation_fi=instance.reservation_pending_instructions_fi,
                 additional_instructions_for_pending_reservation_sv=instance.reservation_pending_instructions_sv,
