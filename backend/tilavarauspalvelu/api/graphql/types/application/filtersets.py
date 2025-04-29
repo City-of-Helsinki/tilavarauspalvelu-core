@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import django_filters
+from django.contrib.postgres.aggregates import ArrayAgg
 from graphene_django_extensions import ModelFilterSet
 from graphene_django_extensions.filters import EnumMultipleChoiceFilter, IntChoiceFilter, IntMultipleChoiceFilter
 from lookup_property import L
@@ -47,8 +48,12 @@ class ApplicationFilterSet(ModelFilterSet):
 
     @staticmethod
     def filter_by_text_search(qs: ApplicationQuerySet, name: str, value: str) -> models.QuerySet:
-        fields = ("id", "application_sections__id", "application_sections__name", "applicant")
-        qs = qs.alias(applicant=L("applicant"))
+        fields = ("id", "application_sections_ids", "application_sections_names", "applicant")
+        qs = qs.alias(
+            applicant=L("applicant"),
+            application_sections_ids=ArrayAgg("application_sections__id"),
+            application_sections_names=ArrayAgg("application_sections__name"),
+        )
         log_text_search(where="applications", text=value)
         return text_search(qs=qs, fields=fields, text=value)
 
