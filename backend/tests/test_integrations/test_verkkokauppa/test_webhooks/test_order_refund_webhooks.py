@@ -56,7 +56,7 @@ def test_order_refund_webhook__success(api_client, settings):
 def test_order_refund_webhook__order_already_refunded_with_different_refund_id(api_client, settings):
     order_id = uuid.uuid4()
     refund_id = uuid.uuid4()
-    payment_order = PaymentOrderFactory.create(
+    PaymentOrderFactory.create(
         remote_id=order_id,
         refund_id=uuid.uuid4(),
         status=OrderStatus.PAID,
@@ -76,7 +76,7 @@ def test_order_refund_webhook__order_already_refunded_with_different_refund_id(a
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
-    assert response.data == {"message": f"Refund ID mismatch: expected {payment_order.refund_id}, got {refund_id}"}
+    assert response.data == {"message": "Refund ID mismatch"}
 
 
 @pytest.mark.parametrize(
@@ -221,7 +221,7 @@ def test_order_refund_webhook__payment_order_not_found(api_client, settings):
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 404, response.data
-    assert response.data == {"message": f"Payment order {order_id=!s} not found"}
+    assert response.data == {"message": "Payment order not found"}
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status, side_effect=GetRefundStatusError("Mock error"))
@@ -248,7 +248,7 @@ def test_order_refund_webhook__refund_fetch_failed(api_client, settings):
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 500, response.data
-    assert response.data == {"message": f"Checking order '{order_id}' failed"}
+    assert response.data == {"message": "Could not get refund status from verkkokauppa"}
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status, return_value=None)
@@ -275,7 +275,7 @@ def test_order_refund_webhook__no_refund_from_verkkokauppa(api_client, settings)
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 404, response.data
-    assert response.data == {"message": f"Refund for order '{order_id}' not found from verkkokauppa"}
+    assert response.data == {"message": "Refund status not found from verkkokauppa"}
 
 
 @patch_method(VerkkokauppaAPIClient.get_refund_status)
@@ -303,4 +303,4 @@ def test_order_refund_webhook__invalid_refund_status(api_client, settings):
     response = api_client.post(url, data=data, format="json")
 
     assert response.status_code == 400, response.data
-    assert response.data == {"message": "Invalid refund status: 'foo'"}
+    assert response.data == {"message": "Payment order cannot be refunded based webshop refund status"}

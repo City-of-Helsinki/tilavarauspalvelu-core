@@ -4,13 +4,13 @@ import datetime
 
 import pytest
 
-from tilavarauspalvelu.enums import PaymentType, ReservationKind, WeekdayChoice
+from tilavarauspalvelu.enums import ReservationKind, WeekdayChoice
 from tilavarauspalvelu.exceptions import HaukiAPIError
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_client import HaukiAPIClient
 from tilavarauspalvelu.integrations.opening_hours.hauki_api_types import HaukiAPIResource, HaukiTranslatedField
 from tilavarauspalvelu.models import ReservationUnit
 
-from tests.factories import ReservationUnitPaymentTypeFactory, UnitFactory
+from tests.factories import UnitFactory
 from tests.helpers import patch_method
 
 from .helpers import CREATE_MUTATION, get_create_non_draft_input_data
@@ -131,29 +131,6 @@ def test_reservation_unit__create__empty_name(graphql):
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages("name") == ["This field may not be blank."]
-
-
-def test_reservation_unit__create__payment_types(graphql):
-    ReservationUnitPaymentTypeFactory.create(code=PaymentType.INVOICE.value)
-    ReservationUnitPaymentTypeFactory.create(code=PaymentType.ON_SITE.value)
-
-    unit = UnitFactory.create()
-    graphql.login_with_superuser()
-
-    data = {
-        "isDraft": True,
-        "name": "foo",
-        "unit": unit.pk,
-        "paymentTypes": ["ON_SITE", "INVOICE"],
-    }
-
-    response = graphql(CREATE_MUTATION, input_data=data)
-
-    assert response.has_errors is False
-
-    reservation_unit = ReservationUnit.objects.get(pk=response.first_query_object["pk"])
-    payment_types = list(reservation_unit.payment_types.order_by("code").values_list("code", flat=True))
-    assert payment_types == ["INVOICE", "ON_SITE"]
 
 
 def test_reservation_unit__create__instructions(graphql):

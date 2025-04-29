@@ -3,10 +3,10 @@ from __future__ import annotations
 import datetime
 
 import pytest
-from django.utils.timezone import get_default_timezone
 
 from tilavarauspalvelu.enums import ApplicationSectionStatusChoice, ApplicationStatusChoice, Weekday
 from tilavarauspalvelu.models import ReservationUnitHierarchy
+from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import (
     AllocatedTimeSlotFactory,
@@ -326,8 +326,8 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_back_to_back_su
     SuitableTimeRangeFactory.create(
         application_section=section,
         day_of_the_week=Weekday.MONDAY,
-        begin_time=datetime.time(14, 0, tzinfo=get_default_timezone()),
-        end_time=datetime.time(16, 0, tzinfo=get_default_timezone()),
+        begin_time=datetime.time(14, 0, tzinfo=DEFAULT_TIMEZONE),
+        end_time=datetime.time(16, 0, tzinfo=DEFAULT_TIMEZONE),
     )
 
     # when:
@@ -357,8 +357,8 @@ def test_allocated_time_slot__create__approved_time_falls_on_two_separated_wishe
     SuitableTimeRangeFactory.create(
         application_section=section,
         day_of_the_week=Weekday.MONDAY,
-        begin_time=datetime.time(15, 0, tzinfo=get_default_timezone()),
-        end_time=datetime.time(16, 0, tzinfo=get_default_timezone()),
+        begin_time=datetime.time(15, 0, tzinfo=DEFAULT_TIMEZONE),
+        end_time=datetime.time(16, 0, tzinfo=DEFAULT_TIMEZONE),
     )
 
     # when:
@@ -444,8 +444,8 @@ def test_allocated_time_slot__create__two_allocations_for_same_day(graphql, forc
     AllocatedTimeSlotFactory.create(
         reservation_unit_option=option,
         day_of_the_week=Weekday.MONDAY,
-        begin_time=datetime.time(10, 0, tzinfo=get_default_timezone()),
-        end_time=datetime.time(12, 0, tzinfo=get_default_timezone()),
+        begin_time=datetime.time(10, 0, tzinfo=DEFAULT_TIMEZONE),
+        end_time=datetime.time(12, 0, tzinfo=DEFAULT_TIMEZONE),
     )
 
     graphql.login_with_superuser()

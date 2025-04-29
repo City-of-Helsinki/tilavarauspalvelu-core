@@ -12,7 +12,7 @@ from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraAPIError
 from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
-from tilavarauspalvelu.integrations.verkkokauppa.payment.types import PaymentStatus
+from tilavarauspalvelu.integrations.verkkokauppa.payment.types import WebShopPaymentStatus
 from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import Reservation
 
@@ -40,7 +40,9 @@ def test_reservation__delete__waiting_for_payment__can_be_deleted(graphql):
     assert Reservation.objects.filter(pk=reservation.pk).exists() is False
 
 
-@patch_method(VerkkokauppaAPIClient.get_payment, return_value=PaymentFactory.create(status=PaymentStatus.CREATED.value))
+@patch_method(
+    VerkkokauppaAPIClient.get_payment, return_value=PaymentFactory.create(status=WebShopPaymentStatus.CREATED.value)
+)
 @patch_method(VerkkokauppaAPIClient.cancel_order)
 @pytest.mark.parametrize(
     "order_status",
@@ -74,7 +76,7 @@ def test_reservation__delete__draft__call_webshop_cancel(graphql, order_status):
 
 @patch_method(
     VerkkokauppaAPIClient.get_payment,
-    return_value=PaymentFactory.create(status=PaymentStatus.CANCELLED.value),
+    return_value=PaymentFactory.create(status=WebShopPaymentStatus.CANCELLED.value),
 )
 @patch_method(VerkkokauppaAPIClient.cancel_order)
 def test_reservation__delete__cancelled__dont_call_webshop_cancel_when_order_is_already_cancelled(graphql):
@@ -96,13 +98,20 @@ def test_reservation__delete__cancelled__dont_call_webshop_cancel_when_order_is_
     assert payment_order.status == OrderStatus.CANCELLED
 
 
-@patch_method(VerkkokauppaAPIClient.get_payment, return_value=PaymentFactory.create(status=PaymentStatus.CREATED.value))
+@patch_method(
+    VerkkokauppaAPIClient.get_payment,
+    return_value=PaymentFactory.create(status=WebShopPaymentStatus.CREATED.value),
+)
 @patch_method(VerkkokauppaAPIClient.cancel_order, side_effect=CancelOrderError("mock-error"))
-@patch_method(SentryLogger.log_exception)
+@patch_method(SentryLogger.log_message)
 def test_reservation__delete__webshop_error__log_error_on_cancel_order_failure_but_mark_order_cancelled(graphql):
-    reservation = ReservationFactory.create_for_delete(state=ReservationStateChoice.WAITING_FOR_PAYMENT)
+    reservation = ReservationFactory.create_for_delete(
+        state=ReservationStateChoice.WAITING_FOR_PAYMENT,
+    )
     payment_order = PaymentOrderFactory.create(
-        remote_id=uuid.uuid4(), reservation=reservation, status=OrderStatus.DRAFT
+        remote_id=uuid.uuid4(),
+        reservation=reservation,
+        status=OrderStatus.DRAFT,
     )
 
     graphql.login_with_superuser()
@@ -117,7 +126,7 @@ def test_reservation__delete__webshop_error__log_error_on_cancel_order_failure_b
 
     assert VerkkokauppaAPIClient.get_payment.called is True
     assert VerkkokauppaAPIClient.cancel_order.called is True
-    assert SentryLogger.log_exception.call_count == 1
+    assert SentryLogger.log_message.call_count == 1
 
 
 def test_reservation__delete__confirmed__cannot_delete_when_status_not_created_nor_waiting_for_payment(graphql):
@@ -129,12 +138,12 @@ def test_reservation__delete__confirmed__cannot_delete_when_status_not_created_n
 
     assert response.error_message() == "Mutation was unsuccessful."
     assert response.field_error_messages() == [
-        "Reservation which is not in ['CREATED', 'WAITING_FOR_PAYMENT'] state cannot be deleted."
+        "Reservation which is not in 'CREATED' or 'WAITING_FOR_PAYMENT' state cannot be deleted."
     ]
     assert Reservation.objects.filter(pk=reservation.pk).exists() is True
 
 
-@patch_method(VerkkokauppaAPIClient.get_payment, PaymentFactory.create(status=PaymentStatus.PAID_ONLINE.value))
+@patch_method(VerkkokauppaAPIClient.get_payment, PaymentFactory.create(status=WebShopPaymentStatus.PAID_ONLINE.value))
 @patch_method(VerkkokauppaAPIClient.cancel_order)
 @patch_method(EmailService.send_reservation_confirmed_email)
 def test_reservation__delete__reservation_is_in_draft_state_but_paid_in_verkkokauppa(graphql):

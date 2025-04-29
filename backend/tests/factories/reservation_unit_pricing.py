@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 from decimal import Decimal
 
-from tilavarauspalvelu.enums import PriceUnit
+from tilavarauspalvelu.enums import PaymentType, PriceUnit
 from tilavarauspalvelu.models import ReservationUnitPricing
 
 from ._base import ForeignKeyFactory, GenericDjangoModelFactory, ModelFactoryBuilder
@@ -19,6 +19,8 @@ class ReservationUnitPricingFactory(GenericDjangoModelFactory[ReservationUnitPri
 
     begins = datetime.date(2021, 1, 1)
     price_unit = PriceUnit.PRICE_UNIT_PER_15_MINS
+
+    payment_type = PaymentType.ONLINE
 
     lowest_price = Decimal(5)
     highest_price = Decimal(10)

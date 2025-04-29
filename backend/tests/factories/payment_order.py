@@ -31,7 +31,7 @@ class PaymentOrderFactory(GenericDjangoModelFactory[PaymentOrder]):
     remote_id = factory.LazyFunction(uuid.uuid4)
     payment_id = ""  # uuid.UUID
     refund_id = None  # uuid.UUID
-    payment_type = PaymentType.INVOICE
+    payment_type = PaymentType.ONLINE
     status = OrderStatus.DRAFT
 
     price_net = Decimal("10.0")

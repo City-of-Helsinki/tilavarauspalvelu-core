@@ -4,10 +4,10 @@ import datetime
 
 import freezegun
 import pytest
-from django.utils.timezone import get_default_timezone
 from graphene_django.settings import graphene_settings
 
 from tilavarauspalvelu.enums import ReservationKind
+from utils.date_utils import DEFAULT_TIMEZONE
 
 from tests.factories import ReservationFactory, ReservationUnitFactory, UnitFactory, UserFactory
 
@@ -46,7 +46,7 @@ def test_units__filter__by_published_reservation_units(graphql, gql_query):
     unit_3 = UnitFactory.create(name="3")
     unit_4 = UnitFactory.create(name="4")
 
-    publish_date = datetime.datetime.now(tz=get_default_timezone())
+    publish_date = datetime.datetime.now(tz=DEFAULT_TIMEZONE)
 
     # Returned
     ReservationUnitFactory.create(unit=unit_1)

@@ -401,7 +401,7 @@ def test_reservation__query__order__all_fields(graphql):
                 "reservationPk": str(reservation.pk),
                 "checkoutUrl": None,
                 "orderUuid": "b3fef99e-6c18-422e-943d-cf00702af53e",
-                "paymentType": "INVOICE",
+                "paymentType": "ONLINE",
                 "receiptUrl": None,
                 "refundUuid": None,
                 "status": "DRAFT",
