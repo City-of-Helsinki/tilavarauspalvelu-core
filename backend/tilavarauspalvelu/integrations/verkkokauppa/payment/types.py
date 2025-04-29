@@ -4,7 +4,7 @@ import datetime
 import uuid
 from dataclasses import dataclass
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from django.conf import settings
@@ -17,7 +17,7 @@ from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import (
 )
 
 
-class PaymentStatus(Enum):
+class WebShopPaymentStatus(StrEnum):
     """
     Source:
     https://github.com/City-of-Helsinki/verkkokauppa-core/blob/master/paymentapi/src/main/java/fi/hel/verkkokauppa/payment/model/PaymentStatus.java
@@ -26,11 +26,34 @@ class PaymentStatus(Enum):
     CREATED = "payment_created"
     PAID_ONLINE = "payment_paid_online"
     CANCELLED = "payment_cancelled"
+
+    # Not currently used:
+    INVOICE = "payment_invoice"  # Not for invoicing -> determined by 'WebShopPaymentGateway'
     AUTHORIZED = "authorized"
-    # INVOICE = "payment_invoice" - Exists in the webshop, but not used in Tilavarauspalvelu.
+    CREATED_FOR_MIT_CHARGE = "payment_created_for_mit_charge"
+    FREE = "payment_free"
 
 
-class RefundStatus(Enum):
+class WebShopPaymentGateway(StrEnum):
+    """
+    Source:
+    https://github.com/City-of-Helsinki/verkkokauppa-core/blob/master/paymentapi/src/main/java/fi/hel/verkkokauppa/payment/constant/PaymentGatewayEnum.java
+    """
+
+    PAYTRAIL = "online-paytrail"
+    INVOICE = "offline"
+
+    # Not currently used:
+    VISMA = "online"
+    FREE = "free"
+
+
+class WebShopRefundStatus(StrEnum):
+    """
+    Source:
+    https://github.com/City-of-Helsinki/verkkokauppa-core/blob/7186e76040ed51f2b5322287eee85022dc80181a/paymentapi/src/main/java/fi/hel/verkkokauppa/payment/model/refund/RefundPaymentStatus.java
+    """
+
     CREATED = "refund_created"
     PAID_ONLINE = "refund_paid_online"
     CANCELLED = "refund_cancelled"
@@ -42,7 +65,7 @@ class Payment:
     namespace: str
     order_id: uuid.UUID
     user_id: str
-    status: PaymentStatus
+    status: str  # Don's use 'WebShopPaymentStatus' here so that new statuses don't break out code
     payment_method: str
     payment_type: str
     total_excl_tax: Decimal
@@ -53,6 +76,7 @@ class Payment:
     token: str
     timestamp: datetime.datetime  # When Payment was created in the webshop, usually later than PaymentOrder.created_at
     payment_method_label: str
+    payment_gateway: str  # Don't use 'WebShopPaymentGateway' here so that new gateways don't break out code
 
     @classmethod
     def from_json(cls, json: dict[str, Any]) -> Payment:
@@ -73,6 +97,7 @@ class Payment:
                 token=json["token"],
                 timestamp=cls._parse_datetime(json["timestamp"]),
                 payment_method_label=json["paymentMethodLabel"],
+                payment_gateway=json["paymentGateway"],
             )
         except (KeyError, ValueError) as err:
             SentryLogger.log_exception(err, details="Parsing refund failed", json=json)
@@ -128,7 +153,7 @@ class RefundStatusResult:
     refund_payment_id: str
     refund_transaction_id: uuid.UUID
     namespace: str
-    status: str
+    status: str  # Don't use 'WebShopRefundStatus' here so that new statuses don't break out code
     created_at: datetime.datetime
 
     @classmethod
