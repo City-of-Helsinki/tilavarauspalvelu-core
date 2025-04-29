@@ -10,7 +10,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import DateTimeField, IntegerField
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import AccessType
+from tilavarauspalvelu.enums import AccessType, PaymentType
 from tilavarauspalvelu.integrations.helsinki_profile.clients import HelsinkiProfileClient
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
@@ -73,11 +73,13 @@ class ReservationCreateSerializer(NestingModelSerializer):
 
         if pricing is None:
             msg = "No pricing found for the given date."
-            raise ValidationError(msg, code=error_codes.NO_PRICING_FOUND)
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_ACTIVE_PRICING)
 
         if pricing.highest_price > 0:
-            reservation_unit.validators.validate_has_payment_type()
-            reservation_unit.validators.validate_has_payment_product()
+            pricing.validators.validate_has_payment_type()
+
+            if pricing.payment_type != PaymentType.ON_SITE:
+                reservation_unit.validators.validate_has_payment_product()
 
         data["sku"] = reservation_unit.sku
         data["buffer_time_before"] = reservation_unit.actions.get_actual_before_buffer(begin)

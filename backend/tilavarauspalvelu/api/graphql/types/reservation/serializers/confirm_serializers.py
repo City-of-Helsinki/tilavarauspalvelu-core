@@ -2,29 +2,21 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from django.conf import settings
 from graphene_django_extensions import NestingModelSerializer
 from graphene_django_extensions.fields import EnumFriendlyChoiceField
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField
 
 from tilavarauspalvelu.api.graphql.extensions import error_codes
-from tilavarauspalvelu.enums import AccessType, OrderStatus, PaymentType, ReservationStateChoice
+from tilavarauspalvelu.enums import AccessType, PaymentType, ReservationStateChoice
 from tilavarauspalvelu.integrations.email.main import EmailService
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.sentry import SentryLogger
-from tilavarauspalvelu.integrations.verkkokauppa.helpers import (
-    create_mock_verkkokauppa_order,
-    get_verkkokauppa_order_params,
-)
-from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CreateOrderError
-from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
-from tilavarauspalvelu.models import PaymentOrder, Reservation
+from tilavarauspalvelu.models import Reservation
 from utils.date_utils import local_datetime
 from utils.external_service.errors import ExternalServiceError
 
 if TYPE_CHECKING:
-    from tilavarauspalvelu.integrations.verkkokauppa.order.types import CreateOrderParams, Order
     from tilavarauspalvelu.models import ReservationUnit
     from tilavarauspalvelu.typing import ReservationConfirmData
 
@@ -69,11 +61,19 @@ class ReservationConfirmSerializer(NestingModelSerializer):
             return data
 
         reservation_unit: ReservationUnit = self.instance.reservation_units.first()
+        pricing = reservation_unit.actions.get_active_pricing(by_date=self.instance.begin.date())
 
-        reservation_unit.validators.validate_has_payment_type()
-        reservation_unit.validators.validate_has_payment_product()
+        if pricing is None:
+            msg = "No pricing found for the given date."
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_ACTIVE_PRICING)
 
-        data["payment_type"] = reservation_unit.actions.get_default_payment_type()
+        pricing.validators.validate_has_payment_type()
+
+        data["payment_type"] = PaymentType(pricing.payment_type)
+
+        if pricing.payment_type != PaymentType.ON_SITE:
+            reservation_unit.validators.validate_has_payment_product()
+
         data["state"] = self.instance.actions.get_state_on_reservation_confirmed(payment_type=data["payment_type"])
 
         return data
@@ -82,7 +82,7 @@ class ReservationConfirmSerializer(NestingModelSerializer):
         state = validated_data["state"]
 
         if self.instance.price_net > 0 and state.should_create_payment_order:
-            self.create_payment_order(payment_type=validated_data["payment_type"])
+            self.instance.actions.create_payment_order(payment_type=validated_data["payment_type"])
 
         instance = super().update(instance=instance, validated_data=validated_data)
 
@@ -102,44 +102,3 @@ class ReservationConfirmSerializer(NestingModelSerializer):
             EmailService.send_reservation_requires_handling_staff_notification_email(reservation=instance)
 
         return instance
-
-    def create_payment_order(self, payment_type: PaymentType) -> PaymentOrder:
-        if payment_type == PaymentType.ON_SITE:
-            return PaymentOrder.objects.create(
-                payment_type=payment_type,
-                status=OrderStatus.PAID_MANUALLY,
-                language=self.instance.user.get_preferred_language(),
-                price_net=self.instance.price_net,
-                price_vat=self.instance.price_vat_amount,
-                price_total=self.instance.price,
-                reservation=self.instance,
-            )
-
-        verkkokauppa_order: Order = self.create_order_in_verkkokauppa()
-
-        return PaymentOrder.objects.create(
-            payment_type=payment_type,
-            status=OrderStatus.DRAFT,
-            language=self.instance.user.get_preferred_language(),
-            price_net=self.instance.price_net,
-            price_vat=self.instance.price_vat_amount,
-            price_total=self.instance.price,
-            reservation=self.instance,
-            reservation_user_uuid=self.instance.user.uuid,
-            remote_id=verkkokauppa_order.order_id,
-            checkout_url=verkkokauppa_order.checkout_url,
-            receipt_url=verkkokauppa_order.receipt_url,
-        )
-
-    def create_order_in_verkkokauppa(self) -> Order:
-        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
-            return create_mock_verkkokauppa_order(self.instance)
-
-        order_params: CreateOrderParams = get_verkkokauppa_order_params(self.instance)
-        try:
-            return VerkkokauppaAPIClient.create_order(order_params=order_params)
-        except CreateOrderError as err:
-            sentry_msg = "Creating order in Verkkokauppa failed"
-            SentryLogger.log_exception(err, details=sentry_msg, reservation_id=self.instance.pk)
-            msg = "Upstream service call failed. Unable to confirm the reservation."
-            raise ValidationError(msg, code=error_codes.UPSTREAM_CALL_FAILED) from err

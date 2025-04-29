@@ -7,11 +7,16 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from graphene_django_extensions import CreateMutation, DeleteMutation, UpdateMutation
 
-from tilavarauspalvelu.api.graphql.types.merchants.types import PaymentOrderNode
-from tilavarauspalvelu.enums import AccessType, OrderStatus, ReservationStateChoice
+from tilavarauspalvelu.api.graphql.extensions import error_codes
+from tilavarauspalvelu.api.graphql.types.payment_order.types import PaymentOrderNode
+from tilavarauspalvelu.enums import AccessType, OrderStatus
 from tilavarauspalvelu.integrations.keyless_entry import PindoraService
 from tilavarauspalvelu.integrations.keyless_entry.exceptions import PindoraNotFoundError
+from tilavarauspalvelu.integrations.sentry import SentryLogger
 from tilavarauspalvelu.integrations.verkkokauppa.order.exceptions import CancelOrderError
+from tilavarauspalvelu.integrations.verkkokauppa.order.types import WebShopOrderStatus
+from tilavarauspalvelu.integrations.verkkokauppa.payment.exceptions import GetPaymentError
+from tilavarauspalvelu.integrations.verkkokauppa.verkkokauppa_api_client import VerkkokauppaAPIClient
 from tilavarauspalvelu.models import Reservation
 from tilavarauspalvelu.tasks import delete_pindora_reservation
 
@@ -144,13 +149,7 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
 
     @classmethod
     def validate_deletion(cls, reservation: Reservation, user: AnyUser) -> None:
-        # Check Reservation state
-        if reservation.state not in ReservationStateChoice.states_that_can_be_deleted:
-            msg = (
-                f"Reservation which is not in {ReservationStateChoice.states_that_can_be_deleted} "
-                f"state cannot be deleted."
-            )
-            raise ValidationError(msg)
+        reservation.validators.validate_can_be_deleted(reservation)
 
         payment_order: PaymentOrder | None = reservation.payment_order.first()
         if payment_order is not None:
@@ -175,25 +174,32 @@ class ReservationDeleteTentativeMutation(DeleteMutation):
         if not payment_order.remote_id:
             return
 
-        # Verify PaymentOrder status from the webshop
-        payment_order.actions.refresh_order_status_from_webshop()
+        try:
+            payment_order.actions.refresh_order_status_from_webshop()
+        except GetPaymentError as error:
+            raise ValidationError(str(error), code=error_codes.EXTERNAL_SERVICE_ERROR) from error
 
-        # If the PaymentOrder is marked as paid, prevent the deletion.
-        if payment_order.status == OrderStatus.PAID:
+        if payment_order.status in OrderStatus.paid_in_webshop:
             msg = "Reservation which is paid cannot be deleted."
             raise ValidationError(msg)
 
         if payment_order.status not in OrderStatus.can_be_cancelled_statuses:
             return
 
-        # Status should be updated if the webshop call errors or the order is successfully cancelled
-        # When the webshop returns any other status than "cancelled", the payment_order status is not updated
+        # If there is an unexpected response or error from verkkokauppa,
+        # payment order should still be cancelled
         try:
-            webshop_order = payment_order.actions.cancel_order_in_webshop()
-            if not webshop_order or webshop_order.status != "cancelled":
+            webshop_order = VerkkokauppaAPIClient.cancel_order(
+                order_uuid=payment_order.remote_id,
+                user_uuid=payment_order.reservation_user_uuid,
+            )
+
+            # Don't update if order is missing or something other than cancelled
+            if webshop_order is None or webshop_order.status != WebShopOrderStatus.CANCELLED:
                 return
-        except CancelOrderError:
-            pass
+
+        except CancelOrderError as error:
+            SentryLogger.log_message("Verkkokauppa: Failed to cancel order", details=str(error))
 
         payment_order.actions.set_order_as_cancelled()
 
