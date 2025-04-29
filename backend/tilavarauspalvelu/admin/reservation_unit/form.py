@@ -194,7 +194,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             "require_reservation_handling": _("Require reservation handling"),
             "authentication": _("Authentication"),
             "reservation_kind": _("Reservation kind"),
-            "payment_types": _("Payment types"),
             "reservation_block_whole_day": _("Reservation block whole day"),
             "can_apply_free_of_charge": _("Can apply free of charge"),
             "allow_reservations_without_opening_hours": _("Allow reservations without opening hours"),
@@ -279,7 +278,6 @@ class ReservationUnitAdminForm(forms.ModelForm):
             ),
             "authentication": _("Authentication required for reserving this reservation unit."),
             "reservation_kind": _("What kind of reservations are to be booked with this reservation unit."),
-            "payment_types": _("Payment types"),
             "reservation_block_whole_day": _("Reservation block whole day"),
             "can_apply_free_of_charge": _("Can reservations to this reservation unit be able to apply free of charge."),
             "allow_reservations_without_opening_hours": _(

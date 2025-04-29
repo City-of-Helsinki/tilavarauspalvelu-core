@@ -161,7 +161,6 @@ class ReservationUnitNode(DjangoNode):
             "resources",
             "purposes",
             "equipments",
-            "payment_types",
             "qualifiers",
             #
             # Reverse many-to-many related
