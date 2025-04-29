@@ -15,7 +15,6 @@ from utils.date_utils import local_datetime, local_start_of_day
 if TYPE_CHECKING:
     from collections.abc import Collection
 
-    from tilavarauspalvelu.enums import PaymentType
     from tilavarauspalvelu.models import ReservationUnit, User
 
 __all__ = [
@@ -169,25 +168,21 @@ class ReservationUnitValidator:
             msg = "Reservation unit is in an open application round."
             raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_IN_OPEN_ROUND)
 
-    def validate_has_payment_type(self) -> None:
-        payment_type = self.reservation_unit.actions.get_default_payment_type()
-        if payment_type is None:
-            msg = "Reservation might require payment, but reservation unit has no payment type defined"
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_PAYMENT_TYPE)
-
-    def validate_supports_payment_type(self, payment_type: PaymentType) -> None:  # TODO: Used?
-        supported = set(self.reservation_unit.payment_types.values_list("code", flat=True))
-        if payment_type not in supported:
-            msg = f"Reservation unit does not support the '{payment_type}' payment type."
-            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_NO_PAYMENT_TYPE)
-
     def validate_has_payment_product(self) -> None:
         if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
             return
 
         if not self.reservation_unit.payment_product:
             msg = "Reservation unit is missing payment product"
-            raise ValidationError(msg, code=error_codes.MISSING_PAYMENT_PRODUCT)
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PAYMENT_PRODUCT)
+
+    def validate_has_payment_accounting(self) -> None:
+        if settings.MOCK_VERKKOKAUPPA_API_ENABLED:
+            return
+
+        if not self.reservation_unit.actions.get_accounting():
+            msg = "Reservation unit is missing payment accounting"
+            raise ValidationError(msg, code=error_codes.RESERVATION_UNIT_MISSING_PAYMENT_ACCOUNTING)
 
     def validate_cancellation_rule(self, begin: datetime.datetime) -> None:
         cancel_rule = self.reservation_unit.cancellation_rule
