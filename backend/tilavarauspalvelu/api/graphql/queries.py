@@ -39,7 +39,6 @@ from .types.reservation_unit_access_type.types import ReservationUnitAccessTypeN
 from .types.reservation_unit_cancellation_rule.types import ReservationUnitCancellationRuleNode
 from .types.reservation_unit_image.types import ReservationUnitImageNode
 from .types.reservation_unit_option.types import ReservationUnitOptionNode
-from .types.reservation_unit_payment_type.types import ReservationUnitPaymentTypeNode
 from .types.reservation_unit_pricing.types import ReservationUnitPricingNode
 from .types.reservation_unit_type.types import ReservationUnitTypeNode
 from .types.resource.types import ResourceNode
@@ -91,7 +90,6 @@ __all__ = [
     "ReservationUnitImageNode",
     "ReservationUnitNode",
     "ReservationUnitOptionNode",
-    "ReservationUnitPaymentTypeNode",
     "ReservationUnitPricingNode",
     "ReservationUnitTypeNode",
     "ResourceNode",

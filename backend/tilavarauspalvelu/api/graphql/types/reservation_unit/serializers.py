@@ -110,7 +110,6 @@ class ReservationUnitSerializer(NestingModelSerializer):
             "resources",
             "purposes",
             "equipments",
-            "payment_types",
             "qualifiers",
             #
             # Reverse one-to-many related
